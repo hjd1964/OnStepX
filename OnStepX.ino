@@ -70,7 +70,7 @@
   #define VLF(x)
 #endif
 
-#define  TASKS_SKIP_MISSED
+//#define  TASKS_SKIP_MISSED
 #define  TASKS_HWTIMER1_ENABLE
 #define  TASKS_HWTIMER2_ENABLE
 #define  TASKS_HWTIMER3_ENABLE
@@ -126,7 +126,7 @@ void setup() {
 
   // ------------------------------------------------------------------------------------------------
   // add an event to tick the centisecond sidereal clock
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), event_handle
+  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle=tasks.add(0, 0, true, 0, clockTick);
   tasks.requestHardwareTimer(handle,3,1);
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
@@ -134,7 +134,7 @@ void setup() {
 
   // ------------------------------------------------------------------------------------------------
   // add an event to process commands
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), event_handle
+  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle=tasks.add(0, 0, true, 7, processCommands);
   tasks.setPeriodMicros(handle, 200);
 
