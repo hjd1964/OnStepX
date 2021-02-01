@@ -9,7 +9,7 @@ bool atoi2(char *a, int *i, bool sign=true) {
   if (len == 0 || len > 6) return false;
   for (int l=0; l < len; l++) {
     if ((l == 0) && ((a[l] == '+') || (a[l] == '-')) && sign) continue;
-    if ((a[l] < '0') || (a[l] > '9')) return false;
+    if ((a[l] < '0') || (a[l] > '9')) return false; 
   }
   long l=atol(a);
   if ((l < -32767) || (l > 32768)) return false;

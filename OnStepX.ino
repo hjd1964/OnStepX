@@ -74,16 +74,16 @@
 #define  TASKS_HWTIMER1_ENABLE
 #define  TASKS_HWTIMER2_ENABLE
 #define  TASKS_HWTIMER3_ENABLE
-#include "OnTask.h"
+#include "src/tasks/OnTask.h"
 
 #include "Constants.h"
 #include "Config.h"
 #include "Axis.h"
 #include "Transform.h"
-#include "StepDriver.h"
+#include "src/lib/StepDriver.h"
 #include "Globals.h"
 #include "Astro.h"
-#include "BufferCmds.h"
+#include "src/lib/BufferCmds.h"
 #include "ProcessCmds.h"
 
 // -------------------------------

@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------------
 // Command processing
 
-#include "BufferCmds.h"
-#include "SerialWrapper.h"
+#include "src/lib/BufferCmds.h"
+#include "src/lib/SerialWrapper.h"
 
 enum CommandErrors {
   CE_NONE, CE_0, CE_CMD_UNKNOWN, CE_REPLY_UNKNOWN, CE_PARAM_RANGE, CE_PARAM_FORM,
