@@ -176,9 +176,7 @@ class Axis {
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency) {
       maxFreq = frequency*spm;
-      Serial.print("Steps per second="); Serial.println(maxFreq);
       if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;
-      Serial.print("Timer period in us="); Serial.println(minPeriodMicros);
       minPeriodMicrosHalf = lround(minPeriodMicros/2.0);
     }
 
@@ -190,7 +188,6 @@ class Axis {
       if (next_period_in_microseconds < minPeriodMicrosHalf) next_period_in_microseconds=minPeriodMicrosHalf;
       // handle the case where the move() method isn't called to set the new period
       if (last_period_in_microseconds == 0) tasks.setPeriodMicros(event_handle,next_period_in_microseconds);
-      Serial.println(next_period_in_microseconds);
     }
 
     void setTracking(bool tracking) {
