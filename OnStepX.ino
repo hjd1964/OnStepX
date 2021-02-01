@@ -78,11 +78,10 @@
 
 #include "Constants.h"
 #include "Config.h"
+#include "Globals.h"
 #include "Axis.h"
 #include "Transform.h"
 #include "src/lib/StepDriver.h"
-#include "Globals.h"
-#include "Astro.h"
 #include "src/lib/BufferCmds.h"
 #include "ProcessCmds.h"
 
@@ -146,7 +145,7 @@ void setup() {
   axis1Driver.init(axis1DriverSettings);
   handle = tasks.add(0, 0, true, 0, moveAxis1); tasks.requestHardwareTimer(handle,1,0);
   axis1.init(false, false, true, handle);
-  axis1.setStepsPerMeasure(axis1_steps_per_radian);
+  axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
   axis1.setMinCoordinate(degToRad(-180.0));
   axis1.setMaxCoordinate(degToRad(180.0));
   axis1.setInstrumentCoordinate(degToRad(90.0));
@@ -158,7 +157,7 @@ void setup() {
   axis2Driver.init(axis2DriverSettings);
   handle = tasks.add(0, 0, true , 0, moveAxis2); tasks.requestHardwareTimer(handle,2,0);
   axis2.init(false, false, true, handle);
-  axis2.setStepsPerMeasure(axis2_steps_per_radian);
+  axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
   axis2.setMinCoordinate(degToRad(-90.0));
   axis2.setMaxCoordinate(degToRad(90.0));
   axis2.setInstrumentCoordinate(degToRad(90.0));

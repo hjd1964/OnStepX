@@ -45,7 +45,7 @@ class Command {
 //            Return: 0 on failure
 //                    1 on success
         if (command[1] == 'd' && parameter[0] == 0)  {
-          if (!dmsToDouble(&target.d,parameter,true)) return CE_PARAM_RANGE;
+          if (!transform.dmsToDouble(&target.d,parameter,true)) return CE_PARAM_RANGE;
           target.d = degToRad(target.d);
         } else
 
@@ -54,7 +54,7 @@ class Command {
 //            Return: 0 on failure
 //                    1 on success
         if (command[1] == 'r' && parameter[0] == 0)  {
-          if (!hmsToDouble(&target.r, parameter)) return CE_PARAM_RANGE;
+          if (!transform.hmsToDouble(&target.r, parameter)) return CE_PARAM_RANGE;
           target.r = hrsToRad(target.r);
         } else return CE_CMD_UNKNOWN;
       } else return CE_CMD_UNKNOWN;

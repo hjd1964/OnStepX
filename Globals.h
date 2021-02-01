@@ -1,11 +1,10 @@
+// -----------------------------------------------------------------------------------
+// Globals
 #pragma once
+
 #include "Axis.h"
 #include "Transform.h"
 #include "src/lib/StepDriver.h"
-
-// 
-double axis1_steps_per_radian = radToDeg(AXIS1_STEPS_PER_DEGREE);
-double axis2_steps_per_radian = radToDeg(AXIS2_STEPS_PER_DEGREE);
 
 // stepper drivers
 #if AXIS1_DRIVER != OFF
