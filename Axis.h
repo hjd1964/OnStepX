@@ -9,21 +9,23 @@ typedef struct AxisSettings {
   int16_t max;
 } AxisSettings;
 
+enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
+
 class Axis {
   public:
     Axis(int8_t stepPin, int8_t dirPin, int8_t enabledPin) : stepPin{ stepPin }, dirPin{ dirPin }, enabledPin{ enabledPin } {}
     
-    void init(bool invertStep, bool invertDir, bool invertEnabled, uint8_t event_handle) {
-      this->invertStep  = invertStep;
+    void init(bool invertStep, bool invertDir, bool invertEnabled, uint8_t task_handle) {
+      this->invertStep = invertStep;
       pinModeInit(stepPin,OUTPUT,!invertStep?LOW:HIGH);
 
-      this->invertDir  = invertDir;
+      this->invertDir = invertDir;
       pinModeInit(dirPin,OUTPUT,!invertDir?LOW:HIGH);
 
       this->invertEnabled = invertEnabled;
       pinModeEx(enabledPin,OUTPUT); enable(false);
 
-      this->event_handle=event_handle;
+      this->task_handle = task_handle;
     }
 
     void enable(bool value) {
@@ -183,11 +185,11 @@ class Axis {
     // causes a movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency) {
       double d=500000.0/(frequency*spm);
-      if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(event_handle,0); return; }
+      if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
       next_period_in_microseconds = lround(d);
-      if (next_period_in_microseconds < minPeriodMicrosHalf) next_period_in_microseconds=minPeriodMicrosHalf;
+      if (next_period_in_microseconds < minPeriodMicrosHalf) next_period_in_microseconds = minPeriodMicrosHalf;
       // handle the case where the move() method isn't called to set the new period
-      if (last_period_in_microseconds == 0) tasks.setPeriodMicros(event_handle,next_period_in_microseconds);
+      if (last_period_in_microseconds == 0) tasks.setPeriodMicros(task_handle, next_period_in_microseconds);
     }
 
     void setTracking(bool tracking) {
@@ -231,7 +233,7 @@ class Axis {
   private:
     const int8_t stepPin, dirPin, enabledPin;
 
-    uint8_t event_handle       = 0;
+    uint8_t task_handle       = 0;
 
     bool invertStep, invertDir, invertEnabled;
 
