@@ -14,6 +14,12 @@ enum CommandErrors {
 
 class Command {
   public:
+    Command(long baud) {
+      serialBaud = baud;
+    }
+    ~Command() {
+      SerialPort.end();
+    }
     CommandErrors process(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {
     
 // G - Get Telescope Information
@@ -61,6 +67,8 @@ class Command {
     }
 
     void poll() {
+      if (!serialReady) { SerialPort.begin(serialBaud); serialReady = true; }
+
       //  char reply[50];
       //  static char command[3];
       //  static char parameter[45];
@@ -89,6 +97,7 @@ class Command {
           if (!supressFrame) strcat(reply,"#");
           SerialPort.write(reply);
         }
+        buffer.flush();
       }
     }
 
@@ -102,42 +111,31 @@ class Command {
 
     Buffer buffer;
     SerialWrapper SerialPort;
-    CommandErrors commandError = CE_NONE;
+    CommandErrors commandError     = CE_NONE;
     CommandErrors lastCommandError = CE_NONE;
+    bool serialReady = false;
+    long serialBaud  = 9600;
 
     EquCoordinate target;
 };
 
 #ifdef SERIAL_A
-  Command processCommandsA;
+  Command processCommandsA(SERIAL_A_BAUD);
+  void processCmdsA() { processCommandsA.poll(); }
 #endif
 #ifdef SERIAL_B
-  Command processCommandsB;
+  Command processCommandsB(SERIAL_B_BAUD);
+  void processCmdsB() { processCommandsB.poll(); }
 #endif
 #ifdef SERIAL_C
-  Command processCommandsC;
+  Command processCommandsC(SERIAL_C_BAUD);
+  void processCmdsC() { processCommandsC.poll(); }
 #endif
 #ifdef SERIAL_D
-  Command processCommandsD;
+  Command processCommandsD(SERIAL_D_BAUD);
+  void processCmdsD() { processCommandsD.poll(); }
 #endif
 #ifdef SERIAL_ST4
-  Command processCommandsST4;
+  Command processCommandsST4(9600);
+  void processCmdsST4() { processCommandsST4.poll(); }
 #endif
-
-void processCommands() {
-#ifdef SERIAL_A
-  processCommandsA.poll();
-#endif
-#ifdef SERIAL_B
-  processCommandsB.poll();
-#endif
-#ifdef SERIAL_C
-  processCommandsC.poll();
-#endif
-#ifdef SERIAL_D
-  processCommandsD.poll();
-#endif
-#ifdef SERIAL_ST4
-  processCommandsST4.poll();
-#endif
-}
