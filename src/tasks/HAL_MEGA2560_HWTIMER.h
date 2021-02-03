@@ -93,7 +93,6 @@ void HAL_HWTIMER4_DONE() {
 volatile uint32_t _nextPeriod1, _nextPeriod2, _nextPeriod3, _nextPeriod4;
 volatile uint16_t _nextRep1, _nextRep2, _nextRep3, _nextRep4;
 void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
-//  Serial.print("Sidereal -> "); Serial.println(period);
   // maximum time is about 134 seconds for this design
   uint32_t i, reps=0;
   if (period != 0 && period <= 2144000000) {
@@ -135,40 +134,49 @@ void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
   #define HAL_HWTIMER4_SET_PERIOD()
 #endif
 
+// help for profiler
 // interrupt service routine wrappers
 #ifdef TASKS_HWTIMER1_ENABLE
 ISR(TIMER1_COMPA_vect) {
+  TASKS_HWTIMER1_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep1 > 1) { count++; if (count%_nextRep1 != 0) goto done; }
   if (_nextRep1) HAL_HWTIMER1_FUN();
   HAL_HWTIMER1_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER1_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER2_ENABLE
 ISR(TIMER3_COMPA_vect) {
+  TASKS_HWTIMER2_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep2 > 1) { count++; if (count%_nextRep2 != 0) goto done; }
   if (_nextRep2) HAL_HWTIMER2_FUN();
   HAL_HWTIMER2_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER2_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER3_ENABLE
 ISR(TIMER4_COMPA_vect) {
+  TASKS_HWTIMER3_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep3 > 1) { count++; if (count%_nextRep3 != 0) goto done; }
   if (_nextRep3) HAL_HWTIMER3_FUN();
   HAL_HWTIMER3_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER3_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER4_ENABLE
 ISR(TIMER5_COMPA_vect) {
+  TASKS_HWTIMER4_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep4 > 1) { count++; if (count%_nextRep4 != 0) goto done; }
   if (_nextRep4) HAL_HWTIMER4_FUN();
   HAL_HWTIMER4_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER4_PROFILER_SUFFIX;
 }
 #endif

@@ -74,10 +74,12 @@ void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
 // interrupt service routine wrappers
 #ifdef TASKS_HWTIMER1_ENABLE
 ISR(TIMER1_COMPA_vect) {
+  TASKS_HWTIMER1_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep1 > 1) { count++; if (count%_nextRep1 != 0) goto done; }
   if (_nextRep1) HAL_HWTIMER1_FUN();
   HAL_HWTIMER1_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER1_PROFILER_SUFFIX;
 }
 #endif

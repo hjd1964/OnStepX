@@ -112,37 +112,45 @@ void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
 // interrupt service routine wrappers
 #ifdef TASKS_HWTIMER1_ENABLE
 void HAL_HWTIMER1_WRAPPER() {
+  TASKS_HWTIMER1_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep1 > 1) { count++; if (count%_nextRep1 != 0) goto done; }
   if (_nextRep1) HAL_HWTIMER1_FUN();
   HAL_HWTIMER1_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER1_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER2_ENABLE
 void HAL_HWTIMER2_WRAPPER() {
+  TASKS_HWTIMER2_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep2 > 1) { count++; if (count%_nextRep2 != 0) goto done; }
   if (_nextRep2) HAL_HWTIMER2_FUN();
   HAL_HWTIMER2_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER2_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER3_ENABLE
 void HAL_HWTIMER3_WRAPPER() {
+  TASKS_HWTIMER3_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep3 > 1) { count++; if (count%_nextRep3 != 0) goto done; }
   if (_nextRep3) HAL_HWTIMER3_FUN();
   HAL_HWTIMER3_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER3_PROFILER_SUFFIX;
 }
 #endif
 #ifdef TASKS_HWTIMER4_ENABLE
 void HAL_HWTIMER4_WRAPPER() {
+  TASKS_HWTIMER4_PROFILER_PREFIX;
   static uint16_t count = 0;
   if (_nextRep4 > 1) { count++; if (count%_nextRep4 != 0) goto done; }
   if (_nextRep4) HAL_HWTIMER4_FUN();
   HAL_HWTIMER4_SET_PERIOD();
   done: {}
+  TASKS_HWTIMER4_PROFILER_SUFFIX;
 }
 #endif

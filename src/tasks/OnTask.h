@@ -9,8 +9,59 @@
 // to enable the option to use a given hardware timer (1..4), if available depending on hw) add:
 // #define TASKS_HWTIMER1_ENABLE (for example) before the #include for this library
 
-// Normally skipped tasks (too busy) are delayed for later processing, to instead skip them add:
+// normally skipped tasks (too busy) are queued for later processing, to instead skip them add:
 // #define TASKS_SKIP_MISSED
+
+// enabling the profiler inserts time logging code into the process calls.  this provides the average
+// and largest start time delta and run time for each process.  to enable the profiler use:
+// #define TASKS_PROFILER
+
+#ifdef TASKS_PROFILER_ENABLE
+  volatile unsigned long _task_max_runtime[4] = {0, 0, 0, 0};
+  volatile unsigned long _task_total_runtime[4] = {0, 0, 0, 0};
+  volatile unsigned long _task_total_runtime_count[4] = {0, 0, 0, 0};
+  #ifdef TASKS_HWTIMER1_ENABLE
+    #define TASKS_HWTIMER1_PROFILER_PREFIX unsigned long runtime_t0 = micros()
+    #define TASKS_HWTIMER1_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[0] += at; _task_total_runtime_count[0]++; if (labs(at) > _task_max_runtime[0]) _task_max_runtime[0] = labs(at); }
+  #endif
+  #ifdef TASKS_HWTIMER2_ENABLE
+    #define TASKS_HWTIMER2_PROFILER_PREFIX unsigned long runtime_t0 = micros()
+    #define TASKS_HWTIMER2_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[1] += at; _task_total_runtime_count[1]++; if (labs(at) > _task_max_runtime[1]) _task_max_runtime[1] = labs(at); }
+  #endif
+  #ifdef TASKS_HWTIMER3_ENABLE
+    #define TASKS_HWTIMER3_PROFILER_PREFIX unsigned long runtime_t0 = micros()
+    #define TASKS_HWTIMER3_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[2] += at; _task_total_runtime_count[2]++; if (labs(at) > _task_max_runtime[2]) _task_max_runtime[2] = labs(at); }
+  #endif
+  #ifdef TASKS_HWTIMER4_ENABLE
+    #define TASKS_HWTIMER4_PROFILER_PREFIX unsigned long runtime_t0 = micros()
+    #define TASKS_HWTIMER4_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[3] += at; _task_total_runtime_count[3]++; if (labs(at) > _task_max_runtime[3]) _task_max_runtime[3] = labs(at); }
+  #endif
+
+  #define TASKS_PROFILER_PREFIX \
+    long at = time_to_next_task - period; \
+    average_arrival_time += at; \
+    average_arrival_time_count++; \
+    if (labs(at) > max_arrival_time) max_arrival_time = labs(at); \
+    unsigned long runtime_t0 = micros(); 
+  #define TASKS_PROFILER_SUFFIX \
+    at = micros()-runtime_t0; \
+    total_runtime += at; \
+    total_runtime_count++; \
+    if (labs(at) > max_runtime) max_runtime = labs(at);
+
+#else
+  #define TASKS_HWTIMER1_PROFILER_PREFIX
+  #define TASKS_HWTIMER1_PROFILER_SUFFIX
+  #define TASKS_HWTIMER2_PROFILER_PREFIX
+  #define TASKS_HWTIMER2_PROFILER_SUFFIX
+  #define TASKS_HWTIMER3_PROFILER_PREFIX
+  #define TASKS_HWTIMER3_PROFILER_SUFFIX
+  #define TASKS_HWTIMER4_PROFILER_PREFIX
+  #define TASKS_HWTIMER4_PROFILER_SUFFIX
+  #define TASKS_PROFILER_CALIBRATE
+  #define TASKS_PROFILER_PREFIX
+  #define TASKS_PROFILER_SUFFIX
+#endif
 
 // bring in hardware timer support
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
@@ -33,13 +84,13 @@ enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 class Task {
   public:
     Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
-      this->period = period;
-      period_units = PU_MILLIS;
+      this->period   = period;
+      period_units   = PU_MILLIS;
       this->duration = duration;
-      this->repeat = repeat;
+      this->repeat   = repeat;
       this->priority = priority;
       this->callback = callback;
-      start_time = millis();
+      start_time     = millis();
       next_task_time = start_time + period;
     }
 
@@ -58,7 +109,7 @@ class Task {
       if (priority != 0) return false;
 
       unsigned long hwPeriod = period;
-      if (period_units == PU_NONE)   hwPeriod = 0; else if (period_units == PU_MILLIS) hwPeriod *= 16000UL; else if (period_units == PU_MICROS) hwPeriod *= 16UL;
+      if (period_units == PU_NONE) hwPeriod = 0; else if (period_units == PU_MILLIS) hwPeriod *= 16000UL; else if (period_units == PU_MICROS) hwPeriod *= 16UL;
       HAL_HWTIMER_PREPARE_PERIOD(num, hwPeriod);
 
       switch (num) {
@@ -94,22 +145,20 @@ class Task {
     }
 
     // run task at the prescribed interval
-    // priority: level highest 0 to 7 lowest
-    // note: tasks are timed in such a way as to achieve an accurate average frequency
-    // if the task occurs late the next call is scheduled earlier to make up the difference
-    bool poll(uint8_t priority) {
+    // note: tasks are timed in such a way as to achieve an accurate average frequency, if
+    //       the task occurs late the next call is scheduled earlier to make up the difference
+    bool poll() {
       if (hardwareTimer) return false;
 
-      static uint8_t priority_level_set = 0;
-      uint8_t current_priority = 0; bitSet(current_priority, 7 - priority);
-      if (priority == this->priority && current_priority > priority_level_set && period > 0) {
+      if (period > 0 && !running) {
         unsigned long t;
         if (period_units == PU_MICROS) t = micros(); else if (period_units == PU_SUB_MICROS) t = micros() * 16; else t = millis();
         unsigned long time_to_next_task = next_task_time - t;
         if ((long)time_to_next_task < 0) {
-          bitSet(priority_level_set, 7 - priority);
+          running = true;
+          TASKS_PROFILER_PREFIX;
           callback();
-          bitClear(priority_level_set, 7 - priority);
+          TASKS_PROFILER_SUFFIX;
 
           // adopt next period
           if (next_period_units != PU_NONE) {
@@ -119,14 +168,14 @@ class Task {
             next_period_units = PU_NONE;
           }
 
-#ifdef TASKS_SKIP_MISSED
-          // optionally skip missed tasks
-          if (-time_to_next_task > period) time_to_next_task = period;
-#endif
-
           // set adjusted period
+          #ifdef TASKS_SKIP_MISSED
+            if (-time_to_next_task > period) time_to_next_task = period;
+          #endif
           next_task_time = t + (long)(period + time_to_next_task);
           if (!repeat) period = 0;
+
+          running = false;
           return true;
         }
       }
@@ -228,6 +277,49 @@ class Task {
       return priority;
     }
 
+    void setNameStr(const char name[]) {
+      strncpy(processName,name,7);
+    }
+
+    char *getNameStr() {
+      return processName;
+    }
+
+#ifdef TASKS_PROFILER_ENABLE
+    double getArrivalAvg() {
+      if (hardwareTimer) return 0;
+      if (average_arrival_time_count == 0) return 0;
+      double value = -average_arrival_time/average_arrival_time_count;
+      average_arrival_time = 0;
+      average_arrival_time_count = 0;
+      return value;
+    }
+    double getArrivalMax() {
+      if (hardwareTimer) return 0;
+      double value = max_arrival_time;
+      max_arrival_time = 0;
+      return value;
+    }
+    double getRuntimeTotal() {
+      if (hardwareTimer) { noInterrupts(); total_runtime = _task_total_runtime[hardwareTimer-1]; _task_total_runtime[hardwareTimer-1] = 0; total_runtime_count=_task_total_runtime_count[hardwareTimer-1]; interrupts(); };
+      double value = total_runtime;
+      total_runtime = 0;
+      return value;
+    }
+    long getRuntimeTotalCount() {
+      if (hardwareTimer) { noInterrupts(); total_runtime_count = _task_total_runtime_count[hardwareTimer-1]; _task_total_runtime_count[hardwareTimer-1] = 0; interrupts(); };
+      long value = total_runtime_count;
+      total_runtime_count = 0;
+      return value;
+    }
+    double getRuntimeMax() {
+      if (hardwareTimer) { noInterrupts(); max_runtime = _task_max_runtime[hardwareTimer-1]; _task_max_runtime[hardwareTimer-1] = 0; interrupts(); };
+      double value = max_runtime;
+      max_runtime = 0;
+      return value;
+    }
+#endif
+
   private:
 
     void setHardwareTimerPeriod() {
@@ -241,17 +333,27 @@ class Task {
       }
     }
 
-    uint8_t hardwareTimer = 0;
-    unsigned long period = 0;
-    unsigned long next_period = 0;
-    PeriodUnits period_units = PU_MILLIS;
-    PeriodUnits next_period_units = PU_NONE;
-    unsigned long start_time = 0;
-    unsigned long duration = 0;
-    unsigned long next_task_time = 0;
-    bool repeat = false;
-    uint8_t priority = 0;
+    char          processName[8]    = "";
+    unsigned long period            = 0;
+    unsigned long duration          = 0;
+    bool          repeat            = false;
+    uint8_t       priority          = 0;
+    unsigned long next_period       = 0;
+    PeriodUnits   period_units      = PU_MILLIS;
+    PeriodUnits   next_period_units = PU_NONE;
+    unsigned long start_time        = 0;
+    unsigned long next_task_time    = 0;
+    bool          running           = false;
+    uint8_t       hardwareTimer     = 0;
     void (*callback)() = NULL;
+#ifdef TASKS_PROFILER_ENABLE
+    volatile double        average_arrival_time       = 0;
+    volatile unsigned long average_arrival_time_count = 0;
+    volatile long          max_arrival_time           = 0;
+    volatile double        total_runtime              = 0;
+    volatile unsigned long total_runtime_count        = 0;
+    volatile long          max_runtime                = 0;
+#endif
 };
 
 class Tasks {
@@ -277,7 +379,6 @@ class Tasks {
     // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
     // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
     // priority: level highest 0 to 7 lowest, all tasks of priority 0 must be complete before priority 1 tasks are serviced, etc.
-    //           only processes of higher priority are allowed to run while other processes (of a lower priority) are running
     // callback: function to handle this tasks processing
     // returns:  handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
@@ -304,6 +405,12 @@ class Tasks {
       updateEventRange();
 
       return e + 1;
+    }
+    // as above, and adds a process name
+    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)(), const char name[]) {
+      uint8_t handle = add(period, duration, repeat, priority, callback);
+      setNameStr(handle, name);
+      return handle;
     }
 
     // allocates a hardware timer, if available, for this task
@@ -409,15 +516,71 @@ class Tasks {
       }
     }
 
+    // set the process name
+    void setNameStr(uint8_t handle, const char name[]) {
+      if (handle != 0 && allocated[handle - 1]) {
+        task[handle - 1]->setNameStr(name);
+      }
+    }
+
+    // set the process name
+    char *getNameStr(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getNameStr();
+      }
+    }
+
+    // allow search for tasks, returns 0 if no handles are found
+    uint8_t getFirstHandle() {
+      handleSearch = 255;
+      return getNextHandle();
+    }
+
+    uint8_t getNextHandle() {
+      do {
+        handleSearch++;
+        if (allocated[handleSearch]) return handleSearch + 1;
+      } while (handleSearch < highest_task);
+      return false;
+    }
+
+#ifdef TASKS_PROFILER_ENABLE
+    double getArrivalAvg(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getArrivalAvg();
+      } else return 0;
+    }
+    double getArrivalMax(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getArrivalMax();
+      } else return 0;
+    }
+    double getRuntimeTotal(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getRuntimeTotal();
+      } else return 0;
+    }
+    long getRuntimeTotalCount(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getRuntimeTotalCount();
+      } else return 0;
+    }
+    double getRuntimeMax(uint8_t handle) {
+      if (handle != 0 && allocated[handle - 1]) {
+        return task[handle - 1]->getRuntimeMax();
+      } else return 0;
+    }
+#endif
+
     // runs tasks at the prescribed interval, each call can trigger at most a single process
     // processes that are already running are ignored so it's ok to poll() within a process
     void yield() {
       for (uint8_t priority = 0; priority <= highest_priority; priority++) {
         for (uint8_t i = 0; i <= highest_task; i++) {
-          number[priority]++; if (number[priority] > highest_task) number[priority]=0;
+          number[priority]++; if (number[priority] > highest_task) number[priority] = 0;
           if (allocated[number[priority]]) {
             if (!task[number[priority]]->isDurationComplete()) {
-              if (task[number[priority]]->poll(priority)) return;
+              if (task[number[priority]]->poll()) return;
             } else remove(number[priority] + 1);
           }
         }
@@ -445,13 +608,14 @@ class Tasks {
       }
     }
 
-    uint8_t highest_task = 0;
+    uint8_t highest_task     = 0;
     uint8_t highest_priority = 0;
-    uint8_t count = 0;
-    uint8_t num_tasks = 0;
-    uint8_t number[8] = {255, 255, 255, 255, 255, 255, 255, 255};
+    uint8_t count            = 0;
+    uint8_t num_tasks        = 0;
+    uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255};
     bool    allocated[TASKS_MAX];
-    Task *task[TASKS_MAX];
+    uint8_t handleSearch     = 255;
+    Task    *task[TASKS_MAX];
 };
 
 Tasks tasks;
