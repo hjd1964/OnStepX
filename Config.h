@@ -1,6 +1,11 @@
 #define HAL_HAS_DIGITAL_FAST
 
 #define SERIAL_A                    Serial
+#define SERIAL_A_BAUD               115200
+#define SERIAL_B                   Serial1
+#define SERIAL_B_BAUD               115200
+#define SERIAL_C                   Serial2
+#define SERIAL_C_BAUD               115200
 
 #define MOUNT_TYPE                  ALTAZM
 
