@@ -1,8 +1,6 @@
 // -----------------------------------------------------------------------------------
 // Constants
 
-enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
-
 // misc.                     
 #define OFF                            -1
 #define ON                             -2
