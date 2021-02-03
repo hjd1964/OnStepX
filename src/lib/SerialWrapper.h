@@ -39,24 +39,24 @@ class SerialWrapper : public Stream
 SerialWrapper::SerialWrapper() {
   static uint8_t channel = 0;
 #ifdef SERIAL_A
-  channel++;
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
 #endif
 #ifdef SERIAL_B
-  channel++;
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
 #endif
 #ifdef SERIAL_C
-  channel++;
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
 #endif
 #ifdef SERIAL_D
-  channel++;
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  channel++;
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
 #endif
 }
 
@@ -67,151 +67,191 @@ void SerialWrapper::begin() {
 void SerialWrapper::begin(long baud) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.begin(baud);
+  if (isChannel(channel)) SERIAL_A.begin(baud);
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.begin(baud);
+  if (isChannel(channel)) SERIAL_B.begin(baud);
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.begin(baud);
+  if (isChannel(channel)) SERIAL_C.begin(baud);
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.begin(baud);
+  if (isChannel(channel)) SERIAL_D.begin(baud);
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.begin(baud);
+  if (isChannel(channel)) SERIAL_ST4.begin(baud);
+  channel++;
 #endif
 }
 
 void SerialWrapper::end() {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.end();
+  if (isChannel(channel)) SERIAL_A.end();
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.end();
+  if (isChannel(channel)) SERIAL_B.end();
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.end();
+  if (isChannel(channel)) SERIAL_C.end();
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.end();
+  if (isChannel(channel)) SERIAL_D.end();
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.end();
+  if (isChannel(channel)) SERIAL_ST4.end();
+  channel++;
 #endif
 }
 
 size_t SerialWrapper::write(uint8_t data) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.write(data);
+  if (isChannel(channel)) return SERIAL_A.write(data);
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.write(data);
+  if (isChannel(channel)) return SERIAL_B.write(data);
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.write(data);
+  if (isChannel(channel)) return SERIAL_C.write(data);
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.write(data);
+  if (isChannel(channel)) return SERIAL_D.write(data);
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.write(data);
+  if (isChannel(channel)) return SERIAL_ST4.write(data);
+  channel++;
 #endif
 }
 
 size_t SerialWrapper::write(const uint8_t *data, size_t quantity) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.write(data, quantity);
+  if (isChannel(channel)) return SERIAL_A.write(data, quantity);
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.write(data, quantity);
+  if (isChannel(channel)) return SERIAL_B.write(data, quantity);
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.write(data, quantity);
+  if (isChannel(channel)) return SERIAL_C.write(data, quantity);
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.write(data, quantity);
+  if (isChannel(channel)) return SERIAL_D.write(data, quantity);
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.write(data, quantity);
+  if (isChannel(channel)) return SERIAL_ST4.write(data, quantity);
+  channel++;
 #endif
 }
 
 int SerialWrapper::available(void) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.available();
+  if (isChannel(channel)) return SERIAL_A.available();
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.available();
+  if (isChannel(channel)) return SERIAL_B.available();
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.available();
+  if (isChannel(channel)) return SERIAL_C.available();
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.available();
+  if (isChannel(channel)) return SERIAL_D.available();
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.available();
+  if (isChannel(channel)) return SERIAL_ST4.available();
+  channel++;
 #endif
 }
 
 int SerialWrapper::read(void) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.read();
+  if (isChannel(channel)) return SERIAL_A.read();
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.read();
+  if (isChannel(channel)) return SERIAL_B.read();
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.read();
+  if (isChannel(channel)) return SERIAL_C.read();
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.read();
+  if (isChannel(channel)) return SERIAL_D.read();
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.read();
+  if (isChannel(channel)) return SERIAL_ST4.read();
+  channel++;
 #endif
 }
 
 int SerialWrapper::peek(void) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (isChannel(++channel)) SERIAL_A.peek();
+  if (isChannel(channel)) return SERIAL_A.peek();
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (isChannel(++channel)) SERIAL_B.peek();
+  if (isChannel(channel)) return SERIAL_B.peek();
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (isChannel(++channel)) SERIAL_C.peek();
+  if (isChannel(channel)) return SERIAL_C.peek();
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (isChannel(++channel)) SERIAL_D.peek();
+  if (isChannel(channel)) return SERIAL_D.peek();
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (isChannel(++channel)) SERIAL_ST4.peek();
+  if (isChannel(channel)) return SERIAL_ST4.peek();
+  channel++;
 #endif
 }
 
 void SerialWrapper::flush(void) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
-  if (channel == 1) SERIAL_A.flush();
+  if (isChannel(channel)) SERIAL_A.flush();
+  channel++;
 #endif
 #ifdef SERIAL_B
-  if (channel == 2) SERIAL_B.flush();
+  if (isChannel(channel)) SERIAL_B.flush();
+  channel++;
 #endif
 #ifdef SERIAL_C
-  if (channel == 3) SERIAL_C.flush();
+  if (isChannel(channel)) SERIAL_C.flush();
+  channel++;
 #endif
 #ifdef SERIAL_D
-  if (channel == 4) SERIAL_D.flush();
+  if (isChannel(channel)) SERIAL_D.flush();
+  channel++;
 #endif
 #ifdef SERIAL_ST4
-  if (channel == 4) SERIAL_ST4.flush();
+  if (isChannel(channel)) SERIAL_ST4.flush();
+  channel++;
 #endif
 }
