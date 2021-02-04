@@ -49,15 +49,16 @@
 #undef E2END
 #if defined(NV_M24C32)
   // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
+  ASFASF
   #define NV_ENDURANCE HIGH
   #define E2END 8191
   #define I2C_EEPROM_ADDRESS 0x50
-  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"
+  #include "NV/NV_I2C_EEPROM_24XX_C.h"
 #elif defined(NV_MB85RC256V)
-  #include "../drivers/NV_I2C_FRAM_MB85RC256V.h"
+  #include "NV/NV_I2C_FRAM_MB85RC256V.h"
 #else
   // defaults to 0x57 and 4KB as used on DS3231 RTC modules
-  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"
+  #include "NV/NV_I2C_EEPROM_24XX_C.h"
 #endif
 
 //----------------------------------------------------------------------------------------------------

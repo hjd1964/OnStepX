@@ -34,11 +34,8 @@
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #undef E2END
-#if defined(NV_MB85RC256V)
-  #include "../drivers/NV_I2C_FRAM_MB85RC256V.h"
-#else
-  // Defaults to 0x57 and 4KB
-  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"
+#ifdef NV_DEFAULT
+  #include "NV/NV_I2C_EEPROM_24XX_C.h" // Defaults to 0x57 and 4KB
 #endif
 
 //----------------------------------------------------------------------------------------------------

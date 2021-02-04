@@ -82,6 +82,7 @@
     hwtimer1->setInterruptPriority(priority, 0);
     hwtimer1->resume();                   // start the timer counting
     hwtimer1->refresh();                  // refresh the timer's count, prescale, and overflow
+    return true;
   }
 
   void HAL_HWTIMER1_DONE() {

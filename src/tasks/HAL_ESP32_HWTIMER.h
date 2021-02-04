@@ -4,8 +4,8 @@
 // provides two 32 bit interval timers with 16 bit software pre-scalers, running at 16MHz
 // each timer configured as ~0 to x seconds (granularity of timer is 0.062uS)
 
-#define TIMER_RATE_MHZ (F_BUS/1000000.0)             // Teensy motor timers run at F_BUS Hz so use full resolution
-#define TIMER_RATE_16MHZ_TICKS (16.0/TIMER_RATE_MHZ) // 16.0/TIMER_RATE_MHZ for the default 16MHz "sub micros"
+#define TIMER_RATE_MHZ 16L                           // ESP32 motor timers run at 16MHz so use full resolution
+#define TIMER_RATE_16MHZ_TICKS 1L                    // 16L/TIMER_RATE_MHZ, for the default 16MHz "sub-micros" (16MHz)
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
@@ -37,8 +37,8 @@
 #ifdef TASKS_HWTIMER1_ENABLE
   hw_timer_t *itimer1 = NULL;
 
-  void (*HAL_HWTIMER1_FUN)() = NULL;  // points to task/process callback function
-  void HAL_HWTIMER1_WRAPPER();        // forward definition of the timer ISR
+  void (*HAL_HWTIMER1_FUN)() = NULL; // points to task/process callback function
+  void HAL_HWTIMER1_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     // set the system timer for millis() to the second highest priority

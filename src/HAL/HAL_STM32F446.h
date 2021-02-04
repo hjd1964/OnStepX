@@ -42,9 +42,7 @@
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #undef E2END
-#if defined(NV_MB85RC256V)
-  #include "../drivers/NV_I2C_FRAM_MB85RC256V.h"
-#else
+#ifdef NV_DEFAULT
   // The FYSETC S6 v2 has a 4096 byte EEPROM built-in
   #if PINMAP == FYSETC_S6_2
     #define E2END 4095
@@ -55,8 +53,7 @@
     #define E2END 2047
     #define I2C_EEPROM_ADDRESS 0x50
   #endif
-  // Defaults to 0x57 and 4KB 
-  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"
+  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"  // Defaults to 0x57 and 4KB
 #endif
 
 //----------------------------------------------------------------------------------------------------

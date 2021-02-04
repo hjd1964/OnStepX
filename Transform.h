@@ -176,7 +176,7 @@ class Transform {
     // strings
     
     // convert string in format MM/DD/YY to julian date
-    bool dateToDouble(double *julianDay, char *date) {
+    bool dateTodouble(double *julianDay, char *date) {
       char m[3],d[3],y[3];
       int  m1,d1,y1;
       
@@ -196,7 +196,7 @@ class Transform {
     // (also handles)           HH:MM.M
     // (also handles)           HH:MM:SS
     // (also handles)           HH:MM:SS.SSSS
-    bool hmsToDouble(double *f, char *hms, PrecisionMode p) {
+    bool hmsTodouble(double *f, char *hms, PrecisionMode p) {
       char h[3], m[5];
       int  h1, m1, m2=0;
       double s1=0;
@@ -237,10 +237,10 @@ class Transform {
       return true;
     }
     
-    bool hmsToDouble(double *f, char *hms) {
-      if (!hmsToDouble(f, hms, PM_HIGHEST))
-        if (!hmsToDouble(f, hms, PM_HIGH))
-          if (!hmsToDouble(f, hms, PM_LOW)) return false;
+    bool hmsTodouble(double *f, char *hms) {
+      if (!hmsTodouble(f, hms, PM_HIGHEST))
+        if (!hmsTodouble(f, hms, PM_HIGH))
+          if (!hmsTodouble(f, hms, PM_LOW)) return false;
       return true;
     }
     
@@ -281,7 +281,7 @@ class Transform {
     //                          DDD:MM
     //                          sDD*MM
     //                          DDD*MM
-    bool dmsToDouble(double *f, char *dms, bool sign_present, PrecisionMode p) {
+    bool dmsTodouble(double *f, char *dms, bool sign_present, PrecisionMode p) {
       char d[4],m[5];
       int d1,m1,lowLimit=0,highLimit=360,len;
       double s1=0,sign=1;
@@ -325,10 +325,10 @@ class Transform {
       *f=sign*((double)d1+(double)m1/60.0+s1/3600.0);
       return true;
     }
-    bool dmsToDouble(double *f, char *dms, bool sign_present) {
-      if (!dmsToDouble(f,dms,sign_present,PM_HIGHEST))
-        if (!dmsToDouble(f,dms,sign_present,PM_HIGH))
-          if (!dmsToDouble(f,dms,sign_present,PM_LOW)) return false;
+    bool dmsTodouble(double *f, char *dms, bool sign_present) {
+      if (!dmsTodouble(f,dms,sign_present,PM_HIGHEST))
+        if (!dmsTodouble(f,dms,sign_present,PM_HIGH))
+          if (!dmsTodouble(f,dms,sign_present,PM_LOW)) return false;
       return true;
     }
     
