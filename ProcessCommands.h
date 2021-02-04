@@ -12,7 +12,7 @@ enum CommandErrors {
   CE_SLEW_ERR_IN_PARK, CE_GOTO_ERR_GOTO, CE_SLEW_ERR_OUTSIDE_LIMITS, CE_SLEW_ERR_HARDWARE_FAULT,
   CE_MOUNT_IN_MOTION, CE_GOTO_ERR_UNSPECIFIED, CE_NULL};
 
-class Command {
+class CommandProcessor {
   public:
     Command(long baud) {
       serialBaud = baud;
@@ -124,22 +124,22 @@ class Command {
 
 // callback wrappers
 #ifdef SERIAL_A
-  Command processCommandsA(SERIAL_A_BAUD_DEFAULT);
+  CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT);
   void processCmdsA() { processCommandsA.poll(); }
 #endif
 #ifdef SERIAL_B
-  Command processCommandsB(SERIAL_B_BAUD_DEFAULT);
+  CommandProcessor processCommandsB(SERIAL_B_BAUD_DEFAULT);
   void processCmdsB() { processCommandsB.poll(); }
 #endif
 #ifdef SERIAL_C
-  Command processCommandsC(SERIAL_C_BAUD_DEFAULT);
+  CommandProcessor processCommandsC(SERIAL_C_BAUD_DEFAULT);
   void processCmdsC() { processCommandsC.poll(); }
 #endif
 #ifdef SERIAL_D
-  Command processCommandsD(SERIAL_D_BAUD_DEFAULT);
+  CommandProcessor processCommandsD(SERIAL_D_BAUD_DEFAULT);
   void processCmdsD() { processCommandsD.poll(); }
 #endif
 #ifdef SERIAL_ST4
-  Command processCommandsST4(9600);
+  CommandProcessor processCommandsST4(9600);
   void processCmdsST4() { processCommandsST4.poll(); }
 #endif
