@@ -1,36 +1,52 @@
 // -----------------------------------------------------------------------------------
-// Simple software SPI routines (CPOL=1, CPHA=1)
+// Simple software SPI routines (CPOL=1, CPHA=1) just for TMC stepper drivers
 #pragma once
+
+typedef struct DriverPins {
+  int8_t m0;
+  int8_t m1;
+  int8_t m2;
+  int8_t m3;
+  int8_t decay;
+} DriverPins;
+
+#define mosi m0
+#define sck  m1
+#define cs   m2
+#define miso m3
 
 class SoftSpi {
   public:
-    bool init(int8_t mosiPin, int8_t sckPin, int8_t csPin, int8_t misoPin) {
-      this->mosi = mosiPin;
-      this->sck  = sckPin;
-      this->cs   = csPin;
-      this->miso = misoPin;
+    SoftSpi(DriverPins Pins) : Pins{ Pins } {}
 
-      if (cs == OFF || sck == OFF || cs == OFF) return false; else return true;
+    bool init() {
+      Serial.begin(115200);
+      Serial.println();
+      Serial.print("Pin m0 = "); Serial.println(Pins.m0);
+      Serial.print("Pin m1 = "); Serial.println(Pins.m1);
+      Serial.print("Pin m2 = "); Serial.println(Pins.m2);
+      delay(100);
+      if (Pins.cs == OFF || Pins.sck == OFF || Pins.cs == OFF) return false; else return true;
     }
 
     void begin()
     {
-      pinMode(cs,OUTPUT);
-      digitalWrite(cs,HIGH);  delaySpi();
-      pinMode(sck,OUTPUT);
-      digitalWrite(sck,HIGH); Y;
-      pinMode(miso,INPUT);
-      pinMode(mosi,OUTPUT);   delaySpi();
-      digitalWrite(cs,LOW);   delaySpi(); Y;
+      pinMode(Pins.cs,OUTPUT);
+      digitalWrite(Pins.cs,HIGH);  delaySpi();
+      pinMode(Pins.sck,OUTPUT);
+      digitalWrite(Pins.sck,HIGH);
+      pinMode(Pins.miso,INPUT);
+      pinMode(Pins.mosi,OUTPUT);   delaySpi();
+      digitalWrite(Pins.cs,LOW);   delaySpi();
     }
     
     void pause() {
-      digitalWrite(cs, HIGH); delaySpi();
-      digitalWrite(cs, LOW);  delaySpi();
+      digitalWrite(Pins.cs, HIGH); delaySpi();
+      digitalWrite(Pins.cs, LOW);  delaySpi();
     }
     
     void end() {
-      digitalWrite(cs, HIGH); delaySpi();
+      digitalWrite(Pins.cs, HIGH); delaySpi();
     }
     
     uint8_t transfer(uint8_t data_out)
@@ -38,12 +54,11 @@ class SoftSpi {
       uint8_t data_in = 0;
       for(int i=7; i >= 0; i--)
       {
-        digitalWrite(sck,LOW);
-        digitalWrite(mosi,bitRead(data_out,i));  delaySpi();
-        digitalWrite(sck,HIGH);
-        bitWrite(data_in,i,digitalReadEx(miso)); delaySpi(); Y;
+        digitalWrite(Pins.sck,LOW);
+        digitalWrite(Pins.mosi,bitRead(data_out,i));  delaySpi();
+        digitalWrite(Pins.sck,HIGH);
+        bitWrite(data_in,i,digitalReadEx(Pins.miso)); delaySpi();
       }
-      
       return data_in;
     }
     
@@ -52,17 +67,13 @@ class SoftSpi {
       uint32_t data_in = 0;
       for(int i=31; i >= 0; i--)
       {
-        digitalWrite(sck,LOW);
-        digitalWrite(mosi,bitRead(data_out,i)); delaySpi();
-        digitalWrite(sck,HIGH);
-        if (miso >= 0) bitWrite(data_in,i,digitalRead(miso)); delaySpi(); Y;
+        digitalWrite(Pins.sck,LOW);
+        digitalWrite(Pins.mosi,bitRead(data_out,i)); delaySpi();
+        digitalWrite(Pins.sck,HIGH);
+        bitWrite(data_in,i,digitalReadEx(Pins.miso)); delaySpi();
       }
-
       return data_in;
     }
   private:
-    int8_t cs = 0;
-    int8_t sck = 0;
-    int8_t miso = 0;
-    int8_t mosi = 0;
+    const DriverPins Pins = {OFF, OFF, OFF, OFF};
 };

@@ -1,5 +1,8 @@
 //--------------------------------------------------------------------------------------------------
 // coordinate transformation
+#pragma once
+
+#include "Observatory.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
 // INSTRUMENT <--> apply celestial coordinate conventions <--> MOUNT       (Transform)
@@ -8,8 +11,6 @@
 
 enum PierSide {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 enum PrecisionMode {PM_LOW, PM_HIGH, PM_HIGHEST};
-
-#pragma once
 
 typedef struct EquCoordinate {
     double r;
@@ -23,42 +24,8 @@ typedef struct HorCoordinate {
     double z;
 } HorCoordinate;
 
-typedef struct TI {
-  int16_t year;
-  uint8_t month;
-  uint8_t day;
-  uint8_t hour;
-  uint8_t minute;
-  uint8_t second;
-  uint8_t centisecond;
-  long    julianDay;
-} TI;
-
-typedef struct Latitude {
-  double value;
-  double sine;
-  double cosine;
-  double absval;
-  double sign;
-} Latitude;
-
-typedef struct LI {
-  Latitude latitude;
-  double longitude;
-  double timezone;
-} LI;
-
 class Transform {
   public:
-    void init(LI site, TI ut1, uint8_t handle) {
-      this->site = site;
-      updateLatitude(site.latitude.value);
-
-      this->ut1  = ut1;
-      ut1.julianDay = gregorianToJulian(ut1.year,ut1.month,ut1.day);
-      updateLAST(julianToLAST(ut1.julianDay,ut1.hour));
-    }
-
     EquCoordinate equMountToTopocentric(EquCoordinate equ) {
       EquCoordinate obs=equMountToObservedPlace(equ);
       return observedPlaceToTopocentric(obs);
@@ -91,7 +58,7 @@ class Transform {
     // converts from mount to instrument coordinates
     EquCoordinate equMountToInstrument(EquCoordinate equ) {
       if (equ.p == PIER_SIDE_WEST) equ.r += PI;
-      if (site.latitude.value >= 0.0) {
+      if (observatory.site.latitude.value >= 0.0) {
         if (equ.p == PIER_SIDE_WEST) equ.d =   PI  - equ.d;
       } else {
         if (equ.p == PIER_SIDE_WEST) equ.d = (-PI) - equ.d;
@@ -138,7 +105,7 @@ class Transform {
     
     void hourAngleToRightAscension(EquCoordinate *equ) {
       noInterrupts();
-      long cs = centisecondLAST;
+      unsigned long cs = observatory.centisecondLAST;
       interrupts();
       equ->r = csToRad(cs) - equ->h;
       equ->r = backInRads(equ->r);
@@ -146,7 +113,7 @@ class Transform {
     
     void rightAscensionToHourAngle(EquCoordinate *equ) {
       noInterrupts();
-      long cs = centisecondLAST;
+      unsigned long cs = observatory.centisecondLAST;
       interrupts();
       equ->h = csToRad(cs) - equ->r;
       equ->h = backInRads(equ->h);
@@ -156,10 +123,10 @@ class Transform {
     HorCoordinate equToHor(EquCoordinate equ) {
       HorCoordinate hor;
       double cosHA  = cos(equ.h);
-      double sinAlt = (sin(equ.d) * site.latitude.sine) + (cos(equ.d) * site.latitude.cosine * cosHA);  
+      double sinAlt = (sin(equ.d) * observatory.site.latitude.sine) + (cos(equ.d) * observatory.site.latitude.cosine * cosHA);  
       hor.a         = asin(sinAlt);
       double t1     = sin(equ.h);
-      double t2     = cosHA*site.latitude.sine-tan(equ.d)*site.latitude.cosine;
+      double t2     = cosHA*observatory.site.latitude.sine-tan(equ.d)*observatory.site.latitude.cosine;
       hor.z         = atan2(t1,t2);
       hor.z        += PI;
       return hor;
@@ -169,10 +136,10 @@ class Transform {
     EquCoordinate horToEqu(HorCoordinate hor) { 
       EquCoordinate equ;
       double cosAzm = cos(hor.z);
-      double sinDec = (sin(hor.a) * site.latitude.sine) + (cos(hor.a) * site.latitude.cosine * cosAzm);  
+      double sinDec = (sin(hor.a) * observatory.site.latitude.sine) + (cos(hor.a) * observatory.site.latitude.cosine * cosAzm);  
       equ.d         = asin(sinDec); 
       double t1     = sin(hor.z);
-      double t2     = cosAzm*site.latitude.sine-tan(hor.a)*site.latitude.cosine;
+      double t2     = cosAzm*observatory.site.latitude.sine-tan(hor.a)*observatory.site.latitude.cosine;
       equ.h         = atan2(t1,t2);
       equ.h        += PI;
       return equ;
@@ -200,45 +167,8 @@ class Transform {
     double apparentRefrac(double altitude, double pressure = 1010.0, double temperature = 10.0) {
       if (isnan(pressure)) pressure = 1010.0;
       if (isnan(temperature)) temperature = 10.0;
-      double r = trueRefrac(altitude,pressure,temperature);
-      return trueRefrac(altitude-r,pressure,temperature);
-    }
-
-    // --------------------------------------------------------------------------------------------------------
-    // site
-
-    void updateLatitude(double lat) {
-      site.latitude.value  = lat;
-      site.latitude.cosine = cos(lat);
-      site.latitude.sine   = sin(lat);
-      site.latitude.absval = fabs(lat);
-      if (lat >= 0) site.latitude.sign = 1; else site.latitude.sign = -1;
-    }
-
-    void updateLongitude(double latitude) {
-    }
-
-    // --------------------------------------------------------------------------------------------------------
-    // time
-
-    // gets the local apparent sidereal time in hours
-    double getLAST() {
-      double cs;
-      noInterrupts(); 
-      cs = centisecondLAST;
-      interrupts();
-      return backInHours(radToHrs(csToRad(cs)));
-    }
-
-    void clockTick() {
-      centisecondLAST++;
-    }
-
-    // convert gregorian date (year,month,day) to julian day number
-    double gregorianToJulian(int year, int month, int day) {
-      if (month == 1 || month == 2) { year--; month=month + 12; }
-      double B = 2.0-floor(year/100.0) + floor(year/400.0);
-      return (B + floor(365.25*year) + floor(30.6001*(month + 1.0)) + day + 1720994.5);
+      double r = trueRefrac(altitude, pressure, temperature);
+      return trueRefrac(altitude-r, pressure, temperature);
     }
 
     // --------------------------------------------------------------------------------------------------------
@@ -251,13 +181,13 @@ class Transform {
       
       if (strlen(date) !=  8) return false;
     
-      m[0]=*date++; m[1]=*date++; m[2]=0; if (!atoi2(m,&m1,false)) return false;
-      if (*date++ != '/') return false; d[0]=*date++; d[1]=*date++; d[2]=0; if (!atoi2(d,&d1,false)) return false;
-      if (*date++ != '/') return false; y[0]=*date++; y[1]=*date++; y[2]=0; if (!atoi2(y,&y1,false)) return false;
+      m[0] = *date++; m[1] = *date++; m[2] = 0; if (!atoi2(m, &m1, false)) return false;
+      if (*date++ != '/') return false; d[0] = *date++; d[1] = *date++; d[2]=0; if (!atoi2(d, &d1, false)) return false;
+      if (*date++ != '/') return false; y[0] = *date++; y[1] = *date++; y[2]=0; if (!atoi2(y, &y1, false)) return false;
       if (m1 < 1 || m1 > 12 || d1 < 1 || d1 > 31 || y1 < 0 || y1 > 99) return false;
-      if (y1 > 11) y1=y1+2000; else y1=y1+2100;
+      if (y1 > 11) y1 = y1 + 2000; else y1 = y1 + 2100;
       
-      *julianDay = gregorianToJulian(y1,m1,d1);
+      *julianDay = observatory.gregorianToJulian(y1, m1, d1);
       return true;
     }
     
@@ -266,8 +196,8 @@ class Transform {
     // (also handles)           HH:MM:SS
     // (also handles)           HH:MM:SS.SSSS
     bool hmsToDouble(double *f, char *hms, PrecisionMode p) {
-      char h[3],m[5];
-      int  h1,m1,m2=0;
+      char h[3], m[5];
+      int  h1, m1, m2=0;
       double s1=0;
     
       while (*hms == ' ') hms++; // strip prefix white-space
@@ -283,63 +213,64 @@ class Transform {
       }
     
       // convert the hours part
-      h[0]=*hms++; h[1]=*hms++; h[2]=0; if (!atoi2(h,&h1,false)) return false;
+      h[0] = *hms++; h[1] = *hms++; h[2] = 0; if (!atoi2(h, &h1, false)) return false;
     
       // make sure the seperator is an allowed character, then convert the minutes part
       if (*hms++ != ':') return false;
-      m[0]=*hms++; m[1]=*hms++; m[2]=0; if (!atoi2(m,&m1,false)) return false;
+      m[0] = *hms++; m[1] = *hms++; m[2] = 0; if (!atoi2(m, &m1, false)) return false;
     
       if (p == PM_HIGHEST || p == PM_HIGH) {
         // make sure the seperator is an allowed character, then convert the seconds part
         if (*hms++ != ':') return false;
-        if (!atof2(hms,&s1,false)) return false;
+        if (!atof2(hms, &s1, false)) return false;
       } else
       if (p == PM_LOW) {
         // make sure the seperator is an allowed character, then convert the decimal minutes part
         if (*hms++ != '.') return false;
-        m2=(*hms++)-'0';
+        m2=(*hms++) - '0';
       }
       
       if (h1 < 0 || h1 > 23 || m1 < 0 || m1 > 59 || m2 < 0 || m2 > 9 || s1 < 0 || s1 > 59.9999) return false;
     
-      *f=(double)h1+(double)m1/60.0+(double)m2/600.0+s1/3600.0;
+      *f=(double)h1 + (double)m1/60.0 + (double)m2/600.0 + s1/3600.0;
       return true;
     }
+    
     bool hmsToDouble(double *f, char *hms) {
-      if (!hmsToDouble(f,hms,PM_HIGHEST))
-        if (!hmsToDouble(f,hms,PM_HIGH))
-          if (!hmsToDouble(f,hms,PM_LOW)) return false;
+      if (!hmsToDouble(f, hms, PM_HIGHEST))
+        if (!hmsToDouble(f, hms, PM_HIGH))
+          if (!hmsToDouble(f, hms, PM_LOW)) return false;
       return true;
     }
     
     // convert double to string in a variety of formats (as above) 
     void doubleToHms(char *reply, double *f, PrecisionMode p) {
-      double h1,m1,f1,s1,sd=0;
+      double h1, m1, f1, s1, sd=0;
     
       // round to 0.00005 second or 0.5 second, depending on precision mode
-      if (p == PM_HIGHEST) f1=fabs(*f)+0.0000000139; else f1=fabs(*f)+0.000139;
+      if (p == PM_HIGHEST) f1=fabs(*f) + 0.0000000139; else f1 = fabs(*f) + 0.000139;
     
-      h1=floor(f1);
-      m1=(f1-h1)*60.0;
-      s1=(m1-floor(m1))*60.0;
+      h1 = floor(f1);
+      m1 = (f1 - h1)*60.0;
+      s1 = (m1 - floor(m1))*60.0;
     
       // finish off calculations for hms and form string template
       char s[]="%s%02d:%02d:%02d.%04d";
       if (p == PM_HIGHEST) {
-        sd=(s1-floor(s1))*10000.0;
+        sd = (s1 - floor(s1))*10000.0;
       } else
       if (p == PM_HIGH) {
-        s[16]=0;
+        s[16] = 0;
       } else
       if (p == PM_LOW) {
-        s1=s1/6.0;
-        s[11]='.'; s[14]='1'; s[16]=0;
+        s1 = s1/6.0;
+        s[11] = '.'; s[14] = '1'; s[16]=0;
       }
     
       // set sign and return result string
       char sign[2]="";
       if ((sd != 0 || s1 != 0 || m1 != 0 || h1 != 0) && *f < 0.0) strcpy(sign,"-");
-      if (p == PM_HIGHEST) sprintf(reply,s,sign,(int)h1,(int)m1,(int)s1,(int)sd); else sprintf(reply,s,sign,(int)h1,(int)m1,(int)s1);
+      if (p == PM_HIGHEST) sprintf(reply, s, sign, (int)h1, (int)m1, (int)s1, (int)sd); else sprintf(reply, s, sign, (int)h1, (int)m1, (int)s1);
     }
     
     // convert string in format sDD:MM:SS to double
@@ -356,7 +287,7 @@ class Transform {
       bool secondsOff=false;
     
       while (*dms == ' ') dms++; // strip prefix white-space
-      if (strlen(dms) > 13) dms[13]=0; // maximum length
+      if (strlen(dms) > 13) dms[13] = 0; // maximum length
       len=strlen(dms);
     
       if (p == PM_HIGHEST || p == PM_HIGH) { // validate length
@@ -445,77 +376,8 @@ class Transform {
 
   private:
 
-    // passes local apparent sidereal time to centi-sidereal-second timer counter
-    // and marks the date/time this occured
-    void updateLAST(double t) {
-      long cs = lround((t/24.0)*8640000.0);
-      start_ut1 = ut1;
-      start_ut1.centisecond = cs;
-      noInterrupts();
-      centisecondLAST = cs;
-      interrupts();
-    }
-
-    // convert julian date/time to greenwich apparent sidereal time
-    double julianToGAST(double julianDay, double ut1) {
-      int y,m,d;
-      julianToGregorian(julianDay,&y,&m,&d);
-      double julianDay0 = gregorianToJulian(y,m,d);
-      double D= (julianDay - 2451545.0)+(ut1/24.0);
-      double D0=(julianDay0- 2451545.0);
-      double H = ut1;
-      double T = D/36525.0;
-      double gmst = 6.697374558 + 0.06570982441908*D0;
-      gmst=gmst + 1.00273790935*H + 0.000026*T*T;
-    
-      // equation of the equinoxes
-      double O = 125.04  - 0.052954 *D;
-      double L = 280.47  + 0.98565  *D;
-      double E = 23.4393 - 0.0000004*D;
-      double W = -0.000319*sin(degToRad(O)) - 0.000024*sin(degToRad(2*L));
-      double eqeq = W*cos(degToRad(E));
-      double gast = gmst + eqeq;
-      return backInHours(gast);
-    }
-    
-    // convert julian date/time to local apparent sidereal time
-    double julianToLAST(double julianDay, double ut1) {
-      double gast = julianToGAST(julianDay,ut1);
-      return backInHours(radToHrs(gast-site.longitude));
-    }
-
-    // convert julian day number to gregorian date (year,month,day)
-    void julianToGregorian(double julianDay, int *year, int *month, int *day) {
-      double A,B,C,D,D1,E,F,G,I;
-    
-      julianDay += 0.5;
-      I=floor(julianDay);
-     
-      F=0.0;
-      if (I > 2299160.0) {
-        A=int((I-1867216.25)/36524.25);
-        B=I+1.0+A-floor(A/4.0);
-      } else B=I;
-    
-      C=B+1524.0;
-      D=floor((C - 122.1)/365.25);
-      E=floor(365.25*D);
-      G=floor((C - E)/30.6001);
-    
-      D1=C-E+F-floor(30.6001*G);
-      *day=floor(D1);
-      if (G < 13.5)     *month=floor(G - 1.0);    else *month=floor(G - 13.0);
-      if (*month > 2.5) *year =floor(D - 4716.0); else *year =floor(D - 4715.0);
-    }
-
     double cot(double n) {
       return 1.0/tan(n);
-    }
-
-    double backInHours(double time) {
-      while (time >= 24.0) time -= 24.0;
-      while (time < 0.0)   time += 24.0;
-      return time;
     }
 
     double backInRads(double angle) {
@@ -551,11 +413,7 @@ class Transform {
       *d=atof(a);
       return true;
     }
-
-    uint32_t centisecondLAST;
-    TI       start_ut1;
-    TI       ut1;
-    LI       site;
 };
 
+// instantiate
 Transform transform;

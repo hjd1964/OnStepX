@@ -40,11 +40,21 @@
 // firmware info, these are returned by the ":GV?#" commands
 #define FirmwareDate          __DATE__
 #define FirmwareVersionMajor  00
-#define FirmwareVersionMinor  01      // minor version 0 to 99
+#define FirmwareVersionMinor  02      // minor version 0 to 99
 #define FirmwareVersionPatch  "a"     // for example major.minor patch: 1.3c
 #define FirmwareVersionConfig 01      // internal, for tracking configuration file changes
 #define FirmwareName          "OnStepX"
 #define FirmwareTime          __TIME__
+
+// Enable additional debugging and/or status messages on the specified DebugSer port
+// Note that the DebugSer port cannot be used for normal communication with OnStep
+#define DEBUG OFF             // default=OFF, use "DEBUG ON" for background errors only, use "DEBUG VERBOSE" for all errors and status messages
+#define DebugSer SerialA      // default=SerialA, or Serial4 for example (always 9600 baud)
+
+#include "Constants.h"
+#include "Config.h"
+#include "src/pinmaps/Models.h"
+#include "src/HAL/HAL.h"
 
 // Helper macros for debugging, with less typing
 #if DEBUG != OFF
@@ -70,48 +80,20 @@
   #define VLF(x)
 #endif
 
-//#ifdef TASKS_SHOW_COORDS
-#define TASKS_PROFILER_ENABLE    // turning this on will impact performance
-#define TASKS_SKIP_MISSED        // causes late tasks to be skipped, best not to do that
-#define  TASKS_HWTIMER1_ENABLE
-#define  TASKS_HWTIMER2_ENABLE
-#define  TASKS_HWTIMER3_ENABLE
+#define  TASKS_SKIP_MISSED
+#define  TASKS_HWTIMER1_ENABLE     // only the Mega2560 hardware timers are tested and seem to work
+#define  TASKS_HWTIMER2_ENABLE     // if the Teensy or UNO don't work comment these out to use the
+#define  TASKS_HWTIMER3_ENABLE     // software task scheduler instead
 #include "src/tasks/OnTask.h"
+#ifdef TASKS_PROFILER_ENABLE
+  #include "src/tasks/Profiler.h"
+#endif
 
-#include "Constants.h"
-#include "Config.h"
-#include "Globals.h"
 #include "Axis.h"
+#include "Observatory.h"
 #include "Transform.h"
-#include "src/lib/StepDriver.h"
 #include "src/lib/BufferCmds.h"
 #include "ProcessCmds.h"
-
-// -------------------------------
-// various tasks
-
-void clockTick() { transform.clockTick(); }
-
-#if AXIS1_DRIVER != OFF
-void moveAxis1() { axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-#endif
-#if AXIS2_DRIVER != OFF
-void moveAxis2() { axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-#endif
-#if AXIS3_DRIVER != OFF
-void moveAxis3() { axis3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
-#endif
-#if AXIS4_DRIVER != OFF
-void moveAxis4() { axis4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
-#endif
-#if AXIS5_DRIVER != OFF
-void moveAxis5() { axis5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
-#endif
-#if AXIS6_DRIVER != OFF
-void moveAxis6() { axis6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
-#endif
-
-// -------------------------------
 
 void setup() {
   uint8_t handle;
@@ -127,35 +109,34 @@ void setup() {
   // ------------------------------------------------------------------------------------------------
   // add an event to tick the centisecond sidereal clock
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  handle=tasks.add(0, 0, true, 0, clockTick, "ClkTick");
-  tasks.requestHardwareTimer(handle,3,1);
+  handle = tasks.add(0, 0, true, 0, clockTick, "ClkTick");
+  tasks.requestHardwareTimer(handle, 3, 1);
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
-  transform.init(site, ut1, handle);
+  observatory.init(site, ut1, handle);
 
   // ------------------------------------------------------------------------------------------------
   // add an event to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
 #ifdef SERIAL_A
-  handle=tasks.add(1, 0, true, 7, processCmdsA, "PrcCmdA");
+  handle=tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
 #endif
 #ifdef SERIAL_B
-  handle=tasks.add(1, 0, true, 7, processCmdsB, "PrcCmdB");
+  handle=tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
 #endif
 #ifdef SERIAL_C
-  handle=tasks.add(1, 0, true, 7, processCmdsC, "PrcCmdC");
+  handle=tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
 #endif
 #ifdef SERIAL_D
-  handle=tasks.add(1, 0, true, 7, processCmdsD, "PrcCmdD");
+  handle=tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
 #endif
 #ifdef SERIAL_ST4
-  handle=tasks.add(1, 0, true, 7, processCmdsST4, "PrcCmdS");
+  handle=tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
 #endif
 
   // ------------------------------------------------------------------------------------------------
 
   // setup axis1
-#if AXIS1_DRIVER != OFF
-  axis1Driver.init(axis1DriverSettings);
+#if AXIS1_DRIVER_MODEL != OFF
   handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1"); tasks.requestHardwareTimer(handle,1,0);
   axis1.init(false, false, true, handle);
   axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
@@ -166,8 +147,7 @@ void setup() {
 #endif
 
   // setup axis2
-#if AXIS2_DRIVER != OFF
-  axis2Driver.init(axis2DriverSettings);
+#if AXIS2_DRIVER_MODEL != OFF
   handle = tasks.add(0, 0, true , 0, moveAxis2, "MoveAx2"); tasks.requestHardwareTimer(handle,2,0);
   axis2.init(false, false, true, handle);
   axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
@@ -184,10 +164,11 @@ void setup() {
   axis1.setTracking(true);
 
   // ------------------------------------------------------------------------------------------------
-  // add an event to show RA and Dec
+  // add an event to show the Task Profiler
 #ifdef TASKS_PROFILER_ENABLE
   tasks.add(142, 0, true, 7, profiler, "Profilr");
 #else
+  // add an event to show the telescope coordinates
   #ifdef TASKS_SHOW_COORDS
     tasks.add(1000, 0, true, 7, showEquatorialCoordinates);
   #endif
@@ -213,7 +194,7 @@ void showEquatorialCoordinates() {
   observed = transform.equMountToObservedPlace(mount);
 
   transform.hourAngleToRightAscension(&observed);
-  Serial.print("LST = "); Serial.println((transform.getLAST()/SIDEREAL_RATIO)*3600,1);
+  Serial.print("LST = "); Serial.println((observatory.getLAST()/SIDEREAL_RATIO)*3600,1);
   Serial.print("RA  = "); Serial.println(radToDeg(observed.r),4);
   Serial.print("HA  = "); Serial.println(radToDeg(observed.h),4);
   Serial.print("Dec = "); Serial.println(radToDeg(observed.d),4);
@@ -221,58 +202,5 @@ void showEquatorialCoordinates() {
   horizon = transform.equToHor(instrument);
   Serial.print("Alt = "); Serial.println(radToDeg(horizon.a),4);
   Serial.print("Azm = "); Serial.println(radToDeg(horizon.z),4);
-}
-#endif
-
-// the grab the task profiler info. once a second
-#ifdef TASKS_PROFILER_ENABLE
-#define PROFILER_VT100 ON
-void profiler() {
-  static int handle = tasks.getFirstHandle();
-
-  handle = tasks.getNextHandle();
-  if (!handle) {
-    handle = tasks.getFirstHandle();
-    #if PROFILER_VT100 == ON
-      Serial.print("\x1b[J");  // clear to end of screen
-      Serial.print("\x1b[H");  // cursor to upper left
-      Serial.print("\x1b[K");  // clear to end of line
-    #endif
-    Serial.println();
-  }
-
-  char *name = tasks.getNameStr(handle);
-  
-  double AA = tasks.getArrivalAvg(handle); Y;
-  double AX = tasks.getArrivalMax(handle); Y;
-  double RT = tasks.getRuntimeTotal(handle); Y;
-  double RTcount = tasks.getRuntimeTotalCount(handle); Y;
-  double RA; if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
-  double RX = tasks.getRuntimeMax(handle); Y;
-  char s[120];
-
-  char aau[] = "us";
-  char axu[] = "us";
-  char rtu[] = "us";
-  char rau[] = "us";
-  char rxu[] = "us";
-  
-  if (abs(lround(AA)) > 999) { AA /= 1000.0; strcpy(aau,"ms"); }
-  if (abs(lround(AX)) > 999) { AX /= 1000.0; strcpy(axu,"ms"); }
-  if (abs(lround(RT)) > 999) { RT /= 1000.0; strcpy(rtu,"ms"); }
-  if (abs(lround(RA)) > 999) { RA /= 1000.0; strcpy(rau,"ms"); }
-  if (abs(lround(RX)) > 999) { RX /= 1000.0; strcpy(rxu,"ms"); }
-
-  if (abs(lround(AA)) > 999) { AA /= 1000.0; strcpy(aau,"s "); }
-  if (abs(lround(AX)) > 999) { AX /= 1000.0; strcpy(axu,"s "); }
-  if (abs(lround(RT)) > 999) { RT /= 1000.0; strcpy(rtu,"s "); }
-  if (abs(lround(RA)) > 999) { RA /= 1000.0; strcpy(rau,"s "); }
-  if (abs(lround(RX)) > 999) { RX /= 1000.0; strcpy(rxu,"s "); }
-
-  sprintf(s, "[%-10s] arrives avg=%5ld%s, max=±%4ld%s; runs tot=%4ld%s, avg=%4ld%s, max=%4ld%s", 
-          name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
-
-  Serial.print(s); Y;
-  Serial.println();
 }
 #endif

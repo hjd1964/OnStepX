@@ -1,82 +1,57 @@
-// --------------------------------------------------------------
-// OnTask
+/*
+ * Title       OnTask
+ * by          Howard Dutton
+ *
+ * Copyright (C) 2021 Howard Dutton
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+// DESCRIPTION:
+// 
+// Default provision is for 8 tasks, up to 255 are allowed, to change use:
+// #define TASKS_MAX 200 (for example) before the #include for this library.
+//
+// To enable the option to use a given hardware timer (1..4), if available depending on the HAL) add:
+// #define TASKS_HWTIMER1_ENABLE (for example) before the #include for this library.
+//
+// Normally tasks are skipped if they become too late, to instead queue them for later processing add:
+// #define TASKS_QUEUE_MISSED
+//
+// Enabling the profiler inserts time logging code into the process calls.  This provides the average
+// and largest start time delta and run time for each process.  To enable the profiler use:
+// #define TASKS_PROFILER
+//
+// Software timer based processes must use "tasks.yield();" (or the "Y;" macro, which is the same exact thing)
+// during any processing that requires a significant amount of time. This allows for the processing of other tasks
+// while it is working.  What a "significant amount of time" is depends on the program's requirements.  It might
+// be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timers based 
+// processes
+//
+// Up to 64 mutexes (0 to 63) are supported with the following macros:
+// tasks_mutex_enter(mutex_number)
+// tasks_mutex_exit(mutex_number)
 
 #pragma once
 
-// default provision is for 8 tasks, up to 255 are allowed, to change use:
-// #define TASKS_MAX 200 (for example) before the #include for this library
-
-// to enable the option to use a given hardware timer (1..4), if available depending on hw) add:
-// #define TASKS_HWTIMER1_ENABLE (for example) before the #include for this library
-
-// normally skipped tasks (too busy) are queued for later processing, to instead skip them add:
-// #define TASKS_SKIP_MISSED
-
-// enabling the profiler inserts time logging code into the process calls.  this provides the average
-// and largest start time delta and run time for each process.  to enable the profiler use:
-// #define TASKS_PROFILER
-
-#ifdef TASKS_PROFILER_ENABLE
-  volatile unsigned long _task_max_runtime[4] = {0, 0, 0, 0};
-  volatile unsigned long _task_total_runtime[4] = {0, 0, 0, 0};
-  volatile unsigned long _task_total_runtime_count[4] = {0, 0, 0, 0};
-  #ifdef TASKS_HWTIMER1_ENABLE
-    #define TASKS_HWTIMER1_PROFILER_PREFIX unsigned long runtime_t0 = micros()
-    #define TASKS_HWTIMER1_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[0] += at; _task_total_runtime_count[0]++; if (labs(at) > _task_max_runtime[0]) _task_max_runtime[0] = labs(at); }
-  #endif
-  #ifdef TASKS_HWTIMER2_ENABLE
-    #define TASKS_HWTIMER2_PROFILER_PREFIX unsigned long runtime_t0 = micros()
-    #define TASKS_HWTIMER2_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[1] += at; _task_total_runtime_count[1]++; if (labs(at) > _task_max_runtime[1]) _task_max_runtime[1] = labs(at); }
-  #endif
-  #ifdef TASKS_HWTIMER3_ENABLE
-    #define TASKS_HWTIMER3_PROFILER_PREFIX unsigned long runtime_t0 = micros()
-    #define TASKS_HWTIMER3_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[2] += at; _task_total_runtime_count[2]++; if (labs(at) > _task_max_runtime[2]) _task_max_runtime[2] = labs(at); }
-  #endif
-  #ifdef TASKS_HWTIMER4_ENABLE
-    #define TASKS_HWTIMER4_PROFILER_PREFIX unsigned long runtime_t0 = micros()
-    #define TASKS_HWTIMER4_PROFILER_SUFFIX { long at = micros()-runtime_t0; _task_total_runtime[3] += at; _task_total_runtime_count[3]++; if (labs(at) > _task_max_runtime[3]) _task_max_runtime[3] = labs(at); }
-  #endif
-
-  #define TASKS_PROFILER_PREFIX \
-    long at = time_to_next_task - period; \
-    average_arrival_time += at; \
-    average_arrival_time_count++; \
-    if (labs(at) > max_arrival_time) max_arrival_time = labs(at); \
-    unsigned long runtime_t0 = micros(); 
-  #define TASKS_PROFILER_SUFFIX \
-    at = micros()-runtime_t0; \
-    total_runtime += at; \
-    total_runtime_count++; \
-    if (labs(at) > max_runtime) max_runtime = labs(at);
-
-#else
-  #define TASKS_HWTIMER1_PROFILER_PREFIX
-  #define TASKS_HWTIMER1_PROFILER_SUFFIX
-  #define TASKS_HWTIMER2_PROFILER_PREFIX
-  #define TASKS_HWTIMER2_PROFILER_SUFFIX
-  #define TASKS_HWTIMER3_PROFILER_PREFIX
-  #define TASKS_HWTIMER3_PROFILER_SUFFIX
-  #define TASKS_HWTIMER4_PROFILER_PREFIX
-  #define TASKS_HWTIMER4_PROFILER_SUFFIX
-  #define TASKS_PROFILER_CALIBRATE
-  #define TASKS_PROFILER_PREFIX
-  #define TASKS_PROFILER_SUFFIX
-#endif
-
-// bring in hardware timer support
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
-#include "HAL_ATMEGA328_HWTIMER.h"
-#elif defined(__AVR_ATmega1280__) ||defined(__AVR_ATmega2560__)
-#include "HAL_MEGA2560_HWTIMER.h"
-#elif defined(__TEENSYDUINO__)
-#include "HAL_TEENSY_HWTIMER.h"
-#else
-#include "HAL_EMPTY_HWTIMER.h"
-#endif
+#include "HAL_PROFILER.h"
+#include "HAL_HWTIMERS.h"
 
 // up to 8 tasks default
 #ifndef TASKS_MAX
-#define TASKS_MAX 8
+  #define TASKS_MAX 8
 #endif
 
 enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
@@ -169,7 +144,7 @@ class Task {
           }
 
           // set adjusted period
-          #ifdef TASKS_SKIP_MISSED
+          #ifndef TASKS_QUEUE_MISSED
             if (-time_to_next_task > period) time_to_next_task = period;
           #endif
           next_task_time = t + (long)(period + time_to_next_task);
@@ -246,7 +221,7 @@ class Task {
           setPeriodMicros(lround(x));
           return;
         }
-        x = freq * 1000.0;            // micros per call
+        x = freq * 1000.0;            // millis per call
         if (x <= 4294967295.0) {
           setPeriod(lround(x));
           return;
@@ -333,18 +308,18 @@ class Task {
       }
     }
 
-    char          processName[8]    = "";
-    unsigned long period            = 0;
-    unsigned long duration          = 0;
-    bool          repeat            = false;
-    uint8_t       priority          = 0;
-    unsigned long next_period       = 0;
-    PeriodUnits   period_units      = PU_MILLIS;
-    PeriodUnits   next_period_units = PU_NONE;
-    unsigned long start_time        = 0;
-    unsigned long next_task_time    = 0;
-    bool          running           = false;
-    uint8_t       hardwareTimer     = 0;
+    char                   processName[8]             = "";
+    unsigned long          period                     = 0;
+    unsigned long          next_period                = 0;
+    unsigned long          duration                   = 0;
+    bool                   repeat                     = false;
+    uint8_t                priority                   = 0;
+    bool                   running                    = false;
+    PeriodUnits            period_units               = PU_MILLIS;
+    PeriodUnits            next_period_units          = PU_NONE;
+    unsigned long          start_time                 = 0;
+    unsigned long          next_task_time             = 0;
+    uint8_t                hardwareTimer              = 0;
     void (*callback)() = NULL;
 #ifdef TASKS_PROFILER_ENABLE
     volatile double        average_arrival_time       = 0;
@@ -619,4 +594,11 @@ class Tasks {
 };
 
 Tasks tasks;
-#define Y tasks.yield() // short P macro to embed polling
+
+// short P macro to embed polling
+#define Y tasks.yield()
+
+// mutex macros, do not run these in hardware timers (not ISR safe)!
+#define tasks_mutex_enter(m) while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8,1));
+#define tasks_mutex_exit(m)  bitClear(__task_mutex[m/8],m%8,0));
+static uint8_t __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};

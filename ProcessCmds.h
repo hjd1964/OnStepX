@@ -22,7 +22,7 @@ class Command {
     }
     CommandErrors process(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {
     
-// G - Get Telescope Information
+// G - Telescope Get
       if (command[0] == 'G') {
 // :GVD#      Get Telescope Firmware Date
 //            Returns: MTH DD YYYY#
@@ -44,7 +44,7 @@ class Command {
         } else return CE_CMD_UNKNOWN;
       } else
 
-// S - Telescope Set Commands
+// S - Telescope Set
       if (command[0] == 'S') {
 //  :Sd[sDD*MM]# or :Sd[sDD*MM:SS]# or :Sd[sDD*MM:SS.SSS]#
 //            Set target object declination
@@ -109,30 +109,32 @@ class Command {
       strcat(s,HEXS);
     }
 
-    Buffer buffer;
-    SerialWrapper SerialPort;
     CommandErrors commandError     = CE_NONE;
     CommandErrors lastCommandError = CE_NONE;
-    bool serialReady = false;
-    long serialBaud  = 9600;
+    bool serialReady               = false;
+    long serialBaud                = 9600;
 
     EquCoordinate target;
+
+    Buffer buffer;
+    SerialWrapper SerialPort;
 };
 
+// callback wrappers
 #ifdef SERIAL_A
-  Command processCommandsA(SERIAL_A_BAUD);
+  Command processCommandsA(SERIAL_A_BAUD_DEFAULT);
   void processCmdsA() { processCommandsA.poll(); }
 #endif
 #ifdef SERIAL_B
-  Command processCommandsB(SERIAL_B_BAUD);
+  Command processCommandsB(SERIAL_B_BAUD_DEFAULT);
   void processCmdsB() { processCommandsB.poll(); }
 #endif
 #ifdef SERIAL_C
-  Command processCommandsC(SERIAL_C_BAUD);
+  Command processCommandsC(SERIAL_C_BAUD_DEFAULT);
   void processCmdsC() { processCommandsC.poll(); }
 #endif
 #ifdef SERIAL_D
-  Command processCommandsD(SERIAL_D_BAUD);
+  Command processCommandsD(SERIAL_D_BAUD_DEFAULT);
   void processCmdsD() { processCommandsD.poll(); }
 #endif
 #ifdef SERIAL_ST4
