@@ -80,5 +80,5 @@ float HAL_MCU_Temperature(void) {
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #ifdef NV_DEFAULT
-  #include "NV/NV_EEPROM.h"
+  #include "NV/NV_EEPROM_ESP.h"
 #endif
