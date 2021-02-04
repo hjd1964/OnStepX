@@ -54,6 +54,11 @@
   #define TASKS_MAX 8
 #endif
 
+// mutex macros, do not run these in hardware timers (not ISR safe)!
+#define tasks_mutex_enter(m) while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8,1));
+#define tasks_mutex_exit(m)  bitClear(__task_mutex[m/8],m%8,0));
+static uint8_t __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 
 class Task {
@@ -339,6 +344,8 @@ class Tasks {
         task[c] = NULL;
         allocated[c] = false;
       }
+      
+      for (uint8_t c = 0; c < 8; c++) __task_mutex[c] = 0;
     }
 
     ~Tasks() {
@@ -597,8 +604,3 @@ Tasks tasks;
 
 // short P macro to embed polling
 #define Y tasks.yield()
-
-// mutex macros, do not run these in hardware timers (not ISR safe)!
-#define tasks_mutex_enter(m) while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8,1));
-#define tasks_mutex_exit(m)  bitClear(__task_mutex[m/8],m%8,0));
-static uint8_t __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};

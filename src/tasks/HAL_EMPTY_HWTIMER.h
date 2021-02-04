@@ -48,6 +48,7 @@
     HAL_HWTIMER1_FUN = NULL;
   }
 
+  #define HAL_HWTIMER1_SET_PERIOD() {} // <--- code to set timer period goes here
   void HAL_HWTIMER1_WRAPPER() {
     TASKS_HWTIMER1_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -73,6 +74,7 @@
     HAL_HWTIMER2_FUN = NULL;
   }
 
+  #define HAL_HWTIMER2_SET_PERIOD() {} // <--- code to set timer period goes here
   void HAL_HWTIMER2_WRAPPER() {
     TASKS_HWTIMER2_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -91,12 +93,14 @@
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
     // <--- code to init/start timer goes here
     return true;
+  }
   
   void HAL_HWTIMER3_DONE() {
     // <--- code to stop timer goes here
     HAL_HWTIMER3_FUN = NULL;
   }
 
+  #define HAL_HWTIMER3_SET_PERIOD() {} // <--- code to set timer period goes here
   void HAL_HWTIMER3_WRAPPER() {
     TASKS_HWTIMER3_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -122,6 +126,7 @@
     HAL_HWTIMER4_FUN = NULL;
   }
 
+  #define HAL_HWTIMER4_SET_PERIOD() {} // <--- code to set timer period goes here
   void HAL_HWTIMER4_WRAPPER() {
     TASKS_HWTIMER4_PROFILER_PREFIX;
     static uint16_t count = 0;

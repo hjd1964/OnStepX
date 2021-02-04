@@ -64,6 +64,8 @@ class Command {
           target.r = hrsToRad(target.r);
         } else return CE_CMD_UNKNOWN;
       } else return CE_CMD_UNKNOWN;
+
+      return CE_NONE;
     }
 
     void poll() {

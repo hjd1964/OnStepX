@@ -27,8 +27,8 @@ class SerialWrapper : public Stream
     inline size_t write(int n) { return write((uint8_t)n); }
 
     inline bool hasChannel(uint8_t channel) { return bitRead(_wrapper_channels, channel); }
-    inline bool setChannel(uint8_t channel) { bitSet(_wrapper_channels, channel); }
-    inline bool clrChannel(uint8_t channel) { bitClear(_wrapper_channels, channel); }
+    inline void setChannel(uint8_t channel) { bitSet(_wrapper_channels, channel); }
+    inline void clrChannel(uint8_t channel) { bitClear(_wrapper_channels, channel); }
 
     using Print::write;
 
@@ -134,6 +134,7 @@ size_t SerialWrapper::write(uint8_t data) {
   if (isChannel(channel)) return SERIAL_ST4.write(data);
   channel++;
 #endif
+  return -1;
 }
 
 size_t SerialWrapper::write(const uint8_t *data, size_t quantity) {
@@ -158,6 +159,7 @@ size_t SerialWrapper::write(const uint8_t *data, size_t quantity) {
   if (isChannel(channel)) return SERIAL_ST4.write(data, quantity);
   channel++;
 #endif
+  return -1;
 }
 
 int SerialWrapper::available(void) {
@@ -182,6 +184,7 @@ int SerialWrapper::available(void) {
   if (isChannel(channel)) return SERIAL_ST4.available();
   channel++;
 #endif
+  return 0;
 }
 
 int SerialWrapper::read(void) {
@@ -206,6 +209,7 @@ int SerialWrapper::read(void) {
   if (isChannel(channel)) return SERIAL_ST4.read();
   channel++;
 #endif
+  return -1;
 }
 
 int SerialWrapper::peek(void) {
@@ -230,6 +234,7 @@ int SerialWrapper::peek(void) {
   if (isChannel(channel)) return SERIAL_ST4.peek();
   channel++;
 #endif
+  return -1;
 }
 
 void SerialWrapper::flush(void) {

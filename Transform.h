@@ -65,6 +65,7 @@ class Transform {
       }
       if (equ.d >  PI*2) equ.d -= PI*2; else
       if (equ.d < -PI*2) equ.d += PI*2;
+      return equ;
     }
 
     PierSide mountToPierSide(EquCoordinate equ) {

@@ -16,9 +16,9 @@
     uint32_t counts, reps=0;
     if (period != 0 && period <= 2144000000) {
       if (period < 16) period = 16;         // minimum time is 1us
-      double fperiod  = period/timerRate16MHzTicks;
-      uint32_t reps   = fperiod/4194304.0 + 1.0;
-      uint32_t counts = fperiod/reps - 1.0; // has -1 since this is dropped right into a timer register
+      double fperiod = period/timerRate16MHzTicks;
+      reps           = fperiod/4194304.0 + 1.0;
+      counts         = fperiod/reps - 1.0; // has -1 since this is dropped right into a timer register
     } else counts = 160000;                 // set for a 10ms period, stopped
   
     noInterrupts();
@@ -47,7 +47,7 @@
 
   void HAL_HWTIMER1_DONE() {
     HAL_HWTIMER1_FUN = NULL;
-    itimer1.done();
+    itimer1.end();
   }
 
   #define HAL_HWTIMER1_SET_PERIOD() (PIT_LDVAL1=_nextPeriod1)
@@ -75,7 +75,7 @@
 
   void HAL_HWTIMER2_DONE() {
     HAL_HWTIMER2_FUN = NULL;
-    itimer2.done();
+    itimer2.end();
   }
   
   #define HAL_HWTIMER2_SET_PERIOD() (PIT_LDVAL2=_nextPeriod2)
@@ -103,7 +103,7 @@
 
   void HAL_HWTIMER3_DONE() {
     HAL_HWTIMER3_FUN = NULL;
-    itimer3.done();
+    itimer3.end();
   }
   
   #define HAL_HWTIMER3_SET_PERIOD() (PIT_LDVAL3=_nextPeriod3)
@@ -131,7 +131,7 @@
 
   void HAL_HWTIMER4_DONE() {
     HAL_HWTIMER4_FUN = NULL;
-    itimer4.done();
+    itimer4.end();
   }
   
   #define HAL_HWTIMER4_SET_PERIOD() (PIT_LDVAL4=_nextPeriod4)

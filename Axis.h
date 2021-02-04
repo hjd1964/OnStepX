@@ -275,9 +275,9 @@ class Axis {
     unsigned long last_period_in_microseconds = 0;
     unsigned long next_period_in_microseconds = 0;
 
-    double maxFreq             = 0.0;
-    double minPeriodMicros     = 0.0;
-    long   minPeriodMicrosHalf = 0;
+    double maxFreq                            = 0.0;
+    double minPeriodMicros                    = 0.0;
+    unsigned long minPeriodMicrosHalf         = 0;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
