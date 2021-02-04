@@ -28,7 +28,7 @@
 #define SERIAL_C_BLUETOOTH_NAME  "OnStep" // "On..", Bluetooth device name for ESP32.                                         Option
 
 //#define TASKS_SHOW_COORDS
-#define TASKS_PROFILER_ENABLE // turning this on will impact performance
+//#define TASKS_PROFILER_ENABLE // turning this on will impact performance
 
 #define NV_DEFAULT
 
