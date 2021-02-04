@@ -3,7 +3,9 @@
 
 // provides four 32 bit pit timers with 16 bit software pre-scalers, running at 16MHz
 // each timer configured as ~0 to x seconds (granularity of timer is 0.062uS)
-
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)  
+  #define F_BUS 16000000L                            // F_BUS isn't defined for the T4.0, we force the timers to run at 16MHZ
+#endif
 #define TIMER_RATE_MHZ (F_BUS/1000000.0)             // Teensy motor timers run at F_BUS Hz so use full resolution
 #define TIMER_RATE_16MHZ_TICKS (16.0/TIMER_RATE_MHZ) // 16.0/TIMER_RATE_MHZ for the default 16MHz "sub micros"
 
@@ -50,7 +52,11 @@
     itimer1.end();
   }
 
-  #define HAL_HWTIMER1_SET_PERIOD() (PIT_LDVAL1=_nextPeriod1)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+  #define HAL_HWTIMER1_SET_PERIOD() itimer1.update((double)_nextPeriod1 * 0.0625)
+#else
+  #define HAL_HWTIMER1_SET_PERIOD() (PIT_LDVAL1 = _nextPeriod1)
+#endif
   void HAL_HWTIMER1_WRAPPER() {
     TASKS_HWTIMER1_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -78,7 +84,11 @@
     itimer2.end();
   }
   
-  #define HAL_HWTIMER2_SET_PERIOD() (PIT_LDVAL2=_nextPeriod2)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+  #define HAL_HWTIMER2_SET_PERIOD() itimer2.update((double)_nextPeriod2 * 0.0625)
+#else
+  #define HAL_HWTIMER2_SET_PERIOD() (PIT_LDVAL2 = _nextPeriod2)
+#endif
   void HAL_HWTIMER2_WRAPPER() {
     TASKS_HWTIMER2_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -106,7 +116,11 @@
     itimer3.end();
   }
   
-  #define HAL_HWTIMER3_SET_PERIOD() (PIT_LDVAL3=_nextPeriod3)
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+  #define HAL_HWTIMER3_SET_PERIOD() itimer3.update((double)_nextPeriod3 * 0.0625)
+#else
+  #define HAL_HWTIMER3_SET_PERIOD() (PIT_LDVAL3 = _nextPeriod3)
+#endif
   void HAL_HWTIMER3_WRAPPER() {
     TASKS_HWTIMER3_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -133,8 +147,12 @@
     HAL_HWTIMER4_FUN = NULL;
     itimer4.end();
   }
-  
-  #define HAL_HWTIMER4_SET_PERIOD() (PIT_LDVAL4=_nextPeriod4)
+
+#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+  #define HAL_HWTIMER4_SET_PERIOD() itimer4.update((double)_nextPeriod4 * 0.0625)
+#else
+  #define HAL_HWTIMER4_SET_PERIOD() (PIT_LDVAL4 = _nextPeriod4)
+#endif
   void HAL_HWTIMER4_WRAPPER() {
     TASKS_HWTIMER4_PROFILER_PREFIX;
     static uint16_t count = 0;
