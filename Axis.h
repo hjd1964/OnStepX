@@ -120,23 +120,23 @@ class Axis {
         if (tracking) targetSteps += trackingStep;
         if (motorSteps + backlashSteps > targetSteps) {
           if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
-          digitalWriteF(stepPin,invertStep?LOW:HIGH);
+          digitalWriteF(stepPin, invertStep?LOW:HIGH);
         } else {
           if (motorSteps + backlashSteps < targetSteps) {
             if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
-            digitalWriteF(stepPin,invertStep?LOW:HIGH);
+            digitalWriteF(stepPin, invertStep?LOW:HIGH);
           }
         }
       } else {
         if (motorSteps + backlashSteps > targetSteps) {
           if (!dirFwd) {
             dirFwd = !dirFwd;
-            digitalWriteF(dirPin,invertDir?LOW:HIGH);
+            digitalWriteF(dirPin, invertDir?LOW:HIGH);
           }
         } else if (motorSteps + backlashSteps < targetSteps) {
           if (dirFwd) {
             dirFwd = !dirFwd;
-            digitalWriteF(dirPin,invertDir?HIGH:LOW);
+            digitalWriteF(dirPin, invertDir?HIGH:LOW);
           }
         }
         if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
@@ -192,10 +192,11 @@ class Axis {
     void setFrequency(double frequency) {
       double d=500000.0/(frequency*spm);
       if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
-      next_period_in_microseconds = lround(d);
-      if (next_period_in_microseconds < minPeriodMicrosHalf) next_period_in_microseconds = minPeriodMicrosHalf;
+      unsigned long periodMicroseconds = lround(d);
+      if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
       // handle the case where the move() method isn't called to set the new period
-      if (last_period_in_microseconds == 0) tasks.setPeriodMicros(task_handle, next_period_in_microseconds);
+      if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
+      lastFrequency = frequency;
     }
 
     void setTracking(bool tracking) {
@@ -239,45 +240,44 @@ class Axis {
   private:
     const int8_t stepPin, dirPin, enabledPin;
 
-    uint8_t task_handle        = 0;
+    uint8_t task_handle               = 0;
 
-    bool   invertStep          = false;
-    bool   invertDir           = false;
-    bool   invertEnabled       = false;
+    bool   invertEnabled              = false;
+    bool   enabled                    = false;
+    bool   tracking                   = false;
 
-    bool   enabled             = false;
-    bool   dirFwd              = true;
-    bool   takeStep            = false;
-    
-    bool   tracking            = false;
-    int    trackingStep        = 1;
-    int    step                = 1;
+    double origin                     = 0.0;
+    double target                     = 0.0;
+    double motor                      = 0.0;
 
-    double origin              = 0.0;
-    long   originSteps         = 0;
-    double target              = 0.0;
-    volatile long targetSteps  = 0;
-    double motor               = 0.0;
-    volatile long motorSteps   = 0;
-    volatile long indexSteps   = 0;
+    long   originSteps                = 0;
 
-    volatile long backlashSteps= 0;
-    long   backlashAmountSteps = 0;
+    volatile long targetSteps         = 0;
+    volatile long motorSteps          = 0;
+    volatile long indexSteps          = 0;
+    volatile int  trackingStep        = 1;
+    volatile int  step                = 1;
+    volatile bool invertStep          = false;
+    volatile bool takeStep            = false;
+    volatile bool invertDir           = false;
+    volatile bool dirFwd              = true;
 
-    long   minSteps            = 0;
-    long   maxSteps            = 0;
+    volatile long backlashSteps       = 0;
+    long   backlashAmountSteps        = 0;
 
-    double spm                 = 1.0;
+    long   minSteps                   = 0;
+    long   maxSteps                   = 0;
 
-    double trackingFreq                       = 0.0;
-    double trackingPeriodMicros               = 0.0;
-    long   trackingPeriodMicrosHalf           = 0;
-    unsigned long last_period_in_microseconds = 0;
-    unsigned long next_period_in_microseconds = 0;
+    double spm                        = 1.0;
 
-    double maxFreq                            = 0.0;
-    double minPeriodMicros                    = 0.0;
-    unsigned long minPeriodMicrosHalf         = 0;
+    double trackingFreq               = 0.0;
+    double trackingPeriodMicros       = 0.0;
+    long   trackingPeriodMicrosHalf   = 0;
+    double lastFrequency              = 0.0;
+
+    double maxFreq                    = 0.0;
+    double minPeriodMicros            = 0.0;
+    unsigned long minPeriodMicrosHalf = 0;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
