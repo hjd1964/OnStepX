@@ -90,10 +90,10 @@
 #define radToArcsec(x)              ((x*RAD)*3600.0)
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
-#define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }
+#define pinModeEx(pin,mode)           { if (pin != OFF || pin != SHARED) { pinMode(pin,mode); } }
 #define pinModeInitEx(pin,mode,state) { pinModeEx(pin,mode); digitalWrite(pin,state); }
-#define digitalWriteEx(pin,value)     { if (pin != OFF && pin != SHARED) digitalWrite(pin,value); }
-int     digitalReadEx(int pin)        { if (pin != OFF && pin != SHARED) return digitalRead(pin); else return 0; }
+#define digitalWriteEx(pin,value)     { if (pin != OFF || pin != SHARED) digitalWrite(pin,value); }
+int     digitalReadEx(int pin)        { if (pin != OFF || pin != SHARED) return digitalRead(pin); else return 0; }
 #ifndef delaySpi
   #define delaySpi() delayMicroseconds(1)
 #endif
