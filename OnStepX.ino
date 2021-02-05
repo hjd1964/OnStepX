@@ -89,8 +89,9 @@
   #include "src/tasks/Profiler.h"
 #endif
 
-#include "Axis.h"
 #include "Observatory.h"
+#include "Telescope.h"
+#include "Axis.h"
 #include "Transform.h"
 #include "src/lib/BufferCmds.h"
 #include "ProcessCommands.h"

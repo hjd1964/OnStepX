@@ -29,13 +29,13 @@ class Observatory {
       if (command[0] == 'S' && command[1] == 'C')  {
         double jd;
         if (transform.dateToDouble(&jd, parameter)) {
-          //nv.writeFloat(EE_JD, JD);
-          ut1.julianDay = jd;        // <-- watch this for truncating the fraction, Julian days start at Noon
+          // nv.writeFloat(EE_JD, JD);
+          ut1.julianDay = jd; // <-- watch this for truncating the fraction, Julian days start at Noon
           adjustLAST(ut1.julianDay);
-          //if (generalError == ERR_SITE_INIT && observatory.ut1.timeReady) generalError = ERR_NONE;
+          // if (generalError == ERR_SITE_INIT && observatory.ut1.timeReady) generalError = ERR_NONE;
         } else *commandError = CE_PARAM_FORM;
-        return true;
       } else return false;
+      return true;
     }
 
     void setLatitude(double latitude) {
