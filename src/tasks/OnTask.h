@@ -3,6 +3,7 @@
  * by          Howard Dutton
  *
  * Copyright (C) 2021 Howard Dutton
+ * www.stellarjourney.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +41,12 @@
 // be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timers based 
 // processes
 //
-// Up to 64 mutexes (0 to 63) are supported with the following macros:
+// Up to 64 mutexes (0 to 63) are supported with the following macros, any
+// code between these two statements will be limited to running on one process
+// at a time even if "tasks.yield();" is called within that code:
 // tasks_mutex_enter(mutex_number)
 // tasks_mutex_exit(mutex_number)
+//
 
 #pragma once
 
