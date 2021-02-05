@@ -11,23 +11,27 @@ typedef struct AxisSettings {
   int16_t max;
 } AxisSettings;
 
+typedef struct AxisPins {
+  int8_t step;
+  int8_t dir;
+  int8_t enable;
+  bool   invertStep;
+  bool   invertDir;
+  bool   invertEnable;
+} AxisPins;
+
 enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
+
 
 class Axis {
   public:
-    Axis(int8_t stepPin, int8_t dirPin, int8_t enabledPin, DriverPins ModePins, DriverSettings ModeSettings) :
-      stepPin{ stepPin }, dirPin{ dirPin }, enabledPin{ enabledPin },
-      ModePins{ ModePins }, ModeSettings{ ModeSettings } {}
+    Axis(AxisPins Pins, DriverPins ModePins, DriverSettings ModeSettings) :
+      Pins{ Pins }, ModePins{ ModePins }, ModeSettings{ ModeSettings } {}
 
-    void init(bool invertStep, bool invertDir, bool invertEnabled, uint8_t task_handle) {
-      this->invertStep = invertStep;
-      pinModeInitEx(stepPin, OUTPUT, !invertStep?LOW:HIGH);
-
-      this->invertDir = invertDir;
-      pinModeInitEx(dirPin, OUTPUT, !invertDir?LOW:HIGH);
-
-      this->invertEnabled = invertEnabled;
-      pinModeEx(enabledPin, OUTPUT); enable(false);
+    void init(uint8_t task_handle) {
+      pinModeInitEx(Pins.step, OUTPUT, !invertStep?LOW:HIGH);
+      pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
+      pinModeEx(Pins.enable, OUTPUT); enable(false);
 
       this->task_handle = task_handle;
 
@@ -35,9 +39,8 @@ class Axis {
     }
 
     void enable(bool value) {
-      enabled = value;
-      if (enabledPin != OFF) {
-        if (enabled) digitalWrite(enabledPin, invertEnabled?LOW:HIGH); else digitalWrite(enabledPin, invertEnabled?HIGH:LOW);
+      if (Pins.enable != OFF) {
+        if (value) digitalWrite(Pins.enable, invertEnabled?HIGH:LOW); else digitalWrite(Pins.enable, invertEnabled?LOW:HIGH);
       }
     }
 
@@ -164,7 +167,7 @@ class Axis {
     }
 
     void setTracking(bool tracking) {
-      this->tracking=tracking;
+      this->tracking = tracking;
     }
 
     bool getTracking() {
@@ -182,27 +185,26 @@ class Axis {
     }
 
     double getBacklash() {
-      return backlashSteps / spm;
+      return backlashSteps/spm;
     }
 
     void setMinCoordinate(double value) {
-      minSteps = value * spm;
+      minSteps = value*spm;
     }
 
     double getMinCoordinate() {
-      return minSteps / spm;
+      return minSteps/spm;
     }
 
     void setMaxCoordinate(double value) {
-      maxSteps = value * spm;
+      maxSteps = value*spm;
     }
 
     double getMaxCoordinate() {
-      return maxSteps / spm;
+      return maxSteps/spm;
     }
         
   private:
-    const int8_t stepPin, dirPin, enabledPin;
 
     uint8_t task_handle               = 0;
 
@@ -245,6 +247,7 @@ class Axis {
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
+    const AxisPins       Pins         = {OFF, OFF, OFF, false, false, false};
     const DriverPins     ModePins     = {OFF, OFF, OFF, OFF, OFF};
     const DriverSettings ModeSettings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
     StepDriver stepDriver{ModePins, ModeSettings};
@@ -252,26 +255,32 @@ class Axis {
 
 // instantiate and callback wrappers
 #if AXIS1_DRIVER_MODEL != OFF
-  Axis axis1{AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, Axis1DriverModePins, Axis1DriverModeSettings};
+  const AxisPins Axis1Pins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
+  Axis axis1{Axis1Pins, Axis1DriverModePins, Axis1DriverModeSettings};
   void moveAxis1() { axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
-  Axis axis2{AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, Axis2DriverModePins, Axis2DriverModeSettings};
+  const AxisPins Axis2Pins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
+  Axis axis2{Axis2Pins, Axis2DriverModePins, Axis2DriverModeSettings};
   void moveAxis2() { axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
-  Axis axis3{AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, Axis3DriverModePins, Axis3DriverModeSettings};
+  const AxisPins Axis3Pins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
+  Axis axis3{Axis3Pins, Axis3DriverModePins, Axis3DriverModeSettings};
   void moveAxis3() { axis3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
-  Axis axis4{AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, Axis4DriverModePins, Axis4DriverModeSettings};
+  const AxisPins Axis4Pins = {AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, false, false, true};
+  Axis axis4{Axis4Pins, Axis4DriverModePins, Axis4DriverModeSettings};
   void moveAxis4() { axis4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
-  Axis axis5{AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, Axis5DriverModePins, Axis5DriverModeSettings};
+  const AxisPins Axis5Pins = {AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, false, false, true};
+  Axis axis5{Axis5Pins, Axis5DriverModePins, Axis5DriverModeSettings};
   void moveAxis5() { axis5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
-  Axis axis6{AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, Axis6DriverModePins, Axis6DriverModeSettings};
+  const AxisPins Axis6Pins = {AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, false, false, true};
+  Axis axis6{Axis6Pins, Axis6DriverModePins, Axis6DriverModeSettings};
   void moveAxis6() { axis6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
