@@ -37,7 +37,7 @@ class Axis {
     void enable(bool value) {
       enabled = value;
       if (enabledPin != OFF) {
-        if (enabled) digitalWrite(enabledPin,invertEnabled?LOW:HIGH); else digitalWrite(enabledPin,invertEnabled?HIGH:LOW);
+        if (enabled) digitalWrite(enabledPin, invertEnabled?LOW:HIGH); else digitalWrite(enabledPin, invertEnabled?HIGH:LOW);
       }
     }
 

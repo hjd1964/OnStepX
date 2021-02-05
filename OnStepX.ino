@@ -118,19 +118,19 @@ void setup() {
   // add an event to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
 #ifdef SERIAL_A
-  handle=tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
+  handle = tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
 #endif
 #ifdef SERIAL_B
-  handle=tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
+  handle = tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
 #endif
 #ifdef SERIAL_C
-  handle=tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
+  handle = tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
 #endif
 #ifdef SERIAL_D
-  handle=tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
+  handle = tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
 #endif
 #ifdef SERIAL_ST4
-  handle=tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
+  handle = tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
 #endif
 
   // ------------------------------------------------------------------------------------------------
@@ -194,13 +194,13 @@ void showEquatorialCoordinates() {
   observed = transform.equMountToObservedPlace(mount);
 
   transform.hourAngleToRightAscension(&observed);
-  Serial.print("LST = "); Serial.println((observatory.getLAST()/SIDEREAL_RATIO)*3600,1);
-  Serial.print("RA  = "); Serial.println(radToDeg(observed.r),4);
-  Serial.print("HA  = "); Serial.println(radToDeg(observed.h),4);
-  Serial.print("Dec = "); Serial.println(radToDeg(observed.d),4);
+  Serial.print("LST = "); Serial.println((observatory.getLAST()/SIDEREAL_RATIO)*3600, 1);
+  Serial.print("RA  = "); Serial.println(radToDeg(observed.r), 4);
+  Serial.print("HA  = "); Serial.println(radToDeg(observed.h), 4);
+  Serial.print("Dec = "); Serial.println(radToDeg(observed.d), 4);
 
   horizon = transform.equToHor(instrument);
-  Serial.print("Alt = "); Serial.println(radToDeg(horizon.a),4);
-  Serial.print("Azm = "); Serial.println(radToDeg(horizon.z),4);
+  Serial.print("Alt = "); Serial.println(radToDeg(horizon.a), 4);
+  Serial.print("Azm = "); Serial.println(radToDeg(horizon.z), 4);
 }
 #endif

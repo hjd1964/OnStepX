@@ -9,7 +9,7 @@
 // MOUNT      <--> apply pointing model                   <--> OBSERVED    (Transform)
 // OBSERVED   <--> apply refraction                       <--> TOPOCENTRIC (Transform)
 
-enum PierSide {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
+enum PierSide      {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 enum PrecisionMode {PM_LOW, PM_HIGH, PM_HIGHEST};
 
 typedef struct EquCoordinate {
@@ -78,8 +78,8 @@ class Transform {
 
       // within about 1/20 arc-second of NCP or SCP
     #if TOPOCENTRIC_STRICT == ON
-      if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0; hor.a= site.latitude.value; } else 
-      if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = PI;  hor.a=-site.latitude.value; } else hor=equToHor(equ);
+      if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0; hor.a =  site.latitude.value; } else 
+      if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = PI;  hor.a = -site.latitude.value; } else hor=equToHor(equ);
     #else
       if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor=equToHor(equ);
     #endif
@@ -94,10 +94,10 @@ class Transform {
       
       // within about 1/20 arc-second of the "refracted" NCP or SCP
     #if TOPOCENTRIC_STRICT == ON
-      if (fabs(equ.d-PI/2) < SmallestRad) { hor.z=0.0;   hor.a= site.latitude.value; } else
-      if (fabs(equ.d+PI/2) < SmallestRad) { hor.z=180.0; hor.a=-site.latitude.value; } else hor=equToHor(equ);
+      if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0;   hor.a =  site.latitude.value; } else
+      if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = 180.0; hor.a = -site.latitude.value; } else hor = equToHor(equ);
     #else  
-      if (fabs(equ.d-PI/2) < SmallestRad || fabs(equ.d+PI/2) < SmallestRad) return equ; else hor=equToHor(equ);
+      if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor = equToHor(equ);
     #endif
 
       hor.a -= apparentRefrac(hor.a);
@@ -140,7 +140,7 @@ class Transform {
       double sinDec = (sin(hor.a) * observatory.site.latitude.sine) + (cos(hor.a) * observatory.site.latitude.cosine * cosAzm);  
       equ.d         = asin(sinDec); 
       double t1     = sin(hor.z);
-      double t2     = cosAzm*observatory.site.latitude.sine-tan(hor.a)*observatory.site.latitude.cosine;
+      double t2     = cosAzm*observatory.site.latitude.sine - tan(hor.a)*observatory.site.latitude.cosine;
       equ.h         = atan2(t1,t2);
       equ.h        += PI;
       return equ;
@@ -169,7 +169,7 @@ class Transform {
       if (isnan(pressure)) pressure = 1010.0;
       if (isnan(temperature)) temperature = 10.0;
       double r = trueRefrac(altitude, pressure, temperature);
-      return trueRefrac(altitude-r, pressure, temperature);
+      return trueRefrac(altitude - r, pressure, temperature);
     }
 
     // --------------------------------------------------------------------------------------------------------
@@ -269,7 +269,7 @@ class Transform {
       }
     
       // set sign and return result string
-      char sign[2]="";
+      char sign[2] = "";
       if ((sd != 0 || s1 != 0 || m1 != 0 || h1 != 0) && *f < 0.0) strcpy(sign,"-");
       if (p == PM_HIGHEST) sprintf(reply, s, sign, (int)h1, (int)m1, (int)s1, (int)sd); else sprintf(reply, s, sign, (int)h1, (int)m1, (int)s1);
     }
@@ -282,14 +282,14 @@ class Transform {
     //                          sDD*MM
     //                          DDD*MM
     bool dmsTodouble(double *f, char *dms, bool sign_present, PrecisionMode p) {
-      char d[4],m[5];
-      int d1,m1,lowLimit=0,highLimit=360,len;
-      double s1=0,sign=1;
+      char d[4], m[5];
+      int d1, m1, lowLimit=0, highLimit=360, len;
+      double s1=0, sign=1;
       bool secondsOff=false;
     
       while (*dms == ' ') dms++; // strip prefix white-space
       if (strlen(dms) > 13) dms[13] = 0; // maximum length
-      len=strlen(dms);
+      len = strlen(dms);
     
       if (p == PM_HIGHEST || p == PM_HIGH) { // validate length
         if (len != 9 && len < 11) return false;
@@ -304,74 +304,74 @@ class Transform {
       // determine if the sign was used and accept it if so, then convert the degrees part
       if (sign_present) {
         if (*dms == '-') sign=-1.0; else if (*dms == '+') sign=1.0; else return false; 
-        dms++; d[0]=*dms++; d[1]=*dms++; d[2]=0; if (!atoi2(d,&d1,false)) return false;
+        dms++; d[0] = *dms++; d[1] = *dms++; d[2] = 0; if (!atoi2(d, &d1, false)) return false;
       } else {
-        d[0]=*dms++; d[1]=*dms++; d[2]=*dms++; d[3]=0; if (!atoi2(d,&d1,false)) return false;
+        d[0] = *dms++; d[1] = *dms++; d[2] = *dms++; d[3] = 0; if (!atoi2(d, &d1, false)) return false;
       }
     
       // make sure the seperator is an allowed character, then convert the minutes part
       if (*dms != ':' && *dms != '*' && *dms != char(223)) return false; else dms++;
-      m[0]=*dms++; m[1]=*dms++; m[2]=0; if (!atoi2(m,&m1,false)) return false;
+      m[0] = *dms++; m[1] = *dms++; m[2] = 0; if (!atoi2(m, &m1, false)) return false;
     
       if ((p == PM_HIGHEST || p == PM_HIGH) && !secondsOff) {
         // make sure the seperator is an allowed character, then convert the seconds part
         if (*dms++ != ':' && *dms++ != '\'') return false;
-        if (!atof2(dms,&s1,false)) return false;
+        if (!atof2(dms, &s1, false)) return false;
       }
     
-      if (sign_present) { lowLimit=-90; highLimit=90; }
-      if ((d1 < lowLimit) || (d1 > highLimit) || (m1 < 0) || (m1 > 59) || (s1 < 0) || (s1 > 59.999)) return false;
+      if (sign_present) { lowLimit = -90; highLimit = 90; }
+      if (d1 < lowLimit || d1 > highLimit || m1 < 0 || m1 > 59 || s1 < 0 || s1 > 59.999) return false;
     
-      *f=sign*((double)d1+(double)m1/60.0+s1/3600.0);
+      *f = sign*((double)d1 + (double)m1/60.0 + s1/3600.0);
       return true;
     }
     bool dmsTodouble(double *f, char *dms, bool sign_present) {
-      if (!dmsTodouble(f,dms,sign_present,PM_HIGHEST))
-        if (!dmsTodouble(f,dms,sign_present,PM_HIGH))
-          if (!dmsTodouble(f,dms,sign_present,PM_LOW)) return false;
+      if (!dmsTodouble(f, dms, sign_present, PM_HIGHEST))
+        if (!dmsTodouble(f, dms, sign_present, PM_HIGH))
+          if (!dmsTodouble(f, dms, sign_present, PM_LOW)) return false;
       return true;
     }
     
     // convert double to string in a variety of formats (as above) 
     void doubleToDms(char *reply, double *f, bool fullRange, bool signPresent, PrecisionMode p) {
-      char sign[]="+";
-      int  o=0;
-      double d1,m1,s1=0,s2,f1;
+      char sign[] = "+";
+      int  o = 0;
+      double d1, m1, s1=0, s2, f1;
     
       // setup formatting, handle adding the sign
-      f1=*f;
-      if (f1 < 0) { f1=-f1; sign[0]='-'; }
+      f1 = *f;
+      if (f1 < 0) { f1 = -f1; sign[0] = '-'; }
     
       // round to 0.0005 arc-second or 0.5 arc-second, depending on precision mode
-      if (p == PM_HIGHEST) f1=f1+0.000000139; else f1=f1+0.000139; 
+      if (p == PM_HIGHEST) f1 = f1 + 0.000000139; else f1 = f1 + 0.000139; 
     
-      d1=floor(f1);
-      m1=(f1-d1)*60.0;
-      s1=(m1-floor(m1))*60.0;
+      d1 = floor(f1);
+      m1 = (f1 - d1)*60.0;
+      s1 = (m1 - floor(m1))*60.0;
     
       // finish off calculations for dms and form string template
       char s[]="+%02d*%02d:%02d.%03d";
       if (p == PM_HIGHEST) {
-        s2=(s1-floor(s1))*1000.0;
+        s2 = (s1 - floor(s1))*1000.0;
       } else s[15]=0;
     
       if (signPresent) {
         if (sign[0] == '-') s[0]='-';
         o=1;
-      } else memmove(&s[0],&s[1],strlen(s));
+      } else memmove(&s[0], &s[1], strlen(s));
     
-      if (fullRange) s[2+o]='3';
+      if (fullRange) s[2 + o] = '3';
      
       // return result string
       if (p == PM_HIGHEST) {
-        sprintf(reply,s,(int)d1,(int)m1,(int)s1,(int)s2);
+        sprintf(reply, s, (int)d1, (int)m1, (int)s1, (int)s2);
       } else
       if (p == PM_HIGH) {
-        sprintf(reply,s,(int)d1,(int)m1,(int)s1);
+        sprintf(reply, s, (int)d1, (int)m1, (int)s1);
       } else
       if (p == PM_LOW) {
-        s[9+o]=0;
-        sprintf(reply,s,(int)d1,(int)m1);
+        s[9 + o]=0;
+        sprintf(reply, s, (int)d1, (int)m1);
       }
     }
 
