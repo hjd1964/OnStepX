@@ -2,8 +2,6 @@
 // coordinate transformation
 #pragma once
 
-#include "Observatory.h"
-
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
 // INSTRUMENT <--> apply celestial coordinate conventions <--> MOUNT       (Transform)
 // MOUNT      <--> apply pointing model                   <--> OBSERVED    (Transform)
@@ -11,6 +9,35 @@
 
 enum PierSide      {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 enum PrecisionMode {PM_LOW, PM_HIGH, PM_HIGHEST};
+
+typedef struct Latitude {
+  double   value;
+  double   sine;
+  double   cosine;
+  double   absval;
+  double   sign;
+} Latitude;
+
+typedef struct LI {
+  Latitude latitude;
+  double   longitude;
+  double   timezone;
+  bool     ready;
+} LI;
+
+typedef struct TI {
+  int16_t  year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  minute;
+  uint8_t  second;
+  long     centisecond;
+  long     centisecondLASTstart;
+  long     julianDay;
+  bool     dateReady;
+  bool     timeReady;
+} TI;
 
 typedef struct EquCoordinate {
     double r;
@@ -26,10 +53,16 @@ typedef struct HorCoordinate {
 
 class Transform {
   public:
+  
+    void init(LI site) {
+      this->site = site;
+    }
+    
     EquCoordinate equMountToTopocentric(EquCoordinate equ) {
       EquCoordinate obs=equMountToObservedPlace(equ);
       return observedPlaceToTopocentric(obs);
     }
+
     EquCoordinate topocentricToEquMount(EquCoordinate equ) {
       EquCoordinate obs=topocentricToObservedPlace(equ);
       return observedPlaceToEquMount(obs);
@@ -37,16 +70,19 @@ class Transform {
 
     EquCoordinate equMountToObservedPlace(EquCoordinate equ) {
       // apply the pointing model
+      // convert HA into RA
       return equ;
     }
+
     EquCoordinate observedPlaceToEquMount(EquCoordinate equ) {
+      // convert RA into HA
       // de-apply the pointing model
       return equ;
     }
 
     // converts from instrument to mount coordinates
     EquCoordinate equInstrumentToMount(EquCoordinate equ) {
-      if ((equ.d < -PI/2) || (equ.d > PI/2)) {
+      if (equ.d < -PI/2 || equ.d > PI/2) {
         equ.r += (PI - degToRad(360.0));
         equ.d =   PI - equ.d;
       }
@@ -58,7 +94,7 @@ class Transform {
     // converts from mount to instrument coordinates
     EquCoordinate equMountToInstrument(EquCoordinate equ) {
       if (equ.p == PIER_SIDE_WEST) equ.r += PI;
-      if (observatory.site.latitude.value >= 0.0) {
+      if (site.latitude.value >= 0.0) {
         if (equ.p == PIER_SIDE_WEST) equ.d =   PI  - equ.d;
       } else {
         if (equ.p == PIER_SIDE_WEST) equ.d = (-PI) - equ.d;
@@ -78,10 +114,10 @@ class Transform {
 
       // within about 1/20 arc-second of NCP or SCP
     #if TOPOCENTRIC_STRICT == ON
-      if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0; hor.a =  site.latitude.value; } else 
-      if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = PI;  hor.a = -site.latitude.value; } else hor=equToHor(equ);
+      if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0; hor.a =  site.latitude.value; } else
+      if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = PI;  hor.a = -site.latitude.value; } else hor = equToHor(equ);
     #else
-      if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor=equToHor(equ);
+      if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor = equToHor(equ);
     #endif
 
       hor.a += trueRefrac(hor.a);
@@ -106,7 +142,7 @@ class Transform {
     
     void hourAngleToRightAscension(EquCoordinate *equ) {
       noInterrupts();
-      unsigned long cs = observatory.centisecondLAST;
+      unsigned long cs = centisecondLAST;
       interrupts();
       equ->r = csToRad(cs) - equ->h;
       equ->r = backInRads(equ->r);
@@ -114,7 +150,7 @@ class Transform {
     
     void rightAscensionToHourAngle(EquCoordinate *equ) {
       noInterrupts();
-      unsigned long cs = observatory.centisecondLAST;
+      unsigned long cs = centisecondLAST;
       interrupts();
       equ->h = csToRad(cs) - equ->r;
       equ->h = backInRads(equ->h);
@@ -124,10 +160,10 @@ class Transform {
     HorCoordinate equToHor(EquCoordinate equ) {
       HorCoordinate hor;
       double cosHA  = cos(equ.h);
-      double sinAlt = (sin(equ.d) * observatory.site.latitude.sine) + (cos(equ.d) * observatory.site.latitude.cosine * cosHA);  
+      double sinAlt = (sin(equ.d)*site.latitude.sine) + (cos(equ.d)*site.latitude.cosine*cosHA);  
       hor.a         = asin(sinAlt);
       double t1     = sin(equ.h);
-      double t2     = cosHA*observatory.site.latitude.sine-tan(equ.d)*observatory.site.latitude.cosine;
+      double t2     = cosHA*site.latitude.sine-tan(equ.d)*site.latitude.cosine;
       hor.z         = atan2(t1,t2);
       hor.z        += PI;
       return hor;
@@ -137,13 +173,44 @@ class Transform {
     EquCoordinate horToEqu(HorCoordinate hor) { 
       EquCoordinate equ;
       double cosAzm = cos(hor.z);
-      double sinDec = (sin(hor.a) * observatory.site.latitude.sine) + (cos(hor.a) * observatory.site.latitude.cosine * cosAzm);  
+      double sinDec = (sin(hor.a)*site.latitude.sine) + (cos(hor.a)*site.latitude.cosine*cosAzm);  
       equ.d         = asin(sinDec); 
       double t1     = sin(hor.z);
-      double t2     = cosAzm*observatory.site.latitude.sine - tan(hor.a)*observatory.site.latitude.cosine;
+      double t2     = cosAzm*site.latitude.sine - tan(hor.a)*site.latitude.cosine;
       equ.h         = atan2(t1,t2);
       equ.h        += PI;
       return equ;
+    }
+
+    // convert gregorian date (year, month, day) to Julian day
+    double gregorianToJulian(int year, int month, int day) {
+      if (month == 1 || month == 2) { year--; month=month + 12; }
+      double B = 2.0-floor(year/100.0) + floor(year/400.0);
+      return (B + floor(365.25*year) + floor(30.6001*(month + 1.0)) + day + 1720994.5);
+    }
+
+    // convert julian day number to gregorian date (year,month,day)
+    void julianToGregorian(double julianDay, int *year, int *month, int *day) {
+      double A, B, C, D, D1, E, F, G, I;
+    
+      julianDay += 0.5;
+      I = floor(julianDay);
+     
+      F = 0.0;
+      if (I > 2299160.0) {
+        A = int((I - 1867216.25)/36524.25);
+        B = I + 1.0 + A - floor(A/4.0);
+      } else B = I;
+    
+      C = B + 1524.0;
+      D = floor((C - 122.1)/365.25);
+      E = floor(365.25*D);
+      G = floor((C - E)/30.6001);
+    
+      D1 = C - E + F - floor(30.6001*G);
+      *day = floor(D1);
+      if (G < 13.5)     *month = floor(G - 1.0);    else *month = floor(G - 13.0);
+      if (*month > 2.5) *year  = floor(D - 4716.0); else *year  = floor(D - 4715.0);
     }
 
     // --------------------------------------------------------------------------------------------------------
@@ -174,9 +241,9 @@ class Transform {
 
     // --------------------------------------------------------------------------------------------------------
     // strings
-    
+
     // convert string in format MM/DD/YY to julian date
-    bool dateTodouble(double *julianDay, char *date) {
+    bool dateToDouble(double *julianDay, char *date) {
       char m[3],d[3],y[3];
       int  m1,d1,y1;
       
@@ -188,10 +255,10 @@ class Transform {
       if (m1 < 1 || m1 > 12 || d1 < 1 || d1 > 31 || y1 < 0 || y1 > 99) return false;
       if (y1 > 11) y1 = y1 + 2000; else y1 = y1 + 2100;
       
-      *julianDay = observatory.gregorianToJulian(y1, m1, d1);
+      *julianDay = gregorianToJulian(y1, m1, d1);
       return true;
     }
-    
+
     // convert string in format HH:MM:SS to double
     // (also handles)           HH:MM.M
     // (also handles)           HH:MM:SS
@@ -374,8 +441,9 @@ class Transform {
         sprintf(reply, s, (int)d1, (int)m1);
       }
     }
-
+    
   private:
+    LI site;
 
     double cot(double n) {
       return 1.0/tan(n);
@@ -401,7 +469,7 @@ class Transform {
       *i=l;
       return true;
     }
-    
+
     // string to float with error checking
     bool atof2(char *a, double *d, bool sign=true) {
       int dc=0;

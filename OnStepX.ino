@@ -139,7 +139,7 @@ void setup() {
   // setup axis1
 #if AXIS1_DRIVER_MODEL != OFF
   handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1"); tasks.requestHardwareTimer(handle,1,0);
-  axis1.init(false, false, true, handle);
+  axis1.init(handle);
   axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
   axis1.setMinCoordinate(degToRad(-180.0));
   axis1.setMaxCoordinate(degToRad(180.0));
@@ -150,7 +150,7 @@ void setup() {
   // setup axis2
 #if AXIS2_DRIVER_MODEL != OFF
   handle = tasks.add(0, 0, true , 0, moveAxis2, "MoveAx2"); tasks.requestHardwareTimer(handle,2,0);
-  axis2.init(false, false, true, handle);
+  axis2.init(handle);
   axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
   axis2.setMinCoordinate(degToRad(-90.0));
   axis2.setMaxCoordinate(degToRad(90.0));

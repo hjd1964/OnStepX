@@ -102,6 +102,7 @@ int     digitalReadEx(int pin)        { if (pin != OFF && pin != SHARED) return 
 #else
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
 #endif
+#define DEBUG_CHECK_CONSTANT(P) { Serial.begin(115200); Serial.println("Constant? "); Serial.println(__builtin_constant_p(P)); }
 
 // Status --------------------------------------------------------------------------------------------------------------------------
 // Note: the following error codes are obsolete ERR_SYNC, ERR_PARK
@@ -111,6 +112,14 @@ enum GeneralErrors {
   ERR_ALT_MAX, ERR_WEATHER_INIT, ERR_SITE_INIT, ERR_NV_INIT};
 const GeneralErrors generalError = ERR_NONE;
 
+enum CommandErrors {
+  CE_NONE, CE_0, CE_CMD_UNKNOWN, CE_REPLY_UNKNOWN, CE_PARAM_RANGE, CE_PARAM_FORM,
+  CE_ALIGN_FAIL, CE_ALIGN_NOT_ACTIVE, CE_NOT_PARKED_OR_AT_HOME, CE_PARKED,
+  CE_PARK_FAILED, CE_NOT_PARKED, CE_NO_PARK_POSITION_SET, CE_GOTO_FAIL, CE_LIBRARY_FULL,
+  CE_GOTO_ERR_BELOW_HORIZON, CE_GOTO_ERR_ABOVE_OVERHEAD, CE_SLEW_ERR_IN_STANDBY, 
+  CE_SLEW_ERR_IN_PARK, CE_GOTO_ERR_GOTO, CE_SLEW_ERR_OUTSIDE_LIMITS, CE_SLEW_ERR_HARDWARE_FAULT,
+  CE_MOUNT_IN_MOTION, CE_GOTO_ERR_UNSPECIFIED, CE_NULL};
+  
 #if DEBUG != OFF
   // command errors
   #define L_CE_NONE                    "No Errors"
