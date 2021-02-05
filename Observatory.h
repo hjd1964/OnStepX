@@ -65,8 +65,8 @@ class Observatory {
       centisecondLAST++;
     }
 
-    TI                     ut1;
-    LI                     site;
+    TI ut1;
+    LI site;
 
   private:
 

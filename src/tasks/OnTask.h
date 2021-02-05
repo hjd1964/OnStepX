@@ -33,7 +33,7 @@
 //
 // Enabling the profiler inserts time logging code into the process calls.  This provides the average
 // and largest start time delta and run time for each process.  To enable the profiler use:
-// #define TASKS_PROFILER
+// #define TASKS_PROFILER_ENABLE
 //
 // Software timer based processes must use "tasks.yield();" (or the "Y;" macro, which is the same exact thing)
 // during any processing that requires a significant amount of time. This allows for the processing of other tasks

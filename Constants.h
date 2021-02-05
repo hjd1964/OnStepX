@@ -61,6 +61,8 @@
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
+#define CONSOLE                     -6
+#define PROFILER                    -7
 #define SHARED                      -14
 #define INVALID                     -32767
 

@@ -27,13 +27,6 @@ class CommandProcessor {
 
     void poll() {
       if (!serialReady) { SerialPort.begin(serialBaud); serialReady = true; }
-
-      //  char reply[50];
-      //  static char command[3];
-      //  static char parameter[45];
-      //  bool numericReply = true;
-      //  bool supressFrame = false;
-
       if (SerialPort.available()) buffer.add(SerialPort.read()); else return;
       if (buffer.ready()) {
         char reply[50] = "";

@@ -40,50 +40,28 @@
 // firmware info, these are returned by the ":GV?#" commands
 #define FirmwareDate          __DATE__
 #define FirmwareVersionMajor  00
-#define FirmwareVersionMinor  02      // minor version 0 to 99
-#define FirmwareVersionPatch  "a"     // for example major.minor patch: 1.3c
+#define FirmwareVersionMinor  02      // minor version 00 to 99
+#define FirmwareVersionPatch  "a"     // for example major.minor patch: 1.03c
 #define FirmwareVersionConfig 01      // internal, for tracking configuration file changes
 #define FirmwareName          "OnStepX"
 #define FirmwareTime          __TIME__
 
 // Enable additional debugging and/or status messages on the specified DebugSer port
 // Note that the DebugSer port cannot be used for normal communication with OnStep
-#define DEBUG OFF             // default=OFF, use "DEBUG ON" for background errors only, use "DEBUG VERBOSE" for all errors and status messages
-#define DebugSer SerialA      // default=SerialA, or Serial4 for example (always 9600 baud)
+#define DEBUG PROFILER                // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
+                                      // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
+#define DebugSer SerialA              // default SerialA, or Serial4 for example (always 9600 baud)
 
 #include "Constants.h"
 #include "Config.h"
 #include "src/pinmaps/Models.h"
 #include "src/HAL/HAL.h"
-
-// Helper macros for debugging, with less typing
-#if DEBUG != OFF
-  #define D(x)       DebugSer.print(x)
-  #define DF(x)      DebugSer.print(F(x))
-  #define DL(x)      DebugSer.println(x)
-  #define DLF(x)     DebugSer.println(F(x))
-#else
-  #define D(x)
-  #define DF(x)
-  #define DL(x)
-  #define DLF(x)
-#endif
-#if DEBUG == VERBOSE
-  #define V(x)       DebugSer.print(x)
-  #define VF(x)      DebugSer.print(F(x))
-  #define VL(x)      DebugSer.println(x)
-  #define VLF(x)     DebugSer.println(F(x))
-#else
-  #define V(x)
-  #define VF(x)
-  #define VL(x)
-  #define VLF(x)
-#endif
+#include "src/debug/Debug.h"
 
 #define  TASKS_SKIP_MISSED
-#define  TASKS_HWTIMER1_ENABLE     // only the Mega2560 hardware timers are tested and seem to work
-#define  TASKS_HWTIMER2_ENABLE     // if the Teensy or UNO don't work comment these out to use the
-#define  TASKS_HWTIMER3_ENABLE     // software task scheduler instead
+#define  TASKS_HWTIMER1_ENABLE        // only the Mega2560 hardware timers are tested and seem to work
+#define  TASKS_HWTIMER2_ENABLE        // if the Teensy or UNO don't work comment these out to use the
+#define  TASKS_HWTIMER3_ENABLE        // software task scheduler instead
 #include "src/tasks/OnTask.h"
 #ifdef TASKS_PROFILER_ENABLE
   #include "src/tasks/Profiler.h"
@@ -95,6 +73,8 @@
 #include "Transform.h"
 #include "src/lib/BufferCmds.h"
 #include "ProcessCommands.h"
+
+#include "src/debug/Console.h"
 
 void setup() {
   uint8_t handle;
@@ -166,43 +146,16 @@ void setup() {
   axis1.setTracking(true);
 
   // ------------------------------------------------------------------------------------------------
-  // add an event to show the Task Profiler
-#ifdef TASKS_PROFILER_ENABLE
+  // task manager debug events
+#if DEBUG == PROFILER
   tasks.add(142, 0, true, 7, profiler, "Profilr");
-#else
-  // add an event to show the telescope coordinates
-  #ifdef TASKS_SHOW_COORDS
-    tasks.add(1000, 0, true, 7, showEquatorialCoordinates);
-  #endif
+#endif
+
+#if DEBUG == CONSOLE
+  tasks.add(1000, 0, true, 7, debugConsole);
 #endif
 }
 
 void loop() {
   tasks.yield();
 }
-
-#ifdef TASKS_SHOW_COORDS
-void showEquatorialCoordinates() {
-  EquCoordinate instrument, mount, observed, topocentric;
-  HorCoordinate horizon;
-
-  instrument.h=axis1.getInstrumentCoordinate();
-  instrument.d=axis2.getInstrumentCoordinate();
-
-  mount = transform.equInstrumentToMount(instrument);
-
-  Serial.println("");
-
-  observed = transform.equMountToObservedPlace(mount);
-
-  transform.hourAngleToRightAscension(&observed);
-  Serial.print("LST = "); Serial.println((observatory.getLAST()/SIDEREAL_RATIO)*3600, 1);
-  Serial.print("RA  = "); Serial.println(radToDeg(observed.r), 4);
-  Serial.print("HA  = "); Serial.println(radToDeg(observed.h), 4);
-  Serial.print("Dec = "); Serial.println(radToDeg(observed.d), 4);
-
-  horizon = transform.equToHor(instrument);
-  Serial.print("Alt = "); Serial.println(radToDeg(horizon.a), 4);
-  Serial.print("Azm = "); Serial.println(radToDeg(horizon.z), 4);
-}
-#endif
