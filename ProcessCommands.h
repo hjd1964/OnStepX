@@ -14,10 +14,10 @@ enum CommandErrors {
 
 class CommandProcessor {
   public:
-    Command(long baud) {
+    CommandProcessor(long baud) {
       serialBaud = baud;
     }
-    ~Command() {
+    ~CommandProcessor() {
       SerialPort.end();
     }
     CommandErrors process(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {
@@ -50,11 +50,12 @@ class CommandProcessor {
 //            Return: 0 on failure
 //                    1 on success
       if (command[1] == 'C')  {
-        if (transform.dateToDouble(&JD,parameter)) {
+//        if (transform.dateToDouble(&JD,parameter)) {
 //          nv.writeFloat(EE_JD,JD);
-          observatory.updateLST(observatory.jd2last(JD, UT1));
-          if (generalError == ERR_SITE_INIT && observatory.ut1.timeReady) generalError=ERR_NONE;
-        } else commandError=CE_PARAM_FORM; } else 
+//          observatory.updateLST(observatory.jd2last(JD, UT1));
+//          if (generalError == ERR_SITE_INIT && observatory.ut1.timeReady) generalError=ERR_NONE;
+//        } else commandError=CE_PARAM_FORM;
+      } else 
       if (command[0] == 'S') {
 //  :Sd[sDD*MM]# or :Sd[sDD*MM:SS]# or :Sd[sDD*MM:SS.SSS]#
 //            Set target object declination

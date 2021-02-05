@@ -10,7 +10,7 @@ typedef struct TI {
   uint8_t  minute;
   uint8_t  second;
   long     centisecond;
-  long     lastCentisecondStart;
+  long     centisecondLASTstart;
   long     julianDay;
   bool     dateReady;
   bool     timeReady;
@@ -50,18 +50,18 @@ class Observatory {
       site.latitude.cosine = cos(latitude);
       site.latitude.sine   = sin(latitude);
       site.latitude.absval = fabs(latitude);
-      if (lat >= 0) site.latitude.sign = 1; else site.latitude.sign = -1;
+      if (latitude >= 0) site.latitude.sign = 1; else site.latitude.sign = -1;
     }
 
     void setLongitude(double longitude) {
       site.longitude = longitude;
-      updateLST(julianToLAST(JD,UT1));
+//      updateLST(julianToLAST(JD,UT1));
     }
 
     // sets a new date
     void setJulianDay(long julianDay) {
       ut1.julianDay = julianDay;
-      updateLAST(julianToLAST(julianDay, backIn24(getJulianHours())));
+      updateLAST(julianToLAST(julianDay, backInHours(getJulianHours())));
     }
 
     // gets the UT1 time

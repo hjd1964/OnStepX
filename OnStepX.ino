@@ -93,7 +93,7 @@
 #include "Observatory.h"
 #include "Transform.h"
 #include "src/lib/BufferCmds.h"
-#include "ProcessCmds.h"
+#include "ProcessCommands.h"
 
 void setup() {
   uint8_t handle;

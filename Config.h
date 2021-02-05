@@ -28,9 +28,7 @@
 #define SERIAL_C_BLUETOOTH_NAME  "OnStep" // "On..", Bluetooth device name for ESP32.                                         Option
 
 //#define TASKS_SHOW_COORDS
-//#define TASKS_PROFILER_ENABLE // turning this on will impact performance
-
-#define NV_DEFAULT
+#define TASKS_PROFILER_ENABLE // turning this on will impact performance
 
 // MOUNT TYPE -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_TYPE                    GEM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
