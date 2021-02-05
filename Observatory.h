@@ -3,55 +3,80 @@
 #pragma once
 
 typedef struct TI {
-  int16_t year;
-  uint8_t month;
-  uint8_t day;
-  uint8_t hour;
-  uint8_t minute;
-  uint8_t second;
-  uint8_t centisecond;
-  long    julianDay;
+  int16_t  year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  minute;
+  uint8_t  second;
+  long     centisecond;
+  long     lastCentisecondStart;
+  long     julianDay;
+  bool     dateReady;
+  bool     timeReady;
 } TI;
 
 typedef struct Latitude {
-  double value;
-  double sine;
-  double cosine;
-  double absval;
-  double sign;
+  double   value;
+  double   sine;
+  double   cosine;
+  double   absval;
+  double   sign;
 } Latitude;
 
 typedef struct LI {
   Latitude latitude;
-  double longitude;
-  double timezone;
+  double   longitude;
+  double   timezone;
+  bool     ready;
 } LI;
 
 class Observatory {
   public:
     void init(LI site, TI ut1, uint8_t handle) {
       this->site = site;
-      updateLatitude(site.latitude.value);
+      setLatitude(site.latitude.value);
+      setLongitude(site.longitude);
 
       this->ut1  = ut1;
-      ut1.julianDay = gregorianToJulian(ut1.year,ut1.month,ut1.day);
-      updateLAST(julianToLAST(ut1.julianDay,ut1.hour));
+      this->ut1.timeReady = false;
+      this->ut1.dateReady = false;
+      ut1.julianDay = gregorianToJulian(ut1.year, ut1.month, ut1.day);
+      updateLAST(julianToLAST(ut1.julianDay, ut1.hour + (ut1.minute + (ut1.second + (ut1.centisecond/100.0))/60.0)/60.0));
     }
 
-    void updateLatitude(double lat) {
-      site.latitude.value  = lat;
-      site.latitude.cosine = cos(lat);
-      site.latitude.sine   = sin(lat);
-      site.latitude.absval = fabs(lat);
+    void setLatitude(double latitude) {
+      site.latitude.value  = latitude;
+      site.latitude.cosine = cos(latitude);
+      site.latitude.sine   = sin(latitude);
+      site.latitude.absval = fabs(latitude);
       if (lat >= 0) site.latitude.sign = 1; else site.latitude.sign = -1;
     }
 
-    void updateLongitude(double latitude) {
+    void setLongitude(double longitude) {
+      site.longitude = longitude;
+      updateLST(julianToLAST(JD,UT1));
+    }
+
+    // sets a new date
+    void setJulianDay(long julianDay) {
+      ut1.julianDay = julianDay;
+      updateLAST(julianToLAST(julianDay, backIn24(getJulianHours())));
+    }
+
+    // gets the UT1 time
+    double getJulianHours() {
+      unsigned long cs;
+      noInterrupts(); 
+      cs = centisecondLAST;
+      interrupts();
+      double gregorianSeconds = (double)((cs - ut1.centisecondLASTstart)/100.0)/SIDEREAL_RATIO;
+      return ut1.julianDay + gregorianSeconds/3600.0;
     }
     
     // gets local apparent sidereal time in hours
     double getLAST() {
-      double cs;
+      unsigned long cs;
       noInterrupts(); 
       cs = centisecondLAST;
       interrupts();
@@ -80,8 +105,7 @@ class Observatory {
     // and marks the date/time this occured
     void updateLAST(double t) {
       long cs = lround((t/24.0)*8640000.0);
-      start_ut1 = ut1;
-      start_ut1.centisecond = cs;
+      ut1.centisecondLASTstart = cs;
       noInterrupts();
       centisecondLAST = cs;
       interrupts();
@@ -110,9 +134,9 @@ class Observatory {
     }
     
     // convert julian date/time to local apparent sidereal time
-    double julianToLAST(double julianDay, double ut1) {
-      double gast = julianToGAST(julianDay,ut1);
-      return backInHours(radToHrs(gast-site.longitude));
+    double julianToLAST(double julianDay, double hours) {
+      double gast = julianToGAST(julianDay, hours);
+      return backInHours(radToHrs(gast - site.longitude));
     }
 
     // convert julian day number to gregorian date (year,month,day)
@@ -144,8 +168,6 @@ class Observatory {
       while (time < 0.0)   time += 24.0;
       return time;
     }
-
-    TI                     start_ut1;
 };
 
 // instantiate and callback wrappers

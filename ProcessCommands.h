@@ -45,13 +45,23 @@ class CommandProcessor {
       } else
 
 // S - Telescope Set
+// :SC[MM/DD/YY]#
+//            Change Date to MM/DD/YY
+//            Return: 0 on failure
+//                    1 on success
+      if (command[1] == 'C')  {
+        if (transform.dateToDouble(&JD,parameter)) {
+//          nv.writeFloat(EE_JD,JD);
+          observatory.updateLST(observatory.jd2last(JD, UT1));
+          if (generalError == ERR_SITE_INIT && observatory.ut1.timeReady) generalError=ERR_NONE;
+        } else commandError=CE_PARAM_FORM; } else 
       if (command[0] == 'S') {
 //  :Sd[sDD*MM]# or :Sd[sDD*MM:SS]# or :Sd[sDD*MM:SS.SSS]#
 //            Set target object declination
 //            Return: 0 on failure
 //                    1 on success
         if (command[1] == 'd' && parameter[0] == 0)  {
-          if (!transform.dmsTodouble(&target.d,parameter,true)) return CE_PARAM_RANGE;
+          if (!transform.dmsTodouble(&target.d, parameter, true)) return CE_PARAM_RANGE;
           target.d = degToRad(target.d);
         } else
 
