@@ -145,42 +145,6 @@ class Axis {
       takeStep = !takeStep;
     }
 
-    // low overhead forward only movement (invoked after backlash is at backlashAmountSteps)
-    void moveFastForward(const int8_t stepPin, const int8_t dirPin) {
-      if (takeStep) {
-        if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin,HIGH); }
-      } else {
-        if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
-        digitalWriteF(stepPin,LOW);
-      }
-      takeStep = !takeStep;
-    }
-    
-    // low overhead backward only movement (invoked after backlash is at 0)
-    void moveFastBackward(const int8_t stepPin, const int8_t dirPin) {
-      if (takeStep) {
-        if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin,HIGH); }
-      } else {
-        if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
-        digitalWriteF(stepPin,LOW);
-      }
-      takeStep = !takeStep;
-    }
-
-    // low overhead forward only movement (invoked after backlash is at backlashAmountSteps)
-    void pulseFastForward(const int8_t stepPin, const int8_t dirPin) {
-      digitalWriteF(stepPin,LOW);
-      if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
-      if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin,HIGH); }
-    }
-
-    // low overhead backward only movement (invoked after backlash is at 0)
-    void pulseFastBackward(const int8_t stepPin, const int8_t dirPin) {
-      digitalWriteF(stepPin,LOW);
-      if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
-      if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin,HIGH); }
-    }
-
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency) {
       maxFreq = frequency*spm;
