@@ -41,8 +41,8 @@ void profiler() {
       Serial.print("\x1b[K");  // clear to end of line
     #endif
     Serial.println(); Y;
-    sprintf(s, "OnStepX %2d.%02d%s                                                            Task Profiler",
-               FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch);
+    sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler",
+               1,0,'a');
     Serial.print(s); Y;
     Serial.println();
   }
