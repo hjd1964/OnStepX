@@ -112,6 +112,7 @@ void setup() {
   handle = tasks.add(0, 0, true, 0, clockTick, "ClkTick");
   tasks.requestHardwareTimer(handle, 3, 1);
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
+
   observatory.init(site, ut1, handle);
 
   // ------------------------------------------------------------------------------------------------
