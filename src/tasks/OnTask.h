@@ -44,8 +44,8 @@
 // Up to 64 mutexes (0 to 63) are supported with the following macros, any
 // code between these two statements will be limited to running on one process
 // at a time even if "tasks.yield();" is called within that code:
-// tasks_mutex_enter(mutex_number)
-// tasks_mutex_exit(mutex_number)
+// tasks_mutex_enter(mutex_number);
+// tasks_mutex_exit(mutex_number);
 //
 
 #pragma once
