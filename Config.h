@@ -27,9 +27,6 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n, ON for ESP32 Bluetooth.                                               Option
 #define SERIAL_C_BLUETOOTH_NAME  "OnStep" // "On..", Bluetooth device name for ESP32.                                         Option
 
-//#define TASKS_SHOW_COORDS
-#define TASKS_PROFILER_ENABLE // turning this on will impact performance
-
 // MOUNT TYPE -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_TYPE                    GEM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
                                           //         Dobsonian etc. mounts. GEM Eq mounts perform meridian flips.
