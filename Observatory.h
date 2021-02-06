@@ -48,6 +48,9 @@ class Observatory {
     double julianToLAST(double julianDay, double hours);
 
     double backInHours(double time);
+
+    bool dateIsReady = false;
+    bool timeIsReady = false;
 };
 
 // instantiate and callback wrappers
@@ -56,8 +59,7 @@ void clockTickWrapper() { observatory.clockTick(); }
 
 void Observatory::init() {
   // setup the location and date/time for time keeping and coordinate converson
-  LI site;
-  site.latitude.value = degToRad(40.1); site.longitude = degToRad(76.0); site.timezone = 5;
+  site.latitude.value = degToRad(40.1); site.longitude = degToRad(76.0);
   setLatitude(site.latitude.value);
   setLongitude(site.longitude);
   transform.init(site);
@@ -68,30 +70,53 @@ void Observatory::init() {
   tasks.requestHardwareTimer(handle, 3, 1);
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
 
-  TI ut1;
   ut1.year = 2020; ut1.month  = 1;  ut1.day = 20;
   ut1.hour = 12;   ut1.minute = 11; ut1.second = 9; ut1.centisecond = 252;
-  ut1.timeIsReady = false;
-  ut1.dateIsReady = false;
+  ut1.timezone = 5;
 
   ut1.julianDay = transform.gregorianToJulian(ut1.year, ut1.month, ut1.day);
   updateLAST(julianToLAST(ut1.julianDay, ut1.hour + (ut1.minute + (ut1.second + (ut1.centisecond/100.0))/60.0)/60.0));
 }
 
 bool Observatory::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
+  // :Ga#       Get Local Time in 12 hour format
+  //            Returns: HH:MM:SS#
+  if (command[0] == 'G' && command[1] == 'a' && parameter[0] == 0)  {
+    double localStandardTime = backInHours(getHour() - ut1.timezone); if (localStandardTime > 12.0) localStandardTime -= 12.0;
+    transform.doubleToHms(reply,&localStandardTime, PM_HIGH);
+    *numericReply = false;
+  } else
+  
+  // :GC#       Get the current local calendar date
+  //            Returns: MM/DD/YY#
+  if (command[0] == 'G' && command[1] == 'C' && parameter[0] == 0) {
+    int y, m, d;
+    transform.julianToGregorian(getJulianDay() - ut1.timezone, &y, &m, &d); y -= 2000; if (y >= 100) y -= 100;
+    sprintf(reply,"%02d/%02d/%02d", m, d, y);
+    *numericReply = false;
+  } else
+
+  // :Gc#       Get the current local time format
+  //            Returns: 24#
+  if (command[0] == 'G' && command[1] == 'c' && parameter[0] == 0) {
+    strcpy(reply, "24");
+    *numericReply = false;
+  } else
+
   // :SC[MM/DD/YY]#
-  // Change Date to MM/DD/YY
-  // Return: 0 on failure
-  //         1 on success
+  //            Change Date to MM/DD/YY
+  //            Return: 0 on failure
+  //            1 on success
   if (command[0] == 'S' && command[1] == 'C')  {
     double jd;
     if (transform.dateToDouble(&jd, parameter)) {
       // nv.writeFloat(EE_JD, JD);
       ut1.julianDay = jd; // <-- watch this for truncating the fraction, Julian days start at Noon
       adjustLAST(ut1.julianDay);
-      if (generalError == ERR_SITE_INIT && ut1.dateIsReady && ut1.timeIsReady) generalError = ERR_NONE;
+      if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
     } else *commandError = CE_PARAM_FORM;
   } else return false;
+  
   return true;
 }
 
@@ -126,7 +151,7 @@ void Observatory::clockTick() {
 // and marks the date/time this occured
 void Observatory::updateLAST(double hours) {
   long cs = lround((hours/24.0)*8640000.0);
-  ut1.centisecondLASTstart = cs;
+  ut1.centisecond = cs;
   noInterrupts();
   centisecondLAST = cs;
   interrupts();
@@ -148,7 +173,7 @@ double Observatory::getHour() {
   noInterrupts(); 
   cs = centisecondLAST;
   interrupts();
-  double gregorianSeconds = (double)((cs - ut1.centisecondLASTstart)/100.0)/SIDEREAL_RATIO;
+  double gregorianSeconds = (double)((cs - ut1.centisecond)/100.0)/SIDEREAL_RATIO;
   return gregorianSeconds/3600.0;
 }
 

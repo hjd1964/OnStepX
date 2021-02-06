@@ -21,7 +21,6 @@ typedef struct Latitude {
 typedef struct LI {
   Latitude latitude;
   double   longitude;
-  double   timezone;
   bool     ready;
 } LI;
 
@@ -33,10 +32,8 @@ typedef struct TI {
   uint8_t  minute;
   uint8_t  second;
   long     centisecond;
-  long     centisecondLASTstart;
-  long     julianDay;
-  bool     dateIsReady;
-  bool     timeIsReady;
+  double   julianDay;
+  double   timezone;
 } TI;
 
 typedef struct EquCoordinate {
@@ -57,7 +54,7 @@ class Transform {
     void init(LI site) {
       this->site = site;
     }
-    
+
     EquCoordinate equMountToTopocentric(EquCoordinate equ) {
       EquCoordinate obs=equMountToObservedPlace(equ);
       return observedPlaceToTopocentric(obs);
@@ -244,9 +241,9 @@ class Transform {
 
     // convert string in format MM/DD/YY to julian date
     bool dateToDouble(double *julianDay, char *date) {
-      char m[3],d[3],y[3];
-      int  m1,d1,y1;
-      
+      char m[3], d[3], y[3];
+      int  m1, d1, y1;
+
       if (strlen(date) !=  8) return false;
     
       m[0] = *date++; m[1] = *date++; m[2] = 0; if (!atoi2(m, &m1, false)) return false;

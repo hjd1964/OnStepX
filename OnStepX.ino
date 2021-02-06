@@ -40,18 +40,18 @@
 // firmware info, these are returned by the ":GV?#" commands
 #define FirmwareDate          __DATE__
 #define FirmwareVersionMajor  00
-#define FirmwareVersionMinor  02      // minor version 00 to 99
-#define FirmwareVersionPatch  "a"     // for example major.minor patch: 1.03c
-#define FirmwareVersionConfig 01      // internal, for tracking configuration file changes
+#define FirmwareVersionMinor  02       // minor version 00 to 99
+#define FirmwareVersionPatch  "a"      // for example major.minor patch: 1.03c
+#define FirmwareVersionConfig 01       // internal, for tracking configuration file changes
 #define FirmwareName          "OnStepX"
 #define FirmwareTime          __TIME__
 
 // Enable additional debugging and/or status messages on the specified DebugSer port
 // Note that the DebugSer port cannot be used for normal communication with OnStep
-#define DEBUG CONSOLE                 // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
-                                      // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
-#define SERIAL_DEBUG      SERIAL_A    // default SERIAL_A... or use Serial4, for example (always 9600 baud)
-#define SERIAL_DEBUG_BAUD 115200
+#define DEBUG OFF                      // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
+                                       // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
+#define SERIAL_DEBUG          SERIAL_A // default SERIAL_A... or use Serial4, for example (always 9600 baud)
+#define SERIAL_DEBUG_BAUD     115200
 
 #include "Constants.h"
 #include "Config.h"
@@ -60,9 +60,9 @@
 #include "src/debug/Debug.h"
 
 #define  TASKS_SKIP_MISSED
-#define  TASKS_HWTIMER1_ENABLE        // only the Mega2560 hardware timers are tested and seem to work
-#define  TASKS_HWTIMER2_ENABLE        // if the Teensy or UNO don't work comment these out to use the
-#define  TASKS_HWTIMER3_ENABLE        // software task scheduler instead
+#define  TASKS_HWTIMER1_ENABLE         // only the Mega2560 hardware timers are tested and seem to work
+#define  TASKS_HWTIMER2_ENABLE         // if the Teensy, etc. don't work comment these out to use the
+#define  TASKS_HWTIMER3_ENABLE         // software task scheduler instead
 #include "src/tasks/OnTask.h"
 #ifdef TASKS_PROFILER_ENABLE
   #include "src/tasks/Profiler.h"
@@ -74,7 +74,6 @@
 #include "Transform.h"
 #include "src/lib/BufferCmds.h"
 #include "ProcessCommands.h"
-
 #include "src/debug/Console.h"
 
 void setup() {

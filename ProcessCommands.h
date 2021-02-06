@@ -15,6 +15,7 @@ class CommandProcessor {
     }
 
     CommandErrors command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {
+      commandError = CE_NONE;
 
       // Handle observatory date/time/location commands
       if (observatory.command(reply, command, parameter, supressFrame, numericReply, &commandError)) {} else
@@ -22,7 +23,7 @@ class CommandProcessor {
       // Handle telescope goto, etc. commands
       if (telescope.command(reply, command, parameter, supressFrame, numericReply, &commandError)) {} else
 
-      return CE_CMD_UNKNOWN;
+      return commandError;
     }
 
     void poll() {
