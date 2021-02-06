@@ -35,8 +35,8 @@ typedef struct TI {
   long     centisecond;
   long     centisecondLASTstart;
   long     julianDay;
-  bool     dateReady;
-  bool     timeReady;
+  bool     dateIsReady;
+  bool     timeIsReady;
 } TI;
 
 typedef struct EquCoordinate {

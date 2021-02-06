@@ -48,9 +48,10 @@
 
 // Enable additional debugging and/or status messages on the specified DebugSer port
 // Note that the DebugSer port cannot be used for normal communication with OnStep
-#define DEBUG PROFILER                // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
+#define DEBUG CONSOLE                 // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
                                       // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
-#define DebugSer SerialA              // default SerialA, or Serial4 for example (always 9600 baud)
+#define SERIAL_DEBUG      SERIAL_A    // default SERIAL_A... or use Serial4, for example (always 9600 baud)
+#define SERIAL_DEBUG_BAUD 115200
 
 #include "Constants.h"
 #include "Config.h"
@@ -79,40 +80,29 @@
 void setup() {
   uint8_t handle;
 
-  // ------------------------------------------------------------------------------------------------
-  // setup date/time/location for time keeping and coordinate converson
-  TI ut1;
-  ut1.year=2020; ut1.month=1;   ut1.day=20;
-  ut1.hour=12;   ut1.minute=11; ut1.second=9; ut1.centisecond=252;
-  LI site;
-  site.latitude.value=degToRad(40.1); site.longitude=degToRad(76.0); site.timezone=5;
+  #if DEBUG != OFF
+    SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
+  #endif
 
-  // ------------------------------------------------------------------------------------------------
-  // add an event to tick the centisecond sidereal clock
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  handle = tasks.add(0, 0, true, 0, clockTick, "ClkTick");
-  tasks.requestHardwareTimer(handle, 3, 1);
-  tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
-
-  observatory.init(site, ut1, handle);
+  observatory.init();
 
   // ------------------------------------------------------------------------------------------------
   // add an event to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
 #ifdef SERIAL_A
-  handle = tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
+  tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
 #endif
 #ifdef SERIAL_B
-  handle = tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
+  tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
 #endif
 #ifdef SERIAL_C
-  handle = tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
+  tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
 #endif
 #ifdef SERIAL_D
-  handle = tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
+  tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
 #endif
 #ifdef SERIAL_ST4
-  handle = tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
+  tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
 #endif
 
   // ------------------------------------------------------------------------------------------------

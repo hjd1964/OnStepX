@@ -1,10 +1,10 @@
 // Helper macros for debugging, with less typing
 
 #if DEBUG != OFF
-  #define D(x)       DebugSer.print(x)
-  #define DF(x)      DebugSer.print(F(x))
-  #define DL(x)      DebugSer.println(x)
-  #define DLF(x)     DebugSer.println(F(x))
+  #define D(x)       SERIAL_DEBUG.print(x)
+  #define DF(x)      SERIAL_DEBUG.print(F(x))
+  #define DL(x)      SERIAL_DEBUG.println(x)
+  #define DLF(x)     SERIAL_DEBUG.println(F(x))
 #else
   #define D(x)
   #define DF(x)
@@ -12,10 +12,10 @@
   #define DLF(x)
 #endif
 #if DEBUG == VERBOSE
-  #define V(x)       DebugSer.print(x)
-  #define VF(x)      DebugSer.print(F(x))
-  #define VL(x)      DebugSer.println(x)
-  #define VLF(x)     DebugSer.println(F(x))
+  #define V(x)       SERIAL_DEBUG.print(x)
+  #define VF(x)      SERIAL_DEBUG.print(F(x))
+  #define VL(x)      SERIAL_DEBUG.println(x)
+  #define VLF(x)     SERIAL_DEBUG.println(F(x))
 #else
   #define V(x)
   #define VF(x)

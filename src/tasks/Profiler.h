@@ -24,27 +24,26 @@ void profiler() {
     aau = scale_unit(&AAA); axu = scale_unit(&AXA); rtu = scale_unit(&RTT); rau = scale_unit(&RAA); rxu = scale_unit(&RXA);
 
     sprintf(s, "                     ----------- ------------        ----------   --------   ----------");
-    Serial.print(s); Y;
-    Serial.println(); Y;
+    D(s); Y;
+    DL(); Y;
 
     sprintf(s, "                    avgd %5ld%cs  avgd %4ld%cs    totaled %4ld%cs avgd %4ld%cs avgd %4ld%cs", 
     lround(AAA), aau, lround(AXA), axu, lround(RTT), rtu, lround(RAA), rau, lround(RXA), rxu); Y;
   
-    Serial.print(s); Y;
-    Serial.println(); Y;
+    D.print(s); Y;
+    D.println(); Y;
 
     count = 0;
     handle = tasks.getFirstHandle();
     #if PROFILER_VT100 == ON
-      Serial.print("\x1b[J");  // clear to end of screen
-      Serial.print("\x1b[H");  // cursor to upper left
-      Serial.print("\x1b[K");  // clear to end of line
+      D("\x1b[J");  // clear to end of screen
+      D("\x1b[H");  // cursor to upper left
+      D("\x1b[K");  // clear to end of line
     #endif
-    Serial.println(); Y;
-    sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler",
-               1,0,'a');
-    Serial.print(s); Y;
-    Serial.println();
+    DL(); Y;
+    sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler", 1, 0, 'a');
+    DL(s); Y;
+    DL();
   }
 
   char *name = tasks.getNameStr(handle);
@@ -61,6 +60,6 @@ void profiler() {
   sprintf(s, "[%-10s] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
   name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
 
-  Serial.print(s); Y;
-  Serial.println();
+  D(s); Y;
+  DL();
 }

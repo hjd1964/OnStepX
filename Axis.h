@@ -22,7 +22,6 @@ typedef struct AxisPins {
 
 enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
 
-
 class Axis {
   public:
     Axis(AxisPins Pins, DriverPins ModePins, DriverSettings ModeSettings) :
