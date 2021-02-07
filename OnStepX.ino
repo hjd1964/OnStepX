@@ -48,7 +48,7 @@
 
 // Enable additional debugging and/or status messages on the specified DebugSer port
 // Note that the DebugSer port cannot be used for normal communication with OnStep
-#define DEBUG OFF                      // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
+#define DEBUG ON                      // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
                                        // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
 #define SERIAL_DEBUG          SERIAL_A // default SERIAL_A... or use Serial4, for example (always 9600 baud)
 #define SERIAL_DEBUG_BAUD     115200
@@ -68,12 +68,16 @@
   #include "src/tasks/Profiler.h"
 #endif
 
-#include "Observatory.h"
-#include "Telescope.h"
-#include "Axis.h"
+#include "Convert.h"
+#include "Clock.h"
 #include "Transform.h"
+#include "Observatory.h"
+#include "Axis.h"
+#include "Telescope.h"
+
 #include "src/lib/BufferCmds.h"
 #include "ProcessCommands.h"
+
 #include "src/debug/Console.h"
 
 void setup() {
@@ -83,10 +87,7 @@ void setup() {
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
   #endif
 
-  observatory.init();
-
-  // ------------------------------------------------------------------------------------------------
-  // add an event to process commands
+  // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
 #ifdef SERIAL_A
   tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
@@ -104,7 +105,7 @@ void setup() {
   tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
 #endif
 
-  // ------------------------------------------------------------------------------------------------
+  observatory.init();
 
   // setup axis1
 #if AXIS1_DRIVER_MODEL != OFF

@@ -73,6 +73,12 @@
 #define ALTAZM                      3 // Altitude Azimuth Mounts, Dobsonians, etc.
 #define MOUNT_TYPE_LAST             3
 
+// Mutexes -------------------------------------------------------------------------------------------------------------------------
+#define MX_CLOCK_CMD                0
+#define MX_TELESCOPE_CMD            0
+
+// Macros --------------------------------------------------------------------------------------------------------------------------
+
 // misc. math
 #define RAD                         57.29577951308232
 #define RAD_HOUR_RATIO              3.819718634205488
@@ -88,21 +94,32 @@
 #define radToHrs(x)                 (x*RAD_HOUR_RATIO)
 #define csToRad(x)                  (x/1375098.708313976)
 #define radToCs(x)                  (x*1375098.708313976)
+#define csToHours(x)                (x/360000.0)
+#define hoursToCs(x)                (x*360000.0)
+#define csToDays(x)                 (x/8640000.0)
+#define daysToCs(x)                 (x*8640000.0)
 #define arcsecToRad(x)              ((x/3600.0)/RAD)
 #define radToArcsec(x)              ((x*RAD)*3600.0)
 
-// Macros --------------------------------------------------------------------------------------------------------------------------
+// pins
 #define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }
 #define pinModeInitEx(pin,mode,state) { pinModeEx(pin,mode); digitalWrite(pin,state); }
 #define digitalWriteEx(pin,value)     { if (pin != OFF && pin != SHARED) digitalWrite(pin,value); }
 int     digitalReadEx(int pin)        { if (pin != OFF && pin != SHARED) return digitalRead(pin); else return 0; }
-#ifndef delaySpi
-  #define delaySpi() delayMicroseconds(1)
-#endif
 #ifdef HAL_HAS_DIGITAL_FAST
   #define digitalWriteF(pin,value)    { digitalWriteFast(pin,value); }
 #else
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
+#endif
+
+// etc
+#define cmdp(a) (command[0] == a[0] && command[1] == a[1])
+#define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)
+#define cmd1(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == 0)
+#define cmd2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3] && parameter[2] == 0)
+
+#ifndef delaySpi
+  #define delaySpi() delayMicroseconds(1)
 #endif
 #define DEBUG_CHECK_CONSTANT(P) { Serial.begin(115200); Serial.println("Constant? "); Serial.println(__builtin_constant_p(P)); }
 
