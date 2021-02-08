@@ -200,7 +200,7 @@ HorCoordinate Transform::equToHor(EquCoordinate equ) {
   hor.z        += PI;
   return hor;
 }
-      
+
 EquCoordinate Transform::horToEqu(HorCoordinate hor) { 
   EquCoordinate equ;
   double cosAzm = cos(hor.z);

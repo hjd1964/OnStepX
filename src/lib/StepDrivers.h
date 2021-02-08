@@ -39,8 +39,8 @@ const static int8_t steps[13][9] =
 #define MIXED         0
 #define FAST          1
 #define SLOW          2
-#define SPREAD_CYCLE  3
-#define STEALTH_CHOP  4
+#define SPREADCYCLE  3
+#define STEALTHCHOP  4
 
 #pragma pack(1)
 typedef struct DriverSettings {
@@ -71,122 +71,35 @@ typedef struct DriverSettings {
 
 class StepDriver {
   public:
+    // create and set pin values and driver model/microstep mode (from Config.h)
     StepDriver(DriverPins Pins, DriverSettings Settings) : Pins{ Pins }, Settings{ Settings } {}
 
-    void init() {
-      microstepCode     = microstepsToCode(Settings.model,Settings.microsteps);
-      microstepCodeGoto = microstepsToCode(Settings.model,Settings.microstepsGoto);
-      microstepRatio    = Settings.microsteps/Settings.microstepsGoto;
+    // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
+    // and sets up the pin modes
+    void init();
 
-      if (isTmcSPI()) {
-#ifdef HAS_TMC_DRIVER
-        tmcDriver.init(Settings.model);
-#endif
-      } else {
-        if (isDecayOnM2()) { decayPin = Pins.m2; m2Pin = OFF; } else { decayPin = Pins.decay; m2Pin = Pins.m2; }
-        pinModeInitEx(decayPin, OUTPUT, getDecayPinState(Settings.decay));
+    // set microstep and decay modes for tracking
+    void modeTracking();
+    void modeDecayTracking();
 
-        microstepBitCode     = microstepCode;
-        microstepBitCodeGoto = microstepCodeGoto;
-        pinModeInitEx(Pins.m0, OUTPUT, bitRead(microstepBitCode, 0));
-        pinModeInitEx(Pins.m1, OUTPUT, bitRead(microstepBitCode, 1));
-        pinModeInitEx(m2Pin,   OUTPUT, bitRead(microstepBitCode, 2));
-        pinModeEx    (Pins.m3, INPUT);
-      }
-    }
-
-    void modeTracking() {
-      if (isTmcSPI()) {
-#ifdef HAS_TMC_DRIVER
-        tmcDriver.refresh_CHOPCONF(microstepCode);
-#endif
-      } else {
-        noInterrupts();
-        digitalWriteEx(Pins.m0, bitRead(microstepBitCode, 0));
-        digitalWriteEx(Pins.m1, bitRead(microstepBitCode, 1));
-        digitalWriteEx(Pins.m2, bitRead(microstepBitCode, 2));
-        interrupts();
-      }
-    }
-
-    void modeDecayTracking() {
-      if (isTmcSPI()) {
-#ifdef HAS_TMC_DRIVER
-        tmcDriver.mode(true, Settings.decay, microstepCode, Settings.currentRun, Settings.currentHold);
-#endif
-      } else {
-        if (Settings.decay == OFF) return;
-        int8_t state = getDecayPinState(Settings.decay);
-        noInterrupts();
-        if (state != OFF) digitalWriteEx(decayPin,state);
-        interrupts();
-      }
-    }
-
-    uint8_t modeGoto() {
-      if (isTmcSPI()) {
-#ifdef HAS_TMC_DRIVER
-        tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
-#endif
-      } else {
-        noInterrupts();
-        digitalWriteEx(Pins.m0, bitRead(microstepBitCodeGoto, 0));
-        digitalWriteEx(Pins.m1, bitRead(microstepBitCodeGoto, 1));
-        digitalWriteEx(Pins.m2, bitRead(microstepBitCodeGoto, 2));
-        interrupts();
-      }
-      return microstepRatio;
-    }
-
-    void modeDecayGoto() {
-      if (isTmcSPI()) {
-#ifdef HAS_TMC_DRIVER
-        int IRUN = Settings.currentGoto;
-        if (IRUN == OFF) IRUN = Settings.currentRun;
-        tmcDriver.mode(true, Settings.decayGoto, microstepCodeGoto, IRUN, Settings.currentHold);
-#endif
-      } else {
-        if (Settings.decayGoto == OFF) return;
-        int8_t state = getDecayPinState(Settings.decayGoto);
-        noInterrupts();
-        if (state != OFF) digitalWriteEx(decayPin,state);
-        interrupts();
-      }
-    }
+    // set microstep and decay modes for goto
+    uint8_t modeGoto();
+    void modeDecayGoto();
 
   private:
-    int8_t getDecayPinState(int8_t decay) {
-      uint8_t state = OFF;
-      if (decay == SPREAD_CYCLE) state = LOW;  else
-      if (decay == STEALTH_CHOP) state = HIGH; else
-      if (decay == MIXED)        state = LOW;  else
-      if (decay == FAST)         state = HIGH;
-      return state;
-    }
+    // checks if decay pin should be HIGH/LOW for a given decay setting
+    int8_t getDecayPinState(int8_t decay);
 
-    bool isTmcSPI() {
-#ifdef HAS_TMC_DRIVER
-      if (Settings.model == TMC2130 || Settings.model == TMC5160) return true; else return false;
-#else
-      return false;
-#endif
-    }
+    // checks if this is a TMC SPI driver
+    bool isTmcSPI();
 
-    bool isDecayOnM2() {
-      if (Settings.model == TMC2209) return true; else return false;
-    }
+    // checkes if decay control is on the M2 pin
+    bool isDecayOnM2();
 
     // different models of stepper drivers have different bit settings for microsteps
     // translate the human readable microsteps in the configuration to mode bit settings
     // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
-    int microstepsToCode(uint8_t driverModel, uint8_t microsteps) {
-      int allowed[9] = {1,2,4,8,16,32,64,128,256};
-      if (driverModel >= DRIVER_MODEL_COUNT) return OFF;
-      for (int i = 0; i < 9; i++) {
-        if (microsteps == allowed[i]) return steps[driverModel][i];
-      }
-      return OFF;
-    }
+    int microstepsToCode(uint8_t driverModel, uint8_t microsteps);
     
     uint8_t microstepRatio        = 1;
     int     microstepCode         = OFF;
@@ -198,10 +111,125 @@ class StepDriver {
 
     const DriverPins Pins         = {OFF, OFF, OFF, OFF, OFF};
     const DriverSettings Settings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
-#ifdef HAS_TMC_DRIVER
-    TmcDriver tmcDriver{Pins};
-#endif
+
+    #ifdef HAS_TMC_DRIVER
+      TmcDriver tmcDriver{Pins};
+    #endif
 };
+
+void StepDriver::init() {
+  microstepCode     = microstepsToCode(Settings.model, Settings.microsteps);
+  microstepCodeGoto = microstepsToCode(Settings.model, Settings.microstepsGoto);
+  microstepRatio    = Settings.microsteps/Settings.microstepsGoto;
+
+  if (isTmcSPI()) {
+    #ifdef HAS_TMC_DRIVER
+      tmcDriver.init(Settings.model);
+    #endif
+  } else {
+    if (isDecayOnM2()) { decayPin = Pins.m2; m2Pin = OFF; } else { decayPin = Pins.decay; m2Pin = Pins.m2; }
+    pinModeInitEx(decayPin, OUTPUT, getDecayPinState(Settings.decay));
+
+    microstepBitCode     = microstepCode;
+    microstepBitCodeGoto = microstepCodeGoto;
+    pinModeInitEx(Pins.m0, OUTPUT, bitRead(microstepBitCode, 0));
+    pinModeInitEx(Pins.m1, OUTPUT, bitRead(microstepBitCode, 1));
+    pinModeInitEx(m2Pin,   OUTPUT, bitRead(microstepBitCode, 2));
+    pinModeEx    (Pins.m3, INPUT);
+  }
+}
+
+void StepDriver::modeTracking() {
+  if (isTmcSPI()) {
+    #ifdef HAS_TMC_DRIVER
+      tmcDriver.refresh_CHOPCONF(microstepCode);
+    #endif
+  } else {
+    noInterrupts();
+    digitalWriteEx(Pins.m0, bitRead(microstepBitCode, 0));
+    digitalWriteEx(Pins.m1, bitRead(microstepBitCode, 1));
+    digitalWriteEx(Pins.m2, bitRead(microstepBitCode, 2));
+    interrupts();
+  }
+}
+
+void StepDriver::modeDecayTracking() {
+  if (isTmcSPI()) {
+    #ifdef HAS_TMC_DRIVER
+      tmcDriver.mode(true, Settings.decay, microstepCode, Settings.currentRun, Settings.currentHold);
+    #endif
+  } else {
+    if (Settings.decay == OFF) return;
+    int8_t state = getDecayPinState(Settings.decay);
+    noInterrupts();
+    if (state != OFF) digitalWriteEx(decayPin,state);
+    interrupts();
+  }
+}
+
+uint8_t StepDriver::modeGoto() {
+  if (isTmcSPI()) {
+    #ifdef HAS_TMC_DRIVER
+      tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
+    #endif
+  } else {
+    noInterrupts();
+    digitalWriteEx(Pins.m0, bitRead(microstepBitCodeGoto, 0));
+    digitalWriteEx(Pins.m1, bitRead(microstepBitCodeGoto, 1));
+    digitalWriteEx(Pins.m2, bitRead(microstepBitCodeGoto, 2));
+    interrupts();
+  }
+  return microstepRatio;
+}
+
+void StepDriver::modeDecayGoto() {
+  if (isTmcSPI()) {
+    #ifdef HAS_TMC_DRIVER
+      int IRUN = Settings.currentGoto;
+      if (IRUN == OFF) IRUN = Settings.currentRun;
+      tmcDriver.mode(true, Settings.decayGoto, microstepCodeGoto, IRUN, Settings.currentHold);
+    #endif
+  } else {
+    if (Settings.decayGoto == OFF) return;
+    int8_t state = getDecayPinState(Settings.decayGoto);
+    noInterrupts();
+    if (state != OFF) digitalWriteEx(decayPin, state);
+    interrupts();
+  }
+}
+
+int8_t StepDriver::getDecayPinState(int8_t decay) {
+  uint8_t state = OFF;
+  if (decay == SPREADCYCLE) state = LOW;  else
+  if (decay == STEALTHCHOP) state = HIGH; else
+  if (decay == MIXED)       state = LOW;  else
+  if (decay == FAST)        state = HIGH;
+  return state;
+}
+
+bool StepDriver::isTmcSPI() {
+  #ifdef HAS_TMC_DRIVER
+    if (Settings.model == TMC2130 || Settings.model == TMC5160) return true; else return false;
+  #else
+    return false;
+  #endif
+}
+
+bool StepDriver::isDecayOnM2() {
+  if (Settings.model == TMC2209) return true; else return false;
+}
+
+// different models of stepper drivers have different bit settings for microsteps
+// translate the human readable microsteps in the configuration to mode bit settings
+// returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
+int StepDriver::microstepsToCode(uint8_t driverModel, uint8_t microsteps) {
+  int allowed[9] = {1,2,4,8,16,32,64,128,256};
+  if (driverModel >= DRIVER_MODEL_COUNT) return OFF;
+  for (int i = 0; i < 9; i++) {
+    if (microsteps == allowed[i]) return steps[driverModel][i];
+  }
+  return OFF;
+}
 
 #if AXIS1_DRIVER_MODEL != OFF
   const DriverPins     Axis1DriverModePins     = {AXIS1_M0_PIN,AXIS1_M1_PIN,AXIS1_M2_PIN,AXIS1_M3_PIN,AXIS1_DECAY_PIN};
