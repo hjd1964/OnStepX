@@ -6,7 +6,7 @@
 
 class Observatory {
   public:
-    // setup the location and date/time for time keeping and coordinate converson
+    // setup the location, time keeping, and coordinate converson
     void init();
 
     // update the location for time keeping and coordinate conversion

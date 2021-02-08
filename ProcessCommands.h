@@ -1,19 +1,23 @@
 // -----------------------------------------------------------------------------------
 // Command processing
+#pragma once
 
 #include "src/lib/BufferCmds.h"
 #include "src/lib/SerialWrapper.h"
 
 class CommandProcessor {
   public:
+    // start and stop the serial port for the associated command channel
     CommandProcessor(long baud);
     ~CommandProcessor();
 
+    // check for incomming commands and send responses
     void poll();
+
+    // pass along commands as required for processing
     CommandErrors command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply);
 
   private:
-
     void appendChecksum(char s[]);
 
     CommandErrors commandError     = CE_NONE;

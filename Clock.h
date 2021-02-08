@@ -76,7 +76,7 @@ void Clock::init(LI site) {
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
 
   GregorianDate date;
-  date.year = 2021; date.month  = 2;  date.day = 7;
+  date.year = 2021; date.month  = 2; date.day = 7;
   date.hour = 12;   date.minute = 0; date.second = 0; date.centisecond = 0;
   date.timezone = 5;
 
@@ -95,6 +95,7 @@ void Clock::setSite(LI site) {
     
 bool Clock::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
   tasks_mutex_enter(MX_CLOCK_CMD);
+  PrecisionMode precisionMode = convert.precision;
 
   // :Ga#       Get standard time in 12 hour format
   //            Returns: HH:MM:SS#
@@ -124,7 +125,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
     strcpy(reply, "24");
     *numericReply = false;
   } else
-  
+
   // :GG#       Get UTC offset time, hours and minutes to add to local time to convert to UTC
   //            Returns: [s]HH:MM#
   if (cmd("GG"))  {
@@ -134,23 +135,19 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
 
   // :GL#       Get Local Standard Time in 24 hour format
   //            Returns: HH:MM:SS#
-  // :GLH#      Get Local Standard Time in 24 hour format
-  //            Returns: HH:MM:SS.SSSS# (high precision)
-  if (cmdp("GL")) {
-    if (parameter[0] == 0) convert.doubleToHms(reply, backInHours(getTime() - ut1.timezone), PM_HIGH); else
-    if (parameter[0] == 'H' && parameter[1] == 0) convert.doubleToHms(reply, backInHours(getTime() - ut1.timezone), PM_HIGHEST); else
-      *commandError = CE_PARAM_FORM;
+  // :GLH#      Returns: HH:MM:SS.SSSS# (high precision)
+  if (cmdH("GL")) {
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToHms(reply, backInHours(getTime() - ut1.timezone), precisionMode);
     *numericReply = false;
   } else
 
   // :GS#       Get the Sidereal Time as sexagesimal value in 24 hour format
   //            Returns: HH:MM:SS#
-  // :GSH#      Get the Sidereal Time as sexagesimal value in 24 hour format, with high precision
-  //            Returns HH:MM:SS.ss#
-  if (cmdp("GS")) {
-    if (parameter[0] == 0) convert.doubleToHms(reply, getSiderealTime(), PM_HIGH); else 
-    if (parameter[0] == 'H' && parameter[1] == 0) convert.doubleToHms(reply, getSiderealTime(), PM_HIGHEST); else
-      *commandError = CE_PARAM_FORM;
+  // :GSH#      Returns: HH:MM:SS.ss# (high precision)
+  if (cmdH("GS")) {
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToHms(reply, getSiderealTime(), precisionMode);
     *numericReply = false;
   } else
 
@@ -175,17 +172,14 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   } else
 
   // :GX89#     Date/time ready status
-  //            Return: 0 ready
-  //                    1 not ready
-
+  //            Return: 0 ready, 1 not ready
   if (cmd2("GX89")) {
     if (dateIsReady && timeIsReady) *commandError = CE_0;
   } else
 
   // :SC[MM/DD/YY]#
   //            Change standard date to MM/DD/YY
-  //            Return: 0 on failure
-  //                    1 on success
+  //            Return: 0 on failure, 1 on success
   if (cmdp("SC"))  {
     GregorianDate date = convert.strToDate(parameter);
     if (date.valid) {
@@ -195,16 +189,15 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       if (hour >= 24.0) { hour -= 24.0; ut1.day += 1.0; } else
       if (hour <  0.0)  { hour += 24.0; ut1.day -= 1.0; }
       setSiderealTime(ut1, julianDateToLAST(ut1));
-
       // nv.writeFloat(EE_JD, JD);
+      dateIsReady = true;
       if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
     } else *commandError = CE_PARAM_FORM;
   } else
 
   //  :SG[sHH]# or :SG[sHH:MM]# (where MM is 00, 30, or 45)
   //            Set the number of hours added to local time to yield UTC
-  //            Return: 0 on failure
-  //                    1 on success
+  //            Return: 0 failure, 1 success
   if (cmdp("SG")) {
     double hour;
     if (convert.tzstrToDouble(&hour, parameter)) {
@@ -217,8 +210,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
 
   //  :SL[HH:MM:SS]# or :SL[HH:MM:SS.SSS]#
   //            Set the local Time
-  //            Return: 0 on failure
-  //                    1 on success
+  //            Return: 0 failure, 1 success
   if (cmdp("SL"))  {
     double hour;
     if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
@@ -306,6 +298,7 @@ double Clock::julianDateToGAST(JulianDate julianDate) {
   double W = -0.000319*sin(degToRad(O)) - 0.000024*sin(degToRad(2*L));
   double eqeq = W*cos(degToRad(E));
   double gast = gmst + eqeq;
+
   return backInHours(gast);
 }
 

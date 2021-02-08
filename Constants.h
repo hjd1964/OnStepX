@@ -73,6 +73,15 @@
 #define ALTAZM                      3 // Altitude Azimuth Mounts, Dobsonians, etc.
 #define MOUNT_TYPE_LAST             3
 
+// coordinate mode
+#define OBSERVED_PLACE              1
+#define TOPOCENTRIC                 2
+#define ASTROMETRIC_J2000           3
+#define TOPOCENTRIC_STRICT          OFF
+#ifndef TELESCOPE_COORDINATES
+  #define TELESCOPE_COORDINATES TOPOCENTRIC
+#endif 
+
 // Mutexes -------------------------------------------------------------------------------------------------------------------------
 #define MX_CLOCK_CMD                0
 #define MX_TELESCOPE_CMD            0
@@ -113,8 +122,13 @@ int     digitalReadEx(int pin)        { if (pin != OFF && pin != SHARED) return 
 #endif
 
 // etc
-#define cmdp(a) (command[0] == a[0] && command[1] == a[1])
+
+// command
 #define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)
+// command with high precision option
+#define cmdH(a) (command[0] == a[0] && command[1] == a[1] && (command[2] == 0 || (command[2] == 'H' && command[3] == 0)))
+// command with parameter
+#define cmdp(a) (command[0] == a[0] && command[1] == a[1])
 #define cmd1(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == 0)
 #define cmd2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3] && parameter[2] == 0)
 

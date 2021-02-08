@@ -24,187 +24,69 @@ enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKI
 
 class Axis {
   public:
+    // creation and basic initialization
     Axis(AxisPins Pins, DriverPins ModePins, DriverSettings ModeSettings) :
-      Pins{ Pins }, ModePins{ ModePins }, ModeSettings{ ModeSettings } {}
+      Pins{ Pins }, ModePins{ ModePins }, ModeSettings{ ModeSettings } {};
 
-    void init(uint8_t task_handle) {
-      pinModeInitEx(Pins.step, OUTPUT, !invertStep?LOW:HIGH);
-      pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
-      pinModeEx(Pins.enable, OUTPUT); enable(false);
+    // sets up the driver step/dir/enable pins and any associated driver mode control
+    void init(uint8_t task_handle);
 
-      this->task_handle = task_handle;
+    // enables or disables the associated step/dir driver
+    void enable(bool value);
 
-      stepDriver.init();
-    }
-
-    void enable(bool value) {
-      if (Pins.enable != OFF) {
-        if (value) digitalWrite(Pins.enable, invertEnabled?HIGH:LOW); else digitalWrite(Pins.enable, invertEnabled?LOW:HIGH);
-      }
-    }
-
-    bool isEnabled() {
-      return enabled;
-    }
+    // get the enabled state
+    bool isEnabled();
 
     // set motor coordinate, in "measure" units
-    void setMotorCoordinate(double value) {
-      long steps = lround(value*spm);
-      setMotorCoordinateSteps(steps);
-    }
+    void setMotorCoordinate(double value);
 
-    // set motor coordinate, in steps
-    void setMotorCoordinateSteps(long value) {
-      indexSteps    = 0;
-      noInterrupts();
-      motorSteps    = value;
-      targetSteps   = value;
-      backlashSteps = 0;
-      interrupts();
-    }
-
-    // get motor coordinate, in steps
-    long getMotorCoordinateSteps() {
-      noInterrupts();
-      long steps = motorSteps + backlashSteps;
-      interrupts();
-      return steps;
-    }
-
-    // set instrument coordinate, in "measure" units
-    void setInstrumentCoordinate(double value) {
-      long steps = value*spm;
-      noInterrupts();
-      indexSteps = steps - motorSteps;
-      interrupts();
-    }
-
-    // get instrument coordinate, in "measure" units
-    double getInstrumentCoordinate() {
-      noInterrupts();
-      long steps = motorSteps + indexSteps;
-      interrupts();
-      return steps / spm;
-    }
+    // set and get motor coordinate, in steps
+    void setMotorCoordinateSteps(long value);
+    long getMotorCoordinateSteps();
 
     // get instrument coordinate, in steps
-    long getInstrumentCoordinateSteps() {
-      noInterrupts();
-      long steps = motorSteps + indexSteps;
-      interrupts();
-      return steps;
-    }
+    long getInstrumentCoordinateSteps();
+
+    // set and get instrument coordinate, in "measures" (radians, microns, etc.)
+    void setInstrumentCoordinate(double value);
+    double getInstrumentCoordinate();
 
     // set origin coordinate as current location
-    void markOriginCoordinate() {
-      originSteps = getInstrumentCoordinateSteps();
-    }
+    void markOriginCoordinate();
 
-    // set target coordinate, in "measures" (degrees, microns, etc.)
-    void setTargetCoordinate(double value) {
-      long steps = lround(value*spm);
-      noInterrupts();
-      targetSteps = steps;
-      interrupts();
-    }
-
-    // get target coordinate, in "measures" (degrees, microns, etc.)
-    double getTargetCoordinate() {
-      noInterrupts();
-      long steps = targetSteps;
-      interrupts();
-      return steps/spm;
-    }
-
-    // set dir as required to move coord toward the target and take a step; requires two calls to take a step
-    void move(const int8_t stepPin, const int8_t dirPin) {
-      if (takeStep) {
-        if (tracking) targetSteps += trackingStep;
-        if (motorSteps + backlashSteps > targetSteps) {
-          if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
-          digitalWriteF(stepPin, invertStep?LOW:HIGH);
-        } else {
-          if (motorSteps + backlashSteps < targetSteps) {
-            if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
-            digitalWriteF(stepPin, invertStep?LOW:HIGH);
-          }
-        }
-      } else {
-        if (motorSteps + backlashSteps > targetSteps) {
-          if (!dirFwd) {
-            dirFwd = !dirFwd;
-            digitalWriteF(dirPin, invertDir?LOW:HIGH);
-          }
-        } else if (motorSteps + backlashSteps < targetSteps) {
-          if (dirFwd) {
-            dirFwd = !dirFwd;
-            digitalWriteF(dirPin, invertDir?HIGH:LOW);
-          }
-        }
-        if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
-        digitalWriteF(stepPin,invertStep?HIGH:LOW);
-      }
-      takeStep = !takeStep;
-    }
+    // set and get target coordinate, in "measures" (degrees, microns, etc.)
+    void setTargetCoordinate(double value);
+    double getTargetCoordinate();
 
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
-    void setFrequencyMax(double frequency) {
-      maxFreq = frequency*spm;
-      if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;
-      minPeriodMicrosHalf = lround(minPeriodMicros/2.0);
-    }
+    void setFrequencyMax(double frequency);
 
     // causes a movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
-    void setFrequency(double frequency) {
-      double d=500000.0/(frequency*spm);
-      if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
-      unsigned long periodMicroseconds = lround(d);
-      if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
-      // handle the case where the move() method isn't called to set the new period
-      if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
-      lastFrequency = frequency;
-    }
+    void setFrequency(double frequency);
 
-    void setTracking(bool tracking) {
-      this->tracking = tracking;
-    }
+    // set and get tracking state (movement of motor to target)
+    void setTracking(bool tracking);
+    bool getTracking();
 
-    bool getTracking() {
-      return tracking;
-    }
+    // set steps per measure for conversion between steps and "measures" (radians, microns, etc.)
+    void setStepsPerMeasure(double value);
 
-    // set steps per measure
-    // for conversion between steps and "measures" (radians, microns, etc.)
-    void setStepsPerMeasure(double value) {
-      spm = value;
-    }
+    // set and get backlash in "measures" (radians, microns, etc.)
+    void setBacklash(double value);
+    double getBacklash();
 
-    void setBacklash(double value) {
-      backlashAmountSteps = value * spm;
-    }
+    // set and get minimum position in "measures" (radians, microns, etc.)
+    void setMinCoordinate(double value);
+    double getMinCoordinate();
 
-    double getBacklash() {
-      return backlashSteps/spm;
-    }
-
-    void setMinCoordinate(double value) {
-      minSteps = value*spm;
-    }
-
-    double getMinCoordinate() {
-      return minSteps/spm;
-    }
-
-    void setMaxCoordinate(double value) {
-      maxSteps = value*spm;
-    }
-
-    double getMaxCoordinate() {
-      return maxSteps/spm;
-    }
+    // set and get maximum position in "measures" (radians, microns, etc.)
+    void setMaxCoordinate(double value);
+    double getMaxCoordinate();
         
-  private:
+    // set dir as required and move coord toward the target and take a step; requires two calls to take a step
+    void move(const int8_t stepPin, const int8_t dirPin);
 
+  private:
     uint8_t task_handle               = 0;
 
     bool   invertEnabled              = false;
@@ -251,6 +133,168 @@ class Axis {
     const DriverSettings ModeSettings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
     StepDriver stepDriver{ModePins, ModeSettings};
 };
+
+void Axis::init(uint8_t task_handle) {
+  pinModeInitEx(Pins.step, OUTPUT, !invertStep?LOW:HIGH);
+  pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
+  pinModeEx(Pins.enable, OUTPUT); enable(false);
+
+  this->task_handle = task_handle;
+
+  stepDriver.init();
+}
+
+void Axis::enable(bool value) {
+  if (Pins.enable != OFF) {
+    if (value) digitalWrite(Pins.enable, invertEnabled?HIGH:LOW); else digitalWrite(Pins.enable, invertEnabled?LOW:HIGH);
+  }
+}
+
+bool Axis::isEnabled() {
+  return enabled;
+}
+
+void Axis::setMotorCoordinate(double value) {
+  long steps = lround(value*spm);
+  setMotorCoordinateSteps(steps);
+}
+
+void Axis::setMotorCoordinateSteps(long value) {
+  indexSteps    = 0;
+  noInterrupts();
+  motorSteps    = value;
+  targetSteps   = value;
+  backlashSteps = 0;
+  interrupts();
+}
+
+long Axis::getMotorCoordinateSteps() {
+  noInterrupts();
+  long steps = motorSteps + backlashSteps;
+  interrupts();
+  return steps;
+}
+
+long Axis::getInstrumentCoordinateSteps() {
+  noInterrupts();
+  long steps = motorSteps + indexSteps;
+  interrupts();
+  return steps;
+}
+
+void Axis::setInstrumentCoordinate(double value) {
+  long steps = value*spm;
+  noInterrupts();
+  indexSteps = steps - motorSteps;
+  interrupts();
+}
+
+double Axis::getInstrumentCoordinate() {
+  noInterrupts();
+  long steps = motorSteps + indexSteps;
+  interrupts();
+  return steps / spm;
+}
+
+void Axis::markOriginCoordinate() {
+  originSteps = getInstrumentCoordinateSteps();
+}
+
+void Axis::setTargetCoordinate(double value) {
+  long steps = lround(value*spm);
+  noInterrupts();
+  targetSteps = steps;
+  interrupts();
+}
+
+double Axis::getTargetCoordinate() {
+  noInterrupts();
+  long steps = targetSteps;
+  interrupts();
+  return steps/spm;
+}
+
+void Axis::setFrequencyMax(double frequency) {
+  maxFreq = frequency*spm;
+  if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;
+  minPeriodMicrosHalf = lround(minPeriodMicros/2.0);
+}
+
+void Axis::setFrequency(double frequency) {
+  double d=500000.0/(frequency*spm);
+  if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
+  unsigned long periodMicroseconds = lround(d);
+  if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
+  // handle the case where the move() method isn't called to set the new period
+  if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
+  lastFrequency = frequency;
+}
+
+void Axis::setTracking(bool tracking) {
+  this->tracking = tracking;
+}
+
+bool Axis::getTracking() {
+  return tracking;
+}
+
+void Axis::setStepsPerMeasure(double value) {
+  spm = value;
+}
+
+void Axis::setBacklash(double value) {
+  backlashAmountSteps = value * spm;
+}
+
+double Axis::getBacklash() {
+  return backlashSteps/spm;
+}
+
+void Axis::setMinCoordinate(double value) {
+  minSteps = value*spm;
+}
+
+double Axis::getMinCoordinate() {
+  return minSteps/spm;
+}
+
+void Axis::setMaxCoordinate(double value) {
+  maxSteps = value*spm;
+}
+
+double Axis::getMaxCoordinate() {
+  return maxSteps/spm;
+}
+
+void Axis::move(const int8_t stepPin, const int8_t dirPin) {
+  if (takeStep) {
+    if (tracking) targetSteps += trackingStep;
+    if (motorSteps + backlashSteps > targetSteps) {
+      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+      digitalWriteF(stepPin, invertStep?LOW:HIGH);
+    } else {
+      if (motorSteps + backlashSteps < targetSteps) {
+        if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
+        digitalWriteF(stepPin, invertStep?LOW:HIGH);
+      }
+    }
+  } else {
+    if (motorSteps + backlashSteps > targetSteps) {
+      if (!dirFwd) {
+        dirFwd = !dirFwd;
+        digitalWriteF(dirPin, invertDir?LOW:HIGH);
+      }
+    } else if (motorSteps + backlashSteps < targetSteps) {
+      if (dirFwd) {
+        dirFwd = !dirFwd;
+        digitalWriteF(dirPin, invertDir?HIGH:LOW);
+      }
+    }
+    if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
+    digitalWriteF(stepPin,invertStep?HIGH:LOW);
+  }
+  takeStep = !takeStep;
+}
 
 // instantiate and callback wrappers
 #if AXIS1_DRIVER_MODEL != OFF
