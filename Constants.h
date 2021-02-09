@@ -80,7 +80,7 @@
 #define TOPOCENTRIC_STRICT          OFF
 #ifndef TELESCOPE_COORDINATES
   #define TELESCOPE_COORDINATES TOPOCENTRIC
-#endif 
+#endif
 
 // Mutexes -------------------------------------------------------------------------------------------------------------------------
 #define MX_CLOCK_CMD                0
@@ -92,6 +92,9 @@
 #define RAD                         57.29577951308232
 #define RAD_HOUR_RATIO              3.819718634205488
 #define SIDEREAL_RATIO              1.002737909350795
+#define Deg90                       1.570796326794896
+#define Deg180                      3.141592653589793
+#define Deg360                      6.283185307179586
 
 // for handling degenerate spherical coordinates near the poles
 #define SmallestRad                 0.000005
@@ -123,14 +126,16 @@ int     digitalReadEx(int pin)        { if (pin != OFF && pin != SHARED) return 
 
 // etc
 
-// command
+// command of 2 chars
 #define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)
-// command with high precision option
-#define cmdH(a) (command[0] == a[0] && command[1] == a[1] && (command[2] == 0 || (command[2] == 'H' && command[3] == 0)))
-// command with parameter
-#define cmdp(a) (command[0] == a[0] && command[1] == a[1])
+// command of 3 chars
 #define cmd1(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == 0)
+// command of 4 chars
 #define cmd2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3] && parameter[2] == 0)
+// command of 2 chars with high precision option
+#define cmdH(a) (command[0] == a[0] && command[1] == a[1] && (command[2] == 0 || (command[2] == 'H' && command[3] == 0)))
+// command of 2 chars with parameter
+#define cmdP(a) (command[0] == a[0] && command[1] == a[1])
 
 #ifndef delaySpi
   #define delaySpi() delayMicroseconds(1)
