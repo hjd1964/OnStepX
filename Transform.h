@@ -9,17 +9,14 @@
 
 enum PierSide {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 
-typedef struct EquCoordinate {
+typedef struct Coordinate {
     double r;
     double h;
     double d;
-    PierSide p;
-} EquCoordinate;
-
-typedef struct HorCoordinate {
     double a;
     double z;
-} HorCoordinate;
+    PierSide p;
+} Coordinate;
 
 class Transform {
   public:
@@ -27,34 +24,32 @@ class Transform {
     // setup for coordinate transformation
     void setSite(LI site);
 
-    // converts between Instrument and Native coordinates, including Pier side
-    EquCoordinate equInstrumentToNative(EquCoordinate equ);
-    EquCoordinate nativeToEquInstrument(EquCoordinate equ);
-    PierSide mountToPierSide(EquCoordinate equ);
-
+    // converts between Mount and Native coordinates
+    Coordinate mountToNative(Coordinate *coord);
+    
     // converts between Mount and Topocentric coordinates
-    EquCoordinate equMountToTopocentric(EquCoordinate equ);
-    EquCoordinate topocentricToEquMount(EquCoordinate equ);
+    void equMountToTopocentric(Coordinate *coord);
+    void topocentricToEquMount(Coordinate *coord);
 
     // converts between Mount and Observed coordinates
-    EquCoordinate equMountToObservedPlace(EquCoordinate equ);
-    EquCoordinate observedPlaceToEquMount(EquCoordinate equ);
+    void equMountToObservedPlace(Coordinate *coord);
+    void observedPlaceToEquMount(Coordinate *coord);
 
     // converts between Mount and Instrument coordinates
-    EquCoordinate equInstrumentToMount(EquCoordinate equ);
-    EquCoordinate equMountToInstrument(EquCoordinate equ);
+    Coordinate instrumentToMount(double a1, double a2);
+    void mountToInstrument(Coordinate *coord, double *a1, double *a2);
 
     // converts between Topocentric and Observed coordinates
-    EquCoordinate topocentricToObservedPlace(EquCoordinate equ);
-    EquCoordinate observedPlaceToTopocentric(EquCoordinate equ);
-    
+    void topocentricToObservedPlace(Coordinate *coord);
+    void observedPlaceToTopocentric(Coordinate *coord);
+
     // converts between Hour Angle and Right Ascension coordinates
-    void hourAngleToRightAscension(EquCoordinate *equ);
-    void rightAscensionToHourAngle(EquCoordinate *equ);
+    void hourAngleToRightAscension(Coordinate *coord);
+    void rightAscensionToHourAngle(Coordinate *coord);
 
     // convert between Equatorial and Horizon coordinates
-    HorCoordinate equToHor(EquCoordinate equ);
-    EquCoordinate horToEqu(HorCoordinate hor);
+    void equToHor(Coordinate *coord);
+    void horToEqu(Coordinate *coord);
 
     // refraction at altitude (radians), pressure (millibars), and temperature (celsius)
     // returns amount of refraction at the true altitude
@@ -74,156 +69,142 @@ void Transform::setSite(LI site) {
   this->site = site;
 }
 
-EquCoordinate Transform::equInstrumentToNative(EquCoordinate equ) {
-  EquCoordinate mount = equInstrumentToMount(equ);
-  #if TELESCOPE_COORDINATES == TOPOCENTRIC
-    return equMountToObservedPlace(mount);
-  #elif TELESCOPE_COORDINATES == OBSERVED
-    return equMountToTopocentric(mount);
-  #else
-    #error "Configuration (Constants.h): TELESCOPE_COORDINATES invalid!"
-  #endif
+Coordinate Transform::mountToNative(Coordinate *coord) {
+  Coordinate result = *coord;
+  if (mountType == ALTAZM) horToEqu(&result);
+#if TELESCOPE_COORDINATES == OBSERVED
+  equMountToObservedPlace(&result);
+#elif TELESCOPE_COORDINATES == TOPOCENTRIC
+  equMountToTopocentric(&result);
+#else
+  #error "Configuration (Constants.h): Unknown TELESCOPE_COORDINATES!"
+#endif
+  hourAngleToRightAscension(&result);
+  return result;
 }
 
-EquCoordinate Transform::nativeToEquInstrument(EquCoordinate equ) {
-  #if TELESCOPE_COORDINATES == TOPOCENTRIC
-    EquCoordinate mount = observedPlaceToEquMount(equ);
-  #elif TELESCOPE_COORDINATES == OBSERVED
-    EquCoordinate mount =  topocentricToEquMount(equ);
-  #endif
-  return equMountToInstrument(mount);
+void Transform::equMountToTopocentric(Coordinate *coord) {
+  equMountToObservedPlace(coord);
+  observedPlaceToTopocentric(coord);
 }
 
-PierSide Transform::mountToPierSide(EquCoordinate equ) {
-  if (equ.d < -PI/2 || equ.d > PI/2) return PIER_SIDE_WEST; else return PIER_SIDE_EAST;
+void Transform::topocentricToEquMount(Coordinate *coord) {
+  topocentricToObservedPlace(coord);
+  observedPlaceToEquMount(coord);
 }
 
-EquCoordinate Transform::equMountToTopocentric(EquCoordinate equ) {
-  EquCoordinate obs=equMountToObservedPlace(equ);
-  return observedPlaceToTopocentric(obs);
-}
-
-EquCoordinate Transform::topocentricToEquMount(EquCoordinate equ) {
-  EquCoordinate obs=topocentricToObservedPlace(equ);
-  return observedPlaceToEquMount(obs);
-}
-
-EquCoordinate Transform::equMountToObservedPlace(EquCoordinate equ) {
+void Transform::equMountToObservedPlace(Coordinate *coord) {
   // apply the pointing model
   // convert HA into RA
-  return equ;
 }
 
-EquCoordinate Transform::observedPlaceToEquMount(EquCoordinate equ) {
+void Transform::observedPlaceToEquMount(Coordinate *coord) {
   // convert RA into HA
   // de-apply the pointing model
-  return equ;
 }
 
 // converts from instrument to mount coordinates
-EquCoordinate Transform::equInstrumentToMount(EquCoordinate equ) {
-  if (equ.d < -PI/2 || equ.d > PI/2) {
-    equ.r += (PI - degToRad(360.0));
-    equ.d =   PI - equ.d;
+Coordinate Transform::instrumentToMount(double a1, double a2) {
+  Coordinate mount;
+
+  if (a2 < -Deg90 || a2 > Deg90) {
+    a1 -= Deg180;
+    a2  = Deg180 - a2;
   }
-  if (equ.d >  PI) equ.d -= PI*2; else
-  if (equ.d < -PI) equ.d += PI*2;
-  return equ;
+  if (a2 >  Deg180) a2 -= Deg360; else
+  if (a2 < -Deg180) a2 += Deg360;
+
+  if (a2 < -Deg90 || a2 > Deg90) mount.p = PIER_SIDE_WEST; else mount.p = PIER_SIDE_EAST;
+
+  if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
+  return mount;
 }
 
-EquCoordinate Transform::equMountToInstrument(EquCoordinate equ) {
-  if (equ.p == PIER_SIDE_WEST) equ.r += PI;
-  if (site.latitude.value >= 0.0) {
-    if (equ.p == PIER_SIDE_WEST) equ.d =   PI  - equ.d;
-  } else {
-    if (equ.p == PIER_SIDE_WEST) equ.d = (-PI) - equ.d;
-  }
-  if (equ.d >  PI*2) equ.d -= PI*2; else
-  if (equ.d < -PI*2) equ.d += PI*2;
-  return equ;
-}
-
-EquCoordinate Transform::topocentricToObservedPlace(EquCoordinate equ) {
-  HorCoordinate hor;
-
-  // within about 1/20 arc-second of NCP or SCP
-#if TOPOCENTRIC_STRICT == ON
-  if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0; hor.a =  site.latitude.value; } else
-  if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = PI;  hor.a = -site.latitude.value; } else hor = equToHor(equ);
-#else
-  if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor = equToHor(equ);
-#endif
-
-  hor.a += trueRefrac(hor.a);
-  return horToEqu(hor);
-}
-
-EquCoordinate Transform::observedPlaceToTopocentric(EquCoordinate equ) {
-  HorCoordinate hor;
+void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
+  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   
-  // within about 1/20 arc-second of the "refracted" NCP or SCP
-#if TOPOCENTRIC_STRICT == ON
-  if (fabs(equ.d - PI/2) < SmallestRad) { hor.z = 0.0;   hor.a =  site.latitude.value; } else
-  if (fabs(equ.d + PI/2) < SmallestRad) { hor.z = 180.0; hor.a = -site.latitude.value; } else hor = equToHor(equ);
-#else  
-  if (fabs(equ.d - PI/2) < SmallestRad || fabs(equ.d + PI/2) < SmallestRad) return equ; else hor = equToHor(equ);
-#endif
-
-  hor.a -= apparentRefrac(hor.a);
-  return horToEqu(hor);
+  if (coord->p == PIER_SIDE_WEST) *a1 += PI;
+  if (site.latitude.value >= 0.0) {
+    if (coord->p == PIER_SIDE_WEST) *a2 =   Deg180  - *a2;
+  } else {
+    if (coord->p == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
+  }
+  if (*a2 >  Deg360) *a2 -= Deg360; else
+  if (*a2 < -Deg360) *a2 += Deg360;
 }
 
-void Transform::hourAngleToRightAscension(EquCoordinate *equ) {
+void Transform::topocentricToObservedPlace(Coordinate *coord) {
+  if (mountType != ALTAZM) {
+    // within about 1/20 arc-second of NCP or SCP
+    #if TOPOCENTRIC_STRICT == ON
+      if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
+      if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
+    #else
+      if (fabs(coord->d - Deg90) < SmallestRad || fabs(coord->d + Deg90) < SmallestRad) return; else equToHor(coord);
+    #endif
+  }
+  coord->a += trueRefrac(coord->a);
+  horToEqu(coord);
+}
+
+void Transform::observedPlaceToTopocentric(Coordinate *coord) {
+  if (mountType != ALTAZM) {
+    // within about 1/20 arc-second of the "refracted" NCP or SCP
+    #if TOPOCENTRIC_STRICT == ON
+      if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
+      if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
+    #else  
+      if (fabs(coord->d - Deg90) < SmallestRad || fabs(coord->d + Deg90) < SmallestRad) return; else equToHor(coord);
+    #endif
+  }
+  coord->a -= apparentRefrac(coord->a);
+  horToEqu(coord);
+}
+
+void Transform::hourAngleToRightAscension(Coordinate *coord) {
   noInterrupts();
   unsigned long cs = centisecondLAST;
   interrupts();
-  equ->r = csToRad(cs) - equ->h;
-  equ->r = backInRads(equ->r);
+  coord->r = csToRad(cs) - coord->h;
+  coord->r = backInRads(coord->r);
 }
 
-void Transform::rightAscensionToHourAngle(EquCoordinate *equ) {
+void Transform::rightAscensionToHourAngle(Coordinate *coord) {
   noInterrupts();
   unsigned long cs = centisecondLAST;
   interrupts();
-  equ->h = csToRad(cs) - equ->r;
-  equ->h = backInRads(equ->h);
+  coord->h = csToRad(cs) - coord->r;
+  coord->h = backInRads(coord->h);
 }
 
-HorCoordinate Transform::equToHor(EquCoordinate equ) {
-  HorCoordinate hor;
-  double cosHA  = cos(equ.h);
-  double sinAlt = (sin(equ.d)*site.latitude.sine) + (cos(equ.d)*site.latitude.cosine*cosHA);  
-  hor.a         = asin(sinAlt);
-  double t1     = sin(equ.h);
-  double t2     = cosHA*site.latitude.sine - tan(equ.d)*site.latitude.cosine;
-  hor.z         = atan2(t1,t2);
-  hor.z        += PI;
-  return hor;
+void Transform::equToHor(Coordinate *coord) {
+  rightAscensionToHourAngle(coord);
+  double cosHA  = cos(coord->h);
+  double sinAlt = sin(coord->d)*site.latitude.sine + cos(coord->d)*site.latitude.cosine*cosHA;  
+  coord->a      = asin(sinAlt);
+  double t1     = sin(coord->h);
+  double t2     = cosHA*site.latitude.sine - tan(coord->d)*site.latitude.cosine;
+  coord->z      = atan2(t1,t2);
+  coord->z      += PI;
 }
 
-EquCoordinate Transform::horToEqu(HorCoordinate hor) { 
-  EquCoordinate equ;
-  double cosAzm = cos(hor.z);
-  double sinDec = (sin(hor.a)*site.latitude.sine) + (cos(hor.a)*site.latitude.cosine*cosAzm);  
-  equ.d         = asin(sinDec); 
-  double t1     = sin(hor.z);
-  double t2     = cosAzm*site.latitude.sine - tan(hor.a)*site.latitude.cosine;
-  equ.h         = atan2(t1,t2);
-  equ.h        += PI;
-  return equ;
+void Transform::horToEqu(Coordinate *coord) { 
+  double cosAzm = cos(coord->z);
+  double sinDec = sin(coord->a)*site.latitude.sine + cos(coord->a)*site.latitude.cosine*cosAzm;  
+  coord->d      = asin(sinDec); 
+  double t1     = sin(coord->z);
+  double t2     = cosAzm*site.latitude.sine - tan(coord->a)*site.latitude.cosine;
+  coord->h      = atan2(t1,t2);
+  coord->h     += PI;
+  hourAngleToRightAscension(coord);
 }
 
 double Transform::trueRefrac(double altitude, double pressure, double temperature) {
   if (isnan(pressure)) pressure = 1010.0;
   if (isnan(temperature)) temperature = 10.0;
-
-//    double TPC = (pressure/1010.0)*(283.0/(273.0+temperature));
-//    double r   = 1.02*cot( (Alt+(10.3/(Alt+5.11)))/Rad ) * TPC;  // r is in arc-minutes
-
   double TPC = (pressure/1010.0)*(283.0/(273.0 + temperature));
   double r   = 2.96705972855e-4*cot(altitude + 0.17977/(altitude + 0.08919))*TPC;
-
-  if (r < 0.0) r=0.0;
+  if (r < 0.0) r = 0.0;
   return r;
 }
 
@@ -239,9 +220,8 @@ double Transform::cot(double n) {
 }
 
 double Transform::backInRads(double angle) {
-  double PI2 = PI*2.0;
-  while (angle >= PI2) angle -= PI2;
-  while (angle < 0.0)  angle += PI2;
+  while (angle >= Deg360) angle -= Deg360;
+  while (angle < 0.0)     angle += Deg360;
   return angle;
 }
 

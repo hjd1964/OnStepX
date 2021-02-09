@@ -84,7 +84,7 @@ CommandErrors CommandProcessor::command(char reply[], char command[], char param
 //            Returns: s#
 // :GVT#      Get Telescope Firmware Time
 //            Returns: HH:MM:SS#
-  if (cmdp("GV")) {
+  if (cmdP("GV")) {
     if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
     if (parameter[0] == 'M') sprintf(reply,"OnStepX %i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else
     if (parameter[0] == 'N') sprintf(reply,"%i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else

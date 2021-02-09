@@ -82,7 +82,10 @@ class Axis {
     // set and get maximum position in "measures" (radians, microns, etc.)
     void setMaxCoordinate(double value);
     double getMaxCoordinate();
-        
+
+    // for TMC drivers, etc. report status
+    inline bool fault() { return false; };
+
     // set dir as required and move coord toward the target and take a step; requires two calls to take a step
     void move(const int8_t stepPin, const int8_t dirPin);
 
