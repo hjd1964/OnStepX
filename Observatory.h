@@ -76,7 +76,7 @@ bool Observatory::command(char reply[], char command[], char parameter[], bool *
   //            Return: 0 failure, 1 success
   if (cmd("St"))  {
     tasks_mutex_enter(MX_CLOCK_CMD);
-    if (convert.degToDouble(&value, parameter, true)) {
+    if (convert.dmsToDouble(&value, parameter, true)) {
       site.latitude.value = degToRad(value);
       updateSite();
     } else *commandError = CE_PARAM_FORM;
@@ -89,7 +89,7 @@ bool Observatory::command(char reply[], char command[], char parameter[], bool *
   if (cmd("Sg"))  {
     tasks_mutex_enter(MX_CLOCK_CMD);
     if (parameter[0] == '-' || parameter[0] == '+') i = 1; else i = 0;
-    if (convert.degToDouble(&value, (char *)&parameter[i], false)) {
+    if (convert.dmsToDouble(&value, (char *)&parameter[i], false)) {
       if (parameter[0] == '-') site.longitude = -site.longitude;
       if (value >= -180.0 && value <= 360.0) {
         if (value >= 180.0) value -= 360.0;

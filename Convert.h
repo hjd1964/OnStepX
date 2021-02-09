@@ -44,17 +44,17 @@ class Convert {
     // convert string in format MM/DD/YY to julian date
     GregorianDate strToDate(char *ymd);
 
-    // convert timezone string in format sHH:MM to double
-    // (also handles)                    sHH
+    // convert timezone string  sHH:MM to double
+    // (also handles)           sHH
     bool tzToDouble(double *value, char *hm);
 
     // convert string in format HH:MM:SS to double
     // (also handles)           HH:MM.M
-    // (also handles)           HH:MM:SS
-    // (also handles)           HH:MM:SS.SSSS
-    bool hourToDouble(double *value, char *hms, PrecisionMode p);
+    //                          HH:MM:SS
+    //                          HH:MM:SS.SSSS
+    bool hmsToDouble(double *value, char *hms, PrecisionMode p);
     // automatically detects PrecisionMode (as above)
-    bool hourToDouble(double *value, char *hms);
+    bool hmsToDouble(double *value, char *hms);
 
     // convert string in format sDD:MM:SS to double
     // (also handles)           sDD:MM:SS.SSS
@@ -63,9 +63,9 @@ class Convert {
     //                          DDD:MM
     //                          sDD*MM
     //                          DDD*MM
-    bool degToDouble(double *value, char *dms, bool signPresent, PrecisionMode p);
+    bool dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p);
     // automatically detects PrecisionMode (as above)
-    bool degToDouble(double *value, char *dms, bool signPresent);
+    bool dmsToDouble(double *value, char *dms, bool signPresent);
     
     // convert double to string in a variety of formats (as above)
     void doubleToHms(char *reply, double value, bool signPresent, PrecisionMode p);
@@ -131,7 +131,7 @@ bool Convert::tzToDouble(double *value, char *hm) {
   return true;
 }
 
-bool Convert::hourToDouble(double *value, char *hms, PrecisionMode p) {
+bool Convert::hmsToDouble(double *value, char *hms, PrecisionMode p) {
   char h[3], m[5];
   int  hour, minute, decimal = 0;
   double second = 0;
@@ -170,14 +170,14 @@ bool Convert::hourToDouble(double *value, char *hms, PrecisionMode p) {
   return true;
 }
 
-bool Convert::hourToDouble(double *value, char *hms) {
-  if (!hourToDouble(value, hms, PM_HIGHEST))
-    if (!hourToDouble(value, hms, PM_HIGH))
-      if (!hourToDouble(value, hms, PM_LOW)) return false;
+bool Convert::hmsToDouble(double *value, char *hms) {
+  if (!hmsToDouble(value, hms, PM_HIGHEST))
+    if (!hmsToDouble(value, hms, PM_HIGH))
+      if (!hmsToDouble(value, hms, PM_LOW)) return false;
   return true;
 }
 
-bool Convert::degToDouble(double *value, char *dms, bool signPresent, PrecisionMode p) {
+bool Convert::dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p) {
   char d[4], m[5];
   int length;
   int sign = 1, deg, minute, lowLimit = 0, highLimit = 360;
@@ -222,10 +222,10 @@ bool Convert::degToDouble(double *value, char *dms, bool signPresent, PrecisionM
   return true;
 }
 
-bool Convert::degToDouble(double *value, char *dms, bool signPresent) {
-  if (!degToDouble(value, dms, signPresent, PM_HIGHEST))
-    if (!degToDouble(value, dms, signPresent, PM_HIGH))
-      if (!degToDouble(value, dms, signPresent, PM_LOW)) return false;
+bool Convert::dmsToDouble(double *value, char *dms, bool signPresent) {
+  if (!dmsToDouble(value, dms, signPresent, PM_HIGHEST))
+    if (!dmsToDouble(value, dms, signPresent, PM_HIGH))
+      if (!dmsToDouble(value, dms, signPresent, PM_LOW)) return false;
   return true;
 }
 

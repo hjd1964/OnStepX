@@ -81,7 +81,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sd"))  {
-    if (!convert.degToDouble(&target.d, parameter, true)) *commandError = CE_PARAM_RANGE;
+    if (!convert.dmsToDouble(&target.d, parameter, true)) *commandError = CE_PARAM_RANGE;
     target.d = degToRad(target.d);
   } else
 
@@ -90,7 +90,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sr"))  {
-    if (!convert.hourToDouble(&target.r, parameter)) *commandError = CE_PARAM_RANGE;
+    if (!convert.hmsToDouble(&target.r, parameter)) *commandError = CE_PARAM_RANGE;
     target.r = hrsToRad(target.r);
   } else
 

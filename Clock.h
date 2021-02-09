@@ -217,7 +217,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   if (cmdP("SL"))  {
     tasks_mutex_enter(MX_CLOCK_CMD);
     double hour;
-    if (convert.hourToDouble(&hour, parameter, PM_HIGH) || convert.hourToDouble(&hour, parameter, PM_HIGHEST)) {
+    if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
       #ifndef ESP32
         // nv.writeFloat(EE_LMT,LMT);
       #endif
