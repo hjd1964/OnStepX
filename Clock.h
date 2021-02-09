@@ -94,7 +94,6 @@ void Clock::setSite(LI site) {
 }
     
 bool Clock::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
-  tasks_mutex_enter(MX_CLOCK_CMD);
   PrecisionMode precisionMode = convert.precision;
 
   // :Ga#       Get standard time in 12 hour format
@@ -102,7 +101,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   if (cmd("Ga"))  {
     double time = backInHours(getTime() - ut1.timezone);
     if (time > 12.0) time -= 12.0;
-    convert.doubleToHms(reply, time, PM_HIGH);
+    convert.doubleToHms(reply, time, false, PM_HIGH);
     *numericReply = false;
   } else
 
@@ -129,7 +128,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   // :GG#       Get UTC offset time, hours and minutes to add to local time to convert to UTC
   //            Returns: [s]HH:MM#
   if (cmd("GG"))  {
-    convert.doubleToHms(reply, ut1.timezone, PM_LOWEST);
+    convert.doubleToHms(reply, ut1.timezone, false, PM_LOWEST);
     *numericReply=false;
   } else
 
@@ -138,7 +137,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   // :GLH#      Returns: HH:MM:SS.SSSS# (high precision)
   if (cmdH("GL")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, backInHours(getTime() - ut1.timezone), precisionMode);
+    convert.doubleToHms(reply, backInHours(getTime() - ut1.timezone), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -147,14 +146,14 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   // :GSH#      Returns: HH:MM:SS.ss# (high precision)
   if (cmdH("GS")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, getSiderealTime(), precisionMode);
+    convert.doubleToHms(reply, getSiderealTime(), false, precisionMode);
     *numericReply = false;
   } else
 
   // :GX80#     Get the UT1 Time as sexagesimal value in 24 hour format
   //            Returns: HH:MM:SS.ss#
   if (cmd2("GX80")) {
-    convert.doubleToHms(reply, backInHours(getTime()), PM_HIGH);
+    convert.doubleToHms(reply, backInHours(getTime()), false, PM_HIGH);
     *numericReply = false;
   } else
 
@@ -180,7 +179,8 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   // :SC[MM/DD/YY]#
   //            Change standard date to MM/DD/YY
   //            Return: 0 on failure, 1 on success
-  if (cmdp("SC"))  {
+  if (cmdP("SC"))  {
+    tasks_mutex_enter(MX_CLOCK_CMD);
     GregorianDate date = convert.strToDate(parameter);
     if (date.valid) {
       ut1 = gregorianToJulianDay(date);
@@ -193,27 +193,31 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       dateIsReady = true;
       if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
     } else *commandError = CE_PARAM_FORM;
+    tasks_mutex_exit(MX_CLOCK_CMD);
   } else
 
   //  :SG[sHH]# or :SG[sHH:MM]# (where MM is 00, 30, or 45)
   //            Set the number of hours added to local time to yield UTC
   //            Return: 0 failure, 1 success
-  if (cmdp("SG")) {
+  if (cmdP("SG")) {
+    tasks_mutex_enter(MX_CLOCK_CMD);
     double hour;
-    if (convert.tzstrToDouble(&hour, parameter)) {
+    if (convert.tzToDouble(&hour, parameter)) {
       if (hour >= -13.75 || hour <= 12.0) {
         ut1.timezone = hour;
         //nv.update(EE_sites+currentSite*25 + 8, b);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
+    tasks_mutex_exit(MX_CLOCK_CMD);
   } else
 
   //  :SL[HH:MM:SS]# or :SL[HH:MM:SS.SSS]#
   //            Set the local Time
   //            Return: 0 failure, 1 success
-  if (cmdp("SL"))  {
+  if (cmdP("SL"))  {
+    tasks_mutex_enter(MX_CLOCK_CMD);
     double hour;
-    if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
+    if (convert.hourToDouble(&hour, parameter, PM_HIGH) || convert.hourToDouble(&hour, parameter, PM_HIGHEST)) {
       #ifndef ESP32
         // nv.writeFloat(EE_LMT,LMT);
       #endif
@@ -222,10 +226,10 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       timeIsReady = true;
       if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
     } else *commandError = CE_PARAM_FORM;
-  } else
+    tasks_mutex_exit(MX_CLOCK_CMD);
+  } else return false;
 
-  { tasks_mutex_exit(MX_CLOCK_CMD); return false; }
-  tasks_mutex_exit(MX_CLOCK_CMD); return true;
+  return true;
 }
 
 void Clock::tick() {
