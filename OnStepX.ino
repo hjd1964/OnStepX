@@ -50,7 +50,7 @@
 // Note that the DebugSer port cannot be used for normal communication with OnStep
 #define DEBUG OFF                      // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
                                        // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
-#define SERIAL_DEBUG          SERIAL_A // default SERIAL_A... or use Serial4, for example (always 9600 baud)
+#define SERIAL_DEBUG          SERIAL_A // default SERIAL_A... or use Serial4, for example
 #define SERIAL_DEBUG_BAUD     115200
 
 #include "Constants.h"
