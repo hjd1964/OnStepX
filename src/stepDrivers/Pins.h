@@ -7,3 +7,8 @@ typedef struct DriverPins {
   int8_t m3;
   int8_t decay;
 } DriverPins;
+
+#define mosi m0
+#define sck  m1
+#define cs   m2
+#define miso m3

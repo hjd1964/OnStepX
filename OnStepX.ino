@@ -63,7 +63,21 @@ Tasks tasks;
 #include "src/lib/Telescope.h"
 Telescope telescope;
 
-extern void processCmdsA();
+#ifdef SERIAL_A
+  extern void processCmdsA();
+#endif
+#ifdef SERIAL_B
+  extern void processCmdsB();
+#endif
+#ifdef SERIAL_C
+  extern void processCmdsC();
+#endif
+#ifdef SERIAL_D
+  extern void processCmdsD();
+#endif
+#ifdef SERIAL_ST4
+  extern void processCmdsST4();
+#endif
 
 void setup() {
   #if DEBUG != OFF

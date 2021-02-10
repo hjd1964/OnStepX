@@ -6,11 +6,6 @@
 
 #include "Pins.h"
 
-#define mosi m0
-#define sck  m1
-#define cs   m2
-#define miso m3
-
 class SoftSpi {
   public:
     // create and set pin values
