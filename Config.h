@@ -17,7 +17,7 @@
 //   *** to be sure it matches your wiring.            *** USE AT YOUR OWN RISK ***                                           ***
 
 //      Parameter Name              Value   Default  Notes                                                                      Hint
-#define PINMAP                   MksGenL2 //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB, MaxPCB2, STM32Blue,             <-Req'd
+#define PINMAP                  STM32Blue //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB, MaxPCB2, STM32Blue,             <-Req'd
                                           //         Ramps14, MaxESP3, MaxSTM3.  Check Constants.h for more info.
 
 // SERIAL PORT COMMAND CHANNELS ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SERIAL
@@ -119,7 +119,7 @@
 #define AXIS1_STEPS_PER_WORMROT     12800 //      0, n. Number steps per worm rotation (PEC Eq mode only, 0 disables PEC.)   <-Req'd
                                           //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage
 
-#define AXIS1_DRIVER_MODEL          A4988 //    OFF, (See above.) Stepper driver model.                                      <-Often
+#define AXIS1_DRIVER_MODEL        TMC2130 //    OFF, (See above.) Stepper driver model.                                      <-Often
 #define AXIS1_DRIVER_DECAY            OFF //    OFF, Decay mode                                                               Option
 #define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode                                                               Option
 #define AXIS1_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Often
@@ -140,7 +140,7 @@
 #define AXIS2_STEPS_PER_DEGREE    12800.0 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
 
-#define AXIS2_DRIVER_MODEL          A4988 //    OFF, (See above.) Stepper driver model.                                      <-Often
+#define AXIS2_DRIVER_MODEL        TMC2130 //    OFF, (See above.) Stepper driver model.                                      <-Often
 #define AXIS2_DRIVER_DECAY            OFF //    OFF, Decay mode                                                               Option
 #define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode                                                               Option
 #define AXIS2_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Often

@@ -1,79 +1,21 @@
 //--------------------------------------------------------------------------------------------------
 // observatory site and time
-#pragma once
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../debug/Debug.h"
+#include "../tasks/OnTask.h"
 
+#include "Convert.h"
+#include "Transform.h"
+#include "../commands/ProcessCmds.h"
+
+#include "Clock.h"
+
+extern GeneralError generalError;
 volatile unsigned long centisecondLAST;
 
-class Clock {
-  public:
-    // sets date/time from NV and/or the various TLS sources
-    // and sets up an event to tick the centisecond sidereal clock
-    void init(LI site);
-
-    // set and apply the site longitude, necessary for LAST calculations
-    void setSite(LI site);
-
-    // handle date/time commands
-    bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError);
-
-    // gets local apparent sidereal time in hours
-    double getLAST();
-
-    // callback to tick the centisecond sidereal clock
-    void tick();
-
-  private:
-
-    // sets the time in hours that have passed in this Julian Day
-    void setTime(JulianDate julianDate);
-
-    // gets the time in hours that have passed in this Julian Day
-    double getTime();
-
-    // sets the time in sidereal hours
-    void setSiderealTime(JulianDate julianDate, double time);
-
-    // gets the time in sidereal hours
-    double getSiderealTime();
-
-    // adjust time (hours) into the 0 to 24 range
-    double backInHours(double time);
-
-    // adjust time (hours) into the -12 to 12 range
-    double backInHourAngle(double time);
-
-    // convert julian date/time to local apparent sidereal time
-    double julianDateToLAST(JulianDate julianDate);
-
-    // convert julian date/time to greenwich apparent sidereal time
-    double julianDateToGAST(JulianDate julianDate);
-
-    // convert Gregorian date (year, month, day) to Julian Day
-    JulianDate gregorianToJulianDay(GregorianDate date);
-
-    // convert Julian Day to Gregorian date (year, month, day)
-    GregorianDate julianDayToGregorian(JulianDate julianDate);
-
-    LI site;
-    JulianDate ut1;
-    double centisecondHOUR = 0;
-    unsigned long centisecondSTART = 0;
-
-    bool dateIsReady = false;
-    bool timeIsReady = false;
-};
-
-// instantiate and callback wrappers
-Clock clock;
-void clockTickWrapper() { clock.tick(); }
-
-void Clock::init(LI site) {
+void Clock::init(Site site) {
   setSite(site);
-
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  uint8_t handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
-  tasks.requestHardwareTimer(handle, 3, 1);
-  tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
 
   GregorianDate date;
   date.year = 2021; date.month  = 2; date.day = 7;
@@ -85,7 +27,7 @@ void Clock::init(LI site) {
   setTime(ut1);
 }
 
-void Clock::setSite(LI site) {
+void Clock::setSite(Site site) {
   this->site = site;
 
   // same date and time, just calculates the sidereal time again
@@ -93,7 +35,7 @@ void Clock::setSite(LI site) {
   setSiderealTime(ut1, julianDateToLAST(ut1));
 }
     
-bool Clock::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
+bool Clock::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = convert.precision;
 
   // :Ga#       Get standard time in 12 hour format

@@ -1,4 +1,5 @@
 // Helper macros for debugging, with less typing
+#pragma once
 
 #if DEBUG != OFF
   #define D(x)       SERIAL_DEBUG.print(x)

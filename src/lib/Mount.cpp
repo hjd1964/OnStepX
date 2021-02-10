@@ -1,43 +1,57 @@
 //--------------------------------------------------------------------------------------------------
-// telescope control
-#pragma once
+// telescope mount control
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.h"
+#include "../../Extended.Config.h"
+#include "../HAL/HAL.h"
+#include "../pinmaps/Models.h"
+#include "../debug/Debug.h"
 
-typedef struct Limits {
-  double horizon;
-  double overhead;
-  double pastMeridianE;
-  double pastMeridianW;
-} Limits;
+#include "Axis.h"
+#include "../commands/ProcessCmds.h"
+#include "Transform.h"
 
-enum MeridianFlip {MeridianFlipNever,  MeridianFlipAlign, MeridianFlipAlways};
+#include "../StepDrivers/StepDrivers.h"
 
-class Telescope {
-  public:
-    // handle telescope commands
-    bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError);
+#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) || (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
 
-    CommandErrors validateGoto();
-    CommandErrors validateGotoCoords(Coordinate coords);
+#include "Mount.h"
 
-    CommandErrors syncEqu(Coordinate target);
+extern Axis axis1;
+extern Axis axis2;
 
-  private:
-    void updatePosition();
-    Coordinate position, target;
+void Mount::init(int8_t mountType) {
+  this->mountType = mountType;
 
-    Limits limits = {degToRad(-10), degToRad(85), degToRad(15), degToRad(15)};
-    bool tracking = false;
-    bool atHome = true;
-    bool safetyLimitsOn = false;
-    bool syncToEncodersOnly = false;
-    MeridianFlip meridianFlip = MeridianFlipAlways;
-};
+  // setup axis1
+  axis1.init(1);
+  axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
+  axis1.setMinCoordinate(degToRad(-180.0));
+  axis1.setMaxCoordinate(degToRad(180.0));
+  axis1.setInstrumentCoordinate(degToRad(90.0));
+  axis1.enable(true);
 
-bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
+  // setup axis2
+  axis2.init(2);
+  axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
+  axis2.setMinCoordinate(degToRad(-90.0));
+  axis2.setMaxCoordinate(degToRad(90.0));
+  axis2.setInstrumentCoordinate(degToRad(90.0));
+  axis2.enable(true);
+
+  // ------------------------------------------------------------------------------------------------
+  // move in measures (radians) per second, tracking_enabled
+  axis1.setFrequencyMax(degToRad(4.0));
+  axis1.setFrequency(arcsecToRad(15.0*SIDEREAL_RATIO));
+  axis1.setTracking(true);
+}
+
+bool Mount::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
   tasks_mutex_enter(MX_TELESCOPE_CMD);
   PrecisionMode precisionMode = convert.precision;
   
-  // :GR#       Get Telescope RA
+  // :GR#       Get Mount RA
   //            Returns: HH:MM.T# or HH:MM:SS# (based on precision setting)
   // :GRH#      Returns: HH:MM:SS.SSSS# (high precision)
   if (cmdH("GR")) {
@@ -47,7 +61,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     *numericReply = false;
   } else
 
-  // :GD#       Get Telescope Declination
+  // :GD#       Get Mount Declination
   //            Returns: sDD*MM# or sDD*MM:SS# (based on precision setting)
   // :GDH#      Returns: sDD*MM:SS.SSS# (high precision)
   if (cmdH("GD"))  {
@@ -99,7 +113,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
 }
 
 // check if goto/sync is valid
-CommandErrors Telescope::validateGoto() {
+CommandError Mount::validateGoto() {
   // Check state
 //if (parkStatus != NotParked)            return CE_SLEW_ERR_IN_PARK;
   if (!axis1.isEnabled())                 return CE_SLEW_ERR_IN_STANDBY;
@@ -110,7 +124,7 @@ CommandErrors Telescope::validateGoto() {
   return CE_NONE;
 }
 
-CommandErrors Telescope::validateGotoCoords(Coordinate coords) {
+CommandError Mount::validateGotoCoords(Coordinate coords) {
   transform.equToHor(&coords);
   // Check coordinates
 //if (coords.a < limits.getMinAltitude())    return CE_GOTO_ERR_BELOW_HORIZON;
@@ -125,9 +139,9 @@ CommandErrors Telescope::validateGotoCoords(Coordinate coords) {
 }
 
 // syncs the telescope/mount to the sky
-CommandErrors Telescope::syncEqu(Coordinate target) {
+CommandError Mount::syncEqu(Coordinate target) {
   // validate
-  CommandErrors e = validateGoto();
+  CommandError e = validateGoto();
   if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { tracking = true; axis1.enable(true); axis2.enable(true); e = validateGoto(); }
   if (e != CE_NONE) return e;
   e = validateGotoCoords(target);
@@ -182,8 +196,7 @@ CommandErrors Telescope::syncEqu(Coordinate target) {
   return CE_NONE;
 }
 
-void Telescope::updatePosition() {
+void Mount::updatePosition() {
   position = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
 }
-
-Telescope telescope;
+#endif

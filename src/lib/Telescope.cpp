@@ -1,51 +1,72 @@
 //--------------------------------------------------------------------------------------------------
 // observatory site and time
-#pragma once
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.h"
+#include "../../Extended.Config.h"
+#include "../HAL/HAL.h"
+#include "../pinmaps/Models.h"
+#include "../debug/Debug.h"
 
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
+
+#include "Convert.h"
 #include "Transform.h"
 
-class Observatory {
-  public:
-    // setup the location, time keeping, and coordinate converson
-    void init();
+#include "../commands/ProcessCmds.h"
+#include "Clock.h"
+#include "Mount.h"
 
-    // update the location for time keeping and coordinate conversion
-    void setSite(LI site);
-    void updateSite();
+#include "Telescope.h"
 
-    // handle observatory commands
-    bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError);
+// instantiate and callback wrapper
+Clock clock;
+void clockTickWrapper() { clock.tick(); }
 
-  private:
-    LI site;
-};
+void Telescope::init() {
+  Serial.begin(115200); Serial.println("STARTED"); delay(100);
 
-void Observatory::init() {
-  LI newSite;
+  // Site
+  Site newSite;
   newSite.latitude.value = degToRad(40.0);
   newSite.longitude      = degToRad(75.2);
   setSite(newSite);
+
+  // Coordinate transformation
+  transform.init(MOUNT_TYPE);
+
+  // Clock
   clock.init(site);
+  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+  uint8_t handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
+  tasks.requestHardwareTimer(handle, 3, 1);
+  tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
+
+  // Mount
+  mount.init(MOUNT_TYPE);
 }
 
-void Observatory::setSite(LI site) {
+void Telescope::setSite(Site site) {
   this->site = site;
   updateSite();
 }
 
-void Observatory::updateSite() {
+void Telescope::updateSite() {
   this->site.latitude.cosine = cos(site.latitude.value);
   this->site.latitude.sine   = sin(site.latitude.value);
   this->site.latitude.absval = fabs(site.latitude.value);
   if (this->site.latitude.value >= 0) this->site.latitude.sign = 1; else this->site.latitude.sign = -1;
   this->site.longitude = site.longitude;
+
   transform.setSite(site);
   clock.setSite(site);
 }
 
-bool Observatory::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandErrors *commandError) {
+bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   if (clock.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
   int i;
   double value;
@@ -70,6 +91,26 @@ bool Observatory::command(char reply[], char command[], char parameter[], bool *
     convert.doubleToDms(reply, radToDeg(site.longitude), true, true, precisionMode);
     *numericReply = false;
   } else 
+
+  // :GVD#      Get OnStepX Firmware Date
+  //            Returns: MTH DD YYYY#
+  // :GVM#      General Message
+  //            Returns: s# (where s is a string up to 16 chars)
+  // :GVN#      Get OnStepX Firmware Number
+  //            Returns: M.mp#
+  // :GVP#      Get OnStepX Product Name
+  //            Returns: s#
+  // :GVT#      Get OnStepX Firmware Time
+  //            Returns: HH:MM:SS#
+  if (cmdP("GV")) {
+    if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
+  //  if (parameter[0] == 'M') sprintf(reply,"OnStepX %i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else
+  //  if (parameter[0] == 'N') sprintf(reply,"%i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else
+  //  if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
+    if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
+    *numericReply = false;
+    return *commandError;
+  } else
 
   //  :St[sDD*MM]# or :St[sDD*MM:SS]# or :St[sDD*MM:SS.SSS]#
   //            Set current site latitude
@@ -103,5 +144,3 @@ bool Observatory::command(char reply[], char command[], char parameter[], bool *
 
   return true;
 }
-
-Observatory observatory;

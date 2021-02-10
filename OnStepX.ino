@@ -38,112 +38,68 @@
 // Use Config.h to configure OnStep to your requirements
 
 // firmware info, these are returned by the ":GV?#" commands
-#define FirmwareDate          __DATE__
+#define FirmwareName          "OnStepX"
 #define FirmwareVersionMajor  00
 #define FirmwareVersionMinor  02       // minor version 00 to 99
 #define FirmwareVersionPatch  "a"      // for example major.minor patch: 1.03c
 #define FirmwareVersionConfig 01       // internal, for tracking configuration file changes
-#define FirmwareName          "OnStepX"
-#define FirmwareTime          __TIME__
-
-// Enable additional debugging and/or status messages on the specified DebugSer port
-// Note that the DebugSer port cannot be used for normal communication with OnStep
-#define DEBUG OFF                      // default OFF, use "ON" for background errors only, use "VERBOSE" for all errors and status messages,
-                                       // use "CONSOLE" for VT100 debug console, use "PROFILER" for VT100 task profiler
-#define SERIAL_DEBUG          SERIAL_A // default SERIAL_A... or use Serial4, for example
-#define SERIAL_DEBUG_BAUD     115200
 
 #include "Constants.h"
 #include "Config.h"
-#include "src/pinmaps/Models.h"
+#include "Extended.Config.h"
 #include "src/HAL/HAL.h"
 #include "src/debug/Debug.h"
 
-#define  TASKS_SKIP_MISSED
-#define  TASKS_HWTIMER1_ENABLE         // only the Mega2560 hardware timers are tested and seem to work
-#define  TASKS_HWTIMER2_ENABLE         // if the Teensy, etc. don't work comment these out to use the
-#define  TASKS_HWTIMER3_ENABLE         // software task scheduler instead
-#include "src/tasks/OnTask.h"
 #ifdef TASKS_PROFILER_ENABLE
   #include "src/tasks/Profiler.h"
 #endif
+#if DEBUG == CONSOLE
+  #include "src/debug/Console.h"
+#endif
 
-#include "Convert.h"
-#include "Clock.h"
-#include "Transform.h"
-#include "Observatory.h"
-#include "Axis.h"
-#include "Telescope.h"
+#include "src/tasks/OnTask.h"
+Tasks tasks;
 
-#include "src/lib/BufferCmds.h"
-#include "ProcessCommands.h"
+#include "src/lib/Telescope.h"
+Telescope telescope;
 
-#include "src/debug/Console.h"
+extern void processCmdsA();
 
 void setup() {
-  uint8_t handle;
-
   #if DEBUG != OFF
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
   #endif
 
+  // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-#ifdef SERIAL_A
-  tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
-#endif
-#ifdef SERIAL_B
-  tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
-#endif
-#ifdef SERIAL_C
-  tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
-#endif
-#ifdef SERIAL_D
-  tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
-#endif
-#ifdef SERIAL_ST4
-  tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
-#endif
+  #ifdef SERIAL_A
+    tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
+  #endif
+  #ifdef SERIAL_B
+    tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
+  #endif
+  #ifdef SERIAL_C
+    tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
+  #endif
+  #ifdef SERIAL_D
+    tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
+  #endif
+  #ifdef SERIAL_ST4
+    tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
+  #endif
 
-  observatory.init();
-
-  // setup axis1
-#if AXIS1_DRIVER_MODEL != OFF
-  handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1"); tasks.requestHardwareTimer(handle,1,0);
-  axis1.init(handle);
-  axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
-  axis1.setMinCoordinate(degToRad(-180.0));
-  axis1.setMaxCoordinate(degToRad(180.0));
-  axis1.setInstrumentCoordinate(degToRad(90.0));
-  axis1.enable(true);
-#endif
-
-  // setup axis2
-#if AXIS2_DRIVER_MODEL != OFF
-  handle = tasks.add(0, 0, true , 0, moveAxis2, "MoveAx2"); tasks.requestHardwareTimer(handle,2,0);
-  axis2.init(handle);
-  axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
-  axis2.setMinCoordinate(degToRad(-90.0));
-  axis2.setMaxCoordinate(degToRad(90.0));
-  axis2.setInstrumentCoordinate(degToRad(90.0));
-  axis2.enable(true);
-#endif
+  telescope.init();
 
   // ------------------------------------------------------------------------------------------------
-  // move in measures (radians) per second, tracking_enabled
-  axis1.setFrequencyMax(degToRad(4.0));
-  axis1.setFrequency(arcsecToRad(15.0*SIDEREAL_RATIO));
-  axis1.setTracking(true);
-
-  // ------------------------------------------------------------------------------------------------
-  // task manager debug events
-#if DEBUG == PROFILER
-  tasks.add(142, 0, true, 7, profiler, "Profilr");
-#endif
-
-#if DEBUG == CONSOLE
-  tasks.add(1000, 0, true, 7, debugConsole);
-#endif
+  // add task manager debug events
+  #if DEBUG == PROFILER
+    tasks.add(142, 0, true, 7, profiler, "Profilr");
+  #endif
+  
+  #if DEBUG == CONSOLE
+    tasks.add(1000, 0, true, 7, debugConsole);
+  #endif
 }
 
 void loop() {

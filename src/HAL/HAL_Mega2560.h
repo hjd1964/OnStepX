@@ -1,5 +1,6 @@
 // Platform setup ------------------------------------------------------------------------------------
 // Mega2560
+#pragma once
 
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
@@ -45,11 +46,8 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-void HAL_Initialize(void) {
-}
+#define HAL_INIT { }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-float HAL_MCU_Temperature(void) {
-  return -999;
-}
+#define HAL_TEMP ( -999 )

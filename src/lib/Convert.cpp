@@ -1,87 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // convert to/from C strings
-#pragma once
-
-GeneralErrors generalError = ERR_NONE;
-
-enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST};
-int8_t mountType = MOUNT_TYPE;
-
-typedef struct GregorianDate {
-  int16_t  year;
-  uint8_t  month;
-  uint8_t  day;
-  uint8_t  hour;
-  uint8_t  minute;
-  uint8_t  second;
-  long     centisecond;
-  double   timezone;
-  bool     valid;
-} GregorianDate;
-
-typedef struct JulianDate {
-  double   day;
-  double   hour;
-  double   timezone;
-} JulianDate;
-
-typedef struct Latitude {
-  double   value;
-  double   sine;
-  double   cosine;
-  double   absval;
-  double   sign;
-} Latitude;
-
-typedef struct LI {
-  Latitude latitude;
-  double   longitude;
-  bool     ready;
-} LI;
-
-class Convert {
-  public:
-    // convert string in format MM/DD/YY to julian date
-    GregorianDate strToDate(char *ymd);
-
-    // convert timezone string  sHH:MM to double
-    // (also handles)           sHH
-    bool tzToDouble(double *value, char *hm);
-
-    // convert string in format HH:MM:SS to double
-    // (also handles)           HH:MM.M
-    //                          HH:MM:SS
-    //                          HH:MM:SS.SSSS
-    bool hmsToDouble(double *value, char *hms, PrecisionMode p);
-    // automatically detects PrecisionMode (as above)
-    bool hmsToDouble(double *value, char *hms);
-
-    // convert string in format sDD:MM:SS to double
-    // (also handles)           sDD:MM:SS.SSS
-    //                          DDD:MM:SS
-    //                          sDD:MM
-    //                          DDD:MM
-    //                          sDD*MM
-    //                          DDD*MM
-    bool dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p);
-    // automatically detects PrecisionMode (as above)
-    bool dmsToDouble(double *value, char *dms, bool signPresent);
-    
-    // convert double to string in a variety of formats (as above)
-    void doubleToHms(char *reply, double value, bool signPresent, PrecisionMode p);
-    // convert double to string in a variety of formats (as above) 
-    void doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p);
-
-    PrecisionMode precision = PM_HIGH;
-
-  private:
-    // string to int with error checking
-    bool atoi2(char *a, int *i, bool sign = true);
-    // string to byte with error checking
-    bool atoi2(char *a, uint8_t *u, bool sign = true);
-    // string to float with error checking
-    bool atof2(char *a, double *d, bool sign = true);
-};
+#include <Arduino.h>
+#include "Convert.h"
 
 // convert string in format MM/DD/YY to Date
 GregorianDate Convert::strToDate(char *ymd) {
@@ -107,8 +27,8 @@ GregorianDate Convert::strToDate(char *ymd) {
 }
 
 bool Convert::tzToDouble(double *value, char *hm) {
-  int sign = 1;
-  int hour, minute = 0;
+  int16_t sign = 1;
+  int16_t hour, minute = 0;
 
   if (strlen(hm) < 1 || strlen(hm) > 6) return false;
 
@@ -133,13 +53,13 @@ bool Convert::tzToDouble(double *value, char *hm) {
 
 bool Convert::hmsToDouble(double *value, char *hms, PrecisionMode p) {
   char h[3], m[5];
-  int  hour, minute, decimal = 0;
+  int16_t hour, minute, decimal = 0;
   double second = 0;
 
   while (*hms == ' ') hms++;
 
   if (strlen(hms) > 13) hms[13]=0;
-  int length = strlen(hms);
+  int16_t length = strlen(hms);
   
   if (p == PM_HIGHEST || p == PM_HIGH) { if (length != 8 && length < 10) return false; } else
   if (p == PM_LOW) { if (length != 7) return false; }
@@ -179,8 +99,8 @@ bool Convert::hmsToDouble(double *value, char *hms) {
 
 bool Convert::dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p) {
   char d[4], m[5];
-  int length;
-  int sign = 1, deg, minute, lowLimit = 0, highLimit = 360;
+  int16_t length;
+  int16_t sign = 1, deg, minute, lowLimit = 0, highLimit = 360;
   double second = 0;
   bool secondsOff = false;
 
@@ -286,10 +206,10 @@ void Convert::doubleToDms(char *reply, double value, bool fullRange, bool signPr
   if (p == PM_LOW)     sprintf(reply, form, sign, (int)deg, (int)minute);
 }
 
-bool Convert::atoi2(char *a, int *i, bool sign) {
-  int len =strlen(a);
+bool Convert::atoi2(char *a, int16_t *i, bool sign) {
+  int16_t len = strlen(a);
   if (len == 0 || len > 6) return false;
-  for (int l=0; l < len; l++) {
+  for (int l = 0; l < len; l++) {
     if (l == 0 && (a[l] == '+' || a[l] == '-') && sign) continue;
     if (a[l] < '0' || a[l] > '9') return false; 
   }
@@ -300,14 +220,14 @@ bool Convert::atoi2(char *a, int *i, bool sign) {
 }
 
 bool Convert::atoi2(char *a, uint8_t *u, bool sign) {
-  int i = (int)u;
+  int16_t i = *u;
   bool result = atoi2(a, &i, sign);
   if (i >= 0 && i <= 255) { *u = i; return result; } else return false;
 }
-
+              
 bool Convert::atof2(char *a, double *d, bool sign) {
-  int dc = 0;
-  int len = strlen(a);
+  int16_t dc = 0;
+  int16_t len = strlen(a);
   for (int l=0; l < len; l++) {
     if (l == 0 && (a[l] == '+' || a[l] == '-') && sign) continue;
     if (a[l] == '.') { if (dc == 0) { dc++; continue; } else return false; }
@@ -316,5 +236,3 @@ bool Convert::atof2(char *a, double *d, bool sign) {
   *d = atof(a);
   return true;
 }
-
-Convert convert;
