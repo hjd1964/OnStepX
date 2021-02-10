@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------------------------------------------------------------
-// Optional Configuration for OnStepX
+// Configuration for OnStepX, eXtended infrequently used options
 
 //                                 *** Most users will not change anything in this file! ***
 

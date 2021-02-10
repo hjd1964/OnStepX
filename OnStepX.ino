@@ -46,7 +46,7 @@
 
 #include "Constants.h"
 #include "Config.h"
-#include "Extended.Config.h"
+#include "ConfigX.h"
 #include "src/HAL/HAL.h"
 #include "src/debug/Debug.h"
 

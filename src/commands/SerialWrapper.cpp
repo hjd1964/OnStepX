@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../../Config.h"
-#include "../../Extended.Config.h"
+#include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"

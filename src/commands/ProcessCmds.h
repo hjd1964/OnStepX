@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../../Config.h"
-#include "../../Extended.Config.h"
+#include "../../ConfigX.h"
 #include "../pinmaps/Models.h"
 
 #include "BufferCmds.h"
