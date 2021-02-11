@@ -72,7 +72,7 @@ void Axis::init(uint8_t axisNumber) {
   pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
   pinModeEx(Pins.enable, OUTPUT); enable(false);
 
-  int handle;
+  int handle = 0;
   if (axisNumber == 1) {
     #if AXIS1_DRIVER_MODEL != OFF
       handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1");
