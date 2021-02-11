@@ -25,8 +25,6 @@ Clock clock;
 void clockTickWrapper() { clock.tick(); }
 
 void Telescope::init() {
-  Serial.begin(115200); Serial.println("STARTED"); delay(100);
-
   // Site
   Site newSite;
   newSite.latitude.value = degToRad(40.0);
@@ -62,15 +60,38 @@ void Telescope::updateSite() {
   transform.setSite(site);
   clock.setSite(site);
 }
-
+    
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   if (clock.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-  if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
+  #if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) && (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
+    if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  
   int i;
   double value;
   PrecisionMode precisionMode = PM_LOW;
+
+  // :GVD#      Get OnStepX Firmware Date
+  //            Returns: MTH DD YYYY#
+  // :GVM#      General Message
+  //            Returns: s# (where s is a string up to 16 chars)
+  // :GVN#      Get OnStepX Firmware Number
+  //            Returns: M.mp#
+  // :GVP#      Get OnStepX Product Name
+  //            Returns: s#
+  // :GVT#      Get OnStepX Firmware Time
+  //            Returns: HH:MM:SS#
+  if (cmdP("GV")) {
+    if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
+    if (parameter[0] == 'M') sprintf(reply,"%s %i.%i%s",FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
+    if (parameter[0] == 'N') sprintf(reply,"%i.%i%s", FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
+    if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
+    if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
+    *numericReply = false;
+    return *commandError;
+  } else
 
   // :Gt#       Get current site Latitude, positive for North latitudes
   //            Returns: sDD*MM#
@@ -91,26 +112,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     convert.doubleToDms(reply, radToDeg(site.longitude), true, true, precisionMode);
     *numericReply = false;
   } else 
-
-  // :GVD#      Get OnStepX Firmware Date
-  //            Returns: MTH DD YYYY#
-  // :GVM#      General Message
-  //            Returns: s# (where s is a string up to 16 chars)
-  // :GVN#      Get OnStepX Firmware Number
-  //            Returns: M.mp#
-  // :GVP#      Get OnStepX Product Name
-  //            Returns: s#
-  // :GVT#      Get OnStepX Firmware Time
-  //            Returns: HH:MM:SS#
-  if (cmdP("GV")) {
-    if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
-  //  if (parameter[0] == 'M') sprintf(reply,"OnStepX %i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else
-  //  if (parameter[0] == 'N') sprintf(reply,"%i.%i%s",FirmwareVersionMajor,FirmwareVersionMinor,FirmwareVersionPatch); else
-  //  if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
-    if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
-    *numericReply = false;
-    return *commandError;
-  } else
 
   //  :St[sDD*MM]# or :St[sDD*MM:SS]# or :St[sDD*MM:SS.SSS]#
   //            Set current site latitude

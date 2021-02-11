@@ -21,8 +21,14 @@
  */
 
 #include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.h"
+#include "../../ConfigX.h"
+#include "../debug/Debug.h"
+
 #include "HAL_PROFILER.h"
 #include "HAL_HWTIMERS.h"
+
 #include "OnTask.h"
 
 // Task object

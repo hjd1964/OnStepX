@@ -1,49 +1,109 @@
 // Helper macros for debugging, with less typing
-#include "Debug.h"
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.h"
+#include "../../ConfigX.h"
+#include "../HAL/HAL.h"
+#include "../debug/Debug.h"
 
-enum CommandErrors {
-  CE_NONE, CE_0, CE_CMD_UNKNOWN, CE_REPLY_UNKNOWN, CE_PARAM_RANGE, CE_PARAM_FORM,
-  CE_ALIGN_FAIL, CE_ALIGN_NOT_ACTIVE, CE_NOT_PARKED_OR_AT_HOME, CE_PARKED,
-  CE_PARK_FAILED, CE_NOT_PARKED, CE_NO_PARK_POSITION_SET, CE_GOTO_FAIL, CE_LIBRARY_FULL,
-  CE_GOTO_ERR_BELOW_HORIZON, CE_GOTO_ERR_ABOVE_OVERHEAD, CE_SLEW_ERR_IN_STANDBY, 
-  CE_SLEW_ERR_IN_PARK, CE_GOTO_ERR_GOTO, CE_SLEW_ERR_OUTSIDE_LIMITS, CE_SLEW_ERR_HARDWARE_FAULT,
-  CE_MOUNT_IN_MOTION, CE_GOTO_ERR_UNSPECIFIED, CE_NULL};
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
+
+#ifdef TASKS_PROFILER_ENABLE
+  #warning "MSG: Warning the OnTask PROFILER is for debugging only, there is siginficant overhead associated with enabling this feature."
+  #define PROFILER_VT100 ON
   
-#if DEBUG != OFF
-  // command errors
-  #define L_CE_NONE                    "No Errors"
-  #define L_CE_0                       "reply 0"
-  #define L_CE_CMD_UNKNOWN             "command unknown"
-  #define L_CE_REPLY_UNKNOWN           "invalid reply"
-  #define L_CE_PARAM_RANGE             "parameter out of range"
-  #define L_CE_PARAM_FORM              "bad parameter format"
-  #define L_CE_ALIGN_FAIL              "align failed"
-  #define L_CE_ALIGN_NOT_ACTIVE        "align not active"
-  #define L_CE_NOT_PARKED_OR_AT_HOME   "not parked or at home"
-  #define L_CE_PARKED                  "already parked"
-  #define L_CE_PARK_FAILED             "park failed"
-  #define L_CE_NOT_PARKED              "not parked"
-  #define L_CE_NO_PARK_POSITION_SET    "no park position set"
-  #define L_CE_GOTO_FAIL               "goto failed"
-  #define L_CE_LIBRARY_FULL            "library full"
-  #define L_CE_GOTO_ERR_BELOW_HORIZON  "goto below horizon"
-  #define L_CE_GOTO_ERR_ABOVE_OVERHEAD "goto above overhead"
-  #define L_CE_SLEW_ERR_IN_STANDBY     "slew in standby"
-  #define L_CE_SLEW_ERR_IN_PARK        "slew in park"
-  #define L_CE_GOTO_ERR_GOTO           "already in goto"
-  #define L_CE_SLEW_ERR_OUTSIDE_LIMITS "outside limits"
-  #define L_CE_SLEW_ERR_HARDWARE_FAULT "hardware fault"
-  #define L_CE_MOUNT_IN_MOTION         "mount in motion"
-  #define L_CE_GOTO_ERR_UNSPECIFIED    "other"
-  #define L_CE_UNK                     "unknown"
+  char scale_unit(double *d) {
+    if (abs(lround(*d)) > 999) { *d /= 1000.0; return 'm'; } else
+      if (abs(lround(*d)) > 999) { *d /= 1000.0; return ' '; } else return 'u';
+  }
   
-  char commandErrorStr[30][25] = {
-    L_CE_NONE, L_CE_0, L_CE_CMD_UNKNOWN, L_CE_REPLY_UNKNOWN, L_CE_PARAM_RANGE,
-    L_CE_PARAM_FORM, L_CE_ALIGN_FAIL, L_CE_ALIGN_NOT_ACTIVE, L_CE_NOT_PARKED_OR_AT_HOME,
-    L_CE_PARKED, L_CE_PARK_FAILED, L_CE_NOT_PARKED, L_CE_NO_PARK_POSITION_SET, L_CE_GOTO_FAIL,
-    L_CE_LIBRARY_FULL, L_CE_GOTO_ERR_BELOW_HORIZON, L_CE_GOTO_ERR_ABOVE_OVERHEAD,
-    L_CE_SLEW_ERR_IN_STANDBY, L_CE_SLEW_ERR_IN_PARK, L_CE_GOTO_ERR_GOTO, L_CE_SLEW_ERR_OUTSIDE_LIMITS,
-    L_CE_SLEW_ERR_HARDWARE_FAULT, L_CE_MOUNT_IN_MOTION, L_CE_GOTO_ERR_UNSPECIFIED, L_CE_UNK};
-#else
-  char commandErrorStr[0][0];
+  void profiler() {
+    char s[120];
+    char aau = 'u'; char axu = 'u'; char rtu = 'u'; char rau = 'u'; char rxu = 'u';
+    static int count;
+    static double AAA,AXA,RTT,RAA,RXA;
+  
+    static int handle = tasks.getFirstHandle();
+  
+    handle = tasks.getNextHandle();
+    if (!handle) {
+      AAA /= count; AXA /= count; RAA /= count; RXA /= count;
+      aau = scale_unit(&AAA); axu = scale_unit(&AXA); rtu = scale_unit(&RTT); rau = scale_unit(&RAA); rxu = scale_unit(&RXA);
+  
+      sprintf(s, "                     ----------- ------------        ----------   --------   ----------");
+      SERIAL_DEBUG.print(s); Y;
+      SERIAL_DEBUG.println(); Y;
+  
+      sprintf(s, "                    avgd %5ld%cs  avgd %4ld%cs    totaled %4ld%cs avgd %4ld%cs avgd %4ld%cs", 
+      lround(AAA), aau, lround(AXA), axu, lround(RTT), rtu, lround(RAA), rau, lround(RXA), rxu); Y;
+    
+      SERIAL_DEBUG.print(s); Y;
+      SERIAL_DEBUG.println(); Y;
+  
+      count = 0;
+      handle = tasks.getFirstHandle();
+      #if PROFILER_VT100 == ON
+        SERIAL_DEBUG.print("\x1b[J");  // clear to end of screen
+        SERIAL_DEBUG.print("\x1b[H");  // cursor to upper left
+        SERIAL_DEBUG.print("\x1b[K");  // clear to end of line
+      #endif
+      SERIAL_DEBUG.println(); Y;
+      sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler", 1, 0, 'a');
+      SERIAL_DEBUG.println(s); Y;
+      SERIAL_DEBUG.println();
+    }
+  
+    char *name = tasks.getNameStr(handle);
+    
+    double AA = tasks.getArrivalAvg(handle); Y;
+    double AX = tasks.getArrivalMax(handle); Y;
+    double RT = tasks.getRuntimeTotal(handle); Y;
+    double RTcount = tasks.getRuntimeTotalCount(handle); Y;
+    double RA; if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
+    double RX = tasks.getRuntimeMax(handle); Y;
+    count++; AAA += AA; AXA += AX; RTT += RT; RAA += RA; RXA += RX;
+    aau = scale_unit(&AA); axu = scale_unit(&AX); rtu = scale_unit(&RT); rau = scale_unit(&RA); rxu = scale_unit(&RX);
+    
+    sprintf(s, "[%-10s] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
+    name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
+  
+    SERIAL_DEBUG.print(s); Y;
+    SERIAL_DEBUG.println();
+  }
+#endif
+
+// Helper console for debugging
+#if DEBUG == CONSOLE
+  #include "../lib/Transform.h"
+  #include "../lib/Axis.h"
+
+  void debugConsole() {
+    EquCoordinate instrument, mount, observed, topocentric;
+    HorCoordinate horizon;
+  
+    instrument.h = axis1.getInstrumentCoordinate();
+    instrument.d = axis2.getInstrumentCoordinate();
+  
+    mount = transform.equInstrumentToMount(instrument);
+  
+    DL();
+  
+    observed = transform.equMountToObservedPlace(mount);
+  
+    transform.hourAngleToRightAscension(&observed);
+    D("DATE/TIME = "); D("12/01/21"); D(" "); DL("12:12:12");
+    D("LST = "); SERIAL_DEBUG.println((observatory.getLAST()/SIDEREAL_RATIO)*3600, 1);
+    D("RA  = "); SERIAL_DEBUG.println(radToDeg(observed.r), 4);
+    D("HA  = "); SERIAL_DEBUG.println(radToDeg(observed.h), 4);
+    D("Dec = "); SERIAL_DEBUG.println(radToDeg(observed.d), 4);
+  
+    horizon = transform.equToHor(instrument);
+    D("Alt = "); SERIAL_DEBUG.println(radToDeg(horizon.a), 4);
+    D("Azm = "); SERIAL_DEBUG.println(radToDeg(horizon.z), 4);
+
+    D("\x1b[J");  // clear to end of screen
+    D("\x1b[H");  // cursor to upper left
+    D("\x1b[K");  // clear to end of line
+  }
 #endif

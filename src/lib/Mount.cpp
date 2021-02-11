@@ -14,7 +14,7 @@
 
 #include "../StepDrivers/StepDrivers.h"
 
-#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) || (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
+#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) && (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
 
 #include "Mount.h"
 
@@ -25,6 +25,7 @@ void Mount::init(int8_t mountType) {
   this->mountType = mountType;
 
   // setup axis1
+  VLF("MSG: mount.init, starting telescope mount axis1");
   axis1.init(1);
   axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
   axis1.setMinCoordinate(degToRad(-180.0));
@@ -33,6 +34,7 @@ void Mount::init(int8_t mountType) {
   axis1.enable(true);
 
   // setup axis2
+  VLF("MSG: mount.init, starting telescope mount axis2");
   axis2.init(2);
   axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
   axis2.setMinCoordinate(degToRad(-90.0));
@@ -42,6 +44,8 @@ void Mount::init(int8_t mountType) {
 
   // ------------------------------------------------------------------------------------------------
   // move in measures (radians) per second, tracking_enabled
+  VLF("MSG: mount.init, starting tracking");
+  delay(100);
   axis1.setFrequencyMax(degToRad(4.0));
   axis1.setFrequency(arcsecToRad(15.0*SIDEREAL_RATIO));
   axis1.setTracking(true);

@@ -37,25 +37,13 @@
 
 // Use Config.h to configure OnStep to your requirements
 
-// firmware info, these are returned by the ":GV?#" commands
-#define FirmwareName          "OnStepX"
-#define FirmwareVersionMajor  00
-#define FirmwareVersionMinor  02       // minor version 00 to 99
-#define FirmwareVersionPatch  "a"      // for example major.minor patch: 1.03c
-#define FirmwareVersionConfig 01       // internal, for tracking configuration file changes
+// See Constants.h for version information
 
 #include "Constants.h"
 #include "Config.h"
 #include "ConfigX.h"
 #include "src/HAL/HAL.h"
 #include "src/debug/Debug.h"
-
-#ifdef TASKS_PROFILER_ENABLE
-  #include "src/tasks/Profiler.h"
-#endif
-#if DEBUG == CONSOLE
-  #include "src/debug/Console.h"
-#endif
 
 #include "src/tasks/OnTask.h"
 Tasks tasks;
@@ -77,6 +65,16 @@ Telescope telescope;
 #endif
 #ifdef SERIAL_ST4
   extern void processCmdsST4();
+#endif
+
+#if DEBUG == PROFILER
+  extern void profiler();
+//  tasks.add(142, 0, true, 7, profiler, "Profilr");
+#endif
+
+#if DEBUG == CONSOLE
+  extern void debugConsole();
+//  tasks.add(1000, 0, true, 7, debugConsole);
 #endif
 
 void setup() {

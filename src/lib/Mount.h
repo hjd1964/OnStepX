@@ -15,7 +15,7 @@
 #include "../StepDrivers/StepDrivers.h"
 #include "Transform.h"
 
-#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) || (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
+#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) && (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
 
 typedef struct Limits {
   double horizon;
@@ -55,25 +55,3 @@ class Mount {
 };
 
 #endif
-/*
-#if AXIS3_DRIVER_MODEL != OFF
-  const AxisPins Axis3Pins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
-  Axis axis3{Axis3Pins, Axis3DriverModePins, Axis3DriverModeSettings};
-  void moveAxis3() { axis3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
-#endif
-#if AXIS4_DRIVER_MODEL != OFF
-  const AxisPins Axis4Pins = {AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, false, false, true};
-  Axis axis4{Axis4Pins, Axis4DriverModePins, Axis4DriverModeSettings};
-  void moveAxis4() { axis4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
-#endif
-#if AXIS5_DRIVER_MODEL != OFF
-  const AxisPins Axis5Pins = {AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, false, false, true};
-  Axis axis5{Axis5Pins, Axis5DriverModePins, Axis5DriverModeSettings};
-  void moveAxis5() { axis5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
-#endif
-#if AXIS6_DRIVER_MODEL != OFF
-  const AxisPins Axis6Pins = {AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, false, false, true};
-  Axis axis6{Axis6Pins, Axis6DriverModePins, Axis6DriverModeSettings};
-  void moveAxis6() { axis6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
-#endif
-*/
