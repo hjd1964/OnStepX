@@ -38,7 +38,7 @@ void Telescope::init() {
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   uint8_t handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Warning, didn't get h/w timer for Clock (using s/w timer)");
-  
+
   tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
 
   // Mount

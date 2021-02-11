@@ -49,7 +49,6 @@
 #undef E2END
 #if defined(NV_M24C32)
   // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
-  ASFASF
   #define NV_ENDURANCE HIGH
   #define E2END 8191
   #define I2C_EEPROM_ADDRESS 0x50
@@ -61,29 +60,13 @@
   #include "NV/NV_I2C_EEPROM_24XX_C.h"
 #endif
 
-//----------------------------------------------------------------------------------------------------
-// Nanoseconds delay function
-unsigned int _nanosPerPass=1;
-void delayNanoseconds(unsigned int n) {
-  unsigned int np=(n/_nanosPerPass);
-  for (unsigned int i=0; i<np; i++) { __asm__ volatile ("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"); }
-}
+//--------------------------------------------------------------------------------------------------
+// General purpose initialize for HAL
+#define HAL_INIT { analogWriteResolution(8); }
+
+//--------------------------------------------------------------------------------------------------
+// Internal MCU temperature (in degrees C)
+#define HAL_TEMP ( -999 )
 
 // Allow MCU reset -----------------------------------------------------------------------------------
 #define HAL_RESET NVIC_SystemReset()
-
-//----------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL
-void HAL_Initialize(void) {
-  // calibrate delayNanoseconds()
-  uint32_t startTime,npp;
-  startTime=micros(); delayNanoseconds(65535); npp=micros(); npp=((int32_t)(npp-startTime)*1000)/63335;
-  if (npp<1) npp=1; if (npp>2000) npp=2000; _nanosPerPass=npp;
-  analogWriteResolution(8);
-}
-
-//----------------------------------------------------------------------------------------------------
-// Internal MCU temperature (in degrees C)
-float HAL_MCU_Temperature(void) {
-  return -999;
-}

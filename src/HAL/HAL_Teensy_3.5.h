@@ -43,34 +43,13 @@
 #endif
 
 //--------------------------------------------------------------------------------------------------
-// Nanoseconds delay function
-unsigned int _nanosPerPass=1;
-void delayNanoseconds(unsigned int n) {
-  unsigned int np=(n/_nanosPerPass);
-  for (unsigned int i=0; i<np; i++) { __asm__ volatile ("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"); }
-}
-
-//--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-void HAL_Initialize(void) {
-  // calibrate delayNanoseconds()
-  uint32_t startTime,npp;
-  cli(); startTime=micros(); delayNanoseconds(65535); npp=micros(); sei(); npp=((int32_t)(npp-startTime)*1000)/63335;
-  if (npp<1) npp=1; if (npp>2000) npp=2000; _nanosPerPass=npp;
-
-  // default 10 bit analog read resolution (0 to 1023)
-  analogReadResolution(10);
-}
+#define HAL_INIT { analogReadResolution(10); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-float HAL_MCU_Temperature(void) {
-  int Tpin=70;
-  // delta of -1.715 mV/C where 25C measures 719 mV
-  float v=(analogRead(Tpin)/1024.0)*3.3;
-  float t=(-(v-0.719)/0.001715)+25.0;
-  return t;
-}
+#define _T_pin 70
+#define HAL_TEMP ( (-((analogRead(Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
 
 //--------------------------------------------------------------------------------------------------
 // for using the DAC as a digital output on Teensy3.6 A21=66 A22=67

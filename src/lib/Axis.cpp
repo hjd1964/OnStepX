@@ -186,7 +186,7 @@ void Axis::setFrequencyMax(double frequency) {
 }
 
 void Axis::setFrequency(double frequency) {
-  double d=500000.0/(frequency*spm);
+  double d = 500000.0/(frequency*spm);
   if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
   unsigned long periodMicroseconds = lround(d);
   if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;

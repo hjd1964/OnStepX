@@ -49,36 +49,19 @@
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
 
-//--------------------------------------------------------------------------------------------------
-// Nanoseconds delay function
-unsigned int _nanosPerPass=1;
-IRAM_ATTR void delayNanoseconds(unsigned int n) {
-  unsigned int np=(n/_nanosPerPass);
-  for (unsigned int i=0; i<np; i++) { __asm__ volatile ("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"); }
-}
-
-//--------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL
-void HAL_Initialize(void) {
-  // calibrate delayNanoseconds()
-  uint32_t startTime,npp;
-  cli(); startTime=micros(); delayNanoseconds(65535); npp=micros(); sei(); npp=((int32_t)(npp-startTime)*1000)/63335;
-  if (npp<1) npp=1; if (npp>2000) npp=2000; _nanosPerPass=npp;
-}
-
 #include "HAL_ESP32_Analog.h"
-
-//--------------------------------------------------------------------------------------------------
-// Internal MCU temperature (in degrees C)
-
-// Correction for ESP32's internal temperture sensor
-#define INTERNAL_TEMP_CORRECTION 0
-
-float HAL_MCU_Temperature(void) {
-  return temperatureRead() + INTERNAL_TEMP_CORRECTION;
-}
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #include "NV/NV_EEPROM_ESP.h"
 #endif
+
+//--------------------------------------------------------------------------------------------------
+// General purpose initialize for HAL
+#define HAL_INIT { }
+
+//--------------------------------------------------------------------------------------------------
+// Internal MCU temperature (in degrees C)
+// Correction for ESP32's internal temperture sensor
+#define INTERNAL_TEMP_CORRECTION 0
+#define HAL_TEMP ( temperatureRead() + INTERNAL_TEMP_CORRECTION )

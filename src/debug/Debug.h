@@ -43,6 +43,7 @@
   #define DF(x)      SERIAL_DEBUG.print(F(x))
   #define DL(x)      SERIAL_DEBUG.println(x)
   #define DLF(x)     SERIAL_DEBUG.println(F(x))
+  #define DLCCHK(P)  { DF("Constant? "); DLF(__builtin_constant_p(P)); }
 #else
   #define D(x)
   #define DF(x)

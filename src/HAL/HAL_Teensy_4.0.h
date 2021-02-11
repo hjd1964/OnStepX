@@ -44,12 +44,10 @@
 // General purpose initialize for HAL
 #include "imxrt.h"
 
-void HAL_Initialize(void) {
-  analogReadResolution(10);
-}
+//--------------------------------------------------------------------------------------------------
+// General purpose initialize for HAL
+#define HAL_INIT { analogReadResolution(10); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-float HAL_MCU_Temperature(void) {
-  return 25.0;
-}
+#define HAL_TEMP (25.0)

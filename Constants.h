@@ -4,25 +4,22 @@
 #pragma once
 
 // Firmware version ----------------------------------------------------------------------------------------------------------------
-// firmware info, these are returned by the ":GV?#" commands
-#define FirmwareName                 "OnStepX"
-#define FirmwareVersionMajor         0
-#define FirmwareVersionMinor         02    // minor version 00 to 99
-#define FirmwareVersionPatch         "a"   // for example major.minor patch: 1.03c
-#define FirmwareVersionConfig        1     // internal, for tracking configuration file changes
-#define FirmwareDate                 __DATE__
-#define FirmwareTime                 __TIME__
+#define FirmwareName                "OnStepX"
+#define FirmwareVersionMajor        10
+#define FirmwareVersionMinor        02     // minor version 00 to 99
+#define FirmwareVersionPatch        "a"    // for example major.minor patch: 10.03c
+#define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
+#define FirmwareDate                __DATE__
+#define FirmwareTime                __TIME__
 
-// ---------------------------------------------------------------------------------------------------------------------------------
 // Configuration options -----------------------------------------------------------------------------------------------------------
 
-// Pinmaps -------------------------------------------------------------------------------------------------------------------------
-
-#define PINMAP_FIRST                 1
-#define Classic                      1     // Original pin-map
-#define ClassicShield                2     // " for Steve's shield where ST4 port is on the Mega2560's "alternate pins"
-#define ClassicInstein               3     // "  w/Instein ST4 port... this isn't tested, I have no idea if it's safe to use!
-#define InsteinESP1                  4     // ESP32 Instein PINMAP (latest variant September/2020)
+// Pinmaps
+#define PINMAP_FIRST                1
+#define Classic                     1      // Original pin-map
+#define ClassicShield               2      // " for Steve's shield where ST4 port is on the Mega2560's "alternate pins"
+#define ClassicInstein              3      // "  w/Instein ST4 port... this isn't tested, I have no idea if it's safe to use!
+#define InsteinESP1                 4      // ESP32 Instein PINMAP (latest variant September/2020)
 
 // RAMPS - 3D printer shields/boards that work with OnStep, all are 5-axis designs
 #define Ramps14                     10     // Ramps v1.4 shield for Mega2560
@@ -64,20 +61,25 @@
 
 #define PINMAP_LAST                 60
 // ---------------------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------------------
 
-// Misc. ---------------------------------------------------------------------------------------------------------------------------
+
+// Settings ------------------------------------------------------------------------------------------------------------------------
+
+// basic values
 #define OFF                         -1
 #define ON                          -2
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
+
+// debug values
 #define CONSOLE                     -6
 #define PROFILER                    -7
-#define SHARED                      -14
-#define INVALID                     -32767
 
-// mount types                     
+// pins
+#define SHARED                      -14
+
+// mount types
 #define MOUNT_TYPE_FIRST            1
 #define GEM                         1      // German Equatorial Mount, meridian flips enabled
 #define FORK                        2      // Fork Mount, meridian flips disabled
@@ -92,6 +94,9 @@
 #ifndef TELESCOPE_COORDINATES
   #define TELESCOPE_COORDINATES     TOPOCENTRIC
 #endif
+
+// etc.
+#define INVALID                     -32767
 
 // Mutexes -------------------------------------------------------------------------------------------------------------------------
 #define MX_CLOCK_CMD                0
@@ -136,8 +141,7 @@
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
 #endif
 
-// Etc
-
+// commands
 // command of 2 chars
 #define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)
 // command of 3 chars
@@ -149,14 +153,8 @@
 // command of 2 chars with parameter
 #define cmdP(a) (command[0] == a[0] && command[1] == a[1])
 
-#ifndef delaySpi
-  #define delaySpi() delayMicroseconds(1)
-#endif
-
 // task manager
 #define TASKS_SKIP_MISSED
 #define TASKS_HWTIMER1_ENABLE              // only the Mega2560 hardware timers are tested and seem to work
 #define TASKS_HWTIMER2_ENABLE              // if the Teensy, etc. don't work comment these out to use the
 #define TASKS_HWTIMER3_ENABLE              // software task scheduler instead
-
-#define DEBUG_CHECK_CONSTANT(P) { Serial.begin(115200); Serial.println("Constant? "); Serial.println(__builtin_constant_p(P)); }
