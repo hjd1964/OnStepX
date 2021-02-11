@@ -11,9 +11,8 @@
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "Convert.h"
-#include "Transform.h"
-
+#include "../coordinates/Convert.h"
+#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
 #include "Clock.h"
 #include "Mount.h"

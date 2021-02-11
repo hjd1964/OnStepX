@@ -1,10 +1,10 @@
 //--------------------------------------------------------------------------------------------------
 // observatory site and time
 #pragma once
-#include "Convert.h"
-#include "Transform.h"
-#include "Mount.h"
+#include "../coordinates/Convert.h"
+#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
+#include "Mount.h"
 
 class Telescope {
   public:

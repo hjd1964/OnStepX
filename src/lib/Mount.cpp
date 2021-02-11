@@ -8,14 +8,12 @@
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
 
-#include "Axis.h"
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
+#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
-#include "Transform.h"
-
 #include "../StepDrivers/StepDrivers.h"
-
-#if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) && (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
-
+#include "Axis.h"
 #include "Mount.h"
 
 extern Axis axis1;

@@ -3,8 +3,8 @@
 #pragma once
 #include <Arduino.h>
 
-#include "Convert.h"
-#include "Transform.h"
+#include "../coordinates/Convert.h"
+#include "../coordinates/Transform.h"
 
 class Clock {
   public:

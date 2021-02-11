@@ -7,11 +7,12 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-#include "Convert.h"
-#include "Transform.h"
-#include "../commands/ProcessCmds.h"
 
+#include "../tasks/OnTask.h"
+
+#include "../coordinates/Convert.h"
+#include "../coordinates/Transform.h"
+#include "../commands/ProcessCmds.h"
 #include "Clock.h"
 
 extern GeneralError generalError;
