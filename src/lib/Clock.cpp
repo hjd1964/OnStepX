@@ -9,6 +9,7 @@
 #include "../debug/Debug.h"
 
 #include "../tasks/OnTask.h"
+extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"

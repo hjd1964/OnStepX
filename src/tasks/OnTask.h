@@ -58,8 +58,8 @@
 
 // mutex macros, do not run these in hardware timers (not ISR safe)!
 static uint8_t __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-#define tasks_mutex_enter(m) //while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8);
-#define tasks_mutex_exit(m)  //bitClear(__task_mutex[m/8],m%8);
+#define tasks_mutex_enter(m) while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8);
+#define tasks_mutex_exit(m)  bitClear(__task_mutex[m/8],m%8);
 
 enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 

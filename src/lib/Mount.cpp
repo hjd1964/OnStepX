@@ -8,6 +8,9 @@
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
 
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
+
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../coordinates/Transform.h"
@@ -169,18 +172,18 @@ CommandError Mount::syncEqu(Coordinate target) {
   if (meridianFlip != MeridianFlipNever) {
     // best side of pier decided based on meridian
     if (atHome) { if (a1 < 0) newPierSide = PIER_SIDE_WEST; else newPierSide = PIER_SIDE_EAST; } else
-#if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-    if (preferredPierSideDefault == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) newPierSide = PIER_SIDE_EAST; } else
-    if (preferredPierSideDefault == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) newPierSide = PIER_SIDE_WEST; } else
-#endif
+    #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
+      if (preferredPierSideDefault == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) newPierSide = PIER_SIDE_EAST; } else
+      if (preferredPierSideDefault == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) newPierSide = PIER_SIDE_WEST; } else
+    #endif
     {
       if ((position.p == PIER_SIDE_WEST) && (a1 >  limits.pastMeridianW)) newPierSide = PIER_SIDE_EAST;
       if ((position.p == PIER_SIDE_EAST) && (a1 < -limits.pastMeridianE)) newPierSide = PIER_SIDE_WEST;
     }
 
-#if PIER_SIDE_SYNC_CHANGE_SIDES == OFF
-    if (!atHome && newPierSide != position.p) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-#endif
+    #if PIER_SIDE_SYNC_CHANGE_SIDES == OFF
+      if (!atHome && newPierSide != position.p) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    #endif
 
   } else {
     // always on the "east" side of pier - we're in the western sky and the HA's are positive
