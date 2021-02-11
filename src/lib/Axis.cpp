@@ -72,19 +72,17 @@ void Axis::init(uint8_t axisNumber) {
   pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
   pinModeEx(Pins.enable, OUTPUT); enable(false);
 
-  this->task_handle = task_handle;
-
   int handle;
   if (axisNumber == 1) {
     #if AXIS1_DRIVER_MODEL != OFF
       handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1");
-      tasks.requestHardwareTimer(handle,1,0);
+      if (!tasks.requestHardwareTimer(handle, 1, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis1 (using s/w timer)");
     #endif
   }
   if (axisNumber == 2) {
     #if AXIS2_DRIVER_MODEL != OFF
       handle = tasks.add(0, 0, true, 0, moveAxis2, "MoveAx2");
-      tasks.requestHardwareTimer(handle,1,0);
+      if (!tasks.requestHardwareTimer(handle, 2, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis2 (using s/w timer)");
     #endif
   }
   if (axisNumber == 3) {
@@ -94,19 +92,20 @@ void Axis::init(uint8_t axisNumber) {
   }
   if (axisNumber == 4) {
     #if AXIS4_DRIVER_MODEL != OFF
-      tasks.add(0, 0, true, 0, moveAxis4, "MoveAx4");
+      handle = tasks.add(0, 0, true, 0, moveAxis4, "MoveAx4");
     #endif
   }
   if (axisNumber == 5) {
     #if AXIS5_DRIVER_MODEL != OFF
-      tasks.add(0, 0, true, 0, moveAxis5, "MoveAx5");
+      handle = tasks.add(0, 0, true, 0, moveAxis5, "MoveAx5");
     #endif
   }
   if (axisNumber == 6) {
     #if AXIS6_DRIVER_MODEL != OFF
-      tasks.add(0, 0, true, 0, moveAxis6, "MoveAx6");
+      handle = tasks.add(0, 0, true, 0, moveAxis6, "MoveAx6");
     #endif
   }
+  task_handle = handle;
   stepDriver.init();
 }
 
@@ -192,7 +191,9 @@ void Axis::setFrequency(double frequency) {
   unsigned long periodMicroseconds = lround(d);
   if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
   // handle the case where the move() method isn't called to set the new period
-  if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
+  if (lastFrequency == 0.0){
+    tasks.setPeriodMicros(task_handle, periodMicroseconds);
+  }
   lastFrequency = frequency;
 }
 

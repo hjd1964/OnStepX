@@ -90,7 +90,7 @@
 #define ASTROMETRIC_J2000           3
 #define TOPOCENTRIC_STRICT          OFF
 #ifndef TELESCOPE_COORDINATES
-  #define TELESCOPE_COORDINATES TOPOCENTRIC
+  #define TELESCOPE_COORDINATES     TOPOCENTRIC
 #endif
 
 // Mutexes -------------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ CommandProcessor::~CommandProcessor() {
 }
 
 void CommandProcessor::poll() {
-  if (!serialReady) { SerialPort.begin(serialBaud); serialReady = true; }
+  if (!serialReady) { delay(200); SerialPort.begin(serialBaud); serialReady = true; }
   if (SerialPort.available()) buffer.add(SerialPort.read()); else return;
   if (buffer.ready()) {
     char reply[50] = "";

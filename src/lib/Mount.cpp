@@ -43,10 +43,10 @@ void Mount::init(int8_t mountType) {
   // ------------------------------------------------------------------------------------------------
   // move in measures (radians) per second, tracking_enabled
   VLF("MSG: mount.init, starting tracking");
-  delay(100);
   axis1.setFrequencyMax(degToRad(4.0));
   axis1.setFrequency(arcsecToRad(15.0*SIDEREAL_RATIO));
   axis1.setTracking(true);
+
 }
 
 bool Mount::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
