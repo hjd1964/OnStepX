@@ -63,8 +63,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   char *conv_end;
   PrecisionMode precisionMode = convert.precision;
 
-  tasks_mutex_enter(MX_TELESCOPE_CMD);
-
   // :Gu#       Get bit packed telescope status
   //            Returns: s#
   if (cmd("Gu"))  {
@@ -166,8 +164,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sa"))  {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     if (!convert.dmsToDouble(&target.a, parameter, true)) *commandError = CE_PARAM_RANGE;
     target.a = degToRad(target.a);
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
   //  :Sz[DDD*MM]# or :Sz[DDD*MM'SS]# or :Sz[DDD*MM'SS.SSS]#
@@ -175,8 +175,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sz"))  {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     if (!convert.dmsToDouble(&target.z, parameter, false)) *commandError = CE_PARAM_RANGE;
     target.z = degToRad(target.z);
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
   // :GR#       Get Mount Right Ascension
@@ -223,8 +225,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sd"))  {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     if (!convert.dmsToDouble(&target.d, parameter, true)) *commandError = CE_PARAM_RANGE;
     target.d = degToRad(target.d);
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
   //  :Sr[HH:MM.T]# or :Sr[HH:MM:SS]# or :Sr[HH:MM:SS.SSSS]#
@@ -232,8 +236,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sr"))  {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     if (!convert.hmsToDouble(&target.r, parameter)) *commandError = CE_PARAM_RANGE;
     target.r = hrsToRad(target.r);
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
 // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
@@ -247,6 +253,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("ST"))  {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     double f = strtod(parameter,&conv_end);
     if (&parameter[0] != conv_end && ((f >= 30.0 && f < 90.0) || fabs(f) < 0.1)) {
       if (fabs(f) < 0.1) trackingState = TS_NONE; else {
@@ -255,6 +262,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       }
       updateTrackingRates();
     } else *commandError = CE_PARAM_RANGE;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
   // T - Tracking Commands
@@ -280,6 +288,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     if (command[1] == 'o' && mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else            // full compensation on
     if (command[1] == 'r' && mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else            // refraction compensation on
     if (command[1] == 'n' && mountType != ALTAZM) { rateCompensation = RC_NONE;    }                 // compensation off
@@ -308,6 +317,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       switch (command[1]) { case 'o': case 'r': case 'n': hzToSidereal(SIDEREAL_RATE_HZ); }
       updateTrackingRates();
     }
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
   //  C - Sync Control
@@ -316,6 +326,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   // :CM#       Synchonize the telescope with the current database object (as above)
   //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
   if (cmd("CS") || cmd("CM")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
     CommandError e;
     //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(syncTarget);
     e = syncEqu(target);
@@ -324,10 +335,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       if (e == CE_NONE) strcpy(reply,"N/A");
     }
     *numericReply = false;
-  } else
-
-  { tasks_mutex_exit(MX_TELESCOPE_CMD); return false; }
-  tasks_mutex_exit(MX_TELESCOPE_CMD); return true;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else return false;
 }
 
 // check if goto/sync is valid
