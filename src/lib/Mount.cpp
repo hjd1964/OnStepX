@@ -62,6 +62,103 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   char *conv_end;
   PrecisionMode precisionMode = convert.precision;
 
+  //  C - Sync Control
+  // :CS#       Synchonize the telescope with the current right ascension and declination coordinates
+  //            Returns: Nothing (Sync's fail silently)
+  // :CM#       Synchonize the telescope with the current database object (as above)
+  //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
+  if (cmd("CS") || cmd("CM")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    CommandError e;
+    //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(syncTarget);
+    e = syncEqu(target);
+    if (command[1] == 'M') {
+      if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
+      if (e == CE_NONE) strcpy(reply,"N/A");
+    }
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else return false;
+
+  // :GA#       Get Mount Altitude
+  //            Returns: sDD*MM# or sDD*MM'SS# (based on precision setting)
+  // :GAH#      High precision
+  //            Returns: sDD*MM'SS.SSS# (high precision)
+  if (cmdH("GA")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    updatePosition();
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).a), false, true, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  // :Ga#       Get Target Altitude
+  //            Returns: sDD*MM# or sDD*MM'SS# (based on precision setting)
+  // :GaH#      High precision
+  //            Returns: sDD*MM'SS.SSS# (high precision)
+  if (cmdH("Ga")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToHms(reply, radToDeg(target.a), false, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  // :GD#       Get Mount Declination
+  //            Returns: sDD*MM# or sDD*MM:SS# (based on precision setting)
+  // :GDH#      Returns: sDD*MM:SS.SSS# (high precision)
+  if (cmdH("GD")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    updatePosition();
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current).d), false, true, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else 
+
+  // :Gd#       Get Target Declination
+  //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
+  // :GdH#      High precision
+  //            Returns: HH:MM:SS.SSS# (high precision)
+  if (cmdH("Gd")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToDms(reply, radToDeg(target.d), false, true, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  // :GR#       Get Mount Right Ascension
+  //            Returns: HH:MM.T# or HH:MM:SS# (based on precision setting)
+  // :GRH#      Returns: HH:MM:SS.SSSS# (high precision)
+  if (cmdH("GR")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    updatePosition();
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToHms(reply, radToHrs(transform.mountToNative(&current).r), false, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  // :Gr#       Get Target Right Ascension
+  //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
+  // :GrH#      Returns: HH:MM:SS.SSSS# (high precision)
+  if (cmdH("Gr")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    convert.doubleToHms(reply, radToHrs(target.r), false, precisionMode);
+    *numericReply = false;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
+  //              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
+  if (cmd("GT"))  {
+    if (trackingState == TS_NONE) strcpy(reply,"0"); else dtostrf(siderealToHz(trackingRate), 0, 5, reply);
+    *numericReply = false;
+  } else 
+
   // :Gu#       Get bit packed telescope status
   //            Returns: s#
   if (cmd("Gu")) {
@@ -118,19 +215,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
-  // :GA#       Get Mount Altitude
-  //            Returns: sDD*MM# or sDD*MM'SS# (based on precision setting)
-  // :GAH#      High precision
-  //            Returns: sDD*MM'SS.SSS# (high precision)
-  if (cmdH("GA")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    updatePosition();
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).a), false, true, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
   // :GZ#       Get Mount Azimuth
   //            Returns: DDD*MM# or DDD*MM'SS# (based on precision setting)
   // :GZH#      High precision
@@ -140,18 +224,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     updatePosition();
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
     convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).z), true, false, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
-  // :Ga#       Get Target Altitude
-  //            Returns: sDD*MM# or sDD*MM'SS# (based on precision setting)
-  // :GaH#      High precision
-  //            Returns: sDD*MM'SS.SSS# (high precision)
-  if (cmdH("Ga")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, radToDeg(target.a), false, precisionMode);
     *numericReply = false;
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
@@ -179,64 +251,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
-  //  :Sz[DDD*MM]# or :Sz[DDD*MM'SS]# or :Sz[DDD*MM'SS.SSS]#
-  //            Set Target Azmuith
-  //            Return: 0 on failure
-  //                    1 on success
-  if (cmdP("Sz")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    if (!convert.dmsToDouble(&target.z, parameter, false)) *commandError = CE_PARAM_RANGE;
-    target.z = degToRad(target.z);
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
-  // :GR#       Get Mount Right Ascension
-  //            Returns: HH:MM.T# or HH:MM:SS# (based on precision setting)
-  // :GRH#      Returns: HH:MM:SS.SSSS# (high precision)
-  if (cmdH("GR")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    updatePosition();
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, radToHrs(transform.mountToNative(&current).r), false, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
-  // :GD#       Get Mount Declination
-  //            Returns: sDD*MM# or sDD*MM:SS# (based on precision setting)
-  // :GDH#      Returns: sDD*MM:SS.SSS# (high precision)
-  if (cmdH("GD")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    updatePosition();
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current).d), false, true, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else 
-
-  // :Gr#       Get Target Right Ascension
-  //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
-  // :GrH#      Returns: HH:MM:SS.SSSS# (high precision)
-  if (cmdH("Gr")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, radToHrs(target.r), false, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
-  // :Gd#       Get Target Declination
-  //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
-  // :GdH#      High precision
-  //            Returns: HH:MM:SS.SSS# (high precision)
-  if (cmdH("Gd")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToDms(reply, radToDeg(target.d), false, true, precisionMode);
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else
-
   //  :Sd[sDD*MM]# or :Sd[sDD*MM:SS]# or :Sd[sDD*MM:SS.SSS]#
   //            Set Target Declination
   //            Return: 0 on failure
@@ -259,13 +273,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
-// :GT#         Get tracking rate, 0.0 unless TrackingSidereal
-//              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
-      if (cmd("GT"))  {
-        if (trackingState == TS_NONE) strcpy(reply,"0"); else dtostrf(siderealToHz(trackingRate), 0, 5, reply);
-        *numericReply = false;
-      } else 
-      
   //  :ST[H.H]# Set Tracking Rate in Hz where 60.0 is solar rate
   //            Return: 0 on failure
   //                    1 on success
@@ -279,6 +286,17 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       }
       updateTrackingRates();
     } else *commandError = CE_PARAM_RANGE;
+    tasks_mutex_exit(MX_TELESCOPE_CMD);
+  } else
+
+  //  :Sz[DDD*MM]# or :Sz[DDD*MM'SS]# or :Sz[DDD*MM'SS.SSS]#
+  //            Set Target Azmuith
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmdP("Sz")) {
+    tasks_mutex_enter(MX_TELESCOPE_CMD);
+    if (!convert.dmsToDouble(&target.z, parameter, false)) *commandError = CE_PARAM_RANGE;
+    target.z = degToRad(target.z);
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
 
@@ -336,24 +354,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     }
     tasks_mutex_exit(MX_TELESCOPE_CMD);
   } else
-
-  //  C - Sync Control
-  // :CS#       Synchonize the telescope with the current right ascension and declination coordinates
-  //            Returns: Nothing (Sync's fail silently)
-  // :CM#       Synchonize the telescope with the current database object (as above)
-  //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
-  if (cmd("CS") || cmd("CM")) {
-    tasks_mutex_enter(MX_TELESCOPE_CMD);
-    CommandError e;
-    //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(syncTarget);
-    e = syncEqu(target);
-    if (command[1] == 'M') {
-      if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
-      if (e == CE_NONE) strcpy(reply,"N/A");
-    }
-    *numericReply = false;
-    tasks_mutex_exit(MX_TELESCOPE_CMD);
-  } else return false;
 
   return true;
 }
