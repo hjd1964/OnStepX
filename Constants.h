@@ -117,23 +117,24 @@
 #define SmallestRad                 0.000005
 
 // conversion math
-#define degToRad(x)                 (x/RAD)
-#define radToDeg(x)                 (x*RAD)
-#define hrsToRad(x)                 (x/RAD_HOUR_RATIO)
-#define radToHrs(x)                 (x*RAD_HOUR_RATIO)
-#define csToRad(x)                  (x/1375098.708313976)
-#define radToCs(x)                  (x*1375098.708313976)
-#define csToHours(x)                (x/360000.0)
-#define hoursToCs(x)                (x*360000.0)
-#define csToDays(x)                 (x/8640000.0)
-#define daysToCs(x)                 (x*8640000.0)
-#define arcsecToRad(x)              ((x/3600.0)/RAD)
-#define siderealToRad(x)            (((x*15.0)/3600.0)/RAD)
-#define radToArcsec(x)              ((x*RAD)*3600.0)
+#define degToRad(x)                 ((x)/RAD)
+#define radToDeg(x)                 ((x)*RAD)
+#define hrsToRad(x)                 ((x)/RAD_HOUR_RATIO)
+#define radToHrs(x)                 ((x)*RAD_HOUR_RATIO)
+#define csToRad(x)                  ((x)/1375098.708313976)
+#define radToCs(x)                  ((x)*1375098.708313976)
+#define csToHours(x)                ((x)/360000.0)
+#define hoursToCs(x)                ((x)*360000.0)
+#define csToDays(x)                 ((x)/8640000.0)
+#define daysToCs(x)                 ((x)*8640000.0)
+#define arcsecToRad(x)              (((x)/3600.0)/RAD)
+#define siderealToRad(x)            ((((x)*15.0)/3600.0)/RAD)
+#define radToArcsec(x)              (((x)*RAD)*3600.0)
 // conversion factor to go to/from Hz for sidereal interval
-#define hzToSubMicros(x)            (x*266666.666666667)    // (x*(16000000.0/60.0))
-#define hzToSidereal(x)             (x/SIDEREAL_RATE_HZ)    // ((x/60.0)/SIDEREAL_RATIO)
-#define siderealToHz(x)             (x*SIDEREAL_RATE_HZ)
+#define hzToSubMicros(x)            ((x)*266666.666666667)    // (x*(16000000.0/60.0))
+#define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)    // ((x/60.0)/SIDEREAL_RATIO)
+#define siderealToHz(x)             ((x)*SIDEREAL_RATE_HZ)
+#define fequal(x,y)                 (fabs((x)-(y))<0.00000001)
 
 // pins
 #define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }

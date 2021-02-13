@@ -30,6 +30,10 @@ const static int8_t steps[13][9] =
  {  0,  1,  1,  1,  1,  1,  1,  1,  1}};  // SERVO
 
 void StepDriver::init() {
+  VF("MSG: StepDriver::init, model "); V(Settings.model);
+  VF(", usteps "); if (Settings.microsteps == OFF) VF("OFF"); else V(Settings.microsteps);
+  VF(", ustepsGoto "); if (Settings.microstepsGoto == OFF) VLF("OFF"); else VL(Settings.microstepsGoto);
+
   microstepCode     = microstepsToCode(Settings.model, Settings.microsteps);
   microstepCodeGoto = microstepsToCode(Settings.model, Settings.microstepsGoto);
   microstepRatio    = Settings.microsteps/Settings.microstepsGoto;

@@ -26,8 +26,10 @@ enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
 enum TrackingState    {TS_NONE, TS_SIDEREAL};
 enum GotoState        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_HOME, GS_GOTO_PARK, GS_GOTO_ABORT};
-enum GuideState       {GU_NONE, GU_GUIDE, GU_GUIDE_STOP};
+enum GuideState       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
+enum GuideRate        {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
 enum ParkState        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
+enum PecState         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 
 class Mount {
   public:
@@ -59,6 +61,10 @@ class Mount {
     uint8_t mountType          = 0;
     bool    tracking           = false;
     bool    atHome             = true;
+    bool    waitingHome        = false;
+    bool    pauseHome          = false;
+    bool    autoMeridianFlip   = false;
+    bool    soundEnabled       = false;
     bool    safetyLimitsOn     = false;
     bool    syncToEncodersOnly = false;
 
@@ -76,10 +82,10 @@ class Mount {
     double trackingRate         = 1.0;
     double trackingRateAxis1    = 0.0;
     double trackingRateAxis2    = 0.0;
-    double guideRateAxis1       = 1.0;
-    double guideRateAxis2       = 1.0;
-    double deltaRateAxis1       = 1.0;
-    double deltaRateAxis2       = 1.0;
+    double guideRateAxis1       = 0.0;
+    double guideRateAxis2       = 0.0;
+    double deltaRateAxis1       = 0.0;
+    double deltaRateAxis2       = 0.0;
     TrackingState trackingState = TS_NONE;
 
     GotoState gotoState         = GS_NONE;
@@ -87,8 +93,13 @@ class Mount {
     GotoState gotoStateLast     = GS_NONE;
 
     GuideState guideState       = GU_NONE;
+    GuideRate guideRate         = GR_20X;
+    GuideRate pulseGuideRate    = GR_1X;
 
     ParkState parkState         = PS_UNPARKED;
+
+    PecState pecState           = PEC_NONE;
+    bool pecRecorded            = false;
 
 };
 

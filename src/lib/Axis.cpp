@@ -66,6 +66,7 @@ extern Tasks tasks;
 #endif
 
 void Axis::init(uint8_t axisNumber) {
+  VF("MSG: Axis::init, axis"); VL(axisNumber);
   pinModeInitEx(Pins.step, OUTPUT, !invertStep?LOW:HIGH);
   pinModeInitEx(Pins.dir, OUTPUT, !invertDir?LOW:HIGH);
   pinModeEx(Pins.enable, OUTPUT); enable(false);
@@ -189,9 +190,7 @@ void Axis::setFrequency(double frequency) {
   if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
   unsigned long periodMicroseconds = lround(d);
   if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
-  // handle the case where the move() method isn't called to set the new period
-  if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
-  lastFrequency = frequency;
+  tasks.setPeriodMicros(task_handle, periodMicroseconds);
 }
 
 void Axis::setTracking(bool tracking) {
