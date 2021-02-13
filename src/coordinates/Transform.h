@@ -27,8 +27,7 @@ class Transform {
 
     // converts between Mount and Native coordinates
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
-    void nativeToMount(Coordinate *coord);
-    void nativeToMount(Coordinate *coord, double *a1, double *a2);
+    void nativeToMount(Coordinate *coord, double *a1 = NULL, double *a2 = NULL);
     
     // converts between Mount and Topocentric coordinates
     void equMountToTopocentric(Coordinate *coord);

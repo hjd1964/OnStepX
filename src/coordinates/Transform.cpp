@@ -7,6 +7,8 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 #include "Transform.h"
 
 Transform transform;
@@ -21,35 +23,39 @@ void Transform::setSite(Site site) {
 }
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
+  tasks_mutex_enter(MX_TRANSFORM_CMD);
   Coordinate result = *coord;
-  if (mountType == ALTAZM) horToEqu(&result);
+  if (mountType == ALTAZM) { horToEqu(&result); Y; }
   #if MOUNT_COORDS == OBSERVED
-    equMountToObservedPlace(&result);
+    equMountToObservedPlace(&result); Y;
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    equMountToTopocentric(&result);
+    equMountToTopocentric(&result); Y;
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  if (returnHorizonCoords) equToHor(&result);
-  hourAngleToRightAscension(&result);
+  if (returnHorizonCoords) { equToHor(&result); Y; }
+  hourAngleToRightAscension(&result); Y;
+  tasks_mutex_exit(MX_TRANSFORM_CMD);
   return result;
 }
 
-void Transform::nativeToMount(Coordinate *coord) {
-  rightAscensionToHourAngle(coord);
+void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
+  tasks_mutex_enter(MX_TRANSFORM_CMD);
+  rightAscensionToHourAngle(coord); Y;
   #if MOUNT_COORDS == OBSERVED
-    observedPlaceToEquMount(coord);
+    observedPlaceToEquMount(coord); Y;
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    topocentricToEquMount(coord);
+    topocentricToEquMount(coord); Y;
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  if (mountType == ALTAZM) equToHor(coord);
-}
-
-void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
-  nativeToMount(coord);
-  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
+  if (mountType == ALTAZM) {
+    equToHor(coord); Y;
+    if (a1 != NULL && a2 != NULL) { *a1 = coord->z; *a2 = coord->a; }
+  } else {
+    if (a1 != NULL && a2 != NULL) { *a1 = coord->h; *a2 = coord->d; }
+  }
+  tasks_mutex_exit(MX_TRANSFORM_CMD);
 }
 
 void Transform::equMountToTopocentric(Coordinate *coord) {
