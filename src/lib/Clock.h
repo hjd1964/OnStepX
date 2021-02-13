@@ -3,6 +3,8 @@
 #pragma once
 #include <Arduino.h>
 #include "../../Constants.h"
+#include "../coordinates/Convert.h"
+#include "../commands/ProcessCmds.h"
 
 class Clock {
   public:
@@ -11,8 +13,8 @@ class Clock {
     void init(Site site);
     
     // adjusts the period of the centisecond sidereal clock, in counts per second
-    unsigned long getPeriodSubMicros();
     void setPeriodSubMicros(unsigned long period);
+    unsigned long getPeriodSubMicros();
 
     // set and apply the site longitude, necessary for LAST calculations
     void setSite(Site site);

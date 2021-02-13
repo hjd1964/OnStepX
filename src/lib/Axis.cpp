@@ -9,6 +9,8 @@
 #include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
+#include "Clock.h"
+extern Clock clock;
 #include "Axis.h"
 
 #if AXIS1_DRIVER_MODEL != OFF
@@ -182,15 +184,17 @@ double Axis::getTargetCoordinate() {
 void Axis::setFrequencyMax(double frequency) {
   maxFreq = frequency*spm;
   if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;
-  minPeriodMicrosHalf = lround(minPeriodMicros/2.0);
 }
 
 void Axis::setFrequency(double frequency) {
-  double d = 500000.0/(frequency*spm);
+  // frequency in measures per second to microsecond counts per step
+  double d = 1000000.0/(frequency*spm);
+  if (d < minPeriodMicros) d = minPeriodMicros;
+  d /= 2.0;  // we need to run twice as fast to make a square wave
   if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
-  unsigned long periodMicroseconds = lround(d);
-  if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
-  tasks.setPeriodMicros(task_handle, periodMicroseconds);
+  d *= 16.0; // convert microsecond counts into sub-microsecond counts
+  d *= (16000000.0/clock.getPeriodSubMicros()); // adjust period for MCU clock inaccuracy
+  tasks.setPeriodSubMicros(task_handle, (unsigned long)lround(d));
 }
 
 void Axis::setTracking(bool tracking) {

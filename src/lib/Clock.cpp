@@ -37,16 +37,18 @@ void Clock::init(Site site) {
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Warning, didn't get h/w timer for Clock (using s/w timer)");
 
+  // period = nv.readLong(EE_siderealPeriod);
+  setPeriodSubMicros(period); // period in SubMicros per second
+}
+
+void Clock::setPeriodSubMicros(unsigned long period) {
   tasks.setPeriodSubMicros(handle, lround(period/100.0));
+  this->period = period;
+  // nv.writeLong(EE_siderealPeriod, period);
 }
 
 unsigned long Clock::getPeriodSubMicros() {
   return period;
-}
-
-void Clock::setPeriodSubMicros(unsigned long period) {
-  //nv.writeLong(EE_siderealPeriod,siderealPeriod);
-  tasks.setPeriodSubMicros(handle, lround(period/100.0));
 }
 
 void Clock::setSite(Site site) {
