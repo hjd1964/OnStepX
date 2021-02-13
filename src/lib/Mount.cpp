@@ -259,54 +259,55 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
   // T - Tracking Commands
   //
-  // :T+#       Master sidereal clock faster by 0.02 Hertz (stored in EEPROM)
-  // :T-#       Master sidereal clock slower by 0.02 Hertz (stored in EEPROM)
+  // :To#       Track full compensation on
+  // :Tr#       Track refraction compensation on
+  // :Tn#       Track compensation off
+  // :T1#       Track dual axis off (disable Dec tracking on Eq mounts)
+  // :T2#       Track dual axis on
+  //
   // :TS#       Track rate solar
+  // :TK#       Track rate king
   // :TL#       Track rate lunar
   // :TQ#       Track rate sidereal
+  //
+  // :T+#       Master sidereal clock faster by 0.02 Hertz (stored in EEPROM)
+  // :T-#       Master sidereal clock slower by 0.02 Hertz (stored in EEPROM)
   // :TR#       Master sidereal clock reset (to calculated sidereal rate, stored in EEPROM)
-  // :TK#       Track rate king
   //            Returns: Nothing
   //
   // :Te#       Tracking enable
   // :Td#       Tracking disable
-  // :To#       OnTrack enable
-  // :Tr#       Track refraction enable
-  // :Tn#       Track refraction disable
-  // :T1#       Track single axis (disable Dec tracking on Eq mounts)
-  // :T2#       Track dual axis
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
-    if (command[1] == '1' && mountType != ALTAZM) { rateCompensationDualAxis = false; } else                                // dual axis tracking off
-    if (command[1] == '2' && mountType != ALTAZM) { rateCompensationDualAxis = true;  } else                                // dual axis tracking on
-    if (command[1] == 'o' && mountType != ALTAZM) { rateCompensation = RC_FULL_RA; trackingRate = 1.0; } else               // full compensation on
-    if (command[1] == 'r' && mountType != ALTAZM) { rateCompensation = RC_REFR_RA; trackingRate = 1.0; } else               // refraction compensation on
-    if (command[1] == 'n' && mountType != ALTAZM) { rateCompensation = RC_NONE;    trackingRate = 1.0; }                    // compensation off
-    if (command[1] == 'S') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60);     *numericReply = false; } else // solar tracking rate 60Hz
-    if (command[1] == 'K') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60.136); DL(siderealToHz(trackingRate)); *numericReply = false; } else // king tracking rate 60.136Hz
-    if (command[1] == 'L') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(57.9);   *numericReply = false; } else // lunar tracking rate 57.9Hz
-    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);                   *numericReply = false; } else // sidereal tracking rate
-    if (command[1] == '+') { clock.setPeriodSubMicros((clock.getPeriodSubMicros() - hzToSubMicros(0.02))); *numericReply = false; } else
-    if (command[1] == '-') { clock.setPeriodSubMicros((clock.getPeriodSubMicros() + hzToSubMicros(0.02))); *numericReply = false; } else
-    if (command[1] == 'R') { clock.setPeriodSubMicros(SIDEREAL_PERIOD); *numericReply = false; } else                       // reset master sidereal clock interval
+    if (command[1] == 'o' && mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else            // full compensation on
+    if (command[1] == 'r' && mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else            // refraction compensation on
+    if (command[1] == 'n' && mountType != ALTAZM) { rateCompensation = RC_NONE;    }                 // compensation off
+    if (command[1] == '1' && mountType != ALTAZM) {                                                  // dual axis tracking off
+      if (rateCompensation == RC_REFR_BOTH) rateCompensation = RC_REFR_RA; else if (rateCompensation == RC_FULL_BOTH) rateCompensation = RC_FULL_RA;
+    } else
+    if (command[1] == '2' && mountType != ALTAZM) {                                                  // dual axis tracking on
+      if (rateCompensation == RC_REFR_RA) rateCompensation = RC_REFR_BOTH; else if (rateCompensation == RC_FULL_RA) rateCompensation = RC_FULL_BOTH;
+    } else
+    if (command[1] == 'S') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60);     } else // solar tracking rate 60Hz
+    if (command[1] == 'K') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60.136); } else // king  tracking rate 60.136Hz
+    if (command[1] == 'L') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(57.9);   } else // lunar tracking rate 57.9Hz
+    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);                   } else // sidereal tracking rate 60.164Hz
+    if (command[1] == '+') { clock.setPeriodSubMicros((clock.getPeriodSubMicros() - hzToSubMicros(0.02))); } else
+    if (command[1] == '-') { clock.setPeriodSubMicros((clock.getPeriodSubMicros() + hzToSubMicros(0.02))); } else
+    if (command[1] == 'R') { clock.setPeriodSubMicros(SIDEREAL_PERIOD); } else                       // reset master sidereal clock interval
     if (command[1] == 'e') {
-      if (parkState == PS_PARKED) *commandError = CE_PARKED; else { resetGeneralErrors(); trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true); }
+      if (parkState != PS_PARKED) { resetGeneralErrors(); trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true); } else *commandError = CE_PARKED;
     } else
     if (command[1] == 'd') {
-      if (gotoState != GS_NONE || guideState != GU_NONE) *commandError = CE_MOUNT_IN_MOTION; else trackingState = TS_NONE;
+      if (gotoState == GS_NONE && guideState == GU_NONE) trackingState = TS_NONE; else *commandError = CE_MOUNT_IN_MOTION;
     } else *commandError = CE_CMD_UNKNOWN;
 
-    if (mountType != ALTAZM) {
-      if (rateCompensation == RC_NONE) rateCompensationDualAxis = false; else
-      if (rateCompensation == RC_REFR_RA   &&  rateCompensationDualAxis) rateCompensation = RC_REFR_BOTH; else
-      if (rateCompensation == RC_REFR_BOTH && !rateCompensationDualAxis) rateCompensation = RC_REFR_RA;   else
-      if (rateCompensation == RC_FULL_RA   &&  rateCompensationDualAxis) rateCompensation = RC_FULL_BOTH; else
-      if (rateCompensation == RC_FULL_BOTH && !rateCompensationDualAxis) rateCompensation = RC_FULL_RA;
+    if (*commandError == CE_NONE) {
+      switch (command[1]) { case 'S': case 'K': case 'L': case 'Q': case '+': case '-': case 'R': *numericReply = false; }
+      switch (command[1]) { case 'o': case 'r': case 'n': hzToSidereal(SIDEREAL_RATE_HZ); }
+      updateTrackingRates();
     }
-    
-    updateTrackingRates();
-
   } else
 
   //  C - Sync Control
