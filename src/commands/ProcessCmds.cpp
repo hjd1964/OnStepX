@@ -7,16 +7,14 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
-
 #include "BufferCmds.h"
 #include "SerialWrapper.h"
 #include "../lib/Telescope.h"
-
 #include "ProcessCmds.h"
 
 extern Telescope telescope;
 
-GeneralError generalError;
+GeneralErrors generalErrors = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 // command processors
 #ifdef SERIAL_A

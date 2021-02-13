@@ -7,16 +7,18 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
-
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../coordinates/Convert.h"
+extern Convert convert;
 #include "../coordinates/Transform.h"
+extern Transform transform;
 #include "../commands/ProcessCmds.h"
+extern GeneralErrors generalErrors;
 #include "Clock.h"
 
-extern GeneralError generalError;
+Clock clock;
+void clockTickWrapper() { clock.tick(); }
 volatile unsigned long centisecondLAST;
 
 void Clock::init(Site site) {
@@ -30,6 +32,21 @@ void Clock::init(Site site) {
   ut1 = gregorianToJulianDay(date);
   ut1.hour = (date.hour + (date.minute + (date.second + date.centisecond/100.0)/60.0)/60.0) + date.timezone;
   setTime(ut1);
+
+  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+  handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
+  if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Warning, didn't get h/w timer for Clock (using s/w timer)");
+
+  tasks.setPeriodSubMicros(handle, lround(period/100.0));
+}
+
+unsigned long Clock::getPeriodSubMicros() {
+  return period;
+}
+
+void Clock::setPeriodSubMicros(unsigned long period) {
+  //nv.writeLong(EE_siderealPeriod,siderealPeriod);
+  tasks.setPeriodSubMicros(handle, lround(period/100.0));
 }
 
 void Clock::setSite(Site site) {
@@ -138,7 +155,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       setSiderealTime(ut1, julianDateToLAST(ut1));
       // nv.writeFloat(EE_JD, JD);
       dateIsReady = true;
-      if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
+      if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
     } else *commandError = CE_PARAM_FORM;
     tasks_mutex_exit(MX_CLOCK_CMD);
   } else
@@ -171,7 +188,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       ut1.hour = hour + ut1.timezone;
       setTime(ut1);
       timeIsReady = true;
-      if (generalError == ERR_SITE_INIT && dateIsReady && timeIsReady) generalError = ERR_NONE;
+      if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
     } else *commandError = CE_PARAM_FORM;
     tasks_mutex_exit(MX_CLOCK_CMD);
   } else return false;

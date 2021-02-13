@@ -19,8 +19,6 @@ class Telescope {
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
   private:
-    Convert convert;
-    Transform transform;
     Site site;
     
     // equipment

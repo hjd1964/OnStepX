@@ -86,14 +86,13 @@
 #define ALTAZM                      3      // Altitude Azimuth Mounts, Dobsonians, etc.
 #define MOUNT_TYPE_LAST             3
 
-// coordinate mode
+// coordinate modes
+#define COORD_MODE_FIRST            1
 #define OBSERVED_PLACE              1
 #define TOPOCENTRIC                 2
-#define ASTROMETRIC_J2000           3
-#define TOPOCENTRIC_STRICT          OFF
-#ifndef TELESCOPE_COORDINATES
-  #define TELESCOPE_COORDINATES     TOPOCENTRIC
-#endif
+#define TOPO_STRICT                 3
+#define ASTROMETRIC_J2000           4
+#define COORD_MODE_LAST             4
 
 // etc.
 #define INVALID                     -32767
@@ -108,6 +107,8 @@
 #define RAD                         57.29577951308232
 #define RAD_HOUR_RATIO              3.819718634205488
 #define SIDEREAL_RATIO              1.002737909350795
+#define SIDEREAL_PERIOD             15956313.06126534
+#define SIDEREAL_RATE_HZ            60.16427456104770
 #define Deg90                       1.570796326794896
 #define Deg180                      3.141592653589793
 #define Deg360                      6.283185307179586
@@ -127,7 +128,12 @@
 #define csToDays(x)                 (x/8640000.0)
 #define daysToCs(x)                 (x*8640000.0)
 #define arcsecToRad(x)              ((x/3600.0)/RAD)
+#define siderealToRad(x)            (((x*15.0)/3600.0)/RAD)
 #define radToArcsec(x)              ((x*RAD)*3600.0)
+// conversion factor to go to/from Hz for sidereal interval
+#define hzToSubMicros(x)            (x*266666.666666667)    // (x*(16000000.0/60.0))
+#define hzToSidereal(x)             (x/SIDEREAL_RATE_HZ)    // ((x/60.0)/SIDEREAL_RATIO)
+#define siderealToHz(x)             (x*SIDEREAL_RATE_HZ)
 
 // pins
 #define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }

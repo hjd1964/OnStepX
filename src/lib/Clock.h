@@ -2,15 +2,17 @@
 // observatory site and time
 #pragma once
 #include <Arduino.h>
-
-#include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
+#include "../../Constants.h"
 
 class Clock {
   public:
     // sets date/time from NV and/or the various TLS sources
     // and sets up an event to tick the centisecond sidereal clock
     void init(Site site);
+    
+    // adjusts the period of the centisecond sidereal clock, in counts per second
+    unsigned long getPeriodSubMicros();
+    void setPeriodSubMicros(unsigned long period);
 
     // set and apply the site longitude, necessary for LAST calculations
     void setSite(Site site);
@@ -56,8 +58,6 @@ class Clock {
     // convert Julian Day to Gregorian date (year, month, day)
     GregorianDate julianDayToGregorian(JulianDate julianDate);
 
-    Convert convert;
-    Transform transform;
     Site site;
     JulianDate ut1;
     double centisecondHOUR = 0;
@@ -65,4 +65,7 @@ class Clock {
 
     bool dateIsReady = false;
     bool timeIsReady = false;
+
+    unsigned long period = SIDEREAL_PERIOD;
+    uint8_t handle = 0;
 };

@@ -1,7 +1,10 @@
 //--------------------------------------------------------------------------------------------------
 // convert to/from C strings
 #include <Arduino.h>
+
 #include "Convert.h"
+
+Convert convert;
 
 // convert string in format MM/DD/YY to Date
 GregorianDate Convert::strToDate(char *ymd) {

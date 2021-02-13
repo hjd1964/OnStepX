@@ -2,11 +2,14 @@
 // coordinate transformation
 #include <Arduino.h>
 #include "../../Constants.h"
-
-#include "Convert.h"
-
+#include "../../Config.h"
+#include "../../ConfigX.h"
+#include "../HAL/HAL.h"
+#include "../pinmaps/Models.h"
+#include "../debug/Debug.h"
 #include "Transform.h"
 
+Transform transform;
 extern volatile unsigned long centisecondLAST;
 
 void Transform::init(int mountType) {
@@ -17,18 +20,36 @@ void Transform::setSite(Site site) {
   this->site = site;
 }
 
-Coordinate Transform::mountToNative(Coordinate *coord) {
+Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   Coordinate result = *coord;
   if (mountType == ALTAZM) horToEqu(&result);
-#if TELESCOPE_COORDINATES == OBSERVED
-  equMountToObservedPlace(&result);
-#elif TELESCOPE_COORDINATES == TOPOCENTRIC
-  equMountToTopocentric(&result);
-#else
-  #error "Configuration (Constants.h): Unknown TELESCOPE_COORDINATES!"
-#endif
+  #if MOUNT_COORDS == OBSERVED
+    equMountToObservedPlace(&result);
+  #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
+    equMountToTopocentric(&result);
+  #else
+    #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
+  #endif
+  if (returnHorizonCoords) equToHor(&result);
   hourAngleToRightAscension(&result);
   return result;
+}
+
+void Transform::nativeToMount(Coordinate *coord) {
+  rightAscensionToHourAngle(coord);
+  #if MOUNT_COORDS == OBSERVED
+    observedPlaceToEquMount(coord);
+  #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
+    topocentricToEquMount(coord);
+  #else
+    #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
+  #endif
+  if (mountType == ALTAZM) equToHor(coord);
+}
+
+void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
+  nativeToMount(coord);
+  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
 }
 
 void Transform::equMountToTopocentric(Coordinate *coord) {
@@ -62,7 +83,7 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   if (a2 >  Deg180) a2 -= Deg360; else
   if (a2 < -Deg180) a2 += Deg360;
 
-  if (a2 < -Deg90 || a2 > Deg90) mount.p = PIER_SIDE_WEST; else mount.p = PIER_SIDE_EAST;
+  if (a2 < -Deg90 || a2 > Deg90) mount.pierSide = PIER_SIDE_WEST; else mount.pierSide = PIER_SIDE_EAST;
 
   if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
   return mount;
@@ -71,11 +92,11 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   
-  if (coord->p == PIER_SIDE_WEST) *a1 += PI;
+  if (coord->pierSide == PIER_SIDE_WEST) *a1 += PI;
   if (site.latitude.value >= 0.0) {
-    if (coord->p == PIER_SIDE_WEST) *a2 =   Deg180  - *a2;
+    if (coord->pierSide == PIER_SIDE_WEST) *a2 =   Deg180  - *a2;
   } else {
-    if (coord->p == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
+    if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
   }
   if (*a2 >  Deg360) *a2 -= Deg360; else
   if (*a2 < -Deg360) *a2 += Deg360;
@@ -84,7 +105,7 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
 void Transform::topocentricToObservedPlace(Coordinate *coord) {
   if (mountType != ALTAZM) {
     // within about 1/20 arc-second of NCP or SCP
-    #if TOPOCENTRIC_STRICT == ON
+    #if MOUNT_COORDS == TOPO_STRICT
       if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
       if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
     #else
@@ -98,7 +119,7 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
 void Transform::observedPlaceToTopocentric(Coordinate *coord) {
   if (mountType != ALTAZM) {
     // within about 1/20 arc-second of the "refracted" NCP or SCP
-    #if TOPOCENTRIC_STRICT == ON
+    #if MOUNT_COORDS == TOPO_STRICT
       if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
       if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
     #else  
@@ -126,7 +147,6 @@ void Transform::rightAscensionToHourAngle(Coordinate *coord) {
 }
 
 void Transform::equToHor(Coordinate *coord) {
-  rightAscensionToHourAngle(coord);
   double cosHA  = cos(coord->h);
   double sinAlt = sin(coord->d)*site.latitude.sine + cos(coord->d)*site.latitude.cosine*cosHA;  
   coord->a      = asin(sinAlt);
@@ -144,7 +164,6 @@ void Transform::horToEqu(Coordinate *coord) {
   double t2     = cosAzm*site.latitude.sine - tan(coord->a)*site.latitude.cosine;
   coord->h      = atan2(t1,t2);
   coord->h     += PI;
-  hourAngleToRightAscension(coord);
 }
 
 double Transform::trueRefrac(double altitude, double pressure, double temperature) {

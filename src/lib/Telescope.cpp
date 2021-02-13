@@ -7,21 +7,17 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
-
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../coordinates/Convert.h"
+extern Convert convert;
 #include "../coordinates/Transform.h"
+extern Transform transform;
 #include "../commands/ProcessCmds.h"
 #include "Clock.h"
+extern Clock clock;
 #include "Mount.h"
-
 #include "Telescope.h"
-
-// instantiate and callback wrapper
-Clock clock;
-void clockTickWrapper() { clock.tick(); }
 
 void Telescope::init() {
   // Site
@@ -35,11 +31,6 @@ void Telescope::init() {
 
   // Clock
   clock.init(site);
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  uint8_t handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
-  if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Warning, didn't get h/w timer for Clock (using s/w timer)");
-
-  tasks.setPeriodSubMicros(handle, lround(160000.0/SIDEREAL_RATIO));
 
   // Mount
   mount.init(MOUNT_TYPE);
@@ -85,8 +76,8 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //            Returns: HH:MM:SS#
   if (cmdP("GV")) {
     if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
-    if (parameter[0] == 'M') sprintf(reply,"%s %i.%i%s",FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
-    if (parameter[0] == 'N') sprintf(reply,"%i.%i%s", FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
+    if (parameter[0] == 'M') sprintf(reply,"%s %i.%02i%s",FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
+    if (parameter[0] == 'N') sprintf(reply,"%i.%02i%s", FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
     if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
     if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
     *numericReply = false;

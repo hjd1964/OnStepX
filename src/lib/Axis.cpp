@@ -7,10 +7,8 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
-
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "Axis.h"
 
 #if AXIS1_DRIVER_MODEL != OFF
@@ -112,6 +110,7 @@ void Axis::init(uint8_t axisNumber) {
 void Axis::enable(bool value) {
   if (Pins.enable != OFF) {
     if (value) digitalWrite(Pins.enable, invertEnabled?HIGH:LOW); else digitalWrite(Pins.enable, invertEnabled?LOW:HIGH);
+    enabled = value;
   }
 }
 
@@ -191,9 +190,7 @@ void Axis::setFrequency(double frequency) {
   unsigned long periodMicroseconds = lround(d);
   if (periodMicroseconds < minPeriodMicrosHalf) periodMicroseconds = minPeriodMicrosHalf;
   // handle the case where the move() method isn't called to set the new period
-  if (lastFrequency == 0.0){
-    tasks.setPeriodMicros(task_handle, periodMicroseconds);
-  }
+  if (lastFrequency == 0.0) tasks.setPeriodMicros(task_handle, periodMicroseconds);
   lastFrequency = frequency;
 }
 

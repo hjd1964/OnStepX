@@ -1,7 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // coordinate transformation
 #pragma once
-
 #include "Convert.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
@@ -17,7 +16,7 @@ typedef struct Coordinate {
     double d;
     double a;
     double z;
-    PierSide p;
+    PierSide pierSide;
 } Coordinate;
 
 class Transform {
@@ -27,7 +26,9 @@ class Transform {
     void setSite(Site site);
 
     // converts between Mount and Native coordinates
-    Coordinate mountToNative(Coordinate *coord);
+    Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
+    void nativeToMount(Coordinate *coord);
+    void nativeToMount(Coordinate *coord, double *a1, double *a2);
     
     // converts between Mount and Topocentric coordinates
     void equMountToTopocentric(Coordinate *coord);
