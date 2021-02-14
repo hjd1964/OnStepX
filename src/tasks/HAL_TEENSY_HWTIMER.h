@@ -1,26 +1,25 @@
 //--------------------------------------------------------------------------------------------------
 // Teensyduino hardware timers
 
-// provides four 32 bit pit timers with 16 bit software pre-scalers, running at 16MHz
+// provides four 32 bit pit timers with 16 bit software pre-scalers
 // each timer configured as ~0 to x seconds (granularity of timer is 0.062uS)
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)  
-  #define F_BUS 16000000L                            // F_BUS isn't defined for the T4.0, we force the timers to run at 16MHZ
-#endif
-#define TIMER_RATE_MHZ (F_BUS/1000000.0)             // Teensy motor timers run at F_BUS Hz so use full resolution
-#define TIMER_RATE_16MHZ_TICKS (16.0/TIMER_RATE_MHZ) // 16.0/TIMER_RATE_MHZ for the default 16MHz "sub micros"
+#define F_BUS2 16000000L                              // Pretend the timers are running at 0.062us/tick
+#define TIMER_RATE_MHZ (F_BUS2/1000000.0)             // Teensy PIT timers run at F_BUS Hz but we use the interval timer library
+#define TIMER_RATE_16MHZ_TICKS (16.0/TIMER_RATE_MHZ)  // 16.0/TIMER_RATE_MHZ for the default 16MHz "sub micros"
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
-  volatile uint32_t _nextPeriod1, _nextPeriod2, _nextPeriod3, _nextPeriod4;
-  volatile uint16_t _nextRep1, _nextRep2, _nextRep3, _nextRep4;
+  volatile float _nextPeriod1 = 16000, _nextPeriod2 = 16000, _nextPeriod3 = 16000, _nextPeriod4 = 16000;
+  volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
   const double timerRate16MHzTicks TIMER_RATE_16MHZ_TICKS;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
-    uint32_t counts, reps=0;
+    float counts;
+  uint16_t reps = 0;
     if (period != 0 && period <= 2144000000) {
       if (period < 16) period = 16;         // minimum time is 1us
       double fperiod = period/timerRate16MHzTicks;
       reps           = fperiod/4194304.0 + 1.0;
-      counts         = fperiod/reps - 1.0; // has -1 since this is dropped right into a timer register
+      counts         = round((fperiod/reps)/16.0);
     } else counts = 160000;                 // set for a 10ms period, stopped
   
     noInterrupts();
@@ -44,7 +43,7 @@
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     itimer1.priority(priority);
-    return itimer1.begin(HAL_HWTIMER1_WRAPPER, (float)128 * 0.0625);
+    return itimer1.begin(HAL_HWTIMER1_WRAPPER, 1000); // startup one millisecond
   }
 
   void HAL_HWTIMER1_DONE() {
@@ -52,11 +51,7 @@
     itimer1.end();
   }
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-  #define HAL_HWTIMER1_SET_PERIOD() itimer1.update((double)_nextPeriod1 * 0.0625)
-#else
-  #define HAL_HWTIMER1_SET_PERIOD() (PIT_LDVAL1 = _nextPeriod1)
-#endif
+  #define HAL_HWTIMER1_SET_PERIOD() itimer1.update(_nextPeriod1)
   void HAL_HWTIMER1_WRAPPER() {
     TASKS_HWTIMER1_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -76,7 +71,7 @@
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
     itimer2.priority(priority);
-    return itimer2.begin(HAL_HWTIMER2_WRAPPER, (float)128 * 0.0625);
+    return itimer2.begin(HAL_HWTIMER2_WRAPPER, 1000); // startup one millisecond
   }
 
   void HAL_HWTIMER2_DONE() {
@@ -84,11 +79,7 @@
     itimer2.end();
   }
   
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-  #define HAL_HWTIMER2_SET_PERIOD() itimer2.update((double)_nextPeriod2 * 0.0625)
-#else
-  #define HAL_HWTIMER2_SET_PERIOD() (PIT_LDVAL2 = _nextPeriod2)
-#endif
+  #define HAL_HWTIMER2_SET_PERIOD() itimer2.update(_nextPeriod2)
   void HAL_HWTIMER2_WRAPPER() {
     TASKS_HWTIMER2_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -108,7 +99,7 @@
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
     itimer3.priority(priority);
-    return itimer3.begin(HAL_HWTIMER3_WRAPPER, (float)128 * 0.0625);
+    return itimer3.begin(HAL_HWTIMER3_WRAPPER, 1000); // startup one millisecond
   }
 
   void HAL_HWTIMER3_DONE() {
@@ -116,11 +107,7 @@
     itimer3.end();
   }
   
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-  #define HAL_HWTIMER3_SET_PERIOD() itimer3.update((double)_nextPeriod3 * 0.0625)
-#else
-  #define HAL_HWTIMER3_SET_PERIOD() (PIT_LDVAL3 = _nextPeriod3)
-#endif
+  #define HAL_HWTIMER3_SET_PERIOD() itimer3.update(_nextPeriod3)
   void HAL_HWTIMER3_WRAPPER() {
     TASKS_HWTIMER3_PROFILER_PREFIX;
     static uint16_t count = 0;
@@ -140,7 +127,7 @@
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
     itimer4.priority(priority);
-    return itimer4.begin(HAL_HWTIMER4_WRAPPER, (float)128 * 0.0625);
+    return itimer4.begin(HAL_HWTIMER4_WRAPPER, 1000); // startup one millisecond
   }
 
   void HAL_HWTIMER4_DONE() {
@@ -148,11 +135,7 @@
     itimer4.end();
   }
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
-  #define HAL_HWTIMER4_SET_PERIOD() itimer4.update((double)_nextPeriod4 * 0.0625)
-#else
-  #define HAL_HWTIMER4_SET_PERIOD() (PIT_LDVAL4 = _nextPeriod4)
-#endif
+  #define HAL_HWTIMER4_SET_PERIOD() itimer4.update(_nextPeriod4)
   void HAL_HWTIMER4_WRAPPER() {
     TASKS_HWTIMER4_PROFILER_PREFIX;
     static uint16_t count = 0;

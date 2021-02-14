@@ -22,8 +22,8 @@ class Clock {
     // handle date/time commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // gets local apparent sidereal time in hours
-    double getLAST();
+    // gets the time in sidereal hours
+    double getSiderealTime();
 
     // callback to tick the centisecond sidereal clock
     void tick();
@@ -38,9 +38,6 @@ class Clock {
 
     // sets the time in sidereal hours
     void setSiderealTime(JulianDate julianDate, double time);
-
-    // gets the time in sidereal hours
-    double getSiderealTime();
 
     // adjust time (hours) into the 0 to 24 range
     double backInHours(double time);

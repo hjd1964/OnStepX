@@ -9,8 +9,8 @@
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
-  volatile uint32_t _nextPeriod1, _nextPeriod2, _nextPeriod3, _nextPeriod4;
-  volatile uint16_t _nextRep1, _nextRep2, _nextRep3, _nextRep4;
+  volatile uint32_t _nextPeriod1 = 16000, _nextPeriod2 = 16000, _nextPeriod3 = 16000, _nextPeriod4 = 16000;
+  volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
     // maximum time is about 134 seconds for this design
     uint32_t counts, reps = 0;

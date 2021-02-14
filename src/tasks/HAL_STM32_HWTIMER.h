@@ -9,8 +9,8 @@
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
-  volatile uint16_t _nextPeriod1, _nextPeriod2, _nextPeriod3, _nextPeriod4;
-  volatile uint16_t _nextRep1, _nextRep2, _nextRep3, _nextRep4;
+  volatile uint16_t _nextPeriod1 = 4000, _nextPeriod2 = 4000, _nextPeriod3 = 4000, _nextPeriod4 = 4000;
+  volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
     // maximum time is about 134 seconds for this design
     uint32_t counts, reps=0;
@@ -74,7 +74,7 @@
     // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
     uint32_t prescaleFactor = hwtimer1->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
     hwtimer1->setPrescaleFactor(prescaleFactor);
-    hwtimer1->setOverflow(round((60000.0/1.00273790935)/3.0));
+    hwtimer1->setOverflow(4000);          // startup one millisecond
   
     // the sub-priority is which interrupt to handle first if both fire at the
     // same time, which isn't supported in this HAL so all are set to 0
@@ -117,7 +117,7 @@
     // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
     uint32_t prescaleFactor = hwtimer2->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
     hwtimer2->setPrescaleFactor(prescaleFactor);
-    hwtimer2->setOverflow(round((60000.0/1.00273790935)/3.0));
+    hwtimer2->setOverflow(4000);          // startup one millisecond
   
     // the sub-priority is which interrupt to handle first if both fire at the
     // same time, which isn't supported in this HAL so all are set to 0
@@ -160,7 +160,7 @@
     // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
     uint32_t prescaleFactor = hwtimer3->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
     hwtimer3->setPrescaleFactor(prescaleFactor);
-    hwtimer3->setOverflow(round((60000.0/1.00273790935)/3.0));
+    hwtimer3->setOverflow(4000);          // startup one millisecond
   
     // the sub-priority is which interrupt to handle first if both fire at the
     // same time, which isn't supported in this HAL so all are set to 0
@@ -203,7 +203,7 @@
     // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
     uint32_t prescaleFactor = hwtimer4->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
     hwtimer4->setPrescaleFactor(prescaleFactor);
-    hwtimer4->setOverflow(round((60000.0/1.00273790935)/3.0));
+    hwtimer4->setOverflow(4000);          // startup one millisecond
   
     // the sub-priority is which interrupt to handle first if both fire at the
     // same time, which isn't supported in this HAL so all are set to 0

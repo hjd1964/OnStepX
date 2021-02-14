@@ -31,6 +31,8 @@
 
 #include "OnTask.h"
 
+unsigned char __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 // Task object
 Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
   this->period   = period;

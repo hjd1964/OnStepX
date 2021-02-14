@@ -16,8 +16,8 @@ void TmcDriver::init(int model) {
   active = softSpi.init();
   this->model = model;
 
-  if (model = TMC5160) rsense = 0.075; else
-  if (model = TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
+  if (model == TMC5160) rsense = 0.075; else
+  if (model == TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
 }
 
 bool TmcDriver::mode(bool intpol, int decay_mode, byte micro_step_mode, int irun, int ihold) {
@@ -128,7 +128,7 @@ bool TmcDriver::error() {
   uint8_t result = read(REG_DRVSTATUS,&data_out);
   
   softSpi.end();
-  if (result & 2 != 0 || (result == 0 && data_out == 0)) return true; else return false;
+  if ((result & 2) != 0 || (result == 0 && data_out == 0)) return true; else return false;
   return true;
 }
 

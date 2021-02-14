@@ -17,7 +17,7 @@
 //   *** to be sure it matches your wiring.            *** USE AT YOUR OWN RISK ***                                           ***
 
 //      Parameter Name              Value   Default  Notes                                                                      Hint
-#define PINMAP                   MksGenL2 //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB2, MaxESP3, MaxSTM3,              <-Req'd
+#define PINMAP                   MaxPCB2 //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB2, MaxESP3, MaxSTM3,              <-Req'd
                                           //         MksGenL2, STM32Blue, FYSETC_S6_2.  Check Constants.h for more info.
 
 // SERIAL PORT COMMAND CHANNELS ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SERIAL

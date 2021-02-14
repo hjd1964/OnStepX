@@ -33,8 +33,8 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  if (returnHorizonCoords) { equToHor(&result); Y; }
   hourAngleToRightAscension(&result); Y;
+  if (returnHorizonCoords) { equToHor(&result); Y; }
   tasks_mutex_exit(MX_TRANSFORM_CMD);
   return result;
 }

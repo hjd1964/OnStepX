@@ -170,13 +170,13 @@ void Axis::markOriginCoordinate() {
 void Axis::setTargetCoordinate(double value) {
   long steps = lround(value*spm);
   noInterrupts();
-  targetSteps = steps;
+  targetSteps = steps - indexSteps;
   interrupts();
 }
 
 double Axis::getTargetCoordinate() {
   noInterrupts();
-  long steps = targetSteps;
+  long steps = targetSteps + indexSteps;
   interrupts();
   return steps/spm;
 }

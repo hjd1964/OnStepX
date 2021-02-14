@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// telescope control
+// telescope mount control
 #pragma once
 #include <Arduino.h>
 #include "../../Constants.h"
@@ -45,6 +45,9 @@ class Mount {
 
     // sync. to equatorial coordinates
     CommandError syncEqu(Coordinate target);
+    
+    // goto equatorial coordinates
+    CommandError gotoEqu(Coordinate target);
 
     // update where we are pointing *now*
     void updatePosition();

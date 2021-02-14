@@ -75,32 +75,39 @@ extern Tasks tasks;
 
 // Helper console for debugging
 #if DEBUG == CONSOLE
-  #include "../lib/Transform.h"
-  #include "../lib/Axis.h"
+  #include "../coordinates/Convert.h"
+  extern Convert convert;
+  #include "../coordinates/Transform.h"
+  extern Transform transform;
+  #include "../lib/Mount.h"
+  extern Axis axis1;
+  extern Axis axis2;
+  #include "../lib/Clock.h"
+  extern Clock clock;
 
   void debugConsole() {
-    EquCoordinate instrument, mount, observed, topocentric;
-    HorCoordinate horizon;
-  
-    instrument.h = axis1.getInstrumentCoordinate();
-    instrument.d = axis2.getInstrumentCoordinate();
-  
-    mount = transform.equInstrumentToMount(instrument);
-  
+    Coordinate mount, target;
+
+    mount  = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+    target = transform.instrumentToMount(axis1.getTargetCoordinate(), axis2.getTargetCoordinate());
+    //native = transform.mountToNative(&mount, true);
+    transform.equToHor(&mount);
     DL();
   
-    observed = transform.equMountToObservedPlace(mount);
-  
-    transform.hourAngleToRightAscension(&observed);
     D("DATE/TIME = "); D("12/01/21"); D(" "); DL("12:12:12");
-    D("LST = "); SERIAL_DEBUG.println((observatory.getLAST()/SIDEREAL_RATIO)*3600, 1);
-    D("RA  = "); SERIAL_DEBUG.println(radToDeg(observed.r), 4);
-    D("HA  = "); SERIAL_DEBUG.println(radToDeg(observed.h), 4);
-    D("Dec = "); SERIAL_DEBUG.println(radToDeg(observed.d), 4);
-  
-    horizon = transform.equToHor(instrument);
-    D("Alt = "); SERIAL_DEBUG.println(radToDeg(horizon.a), 4);
-    D("Azm = "); SERIAL_DEBUG.println(radToDeg(horizon.z), 4);
+    char reply[40];
+    convert.doubleToHms(reply, clock.getSiderealTime(), false, PM_HIGH);
+    D("LST = "); SERIAL_DEBUG.println(reply);
+    SERIAL_DEBUG.println();
+    D("current HA  = "); SERIAL_DEBUG.print(radToHrs(mount.h), 4); SERIAL_DEBUG.println(" hrs");
+    D("current RA  = "); SERIAL_DEBUG.print(radToHrs(mount.r), 4); SERIAL_DEBUG.println(" hrs");
+    D("current Dec = "); SERIAL_DEBUG.print(radToDeg(mount.d), 4); SERIAL_DEBUG.println(" degs");
+    SERIAL_DEBUG.println();
+    D("current Alt = "); SERIAL_DEBUG.print(radToDeg(mount.a), 4); SERIAL_DEBUG.println(" degs");
+    D("current Azm = "); SERIAL_DEBUG.print(radToDeg(mount.z), 4); SERIAL_DEBUG.println(" degs");
+    SERIAL_DEBUG.println();
+    D("target  HA  = "); SERIAL_DEBUG.print(radToHrs(target.h), 4); SERIAL_DEBUG.println(" hrs");
+    D("target  Dec = "); SERIAL_DEBUG.print(radToDeg(target.d), 4); SERIAL_DEBUG.println(" degs");
 
     D("\x1b[J");  // clear to end of screen
     D("\x1b[H");  // cursor to upper left
