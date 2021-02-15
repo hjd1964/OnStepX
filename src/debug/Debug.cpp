@@ -89,6 +89,8 @@ extern Tasks tasks;
     Coordinate mount, target;
 
     mount  = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+    transform.hourAngleToRightAscension(&mount);
+
     target = transform.instrumentToMount(axis1.getTargetCoordinate(), axis2.getTargetCoordinate());
     //native = transform.mountToNative(&mount, true);
     transform.equToHor(&mount);

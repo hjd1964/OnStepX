@@ -18,20 +18,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
+*/
 
 #include <Arduino.h>
+
 #include "../../Constants.h"
 #include "../../Config.h"
 #include "../../ConfigX.h"
 #include "../debug/Debug.h"
 
+// To enable the option to use a given hardware timer (1..4), if available, uncomment that line:
+//#define TASKS_HWTIMER1_ENABLE
+//#define TASKS_HWTIMER2_ENABLE
+//#define TASKS_HWTIMER3_ENABLE
+//#define TASKS_HWTIMER4_ENABLE
+
+// Enabling the profiler inserts time logging code into the process calls.  This provides the average
+// and largest start time delta and run time for each process.  To enable the profiler uncomment:
+//#define TASKS_PROFILER_ENABLE
+
+// Normally tasks are skipped if they become too late, to instead delay them for later processing uncomment:
+//#define TASKS_QUEUE_MISSED
+
 #include "HAL_PROFILER.h"
 #include "HAL_HWTIMERS.h"
-
 #include "OnTask.h"
 
 unsigned char __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+unsigned char __task_postpone = false;
 
 // Task object
 Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
@@ -104,9 +118,14 @@ bool Task::poll() {
     unsigned long time_to_next_task = next_task_time - t;
     if ((long)time_to_next_task < 0) {
       running = true;
+
       TASKS_PROFILER_PREFIX;
       callback();
       TASKS_PROFILER_SUFFIX;
+    
+      running = false;
+
+      if (__task_postpone) { __task_postpone = false; return false; }
 
       // adopt next period
       if (next_period_units != PU_NONE) {
@@ -122,9 +141,6 @@ bool Task::poll() {
       #endif
       next_task_time = t + (long)(period + time_to_next_task);
       if (!repeat) period = 0;
-
-      running = false;
-      return true;
     }
   }
   return false;
@@ -279,7 +295,6 @@ void Task::setHardwareTimerPeriod() {
   }
 }
 
-// Tasks object
 Tasks::Tasks() {
   // clear tasks
   for (uint8_t c = 0; c < TASKS_MAX; c++) {
@@ -298,7 +313,6 @@ Tasks::~Tasks() {
 }
 
 uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
-
   // check priority
   if (priority > 7) return false;
   if (priority > highest_priority) highest_priority = priority;
@@ -323,7 +337,6 @@ uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t prio
   return e + 1;
 }
 
-// as above, and adds a process name
 uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)(), const char name[]) {
   uint8_t handle = add(period, duration, repeat, priority, callback);
   setNameStr(handle, name);
@@ -460,8 +473,14 @@ void Tasks::yield() {
     }
   }
 }
-    
+
+void Tasks::yield(unsigned long milliseconds) {
+  unsigned long endTime = millis() + milliseconds;
+  while ((long)(millis() - endTime) < 0) this->yield();
+}
+
 void Tasks::updatePriorityRange() {
+  // scan for highest priority
   highest_priority = 0;
   for (uint8_t e = 0; e <= highest_task; e++) {
     uint8_t p = task[e]->getPriority();
@@ -470,7 +489,7 @@ void Tasks::updatePriorityRange() {
 }
 
 void Tasks::updateEventRange() {
-  // scan for highest task
+  // scan for highest task handle
   highest_task = 0;
   for (uint8_t e = TASKS_MAX - 1; e >= 0 ; e--) {
     if (allocated[e]) {

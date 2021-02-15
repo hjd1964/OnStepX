@@ -58,6 +58,7 @@ class Axis {
     // set and get target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
     double getTargetCoordinate();
+    void moveTargetCoordinate(int value);
 
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency);

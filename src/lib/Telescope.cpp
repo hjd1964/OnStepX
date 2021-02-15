@@ -108,19 +108,16 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //            Set current site latitude
   //            Return: 0 failure, 1 success
   if (cmd("St"))  {
-    tasks_mutex_enter(MX_CLOCK_CMD);
     if (convert.dmsToDouble(&value, parameter, true)) {
       site.latitude.value = degToRad(value);
       updateSite();
     } else *commandError = CE_PARAM_FORM;
-    tasks_mutex_exit(MX_CLOCK_CMD);
   } else 
     
   //  :Sg[(s)DDD*MM]# or :Sg[(s)DDD*MM:SS]# or :Sg[(s)DDD*MM:SS.SSS]#
   //            Set current site longitude, east longitudes can be negative or > 180 degrees
   //            Return: 0 failure, 1 success
   if (cmd("Sg"))  {
-    tasks_mutex_enter(MX_CLOCK_CMD);
     if (parameter[0] == '-' || parameter[0] == '+') i = 1; else i = 0;
     if (convert.dmsToDouble(&value, (char *)&parameter[i], false)) {
       if (parameter[0] == '-') site.longitude = -site.longitude;
@@ -131,7 +128,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
          // nv.writeFloat(EE_sites+currentSite*25+4,longitude);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
-    tasks_mutex_exit(MX_CLOCK_CMD);
   } else return false;
 
   return true;

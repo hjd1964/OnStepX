@@ -18,48 +18,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
+ *
+ * DESCRIPTION:
+ * 
 
-// DESCRIPTION:
-// 
-// Default provision is for 8 tasks, up to 255 are allowed, to change use:
-// #define TASKS_MAX 200 (for example) before the #include for this library.
-//
-// To enable the option to use a given hardware timer (1..4), if available depending on the HAL) add:
-// #define TASKS_HWTIMER1_ENABLE (for example) before the #include for this library.
-//
-// Normally tasks are skipped if they become too late, to instead queue them for later processing add:
-// #define TASKS_QUEUE_MISSED
-//
-// Enabling the profiler inserts time logging code into the process calls.  This provides the average
-// and largest start time delta and run time for each process.  To enable the profiler use:
-// #define TASKS_PROFILER_ENABLE
-//
-// Software timer based processes must use "tasks.yield();" (or the "Y;" macro, which is the same exact thing)
-// during any processing that requires a significant amount of time. This allows for the processing of other tasks
-// while it is working.  What a "significant amount of time" is depends on the program's requirements.  It might
-// be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timers based 
-// processes
-//
-// Up to 64 mutexes (0 to 63) are supported with the following macros, any
-// code between these two statements will be limited to running on one process
-// at a time even if "tasks.yield();" is called within that code:
-// tasks_mutex_enter(mutex_number);
-// tasks_mutex_exit(mutex_number);
-//
+ *
+ * Software timer based processes must use "tasks.yield();" (or the "Y;" macro, which is the same exact thing)
+ * during any processing that requires a significant amount of time. This allows for the processing of other tasks
+ * while it is working.  What a "significant amount of time" is depends on the program's requirements.  It might
+ * be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timers based 
+ * processes
+ *
+ * Up to 64 mutexes (0 to 63) are supported with the following macros, any
+ * code between these two statements will be limited to running on one process
+ * at a time even if "tasks.yield();" is called within that code:
+ * tasks_mutex_enter(mutex_number);
+ * tasks_mutex_exit(mutex_number);
+*/
 
 #pragma once
 #include <Arduino.h>
 
-// up to 8 tasks default
+// Default provision is for 8 tasks, up to 255 are allowed, to change use:
+// #define TASKS_MAX 200 (for example)
 #ifndef TASKS_MAX
   #define TASKS_MAX 8
 #endif
 
+// short Y macro to embed yield()
+#define Y tasks.yield()
+
+// short macro to allow momentary postponement of the current task
+extern unsigned char __task_postpone;
+#define task_postpone() __task_postpone = true;
+
 // mutex macros, do not run these in hardware timers (not ISR safe)!
 extern unsigned char __task_mutex[];
-#define tasks_mutex_enter(m) //while (bitRead(__task_mutex[m/8],m%8)) tasks.yield(); bitSet(__task_mutex[m/8],m%8);
-#define tasks_mutex_exit(m)  //bitClear(__task_mutex[m/8],m%8);
+#define tasks_mutex_enter(m) bitSet(__task_mutex[(m)/8],(m)%8);
+#define tasks_mutex_exit(m)  bitClear(__task_mutex[(m)/8],(m)%8);
+#define tasks_mutex_busy(m)  (bitRead(__task_mutex[(m)/8],(m)%8))
 
 enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 
@@ -91,13 +88,13 @@ class Task {
     void setNameStr(const char name[]);
     char *getNameStr();
 
-#ifdef TASKS_PROFILER_ENABLE
-    double getArrivalAvg();
-    double getArrivalMax();
-    double getRuntimeTotal();
-    long getRuntimeTotalCount();
-    double getRuntimeMax();
-#endif
+    #ifdef TASKS_PROFILER_ENABLE
+      double getArrivalAvg();
+      double getArrivalMax();
+      double getRuntimeTotal();
+      long getRuntimeTotalCount();
+      double getRuntimeMax();
+    #endif
 
   private:
 
@@ -116,14 +113,15 @@ class Task {
     unsigned long          next_task_time             = 0;
     uint8_t                hardwareTimer              = 0;
     void (*callback)() = NULL;
-#ifdef TASKS_PROFILER_ENABLE
-    volatile double        average_arrival_time       = 0;
-    volatile unsigned long average_arrival_time_count = 0;
-    volatile long          max_arrival_time           = 0;
-    volatile double        total_runtime              = 0;
-    volatile unsigned long total_runtime_count        = 0;
-    volatile long          max_runtime                = 0;
-#endif
+
+    #ifdef TASKS_PROFILER_ENABLE
+      volatile double        average_arrival_time       = 0;
+      volatile unsigned long average_arrival_time_count = 0;
+      volatile long          max_arrival_time           = 0;
+      volatile double        total_runtime              = 0;
+      volatile unsigned long total_runtime_count        = 0;
+      volatile long          max_runtime                = 0;
+    #endif
 };
 
 class Tasks {
@@ -133,10 +131,12 @@ class Tasks {
 
     // add process task
     // period:   between process calls in milliseconds, use 0 to disable
-    //           the possible period in milliseconds is about 49 days
+    //           software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds.
     // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
     // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
-    // priority: level highest 0 to 7 lowest, all tasks of priority 0 must be complete before priority 1 tasks are serviced, etc.
+    // priority: software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks.
+  //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
+  //           round robin within their priority levels, the most recently serviced task will be last visited again
     // callback: function to handle this tasks processing
     // returns:  handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
@@ -213,17 +213,19 @@ class Tasks {
 
     uint8_t getNextHandle();
 
-#ifdef TASKS_PROFILER_ENABLE
-    double getArrivalAvg(uint8_t handle);
-    double getArrivalMax(uint8_t handle);
-    double getRuntimeTotal(uint8_t handle);
-    long getRuntimeTotalCount(uint8_t handle);
-    double getRuntimeMax(uint8_t handle);
-#endif
+    #ifdef TASKS_PROFILER_ENABLE
+      double getArrivalAvg(uint8_t handle);
+      double getArrivalMax(uint8_t handle);
+      double getRuntimeTotal(uint8_t handle);
+      long getRuntimeTotalCount(uint8_t handle);
+      double getRuntimeMax(uint8_t handle);
+    #endif
 
     // runs tasks at the prescribed interval, each call can trigger at most a single process
     // processes that are already running are ignored so it's ok to poll() within a process
     void yield();
+  void yield(unsigned long milliseconds);
+
 
   private:
     // keep track of the range of priorities so we don't waste cycles looking at empty ones
@@ -240,6 +242,3 @@ class Tasks {
     uint8_t handleSearch     = 255;
     Task    *task[TASKS_MAX];
 };
-
-// short P macro to embed polling
-#define Y tasks.yield()

@@ -146,7 +146,6 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   //            Change standard date to MM/DD/YY
   //            Return: 0 on failure, 1 on success
   if (cmdP("SC"))  {
-    tasks_mutex_enter(MX_CLOCK_CMD);
     GregorianDate date = convert.strToDate(parameter);
     if (date.valid) {
       ut1 = gregorianToJulianDay(date);
@@ -159,14 +158,12 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       dateIsReady = true;
       if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
     } else *commandError = CE_PARAM_FORM;
-    tasks_mutex_exit(MX_CLOCK_CMD);
   } else
 
   //  :SG[sHH]# or :SG[sHH:MM]# (where MM is 00, 30, or 45)
   //            Set the number of hours added to local time to yield UTC
   //            Return: 0 failure, 1 success
   if (cmdP("SG")) {
-    tasks_mutex_enter(MX_CLOCK_CMD);
     double hour;
     if (convert.tzToDouble(&hour, parameter)) {
       if (hour >= -13.75 || hour <= 12.0) {
@@ -174,14 +171,12 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
         //nv.update(EE_sites+currentSite*25 + 8, b);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
-    tasks_mutex_exit(MX_CLOCK_CMD);
   } else
 
   //  :SL[HH:MM:SS]# or :SL[HH:MM:SS.SSS]#
   //            Set the local Time
   //            Return: 0 failure, 1 success
   if (cmdP("SL"))  {
-    tasks_mutex_enter(MX_CLOCK_CMD);
     double hour;
     if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
       #ifndef ESP32
@@ -192,7 +187,6 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       timeIsReady = true;
       if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
     } else *commandError = CE_PARAM_FORM;
-    tasks_mutex_exit(MX_CLOCK_CMD);
   } else return false;
 
   return true;

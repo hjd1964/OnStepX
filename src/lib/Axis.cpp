@@ -181,6 +181,12 @@ double Axis::getTargetCoordinate() {
   return steps/spm;
 }
 
+void Axis::moveTargetCoordinate(int value) {
+  noInterrupts();
+  targetSteps += value;
+  interrupts();
+}
+
 void Axis::setFrequencyMax(double frequency) {
   maxFreq = frequency*spm;
   if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;

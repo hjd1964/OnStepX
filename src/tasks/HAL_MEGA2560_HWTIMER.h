@@ -140,13 +140,6 @@
     HAL_HWTIMER4_FUN = NULL;
   }
 
-  void (*HAL_HWTIMER4_FUN)() = NULL;
-
-  void HAL_HWTIMER4_DONE() {
-    TIMSK5 = 0; // stop hw timer (clear register interrupt flag)
-    HAL_HWTIMER4_FUN = NULL;
-  }
-
   #define HAL_HWTIMER4_SET_PERIOD() OCR5A = _nextPeriod4
   ISR(TIMER5_COMPA_vect) {
     TASKS_HWTIMER4_PROFILER_PREFIX;
