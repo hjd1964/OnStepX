@@ -23,20 +23,6 @@ typedef struct JulianDate {
   double   timezone;
 } JulianDate;
 
-typedef struct Latitude {
-  double   value;
-  double   sine;
-  double   cosine;
-  double   absval;
-  double   sign;
-} Latitude;
-
-typedef struct Site {
-  Latitude latitude;
-  double   longitude;
-  bool     ready;
-} Site;
-
 class Convert {
   public:
     // convert string in format MM/DD/YY to julian date

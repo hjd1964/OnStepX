@@ -18,10 +18,6 @@ void Transform::init(int mountType) {
   this->mountType = mountType;
 }
 
-void Transform::setSite(Site site) {
-  this->site = site;
-}
-
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   tasks_mutex_enter(MX_TRANSFORM_CMD);
   Coordinate result = *coord;

@@ -12,15 +12,11 @@ class Telescope {
     void init();
 
     // update the location for time keeping and coordinate conversion
-    void setSite(Site site);
     void updateSite();
 
     // handle observatory commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-  private:
-    Site site;
-    
     // equipment
     #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
       Mount mount;
@@ -37,5 +33,8 @@ class Telescope {
     #if AXIS6_DRIVER_MODEL != OFF
       Focuser focuser3;
     #endif
+
+  private:
+    Site site;
 
 };

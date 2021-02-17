@@ -227,6 +227,11 @@ bool Task::isDurationComplete() {
   return (duration > 0 && ((long)(millis() - (start_time + duration)) >= 0));
 }
 
+void Task::setDurationComplete() {
+  duration = 1;
+  start_time--;
+}
+
 void Task::setRepeat(bool repeat) {
   if (hardwareTimer) return;
   this->repeat = repeat;
@@ -389,6 +394,12 @@ void Tasks::setFrequency(uint8_t handle, double freq) {
 void Tasks::setDuration(uint8_t handle, unsigned long duration) {
   if (handle != 0 && allocated[handle - 1]) {
     task[handle - 1]->setDuration(duration);
+  }
+}
+
+void Tasks::setDurationComplete(uint8_t handle) {
+  if (handle != 0 && allocated[handle - 1]) {
+    task[handle - 1]->setDurationComplete();
   }
 }
 

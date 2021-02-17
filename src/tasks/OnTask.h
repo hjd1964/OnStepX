@@ -79,6 +79,7 @@ class Task {
 
     void setDuration(unsigned long duration);
     bool isDurationComplete();
+    void setDurationComplete();
 
     void setRepeat(bool repeat);
 
@@ -135,8 +136,8 @@ class Tasks {
     // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
     // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
     // priority: software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks.
-  //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
-  //           round robin within their priority levels, the most recently serviced task will be last visited again
+    //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
+    //           round robin within their priority levels, the most recently serviced task will be last visited again
     // callback: function to handle this tasks processing
     // returns:  handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
@@ -157,7 +158,7 @@ class Tasks {
 
     // remove process task
     // handle: task handle
-    // note:   do not remove an task if the task process is running
+    // note:   do not remove a task if the task process is running
     void remove(uint8_t handle);
 
     // set process period ms
@@ -195,6 +196,11 @@ class Tasks {
 
     // change process duration (milliseconds,) use 0 for disabled
     void setDuration(uint8_t handle, unsigned long duration);
+
+    // late removal of process task
+    // handle: task handle
+    // note:   removes a task process, even if it is running
+    void setDurationComplete(uint8_t handle);
 
     // change process repeat (true/false)
     void setRepeat(uint8_t handle, bool repeat);

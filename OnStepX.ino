@@ -49,7 +49,7 @@
 Tasks tasks;
 
 #include "src/lib/Telescope.h"
-Telescope telescope;
+extern Telescope telescope;
 
 #ifdef SERIAL_A
   extern void processCmdsA();

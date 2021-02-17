@@ -19,11 +19,26 @@ typedef struct Coordinate {
     PierSide pierSide;
 } Coordinate;
 
+typedef struct Latitude {
+  double   value;
+  double   sine;
+  double   cosine;
+  double   absval;
+  double   sign;
+} Latitude;
+
+typedef struct Site {
+  Latitude latitude;
+  double   longitude;
+  bool     ready;
+} Site;
+
 class Transform {
   public:
+    Site site;
+
     // setup for coordinate transformation
     void init(int mountType);
-    void setSite(Site site);
 
     // converts between Mount and Native coordinates
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
@@ -61,7 +76,6 @@ class Transform {
 
   private:
     int mountType;
-    Site site;
 
     double cot(double n);
     

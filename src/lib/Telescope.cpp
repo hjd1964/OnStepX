@@ -19,37 +19,27 @@ extern Clock clock;
 #include "Mount.h"
 #include "Telescope.h"
 
+Telescope telescope;
+
 void Telescope::init() {
   // Site
-  Site newSite;
-  newSite.latitude.value = degToRad(40.0);
-  newSite.longitude      = degToRad(75.2);
-  setSite(newSite);
+  site.latitude.value = degToRad(40.0);
+  site.longitude      = degToRad(75.2);
+  updateSite();
 
-  // Coordinate transformation
   transform.init(MOUNT_TYPE);
-
-  // Clock
-  clock.init(site);
-
-  // Mount
+  clock.init();
   mount.init(MOUNT_TYPE);
 }
 
-void Telescope::setSite(Site site) {
-  this->site = site;
-  updateSite();
-}
-
 void Telescope::updateSite() {
-  this->site.latitude.cosine = cos(site.latitude.value);
-  this->site.latitude.sine   = sin(site.latitude.value);
-  this->site.latitude.absval = fabs(site.latitude.value);
-  if (this->site.latitude.value >= 0) this->site.latitude.sign = 1; else this->site.latitude.sign = -1;
-  this->site.longitude = site.longitude;
-
-  transform.setSite(site);
-  clock.setSite(site);
+  site.latitude.cosine = cos(site.latitude.value);
+  site.latitude.sine   = sin(site.latitude.value);
+  site.latitude.absval = fabs(site.latitude.value);
+  if (site.latitude.value >= 0) site.latitude.sign = 1; else site.latitude.sign = -1;
+  site.longitude = site.longitude;
+  transform.site = site;
+  clock.updateSite();
 }
     
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -132,3 +122,29 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
 
   return true;
 }
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+  void mountMonitorWrapper() {
+    telescope.mount.monitor();
+  }
+#endif
+#if AXIS3_DRIVER_MODEL != OFF
+  void rotatorMonitorWrapper() {
+    telescope.rotator.monitor();
+  }
+#endif
+#if AXIS4_DRIVER_MODEL != OFF
+  void focuser1MonitorWrapper() {
+    telescope.focuser1.monitor();
+  }
+#endif
+#if AXIS5_DRIVER_MODEL != OFF
+  void focuser1MonitorWrapper() {
+    telescope.focuser2.monitor();
+  }
+#endif
+#if AXIS6_DRIVER_MODEL != OFF
+  void focuser1MonitorWrapper() {
+    telescope.focuser3.monitor();
+  }
+#endif

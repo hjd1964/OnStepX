@@ -16,8 +16,8 @@
 #include "Axis.h"
 
 typedef struct Limits {
-  double horizon;
-  double overhead;
+  double minAltitude;
+  double maxAltitude;
   double pastMeridianE;
   double pastMeridianW;
 } Limits;
@@ -25,7 +25,9 @@ typedef struct Limits {
 enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
 enum TrackingState    {TS_NONE, TS_SIDEREAL};
-enum GotoState        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_HOME, GS_GOTO_PARK, GS_GOTO_ABORT};
+enum GotoState        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_ABORT};
+enum GotoStage        {GG_NONE, GG_START, GG_WAYPOINT, GG_DESTINATION};
+enum GotoType         {GT_NONE, GT_HOME, GT_PARK};
 enum GuideState       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
 enum GuideRate        {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
 enum ParkState        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
@@ -38,16 +40,25 @@ class Mount {
     // handle telescope commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
+    // the goto monitor
+    void monitor();
+
   private:
     // check mount status ahead of sync or goto
     CommandError validateGoto();
     CommandError validateGotoCoords(Coordinate coords);
 
+    CommandError setMountTarget(Coordinate *coords);
+
     // sync. to equatorial coordinates
-    CommandError syncEqu(Coordinate target);
-    
+    CommandError syncEqu(Coordinate *coords);
+
     // goto equatorial coordinates
-    CommandError gotoEqu(Coordinate target);
+    CommandError gotoEqu(Coordinate *coords);
+
+    void setWaypoint();
+
+    void pierSide();
 
     // update where we are pointing *now*
     void updatePosition();
@@ -57,9 +68,6 @@ class Mount {
 
     // clear any general errors as appropriate for a reset
     void resetGeneralErrors();
-
-    
-    Coordinate current, target;
 
     uint8_t mountType          = 0;
     bool    tracking           = false;
@@ -71,6 +79,11 @@ class Mount {
     bool    safetyLimitsOn     = false;
     bool    syncToEncodersOnly = false;
 
+    Coordinate home;
+    Coordinate gotoTarget;
+    Coordinate current, start, destination, target;
+
+    double radsPerCentisecond = 0.0;
     Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15) };
 
     #if TRACK_REFRACTION_RATE_DEFAULT == ON
@@ -92,9 +105,13 @@ class Mount {
     TrackingState trackingState = TS_NONE;
 
     GotoState gotoState         = GS_NONE;
+    GotoStage gotoStage         = GG_START;
     GotoState gotoStateAbort    = GS_NONE;
     GotoState gotoStateLast     = GS_NONE;
-
+    uint8_t monitorTaskHandle   = 0;
+    double gotoTargetAxis1      = 0.0;
+    double gotoTargetAxis2      = 0.0;
+  
     GuideState guideState       = GU_NONE;
     GuideRate guideRate         = GR_20X;
     GuideRate pulseGuideRate    = GR_1X;

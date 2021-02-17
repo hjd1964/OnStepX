@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// observatory site and time
+// observatory time
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../../Config.h"
@@ -21,9 +21,7 @@ Clock clock;
 void clockTickWrapper() { clock.tick(); }
 volatile unsigned long centisecondLAST;
 
-void Clock::init(Site site) {
-  setSite(site);
-
+void Clock::init() {
   GregorianDate date;
   date.year = 2021; date.month  = 2; date.day = 7;
   date.hour = 12;   date.minute = 0; date.second = 0; date.centisecond = 0;
@@ -41,6 +39,12 @@ void Clock::init(Site site) {
   setPeriodSubMicros(period); // period in SubMicros per second
 }
 
+void Clock::updateSite() {
+  // same date and time, just calculates the sidereal time again
+  ut1.hour = getTime();
+  setSiderealTime(ut1, julianDateToLAST(ut1));
+}
+
 void Clock::setPeriodSubMicros(unsigned long period) {
   tasks.setPeriodSubMicros(handle, lround(period/100.0));
   this->period = period;
@@ -51,14 +55,6 @@ unsigned long Clock::getPeriodSubMicros() {
   return period;
 }
 
-void Clock::setSite(Site site) {
-  this->site = site;
-
-  // same date and time, just calculates the sidereal time again
-  ut1.hour = getTime();
-  setSiderealTime(ut1, julianDateToLAST(ut1));
-}
-    
 bool Clock::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = convert.precision;
 
@@ -239,7 +235,7 @@ double Clock::backInHourAngle(double time) {
 
 double Clock::julianDateToLAST(JulianDate julianDate) {
   double gast = julianDateToGAST(julianDate);
-  return backInHours(gast - radToHrs(site.longitude));
+  return backInHours(gast - radToHrs(transform.site.longitude));
 }
 
 double Clock::julianDateToGAST(JulianDate julianDate) {

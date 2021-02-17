@@ -55,10 +55,11 @@ class Axis {
     // set origin coordinate as current location
     void markOriginCoordinate();
 
-    // set and get target coordinate, in "measures" (degrees, microns, etc.)
+    // target coordinate, in "measures" (degrees, microns, etc.)
+    void moveTargetCoordinate(double value);
     void setTargetCoordinate(double value);
     double getTargetCoordinate();
-    void moveTargetCoordinate(int value);
+    bool nearTarget();
 
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency);

@@ -168,7 +168,8 @@ void Axis::markOriginCoordinate() {
 }
 
 void Axis::setTargetCoordinate(double value) {
-  long steps = lround(value*spm);
+  target = value*spm;
+  long steps = lround(target);
   noInterrupts();
   targetSteps = steps - indexSteps;
   interrupts();
@@ -181,10 +182,16 @@ double Axis::getTargetCoordinate() {
   return steps/spm;
 }
 
-void Axis::moveTargetCoordinate(int value) {
+void Axis::moveTargetCoordinate(double value) {
+  target += value*spm;
+  long steps = lround(target);
   noInterrupts();
-  targetSteps += value;
+  targetSteps = steps - indexSteps;
   interrupts();
+}
+
+bool Axis::nearTarget() {
+  return fabs((motorSteps + backlashSteps) - targetSteps) <= step * 2.0;
 }
 
 void Axis::setFrequencyMax(double frequency) {

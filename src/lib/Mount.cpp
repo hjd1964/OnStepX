@@ -20,16 +20,18 @@ extern Transform transform;
 extern GeneralErrors generalErrors;
 #include "../StepDrivers/StepDrivers.h"
 #include "Axis.h"
+extern Axis axis1;
+extern Axis axis2;
 #include "Clock.h"
 extern Clock clock;
 #include "Mount.h"
-extern Axis axis1;
-extern Axis axis2;
 
 void Mount::init(int8_t mountType) {
   VF("MSG: Mount::init, type "); VL(mountType);
   this->mountType = mountType;
   if (mountType == GEM) meridianFlip = MF_ALWAYS;
+
+  radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
 
   // setup axis1
   axis1.init(1);
@@ -68,8 +70,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
   if (cmd("CS") || cmd("CM")) {
     CommandError e;
-    //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(target);
-    e = syncEqu(target);
+    //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(gotoTarget);
+    e = syncEqu(&gotoTarget);
     if (command[1] == 'M') {
       if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) strcpy(reply,"N/A");
@@ -90,7 +92,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //              8=already in motion
   //              9=unspecified error
   if (cmd("MS"))  {
-    CommandError e = gotoEqu(target);
+    CommandError e = gotoEqu(&gotoTarget);
     strcpy(reply,"0");
     if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
     if (e == CE_NONE) reply[0] = '0';
@@ -116,7 +118,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: sDD*MM'SS.SSS# (high precision)
   if (cmdH("Ga")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, radToDeg(target.a), false, precisionMode);
+    convert.doubleToHms(reply, radToDeg(gotoTarget.a), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -136,7 +138,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: HH:MM:SS.SSS# (high precision)
   if (cmdH("Gd")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToDms(reply, radToDeg(target.d), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(gotoTarget.d), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -155,7 +157,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   // :GrH#      Returns: HH:MM:SS.SSSS# (high precision)
   if (cmdH("Gr")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToHms(reply, radToHrs(target.r), false, precisionMode);
+    convert.doubleToHms(reply, radToHrs(gotoTarget.r), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -291,7 +293,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: DDD*MM'SS.SSS# (high precision)
   if (cmdH("Gz")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    convert.doubleToDms(reply, radToDeg(target.z), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(gotoTarget.z), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -300,8 +302,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sa")) {
-    if (!convert.dmsToDouble(&target.a, parameter, true)) *commandError = CE_PARAM_RANGE;
-    target.a = degToRad(target.a);
+    if (!convert.dmsToDouble(&gotoTarget.a, parameter, true)) *commandError = CE_PARAM_RANGE;
+    gotoTarget.a = degToRad(gotoTarget.a);
   } else
 
   //  :Sd[sDD*MM]# or :Sd[sDD*MM:SS]# or :Sd[sDD*MM:SS.SSS]#
@@ -309,8 +311,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sd")) {
-    if (!convert.dmsToDouble(&target.d, parameter, true)) *commandError = CE_PARAM_RANGE;
-    target.d = degToRad(target.d);
+    if (!convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE;
+    gotoTarget.d = degToRad(gotoTarget.d);
   } else
 
   //  :Sr[HH:MM.T]# or :Sr[HH:MM:SS]# or :Sr[HH:MM:SS.SSSS]#
@@ -318,8 +320,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sr")) {
-    if (!convert.hmsToDouble(&target.r, parameter)) *commandError = CE_PARAM_RANGE;
-    target.r = hrsToRad(target.r);
+    if (!convert.hmsToDouble(&gotoTarget.r, parameter)) *commandError = CE_PARAM_RANGE;
+    gotoTarget.r = hrsToRad(gotoTarget.r);
   } else
 
   //  :ST[H.H]# Set Tracking Rate in Hz where 60.0 is solar rate
@@ -341,8 +343,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sz")) {
-    if (!convert.dmsToDouble(&target.z, parameter, false)) *commandError = CE_PARAM_RANGE;
-    target.z = degToRad(target.z);
+    if (!convert.dmsToDouble(&gotoTarget.z, parameter, false)) *commandError = CE_PARAM_RANGE;
+    gotoTarget.z = degToRad(gotoTarget.z);
   } else
 
   // T - Tracking Commands
@@ -399,129 +401,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   } else return false;
 
   return true;
-}
-
-// check if goto/sync is valid
-CommandError Mount::validateGoto() {
-  // Check state
-  if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
-  if (parkState != PS_UNPARKED)                 return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                    return CE_MOUNT_IN_MOTION;
-  if (gotoState == GS_GOTO_SYNC)                return CE_MOUNT_IN_MOTION;
-  if (gotoState != GS_NONE)                     return CE_SLEW_IN_SLEW;
-  return CE_NONE;
-}
-
-CommandError Mount::validateGotoCoords(Coordinate coords) {
-  transform.equToHor(&coords);
-  // Check coordinates
-//if (coords.a < limits.getMinAltitude())       return CE_GOTO_ERR_BELOW_HORIZON;
-//if (coords.a > limits.getMaxAltitude())       return CE_GOTO_ERR_ABOVE_OVERHEAD;
-  if (AXIS2_TANGENT_ARM == OFF && mountType != ALTAZM) {
-    if (coords.d < axis2.getMinCoordinate())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (coords.d > axis2.getMaxCoordinate())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  }
-  if (coords.h < axis1.getMinCoordinate())      return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (coords.h > axis1.getMaxCoordinate())      return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  return CE_NONE;
-}
-
-// syncs the telescope/mount to the sky
-CommandError Mount::syncEqu(Coordinate target) {
-  CommandError e = validateGoto();
-  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { tracking = true; axis1.enable(true); axis2.enable(true); e = validateGoto(); }
-  if (e != CE_NONE) return e;
-
-  double a1, a2;
-  transform.nativeToMount(&target, &a1, &a2);
-
-  e = validateGotoCoords(target);
-  if (e != CE_NONE) return e;
-
-  // east side of pier - we're in the western sky and the HA's are positive
-  // west side of pier - we're in the eastern sky and the HA's are negative
-  updatePosition();
-  target.pierSide = current.pierSide;
-  if (meridianFlip == MF_ALWAYS) {
-    if (atHome) { if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST; } else
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-      if (preferredPierSideDefault == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
-      if (preferredPierSideDefault == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
-    #endif
-      {// preferredPierSideDefault == BEST
-        if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
-        if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
-      }
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == OFF
-      if (!atHome && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    #endif
-  } else {
-    // east side of pier is always the default polar-home position
-    target.pierSide = PIER_SIDE_EAST;
-  }
-
-  transform.mountToInstrument(&target, &a1, &a2);
-  axis1.setInstrumentCoordinate(a1);
-  axis2.setInstrumentCoordinate(a2);
-
-  safetyLimitsOn = true;
-  syncToEncodersOnly = true;
-
-  VLF("MSG: Mount::syncEqu, instrument coordinates updated");
-
-  return CE_NONE;
-}
-
-// start a goto
-CommandError Mount::gotoEqu(Coordinate target) {
-  CommandError e = validateGoto();
-  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { tracking = true; axis1.enable(true); axis2.enable(true); e = validateGoto(); }
-  if (e != CE_NONE) return e;
-
-  double a1, a2;
-  transform.nativeToMount(&target, &a1, &a2);
-
-  e = validateGotoCoords(target);
-  if (e != CE_NONE) return e;
-
-  // east side of pier - we're in the western sky and the HA's are positive
-  // west side of pier - we're in the eastern sky and the HA's are negative
-  updatePosition();
-  target.pierSide = current.pierSide;
-  if (meridianFlip == MF_ALWAYS) {
-    if (atHome) { if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST; } else
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-      if (preferredPierSideDefault == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
-      if (preferredPierSideDefault == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
-    #endif
-      {// preferredPierSideDefault == BEST
-        if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
-        if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
-      }
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == OFF
-      if (!atHome && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    #endif
-  } else {
-    // east side of pier is always the default polar-home position
-    target.pierSide = PIER_SIDE_EAST;
-  }
-
-  transform.mountToInstrument(&target, &a1, &a2);
-  
-  axis1.setTracking(false);
-  axis2.setTracking(false);
-  axis1.setTargetCoordinate(a1);
-  axis2.setTargetCoordinate(a2);
-  axis1.setFrequency(siderealToRad(50));
-  axis2.setFrequency(siderealToRad(50));
-
-  safetyLimitsOn = true;
-  syncToEncodersOnly = true;
-
-  VLF("MSG: Mount::syncEqu, instrument coordinates updated");
-
-  return CE_NONE;
 }
 
 void Mount::updatePosition() {
