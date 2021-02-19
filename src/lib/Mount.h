@@ -67,8 +67,13 @@ class Mount {
     // this updates differiental tracking rates for refraction, pointing model, and alt/azm tracking
     void updateTrackingRates();
 
+    // estimate average microseconds per step lower limit
+    double usPerStepLowerLimit();
+
     // clear any general errors as appropriate for a reset
     void resetGeneralErrors();
+
+    double     timerRateRatio      = 1.0;
 
     uint8_t    mountType           = 0;
     bool       soundEnabled        = false;
@@ -104,8 +109,9 @@ class Mount {
     uint8_t    monitorTaskHandle   = 0;
     double     gotoTargetAxis1     = 0.0;
     double     gotoTargetAxis2     = 0.0;
-    double     maxRateCurrent      = 16.0;
-    double     maxRateDefault      = 16.0;
+    double     usPerStepCurrent    = 64.0;
+    double     usPerStepDefault    = 64.0;
+    double     usPerStepBase       = 128.0;
 
     // limits
     Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };
@@ -115,6 +121,7 @@ class Mount {
     Coordinate home;
     bool       atHome              = true;
     bool       waitingHome         = false;
+    bool       waitingHomeContinue = false;
     bool       pauseHome           = false;
   
     // guiding

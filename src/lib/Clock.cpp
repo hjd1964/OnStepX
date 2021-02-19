@@ -90,7 +90,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
   // :GG#       Get UTC offset time, hours and minutes to add to local time to convert to UTC
   //            Returns: [s]HH:MM#
   if (cmd("GG"))  {
-    convert.doubleToHms(reply, ut1.timezone, false, PM_LOWEST);
+    convert.doubleToHms(reply, ut1.timezone, true, PM_LOWEST);
     *numericReply=false;
   } else
 

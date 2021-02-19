@@ -41,6 +41,9 @@ class Axis {
     // get steps per measure
     double getStepsPerMeasure();
 
+    // get tracking mode steps per goto mode step
+    int getStepsPerStepGoto();
+
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
 
@@ -67,8 +70,9 @@ class Axis {
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency);
 
-    // causes a movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
+    // causes movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency);
+    double getFrequency();
 
     // set and get tracking state (movement of motor to target)
     void setTracking(bool tracking);
@@ -133,5 +137,6 @@ class Axis {
     const AxisPins       Pins         = {OFF, OFF, OFF, false, false, false};
     const DriverPins     ModePins     = {OFF, OFF, OFF, OFF, OFF};
     const DriverSettings ModeSettings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
+
     StepDriver stepDriver{ModePins, ModeSettings};
 };

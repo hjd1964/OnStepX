@@ -97,7 +97,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //  :St[sDD*MM]# or :St[sDD*MM:SS]# or :St[sDD*MM:SS.SSS]#
   //            Set current site latitude
   //            Return: 0 failure, 1 success
-  if (cmd("St"))  {
+  if (cmdP("St"))  {
     if (convert.dmsToDouble(&value, parameter, true)) {
       site.latitude.value = degToRad(value);
       updateSite();
@@ -107,7 +107,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //  :Sg[(s)DDD*MM]# or :Sg[(s)DDD*MM:SS]# or :Sg[(s)DDD*MM:SS.SSS]#
   //            Set current site longitude, east longitudes can be negative or > 180 degrees
   //            Return: 0 failure, 1 success
-  if (cmd("Sg"))  {
+  if (cmdP("Sg"))  {
     if (parameter[0] == '-' || parameter[0] == '+') i = 1; else i = 0;
     if (convert.dmsToDouble(&value, (char *)&parameter[i], false)) {
       if (parameter[0] == '-') site.longitude = -site.longitude;

@@ -12,6 +12,12 @@ extern Tasks tasks;
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
+#if STEPS_PER_WORM_ROTATION == 0
+  #define AXIS1_PEC ON
+#else
+  #define AXIS1_PEC OFF
+#endif
+
 #include "../coordinates/Convert.h"
 extern Convert convert;
 #include "../coordinates/Transform.h"
@@ -21,12 +27,17 @@ extern GeneralErrors generalErrors;
 #include "../StepDrivers/StepDrivers.h"
 #include "Axis.h"
 extern Axis axis1;
-extern AxisSettings axis1Settings;
 extern Axis axis2;
-extern AxisSettings axis2Settings;
 #include "Clock.h"
 extern Clock clock;
 #include "Mount.h"
+
+#if AXIS1_DRIVER_MODEL != OFF
+  AxisSettings         axis1Settings           = {AXIS1_STEPS_PER_DEGREE*RAD,AXIS1_DRIVER_REVERSE,degToRad(AXIS1_LIMIT_MIN),degToRad(AXIS1_LIMIT_MAX)};
+#endif
+#if AXIS2_DRIVER_MODEL != OFF
+  AxisSettings         axis2Settings           = {AXIS2_STEPS_PER_DEGREE*RAD,AXIS2_DRIVER_REVERSE,degToRad(AXIS2_LIMIT_MIN),degToRad(AXIS2_LIMIT_MAX)};
+#endif
 
 void Mount::init(int8_t mountType) {
   VF("MSG: Mount::init, type "); VL(mountType);
@@ -177,32 +188,30 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: s#
   if (cmd("GU"))  {
     int i = 0;
-    if (trackingState == TS_NONE)            reply[i++]='n';                                             // [n]ot tracking
-    if (gotoState == GS_NONE)                reply[i++]='N';                                             // [N]o goto
+    if (trackingState == TS_NONE)            reply[i++]='n';                     // [n]ot tracking
+    if (gotoState == GS_NONE)                reply[i++]='N';                     // [N]o goto
     if (parkState == PS_UNPARKED)            reply[i++]='p'; else
     if (parkState == PS_PARKING)             reply[i++]='I'; else
     if (parkState == PS_PARKED)              reply[i++]='P'; else
-    if (parkState == PS_PARK_FAILED)         reply[i++]='F';                                             // not [p]arked, parking [I]n-progress, [P]arked, Park [F]ailed
-    if (pecRecorded)                         reply[i++]='R';                                             // PEC data has been [R]ecorded
-  //if (syncToEncodersOnly)                  reply[i++]='e';                                             // sync to [e]ncoders only
-    if (atHome)                              reply[i++]='H';                                             // at [H]ome
-  //if (ppsSynced)                           reply[i++]='S';                                             // PPS [S]ync
-    if (guideState != GU_NONE)               reply[i++]='g';                                             // [g]uide active
-    if (guideState != GU_PULSE_GUIDE)        reply[i++]='G';                                             // pulse [G]uide active
+    if (parkState == PS_PARK_FAILED)         reply[i++]='F';                     // not [p]arked, parking [I]n-progress, [P]arked, Park [F]ailed
+    if (pecRecorded)                         reply[i++]='R';                     // PEC data has been [R]ecorded
+  //if (syncToEncodersOnly)                  reply[i++]='e';                     // sync to [e]ncoders only
+    if (atHome)                              reply[i++]='H';                     // at [H]ome
+  //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
+    if (guideState != GU_NONE)               reply[i++]='g';                     // [g]uide active
+    if (guideState != GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
     if (mountType != ALTAZM) {
-      if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }                           // [r]efr enabled [s]ingle axis
-      if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                                           // [r]efr enabled
-      if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }                           // on[t]rack enabled [s]ingle axis
-      if (rateCompensation == RC_FULL_BOTH){ reply[i++]='t'; }                                           // on[t]rack enabled
+      if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }   // [r]efr enabled [s]ingle axis
+      if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                   // [r]efr enabled
+      if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }   // on[t]rack enabled [s]ingle axis
+      if (rateCompensation == RC_FULL_BOTH){ reply[i++]='t'; }                   // on[t]rack enabled
     }
-    if (waitingHome)                         reply[i++]='w';                                             // [w]aiting at home 
-    if (pauseHome)                           reply[i++]='u';                                             // pa[u]se at home enabled?
-    if (soundEnabled)                        reply[i++]='z';                                             // bu[z]zer enabled?
-    if (mountType==GEM && autoMeridianFlip)  reply[i++]='a';                                             // [a]uto meridian flip
+    if (waitingHome)                         reply[i++]='w';                     // [w]aiting at home 
+    if (pauseHome)                           reply[i++]='u';                     // pa[u]se at home enabled?
+    if (soundEnabled)                        reply[i++]='z';                     // bu[z]zer enabled?
+    if (mountType==GEM && autoMeridianFlip)  reply[i++]='a';                     // [a]uto meridian flip
     #if AXIS1_PEC == ON
-      if (mountType != ALTAZM) {
-        const char *pch = PECStatusStringAlt;  reply[i++]=pch[pecStatus];                                  // PEC Status one of "/,~;^" (/)gnore, ready to (,)lay, (~)laying, ready to (;)ecord, (^)ecording
-      }
+      if (mountType != ALTAZM)               reply[i++]="/,~;^"[(int)pecState];  // PEC Status (/)gnore, ready (,)lay, (~)laying, ready (;)ecord, (^)ecording
     #endif
     // provide mount type
     if (mountType == GEM)                    reply[i++]='E'; else
@@ -210,9 +219,9 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (mountType == ALTAZM)                 reply[i++]='A';
 
     // provide pier side info.
-    if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                                      // pier side n[o]ne
-    if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                                      // pier side eas[T]
-    if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                                           // pier side [W]est
+    if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // pier side n[o]ne
+    if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // pier side eas[T]
+    if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // pier side [W]est
 
     // provide pulse-guide rate
     reply[i++]='0'+pulseGuideRate;
@@ -286,12 +295,12 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     switch (parameter[1]) {
 //    case '0': dtostrf(guideRates[getPulseGuideRateSelection()]/15.0,2,2,reply); break; // pulse-guide rate
 //    case '1': sprintf(reply,"%d",pecValue); break;                             // pec analog value
-//    case '2': dtostrf(maxRateCurrent,3,3,reply); break;                        // MaxRate (current)
-//    case '3': dtostrf(maxRateDefault,3,3,reply); break;                        // MaxRate (default)
+      case '2': dtostrf(usPerStepCurrent,3,3,reply); break;                      // MaxRate (current)
+      case '3': dtostrf(usPerStepDefault,3,3,reply); break;                      // MaxRate (default)
       case '4': sprintf(reply,"%d%s",(int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
       case '5': sprintf(reply,"%d",(int)limits.autoMeridianFlip); break;         // autoMeridianFlip
       case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;     // preferred pier side
-      case '7': dtostrf((1000000.0/maxRateCurrent)/degToRad(axis1.getStepsPerMeasure()),3,1,reply); break; // slew speed
+      case '7': dtostrf((1000000.0/usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure()),3,1,reply); break; // slew speed
       case '8':                                                                  // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
         if (ROTATOR == ON) {
           if (mountType == ALTAZM) strcpy(reply,"D"); else strcpy(reply,"R");
@@ -316,7 +325,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   if (cmdP("GX") && parameter[0] == 'E') { // En: Get settings
     *numericReply = false;
     switch (parameter[1]) {
-//    case '1': dtostrf((double)maxRateBaseActual,3,3,reply); break;
+//    case '1': dtostrf((double)usPerStepBaseActual,3,3,reply); break;
 //    case '2': dtostrf(SLEW_ACCELERATION_DIST,2,1,reply); break;
 //    case '3': sprintf(reply,"%ld",lround(TRACK_BACKLASH_RATE)); break;
       case '4': sprintf(reply,"%ld",lround(axis1Settings.stepsPerMeasure/RAD)); break;
@@ -334,6 +343,17 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; break;
       case 'F': if (AXIS2_TANGENT_ARM == ON) reply[0] = '1'; else reply[0] = '0'; *supressFrame = true; break;
 //    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply,"%d",(int)nv.read(EE_mountType)); break; // return the mount type
+    default:
+      *numericReply = true;
+      *commandError = CE_CMD_UNKNOWN;
+    }
+  } else
+
+  if (parameter[0] == 'F') { // Fn: Debug
+    *numericReply = false;
+    switch (parameter[1]) {
+      case '3': dtostrf(axis1.getFrequency(),3,6,reply); break;                       // Axis1 final tracking rate Hz
+      case '4': dtostrf(axis2.getFrequency(),3,6,reply); break;                       // Axis2 final tracking rate Hz
     default:
       *numericReply = true;
       *commandError = CE_CMD_UNKNOWN;
@@ -366,7 +386,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sa")) {
-    if (!convert.dmsToDouble(&gotoTarget.a, parameter, true)) *commandError = CE_PARAM_RANGE;
+    if (!convert.dmsToDouble(&gotoTarget.a, parameter, true)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.a = degToRad(gotoTarget.a);
   } else
 
@@ -375,7 +395,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sd")) {
-    if (!convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE;
+    if (!convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.d = degToRad(gotoTarget.d);
   } else
 
@@ -413,7 +433,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sr")) {
-    if (!convert.hmsToDouble(&gotoTarget.r, parameter)) *commandError = CE_PARAM_RANGE;
+    if (!convert.hmsToDouble(&gotoTarget.r, parameter)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.r = hrsToRad(gotoTarget.r);
   } else
 
@@ -431,12 +451,129 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     } else *commandError = CE_PARAM_RANGE;
   } else
 
+  if (cmdP("SX") && parameter[0] == '9') { // 9n: Misc.
+    switch (parameter[1]) {
+      case '2': // set new slew rate (returns 1 success or 0 failure)
+        if (gotoState == GS_NONE && guideState == GU_NONE) {
+          usPerStepCurrent = strtod(&parameter[3],&conv_end);
+          if (usPerStepCurrent < usPerStepBase/2.0) usPerStepCurrent = usPerStepBase/2.0;
+          if (usPerStepCurrent > usPerStepBase*2.0) usPerStepCurrent = usPerStepBase*2.0;
+          if (usPerStepCurrent < usPerStepLowerLimit()) usPerStepCurrent = usPerStepLowerLimit();
+          //nv.writeLong(EE_maxRateL,maxRate);
+          //setAccelerationRates(maxRate);
+        } else *commandError = CE_MOUNT_IN_MOTION;
+      break;
+      case '3': // slew rate preset (returns nothing)
+        *numericReply = false;
+        if (gotoState == GS_NONE && guideState == GU_NONE) {
+          switch (parameter[3]) {
+            case '5': usPerStepCurrent = usPerStepBase*2.0; break; // 50%
+            case '4': usPerStepCurrent = usPerStepBase*1.5; break; // 75%
+            case '3': usPerStepCurrent = usPerStepBase;     break; // 100%
+            case '2': usPerStepCurrent = usPerStepBase/1.5; break; // 150%
+            case '1': usPerStepCurrent = usPerStepBase/2.0; break; // 200%
+            default:  usPerStepCurrent = usPerStepBase;
+          }
+          if (usPerStepCurrent < usPerStepLowerLimit()) usPerStepCurrent = usPerStepLowerLimit();
+
+          //nv.writeLong(EE_maxRateL,maxRate);
+          //setAccelerationRates(maxRate);
+        } else *commandError = CE_MOUNT_IN_MOTION;
+      break;
+      case '5': // autoMeridianFlip
+        if (parameter[3] == '0' || parameter[3] == '1') {
+          autoMeridianFlip = parameter[3]-'0';
+          //nv.write(EE_autoMeridianFlip, autoMeridianFlip);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case '6': // preferred pier side 
+        switch (parameter[3]) {
+          case 'E': preferredPierSide = EAST; break;
+          case 'W': preferredPierSide = WEST; break;
+          case 'B': preferredPierSide = BEST; break;
+          default: *commandError = CE_PARAM_RANGE;
+        }
+      break;
+      case '7': // buzzer
+        if (parameter[3] == '0' || parameter[3] == '1') {
+          soundEnabled = parameter[3] - '0';
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case '8': // pause at home on meridian flip
+        if (parameter[3] == '0' || parameter[3] == '1') {
+          pauseHome = parameter[3]-'0';
+          //nv.write(EE_pauseHome, pauseHome);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case '9': // continue if paused at home
+        if (parameter[3] == '1') { if (waitingHome) waitingHomeContinue = true; } *commandError = CE_PARAM_RANGE;
+      break;
+/*
+      case 'A': // temperature in deg. C
+        float f = strtod(&parameter[3], &conv_end);
+        if (&parameter[3] != conv_end && f >= -100.0 && f < 100.0) {
+          ambient.setTemperature(f);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case 'B': // pressure in mb
+        f=strtod(&parameter[3],&conv_end);
+        if (&parameter[3] != conv_end && f >= 500.0 && f < 1500.0) {
+          ambient.setPressure(f);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case 'C': // relative humidity in % 
+        f=strtod(&parameter[3],&conv_end);
+        if (&parameter[3] != conv_end && f >= 0.0 && f < 100.0) {
+          ambient.setHumidity(f);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case 'D': // altitude 
+        f = strtod(&parameter[3], &conv_end);
+        if (&parameter[3] != conv_end && f >= -100.0 && f < 20000.0) {
+          ambient.setAltitude(f);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+  */
+      default: *commandError = CE_CMD_UNKNOWN;
+    }
+  } else
+
+  if (cmdP("SX") && parameter[0] == 'E') { // En: Setup value
+    long l = strtol(&parameter[3],NULL,10); float degs = l/4.0;
+    switch (parameter[1]) {
+      case '7': // stepsPerWormRotation
+        if (AXIS1_PEC != ON) l = 0;
+        //if (l >= 0 && l < 129600000) nv.writeLong(EE_stepsPerWormRotAxis1,l); else *commandError = CE_PARAM_RANGE;
+      break;
+      case '9': // minutes past meridianE (up to +/- 270 degrees range, within min/max)
+        if (degs >= -270 && degs <= 270) {
+          limits.pastMeridianE = degToRad(degs);
+          if (limits.pastMeridianE < -axis1Settings.max) limits.pastMeridianE = -axis1Settings.max;
+          if (limits.pastMeridianE > -axis1Settings.min) limits.pastMeridianE = -axis1Settings.min;
+          //nv.writeFloat(EE_dpmE, limits.pastMeridianE);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      case 'A': // minutes past meridianW (up to +/- 270 degrees range, within min/max)
+        if (degs >= -270 && degs <= 270) {
+          limits.pastMeridianW = degToRad(degs);
+          if (limits.pastMeridianW < axis1Settings.min) limits.pastMeridianW = axis1Settings.min;
+          if (limits.pastMeridianW > axis1Settings.max) limits.pastMeridianW = axis1Settings.max;
+          //nv.writeFloat(EE_dpmW,limits.pastMeridianW);
+        } else *commandError = CE_PARAM_RANGE;
+      break;
+      default: *commandError = CE_CMD_UNKNOWN;
+      case 'M': // mount type
+        //if (l == 0 || l == GEM || l == FORK || l == ALTAZM) nv.write(EE_mountType,l); else *commandError = CE_PARAM_RANGE;
+      break;
+    }
+  } else
+
   //  :Sz[DDD*MM]# or :Sz[DDD*MM'SS]# or :Sz[DDD*MM'SS.SSS]#
   //            Set Target Azmuith
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sz")) {
-    if (!convert.dmsToDouble(&gotoTarget.z, parameter, false)) *commandError = CE_PARAM_RANGE;
+    if (!convert.dmsToDouble(&gotoTarget.z, parameter, false)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.z = degToRad(gotoTarget.z);
   } else
 
@@ -448,10 +585,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   // :T1#       Track dual axis off (disable Dec tracking on Eq mounts)
   // :T2#       Track dual axis on
   //
-  // :TS#       Track rate solar
-  // :TK#       Track rate king
-  // :TL#       Track rate lunar
-  // :TQ#       Track rate sidereal
+  // :TS#       Track rate solar    60Hz
+  // :TK#       Track rate king     60.136Hz
+  // :TL#       Track rate lunar    57.9Hz
+  // :TQ#       Track rate sidereal 60.164Hz
   //
   // :T+#       Master sidereal clock faster by 0.02 Hertz (stored in EEPROM)
   // :T-#       Master sidereal clock slower by 0.02 Hertz (stored in EEPROM)
@@ -463,24 +600,28 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
-    if (command[1] == 'o' && mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else            // full compensation on
-    if (command[1] == 'r' && mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else            // refraction compensation on
-    if (command[1] == 'n' && mountType != ALTAZM) { rateCompensation = RC_NONE;    }                 // compensation off
-    if (command[1] == '1' && mountType != ALTAZM) {                                                  // dual axis tracking off
-      if (rateCompensation == RC_REFR_BOTH) rateCompensation = RC_REFR_RA; else if (rateCompensation == RC_FULL_BOTH) rateCompensation = RC_FULL_RA;
+    if (command[1] == 'o' && mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else
+    if (command[1] == 'r' && mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else
+    if (command[1] == 'n' && mountType != ALTAZM) { rateCompensation = RC_NONE;    }
+    if (command[1] == '1' && mountType != ALTAZM) {
+      if (rateCompensation == RC_REFR_BOTH) rateCompensation = RC_REFR_RA; else
+      if (rateCompensation == RC_FULL_BOTH) rateCompensation = RC_FULL_RA;
     } else
-    if (command[1] == '2' && mountType != ALTAZM) {                                                  // dual axis tracking on
-      if (rateCompensation == RC_REFR_RA) rateCompensation = RC_REFR_BOTH; else if (rateCompensation == RC_FULL_RA) rateCompensation = RC_FULL_BOTH;
+    if (command[1] == '2' && mountType != ALTAZM) {
+      if (rateCompensation == RC_REFR_RA) rateCompensation = RC_REFR_BOTH; else
+      if (rateCompensation == RC_FULL_RA) rateCompensation = RC_FULL_BOTH;
     } else
-    if (command[1] == 'S') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60);     } else // solar tracking rate 60Hz
-    if (command[1] == 'K') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60.136); } else // king  tracking rate 60.136Hz
-    if (command[1] == 'L') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(57.9);   } else // lunar tracking rate 57.9Hz
-    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);                   } else // sidereal tracking rate 60.164Hz
+    if (command[1] == 'S') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60);     } else
+    if (command[1] == 'K') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60.136); } else
+    if (command[1] == 'L') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(57.9);   } else
+    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);                   } else 
     if (command[1] == '+') { clock.setPeriodSubMicros(clock.getPeriodSubMicros() - hzToSubMicros(0.02)); } else
     if (command[1] == '-') { clock.setPeriodSubMicros(clock.getPeriodSubMicros() + hzToSubMicros(0.02)); } else
-    if (command[1] == 'R') { clock.setPeriodSubMicros(SIDEREAL_PERIOD); } else                       // reset master sidereal clock interval
+    if (command[1] == 'R') { clock.setPeriodSubMicros(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
-      if (parkState != PS_PARKED) { resetGeneralErrors(); trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true); } else *commandError = CE_PARKED;
+      if (parkState != PS_PARKED) {
+        resetGeneralErrors(); trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true);
+      } else *commandError = CE_PARKED;
     } else
     if (command[1] == 'd') {
       if (gotoState == GS_NONE && guideState == GU_NONE) trackingState = TS_NONE; else *commandError = CE_MOUNT_IN_MOTION;
@@ -561,6 +702,39 @@ void Mount::updateTrackingRates() {
   if (trackingState == TS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
   axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1));
   axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2));
+}
+
+// check for platform rate limit (lowest maxRate) in us units
+double Mount::usPerStepLowerLimit() {
+  // for example 16us, this basis is platform/clock-rate specific (for square wave)
+  double r_us = HAL_MAXRATE_LOWER_LIMIT;
+  
+  // higher speed ISR code path?
+  #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
+    r_us=r_us/1.6; // about 1.6x faster than SQW mode in my testing
+  #endif
+  
+  // on-the-fly mode switching used?
+  #if MODE_SWITCH_BEFORE_SLEW == OFF
+    // if this code is enabled, r_us == 27us
+    if (axis1StepsGoto != 1 || axis2StepsGoto != 1) r_us *= 1.7;
+  #endif
+
+  // average required goto us rates for each axis with any micro-step mode switching applied,
+  // if tracking in 32X mode using 4X for gotos (32/4 = 8,) that's an 8x lower true rate so 27/8 = 3.4 is allowed
+  double r_us_axis1 = r_us/axis1.getStepsPerStepGoto();
+  double r_us_axis2 = r_us/axis2.getStepsPerStepGoto();
+  
+  // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
+  // if Axis1 is 10000 step/deg & Axis2 is 20000 steps/deg, Axis2 needs to run 2x speed so we must slow down.
+  // 3.4 on one axis and 6.8 on the other for an average of 5.1
+  r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0;
+ 
+  // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
+  if (r_us < 0.25) { r_us = 0.25; DLF("WRN, usPerStepLowerLimit(): r_us exceeds design limit"); }
+
+  // return rate in us units
+  return r_us;
 }
 
 void Mount::resetGeneralErrors() {

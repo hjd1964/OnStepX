@@ -14,27 +14,24 @@ extern Clock clock;
 #include "Axis.h"
 
 #if AXIS1_DRIVER_MODEL != OFF
-  AxisSettings         axis1Settings           = {AXIS1_STEPS_PER_DEGREE*RAD,AXIS1_DRIVER_REVERSE,degToRad(AXIS1_LIMIT_MIN),degToRad(AXIS1_LIMIT_MAX)};
   const AxisPins       Axis1DriverStepPins     = {AXIS1_STEP_PIN,AXIS1_DIR_PIN,AXIS1_ENABLE_PIN,false,false,true};
   const DriverPins     Axis1DriverModePins     = {AXIS1_M0_PIN,AXIS1_M1_PIN,AXIS1_M2_PIN,AXIS1_M3_PIN,AXIS1_DECAY_PIN};
-  const DriverSettings Axis1DriverModeSettings = {AXIS1_DRIVER_MODEL,AXIS1_DRIVER_MICROSTEPS,AXIS1_DRIVER_MICROSTEPS_GOTO,AXIS1_DRIVER_IHOLD,AXIS1_DRIVER_IRUN,AXIS1_DRIVER_IGOTO,AXIS1_DRIVER_DECAY,AXIS1_DRIVER_DECAY_GOTO};
+  DriverSettings       Axis1DriverModeSettings = {AXIS1_DRIVER_MODEL,AXIS1_DRIVER_MICROSTEPS,AXIS1_DRIVER_MICROSTEPS_GOTO,AXIS1_DRIVER_IHOLD,AXIS1_DRIVER_IRUN,AXIS1_DRIVER_IGOTO,AXIS1_DRIVER_DECAY,AXIS1_DRIVER_DECAY_GOTO};
   StepDriver axis1Driver{Axis1DriverModePins, Axis1DriverModeSettings};
-  Axis       axis1{Axis1DriverStepPins, Axis1DriverModePins, Axis1DriverModeSettings};
+  Axis axis1{Axis1DriverStepPins, Axis1DriverModePins, Axis1DriverModeSettings};
   void moveAxis1() { axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 
 #if AXIS2_DRIVER_MODEL != OFF
-  AxisSettings         axis2Settings           = {AXIS2_STEPS_PER_DEGREE*RAD,AXIS2_DRIVER_REVERSE,degToRad(AXIS2_LIMIT_MIN),degToRad(AXIS2_LIMIT_MAX)};
   const AxisPins       Axis2DriverStepPins     = {AXIS2_STEP_PIN,AXIS2_DIR_PIN,AXIS2_ENABLE_PIN,false,false,true};
   const DriverPins     Axis2DriverModePins     = {AXIS2_M0_PIN,AXIS2_M1_PIN,AXIS2_M2_PIN,AXIS2_M3_PIN,AXIS2_DECAY_PIN};
-  const DriverSettings Axis2DriverModeSettings = {AXIS2_DRIVER_MODEL,AXIS2_DRIVER_MICROSTEPS,AXIS2_DRIVER_MICROSTEPS_GOTO,AXIS2_DRIVER_IHOLD,AXIS2_DRIVER_IRUN,AXIS2_DRIVER_IGOTO,AXIS2_DRIVER_DECAY,AXIS2_DRIVER_DECAY_GOTO};
+  DriverSettings       Axis2DriverModeSettings = {AXIS2_DRIVER_MODEL,AXIS2_DRIVER_MICROSTEPS,AXIS2_DRIVER_MICROSTEPS_GOTO,AXIS2_DRIVER_IHOLD,AXIS2_DRIVER_IRUN,AXIS2_DRIVER_IGOTO,AXIS2_DRIVER_DECAY,AXIS2_DRIVER_DECAY_GOTO};
   StepDriver axis2Driver{Axis2DriverModePins, Axis2DriverModeSettings};
-  Axis       axis2{Axis2DriverStepPins, Axis2DriverModePins, Axis2DriverModeSettings};
+  Axis axis2{Axis2DriverStepPins, Axis2DriverModePins, Axis2DriverModeSettings};
   void moveAxis2() { axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 
 #if AXIS3_DRIVER_MODEL != OFF
-  AxisSettings         axis3Settings           = {AXIS3_STEPS_PER_DEGREE*RAD,AXIS3_DRIVER_REVERSE,degToRad(AXIS3_LIMIT_MIN),degToRad(AXIS3_LIMIT_MAX)};
   const AxisPins       Axis3DriverStepPins     = {AXIS3_STEP_PIN,AXIS3_DIR_PIN,AXIS3_ENABLE_PIN,false,false,true};
   const DriverPins     Axis3DriverModePins     = {AXIS3_M0_PIN,AXIS3_M1_PIN,AXIS3_M2_PIN,AXIS3_M3_PIN,AXIS3_DECAY_PIN};
   const DriverSettings Axis3DriverModeSettings = {AXIS3_DRIVER_MODEL,AXIS3_DRIVER_MICROSTEPS,AXIS3_DRIVER_MICROSTEPS_GOTO,AXIS3_DRIVER_IHOLD,AXIS3_DRIVER_IRUN,AXIS3_DRIVER_IGOTO,AXIS3_DRIVER_DECAY,AXIS3_DRIVER_DECAY_GOTO};
@@ -44,7 +41,6 @@ extern Clock clock;
 #endif
 
 #if AXIS4_DRIVER_MODEL != OFF
-  AxisSettings         axis4Settings           = {AXIS4_STEPS_PER_MICRON,AXIS4_DRIVER_REVERSE,AXIS4_LIMIT_MIN*1000.0,AXIS4_LIMIT_MAX*1000.0};
   const AxisPins       Axis4DriverStepPins     = {AXIS4_STEP_PIN,AXIS4_DIR_PIN,AXIS4_ENABLE_PIN,false,false,true};
   const DriverPins     Axis4DriverModePins     = {AXIS4_M0_PIN,AXIS4_M1_PIN,AXIS4_M2_PIN,AXIS4_M3_PIN,AXIS4_DECAY_PIN};
   const DriverSettings Axis4DriverModeSettings = {AXIS4_DRIVER_MODEL,AXIS4_DRIVER_MICROSTEPS,AXIS4_DRIVER_MICROSTEPS_GOTO,AXIS4_DRIVER_IHOLD,AXIS4_DRIVER_IRUN,AXIS4_DRIVER_IGOTO,AXIS4_DRIVER_DECAY,AXIS4_DRIVER_DECAY_GOTO};
@@ -54,7 +50,6 @@ extern Clock clock;
 #endif
 
 #if AXIS5_DRIVER_MODEL != OFF
-  AxisSettings         axis5Settings           = {AXIS5_STEPS_PER_MICRON,AXIS5_DRIVER_REVERSE,AXIS5_LIMIT_MIN*1000.0,AXIS5_LIMIT_MAX*1000.0};
   const AxisPins       Axis5DriverStepPins     = {AXIS5_STEP_PIN,AXIS5_DIR_PIN,AXIS5_ENABLE_PIN,false,false,true};
   const DriverPins     Axis5DriverModePins     = {AXIS5_M0_PIN,AXIS5_M1_PIN,AXIS5_M2_PIN,AXIS5_M3_PIN,AXIS5_DECAY_PIN};
   const DriverSettings Axis5DriverModeSettings = {AXIS5_DRIVER_MODEL,AXIS5_DRIVER_MICROSTEPS,AXIS5_DRIVER_MICROSTEPS_GOTO,AXIS5_DRIVER_IHOLD,AXIS5_DRIVER_IRUN,AXIS5_DRIVER_IGOTO,AXIS5_DRIVER_DECAY,AXIS5_DRIVER_DECAY_GOTO};
@@ -64,7 +59,6 @@ extern Clock clock;
 #endif
 
 #if AXIS6_DRIVER_MODEL != OFF
-  AxisSettings         axis6Settings           = {AXIS6_STEPS_PER_MICRON,AXIS6_DRIVER_REVERSE,AXIS6_LIMIT_MIN*1000.0,AXIS6_LIMIT_MAX*1000.0};
   const AxisPins       Axis6DriverStepPins     = {AXIS6_STEP_PIN,AXIS6_DIR_PIN,AXIS6_ENABLE_PIN,false,false,true};
   const DriverPins     Axis6DriverModePins     = {AXIS6_M0_PIN,AXIS6_M1_PIN,AXIS6_M2_PIN,AXIS6_M3_PIN,AXIS6_DECAY_PIN};
   const DriverSettings Axis6DriverModeSettings = {AXIS6_DRIVER_MODEL,AXIS6_DRIVER_MICROSTEPS,AXIS6_DRIVER_MICROSTEPS_GOTO,AXIS6_DRIVER_IHOLD,AXIS6_DRIVER_IRUN,AXIS6_DRIVER_IGOTO,AXIS6_DRIVER_DECAY,AXIS6_DRIVER_DECAY_GOTO};
@@ -135,6 +129,11 @@ bool Axis::isEnabled() {
 
 double Axis::getStepsPerMeasure() {
   return spm;
+}
+
+int Axis::getStepsPerStepGoto() {
+  if (ModeSettings.microsteps == OFF || ModeSettings.microstepsGoto == OFF) return 1;
+  return ModeSettings.microsteps/ModeSettings.microstepsGoto;
 }
 
 void Axis::setMotorCoordinate(double value) {
@@ -219,11 +218,16 @@ void Axis::setFrequency(double frequency) {
   // frequency in measures per second to microsecond counts per step
   double d = 1000000.0/(frequency*spm);
   if (d < minPeriodMicros) d = minPeriodMicros;
+  lastFrequency = (d/1000000.0)/spm;
   d /= 2.0;  // we need to run twice as fast to make a square wave
   if (isnan(d) || fabs(d) > 134000000) { tasks.setPeriod(task_handle, 0); return; }
   d *= 16.0; // convert microsecond counts into sub-microsecond counts
   d *= (16000000.0/clock.getPeriodSubMicros()); // adjust period for MCU clock inaccuracy
   tasks.setPeriodSubMicros(task_handle, (unsigned long)lround(d));
+}
+
+double Axis::getFrequency() {
+  return lastFrequency;
 }
 
 void Axis::setTracking(bool tracking) {
