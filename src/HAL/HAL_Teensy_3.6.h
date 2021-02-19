@@ -34,10 +34,14 @@
 #endif
 // SerialD/E are optional
 #if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
-  #define SERIAL_D SerialUSB1
+  #if defined(SERIAL_D_BAUD_DEFAULT) && SERIAL_D_BAUD_DEFAULT != OFF
+    #define SERIAL_D SerialUSB1
+  #endif
 #endif
 #if defined(USB_TRIPLE_SERIAL)
-  #define SERIAL_E SerialUSB2
+  #if defined(SERIAL_E_BAUD_DEFAULT) && SERIAL_E_BAUD_DEFAULT != OFF
+    #define SERIAL_E SerialUSB2
+  #endif
 #endif
 
 // New symbol for the default I2C port -------------------------------------------------------------

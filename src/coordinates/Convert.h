@@ -56,13 +56,15 @@ class Convert {
     // convert double to string in a variety of formats (as above) 
     void doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p);
 
-    PrecisionMode precision = PM_HIGH;
-
-  private:
     // string to int with error checking
     bool atoi2(char *a, int16_t *i, bool sign = true);
     // string to byte with error checking
     bool atoi2(char *a, uint8_t *u, bool sign = true);
     // string to float with error checking
     bool atof2(char *a, double *d, bool sign = true);
+
+    PrecisionMode precision = PM_HIGH;
+
+  private:
+
 };

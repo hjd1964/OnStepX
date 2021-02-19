@@ -69,12 +69,10 @@ extern Telescope telescope;
 
 #if DEBUG == PROFILER
   extern void profiler();
-//  tasks.add(142, 0, true, 7, profiler, "Profilr");
 #endif
 
 #if DEBUG == CONSOLE
   extern void debugConsole();
-//  tasks.add(1000, 0, true, 7, debugConsole);
 #endif
 
 void setup() {

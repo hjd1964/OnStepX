@@ -20,6 +20,7 @@ typedef struct Limits {
   double maxAltitude;
   double pastMeridianE;
   double pastMeridianW;
+  bool   autoMeridianFlip;
 } Limits;
 
 enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
@@ -37,7 +38,7 @@ class Mount {
   public:
     void init(int8_t mountType);
 
-    // handle telescope commands
+    // handle mount commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // the goto monitor
@@ -69,57 +70,66 @@ class Mount {
     // clear any general errors as appropriate for a reset
     void resetGeneralErrors();
 
-    uint8_t mountType          = 0;
-    bool    tracking           = false;
-    bool    atHome             = true;
-    bool    waitingHome        = false;
-    bool    pauseHome          = false;
-    bool    autoMeridianFlip   = false;
-    bool    soundEnabled       = false;
-    bool    safetyLimitsOn     = false;
-    bool    syncToEncodersOnly = false;
+    uint8_t    mountType           = 0;
+    bool       soundEnabled        = false;
+    bool       syncToEncodersOnly  = false;
 
-    Coordinate home;
-    Coordinate gotoTarget;
-    Coordinate current, start, destination, target;
-
-    double radsPerCentisecond = 0.0;
-    Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15) };
-
+    // tracking
+    Coordinate current;
+    bool       tracking            = false;
+    double     radsPerCentisecond  = 0.0;
+    double     trackingRate        = 1.0;
+    double     trackingRateAxis1   = 0.0;
+    double     trackingRateAxis2   = 0.0;
+    double     deltaRateAxis1      = 0.0;
+    double     deltaRateAxis2      = 0.0;
+    double     stepsPerSecondAxis1 = AXIS1_STEPS_PER_DEGREE/240.0;
+    TrackingState trackingState    = TS_NONE;
     #if TRACK_REFRACTION_RATE_DEFAULT == ON
       RateCompensation rateCompensation = RC_REFR_RA;
     #else
       RateCompensation rateCompensation = RC_NONE;
     #endif
-    bool rateCompensationDualAxis = false;
 
-    MeridianFlip meridianFlip = MF_NEVER;
+    // goto
+    Coordinate gotoTarget;
+    Coordinate start, destination, target;
+    GotoState  gotoState           = GS_NONE;
+    GotoStage  gotoStage           = GG_START;
+    GotoState  gotoStateAbort      = GS_NONE;
+    GotoState  gotoStateLast       = GS_NONE;
+    MeridianFlip meridianFlip      = MF_NEVER;
+    uint8_t    preferredPierSide   = PIER_SIDE_PREFERRED_DEFAULT;
+    bool       autoMeridianFlip    = false;
+    uint8_t    monitorTaskHandle   = 0;
+    double     gotoTargetAxis1     = 0.0;
+    double     gotoTargetAxis2     = 0.0;
+    double     maxRateCurrent      = 16.0;
+    double     maxRateDefault      = 16.0;
 
-    double trackingRate         = 1.0;
-    double trackingRateAxis1    = 0.0;
-    double trackingRateAxis2    = 0.0;
-    double guideRateAxis1       = 0.0;
-    double guideRateAxis2       = 0.0;
-    double deltaRateAxis1       = 0.0;
-    double deltaRateAxis2       = 0.0;
-    TrackingState trackingState = TS_NONE;
+    // limits
+    Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };
+    bool       safetyLimitsOn      = false;
 
-    GotoState gotoState         = GS_NONE;
-    GotoStage gotoStage         = GG_START;
-    GotoState gotoStateAbort    = GS_NONE;
-    GotoState gotoStateLast     = GS_NONE;
-    uint8_t monitorTaskHandle   = 0;
-    double gotoTargetAxis1      = 0.0;
-    double gotoTargetAxis2      = 0.0;
+    // homing
+    Coordinate home;
+    bool       atHome              = true;
+    bool       waitingHome         = false;
+    bool       pauseHome           = false;
   
-    GuideState guideState       = GU_NONE;
-    GuideRate guideRate         = GR_20X;
-    GuideRate pulseGuideRate    = GR_1X;
+    // guiding
+    double     guideRateAxis1      = 0.0;
+    double     guideRateAxis2      = 0.0;
+    GuideState guideState          = GU_NONE;
+    GuideRate  guideRate           = GR_20X;
+    GuideRate  pulseGuideRate      = GR_1X;
 
-    ParkState parkState         = PS_UNPARKED;
+    // pec
+    PecState   pecState            = PEC_NONE;
+    bool       pecRecorded         = false;
 
-    PecState pecState           = PEC_NONE;
-    bool pecRecorded            = false;
+    // park
+    ParkState  parkState           = PS_UNPARKED;
 
 };
 

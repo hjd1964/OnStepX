@@ -8,8 +8,8 @@
 typedef struct AxisSettings {
   double  stepsPerMeasure;
   int8_t  reverse;
-  int16_t min;
-  int16_t max;
+  double  min;
+  double  max;
 } AxisSettings;
 
 typedef struct AxisPins {
@@ -30,13 +30,16 @@ class Axis {
       Pins{ Pins }, ModePins{ ModePins }, ModeSettings{ ModeSettings } {};
 
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber);
+    void init(uint8_t axisNumber, AxisSettings axisSettings);
 
     // enables or disables the associated step/dir driver
     void enable(bool value);
 
     // get the enabled state
     bool isEnabled();
+
+    // get steps per measure
+    double getStepsPerMeasure();
 
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
@@ -71,19 +74,12 @@ class Axis {
     void setTracking(bool tracking);
     bool getTracking();
 
-    // set steps per measure for conversion between steps and "measures" (radians, microns, etc.)
-    void setStepsPerMeasure(double value);
-
     // set and get backlash in "measures" (radians, microns, etc.)
-    void setBacklash(double value);
+    void   setBacklash(double value);
     double getBacklash();
 
-    // set and get minimum position in "measures" (radians, microns, etc.)
-    void setMinCoordinate(double value);
+    // get minimum and maximum position in "measures" (radians, microns, etc.)
     double getMinCoordinate();
-
-    // set and get maximum position in "measures" (radians, microns, etc.)
-    void setMaxCoordinate(double value);
     double getMaxCoordinate();
 
     // for TMC drivers, etc. report status

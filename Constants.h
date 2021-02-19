@@ -1,6 +1,5 @@
 // -----------------------------------------------------------------------------------
 // Constants
-
 #pragma once
 
 // Firmware version ----------------------------------------------------------------------------------------------------------------
@@ -72,12 +71,16 @@
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
 
+#define EAST                        -10
+#define WEST                        -11
+#define BEST                        -12
+
 // debug values
-#define CONSOLE                     -6
-#define PROFILER                    -7
+#define CONSOLE                     -20
+#define PROFILER                    -21
 
 // pins
-#define SHARED                      -14
+#define SHARED                      -30
 
 // mount types
 #define MOUNT_TYPE_FIRST            1
@@ -129,8 +132,8 @@
 #define csToDays(x)                 ((x)/8640000.0)
 #define daysToCs(x)                 ((x)*8640000.0)
 #define arcsecToRad(x)              (((x)/3600.0)/RAD)
-#define siderealToRad(x)            ((((x)*15.0)/3600.0)/RAD)
 #define radToArcsec(x)              (((x)*RAD)*3600.0)
+#define siderealToRad(x)            ((((x)*15.0)/3600.0)/RAD)
 // conversion factor to go to/from Hz for sidereal interval
 #define hzToSubMicros(x)            ((x)*266666.666666667)    // (x*(16000000.0/60.0))
 #define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)    // ((x/60.0)/SIDEREAL_RATIO)

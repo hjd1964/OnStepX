@@ -10,9 +10,7 @@ extern Axis axis2;
 #include "Mount.h"
 extern void mountMonitorWrapper();
 
-// check if goto/sync is valid
 CommandError Mount::validateGoto() {
-  // Check state
   if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (parkState != PS_UNPARKED)                 return CE_SLEW_ERR_IN_PARK;
@@ -24,7 +22,6 @@ CommandError Mount::validateGoto() {
 
 CommandError Mount::validateGotoCoords(Coordinate coords) {
   transform.equToHor(&coords);
-  // Check coordinates
   if (coords.a < limits.minAltitude)            return CE_GOTO_ERR_BELOW_HORIZON;
   if (coords.a > limits.maxAltitude)            return CE_GOTO_ERR_ABOVE_OVERHEAD;
   if (AXIS2_TANGENT_ARM == OFF && mountType != ALTAZM) {
@@ -36,7 +33,6 @@ CommandError Mount::validateGotoCoords(Coordinate coords) {
   return CE_NONE;
 }
 
-// validate and set target, decides pier side
 CommandError Mount::setMountTarget(Coordinate *coords) {
   target = *coords;
 
@@ -57,8 +53,8 @@ CommandError Mount::setMountTarget(Coordinate *coords) {
   if (meridianFlip == MF_ALWAYS) {
     if (atHome) { if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST; } else
     #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-      if (preferredPierSideDefault == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
-      if (preferredPierSideDefault == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
+      if (preferredPierSide == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
+      if (preferredPierSide == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
     #endif
       {// preferredPierSideDefault == BEST
         if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
@@ -74,7 +70,6 @@ CommandError Mount::setMountTarget(Coordinate *coords) {
   return CE_NONE;
 }
 
-// syncs the telescope/mount to the sky
 CommandError Mount::syncEqu(Coordinate *coords) {
   CommandError e = setMountTarget(coords);
   if (e != CE_NONE) return e;
@@ -92,7 +87,6 @@ CommandError Mount::syncEqu(Coordinate *coords) {
   return CE_NONE;
 }
 
-// start a goto
 CommandError Mount::gotoEqu(Coordinate *coords) {
   CommandError e = setMountTarget(coords);
   if (e != CE_NONE) return e;

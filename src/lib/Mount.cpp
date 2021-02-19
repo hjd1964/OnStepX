@@ -21,7 +21,9 @@ extern GeneralErrors generalErrors;
 #include "../StepDrivers/StepDrivers.h"
 #include "Axis.h"
 extern Axis axis1;
+extern AxisSettings axis1Settings;
 extern Axis axis2;
+extern AxisSettings axis2Settings;
 #include "Clock.h"
 extern Clock clock;
 #include "Mount.h"
@@ -34,18 +36,12 @@ void Mount::init(int8_t mountType) {
   radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
 
   // setup axis1
-  axis1.init(1);
-  axis1.setStepsPerMeasure(radToDeg(AXIS1_STEPS_PER_DEGREE));
-  axis1.setMinCoordinate(degToRad(-180.0));
-  axis1.setMaxCoordinate(degToRad(180.0));
+  axis1.init(1, axis1Settings);
   axis1.setInstrumentCoordinate(degToRad(90.0));
   axis1.enable(true);
 
   // setup axis2
-  axis2.init(2);
-  axis2.setStepsPerMeasure(radToDeg(AXIS2_STEPS_PER_DEGREE));
-  axis2.setMinCoordinate(degToRad(-90.0));
-  axis2.setMaxCoordinate(degToRad(90.0));
+  axis2.init(2, axis2Settings);
   axis2.setInstrumentCoordinate(degToRad(90.0));
   axis2.enable(true);
 
@@ -142,6 +138,15 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     *numericReply = false;
   } else
 
+  // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon
+  //            Returns: sDD*#
+  if (cmd("Gh"))  { sprintf(reply,"%+02ld*", lround(radToDeg(limits.minAltitude))); *numericReply = false; } else
+
+  // :Go#       Get Overhead Limit
+  //            Returns: DD*#
+  //            The highest elevation above the horizon that the telescope will goto
+  if (cmd("Go"))  { sprintf(reply,"%02ld*", lround(radToDeg(limits.maxAltitude))); *numericReply=false; } else
+
   // :GR#       Get Mount Right Ascension
   //            Returns: HH:MM.T# or HH:MM:SS# (based on precision setting)
   // :GRH#      Returns: HH:MM:SS.SSSS# (high precision)
@@ -170,7 +175,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
   // :GU#       Get telescope Status
   //            Returns: s#
-  if (cmd("GT"))  {
+  if (cmd("GU"))  {
     int i = 0;
     if (trackingState == TS_NONE)            reply[i++]='n';                                             // [n]ot tracking
     if (gotoState == GS_NONE)                reply[i++]='N';                                             // [N]o goto
@@ -226,54 +231,113 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Returns: s#
   if (cmd("Gu")) {
     memset(reply, (char)0b10000000, 9);
-    if (trackingState == TS_NONE)                reply[0]|=0b10000001;      // Not tracking
-    if (gotoState == GS_NONE)                    reply[0]|=0b10000010;      // No goto
-//  if (ppsSynced)                               reply[0]|=0b10000100;      // PPS sync
-    if (guideState == GU_PULSE_GUIDE)            reply[0]|=0b10001000;      // pulse guide active
+    if (trackingState == TS_NONE)                reply[0]|=0b10000001;           // Not tracking
+    if (gotoState == GS_NONE)                    reply[0]|=0b10000010;           // No goto
+//  if (ppsSynced)                               reply[0]|=0b10000100;           // PPS sync
+    if (guideState == GU_PULSE_GUIDE)            reply[0]|=0b10001000;           // pulse guide active
     if (mountType != ALTAZM) {
-      if (rateCompensation == RC_REFR_RA)        reply[0]|=0b11010000;      // Refr enabled Single axis
-      if (rateCompensation == RC_REFR_BOTH)      reply[0]|=0b10010000;      // Refr enabled
-      if (rateCompensation == RC_FULL_RA)        reply[0]|=0b11100000;      // OnTrack enabled Single axis
-      if (rateCompensation == RC_FULL_BOTH)      reply[0]|=0b10100000;      // OnTrack enabled
+      if (rateCompensation == RC_REFR_RA)        reply[0]|=0b11010000;           // Refr enabled Single axis
+      if (rateCompensation == RC_REFR_BOTH)      reply[0]|=0b10010000;           // Refr enabled
+      if (rateCompensation == RC_FULL_RA)        reply[0]|=0b11100000;           // OnTrack enabled Single axis
+      if (rateCompensation == RC_FULL_BOTH)      reply[0]|=0b10100000;           // OnTrack enabled
     }
     if (rateCompensation == RC_NONE) {
       double r = siderealToHz(trackingRate);
-      if (fequal(r, 57.900))                     reply[1]|=0b10000001; else // Lunar rate selected
-      if (fequal(r, 60.000))                     reply[1]|=0b10000010; else // Solar rate selected
-      if (fequal(r, 60.136))                     reply[1]|=0b10000011;      // King rate selected
+      if (fequal(r, 57.900))                     reply[1]|=0b10000001; else      // Lunar rate selected
+      if (fequal(r, 60.000))                     reply[1]|=0b10000010; else      // Solar rate selected
+      if (fequal(r, 60.136))                     reply[1]|=0b10000011;           // King rate selected
     }
     
-    if (syncToEncodersOnly)                      reply[1]|=0b10000100;      // sync to encoders only
-    if (guideState != GU_NONE)                   reply[1]|=0b10001000;      // guide active
-    if (atHome)                                  reply[2]|=0b10000001;      // At home
-    if (waitingHome)                             reply[2]|=0b10000010;      // Waiting at home
-    if (pauseHome)                               reply[2]|=0b10000100;      // Pause at home enabled?
-    if (soundEnabled)                            reply[2]|=0b10001000;      // Buzzer enabled?
-    if (mountType == GEM && autoMeridianFlip)    reply[2]|=0b10010000;      // Auto meridian flip
-    if (pecRecorded)                             reply[2]|=0b10100000;      // PEC data has been recorded
+    if (syncToEncodersOnly)                      reply[1]|=0b10000100;           // sync to encoders only
+    if (guideState != GU_NONE)                   reply[1]|=0b10001000;           // guide active
+    if (atHome)                                  reply[2]|=0b10000001;           // At home
+    if (waitingHome)                             reply[2]|=0b10000010;           // Waiting at home
+    if (pauseHome)                               reply[2]|=0b10000100;           // Pause at home enabled?
+    if (soundEnabled)                            reply[2]|=0b10001000;           // Buzzer enabled?
+    if (mountType == GEM && autoMeridianFlip)    reply[2]|=0b10010000;           // Auto meridian flip
+    if (pecRecorded)                             reply[2]|=0b10100000;           // PEC data has been recorded
 
     // provide mount type
-    if (mountType == GEM)                        reply[3]|=0b10000001; else // GEM
-    if (mountType == FORK)                       reply[3]|=0b10000010; else // FORK
-    if (mountType == ALTAZM)                     reply[3]|=0b10001000;      // ALTAZM
+    if (mountType == GEM)                        reply[3]|=0b10000001; else      // GEM
+    if (mountType == FORK)                       reply[3]|=0b10000010; else      // FORK
+    if (mountType == ALTAZM)                     reply[3]|=0b10001000;           // ALTAZM
 
     // provide pier side info.
     updatePosition();
-    if (current.pierSide == PIER_SIDE_NONE)      reply[3]|=0b10010000; else // Pier side none
-    if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else // Pier side east
-    if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;      // Pier side west
+    if (current.pierSide == PIER_SIDE_NONE)      reply[3]|=0b10010000; else      // Pier side none
+    if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else      // Pier side east
+    if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
 
 #if AXIS1_PEC == ON
     if (mountType != ALTAZM) {
-      reply[4] = (int)pecState|0b10000000;                                  // PEC status: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
+      reply[4] = (int)pecState|0b10000000;                                       // PEC status: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
     }
 #endif
-    reply[5] = (int)parkState|0b10000000;                                   // Park status: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
-    reply[6] = (int)pulseGuideRate|0b10000000;                              // Pulse-guide rate
-    reply[7] = (int)guideRate|0b10000000;                                   // Guide rate
-//  reply[8] = generalError|0b10000000;                                     // General error
+    reply[5] = (int)parkState|0b10000000;                                        // Park status: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
+    reply[6] = (int)pulseGuideRate|0b10000000;                                   // Pulse-guide rate
+    reply[7] = (int)guideRate|0b10000000;                                        // Guide rate
+//  reply[8] = generalError|0b10000000;                                          // General error
     reply[9] = 0;
     *numericReply=false;
+  } else
+
+  if (cmdP("GX") && parameter[0] == '9') { // 9n: Misc.
+    *numericReply = false;
+    switch (parameter[1]) {
+//    case '0': dtostrf(guideRates[getPulseGuideRateSelection()]/15.0,2,2,reply); break; // pulse-guide rate
+//    case '1': sprintf(reply,"%d",pecValue); break;                             // pec analog value
+//    case '2': dtostrf(maxRateCurrent,3,3,reply); break;                        // MaxRate (current)
+//    case '3': dtostrf(maxRateDefault,3,3,reply); break;                        // MaxRate (default)
+      case '4': sprintf(reply,"%d%s",(int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
+      case '5': sprintf(reply,"%d",(int)limits.autoMeridianFlip); break;         // autoMeridianFlip
+      case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;     // preferred pier side
+      case '7': dtostrf((1000000.0/maxRateCurrent)/degToRad(axis1.getStepsPerMeasure()),3,1,reply); break; // slew speed
+      case '8':                                                                  // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
+        if (ROTATOR == ON) {
+          if (mountType == ALTAZM) strcpy(reply,"D"); else strcpy(reply,"R");
+        } else strcpy(reply,"N");
+      break;
+//    case '9': dtostrf(maxRateLowerLimit()/16.0,3,3,reply); break;              // MaxRate (fastest/lowest)
+//    case 'A': dtostrf(ambient.getTemperature(),3,1,reply); break;              // temperature in deg. C
+//    case 'B': dtostrf(ambient.getPressure(),3,1,reply); break;                 // pressure in mb
+//    case 'C': dtostrf(ambient.getHumidity(),3,1,reply); break;                 // relative humidity in %
+//    case 'D': dtostrf(ambient.getAltitude(),3,1,reply); break;                 // altitude in meters
+//    case 'E': dtostrf(ambient.getDewPoint(),3,1,reply); break;                 // dew point in deg. C
+//    case 'F':                                                                  // internal MCU temperature in deg. C
+//      float t=HAL_MCU_Temperature();
+//      if (t > -999) dtostrf(t,1,0,reply); else { *numericReply = true; commandError=CE_0; }
+//    break;
+    default:
+      *numericReply = true;
+      *commandError = CE_CMD_UNKNOWN;
+    }
+  } else
+
+  if (cmdP("GX") && parameter[0] == 'E') { // En: Get settings
+    *numericReply = false;
+    switch (parameter[1]) {
+//    case '1': dtostrf((double)maxRateBaseActual,3,3,reply); break;
+//    case '2': dtostrf(SLEW_ACCELERATION_DIST,2,1,reply); break;
+//    case '3': sprintf(reply,"%ld",lround(TRACK_BACKLASH_RATE)); break;
+      case '4': sprintf(reply,"%ld",lround(axis1Settings.stepsPerMeasure/RAD)); break;
+      case '5': sprintf(reply,"%ld",lround(axis2Settings.stepsPerMeasure/RAD)); break;
+//    case '6': dtostrf(stepsPerSecondAxis1,3,6,reply); break;
+//    case '7': sprintf(reply,"%ld",nv.readLong(EE_stepsPerWormRotAxis1)); break;
+//    case '8': sprintf(reply,"%ld",lround(pecBufferSize)); break;
+      case '9': sprintf(reply,"%ld",lround(radToDeg(limits.pastMeridianE)*4)); break; // minutes past meridianE
+      case 'A': sprintf(reply,"%ld",lround(radToDeg(limits.pastMeridianW)*4)); break; // minutes past meridianW
+      case 'e': sprintf(reply,"%ld",lround(radToDeg(axis1Settings.min))); break;      // RA east or -Az limit, in degrees
+      case 'w': sprintf(reply,"%ld",lround(radToDeg(axis1Settings.max))); break;      // RA west or +Az limit, in degrees
+      case 'B': sprintf(reply,"%ld",lround(radToDeg(axis1Settings.max)/15.0)); break; // RA west or +Az limit, in hours
+      case 'C': sprintf(reply,"%ld",lround(radToDeg(axis2Settings.min))); break;
+      case 'D': sprintf(reply,"%ld",lround(radToDeg(axis2Settings.max))); break;
+      case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; break;
+      case 'F': if (AXIS2_TANGENT_ARM == ON) reply[0] = '1'; else reply[0] = '0'; *supressFrame = true; break;
+//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply,"%d",(int)nv.read(EE_mountType)); break; // return the mount type
+    default:
+      *numericReply = true;
+      *commandError = CE_CMD_UNKNOWN;
+    }
   } else
 
   // :GZ#       Get Mount Azimuth
@@ -313,6 +377,35 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   if (cmdP("Sd")) {
     if (!convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE;
     gotoTarget.d = degToRad(gotoTarget.d);
+  } else
+
+  //  :Sh[sDD]#
+  //            Set the elevation lower limit
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmdP("Sh")) {
+    int16_t deg;
+    if (convert.atoi2(parameter, &deg)) {
+      if (deg >= -30 && deg <= 30) {
+        limits.minAltitude = degToRad(deg);
+//      nv.update(EE_minAlt, minAlt+128);
+      } else *commandError = CE_PARAM_RANGE;
+    } else *commandError = CE_PARAM_FORM;
+  } else
+
+  //  :So[DD]#
+  //            Set the overhead elevation limit in degrees relative to the horizon
+  //            Return: 0 on failure
+  //                    1 on success
+  if (command[1] == 'o')  {
+    int16_t deg;
+    if (convert.atoi2(parameter, &deg)) {
+      if (deg >= 60 && deg <= 90) {
+        limits.maxAltitude = degToRad(deg);
+        if (mountType == ALTAZM && limits.maxAltitude > 87) limits.maxAltitude = 87;
+//      nv.update(EE_maxAlt,maxAlt); 
+      } else *commandError = CE_PARAM_RANGE;
+    } else *commandError = CE_PARAM_FORM;
   } else
 
   //  :Sr[HH:MM.T]# or :Sr[HH:MM:SS]# or :Sr[HH:MM:SS.SSSS]#
@@ -398,6 +491,59 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       switch (command[1]) { case 'o': case 'r': case 'n': trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); }
       updateTrackingRates();
     }
+  } else
+
+  // :VS#       PEC number of steps per second of worm rotation
+  //            Returns: n.n#
+  if (cmd("VS")) {
+    char temp[12];
+    dtostrf(stepsPerSecondAxis1, 0, 6, temp);
+    strcpy(reply, temp);
+    *numericReply = false;
+  } else
+
+  //  $ - Set parameter
+  // :$BD[n]#   Set Dec/Alt backlash in arc-seconds
+  //            Return: 0 on failure
+  //                    1 on success
+  // :$BR[n]#   Set RA/Azm backlash in arc-seconds
+  //            Return: 0 on failure
+  //                    1 on success
+  //        Set the Backlash values.  Units are arc-seconds
+  if (cmdP("$B")) {
+    int16_t arcSecs;
+    if (convert.atoi2((char*)&parameter[1], &arcSecs)) {
+      if (arcSecs >= 0 && arcSecs <= 3600) {
+        if (parameter[0] == 'D') {
+          axis2.setBacklash(arcsecToRad(arcSecs));
+//        nv.writeInt(EE_backlashAxis2,backlashAxis2);
+        } else
+        if (parameter[0] == 'R') {
+          axis1.setBacklash(arcsecToRad(arcSecs));
+//        nv.writeInt(EE_backlashAxis1,backlashAxis1);
+        } else *commandError = CE_CMD_UNKNOWN;
+      } else *commandError = CE_PARAM_RANGE;
+    } else *commandError = CE_PARAM_FORM;
+  } else
+
+  //  % - Return parameter
+  // :%BD#      Get Dec/Alt Antibacklash value in arc-seconds
+  //            Return: n#
+  // :%BR#      Get RA/Azm Antibacklash value in arc-seconds
+  //            Return: n#
+  if (cmdP("%B")) {
+    if (parameter[0] == 'D' && parameter[1] == 0) {
+        int arcSec = radToArcsec(axis2.getBacklash());
+        if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
+        sprintf(reply,"%d", arcSec);
+        *numericReply = false;
+    } else
+    if (parameter[0] == 'R' && parameter[1] == 0) {
+        int arcSec = radToArcsec(axis2.getBacklash());
+        if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
+        sprintf(reply,"%d", arcSec);
+        *numericReply = false;
+    } else *commandError = CE_CMD_UNKNOWN;
   } else return false;
 
   return true;

@@ -154,7 +154,7 @@ bool Convert::dmsToDouble(double *value, char *dms, bool signPresent) {
 
 void Convert::doubleToHms(char *reply, double value, bool signPresent, PrecisionMode p) {
   char sign[2] = "";
-  double value1, hour, minute, second, decimal = 0;
+  double hour, minute, second, decimal = 0;
 
   // setup formatting, handle adding the sign
   if (signPresent) {

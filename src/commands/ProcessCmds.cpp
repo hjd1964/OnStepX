@@ -55,6 +55,7 @@ void CommandProcessor::poll() {
     bool supressFrame = false;
 
     commandError = command(reply, buffer.getCmd(), buffer.getParameter(), &supressFrame, &numericReply);
+    VF("MSG: cmd = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); VL(reply);
 
     if (numericReply) {
       if (commandError != CE_NONE) strcpy(reply,"0"); else strcpy(reply,"1");
