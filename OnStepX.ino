@@ -78,6 +78,7 @@ extern Telescope telescope;
 void setup() {
   #if DEBUG != OFF
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
+    delay(2000);
   #endif
   
   // Command processing

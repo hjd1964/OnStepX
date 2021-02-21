@@ -136,10 +136,10 @@
 #define daysToCs(x)                 ((x)*8640000.0)
 #define arcsecToRad(x)              (((x)/3600.0)/RAD)
 #define radToArcsec(x)              (((x)*RAD)*3600.0)
-#define siderealToRad(x)            ((((x)*15.0)/3600.0)/RAD)
+#define siderealToRad(x)            ((((x)*SIDEREAL_RATIO*15.0)/3600.0)/RAD)
 // conversion factor to go to/from Hz for sidereal interval
 #define hzToSubMicros(x)            ((x)*266666.666666667)    // (x*(16000000.0/60.0))
-#define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)    // ((x/60.0)/SIDEREAL_RATIO)
+#define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)
 #define siderealToHz(x)             ((x)*SIDEREAL_RATE_HZ)
 #define fequal(x,y)                 (fabs((x)-(y))<0.00000001)
 

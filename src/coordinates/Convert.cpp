@@ -30,7 +30,6 @@ GregorianDate Convert::strToDate(char *ymd) {
 }
 
 bool Convert::tzToDouble(double *value, char *hm) {
-  return false;
   int16_t sign = 1;
   int16_t hour, minute = 0;
 
@@ -63,7 +62,7 @@ bool Convert::hmsToDouble(double *value, char *hms, PrecisionMode p) {
 
   while (*hms == ' ') hms++;
 
-  if (strlen(hms) > 13) hms[13]=0;
+  if (strlen(hms) > 13) hms[13] = 0;
   int16_t length = strlen(hms);
   
   if (p == PM_HIGHEST || p == PM_HIGH) { if (length != 8 && length < 10) return false; } else

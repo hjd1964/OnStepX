@@ -42,7 +42,7 @@ CommandError Mount::validateGotoCoords(Coordinate coords) {
   return CE_NONE;
 }
 
-CommandError Mount::setMountTarget(Coordinate *coords) {
+CommandError Mount::setMountTarget(Coordinate *coords, bool pierSideChangeCheck) {
   target = *coords;
 
   CommandError e = validateGoto();
@@ -65,13 +65,11 @@ CommandError Mount::setMountTarget(Coordinate *coords) {
       if (preferredPierSide == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
       if (preferredPierSide == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
     #endif
-      {// preferredPierSideDefault == BEST
-        if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
-        if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
-      }
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == OFF
-      if (!atHome && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    #endif
+    {// preferredPierSideDefault == BEST
+      if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
+      if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
+    }
+    if (!atHome && pierSideChangeCheck && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
     // east side of pier is always the default polar-home position
     target.pierSide = PIER_SIDE_EAST;
@@ -80,7 +78,7 @@ CommandError Mount::setMountTarget(Coordinate *coords) {
 }
 
 CommandError Mount::syncEqu(Coordinate *coords) {
-  CommandError e = setMountTarget(coords);
+  CommandError e = setMountTarget(coords, PIER_SIDE_SYNC_CHANGE_SIDES == ON);
   if (e != CE_NONE) return e;
   
   double a1, a2;
@@ -97,34 +95,44 @@ CommandError Mount::syncEqu(Coordinate *coords) {
 }
 
 CommandError Mount::gotoEqu(Coordinate *coords) {
-  CommandError e = setMountTarget(coords);
+  CommandError e = setMountTarget(coords, false);
   if (e != CE_NONE) return e;
 
   safetyLimitsOn = true;
   syncToEncodersOnly = true;
 
+  start = current;
   destination = target;
-  start = target;
 
   // prepare goto, check for any waypoints and set them if found
   gotoState = GS_GOTO;
   gotoStage = GG_DESTINATION;
-  if (MFLIP_SKIP_HOME == OFF && mountType != ALTAZM && start.pierSide != destination.pierSide) setWaypoint();
+  if (MFLIP_SKIP_HOME == OFF && mountType != ALTAZM && start.pierSide != destination.pierSide) {
+    VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
+    setWaypoint();
+  }
 
   // set the mount target
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
-  axis1.setTracking(false);
-  axis2.setTracking(false);
+
+  // locked tracking with movement within axisn ISR, off
+  axis1.setTracking(false); axis2.setTracking(false);
+  VLF("MSG: Mount::gotoEqu, axis tracking stopped");
+
   axis1.setTargetCoordinate(a1);
   axis2.setTargetCoordinate(a2);
+  VLF("MSG: Mount::gotoEqu, target coordinates set");
+
+  // temporary "fast" slewing
+  gotoRateAxis1 = 50.0; gotoRateAxis2 = 50.0;
+  updateTrackingRates();
 
   // start the goto monitor
   if (monitorTaskHandle != 0) tasks.remove(monitorTaskHandle);
   monitorTaskHandle = tasks.add(0, 0, true, 0, mountMonitorWrapper);
   tasks.setPeriod(monitorTaskHandle,10);
-
-  VLF("MSG: Mount::gotoEqu, target coordinates set");
+  if (monitorTaskHandle) VLF("MSG: Mount::gotoEqu, mount monitor started"); else DLF("MSG: Mount::gotoEqu, mount monitor failed to start");
 
   return CE_NONE;
 }
@@ -133,6 +141,7 @@ void Mount::monitor() {
   double a1, a2;
   if (gotoStage == GG_WAYPOINT) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
+      VLF("MSG: Mount::monitor, waypoint reached");
       gotoStage = GG_DESTINATION;
       destination = target;
       transform.mountToInstrument(&destination, &a1, &a2);
@@ -142,14 +151,29 @@ void Mount::monitor() {
   } else
   if (gotoStage == GG_DESTINATION) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
+      VLF("MSG: Mount::monitor, destination reached");
+
+      // flag the goto as finished
       gotoState = GS_NONE;
       gotoStage = GG_NONE;
-      if (tracking == TS_SIDEREAL) { axis1.setTracking(true); axis2.setTracking(true); }
+
+      // back to normal tracking
+      gotoRateAxis1 = 0.0;
+      gotoRateAxis2 = 0.0;
+      updateTrackingRates();
+
+      // locked tracking with movement within axisn ISR, on
+      axis1.setTracking(true); axis2.setTracking(true);
+      VLF("MSG: Mount::monitor, axis tracking resumed");
+
+      // kill this monitor
       tasks.setDurationComplete(monitorTaskHandle);
       monitorTaskHandle = 0;
+      VLF("MSG: Mount::monitor, monitor terminated");
       return;
     }
 
+    // keep moving the target
     if (mountType == ALTAZM) transform.equToHor(&target);
     transform.mountToInstrument(&target, &a1, &a2);
     axis1.setTargetCoordinate(a1);

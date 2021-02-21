@@ -49,7 +49,7 @@ class Mount {
     CommandError validateGoto();
     CommandError validateGotoCoords(Coordinate coords);
 
-    CommandError setMountTarget(Coordinate *coords);
+    CommandError setMountTarget(Coordinate *coords, bool pierSideChangeCheck);
 
     // sync. to equatorial coordinates
     CommandError syncEqu(Coordinate *coords);
@@ -88,6 +88,8 @@ class Mount {
     double     trackingRateAxis2   = 0.0;
     double     deltaRateAxis1      = 0.0;
     double     deltaRateAxis2      = 0.0;
+    double     gotoRateAxis1       = 0.0;
+    double     gotoRateAxis2       = 0.0;
     double     stepsPerSecondAxis1 = AXIS1_STEPS_PER_DEGREE/240.0;
     TrackingState trackingState    = TS_NONE;
     #if TRACK_REFRACTION_RATE_DEFAULT == ON

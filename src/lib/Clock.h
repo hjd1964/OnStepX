@@ -65,6 +65,6 @@ class Clock {
     bool dateIsReady = false;
     bool timeIsReady = false;
 
-    unsigned long period = SIDEREAL_PERIOD;
+    unsigned long period;
     uint8_t handle = 0;
 };

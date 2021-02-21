@@ -26,8 +26,8 @@ enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKI
 class Axis {
   public:
     // creation and basic initialization
-    Axis(AxisPins Pins, DriverPins ModePins, DriverSettings ModeSettings) :
-      Pins{ Pins }, ModePins{ ModePins }, ModeSettings{ ModeSettings } {};
+    Axis(AxisPins Pins) :
+      Pins{ Pins } {};
 
     // sets up the driver step/dir/enable pins and any associated driver mode control
     void init(uint8_t axisNumber, AxisSettings axisSettings);
@@ -73,6 +73,7 @@ class Axis {
     // causes movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency);
     double getFrequency();
+    double getFrequencySteps();
 
     // set and get tracking state (movement of motor to target)
     void setTracking(bool tracking);
@@ -110,6 +111,7 @@ class Axis {
     volatile long indexSteps          = 0;
     volatile int  trackingStep        = 1;
     volatile int  step                = 1;
+    volatile int  stepGoto            = 1;
     volatile bool invertStep          = false;
     volatile bool takeStep            = false;
     volatile bool invertDir           = false;
@@ -126,7 +128,7 @@ class Axis {
     double trackingFreq               = 0.0;
     double trackingPeriodMicros       = 0.0;
     long   trackingPeriodMicrosHalf   = 0;
-    double lastFrequency              = 0.0;
+    unsigned long lastPeriod          = 0;
 
     double maxFreq                    = 0.0;
     double minPeriodMicros            = 0.0;
@@ -135,8 +137,5 @@ class Axis {
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
     const AxisPins       Pins         = {OFF, OFF, OFF, false, false, false};
-    const DriverPins     ModePins     = {OFF, OFF, OFF, OFF, OFF};
-    const DriverSettings ModeSettings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
 
-    StepDriver stepDriver{ModePins, ModeSettings};
 };

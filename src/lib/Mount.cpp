@@ -50,18 +50,19 @@ void Mount::init(int8_t mountType) {
   axis1.init(1, axis1Settings);
   axis1.setInstrumentCoordinate(degToRad(90.0));
   axis1.enable(true);
+  axis1.setTracking(true);
 
   // setup axis2
   axis2.init(2, axis2Settings);
   axis2.setInstrumentCoordinate(degToRad(90.0));
   axis2.enable(true);
+  axis2.setTracking(true);
 
   // ------------------------------------------------------------------------------------------------
   // move in measures (radians) per second, tracking_enabled
   VLF("MSG: Mount::init, starting tracking");
   trackingState = TS_SIDEREAL;
   axis1.setFrequencyMax(degToRad(4.0));
-  axis1.setTracking(true);
   trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   updateTrackingRates();
 }
@@ -352,8 +353,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   if (parameter[0] == 'F') { // Fn: Debug
     *numericReply = false;
     switch (parameter[1]) {
-      case '3': dtostrf(axis1.getFrequency(),3,6,reply); break;                       // Axis1 final tracking rate Hz
-      case '4': dtostrf(axis2.getFrequency(),3,6,reply); break;                       // Axis2 final tracking rate Hz
+      case '3': dtostrf(axis1.getFrequencySteps(),3,6,reply); break;                  // Axis1 final tracking rate Hz
+      case '4': dtostrf(axis2.getFrequencySteps(),3,6,reply); break;                  // Axis2 final tracking rate Hz
     default:
       *numericReply = true;
       *commandError = CE_CMD_UNKNOWN;
@@ -699,9 +700,9 @@ void Mount::updateTrackingRates() {
     trackingRateAxis1 = trackingRate;
     if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
   }
-  if (trackingState == TS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
-  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1));
-  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2));
+  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
+  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1 + gotoRateAxis1));
+  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2 + gotoRateAxis2));
 }
 
 // check for platform rate limit (lowest maxRate) in us units

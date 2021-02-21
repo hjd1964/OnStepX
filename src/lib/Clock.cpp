@@ -36,7 +36,7 @@ void Clock::init() {
   if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Warning, didn't get h/w timer for Clock (using s/w timer)");
 
   // period = nv.readLong(EE_siderealPeriod);
-  setPeriodSubMicros(period); // period in SubMicros per second
+  setPeriodSubMicros(SIDEREAL_PERIOD);
 }
 
 void Clock::updateSite() {
@@ -153,6 +153,7 @@ bool Clock::command(char reply[], char command[], char parameter[], bool *supres
       // nv.writeFloat(EE_JD, JD);
       dateIsReady = true;
       if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
+      delay(10);
     } else *commandError = CE_PARAM_FORM;
   } else
 
