@@ -12,10 +12,11 @@
 // Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
 
 //      Parameter Name              Value   Default     Notes                                                                   Hint
-#define DEBUG                     VERBOSE //         OFF, Use "ON" for background error messages only, use "VERBOSE" for all  Infreq
-                                          //              error and status messages, use "CONSOLE" for VT100 debug console,
-                                          //              or use "PROFILER" for VT100 task profiler.
-#define SERIAL_DEBUG               Serial //    SERIAL_A, Or use any h/w serial port. Serial1 or Serial2, etc. as supported.  Infreq
+#define DEBUG                         OFF //         OFF, Use ON for background error messages only, use VERBOSE for all      Infreq
+                                          //              error and status messages, use CONSOLE for VT100 debug console,
+                                          //              or use PROFILER for VT100 task profiler.
+#define DEBUG_ECHO_COMMANDS           OFF //         OFF, Use ON to log command/response's to the debug serial port.          Infreq
+#define SERIAL_DEBUG           SerialUSB1 //    SERIAL_A, Or use any h/w serial port. Serial1 or Serial2, etc. as supported.  Infreq
 #define SERIAL_DEBUG_BAUD          115200 //        9600, n. Where n=9600,19200,57600,115200 (common baud rates.)             Infreq
 
 // MOUNT COORDINATES ------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
