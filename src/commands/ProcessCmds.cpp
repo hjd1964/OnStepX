@@ -18,27 +18,28 @@ GeneralErrors generalErrors = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 // command processors
 #ifdef SERIAL_A
-  CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT);
+  CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT,'A');
   void processCmdsA() { processCommandsA.poll(); }
 #endif
 #ifdef SERIAL_B
-  CommandProcessor processCommandsB(SERIAL_B_BAUD_DEFAULT);
+  CommandProcessor processCommandsB(SERIAL_B_BAUD_DEFAULT,'B');
   void processCmdsB() { processCommandsB.poll(); }
 #endif
 #ifdef SERIAL_C
-  CommandProcessor processCommandsC(SERIAL_C_BAUD_DEFAULT);
+  CommandProcessor processCommandsC(SERIAL_C_BAUD_DEFAULT,'C');
   void processCmdsC() { processCommandsC.poll(); }
 #endif
 #ifdef SERIAL_D
-  CommandProcessor processCommandsD(SERIAL_D_BAUD_DEFAULT);
+  CommandProcessor processCommandsD(SERIAL_D_BAUD_DEFAULT,'D');
   void processCmdsD() { processCommandsD.poll(); }
 #endif
 #ifdef SERIAL_ST4
-  CommandProcessor processCommandsST4(9600);
+  CommandProcessor processCommandsST4(9600),'S';
   void processCmdsST4() { processCommandsST4.poll(); }
 #endif
 
-CommandProcessor::CommandProcessor(long baud) {
+CommandProcessor::CommandProcessor(long baud, char channel) {
+  this->channel = channel;
   serialBaud = baud;
 }
 
@@ -55,7 +56,6 @@ void CommandProcessor::poll() {
     bool supressFrame = false;
 
     commandError = command(reply, buffer.getCmd(), buffer.getParameter(), &supressFrame, &numericReply);
-    VF("MSG: cmd = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); VL(reply);
 
     if (numericReply) {
       if (commandError != CE_NONE) strcpy(reply,"0"); else strcpy(reply,"1");
@@ -69,6 +69,10 @@ void CommandProcessor::poll() {
         supressFrame = false;
       }
       if (!supressFrame) strcat(reply,"#");
+
+      #if DEBUG_ECHO_COMMANDS == ON
+        VF("MSG: cmd"); V(channel); V(" = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); VL(reply);
+      #endif
       SerialPort.write(reply);
     }
     buffer.flush();

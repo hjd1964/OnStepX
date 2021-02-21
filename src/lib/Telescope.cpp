@@ -29,7 +29,9 @@ void Telescope::init() {
 
   transform.init(MOUNT_TYPE);
   clock.init();
-  mount.init(MOUNT_TYPE);
+  #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+    mount.init(MOUNT_TYPE);
+  #endif
 }
 
 void Telescope::updateSite() {
@@ -46,7 +48,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
 
   if (clock.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
-  #if (defined(AXIS1_DRIVER_MODEL) && AXIS1_DRIVER_MODEL != OFF) && (defined(AXIS2_DRIVER_MODEL) && AXIS2_DRIVER_MODEL != OFF)
+  #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
   
@@ -113,9 +115,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (parameter[0] == '-') site.longitude = -site.longitude;
       if (value >= -180.0 && value <= 360.0) {
         if (value >= 180.0) value -= 360.0;
-         site.longitude = degToRad(value);
-         updateSite(); 
-         // nv.writeFloat(EE_sites+currentSite*25+4,longitude);
+        site.longitude = degToRad(value);
+        updateSite(); 
+        // nv.writeFloat(EE_sites+currentSite*25+4,longitude);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else return false;

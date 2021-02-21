@@ -1,5 +1,14 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, sync and goto
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.h"
+#include "../../ConfigX.h"
+#include "../HAL/HAL.h"
+#include "../pinmaps/Models.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include "../coordinates/Transform.h"
 extern Transform transform;
 #include "../tasks/OnTask.h"
@@ -189,3 +198,5 @@ void Mount::setWaypoint() {
 
   gotoStage = GG_WAYPOINT;
 }
+
+#endif

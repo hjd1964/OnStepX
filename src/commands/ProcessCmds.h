@@ -38,7 +38,7 @@ typedef struct GeneralErrors {
 class CommandProcessor {
   public:
     // start and stop the serial port for the associated command channel
-    CommandProcessor(long baud);
+    CommandProcessor(long baud, char channel);
     ~CommandProcessor();
 
     // check for incomming commands and send responses
@@ -54,6 +54,7 @@ class CommandProcessor {
     CommandError lastCommandError  = CE_NONE;
     bool serialReady               = false;
     long serialBaud                = 9600;
+    char channel                   = '?';
 
     Buffer buffer;
     SerialWrapper SerialPort;

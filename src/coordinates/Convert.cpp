@@ -30,6 +30,7 @@ GregorianDate Convert::strToDate(char *ymd) {
 }
 
 bool Convert::tzToDouble(double *value, char *hm) {
+  return false;
   int16_t sign = 1;
   int16_t hour, minute = 0;
 
@@ -40,12 +41,13 @@ bool Convert::tzToDouble(double *value, char *hm) {
 
   // if there's a minute part convert it and mark the end of the hours string
   char* m = strchr(hm,':');
-  if (m != 0) {
+  if (m != NULL) {
+    m[0] = 0;
+    m++;
     if (strlen(m) != 2) return false;
     if (!atoi2(m, &minute, false)) return false;
     // only these exact minutes are allowed for time zones
     if (minute != 45 && minute != 30 && minute != 0) return false;
-    m[0] = 0; m++;
   }
 
   if (!atoi2(hm, &hour, false)) return false;

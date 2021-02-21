@@ -22,7 +22,11 @@
   #define IRAM_ATTR
 #endif
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega328P__)
+  #define MCU_STR "AtMega328"
+  #include "HAL_AtMega328.h"
+
+#elif defined(__AVR_ATmega1280__)
   #define MCU_STR "Mega1280"
   #include "HAL_Mega2560.h"
 

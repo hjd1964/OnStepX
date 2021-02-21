@@ -58,7 +58,10 @@
 // Khalid and Dave's PCB for STM32 Blue pill (STM32F303CC)
 #define STM32Blue                   60
 
-#define PINMAP_LAST                 60
+// Etc.
+#define UNO                         70     // Arduino UNO for focuser (etc?) only
+
+#define PINMAP_LAST                 70
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 

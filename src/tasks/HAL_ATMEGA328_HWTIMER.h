@@ -57,3 +57,24 @@
     TASKS_HWTIMER1_PROFILER_SUFFIX;
   }
 #endif
+
+#ifdef TASKS_HWTIMER2_ENABLE
+  void (*HAL_HWTIMER2_FUN)() = NULL;
+  #define HAL_HWTIMER2_SET_PERIOD()
+  bool HAL_HWTIMER2_INIT(uint8_t priority) { return false; }
+  void HAL_HWTIMER2_DONE() { }
+#endif
+
+#ifdef TASKS_HWTIMER3_ENABLE
+  void (*HAL_HWTIMER3_FUN)() = NULL;
+  #define HAL_HWTIMER3_SET_PERIOD()
+  bool HAL_HWTIMER3_INIT(uint8_t priority) { return false;}
+  void HAL_HWTIMER3_DONE() { }
+#endif
+
+#ifdef TASKS_HWTIMER4_ENABLE
+  void (*HAL_HWTIMER4_FUN)() = NULL;
+  #define HAL_HWTIMER4_SET_PERIOD()
+  bool HAL_HWTIMER4_INIT(uint8_t priority) { return false; }
+  void HAL_HWTIMER4_DONE() { }
+#endif

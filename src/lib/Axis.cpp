@@ -80,38 +80,38 @@ void Axis::init(uint8_t axisNumber, AxisSettings axisSettings) {
   pinModeEx(Pins.enable, OUTPUT); enable(false);
 
   int handle = 0;
-  if (axisNumber == 1) {
-    #if AXIS1_DRIVER_MODEL != OFF
+  #if AXIS1_DRIVER_MODEL != OFF
+    if (axisNumber == 1) {
       handle = tasks.add(0, 0, true, 0, moveAxis1, "MoveAx1");
       if (!tasks.requestHardwareTimer(handle, 1, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis1 (using s/w timer)");
-    #endif
-  }
-  if (axisNumber == 2) {
-    #if AXIS2_DRIVER_MODEL != OFF
+    }
+  #endif
+  #if AXIS2_DRIVER_MODEL != OFF
+    if (axisNumber == 2) {
       handle = tasks.add(0, 0, true, 0, moveAxis2, "MoveAx2");
       if (!tasks.requestHardwareTimer(handle, 2, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis2 (using s/w timer)");
-    #endif
-  }
-  if (axisNumber == 3) {
-    #if AXIS3_DRIVER_MODEL != OFF
+    }
+  #endif
+  #if AXIS3_DRIVER_MODEL != OFF
+    if (axisNumber == 3) {
       tasks.add(0, 0, true, 0, moveAxis3, "MoveAx3");
-    #endif
-  }
-  if (axisNumber == 4) {
-    #if AXIS4_DRIVER_MODEL != OFF
+    }
+  #endif
+  #if AXIS4_DRIVER_MODEL != OFF
+    if (axisNumber == 4) {
       handle = tasks.add(0, 0, true, 0, moveAxis4, "MoveAx4");
-    #endif
-  }
-  if (axisNumber == 5) {
-    #if AXIS5_DRIVER_MODEL != OFF
+    }
+  #endif
+  #if AXIS5_DRIVER_MODEL != OFF
+    if (axisNumber == 5) {
       handle = tasks.add(0, 0, true, 0, moveAxis5, "MoveAx5");
-    #endif
-  }
-  if (axisNumber == 6) {
-    #if AXIS6_DRIVER_MODEL != OFF
+    }
+  #endif
+  #if AXIS6_DRIVER_MODEL != OFF
+    if (axisNumber == 6) {
       handle = tasks.add(0, 0, true, 0, moveAxis6, "MoveAx6");
-    #endif
-  }
+    }
+  #endif
   task_handle = handle;
   stepDriver.init();
 }

@@ -6,9 +6,6 @@
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
@@ -18,6 +15,9 @@ extern Tasks tasks;
   #define AXIS1_PEC OFF
 #endif
 
+#include "../debug/Debug.h"
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 #include "../coordinates/Convert.h"
 extern Convert convert;
 #include "../coordinates/Transform.h"

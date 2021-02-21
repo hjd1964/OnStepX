@@ -1,5 +1,5 @@
 // Platform setup ------------------------------------------------------------------------------------
-// Mega2560
+// AtMega328
 #pragma once
 
 // This platform has digitalReadFast, digitalWriteFast, etc.
@@ -19,23 +19,9 @@
 
 // SerialA is manidatory
 #define SERIAL_A Serial
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B Serial1
-#endif
-// SerialC is optional
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #if PINMAP != Classic
-    #if PINMAP != Rumba
-      #define SERIAL_C Serial2
-    #else
-      #define SERIAL_C Serial3
-    #endif
-  #endif
-#endif
 
 // New symbol for the default I2C port -------------------------------------------------------------
-#include <Wire.h>
+//#include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
 
