@@ -44,24 +44,18 @@ void Mount::init(int8_t mountType) {
   this->mountType = mountType;
   if (mountType == GEM) meridianFlip = MF_ALWAYS;
 
-  radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
-
-  home.h = degToRad(90.0);
-  home.d = degToRad(90.0);
-  home.pierSide = PIER_SIDE_EAST;
-
-  // setup axis1 and axis2
+  // get the main axis objects ready
   axis1.init(1, axis1Settings);
-  axis1.setInstrumentCoordinate(home.h);
   axis2.init(2, axis2Settings);
-  axis2.setInstrumentCoordinate(home.d);
 
-  // ------------------------------------------------------------------------------------------------
-  // move in measures (radians) per second, tracking_enabled
-  VLF("MSG: Mount::init, starting tracking");
-  setTrackingState(TS_SIDEREAL);
-  axis1.setFrequencyMax(degToRad(4.0));
-  trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+  // startup state
+  resetHome();
+
+  #if TRACK_AUTOSTART == ON
+    VLF("MSG: Mount::init, starting tracking");
+    setTrackingState(TS_SIDEREAL);
+    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+  #endif
   updateTrackingRates();
 
   // automatic movement for axis1 and axis2
@@ -384,6 +378,26 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     *numericReply = false;
   } else
 
+  // :hF#       Reset telescope at the home position.  This position is required for a cold Start.
+  //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
+  //            Returns: Nothing
+  if (cmd("hF")) {
+
+  // setup where the home position is
+  updateHomePosition();
+    *commandError = resetHome();
+    *numericReply = false;
+  } else 
+
+  // :hC#       Moves telescope to the home position
+  //            Returns: Nothing
+  if (cmd("hC")) {
+    trackingState = TS_NONE;
+    if (mountType == ALTAZM) transform.horToEqu(&home);
+    *commandError = gotoEqu(&home);
+    *numericReply = false;
+  } else
+
   //  :Sa[sDD*MM]# or :Sa[sDD*MM'SS]# or :Sa[sDD*MM'SS.SSS]#
   //            Set Target Altitude
   //            Return: 0 on failure
@@ -698,6 +712,21 @@ void Mount::setTrackingState(TrackingState state) {
   if (trackingState == TS_NONE) { axis1.enable(true); axis2.enable(true); }
   trackingState = state;
   if (trackingState == TS_SIDEREAL) atHome = false;
+}
+
+void Mount::updateHomePosition() {
+  #ifndef AXIS1_HOME_DEFAULT
+    if (mountType == GEM) home.h = Deg90; else home.h = 0;
+  #else
+    if (mountType == ALTAZM) home.z = AXIS1_HOME_DEFAULT; else home.h = AXIS1_HOME_DEFAULT;
+  #endif
+  #ifndef AXIS2_HOME_DEFAULT
+    if (mountType == ALTAZM) home.a = 0.0; else home.d = transform.site.latitude.sign*Deg90;
+  #else
+    if (mountType == ALTAZM) home.a = AXIS2_HOME_DEFAULT; else home.d = AXIS2_HOME_DEFAULT;
+  #endif
+  DL(radToDeg(home.d));
+  home.pierSide = PIER_SIDE_EAST;
 }
 
 void Mount::updatePosition() {

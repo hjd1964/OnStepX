@@ -82,6 +82,9 @@ class Axis {
     // set and get backlash in "measures" (radians, microns, etc.)
     void   setBacklash(double value);
     double getBacklash();
+    void   clearBacklash();
+    void   storeBacklash();
+    void   restoreBacklash();
 
     // get minimum and maximum position in "measures" (radians, microns, etc.)
     double getMinCoordinate();
@@ -118,6 +121,7 @@ class Axis {
     volatile bool dirFwd              = true;
 
     volatile long backlashSteps       = 0;
+    long   backlashStepsStore         = 0;
     long   backlashAmountSteps        = 0;
 
     long   minSteps                   = 0;

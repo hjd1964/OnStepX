@@ -42,6 +42,7 @@ void Telescope::updateSite() {
   site.longitude = site.longitude;
   transform.site = site;
   clock.updateSite();
+  mount.updateHomePosition();
 }
     
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {

@@ -44,6 +44,9 @@ class Mount {
     // the goto monitor
     void monitor();
 
+    // update the home position
+    void updateHomePosition();
+
   private:
     // check mount status ahead of sync or goto
     CommandError validateGoto();
@@ -56,6 +59,9 @@ class Mount {
 
     // goto equatorial coordinates
     CommandError gotoEqu(Coordinate *coords);
+
+    // reset mount
+    CommandError resetHome();
 
     void setWaypoint();
 

@@ -22,10 +22,10 @@ extern void mountMonitorWrapper();
 CommandError Mount::validateGoto() {
   if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
-  if (parkState != PS_UNPARKED)                 return CE_SLEW_ERR_IN_PARK;
+  if (parkState  != PS_UNPARKED)                return CE_SLEW_ERR_IN_PARK;
   if (guideState != GU_NONE)                    return CE_MOUNT_IN_MOTION;
-  if (gotoState == GS_GOTO_SYNC)                return CE_MOUNT_IN_MOTION;
-  if (gotoState != GS_NONE)                     return CE_SLEW_IN_SLEW;
+  if (gotoState  == GS_GOTO_SYNC)               return CE_MOUNT_IN_MOTION;
+  if (gotoState  != GS_NONE)                    return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
 
@@ -166,9 +166,14 @@ void Mount::monitor() {
   double a1, a2;
   if (gotoStage == GG_WAYPOINT) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
-      VLF("MSG: Mount::monitor, waypoint reached");
-      gotoStage = GG_DESTINATION;
-      destination = target;
+      if (destination == home) {
+        VLF("MSG: Mount::monitor, home reached");
+        gotoStage = GG_DESTINATION;
+        destination = target;
+      } else {
+        VLF("MSG: Mount::monitor, waypoint reached");
+        destination = home;
+      }
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);

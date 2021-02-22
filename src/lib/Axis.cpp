@@ -273,11 +273,35 @@ bool Axis::getTracking() {
 }
 
 void Axis::setBacklash(double value) {
+  noInterrupts();
   backlashAmountSteps = value * spm;
+  interrupts();
 }
 
 double Axis::getBacklash() {
-  return backlashSteps/spm;
+  noInterrupts();
+  long b = backlashSteps;
+  interrupts();
+  return b/spm;
+}
+
+void Axis::clearBacklash() {
+  noInterrupts();
+  backlashSteps = 0;
+  interrupts();
+}
+
+void Axis::storeBacklash() {
+  noInterrupts();
+  backlashStepsStore = backlashSteps;
+  backlashSteps = 0;
+  interrupts();
+}
+
+void Axis::restoreBacklash() {
+  noInterrupts();
+  backlashSteps = backlashStepsStore;
+  interrupts();
 }
 
 double Axis::getMinCoordinate() {
