@@ -42,7 +42,7 @@ CommandError Mount::validateGotoCoords(Coordinate coords) {
   return CE_NONE;
 }
 
-CommandError Mount::setMountTarget(Coordinate *coords, bool pierSideChangeCheck) {
+CommandError Mount::setMountTarget(Coordinate *coords, bool allowPierSideChange) {
   target = *coords;
 
   CommandError e = validateGoto();
@@ -52,24 +52,37 @@ CommandError Mount::setMountTarget(Coordinate *coords, bool pierSideChangeCheck)
   e = validateGotoCoords(target);
   if (e != CE_NONE) return e;
 
-  double a1, a2;
-  transform.nativeToMount(&target, &a1, &a2);
-
   // east side of pier - we're in the western sky and the HA's are positive
   // west side of pier - we're in the eastern sky and the HA's are negative
   updatePosition();
   target.pierSide = current.pierSide;
+
+  double a1, a2;
+  transform.nativeToMount(&target, &a1, &a2);
+
+  D("limit.pastMeridianE="); DL(radToDeg(limits.pastMeridianE));
+  D("preferredPierSide="); DL(preferredPierSide);
+  DL("");
+  DL("Start:");
+  D(" h="); DL(radToDeg(a1));
+  D(" d="); DL(radToDeg(a2));
+  D(" p="); DL(target.pierSide);
+
   if (meridianFlip == MF_ALWAYS) {
-    if (atHome) { if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST; } else
-    #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-      if (preferredPierSide == WEST) { newPierSide = PIER_SIDE_WEST; if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; } else
-      if (preferredPierSide == EAST) { newPierSide = PIER_SIDE_EAST; if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; } else
-    #endif
-    {// preferredPierSideDefault == BEST
+    if (atHome) {
+      if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+    } else
+    if (preferredPierSide == EAST && allowPierSideChange) {
+      if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+    } else
+    if (preferredPierSide == WEST && allowPierSideChange) {
+      if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; else target.pierSide = PIER_SIDE_WEST;
+    } else
+    if (preferredPierSide == BEST) {
       if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
       if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
     }
-    if (!atHome && pierSideChangeCheck && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (!atHome && !allowPierSideChange && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
     // east side of pier is always the default polar-home position
     target.pierSide = PIER_SIDE_EAST;
@@ -86,6 +99,11 @@ CommandError Mount::syncEqu(Coordinate *coords) {
   axis1.setInstrumentCoordinate(a1);
   axis2.setInstrumentCoordinate(a2);
 
+  DL("Final:");
+  D(" h="); DL(radToDeg(a1));
+  D(" d="); DL(radToDeg(a2));
+  D(" p="); DL(target.pierSide);
+
   safetyLimitsOn = true;
   syncToEncodersOnly = true;
 
@@ -95,12 +113,14 @@ CommandError Mount::syncEqu(Coordinate *coords) {
 }
 
 CommandError Mount::gotoEqu(Coordinate *coords) {
-  CommandError e = setMountTarget(coords, false);
+  CommandError e = setMountTarget(coords, true);
   if (e != CE_NONE) return e;
 
   safetyLimitsOn = true;
   syncToEncodersOnly = true;
 
+  updatePosition();
+  transform.equToHor(&current);
   start = current;
   destination = target;
 
@@ -123,6 +143,11 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   axis1.setTargetCoordinate(a1);
   axis2.setTargetCoordinate(a2);
   VLF("MSG: Mount::gotoEqu, target coordinates set");
+
+  DL("Final:");
+  D(" h="); DL(radToDeg(a1));
+  D(" d="); DL(radToDeg(a2));
+  D(" p="); DL(destination.pierSide);
 
   // temporary "fast" slewing
   gotoRateAxis1 = 50.0; gotoRateAxis2 = 50.0;
@@ -186,41 +211,30 @@ void Mount::monitor() {
 void Mount::setWaypoint() {
   // HA goes from +90...0..-90
   //                W   .   E
-  // meridian flip, first phase, only happens for GEM mounts
-
-  // first phase, decide if we should move to 60 deg. HA (4 hours) to get away from the horizon limits or just go straight to the home position
-  if (home.h == 0.0) destination.h = 0.0; else {
-    if (current.pierSide == PIER_SIDE_WEST) {
-      if (current.a < degToRad(10.0) && start.h > degToRad(-90.0)) destination.h = degToRad(-60.0); else destination.h = -home.h;
-    } else {
-      if (current.a < degToRad(10.0) && start.h < degToRad(90.0)) destination.h = degToRad(60.0); else destination.h = home.h;
-    }
-  }
-  destination.d = home.d;
-
-  // first phase, override for additional waypoints
-  // if Dec is in the general area of the pole slew both axis back at once, or...
-  // if we're at a low latitude and in the opposite sky, |HA|=6 is very low on the horizon in this orientation and we need to delay arriving there during a meridian flip
-  // in the extreme case, where the user is very near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation.
-  if (home.h > 0.0) {
-    if (current.d > degToRad(90.0) - transform.site.latitude.value) {
-      if (current.pierSide == PIER_SIDE_WEST) destination.h = -home.h; else destination.h = home.h;
-    } else {
-      if (current.a < degToRad(20.0) && transform.site.latitude.absval < degToRad(45.0) && current.d < 0.0) {
-        if (current.pierSide == PIER_SIDE_WEST) destination.h = degToRad(-45.0); else destination.h = degToRad(45.0);
-      }
-    }
-  } else {
-    if (current.d < degToRad(-90.0) - transform.site.latitude.value) {
-      if (current.pierSide == PIER_SIDE_WEST) destination.h = -home.h; else destination.h = home.h;
-    } else { 
-      if (current.a < degToRad(20.0) && transform.site.latitude.absval < degToRad(45.0) && current.d > 0.0) {
-        if (current.pierSide == PIER_SIDE_WEST) destination.h = degToRad(-45.0); else destination.h = degToRad(45.0);
-      }
-    }
-  }
+  // meridian flip, only happens for equatorial mounts
 
   gotoStage = GG_WAYPOINT;
+
+  // default goes straight to the home position
+  destination = home;
+
+  // if the home position is at 0 hours, we're done
+  if (home.h = 0.0) return;
+
+  // decide if we should first move to 60 deg. HA (4 hours) to get away from the horizon limits
+  if (current.a < Deg10 && fabs(start.h) > Deg90) destination.h = Deg60;
+
+  // decide if we should first move to 45 deg. HA (3 hours) to get away from the horizon limits
+  // if at a low latitude and in the opposite sky, |HA| = 6 is very low on the horizon and we need
+  // to delay arriving there during a meridian flip.  In the extreme case, where the user is very
+  // near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation
+  if (current.a < Deg20 && transform.site.latitude.absval < Deg45) {
+    if (transform.site.latitude.value >= 0) {
+      if (current.d <= Deg90 - transform.site.latitude.value) destination.h = Deg45;
+    } else {
+      if (current.d >= -Deg90 - transform.site.latitude.value) destination.h = Deg45;
+    }
+  }
 }
 
 #endif

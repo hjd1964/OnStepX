@@ -61,6 +61,9 @@ class Mount {
 
     void pierSide();
 
+    // change tracking state
+    void setTrackingState(TrackingState state);
+
     // update where we are pointing *now*
     void updatePosition();
 
@@ -105,8 +108,8 @@ class Mount {
     GotoStage  gotoStage           = GG_START;
     GotoState  gotoStateAbort      = GS_NONE;
     GotoState  gotoStateLast       = GS_NONE;
-    MeridianFlip meridianFlip      = MF_NEVER;
-    uint8_t    preferredPierSide   = PIER_SIDE_PREFERRED_DEFAULT;
+    MeridianFlip meridianFlip      = MF_ALWAYS;
+    int8_t     preferredPierSide   = PIER_SIDE_PREFERRED_DEFAULT;
     bool       autoMeridianFlip    = false;
     uint8_t    monitorTaskHandle   = 0;
     double     gotoTargetAxis1     = 0.0;

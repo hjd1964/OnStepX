@@ -79,13 +79,12 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
 
   if (a2 < -Deg90 || a2 > Deg90) {
+    mount.pierSide = PIER_SIDE_WEST;
     a1 -= Deg180;
     a2  = Deg180 - a2;
-  }
-  if (a2 >  Deg180) a2 -= Deg360; else
-  if (a2 < -Deg180) a2 += Deg360;
+  } else mount.pierSide = PIER_SIDE_EAST;
 
-  if (a2 < -Deg90 || a2 > Deg90) mount.pierSide = PIER_SIDE_WEST; else mount.pierSide = PIER_SIDE_EAST;
+  if (a2 > Deg180) a2 -= Deg360; else if (a2 <= -Deg180) a2 += Deg360;
 
   if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
   return mount;
@@ -94,14 +93,13 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   
-  if (coord->pierSide == PIER_SIDE_WEST) *a1 += PI;
+  if (coord->pierSide == PIER_SIDE_WEST) *a1 += Deg180;
   if (site.latitude.value >= 0.0) {
-    if (coord->pierSide == PIER_SIDE_WEST) *a2 =   Deg180  - *a2;
+    if (coord->pierSide == PIER_SIDE_WEST) *a2 = Deg180 - *a2;
   } else {
     if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
   }
-  if (*a2 >  Deg360) *a2 -= Deg360; else
-  if (*a2 < -Deg360) *a2 += Deg360;
+  if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
 }
 
 void Transform::topocentricToObservedPlace(Coordinate *coord) {
@@ -156,6 +154,7 @@ void Transform::equToHor(Coordinate *coord) {
   double t2     = cosHA*site.latitude.sine - tan(coord->d)*site.latitude.cosine;
   coord->z      = atan2(t1,t2);
   coord->z      += PI;
+  if (coord->z > PI) coord->z -= TWO_PI;
 }
 
 void Transform::horToEqu(Coordinate *coord) { 
@@ -166,6 +165,7 @@ void Transform::horToEqu(Coordinate *coord) {
   double t2     = cosAzm*site.latitude.sine - tan(coord->a)*site.latitude.cosine;
   coord->h      = atan2(t1,t2);
   coord->h     += PI;
+  if (coord->h > PI) coord->h -= TWO_PI;
 }
 
 double Transform::trueRefrac(double altitude, double pressure, double temperature) {

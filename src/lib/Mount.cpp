@@ -46,25 +46,27 @@ void Mount::init(int8_t mountType) {
 
   radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
 
-  // setup axis1
-  axis1.init(1, axis1Settings);
-  axis1.setInstrumentCoordinate(degToRad(90.0));
-  axis1.enable(true);
-  axis1.setTracking(true);
+  home.h = degToRad(90.0);
+  home.d = degToRad(90.0);
+  home.pierSide = PIER_SIDE_EAST;
 
-  // setup axis2
+  // setup axis1 and axis2
+  axis1.init(1, axis1Settings);
+  axis1.setInstrumentCoordinate(home.h);
   axis2.init(2, axis2Settings);
-  axis2.setInstrumentCoordinate(degToRad(90.0));
-  axis2.enable(true);
-  axis2.setTracking(true);
+  axis2.setInstrumentCoordinate(home.d);
 
   // ------------------------------------------------------------------------------------------------
   // move in measures (radians) per second, tracking_enabled
   VLF("MSG: Mount::init, starting tracking");
-  trackingState = TS_SIDEREAL;
+  setTrackingState(TS_SIDEREAL);
   axis1.setFrequencyMax(degToRad(4.0));
   trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   updateTrackingRates();
+
+  // automatic movement for axis1 and axis2
+  axis1.setTracking(true);
+  axis2.setTracking(true);
 }
 
 bool Mount::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -445,7 +447,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     double f = strtod(parameter,&conv_end);
     if (&parameter[0] != conv_end && ((f >= 30.0 && f < 90.0) || fabs(f) < 0.1)) {
       if (fabs(f) < 0.1) trackingState = TS_NONE; else {
-        if (trackingState == TS_NONE) { trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true); }
+        if (trackingState == TS_NONE) setTrackingState(TS_SIDEREAL);
         trackingRate = hzToSidereal(f);
       }
       updateTrackingRates();
@@ -621,7 +623,8 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (command[1] == 'R') { clock.setPeriodSubMicros(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
       if (parkState != PS_PARKED) {
-        resetGeneralErrors(); trackingState = TS_SIDEREAL; axis1.enable(true); axis2.enable(true);
+        resetGeneralErrors();
+        setTrackingState(TS_SIDEREAL);
       } else *commandError = CE_PARKED;
     } else
     if (command[1] == 'd') {
@@ -689,6 +692,12 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   } else return false;
 
   return true;
+}
+
+void Mount::setTrackingState(TrackingState state) {
+  if (trackingState == TS_NONE) { axis1.enable(true); axis2.enable(true); }
+  trackingState = state;
+  if (trackingState == TS_SIDEREAL) atHome = false;
 }
 
 void Mount::updatePosition() {

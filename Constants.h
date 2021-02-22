@@ -116,6 +116,10 @@
 #define SIDEREAL_RATIO              1.002737909350795
 #define SIDEREAL_PERIOD             15956313.06126534
 #define SIDEREAL_RATE_HZ            60.16427456104770
+#define Deg10                       0.174532925199432
+#define Deg20                       0.349065850398865
+#define Deg45                       0.785398163397448
+#define Deg60                       1.047197551196597
 #define Deg90                       1.570796326794896
 #define Deg180                      3.141592653589793
 #define Deg360                      6.283185307179586
