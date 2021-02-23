@@ -166,7 +166,7 @@ void Mount::monitor() {
   double a1, a2;
   if (gotoStage == GG_WAYPOINT) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
-      if (destination == home) {
+      if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
         VLF("MSG: Mount::monitor, home reached");
         gotoStage = GG_DESTINATION;
         destination = target;
@@ -224,7 +224,7 @@ void Mount::setWaypoint() {
   destination = home;
 
   // if the home position is at 0 hours, we're done
-  if (home.h = 0.0) return;
+  if (home.h == 0.0) return;
 
   // decide if we should first move to 60 deg. HA (4 hours) to get away from the horizon limits
   if (current.a < Deg10 && fabs(start.h) > Deg90) destination.h = Deg60;
