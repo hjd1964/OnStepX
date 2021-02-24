@@ -109,6 +109,26 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   return true;
 }
 
+void Task::setCallback(void (*callback)()) {
+  this->callback = callback;
+  noInterrupts();
+  switch (hardwareTimer) {
+    case 1:
+      HAL_HWTIMER1_FUN = callback;
+    break;
+    case 2:
+      HAL_HWTIMER2_FUN = callback;
+    break;
+    case 3:
+      HAL_HWTIMER3_FUN = callback;
+    break;
+    case 4:
+      HAL_HWTIMER4_FUN = callback;
+    break;
+  }
+  interrupts();
+}
+
 bool Task::poll() {
   if (hardwareTimer) return false;
 
@@ -355,6 +375,13 @@ bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t num) {
 bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority) {
   if (handle != 0 && allocated[handle - 1]) {
     return task[handle - 1]->requestHardwareTimer(num, hwPriority);
+  } else return false;
+}
+
+bool Tasks::setCallback(uint8_t handle, void (*callback)()) {
+  if (handle != 0 && allocated[handle - 1]) {
+    task[handle - 1]->setCallback(callback);
+    return true;
   } else return false;
 }
 

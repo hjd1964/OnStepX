@@ -67,6 +67,8 @@ class Task {
 
     bool requestHardwareTimer(uint8_t num, uint8_t hwPriority);
 
+    void setCallback(void (*callback)());
+
     // run task at the prescribed interval
     // note: tasks are timed in such a way as to achieve an accurate average frequency, if
     //       the task occurs late the next call is scheduled earlier to make up the difference
@@ -155,6 +157,8 @@ class Tasks {
     //   generally it's a good idea to NOT poll tasks (P macro) from within the process associated with this task
     bool requestHardwareTimer(uint8_t handle, uint8_t num);
     bool requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority);
+
+    bool setCallback(uint8_t handle, void (*callback)());
 
     // remove process task
     // handle: task handle

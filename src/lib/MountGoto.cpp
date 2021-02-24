@@ -142,6 +142,8 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
 
   axis1.setTargetCoordinate(a1);
   axis2.setTargetCoordinate(a2);
+  axis1.setOriginCoordinate();
+  axis2.setOriginCoordinate();
   VLF("MSG: Mount::gotoEqu, target coordinates set");
 
   DL("Final:");
@@ -150,7 +152,15 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   D(" p="); DL(destination.pierSide);
 
   // temporary "fast" slewing
-  gotoRateAxis1 = 50.0; gotoRateAxis2 = 50.0;
+  gotoRateAxis1 = TRACK_BACKLASH_RATE;
+  gotoRateAxis2 = TRACK_BACKLASH_RATE;
+  D("usPerStepCurrent="); DL(usPerStepCurrent);
+
+//usPerStepBase = 1000000.0/((axis1Settings.stepsPerMeasure/RAD)*SLEW_RATE_BASE_DESIRED);
+  
+  gotoRateLimitAxis1 = ((1000000.0/usPerStepBase)/(axis1.getStepsPerMeasure()/RAD))*240.0;
+  D("gotoRateLimitAxis1 (in rads per second)="); DL(gotoRateLimitAxis1);
+  gotoRateLimitAxis2 = ((1000000.0/usPerStepBase)/(axis2.getStepsPerMeasure()/RAD))*240.0;
   updateTrackingRates();
 
   // start the goto monitor
@@ -177,6 +187,8 @@ void Mount::monitor() {
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
+      axis1.setOriginCoordinate();
+      axis2.setOriginCoordinate();
     }
   } else
   if (gotoStage == GG_DESTINATION) {
@@ -203,14 +215,24 @@ void Mount::monitor() {
       return;
     }
 
-    // keep moving the target
+    // keep updating the target
     if (mountType == ALTAZM) transform.equToHor(&target);
     transform.mountToInstrument(&target, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
   }
 
-  if (tracking == TS_SIDEREAL) target.h += radsPerCentisecond;
+  // keep moving the target
+  target.h += radsPerCentisecond;
+
+  // acceleration
+  gotoRateAxis1 = (radToDeg(axis1.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST) * gotoRateLimitAxis1;
+  if (gotoRateAxis1 < TRACK_BACKLASH_RATE) gotoRateAxis1 = TRACK_BACKLASH_RATE; else
+  if (gotoRateAxis1 > gotoRateLimitAxis1)  gotoRateAxis1 = gotoRateLimitAxis1;
+  gotoRateAxis2 = (radToDeg(axis2.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST) * gotoRateLimitAxis2;
+  if (gotoRateAxis2 < TRACK_BACKLASH_RATE) gotoRateAxis2 = TRACK_BACKLASH_RATE; else
+  if (gotoRateAxis2 > gotoRateLimitAxis2)  gotoRateAxis2 = gotoRateLimitAxis2;
+  updateTrackingRates();
 }
 
 void Mount::setWaypoint() {

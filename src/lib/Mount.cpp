@@ -33,10 +33,10 @@ extern Clock clock;
 #include "Mount.h"
 
 #if AXIS1_DRIVER_MODEL != OFF
-  AxisSettings         axis1Settings           = {AXIS1_STEPS_PER_DEGREE*RAD,AXIS1_DRIVER_REVERSE,degToRad(AXIS1_LIMIT_MIN),degToRad(AXIS1_LIMIT_MAX)};
+  AxisSettings axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD,AXIS1_DRIVER_REVERSE,degToRad(AXIS1_LIMIT_MIN),degToRad(AXIS1_LIMIT_MAX)};
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
-  AxisSettings         axis2Settings           = {AXIS2_STEPS_PER_DEGREE*RAD,AXIS2_DRIVER_REVERSE,degToRad(AXIS2_LIMIT_MIN),degToRad(AXIS2_LIMIT_MAX)};
+  AxisSettings axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD,AXIS2_DRIVER_REVERSE,degToRad(AXIS2_LIMIT_MIN),degToRad(AXIS2_LIMIT_MAX)};
 #endif
 
 void Mount::init(int8_t mountType) {
@@ -47,6 +47,14 @@ void Mount::init(int8_t mountType) {
   // get the main axis objects ready
   axis1.init(1, axis1Settings);
   axis2.init(2, axis2Settings);
+
+  // set slew rate
+  usPerStepBase = 1000000.0/((axis1Settings.stepsPerMeasure/RAD)*SLEW_RATE_BASE_DESIRED);
+  D("usPerStepBase="); DL(usPerStepBase);
+  if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
+  usPerStepCurrent = usPerStepBase;
+  D("usPerStepBase="); DL(usPerStepBase);
+  radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
 
   // startup state
   resetHome();
@@ -739,8 +747,8 @@ void Mount::updateTrackingRates() {
     if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
   }
   if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
-  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1 + gotoRateAxis1));
-  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2 + gotoRateAxis2));
+  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1 + gotoRateAxis1)*SIDEREAL_RATIO);
+  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2 + gotoRateAxis2)*SIDEREAL_RATIO);
 }
 
 // check for platform rate limit (lowest maxRate) in us units

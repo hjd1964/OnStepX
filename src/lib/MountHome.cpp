@@ -27,15 +27,14 @@ CommandError Mount::resetHome() {
   // setup axis1 and axis2
   axis1.enable(false);
   axis1.setMotorCoordinateSteps(0);
-  axis1.clearBacklash();
+  axis1.clearBacklashCount();
   axis1.setInstrumentCoordinate(home.h);
   axis1.setFrequencyMax(degToRad(4.0));
   axis2.enable(false);
   axis2.setMotorCoordinateSteps(0);
-  axis2.clearBacklash();
+  axis2.clearBacklashCount();
   axis2.setInstrumentCoordinate(home.d);
   axis2.setFrequencyMax(degToRad(4.0));
-  radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
   atHome = true;
 
   setTrackingState(TS_NONE);

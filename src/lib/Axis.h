@@ -59,7 +59,7 @@ class Axis {
     double getInstrumentCoordinate();
 
     // set origin coordinate as current location
-    void markOriginCoordinate();
+    void setOriginCoordinate();
 
     // target coordinate, in "measures" (degrees, microns, etc.)
     void moveTargetCoordinate(double value);
@@ -67,24 +67,32 @@ class Axis {
     double getTargetCoordinate();
     bool nearTarget();
 
+    // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
+    double getOriginOrTargetDistance();
+
     // sets maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency);
 
-    // causes movement at frequency "measures" (degrees, microns, etc.) per second (0 stops motion)
+    // sets movement frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency);
+    // gets movement frequency in "measures" (degrees, microns, etc.) per second
     double getFrequency();
+    // gets movement frequency in steps per second
     double getFrequencySteps();
 
-    // set and get tracking state (movement of motor to target)
-    void setTracking(bool tracking);
+    // set tracking state (automatic movement of target)
+    void setTracking(bool state);
+    // get tracking state (automatic movement of target)
     bool getTracking();
 
-    // set and get backlash in "measures" (radians, microns, etc.)
+    // set backlash in "measures" (radians, microns, etc.)
     void   setBacklash(double value);
+    // get backlash in "measures" (radians, microns, etc.)
     double getBacklash();
-    void   clearBacklash();
-    void   storeBacklash();
-    void   restoreBacklash();
+    // clear backlash counter
+    void   clearBacklashCount();
+    // enable or disable backlash compensation
+    void   enableBacklash(bool state);
 
     // get minimum and maximum position in "measures" (radians, microns, etc.)
     double getMinCoordinate();
@@ -93,11 +101,19 @@ class Axis {
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
 
-    // set dir as required and move coord toward the target and take a step; requires two calls to take a step
+    // swaps fast unidirectional movement ISR for slewing in/out
+    void enableMoveFast(bool state);
+
+    // sets dir as required and moves coord toward target; requires two calls to take a step
     void move(const int8_t stepPin, const int8_t dirPin);
+    // fast axis movement forward only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
+    void moveFastForward(const int8_t stepPin, const int8_t dirPin);
+    // fast axis movement backward only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
+    void moveFastBackward(const int8_t stepPin, const int8_t dirPin);
 
   private:
     uint8_t task_handle               = 0;
+    uint8_t axis_number               = 0;
 
     bool   invertEnabled              = false;
     bool   enabled                    = false;

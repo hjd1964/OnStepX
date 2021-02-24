@@ -97,8 +97,6 @@ class Mount {
     double     trackingRateAxis2   = 0.0;
     double     deltaRateAxis1      = 0.0;
     double     deltaRateAxis2      = 0.0;
-    double     gotoRateAxis1       = 0.0;
-    double     gotoRateAxis2       = 0.0;
     double     stepsPerSecondAxis1 = AXIS1_STEPS_PER_DEGREE/240.0;
     TrackingState trackingState    = TS_NONE;
     #if TRACK_REFRACTION_RATE_DEFAULT == ON
@@ -123,6 +121,10 @@ class Mount {
     double     usPerStepCurrent    = 64.0;
     double     usPerStepDefault    = 64.0;
     double     usPerStepBase       = 128.0;
+    double     gotoRateAxis1       = 0.0;
+    double     gotoRateAxis2       = 0.0;
+    double     gotoRateLimitAxis1  = 0.0;
+    double     gotoRateLimitAxis2  = 0.0;
 
     // limits
     Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };
