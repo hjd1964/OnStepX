@@ -21,7 +21,7 @@
                                           //         MksGenL2, STM32Blue, FYSETC_S6_2.  Check Constants.h for more info.
 
 // SERIAL PORT COMMAND CHANNELS ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SERIAL
-#define SERIAL_A_BAUD_DEFAULT      115200 //   9600, n. Where n=9600,19200,57600,115200 (common baud rates.)                  Infreq
+#define SERIAL_A_BAUD_DEFAULT        9600 //   9600, n. Where n=9600,19200,57600,115200 (common baud rates.)                  Infreq
 #define SERIAL_B_BAUD_DEFAULT         OFF //   9600, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
 #define SERIAL_B_ESP_FLASHING         OFF //    OFF, ON Upload ESP8266 WiFi firmware through SERIAL_B with :ESPFLASH# cmd.    Option
 #define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n, ON for ESP32 Bluetooth.                                               Option
