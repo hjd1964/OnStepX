@@ -107,10 +107,9 @@
 #define STEP_WAVE_FORM             SQUARE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
 
 // Stepper driver models (also see ~/OnStep/src/sd_drivers/Models.h for additional infrequently used models and more info.): 
-// A4988, DRV8825, LV8729, S109, SSS TMC2209*, TMC2130* **, and TMC5160* ***
-// * = add _QUIET (stealthChop tracking) for example "TMC2130_QUIET"
-// ** = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
-// *** = SSS TMC5160 you must set stepper driver current (in mA) w/ #define AXISn_TMC_IRUN (IHOLD, etc.)
+// GENERIC (step/dir only), A4988, DRV8825, LV8729, S109, SSS TMC2209, TMC2130*, and TMC5160**
+// * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
+// ** = SSS TMC5160 you must set stepper driver current (in mA) w/ #define AXISn_TMC_IRUN (IHOLD, etc.)
 
 // AXIS1 RA/AZM
 // see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS1
