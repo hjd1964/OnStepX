@@ -119,9 +119,9 @@
                                           //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage
 
 #define AXIS1_DRIVER_MODEL          A4988 //    OFF, (See above.) Stepper driver model.                                      <-Often
-#define AXIS1_DRIVER_DECAY            OFF //    OFF, Decay mode                                                               Option
-#define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode                                                               Option
-#define AXIS1_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS1_DRIVER_DECAY            OFF //    OFF, Decay mode for TMC drivers, often STEALTHCHOP is used here.              Option
+#define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode for TMC drivers, often SPREADCYCLE is used here.              Option
+#define AXIS1_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos.                                     Option
 #define AXIS1_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
 #define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
@@ -140,9 +140,9 @@
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
 
 #define AXIS2_DRIVER_MODEL          A4988 //    OFF, (See above.) Stepper driver model.                                      <-Often
-#define AXIS2_DRIVER_DECAY            OFF //    OFF, Decay mode                                                               Option
-#define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode                                                               Option
-#define AXIS2_DRIVER_MICROSTEPS        32 //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS2_DRIVER_DECAY            OFF //    OFF, Decay mode for TMC drivers, often STEALTHCHOP is used here.              Option
+#define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode for TMC drivers, often SPREADCYCLE is used here.              Option
+#define AXIS2_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos.                                     Option
 #define AXIS2_DRIVER_IHOLD            OFF //    OFF, n, (mA.) Current during standstill. OFF uses IRUN/2.0                    Option
 #define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
