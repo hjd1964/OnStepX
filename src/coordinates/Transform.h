@@ -11,12 +11,12 @@
 enum PierSide {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 
 typedef struct Coordinate {
-    double r;
-    double h;
-    double d;
-    double a;
-    double z;
-    PierSide pierSide;
+  double r;
+  double h;
+  double d;
+  double a;
+  double z;
+  PierSide pierSide;
 } Coordinate;
 
 typedef struct Latitude {
@@ -48,14 +48,14 @@ class Transform {
     void nativeToMount(Coordinate *coord, double *a1 = NULL, double *a2 = NULL);
 
     // converts from Mount to Topocentric coordinates (removes pointing model and refraction from equatorial coordinates)
-    void equMountToTopocentric(Coordinate *coord);
+    void mountToTopocentric(Coordinate *coord);
     // converts from Topocentric to Mount coordinates (adds pointing model and refraction to equatorial coordinates)
-    void topocentricToEquMount(Coordinate *coord);
+    void topocentricToMount(Coordinate *coord);
 
-    // converts from Mount to Observed coordinates (removes pointing model from equatorial coordinates)
-    void equMountToObservedPlace(Coordinate *coord);
-    // converts from Observed to Mount coordinates (adds pointing model to equatorial coordinates)
-    void observedPlaceToEquMount(Coordinate *coord);
+    // converts from Mount to Observed coordinates (removes pointing model from coordinates)
+    void mountToObservedPlace(Coordinate *coord);
+    // converts from Observed to Mount coordinates (adds pointing model to coordinates)
+    void observedPlaceToMount(Coordinate *coord);
 
     // converts from Instrument (angular) to Mount (equatorial or horizon) coordinates
     Coordinate instrumentToMount(double a1, double a2);

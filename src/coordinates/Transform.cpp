@@ -20,11 +20,10 @@ void Transform::init(int mountType) {
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   Coordinate result = *coord;
-  if (mountType == ALTAZM) horToEqu(&result);
   #if MOUNT_COORDS == OBSERVED
-    equMountToObservedPlace(&result);
+    mountToObservedPlace(&result);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    equMountToTopocentric(&result);
+    mountToTopocentric(&result);
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
@@ -36,37 +35,34 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   rightAscensionToHourAngle(coord);
   #if MOUNT_COORDS == OBSERVED
-    observedPlaceToEquMount(coord);
+    observedPlaceToMount(coord);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    topocentricToEquMount(coord);
+    topocentricToMount(coord);
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  if (mountType == ALTAZM) {
-    equToHor(coord);
-    if (a1 != NULL && a2 != NULL) { *a1 = coord->z; *a2 = coord->a; }
-  } else {
-    if (a1 != NULL && a2 != NULL) { *a1 = coord->h; *a2 = coord->d; }
+  if (a1 != NULL && a2 != NULL) {
+    if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   }
 }
 
-void Transform::equMountToTopocentric(Coordinate *coord) {
-  equMountToObservedPlace(coord);
+void Transform::mountToTopocentric(Coordinate *coord) {
+  mountToObservedPlace(coord);
   observedPlaceToTopocentric(coord);
 }
 
-void Transform::topocentricToEquMount(Coordinate *coord) {
+void Transform::topocentricToMount(Coordinate *coord) {
   topocentricToObservedPlace(coord);
-  observedPlaceToEquMount(coord);
+  observedPlaceToMount(coord);
 }
 
-void Transform::equMountToObservedPlace(Coordinate *coord) {
+void Transform::mountToObservedPlace(Coordinate *coord) {
   // apply the pointing model
-  // convert HA into RA
+  if (mountType == ALTAZM) horToEqu(coord);
 }
 
-void Transform::observedPlaceToEquMount(Coordinate *coord) {
-  // convert RA into HA
+void Transform::observedPlaceToMount(Coordinate *coord) {
+  if (mountType == ALTAZM) equToHor(coord);
   // de-apply the pointing model
 }
 
