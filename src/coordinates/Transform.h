@@ -40,41 +40,41 @@ class Transform {
     // setup for coordinate transformation
     void init(int mountType);
 
-    // converts between Mount (equatorial or horizon) and Native (equatorial and optionally horizon also) coordinates
+    // converts from Mount (equatorial or horizon) to Native (equatorial and optionally horizon also) coordinates
     // returns equatorial RA
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
-    // converts between Native (equatorial) and Mount (equatorial or horizon) coordinates (optional: a1 is h or z, a2 is d or a)
+    // converts from Native (equatorial) to Mount (equatorial or horizon) coordinates (optional: a1 is h or z, a2 is d or a)
     // accepts equatorial RA
     void nativeToMount(Coordinate *coord, double *a1 = NULL, double *a2 = NULL);
 
-    // converts between Mount and Topocentric coordinates (removes pointing model and refraction from equatorial coordinates)
+    // converts from Mount to Topocentric coordinates (removes pointing model and refraction from equatorial coordinates)
     void equMountToTopocentric(Coordinate *coord);
-    // converts between Topocentric and Mount coordinates (adds pointing model and refraction to equatorial coordinates)
+    // converts from Topocentric to Mount coordinates (adds pointing model and refraction to equatorial coordinates)
     void topocentricToEquMount(Coordinate *coord);
 
-    // converts between Mount and Observed coordinates (removes pointing model from equatorial coordinates)
+    // converts from Mount to Observed coordinates (removes pointing model from equatorial coordinates)
     void equMountToObservedPlace(Coordinate *coord);
-    // converts between Observed and Mount coordinates (adds pointing model to equatorial coordinates)
+    // converts from Observed to Mount coordinates (adds pointing model to equatorial coordinates)
     void observedPlaceToEquMount(Coordinate *coord);
 
-    // converts between Instrument (angular) and Mount (equatorial or horizon) coordinates
+    // converts from Instrument (angular) to Mount (equatorial or horizon) coordinates
     Coordinate instrumentToMount(double a1, double a2);
-    // converts between Mount (equatorial or horizon) and Instrument (angular) coordinates
+    // converts from Mount (equatorial or horizon) to Instrument (angular) coordinates
     void mountToInstrument(Coordinate *coord, double *a1, double *a2);
 
-    // converts between Topocentric and Observed coordinates (removes refraction effects from equatorial coordinates)
+    // converts from Topocentric to Observed coordinates (removes refraction effects from equatorial coordinates)
     void topocentricToObservedPlace(Coordinate *coord);
-    // converts between Observed and Topocentric coordinates (adds refraction effects to equatorial coordinates)
+    // converts from Observed to Topocentric coordinates (adds refraction effects to equatorial coordinates)
     void observedPlaceToTopocentric(Coordinate *coord);
 
-    // converts between Hour Angle (h) and Right Ascension (r) coordinates
+    // converts from Hour Angle (h) to Right Ascension (r) coordinates
     void hourAngleToRightAscension(Coordinate *coord);
-    // converts between Right Ascension (r) and Hour Angle (h) coordinates
+    // converts from Right Ascension (r) to Hour Angle (h) coordinates
     void rightAscensionToHourAngle(Coordinate *coord);
 
-    // convert between Equatorial (h,d) and Horizon (a,z) coordinates
+    // converts from Equatorial (h,d) to Horizon (a,z) coordinates
     void equToHor(Coordinate *coord);
-    // convert between Equatorial (h,d) and Horizon (a,z) coordinates
+    // converts from Equatorial (h,d) to Horizon (a,z) coordinates
     void horToEqu(Coordinate *coord);
 
     // refraction at altitude, pressure (millibars), and temperature (celsius)
