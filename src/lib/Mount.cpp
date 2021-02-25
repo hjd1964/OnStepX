@@ -55,7 +55,7 @@ void Mount::init(int8_t mountType) {
   usPerStepCurrent = usPerStepBase;
   D("usPerStepBase="); DL(usPerStepBase);
 
-  radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
+  radsPerCentisecond = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
 
   // startup state
   resetHome();

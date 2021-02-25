@@ -60,14 +60,6 @@ CommandError Mount::setMountTarget(Coordinate *coords, bool allowPierSideChange)
   double a1, a2;
   transform.nativeToMount(&target, &a1, &a2);
 
-  D("limit.pastMeridianE="); DL(radToDeg(limits.pastMeridianE));
-  D("preferredPierSide="); DL(preferredPierSide);
-  DL("");
-  DL("Start:");
-  D(" h="); DL(radToDeg(a1));
-  D(" d="); DL(radToDeg(a2));
-  D(" p="); DL(target.pierSide);
-
   if (meridianFlip == MF_ALWAYS) {
     if (atHome) {
       if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
@@ -98,11 +90,6 @@ CommandError Mount::syncEqu(Coordinate *coords) {
   transform.mountToInstrument(&target, &a1, &a2);
   axis1.setInstrumentCoordinate(a1);
   axis2.setInstrumentCoordinate(a2);
-
-  DL("Final:");
-  D(" h="); DL(radToDeg(a1));
-  D(" d="); DL(radToDeg(a2));
-  D(" p="); DL(target.pierSide);
 
   safetyLimitsOn = true;
   syncToEncodersOnly = true;
@@ -146,11 +133,6 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   axis2.setOriginCoordinate();
   VLF("MSG: Mount::gotoEqu, target coordinates set");
 
-  DL("Final:");
-  D(" h="); DL(radToDeg(a1));
-  D(" d="); DL(radToDeg(a2));
-  D(" p="); DL(destination.pierSide);
-
   // set rate limit, in sidereal
   gotoRateLimitAxis1 = ((1000000.0/usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD))*240.0;
   gotoRateLimitAxis2 = ((1000000.0/usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD))*240.0;
@@ -161,8 +143,7 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
 
   // start the goto monitor
   if (monitorTaskHandle != 0) tasks.remove(monitorTaskHandle);
-  monitorTaskHandle = tasks.add(0, 0, true, 0, mountMonitorWrapper);
-  tasks.setPeriod(monitorTaskHandle,10);
+  monitorTaskHandle = tasks.add(10, 0, true, 1, mountMonitorWrapper);
   if (monitorTaskHandle) VLF("MSG: Mount::gotoEqu, mount monitor started"); else DLF("MSG: Mount::gotoEqu, mount monitor failed to start");
 
   return CE_NONE;
@@ -206,7 +187,7 @@ void Mount::monitor() {
 
       // locked tracking with movement within axisn ISR, on
       axis1.setTracking(true); axis2.setTracking(true);
-      VLF("MSG: Mount::monitor, axis tracking resumed");
+      VLF("MSG: Mount::monitor, tracking resumed");
 
       // kill this monitor
       tasks.setDurationComplete(monitorTaskHandle);
