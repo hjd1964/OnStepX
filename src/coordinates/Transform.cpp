@@ -19,39 +19,35 @@ void Transform::init(int mountType) {
 }
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
-  tasks_mutex_enter(MX_TRANSFORM_CMD);
   Coordinate result = *coord;
-  if (mountType == ALTAZM) { horToEqu(&result); Y; }
+  if (mountType == ALTAZM) horToEqu(&result);
   #if MOUNT_COORDS == OBSERVED
-    equMountToObservedPlace(&result); Y;
+    equMountToObservedPlace(&result);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    equMountToTopocentric(&result); Y;
+    equMountToTopocentric(&result);
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  hourAngleToRightAscension(&result); Y;
-  if (returnHorizonCoords) { equToHor(&result); Y; }
-  tasks_mutex_exit(MX_TRANSFORM_CMD);
+  hourAngleToRightAscension(&result);
+  if (returnHorizonCoords) equToHor(&result);
   return result;
 }
 
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
-  tasks_mutex_enter(MX_TRANSFORM_CMD);
-  rightAscensionToHourAngle(coord); Y;
+  rightAscensionToHourAngle(coord);
   #if MOUNT_COORDS == OBSERVED
-    observedPlaceToEquMount(coord); Y;
+    observedPlaceToEquMount(coord);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
-    topocentricToEquMount(coord); Y;
+    topocentricToEquMount(coord);
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
   if (mountType == ALTAZM) {
-    equToHor(coord); Y;
+    equToHor(coord);
     if (a1 != NULL && a2 != NULL) { *a1 = coord->z; *a2 = coord->a; }
   } else {
     if (a1 != NULL && a2 != NULL) { *a1 = coord->h; *a2 = coord->d; }
   }
-  tasks_mutex_exit(MX_TRANSFORM_CMD);
 }
 
 void Transform::equMountToTopocentric(Coordinate *coord) {
@@ -143,7 +139,7 @@ void Transform::rightAscensionToHourAngle(Coordinate *coord) {
   unsigned long cs = centisecondLAST;
   interrupts();
   coord->h = csToRad(cs) - coord->r;
-  coord->h = backInRads(coord->h);
+  coord->h = backInRads2(coord->h);
 }
 
 void Transform::equToHor(Coordinate *coord) {
@@ -191,5 +187,11 @@ double Transform::cot(double n) {
 double Transform::backInRads(double angle) {
   while (angle >= Deg360) angle -= Deg360;
   while (angle < 0.0)     angle += Deg360;
+  return angle;
+}
+
+double Transform::backInRads2(double angle) {
+  while (angle >= Deg180) angle -= Deg360;
+  while (angle < -Deg180) angle += Deg360;
   return angle;
 }

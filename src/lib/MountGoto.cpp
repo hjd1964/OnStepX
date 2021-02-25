@@ -23,33 +23,33 @@ CommandError Mount::validateGoto() {
   if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (parkState  != PS_UNPARKED)                return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                    return CE_MOUNT_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC)               return CE_MOUNT_IN_MOTION;
+  if (guideState != GU_NONE)                    return CE_SLEW_IN_MOTION;
+  if (gotoState  == GS_GOTO_SYNC)               return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)                    return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
 
-CommandError Mount::validateGotoCoords(Coordinate coords) {
-  transform.equToHor(&coords);
-  if (coords.a < limits.minAltitude)            return CE_GOTO_ERR_BELOW_HORIZON;
-  if (coords.a > limits.maxAltitude)            return CE_GOTO_ERR_ABOVE_OVERHEAD;
+CommandError Mount::validateGotoCoords(Coordinate *coords) {
+  if (coords->a < limits.minAltitude)           return CE_SLEW_ERR_BELOW_HORIZON;
+  if (coords->a > limits.maxAltitude)           return CE_SLEW_ERR_ABOVE_OVERHEAD;
   if (AXIS2_TANGENT_ARM == OFF && mountType != ALTAZM) {
-    if (coords.d < axis2.getMinCoordinate())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (coords.d > axis2.getMaxCoordinate())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (coords->d < axis2.getMinCoordinate())   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (coords->d > axis2.getMaxCoordinate())   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   }
-  if (coords.h < axis1.getMinCoordinate())      return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (coords.h > axis1.getMaxCoordinate())      return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (coords->h < axis1.getMinCoordinate())     return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (coords->h > axis1.getMaxCoordinate())     return CE_SLEW_ERR_OUTSIDE_LIMITS;
   return CE_NONE;
 }
 
 CommandError Mount::setMountTarget(Coordinate *coords, bool allowPierSideChange) {
-  target = *coords;
-
   CommandError e = validateGoto();
   if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { tracking = true; axis1.enable(true); axis2.enable(true); e = validateGoto(); }
   if (e != CE_NONE) return e;
 
-  e = validateGotoCoords(target);
+  target = *coords;
+  transform.rightAscensionToHourAngle(&target);
+  transform.equToHor(&target);
+  e = validateGotoCoords(&target);
   if (e != CE_NONE) return e;
 
   // east side of pier - we're in the western sky and the HA's are positive
@@ -151,16 +151,12 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   D(" d="); DL(radToDeg(a2));
   D(" p="); DL(destination.pierSide);
 
-  // temporary "fast" slewing
+  // set rate limit, in sidereal
+  gotoRateLimitAxis1 = ((1000000.0/usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD))*240.0;
+  gotoRateLimitAxis2 = ((1000000.0/usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD))*240.0;
+
   gotoRateAxis1 = TRACK_BACKLASH_RATE;
   gotoRateAxis2 = TRACK_BACKLASH_RATE;
-  D("usPerStepCurrent="); DL(usPerStepCurrent);
-
-//usPerStepBase = 1000000.0/((axis1Settings.stepsPerMeasure/RAD)*SLEW_RATE_BASE_DESIRED);
-  
-  gotoRateLimitAxis1 = ((1000000.0/usPerStepBase)/(axis1.getStepsPerMeasure()/RAD))*240.0;
-  D("gotoRateLimitAxis1 (in rads per second)="); DL(gotoRateLimitAxis1);
-  gotoRateLimitAxis2 = ((1000000.0/usPerStepBase)/(axis2.getStepsPerMeasure()/RAD))*240.0;
   updateTrackingRates();
 
   // start the goto monitor
@@ -204,6 +200,10 @@ void Mount::monitor() {
       gotoRateAxis2 = 0.0;
       updateTrackingRates();
 
+      // one last check to be sure the full capability ISR's are active
+      moveFastAxis1 = false; axis1.enableMoveFast(false);
+      moveFastAxis2 = false; axis2.enableMoveFast(false);
+
       // locked tracking with movement within axisn ISR, on
       axis1.setTracking(true); axis2.setTracking(true);
       VLF("MSG: Mount::monitor, axis tracking resumed");
@@ -215,21 +215,28 @@ void Mount::monitor() {
       return;
     }
 
+    // automatically switch to fast ISR's at high speed
+    if ( moveFastAxis1 && gotoRateAxis1 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = false; axis1.enableMoveFast(false); }
+    if (!moveFastAxis1 && gotoRateAxis1 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = true;  axis1.enableMoveFast(true);  }
+    if ( moveFastAxis2 && gotoRateAxis2 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = false; axis2.enableMoveFast(false); }
+    if (!moveFastAxis2 && gotoRateAxis2 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = true;  axis2.enableMoveFast(true);  }
+
     // keep updating the target
     if (mountType == ALTAZM) transform.equToHor(&target);
     transform.mountToInstrument(&target, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
+
   }
 
   // keep moving the target
   target.h += radsPerCentisecond;
 
   // acceleration
-  gotoRateAxis1 = (radToDeg(axis1.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST) * gotoRateLimitAxis1;
+  gotoRateAxis1 = (radToDeg(axis1.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST)*gotoRateLimitAxis1 + TRACK_BACKLASH_RATE;
   if (gotoRateAxis1 < TRACK_BACKLASH_RATE) gotoRateAxis1 = TRACK_BACKLASH_RATE; else
   if (gotoRateAxis1 > gotoRateLimitAxis1)  gotoRateAxis1 = gotoRateLimitAxis1;
-  gotoRateAxis2 = (radToDeg(axis2.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST) * gotoRateLimitAxis2;
+  gotoRateAxis2 = (radToDeg(axis2.getOriginOrTargetDistance())/SLEW_ACCELERATION_DIST)*gotoRateLimitAxis2 + TRACK_BACKLASH_RATE;
   if (gotoRateAxis2 < TRACK_BACKLASH_RATE) gotoRateAxis2 = TRACK_BACKLASH_RATE; else
   if (gotoRateAxis2 > gotoRateLimitAxis2)  gotoRateAxis2 = gotoRateLimitAxis2;
   updateTrackingRates();

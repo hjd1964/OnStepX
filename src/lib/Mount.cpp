@@ -54,6 +54,7 @@ void Mount::init(int8_t mountType) {
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
   usPerStepCurrent = usPerStepBase;
   D("usPerStepBase="); DL(usPerStepBase);
+
   radsPerCentisecond = degToRad(15.0/3600.0)/100.0;
 
   // startup state
@@ -85,7 +86,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     //if (alignActive()) { e = alignStar(); if (e != CE_NONE) { alignNumStars = 0; alignThisStar = 0; commandError = e; } } else e = syncEqu(gotoTarget);
     e = syncEqu(&gotoTarget);
     if (command[1] == 'M') {
-      if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
+      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) strcpy(reply,"N/A");
     }
     *numericReply = false;
@@ -104,9 +105,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //              8=already in motion
   //              9=unspecified error
   if (cmd("MS"))  {
+    DL("MS running...");
     CommandError e = gotoEqu(&gotoTarget);
     strcpy(reply,"0");
-    if (e >= CE_GOTO_ERR_BELOW_HORIZON && e <= CE_GOTO_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_GOTO_ERR_BELOW_HORIZON) + '1';
+    if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
     if (e == CE_NONE) reply[0] = '0';
     *numericReply = false;
     *supressFrame = true;
@@ -282,11 +284,11 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else      // Pier side east
     if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
 
-#if AXIS1_PEC == ON
-    if (mountType != ALTAZM) {
-      reply[4] = (int)pecState|0b10000000;                                       // PEC status: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
-    }
-#endif
+    #if AXIS1_PEC == ON
+      if (mountType != ALTAZM) {
+        reply[4] = (int)pecState|0b10000000;                                     // PEC status: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
+      }
+    #endif
     reply[5] = (int)parkState|0b10000000;                                        // Park status: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
     reply[6] = (int)pulseGuideRate|0b10000000;                                   // Pulse-guide rate
     reply[7] = (int)guideRate|0b10000000;                                        // Guide rate
@@ -311,7 +313,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
           if (mountType == ALTAZM) strcpy(reply,"D"); else strcpy(reply,"R");
         } else strcpy(reply,"N");
       break;
-//    case '9': dtostrf(maxRateLowerLimit()/16.0,3,3,reply); break;              // MaxRate (fastest/lowest)
+      case '9': dtostrf(usPerStepLowerLimit(),3,3,reply); break;                 // fastest step rate in microseconds
 //    case 'A': dtostrf(ambient.getTemperature(),3,1,reply); break;              // temperature in deg. C
 //    case 'B': dtostrf(ambient.getPressure(),3,1,reply); break;                 // pressure in mb
 //    case 'C': dtostrf(ambient.getHumidity(),3,1,reply); break;                 // relative humidity in %
@@ -486,7 +488,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
           if (usPerStepCurrent < usPerStepLowerLimit()) usPerStepCurrent = usPerStepLowerLimit();
           //nv.writeLong(EE_maxRateL,maxRate);
           //setAccelerationRates(maxRate);
-        } else *commandError = CE_MOUNT_IN_MOTION;
+        } else *commandError = CE_SLEW_IN_MOTION;
       break;
       case '3': // slew rate preset (returns nothing)
         *numericReply = false;
@@ -503,7 +505,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
           //nv.writeLong(EE_maxRateL,maxRate);
           //setAccelerationRates(maxRate);
-        } else *commandError = CE_MOUNT_IN_MOTION;
+        } else *commandError = CE_SLEW_IN_MOTION;
       break;
       case '5': // autoMeridianFlip
         if (parameter[3] == '0' || parameter[3] == '1') {
@@ -650,7 +652,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
       } else *commandError = CE_PARKED;
     } else
     if (command[1] == 'd') {
-      if (gotoState == GS_NONE && guideState == GU_NONE) trackingState = TS_NONE; else *commandError = CE_MOUNT_IN_MOTION;
+      if (gotoState == GS_NONE && guideState == GU_NONE) trackingState = TS_NONE; else *commandError = CE_SLEW_IN_MOTION;
     } else *commandError = CE_CMD_UNKNOWN;
 
     if (*commandError == CE_NONE) {

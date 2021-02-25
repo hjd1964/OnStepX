@@ -23,6 +23,8 @@ typedef struct AxisPins {
 
 enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
 
+enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
+
 class Axis {
   public:
     // creation and basic initialization
@@ -107,9 +109,9 @@ class Axis {
     // sets dir as required and moves coord toward target; requires two calls to take a step
     void move(const int8_t stepPin, const int8_t dirPin);
     // fast axis movement forward only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
-    void moveFastForward(const int8_t stepPin, const int8_t dirPin);
-    // fast axis movement backward only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
-    void moveFastBackward(const int8_t stepPin, const int8_t dirPin);
+    void moveForwardFast(const int8_t stepPin, const int8_t dirPin);
+    // fast axis movement reverse only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
+    void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
 
   private:
     uint8_t task_handle               = 0;
@@ -134,7 +136,7 @@ class Axis {
     volatile bool invertStep          = false;
     volatile bool takeStep            = false;
     volatile bool invertDir           = false;
-    volatile bool dirFwd              = true;
+    Direction direction               = DIR_NONE;
 
     volatile long backlashSteps       = 0;
     long   backlashStepsStore         = 0;

@@ -62,12 +62,12 @@ enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 
 class Task {
   public:
-    Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
+    Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
     ~Task();
 
     bool requestHardwareTimer(uint8_t num, uint8_t hwPriority);
 
-    void setCallback(void (*callback)());
+    void setCallback(void (*volatile callback)());
 
     // run task at the prescribed interval
     // note: tasks are timed in such a way as to achieve an accurate average frequency, if
@@ -115,7 +115,7 @@ class Task {
     unsigned long          start_time                 = 0;
     unsigned long          next_task_time             = 0;
     uint8_t                hardwareTimer              = 0;
-    void (*callback)() = NULL;
+    void (*volatile callback)() = NULL;
 
     #ifdef TASKS_PROFILER_ENABLE
       volatile double        average_arrival_time       = 0;
@@ -142,9 +142,9 @@ class Tasks {
     //           round robin within their priority levels, the most recently serviced task will be last visited again
     // callback: function to handle this tasks processing
     // returns:  handle to the task on success, or 0 on failure
-    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
+    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
     // as above, and adds a process name
-    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)(), const char name[]);
+    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]);
 
     // allocates a hardware timer, if available, for this task
     // handle:       task handle
@@ -158,7 +158,7 @@ class Tasks {
     bool requestHardwareTimer(uint8_t handle, uint8_t num);
     bool requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority);
 
-    bool setCallback(uint8_t handle, void (*callback)());
+    bool setCallback(uint8_t handle, void (*volatile callback)());
 
     // remove process task
     // handle: task handle

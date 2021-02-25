@@ -48,9 +48,10 @@ class Mount {
     void updateHomePosition();
 
   private:
-    // check mount status ahead of sync or goto
+    // general status checks ahead of sync or goto
     CommandError validateGoto();
-    CommandError validateGotoCoords(Coordinate coords);
+    // target coordinate checks ahead of sync or goto
+    CommandError validateGotoCoords(Coordinate *coords);
 
     CommandError setMountTarget(Coordinate *coords, bool pierSideChangeCheck);
 
@@ -63,9 +64,8 @@ class Mount {
     // reset mount
     CommandError resetHome();
 
+    // set any waypoints required for a goto
     void setWaypoint();
-
-    void pierSide();
 
     // change tracking state
     void setTrackingState(TrackingState state);
@@ -125,6 +125,8 @@ class Mount {
     double     gotoRateAxis2       = 0.0;
     double     gotoRateLimitAxis1  = 0.0;
     double     gotoRateLimitAxis2  = 0.0;
+    bool       moveFastAxis1       = false;
+    bool       moveFastAxis2       = false;
 
     // limits
     Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };

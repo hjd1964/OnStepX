@@ -11,14 +11,15 @@
 
 #include "../coordinates/Transform.h"
 extern Transform transform;
+#include "../commands/ProcessCmds.h"
 #include "Axis.h"
 extern Axis axis1;
 extern Axis axis2;
 #include "Mount.h"
 
 CommandError Mount::resetHome() {
-  if (guideState != GU_NONE)      return CE_MOUNT_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC) return CE_MOUNT_IN_MOTION;
+  if (guideState != GU_NONE)      return CE_SLEW_IN_MOTION;
+  if (gotoState  == GS_GOTO_SYNC) return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)      return CE_SLEW_IN_SLEW;
 
   // setup where the home position is

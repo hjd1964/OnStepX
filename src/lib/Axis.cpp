@@ -22,8 +22,8 @@ extern Clock clock;
   const AxisPins Axis1DriverStepPins = {AXIS1_STEP_PIN,AXIS1_DIR_PIN,AXIS1_ENABLE_PIN,false,false,true};
   Axis axis1{Axis1DriverStepPins};
   inline void moveAxis1() { axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  inline void moveFastForwardAxis1() { axis1.moveFastForward(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  inline void moveFastBackwardAxis1() { axis1.moveFastBackward(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  inline void moveForwardFastAxis1() { axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  inline void moveReverseFastAxis1() { axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 
 #if AXIS2_DRIVER_MODEL != OFF
@@ -35,8 +35,8 @@ extern Clock clock;
   const AxisPins Axis2DriverStepPins = {AXIS2_STEP_PIN,AXIS2_DIR_PIN,AXIS2_ENABLE_PIN,false,false,true};
   Axis axis2{Axis2DriverStepPins};
   inline void moveAxis2() { axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  inline void moveFastForwardAxis2() { axis2.moveFastForward(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  inline void moveFastBackwardAxis2() { axis2.moveFastBackward(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  inline void moveForwardFastAxis2() { axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  inline void moveReverseFastAxis2() { axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 
 #if AXIS3_DRIVER_MODEL != OFF
@@ -329,69 +329,108 @@ double Axis::getMaxCoordinate() {
 }
 
 void Axis::enableMoveFast(bool state) {
+  // make sure the direction is set
+  noInterrupts();
+  if (motorSteps + backlashSteps < targetSteps) {
+    direction = DIR_FORWARD;
+    digitalWriteF(Pins.dir, invertDir?HIGH:LOW);
+  } else if (motorSteps + backlashSteps > targetSteps) {
+    direction = DIR_REVERSE;
+    digitalWriteF(Pins.dir, invertDir?LOW:HIGH);
+  } else direction = DIR_NONE;
+  interrupts();
+  
+  if (direction == DIR_NONE) return;
+
   #if AXIS1_DRIVER_MODEL != OFF
-    if (state) {
-      if (axis_number == 1) { if (dirFwd) tasks.setCallback(task_handle, moveFastForwardAxis1); else tasks.setCallback(task_handle, moveFastBackwardAxis1); }
-    } else {
-      if (axis_number == 1) tasks.setCallback(task_handle, moveAxis1);
+    if (axis_number == 1) {
+      if (!state) tasks.setCallback(task_handle, moveAxis1); else {
+        if (direction == DIR_FORWARD) tasks.setCallback(task_handle, moveForwardFastAxis1); else tasks.setCallback(task_handle, moveReverseFastAxis1);
+      } 
     }
   #endif
   #if AXIS2_DRIVER_MODEL != OFF
-    if (state) {
-      if (axis_number == 2) { if (dirFwd) tasks.setCallback(task_handle, moveFastForwardAxis2); else tasks.setCallback(task_handle, moveFastBackwardAxis2); }
-    } else {
-      if (axis_number == 2) tasks.setCallback(task_handle, moveAxis2);
+    if (axis_number == 2) {
+      if (!state) tasks.setCallback(task_handle, moveAxis2); else {
+        if (direction == DIR_FORWARD) tasks.setCallback(task_handle, moveForwardFastAxis2); else tasks.setCallback(task_handle, moveReverseFastAxis2);
+      }
     }
   #endif
 }
 
 inline void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   if (takeStep) {
-    if (tracking) targetSteps += trackingStep;
-    if (motorSteps + backlashSteps > targetSteps) {
-      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
-      digitalWriteF(stepPin, invertStep?LOW:HIGH);
-    } else
-    if (motorSteps + backlashSteps < targetSteps) {
+    if (direction == DIR_FORWARD) {
       if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
-      digitalWriteF(stepPin, invertStep?LOW:HIGH);
+      digitalWriteF(stepPin, HIGH);
+    } else
+    if (direction == DIR_REVERSE) {
+      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+      digitalWriteF(stepPin, HIGH);
     }
   } else {
-    if (motorSteps + backlashSteps > targetSteps) {
-      if (!dirFwd) { dirFwd = !dirFwd; digitalWriteF(dirPin, invertDir?LOW:HIGH); }
-    } else if (motorSteps + backlashSteps < targetSteps) {
-      if (dirFwd) { dirFwd = !dirFwd; digitalWriteF(dirPin, invertDir?HIGH:LOW); }
-    }
+    if (tracking) targetSteps += trackingStep;
+    if (motorSteps + backlashSteps < targetSteps) {
+      direction = DIR_FORWARD;
+      digitalWriteF(dirPin, LOW);
+    } else if (motorSteps + backlashSteps > targetSteps) {
+      direction = DIR_REVERSE;
+      digitalWriteF(dirPin, HIGH);
+    } else direction = DIR_NONE;
     if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
-    digitalWriteF(stepPin,invertStep?HIGH:LOW);
+    digitalWriteF(stepPin, LOW);
   }
   takeStep = !takeStep;
 }
 
-inline void Axis::moveFastForward(const int8_t stepPin, const int8_t dirPin) {
-  #if STEP_WAVE_FORM == PULSE
-    digitalWriteF(stepPin, LOW);
-  #endif
+#if MODE_SWITCH == ON
   #if STEP_WAVE_FORM == SQUARE
+  inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
-  #endif
-      if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
-  #if STEP_WAVE_FORM == SQUARE
-    } else digitalWriteF(stepPin, LOW);
-    takeStep = !takeStep;
-  #endif
-}
-
-inline void Axis::moveFastBackward(const int8_t stepPin, const int8_t dirPin) {
-  #if STEP_WAVE_FORM == PULSE
-    digitalWriteF(stepPin, LOW);
-  #endif
-  #if STEP_WAVE_FORM == SQUARE
-    if (takeStep) {
-  #endif
       if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
-  #if STEP_WAVE_FORM == SQUARE
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
+  }
+  inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    if (takeStep) {
+      if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
+    } else digitalWriteF(stepPin, LOW);
+    takeStep = !takeStep;
+  }
   #endif
-}
+  #if STEP_WAVE_FORM == PULSE
+  inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+    digitalWriteF(stepPin, LOW);
+    if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
+  }
+  inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    digitalWriteF(stepPin, LOW);
+    if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
+  }
+  #endif
+#else
+  #if STEP_WAVE_FORM == SQUARE
+    inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+      if (takeStep) {
+        if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
+      } else digitalWriteF(stepPin, LOW);
+      takeStep = !takeStep;
+    }
+    inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+      if (takeStep) {
+        if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
+      } else digitalWriteF(stepPin, LOW);
+      takeStep = !takeStep;
+    }
+  #endif
+  #if STEP_WAVE_FORM == PULSE
+    inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+      digitalWriteF(stepPin, LOW);
+      if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
+    }
+    inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+      digitalWriteF(stepPin, LOW);
+      if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
+    }
+  #endif
+#endif

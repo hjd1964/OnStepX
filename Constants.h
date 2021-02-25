@@ -100,8 +100,14 @@
 #define ASTROMETRIC_J2000           4
 #define COORD_MODE_LAST             4
 
+// step modes
+#define STEP_MODE_FIRST             1
+#define SQUARE                      1
+#define PULSE                       2
+#define STEP_MODE_LAST              2
+
 // etc.
-#define INVALID                     -32767
+#define INVALID                     -127
 
 // Mutexes -------------------------------------------------------------------------------------------------------------------------
 #define MX_CLOCK_CMD                0
