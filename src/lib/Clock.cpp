@@ -235,7 +235,9 @@ double Clock::backInHourAngle(double time) {
 }
 
 double Clock::julianDateToLAST(JulianDate julianDate) {
+  DL("ST 1"); delay(100);
   double gast = julianDateToGAST(julianDate);
+  DL("ST 2"); delay(100);
   return backInHours(gast - radToHrs(transform.site.longitude));
 }
 
