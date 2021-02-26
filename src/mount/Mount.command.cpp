@@ -24,8 +24,8 @@ extern Tasks tasks;
 #include "../coordinates/Site.h"
 #include "../commands/ProcessCmds.h"
 extern GeneralErrors generalErrors;
-#include "../StepDrivers/StepDrivers.h"
-#include "Axis.h"
+#include "../motion/StepDrivers.h"
+#include "../motion/Axis.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;

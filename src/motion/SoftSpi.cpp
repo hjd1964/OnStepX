@@ -2,6 +2,11 @@
 // Simple software SPI routines (CPOL=1, CPHA=1) just for TMC stepper drivers
 #include <Arduino.h>
 #include "../../Constants.h"
+#include "../../Config.h"
+#include "../../ConfigX.h"
+#include "../HAL/HAL.h"
+#include "../pinmaps/Models.h"
+#include "../debug/Debug.h"
 
 #include "SoftSpi.h"
 

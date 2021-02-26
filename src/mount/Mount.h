@@ -13,8 +13,8 @@
 #include "../debug/Debug.h"
 #include "../commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
-#include "../StepDrivers/StepDrivers.h"
-#include "Axis.h"
+#include "../motion/StepDrivers.h"
+#include "../motion/Axis.h"
 
 typedef struct Limits {
   float minAxis1;

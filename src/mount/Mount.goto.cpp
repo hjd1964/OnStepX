@@ -6,16 +6,15 @@
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include "../coordinates/Transform.h"
-#include "Axis.h"
-#include "Telescope.h"
+#include "../motion/Axis.h"
+#include "../telescope/Telescope.h"
 extern Telescope telescope;
 #include "Mount.h"
 

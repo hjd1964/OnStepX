@@ -5,7 +5,6 @@
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../debug/Debug.h"
-
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 

@@ -6,24 +6,23 @@
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
+#include "../debug/Debug.h"
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
+#include "../coordinates/Transform.h"
+#include "../coordinates/Site.h"
+#include "../motion/StepDrivers.h"
+#include "../motion/Axis.h"
+#include "Mount.h"
 
 #if STEPS_PER_WORM_ROTATION == 0
   #define AXIS1_PEC ON
 #else
   #define AXIS1_PEC OFF
 #endif
-
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
-
-#include "../coordinates/Transform.h"
-#include "../coordinates/Site.h"
-#include "../StepDrivers/StepDrivers.h"
-#include "Axis.h"
-#include "Mount.h"
 
 void Mount::init() {
   transform.init();

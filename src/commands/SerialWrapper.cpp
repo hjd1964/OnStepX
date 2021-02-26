@@ -7,6 +7,7 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
+
 #include "SerialWrapper.h"
 
 SerialWrapper::SerialWrapper() {

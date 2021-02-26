@@ -3,7 +3,7 @@
 #pragma once
 #include <Arduino.h>
 
-#include "../StepDrivers/StepDrivers.h"
+#include "StepDrivers.h"
 
 typedef struct AxisSettings {
   double  stepsPerMeasure;

@@ -48,7 +48,7 @@
 #include "src/tasks/OnTask.h"
 Tasks tasks;
 
-#include "src/lib/Telescope.h"
+#include "src/telescope/Telescope.h"
 extern Telescope telescope;
 
 #ifdef SERIAL_A

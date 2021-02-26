@@ -7,10 +7,11 @@
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
+
 #include "BufferCmds.h"
 #include "SerialWrapper.h"
-#include "../lib/Telescope.h"
 #include "ProcessCmds.h"
+#include "../telescope/Telescope.h"
 
 extern Telescope telescope;
 

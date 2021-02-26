@@ -89,6 +89,10 @@ class StepDriver {
     DriverPins pins;
     DriverSettings settings;
     
+    #ifdef HAS_TMC_DRIVER
+      TmcDriver tmcDriver{pins};
+    #endif
+
     uint8_t microstepRatio        = 1;
     int     microstepCode         = OFF;
     int     microstepCodeGoto     = OFF;
@@ -97,7 +101,4 @@ class StepDriver {
     int8_t  m2Pin                 = OFF;
     int8_t  decayPin              = OFF;
 
-    #ifdef HAS_TMC_DRIVER
-      TmcDriver tmcDriver{Pins};
-    #endif
 };

@@ -2,7 +2,7 @@
 // observatory site and time
 #pragma once
 #include "../commands/ProcessCmds.h"
-#include "Mount.h"
+#include "../mount/Mount.h"
 
 class Telescope {
   public:

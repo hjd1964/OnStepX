@@ -6,13 +6,12 @@
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
 #include "../pinmaps/Models.h"
-
 #include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
 #include "../commands/ProcessCmds.h"
-#include "Mount.h"
+#include "../mount/Mount.h"
 #include "Telescope.h"
 
 Telescope telescope;

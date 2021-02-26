@@ -40,7 +40,6 @@ void Site::init() {
 
   // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);
-
 }
 
 void Site::update() {
@@ -104,9 +103,9 @@ double Site::backInHourAngle(double time) {
 }
 
 double Site::julianDateToLAST(JulianDate julianDate) {
-  DL("ST 1"); delay(100);
+ // DL("ST 1"); delay(100);
   double gast = julianDateToGAST(julianDate);
-  DL("ST 2"); delay(100);
+//  DL("ST 2"); delay(100);
   return backInHours(gast - radToHrs(location.longitude));
 }
 
