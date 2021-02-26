@@ -9,35 +9,49 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../coordinates/Transform.h"
-extern Transform transform;
+#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
+
+#include "../coordinates/Transform.h"
 #include "Axis.h"
-extern Axis axis1;
-extern Axis axis2;
+#include "Telescope.h"
+extern Telescope telescope;
 #include "Mount.h"
-extern void mountMonitorWrapper();
 
 CommandError Mount::validateGoto() {
-  if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
-  if (parkState  != PS_UNPARKED)                return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                    return CE_SLEW_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC)               return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE)                    return CE_SLEW_IN_SLEW;
+  if ( axis1.fault()     ||  axis2.fault())       return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!axis1.isEnabled() || !axis2.isEnabled())   return CE_SLEW_ERR_IN_STANDBY;
+  if (parkState  != PS_UNPARKED)                  return CE_SLEW_ERR_IN_PARK;
+  if (guideState != GU_NONE)                      return CE_SLEW_IN_MOTION;
+  if (gotoState  == GS_GOTO_SYNC)                 return CE_SLEW_IN_MOTION;
+  if (gotoState  != GS_NONE)                      return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
 
 CommandError Mount::validateGotoCoords(Coordinate *coords) {
-  if (coords->a < limits.minAltitude)           return CE_SLEW_ERR_BELOW_HORIZON;
-  if (coords->a > limits.maxAltitude)           return CE_SLEW_ERR_ABOVE_OVERHEAD;
-  if (AXIS2_TANGENT_ARM == OFF && mountType != ALTAZM) {
-    if (coords->d < axis2.getMinCoordinate())   return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (coords->d > axis2.getMaxCoordinate())   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  DL(radToDeg(coords->h));
+  char ws[80]; sprintf(ws, "%1.12f", coords->d); DL(ws);
+//  DL(radToDeg(coords->d));
+  DL(radToDeg(limits.minAxis2));
+  DL(radToDeg(limits.maxAxis2));
+  DL(radToDeg(limits.minAxis1));
+  DL(radToDeg(limits.maxAxis1));
+  if (flt(coords->a, limits.minAltitude))         return CE_SLEW_ERR_BELOW_HORIZON;
+  DL("1");
+  if (fgt(coords->a, limits.maxAltitude))         return CE_SLEW_ERR_ABOVE_OVERHEAD;
+  DL("2");
+  if (AXIS2_TANGENT_ARM == OFF && transform.mountType != ALTAZM) {
+    if (flt(coords->d, limits.minAxis2)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  DL("3");
+  char ws[80]; sprintf(ws, "%1.12f", limits.maxAxis2); DL(ws);
+    if (fgt(coords->d, limits.maxAxis2)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  DL("4");
   }
-  if (coords->h < axis1.getMinCoordinate())     return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (coords->h > axis1.getMaxCoordinate())     return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (flt(coords->h, limits.minAxis1))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  DL("5");
+  if (fgt(coords->h, limits.maxAxis1))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  DL("6");
   return CE_NONE;
 }
 
@@ -47,6 +61,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, bool allowPierSideChange)
   if (e != CE_NONE) return e;
 
   target = *coords;
+  // NAN is a flag that the RA shouldn't be converted (go directly to h,d)
   transform.rightAscensionToHourAngle(&target);
   transform.equToHor(&target);
   e = validateGotoCoords(&target);
@@ -99,6 +114,8 @@ CommandError Mount::syncEqu(Coordinate *coords) {
   return CE_NONE;
 }
 
+inline void mountMonitorWrapper() { telescope.mount.monitor(); }
+  
 CommandError Mount::gotoEqu(Coordinate *coords) {
   CommandError e = setMountTarget(coords, true);
   if (e != CE_NONE) return e;
@@ -114,7 +131,7 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   // prepare goto, check for any waypoints and set them if found
   gotoState = GS_GOTO;
   gotoStage = GG_DESTINATION;
-  if (MFLIP_SKIP_HOME == OFF && mountType != ALTAZM && start.pierSide != destination.pierSide) {
+  if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
     VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
     setWaypoint();
   }
@@ -134,8 +151,8 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   VLF("MSG: Mount::gotoEqu, target coordinates set");
 
   // set rate limit, in sidereal
-  gotoRateLimitAxis1 = ((1000000.0/usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD))*240.0;
-  gotoRateLimitAxis2 = ((1000000.0/usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD))*240.0;
+  gotoRateLimitAxis1 = ((1000000.0/usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
+  gotoRateLimitAxis2 = ((1000000.0/usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
 
   gotoRateAxis1 = TRACK_BACKLASH_RATE;
   gotoRateAxis2 = TRACK_BACKLASH_RATE;
@@ -197,13 +214,13 @@ void Mount::monitor() {
     }
 
     // automatically switch to fast ISR's at high speed
-    if ( moveFastAxis1 && gotoRateAxis1 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = false; axis1.enableMoveFast(false); }
-    if (!moveFastAxis1 && gotoRateAxis1 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = true;  axis1.enableMoveFast(true);  }
-    if ( moveFastAxis2 && gotoRateAxis2 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = false; axis2.enableMoveFast(false); }
-    if (!moveFastAxis2 && gotoRateAxis2 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = true;  axis2.enableMoveFast(true);  }
+    if ( moveFastAxis1 && gotoRateAxis1 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = false; axis1.enableMoveFast(false); DL("MSG: Mount::monitor, Axis1 low speed ISR"); }
+    if (!moveFastAxis1 && gotoRateAxis1 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis1 = true;  axis1.enableMoveFast(true);  DL("MSG: Mount::monitor, Axis1 high speed ISR"); }
+    if ( moveFastAxis2 && gotoRateAxis2 < TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = false; axis2.enableMoveFast(false); DL("MSG: Mount::monitor, Axis2 low speed ISR"); }
+    if (!moveFastAxis2 && gotoRateAxis2 > TRACK_BACKLASH_RATE*1.2) { moveFastAxis2 = true;  axis2.enableMoveFast(true);  DL("MSG: Mount::monitor, Axis2 high speed ISR"); }
 
     // keep updating the target
-    if (mountType == ALTAZM) transform.equToHor(&target);
+    if (transform.mountType == ALTAZM) transform.equToHor(&target);
     transform.mountToInstrument(&target, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
@@ -243,11 +260,11 @@ void Mount::setWaypoint() {
   // if at a low latitude and in the opposite sky, |HA| = 6 is very low on the horizon and we need
   // to delay arriving there during a meridian flip.  In the extreme case, where the user is very
   // near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation
-  if (current.a < Deg20 && transform.site.latitude.absval < Deg45) {
-    if (transform.site.latitude.value >= 0) {
-      if (current.d <= Deg90 - transform.site.latitude.value) destination.h = Deg45;
+  if (current.a < Deg20 && transform.site.location.latitude.absval < Deg45) {
+    if (transform.site.location.latitude.value >= 0) {
+      if (current.d <= Deg90 - transform.site.location.latitude.value) destination.h = Deg45;
     } else {
-      if (current.d >= -Deg90 - transform.site.latitude.value) destination.h = Deg45;
+      if (current.d >= -Deg90 - transform.site.location.latitude.value) destination.h = Deg45;
     }
   }
 }

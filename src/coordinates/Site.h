@@ -4,21 +4,33 @@
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
 
-class Clock {
+typedef struct Latitude {
+  double   value;
+  double   sine;
+  double   cosine;
+  double   absval;
+  double   sign;
+} Latitude;
+
+typedef struct Location {
+  Latitude latitude;
+  double   longitude;
+  bool     ready;
+} Location;
+
+class Site {
   public:
-    // sets date/time from NV and/or the various TLS sources
-    // and sets up an event to tick the centisecond sidereal clock
+    // gets date/time/location from NV and/or the various TLS sources
     void init();
     
-    // adjusts the period of the centisecond sidereal clock, in counts per second
-    void setPeriodSubMicros(unsigned long period);
-    unsigned long getPeriodSubMicros();
+    // update/apply the site latitude and longitude, necessary for LAST calculations etc.
+    void update();
 
-    // update/apply the site longitude, necessary for LAST calculations
-    void updateSite();
+    // adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
+    // adjust up/down to compensate for MCU oscillator inaccuracy
+    void setPeriodSubMicros(unsigned long period);
 
     // handle date/time commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -29,6 +41,8 @@ class Clock {
     // callback to tick the centisecond sidereal clock
     void tick();
 
+    Location location;
+    Convert convert;
   private:
 
     // sets the time in hours that have passed in this Julian Day

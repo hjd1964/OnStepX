@@ -4,8 +4,6 @@
 
 #include "Convert.h"
 
-Convert convert;
-
 // convert string in format MM/DD/YY to Date
 GregorianDate Convert::strToDate(char *ymd) {
   GregorianDate date;

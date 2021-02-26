@@ -59,12 +59,9 @@ typedef struct DriverSettings {
 
 class StepDriver {
   public:
-    // create and set pin values and driver model/microstep mode (from Config.h)
-    StepDriver(DriverPins Pins, DriverSettings Settings) : Pins{ Pins }, Settings{ Settings } {}
-
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
-    void init();
+    void init(uint8_t axisNumber);
 
     // set microstep and decay modes for tracking
     void modeTracking();
@@ -88,6 +85,9 @@ class StepDriver {
     // translate the human readable microsteps in the configuration to mode bit settings
     // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
     int microstepsToCode(uint8_t driverModel, uint8_t microsteps);
+
+    DriverPins pins;
+    DriverSettings settings;
     
     uint8_t microstepRatio        = 1;
     int     microstepCode         = OFF;
@@ -96,9 +96,6 @@ class StepDriver {
     uint8_t microstepBitCodeGoto  = 0;
     int8_t  m2Pin                 = OFF;
     int8_t  decayPin              = OFF;
-
-    const DriverPins Pins         = {OFF, OFF, OFF, OFF, OFF};
-    const DriverSettings Settings = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
 
     #ifdef HAS_TMC_DRIVER
       TmcDriver tmcDriver{Pins};

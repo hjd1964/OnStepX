@@ -27,12 +27,8 @@ enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
 
 class Axis {
   public:
-    // creation and basic initialization
-    Axis(AxisPins Pins) :
-      Pins{ Pins } {};
-
-    // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber, AxisSettings axisSettings);
+     // sets up the driver step/dir/enable pins and any associated driver mode control
+    void init(uint8_t axisNumber);
 
     // enables or disables the associated step/dir driver
     void enable(bool value);
@@ -88,17 +84,15 @@ class Axis {
     bool getTracking();
 
     // set backlash in "measures" (radians, microns, etc.)
-    void   setBacklash(double value);
+    void setBacklash(double value);
     // get backlash in "measures" (radians, microns, etc.)
     double getBacklash();
-    // clear backlash counter
-    void   clearBacklashCount();
-    // enable or disable backlash compensation
-    void   enableBacklash(bool state);
-
-    // get minimum and maximum position in "measures" (radians, microns, etc.)
-    double getMinCoordinate();
-    double getMaxCoordinate();
+    // returns true if traveling through backlash
+    bool inBacklash();
+    // disable backlash compensation, to work properly there must be an enable call to match
+    void disableBacklash();
+    // enable backlash compensation, to work properly this must be proceeded by a disable call
+    void enableBacklash();
 
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
@@ -114,8 +108,13 @@ class Axis {
     void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
 
   private:
-    uint8_t task_handle               = 0;
-    uint8_t axis_number               = 0;
+    StepDriver driver;
+
+    AxisSettings settings;
+    AxisPins pins;
+
+    uint8_t taskHandle               = 0;
+    uint8_t axisNumber               = 0;
 
     bool   invertEnabled              = false;
     bool   enabled                    = false;
@@ -142,9 +141,6 @@ class Axis {
     long   backlashStepsStore         = 0;
     long   backlashAmountSteps        = 0;
 
-    long   minSteps                   = 0;
-    long   maxSteps                   = 0;
-
     double spm                        = 1.0;
 
     double trackingFreq               = 0.0;
@@ -157,7 +153,4 @@ class Axis {
     unsigned long minPeriodMicrosHalf = 0;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
-
-    const AxisPins       Pins         = {OFF, OFF, OFF, false, false, false};
-
 };

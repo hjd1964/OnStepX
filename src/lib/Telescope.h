@@ -1,8 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // observatory site and time
 #pragma once
-#include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
 #include "Mount.h"
 
@@ -35,6 +33,5 @@ class Telescope {
     #endif
 
   private:
-    Site site;
 
 };

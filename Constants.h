@@ -117,8 +117,8 @@
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
-#define RAD                         57.29577951308232
-#define RAD_HOUR_RATIO              3.819718634205488
+#define RAD_DEG_RATIO               ((double)57.29577951308232L)
+#define RAD_HOUR_RATIO              ((double)3.819718634205488L)
 #define SIDEREAL_RATIO              1.002737909350795
 #define SIDEREAL_PERIOD             15956313.06126534
 #define SIDEREAL_RATE_HZ            60.16427456104770
@@ -132,10 +132,11 @@
 
 // for handling degenerate spherical coordinates near the poles
 #define SmallestRad                 0.000005
+#define SmallestFloat               0.00000001
 
 // conversion math
-#define degToRad(x)                 ((x)/RAD)
-#define radToDeg(x)                 ((x)*RAD)
+#define degToRad(x)                 ((x)/RAD_DEG_RATIO)
+#define radToDeg(x)                 ((x)*RAD_DEG_RATIO)
 #define hrsToRad(x)                 ((x)/RAD_HOUR_RATIO)
 #define radToHrs(x)                 ((x)*RAD_HOUR_RATIO)
 #define csToRad(x)                  ((x)/1375098.708313976)
@@ -144,16 +145,18 @@
 #define hoursToCs(x)                ((x)*360000.0)
 #define csToDays(x)                 ((x)/8640000.0)
 #define daysToCs(x)                 ((x)*8640000.0)
-#define arcsecToRad(x)              ((x)/(RAD*3600.0))
-#define radToArcsec(x)              ((x)*(RAD*3600.0))
-#define siderealToRad(x)            ((x)/(RAD*240.0))
-#define radToSidereal(x)            ((x)*(RAD*240.0))
+#define arcsecToRad(x)              ((x)/206264.8062470963)
+#define radToArcsec(x)              ((x)*206264.8062470963)
+#define siderealToRad(x)            ((x)/13750.98708313975)
+#define radToSidereal(x)            ((x)*13750.98708313975)
 //#define siderealToRad(x)            ((((x)*SIDEREAL_RATIO*15.0)/3600.0)/RAD)
 // conversion factor to go to/from Hz for sidereal interval
-#define hzToSubMicros(x)            ((x)*266666.666666667)    // (x*(16000000.0/60.0))
+#define hzToSubMicros(x)            ((x)*266666.666666667)
 #define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)
 #define siderealToHz(x)             ((x)*SIDEREAL_RATE_HZ)
-#define fequal(x,y)                 (fabs((x)-(y))<0.00000001)
+#define fequal(x,y)                 (fabs((x)-(y))<SmallestFloat)
+#define fgt(x,y)                    ((x)-(y)>SmallestFloat)
+#define flt(x,y)                    ((y)-(x)>SmallestFloat)
 
 // pins
 #define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }

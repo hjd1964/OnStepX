@@ -9,12 +9,11 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
+#include "../debug/Debug.h"
+
 #include "../coordinates/Transform.h"
-extern Transform transform;
 #include "../commands/ProcessCmds.h"
 #include "Axis.h"
-extern Axis axis1;
-extern Axis axis2;
 #include "Mount.h"
 
 CommandError Mount::resetHome() {
@@ -28,12 +27,12 @@ CommandError Mount::resetHome() {
   // setup axis1 and axis2
   axis1.enable(false);
   axis1.setMotorCoordinateSteps(0);
-  axis1.clearBacklashCount();
+  axis1.setBacklash(0);
   axis1.setInstrumentCoordinate(home.h);
   axis1.setFrequencyMax(degToRad(4.0));
   axis2.enable(false);
   axis2.setMotorCoordinateSteps(0);
-  axis2.clearBacklashCount();
+  axis2.setBacklash(0);
   axis2.setInstrumentCoordinate(home.d);
   axis2.setFrequencyMax(degToRad(4.0));
   atHome = true;
@@ -44,5 +43,19 @@ CommandError Mount::resetHome() {
   VLF("MSG: Mount::resetHome, in standby");
   return CE_NONE;
  }
+
+void Mount::updateHomePosition() {
+  #ifndef AXIS1_HOME_DEFAULT
+    if (transform.mountType == GEM) home.h = Deg90; else home.h = 0;
+  #else
+    if (transform.mountType == ALTAZM) home.z = AXIS1_HOME_DEFAULT; else home.h = AXIS1_HOME_DEFAULT;
+  #endif
+  #ifndef AXIS2_HOME_DEFAULT
+    if (transform.mountType == ALTAZM) home.a = 0.0; else home.d = transform.site.location.latitude.sign*Deg90;
+  #else
+    if (transform.mountType == ALTAZM) home.a = AXIS2_HOME_DEFAULT; else home.d = AXIS2_HOME_DEFAULT;
+  #endif
+  home.pierSide = PIER_SIDE_NONE;
+}
 
 #endif

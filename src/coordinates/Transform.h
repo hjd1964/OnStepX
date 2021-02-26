@@ -2,6 +2,7 @@
 // coordinate transformation
 #pragma once
 #include "Convert.h"
+#include "Site.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
 // INSTRUMENT <--> apply celestial coordinate conventions <--> MOUNT       (Transform)
@@ -19,32 +20,16 @@ typedef struct Coordinate {
   PierSide pierSide;
 } Coordinate;
 
-typedef struct Latitude {
-  double   value;
-  double   sine;
-  double   cosine;
-  double   absval;
-  double   sign;
-} Latitude;
-
-typedef struct Site {
-  Latitude latitude;
-  double   longitude;
-  bool     ready;
-} Site;
-
 class Transform {
   public:
-    Site site;
-
     // setup for coordinate transformation
-    void init(int mountType);
+    void init();
 
     // converts from Mount (equatorial or horizon) to Native (equatorial and optionally horizon also) coordinates
     // returns equatorial RA
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
     // converts from Native (equatorial) to Mount (equatorial or horizon) coordinates (optional: a1 is h or z, a2 is d or a)
-    // accepts equatorial RA
+    // accepts equatorial RA, unless RA is NAN, in which case the Hour Angle coordinate is used instead
     void nativeToMount(Coordinate *coord, double *a1 = NULL, double *a2 = NULL);
 
     // converts from Mount to Topocentric coordinates (removes pointing model and refraction from equatorial coordinates)
@@ -70,6 +55,7 @@ class Transform {
     // converts from Hour Angle (h) to Right Ascension (r) coordinates
     void hourAngleToRightAscension(Coordinate *coord);
     // converts from Right Ascension (r) to Hour Angle (h) coordinates
+    // set RA to NAN to use the Hour Angle coordinate as (h)
     void rightAscensionToHourAngle(Coordinate *coord);
 
     // converts from Equatorial (h,d) to Horizon (a,z) coordinates
@@ -84,8 +70,10 @@ class Transform {
     // returns the amount of refraction at the apparent altitude
     double apparentRefrac(double altitude, double pressure = 1010.0, double temperature = 10.0);
 
+    Site site;
+    int8_t mountType;
+
   private:
-    int mountType;
 
     double cot(double n);
     

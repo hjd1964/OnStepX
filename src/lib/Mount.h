@@ -12,15 +12,20 @@
 
 #include "../debug/Debug.h"
 #include "../commands/ProcessCmds.h"
+#include "../coordinates/Transform.h"
 #include "../StepDrivers/StepDrivers.h"
 #include "Axis.h"
 
 typedef struct Limits {
-  double minAltitude;
-  double maxAltitude;
-  double pastMeridianE;
-  double pastMeridianW;
-  bool   autoMeridianFlip;
+  float minAxis1;
+  float maxAxis1;
+  float minAxis2;
+  float maxAxis2;
+  float minAltitude;
+  float maxAltitude;
+  float pastMeridianE;
+  float pastMeridianW;
+  bool  autoMeridianFlip;
 } Limits;
 
 enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
@@ -36,7 +41,7 @@ enum PecState         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC
 
 class Mount {
   public:
-    void init(int8_t mountType);
+    void init();
 
     // handle mount commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -46,6 +51,11 @@ class Mount {
 
     // update the home position
     void updateHomePosition();
+
+    Transform  transform;
+
+    Axis axis1;
+    Axis axis2;
 
   private:
     // general status checks ahead of sync or goto
@@ -81,12 +91,6 @@ class Mount {
 
     // clear any general errors as appropriate for a reset
     void resetGeneralErrors();
-
-    double     timerRateRatio      = 1.0;
-
-    uint8_t    mountType           = 0;
-    bool       soundEnabled        = false;
-    bool       syncToEncodersOnly  = false;
 
     // tracking
     Coordinate current;
@@ -129,7 +133,10 @@ class Mount {
     bool       moveFastAxis2       = false;
 
     // limits
-    Limits limits = { degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };
+    Limits limits = { 
+      degToRad(AXIS1_LIMIT_MIN), degToRad(AXIS1_LIMIT_MAX),
+      degToRad(AXIS2_LIMIT_MIN), degToRad(AXIS2_LIMIT_MAX),
+      degToRad(-10), degToRad(85), degToRad(15), degToRad(15), false };
     bool       safetyLimitsOn      = false;
 
     // homing
@@ -152,6 +159,11 @@ class Mount {
 
     // park
     ParkState  parkState           = PS_UNPARKED;
+
+    // misc.
+    double     timerRateRatio      = 1.0;
+    bool       soundEnabled        = false;
+    bool       syncToEncodersOnly  = false;
 
 };
 
