@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// observatory site and time
+// OnStepX telescope control
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../../Config.h"

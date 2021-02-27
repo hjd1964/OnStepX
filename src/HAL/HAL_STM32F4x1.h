@@ -47,22 +47,24 @@
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #undef E2END
-#if defined(NV_M24C32)
-  // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
-  #define NV_ENDURANCE HIGH
-  #define E2END 8191
-  #define I2C_EEPROM_ADDRESS 0x50
-  #include "NV/NV_I2C_EEPROM_24XX_C.h"
-#elif defined(NV_MB85RC256V)
-  #include "NV/NV_I2C_FRAM_MB85RC256V.h"
-#else
-  // defaults to 0x57 and 4KB as used on DS3231 RTC modules
-  #include "NV/NV_I2C_EEPROM_24XX_C.h"
+#ifdef NV_DEFAULT
+  #if PINMAP == MaxSTM3I
+    // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
+    #define NV_ENDURANCE HIGH
+    #define E2END 8191
+    #define I2C_EEPROM_ADDRESS 0x50
+  #else
+    // fall back to the DS3231/AT24C32
+    #define E2END 4095
+    #define I2C_EEPROM_ADDRESS 0x57
+  #endif
+  #include "../lib/nv/NV_24XX.h"
+  #define NVS NonVolatileStorage24XX
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { analogWriteResolution(8); }
+#define HAL_INIT { analogWriteResolution(8); nv.init(E2END + 1, &HAL_Wire, I2C_EEPROM_ADDRESS); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

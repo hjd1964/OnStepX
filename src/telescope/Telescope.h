@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------
-// observatory site and time
+// OnStepX telescope control
 #pragma once
 #include "../commands/ProcessCmds.h"
 #include "../mount/Mount.h"

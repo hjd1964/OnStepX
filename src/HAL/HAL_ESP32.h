@@ -51,14 +51,16 @@
 
 #include "HAL_ESP32_Analog.h"
 
-// Non-volatile storage ------------------------------------------------------------------------------
+// Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
-  #include "NV/NV_EEPROM_ESP.h"
+  #define E2END 4095
+  #include "../lib/nv/NV_FLASH.h"
+  #define NVS NonVolatileStorageFLASH
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { }
+#define HAL_INIT { nv.init(E2END + 1); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

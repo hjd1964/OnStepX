@@ -41,12 +41,13 @@
 
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
-  #include "NV/NV_EEPROM.h"
+  #include "../lib/nv/NV_EEPROM.h"
+  #define NVS NonVolatileStorageEEPROM
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { }
+#define HAL_INIT { nv.init(0); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

@@ -23,3 +23,9 @@
 #define MOUNT_COORDS          TOPOCENTRIC // TOPOCENTRIC, Applies refraction to coordinates to/from OnStep, except exactly    Infreq
                                           //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
                                           //              Use OBSERVED_PLACE for no refraction.
+
+// NON-VOLATILE STORAGE ------------------------------------------------------------------------------------------------------------
+#define NV_DEFAULT                     ON //          ON, Uses HAL specified default, for remembering settings when           Infreq
+                                          //              powered off.  This is usually done using the microcontrollers
+                                          //              built-in EEPROM or FLASH emulation of EEPROM.  Sometimes (Bluepill)
+                                          //              it uses an DS3231 RTC's onboard EEPROM AT24C32 chip.

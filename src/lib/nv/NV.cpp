@@ -1,0 +1,145 @@
+// -----------------------------------------------------------------------------------
+// non-volatile storage base class
+
+#include "Arduino.h"
+#include "NV.h"
+
+bool NonVolatileStorage::init(uint16_t cacheSize) {
+  this->cacheSize = cacheSize;
+  cacheStateSize = cacheSize/8;
+  if (cacheSize == 0) return true;
+
+  cache = new uint8_t[cacheSize];
+  cacheStateRead  = new uint8_t[cacheStateSize];
+  cacheStateWrite = new uint8_t[cacheStateSize];
+
+  // mark entire read cache as dirty
+  for (uint16_t i = 0; i < cacheStateSize; i++) cacheStateRead[i] = 255;
+  // mark entire write cache as clean
+  for (uint16_t i = 0; i < cacheStateSize; i++) cacheStateWrite[i] = 0;
+
+  return true;
+}
+
+void NonVolatileStorage::poll() {
+  if (cacheSize == 0) return;
+
+  int8_t dirtyW = 0, dirtyR = 0;
+
+  if (busy()) return;
+
+  // check 20 byte chunks of cache for data that needs processing
+  for (uint16_t j = 0; j < 20; j++) {
+    cacheIndex++; if (cacheIndex >= cacheSize) cacheIndex = 0;
+    dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
+    dirtyR = bitRead(cacheStateRead[cacheIndex/8], cacheIndex%8);
+    if (dirtyW || dirtyR) break;
+  }
+
+  if (dirtyW) {
+    writeToStorage(cacheIndex, cache[cacheIndex]);
+    bitWrite(cacheStateWrite[cacheIndex/8], cacheIndex%8, 0);
+  } else {
+    if (dirtyR) {
+      cache[cacheIndex] = readFromStorage(cacheIndex);
+      bitWrite(cacheStateRead[cacheIndex/8], cacheIndex%8, 0);
+    }
+  }
+}
+
+bool NonVolatileStorage::committed() {
+  uint8_t dirty = 0;
+
+  for (int16_t j = 0; j < cacheSize; j++) {
+    dirty = bitRead(cacheStateWrite[j/8], j%8);
+    if (dirty) break;
+  }
+
+  return !dirty;
+}
+
+bool valid() {
+  return true;
+}
+
+uint8_t NonVolatileStorage::readFromCache(uint16_t i) {
+  if (cacheSize == 0) return readFromStorage(i);
+
+  uint8_t dirty = bitRead(cacheStateRead[i/8], i%8);
+  if (dirty) {
+    uint8_t j = readFromStorage(i);
+    
+    // store and mark as clean
+    cache[i] = j;
+    bitWrite(cacheStateRead[i/8], i%8, 0);
+
+    return j;
+  } else return cache[i];
+}
+
+void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
+  if (cacheSize == 0) { writeToStorage(i, j); return; }
+
+  uint8_t k = readFromCache(i);
+  if (j != k) {
+    cache[i] = j;
+
+    // mark write as dirty (needs to be written)
+    bitWrite(cacheStateWrite[i/8], i%8, 1);
+
+    // mark read as clean (so we don't overwrite the cache)
+    bitWrite(cacheStateRead[i/8], i%8, 0);
+  }
+}
+
+void NonVolatileStorage::writeThrough(bool state) {
+  writeOnUpdate = state;
+}
+
+uint8_t NonVolatileStorage::read(uint16_t i) { return readFromCache(i); }
+void NonVolatileStorage::update(uint16_t i,  uint8_t j) { writeToCache(i, j); }
+
+void NonVolatileStorage::read(uint16_t i,  uint8_t* j) { *j = read(i); }
+void NonVolatileStorage::read(uint16_t i,   int8_t* j) { *j = read(i); }
+void NonVolatileStorage::read(uint16_t i, uint16_t* j) { readBytes(i, (uint8_t*)j, sizeof(uint16_t)); }
+void NonVolatileStorage::read(uint16_t i,  int16_t* j) { readBytes(i, (uint8_t*)j, sizeof(int16_t)); }
+void NonVolatileStorage::read(uint16_t i, uint32_t* j) { readBytes(i, (uint8_t*)j, sizeof(uint32_t)); }
+void NonVolatileStorage::read(uint16_t i,  int32_t* j) { readBytes(i, (uint8_t*)j, sizeof(int32_t)); }
+void NonVolatileStorage::read(uint16_t i,    float* j) { readBytes(i, (uint8_t*)j, sizeof(float)); }
+void NonVolatileStorage::read(uint16_t i,   double* j) { readBytes(i, (uint8_t*)j, sizeof(double)); }
+void NonVolatileStorage::read(uint16_t i,     char* j, int16_t maxLen) { readBytes(i, (uint8_t*)j, -maxLen); }
+
+void NonVolatileStorage::update(uint16_t i,   int8_t j) { update(i,(uint8_t)j); }
+void NonVolatileStorage::update(uint16_t i, uint16_t j) { updateBytes(i, (uint8_t*)&j, sizeof(uint16_t)); }
+void NonVolatileStorage::update(uint16_t i,  int16_t j) { updateBytes(i, (uint8_t*)&j, sizeof(int16_t)); }
+void NonVolatileStorage::update(uint16_t i, uint32_t j) { updateBytes(i, (uint8_t*)&j, sizeof(uint32_t)); }
+void NonVolatileStorage::update(uint16_t i,  int32_t j) { updateBytes(i, (uint8_t*)&j, sizeof(int32_t)); }
+void NonVolatileStorage::update(uint16_t i,    float j) { updateBytes(i, (uint8_t*)&j, sizeof(float)); }
+void NonVolatileStorage::update(uint16_t i,   double j) { updateBytes(i, (uint8_t*)&j, sizeof(double)); }
+void NonVolatileStorage::update(uint16_t i,    char* j) { updateBytes(i, (uint8_t*)&j, strlen(j) + 1); }
+
+void NonVolatileStorage::readBytes(uint16_t i, uint8_t *j, int16_t count) {
+  if (abs(count) > 255) return;
+  if (count < 0) {
+    count = -count;
+    for (uint8_t k = 0; k < count; k++) { *j = read(i++); if (*j == 0) return; else j++; }
+  } else {
+    for (uint8_t k = 0; k < count; k++) *j++ = read(i++);
+  }
+}
+
+void NonVolatileStorage::updateBytes(uint16_t i, uint8_t *j, int16_t count) {
+  if (abs(count) > 255) return;
+  for (int k = 0; k < count; k++) update(i++, *j++);
+}
+
+bool NonVolatileStorage::busy() {
+  return false;
+}
+
+uint8_t NonVolatileStorage::readFromStorage(uint16_t i) {
+  return 0;
+}
+
+void NonVolatileStorage::writeToStorage(uint16_t i, uint8_t j) {
+}
