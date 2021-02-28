@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _HAL_H
-#define _HAL_H
+#pragma once
 
 #ifndef IRAM_ATTR
   #define IRAM_ATTR
@@ -96,5 +95,3 @@
 #else
   #error "Unsupported Platform! If this is a new platform, it needs the appropriate entries in the HAL directory."
 #endif
-
-#endif // _HAL_H

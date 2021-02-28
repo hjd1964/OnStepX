@@ -13,14 +13,13 @@ typedef struct GregorianDate {
   uint8_t  minute;
   uint8_t  second;
   long     centisecond;
-  double   timezone;
   bool     valid;
 } GregorianDate;
 
+#define JulianDateSize 16
 typedef struct JulianDate {
   double   day;
   double   hour;
-  double   timezone;
 } JulianDate;
 
 class Convert {

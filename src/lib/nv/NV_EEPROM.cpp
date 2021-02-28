@@ -5,10 +5,6 @@
 #include "EEPROM.h"
 #include "NV_EEPROM.h"
 
-#ifndef NV_ENDURANCE
-  #define NV_ENDURANCE 1 // 0 = LOW (< 100K), 1 = MID (~ 100K), 2 = HIGH (~ 1M), 3 = VERY HIGH (> 1M)
-#endif
-
 bool NonVolatileStorageEEPROM::init(uint16_t cacheSize) {
   // setup cache size
   NonVolatileStorage::init(cacheSize);

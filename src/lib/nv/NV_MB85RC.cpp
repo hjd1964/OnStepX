@@ -5,10 +5,6 @@
 #include "Wire.h"
 #include "NV_MB85RC.h"
 
-#ifndef NV_ENDURANCE
-  #define NV_ENDURANCE 3 // 0 = LOW (< 100K), 1 = MID (~ 100K), 2 = HIGH (~ 1M), 3 = VERY HIGH (> 1M)
-#endif
-
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)
 

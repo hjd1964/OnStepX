@@ -5,6 +5,7 @@
 #include "../../Config.h"
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
+#include "../lib/nv/NV.h"
 extern NVS nv;
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"

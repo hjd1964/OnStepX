@@ -6,18 +6,29 @@
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 
-typedef struct Latitude {
-  double   value;
+typedef struct LatitudeExtras {
+//  double   value;
   double   sine;
   double   cosine;
   double   absval;
   double   sign;
 } Latitude;
 
+typedef struct LocationExtras {
+  LatitudeExtras latitude;
+  bool ready;
+} LocationExtras;
+
+#define SiteSize 36
 typedef struct Location {
-  Latitude latitude;
-  double   longitude;
-  bool     ready;
+  double latitude;
+  double longitude;
+  float  timezone;
+  char   name[16];
+
+//  Latitude latitude;
+//  double   longitude;
+//  bool     ready;
 } Location;
 
 class Site {
@@ -42,6 +53,7 @@ class Site {
     void tick();
 
     Location location;
+    LocationExtras locationEx;
     Convert convert;
   private:
 
@@ -72,6 +84,12 @@ class Site {
     // convert Julian Day to Gregorian date (year, month, day)
     GregorianDate julianDayToGregorian(JulianDate julianDate);
 
+    // reads the site information from NV
+    void readSite(uint8_t siteNumber);
+
+    // reads the julian date information from NV
+    void readJD();
+
     JulianDate ut1;
     double centisecondHOUR = 0;
     unsigned long centisecondSTART = 0;
@@ -80,5 +98,8 @@ class Site {
     bool timeIsReady = false;
 
     unsigned long period = 0;
+    // handle to centisecond LAST task
     uint8_t handle = 0;
+    // site number 0..3
+    uint8_t number = 0;
 };

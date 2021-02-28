@@ -7,10 +7,6 @@
 #include "EEPROM.h"
 #include "NV_ESP32.h"
 
-#ifndef NV_ENDURANCE
-  #define NV_ENDURANCE 0 // 0 = LOW (< 100K), 1 = MID (~ 100K), 2 = HIGH (~ 1M), 3 = VERY HIGH (> 1M)
-#endif
-
 bool NonVolatileStorageESP32::init(uint16_t size) {
   EEPROM.begin(size);
 

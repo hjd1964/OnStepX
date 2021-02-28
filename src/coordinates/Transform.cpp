@@ -88,7 +88,7 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   
   if (coord->pierSide == PIER_SIDE_WEST) *a1 += Deg180;
-  if (site.location.latitude.value >= 0.0) {
+  if (site.location.latitude >= 0.0) {
     if (coord->pierSide == PIER_SIDE_WEST) *a2 = Deg180 - *a2;
   } else {
     if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
@@ -144,10 +144,10 @@ void Transform::rightAscensionToHourAngle(Coordinate *coord) {
 
 void Transform::equToHor(Coordinate *coord) {
   double cosHA  = cos(coord->h);
-  double sinAlt = sin(coord->d)*site.location.latitude.sine + cos(coord->d)*site.location.latitude.cosine*cosHA;  
+  double sinAlt = sin(coord->d)*site.locationEx.latitude.sine + cos(coord->d)*site.locationEx.latitude.cosine*cosHA;  
   coord->a      = asin(sinAlt);
   double t1     = sin(coord->h);
-  double t2     = cosHA*site.location.latitude.sine - tan(coord->d)*site.location.latitude.cosine;
+  double t2     = cosHA*site.locationEx.latitude.sine - tan(coord->d)*site.locationEx.latitude.cosine;
   coord->z      = atan2(t1,t2);
   coord->z      += PI;
   if (coord->z > PI) coord->z -= TWO_PI;
@@ -155,10 +155,10 @@ void Transform::equToHor(Coordinate *coord) {
 
 void Transform::horToEqu(Coordinate *coord) { 
   double cosAzm = cos(coord->z);
-  double sinDec = sin(coord->a)*site.location.latitude.sine + cos(coord->a)*site.location.latitude.cosine*cosAzm;  
+  double sinDec = sin(coord->a)*site.locationEx.latitude.sine + cos(coord->a)*site.locationEx.latitude.cosine*cosAzm;  
   coord->d      = asin(sinDec); 
   double t1     = sin(coord->z);
-  double t2     = cosAzm*site.location.latitude.sine - tan(coord->a)*site.location.latitude.cosine;
+  double t2     = cosAzm*site.locationEx.latitude.sine - tan(coord->a)*site.locationEx.latitude.cosine;
   coord->h      = atan2(t1,t2);
   coord->h     += PI;
   if (coord->h > PI) coord->h -= TWO_PI;

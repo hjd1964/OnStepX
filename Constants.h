@@ -188,6 +188,20 @@
 #define TASKS_HWTIMER2_ENABLE              // if the Teensy, etc. don't work comment these out to use the
 #define TASKS_HWTIMER3_ENABLE              // software task scheduler instead
 
+// NV write endurance constants
+// low (< 100K writes)
+#define NVE_LOW 0
+// mid (~ 100K writes)
+#define NVE_MID 1
+// high (~ 1M writes)
+#define NVE_HIGH 2
+// very high (> 1M writes)
+#define NVE_VHIGH 3
+#define NV_ENDURANCE NVE_MID
+
 // NV addresses
 #define INIT_NV_KEY                 583927925UL
-#define NV_KEY                      0      // 4, 0..3
+#define NV_KEY                      0      // 4   , 0..3
+#define NV_SITE_NUMBER              4      // 1   , 4..4
+#define NV_SITE_BASE                5      // 36*4, 5..148
+#define NV_JD_BASE                  149    // 16  , 148..163

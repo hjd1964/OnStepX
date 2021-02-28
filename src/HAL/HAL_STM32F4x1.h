@@ -53,6 +53,8 @@
     #define NV_ENDURANCE HIGH
     #define E2END 8191
     #define I2C_EEPROM_ADDRESS 0x50
+    #undef NV_ENDURANCE
+    #define NV_ENDURANCE NVE_HIGH
   #else
     // fall back to the DS3231/AT24C32
     #define E2END 4095

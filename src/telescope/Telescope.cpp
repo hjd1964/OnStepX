@@ -5,6 +5,7 @@
 #include "../../Config.h"
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
+#include "../lib/nv/NV.h"
 extern NVS nv;
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
@@ -24,7 +25,7 @@ void Telescope::init() {
 
     while (!nv.committed()) nv.poll();
 
-    nv.write(NV_KEY, INIT_NV_KEY);
+    nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
 
     VLF("MSG: Telescope::init, NV reset to defaults");
   } else VLF("MSG: Telescope::init, correct NV key found");

@@ -38,6 +38,9 @@
   #define E2END 4095
   #define I2C_EEPROM_ADDRESS 0x57
   #include "../lib/nv/NV_24XX.h"
+  #ifdef NVS
+    #undef NVS
+  #endif
   #define NVS NonVolatileStorage24XX
 #endif
 

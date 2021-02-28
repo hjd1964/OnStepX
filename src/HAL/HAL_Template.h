@@ -12,44 +12,25 @@
 // SerialA is manidatory
 #define SerialA Serial
 // SerialB, SerialC, SerialD are optional
-//#define SerialB Serial1
-//#define SerialC Serial2
-//#define SerialD Serial3
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
 
-// Non-volatile storage ------------------------------------------------------------------------------
-#if defined(NV_AT24C32)
-  // defaults to 0x57 and 4KB
-  #include "../drivers/NV_I2C_EEPROM_24XX_C.h"
-#elif defined(NV_MB85RC256V)
-  #include "../drivers/NV_I2C_FRAM_MB85RC256V.h"
-#else
-  #include "../drivers/NV_EEPROM.h"
+// Non-volatile storage ----------------------------------------------------------------------------
+#ifdef NV_DEFAULT
+  #include "../lib/nv/NV_EEPROM.h"
+  #ifdef NVS
+    #undef NVS
+  #endif
+  #define NVS NonVolatileStorageEEPROM
 #endif
 
 //--------------------------------------------------------------------------------------------------
-// Nanoseconds delay function
-unsigned int _nanosPerPass=1;
-void delayNanoseconds(unsigned int n) {
-  unsigned int np=(n/_nanosPerPass);
-  for (unsigned int i=0; i<np; i++) { __asm__ volatile ("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"); }
-}
-
-//--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-void HAL_Initialize(void) {
-  // calibrate delayNanoseconds()
-  uint32_t startTime,npp;
-  cli(); startTime=micros(); delayNanoseconds(65535); npp=micros(); sei(); npp=((int32_t)(npp-startTime)*1000)/63335;
-  if (npp<1) npp=1; if (npp>2000) npp=2000; _nanosPerPass=npp;
-}
+#define HAL_INIT { nv.init(0); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-float HAL_MCU_Temperature(void) {
-  return -999;
-}
+#define HAL_TEMP ( -999 )

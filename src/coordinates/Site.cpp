@@ -5,6 +5,8 @@
 #include "../../Config.h"
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
+#include "../lib/nv/NV.h"
+extern NVS nv;
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
@@ -19,19 +21,12 @@ void clockTickWrapper() { centisecondLAST++; }
 void Site::init() {
   // get location
   VLF("MSG: Site::init, get Latitude/Longitude");
-  location.latitude.value  = degToRad(40.0);
-  location.longitude       = degToRad(75.2);
+  readSite(number);
   update();
 
   // get date/time
   VLF("MSG: Site::init, get Date/Time");
-  GregorianDate date;
-  date.year = 2021; date.month  = 2; date.day = 7;
-  date.hour = 12;   date.minute = 0; date.second = 0; date.centisecond = 0;
-  date.timezone = 5;
-
-  ut1 = gregorianToJulianDay(date);
-  ut1.hour = (date.hour + (date.minute + (date.second + date.centisecond/100.0)/60.0)/60.0) + date.timezone;
+  readJD();
   setTime(ut1);
 
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
@@ -43,10 +38,10 @@ void Site::init() {
 }
 
 void Site::update() {
-  location.latitude.cosine = cos(location.latitude.value);
-  location.latitude.sine   = sin(location.latitude.value);
-  location.latitude.absval = fabs(location.latitude.value);
-  if (location.latitude.value >= 0.0) location.latitude.sign = 1.0; else location.latitude.sign = -1.0;
+  locationEx.latitude.cosine = cos(location.latitude);
+  locationEx.latitude.sine   = sin(location.latitude);
+  locationEx.latitude.absval = fabs(location.latitude);
+  if (location.latitude >= 0.0) locationEx.latitude.sign = 1.0; else locationEx.latitude.sign = -1.0;
 
   // same date and time, just calculates the sidereal time again
   ut1.hour = getTime();
@@ -142,7 +137,6 @@ JulianDate Site::gregorianToJulianDay(GregorianDate date) {
   double B = 2.0 - floor(y/100.0) + floor(y/400.0);
   julianDay.day = B + floor(365.25*y) + floor(30.6001*(m + 1.0)) + date.day + 1720994.5;
   julianDay.hour = 0;
-  julianDay.timezone = date.timezone;
 
   return julianDay;
 }
@@ -168,7 +162,20 @@ GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
   date.day = floor(D1);
   if (G < 13.5)         date.month = floor(G - 1.0);    else date.month = floor(G - 13.0);
   if (date.month > 2.5) date.year  = floor(D - 4716.0); else date.year  = floor(D - 4715.0);
-  date.timezone = julianDate.timezone;
 
   return date;
+}
+
+void Site::readSite(uint8_t siteNumber) {
+  number = siteNumber;
+  nv.readBytes(NV_SITE_BASE + number*SiteSize, &location, SiteSize);
+  if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; DLF("ERR: Site::readSite, bad NV latitude"); }
+  if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; DLF("ERR: Site::readSite, bad NV longitude"); }
+  if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; DLF("ERR: Site::readSite,  bad NV timeZone"); }
+}
+
+void Site::readJD() {
+  nv.readBytes(NV_JD_BASE, &ut1, JulianDateSize);
+  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; DLF("ERR: Site::readJD, bad NV julian date (day)"); }
+  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; DLF("ERR: Site::readJD, bad NV julian date (hour)"); }
 }

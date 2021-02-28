@@ -5,10 +5,6 @@
 #include "Wire.h"
 #include "NV_24XX.h"
 
-#ifndef NV_ENDURANCE
-  #define NV_ENDURANCE 1 // 0 = LOW (< 100K), 1 = MID (~ 100K), 2 = HIGH (~ 1M), 3 = VERY HIGH (> 1M)
-#endif
-
 // universal value works for all known 24XX series, 10ms
 #define EEPROM_WRITE_WAIT 10
 

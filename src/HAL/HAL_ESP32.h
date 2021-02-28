@@ -56,6 +56,8 @@
   #define E2END 4095
   #include "../lib/nv/NV_ESP32.h"
   #define NVS NonVolatileStorageESP32
+  #undef NV_ENDURANCE
+  #define NV_ENDURANCE NVE_LOW
 #endif
 
 //--------------------------------------------------------------------------------------------------

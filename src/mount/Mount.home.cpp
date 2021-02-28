@@ -50,7 +50,7 @@ void Mount::updateHomePosition() {
     if (transform.mountType == ALTAZM) home.z = AXIS1_HOME_DEFAULT; else home.h = AXIS1_HOME_DEFAULT;
   #endif
   #ifndef AXIS2_HOME_DEFAULT
-    if (transform.mountType == ALTAZM) home.a = 0.0; else home.d = transform.site.location.latitude.sign*Deg90;
+    if (transform.mountType == ALTAZM) home.a = 0.0; else home.d = transform.site.locationEx.latitude.sign*Deg90;
   #else
     if (transform.mountType == ALTAZM) home.a = AXIS2_HOME_DEFAULT; else home.d = AXIS2_HOME_DEFAULT;
   #endif
