@@ -90,8 +90,8 @@ CommandError CommandProcessor::command(char reply[], char command[], char parame
 }
 
 void CommandProcessor::appendChecksum(char s[]) {
-  char HEXS[3]="";
-  byte cks=0; for (unsigned int cksCount0=0; cksCount0 < strlen(s); cksCount0++) {  cks+=s[cksCount0]; }
-  sprintf(HEXS,"%02X",cks);
-  strcat(s,HEXS);
+  char HEXS[3] = "";
+  uint8_t cks = 0; for (unsigned int cksCount0 = 0; cksCount0 < strlen(s); cksCount0++) { cks += s[cksCount0]; }
+  sprintf(HEXS, "%02X", cks);
+  strcat(s, HEXS);
 }
