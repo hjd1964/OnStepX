@@ -89,10 +89,10 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
   // :GP#       Get site 4 name
   //            Returns: s#
   if (command[0] == 'G' && (command[1] == 'M' || command[1] == 'N' || command[1] == 'O' || command[1] == 'P') && parameter[0] == 0)  {
-    Location nvSite;
-    uint8_t siteNumber = command[1] - 'M';
-    nv.readBytes(NV_SITE_BASE + siteNumber*SiteSize, &nvSite, SiteSize);
-    strcpy(reply, nvSite.name);
+    Location tempLocation;
+    uint8_t locationNumber = command[1] - 'M';
+    nv.readBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+    strcpy(reply, tempLocation.name);
     if (reply[0] == 0) { strcat(reply,"None"); }
     *numericReply = false; 
   } else
@@ -159,7 +159,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
     if (convert.tzToDouble(&hour, parameter)) {
       if (hour >= -13.75 || hour <= 12.0) {
         location.timezone = hour;
-        nv.updateBytes(NV_SITE_BASE + number*SiteSize, &location, SiteSize);
+        nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -177,7 +177,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
         if (degs >= 180.0) degs -= 360.0;
         location.longitude = degToRad(degs);
         update();
-        nv.updateBytes(NV_SITE_BASE + number*SiteSize, &location, SiteSize);
+        nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -201,13 +201,12 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'S' && (command[1] == 'M' || command[1] == 'N' || command[1] == 'O' || command[1] == 'P')) {
-    uint8_t siteNumber = command[1] - 'M';
+    uint8_t locationNumber = command[1] - 'M';
     if (strlen(parameter) <= 15) {
-      readSite(siteNumber);
       Location tempLocation;
-      nv.readBytes(NV_SITE_BASE + siteNumber*SiteSize, &tempLocation, SiteSize);
+      nv.readBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
       strcpy(tempLocation.name, parameter);
-      nv.updateBytes(NV_SITE_BASE + siteNumber*SiteSize, &tempLocation, SiteSize);
+      nv.updateBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
     } else *commandError = CE_PARAM_RANGE;
   } else
 
@@ -219,7 +218,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
     if (convert.dmsToDouble(&degs, parameter, true)) {
       location.latitude = degToRad(degs);
       update();
-      nv.updateBytes(NV_SITE_BASE + number*SiteSize, &location, SiteSize);
+      nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
     } else *commandError = CE_PARAM_FORM;
   } else 
 
@@ -227,8 +226,8 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
   //            Returns: Nothing
   if (command[0] == 'W' && (command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
     number = command[1] - '0';
-    nv.update(NV_SITE_NUMBER, number);
-    readSite(number);
+    nv.update(NV_LOCATION_NUMBER, number);
+    readLocation(number);
     update();
     *numericReply = false;
   } else
@@ -236,7 +235,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
   // :W?#       Queries current site
   //            Returns: n#
   if (command[0] == 'W' && command[1] == '?') {
-    sprintf(reply, "%d", (int)nv.read(NV_SITE_NUMBER));
+    sprintf(reply, "%d", (int)nv.read(NV_LOCATION_NUMBER));
     *numericReply = false;
   } else return false;
 

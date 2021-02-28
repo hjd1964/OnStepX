@@ -21,7 +21,7 @@ void clockTickWrapper() { centisecondLAST++; }
 void Site::init() {
   // get location
   VLF("MSG: Site::init, get Latitude/Longitude");
-  readSite(number);
+  readLocation(number);
   update();
 
   // get date/time
@@ -166,9 +166,9 @@ GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
   return date;
 }
 
-void Site::readSite(uint8_t siteNumber) {
-  number = siteNumber;
-  nv.readBytes(NV_SITE_BASE + number*SiteSize, &location, SiteSize);
+void Site::readLocation(uint8_t locationNumber) {
+  number = locationNumber;
+  nv.readBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
   if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; DLF("ERR: Site::readSite, bad NV latitude"); }
   if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; DLF("ERR: Site::readSite, bad NV longitude"); }
   if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; DLF("ERR: Site::readSite,  bad NV timeZone"); }

@@ -201,7 +201,7 @@
 
 // NV addresses
 #define INIT_NV_KEY                 583927925UL
-#define NV_KEY                      0      // 4   , 0..3
-#define NV_SITE_NUMBER              4      // 1   , 4..4
-#define NV_SITE_BASE                5      // 36*4, 5..148
-#define NV_JD_BASE                  149    // 16  , 148..163
+#define NV_KEY                      0      // bytes: 4   , addr: 0..3
+#define NV_LOCATION_NUMBER          4      // bytes: 1   , addr: 4..4
+#define NV_LOCATION_BASE            5      // bytes: 36*4, addr: 5..148
+#define NV_JD_BASE                  149    // bytes: 16  , addr: 148..163

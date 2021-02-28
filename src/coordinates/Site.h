@@ -19,7 +19,7 @@ typedef struct LocationExtras {
   bool ready;
 } LocationExtras;
 
-#define SiteSize 36
+#define LocationSize 36
 typedef struct Location {
   double latitude;
   double longitude;
@@ -84,8 +84,9 @@ class Site {
     // convert Julian Day to Gregorian date (year, month, day)
     GregorianDate julianDayToGregorian(JulianDate julianDate);
 
-    // reads the site information from NV
-    void readSite(uint8_t siteNumber);
+    // reads the location information from NV
+    // locationNumber can be 0..3
+    void readLocation(uint8_t locationNumber);
 
     // reads the julian date information from NV
     void readJD();
