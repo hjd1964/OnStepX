@@ -46,9 +46,9 @@ class NonVolatileStorage {
     int32_t readL(uint16_t i);
     // read float (32bit) starting at position i
     float readF(uint16_t i);
-    // read double (64bit) starting at position i
+    // read double (32 or 64bit) starting at position i
     double readD(uint16_t i);
-    // read char array (maxLen up to 64) starting at position i
+    // read char array (maxLen up to 64 bytes) starting at position i
     void readStr(uint16_t i, char* j, int16_t maxLen);
 
     // write value j starting at position i 
@@ -73,10 +73,10 @@ class NonVolatileStorage {
     void update(uint16_t i, double j);
     void update(uint16_t i, char* j);
 
-    // read count bytes (up to 64) starting at position i into value j
+    // read count bytes (up to 64 bytes) starting at position i into value j
     // for char arrays a negative count represents the maximum length read (if a terminating null is not found)
     void readBytes(uint16_t i, uint8_t *j, int16_t count);
-    // update count bytes (up to 64) starting at position i from value j
+    // update count bytes (up to 64 bytes) starting at position i from value j
     void updateBytes(uint16_t i, uint8_t *j, int16_t count);
 
     // NV size in bytes
