@@ -26,10 +26,9 @@ extern Tasks tasks;
 #endif
 
 void Mount::init() {
+  VLF("MSG: Mount::init started");
+
   transform.init();
-
-  VF("MSG: Mount::init, type "); VL(transform.mountType);
-
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS;
 
   // get the main axes ready

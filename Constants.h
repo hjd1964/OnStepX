@@ -187,3 +187,7 @@
 #define TASKS_HWTIMER1_ENABLE              // only the Mega2560 hardware timers are tested and seem to work
 #define TASKS_HWTIMER2_ENABLE              // if the Teensy, etc. don't work comment these out to use the
 #define TASKS_HWTIMER3_ENABLE              // software task scheduler instead
+
+// NV addresses
+#define INIT_NV_KEY                 583927925
+#define NV_KEY                      0      // 4, 0..3

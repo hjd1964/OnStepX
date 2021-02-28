@@ -85,13 +85,13 @@ void setup() {
     delay(2000);
   #endif
 
-  DL("MSG: setup, HAL initalize");
+  VLF("MSG: setup, HAL initalize");
   HAL_INIT;
   
   // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  DL("MSG: setup, starting command channel tasks");
+  VLF("MSG: setup, starting command channel tasks");
   #ifdef SERIAL_A
     tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
   #endif
@@ -108,7 +108,6 @@ void setup() {
     tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
   #endif
 
-  DL("MSG: setup, telescope initalize");
   telescope.init();
 
   // ------------------------------------------------------------------------------------------------

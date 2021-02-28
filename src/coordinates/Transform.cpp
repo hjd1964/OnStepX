@@ -16,6 +16,7 @@ extern volatile unsigned long centisecondLAST;
 
 void Transform::init() {
   mountType = MOUNT_TYPE;
+  VF("MSG: Transform::init, mount type "); VL(mountType);
   site.init();
 }
 

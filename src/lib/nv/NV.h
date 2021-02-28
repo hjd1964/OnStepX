@@ -29,32 +29,40 @@ class NonVolatileStorage {
 
     void writeToCache(uint16_t i, uint8_t j);
 
-    // read byte at position i
+    // read unsigned char at position i
     uint8_t read(uint16_t i);
 
-    // read position i into value j
-    void read(uint16_t i, uint8_t* j);
-    void read(uint16_t i, int8_t* j);
-    void read(uint16_t i, uint16_t* j);
-    void read(uint16_t i, int16_t* j);
-    void read(uint16_t i, uint32_t* j);
-    void read(uint16_t i, int32_t* j);
-    void read(uint16_t i, float* j);
-    void read(uint16_t i, double* j);
-    void read(uint16_t i, char* j, int16_t maxLen);
+    // read unsigned char at position i
+    uint8_t readUC(uint16_t i);
+    // read signed char at position i
+    int8_t readC(uint16_t i);
+    // read unsigned int (16bit) starting at position i
+    uint16_t readUI(uint16_t i);
+    // read signed int (16bit) starting at position i
+    int16_t readI(uint16_t i);
+    // read unsigned long (32bit) starting at position i
+    uint32_t readUL(uint16_t i);
+    // read signed long (32bit) starting at position i
+    int32_t readL(uint16_t i);
+    // read float (32bit) starting at position i
+    float readF(uint16_t i);
+    // read double (64bit) starting at position i
+    double readD(uint16_t i);
+    // read char array (maxLen up to 64) starting at position i
+    void readStr(uint16_t i, char* j, int16_t maxLen);
 
-    // write position i into value j
-    inline void write(uint16_t i, uint8_t j) { update (i,j); }
-    inline void write(uint16_t i, int8_t j) { update (i,j); }
+    // write value j starting at position i 
+    inline void write(uint16_t i, uint8_t j)  { update (i,j); }
+    inline void write(uint16_t i, int8_t j)   { update (i,j); }
     inline void write(uint16_t i, uint16_t j) { update (i,j); }
-    inline void write(uint16_t i, int16_t j) { update (i,j); }
+    inline void write(uint16_t i, int16_t j)  { update (i,j); }
     inline void write(uint16_t i, uint32_t j) { update (i,j); }
-    inline void write(uint16_t i, int32_t j) { update (i,j); }
-    inline void write(uint16_t i, float j) { update (i,j); }
-    inline void write(uint16_t i, double j) { update (i,j); }
-    inline void write(uint16_t i, char* j) { update (i,j); }
+    inline void write(uint16_t i, int32_t j)  { update (i,j); }
+    inline void write(uint16_t i, float j)    { update (i,j); }
+    inline void write(uint16_t i, double j)   { update (i,j); }
+    inline void write(uint16_t i, char* j)    { update (i,j); }
 
-    // update position i into value j
+    // update value j starting at position i 
     void update(uint16_t i, uint8_t j);
     void update(uint16_t i, int8_t j);
     void update(uint16_t i, uint16_t j);
@@ -65,10 +73,10 @@ class NonVolatileStorage {
     void update(uint16_t i, double j);
     void update(uint16_t i, char* j);
 
-    // read count bytes (up to 255) starting at position i into value j
+    // read count bytes (up to 64) starting at position i into value j
     // for char arrays a negative count represents the maximum length read (if a terminating null is not found)
     void readBytes(uint16_t i, uint8_t *j, int16_t count);
-    // update count bytes (up to 255) starting at position i from value j
+    // update count bytes (up to 64) starting at position i from value j
     void updateBytes(uint16_t i, uint8_t *j, int16_t count);
 
     // NV size in bytes

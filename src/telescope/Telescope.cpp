@@ -5,6 +5,7 @@
 #include "../../Config.h"
 #include "../../ConfigX.h"
 #include "../HAL/HAL.h"
+extern NVS nv;
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
@@ -17,6 +18,17 @@ extern Tasks tasks;
 Telescope telescope;
 
 void Telescope::init() {
+  if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
+    VF("MSG: Telescope::init, Wipe NV "); V(nv.size); VLF(" Bytes (please wait)");
+    for (int i = 0; i < nv.size; i++) nv.write(i, 0);
+
+    while (!nv.committed()) nv.poll();
+
+    nv.write(NV_KEY, INIT_NV_KEY);
+
+    VLF("MSG: Telescope::init, NV reset to defaults");
+  } else VLF("MSG: Telescope::init, correct NV key found");
+
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     mount.init();
   #endif

@@ -99,15 +99,15 @@ void NonVolatileStorage::writeThrough(bool state) {
 uint8_t NonVolatileStorage::read(uint16_t i) { return readFromCache(i); }
 void NonVolatileStorage::update(uint16_t i,  uint8_t j) { writeToCache(i, j); }
 
-void NonVolatileStorage::read(uint16_t i,  uint8_t* j) { *j = read(i); }
-void NonVolatileStorage::read(uint16_t i,   int8_t* j) { *j = read(i); }
-void NonVolatileStorage::read(uint16_t i, uint16_t* j) { readBytes(i, (uint8_t*)j, sizeof(uint16_t)); }
-void NonVolatileStorage::read(uint16_t i,  int16_t* j) { readBytes(i, (uint8_t*)j, sizeof(int16_t)); }
-void NonVolatileStorage::read(uint16_t i, uint32_t* j) { readBytes(i, (uint8_t*)j, sizeof(uint32_t)); }
-void NonVolatileStorage::read(uint16_t i,  int32_t* j) { readBytes(i, (uint8_t*)j, sizeof(int32_t)); }
-void NonVolatileStorage::read(uint16_t i,    float* j) { readBytes(i, (uint8_t*)j, sizeof(float)); }
-void NonVolatileStorage::read(uint16_t i,   double* j) { readBytes(i, (uint8_t*)j, sizeof(double)); }
-void NonVolatileStorage::read(uint16_t i,     char* j, int16_t maxLen) { readBytes(i, (uint8_t*)j, -maxLen); }
+uint8_t  NonVolatileStorage::readUC(uint16_t i) { return read(i); }
+int8_t   NonVolatileStorage::readC (uint16_t i) { return read(i); }
+uint16_t NonVolatileStorage::readUI(uint16_t i) { uint16_t j; readBytes(i, (uint8_t*)&j, sizeof(uint16_t)); return j; }
+int16_t  NonVolatileStorage::readI (uint16_t i) { int16_t j;  readBytes(i, (uint8_t*)&j, sizeof(int16_t));  return j; }
+uint32_t NonVolatileStorage::readUL(uint16_t i) { uint32_t j; readBytes(i, (uint8_t*)&j, sizeof(uint32_t)); return j; }
+int32_t  NonVolatileStorage::readL (uint16_t i) { int32_t j;  readBytes(i, (uint8_t*)&j, sizeof(int32_t));  return j; }
+float    NonVolatileStorage::readF (uint16_t i) { float j;    readBytes(i, (uint8_t*)&j, sizeof(float));    return j; }
+double   NonVolatileStorage::readD (uint16_t i) { double j;   readBytes(i, (uint8_t*)&j, sizeof(double));   return j; }
+void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { readBytes(i, (uint8_t*)j, -maxLen); }
 
 void NonVolatileStorage::update(uint16_t i,   int8_t j) { update(i,(uint8_t)j); }
 void NonVolatileStorage::update(uint16_t i, uint16_t j) { updateBytes(i, (uint8_t*)&j, sizeof(uint16_t)); }
@@ -119,7 +119,7 @@ void NonVolatileStorage::update(uint16_t i,   double j) { updateBytes(i, (uint8_
 void NonVolatileStorage::update(uint16_t i,    char* j) { updateBytes(i, (uint8_t*)&j, strlen(j) + 1); }
 
 void NonVolatileStorage::readBytes(uint16_t i, uint8_t *j, int16_t count) {
-  if (abs(count) > 255) return;
+  if (abs(count) > 64) return;
   if (count < 0) {
     count = -count;
     for (uint8_t k = 0; k < count; k++) { *j = read(i++); if (*j == 0) return; else j++; }
@@ -129,7 +129,7 @@ void NonVolatileStorage::readBytes(uint16_t i, uint8_t *j, int16_t count) {
 }
 
 void NonVolatileStorage::updateBytes(uint16_t i, uint8_t *j, int16_t count) {
-  if (abs(count) > 255) return;
+  if (abs(count) > 64) return;
   for (int k = 0; k < count; k++) update(i++, *j++);
 }
 
