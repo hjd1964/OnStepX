@@ -54,8 +54,8 @@
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #define E2END 4095
-  #include "../lib/nv/NV_FLASH.h"
-  #define NVS NonVolatileStorageFLASH
+  #include "../lib/nv/NV_ESP32.h"
+  #define NVS NonVolatileStorageESP32
 #endif
 
 //--------------------------------------------------------------------------------------------------

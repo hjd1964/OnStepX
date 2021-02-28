@@ -189,5 +189,5 @@
 #define TASKS_HWTIMER3_ENABLE              // software task scheduler instead
 
 // NV addresses
-#define INIT_NV_KEY                 583927925
+#define INIT_NV_KEY                 583927925UL
 #define NV_KEY                      0      // 4, 0..3

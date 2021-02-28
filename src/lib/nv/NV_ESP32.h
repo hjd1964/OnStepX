@@ -1,13 +1,14 @@
 // -----------------------------------------------------------------------------------
-// non-volatile storage (default/built-in, flash emulation)
+// non-volatile storage (default/built-in, flash emulation ESP32)
 
 #pragma once
+
+#ifdef ESP32
 
 #include "Arduino.h"
 #include "NV.h"
 
-#ifdef ESP32
-class NonVolatileStorageFLASH : public NonVolatileStorage {
+class NonVolatileStorageESP32 : public NonVolatileStorage {
   public:
     // prepare FLASH based EEPROM emulation for operation
     // cacheSize: cache size in bytes (should be 0 or match the EEPROM E2END size)
@@ -30,4 +31,5 @@ class NonVolatileStorageFLASH : public NonVolatileStorage {
     bool dirty = false;
     uint32_t lastWrite = 0;
 };
+
 #endif
