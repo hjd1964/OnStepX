@@ -45,11 +45,30 @@
   #define TASKS_MAX 8
 #endif
 
+// ESP32 override cli/sei and use muxes to block the h/w timer ISR's instead
+#ifdef ESP32
+  // on the ESP32 noInterrupts()/interrupts() are #defined to be cli()/sei()
+  // cli()/sei() are empty and do nothing, below we use them for our purposes
+  // to the block execution of all four timer interrupts
+  extern portMUX_TYPE timerMux;
+  #undef cli
+  // disable hardware timer based tasks by FreeRTOS mux
+  #define cli() portENTER_CRITICAL(&timerMux)
+  #undef sei
+  // enable hardware timer based tasks by FreeRTOS mux
+  #define sei() portEXIT_CRITICAL(&timerMux)
+  // disable hardware timer based tasks by clearing interrupt flag(s)
+  extern void timerAlarmsDisable();
+  // enable hardware timer based tasks by setting interrupt flag(s)
+  extern void timerAlarmsEnable();
+#endif
+
 // short Y macro to embed yield()
 #define Y tasks.yield()
 
 // short macro to allow momentary postponement of the current task
 extern unsigned char __task_postpone;
+// postpone currently executing task (scheduler picks task up ASAP again on exit)
 #define task_postpone() __task_postpone = true;
 
 // mutex macros, do not run these in hardware timers (not ISR safe)!
@@ -231,11 +250,10 @@ class Tasks {
       double getRuntimeMax(uint8_t handle);
     #endif
 
-    // runs tasks at the prescribed interval, each call can trigger at most a single process
+    // runs tasks at their prescribed interval, each call can trigger at most a single process
     // processes that are already running are ignored so it's ok to poll() within a process
     void yield();
-  void yield(unsigned long milliseconds);
-
+    void yield(unsigned long milliseconds);
 
   private:
     // keep track of the range of priorities so we don't waste cycles looking at empty ones

@@ -19,14 +19,14 @@ extern unsigned long periodSubMicros;
 #if AXIS1_DRIVER_MODEL != OFF
   const AxisPins     Axis1StepPins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
   const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_DRIVER_REVERSE};
-  inline void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   inline void moveForwardFastAxis1() { telescope.mount.axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   inline void moveReverseFastAxis1() { telescope.mount.axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const AxisPins     Axis2StepPins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
   const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_DRIVER_REVERSE};
-  inline void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   inline void moveForwardFastAxis2() { telescope.mount.axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   inline void moveReverseFastAxis2() { telescope.mount.axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
@@ -301,7 +301,7 @@ void Axis::enableMoveFast(bool fast) {
   #endif
 }
 
-inline void Axis::move(const int8_t stepPin, const int8_t dirPin) {
+IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   if (takeStep) {
     if (direction == DIR_FORWARD) {
       if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
@@ -328,13 +328,13 @@ inline void Axis::move(const int8_t stepPin, const int8_t dirPin) {
 
 #if MODE_SWITCH == ON
   #if STEP_WAVE_FORM == SQUARE
-  inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
       if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
   }
-  inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
       if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
@@ -342,24 +342,24 @@ inline void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   }
   #endif
   #if STEP_WAVE_FORM == PULSE
-  inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
     if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
   }
-  inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
     if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
   }
   #endif
 #else
   #if STEP_WAVE_FORM == SQUARE
-    inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+    IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
       if (takeStep) {
         if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
       } else digitalWriteF(stepPin, LOW);
       takeStep = !takeStep;
     }
-    inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
       if (takeStep) {
         if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
       } else digitalWriteF(stepPin, LOW);
@@ -367,11 +367,11 @@ inline void Axis::move(const int8_t stepPin, const int8_t dirPin) {
     }
   #endif
   #if STEP_WAVE_FORM == PULSE
-    inline void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+    IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
       digitalWriteF(stepPin, LOW);
       if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
     }
-    inline void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
       digitalWriteF(stepPin, LOW);
       if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
     }

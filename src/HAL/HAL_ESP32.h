@@ -49,12 +49,13 @@
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
 
-#include "HAL_ESP32_Analog.h"
-
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #define E2END 4095
   #include "../lib/nv/NV_ESP32.h"
+  #ifdef NVS
+    #undef NVS
+  #endif
   #define NVS NonVolatileStorageESP32
   #undef NV_ENDURANCE
   #define NV_ENDURANCE NVE_LOW
@@ -69,3 +70,7 @@
 // Correction for ESP32's internal temperture sensor
 #define INTERNAL_TEMP_CORRECTION 0
 #define HAL_TEMP ( temperatureRead() + INTERNAL_TEMP_CORRECTION )
+
+//---------------------------------------------------------------------------------------------------
+// Misc. includes to support this processor's operation
+#include "../lib/analog/AN_ESP32.h"

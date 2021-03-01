@@ -16,7 +16,7 @@ extern Tasks tasks;
 
 volatile unsigned long centisecondLAST;
 unsigned long periodSubMicros;
-void clockTickWrapper() { centisecondLAST++; }
+IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
 
 void Site::init() {
   // get location

@@ -5,6 +5,9 @@
 
 #include "Arduino.h"
 #include "EEPROM.h"
+#include "../../tasks/OnTask.h"
+extern Tasks tasks;
+
 #include "NV_ESP32.h"
 
 bool NonVolatileStorageESP32::init(uint16_t size) {

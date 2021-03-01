@@ -4,7 +4,10 @@
 #pragma once
 
 #include "Arduino.h"
+#include "EEPROM.h"
 #include "NV.h"
+
+#ifdef E2END
 
 class NonVolatileStorageEEPROM : public NonVolatileStorage {
   public:
@@ -20,3 +23,5 @@ class NonVolatileStorageEEPROM : public NonVolatileStorage {
     // write value j to position i in storage 
     void writeToStorage(uint16_t i, uint8_t j);  
 };
+
+#endif

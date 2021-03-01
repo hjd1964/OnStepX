@@ -5,6 +5,8 @@
 #include "EEPROM.h"
 #include "NV_EEPROM.h"
 
+#ifdef E2END
+
 bool NonVolatileStorageEEPROM::init(uint16_t cacheSize) {
   // setup cache size
   NonVolatileStorage::init(cacheSize);
@@ -20,3 +22,4 @@ uint8_t NonVolatileStorageEEPROM::readFromStorage(uint16_t i) {
 void NonVolatileStorageEEPROM::writeToStorage(uint16_t i,  uint8_t j) {
   EEPROM.write(i, j);
 }
+#endif
