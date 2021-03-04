@@ -78,34 +78,42 @@ extern Telescope telescope;
   extern void debugConsole();
 #endif
 
-void setup() {
+void systemServices() {
+  nv.poll();
+}
 
+void setup() {
   #if DEBUG != OFF
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
     delay(2000);
   #endif
 
-  VLF("MSG: setup, HAL initalize");
-  HAL_INIT;
-  
+  VLF("MSG: Setup, HAL initalize");
+  HAL_INIT();
+
+  // System services
+  // add task for system services, runs at 5ms intervals
+  VLF("MSG: Setup, starting system service task");
+  tasks.add(5, 0, true, 7, systemServices, "SysSvc");
+
   // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  VLF("MSG: setup, starting command channel tasks");
+  VLF("MSG: Setup, starting command channel tasks");
   #ifdef SERIAL_A
-    tasks.add(2, 0, true, 7, processCmdsA, "PrcCmdA");
+    tasks.add(2, 0, true, 6, processCmdsA, "PrcCmdA");
   #endif
   #ifdef SERIAL_B
-    tasks.add(2, 0, true, 7, processCmdsB, "PrcCmdB");
+    tasks.add(2, 0, true, 6, processCmdsB, "PrcCmdB");
   #endif
   #ifdef SERIAL_C
-    tasks.add(2, 0, true, 7, processCmdsC, "PrcCmdC");
+    tasks.add(2, 0, true, 6, processCmdsC, "PrcCmdC");
   #endif
   #ifdef SERIAL_D
-    tasks.add(2, 0, true, 7, processCmdsD, "PrcCmdD");
+    tasks.add(2, 0, true, 6, processCmdsD, "PrcCmdD");
   #endif
   #ifdef SERIAL_ST4
-    tasks.add(2, 0, true, 7, processCmdsST4, "PrcCmdS");
+    tasks.add(2, 0, true, 6, processCmdsST4, "PrcCmdS");
   #endif
 
   telescope.init();
