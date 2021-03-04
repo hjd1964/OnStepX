@@ -94,7 +94,7 @@ void setup() {
   // System services
   // add task for system services, runs at 5ms intervals
   VLF("MSG: Setup, starting system service task");
-  tasks.add(5, 0, true, 7, systemServices, "SysSvc");
+  tasks.add(5, 0, true, 7, systemServices, "SysSvcs");
 
   // Command processing
   // add tasks to process commands
