@@ -26,10 +26,6 @@ typedef struct AxisPins {
   bool   invertEnable;
 } AxisPins;
 
-enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
-
-enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
-
 typedef struct AxisErrors {
   uint8_t driverFault:1;
   uint8_t motorFault:1;
@@ -38,6 +34,10 @@ typedef struct AxisErrors {
   uint8_t minLimitSensed:1;
   uint8_t maxLimitSensed:1;
 } AxisErrors;
+
+enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
+enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
+enum AutoRate {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_START_TIME, AR_RATE_BY_END_TIME};
 
 class Axis {
   public:
@@ -83,15 +83,27 @@ class Axis {
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
 
-    // sets maximum frequency in "measures" (radians, microns, etc.) per second
-    void setFrequencyMax(double frequency);
-
     // sets movement frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency);
     // gets movement frequency in "measures" (degrees, microns, etc.) per second
     double getFrequency();
     // gets movement frequency in steps per second
     double getFrequencySteps();
+    // sets maximum frequency in "measures" (radians, microns, etc.) per second
+    void setFrequencyMax(double frequency);
+
+    // automatically adjusts movement frequency by distance (in radians to FrequencyMax)
+    void autoSlewRateByDistance(double distance);
+    // automatically adjusts movement frequency by time (in seconds to FrequencyMax)
+    void autoSlewRateByTime(double time);
+    // stops automatic movement
+    void autoSlewStop(double time);
+    // time to stop movement (emergency stop)
+    void setAutoSlewAbortTime(double time);
+    // stops automatic movement (emergency stop)
+    void autoSlewAbort();
+    // monitor movement
+    void poll();
 
     // set tracking state (automatic movement of target)
     void setTracking(bool state);
@@ -143,6 +155,7 @@ class Axis {
     bool   invertEnabled              = false;
     bool   enabled                    = false;
     bool   tracking                   = false;
+    bool   moveFast                   = false;
 
     double origin                     = 0.0;
     double target                     = 0.0;
@@ -164,6 +177,7 @@ class Axis {
     volatile long backlashSteps       = 0;
     volatile long backlashAmountSteps = 0;
     unsigned long backlashStepsStore  = 0;
+    double backlashFreq               = siderealToRad(TRACK_BACKLASH_RATE);
 
     double spm                        = 1.0;
 
@@ -173,8 +187,15 @@ class Axis {
     unsigned long lastPeriod          = 0;
 
     double maxFreq                    = 0.0;
+    double lastFreq                   = 0.0;
     double minPeriodMicros            = 0.0;
     unsigned long minPeriodMicrosHalf = 0;
+    AutoRate autoRate                 = AR_NONE;
+    unsigned long autoRateStartTime   = 0;
+    unsigned long autoRateEndTime     = 0;
+    unsigned long autoRateAbortTime   = 0;
+    double autoRateTimeToMax          = 0;
+    double slewAccelerationDistance   = 0;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

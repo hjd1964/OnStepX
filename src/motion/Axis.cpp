@@ -20,15 +20,15 @@ extern unsigned long periodSubMicros;
   const AxisPins     Axis1StepPins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
   const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS1_DRIVER_REVERSE, { degToRad(AXIS1_LIMIT_MIN), degToRad(AXIS1_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  inline void moveForwardFastAxis1() { telescope.mount.axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  inline void moveReverseFastAxis1() { telescope.mount.axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void moveForwardFastAxis1() { telescope.mount.axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void moveReverseFastAxis1() { telescope.mount.axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const AxisPins     Axis2StepPins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
   const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS2_DRIVER_REVERSE, { degToRad(AXIS2_LIMIT_MIN), degToRad(AXIS2_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  inline void moveForwardFastAxis2() { telescope.mount.axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  inline void moveReverseFastAxis2() { telescope.mount.axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void moveForwardFastAxis2() { telescope.mount.axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void moveReverseFastAxis2() { telescope.mount.axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3StepPins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
@@ -51,7 +51,34 @@ extern unsigned long periodSubMicros;
   inline void moveAxis6() { telescope.focuser3.axis.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
 
+static uint8_t pollingTaskHandle  = 0;
+inline void pollAxes() {
+  #if AXIS1_DRIVER_MODEL != OFF
+    telescope.mount.axis1.poll();
+  #endif
+  #if AXIS2_DRIVER_MODEL != OFF
+    telescope.mount.axis2.poll();
+  #endif
+  #if AXIS3_DRIVER_MODEL != OFF
+    telescope.mount.axis3.poll();
+  #endif
+  #if AXIS4_DRIVER_MODEL != OFF
+    telescope.mount.axis4.poll();
+  #endif
+  #if AXIS5_DRIVER_MODEL != OFF
+    telescope.mount.axis5.poll();
+  #endif
+  #if AXIS6_DRIVER_MODEL != OFF
+    telescope.mount.axis6.poll();
+  #endif
+}
+
 void Axis::init(uint8_t axisNumber) {
+  if (pollingTaskHandle == 0) {
+    VLF("MSG: Axis, starting axis polling task");
+    pollingTaskHandle = tasks.add(10, 0, true, 0, pollAxes, "AxsPoll");
+  }
+
   this->axisNumber = axisNumber;
 
   VF("MSG: Axis"); V(axisNumber); VF(", starting moveAxis"); V(axisNumber); VLF(" task");
@@ -209,19 +236,95 @@ double Axis::getOriginOrTargetDistance() {
 }
 
 void Axis::setFrequencyMax(double frequency) {
-  maxFreq = frequency*spm;
-  if (frequency != 0.0) minPeriodMicros = 1000000.0/maxFreq; else minPeriodMicros = 0.0;
+  maxFreq = frequency;
+  if (frequency != 0.0) minPeriodMicros = 1000000.0/(maxFreq*spm); else minPeriodMicros = 0.0;
+}
+
+void Axis::autoSlewRateByDistance(double distance) {
+  autoRate = AR_RATE_BY_DISTANCE;
+  slewAccelerationDistance = distance;
+  VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
+}
+
+void Axis::autoSlewRateByTime(double time) {
+  autoRate = AR_RATE_BY_START_TIME;
+  autoRateStartTime = millis();
+  autoRateTimeToMax = time*1000.0;
+  VF("MSG: Axis::autoFrequencyByTime(); Axis"); V(axisNumber); VLF(" slew started");
+}
+
+void Axis::autoSlewStop(double time) {
+  autoRate = AR_RATE_BY_END_TIME;
+  autoRateEndTime = millis() + lround(time*1000.0);
+  autoRateTimeToMax = (time*1000.0)*(lastFreq/maxFreq);
+  poll();
+}
+
+void Axis::setAutoSlewAbortTime(double time) {
+  autoRateAbortTime = time;
+}
+
+void Axis::autoSlewAbort() {
+  autoRate = AR_RATE_BY_END_TIME;
+  autoRateEndTime = millis() + lround(autoRateAbortTime*1000.0);
+  autoRateTimeToMax = (autoRateAbortTime*1000.0)*(lastFreq/maxFreq);
+  poll();
+}
+
+void Axis::poll() {
+  // limits
+
+  // acceleration
+  if (autoRate == AR_NONE) return;
+  double freq;
+  if (autoRate == AR_RATE_BY_DISTANCE) {
+    freq = getOriginOrTargetDistance()/slewAccelerationDistance*maxFreq + siderealToRad(backlashFreq);
+    if (freq < backlashFreq) freq = backlashFreq;
+  } else
+  if (autoRate == AR_RATE_BY_START_TIME) {
+    long timeFromStart = (long)(millis() - autoRateStartTime);
+    freq = (timeFromStart/autoRateTimeToMax)*maxFreq;
+    if (freq < 0) freq = 0;
+  } else
+  if (autoRate == AR_RATE_BY_END_TIME) {
+    long timeUntilStop = (long)(autoRateEndTime - millis());
+    if (timeUntilStop <= 0) {
+      timeUntilStop = 0;
+      autoRate = AR_NONE;
+      VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew stopped");
+    }
+    freq = (timeUntilStop/autoRateTimeToMax)*maxFreq;
+    if (freq < 0) freq = 0;
+  } else freq = 0;
+  if (freq > maxFreq) freq = maxFreq;
+  setFrequency(freq);
+
+  // ISR swap
+  if (moveFast && (freq < backlashFreq*1.2 || autoRate == AR_NONE)) {
+     moveFast = false;
+     enableMoveFast(false);
+     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" high speed ISR swapped out");
+  }
+
+  if (!moveFast && freq > backlashFreq*1.2) {
+    moveFast = true;
+    enableMoveFast(true);
+     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" high speed ISR swapped in");
+  }
 }
 
 void Axis::setFrequency(double frequency) {
+  lastFreq = frequency;
   // frequency in measures per second to microsecond counts per step
   double d = 1000000.0/(frequency*spm);
   if (d < minPeriodMicros) d = minPeriodMicros;
-  d /= 2.0;  // we need to run twice as fast to make a square wave
+  if (STEP_WAVE_FORM == SQUARE) d /= 2.0;
   if (!isnan(d) && fabs(d) <= 134000000) {
-    d *= 16.0; // convert microsecond counts into sub-microsecond counts
+    // convert microsecond counts to sub-microsecond counts
+    d *= 16.0;
     lastPeriod = (unsigned long)lround(d);
-    d *= (SIDEREAL_PERIOD/periodSubMicros); // adjust period for MCU clock inaccuracy
+    // adjust period for MCU clock inaccuracy
+    d *= (SIDEREAL_PERIOD/periodSubMicros);
   } else { d = 0; lastPeriod = 0; }
   tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(d));
 }
@@ -312,7 +415,7 @@ void Axis::enableMoveFast(bool fast) {
     digitalWriteF(pins.dir, invertDir?LOW:HIGH);
   } else direction = DIR_NONE;
   interrupts();
-  
+
   if (direction == DIR_NONE) return;
 
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
@@ -343,10 +446,10 @@ IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
     if (tracking) targetSteps += trackingStep;
     if (motorSteps + backlashSteps < targetSteps) {
       direction = DIR_FORWARD;
-      digitalWriteF(dirPin, LOW);
+      digitalWriteF(dirPin, invertDir?HIGH:LOW);
     } else if (motorSteps + backlashSteps > targetSteps) {
       direction = DIR_REVERSE;
-      digitalWriteF(dirPin, HIGH);
+      digitalWriteF(dirPin, invertDir?LOW:HIGH);
     } else direction = DIR_NONE;
     if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
     digitalWriteF(stepPin, LOW);

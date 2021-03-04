@@ -23,7 +23,6 @@ void Telescope::init() {
   if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
     VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes (please wait)");
     for (int i = 0; i < nv.size; i++) nv.write(i, (char)0);
-
     while (!nv.committed()) nv.poll();
 
     nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);

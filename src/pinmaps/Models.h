@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Loads pinmap model for current configuration
+#pragma once
 
 #if PINMAP == Classic
   #define PINMAP_STR "Classic"

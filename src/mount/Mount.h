@@ -201,12 +201,6 @@ class Mount {
     double     gotoTargetAxis2       = 0.0;
     double     usPerStepDefault      = 64.0;
     double     usPerStepBase         = 128.0;
-    double     gotoRateAxis1         = 0.0;
-    double     gotoRateAxis2         = 0.0;
-    double     gotoRateLimitAxis1    = 0.0;
-    double     gotoRateLimitAxis2    = 0.0;
-    bool       moveFastAxis1         = false;
-    bool       moveFastAxis2         = false;
 
     // limits
     bool       limitsEnabled         = false;

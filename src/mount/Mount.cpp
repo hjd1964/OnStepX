@@ -32,34 +32,35 @@ void Mount::init() {
   axis1.init(1);
   axis2.init(2);
 
+  // get misc settings from NV
+  if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+
   // calculate base slew rate
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
 
-  // get misc settings from NV
-  if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+  if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
+  if (misc.usPerStepCurrent > 2048) misc.usPerStepCurrent = 2048;
 
   // get limit settings from NV
   if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::init(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
 
-  if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
-  if (misc.usPerStepCurrent > 2048) misc.usPerStepCurrent = 2048;
-
   // startup state
   resetHome();
 
+  // automatic movement for axis1 and axis2
+  axis1.setTracking(true);
+  axis2.setTracking(true);
+
+  // possibly start tracking
   #if TRACK_AUTOSTART == ON
     VLF("MSG: Mount starting tracking");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   #endif
   updateTrackingRates();
-
-  // automatic movement for axis1 and axis2
-  axis1.setTracking(true);
-  axis2.setTracking(true);
 }
 
 void Mount::setTrackingState(TrackingState state) {
@@ -78,8 +79,8 @@ void Mount::updateTrackingRates() {
     if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
   }
   if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
-  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1 + gotoRateAxis1)*SIDEREAL_RATIO);
-  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2 + gotoRateAxis2)*SIDEREAL_RATIO);
+  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO);
+  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO);
 }
 
 // check for platform rate limit (lowest maxRate) in us units
@@ -89,7 +90,7 @@ double Mount::usPerStepLowerLimit() {
   
   // higher speed ISR code path?
   #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
-    r_us=r_us/1.6; // about 1.6x faster than SQW mode in my testing
+    r_us /= 1.6; // about 1.6x faster than SQW mode in my testing
   #endif
   
   // on-the-fly mode switching used?
@@ -109,7 +110,7 @@ double Mount::usPerStepLowerLimit() {
   r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0;
  
   // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
-  if (r_us < 0.25) { r_us = 0.25; DLF("WRN, usPerStepLowerLimit(): r_us exceeds design limit"); }
+  if (r_us < 0.25) { r_us = 0.25; DLF("WRN, Mount::usPerStepLowerLimit(): r_us exceeds design limit"); }
 
   // return rate in us units
   return r_us;
