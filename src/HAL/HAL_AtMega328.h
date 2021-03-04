@@ -12,8 +12,8 @@
 #define HAL_SLOW_PROCESSOR
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode)
-#define HAL_MAXRATE_LOWER_LIMIT   76.8
-#define HAL_PULSE_WIDTH          10000
+#define HAL_MAXRATE_LOWER_LIMIT 76.8
+#define HAL_PULSE_WIDTH         10000
 
 // New symbols for the Serial ports so they can be remapped if necessary -----------------------------
 
@@ -28,13 +28,12 @@
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #include "../lib/nv/NV_EEPROM.h"
-  #define NVS NonVolatileStorageEEPROM
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { nv.init(0); }
+#define HAL_INIT() { nv.init(E2END + 1, false, 0, false); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP ( -999 )
+#define HAL_TEMP() ( NAN )

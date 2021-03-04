@@ -7,11 +7,10 @@
 #include "../commands/ProcessCmds.h"
 
 typedef struct LatitudeExtras {
-//  double   value;
-  double   sine;
-  double   cosine;
-  double   absval;
-  double   sign;
+  double sine;
+  double cosine;
+  double absval;
+  double sign;
 } Latitude;
 
 typedef struct LocationExtras {
@@ -19,17 +18,30 @@ typedef struct LocationExtras {
   bool ready;
 } LocationExtras;
 
+#pragma pack(1)
 #define LocationSize 36
 typedef struct Location {
   double latitude;
   double longitude;
   float  timezone;
   char   name[16];
-
-//  Latitude latitude;
-//  double   longitude;
-//  bool     ready;
 } Location;
+#pragma pack()
+
+// ambient temperature (°C), pressure (mb), humidity (RH %), and altitude (meters)
+typedef struct SiteConditions {
+  float temperature;
+  float pressure;
+  float humidity;
+  float altitude;
+} SiteConditions;
+
+extern SiteConditions siteConditions;
+
+typedef struct SiteErrors {
+  bool init;
+  bool TLSinit;
+} SiteErrors;
 
 class Site {
   public:
@@ -55,6 +67,9 @@ class Site {
     Location location;
     LocationExtras locationEx;
     Convert convert;
+
+    SiteErrors error = {false, false};
+
   private:
 
     // sets the time in hours that have passed in this Julian Day
@@ -90,6 +105,8 @@ class Site {
 
     // reads the julian date information from NV
     void readJD();
+
+    inline double dewPoint(SiteConditions conditions) { return conditions.temperature - ((100.0 - conditions.humidity) / 5.0); }
 
     JulianDate ut1;
     double centisecondHOUR = 0;

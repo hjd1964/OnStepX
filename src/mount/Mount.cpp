@@ -20,34 +20,38 @@ extern Tasks tasks;
 #include "../motion/Axis.h"
 #include "Mount.h"
 
-#if STEPS_PER_WORM_ROTATION == 0
-  #define AXIS1_PEC ON
-#else
-  #define AXIS1_PEC OFF
-#endif
-
 void Mount::init() {
-  VLF("MSG: Mount::init started");
 
   transform.init();
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS;
+
+  // get PEC ready
+  initPec();
 
   // get the main axes ready
   axis1.init(1);
   axis2.init(2);
 
-  // set slew rate
+  // calculate base slew rate
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
-  usPerStepCurrent = usPerStepBase;
 
-  radsPerCentisecond = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
+  // get misc settings from NV
+  if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+
+  // get limit settings from NV
+  if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::init(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+
+  if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
+  if (misc.usPerStepCurrent > 2048) misc.usPerStepCurrent = 2048;
 
   // startup state
   resetHome();
 
   #if TRACK_AUTOSTART == ON
-    VLF("MSG: Mount::init, starting tracking");
+    VLF("MSG: Mount starting tracking");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   #endif
@@ -111,18 +115,20 @@ double Mount::usPerStepLowerLimit() {
   return r_us;
 }
 
-extern GeneralErrors generalErrors;
+bool Mount::anyError() {
+  return error.altitude.minExceeded ||
+         error.altitude.maxExceeded ||
+         error.meridian.eastExceeded ||
+         error.meridian.westExceeded ||
+         error.parkFailed;
+}
 
-void Mount::resetGeneralErrors() {
-  generalErrors.altitudeMin = false;
-  generalErrors.limitSense = false;
-  generalErrors.decMinMax = false;
-  generalErrors.azmMinMax = false;
-  generalErrors.raMinMax  = false;
-  generalErrors.raMeridian = false;
-  generalErrors.sync = false;
-  generalErrors.altitudeMax = false;
-  generalErrors.park = false;
+void Mount::resetErrors() {
+  error.altitude.minExceeded = false;
+  error.altitude.minExceeded = false;
+  error.meridian.eastExceeded = false;
+  error.meridian.westExceeded = false;
+  error.parkFailed = false;
 }
 
 #endif

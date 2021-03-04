@@ -11,9 +11,14 @@
 class NonVolatileStorageESP32 : public NonVolatileStorage {
   public:
     // prepare FLASH based EEPROM emulation for operation
-    // cacheSize: cache size in bytes (should be 0 or match the EEPROM E2END size)
-    // result: always true
-    bool init(uint16_t cacheSize);
+    // size:    NV size in bytes
+    // cache:   enable or disable the cache (note NV size must be divisible by 8 if enabled)
+    // wait:    minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
+    // check:   checksum error detection
+    // wire:    I2C interface pointer (set to NULL if not used)
+    // address: I2C address
+    // result:  true if the device was found, or false if not
+    bool init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0);
 
     // call frequently to perform any operations that need to happen in the background
     void poll();
@@ -29,7 +34,8 @@ class NonVolatileStorageESP32 : public NonVolatileStorage {
     void writeToStorage(uint16_t i, uint8_t j);  
 
     bool dirty = false;
-    uint32_t lastWrite = 0;
 };
+
+#define NVS NonVolatileStorageESP32
 
 #endif

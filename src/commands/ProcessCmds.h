@@ -22,24 +22,6 @@ typedef enum CommandError {
 
   CE_NULL} CommandError;
 
-typedef struct GeneralErrors {
-  uint16_t motorFault:  1; // ERR_MOTOR_FAULT
-  uint16_t altitudeMin: 1; // ERR_ALT_MIN
-  uint16_t limitSense:  1; // ERR_LIMIT_SENSE
-  uint16_t decMinMax:   1; // ERR_DEC
-  uint16_t azmMinMax:   1; // ERR_AZM
-  uint16_t raMinMax:    1; // ERR_UNDER_POLE
-  uint16_t raMeridian:  1; // ERR_MERIDIAN
-  uint16_t sync:        1; // ERR_SYNC
-  uint16_t park:        1; // ERR_PARK
-  uint16_t gotoSync:    1; // ERR_GOTO_SYNC
-  uint16_t unspecified: 1; // ERR_UNSPECIFIED
-  uint16_t altitudeMax: 1; // ERR_ALT_MAX
-  uint16_t weatherInit: 1; // ERR_WEATHER_INIT
-  uint16_t siteInit:    1; // ERR_SITE_INIT
-  uint16_t nvInit:      1; // ERR_NV_INIT
-} GeneralErrors;
-
 class CommandProcessor {
   public:
     // start and stop the serial port for the associated command channel

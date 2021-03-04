@@ -16,7 +16,10 @@ extern volatile unsigned long centisecondLAST;
 
 void Transform::init() {
   mountType = MOUNT_TYPE;
-  VF("MSG: Transform::init, mount type "); VL(mountType);
+  #if DEBUG_MODE != OFF
+  const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
+  VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
+  #endif
   site.init();
 }
 
@@ -164,20 +167,20 @@ void Transform::horToEqu(Coordinate *coord) {
   if (coord->h > PI) coord->h -= TWO_PI;
 }
 
-double Transform::trueRefrac(double altitude, double pressure, double temperature) {
-  if (isnan(pressure)) pressure = 1010.0;
-  if (isnan(temperature)) temperature = 10.0;
+double Transform::trueRefrac(double altitude) {
+  double pressure = 1010.0;
+  double temperature = 10.0;
+  if (isnan(siteConditions.pressure)) pressure = siteConditions.pressure;
+  if (isnan(siteConditions.temperature)) temperature = siteConditions.temperature;
   double TPC = (pressure/1010.0)*(283.0/(273.0 + temperature));
   double r   = 2.96705972855e-4*cot(altitude + 0.17977/(altitude + 0.08919))*TPC;
   if (r < 0.0) r = 0.0;
   return r;
 }
 
-double Transform::apparentRefrac(double altitude, double pressure, double temperature) {
-  if (isnan(pressure)) pressure = 1010.0;
-  if (isnan(temperature)) temperature = 10.0;
-  double r = trueRefrac(altitude, pressure, temperature);
-  return trueRefrac(altitude - r, pressure, temperature);
+double Transform::apparentRefrac(double altitude) {
+  double r = trueRefrac(altitude);
+  return trueRefrac(altitude - r);
 }
 
 double Transform::cot(double n) {

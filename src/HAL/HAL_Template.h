@@ -33,4 +33,4 @@
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP ( -999 )
+#define HAL_TEMP ( NAN )

@@ -17,8 +17,6 @@ extern Tasks tasks;
 
 extern Telescope telescope;
 
-GeneralErrors generalErrors = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
 // command processors
 #ifdef SERIAL_A
   CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT,'A');
@@ -100,6 +98,13 @@ CommandError CommandProcessor::command(char reply[], char command[], char parame
       SerialPort.begin(baud[rate]);
       *numericReply = false;
     } else commandError = CE_PARAM_RANGE;
+    return commandError;
+  } else
+
+  // internal MCU temperature in deg. C
+  if (cmd2("GX9F")) {
+    float t = HAL_TEMP();
+    if (!isnan(t)) dtostrf(t, 1, 0, reply); else { *numericReply = true; commandError = CE_0; }
     return commandError;
   } else
 

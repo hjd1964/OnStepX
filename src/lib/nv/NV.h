@@ -4,25 +4,34 @@
 #pragma once
 
 #include "Arduino.h"
+#include "Wire.h"
 
 class NonVolatileStorage {
   public:
     // prepare EEPROM/FLASH/etc. for operation
-    virtual bool init(uint16_t size);
+    // size:    NV size in bytes
+    // cache:   enable or disable the cache (note NV size must be divisible by 8 if enabled)
+    // wait:    minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
+    // check:   checksum error detection
+    // wire:    I2C interface pointer (set to NULL if not used)
+    // address: I2C address
+    // result:  true if the device was found, or false if not
+    virtual bool init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0);
+
+    // disables writing if true, defaults to false
+    void readOnly(bool state);
 
     // call frequently to perform any operations that need to happen in the background
     virtual void poll();
 
-    // returns true if all data in any cache has been written
+    // returns true if all data in any cache has been written or the commit has been done
     virtual bool committed();
 
     // returns true if all data in nv has passed ongoing validation checks
     bool valid();
 
-    // causes write and update to actually write to EEPROM
-    // normally both write and update read first and only write if the
-    // value has changed (and possibly later after being cached)
-    void writeThrough(bool state);
+    // causes read/write to ignore cache, write by update is disabled also
+    void ignoreCache(bool state);
 
     // reads data from memory
     uint8_t readFromCache(uint16_t i);
@@ -96,7 +105,8 @@ class NonVolatileStorage {
     // write value j to position i in storage 
     virtual void writeToStorage(uint16_t i, uint8_t j);
 
-    bool writeOnUpdate = false;
+    bool readAndWriteThrough = false;
+    bool readOnlyMode = false;
 
     uint16_t cacheIndex = -1;
     uint16_t cacheSize = 0;
@@ -104,6 +114,7 @@ class NonVolatileStorage {
     uint16_t cacheStateSize = 0;
     uint8_t* cacheStateRead;
     uint8_t* cacheStateWrite;
-};
 
-#define NVS NonVolatileStorage
+    uint32_t waitMs = 0;
+    uint32_t commitReadyTimeMs = 0;
+};

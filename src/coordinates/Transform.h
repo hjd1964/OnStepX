@@ -65,10 +65,10 @@ class Transform {
 
     // refraction at altitude, pressure (millibars), and temperature (celsius)
     // returns amount of refraction at the true altitude
-    double trueRefrac(double altitude, double pressure = 1010.0, double temperature = 10.0);
+    double trueRefrac(double altitude);
     // refraction at altitude, pressure (millibars), and temperature (celsius)
     // returns the amount of refraction at the apparent altitude
-    double apparentRefrac(double altitude, double pressure = 1010.0, double temperature = 10.0);
+    double apparentRefrac(double altitude);
 
     Site site;
     int8_t mountType;

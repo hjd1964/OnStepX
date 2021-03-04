@@ -267,7 +267,7 @@ uint8_t Task::getPriority() {
 }
 
 void Task::setNameStr(const char name[]) {
-  strncpy(processName,name,7);
+  strncpy(processName, name, 7);
 }
 
 char* Task::getNameStr() {

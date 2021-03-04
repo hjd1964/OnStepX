@@ -18,43 +18,43 @@ extern unsigned long periodSubMicros;
 
 #if AXIS1_DRIVER_MODEL != OFF
   const AxisPins     Axis1StepPins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_DRIVER_REVERSE};
+  const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS1_DRIVER_REVERSE, { degToRad(AXIS1_LIMIT_MIN), degToRad(AXIS1_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   inline void moveForwardFastAxis1() { telescope.mount.axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   inline void moveReverseFastAxis1() { telescope.mount.axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const AxisPins     Axis2StepPins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_DRIVER_REVERSE};
+  const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS2_DRIVER_REVERSE, { degToRad(AXIS2_LIMIT_MIN), degToRad(AXIS2_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   inline void moveForwardFastAxis2() { telescope.mount.axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   inline void moveReverseFastAxis2() { telescope.mount.axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3StepPins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis3Settings = {AXIS3_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS3_DRIVER_REVERSE};
+  const AxisSettings Axis3Settings = {AXIS3_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS3_DRIVER_REVERSE, { degToRad(AXIS3_LIMIT_MIN), degToRad(AXIS3_LIMIT_MAX) } };
   inline void moveAxis3() { telescope.rotator.axis.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
   const AxisPins     Axis4StepPins = {AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis4Settings = {AXIS4_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS4_DRIVER_REVERSE};
+  const AxisSettings Axis4Settings = {AXIS4_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS4_DRIVER_REVERSE, { degToRad(AXIS4_LIMIT_MIN), degToRad(AXIS4_LIMIT_MAX) } };
   inline void moveAxis4() { telescope.focuser1.axis.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
   const AxisPins     Axis5StepPins = {AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis5Settings = {AXIS5_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS5_DRIVER_REVERSE};
+  const AxisSettings Axis5Settings = {AXIS5_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS5_DRIVER_REVERSE, { degToRad(AXIS5_LIMIT_MIN), degToRad(AXIS5_LIMIT_MAX) } };
   inline void moveAxis5() { telescope.focuser2.axis.move(AXIS2_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
   const AxisPins     Axis6StepPins = {AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, false, false, true};
-  const AxisSettings Axis6Settings = {AXIS6_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS6_DRIVER_REVERSE};
+  const AxisSettings Axis6Settings = {AXIS6_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS6_DRIVER_REVERSE, { degToRad(AXIS6_LIMIT_MIN), degToRad(AXIS6_LIMIT_MAX) } };
   inline void moveAxis6() { telescope.focuser3.axis.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
 
 void Axis::init(uint8_t axisNumber) {
   this->axisNumber = axisNumber;
-  VF("MSG: Axis::init, axis"); VL(axisNumber);
-  driver.init(axisNumber);
+
+  VF("MSG: Axis"); V(axisNumber); VF(", starting moveAxis"); V(axisNumber); VLF(" task");
 
   taskHandle = 0;
   #if AXIS1_DRIVER_MODEL != OFF
@@ -88,6 +88,8 @@ void Axis::init(uint8_t axisNumber) {
     if (axisNumber == 6) handle = tasks.add(0, 0, true, 0, moveAxis6, "Axis6");
   #endif
 
+  driver.init(axisNumber);
+
   spm = settings.stepsPerMeasure;
   if (settings.reverse) invertDir = !invertDir;
 
@@ -118,6 +120,13 @@ int Axis::getStepsPerStepGoto() {
 void Axis::setMotorCoordinate(double value) {
   long steps = lround(value*spm);
   setMotorCoordinateSteps(steps);
+}
+
+double Axis::getMotorCoordinate() {
+  noInterrupts();
+  long steps = motorSteps + backlashSteps;
+  interrupts();
+  return steps/spm;
 }
 
 void Axis::setMotorCoordinateSteps(long value) {
@@ -154,10 +163,10 @@ double Axis::getInstrumentCoordinate() {
   noInterrupts();
   long steps = motorSteps + indexSteps;
   interrupts();
-  return steps / spm;
+  return steps/spm;
 }
 
-void Axis::setOriginCoordinate() {
+void Axis::markOriginCoordinate() {
   noInterrupts();
   originSteps = motorSteps;
   interrupts();
@@ -238,6 +247,7 @@ void Axis::setBacklash(double value) {
   noInterrupts();
   backlashAmountSteps = value * spm;
   interrupts();
+  settings.backlashAmountSteps = backlashAmountSteps;
 }
 
 double Axis::getBacklash() {
@@ -268,6 +278,24 @@ void Axis::enableBacklash() {
   motorSteps -= backlashSteps;
   interrupts();
   backlashStepsStore = 0;
+}
+
+bool Axis::motionForwardError() {
+  return error.motorFault ||
+         error.driverFault ||
+         error.maxExceeded ||
+         error.maxLimitSensed;
+}
+
+bool Axis::motionReverseError() {
+  return error.motorFault ||
+         error.driverFault ||
+         error.minExceeded ||
+         error.minLimitSensed;
+}
+
+bool Axis::motionError() {
+  return motionForwardError() || motionReverseError();
 }
 
 void Axis::enableMoveFast(bool fast) {

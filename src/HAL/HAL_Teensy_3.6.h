@@ -52,17 +52,16 @@
 // Non-volatile storage ------------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #include "../lib/nv/NV_EEPROM.h"
-  #define NVS NonVolatileStorageEEPROM
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { analogReadResolution(10); nv.init(E2END + 1); }
+#define HAL_INIT() { analogReadResolution(10); nv.init(E2END + 1, true, 0, false); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define _T_pin 70
-#define HAL_TEMP ( (-((analogRead(Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
+#define _Tpin 70
+#define HAL_TEMP() ( (-((analogRead(_Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
 
 //--------------------------------------------------------------------------------------------------
 // for using the DAC as a digital output on Teensy3.6 A21=66 A22=67

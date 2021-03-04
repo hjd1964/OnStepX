@@ -10,11 +10,14 @@
 class NonVolatileStorageMB85RC : public NonVolatileStorage {
   public:
     // prepare FRAM for operation
-    // size: size in bytes
-    // wire: pointer to the TwoWire interface to use
-    // framAddress: the I2C address
-    // result: true if the device was found, or false if not
-    bool init(uint16_t size, TwoWire* wire, uint8_t framAddress);
+    // size:    NV size in bytes
+    // cache:   enable or disable the cache (note NV size must be divisible by 8 if enabled)
+    // wait:    minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
+    // check:   checksum error detection
+    // wire:    I2C interface pointer (set to NULL if not used)
+    // address: I2C address
+    // result:  true if the device was found, or false if not
+    bool init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0);
 
   private:
     // returns false if ready to read or write immediately
@@ -30,3 +33,5 @@ class NonVolatileStorageMB85RC : public NonVolatileStorage {
     uint8_t framAddress = 0;
     uint32_t nextOpMs = 0;
 };
+
+#define NVS NonVolatileStorageMB85RC

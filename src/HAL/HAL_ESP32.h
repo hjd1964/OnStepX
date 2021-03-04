@@ -51,25 +51,20 @@
 
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
-  #define E2END 4095
-  #include "../lib/nv/NV_ESP32.h"
-  #ifdef NVS
-    #undef NVS
-  #endif
-  #define NVS NonVolatileStorageESP32
-  #undef NV_ENDURANCE
+  #undef  NV_ENDURANCE
   #define NV_ENDURANCE NVE_LOW
+  #include "../lib/nv/NV_ESP32.h"
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { nv.init(E2END + 1); }
+#define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 // Correction for ESP32's internal temperture sensor
 #define INTERNAL_TEMP_CORRECTION 0
-#define HAL_TEMP ( temperatureRead() + INTERNAL_TEMP_CORRECTION )
+#define HAL_TEMP() ( temperatureRead() + INTERNAL_TEMP_CORRECTION )
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation

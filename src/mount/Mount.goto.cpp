@@ -19,85 +19,73 @@ extern Telescope telescope;
 #include "Mount.h"
 
 CommandError Mount::validateGoto() {
-  if ( axis1.fault()     ||  axis2.fault())       return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!axis1.isEnabled() || !axis2.isEnabled())   return CE_SLEW_ERR_IN_STANDBY;
-  if (parkState  != PS_UNPARKED)                  return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                      return CE_SLEW_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC)                 return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE)                      return CE_SLEW_IN_SLEW;
+  if ( axis1.fault()     ||  axis2.fault())        return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!axis1.isEnabled() || !axis2.isEnabled())    return CE_SLEW_ERR_IN_STANDBY;
+  if (parkState  != PS_UNPARKED)                   return CE_SLEW_ERR_IN_PARK;
+  if (guideState != GU_NONE)                       return CE_SLEW_IN_MOTION;
+  if (gotoState  == GS_GOTO_SYNC)                  return CE_SLEW_IN_MOTION;
+  if (gotoState  != GS_NONE)                       return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
 
 CommandError Mount::validateGotoCoords(Coordinate *coords) {
-  DL(radToDeg(coords->h));
-  char ws[80]; sprintf(ws, "%1.12f", coords->d); DL(ws);
-//  DL(radToDeg(coords->d));
-  DL(radToDeg(limits.minAxis2));
-  DL(radToDeg(limits.maxAxis2));
-  DL(radToDeg(limits.minAxis1));
-  DL(radToDeg(limits.maxAxis1));
-  if (flt(coords->a, limits.minAltitude))         return CE_SLEW_ERR_BELOW_HORIZON;
-  DL("1");
-  if (fgt(coords->a, limits.maxAltitude))         return CE_SLEW_ERR_ABOVE_OVERHEAD;
-  DL("2");
+  if (flt(coords->a, limits.altitude.min))         return CE_SLEW_ERR_BELOW_HORIZON;
+  if (fgt(coords->a, limits.altitude.max))         return CE_SLEW_ERR_ABOVE_OVERHEAD;
   if (AXIS2_TANGENT_ARM == OFF && transform.mountType != ALTAZM) {
-    if (flt(coords->d, limits.minAxis2)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  DL("3");
-  char ws[80]; sprintf(ws, "%1.12f", limits.maxAxis2); DL(ws);
-    if (fgt(coords->d, limits.maxAxis2)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  DL("4");
+    if (flt(coords->d, axis2.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (fgt(coords->d, axis2.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   }
-  if (flt(coords->h, limits.minAxis1))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  DL("5");
-  if (fgt(coords->h, limits.maxAxis1))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  DL("6");
+  if (flt(coords->h, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (fgt(coords->h, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   return CE_NONE;
 }
 
-CommandError Mount::setMountTarget(Coordinate *coords, bool allowPierSideChange) {
+CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect) {
   CommandError e = validateGoto();
-  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { tracking = true; axis1.enable(true); axis2.enable(true); e = validateGoto(); }
+  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { axis1.enable(true); axis2.enable(true); e = validateGoto(); }
   if (e != CE_NONE) return e;
 
   target = *coords;
-  // NAN is a flag that the RA shouldn't be converted (go directly to h,d)
   transform.rightAscensionToHourAngle(&target);
   transform.equToHor(&target);
   e = validateGotoCoords(&target);
   if (e != CE_NONE) return e;
 
+  // east side of pier is always the default polar-home position
   // east side of pier - we're in the western sky and the HA's are positive
   // west side of pier - we're in the eastern sky and the HA's are negative
+
   updatePosition();
   target.pierSide = current.pierSide;
 
   double a1, a2;
   transform.nativeToMount(&target, &a1, &a2);
 
-  if (meridianFlip == MF_ALWAYS) {
-    if (atHome) {
-      if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
-    } else
-    if (preferredPierSide == EAST && allowPierSideChange) {
-      if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
-    } else
-    if (preferredPierSide == WEST && allowPierSideChange) {
-      if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; else target.pierSide = PIER_SIDE_WEST;
-    } else
-    if (preferredPierSide == BEST) {
-      if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
-      if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
-    }
-    if (!atHome && !allowPierSideChange && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  } else {
-    // east side of pier is always the default polar-home position
-    target.pierSide = PIER_SIDE_EAST;
+  if (meridianFlip != MF_ALWAYS) { target.pierSide = PIER_SIDE_EAST; return CE_NONE; }
+
+  if (atHome) {
+    if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+  } else
+  if (pierSideSelect == PSS_EAST || pierSideSelect == PSS_EAST_ONLY) {
+    if (a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+  } else
+  if (pierSideSelect == PSS_WEST || pierSideSelect == PSS_WEST_ONLY) {
+    if (a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST; else target.pierSide = PIER_SIDE_WEST;
+  } else
+  if (pierSideSelect == PSS_BEST || pierSideSelect == PSS_SAME_ONLY) {
+    if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
+    if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
   }
+
+  if (pierSideSelect == PSS_EAST_ONLY && target.pierSide != PIER_SIDE_EAST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
+  if (pierSideSelect == PSS_WEST_ONLY && target.pierSide != PIER_SIDE_WEST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
+  if (pierSideSelect == PSS_SAME_ONLY && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
   return CE_NONE;
 }
 
-CommandError Mount::syncEqu(Coordinate *coords) {
-  CommandError e = setMountTarget(coords, PIER_SIDE_SYNC_CHANGE_SIDES == ON);
+CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
+  CommandError e = setMountTarget(coords, pierSideSelect);
   if (e != CE_NONE) return e;
   
   double a1, a2;
@@ -105,8 +93,8 @@ CommandError Mount::syncEqu(Coordinate *coords) {
   axis1.setInstrumentCoordinate(a1);
   axis2.setInstrumentCoordinate(a2);
 
-  safetyLimitsOn = true;
-  syncToEncodersOnly = true;
+  limitsEnabled = true;
+  misc.syncToEncodersOnly = false;
 
   VLF("MSG: Mount::syncEqu, instrument coordinates updated");
 
@@ -115,12 +103,12 @@ CommandError Mount::syncEqu(Coordinate *coords) {
 
 inline void mountMonitorWrapper() { telescope.mount.monitor(); }
   
-CommandError Mount::gotoEqu(Coordinate *coords) {
-  CommandError e = setMountTarget(coords, true);
+CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
+  CommandError e = setMountTarget(coords, pierSideSelect);
   if (e != CE_NONE) return e;
 
-  safetyLimitsOn = true;
-  syncToEncodersOnly = true;
+  limitsEnabled = true;
+  misc.syncToEncodersOnly = false;
 
   updatePosition();
   transform.equToHor(&current);
@@ -143,15 +131,25 @@ CommandError Mount::gotoEqu(Coordinate *coords) {
   axis1.setTracking(false); axis2.setTracking(false);
   VLF("MSG: Mount::gotoEqu, axis tracking stopped");
 
+  axis1.markOriginCoordinate();
   axis1.setTargetCoordinate(a1);
+//axis1.setGotoMaxRate(degToRad(3)); // in radians per second
+//axis1.gotoRateByDistance(2);       // in radians for MaxRate
+//axis1.slewRateByTime(1.5);         // fast stop example
+//axis1.slewStop();
+
+//axis1.setSlewMaxRate(degToRad(3)); // in radians per second
+//axis1.slewRateByTime(2);           // in seconds for MaxRate
+//axis1.slewStart();
+//axis1.slewStop();
+
+  axis2.markOriginCoordinate();
   axis2.setTargetCoordinate(a2);
-  axis1.setOriginCoordinate();
-  axis2.setOriginCoordinate();
   VLF("MSG: Mount::gotoEqu, target coordinates set");
 
   // set rate limit, in sidereal
-  gotoRateLimitAxis1 = ((1000000.0/usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
-  gotoRateLimitAxis2 = ((1000000.0/usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
+  gotoRateLimitAxis1 = ((1000000.0/misc.usPerStepCurrent)/(axis1.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
+  gotoRateLimitAxis2 = ((1000000.0/misc.usPerStepCurrent)/(axis2.getStepsPerMeasure()/RAD_DEG_RATIO))*240.0;
 
   gotoRateAxis1 = TRACK_BACKLASH_RATE;
   gotoRateAxis2 = TRACK_BACKLASH_RATE;
@@ -178,10 +176,10 @@ void Mount::monitor() {
         destination = home;
       }
       transform.mountToInstrument(&destination, &a1, &a2);
+      axis1.markOriginCoordinate();
       axis1.setTargetCoordinate(a1);
+      axis2.markOriginCoordinate();
       axis2.setTargetCoordinate(a2);
-      axis1.setOriginCoordinate();
-      axis2.setOriginCoordinate();
     }
   } else
   if (gotoStage == GG_DESTINATION) {

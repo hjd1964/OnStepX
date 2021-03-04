@@ -5,11 +5,16 @@
 
 #include "StepDrivers.h"
 
+typedef struct AxisLimits {
+  float min;
+  float max;
+} AxisLimits;
+
 typedef struct AxisSettings {
-  double  stepsPerMeasure;
-  int8_t  reverse;
-  double  min;
-  double  max;
+  double     stepsPerMeasure;
+  uint16_t   backlashAmountSteps;
+  int8_t     reverse;
+  AxisLimits limits;
 } AxisSettings;
 
 typedef struct AxisPins {
@@ -25,9 +30,18 @@ enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKI
 
 enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
 
+typedef struct AxisErrors {
+  uint8_t driverFault:1;
+  uint8_t motorFault:1;
+  uint8_t minExceeded:1;
+  uint8_t maxExceeded:1;
+  uint8_t minLimitSensed:1;
+  uint8_t maxLimitSensed:1;
+} AxisErrors;
+
 class Axis {
   public:
-     // sets up the driver step/dir/enable pins and any associated driver mode control
+    // sets up the driver step/dir/enable pins and any associated driver mode control
     void init(uint8_t axisNumber);
 
     // enables or disables the associated step/dir driver
@@ -44,6 +58,7 @@ class Axis {
 
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
+    double getMotorCoordinate();
 
     // set and get motor coordinate, in steps
     void setMotorCoordinateSteps(long value);
@@ -56,8 +71,8 @@ class Axis {
     void setInstrumentCoordinate(double value);
     double getInstrumentCoordinate();
 
-    // set origin coordinate as current location
-    void setOriginCoordinate();
+    // mark origin coordinate as current location
+    void markOriginCoordinate();
 
     // target coordinate, in "measures" (degrees, microns, etc.)
     void moveTargetCoordinate(double value);
@@ -107,14 +122,23 @@ class Axis {
     // fast axis movement reverse only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
     void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
 
+    // checks for an error that would disallow forward motion
+    bool motionForwardError();
+    // checks for an error that would disallow reverse motion
+    bool motionReverseError();
+    // checks for an error that would disallow motion
+    bool motionError();
+
+    AxisSettings settings;
+    AxisErrors error;
+
   private:
     StepDriver driver;
 
-    AxisSettings settings;
     AxisPins pins;
 
-    uint8_t taskHandle               = 0;
-    uint8_t axisNumber               = 0;
+    uint8_t taskHandle                = 0;
+    uint8_t axisNumber                = 0;
 
     bool   invertEnabled              = false;
     bool   enabled                    = false;
@@ -138,8 +162,8 @@ class Axis {
     Direction direction               = DIR_NONE;
 
     volatile long backlashSteps       = 0;
-    long   backlashStepsStore         = 0;
-    long   backlashAmountSteps        = 0;
+    volatile long backlashAmountSteps = 0;
+    unsigned long backlashStepsStore  = 0;
 
     double spm                        = 1.0;
 

@@ -15,7 +15,7 @@
 #define DEBUG                         OFF //         OFF, Use ON for background error messages only, use VERBOSE for all      Infreq
                                           //              error and status messages, use CONSOLE for VT100 debug console,
                                           //              or use PROFILER for VT100 task profiler.
-#define DEBUG_ECHO_COMMANDS           OFF //         OFF, Use ON to log command/response's to the debug serial port.          Option
+#define DEBUG_ECHO_COMMANDS           OFF //         OFF, Use ON to log command/responses to the debug serial port.           Option
 #define SERIAL_DEBUG               Serial //    SERIAL_A, Or use any h/w serial port. Serial1 or Serial2, etc. as supported.  Option
 #define SERIAL_DEBUG_BAUD            9600 //        9600, n. Where n=9600,19200,57600,115200 (common baud rates.)             Option
 
@@ -23,6 +23,9 @@
 #define MOUNT_COORDS          TOPOCENTRIC // TOPOCENTRIC, Applies refraction to coordinates to/from OnStep, except exactly    Infreq
                                           //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
                                           //              Use OBSERVED_PLACE for no refraction.
+
+// GUIDING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#GUIDING
+#define SEPARATE_PULSE_GUIDE_RATE      ON //          ON, Uses a separate rate (stored in NV) for pulse guiding               Infreq
 
 // NON-VOLATILE STORAGE ------------------------------------------------------------------------------------------------------------
 #define NV_DEFAULT                     ON //          ON, Uses HAL specified default, for remembering settings when           Infreq

@@ -5,7 +5,7 @@
 // Firmware version ----------------------------------------------------------------------------------------------------------------
 #define FirmwareName                "OnStepX"
 #define FirmwareVersionMajor        10
-#define FirmwareVersionMinor        02     // minor version 00 to 99
+#define FirmwareVersionMinor        01     // minor version 00 to 99
 #define FirmwareVersionPatch        "a"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 #define FirmwareDate                __DATE__
@@ -69,14 +69,20 @@
 
 // basic values
 #define OFF                         -1
+#define SAME                        -1
 #define ON                          -2
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
 
-#define EAST                        -10
-#define WEST                        -11
-#define BEST                        -12
+// pier side
+// same as PSS_EAST
+#define EAST                        1
+// same as PSS_WEST
+#define WEST                        2
+// same as PSS_BEST
+#define BEST                        3
+
 
 // debug values
 #define CONSOLE                     -20
@@ -181,6 +187,12 @@
 #define cmdH(a) (command[0] == a[0] && command[1] == a[1] && (command[2] == 0 || (command[2] == 'H' && command[3] == 0)))
 // command of 2 chars with parameter
 #define cmdP(a) (command[0] == a[0] && command[1] == a[1])
+// command of 4 chars with parameter
+#define cmdP2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3])
+// GX command of 3 chars, with end of string check
+#define cmdGX(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[2] == 0)
+// SX, command of 3 chars, comma, then parameter
+#define cmdSX(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[2] == ',')
 
 // task manager
 #define TASKS_SKIP_MISSED
@@ -201,7 +213,13 @@
 
 // NV addresses
 #define INIT_NV_KEY                 583927925UL
+
 #define NV_KEY                      0      // bytes: 4   , addr: 0..3
 #define NV_LOCATION_NUMBER          4      // bytes: 1   , addr: 4..4
 #define NV_LOCATION_BASE            5      // bytes: 36*4, addr: 5..148
-#define NV_JD_BASE                  149    // bytes: 16  , addr: 148..163
+#define NV_JD_BASE                  149    // bytes: 16  , addr: 149..164
+#define NV_LIMITS_BASE              165    // bytes: 16  , addr: 165..180
+#define NV_MOUNT_MISC_BASE          181    // bytes: 9   , addr: 181..189
+#define NV_PEC_BASE                 190    // bytes: 13  , addr: 190..202
+
+#define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)

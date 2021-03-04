@@ -11,11 +11,10 @@
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)
 
-bool NonVolatileStorage24XX::init(uint16_t size, TwoWire* wire, uint8_t eepromAddress) {
-  // setup cache
-  NonVolatileStorage::init(size);
+bool NonVolatileStorage24XX::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire, uint8_t address) {
+  // setup size, cache, etc.
+  NonVolatileStorage::init(size, cache, wait, check);
 
-  this->size = size;
   this->wire = wire;
   this->eepromAddress = eepromAddress;
   wire->begin();
@@ -46,7 +45,7 @@ uint8_t NonVolatileStorage24XX::readFromStorage(uint16_t i) {
 
 void NonVolatileStorage24XX::writeToStorage(uint16_t i,  uint8_t j) {
   while (busy()) {}
-    
+
   wire->beginTransmission(eepromAddress);
   wire->write(MSB(i));
   wire->write(LSB(i));

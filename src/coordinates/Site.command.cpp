@@ -12,7 +12,6 @@ extern NVS nv;
 
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
-extern GeneralErrors generalErrors;
 #include "Site.h"
 
 bool Site::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -106,30 +105,71 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
     *numericReply = false;
   } else
 
-  // :GX80#     Get the UT1 Time as sexagesimal value in 24 hour format
-  //            Returns: HH:MM:SS.ss#
-  if (cmd2("GX80")) {
-    convert.doubleToHms(reply, backInHours(getTime()), false, PM_HIGH);
-    *numericReply = false;
+  if (cmdGX("GX8")) {
+
+    // :GX80#     Get the UT1 Time as sexagesimal value in 24 hour format
+    //            Returns: HH:MM:SS.ss#
+    if (parameter[1] == '0') {
+      convert.doubleToHms(reply, backInHours(getTime()), false, PM_HIGH);
+      *numericReply = false;
+    } else
+
+    // :GX81#     Get the UT1 Date
+    //            Returns: MM/DD/YY#
+    if (parameter[1] == '1') {
+      JulianDate julianDay = ut1;
+      double hour = getTime();
+      while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
+      if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
+      GregorianDate date = julianDayToGregorian(julianDay);
+      date.year -= 2000; if (date.year >= 100) date.year -= 100;
+      sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
+      *numericReply = false;
+    } else
+
+    // :GX89#     Date/time ready status
+    //            Return: 0 ready, 1 not ready
+    if (parameter[1] == '9') {
+      if (dateIsReady && timeIsReady) *commandError = CE_0;
+    } else return false;
   } else
 
-  // :GX81#     Get the UT1 Date
-  //            Returns: MM/DD/YY#
-  if (cmd2("GX81")) {
-    JulianDate julianDay = ut1;
-    double hour = getTime();
-    while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
-    if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
-    GregorianDate date = julianDayToGregorian(julianDay);
-    date.year -= 2000; if (date.year >= 100) date.year -= 100;
-    sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
-    *numericReply = false;
-  } else
+  if (cmdGX("GX9")) {
 
-  // :GX89#     Date/time ready status
-  //            Return: 0 ready, 1 not ready
-  if (cmd2("GX89")) {
-    if (dateIsReady && timeIsReady) *commandError = CE_0;
+    // :GX9A#     temperature in deg. C
+    //            Returns: +/-n.n
+    if (parameter[1] == 'A') {
+      dtostrf(siteConditions.temperature,3,1,reply);
+      *numericReply = false;
+     } else
+
+    // :GX9B#     pressure in mb
+    //            Returns: +/-n.n
+    if (parameter[1] == 'B') {
+      dtostrf(siteConditions.pressure,3,1,reply);
+      *numericReply = false;
+    } else
+
+    // :GX9C#     relative humidity in %
+    //            Returns: +/-n.n
+    if (parameter[1] == 'C') {
+      dtostrf(siteConditions.humidity,3,1,reply);
+      *numericReply = false;
+    } else
+
+    // :GX9D#     altitude in meters
+    //            Returns: +/-n.n
+    if (parameter[1] == 'D') {
+      dtostrf(siteConditions.altitude,3,1,reply);
+      *numericReply = false;
+    } else
+
+    // :GX9E#     dew point in deg. C
+    //            Returns: +/-n.n
+    if (parameter[1] == 'E') {
+      dtostrf(dewPoint(siteConditions),3,1,reply);
+      *numericReply = false;
+    } else return false;
   } else
  
   // :SC[MM/DD/YY]#
@@ -146,7 +186,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
       setSiderealTime(ut1, julianDateToLAST(ut1));
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
       dateIsReady = true;
-      if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
+      if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
       delay(10);
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -192,7 +232,7 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
       setTime(ut1);
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
       timeIsReady = true;
-      if (generalErrors.siteInit && dateIsReady && timeIsReady) generalErrors.siteInit = false;
+      if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
     } else *commandError = CE_PARAM_FORM;
   } else
 
@@ -221,6 +261,36 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
       nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
     } else *commandError = CE_PARAM_FORM;
   } else 
+
+  if (cmdSX("SX9")) {
+    char *conv_end;
+    float f = strtod(&parameter[3], &conv_end);
+    if (&parameter[3] == conv_end) f = NAN;
+    // :SX9A,[sn.n]#
+    //            Set temperature in deg. C
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'A') {
+      if (f >= -100.0 && f < 100.0) siteConditions.temperature = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9B,[n.n]#
+    //            Set pressure in mb
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'B') {
+      if (f >= 500.0 && f < 1500.0) siteConditions.pressure = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9C,[n.n]#
+    //            relative humidity in %
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'C') {
+      if (f >= 0.0 && f < 100.0) siteConditions.humidity = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9D,[sn.n]#
+    //            altitude
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'D') {
+      if (f >= -100.0 && f < 20000.0) siteConditions.altitude = f; else *commandError = CE_PARAM_RANGE;
+    } else return false;
+  } else
 
   // :W[n]#     Sets current site to n, where n = 0..3
   //            Returns: Nothing

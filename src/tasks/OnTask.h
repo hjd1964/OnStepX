@@ -162,7 +162,18 @@ class Tasks {
     // callback: function to handle this tasks processing
     // returns:  handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
-    // as above, and adds a process name
+
+    // add process task
+    // period:   between process calls in milliseconds, use 0 to disable
+    //           software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds.
+    // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
+    // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
+    // priority: software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks.
+    //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
+    //           round robin within their priority levels, the most recently serviced task will be last visited again
+    // callback: function to handle this tasks processing
+    // name:     an optional short (max length 7) char str describing the task 
+    // returns:  handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]);
 
     // allocates a hardware timer, if available, for this task

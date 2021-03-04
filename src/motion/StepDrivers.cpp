@@ -20,14 +20,21 @@ const static int8_t steps[13][9] =
  {  4,  2,  6,  5,  3,  7,OFF,OFF,OFF},   // S109
  {  0,  1,  2,  3,  4,  5,  6,  7,OFF},   // LV8729
  {  0,  1,  2,  3,  4,  5,  6,  7,OFF},   // RAPS128
- {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TCM2100
- {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TCM2208
- {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TCM2209
+ {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2100
+ {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208
+ {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209
  {  0,  1,  2,  3,  4,  5,OFF,  6,  7},   // ST820
- {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TCM2130
- {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TCM5160
+ {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
+ {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
  {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC
  {  0,  1,  1,  1,  1,  1,  1,  1,  1}};  // SERVO
+
+#if DEBUG_MODE != OFF
+  const char* DRIVER_NAME[13] = {
+  "A4988","DRV8825","S109","LV8729","RAPS128",
+  "TMC2100","TMC2208","TMC2209","ST820","TMC2130",
+  "TMC5160","GENERIC","SERVO" };
+#endif
 
 #if AXIS1_DRIVER_MODEL != OFF
   const DriverPins     Axis1DriverModePins     = {AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_DECAY_PIN};
@@ -86,9 +93,9 @@ void StepDriver::init(uint8_t axisNumber) {
     if (axisNumber == 6) { pins = Axis6DriverModePins; settings = Axis6DriverModeSettings; }
   #endif
 
-  VF("MSG: StepDriver::init, model "); V(settings.model);
-  VF(", usteps "); if (settings.microsteps == OFF) VF("OFF"); else V(settings.microsteps);
-  VF(", ustepsGoto "); if (settings.microstepsGoto == OFF) VLF("OFF"); else VL(settings.microstepsGoto);
+  VF("MSG: StepDriver model "); V(DRIVER_NAME[settings.model]);
+  VF(", u-step mode "); if (settings.microsteps == OFF) VF("OFF"); else { V(settings.microsteps); V("X"); }
+  VF(", u-step goto mode "); if (settings.microstepsGoto == OFF) VLF("SAME"); else { V(settings.microstepsGoto); VL("X"); }
 
   microstepCode     = microstepsToCode(settings.model, settings.microsteps);
   microstepCodeGoto = microstepsToCode(settings.model, settings.microstepsGoto);

@@ -9,12 +9,15 @@
 
 class NonVolatileStorage24XX : public NonVolatileStorage {
   public:
-    // prepare EEPROM of size on the I2C wire interface at eepromAddress for operation
-    // size: size of EEPROM in bytes (cache will be of equal size)
-    // wire: pointer to the TwoWire interface to use
-    // eepromAddress: the EEPROM I2C address
-    // result: true if the device was found, or false if not
-    bool init(uint16_t size, TwoWire* wire, uint8_t eepromAddress);
+    // prepare EEPROM for operation
+    // size:    NV size in bytes
+    // cache:   enable or disable the cache (note NV size must be divisible by 8 if enabled)
+    // wait:    minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
+    // check:   checksum error detection
+    // wire:    I2C interface pointer (set to NULL if not used)
+    // address: I2C address
+    // result:  true if the device was found, or false if not
+    bool init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0);
 
   private:
     // returns false if ready to read or write immediately
@@ -30,3 +33,5 @@ class NonVolatileStorage24XX : public NonVolatileStorage {
     uint8_t eepromAddress = 0;
     uint32_t nextOpMs = 0;
 };
+
+#define NVS NonVolatileStorage24XX

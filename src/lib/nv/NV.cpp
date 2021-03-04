@@ -4,8 +4,13 @@
 #include "Arduino.h"
 #include "NV.h"
 
-bool NonVolatileStorage::init(uint16_t cacheSize) {
-  this->cacheSize = cacheSize;
+bool NonVolatileStorage::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0) {
+  // set nv size
+  this->size = size;
+  // set cache size, defaults to 0 otherwise
+  if (cache) cacheSize = size;
+  waitMs = wait;
+
   cacheStateSize = cacheSize/8;
   if (cacheSize == 0) return true;
 
@@ -21,6 +26,10 @@ bool NonVolatileStorage::init(uint16_t cacheSize) {
   return true;
 }
 
+void NonVolatileStorage::readOnly(bool state) {
+  readOnlyMode = state;
+}
+
 void NonVolatileStorage::poll() {
   if (cacheSize == 0) return;
 
@@ -31,13 +40,13 @@ void NonVolatileStorage::poll() {
   // check 20 byte chunks of cache for data that needs processing
   for (uint16_t j = 0; j < 20; j++) {
     cacheIndex++; if (cacheIndex >= cacheSize) cacheIndex = 0;
-    dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
+    if ((long)(millis() - commitReadyTimeMs) >= 0) dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
     dirtyR = bitRead(cacheStateRead[cacheIndex/8], cacheIndex%8);
     if (dirtyW || dirtyR) break;
   }
 
   if (dirtyW) {
-    writeToStorage(cacheIndex, cache[cacheIndex]);
+    if (!readOnlyMode) writeToStorage(cacheIndex, cache[cacheIndex]);
     bitWrite(cacheStateWrite[cacheIndex/8], cacheIndex%8, 0);
   } else {
     if (dirtyR) {
@@ -62,8 +71,12 @@ bool valid() {
   return true;
 }
 
+void NonVolatileStorage::ignoreCache(bool state) {
+  readAndWriteThrough = state;
+}
+
 uint8_t NonVolatileStorage::readFromCache(uint16_t i) {
-  if (cacheSize == 0) return readFromStorage(i);
+  if (cacheSize == 0 || readAndWriteThrough) return readFromStorage(i);
 
   uint8_t dirty = bitRead(cacheStateRead[i/8], i%8);
   if (dirty) {
@@ -78,7 +91,8 @@ uint8_t NonVolatileStorage::readFromCache(uint16_t i) {
 }
 
 void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
-  if (cacheSize == 0) { writeToStorage(i, j); return; }
+  if (cacheSize == 0 || readAndWriteThrough) if (!readOnlyMode) writeToStorage(i, j);
+  if (cacheSize == 0) return;
 
   uint8_t k = readFromCache(i);
   if (j != k) {
@@ -90,10 +104,7 @@ void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
     // mark read as clean (so we don't overwrite the cache)
     bitWrite(cacheStateRead[i/8], i%8, 0);
   }
-}
-
-void NonVolatileStorage::writeThrough(bool state) {
-  writeOnUpdate = state;
+  commitReadyTimeMs = millis() + waitMs;
 }
 
 uint8_t  NonVolatileStorage::read(uint16_t i)   { return readFromCache(i); }

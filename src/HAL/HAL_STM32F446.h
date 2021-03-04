@@ -46,27 +46,26 @@
   #if PINMAP == FYSETC_S6_2
     // The FYSETC S6 v2 has a 4096 byte EEPROM built-in
     #define E2END 4095
-    #define I2C_EEPROM_ADDRESS 0x50
+    #define NV_EEPROM_ADDRESS 0x50
   #elif PINMAP == FYSETC_S6
     // The FYSETC S6 has a 2048 byte EEPROM built-in
     #define E2END 2047
-    #define I2C_EEPROM_ADDRESS 0x50
+    #define NV_EEPROM_ADDRESS 0x50
   #else
     // fall back to the DS3231/AT24C32
     #define E2END 4095
-    #define I2C_EEPROM_ADDRESS 0x57
+    #define NV_EEPROM_ADDRESS 0x57
   #endif
   #include "../lib/nv/NV_24XX.h"
-  #define NVS NonVolatileStorage24XX
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { analogWriteResolution(8); nv.init(E2END + 1, &Wire, I2C_EEPROM_ADDRESS); }
+#define HAL_INIT() { analogWriteResolution(8); nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_EEPROM_ADDRESS); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP ( -999 )
+#define HAL_TEMP() ( NAN )
 
 // Allow MCU reset -----------------------------------------------------------------------------------
-#define HAL_RESET NVIC_SystemReset()
+#define HAL_RESET() NVIC_SystemReset()

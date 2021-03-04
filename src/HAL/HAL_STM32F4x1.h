@@ -50,27 +50,26 @@
 #ifdef NV_DEFAULT
   #if PINMAP == MaxSTM3I
     // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
-    #define NV_ENDURANCE HIGH
     #define E2END 8191
-    #define I2C_EEPROM_ADDRESS 0x50
-    #undef NV_ENDURANCE
+    #define NV_ENDURANCE HIGH
+    #define NV_EEPROM_ADDRESS 0x50
+    #undef  NV_ENDURANCE
     #define NV_ENDURANCE NVE_HIGH
   #else
     // fall back to the DS3231/AT24C32
     #define E2END 4095
-    #define I2C_EEPROM_ADDRESS 0x57
+    #define NV_EEPROM_ADDRESS 0x57
   #endif
   #include "../lib/nv/NV_24XX.h"
-  #define NVS NonVolatileStorage24XX
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT { analogWriteResolution(8); nv.init(E2END + 1, &HAL_Wire, I2C_EEPROM_ADDRESS); }
+#define HAL_INIT() { analogWriteResolution(8); nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_EEPROM_ADDRESS); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP ( -999 )
+#define HAL_TEMP() ( NAN )
 
 // Allow MCU reset -----------------------------------------------------------------------------------
-#define HAL_RESET NVIC_SystemReset()
+#define HAL_RESET() NVIC_SystemReset()

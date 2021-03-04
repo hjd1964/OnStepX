@@ -14,24 +14,29 @@ extern Tasks tasks;
 
 #include "Site.h"
 
-volatile unsigned long centisecondLAST;
+// base clock period (in 1/16us units per second) for adjusting the length of a sidereal second and all timing in OnStepX
 unsigned long periodSubMicros;
+
+// centisecond sidereal clock
+volatile unsigned long centisecondLAST;
 IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
+
+SiteConditions siteConditions = { 10.0, 1010.0, 50, 100 };
 
 void Site::init() {
   // get location
-  VLF("MSG: Site::init, get Latitude/Longitude");
+  VLF("MSG: Site, get Latitude/Longitude");
   readLocation(number);
   update();
 
   // get date/time
-  VLF("MSG: Site::init, get Date/Time");
+  VLF("MSG: Site, get Date/Time");
   readJD();
   setTime(ut1);
 
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
-  if (!tasks.requestHardwareTimer(handle, 3, 1)) VLF("MSG: Site::init, Warning didn't get h/w timer for Clock (using s/w timer)");
+  if (!tasks.requestHardwareTimer(handle, 3, 1)) DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)");
 
   // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);
@@ -76,7 +81,6 @@ double Site::getSiderealTime() {
 }
 
 void Site::setSiderealTime(JulianDate julianDate, double time) {
-//  DL("ST3"); delay(100);
   long cs = lround(hoursToCs(time));
   centisecondHOUR = julianDate.hour;
   centisecondSTART = cs;
@@ -168,6 +172,7 @@ GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
 
 void Site::readLocation(uint8_t locationNumber) {
   number = locationNumber;
+  if (LocationSize < sizeof(Location)) { DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
   if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; DLF("ERR: Site::readSite, bad NV latitude"); }
   if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; DLF("ERR: Site::readSite, bad NV longitude"); }
@@ -175,7 +180,8 @@ void Site::readLocation(uint8_t locationNumber) {
 }
 
 void Site::readJD() {
+  if (JulianDateSize < sizeof(ut1)) { DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_JD_BASE, &ut1, JulianDateSize);
-  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; DLF("ERR: Site::readJD, bad NV julian date (day)"); }
-  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; DLF("ERR: Site::readJD, bad NV julian date (hour)"); }
+  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
+  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
 }

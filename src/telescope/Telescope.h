@@ -4,6 +4,18 @@
 #include "../commands/ProcessCmds.h"
 #include "../mount/Mount.h"
 
+typedef struct InitError {
+  uint8_t nv:1;
+  uint8_t site:1;
+  uint8_t mount:1;
+  uint8_t axis:1;
+  uint8_t driver:1;
+  uint8_t tls:1;
+  uint8_t weather:1;
+} InitError;
+
+extern InitError initError;
+
 class Telescope {
   public:
     // setup the location, time keeping, and coordinate converson
@@ -31,6 +43,8 @@ class Telescope {
     #if AXIS6_DRIVER_MODEL != OFF
       Focuser focuser3;
     #endif
+
+    Site site;
 
   private:
 

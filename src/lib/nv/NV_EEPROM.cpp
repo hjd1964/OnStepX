@@ -7,11 +7,9 @@
 
 #ifdef E2END
 
-bool NonVolatileStorageEEPROM::init(uint16_t cacheSize) {
-  // setup cache size
-  NonVolatileStorage::init(cacheSize);
-  // set NV size
-  this->size = E2END + 1;
+bool NonVolatileStorageEEPROM::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire, uint8_t address) {
+  // setup size, cache, etc.
+  NonVolatileStorage::init(size, cache, wait, check);
   return true;
 }
 

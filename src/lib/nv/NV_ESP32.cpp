@@ -10,18 +10,16 @@ extern Tasks tasks;
 
 #include "NV_ESP32.h"
 
-bool NonVolatileStorageESP32::init(uint16_t size) {
+bool NonVolatileStorageEEPROM::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire, uint8_t address) {
+  // setup size, cache, etc.
+  NonVolatileStorage::init(size, cache, wait, check);
+
   EEPROM.begin(size);
-
-  // cache isn't needed
-  NonVolatileStorage::init(0);
-
-  // set NV size
-  this->size = size;
+  return true;
 }
 
 void NonVolatileStorageESP32::poll() {
-  if (dirty && ((long)(millis() - lastWrite) > 5000)) {
+  if (dirty && ((long)(millis() - commitReadyTimeMs) >= 0)) {
     timerAlarmsDisable();
     EEPROM.commit();
     timerAlarmsEnable();
@@ -39,7 +37,6 @@ uint8_t NonVolatileStorageESP32::readFromStorage(uint16_t i) {
 
 void NonVolatileStorageESP32::writeToStorage(uint16_t i,  uint8_t j) {
   EEPROM.write(i, j);
-  lastWrite = millis();
   dirty = true;
 }
 #endif

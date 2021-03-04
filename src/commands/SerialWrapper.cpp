@@ -34,6 +34,8 @@ SerialWrapper::SerialWrapper() {
 #endif
 }
 
+void SerialWrapper::begin() { begin(9600); }
+
 void SerialWrapper::begin(long baud) {
   uint8_t channel = 0;
 #ifdef SERIAL_A
