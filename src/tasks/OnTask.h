@@ -42,7 +42,7 @@
 // Default provision is for 8 tasks, up to 255 are allowed, to change use:
 // #define TASKS_MAX 200 (for example)
 #ifndef TASKS_MAX
-  #define TASKS_MAX 8
+  #define TASKS_MAX 16
 #endif
 
 // ESP32 override cli/sei and use muxes to block the h/w timer ISR's instead

@@ -99,9 +99,6 @@ class Mount {
     bool commandLimit(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
     bool commandPec(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // the goto monitor
-    void monitor();
-
     // update the home position
     void updateHomePosition();
 
@@ -110,6 +107,12 @@ class Mount {
 
     // check for any mount related error
     bool anyError();
+
+    // monitor goto operation
+    void pollGotos();
+
+    // monitor guide operation
+    void pollGuides();
 
     Transform  transform;
 
@@ -144,8 +147,11 @@ class Mount {
     // update where we are pointing *now*
     void updatePosition();
 
-    // this updates differiental tracking rates for refraction, pointing model, and alt/azm tracking
+    // update tracking rates for refraction, pointing model, and alt/azm tracking
     void updateTrackingRates();
+
+    // update acceleration rates for goto and guiding
+    void updateAccelerationRates();
 
     // estimate average microseconds per step lower limit
     double usPerStepLowerLimit();
@@ -196,7 +202,7 @@ class Mount {
     GotoStage  gotoStage             = GG_START;
     GotoState  gotoStateAbort        = GS_NONE;
     GotoState  gotoStateLast         = GS_NONE;
-    uint8_t    monitorTaskHandle     = 0;
+    uint8_t    gotoTaskHandle        = 0;
     double     gotoTargetAxis1       = 0.0;
     double     gotoTargetAxis2       = 0.0;
     double     usPerStepDefault      = 64.0;

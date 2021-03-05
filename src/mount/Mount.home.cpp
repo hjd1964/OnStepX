@@ -39,7 +39,7 @@ CommandError Mount::resetHome() {
   setTrackingState(TS_NONE);
   updateTrackingRates();
 
-  VLF("MSG: Mount reset, at home and in standby");
+  VLF("MSG: Mount, reset at home and in standby");
   return CE_NONE;
  }
 

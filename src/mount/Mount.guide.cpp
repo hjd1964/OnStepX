@@ -51,18 +51,17 @@ bool Mount::validGuideAxis2(GuideAction guideAction) {
   if (!limitsEnabled) return true;
   updatePosition();
   transform.equToHor(&current);
-  if (guideAction == GA_FORWARD) {
-    // if (AXIS2_TANGENT_ARM == ON) { cli(); a2=posAxis2/axis2Settings.stepsPerMeasure; sei(); } else 
-    // if (AXIS2_TANGENT_ARM == ON) a2 = axis2.getMotorCoordinate(); else
+  #if AXIS2_TANGENT_ARM == ON
     a2 = axis2.getInstrumentCoordinate();
-    if (current.h < axis2.settings.limits.min && current.pierSide == PIER_SIDE_WEST) return false;
+  #else
+    if (transform.mountType == ALTAZM) a2 = current.a; else a2 = current.d;
+  #endif
+  if (guideAction == GA_FORWARD) {
+    if (a2 < axis2.settings.limits.min && current.pierSide == PIER_SIDE_WEST) return false;
     if (a2 > axis2.settings.limits.max && current.pierSide == PIER_SIDE_EAST) return false;
     if (transform.mountType == ALTAZM && current.a > limits.altitude.max) return false;
   }
   if (guideAction == GA_REVERSE) {
-    // if (AXIS2_TANGENT_ARM == ON) { cli(); a2=posAxis2/axis2Settings.stepsPerMeasure; sei(); } else 
-    // if (AXIS2_TANGENT_ARM == ON) a2 = axis2.getMotorCoordinate(); else
-    a2 = axis2.getInstrumentCoordinate();
     if (a2 < axis2.settings.limits.min && current.pierSide == PIER_SIDE_EAST) return false;
     if (a2 > axis2.settings.limits.max && current.pierSide == PIER_SIDE_WEST) return false;
     if (transform.mountType == ALTAZM && current.a < limits.altitude.min) return false;
@@ -74,7 +73,7 @@ CommandError Mount::startGuideAxis1(GuideAction guideAction, GuideRateSelect gui
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
   if (axis1.error.driverFault || axis1.error.motorFault) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (parkState == PS_PARKED)          return CE_SLEW_ERR_IN_PARK;
-  if (gotoState == GS_NONE)            return CE_SLEW_IN_MOTION;
+  if (gotoState != GS_NONE)            return CE_SLEW_IN_MOTION;
   if (isSpiralGuiding())               return CE_SLEW_IN_MOTION;
   if (!validGuideAxis1(guideAction))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (guideRateSelect < 3) {
@@ -83,8 +82,22 @@ CommandError Mount::startGuideAxis1(GuideAction guideAction, GuideRateSelect gui
   }
 
   guideActionAxis1 = guideAction;
-  if (guideAction == GA_FORWARD) guideRateAxis1 =  guideRateSelectToRate(guideRateSelect); else
-  if (guideAction == GA_REVERSE) guideRateAxis1 = -guideRateSelectToRate(guideRateSelect);
+ 
+  double rate = guideRateSelectToRate(guideRateSelect);
+
+  VF("MSG: startGuideAxis1(); guide ");
+  if (guideAction == GA_REVERSE) VF("reverse"); else VF("forward"); VF(" started at "); V(rate); VL("X");
+
+  if (rate <= 2) {
+    if (guideAction == GA_REVERSE) guideRateAxis1 = -rate; else guideRateAxis1 = rate;
+    updateTrackingRates();
+  } else {
+    axis1.setFrequencyMax(degToRad(rate/240.0));
+    if (guideAction == GA_REVERSE) axis1.autoSlew(DIR_REVERSE); else axis1.autoSlew(DIR_FORWARD);
+  }
+
+  // unlimited 0 means the maximum period, about 49 days
+  if (guideTimeLimit == 0) guideTimeLimit = 0xFFFFFFFF;
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
   return CE_NONE;
@@ -94,7 +107,7 @@ CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect gui
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
   if (axis2.error.driverFault || axis2.error.motorFault) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (parkState == PS_PARKED)          return CE_SLEW_ERR_IN_PARK;
-  if (gotoState == GS_NONE)            return CE_SLEW_IN_MOTION;
+  if (gotoState != GS_NONE)            return CE_SLEW_IN_MOTION;
   if (isSpiralGuiding())               return CE_SLEW_IN_MOTION;
   if (!validGuideAxis2(guideAction))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (guideRateSelect < 3) {
@@ -103,19 +116,75 @@ CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect gui
   }
 
   guideActionAxis2 = guideAction;
-  if (guideAction == GA_FORWARD) guideRateAxis2 =  guideRateSelectToRate(guideRateSelect); else
-  if (guideAction == GA_REVERSE) guideRateAxis2 = -guideRateSelectToRate(guideRateSelect);
+
+  double rate = guideRateSelectToRate(guideRateSelect);
+
+  VF("MSG: startGuideAxis2(); guide ");
+  if (guideAction == GA_REVERSE) VF("reverse"); else VF("forward"); VF(" started at "); V(rate); VL("X");
+
+  if (rate <= 2) {
+    if (guideAction == GA_REVERSE) guideRateAxis2 = -rate; else guideRateAxis2 = rate;
+    updateTrackingRates();
+  } else {
+    axis2.setFrequencyMax(degToRad(rate/240.0));
+    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
+  }
+  
+  // unlimited 0 means the maximum period, about 49 days
+  if (guideTimeLimit == 0) guideTimeLimit = 0xFFFFFFFF;
   guideFinishTimeAxis2 = millis() + guideTimeLimit;
 
   return CE_NONE;
 }
 
 void Mount::stopGuideAxis1() {
-  if (guideActionAxis1 > GA_BREAK) guideActionAxis1 = GA_BREAK;
+  if (guideActionAxis1 > GA_BREAK) {
+    if (guideRateAxis1 == 0.0) {
+      VLF("MSG: stopGuideAxis1(); requesting guide stop");
+      guideActionAxis1 = GA_BREAK;
+      axis1.autoSlewStop();
+    } else {
+      VLF("MSG: stopGuideAxis1(); guide stopped");
+      guideActionAxis1 = GA_NONE;
+      guideRateAxis1 = 0.0;
+      updateTrackingRates();
+    }
+  }
 }
 
 void Mount::stopGuideAxis2() {
-  if (guideActionAxis2 > GA_BREAK) guideActionAxis2 = GA_BREAK;
+  if (guideActionAxis2 > GA_BREAK) {
+    if (guideRateAxis2 == 0.0) {
+      VLF("MSG: stopGuideAxis2(); requesting guide stop");
+      guideActionAxis2 = GA_BREAK;
+      axis2.autoSlewStop();
+    } else {
+      VLF("MSG: stopGuideAxis2(); guide stopped");
+      guideActionAxis2 = GA_NONE;
+      guideRateAxis2 = 0.0;
+      updateTrackingRates();
+    }
+  }
+}
+
+void Mount::pollGuides() {
+  // check fast guide completion axis1
+  if (guideActionAxis1 == GA_BREAK && guideRateAxis1 == 0.0 && !axis1.autoSlewActive()) {
+    guideActionAxis1 = GA_NONE;
+    updateTrackingRates();
+  } else {
+    // check for guide timeout axis1
+    if (guideActionAxis1 > GA_BREAK && (long)(millis() - guideFinishTimeAxis1) >= 0) stopGuideAxis1();
+  }
+
+  // check fast guide completion axis2
+  if (guideActionAxis2 == GA_BREAK && guideRateAxis2 == 0.0 && !axis2.autoSlewActive()) {
+    guideActionAxis2 = GA_NONE;
+    updateTrackingRates();
+  } else {
+    // check for guide timeout axis2
+    if (guideActionAxis2 > GA_BREAK && (long)(millis() - guideFinishTimeAxis2) >= 0) stopGuideAxis2();
+  }
 }
 
 bool Mount::isSpiralGuiding() {

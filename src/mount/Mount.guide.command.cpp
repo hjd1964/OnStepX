@@ -124,13 +124,12 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
     if (command[1] == 'A') {
       char* conv_end;
       float f = strtod(parameter, &conv_end);
-      double maxStepsPerSecond = 1000000.0/misc.usPerStepCurrent;
       if (&parameter[0] != conv_end) {
-        if (f < 0.001/60.0/60.0) f = 0.001/60.0/60.0;
-        if (f > maxStepsPerSecond/axis1.getStepsPerMeasure()) f = maxStepsPerSecond/axis1.getStepsPerMeasure();
+        float maxDegsPerSec = radToDeg((1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure());
+        if (f < 0.001/3600.0) f = 0.001/3600.0;
+        if (f > maxDegsPerSec) f = maxDegsPerSec;
         customGuideRateAxis1 = f*240.0;
         guideRateSelectAxis1 = GR_CUSTOM;
-//      setCustomGuideRateAxis1(GUIDE_TIME_LIMIT*1000);
       }
       *numericReply=false; 
     } else
@@ -140,13 +139,12 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
     if (command[1] == 'E') {
       char* conv_end;
       float f = strtod(parameter, &conv_end);
-      double maxStepsPerSecond = 1000000.0/misc.usPerStepCurrent;
       if (&parameter[0] != conv_end) {
-        if (f < 0.001/60.0/60.0) f = 0.001/60.0/60.0;
-        if (f > maxStepsPerSecond/axis2.getStepsPerMeasure()) f = maxStepsPerSecond/axis2.getStepsPerMeasure();
+        float maxDegsPerSec = radToDeg((1000000.0/misc.usPerStepCurrent)/axis2.getStepsPerMeasure());
+        if (f < 0.001/3600.0) f = 0.001/3600.0;
+        if (f > maxDegsPerSec) f = maxDegsPerSec;
         customGuideRateAxis2 = f*240.0;
         guideRateSelectAxis2 = GR_CUSTOM;
-//      setCustomGuideRateAxis2(GUIDE_TIME_LIMIT*1000);
       }
       *numericReply = false;
     } else

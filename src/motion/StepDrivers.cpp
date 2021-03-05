@@ -93,9 +93,9 @@ void StepDriver::init(uint8_t axisNumber) {
     if (axisNumber == 6) { pins = Axis6DriverModePins; settings = Axis6DriverModeSettings; }
   #endif
 
-  VF("MSG: StepDriver model "); V(DRIVER_NAME[settings.model]);
-  VF(", u-step mode "); if (settings.microsteps == OFF) VF("OFF"); else { V(settings.microsteps); V("X"); }
-  VF(", u-step goto mode "); if (settings.microstepsGoto == OFF) VLF("SAME"); else { V(settings.microstepsGoto); VL("X"); }
+  VF("MSG: StepDriver, model "); V(DRIVER_NAME[settings.model]);
+  VF(" u-step mode "); if (settings.microsteps == OFF) VF("OFF"); else { V(settings.microsteps); V("X"); }
+  VF(" (goto mode "); if (settings.microstepsGoto == OFF) VLF("SAME)"); else { V(settings.microstepsGoto); VL("X)"); }
 
   microstepCode     = microstepsToCode(settings.model, settings.microsteps);
   microstepCodeGoto = microstepsToCode(settings.model, settings.microstepsGoto);

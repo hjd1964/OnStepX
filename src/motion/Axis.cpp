@@ -75,45 +75,47 @@ inline void pollAxes() {
 
 void Axis::init(uint8_t axisNumber) {
   if (pollingTaskHandle == 0) {
-    VLF("MSG: Axis, starting axis polling task");
+    VF("MSG: Axis, starting axis polling task... ");
     pollingTaskHandle = tasks.add(10, 0, true, 0, pollAxes, "AxsPoll");
+    if (pollingTaskHandle) VL("success"); else VL("FAILED!");
   }
 
   this->axisNumber = axisNumber;
-
-  VF("MSG: Axis"); V(axisNumber); VF(", starting moveAxis"); V(axisNumber); VLF(" task");
 
   taskHandle = 0;
   #if AXIS1_DRIVER_MODEL != OFF
     if (axisNumber == 1) {
       pins = Axis1StepPins; settings = Axis1Settings;
       taskHandle = tasks.add(0, 0, true, 0, moveAxis1, "Axis1");
-      if (!tasks.requestHardwareTimer(taskHandle, 1, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis1 (using s/w timer)");
+      if (!tasks.requestHardwareTimer(taskHandle, 1, 0)) VLF("WRN: Axis, didn't get h/w timer for Axis1 (using s/w timer)");
     }
   #endif
   #if AXIS1_DRIVER_MODEL != OFF
     if (axisNumber == 2) {
       pins = Axis2StepPins; settings = Axis2Settings;
       taskHandle = tasks.add(0, 0, true, 0, moveAxis2, "Axis2");
-      if (!tasks.requestHardwareTimer(taskHandle, 2, 0)) VLF("MSG: Warning, didn't get h/w timer for Axis2 (using s/w timer)");
+      if (!tasks.requestHardwareTimer(taskHandle, 2, 0)) VLF("WRN: Axis, didn't get h/w timer for Axis2 (using s/w timer)");
     }
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
     pins = Axis3StepPins; settings = Axis3Settings;
-    if (axisNumber == 3) handle = tasks.add(0, 0, true, 0, moveAxis3, "Axis3");
+    if (axisNumber == 3) taskHandle = tasks.add(0, 0, true, 0, moveAxis3, "Axis3");
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
     pins = Axis4StepPins; settings = Axis4Settings;
-    if (axisNumber == 4) handle = tasks.add(0, 0, true, 0, moveAxis4, "Axis4");
+    if (axisNumber == 4) taskHandle = tasks.add(0, 0, true, 0, moveAxis4, "Axis4");
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
     pins = Axis5StepPins; settings = Axis5Settings;
-    if (axisNumber == 5) handle = tasks.add(0, 0, true, 0, moveAxis5, "Axis5");
+    if (axisNumber == 5) taskHandle = tasks.add(0, 0, true, 0, moveAxis5, "Axis5");
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
     pins = Axis6StepPins; settings = Axis6Settings;
-    if (axisNumber == 6) handle = tasks.add(0, 0, true, 0, moveAxis6, "Axis6");
+    if (axisNumber == 6) taskHandle = tasks.add(0, 0, true, 0, moveAxis6, "Axis6");
   #endif
+  
+  VF("MSG: Axis, starting moveAxis"); V(axisNumber); VF(" task... ");
+  if (taskHandle) VL("success"); else VL("FAILED!");
 
   driver.init(axisNumber);
 
@@ -240,35 +242,43 @@ void Axis::setFrequencyMax(double frequency) {
   if (frequency != 0.0) minPeriodMicros = 1000000.0/(maxFreq*spm); else minPeriodMicros = 0.0;
 }
 
+void Axis::setSlewAccelerationRate(double mpsps) {
+  slewMpspcs = mpsps/100.0;
+}
+
+void Axis::setSlewAccelerationRateAbort(double mpsps) {
+  abortMpspcs = mpsps/100.0;
+}
+
 void Axis::autoSlewRateByDistance(double distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
-void Axis::autoSlewRateByTime(double time) {
-  autoRate = AR_RATE_BY_START_TIME;
-  autoRateStartTime = millis();
-  autoRateTimeToMax = time*1000.0;
-  VF("MSG: Axis::autoFrequencyByTime(); Axis"); V(axisNumber); VLF(" slew started");
+void Axis::autoSlew(Direction direction) {
+  if (direction == DIR_NONE) return;
+  if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
+  VF("MSG: Axis::autoSlewTime(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
-void Axis::autoSlewStop(double time) {
-  autoRate = AR_RATE_BY_END_TIME;
-  autoRateEndTime = millis() + lround(time*1000.0);
-  autoRateTimeToMax = (time*1000.0)*(lastFreq/maxFreq);
-  poll();
-}
-
-void Axis::setAutoSlewAbortTime(double time) {
-  autoRateAbortTime = time;
+void Axis::autoSlewStop() {
+  if (autoRate != AR_NONE && autoRate != AR_RATE_BY_TIME_ABORT) {
+    VF("MSG: Axis::autoSlewStop(); Axis"); V(axisNumber); VLF(" stopping slew");
+    autoRate = AR_RATE_BY_TIME_END;
+    poll();
+  }
 }
 
 void Axis::autoSlewAbort() {
-  autoRate = AR_RATE_BY_END_TIME;
-  autoRateEndTime = millis() + lround(autoRateAbortTime*1000.0);
-  autoRateTimeToMax = (autoRateAbortTime*1000.0)*(lastFreq/maxFreq);
-  poll();
+  if (autoRate != AR_NONE) {
+    autoRate = AR_RATE_BY_TIME_ABORT;
+    poll();
+  }
+}
+
+bool Axis::autoSlewActive() {
+  return autoRate != AR_NONE;  
 }
 
 void Axis::poll() {
@@ -281,22 +291,28 @@ void Axis::poll() {
     freq = getOriginOrTargetDistance()/slewAccelerationDistance*maxFreq + siderealToRad(backlashFreq);
     if (freq < backlashFreq) freq = backlashFreq;
   } else
-  if (autoRate == AR_RATE_BY_START_TIME) {
-    long timeFromStart = (long)(millis() - autoRateStartTime);
-    freq = (timeFromStart/autoRateTimeToMax)*maxFreq;
-    if (freq < 0) freq = 0;
+  if (autoRate == AR_RATE_BY_TIME_FORWARD) {
+    freq += slewMpspcs;
   } else
-  if (autoRate == AR_RATE_BY_END_TIME) {
-    long timeUntilStop = (long)(autoRateEndTime - millis());
-    if (timeUntilStop <= 0) {
-      timeUntilStop = 0;
+  if (autoRate == AR_RATE_BY_TIME_REVERSE) {
+    freq -= slewMpspcs;
+  } else
+  if (autoRate == AR_RATE_BY_TIME_END) {
+    if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < slewMpspcs) freq += slewMpspcs; else freq = 0;
+    if (freq == 0) {
       autoRate = AR_NONE;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew stopped");
     }
-    freq = (timeUntilStop/autoRateTimeToMax)*maxFreq;
-    if (freq < 0) freq = 0;
+  } else
+  if (autoRate == AR_RATE_BY_TIME_ABORT) {
+    if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < abortMpspcs) freq += abortMpspcs; else freq = 0;
+    if (freq == 0) {
+      autoRate = AR_NONE;
+      VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew aborted");
+    }
   } else freq = 0;
-  if (freq > maxFreq) freq = maxFreq;
+
+  if (freq < -maxFreq) freq = -maxFreq; else if (freq >  maxFreq) freq = maxFreq;
   setFrequency(freq);
 
   // ISR swap
@@ -314,6 +330,13 @@ void Axis::poll() {
 }
 
 void Axis::setFrequency(double frequency) {
+  if (frequency < 0) {
+    frequency = -frequency;
+    noInterrupts(); trackingStep = -1; interrupts();
+  } else {
+    noInterrupts(); trackingStep =  1; interrupts();
+  }
+
   lastFreq = frequency;
   // frequency in measures per second to microsecond counts per step
   double d = 1000000.0/(frequency*spm);

@@ -37,7 +37,7 @@ typedef struct AxisErrors {
 
 enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
 enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
-enum AutoRate {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_START_TIME, AR_RATE_BY_END_TIME};
+enum AutoRate {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
 
 class Axis {
   public:
@@ -83,25 +83,30 @@ class Axis {
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
 
-    // sets movement frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
+    // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(double frequency);
-    // gets movement frequency in "measures" (degrees, microns, etc.) per second
+    // get frequency in "measures" (degrees, microns, etc.) per second
     double getFrequency();
-    // gets movement frequency in steps per second
+    // get frequency in steps per second
     double getFrequencySteps();
-    // sets maximum frequency in "measures" (radians, microns, etc.) per second
+    // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(double frequency);
 
-    // automatically adjusts movement frequency by distance (in radians to FrequencyMax)
+    // set time to emergency stop movement, with acceleration in "measures" per second per second
+    void setSlewAccelerationRate(double mpsps);
+    // set time to emergency stop movement, with acceleration in "measures" per second per second
+    void setSlewAccelerationRateAbort(double mpsps);
+
+    // slew, with acceleration in "measures" per second per second
+    void autoSlew(Direction direction);
+    // slew, with acceleration in distance (radians to FrequencyMax)
     void autoSlewRateByDistance(double distance);
-    // automatically adjusts movement frequency by time (in seconds to FrequencyMax)
-    void autoSlewRateByTime(double time);
     // stops automatic movement
-    void autoSlewStop(double time);
-    // time to stop movement (emergency stop)
-    void setAutoSlewAbortTime(double time);
-    // stops automatic movement (emergency stop)
+    void autoSlewStop();
+    // emergency stops automatic movement
     void autoSlewAbort();
+    // checks if slew is active on this axis
+    bool autoSlewActive();
     // monitor movement
     void poll();
 
@@ -191,11 +196,13 @@ class Axis {
     double minPeriodMicros            = 0.0;
     unsigned long minPeriodMicrosHalf = 0;
     AutoRate autoRate                 = AR_NONE;
-    unsigned long autoRateStartTime   = 0;
-    unsigned long autoRateEndTime     = 0;
-    unsigned long autoRateAbortTime   = 0;
-    double autoRateTimeToMax          = 0;
+    Direction autoRateDirection       = DIR_NONE;
     double slewAccelerationDistance   = 0;
+    double autoRatePerCentisecond     = 0;
+    // auto slew rate in measures per second per centisecond
+    double slewMpspcs                 = 0.0;
+    // abort slew rate in measures per second per centisecond
+    double abortMpspcs                = 0.0;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

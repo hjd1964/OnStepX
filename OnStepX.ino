@@ -93,27 +93,31 @@ void setup() {
 
   // System services
   // add task for system services, runs at 5ms intervals
-  VLF("MSG: Setup, starting system service task");
-  tasks.add(5, 0, true, 7, systemServices, "SysSvcs");
+  VF("MSG: Setup, starting system service task... ");
+  if (tasks.add(5, 0, true, 7, systemServices, "SysSvcs")) VL("success"); else VL("FAILED!");
 
   // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  VLF("MSG: Setup, starting command channel tasks");
   #ifdef SERIAL_A
-    tasks.add(2, 0, true, 6, processCmdsA, "PrcCmdA");
+    VF("MSG: Setup, starting command channel A task... ");
+    if (tasks.add(2, 0, true, 6, processCmdsA, "PrcCmdA")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_B
-    tasks.add(2, 0, true, 6, processCmdsB, "PrcCmdB");
+    VF("MSG: Setup, starting command channel B task... ");
+    if (tasks.add(2, 0, true, 6, processCmdsB, "PrcCmdB")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_C
-    tasks.add(2, 0, true, 6, processCmdsC, "PrcCmdC");
+    VF("MSG: Setup, starting command channel C task... ");
+    if (tasks.add(2, 0, true, 6, processCmdsC, "PrcCmdC")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_D
-    tasks.add(2, 0, true, 6, processCmdsD, "PrcCmdD");
+    VF("MSG: Setup, starting command channel D task... ");
+    if (tasks.add(2, 0, true, 6, processCmdsD, "PrcCmdD")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_ST4
-    tasks.add(2, 0, true, 6, processCmdsST4, "PrcCmdS");
+    VF("MSG: Setup, starting command channel ST4 task... ");
+    if (tasks.add(2, 0, true, 6, processCmdsST4, "PrcCmdS")) VL("success"); else VL("FAILED!");
   #endif
 
   telescope.init();

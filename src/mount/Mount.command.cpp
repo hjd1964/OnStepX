@@ -231,7 +231,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
           if (misc.usPerStepCurrent > usPerStepBase*2.0) misc.usPerStepCurrent = usPerStepBase*2.0;
           if (misc.usPerStepCurrent < usPerStepLowerLimit()) misc.usPerStepCurrent = usPerStepLowerLimit();
           nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
-          //setAccelerationRates(maxRate);
+          updateAccelerationRates();
         } else *commandError = CE_SLEW_IN_MOTION;
       break;
       case '3': // slew rate preset (returns nothing)
@@ -247,7 +247,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
           }
           if (misc.usPerStepCurrent < usPerStepLowerLimit()) misc.usPerStepCurrent = usPerStepLowerLimit();
           nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
-          //setAccelerationRates(maxRate);
+          updateAccelerationRates();
         } else *commandError = CE_SLEW_IN_MOTION;
       break;
       case '5': // autoMeridianFlip

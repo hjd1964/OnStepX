@@ -18,7 +18,11 @@ extern Tasks tasks;
 #include "../coordinates/Site.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
+#include "../telescope/Telescope.h"
+extern Telescope telescope;
 #include "Mount.h"
+
+inline void mountGuideWrapper() { telescope.mount.pollGuides(); }
 
 void Mount::init() {
 
@@ -47,6 +51,10 @@ void Mount::init() {
   if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::init(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
 
+  // start guide monitor task
+  VF("MSG: Mount, start mountGuide task... ");
+  if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) VL("success"); else VL("FAILED!");
+
   // startup state
   resetHome();
 
@@ -54,13 +62,14 @@ void Mount::init() {
   axis1.setTracking(true);
   axis2.setTracking(true);
 
-  // possibly start tracking
+  // get tracking and slewing ready
   #if TRACK_AUTOSTART == ON
-    VLF("MSG: Mount starting tracking");
+    VLF("MSG: Mount, starting tracking");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   #endif
   updateTrackingRates();
+  updateAccelerationRates();
 }
 
 void Mount::setTrackingState(TrackingState state) {
@@ -83,30 +92,39 @@ void Mount::updateTrackingRates() {
   axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO);
 }
 
-// check for platform rate limit (lowest maxRate) in us units
+void Mount::updateAccelerationRates() {
+  double radsPerSecondMax = (1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure();
+  double radsPerSecondPerSecond = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondMax) * 2.0;
+  axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
+  radsPerSecondPerSecond = (degToRad(SLEW_RAPID_STOP_DIST)/radsPerSecondMax) * 2.0;
+  axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond);
+
+  radsPerSecondMax = (1000000.0/misc.usPerStepCurrent)/axis2.getStepsPerMeasure();
+  radsPerSecondPerSecond = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondMax) * 2.0;
+  axis2.setSlewAccelerationRate(radsPerSecondPerSecond);
+  radsPerSecondPerSecond = (degToRad(SLEW_RAPID_STOP_DIST)/radsPerSecondMax) * 2.0;
+  axis2.setSlewAccelerationRateAbort(radsPerSecondPerSecond);
+}
+
 double Mount::usPerStepLowerLimit() {
-  // for example 16us, this basis is platform/clock-rate specific (for square wave)
+  // basis is platform/clock-rate specific (for square wave)
   double r_us = HAL_MAXRATE_LOWER_LIMIT;
   
   // higher speed ISR code path?
   #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
-    r_us /= 1.6; // about 1.6x faster than SQW mode in my testing
+    r_us /= 1.6;
   #endif
   
   // on-the-fly mode switching used?
   #if MODE_SWITCH_BEFORE_SLEW == OFF
-    // if this code is enabled, r_us == 27us
     if (axis1StepsGoto != 1 || axis2StepsGoto != 1) r_us *= 1.7;
   #endif
 
-  // average required goto us rates for each axis with any micro-step mode switching applied,
-  // if tracking in 32X mode using 4X for gotos (32/4 = 8,) that's an 8x lower true rate so 27/8 = 3.4 is allowed
+  // average required goto us rates for each axis with any micro-step mode switching applied
   double r_us_axis1 = r_us/axis1.getStepsPerStepGoto();
   double r_us_axis2 = r_us/axis2.getStepsPerStepGoto();
   
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
-  // if Axis1 is 10000 step/deg & Axis2 is 20000 steps/deg, Axis2 needs to run 2x speed so we must slow down.
-  // 3.4 on one axis and 6.8 on the other for an average of 5.1
   r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0;
  
   // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
