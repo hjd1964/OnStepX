@@ -11,8 +11,8 @@
 // Enable additional debugging and/or status messages on the specified SERIAL_DEBUG port
 // Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
 
-//      Parameter Name              Value   Default     Notes                                                                   Hint
 #define DEBUG                         OFF //         OFF, Use ON for background error messages only, use VERBOSE for all      Infreq
+//      Parameter Name              Value        Default  Notes                                                                 Hint
                                           //              error and status messages, use CONSOLE for VT100 debug console,
                                           //              or use PROFILER for VT100 task profiler.
 #define DEBUG_ECHO_COMMANDS           OFF //         OFF, Use ON to log command/responses to the debug serial port.           Option
