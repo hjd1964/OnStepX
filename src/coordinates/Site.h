@@ -6,6 +6,8 @@
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 
+extern volatile unsigned long centisecondLAST;
+
 typedef struct LatitudeExtras {
   double sine;
   double cosine;

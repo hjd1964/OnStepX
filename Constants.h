@@ -83,7 +83,6 @@
 // same as PSS_BEST
 #define BEST                        3
 
-
 // debug values
 #define CONSOLE                     -20
 #define PROFILER                    -21
@@ -223,3 +222,6 @@
 #define NV_PEC_BASE                 190    // bytes: 13  , addr: 190..202
 
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)
+
+// Align
+#define ALIGN_MAX_STARS             1
