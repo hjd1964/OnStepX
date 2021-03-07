@@ -75,7 +75,6 @@ class Axis {
     void markOriginCoordinate();
 
     // target coordinate, in "measures" (degrees, microns, etc.)
-    void moveTargetCoordinate(double value);
     void setTargetCoordinate(double value);
     double getTargetCoordinate();
     bool nearTarget();
@@ -84,23 +83,23 @@ class Axis {
     double getOriginOrTargetDistance();
 
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
-    void setFrequency(double frequency);
+    void setFrequency(float frequency);
     // get frequency in "measures" (degrees, microns, etc.) per second
-    double getFrequency();
+    float getFrequency();
     // get frequency in steps per second
-    double getFrequencySteps();
+    float getFrequencySteps();
     // set maximum frequency in "measures" (radians, microns, etc.) per second
-    void setFrequencyMax(double frequency);
+    void setFrequencyMax(float frequency);
 
     // set time to emergency stop movement, with acceleration in "measures" per second per second
-    void setSlewAccelerationRate(double mpsps);
+    void setSlewAccelerationRate(float mpsps);
     // set time to emergency stop movement, with acceleration in "measures" per second per second
-    void setSlewAccelerationRateAbort(double mpsps);
+    void setSlewAccelerationRateAbort(float mpsps);
 
     // slew, with acceleration in "measures" per second per second
     void autoSlew(Direction direction);
     // slew, with acceleration in distance (radians to FrequencyMax)
-    void autoSlewRateByDistance(double distance);
+    void autoSlewRateByDistance(float distance);
     // stops automatic movement
     void autoSlewStop();
     // emergency stops automatic movement
@@ -116,9 +115,9 @@ class Axis {
     bool getTracking();
 
     // set backlash in "measures" (radians, microns, etc.)
-    void setBacklash(double value);
+    void setBacklash(float value);
     // get backlash in "measures" (radians, microns, etc.)
-    double getBacklash();
+    float getBacklash();
     // returns true if traveling through backlash
     bool inBacklash();
     // disable backlash compensation, to work properly there must be an enable call to match
@@ -151,58 +150,46 @@ class Axis {
 
   private:
     StepDriver driver;
-
     AxisPins pins;
 
-    uint8_t taskHandle                = 0;
-    uint8_t axisNumber                = 0;
+    uint8_t taskHandle = 0;
+    uint8_t axisNumber = 0;
 
-    bool   invertEnabled              = false;
-    bool   enabled                    = false;
-    bool   tracking                   = false;
-    bool   moveFast                   = false;
+    bool invertEnable = false;
+    bool enabled = false;
+    bool tracking = false;
+    bool moveFast = false;
 
-    double origin                     = 0.0;
-    double target                     = 0.0;
-    double motor                      = 0.0;
+    long originSteps = 0;
 
-    long   originSteps                = 0;
-
-    volatile long targetSteps         = 0;
-    volatile long motorSteps          = 0;
-    volatile long indexSteps          = 0;
-    volatile int  trackingStep        = 1;
-    volatile int  step                = 1;
-    volatile int  stepGoto            = 1;
-    volatile bool invertStep          = false;
-    volatile bool takeStep            = false;
-    volatile bool invertDir           = false;
-    Direction direction               = DIR_NONE;
-
-    volatile long backlashSteps       = 0;
+    float backlashFreq = siderealToRad(TRACK_BACKLASH_RATE);
+    unsigned long backlashStepsStore;
+    volatile long backlashSteps = 0;
     volatile long backlashAmountSteps = 0;
-    unsigned long backlashStepsStore  = 0;
-    double backlashFreq               = siderealToRad(TRACK_BACKLASH_RATE);
 
-    double spm                        = 1.0;
+    volatile bool invertStep = false;
+    volatile bool invertDir = false;
+    volatile long targetSteps = 0;
+    volatile long motorSteps = 0;
+    volatile long indexSteps = 0;
+    volatile int  trackingStep = 1;
+    volatile int  step = 1;
+    volatile int  stepGoto = 1;
+    volatile bool takeStep = false;
+    volatile Direction direction = DIR_NONE;
 
-    double trackingFreq               = 0.0;
-    double trackingPeriodMicros       = 0.0;
-    long   trackingPeriodMicrosHalf   = 0;
-    unsigned long lastPeriod          = 0;
+    unsigned long lastPeriod;
 
-    double maxFreq                    = 0.0;
-    double lastFreq                   = 0.0;
-    double minPeriodMicros            = 0.0;
-    unsigned long minPeriodMicrosHalf = 0;
-    AutoRate autoRate                 = AR_NONE;
-    Direction autoRateDirection       = DIR_NONE;
-    double slewAccelerationDistance   = 0;
-    double autoRatePerCentisecond     = 0;
+    float maxFreq;
+    float lastFreq;
+    float minPeriodMicros;
+    AutoRate autoRate = AR_NONE;
+    // auto slew rate distance in radians to max rate
+    float slewAccelerationDistance;
     // auto slew rate in measures per second per centisecond
-    double slewMpspcs                 = 0.0;
+    float slewMpspcs;
     // abort slew rate in measures per second per centisecond
-    double abortMpspcs                = 0.0;
+    float abortMpspcs;
 
     MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

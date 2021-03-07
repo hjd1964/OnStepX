@@ -119,7 +119,6 @@ void Axis::init(uint8_t axisNumber) {
 
   driver.init(axisNumber);
 
-  spm = settings.stepsPerMeasure;
   if (settings.reverse) invertDir = !invertDir;
 
   pinModeInitEx(pins.step, OUTPUT, !invertStep?LOW:HIGH);
@@ -129,7 +128,7 @@ void Axis::init(uint8_t axisNumber) {
 
 void Axis::enable(bool value) {
   if (pins.enable != OFF) {
-    if (value) digitalWrite(pins.enable, invertEnabled?HIGH:LOW); else digitalWrite(pins.enable, invertEnabled?LOW:HIGH);
+    if (value) digitalWrite(pins.enable, invertEnable?HIGH:LOW); else digitalWrite(pins.enable, invertEnable?LOW:HIGH);
     enabled = value;
   }
 }
@@ -139,7 +138,7 @@ bool Axis::isEnabled() {
 }
 
 double Axis::getStepsPerMeasure() {
-  return spm;
+  return settings.stepsPerMeasure;
 }
 
 int Axis::getStepsPerStepGoto() {
@@ -147,7 +146,7 @@ int Axis::getStepsPerStepGoto() {
 }
 
 void Axis::setMotorCoordinate(double value) {
-  long steps = lround(value*spm);
+  long steps = lround(value*settings.stepsPerMeasure);
   setMotorCoordinateSteps(steps);
 }
 
@@ -155,7 +154,7 @@ double Axis::getMotorCoordinate() {
   noInterrupts();
   long steps = motorSteps + backlashSteps;
   interrupts();
-  return steps/spm;
+  return steps/settings.stepsPerMeasure;
 }
 
 void Axis::setMotorCoordinateSteps(long value) {
@@ -182,7 +181,7 @@ long Axis::getInstrumentCoordinateSteps() {
 }
 
 void Axis::setInstrumentCoordinate(double value) {
-  long steps = value*spm;
+  long steps = value*settings.stepsPerMeasure;
   noInterrupts();
   indexSteps = steps - motorSteps;
   interrupts();
@@ -192,7 +191,7 @@ double Axis::getInstrumentCoordinate() {
   noInterrupts();
   long steps = motorSteps + indexSteps;
   interrupts();
-  return steps/spm;
+  return steps/settings.stepsPerMeasure;
 }
 
 void Axis::markOriginCoordinate() {
@@ -202,8 +201,7 @@ void Axis::markOriginCoordinate() {
 }
 
 void Axis::setTargetCoordinate(double value) {
-  target = value*spm;
-  long steps = lround(target);
+  long steps = lround(value*settings.stepsPerMeasure);
   noInterrupts();
   targetSteps = steps - indexSteps;
   interrupts();
@@ -213,15 +211,7 @@ double Axis::getTargetCoordinate() {
   noInterrupts();
   long steps = targetSteps + indexSteps;
   interrupts();
-  return steps/spm;
-}
-
-void Axis::moveTargetCoordinate(double value) {
-  target += value*spm;
-  long steps = lround(target);
-  noInterrupts();
-  targetSteps = steps - indexSteps;
-  interrupts();
+  return steps/settings.stepsPerMeasure;
 }
 
 bool Axis::nearTarget() {
@@ -234,23 +224,23 @@ double Axis::getOriginOrTargetDistance() {
   interrupts();
   long distanceOrigin = labs(originSteps - steps);
   long distanceTarget = labs(targetSteps - steps);
-  if (distanceOrigin < distanceTarget) return distanceOrigin/spm; else return distanceTarget/spm;
+  if (distanceOrigin < distanceTarget) return distanceOrigin/settings.stepsPerMeasure; else return distanceTarget/settings.stepsPerMeasure;
 }
 
-void Axis::setFrequencyMax(double frequency) {
+void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
-  if (frequency != 0.0) minPeriodMicros = 1000000.0/(maxFreq*spm); else minPeriodMicros = 0.0;
+  if (frequency != 0.0) minPeriodMicros = 1000000.0/(maxFreq*settings.stepsPerMeasure); else minPeriodMicros = 0.0;
 }
 
-void Axis::setSlewAccelerationRate(double mpsps) {
+void Axis::setSlewAccelerationRate(float mpsps) {
   slewMpspcs = mpsps/100.0;
 }
 
-void Axis::setSlewAccelerationRateAbort(double mpsps) {
+void Axis::setSlewAccelerationRateAbort(float mpsps) {
   abortMpspcs = mpsps/100.0;
 }
 
-void Axis::autoSlewRateByDistance(double distance) {
+void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
@@ -286,7 +276,7 @@ void Axis::poll() {
 
   // acceleration
   if (autoRate == AR_NONE) return;
-  double freq;
+  float freq = 0;
   if (autoRate == AR_RATE_BY_DISTANCE) {
     freq = getOriginOrTargetDistance()/slewAccelerationDistance*maxFreq + siderealToRad(backlashFreq);
     if (freq < backlashFreq) freq = backlashFreq;
@@ -299,18 +289,18 @@ void Axis::poll() {
   } else
   if (autoRate == AR_RATE_BY_TIME_END) {
     if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < slewMpspcs) freq += slewMpspcs; else freq = 0;
-    if (freq == 0) {
+    if (abs(freq) <= slewMpspcs) {
       autoRate = AR_NONE;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew stopped");
     }
   } else
   if (autoRate == AR_RATE_BY_TIME_ABORT) {
     if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < abortMpspcs) freq += abortMpspcs; else freq = 0;
-    if (freq == 0) {
+    if (abs(freq) <= slewMpspcs) {
       autoRate = AR_NONE;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew aborted");
     }
-  } else freq = 0;
+  } else freq = 0.0;
 
   if (freq < -maxFreq) freq = -maxFreq; else if (freq >  maxFreq) freq = maxFreq;
   setFrequency(freq);
@@ -329,8 +319,8 @@ void Axis::poll() {
   }
 }
 
-void Axis::setFrequency(double frequency) {
-  if (frequency < 0) {
+void Axis::setFrequency(float frequency) {
+  if (frequency < 0.0) {
     frequency = -frequency;
     noInterrupts(); trackingStep = -1; interrupts();
   } else {
@@ -339,7 +329,7 @@ void Axis::setFrequency(double frequency) {
 
   lastFreq = frequency;
   // frequency in measures per second to microsecond counts per step
-  double d = 1000000.0/(frequency*spm);
+  double d = 1000000.0/(frequency*settings.stepsPerMeasure);
   if (d < minPeriodMicros) d = minPeriodMicros;
   if (STEP_WAVE_FORM == SQUARE) d /= 2.0;
   if (!isnan(d) && fabs(d) <= 134000000) {
@@ -352,11 +342,11 @@ void Axis::setFrequency(double frequency) {
   tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(d));
 }
 
-double Axis::getFrequency() {
-  return getFrequencySteps()/spm;
+float Axis::getFrequency() {
+  return getFrequencySteps()/settings.stepsPerMeasure;
 }
 
-double Axis::getFrequencySteps() {
+float Axis::getFrequencySteps() {
   if (lastPeriod == 0) return 0;
   return 16000000.0/(lastPeriod * 2UL);
 }
@@ -369,18 +359,18 @@ bool Axis::getTracking() {
   return tracking;
 }
 
-void Axis::setBacklash(double value) {
+void Axis::setBacklash(float value) {
   noInterrupts();
-  backlashAmountSteps = value * spm;
+  backlashAmountSteps = value*settings.stepsPerMeasure;
   interrupts();
   settings.backlashAmountSteps = backlashAmountSteps;
 }
 
-double Axis::getBacklash() {
+float Axis::getBacklash() {
   noInterrupts();
   long b = backlashSteps;
   interrupts();
-  return b/spm;
+  return b/settings.stepsPerMeasure;
 }
 
 bool Axis::inBacklash() {
@@ -444,12 +434,12 @@ void Axis::enableMoveFast(bool fast) {
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     if (axisNumber == 1) {
       if (!fast) tasks.setCallback(taskHandle, moveAxis1); else {
-        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis1); else tasks.setCallback(taskHandle, moveReverseFastAxis1);
+//        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis1); else tasks.setCallback(taskHandle, moveReverseFastAxis1);
       } 
     }
     if (axisNumber == 2) {
       if (!fast) tasks.setCallback(taskHandle, moveAxis2); else {
-        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
+//        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
       }
     }
   #endif
