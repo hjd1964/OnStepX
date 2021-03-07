@@ -11,9 +11,9 @@
 // universal value works for all known 85RC series, 3ms
 #define FRAM_WRITE_WAIT 3
 
-bool NonVolatileStorageMB85RC::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire, uint8_t address) {
+bool NonVolatileStorageMB85RC::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // setup size, cache, etc.
-  NonVolatileStorage::init(size, cache, wait, check);
+  NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
 
   this->wire = wire;
   this->framAddress = framAddress;

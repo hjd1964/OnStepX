@@ -11,9 +11,9 @@
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)
 
-bool NonVolatileStorage24XX::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire, uint8_t address) {
+bool NonVolatileStorage24XX::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // setup size, cache, etc.
-  NonVolatileStorage::init(size, cache, wait, check);
+  NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
 
   this->wire = wire;
   this->eepromAddress = eepromAddress;

@@ -4,14 +4,14 @@
 #include "Arduino.h"
 #include "NV.h"
 
-bool NonVolatileStorage::init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0) {
+bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // set nv size
   this->size = size;
   // set cache size, defaults to 0 otherwise
-  if (cache) cacheSize = size;
+  if (cacheEnable) cacheSize = size;
   waitMs = wait;
 
-  cacheStateSize = cacheSize/8;
+  cacheStateSize = cacheSize/8 + 1;
   if (cacheSize == 0) return true;
 
   cache = new uint8_t[cacheSize];

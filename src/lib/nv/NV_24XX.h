@@ -9,15 +9,15 @@
 
 class NonVolatileStorage24XX : public NonVolatileStorage {
   public:
-    // prepare EEPROM for operation
-    // size:    NV size in bytes
-    // cache:   enable or disable the cache (note NV size must be divisible by 8 if enabled)
-    // wait:    minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
-    // check:   checksum error detection
-    // wire:    I2C interface pointer (set to NULL if not used)
-    // address: I2C address
-    // result:  true if the device was found, or false if not
-    bool init(uint16_t size, bool cache, uint16_t wait, bool check, TwoWire* wire = NULL, uint8_t address = 0);
+    // prepare      FLASH based EEPROM emulation for operation
+    // size:        NV size in bytes
+    // cacheEnable: enable or disable the cache (note NV size must be divisible by 8 if enabled)
+    // wait:        minimum time in milliseconds to wait (after last write) before writing cache or doing the commit
+    // checkEnable: enable or disable checksum error detection
+    // wire:        I2C interface pointer (set to NULL if not used)
+    // address:     I2C address
+    // result:      true if the device was found, or false if not
+    bool init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire = NULL, uint8_t address = 0);
 
   private:
     // returns false if ready to read or write immediately
