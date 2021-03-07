@@ -125,7 +125,7 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
       char* conv_end;
       float f = strtod(parameter, &conv_end);
       if (&parameter[0] != conv_end) {
-        float maxDegsPerSec = radToDeg((1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure());
+        float maxDegsPerSec = radToDeg(radsPerSecondCurrent);
         if (f < 0.001/3600.0) f = 0.001/3600.0;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
         customGuideRateAxis1 = f*240.0;
@@ -140,7 +140,7 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
       char* conv_end;
       float f = strtod(parameter, &conv_end);
       if (&parameter[0] != conv_end) {
-        float maxDegsPerSec = radToDeg((1000000.0/misc.usPerStepCurrent)/axis2.getStepsPerMeasure());
+        float maxDegsPerSec = radToDeg(radsPerSecondCurrent);
         if (f < 0.001/3600.0) f = 0.001/3600.0;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
         customGuideRateAxis2 = f*240.0;

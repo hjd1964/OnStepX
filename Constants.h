@@ -125,6 +125,7 @@
 #define RAD_DEG_RATIO               ((double)57.29577951308232L)
 #define RAD_HOUR_RATIO              ((double)3.819718634205488L)
 #define SIDEREAL_RATIO              1.002737909350795
+#define SIDEREAL_RATIO_F            1.0027379F
 #define SIDEREAL_PERIOD             15956313.06126534
 #define SIDEREAL_RATE_HZ            60.16427456104770
 #define Deg10                       0.174532925199432
@@ -153,6 +154,7 @@
 #define arcsecToRad(x)              ((x)/206264.8062470963)
 #define radToArcsec(x)              ((x)*206264.8062470963)
 #define siderealToRad(x)            ((x)/13750.98708313975)
+#define siderealToRadF(x)           ((x)/13750.987F)
 #define radToSidereal(x)            ((x)*13750.98708313975)
 //#define siderealToRad(x)            ((((x)*SIDEREAL_RATIO*15.0)/3600.0)/RAD)
 // conversion factor to go to/from Hz for sidereal interval

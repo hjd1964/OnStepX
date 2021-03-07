@@ -229,21 +229,26 @@ double Axis::getOriginOrTargetDistance() {
 
 void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
-  if (frequency != 0.0) minPeriodMicros = 1000000.0/(maxFreq*settings.stepsPerMeasure); else minPeriodMicros = 0.0;
+  if (frequency != 0.0) minPeriodMicros = 1000000.0F/(maxFreq*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
 }
 
 void Axis::setSlewAccelerationRate(float mpsps) {
-  slewMpspcs = mpsps/100.0;
+  slewMpspcs = mpsps/100.0F;
 }
 
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
-  abortMpspcs = mpsps/100.0;
+  abortMpspcs = mpsps/100.0F;
 }
 
 void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
+}
+
+void Axis::autoSlewRateByDistanceStop() {
+  autoRate = AR_NONE;
+  poll();
 }
 
 void Axis::autoSlew(Direction direction) {
@@ -276,7 +281,6 @@ void Axis::poll() {
 
   // acceleration
   if (autoRate == AR_NONE) return;
-  float freq = 0;
   if (autoRate == AR_RATE_BY_DISTANCE) {
     freq = getOriginOrTargetDistance()/slewAccelerationDistance*maxFreq + siderealToRad(backlashFreq);
     if (freq < backlashFreq) freq = backlashFreq;
@@ -288,39 +292,41 @@ void Axis::poll() {
     freq -= slewMpspcs;
   } else
   if (autoRate == AR_RATE_BY_TIME_END) {
-    if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < slewMpspcs) freq += slewMpspcs; else freq = 0;
-    if (abs(freq) <= slewMpspcs) {
+    if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
+    if (fabs(freq) <= slewMpspcs) {
       autoRate = AR_NONE;
+      freq = 0.0F;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew stopped");
     }
   } else
   if (autoRate == AR_RATE_BY_TIME_ABORT) {
-    if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < abortMpspcs) freq += abortMpspcs; else freq = 0;
-    if (abs(freq) <= slewMpspcs) {
+    if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < abortMpspcs) freq += abortMpspcs; else freq = 0.0F;
+    if (fabs(freq) <= slewMpspcs) {
       autoRate = AR_NONE;
+      freq = 0.0F;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew aborted");
     }
-  } else freq = 0.0;
+  } else freq = 0.0F;
 
   if (freq < -maxFreq) freq = -maxFreq; else if (freq >  maxFreq) freq = maxFreq;
   setFrequency(freq);
 
   // ISR swap
-  if (moveFast && (freq < backlashFreq*1.2 || autoRate == AR_NONE)) {
+  if (moveFast && (fabs(freq) <= backlashFreq*1.2F || autoRate == AR_NONE)) {
      moveFast = false;
      enableMoveFast(false);
-     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" high speed ISR swapped out");
-  }
+     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped out at "); VL(radToDeg(freq));
+  } else
 
-  if (!moveFast && freq > backlashFreq*1.2) {
+  if (!moveFast && fabs(freq) > backlashFreq*1.2F) {
     moveFast = true;
     enableMoveFast(true);
-     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" high speed ISR swapped in");
+     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped in at "); VL(radToDeg(freq));
   }
 }
 
 void Axis::setFrequency(float frequency) {
-  if (frequency < 0.0) {
+  if (frequency < 0.0F) {
     frequency = -frequency;
     noInterrupts(); trackingStep = -1; interrupts();
   } else {
@@ -329,17 +335,17 @@ void Axis::setFrequency(float frequency) {
 
   lastFreq = frequency;
   // frequency in measures per second to microsecond counts per step
-  double d = 1000000.0/(frequency*settings.stepsPerMeasure);
-  if (d < minPeriodMicros) d = minPeriodMicros;
-  if (STEP_WAVE_FORM == SQUARE) d /= 2.0;
-  if (!isnan(d) && fabs(d) <= 134000000) {
+  float f = 1000000.0F/(frequency*settings.stepsPerMeasure);
+  if (f < minPeriodMicros) f = minPeriodMicros;
+  if (STEP_WAVE_FORM == SQUARE) f /= 2.0F;
+  if (!isnan(f) && fabs(f) <= 134000000.0F) {
     // convert microsecond counts to sub-microsecond counts
-    d *= 16.0;
-    lastPeriod = (unsigned long)lround(d);
+    f *= 16.0F;
+    lastPeriod = (unsigned long)lround(f);
     // adjust period for MCU clock inaccuracy
-    d *= (SIDEREAL_PERIOD/periodSubMicros);
-  } else { d = 0; lastPeriod = 0; }
-  tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(d));
+    f *= (SIDEREAL_PERIOD/periodSubMicros);
+  } else { f = 0.0; lastPeriod = 0; }
+  tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(f));
 }
 
 float Axis::getFrequency() {
@@ -348,7 +354,7 @@ float Axis::getFrequency() {
 
 float Axis::getFrequencySteps() {
   if (lastPeriod == 0) return 0;
-  return 16000000.0/(lastPeriod * 2UL);
+  return 16000000.0F/(lastPeriod * 2UL);
 }
 
 void Axis::setTracking(bool state) {
@@ -415,35 +421,24 @@ bool Axis::motionError() {
 }
 
 void Axis::enableMoveFast(bool fast) {
-
-  if (fast) disableBacklash(); else enableBacklash();
-
-  // make sure the direction is set
-  noInterrupts();
-  if (motorSteps < targetSteps) {
-    direction = DIR_FORWARD;
-    digitalWriteF(pins.dir, invertDir?HIGH:LOW);
-  } else if (motorSteps > targetSteps) {
-    direction = DIR_REVERSE;
-    digitalWriteF(pins.dir, invertDir?LOW:HIGH);
-  } else direction = DIR_NONE;
-  interrupts();
-
-  if (direction == DIR_NONE) return;
-
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-    if (axisNumber == 1) {
-      if (!fast) tasks.setCallback(taskHandle, moveAxis1); else {
-//        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis1); else tasks.setCallback(taskHandle, moveReverseFastAxis1);
-      } 
-    }
-    if (axisNumber == 2) {
-      if (!fast) tasks.setCallback(taskHandle, moveAxis2); else {
-//        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
+    if (fast) {
+      // swap in the fast ISR's
+      disableBacklash();
+      if (axisNumber == 1) {
+        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis1); else tasks.setCallback(taskHandle, moveReverseFastAxis1);
       }
+      if (axisNumber == 2) {
+        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
+      }
+    } else {
+      // swap out the fast ISR's
+      if (axisNumber == 1) tasks.setCallback(taskHandle, moveAxis1);
+      if (axisNumber == 2) tasks.setCallback(taskHandle, moveAxis2);
+      enableBacklash();
     }
   #endif
-}
+ }
 
 IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   if (takeStep) {
@@ -474,12 +469,14 @@ IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
+    if (tracking) targetSteps += trackingStep;
       if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
   }
   IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
+    if (tracking) targetSteps += trackingStep;
       if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
@@ -488,10 +485,12 @@ IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   #if STEP_WAVE_FORM == PULSE
   IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
+    if (tracking) targetSteps += trackingStep;
     if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
   }
   IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
+    if (tracking) targetSteps += trackingStep;
     if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
   }
   #endif
@@ -499,12 +498,14 @@ IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   #if STEP_WAVE_FORM == SQUARE
     IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
       if (takeStep) {
+        if (tracking) targetSteps += trackingStep;
         if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
       } else digitalWriteF(stepPin, LOW);
       takeStep = !takeStep;
     }
     IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
       if (takeStep) {
+        if (tracking) targetSteps += trackingStep;
         if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
       } else digitalWriteF(stepPin, LOW);
       takeStep = !takeStep;
@@ -513,10 +514,12 @@ IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
   #if STEP_WAVE_FORM == PULSE
     IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
       digitalWriteF(stepPin, LOW);
+      if (tracking) targetSteps += trackingStep;
       if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
     }
     IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
       digitalWriteF(stepPin, LOW);
+      if (tracking) targetSteps += trackingStep;
       if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
     }
   #endif

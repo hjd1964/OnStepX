@@ -101,6 +101,8 @@ class Axis {
     // slew, with acceleration in distance (radians to FrequencyMax)
     void autoSlewRateByDistance(float distance);
     // stops automatic movement
+    void autoSlewRateByDistanceStop();
+    // stops automatic movement
     void autoSlewStop();
     // emergency stops automatic movement
     void autoSlewAbort();
@@ -180,6 +182,7 @@ class Axis {
 
     unsigned long lastPeriod;
 
+    float freq = 0.0F;
     float maxFreq;
     float lastFreq;
     float minPeriodMicros;

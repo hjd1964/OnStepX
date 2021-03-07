@@ -15,20 +15,20 @@
 #include "../motion/Axis.h"
 #include "Mount.h"
 
-double Mount::guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis) {
+float Mount::guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis) {
   switch (guideRateSelect) {
-    case GR_QUARTER: return 0.25;
-    case GR_HALF: return 0.5;
-    case GR_1X: return 1.0;
-    case GR_2X: return 2.0;
-    case GR_4X: return 4.0;
-    case GR_8X: return 8.0;
-    case GR_20X: return 20.0;
-    case GR_48X: return 48.0;
-    case GR_HALF_MAX: return (2000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure());
-    case GR_MAX: return (1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure());
-    case GR_CUSTOM: if (axis == 1) return 48.0; else if (axis == 2) return 48.0; else return 0;
-    default: return 0;
+    case GR_QUARTER: return 0.25F;
+    case GR_HALF: return 0.5F;
+    case GR_1X: return 1.0F;
+    case GR_2X: return 2.0F;
+    case GR_4X: return 4.0F;
+    case GR_8X: return 8.0F;
+    case GR_20X: return 20.0F;
+    case GR_48X: return 48.0F;
+    case GR_HALF_MAX: return radToDeg(radsPerSecondCurrent)*120.0F;
+    case GR_MAX: return radToDeg(radsPerSecondCurrent)*240.0F;
+    case GR_CUSTOM: if (axis == 1) return 48.0F; else if (axis == 2) return 48.0F; else return 0.0F;
+    default: return 0.0F;
   }
 }
 
@@ -126,7 +126,7 @@ CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect gui
     if (guideAction == GA_REVERSE) guideRateAxis2 = -rate; else guideRateAxis2 = rate;
     updateTrackingRates();
   } else {
-    axis2.setFrequencyMax(degToRad(rate/240.0));
+    axis2.setFrequencyMax(degToRad(rate/240.0F));
     if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
   }
   
@@ -139,14 +139,14 @@ CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect gui
 
 void Mount::stopGuideAxis1() {
   if (guideActionAxis1 > GA_BREAK) {
-    if (guideRateAxis1 == 0.0) {
+    if (guideRateAxis1 == 0.0F) {
       VLF("MSG: stopGuideAxis1(); requesting guide stop");
       guideActionAxis1 = GA_BREAK;
       axis1.autoSlewStop();
     } else {
       VLF("MSG: stopGuideAxis1(); guide stopped");
       guideActionAxis1 = GA_NONE;
-      guideRateAxis1 = 0.0;
+      guideRateAxis1 = 0.0F;
       updateTrackingRates();
     }
   }
@@ -154,14 +154,14 @@ void Mount::stopGuideAxis1() {
 
 void Mount::stopGuideAxis2() {
   if (guideActionAxis2 > GA_BREAK) {
-    if (guideRateAxis2 == 0.0) {
+    if (guideRateAxis2 == 0.0F) {
       VLF("MSG: stopGuideAxis2(); requesting guide stop");
       guideActionAxis2 = GA_BREAK;
       axis2.autoSlewStop();
     } else {
       VLF("MSG: stopGuideAxis2(); guide stopped");
       guideActionAxis2 = GA_NONE;
-      guideRateAxis2 = 0.0;
+      guideRateAxis2 = 0.0F;
       updateTrackingRates();
     }
   }
@@ -169,7 +169,7 @@ void Mount::stopGuideAxis2() {
 
 void Mount::guidePoll() {
   // check fast guide completion axis1
-  if (guideActionAxis1 == GA_BREAK && guideRateAxis1 == 0.0 && !axis1.autoSlewActive()) {
+  if (guideActionAxis1 == GA_BREAK && guideRateAxis1 == 0.0F && !axis1.autoSlewActive()) {
     guideActionAxis1 = GA_NONE;
     updateTrackingRates();
   } else { // check for guide timeout axis1
@@ -177,7 +177,7 @@ void Mount::guidePoll() {
   }
 
   // check fast guide completion axis2
-  if (guideActionAxis2 == GA_BREAK && guideRateAxis2 == 0.0 && !axis2.autoSlewActive()) {
+  if (guideActionAxis2 == GA_BREAK && guideRateAxis2 == 0.0F && !axis2.autoSlewActive()) {
     guideActionAxis2 = GA_NONE;
     updateTrackingRates();
   } else { // check for guide timeout axis2

@@ -72,6 +72,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
       // start tracking
       setTrackingState(TS_SIDEREAL);
+      updateTrackingRates();
 
       // start align...
       alignState.lastStar = command[1] - '0';

@@ -144,17 +144,14 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
 
     // slew rate in rads per second
-    double slewRateAxis1 = (1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure();
-    double slewRateAxis2 = (1000000.0/misc.usPerStepCurrent)/axis2.getStepsPerMeasure();
-    axis1.setFrequencyMax(slewRateAxis1);
-    axis2.setFrequencyMax(slewRateAxis2);
+    axis1.setFrequencyMax(radsPerSecondCurrent);
+    axis2.setFrequencyMax(radsPerSecondCurrent);
     VLF("MSG: Mount::gotoEqu(); slew rate set");
 
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     VLF("MSG: Mount::gotoEqu(); slew started");
 
-    //updateTrackingRates();
   } else DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!");
 
   return CE_NONE;
@@ -190,26 +187,28 @@ void Mount::gotoPoll() {
       axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
       VLF("MSG: Mount::gotoPoll(); slew started");
     }
+    // keep updating mount target
+    target.h += radsPerCentisecond;
   } else
   if (gotoStage == GG_DESTINATION) {
-    if (axis1.nearTarget() && axis2.nearTarget()) {
+    if (axis1.nearTarget() && axis2.nearTarget() || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
 
-      axis1.autoSlewStop();
-      axis2.autoSlewStop();
-      VLF("MSG: Mount::gotoPoll(); slew stopped");
+      VLF("MSG: Mount::gotoPoll(); stopping slew");
+      axis1.autoSlewRateByDistanceStop();
+      axis2.autoSlewRateByDistanceStop();
 
       // flag the goto as finished
       gotoState = GS_NONE;
       gotoStage = GG_NONE;
 
-      // back to normal tracking
-      updateTrackingRates();
-
       // lock tracking with movement
       axis1.setTracking(true);
       axis2.setTracking(true);
       VLF("MSG: Mount::gotoPoll(); automatic tracking resumed");
+
+      // back to normal tracking
+      updateTrackingRates();
 
       // kill this monitor
       tasks.setDurationComplete(gotoTaskHandle);
@@ -218,7 +217,8 @@ void Mount::gotoPoll() {
 
       return;
     }
-
+    // keep updating mount target
+    target.h += radsPerCentisecond;
     // keep updating the axis targets to match the mount target
     if (transform.mountType == ALTAZM) transform.equToHor(&target);
     double a1, a2;
@@ -226,10 +226,7 @@ void Mount::gotoPoll() {
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
   }
-
-  // keep moving the target (sidereal tracking)
- // target.h += radsPerCentisecond;
-}
+ }
 
 void Mount::setWaypoint() {
   // HA goes from +90...0..-90

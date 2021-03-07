@@ -37,8 +37,8 @@ void Mount::init() {
   // get the main axes ready
   axis1.init(1);
   axis2.init(2);
-  stepsPerSiderealSecondAxis1 = radToDeg(axis1.getStepsPerMeasure())/240.0;
-  stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO)/100.0;
+  stepsPerSiderealSecondAxis1 = radToDeg(axis1.getStepsPerMeasure())/240.0F;
+  stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*(float)SIDEREAL_RATIO)/100.0F;
 
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
@@ -46,9 +46,9 @@ void Mount::init() {
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
-  if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
+  if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0F;
   if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
-  if (misc.usPerStepCurrent > 2048) misc.usPerStepCurrent = 2048;
+  if (misc.usPerStepCurrent > 10000.0F) misc.usPerStepCurrent = 10000.0F;
 
   // get limit settings from NV
   if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::init(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
@@ -92,54 +92,50 @@ void Mount::updateTrackingRates() {
     if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
   }
   if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
-    trackingRateAxis1 = 0;
-    trackingRateAxis2 = 0;
+    trackingRateAxis1 = 0.0F;
+    trackingRateAxis2 = 0.0F;
   } else {
     #ifdef HAL_FAST_PROCESSOR
       stepsPerCentisecondAxis1 = ((radToDeg(axis1.getStepsPerMeasure())/(trackingRateAxis1*240.0))*SIDEREAL_RATIO)/100.0;
     #endif
   }
-  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO);
-  axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO);
+  axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO_F);
+  axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO_F);
 }
 
 void Mount::updateAccelerationRates() {
-  double radsPerSecondMax = (1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure();
-  double radsPerSecondPerSecond = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondMax) * 2.0;
+  radsPerSecondCurrent = (1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure();
+  float secondsToAccelerate = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondCurrent)*2.0;
+  float radsPerSecondPerSecond = radsPerSecondCurrent/secondsToAccelerate;
   axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
-  radsPerSecondPerSecond = (degToRad(SLEW_RAPID_STOP_DIST)/radsPerSecondMax) * 2.0;
-  axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond);
-
-  radsPerSecondMax = (1000000.0/misc.usPerStepCurrent)/axis2.getStepsPerMeasure();
-  radsPerSecondPerSecond = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondMax) * 2.0;
+  axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
   axis2.setSlewAccelerationRate(radsPerSecondPerSecond);
-  radsPerSecondPerSecond = (degToRad(SLEW_RAPID_STOP_DIST)/radsPerSecondMax) * 2.0;
-  axis2.setSlewAccelerationRateAbort(radsPerSecondPerSecond);
+  axis2.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
 }
 
-double Mount::usPerStepLowerLimit() {
+float Mount::usPerStepLowerLimit() {
   // basis is platform/clock-rate specific (for square wave)
-  double r_us = HAL_MAXRATE_LOWER_LIMIT;
+  float r_us = HAL_MAXRATE_LOWER_LIMIT;
   
   // higher speed ISR code path?
   #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
-    r_us /= 1.6;
+    r_us /= 1.6F;
   #endif
   
   // on-the-fly mode switching used?
   #if MODE_SWITCH_BEFORE_SLEW == OFF
-    if (axis1StepsGoto != 1 || axis2StepsGoto != 1) r_us *= 1.7;
+    if (axis1StepsGoto != 1 || axis2StepsGoto != 1) r_us *= 1.7F;
   #endif
 
   // average required goto us rates for each axis with any micro-step mode switching applied
-  double r_us_axis1 = r_us/axis1.getStepsPerStepGoto();
-  double r_us_axis2 = r_us/axis2.getStepsPerStepGoto();
+  float r_us_axis1 = r_us/axis1.getStepsPerStepGoto();
+  float r_us_axis2 = r_us/axis2.getStepsPerStepGoto();
   
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
-  r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0;
+  r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0F;
  
   // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
-  if (r_us < 0.25) { r_us = 0.25; DLF("WRN, Mount::usPerStepLowerLimit(): r_us exceeds design limit"); }
+  if (r_us < 0.25F) { r_us = 0.25F; DLF("WRN, Mount::usPerStepLowerLimit(): r_us exceeds design limit"); }
 
   // return rate in us units
   return r_us;

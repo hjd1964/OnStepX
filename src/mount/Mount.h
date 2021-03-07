@@ -162,10 +162,10 @@ class Mount {
     void updateAccelerationRates();
 
     // estimate average microseconds per step lower limit
-    double usPerStepLowerLimit();
+    float usPerStepLowerLimit();
 
     // return guide rate (sidereal x) for guide rate selection
-    double guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);
+    float guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);
 
     // valid guide on Axis1
     bool validGuideAxis1(GuideAction guideAction);
@@ -199,13 +199,13 @@ class Mount {
     #else
       RateCompensation rateCompensation = RC_NONE;
     #endif
-    float trackingRate                  = 1.0;
-    float trackingRateAxis1             = 0.0;
-    float trackingRateAxis2             = 0.0;
-    float deltaRateAxis1                = 0.0;
-    float deltaRateAxis2                = 0.0;
-    float stepsPerSiderealSecondAxis1   = 0.0;
-    float stepsPerCentisecondAxis1      = 0.0;
+    float trackingRate                  = 1.0F;
+    float trackingRateAxis1             = 0.0F;
+    float trackingRateAxis2             = 0.0F;
+    float deltaRateAxis1                = 0.0F;
+    float deltaRateAxis2                = 0.0F;
+    float stepsPerSiderealSecondAxis1   = 0.0F;
+    float stepsPerCentisecondAxis1      = 0.0F;
 
     // align
     AlignState alignState = {0, 0};
@@ -220,8 +220,9 @@ class Mount {
     GotoState  gotoStateAbort           = GS_NONE;
     GotoState  gotoStateLast            = GS_NONE;
     uint8_t    gotoTaskHandle           = 0;
-    float      usPerStepDefault         = 64.0;
-    float      usPerStepBase            = 128.0;
+    float      usPerStepDefault         = 64.0F;
+    float      usPerStepBase            = 128.0F;
+    float      radsPerSecondCurrent;
 
     // limits
     bool       limitsEnabled            = false;
@@ -234,10 +235,10 @@ class Mount {
     bool       waitingHomeContinue      = false;
   
     // guiding
-    float guideRateAxis1                = 0.0;
-    float guideRateAxis2                = 0.0;
-    float customGuideRateAxis1          = 0.0;
-    float customGuideRateAxis2          = 0.0;
+    float guideRateAxis1                = 0.0F;
+    float guideRateAxis2                = 0.0F;
+    float customGuideRateAxis1          = 0.0F;
+    float customGuideRateAxis2          = 0.0F;
     GuideState      guideState          = GU_NONE;
     GuideRateSelect guideRateSelect     = GR_20X;
     GuideRateSelect guideRateSelectAxis1= GR_20X;
@@ -257,7 +258,7 @@ class Mount {
 
       bool     pecFirstRecording        = false;
       long     pecRecordStopTime        = 0;
-      float    accPecGuideAxis1         = 0;
+      float    accPecGuideAxis1         = 0.0F;
       long     pecIndex                 = 0;
       int      pecValue                 = 0;
       long     wormRotationSteps        = 0;
