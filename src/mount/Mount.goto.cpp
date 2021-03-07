@@ -18,6 +18,8 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "Mount.h"
 
+inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
+
 CommandError Mount::validateGoto() {
   if ( axis1.fault()     ||  axis2.fault())        return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled())    return CE_SLEW_ERR_IN_STANDBY;
@@ -101,8 +103,6 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
   return CE_NONE;
 }
 
-inline void mountGotoWrapper() { telescope.mount.pollGotos(); }
-
 CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
   CommandError e = setMountTarget(coords, pierSideSelect);
   if (e != CE_NONE) return e;
@@ -127,7 +127,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
   gotoTaskHandle = tasks.add(10, 0, true, 1, mountGotoWrapper, "MntGoto");
   if (gotoTaskHandle) {
-    VLF("MSG: Mount::gotoEqu(); pollGotos task started"); 
+    VLF("MSG: Mount::gotoEqu(); start goto monitor task... success"); 
 
     axis1.setTracking(false);
     axis2.setTracking(false);
@@ -155,49 +155,49 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
     VLF("MSG: Mount::gotoEqu(); slew started");
 
     //updateTrackingRates();
-  } else DLF("MSG: Mount::gotoEqu(); pollGotos task failed to start, slew aborted");
+  } else DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!");
 
   return CE_NONE;
 }
 
-void Mount::pollGotos() {
+void Mount::gotoPoll() {
   if (gotoStage == GG_WAYPOINT) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
       if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
-        VLF("MSG: Mount::pollGotos(); home reached");
+        VLF("MSG: Mount::gotoPoll(); home reached");
         gotoStage = GG_DESTINATION;
         destination = target;
       } else {
-        VLF("MSG: Mount::pollGotos(); waypoint reached");
+        VLF("MSG: Mount::gotoPoll(); waypoint reached");
         destination = home;
       }
 
       axis1.autoSlewStop();
       axis2.autoSlewStop();
-      VLF("MSG: Mount::pollGotos(); slew stopped");
+      VLF("MSG: Mount::gotoPoll(); slew stopped");
 
       axis1.markOriginCoordinate();
       axis2.markOriginCoordinate();
-      VLF("MSG: Mount::pollGotos(); origin coordinates set");
+      VLF("MSG: Mount::gotoPoll(); origin coordinates set");
 
       double a1, a2;
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
-      VLF("MSG: Mount::pollGotos(); target coordinates set");
+      VLF("MSG: Mount::gotoPoll(); target coordinates set");
 
       axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
       axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-      VLF("MSG: Mount::pollGotos(); slew started");
+      VLF("MSG: Mount::gotoPoll(); slew started");
     }
   } else
   if (gotoStage == GG_DESTINATION) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
-      VLF("MSG: Mount::pollGotos(); destination reached");
+      VLF("MSG: Mount::gotoPoll(); destination reached");
 
       axis1.autoSlewStop();
       axis2.autoSlewStop();
-      VLF("MSG: Mount::pollGotos(); slew stopped");
+      VLF("MSG: Mount::gotoPoll(); slew stopped");
 
       // flag the goto as finished
       gotoState = GS_NONE;
@@ -209,17 +209,17 @@ void Mount::pollGotos() {
       // lock tracking with movement
       axis1.setTracking(true);
       axis2.setTracking(true);
-      VLF("MSG: Mount::pollGotos(); automatic tracking resumed");
+      VLF("MSG: Mount::gotoPoll(); automatic tracking resumed");
 
       // kill this monitor
       tasks.setDurationComplete(gotoTaskHandle);
       gotoTaskHandle = 0;
-      VLF("MSG: Mount::pollGotos(); pollGotos task terminated");
+      VLF("MSG: Mount::gotoPoll(); goto monitor task terminated");
 
       return;
     }
 
-    // keep updating the axis targets to match
+    // keep updating the axis targets to match the mount target
     if (transform.mountType == ALTAZM) transform.equToHor(&target);
     double a1, a2;
     transform.mountToInstrument(&target, &a1, &a2);
@@ -228,7 +228,7 @@ void Mount::pollGotos() {
   }
 
   // keep moving the target (sidereal tracking)
-  target.h += radsPerCentisecond;
+ // target.h += radsPerCentisecond;
 }
 
 void Mount::setWaypoint() {

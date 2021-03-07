@@ -10,17 +10,17 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
+#if AXIS1_STEPS_PER_WORMROT == 0
+  #define AXIS1_PEC OFF
+#else
+  #define AXIS1_PEC ON
+#endif
+
 #include "../debug/Debug.h"
 #include "../commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
-
-#if STEPS_PER_WORM_ROTATION == 0
-  #define AXIS1_PEC OFF
-#else
-  #define AXIS1_PEC ON
-#endif
 
 enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
@@ -71,6 +71,11 @@ typedef struct Pec {
 } Pec;
 #pragma pack()
 
+typedef struct AlignState {
+  uint8_t currentStar;
+  uint8_t lastStar;
+} AlignState;
+
 typedef struct AltitudeError {
   uint8_t minExceeded:1;
   uint8_t maxExceeded:1;
@@ -109,10 +114,13 @@ class Mount {
     bool anyError();
 
     // monitor goto operation
-    void pollGotos();
+    void gotoPoll();
 
     // monitor guide operation
-    void pollGuides();
+    void guidePoll();
+
+    // monitor pec operation
+    void pecPoll();
 
     Transform  transform;
 
@@ -175,78 +183,100 @@ class Mount {
     // check for spiral guide using both axes
     bool isSpiralGuiding();
 
-    const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
-    const double stepsPerSecondAxis1 = AXIS1_STEPS_PER_DEGREE/240.0;
+    // disable PEC
+    void pecDisable();
+    // PEC low pass and linear regression filters
+    void pecCleanup();
 
+    const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
+    
     // current position in Mount coordinates (Observed Place with no corrections except index offset)
     // coordinates are either Horizon (a, z) or Equatorial (h, d) depending on the mountType
     Coordinate current;
-    TrackingState trackingState      = TS_NONE;
+    TrackingState trackingState         = TS_NONE;
     #if TRACK_REFRACTION_RATE_DEFAULT == ON
       RateCompensation rateCompensation = RC_REFR_RA;
     #else
       RateCompensation rateCompensation = RC_NONE;
     #endif
-    double     trackingRate          = 1.0;
-    double     trackingRateAxis1     = 0.0;
-    double     trackingRateAxis2     = 0.0;
-    double     deltaRateAxis1        = 0.0;
-    double     deltaRateAxis2        = 0.0;
+    float trackingRate                  = 1.0;
+    float trackingRateAxis1             = 0.0;
+    float trackingRateAxis2             = 0.0;
+    float deltaRateAxis1                = 0.0;
+    float deltaRateAxis2                = 0.0;
+    float stepsPerSiderealSecondAxis1   = 0.0;
+    float stepsPerCentisecondAxis1      = 0.0;
+
+    // align
+    AlignState alignState = {0, 0};
 
     // goto
-    PierSideSelect preferredPierSide = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
-    MeridianFlip meridianFlip        = MF_ALWAYS;
+    PierSideSelect preferredPierSide    = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
+    MeridianFlip meridianFlip           = MF_ALWAYS;
     Coordinate gotoTarget;
     Coordinate start, destination, target;
-    GotoState  gotoState             = GS_NONE;
-    GotoStage  gotoStage             = GG_START;
-    GotoState  gotoStateAbort        = GS_NONE;
-    GotoState  gotoStateLast         = GS_NONE;
-    uint8_t    gotoTaskHandle        = 0;
-    double     gotoTargetAxis1       = 0.0;
-    double     gotoTargetAxis2       = 0.0;
-    double     usPerStepDefault      = 64.0;
-    double     usPerStepBase         = 128.0;
+    GotoState  gotoState                = GS_NONE;
+    GotoStage  gotoStage                = GG_START;
+    GotoState  gotoStateAbort           = GS_NONE;
+    GotoState  gotoStateLast            = GS_NONE;
+    uint8_t    gotoTaskHandle           = 0;
+    float      usPerStepDefault         = 64.0;
+    float      usPerStepBase            = 128.0;
 
     // limits
-    bool       limitsEnabled         = false;
+    bool       limitsEnabled            = false;
     Limits limits = { { degToRad(-10), degToRad(85) }, degToRad(15), degToRad(15) };
 
     // homing
     Coordinate home;
-    bool       atHome                = true;
-    bool       waitingHome           = false;
-    bool       waitingHomeContinue   = false;
+    bool       atHome                   = true;
+    bool       waitingHome              = false;
+    bool       waitingHomeContinue      = false;
   
     // guiding
-    double     guideRateAxis1        = 0.0;
-    double     guideRateAxis2        = 0.0;
-    double     customGuideRateAxis1  = 0.0;
-    double     customGuideRateAxis2  = 0.0;
-    GuideState guideState            = GU_NONE;
-    GuideRateSelect guideRateSelect      = GR_20X;
-    GuideRateSelect guideRateSelectAxis1 = GR_20X;
-    GuideRateSelect guideRateSelectAxis2 = GR_20X;
-    GuideAction  guideActionAxis1    = GA_NONE;
-    GuideAction  guideActionAxis2    = GA_NONE;
-    unsigned long guideFinishTimeAxis1 = 0;
-    unsigned long guideFinishTimeAxis2 = 0;
+    float guideRateAxis1                = 0.0;
+    float guideRateAxis2                = 0.0;
+    float customGuideRateAxis1          = 0.0;
+    float customGuideRateAxis2          = 0.0;
+    GuideState      guideState          = GU_NONE;
+    GuideRateSelect guideRateSelect     = GR_20X;
+    GuideRateSelect guideRateSelectAxis1= GR_20X;
+    GuideRateSelect guideRateSelectAxis2= GR_20X;
+    GuideAction     guideActionAxis1    = GA_NONE;
+    GuideAction     guideActionAxis2    = GA_NONE;
+    unsigned long guideFinishTimeAxis1  = 0;
+    unsigned long guideFinishTimeAxis2  = 0;
 
     // pec
-    Pec  pec = {false, PEC_NONE, {0, 0}};
-    bool pecIndexSensedSinceLast = false;
-    int pecAnalogValue           = 0;
-    long pecWormRotationSeconds  = 0;
-    long pecBufferSize           = 0;
-    int8_t* pecBuffer;
+    long      pecBufferSize             = 0;
+    float     pecRateAxis1              = 0;
+    #if AXIS1_PEC == ON
+      Pec pec = {false, PEC_NONE, {0, 0}};
+      bool     pecIndexSensedSinceLast  = false;
+      int      pecAnalogValue           = 0;
+
+      bool     pecFirstRecording        = false;
+      long     pecRecordStopTime        = 0;
+      float    accPecGuideAxis1         = 0;
+      long     pecIndex                 = 0;
+      int      pecValue                 = 0;
+      long     wormRotationSteps        = 0;
+      long     lastWormRotationSteps    = -1;
+      long     wormSenseSteps           = 0;
+      bool     wormSenseAgain           = false;
+      uint32_t wormPeriodStartCs        = 0;
+      long     wormRotationSeconds      = 0;
+      bool     pecBufferStart           = false;
+      int8_t*  pecBuffer;
+    #endif
 
     // park
-    ParkState  parkState         = PS_UNPARKED;
+    ParkState parkState = PS_UNPARKED;
 
     // misc. settings stored in NV
-    Misc       misc = {false, false, false, false, 64.0, GR_20X};
+    Misc misc = {false, false, false, false, 64.0, GR_20X};
 
-    double     timerRateRatio    = 1.0;
+    float timerRateRatio = 1.0;
 
 };
 

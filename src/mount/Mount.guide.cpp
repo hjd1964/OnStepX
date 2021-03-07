@@ -97,7 +97,7 @@ CommandError Mount::startGuideAxis1(GuideAction guideAction, GuideRateSelect gui
   }
 
   // unlimited 0 means the maximum period, about 49 days
-  if (guideTimeLimit == 0) guideTimeLimit = 0xFFFFFFFF;
+  if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
   return CE_NONE;
@@ -131,7 +131,7 @@ CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect gui
   }
   
   // unlimited 0 means the maximum period, about 49 days
-  if (guideTimeLimit == 0) guideTimeLimit = 0xFFFFFFFF;
+  if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis2 = millis() + guideTimeLimit;
 
   return CE_NONE;
@@ -167,13 +167,12 @@ void Mount::stopGuideAxis2() {
   }
 }
 
-void Mount::pollGuides() {
+void Mount::guidePoll() {
   // check fast guide completion axis1
   if (guideActionAxis1 == GA_BREAK && guideRateAxis1 == 0.0 && !axis1.autoSlewActive()) {
     guideActionAxis1 = GA_NONE;
     updateTrackingRates();
-  } else {
-    // check for guide timeout axis1
+  } else { // check for guide timeout axis1
     if (guideActionAxis1 > GA_BREAK && (long)(millis() - guideFinishTimeAxis1) >= 0) stopGuideAxis1();
   }
 
@@ -181,10 +180,10 @@ void Mount::pollGuides() {
   if (guideActionAxis2 == GA_BREAK && guideRateAxis2 == 0.0 && !axis2.autoSlewActive()) {
     guideActionAxis2 = GA_NONE;
     updateTrackingRates();
-  } else {
-    // check for guide timeout axis2
+  } else { // check for guide timeout axis2
     if (guideActionAxis2 > GA_BREAK && (long)(millis() - guideFinishTimeAxis2) >= 0) stopGuideAxis2();
   }
+
 }
 
 bool Mount::isSpiralGuiding() {

@@ -22,7 +22,7 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "Mount.h"
 
-inline void mountGuideWrapper() { telescope.mount.pollGuides(); }
+inline void mountGuideWrapper() { telescope.mount.guidePoll(); }
 
 void Mount::init() {
 
@@ -30,20 +30,23 @@ void Mount::init() {
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS;
 
   // get PEC ready
-  initPec();
+  #if AXIS1_PEC == ON
+    initPec();
+  #endif
 
   // get the main axes ready
   axis1.init(1);
   axis2.init(2);
+  stepsPerSiderealSecondAxis1 = radToDeg(axis1.getStepsPerMeasure())/240.0;
+  stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO)/100.0;
 
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
 
-  // calculate base slew rate
+  // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0;
-
   if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
   if (misc.usPerStepCurrent > 2048) misc.usPerStepCurrent = 2048;
 
@@ -52,30 +55,31 @@ void Mount::init() {
   nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
 
   // start guide monitor task
-  VF("MSG: Mount, start mountGuide task... ");
+  VF("MSG: Mount, start guide monitor task... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) VL("success"); else VL("FAILED!");
 
-  // startup state
+  // startup state is reset and at home
   resetHome();
 
-  // automatic movement for axis1 and axis2
-  axis1.setTracking(true);
-  axis2.setTracking(true);
-
-  // get tracking and slewing ready
+  // get tracking ready
   #if TRACK_AUTOSTART == ON
     VLF("MSG: Mount, starting tracking");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+  #else
+    setTrackingState(TS_NONE);
   #endif
   updateTrackingRates();
+
+  // get slewing ready
   updateAccelerationRates();
 }
 
 void Mount::setTrackingState(TrackingState state) {
-  if (trackingState == TS_NONE) { axis1.enable(true); axis2.enable(true); }
   trackingState = state;
-  if (trackingState == TS_SIDEREAL) atHome = false;
+  axis1.setTracking(true);
+  axis2.setTracking(true);
+  if (trackingState == TS_SIDEREAL) { axis1.enable(true); axis2.enable(true); atHome = false; }
 }
 
 void Mount::updatePosition() {
@@ -87,8 +91,15 @@ void Mount::updateTrackingRates() {
     trackingRateAxis1 = trackingRate;
     if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
   }
-  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) { trackingRateAxis1 = 0; trackingRateAxis2 = 0; }
-  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO);
+  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
+    trackingRateAxis1 = 0;
+    trackingRateAxis2 = 0;
+  } else {
+    #ifdef HAL_FAST_PROCESSOR
+      stepsPerCentisecondAxis1 = ((radToDeg(axis1.getStepsPerMeasure())/(trackingRateAxis1*240.0))*SIDEREAL_RATIO)/100.0;
+    #endif
+  }
+  axis1.setFrequency(siderealToRad(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO);
   axis2.setFrequency(siderealToRad(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO);
 }
 
