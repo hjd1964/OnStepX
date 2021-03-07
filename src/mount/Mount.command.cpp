@@ -107,7 +107,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (parkState == PS_PARKING)             reply[i++]='I'; else                // parking [I]n-progress
     if (parkState == PS_PARKED)              reply[i++]='P'; else                // [P]arked
     if (parkState == PS_PARK_FAILED)         reply[i++]='F';                     // park [F]ailed
-    if (pec.recorded)                        reply[i++]='R';                     // PEC data has been [R]ecorded
     if (misc.syncToEncodersOnly)             reply[i++]='e';                     // sync to [e]ncoders only
     if (atHome)                              reply[i++]='H';                     // at [H]ome
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
@@ -124,12 +123,14 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (misc.buzzer)                         reply[i++]='z';                     // bu[z]zer enabled?
     if (transform.mountType==GEM && misc.meridianFlipAuto) reply[i++]='a';       // [a]uto meridian flip
     #if AXIS1_PEC == ON
-      if (transform.mountType != ALTAZM)     reply[i++]="/,~;^"[(int)pecState];  // PEC State (/)gnore, ready (,)lay, (~)laying, ready (;)ecord, (^)ecording
+      if (pec.recorded)                      reply[i++]='R';                     // PEC data has been [R]ecorded
+      if (transform.mountType != ALTAZM)     reply[i++]="/,~;^"[(int)pec.state]; // PEC State (/)gnore, ready (,)lay, (~)laying, ready (;)ecord, (^)ecording
     #endif
     if (transform.mountType == GEM)          reply[i++]='E'; else                // GEM
     if (transform.mountType == FORK)         reply[i++]='K'; else                // FORK
     if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
 
+    updatePosition();
     if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // pier side n[o]ne
     if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // pier side eas[T]
     if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // pier side [W]est
@@ -172,7 +173,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (misc.buzzer)                             reply[2]|=0b10001000;           // Buzzer enabled?
     if (transform.mountType == GEM && misc.meridianFlipAuto)
                                                  reply[2]|=0b10010000;           // Auto meridian flip
-    if (pec.recorded)                            reply[2]|=0b10100000;           // PEC data has been recorded
 
     if (transform.mountType == GEM)              reply[3]|=0b10000001; else      // GEM
     if (transform.mountType == FORK)             reply[3]|=0b10000010; else      // FORK
@@ -184,9 +184,9 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
 
     #if AXIS1_PEC == ON
-      if (transform.mountType != ALTAZM) {
-        reply[4] = (int)pecState|0b10000000;                                     // PEC state: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
-      }
+      if (transform.mountType != ALTAZM)
+        reply[4] = (int)pec.state|0b10000000;                                    // PEC state: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
+      if (pec.recorded)                          reply[4]|=0b11000000;           // PEC state: data has been recorded
     #endif
     reply[5] = (int)parkState|0b10000000;                                        // Park state: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
     reply[6] = (int)misc.pulseGuideRateSelect|0b10000000;                        // Pulse-guide selection
