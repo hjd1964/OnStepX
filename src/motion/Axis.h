@@ -70,6 +70,7 @@ class Axis {
     // set and get instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
     double getInstrumentCoordinate();
+    void incrementTargetCoordinate(double value);
 
     // mark origin coordinate as current location
     void markOriginCoordinate();
@@ -171,6 +172,7 @@ class Axis {
 
     volatile bool invertStep = false;
     volatile bool invertDir = false;
+    double target = 0.0;
     volatile long targetSteps = 0;
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;

@@ -201,6 +201,7 @@ void Axis::markOriginCoordinate() {
 }
 
 void Axis::setTargetCoordinate(double value) {
+  target = value;
   long steps = lround(value*settings.stepsPerMeasure);
   noInterrupts();
   targetSteps = steps - indexSteps;
@@ -212,6 +213,11 @@ double Axis::getTargetCoordinate() {
   long steps = targetSteps + indexSteps;
   interrupts();
   return steps/settings.stepsPerMeasure;
+}
+
+void Axis::incrementTargetCoordinate(double value) {
+  target += value;
+  setTargetCoordinate(value);
 }
 
 bool Axis::nearTarget() {
@@ -334,18 +340,18 @@ void Axis::setFrequency(float frequency) {
   }
 
   lastFreq = frequency;
-  // frequency in measures per second to microsecond counts per step
-  float f = 1000000.0F/(frequency*settings.stepsPerMeasure);
-  if (f < minPeriodMicros) f = minPeriodMicros;
-  if (STEP_WAVE_FORM == SQUARE) f /= 2.0F;
-  if (!isnan(f) && fabs(f) <= 134000000.0F) {
+  // frequency in measures per second to period in microsecond counts per step
+  float period = 1000000.0F/(frequency*settings.stepsPerMeasure);
+  if (period < minPeriodMicros) period = minPeriodMicros;
+  if (STEP_WAVE_FORM == SQUARE) period /= 2.0F;
+  if (!isnan(period) && fabs(period) <= 134000000.0F) {
     // convert microsecond counts to sub-microsecond counts
-    f *= 16.0F;
-    lastPeriod = (unsigned long)lround(f);
+    period *= 16.0F;
+    lastPeriod = (unsigned long)lround(period);
     // adjust period for MCU clock inaccuracy
-    f *= (SIDEREAL_PERIOD/periodSubMicros);
-  } else { f = 0.0; lastPeriod = 0; }
-  tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(f));
+    period *= (SIDEREAL_PERIOD/periodSubMicros);
+  } else { period = 0.0; lastPeriod = 0; }
+  tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(period));
 }
 
 float Axis::getFrequency() {
@@ -354,7 +360,11 @@ float Axis::getFrequency() {
 
 float Axis::getFrequencySteps() {
   if (lastPeriod == 0) return 0;
-  return 16000000.0F/(lastPeriod * 2UL);
+  #if STEP_WAVE_FORM == SQUARE
+      return 16000000.0F/(lastPeriod*2.0F);
+    #else
+      return 16000000.0F/lastPeriod;
+  #endif
 }
 
 void Axis::setTracking(bool state) {
@@ -440,87 +450,75 @@ void Axis::enableMoveFast(bool fast) {
   #endif
  }
 
-IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
-  if (takeStep) {
-    if (direction == DIR_FORWARD) {
-      if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
-      digitalWriteF(stepPin, HIGH);
-    } else
-    if (direction == DIR_REVERSE) {
-      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
-      digitalWriteF(stepPin, HIGH);
-    }
-  } else {
-    if (tracking) targetSteps += trackingStep;
-    if (motorSteps + backlashSteps < targetSteps) {
-      direction = DIR_FORWARD;
-      digitalWriteF(dirPin, invertDir?HIGH:LOW);
-    } else if (motorSteps + backlashSteps > targetSteps) {
-      direction = DIR_REVERSE;
-      digitalWriteF(dirPin, invertDir?LOW:HIGH);
-    } else direction = DIR_NONE;
-    if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
-    digitalWriteF(stepPin, LOW);
-  }
-  takeStep = !takeStep;
-}
-
-#if MODE_SWITCH == ON
-  #if STEP_WAVE_FORM == SQUARE
-  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+#if STEP_WAVE_FORM == SQUARE
+  IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
-    if (tracking) targetSteps += trackingStep;
-      if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
-    } else digitalWriteF(stepPin, LOW);
-    takeStep = !takeStep;
-  }
-  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
-    if (takeStep) {
-    if (tracking) targetSteps += trackingStep;
-      if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
-    } else digitalWriteF(stepPin, LOW);
-    takeStep = !takeStep;
-  }
-  #endif
-  #if STEP_WAVE_FORM == PULSE
-  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
-    digitalWriteF(stepPin, LOW);
-    if (tracking) targetSteps += trackingStep;
-    if (motorSteps < targetSteps) { motorSteps += step; digitalWriteF(stepPin, HIGH); }
-  }
-  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
-    digitalWriteF(stepPin, LOW);
-    if (tracking) targetSteps += trackingStep;
-    if (motorSteps > targetSteps) { motorSteps -= step; digitalWriteF(stepPin, HIGH); }
-  }
-  #endif
-#else
-  #if STEP_WAVE_FORM == SQUARE
-    IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
-      if (takeStep) {
-        if (tracking) targetSteps += trackingStep;
-        if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
-      } else digitalWriteF(stepPin, LOW);
-      takeStep = !takeStep;
-    }
-    IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
-      if (takeStep) {
-        if (tracking) targetSteps += trackingStep;
-        if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
-      } else digitalWriteF(stepPin, LOW);
-      takeStep = !takeStep;
-    }
-  #endif
-  #if STEP_WAVE_FORM == PULSE
-    IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+      if (direction == DIR_FORWARD) {
+        if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
+        digitalWriteF(stepPin, HIGH);
+      } else
+      if (direction == DIR_REVERSE) {
+        if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+        digitalWriteF(stepPin, HIGH);
+      }
+    } else {
+      if (tracking) targetSteps += trackingStep;
+      if (motorSteps + backlashSteps < targetSteps) {
+        direction = DIR_FORWARD;
+        digitalWriteF(dirPin, invertDir?HIGH:LOW);
+      } else if (motorSteps + backlashSteps > targetSteps) {
+        direction = DIR_REVERSE;
+        digitalWriteF(dirPin, invertDir?LOW:HIGH);
+      } else direction = DIR_NONE;
       digitalWriteF(stepPin, LOW);
+      #if MODE_SWITCH == ON
+        if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
+      #endif
+    }
+    takeStep = !takeStep;
+  }
+  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+    if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
-    }
-    IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
-      digitalWriteF(stepPin, LOW);
+    } else digitalWriteF(stepPin, LOW);
+    takeStep = !takeStep;
+  }
+  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
-    }
-  #endif
+    } else digitalWriteF(stepPin, LOW);
+    takeStep = !takeStep;
+  }
+#endif
+#if STEP_WAVE_FORM == PULSE
+  IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
+    digitalWriteF(stepPin, LOW);
+    if (tracking) targetSteps += trackingStep;
+    if (motorSteps + backlashSteps < targetSteps) {
+      digitalWriteF(dirPin, invertDir?HIGH:LOW);
+      direction = DIR_FORWARD;
+      if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
+    } else 
+    if (motorSteps + backlashSteps > targetSteps) {
+      digitalWriteF(dirPin, invertDir?LOW:HIGH);
+      direction = DIR_REVERSE;
+      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+    } else { direction = DIR_NONE; return; }
+    digitalWriteF(stepPin, HIGH);
+    #if MODE_SWITCH == ON
+      if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
+    #endif
+  }
+  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+    digitalWriteF(stepPin, LOW);
+    if (tracking) targetSteps += trackingStep;
+    if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
+  }
+  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+    digitalWriteF(stepPin, LOW);
+    if (tracking) targetSteps += trackingStep;
+    if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
+  }
 #endif
