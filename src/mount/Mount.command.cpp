@@ -349,12 +349,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
   // T - Tracking Commands
   //
-  // :To#       Track full compensation on
-  // :Tr#       Track refraction compensation on
-  // :Tn#       Track compensation off
-  // :T1#       Track dual axis off (disable Dec tracking on Eq mounts)
-  // :T2#       Track dual axis on
-  //
   // :TS#       Track rate solar    60Hz
   // :TK#       Track rate king     60.136Hz
   // :TL#       Track rate lunar    57.9Hz
@@ -367,12 +361,18 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //
   // :Te#       Tracking enable
   // :Td#       Tracking disable
+  //
+  // :To#       Track full compensation on
+  // :Tr#       Track refraction compensation on
+  // :Tn#       Track compensation off
+  // :T1#       Track dual axis off (disable Dec tracking on Eq mounts)
+  // :T2#       Track dual axis on
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
     if (command[1] == 'o' && transform.mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else
     if (command[1] == 'r' && transform.mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else
-    if (command[1] == 'n' && transform.mountType != ALTAZM) { rateCompensation = RC_NONE;    }
+    if (command[1] == 'n' && transform.mountType != ALTAZM) { rateCompensation = RC_NONE;    } else
     if (command[1] == '1' && transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_BOTH) rateCompensation = RC_REFR_RA; else
       if (rateCompensation == RC_FULL_BOTH) rateCompensation = RC_FULL_RA;
