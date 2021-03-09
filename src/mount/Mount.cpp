@@ -23,6 +23,7 @@ extern Telescope telescope;
 #include "Mount.h"
 
 inline void mountGuideWrapper() { telescope.mount.guidePoll(); }
+inline void mountTrackingWrapper() { telescope.mount.trackPoll(); }
 
 void Mount::init() {
 
@@ -37,8 +38,8 @@ void Mount::init() {
   // get the main axes ready
   axis1.init(1);
   axis2.init(2);
-  stepsPerSiderealSecondAxis1 = radToDeg(axis1.getStepsPerMeasure())/240.0F;
-  stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*(float)SIDEREAL_RATIO)/100.0F;
+  stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
+  stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
@@ -71,6 +72,10 @@ void Mount::init() {
   #endif
   updateTrackingRates();
 
+  // start tracking monitor task
+  VF("MSG: Mount, start tracking monitor task... ");
+  if (tasks.add(1000, 0, true, 7, mountTrackingWrapper, "MntTrk")) VL("success"); else VL("FAILED!");
+
   // get slewing ready
   updateAccelerationRates();
 }
@@ -87,20 +92,111 @@ void Mount::updatePosition() {
 }
 
 void Mount::updateTrackingRates() {
-  if (transform.mountType != ALTAZM) {
-    trackingRateAxis1 = trackingRate;
-    if (rateCompensation != RC_REFR_BOTH && rateCompensation != RC_FULL_BOTH) trackingRateAxis2 = 0;
-  }
   if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
     trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
-  } else {
-    #ifdef HAL_FAST_PROCESSOR
-      stepsPerCentisecondAxis1 = ((radToDeg(axis1.getStepsPerMeasure())/(trackingRateAxis1*240.0))*SIDEREAL_RATIO)/100.0;
-    #endif
   }
-  axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1 + deltaRateAxis1)*SIDEREAL_RATIO_F);
-  axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2 + deltaRateAxis2)*SIDEREAL_RATIO_F);
+  axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
+  axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
+}
+
+#ifdef HAL_NO_DOUBLE_PRECISION
+  #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
+  #define DiffRange2 0.017453292F          // 60 arc-minutes in radians
+#else
+  #define DiffRange  2.908882086657216e-4L // 1 arc-minute in radians
+  #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
+#endif
+
+void Mount::trackPoll() {
+  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
+    trackingRateAxis1 = 0.0F;
+    trackingRateAxis2 = 0.0F;
+    updateTrackingRates();
+    return;
+  }
+
+  if (rateCompensation == RC_NONE && transform.mountType != ALTAZM) {
+    trackingRateAxis1 = trackingRate;
+    trackingRateAxis2 = 0.0F;
+    updateTrackingRates();
+    return;
+  }
+
+  updatePosition(); Y;
+  if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
+  Coordinate ahead = current;
+  Coordinate behind = current;
+
+  // get positions 1 (or 10) arc-min ahead and behind the current
+  ahead.h  += DiffRange;
+  behind.h -= DiffRange;
+
+  // apply pointing model
+  if (rateCompensation == RC_FULL_RA || rateCompensation == RC_FULL_BOTH) {
+    transform.mountToObservedPlace(&ahead); Y;
+    transform.mountToObservedPlace(&behind); Y;
+  }
+
+  // apply refraction
+  transform.topocentricToObservedPlace(&ahead); Y;
+  transform.topocentricToObservedPlace(&behind); Y;
+
+  if (transform.mountType == ALTAZM) {
+    // convert back into horizon coordinates
+    transform.equToHor(&ahead); Y;
+    transform.equToHor(&behind); Y;
+
+    // calculate the Azm tracking rate
+    if (ahead.z < -Deg90 && behind.z > Deg90) ahead.z += Deg360;
+    if (behind.z < -Deg90 && ahead.z > Deg90) behind.z += Deg360;
+    float rate1 = (behind.z - ahead.z)/DiffRange2;
+    if (fabs(trackingRateAxis1 - rate1) <= 0.005F)
+      trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
+
+    // calculate the Alt tracking rate
+    float rate2 = (behind.a - ahead.a)/DiffRange2;
+    if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
+
+    // override for special case of near a celestial pole
+    if (fabs(current.d) > Deg85) { trackingRateAxis1 = 0.0F; trackingRateAxis2 = 0.0F; }
+  } else {
+    // calculate the RA tracking rate
+    if (ahead.h < -Deg90 && behind.h > Deg90) ahead.h += Deg360;
+    if (behind.h < -Deg90 && ahead.h > Deg90) behind.h += Deg360;
+    float rate1 = (ahead.h - behind.h)/DiffRange2;
+
+    if (fabs(trackingRateAxis1 - rate1) <= 0.005F)
+      trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
+
+    // calculate the Dec tracking rate
+    if (rateCompensation == RC_REFR_BOTH || rateCompensation == RC_FULL_BOTH) {
+      float rate2;
+      if (current.pierSide == PIER_SIDE_WEST) rate2 = (behind.d - ahead.d)/DiffRange2; else rate2 = (ahead.d - behind.d)/DiffRange2;
+      if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
+    } else trackingRateAxis2 = 0.0F;
+
+    // override RA rate for special case of near a celestial pole
+    if (Deg90 - fabs(current.d) < OneArcSec) { trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
+
+    // override for both rates for special case near the zenith
+    if (current.a > Deg85) { trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
+  }
+  updateTrackingRates();
+}
+
+float Mount::ztr(float a) {
+  if (a > degToRad(89.8F)) return 0.99998667F; else if (a > degToRad(89.5F)) return 0.99996667F;
+
+  float altH = a + degToRad(0.25F); if (altH < 0.0F) altH = 0.0F;
+  float altL = a - degToRad(0.25F); if (altL < 0.0F) altL = 0.0F;
+
+  float altHr = altH - transform.trueRefrac(altH);
+  float altLr = altL - transform.trueRefrac(altL);
+
+  float r = (altH - altL)/(altHr - altLr);
+  if (r > 1.0F) r = 1.0F;
+  return r;
 }
 
 void Mount::updateAccelerationRates() {

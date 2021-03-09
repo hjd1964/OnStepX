@@ -122,6 +122,9 @@ class Mount {
     // monitor pec operation
     void pecPoll();
 
+    // calculate tracking rates for alt/azm, refraction, and pointing model in the background
+    void trackPoll();
+
     Transform  transform;
 
     Axis axis1;
@@ -152,26 +155,24 @@ class Mount {
     // change tracking state
     void setTrackingState(TrackingState state);
 
+    // Alternate tracking rate calculation method
+    float ztr(float a);
+
     // update where we are pointing *now*
     void updatePosition();
-
-    // update tracking rates for refraction, pointing model, and alt/azm tracking
+    // update tracking rates
     void updateTrackingRates();
-
     // update acceleration rates for goto and guiding
     void updateAccelerationRates();
-
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
     // return guide rate (sidereal x) for guide rate selection
     float guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);
-
     // valid guide on Axis1
     bool validGuideAxis1(GuideAction guideAction);
     // valid guide on Axis2
     bool validGuideAxis2(GuideAction guideAction);
-
     // start guide on Axis1
     CommandError startGuideAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // start guide on Axis2
@@ -202,10 +203,9 @@ class Mount {
     float trackingRate                  = 1.0F;
     float trackingRateAxis1             = 0.0F;
     float trackingRateAxis2             = 0.0F;
-    float deltaRateAxis1                = 0.0F;
-    float deltaRateAxis2                = 0.0F;
     float stepsPerSiderealSecondAxis1   = 0.0F;
-    float stepsPerCentisecondAxis1      = 0.0F;
+    double stepsPerCentisecondAxis1     = 0.0F;
+    double stepsPerCentisecondAxis2     = 0.0F;
 
     // align
     AlignState alignState = {0, 0};
