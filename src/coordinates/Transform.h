@@ -75,7 +75,7 @@ class Transform {
 
   private:
 
-    double cot(double n);
+    float cotf(float n);
     
     // adjust coordinate back into 0 to 360 "degrees" range (in radians)
     double backInRads(double angle);

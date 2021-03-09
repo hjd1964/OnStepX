@@ -71,7 +71,6 @@ void Transform::observedPlaceToMount(Coordinate *coord) {
   // de-apply the pointing model
 }
 
-// converts from instrument to mount coordinates
 Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
 
@@ -103,10 +102,10 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
   if (mountType != ALTAZM) {
     // within about 1/20 arc-second of NCP or SCP
     #if MOUNT_COORDS == TOPO_STRICT
-      if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
-      if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
+      if (fabs(coord->d - Deg90) < OneArcSec) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
+      if (fabs(coord->d + Deg90) < OneArcSec) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
     #else
-      if (fabs(coord->d - Deg90) < SmallestRad || fabs(coord->d + Deg90) < SmallestRad) return; else equToHor(coord);
+      if (fabs(coord->d - Deg90) < OneArcSec || fabs(coord->d + Deg90) < OneArcSec) return; else equToHor(coord);
     #endif
   }
   coord->a += trueRefrac(coord->a);
@@ -117,10 +116,10 @@ void Transform::observedPlaceToTopocentric(Coordinate *coord) {
   if (mountType != ALTAZM) {
     // within about 1/20 arc-second of the "refracted" NCP or SCP
     #if MOUNT_COORDS == TOPO_STRICT
-      if (fabs(coord->d - Deg90) < SmallestRad) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
-      if (fabs(coord->d + Deg90) < SmallestRad) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
+      if (fabs(coord->d - Deg90) < OneArcSec) { coord->z = 0.0;    coord->a =  site.latitude.value; } else
+      if (fabs(coord->d + Deg90) < OneArcSec) { coord->z = Deg180; coord->a = -site.latitude.value; } else equToHor(coord);
     #else  
-      if (fabs(coord->d - Deg90) < SmallestRad || fabs(coord->d + Deg90) < SmallestRad) return; else equToHor(coord);
+      if (fabs(coord->d - Deg90) < OneArcSec || fabs(coord->d + Deg90) < OneArcSec) return; else equToHor(coord);
     #endif
   }
   coord->a -= apparentRefrac(coord->a);
@@ -168,13 +167,13 @@ void Transform::horToEqu(Coordinate *coord) {
 }
 
 double Transform::trueRefrac(double altitude) {
-  double pressure = 1010.0;
-  double temperature = 10.0;
+  float pressure = 1010.0F;
+  float temperature = 10.0F;
   if (isnan(siteConditions.pressure)) pressure = siteConditions.pressure;
   if (isnan(siteConditions.temperature)) temperature = siteConditions.temperature;
-  double TPC = (pressure/1010.0)*(283.0/(273.0 + temperature));
-  double r   = 2.96705972855e-4*cot(altitude + 0.17977/(altitude + 0.08919))*TPC;
-  if (r < 0.0) r = 0.0;
+  float TPC = (pressure/1010.0F)*(283.0F/(273.0F + temperature));
+  float r   = 2.9670597e-4F*cotf(altitude + 0.0031375594F/(altitude + 0.089186324F))*TPC;
+  if (r < 0.0F) r = 0.0F;
   return r;
 }
 
@@ -183,8 +182,8 @@ double Transform::apparentRefrac(double altitude) {
   return trueRefrac(altitude - r);
 }
 
-double Transform::cot(double n) {
-  return 1.0/tan(n);
+float Transform::cotf(float n) {
+  return 1.0F/tanf(n);
 }
 
 double Transform::backInRads(double angle) {
