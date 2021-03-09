@@ -122,8 +122,13 @@
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
-#define RAD_DEG_RATIO               ((double)57.29577951308232L)
-#define RAD_HOUR_RATIO              ((double)3.819718634205488L)
+#define RAD_DEG_RATIO_L             57.29577951308232L
+#define RAD_DEG_RATIO               57.29577951308232
+#define RAD_DEG_RATIO_F             57.295780F
+#define RAD_HOUR_RATIO_L            3.819718634205488L
+#define RAD_HOUR_RATIO              3.819718634205488
+#define RAD_HOUR_RATIO_F            3.8197186F
+#define SIDEREAL_RATIO_L            1.002737909350795L
 #define SIDEREAL_RATIO              1.002737909350795
 #define SIDEREAL_RATIO_F            1.0027379F
 #define SIDEREAL_PERIOD             15956313.06126534
@@ -132,13 +137,14 @@
 #define Deg20                       0.349065850398865
 #define Deg45                       0.785398163397448
 #define Deg60                       1.047197551196597
+#define Deg85                       1.483529864195180
 #define Deg90                       1.570796326794896
 #define Deg180                      3.141592653589793
 #define Deg360                      6.283185307179586
 
 // for handling degenerate spherical coordinates near the poles
-#define SmallestRad                 0.000005
-#define SmallestFloat               0.00000001
+#define OneArcSec                   0.0000048481368F
+#define SmallestFloat               0.0000001F
 
 // conversion math
 #define degToRad(x)                 ((x)/RAD_DEG_RATIO)
