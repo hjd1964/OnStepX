@@ -63,6 +63,9 @@ class Site {
     // gets the time in sidereal hours
     double getSiderealTime();
 
+    // checks if date and time were set
+    bool dateTimeReady();
+
     // callback to tick the centisecond sidereal clock
     void tick();
 

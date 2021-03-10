@@ -208,11 +208,25 @@ void Axis::setTargetCoordinate(double value) {
   interrupts();
 }
 
+void Axis::setTargetCoordinateSteps(long value) {
+  target = value/settings.stepsPerMeasure;
+  noInterrupts();
+  targetSteps = value - indexSteps;
+  interrupts();
+}
+
 double Axis::getTargetCoordinate() {
   noInterrupts();
   long steps = targetSteps + indexSteps;
   interrupts();
   return steps/settings.stepsPerMeasure;
+}
+
+long Axis::getTargetCoordinateSteps() {
+  noInterrupts();
+  long steps = targetSteps + indexSteps;
+  interrupts();
+  return steps;
 }
 
 void Axis::incrementTargetCoordinate(double value) {
@@ -221,7 +235,7 @@ void Axis::incrementTargetCoordinate(double value) {
 }
 
 bool Axis::nearTarget() {
-  return fabs(motorSteps - targetSteps) <= step * 2.0;
+  return motorSteps - targetSteps <= step * 2;
 }
 
 double Axis::getOriginOrTargetDistance() {
@@ -452,6 +466,9 @@ void Axis::enableMoveFast(bool fast) {
 
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
+    #if MODE_SWITCH == ON
+      if (microstepModeControl == SLEWING_READY) return;
+    #endif
     if (takeStep) {
       if (direction == DIR_FORWARD) {
         if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
@@ -461,6 +478,9 @@ void Axis::enableMoveFast(bool fast) {
         if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
         digitalWriteF(stepPin, HIGH);
       }
+      #if MODE_SWITCH == ON
+        if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepGoto == 0) microstepModeControl = SLEWING_READY;
+      #endif
     } else {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps + backlashSteps < targetSteps) {
@@ -494,6 +514,9 @@ void Axis::enableMoveFast(bool fast) {
 #endif
 #if STEP_WAVE_FORM == PULSE
   IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
+    #if MODE_SWITCH == ON
+      if (microstepModeControl == SLEWING_READY) return;
+    #endif
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps + backlashSteps < targetSteps) {
@@ -508,7 +531,7 @@ void Axis::enableMoveFast(bool fast) {
     } else { direction = DIR_NONE; return; }
     digitalWriteF(stepPin, HIGH);
     #if MODE_SWITCH == ON
-      if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
+      if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepGoto == 0) microstepModeControl = SLEWING_READY;
     #endif
   }
   IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {

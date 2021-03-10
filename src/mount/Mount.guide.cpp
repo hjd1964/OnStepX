@@ -72,7 +72,7 @@ bool Mount::validGuideAxis2(GuideAction guideAction) {
 CommandError Mount::startGuideAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
   if (axis1.error.driverFault || axis1.error.motorFault) return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (parkState == PS_PARKED)          return CE_SLEW_ERR_IN_PARK;
+  if (park.state == PS_PARKED)         return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)            return CE_SLEW_IN_MOTION;
   if (isSpiralGuiding())               return CE_SLEW_IN_MOTION;
   if (!validGuideAxis1(guideAction))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
@@ -106,7 +106,7 @@ CommandError Mount::startGuideAxis1(GuideAction guideAction, GuideRateSelect gui
 CommandError Mount::startGuideAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
   if (axis2.error.driverFault || axis2.error.motorFault) return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (parkState == PS_PARKED)          return CE_SLEW_ERR_IN_PARK;
+  if (park.state == PS_PARKED)         return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)            return CE_SLEW_IN_MOTION;
   if (isSpiralGuiding())               return CE_SLEW_IN_MOTION;
   if (!validGuideAxis2(guideAction))   return CE_SLEW_ERR_OUTSIDE_LIMITS;

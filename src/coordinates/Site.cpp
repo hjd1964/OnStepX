@@ -89,6 +89,10 @@ void Site::setSiderealTime(JulianDate julianDate, double time) {
   interrupts();
 }
 
+bool Site::dateTimeReady() {
+  return dateIsReady && timeIsReady;
+}
+
 double Site::backInHours(double time) {
   while (time >= 24.0) time -= 24.0;
   while (time < 0.0)   time += 24.0;

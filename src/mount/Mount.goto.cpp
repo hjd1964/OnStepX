@@ -23,7 +23,7 @@ inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
 CommandError Mount::validateGoto() {
   if ( axis1.fault()     ||  axis2.fault())        return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled())    return CE_SLEW_ERR_IN_STANDBY;
-  if (parkState  != PS_UNPARKED)                   return CE_SLEW_ERR_IN_PARK;
+  if (park.state == PS_PARKED)                     return CE_SLEW_ERR_IN_PARK;
   if (guideState != GU_NONE)                       return CE_SLEW_IN_MOTION;
   if (gotoState  == GS_GOTO_SYNC)                  return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)                       return CE_SLEW_IN_SLEW;
@@ -42,14 +42,18 @@ CommandError Mount::validateGotoCoords(Coordinate *coords) {
   return CE_NONE;
 }
 
-CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect) {
+CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
   CommandError e = validateGoto();
   if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { axis1.enable(true); axis2.enable(true); e = validateGoto(); }
   if (e != CE_NONE) return e;
 
   target = *coords;
-  transform.rightAscensionToHourAngle(&target);
+  if (native) {
+    transform.rightAscensionToHourAngle(&target);
+    transform.nativeToMount(&target);
+  }
   transform.equToHor(&target);
+
   e = validateGotoCoords(&target);
   if (e != CE_NONE) return e;
 
@@ -61,7 +65,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
   target.pierSide = current.pierSide;
 
   double a1, a2;
-  transform.nativeToMount(&target, &a1, &a2);
+  if (transform.mountType == ALTAZM) { a1 = target.z; a2 = target.a; } else { a1 = target.h; a2 = target.d; }
 
   if (meridianFlip != MF_ALWAYS) { target.pierSide = PIER_SIDE_EAST; return CE_NONE; }
 
@@ -86,8 +90,8 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
   return CE_NONE;
 }
 
-CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
-  CommandError e = setMountTarget(coords, pierSideSelect);
+CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
+  CommandError e = setMountTarget(coords, pierSideSelect, native);
   if (e != CE_NONE) return e;
   
   double a1, a2;
@@ -103,8 +107,8 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
   return CE_NONE;
 }
 
-CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
-  CommandError e = setMountTarget(coords, pierSideSelect);
+CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
+  CommandError e = setMountTarget(coords, pierSideSelect, native);
   if (e != CE_NONE) return e;
 
   limitsEnabled = true;
@@ -141,6 +145,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect) {
     transform.mountToInstrument(&destination, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
+    if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
 
     // slew rate in rads per second
@@ -181,6 +186,7 @@ void Mount::gotoPoll() {
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
+      if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
       VLF("MSG: Mount::gotoPoll(); target coordinates set");
 
       axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
@@ -198,14 +204,17 @@ void Mount::gotoPoll() {
       axis1.autoSlewRateByDistanceStop();
       axis2.autoSlewRateByDistanceStop();
 
-      // flag the goto as finished
-      gotoState = GS_NONE;
-      gotoStage = GG_NONE;
-
       // lock tracking with movement
       axis1.setTracking(true);
       axis2.setTracking(true);
       VLF("MSG: Mount::gotoPoll(); automatic tracking resumed");
+
+      // check if parking and mark as finished
+      if (park.state == PS_PARKING && gotoState != GS_GOTO_ABORT) parkFinish();
+
+      // flag the goto as finished
+      gotoState = GS_NONE;
+      gotoStage = GG_NONE;
 
       // back to normal tracking
       updateTrackingRates();
@@ -217,6 +226,10 @@ void Mount::gotoPoll() {
 
       return;
     }
+    
+    axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
+    axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
+
     // keep updating mount target
     target.h += radsPerCentisecond;
     // keep updating the axis targets to match the mount target

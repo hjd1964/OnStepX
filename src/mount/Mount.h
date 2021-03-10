@@ -22,18 +22,18 @@
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 
-enum MeridianFlip     {MF_NEVER, MF_ALWAYS};
-enum RateCompensation {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
-enum TrackingState    {TS_NONE, TS_SIDEREAL};
-enum GotoState        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_ABORT};
-enum GotoStage        {GG_NONE, GG_START, GG_WAYPOINT, GG_DESTINATION};
-enum GotoType         {GT_NONE, GT_HOME, GT_PARK};
-enum PierSideSelect   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
-enum GuideState       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
-enum GuideRateSelect  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
-enum GuideAction      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE};
-enum ParkState        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
-enum PecState         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
+enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
+enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
+enum TrackingState: uint8_t    {TS_NONE, TS_SIDEREAL};
+enum GotoState: uint8_t        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_ABORT};
+enum GotoStage: uint8_t        {GG_NONE, GG_START, GG_WAYPOINT, GG_DESTINATION};
+enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
+enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
+enum GuideState: uint8_t       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
+enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
+enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE};
+enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
+enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 
 #pragma pack(1)
 typedef struct AltitudeLimits {
@@ -48,27 +48,36 @@ typedef struct Limits {
   float pastMeridianW;
 } Limits;
 
-#define MiscSize 9
+#define MiscSize 6
 typedef struct Misc {
   bool syncToEncodersOnly:1;
   bool meridianFlipAuto  :1;
   bool meridianFlipPause :1;
-  bool buzzer:1;
+  bool buzzer            :1;
   float usPerStepCurrent;
   GuideRateSelect pulseGuideRateSelect;
 } Misc;
 
-typedef struct Worm {
-  long rotationSteps;
-  long sensePositionSteps;
-} Worm;
-
-#define PecSize 13
+#define PecSize 6
 typedef struct Pec {
   bool recorded:1;
   PecState state;
-  Worm worm;
+  long wormRotationSteps;
 } Pec;
+
+typedef struct ParkPosition {
+  float h;
+  float d;
+  PierSide pierSide;
+} ParkPosition;
+
+#define ParkSize 15
+typedef struct Park {
+  ParkPosition position;
+  bool         saved:1;
+  ParkState    state;
+  long         wormSensePositionSteps;
+} Park;
 #pragma pack()
 
 typedef struct AlignState {
@@ -95,7 +104,7 @@ typedef struct MountError {
 class Mount {
   public:
     void init();
-    void initPec();
+    void pecInit();
 
     // handle mount commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -137,27 +146,22 @@ class Mount {
     CommandError validateGoto();
     // target coordinate checks ahead of sync or goto
     CommandError validateGotoCoords(Coordinate *coords);
-
-    CommandError setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect);
-
+    // set goto or sync target
+    CommandError setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
     // sync. to equatorial coordinates
-    CommandError syncEqu(Coordinate *coords, PierSideSelect pierSideSelect);
-
+    CommandError syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
     // goto equatorial coordinates
-    CommandError gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect);
-
-    // reset mount
-    CommandError resetHome();
-
+    CommandError gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
     // set any waypoints required for a goto
     void setWaypoint();
 
+    // reset mount at home
+    CommandError resetHome();
+
     // change tracking state
     void setTrackingState(TrackingState state);
-
     // Alternate tracking rate calculation method
     float ztr(float a);
-
     // update where we are pointing *now*
     void updatePosition();
     // update tracking rates
@@ -184,10 +188,23 @@ class Mount {
     // check for spiral guide using both axes
     bool isSpiralGuiding();
 
-    // disable PEC
-    void pecDisable();
-    // PEC low pass and linear regression filters
-    void pecCleanup();
+    #if AXIS1_PEC == ON
+      // disable PEC
+      void pecDisable();
+      // PEC low pass and linear regression filters
+      void pecCleanup();
+    #endif
+
+    // goto park position
+    CommandError parkGoto();
+    // once parked save park state
+    void parkFinish();
+    // sets a park position
+    CommandError parkSet();
+    // finds nearest valid park position
+    void parkNearest();
+    // returns a parked telescope to operation
+    CommandError parkRestore(bool withTrackingOn);
 
     const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
     
@@ -252,7 +269,8 @@ class Mount {
     long      pecBufferSize             = 0;
     float     pecRateAxis1              = 0;
     #if AXIS1_PEC == ON
-      Pec pec = {false, PEC_NONE, {0, 0}};
+      uint8_t  pecMonitorHandle         = 0;
+      Pec pec = {false, PEC_NONE, 0};
       bool     pecIndexSensedSinceLast  = false;
       int      pecAnalogValue           = 0;
 
@@ -272,7 +290,7 @@ class Mount {
     #endif
 
     // park
-    ParkState parkState = PS_UNPARKED;
+    Park park = {{0, 0, PIER_SIDE_NONE}, false, PS_NONE, 0};
 
     // misc. settings stored in NV
     Misc misc = {false, false, false, false, 64.0, GR_20X};

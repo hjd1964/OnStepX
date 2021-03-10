@@ -135,13 +135,12 @@ void Transform::hourAngleToRightAscension(Coordinate *coord) {
 }
 
 void Transform::rightAscensionToHourAngle(Coordinate *coord) {
-  if (!isnan(coord->r)) {
-    noInterrupts();
-    unsigned long cs = centisecondLAST;
-    interrupts();
-    coord->h = csToRad(cs) - coord->r;
-    coord->h = backInRads2(coord->h);
-  }
+  if (isnan(coord->r)) return; // NAN flags mount coordinates
+  noInterrupts();
+  unsigned long cs = centisecondLAST;
+  interrupts();
+  coord->h = csToRad(cs) - coord->r;
+  coord->h = backInRads2(coord->h);
 }
 
 void Transform::equToHor(Coordinate *coord) {

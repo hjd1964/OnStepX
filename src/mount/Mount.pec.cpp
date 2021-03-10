@@ -31,13 +31,13 @@ extern Telescope telescope;
 
 inline void mountPecWrapper() { telescope.mount.pecPoll(); }
 
-void Mount::initPec() {
+void Mount::pecInit() {
   // read the pec settings
   if (PecSize < sizeof(Pec)) { DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_PEC_BASE, &pec, PecSize);
 
-  wormRotationSeconds = pec.worm.rotationSteps/stepsPerSiderealSecondAxis1;
-  pecBufferSize = ceil(pec.worm.rotationSteps/(axis1.getStepsPerMeasure()/240.0));
+  wormRotationSeconds = pec.wormRotationSteps/stepsPerSiderealSecondAxis1;
+  pecBufferSize = ceil(pec.wormRotationSteps/(axis1.getStepsPerMeasure()/240.0));
 
   if (pecBufferSize != 0) {
     if (pecBufferSize < 61) {
@@ -69,7 +69,7 @@ void Mount::initPec() {
   if (pecBufferNeedsInit) for (int i = 0; i < pecBufferSize; i++) nv.write(NV_PEC_BUFFER_BASE + i, (int8_t)0);
 
   #if PEC_SENSE == OFF
-    pec.worm.sensePositionSteps = 0;
+    park.wormSensePositionSteps = 0;
     pec.state = PEC_NONE;
   #endif
 
@@ -81,14 +81,17 @@ void Mount::initPec() {
 
   if (!pec.recorded) pec.state = PEC_NONE;
 
-  // start pec monitor task
-  VF("MSG: Mount, start pec monitor task... ");
-  if (tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec")) VL("success"); else VL("FAILED!");
+  // start pec monitor task if it's not running
+  if (pecMonitorHandle == 0) {
+    VF("MSG: Mount, start pec monitor task... ");
+    pecMonitorHandle = tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec");
+    if (pecMonitorHandle) VL("success"); else VL("FAILED!");
+  }
 }
 
 void Mount::pecPoll() {
   // PEC is only active when we're tracking at the sidereal rate with a guide rate that makes sense
-  if (trackingState != TS_SIDEREAL || parkState != PS_PARKED || guideState == GU_GUIDE) { pecDisable(); return; }
+  if (trackingState != TS_SIDEREAL || park.state != PS_PARKED || guideState == GU_GUIDE) { pecDisable(); return; }
 
   // keep track of our current step position, and when the step position on the worm wraps during playback
   long a1Steps = axis1.getMotorCoordinateSteps();
@@ -116,7 +119,7 @@ void Mount::pecPoll() {
   // worm step position corrected for any index found
   lastWormRotationSteps = wormRotationSteps;
   wormRotationSteps = a1Steps - wormSenseSteps;
-  wormRotationSteps = ((wormRotationSteps % pec.worm.rotationSteps) + pec.worm.rotationSteps) % pec.worm.rotationSteps;
+  wormRotationSteps = ((wormRotationSteps % pec.wormRotationSteps) + pec.wormRotationSteps) % pec.wormRotationSteps;
 
   #if PEC_SENSE == OFF
     // "soft" PEC index sense

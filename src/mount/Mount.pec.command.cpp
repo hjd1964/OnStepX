@@ -39,7 +39,7 @@ bool Mount::commandPec(char reply[], char command[], char parameter[], bool *sup
       case '7':
         Pec tempPec;
         nv.readBytes(NV_PEC_BASE, &tempPec, PecSize);
-        sprintf(reply, "%ld", tempPec.worm.rotationSteps);
+        sprintf(reply, "%ld", tempPec.wormRotationSteps);
         *numericReply = false;
       break;
   // :GXE8#     Get pec buffer size in seconds

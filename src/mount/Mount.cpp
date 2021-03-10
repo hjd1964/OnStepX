@@ -70,11 +70,12 @@ void Mount::init() {
   #else
     setTrackingState(TS_NONE);
   #endif
-  updateTrackingRates();
 
   // start tracking monitor task
   VF("MSG: Mount, start tracking monitor task... ");
   if (tasks.add(1000, 0, true, 7, mountTrackingWrapper, "MntTrk")) VL("success"); else VL("FAILED!");
+
+  updateTrackingRates();
 
   // get slewing ready
   updateAccelerationRates();
@@ -84,7 +85,14 @@ void Mount::setTrackingState(TrackingState state) {
   trackingState = state;
   axis1.setTracking(true);
   axis2.setTracking(true);
-  if (trackingState == TS_SIDEREAL) { axis1.enable(true); axis2.enable(true); atHome = false; }
+  if (trackingState == TS_SIDEREAL) {
+    axis1.enable(true);
+    axis2.enable(true);
+    atHome = false;
+    #if AXIS1_PEC == ON
+      pecInit();
+    #endif
+  }
 }
 
 void Mount::updatePosition() {
@@ -109,79 +117,60 @@ void Mount::updateTrackingRates() {
 #endif
 
 void Mount::trackPoll() {
-  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
-    trackingRateAxis1 = 0.0F;
+  if (trackingState != TS_SIDEREAL || (transform.mountType != ALTAZM && rateCompensation == RC_NONE)) {
+    if (trackingState == TS_SIDEREAL) trackingRateAxis1 = trackingRate; else trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
     updateTrackingRates();
     return;
   }
 
-  if (rateCompensation == RC_NONE && transform.mountType != ALTAZM) {
-    trackingRateAxis1 = trackingRate;
-    trackingRateAxis2 = 0.0F;
-    updateTrackingRates();
-    return;
-  }
-
+  // get positions 1 (or 10) arc-min ahead and behind the current
   updatePosition(); Y;
   if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
   Coordinate ahead = current;
   Coordinate behind = current;
-
-  // get positions 1 (or 10) arc-min ahead and behind the current
-  ahead.h  += DiffRange;
+  ahead.h += DiffRange;
   behind.h -= DiffRange;
 
-  // apply pointing model
+  // apply (optional) pointing model and refraction
   if (rateCompensation == RC_FULL_RA || rateCompensation == RC_FULL_BOTH) {
     transform.mountToObservedPlace(&ahead); Y;
     transform.mountToObservedPlace(&behind); Y;
   }
-
-  // apply refraction
   transform.topocentricToObservedPlace(&ahead); Y;
   transform.topocentricToObservedPlace(&behind); Y;
 
+  // convert back into horizon coordinates
+  float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
   if (transform.mountType == ALTAZM) {
-    // convert back into horizon coordinates
-    transform.equToHor(&ahead); Y;
-    transform.equToHor(&behind); Y;
-
-    // calculate the Azm tracking rate
-    if (ahead.z < -Deg90 && behind.z > Deg90) ahead.z += Deg360;
-    if (behind.z < -Deg90 && ahead.z > Deg90) behind.z += Deg360;
-    float rate1 = (behind.z - ahead.z)/DiffRange2;
-    if (fabs(trackingRateAxis1 - rate1) <= 0.005F)
-      trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
-
-    // calculate the Alt tracking rate
-    float rate2 = (behind.a - ahead.a)/DiffRange2;
-    if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
-
-    // override for special case of near a celestial pole
-    if (fabs(current.d) > Deg85) { trackingRateAxis1 = 0.0F; trackingRateAxis2 = 0.0F; }
+    transform.equToHor(&ahead); aheadAxis1 = ahead.z; aheadAxis2 = ahead.a; Y;
+    transform.equToHor(&behind); behindAxis1 = behind.z; behindAxis2 = behind.a; Y;
   } else {
-    // calculate the RA tracking rate
-    if (ahead.h < -Deg90 && behind.h > Deg90) ahead.h += Deg360;
-    if (behind.h < -Deg90 && ahead.h > Deg90) behind.h += Deg360;
-    float rate1 = (ahead.h - behind.h)/DiffRange2;
-
-    if (fabs(trackingRateAxis1 - rate1) <= 0.005F)
-      trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
-
-    // calculate the Dec tracking rate
-    if (rateCompensation == RC_REFR_BOTH || rateCompensation == RC_FULL_BOTH) {
-      float rate2;
-      if (current.pierSide == PIER_SIDE_WEST) rate2 = (behind.d - ahead.d)/DiffRange2; else rate2 = (ahead.d - behind.d)/DiffRange2;
-      if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
-    } else trackingRateAxis2 = 0.0F;
-
-    // override RA rate for special case of near a celestial pole
-    if (Deg90 - fabs(current.d) < OneArcSec) { trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
-
-    // override for both rates for special case near the zenith
-    if (current.a > Deg85) { trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
+    aheadAxis1 = ahead.h; aheadAxis2 = ahead.d;
+    behindAxis1 = behind.h; behindAxis2 = behind.d;
   }
+
+  // calculate the Axis1 tracking rate
+  if (aheadAxis1 < -Deg90 && behindAxis1 > Deg90) aheadAxis1 += Deg360;
+  if (behindAxis1 < -Deg90 && aheadAxis1 > Deg90) behindAxis1 += Deg360;
+  float rate1 = (aheadAxis1 - behindAxis1)/DiffRange2;
+  if (fabs(trackingRateAxis1 - rate1) <= 0.005F)
+    trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
+
+  // calculate the Axis2 Dec/Alt tracking rate (if dual axis or ALTAZM mode)
+  if (rateCompensation == RC_REFR_BOTH || rateCompensation == RC_FULL_BOTH || transform.mountType == ALTAZM) {
+    float rate2;
+    rate2 = (aheadAxis2 - behindAxis2)/DiffRange2;
+    if (current.pierSide == PIER_SIDE_WEST) rate2 = -rate2;
+    if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
+  } else trackingRateAxis2 = 0.0F;
+
+  // override for special case of near a celestial pole
+  if (fabs(current.d) > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
+
+  // override for both rates for special case near the zenith
+  if (current.a > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
+
   updateTrackingRates();
 }
 
@@ -194,8 +183,7 @@ float Mount::ztr(float a) {
   float altHr = altH - transform.trueRefrac(altH);
   float altLr = altL - transform.trueRefrac(altL);
 
-  float r = (altH - altL)/(altHr - altLr);
-  if (r > 1.0F) r = 1.0F;
+  float r = (altH - altL)/(altHr - altLr); if (r > 1.0F) r = 1.0F;
   return r;
 }
 

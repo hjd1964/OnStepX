@@ -72,7 +72,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
 
       // start tracking
       setTrackingState(TS_SIDEREAL);
-      updateTrackingRates();
 
       // start align...
       alignState.lastStar = command[1] - '0';
@@ -104,10 +103,10 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     int i = 0;
     if (trackingState == TS_NONE)            reply[i++]='n';                     // [n]ot tracking
     if (gotoState == GS_NONE)                reply[i++]='N';                     // [N]o goto
-    if (parkState == PS_UNPARKED)            reply[i++]='p'; else                // not [p]arked
-    if (parkState == PS_PARKING)             reply[i++]='I'; else                // parking [I]n-progress
-    if (parkState == PS_PARKED)              reply[i++]='P'; else                // [P]arked
-    if (parkState == PS_PARK_FAILED)         reply[i++]='F';                     // park [F]ailed
+    if (park.state == PS_UNPARKED)           reply[i++]='p'; else                // not [p]arked
+    if (park.state == PS_PARKING)            reply[i++]='I'; else                // parking [I]n-progress
+    if (park.state == PS_PARKED)             reply[i++]='P'; else                // [P]arked
+    if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // park [F]ailed
     if (misc.syncToEncodersOnly)             reply[i++]='e';                     // sync to [e]ncoders only
     if (atHome)                              reply[i++]='H';                     // at [H]ome
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
@@ -189,7 +188,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
         reply[4] = (int)pec.state|0b10000000;                                    // PEC state: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
       if (pec.recorded)                          reply[4]|=0b11000000;           // PEC state: data has been recorded
     #endif
-    reply[5] = (int)parkState|0b10000000;                                        // Park state: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
+    reply[5] = (int)park.state|0b10000000;                                       // Park state: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
     reply[6] = (int)misc.pulseGuideRateSelect|0b10000000;                        // Pulse-guide selection
     reply[7] = (int)guideRateSelect|0b10000000;                                  // Guide selection
 //  reply[8] = generalError|0b10000000;                                          // General error
@@ -273,11 +272,12 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   if (cmdP("ST"))  {
     double f = strtod(parameter,&conv_end);
     if (&parameter[0] != conv_end && ((f >= 30.0 && f < 90.0) || fabs(f) < 0.1)) {
-      if (fabs(f) < 0.1) trackingState = TS_NONE; else {
-        if (trackingState == TS_NONE) setTrackingState(TS_SIDEREAL);
-        trackingRate = hzToSidereal(f);
+      if (fabs(f) < 0.1) setTrackingState(TS_NONE); else {
+        if (park.state != PS_PARKED) {
+          trackingRate = hzToSidereal(f);
+          setTrackingState(TS_SIDEREAL);
+        }
       }
-      updateTrackingRates();
     } else *commandError = CE_PARAM_RANGE;
   } else
 
@@ -389,7 +389,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (command[1] == '-') { transform.site.setPeriodSubMicros(periodSubMicros + hzToSubMicros(0.02)); } else
     if (command[1] == 'R') { transform.site.setPeriodSubMicros(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
-      if (parkState != PS_PARKED) {
+      if (park.state != PS_PARKED) {
         resetErrors();
         setTrackingState(TS_SIDEREAL);
       } else *commandError = CE_PARKED;

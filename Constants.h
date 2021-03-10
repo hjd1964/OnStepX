@@ -219,15 +219,16 @@
 #define NV_ENDURANCE NVE_MID
 
 // NV addresses
-#define INIT_NV_KEY                 583927925UL
+#define INIT_NV_KEY                 583927924UL
 
-#define NV_KEY                      0      // bytes: 4   , addr: 0..3
-#define NV_LOCATION_NUMBER          4      // bytes: 1   , addr: 4..4
-#define NV_LOCATION_BASE            5      // bytes: 36*4, addr: 5..148
+#define NV_KEY                      0      // bytes: 4   , addr:   0..3
+#define NV_LOCATION_NUMBER          4      // bytes: 1   , addr:   4..4
+#define NV_LOCATION_BASE            5      // bytes: 36*4, addr:   5..148
 #define NV_JD_BASE                  149    // bytes: 16  , addr: 149..164
 #define NV_LIMITS_BASE              165    // bytes: 16  , addr: 165..180
-#define NV_MOUNT_MISC_BASE          181    // bytes: 9   , addr: 181..189
-#define NV_PEC_BASE                 190    // bytes: 13  , addr: 190..202
+#define NV_MOUNT_MISC_BASE          181    // bytes: 6   , addr: 181..186
+#define NV_PEC_BASE                 187    // bytes: 6   , addr: 187..192
+#define NV_PARK_BASE                193    // bytes: 15  , addr: 203..217
 
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)
 

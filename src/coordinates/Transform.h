@@ -9,7 +9,7 @@
 // MOUNT      <--> apply pointing model                   <--> OBSERVED    (Transform)
 // OBSERVED   <--> apply refraction                       <--> TOPOCENTRIC (Transform)
 
-enum PierSide {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
+enum PierSide: uint8_t {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 
 typedef struct Coordinate {
   double r;
@@ -29,7 +29,7 @@ class Transform {
     // returns equatorial RA
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
     // converts from Native (equatorial) to Mount (equatorial or horizon) coordinates (optional: a1 is h or z, a2 is d or a)
-    // accepts equatorial RA, unless RA is NAN, in which case the Hour Angle coordinate is used instead
+    // accepts equatorial RA
     void nativeToMount(Coordinate *coord, double *a1 = NULL, double *a2 = NULL);
 
     // converts from Mount to Topocentric coordinates (removes pointing model and refraction from equatorial coordinates)

@@ -35,9 +35,9 @@ typedef struct AxisErrors {
   uint8_t maxLimitSensed:1;
 } AxisErrors;
 
-enum MicrostepModeControl {MMC_TRACKING,MMC_SLEWING_READY,MMC_SLEWING,MMC_TRACKING_READY};
-enum Direction {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
-enum AutoRate {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
+enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING_READY, MMC_SLEWING};
+enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
+enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
 
 class Axis {
   public:
@@ -60,8 +60,9 @@ class Axis {
     void setMotorCoordinate(double value);
     double getMotorCoordinate();
 
-    // set and get motor coordinate, in steps
+    // sets motor and target coordinates in steps, also zeros backlash and index 
     void setMotorCoordinateSteps(long value);
+    // gets motor coordinates in steps
     long getMotorCoordinateSteps();
 
     // get instrument coordinate, in steps
@@ -75,9 +76,15 @@ class Axis {
     // mark origin coordinate as current location
     void markOriginCoordinate();
 
-    // target coordinate, in "measures" (degrees, microns, etc.)
+    // set target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
+    // set target coordinate, in steps
+    void setTargetCoordinateSteps(long value);
+    // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();
+    // get target coordinate, in steps
+    long getTargetCoordinateSteps();
+    // returns true if within 2 steps of target
     bool nearTarget();
 
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
