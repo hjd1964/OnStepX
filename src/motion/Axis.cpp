@@ -235,7 +235,7 @@ void Axis::incrementTargetCoordinate(double value) {
 }
 
 bool Axis::nearTarget() {
-  return motorSteps - targetSteps <= step * 2;
+  return labs(motorSteps - targetSteps) <= step * 2;
 }
 
 double Axis::getOriginOrTargetDistance() {
