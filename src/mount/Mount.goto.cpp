@@ -227,8 +227,8 @@ void Mount::gotoPoll() {
       return;
     }
     
-    axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
-    axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
+    //axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
+    //axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
 
     // keep updating mount target
     target.h += radsPerCentisecond;
