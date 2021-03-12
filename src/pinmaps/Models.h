@@ -90,3 +90,6 @@
   #define PINMAP_STR "Instein (ESP32)"
   #include "Pins.InsteinESP1.h"
 #endif
+
+// all unassigned pins OFF
+#include "../pinmaps/Pins.Null.h"
