@@ -245,16 +245,6 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     }
   } else
 
-  // :hF#       Reset telescope at the home position.  This position is required for a cold Start.
-  //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
-  //            Returns: Nothing
-  if (cmd("hF")) {
-    // setup where the home position is
-    updateHomePosition();
-    *commandError = resetHome();
-    *numericReply = false;
-  } else 
-
   // :hC#       Moves telescope to the home position
   //            Returns: Nothing
   if (cmd("hC")) {
@@ -265,6 +255,31 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     *commandError = gotoEqu(&home, PSS_EAST);
     *numericReply = false;
   } else
+
+  // :hF#       Reset telescope at the home position.  This position is required for a cold Start.
+  //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
+  //            Returns: Nothing
+  if (cmd("hF")) {
+    // setup where the home position is
+    updateHomePosition();
+    *commandError = resetHome();
+    *numericReply = false;
+  } else 
+
+  // :hP#       Goto the Park Position
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmd("hP")) *commandError = parkGoto(); else 
+
+  // :hQ#       Set the park position
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmd("hQ")) *commandError = parkSet(); else 
+
+  // :hR#       Restore parked telescope to operation
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmd("hR")) *commandError = parkRestore(true); else
 
   //  :ST[H.H]# Set Tracking Rate in Hz where 60.0 is solar rate
   //            Return: 0 on failure

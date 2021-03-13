@@ -145,8 +145,8 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     transform.mountToInstrument(&destination, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
-    if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
+    if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
 
     // slew rate in rads per second
     axis1.setFrequencyMax(radsPerSecondCurrent);

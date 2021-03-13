@@ -35,6 +35,9 @@ void Mount::init() {
     initPec();
   #endif
 
+  // get parking ready
+  parkInit();
+
   // get the main axes ready
   axis1.init(1);
   axis2.init(2);

@@ -17,12 +17,17 @@ extern NVS nv;
 #include "../motion/Axis.h"
 #include "Mount.h"
 
-// sets the park postion as the current position
+void Mount::parkInit() {
+  // read the park settings
+  if (ParkSize < sizeof(Park)) { DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  nv.readBytes(NV_PARK_BASE, &park, ParkSize);
+}
+
 CommandError Mount::parkSet() {
   if (park.state == PS_PARK_FAILED)     return CE_PARK_FAILED;
   if (park.state == PS_PARKED)          return CE_PARKED;
-  if (gotoState == GS_NONE)             return CE_SLEW_IN_MOTION;
-  if (guideState == GU_NONE)            return CE_SLEW_IN_MOTION;
+  if (gotoState != GS_NONE)             return CE_SLEW_IN_MOTION;
+  if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
 
   VLF("MSG: Setting park position");
@@ -40,7 +45,6 @@ CommandError Mount::parkSet() {
   park.position.d = current.d;
   park.position.pierSide = current.pierSide;
   park.saved = true;
-  if (ParkSize < sizeof(Park)) { DL("ERR: Mount::parkSet(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
 
   //saveAlignModel();
@@ -80,10 +84,6 @@ CommandError Mount::parkGoto() {
   // record our park status
   ParkState priorParkState = park.state; 
   
-  // get the park info from NV
-  if (ParkSize < sizeof(Park)) { DL("ERR: Mount::unPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_PARK_BASE, &park, ParkSize);
-
   // update state to parking
   park.state = PS_PARKING;
   nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
@@ -93,6 +93,9 @@ CommandError Mount::parkGoto() {
   parkTarget.h = park.position.h;
   parkTarget.d = park.position.d;
   parkTarget.pierSide = park.position.pierSide;
+
+  axis1.setBacklash(0);
+  axis2.setBacklash(0);
 
   // goto the park (mount) target coordinate
   e = gotoEqu(&parkTarget, PSS_SAME_ONLY, false);
@@ -109,7 +112,6 @@ CommandError Mount::parkGoto() {
   return CE_NONE;
 }
 
-// records the park position, updates status, shuts down the stepper motors
 void Mount::parkFinish() {
   if (park.state != PS_PARK_FAILED) {
     park.state = PS_PARKED;
@@ -124,22 +126,19 @@ void Mount::parkFinish() {
   axis2.enable(false);
 }
 
-// adjusts targetAxis1/2 to the nearest park position for micro-step modes up to PARK_MAX_MICROSTEP
 #define PARK_MAX_MICROSTEP 256
 void Mount::parkNearest() {
-  axis1.disableBacklash();
   long positionSteps = axis1.getTargetCoordinateSteps();
   positionSteps -= PARK_MAX_MICROSTEP*2L; 
   for (int l = 0; l < PARK_MAX_MICROSTEP*4; l++) { if (positionSteps % PARK_MAX_MICROSTEP*4L == 0) break; positionSteps++; }
-  axis1.enableBacklash();
   axis1.setTargetCoordinateSteps(positionSteps);
+  VLF("MSG: Mount::parkNearest(); target coordinate axis1 (steps) adjusted to nearest %1024 location");
 
-  axis2.disableBacklash();
   positionSteps = axis2.getTargetCoordinateSteps();
   positionSteps -= PARK_MAX_MICROSTEP*2L; 
   for (int l = 0; l < PARK_MAX_MICROSTEP*4; l++) { if (positionSteps % PARK_MAX_MICROSTEP*4L == 0) break; positionSteps++; }
-  axis2.enableBacklash();
   axis2.setTargetCoordinateSteps(positionSteps);
+  VLF("MSG: Mount::parkNearest(); target coordinate axis2 (steps) adjusted to nearest %1024 location");
 }
 
 CommandError Mount::parkRestore(bool withTrackingOn) {
@@ -150,10 +149,10 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
     #endif
     if (!atHome)                        return CE_NOT_PARKED;
   }
-  if (gotoState == GS_NONE)             return CE_SLEW_IN_MOTION;
-  if (guideState == GU_NONE)            return CE_SLEW_IN_MOTION;
+  if (gotoState != GS_NONE)             return CE_SLEW_IN_MOTION;
+  if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!transform.site.dateTimeReady())  return CE_PARKED;
+//  if (!transform.site.dateTimeReady())  return CE_PARKED;
 
   VLF("MSG: Unparking");
 
@@ -168,10 +167,6 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
 
   // load the pointing model
   // loadAlignModel();
-
-  // get the park info from NV
-  if (ParkSize < sizeof(Park)) { DL("ERR: Mount::parkRestore(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_PARK_BASE, &park, ParkSize);
 
   axis1.setMotorCoordinateSteps(0);
   axis2.setMotorCoordinateSteps(0);

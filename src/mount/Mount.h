@@ -195,13 +195,15 @@ class Mount {
       void pecCleanup();
     #endif
 
+    // read in the park information
+    void parkInit();
     // goto park position
     CommandError parkGoto();
     // once parked save park state
     void parkFinish();
     // sets a park position
     CommandError parkSet();
-    // finds nearest valid park position
+    // finds nearest valid park position (for microstepping up to 256x)
     void parkNearest();
     // returns a parked telescope to operation
     CommandError parkRestore(bool withTrackingOn);
