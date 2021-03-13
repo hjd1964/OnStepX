@@ -62,7 +62,6 @@ void CommandProcessor::poll() {
       if (commandError != CE_NONE) strcpy(reply,"0"); else strcpy(reply,"1");
       supressFrame = true;
     }
-    if (commandError != CE_NULL) lastCommandError = commandError;
     if (strlen(reply) > 0 || buffer.checksum) {
       if (buffer.checksum) {
         appendChecksum(reply);
@@ -70,14 +69,27 @@ void CommandProcessor::poll() {
         supressFrame = false;
       }
       if (!supressFrame) strcat(reply,"#");
+      SerialPort.write(reply);
+    }
 
+    // debug, log errors and/or commands
+    if (commandError != CE_NULL) {
+      lastCommandError = commandError;
+      logErrors(buffer.getCmd(), buffer.getParameter(), reply, commandError); 
+    } else {
       #if DEBUG_ECHO_COMMANDS == ON
         VF("MSG: cmd"); V(channel); V(" = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); VL(reply);
       #endif
-      SerialPort.write(reply);
     }
+
     buffer.flush();
   }
+}
+
+void CommandProcessor::logErrors(char cmd[], char param[], char reply[], CommandError e) {
+  if (e <= CE_0) return;
+  VF("MSG: cmd"); V(channel); V(" = "); V(cmd); V(param); 
+  VF(", reply = "); V(reply); VF(", Error "); VL(commandErrorStr[e]);
 }
 
 CommandError CommandProcessor::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {

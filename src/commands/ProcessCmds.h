@@ -35,6 +35,7 @@ class CommandProcessor {
     CommandError command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply);
 
   private:
+    void logErrors(char cmd[], char param[], char reply[], CommandError e);
     void appendChecksum(char s[]);
 
     CommandError commandError      = CE_NONE;
