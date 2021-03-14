@@ -26,11 +26,7 @@
 // SerialC is optional
 #if SERIAL_C_BAUD_DEFAULT != OFF
   #if PINMAP != Classic
-    #if PINMAP != Rumba
-      #define SERIAL_C Serial2
-    #else
-      #define SERIAL_C Serial3
-    #endif
+    #define SERIAL_C Serial2
   #endif
 #endif
 
@@ -46,7 +42,7 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { nv.init(E2END + 1, false, 0, false); }
+#define HAL_INIT() { nv.init(2048, true, 0, false); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

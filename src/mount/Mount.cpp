@@ -47,6 +47,8 @@ void Mount::init() {
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+  axis1.setBacklash(misc.backlash.axis1);
+  axis2.setBacklash(misc.backlash.axis2);
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);

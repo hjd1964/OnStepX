@@ -74,6 +74,7 @@
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
+#define TMC_SPI
 
 // pier side
 // same as PSS_EAST
@@ -226,9 +227,9 @@
 #define NV_LOCATION_BASE            5      // bytes: 36*4, addr:   5..148
 #define NV_JD_BASE                  149    // bytes: 16  , addr: 149..164
 #define NV_LIMITS_BASE              165    // bytes: 16  , addr: 165..180
-#define NV_MOUNT_MISC_BASE          181    // bytes: 6   , addr: 181..186
-#define NV_PEC_BASE                 187    // bytes: 6   , addr: 187..192
-#define NV_PARK_BASE                193    // bytes: 15  , addr: 203..217
+#define NV_MOUNT_MISC_BASE          181    // bytes: 14  , addr: 181..194
+#define NV_PEC_BASE                 195    // bytes: 6   , addr: 195..200
+#define NV_PARK_BASE                201    // bytes: 15  , addr: 201..215
 
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)
 

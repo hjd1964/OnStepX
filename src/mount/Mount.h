@@ -48,7 +48,12 @@ typedef struct Limits {
   float pastMeridianW;
 } Limits;
 
-#define MiscSize 6
+typedef struct Backlash {
+  float axis1;
+  float axis2;
+} Backlash;
+
+#define MiscSize 14
 typedef struct Misc {
   bool syncToEncodersOnly:1;
   bool meridianFlipAuto  :1;
@@ -56,6 +61,7 @@ typedef struct Misc {
   bool buzzer            :1;
   float usPerStepCurrent;
   GuideRateSelect pulseGuideRateSelect;
+  Backlash backlash;
 } Misc;
 
 #define PecSize 6

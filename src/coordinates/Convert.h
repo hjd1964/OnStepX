@@ -22,6 +22,9 @@ typedef struct JulianDate {
   double   hour;
 } JulianDate;
 
+// sprintf like function for float type, limited to one parameter
+extern void sprintF(char* result, const char* source, float f);
+
 class Convert {
   public:
     // convert string in format MM/DD/YY to julian date

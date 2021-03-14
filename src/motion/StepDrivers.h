@@ -47,7 +47,26 @@ typedef struct DriverSettings {
 } DriverSettings;
 #pragma pack()
 
-// check for TMC stepper drivers
+// check/flag TMC stepper drivers
+#if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160
+  #define AXIS1_DRIVER_TMC_SPI
+#endif
+#if AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160
+  #define AXIS2_DRIVER_TMC_SPI
+#endif
+#if AXIS3_DRIVER_MODEL == TMC2130 || AXIS3_DRIVER_MODEL == TMC5160
+  #define AXIS3_DRIVER_TMC_SPI
+#endif
+#if AXIS4_DRIVER_MODEL == TMC2130 || AXIS4_DRIVER_MODEL == TMC5160
+  #define AXIS4_DRIVER_TMC_SPI
+#endif
+#if AXIS5_DRIVER_MODEL == TMC2130 || AXIS5_DRIVER_MODEL == TMC5160
+  #define AXIS5_DRIVER_TMC_SPI
+#endif
+#if AXIS6_DRIVER_MODEL == TMC2130 || AXIS6_DRIVER_MODEL == TMC5160
+  #define AXIS6_DRIVER_TMC_SPI
+#endif
+
 #if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160 || \
     AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160 || \
     AXIS3_DRIVER_MODEL == TMC2130 || AXIS3_DRIVER_MODEL == TMC5160 || \
@@ -71,6 +90,9 @@ class StepDriver {
     uint8_t modeGoto();
     void modeDecayGoto();
 
+    #ifdef HAS_TMC_DRIVER
+      TmcDriver tmcDriver{pins};
+    #endif
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
@@ -88,10 +110,6 @@ class StepDriver {
 
     DriverPins pins;
     DriverSettings settings;
-    
-    #ifdef HAS_TMC_DRIVER
-      TmcDriver tmcDriver{pins};
-    #endif
 
     uint8_t microstepRatio        = 1;
     int     microstepCode         = OFF;

@@ -73,23 +73,21 @@ void CommandProcessor::poll() {
     }
 
     // debug, log errors and/or commands
+    #if DEBUG_ECHO_COMMANDS == ON
+      VF("MSG: cmd"); V(channel); V(" = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); V(reply);
+    #endif
     if (commandError != CE_NULL) {
       lastCommandError = commandError;
-      logErrors(buffer.getCmd(), buffer.getParameter(), reply, commandError); 
-    } else {
       #if DEBUG_ECHO_COMMANDS == ON
-        VF("MSG: cmd"); V(channel); V(" = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); VL(reply);
+        if (commandError > CE_0) { VF(", Error "); V(commandErrorStr[commandError]); }
       #endif
     }
+    #if DEBUG_ECHO_COMMANDS == ON
+      VL("");
+    #endif
 
     buffer.flush();
   }
-}
-
-void CommandProcessor::logErrors(char cmd[], char param[], char reply[], CommandError e) {
-  if (e <= CE_0) return;
-  VF("MSG: cmd"); V(channel); V(" = "); V(cmd); V(param); 
-  VF(", reply = "); V(reply); VF(", Error "); VL(commandErrorStr[e]);
 }
 
 CommandError CommandProcessor::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {

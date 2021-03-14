@@ -93,7 +93,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
   //              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
   if (cmd("GT"))  {
-    if (trackingState == TS_NONE) strcpy(reply,"0"); else dtostrf(siderealToHz(trackingRate), 0, 5, reply);
+    if (trackingState == TS_NONE) strcpy(reply,"0"); else sprintF(reply,"%0.5f",siderealToHz(trackingRate));
     *numericReply = false;
   } else 
 
@@ -196,24 +196,36 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     *numericReply=false;
   } else
 
+  // :GX0[p]#   Get align setting [p]
+  //            Returns: Value
+  if (cmdGX("GX0")) {
+    switch (parameter[1]) {
+      case '2': sprintf(reply,"%ld",(long)(0*3600.0)); *numericReply = false; break; // altCor
+      case '3': sprintf(reply,"%ld",(long)(0*3600.0)); *numericReply = false; break; // azmCor
+//    case '2': sprintf(reply,"%ld",(long)(AlignH.altCor*3600.0)); *numericReply = false; break; // altCor
+//    case '3': sprintf(reply,"%ld",(long)(AlignH.azmCor*3600.0)); *numericReply = false; break; // azmCor
+    default: return false;
+    }
+  } else
+
   // :GX9[p]#   Get setting [p]
   //            Returns: Value
   if (cmdGX("GX9")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '2': dtostrf(misc.usPerStepCurrent,3,3,reply); break;                 // current
-      case '3': dtostrf(usPerStepDefault,3,3,reply); break;                      // default
+      case '2': sprintF(reply,"%0.3f",misc.usPerStepCurrent); break;             // current
+      case '3': sprintF(reply,"%0.3f",usPerStepDefault); break;                  // default
       case '4': sprintf(reply,"%d%s",(int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
       case '5': sprintf(reply,"%d",(int)misc.meridianFlipAuto); break;           // autoMeridianFlip
       case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;     // preferred pier side
-      case '7': dtostrf((1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure()),3,1,reply); break; // slew speed
+      case '7': sprintF(reply,"%0.1f",(1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure())); break; // slew speed
       case '8':                                                                  // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
         if (ROTATOR == ON) {
           if (transform.mountType == ALTAZM) strcpy(reply,"D"); else strcpy(reply,"R");
         } else strcpy(reply,"N");
       break;
-      case '9': dtostrf(usPerStepLowerLimit(),3,3,reply); break;                 // fastest step rate in microseconds
-    default: return false;
+      case '9': sprintF(reply,"%0.3f",usPerStepLowerLimit()); break;             // fastest step rate in microseconds
+      default: return false;
     }
   } else
 
@@ -234,15 +246,55 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     }
   } else
 
-  // :GXFn#     Get frequency setting
+  // :GXFn#     Get frequency setting and workload
   //            Returns: Value
   if (cmdGX("GXF")) {
     switch (parameter[1]) {
-      case '3': dtostrf(axis1.getFrequencySteps(),3,6,reply); *numericReply = false; break; // Axis1 final tracking rate Hz
-      case '4': dtostrf(axis2.getFrequencySteps(),3,6,reply); *numericReply = false; break; // Axis2 final tracking rate Hz
+      case '3': sprintF(reply,"%0.6f",axis1.getFrequencySteps()); *numericReply = false; break; // Axis1 final tracking rate Hz
+      case '4': sprintF(reply,"%0.6f",axis2.getFrequencySteps()); *numericReply = false; break; // Axis2 final tracking rate Hz
+      case 'A': sprintf(reply,"%d%%", 50); *numericReply = false; break;                        // Workload
     default:
       return false;
     }
+  } else
+
+  // :GXUn#     Get TMC stepper driver statUs (all axes)
+  //            Returns: Value
+  if (cmdGX("GXU")) {
+    #ifdef HAS_TMC_DRIVER
+      TmcDriver* driver = NULL;
+      uint8_t axis = parameter[1] - '0';
+      #ifdef AXIS1_DRIVER_TMC_SPI
+        if (axis == 1) driver == &axis1.driver.tmcDriver;
+      #endif
+      #ifdef AXIS2_DRIVER_TMC_SPI
+        if (axis == 2) driver == &axis2.driver.tmcDriver;
+      #endif
+      #ifdef AXIS3_DRIVER_TMC_SPI
+        if (axis == 3) driver == &axis3.driver.tmcDriver;
+      #endif
+      #ifdef AXIS4_DRIVER_TMC_SPI
+        if (axis == 4) driver == &axis4.driver.tmcDriver;
+      #endif
+      #ifdef AXIS5_DRIVER_TMC_SPI
+        if (axis == 5) driver == &axis5.driver.tmcDriver;
+      #endif
+      #ifdef AXIS6_DRIVER_TMC_SPI
+        if (axis == 6) driver == &axis6.driver.tmcDriver;
+      #endif
+      if (driver != NULL) {
+        driver->refresh_DRVSTATUS();
+        strcat(reply, driver->get_DRVSTATUS_stst() ? "ST," : ",");  // Standstill
+        strcat(reply, driver->get_DRVSTATUS_olA()  ? "OA," : ",");  // Open Load A
+        strcat(reply, driver->get_DRVSTATUS_olB()  ? "OB," : ",");  // Open Load B
+        strcat(reply, driver->get_DRVSTATUS_s2gA() ? "GA," : ",");  // Short to Ground A
+        strcat(reply, driver->get_DRVSTATUS_s2gB() ? "GB," : ",");  // Short to Ground B
+        strcat(reply, driver->get_DRVSTATUS_ot()   ? "OT," : ",");  // Overtemp Shutdown 150C
+        strcat(reply, driver->get_DRVSTATUS_otpw() ? "PW" : "");    // Overtemp Pre-warning 120C
+        *numericReply = false;
+      } else
+    #endif
+    *commandError = CE_0;
   } else
 
   // :hC#       Moves telescope to the home position
@@ -433,10 +485,14 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (transform.site.convert.atoi2((char*)&parameter[1], &arcSecs)) {
       if (arcSecs >= 0 && arcSecs <= 3600) {
         if (parameter[0] == 'D') {
-          axis2.setBacklash(arcsecToRad(arcSecs));
+          misc.backlash.axis2 = arcsecToRad(arcSecs);
+          axis2.setBacklash(misc.backlash.axis2);
+          nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
         } else
         if (parameter[0] == 'R') {
-          axis1.setBacklash(arcsecToRad(arcSecs));
+          misc.backlash.axis1 = arcsecToRad(arcSecs);
+          axis1.setBacklash(misc.backlash.axis1);
+          nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
         } else *commandError = CE_CMD_UNKNOWN;
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
@@ -449,13 +505,13 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
   //            Return: n#
   if (cmdP("%B")) {
     if (parameter[0] == 'D' && parameter[1] == 0) {
-        int arcSec = radToArcsec(axis2.getBacklash());
+        int arcSec = radToArcsec(misc.backlash.axis2);
         if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
         *numericReply = false;
     } else
     if (parameter[0] == 'R' && parameter[1] == 0) {
-        int arcSec = radToArcsec(axis2.getBacklash());
+        int arcSec = radToArcsec(misc.backlash.axis1);
         if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
         *numericReply = false;

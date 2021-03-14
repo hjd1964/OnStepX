@@ -28,7 +28,7 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
   // :GX90#     Get setting pulse guide rate
   //            Returns: n.nn#
   if (cmd2("GX90")) {
-    dtostrf(guideRateSelectToRate(misc.pulseGuideRateSelect), 1, 2, reply);
+    sprintF(reply,"%0.2f",guideRateSelectToRate(misc.pulseGuideRateSelect));
   } else
 
   // M - Telescope Movement (Guiding) Commands

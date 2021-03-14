@@ -10,6 +10,36 @@
 
 #include "Convert.h"
 
+void sprintF(char* result, const char* source, float f) {
+  bool ok = false;
+  uint8_t mas = 0, frac = 0, len = 0;
+  char* a;
+  do {
+    a = (char*)strchr(source, '%');
+    if (a == NULL) return;
+    // "%f" form
+    if (a[1] == 'f') { len = 2; ok = true; break; }
+    // "%.2f" form
+    if (a[1] == '.' && a[2] >= '0' && a[2] <= '9' && a[3] == 'f') { frac = a[2] - '0'; len = 4; ok = true; break; }
+    // "%1.2f" form
+    if (a[1] >= '0' && a[1] <= '9' && a[2] == '.' && a[3] >= '0' && a[3] <= '9' && a[4] == 'f') {
+      mas = a[1] - '0';
+      frac = a[3] - '0';
+      len = 5;
+      ok = true;
+      break;
+    }
+  } while (!ok);
+
+  char s[20];
+  dtostrf(f, mas, frac, s);
+
+  int j = 0;
+  for (int i = 0; i < a - source; i++) result[j++] = source[i];
+  for (int i = 0; i < strlen(s); i++) result[j++] = s[i];
+  for (int i = len; i < strlen(a); i++) result[j++] = a[i];
+}
+
 // convert string in format MM/DD/YY to Date
 GregorianDate Convert::strToDate(char *ymd) {
   GregorianDate date;

@@ -22,6 +22,7 @@
 
 #include <Arduino.h>
 
+// these lines allow configuration of OnTask from OnStep, if this library is used outside OnStep remove them
 #include "../../Constants.h"
 #include "../../Config.h"
 #include "../../ConfigX.h"

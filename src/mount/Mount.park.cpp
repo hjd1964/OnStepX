@@ -190,10 +190,14 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   // and set the motor coordinates to agree with the target
   axis1.setMotorCoordinateSteps(axis1.getTargetCoordinateSteps());
   axis2.setMotorCoordinateSteps(axis2.getTargetCoordinateSteps());
-
+  
   // set Meridian Flip behaviour to match mount type
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
   atHome = false;
+
+  // restore backlash settings, in-case we are unparking without a power cycle
+  axis1.setBacklash(misc.backlash.axis1);
+  axis2.setBacklash(misc.backlash.axis2);
 
   // update our state and start tracking
   if (withTrackingOn) {

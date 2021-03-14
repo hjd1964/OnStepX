@@ -157,9 +157,9 @@ class Axis {
 
     AxisSettings settings;
     AxisErrors error;
+    StepDriver driver;
 
   private:
-    StepDriver driver;
     AxisPins pins;
 
     uint8_t taskHandle = 0;

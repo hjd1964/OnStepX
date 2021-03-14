@@ -25,25 +25,49 @@ extern Tasks tasks;
 
 bool Mount::commandPec(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
+  // :$QZ?      Get PEC status
+  //            Returns: s#, one of "IpPrR" (I)gnore, get ready to (p)lay, (P)laying, get ready to (r)ecord, (R)ecording
+  //                         or an optional (.) to indicate an index detect
+  if (cmd2("$QZ?")) {
+    const char *pecStatusCh = "IpPrR";
+    uint8_t state = 0;
+    #if AXIS1_PEC == ON
+      state = pec.state;
+      if (pecIndexSensedSinceLast) { reply[1] = '.'; pecIndexSensedSinceLast = false; }
+    #endif
+    reply[0] = pecStatusCh[state]; reply[1] = 0; reply[2] = 0;
+  } else
+
   // :VS#       Get PEC number of steps per sidereal second of worm rotation
   //            Returns: n.n#
   if (cmd("VS") || cmd2("GXE6")) {
-    dtostrf(stepsPerSiderealSecondAxis1, 0, 6, reply);
+    sprintF(reply, "%0.6f", stepsPerSiderealSecondAxis1);
+    *numericReply = false;
+  } else
+
+  // :VW#       Get pec worm rotation steps
+  //            Returns: n#
+  if (cmd("VW")) {
+    long steps = 0;
+    #if AXIS1_PEC == ON
+      steps = pec.wormRotationSteps;
+    #endif
+    sprintf(reply, "%06ld", steps);
     *numericReply = false;
   } else
 
   if (cmdGX("GXE")) {
     switch (parameter[1]) {
-  // :GXE7#     Get pec worm rotation steps
-  //            Returns: n#
+      // :GXE7#     Get pec worm rotation steps (from NV)
+      //            Returns: n#
       case '7':
         Pec tempPec;
         nv.readBytes(NV_PEC_BASE, &tempPec, PecSize);
         sprintf(reply, "%ld", tempPec.wormRotationSteps);
         *numericReply = false;
       break;
-  // :GXE8#     Get pec buffer size in seconds
-  //            Returns: n#
+      // :GXE8#     Get pec buffer size in seconds
+      //            Returns: n#
       case '8': sprintf(reply,"%ld",lround(pecBufferSize)); *numericReply = false; break;
       default: return false;
     }
@@ -114,13 +138,6 @@ bool Mount::commandPec(char reply[], char command[], char parameter[], bool *sup
       *numericReply = false;
     } else
 
-    // :VW#       PEC number of steps per worm rotation
-    //            Returns: n#
-    if (cmd("VW")) {
-      sprintf(reply,"%06ld",pec.worm.rotationSteps);
-      *numericReply = false;
-    } else
-
     //  :VH#      PEC index sense position in sidereal seconds
     //            Returns: n#
     if (command[0] == 'V' && command[1] == 'H' && parameter[0] == 0) {
@@ -171,12 +188,10 @@ bool Mount::commandPec(char reply[], char command[], char parameter[], bool *sup
       } else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
-  #endif
 
-  // $QZ - PEC Control
-  if (cmdGX("$QZ")) {
-    *numericReply = false;
-    #if AXIS1_PEC == ON
+    // $QZ - PEC Control
+    if (cmdGX("$QZ")) {
+      *numericReply = false;
       // :$QZ+      Enable RA PEC compensation 
       //            Returns: nothing
       if (parameter[1] == '+') {
@@ -209,29 +224,9 @@ bool Mount::commandPec(char reply[], char command[], char parameter[], bool *sup
         pec.recorded = true;
         nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
         for (int i = 0; i < pecBufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, pecBuffer[i]);
-      } else
-      // :$QZ?      Get PEC status
-      //            Returns: s#, one of "IpPrR" (I)gnore, get ready to (p)lay, (P)laying, get ready to (r)ecord, (R)ecording
-      //                         or an optional (.) to indicate an index detect
-      if (parameter[1] == '?') {
-        const char *pecStatusCh = "IpPrR";
-        reply[0] = pecStatusCh[pec.state];
-        reply[1] = 0;
-        reply[2] = 0;
-        if (pecIndexSensedSinceLast) { reply[1] = '.'; pecIndexSensedSinceLast = false; }
       } else { *numericReply = true; *commandError = CE_CMD_UNKNOWN; }
-    #else
-      // :$QZ?      Get (disabled) PEC status
-      //            Returns: (I)gnore
-      if (parameter[1] == '?') {
-        const char *pecStatusCh = "IpPrR";
-        reply[0] = 'I';
-        reply[1] = 0;
-      } else { *numericReply = true; *commandError = CE_CMD_UNKNOWN; }
-    #endif
-
-
-  } else return false;
+    } else return false;
+  #endif
 
   return true;
 }
