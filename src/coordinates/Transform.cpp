@@ -168,8 +168,8 @@ void Transform::horToEqu(Coordinate *coord) {
 double Transform::trueRefrac(double altitude) {
   float pressure = 1010.0F;
   float temperature = 10.0F;
-  if (isnan(siteConditions.pressure)) pressure = siteConditions.pressure;
-  if (isnan(siteConditions.temperature)) temperature = siteConditions.temperature;
+  if (!isnan(siteConditions.pressure)) pressure = siteConditions.pressure;
+  if (!isnan(siteConditions.temperature)) temperature = siteConditions.temperature;
   float TPC = (pressure/1010.0F)*(283.0F/(273.0F + temperature));
   float r   = 2.9670597e-4F*cotf(altitude + 0.0031375594F/(altitude + 0.089186324F))*TPC;
   if (r < 0.0F) r = 0.0F;
