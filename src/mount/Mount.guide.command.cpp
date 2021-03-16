@@ -23,7 +23,7 @@ extern Tasks tasks;
 
 extern unsigned long periodSubMicros;
 
-bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   // :GX90#     Get setting pulse guide rate
   //            Returns: n.nn#
@@ -46,16 +46,16 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
           GuideRateSelect rateSelect = guideRateSelect;
           if (SEPARATE_PULSE_GUIDE_RATE == ON) rateSelect = misc.pulseGuideRateSelect;
           if (parameter[0] == 'w') {
-            *commandError = startGuideAxis1(GA_FORWARD, rateSelect, timeMs);
+            *commandError = guideStartAxis1(GA_FORWARD, rateSelect, timeMs);
           } else
           if (parameter[0] == 'e') {
-            *commandError = startGuideAxis1(GA_REVERSE, rateSelect, timeMs);
+            *commandError = guideStartAxis1(GA_REVERSE, rateSelect, timeMs);
           } else
           if (parameter[0] == 'n') {
-            *commandError = startGuideAxis2(GA_FORWARD, rateSelect, timeMs);
+            *commandError = guideStartAxis2(GA_FORWARD, rateSelect, timeMs);
           } else
           if (parameter[0] == 's') { 
-            *commandError = startGuideAxis2(GA_REVERSE, rateSelect, timeMs);
+            *commandError = guideStartAxis2(GA_REVERSE, rateSelect, timeMs);
           } else *commandError = CE_CMD_UNKNOWN;
           if (command[1] == 'g') *numericReply = false;
         } else *commandError = CE_PARAM_RANGE;
@@ -65,25 +65,25 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
     // ::Mw#      Move Telescope West at current guide rate
     //            Returns: Nothing
     if (command[1] == 'w' && parameter[0] == 0) {
-      *commandError = startGuideAxis1(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = guideStartAxis1(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Me#       Move Telescope East at current guide rate
     //            Returns: Nothing
     if (command[1] == 'e' && parameter[0] == 0) {
-      *commandError = startGuideAxis1(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = guideStartAxis1(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Mn#       Move Telescope North at current guide rate
     //            Returns: Nothing
     if (command[1] == 'n' && parameter[0] == 0) {
-      *commandError = startGuideAxis2(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = guideStartAxis2(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Ms#       Move Telescope South at current guide rate
     //            Returns: Nothing
     if (command[1] == 's' && parameter[0] == 0) {
-      *commandError = startGuideAxis2(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = guideStartAxis2(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Mp#       Move Telescope for sPiral search at current guide rate
@@ -99,19 +99,21 @@ bool Mount::commandGuide(char reply[], char command[], char parameter[], bool *s
   //            Returns: Nothing
   if (command[0] == 'Q') {
     if (command[1] == 0) {
-//      stopSlewingAndTracking(SS_ALL_FAST);
+        gotoStop();
+        guideStopAxis1(GA_BREAK);
+        guideStopAxis2(GA_BREAK);
         *numericReply = false; 
     } else
     // :Qe# Qw#   Halt east/westward Slews
     //            Returns: Nothing
     if ((command[1] == 'e' || command[1] == 'w') && parameter[0] == 0) {
-      stopGuideAxis1();
+      guideStopAxis1(GA_BREAK);
       *numericReply = false;
     } else
     // :Qn# Qs#   Halt north/southward Slews
     //            Returns: Nothing
     if ((command[1] == 'n' || command[1] == 's') && parameter[0] == 0) {
-      stopGuideAxis2();
+      guideStopAxis2(GA_BREAK);
       *numericReply = false;
     } else return false;
   } else

@@ -60,6 +60,8 @@ class Transform {
 
     // converts from Equatorial (h,d) to Horizon (a,z) coordinates
     void equToHor(Coordinate *coord);
+    // converts from Equatorial (h,d) to Horizon (a) altitude coordinate
+    void equToAlt(Coordinate *coord);
     // converts from Equatorial (h,d) to Horizon (a,z) coordinates
     void horToEqu(Coordinate *coord);
 

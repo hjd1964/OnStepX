@@ -23,7 +23,7 @@ extern Tasks tasks;
 
 extern unsigned long periodSubMicros;
 
-bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;
 
   //  C - Sync Control
@@ -47,7 +47,7 @@ bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *su
   // :GAH#      High precision
   //            Returns: sDD*MM'SS.SSS# (high precision)
   if (cmdH("GA")) {
-    updatePosition();
+    updatePosition(CR_MOUNT_ALT);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
     transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).a), false, true, precisionMode);
     *numericReply = false;
@@ -67,7 +67,7 @@ bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *su
   //            Returns: sDD*MM# or sDD*MM:SS# (based on precision setting)
   // :GDH#      Returns: sDD*MM:SS.SSS# (high precision)
   if (cmdH("GD")) {
-    updatePosition();
+    updatePosition(CR_MOUNT_EQU);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
     transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current).d), false, true, precisionMode);
     *numericReply = false;
@@ -87,7 +87,7 @@ bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *su
   //            Returns: HH:MM.T# or HH:MM:SS# (based on precision setting)
   // :GRH#      Returns: HH:MM:SS.SSSS# (high precision)
   if (cmdH("GR")) {
-    updatePosition();
+    updatePosition(CR_MOUNT_EQU);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
     transform.site.convert.doubleToHms(reply, radToHrs(transform.mountToNative(&current).r), false, precisionMode);
     *numericReply = false;
@@ -107,7 +107,7 @@ bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *su
   // :GZH#      High precision
   //            Returns: DDD*MM'SS.SSS# (high precision)
   if (cmdH("GZ")) {
-    updatePosition();
+    updatePosition(CR_MOUNT_HOR);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
     transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).z), true, false, precisionMode);
     *numericReply = false;
@@ -155,27 +155,29 @@ bool Mount::commandGoto(char reply[], char command[], char parameter[], bool *su
   //  :MNw#  Goto current RA/Dec but West of the Pier (within meridian limit overlap for GEM mounts)
   //         Returns: 0..9, see :MS#
   if (cmdP("MN"))  {
-    updatePosition();
-    Coordinate newTarget = current;
-    CommandError e;
-    if (parameter[0] == 0 ||
-       (parameter[0] == 'e' && parameter[1] == 0)) e = gotoEqu(&newTarget, PSS_EAST_ONLY); else
-    if (parameter[0] == 'w' && parameter[1] == 0) e = gotoEqu(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;
-    if (e != CE_CMD_UNKNOWN) {
-      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
-      if (e == CE_NONE) reply[0] = '0';
-      reply[1] = 0;
-      *numericReply = false;
-      *supressFrame = true;
-    }
-    *commandError = e;
+    if (transform.mountType != ALTAZM) {
+      updatePosition(CR_MOUNT_EQU);
+      Coordinate newTarget = current;
+      CommandError e;
+      if (parameter[0] == 0 ||
+        (parameter[0] == 'e' && parameter[1] == 0)) e = gotoEqu(&newTarget, PSS_EAST_ONLY); else
+      if (parameter[0] == 'w' && parameter[1] == 0) e = gotoEqu(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;
+      if (e != CE_CMD_UNKNOWN) {
+        if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
+        if (e == CE_NONE) reply[0] = '0';
+        reply[1] = 0;
+        *numericReply = false;
+        *supressFrame = true;
+      }
+      *commandError = e;
+    } else *commandError = CE_CMD_UNKNOWN;
   } else
 
   // :MP#       Goto the Current Position for Polar Align
   //            Returns: 0..9, see :MS#
   if (cmd("MP"))  {
     if (transform.mountType != ALTAZM) {
-      updatePosition();
+      updatePosition(CR_MOUNT_EQU);
       Coordinate newTarget = current;
       validateGoto();
       CommandError e = validateGoto();

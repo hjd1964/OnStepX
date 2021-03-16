@@ -10,7 +10,7 @@
 
 #include "Convert.h"
 
-void sprintF(char* result, const char* source, float f) {
+void sprintF(char *result, const char *source, float f) {
   bool ok = false;
   uint8_t mas = 0, frac = 0, len = 0;
   char* a;

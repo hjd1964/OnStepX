@@ -23,7 +23,7 @@ typedef struct JulianDate {
 } JulianDate;
 
 // sprintf like function for float type, limited to one parameter
-extern void sprintF(char* result, const char* source, float f);
+extern void sprintF(char *result, const char *source, float f);
 
 class Convert {
   public:

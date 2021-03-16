@@ -75,7 +75,7 @@ inline void pollAxes() {
 
 void Axis::init(uint8_t axisNumber) {
   if (pollingTaskHandle == 0) {
-    VF("MSG: Axis, starting axis polling task... ");
+    VF("MSG: Axis, starting axis polling task (rate 10ms priority 0)... ");
     pollingTaskHandle = tasks.add(10, 0, true, 0, pollAxes, "AxsPoll");
     if (pollingTaskHandle) VL("success"); else VL("FAILED!");
   }
@@ -287,6 +287,7 @@ void Axis::autoSlewStop() {
 
 void Axis::autoSlewAbort() {
   if (autoRate != AR_NONE) {
+    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" abort slew");
     autoRate = AR_RATE_BY_TIME_ABORT;
     poll();
   }
@@ -312,7 +313,7 @@ void Axis::poll() {
     freq -= slewMpspcs;
   } else
   if (autoRate == AR_RATE_BY_TIME_END) {
-    if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
+    if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < -slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
     if (fabs(freq) <= slewMpspcs) {
       autoRate = AR_NONE;
       freq = 0.0F;
@@ -320,8 +321,8 @@ void Axis::poll() {
     }
   } else
   if (autoRate == AR_RATE_BY_TIME_ABORT) {
-    if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < abortMpspcs) freq += abortMpspcs; else freq = 0.0F;
-    if (fabs(freq) <= slewMpspcs) {
+    if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < -abortMpspcs) freq += abortMpspcs; else freq = 0.0F;
+    if (fabs(freq) <= abortMpspcs) {
       autoRate = AR_NONE;
       freq = 0.0F;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew aborted");

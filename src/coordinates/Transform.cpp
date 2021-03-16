@@ -154,6 +154,12 @@ void Transform::equToHor(Coordinate *coord) {
   if (coord->z > PI) coord->z -= TWO_PI;
 }
 
+void Transform::equToAlt(Coordinate *coord) {
+  double cosHA  = cos(coord->h);
+  double sinAlt = sin(coord->d)*site.locationEx.latitude.sine + cos(coord->d)*site.locationEx.latitude.cosine*cosHA;  
+  coord->a      = asin(sinAlt);
+}
+
 void Transform::horToEqu(Coordinate *coord) { 
   double cosAzm = cos(coord->z);
   double sinDec = sin(coord->a)*site.locationEx.latitude.sine + cos(coord->a)*site.locationEx.latitude.cosine*cosAzm;  

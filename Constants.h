@@ -77,12 +77,9 @@
 #define TMC_SPI
 
 // pier side
-// same as PSS_EAST
-#define EAST                        1
-// same as PSS_WEST
-#define WEST                        2
-// same as PSS_BEST
-#define BEST                        3
+#define EAST                        1      // same as PSS_EAST
+#define WEST                        2      // same as PSS_WEST
+#define BEST                        3      // same as PSS_BEST
 
 // debug values
 #define CONSOLE                     -20

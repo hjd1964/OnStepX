@@ -23,19 +23,19 @@ extern Tasks tasks;
 #include "../motion/Axis.h"
 #include "Mount.h"
 
-bool Mount::commandPec(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   // :$QZ?      Get PEC status
   //            Returns: s#, one of "IpPrR" (I)gnore, get ready to (p)lay, (P)laying, get ready to (r)ecord, (R)ecording
   //                         or an optional (.) to indicate an index detect
   if (cmd2("$QZ?")) {
-    const char *pecStatusCh = "IpPrR";
+    const char *pecStateStr = "IpPrR";
     uint8_t state = 0;
     #if AXIS1_PEC == ON
       state = pec.state;
       if (pecIndexSensedSinceLast) { reply[1] = '.'; pecIndexSensedSinceLast = false; }
     #endif
-    reply[0] = pecStatusCh[state]; reply[1] = 0; reply[2] = 0;
+    reply[0] = pecStateStr[state]; reply[1] = 0; reply[2] = 0;
   } else
 
   // :VS#       Get PEC number of steps per sidereal second of worm rotation
@@ -225,8 +225,9 @@ bool Mount::commandPec(char reply[], char command[], char parameter[], bool *sup
         nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
         for (int i = 0; i < pecBufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, pecBuffer[i]);
       } else { *numericReply = true; *commandError = CE_CMD_UNKNOWN; }
-    } else return false;
+    } else
   #endif
+    return false;
 
   return true;
 }

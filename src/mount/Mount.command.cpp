@@ -25,7 +25,7 @@ extern NVS nv;
 
 extern unsigned long periodSubMicros;
 
-bool Mount::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   char *conv_end;
 
@@ -130,7 +130,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (transform.mountType == FORK)         reply[i++]='K'; else                // FORK
     if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
 
-    updatePosition();
+    updatePosition(CR_MOUNT);
     if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // pier side n[o]ne
     if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // pier side eas[T]
     if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // pier side [W]est
@@ -138,7 +138,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     reply[i++]='0'+misc.pulseGuideRateSelect;                                    // provide pulse-guide rate
     reply[i++]='0'+guideRateSelect;                                              // provide guide rate
 
-    reply[i++]='0'; //+generalError;                                             // provide general error code
+    reply[i++]='0' + errorNumber();                                              // provide general error code
     reply[i++]=0;
 
     *numericReply = false;
@@ -178,7 +178,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (transform.mountType == FORK)             reply[3]|=0b10000010; else      // FORK
     if (transform.mountType == ALTAZM)           reply[3]|=0b10001000;           // ALTAZM
 
-    updatePosition();
+    updatePosition(CR_MOUNT);
     if (current.pierSide == PIER_SIDE_NONE)      reply[3]|=0b10010000; else      // Pier side none
     if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else      // Pier side east
     if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
@@ -191,7 +191,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     reply[5] = (int)park.state|0b10000000;                                       // Park state: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
     reply[6] = (int)misc.pulseGuideRateSelect|0b10000000;                        // Pulse-guide selection
     reply[7] = (int)guideRateSelect|0b10000000;                                  // Guide selection
-//  reply[8] = generalError|0b10000000;                                          // General error
+    reply[8] = errorNumber()|0b10000000;                                         // General error
     reply[9] = 0;
     *numericReply=false;
   } else
@@ -457,7 +457,7 @@ bool Mount::command(char reply[], char command[], char parameter[], bool *supres
     if (command[1] == 'R') { transform.site.setPeriodSubMicros(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
       if (park.state != PS_PARKED) {
-        resetErrors();
+        errorReset();
         setTrackingState(TS_SIDEREAL);
       } else *commandError = CE_PARKED;
     } else

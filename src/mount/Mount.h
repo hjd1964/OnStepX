@@ -25,8 +25,8 @@
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
 enum TrackingState: uint8_t    {TS_NONE, TS_SIDEREAL};
-enum GotoState: uint8_t        {GS_NONE, GS_GOTO, GS_GOTO_SYNC, GS_GOTO_ABORT};
-enum GotoStage: uint8_t        {GG_NONE, GG_START, GG_WAYPOINT, GG_DESTINATION};
+enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
+enum GotoStage: uint8_t        {GG_NONE, GG_WAYPOINT, GG_DESTINATION, GG_READY_ABORT, GG_ABORT};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 enum GuideState: uint8_t       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
@@ -34,6 +34,7 @@ enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X,
 enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE};
 enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
 enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
+enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR};
 
 #pragma pack(1)
 typedef struct AltitudeLimits {
@@ -87,25 +88,38 @@ typedef struct Park {
 #pragma pack()
 
 typedef struct AlignState {
-  uint8_t currentStar;
-  uint8_t lastStar;
+  uint8_t currentStar:1;
+  uint8_t lastStar:1;
 } AlignState;
 
-typedef struct AltitudeError {
-  uint8_t minExceeded:1;
-  uint8_t maxExceeded:1;
-} AltitudeError;
+typedef struct MinMaxError {
+  uint8_t min:1;
+  uint8_t max:1;
+} MinMaxError;
 
 typedef struct MerdianError {
-  uint8_t eastExceeded:1;
-  uint8_t westExceeded:1;
+  uint8_t east:1;
+  uint8_t west:1;
 } MerdianError;
 
+typedef struct LimitError {
+  MinMaxError axis1;
+  MinMaxError axis2;
+} LimitError;
+
 typedef struct MountError {
-  AltitudeError altitude;
+  MinMaxError   altitude;
+  LimitError    limit;
+  LimitError    limitSense;
   MerdianError  meridian;
   uint8_t       parkFailed: 1;
+  uint8_t       motorFault: 1;
+  uint8_t       initWeather: 1;
+  uint8_t       initSite: 1;
+  uint8_t       initNV: 1;
 } MountError;
+
+
 
 class Mount {
   public:
@@ -113,20 +127,23 @@ class Mount {
     void pecInit();
 
     // handle mount commands
-    bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
-    bool commandGoto(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
-    bool commandGuide(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
-    bool commandLimit(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
-    bool commandPec(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool commandGoto(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool commandGuide(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool commandLimit(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // update the home position
     void updateHomePosition();
 
     // reset all mount related errors
-    void resetErrors();
+    void errorReset();
 
     // check for any mount related error
-    bool anyError();
+    bool errorAny();
+    
+    // return OnStep general error code
+    uint8_t errorNumber();
 
     // monitor goto operation
     void gotoPoll();
@@ -136,6 +153,9 @@ class Mount {
 
     // monitor pec operation
     void pecPoll();
+
+    // monitor limits
+    void limitPoll();
 
     // calculate tracking rates for alt/azm, refraction, and pointing model in the background
     void trackPoll();
@@ -159,7 +179,10 @@ class Mount {
     // goto equatorial coordinates
     CommandError gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
     // set any waypoints required for a goto
-    void setWaypoint();
+    void gotoWaypoint();
+    // stop any presently active goto
+    void gotoStop();
+
 
     // reset mount at home
     CommandError resetHome();
@@ -168,8 +191,14 @@ class Mount {
     void setTrackingState(TrackingState state);
     // Alternate tracking rate calculation method
     float ztr(float a);
+
     // update where we are pointing *now*
-    void updatePosition();
+    // CR_MOUNT for Horizon or Equatorial mount coordinates, depending on mode
+    // CR_MOUNT_EQU for Equatorial mount coordinates, depending on mode
+    // CR_MOUNT_ALT for altitude (a) and Horizon or Equatorial mount coordinates, depending on mode
+    // CR_MOUNT_HOR for Horizon mount coordinates, depending on mode
+    void updatePosition(CoordReturn coordReturn);
+
     // update tracking rates
     void updateTrackingRates();
     // update acceleration rates for goto and guiding
@@ -180,19 +209,19 @@ class Mount {
     // return guide rate (sidereal x) for guide rate selection
     float guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);
     // valid guide on Axis1
-    bool validGuideAxis1(GuideAction guideAction);
+    bool guideValidAxis1(GuideAction guideAction);
     // valid guide on Axis2
-    bool validGuideAxis2(GuideAction guideAction);
+    bool guideValidAxis2(GuideAction guideAction);
     // start guide on Axis1
-    CommandError startGuideAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
+    CommandError guideStartAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // start guide on Axis2
-    CommandError startGuideAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
-    // stop guide on Axis1
-    void stopGuideAxis1();
-    // stop guide on Axis2
-    void stopGuideAxis2();
+    CommandError guideStartAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
+    // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
+    void guideStopAxis1(GuideAction stopDirection);
+    // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
+    void guideStopAxis2(GuideAction stopDirection);
     // check for spiral guide using both axes
-    bool isSpiralGuiding();
+    bool guideIsSpiral();
 
     #if AXIS1_PEC == ON
       // disable PEC
@@ -213,6 +242,13 @@ class Mount {
     void parkNearest();
     // returns a parked telescope to operation
     CommandError parkRestore(bool withTrackingOn);
+
+    // read in the limit information, start limit monitor
+    void limitInit();
+    void limitBroken();
+    void limitStop(GuideAction stopDirection);
+    void limitStopAxis1(GuideAction stopDirection);
+    void limitStopAxis2(GuideAction stopDirection);
 
     const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
     
@@ -241,7 +277,7 @@ class Mount {
     Coordinate gotoTarget;
     Coordinate start, destination, target;
     GotoState  gotoState                = GS_NONE;
-    GotoStage  gotoStage                = GG_START;
+    GotoStage  gotoStage                = GG_NONE;
     GotoState  gotoStateAbort           = GS_NONE;
     GotoState  gotoStateLast            = GS_NONE;
     uint8_t    gotoTaskHandle           = 0;

@@ -25,7 +25,6 @@ CommandError Mount::validateGoto() {
   if (!axis1.isEnabled() || !axis2.isEnabled())    return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED)                     return CE_SLEW_ERR_IN_PARK;
   if (guideState != GU_NONE)                       return CE_SLEW_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC)                  return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)                       return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
@@ -61,7 +60,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
   // east side of pier - we're in the western sky and the HA's are positive
   // west side of pier - we're in the eastern sky and the HA's are negative
 
-  updatePosition();
+  updatePosition(CR_MOUNT);
   target.pierSide = current.pierSide;
 
   double a1, a2;
@@ -91,6 +90,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
 }
 
 CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
+  // converts from native to mount coordinates and checks for valid target
   CommandError e = setMountTarget(coords, pierSideSelect, native);
   if (e != CE_NONE) return e;
   
@@ -108,14 +108,15 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 }
 
 CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
+  // converts from native to mount coordinates and checks for valid target
   CommandError e = setMountTarget(coords, pierSideSelect, native);
+  if (e == CE_SLEW_IN_SLEW) { gotoStop(); return e; }
   if (e != CE_NONE) return e;
 
   limitsEnabled = true;
   misc.syncToEncodersOnly = false;
 
-  updatePosition();
-  transform.equToHor(&current);
+  updatePosition(CR_MOUNT_ALT);
   start = current;
   destination = target;
 
@@ -124,14 +125,14 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   gotoStage = GG_DESTINATION;
   if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
     VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
-    setWaypoint();
+    gotoWaypoint();
   }
 
   // start the goto monitor
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
   gotoTaskHandle = tasks.add(10, 0, true, 1, mountGotoWrapper, "MntGoto");
   if (gotoTaskHandle) {
-    VLF("MSG: Mount::gotoEqu(); start goto monitor task... success"); 
+    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success"); 
 
     axis1.setTracking(false);
     axis2.setTracking(false);
@@ -163,6 +164,14 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 }
 
 void Mount::gotoPoll() {
+  if (gotoStage == GG_READY_ABORT) {
+    VLF("MSG: Mount::gotoPoll(); abort requested");
+
+    axis1.autoSlewAbort();
+    axis2.autoSlewAbort();
+
+    gotoStage = GG_ABORT;
+  } else
   if (gotoStage == GG_WAYPOINT) {
     if (axis1.nearTarget() && axis2.nearTarget()) {
       if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
@@ -196,7 +205,7 @@ void Mount::gotoPoll() {
     // keep updating mount target
     target.h += radsPerCentisecond;
   } else
-  if (gotoStage == GG_DESTINATION) {
+  if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
     if (axis1.nearTarget() && axis2.nearTarget() || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
 
@@ -210,7 +219,7 @@ void Mount::gotoPoll() {
       VLF("MSG: Mount::gotoPoll(); automatic tracking resumed");
 
       // check if parking and mark as finished
-      if (park.state == PS_PARKING && gotoState != GS_GOTO_ABORT) parkFinish();
+      if (park.state == PS_PARKING && gotoStage != GG_ABORT) parkFinish();
 
       // flag the goto as finished
       gotoState = GS_NONE;
@@ -227,11 +236,6 @@ void Mount::gotoPoll() {
       return;
     }
     
-    //axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
-    //axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
-
-    // keep updating mount target
-    target.h += radsPerCentisecond;
     // keep updating the axis targets to match the mount target
     if (transform.mountType == ALTAZM) transform.equToHor(&target);
     double a1, a2;
@@ -239,9 +243,16 @@ void Mount::gotoPoll() {
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
   }
+
+  //axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
+  //axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
+
+  // keep updating mount target
+  target.h += radsPerCentisecond;
+
  }
 
-void Mount::setWaypoint() {
+void Mount::gotoWaypoint() {
   // HA goes from +90...0..-90
   //                W   .   E
   // meridian flip, only happens for equatorial mounts
@@ -268,6 +279,10 @@ void Mount::setWaypoint() {
       if (current.d >= -Deg90 - transform.site.location.latitude) destination.h = Deg45;
     }
   }
+}
+
+void Mount::gotoStop() {
+  if (gotoState == GS_GOTO && (gotoStage == GG_DESTINATION || gotoStage == GG_WAYPOINT)) gotoStage = GG_READY_ABORT;
 }
 
 #endif

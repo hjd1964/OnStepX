@@ -37,8 +37,7 @@ CommandError Mount::parkSet() {
   updateTrackingRates();
 
   // get our current position in equatorial coordinates
-  updatePosition();
-  if (transform.mountType == ALTAZM) transform.horToEqu(&current);
+  updatePosition(CR_MOUNT_EQU);
 
   // save as the park position
   park.position.h = current.h;

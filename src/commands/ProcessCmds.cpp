@@ -90,7 +90,7 @@ void CommandProcessor::poll() {
   }
 }
 
-CommandError CommandProcessor::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply) {
+CommandError CommandProcessor::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply) {
   commandError = CE_NONE;
 
   // Handle telescope commands
@@ -114,14 +114,14 @@ CommandError CommandProcessor::command(char reply[], char command[], char parame
   // internal MCU temperature in deg. C
   if (cmd2("GX9F")) {
     float t = HAL_TEMP();
-    if (!isnan(t)) dtostrf(t, 1, 0, reply); else { *numericReply = true; commandError = CE_0; }
+    if (!isnan(t)) sprintF(reply, "%1.0f", t); else { *numericReply = true; commandError = CE_0; }
     return commandError;
   } else
 
   return CE_CMD_UNKNOWN;
 }
 
-void CommandProcessor::appendChecksum(char s[]) {
+void CommandProcessor::appendChecksum(char *s) {
   char HEXS[3] = "";
   uint8_t cks = 0; for (unsigned int cksCount0 = 0; cksCount0 < strlen(s); cksCount0++) { cks += s[cksCount0]; }
   sprintf(HEXS, "%02X", cks);

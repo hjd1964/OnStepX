@@ -58,7 +58,7 @@ class Site {
     void setPeriodSubMicros(unsigned long period);
 
     // handle date/time commands
-    bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // gets the time in sidereal hours
     double getSiderealTime();
@@ -111,7 +111,7 @@ class Site {
     // reads the julian date information from NV
     void readJD();
 
-    inline double dewPoint(SiteConditions conditions) { return conditions.temperature - ((100.0 - conditions.humidity) / 5.0); }
+    inline float dewPoint(SiteConditions conditions) { return conditions.temperature - ((100.0F - conditions.humidity) / 5.0F); }
 
     JulianDate ut1;
     double centisecondHOUR = 0;

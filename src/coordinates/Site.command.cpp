@@ -14,7 +14,7 @@ extern NVS nv;
 #include "../commands/ProcessCmds.h"
 #include "Site.h"
 
-bool Site::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = convert.precision;
 
   // :Ga#       Get standard time in 12 hour format
@@ -139,35 +139,35 @@ bool Site::command(char reply[], char command[], char parameter[], bool *supress
     // :GX9A#     temperature in deg. C
     //            Returns: +/-n.n
     if (parameter[1] == 'A') {
-      dtostrf(siteConditions.temperature,3,1,reply);
+      sprintF(reply, "%3.1f", siteConditions.temperature);
       *numericReply = false;
      } else
 
     // :GX9B#     pressure in mb
     //            Returns: +/-n.n
     if (parameter[1] == 'B') {
-      dtostrf(siteConditions.pressure,3,1,reply);
+      sprintF(reply, "%3.1f", siteConditions.pressure);
       *numericReply = false;
     } else
 
     // :GX9C#     relative humidity in %
     //            Returns: +/-n.n
     if (parameter[1] == 'C') {
-      dtostrf(siteConditions.humidity,3,1,reply);
+      sprintF(reply, "%3.1f", siteConditions.humidity);
       *numericReply = false;
     } else
 
     // :GX9D#     altitude in meters
     //            Returns: +/-n.n
     if (parameter[1] == 'D') {
-      dtostrf(siteConditions.altitude,3,1,reply);
+      sprintF(reply, "%3.1f", siteConditions.altitude);
       *numericReply = false;
     } else
 
     // :GX9E#     dew point in deg. C
     //            Returns: +/-n.n
     if (parameter[1] == 'E') {
-      dtostrf(dewPoint(siteConditions),3,1,reply);
+      sprintF(reply, "%3.1f", dewPoint(siteConditions));
       *numericReply = false;
     } else return false;
   } else

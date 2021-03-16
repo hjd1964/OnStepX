@@ -17,7 +17,6 @@
 
 CommandError Mount::resetHome() {
   if (guideState != GU_NONE)      return CE_SLEW_IN_MOTION;
-  if (gotoState  == GS_GOTO_SYNC) return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)      return CE_SLEW_IN_SLEW;
 
   // setup where the home position is

@@ -25,7 +25,7 @@ extern NVS nv;
 
 extern unsigned long periodSubMicros;
 
-bool Mount::commandLimit(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
   // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon
   //            Returns: sDD*#
@@ -48,7 +48,7 @@ bool Mount::commandLimit(char reply[], char command[], char parameter[], bool *s
       case 'B': sprintf(reply,"%ld",lround(radToDeg(axis1.settings.limits.max)/15.0)); break; // RA west or +Az limit, in hours
       case 'C': sprintf(reply,"%ld",lround(radToDeg(axis2.settings.limits.min))); break;      // Dec south or -Alt limit, in degrees
       case 'D': sprintf(reply,"%ld",lround(radToDeg(axis2.settings.limits.max))); break;      // Dec north or +Alt limit, in degrees
-    default: return false;
+      default: return false;
     }
   } else
   

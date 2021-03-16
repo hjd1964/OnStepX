@@ -44,6 +44,9 @@ void Mount::init() {
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
+  // get limits ready
+  limitInit();
+
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
@@ -56,12 +59,8 @@ void Mount::init() {
   if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
   if (misc.usPerStepCurrent > 10000.0F) misc.usPerStepCurrent = 10000.0F;
 
-  // get limit settings from NV
-  if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::init(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
-
   // start guide monitor task
-  VF("MSG: Mount, start guide monitor task... ");
+  VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) VL("success"); else VL("FAILED!");
 
   // startup state is reset and at home
@@ -77,7 +76,7 @@ void Mount::init() {
   #endif
 
   // start tracking monitor task
-  VF("MSG: Mount, start tracking monitor task... ");
+  VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 7)... ");
   if (tasks.add(1000, 0, true, 7, mountTrackingWrapper, "MntTrk")) VL("success"); else VL("FAILED!");
 
   updateTrackingRates();
@@ -100,8 +99,14 @@ void Mount::setTrackingState(TrackingState state) {
   }
 }
 
-void Mount::updatePosition() {
+void Mount::updatePosition(CoordReturn coordReturn) {
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+  if (transform.mountType == ALTAZM) {
+    if (coordReturn == CR_MOUNT_EQU) transform.horToEqu(&current);
+  } else {
+    if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
+    if (coordReturn == CR_MOUNT_HOR) transform.equToHor(&current);
+  }
 }
 
 void Mount::updateTrackingRates() {
@@ -130,7 +135,7 @@ void Mount::trackPoll() {
   }
 
   // get positions 1 (or 10) arc-min ahead and behind the current
-  updatePosition(); Y;
+  updatePosition(CR_MOUNT); Y;
   if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
   Coordinate ahead = current;
   Coordinate behind = current;
@@ -228,22 +233,6 @@ float Mount::usPerStepLowerLimit() {
 
   // return rate in us units
   return r_us;
-}
-
-bool Mount::anyError() {
-  return error.altitude.minExceeded ||
-         error.altitude.maxExceeded ||
-         error.meridian.eastExceeded ||
-         error.meridian.westExceeded ||
-         error.parkFailed;
-}
-
-void Mount::resetErrors() {
-  error.altitude.minExceeded = false;
-  error.altitude.minExceeded = false;
-  error.meridian.eastExceeded = false;
-  error.meridian.westExceeded = false;
-  error.parkFailed = false;
 }
 
 #endif
