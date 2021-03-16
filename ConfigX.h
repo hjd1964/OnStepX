@@ -32,3 +32,7 @@
                                           //              powered off.  This is usually done using the microcontrollers
                                           //              built-in EEPROM or FLASH emulation of EEPROM.  Sometimes (Bluepill)
                                           //              it uses an DS3231 RTC's onboard EEPROM AT24C32 chip.
+
+// ALIGN ---------------------------------------------------------------------------------------------------------------------------
+#define ALIGN_MAX_STARS              AUTO //        AUTO, Uses HAL specified default (either 6 or 9 stars.)                   Infreq
+                                          //              Or use n. Where n=1, or 3 to 9.
