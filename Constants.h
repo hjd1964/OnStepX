@@ -227,8 +227,5 @@
 #define NV_MOUNT_MISC_BASE          181    // bytes: 14  , addr: 181..194
 #define NV_PEC_BASE                 195    // bytes: 6   , addr: 195..200
 #define NV_PARK_BASE                201    // bytes: 15  , addr: 201..215
-
+#define NV_ALIGN_MODEL_BASE         216    // butes: 32  , addr: 216..247
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)
-
-// Align
-#define ALIGN_MAX_STARS             1

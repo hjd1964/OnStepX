@@ -3,22 +3,12 @@
 #pragma once
 #include "Convert.h"
 #include "Site.h"
+#include "Align.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
 // INSTRUMENT <--> apply celestial coordinate conventions <--> MOUNT       (Transform)
 // MOUNT      <--> apply pointing model                   <--> OBSERVED    (Transform)
 // OBSERVED   <--> apply refraction                       <--> TOPOCENTRIC (Transform)
-
-enum PierSide: uint8_t {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
-
-typedef struct Coordinate {
-  double r;
-  double h;
-  double d;
-  double a;
-  double z;
-  PierSide pierSide;
-} Coordinate;
 
 class Transform {
   public:
@@ -73,6 +63,7 @@ class Transform {
     double apparentRefrac(double altitude);
 
     Site site;
+    GeoAlign align;
     int8_t mountType;
 
   private:

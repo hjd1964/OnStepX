@@ -183,7 +183,6 @@ class Mount {
     // stop any presently active goto
     void gotoStop();
 
-
     // reset mount at home
     CommandError resetHome();
 
@@ -205,6 +204,9 @@ class Mount {
     void updateAccelerationRates();
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
+
+    bool alignActive();
+    CommandError alignAddStar();
 
     // return guide rate (sidereal x) for guide rate selection
     float guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);

@@ -11,6 +11,7 @@
 extern Tasks tasks;
 
 #include "Transform.h"
+#include "Align.h"
 
 extern volatile unsigned long centisecondLAST;
 
@@ -21,6 +22,7 @@ void Transform::init() {
   VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
   #endif
   site.init();
+  align.init(site.location.latitude, mountType);
 }
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
@@ -62,13 +64,13 @@ void Transform::topocentricToMount(Coordinate *coord) {
 }
 
 void Transform::mountToObservedPlace(Coordinate *coord) {
-  // apply the pointing model
+  align.mountToObservedPlace(coord);
   if (mountType == ALTAZM) horToEqu(coord);
 }
 
 void Transform::observedPlaceToMount(Coordinate *coord) {
   if (mountType == ALTAZM) equToHor(coord);
-  // de-apply the pointing model
+  align.observedPlaceToMount(coord);
 }
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {

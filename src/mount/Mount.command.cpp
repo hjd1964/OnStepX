@@ -32,64 +32,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   // process any date/time/location commands
   if (transform.site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
-  if (command[0] == 'A') {
-    // :AW#       Align Write to EEPROM
-    //            Returns: 1 on success
-    if (command[1] == 'W' && parameter[0] == 0) {
-      //saveAlignModel();
-    } else
-
-    // :A?#       Align status
-    //            Returns: mno#
-    //            where m is the maximum number of alignment stars
-    //                  n is the current alignment star (0 otherwise)
-    //                  o is the last required alignment star when an alignment is in progress (0 otherwise)
-    if (command[1] == '?' && parameter[0] == 0) {
-      reply[0] = '0' + ALIGN_MAX_STARS;
-      reply[1] = '0' + alignState.currentStar;
-      reply[2] = '0' + alignState.lastStar;
-      reply[3] = 0;
-      *numericReply = false;
-    } else
-
-    // :A[n]#     Start Telescope Manual Alignment Sequence
-    //            This is to initiate a n-star alignment for 1..MAX_NUM_ALIGN_STARS:
-    //            1) Before calling this function, the telescope should be in the polar-home position
-    //            2) Call this function with the # of align stars you'd like to use
-    //            3) Set the target location (RA/Dec) to a bright star, etc. (not too near the NCP/SCP)
-    //            4) Issue a goto command
-    //            5) Center the star/object using the guide commands (as needed)
-    //            6) Call :A+# command to accept the correction
-    //            ( for two+ star alignment )
-    //            7) Back to #3 above until done, except where possible choose at least one star on both meridian sides
-    //            Return: 0 on failure
-    //                    1 on success
-    if (command[1] >= '1' && command[1] <= ALIGN_MAX_STARS + '0' && parameter[0] == 0) {
-      // set current time and date before calling this routine
-
-      // telescope should be set in the polar home (CWD) as a starting point
-      resetHome();
-
-      // start tracking
-      setTrackingState(TS_SIDEREAL);
-
-      // start align...
-      alignState.lastStar = command[1] - '0';
-      alignState.currentStar = 1;
-    } else
-
-    // :A+#       Align accept target location
-    //            Return: 0 on failure
-    //                    1 on success
-    if (command[1] == '+' && parameter[0] == 0) {
-      if (/*alignActive()*/ false) {
-        CommandError e = CE_NONE; // alignStar();
-        if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
-      } else *commandError = CE_ALIGN_NOT_ACTIVE;
-    } else *commandError = CE_CMD_UNKNOWN;
-  }
-  else
-
   // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
   //              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
   if (cmd("GT"))  {

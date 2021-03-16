@@ -19,12 +19,9 @@
 #define HAL_WIRE_CLOCK 100000
 
 // Non-volatile storage ----------------------------------------------------------------------------
+// Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
   #include "../lib/nv/NV_EEPROM.h"
-  #ifdef NVS
-    #undef NVS
-  #endif
-  #define NVS NonVolatileStorageEEPROM
 #endif
 
 //--------------------------------------------------------------------------------------------------

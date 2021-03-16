@@ -235,4 +235,24 @@ float Mount::usPerStepLowerLimit() {
   return r_us;
 }
 
+CommandError Mount::alignAddStar() {
+  if (alignState.currentStar > alignState.lastStar) return CE_PARAM_RANGE;
+
+  CommandError e = CE_NONE;
+
+  // first star, get ready for a new pointing model, init/sync then call gta.addStar 
+  if (alignState.currentStar == 1) {
+    transform.align.init(transform.site.location.latitude, transform.mountType);
+    e = syncEqu(&gotoTarget, preferredPierSide);
+  }
+
+  // add an align star
+  if (e == CE_NONE) {
+    updatePosition(CR_MOUNT);
+    e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &gotoTarget, &current);
+    if (e == CE_NONE) alignState.currentStar++;
+  }
+
+  return e;
+}
 #endif
