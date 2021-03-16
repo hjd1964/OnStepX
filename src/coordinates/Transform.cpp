@@ -18,11 +18,14 @@ extern volatile unsigned long centisecondLAST;
 void Transform::init() {
   mountType = MOUNT_TYPE;
   #if DEBUG_MODE != OFF
-  const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
-  VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
+    const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
+    VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
   #endif
+
   site.init();
-  align.init(site.location.latitude, mountType);
+  #if ALIGN_MAX_STARS > 1  
+    align.init(site.location.latitude, mountType);
+  #endif
 }
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
@@ -64,13 +67,17 @@ void Transform::topocentricToMount(Coordinate *coord) {
 }
 
 void Transform::mountToObservedPlace(Coordinate *coord) {
-  align.mountToObservedPlace(coord);
+  #if ALIGN_MAX_STARS > 1  
+    align.mountToObservedPlace(coord);
+  #endif
   if (mountType == ALTAZM) horToEqu(coord);
 }
 
 void Transform::observedPlaceToMount(Coordinate *coord) {
   if (mountType == ALTAZM) equToHor(coord);
-  align.observedPlaceToMount(coord);
+  #if ALIGN_MAX_STARS > 1  
+    align.observedPlaceToMount(coord);
+  #endif
 }
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {

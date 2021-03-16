@@ -70,6 +70,7 @@
 // basic values
 #define OFF                         -1
 #define SAME                        -1
+#define AUTO                        -1
 #define ON                          -2
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4

@@ -16,13 +16,14 @@
 #include "../pinmaps/Models.h"
 #include "../debug/Debug.h"
 
-#include "../commands/ProcessCmds.h"
-
-#if defined(ALIGN_MAX_STARS)
-  #if ALIGN_MAX_STARS > 9 || ALIGN_MAX_STARS < 3
-    #error "ALIGN_MAX_STARS must be 3 to 9"
+#if defined(ALIGN_MAX_STARS) && ALIGN_MAX_STARS != AUTO
+  #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
+    #error "ALIGN_MAX_STARS must be 1, or in the range of 3 to 9"
   #endif
 #else
+  #if defined(ALIGN_MAX_STARS)
+    #undef ALIGN_MAX_STARS
+  #endif
   #if defined(HAL_FAST_PROCESSOR)
     #define ALIGN_MAX_STARS 9
   #else
@@ -30,8 +31,7 @@
   #endif
 #endif
 
-// -----------------------------------------------------------------------------------
-// ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
+#include "../commands/ProcessCmds.h"
 
 enum PierSide: uint8_t {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 
@@ -43,6 +43,11 @@ typedef struct Coordinate {
   double z;
   PierSide pierSide;
 } Coordinate;
+
+#if ALIGN_MAX_STARS > 1
+
+// -----------------------------------------------------------------------------------
+// ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
 
 typedef struct AlignCoordinate {
   float ax1;
@@ -118,3 +123,5 @@ class GeoAlign
 
     uint8_t autoModelTask = 0;
 };
+
+#endif

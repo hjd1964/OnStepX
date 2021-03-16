@@ -26,6 +26,8 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "../motion/Axis.h"
 
+#if ALIGN_MAX_STARS > 1
+
 uint8_t modelNumberStars = 0;
 void autoModelWrapper() { telescope.mount.transform.align.autoModel(modelNumberStars); }
 
@@ -507,3 +509,5 @@ float GeoAlign::backInRads2(float angle) {
   while (angle < -Deg180) angle += Deg360;
   return angle;
 }
+
+#endif

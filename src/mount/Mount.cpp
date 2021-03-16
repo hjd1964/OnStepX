@@ -242,14 +242,18 @@ CommandError Mount::alignAddStar() {
 
   // first star, get ready for a new pointing model, init/sync then call gta.addStar 
   if (alignState.currentStar == 1) {
-    transform.align.init(transform.site.location.latitude, transform.mountType);
+    #if ALIGN_MAX_STARS > 1  
+      transform.align.init(transform.site.location.latitude, transform.mountType);
+    #endif
     e = syncEqu(&gotoTarget, preferredPierSide);
   }
 
   // add an align star
   if (e == CE_NONE) {
     updatePosition(CR_MOUNT);
-    e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &gotoTarget, &current);
+    #if ALIGN_MAX_STARS > 1  
+      e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &gotoTarget, &current);
+    #endif
     if (e == CE_NONE) alignState.currentStar++;
   }
 

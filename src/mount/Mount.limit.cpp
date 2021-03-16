@@ -131,6 +131,7 @@ uint8_t Mount::errorNumber() {
   if (error.meridian.east || error.meridian.west) return (uint8_t)ERR_MERIDIAN;
   if (error.initSite) return (uint8_t)ERR_SITE_INIT;
   if (error.initWeather) return (uint8_t)ERR_WEATHER_INIT;
+  return ERR_NONE;
 }
 
 #endif

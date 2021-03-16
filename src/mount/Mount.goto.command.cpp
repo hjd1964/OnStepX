@@ -30,7 +30,9 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     // :AW#       Align Write to EEPROM
     //            Returns: 1 on success
     if (command[1] == 'W' && parameter[0] == 0) {
-      transform.align.modelWrite();
+      #if ALIGN_MAX_STARS > 1  
+        transform.align.modelWrite();
+      #endif
     } else
 
     // :A?#       Align status

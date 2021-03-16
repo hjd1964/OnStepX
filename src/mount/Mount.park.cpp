@@ -46,7 +46,9 @@ CommandError Mount::parkSet() {
   park.saved = true;
   nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
 
-  //saveAlignModel();
+  #if ALIGN_MAX_STARS > 1  
+    transform.align.modelWrite();
+  #endif
 
   trackingState = priorTrackingState;
   updateTrackingRates();
@@ -116,7 +118,9 @@ void Mount::parkFinish() {
     park.state = PS_PARKED;
     nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
 
-    //saveAlignModel();
+    #if ALIGN_MAX_STARS > 1  
+      transform.align.modelWrite();
+    #endif
 
     VLF("MSG: Parking done");
   } else { DLF("ERR, parkFinish(): Parking failed"); }
@@ -151,7 +155,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   if (gotoState != GS_NONE)             return CE_SLEW_IN_MOTION;
   if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
-//  if (!transform.site.dateTimeReady())  return CE_PARKED;
+//if (!transform.site.dateTimeReady())  return CE_PARKED;
 
   VLF("MSG: Unparking");
 
@@ -165,8 +169,10 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   axis2.enable(false);
 
   // load the pointing model
-  // loadAlignModel();
-
+  #if ALIGN_MAX_STARS > 1  
+    transform.align.modelRead();
+  #endif
+  
   axis1.setMotorCoordinateSteps(0);
   axis2.setMotorCoordinateSteps(0);
 
