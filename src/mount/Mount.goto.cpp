@@ -63,8 +63,8 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
   updatePosition(CR_MOUNT);
   target.pierSide = current.pierSide;
 
-  double a1, a2;
-  if (transform.mountType == ALTAZM) { a1 = target.z; a2 = target.a; } else { a1 = target.h; a2 = target.d; }
+  double a1;
+  if (transform.mountType == ALTAZM) a1 = target.z; else a1 = target.h;
 
   if (meridianFlip != MF_ALWAYS) { target.pierSide = PIER_SIDE_EAST; return CE_NONE; }
 
@@ -206,7 +206,7 @@ void Mount::gotoPoll() {
     target.h += radsPerCentisecond;
   } else
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
-    if (axis1.nearTarget() && axis2.nearTarget() || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
+    if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
 
       VLF("MSG: Mount::gotoPoll(); stopping slew");

@@ -34,10 +34,10 @@ void sprintF(char *result, const char *source, float f) {
   char s[20];
   dtostrf(f, mas, frac, s);
 
-  int j = 0;
-  for (int i = 0; i < a - source; i++) result[j++] = source[i];
-  for (int i = 0; i < strlen(s); i++) result[j++] = s[i];
-  for (int i = len; i < strlen(a); i++) result[j++] = a[i];
+  uint8_t j = 0;
+  for (uint8_t i = 0; i < a - source; i++) result[j++] = source[i];
+  for (uint8_t i = 0; i < strlen(s); i++) result[j++] = s[i];
+  for (uint8_t i = len; i < strlen(a); i++) result[j++] = a[i];
 }
 
 // convert string in format MM/DD/YY to Date
