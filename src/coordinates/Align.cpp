@@ -26,7 +26,7 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "../motion/Axis.h"
 
-#if ALIGN_MAX_STARS > 1
+#if ALIGN_MAX_NUM_STARS > 1
 
 uint8_t modelNumberStars = 0;
 void autoModelWrapper() { telescope.mount.transform.align.autoModel(modelNumberStars); }
@@ -82,7 +82,7 @@ bool GeoAlign::modelReady() {
 
 CommandError GeoAlign::addStar(int thisStar, int numberStars, Coordinate *actual, Coordinate *mount) {
   // just return if we are processing a model or the star count is out of range, this should never happen
-  if (autoModelTask != 0 || thisStar < 1 || thisStar > ALIGN_MAX_STARS || numberStars < 1 || numberStars > ALIGN_MAX_STARS) return CE_ALIGN_FAIL;
+  if (autoModelTask != 0 || thisStar < 1 || thisStar > ALIGN_MAX_NUM_STARS || numberStars < 1 || numberStars > ALIGN_MAX_NUM_STARS) return CE_ALIGN_FAIL;
 
   int i = thisStar - 1;
   if (mountType == ALTAZM) {

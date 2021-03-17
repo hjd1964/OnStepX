@@ -30,7 +30,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     // :AW#       Align Write to EEPROM
     //            Returns: 1 on success
     if (command[1] == 'W' && parameter[0] == 0) {
-      #if ALIGN_MAX_STARS > 1  
+      #if ALIGN_MAX_NUM_STARS > 1  
         transform.align.modelWrite();
       #endif
     } else
@@ -41,7 +41,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     //                  n is the current alignment star (0 otherwise)
     //                  o is the last required alignment star when an alignment is in progress (0 otherwise)
     if (command[1] == '?' && parameter[0] == 0) {
-      reply[0] = '0' + ALIGN_MAX_STARS;
+      reply[0] = '0' + ALIGN_MAX_NUM_STARS;
       reply[1] = '0' + alignState.currentStar;
       reply[2] = '0' + alignState.lastStar;
       reply[3] = 0;
@@ -60,7 +60,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     //            7) Back to #3 above until done, except where possible choose at least one star on both meridian sides
     //            Return: 0 on failure
     //                    1 on success
-    if (command[1] >= '1' && command[1] <= ALIGN_MAX_STARS + '0' && parameter[0] == 0) {
+    if (command[1] >= '1' && command[1] <= ALIGN_MAX_NUM_STARS + '0' && parameter[0] == 0) {
       // set current time and date before calling this routine
 
       // telescope should be set in the polar home (CWD) as a starting point

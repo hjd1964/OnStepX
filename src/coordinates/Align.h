@@ -20,14 +20,12 @@
   #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
     #error "ALIGN_MAX_STARS must be 1, or in the range of 3 to 9"
   #endif
+  #define ALIGN_MAX_NUM_STARS ALIGN_MAX_STARS
 #else
-  #if defined(ALIGN_MAX_STARS)
-    #undef ALIGN_MAX_STARS
-  #endif
   #if defined(HAL_FAST_PROCESSOR)
-    #define ALIGN_MAX_STARS 9
+    #define ALIGN_MAX_NUM_STARS 9
   #else
-    #define ALIGN_MAX_STARS 6
+    #define ALIGN_MAX_NUM_STARS 6
   #endif
 #endif
 
@@ -44,7 +42,7 @@ typedef struct Coordinate {
   PierSide pierSide;
 } Coordinate;
 
-#if ALIGN_MAX_STARS > 1
+#if ALIGN_MAX_NUM_STARS > 1
 
 // -----------------------------------------------------------------------------------
 // ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
@@ -96,9 +94,9 @@ class GeoAlign
 
     void autoModel(int n);
 
-    AlignCoordinate mount[ALIGN_MAX_STARS];
-    AlignCoordinate actual[ALIGN_MAX_STARS];
-    AlignCoordinate delta[ALIGN_MAX_STARS];
+    AlignCoordinate mount[ALIGN_MAX_NUM_STARS];
+    AlignCoordinate actual[ALIGN_MAX_NUM_STARS];
+    AlignCoordinate delta[ALIGN_MAX_NUM_STARS];
     AlignModel model;
 
   private:

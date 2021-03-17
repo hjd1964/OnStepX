@@ -63,7 +63,7 @@ class Transform {
     double apparentRefrac(double altitude);
 
     Site site;
-    #if ALIGN_MAX_STARS > 1  
+    #if ALIGN_MAX_NUM_STARS > 1  
       GeoAlign align;
     #endif
     int8_t mountType;

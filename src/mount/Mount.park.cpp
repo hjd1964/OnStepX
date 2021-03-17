@@ -46,7 +46,7 @@ CommandError Mount::parkSet() {
   park.saved = true;
   nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
 
-  #if ALIGN_MAX_STARS > 1  
+  #if ALIGN_MAX_NUM_STARS > 1  
     transform.align.modelWrite();
   #endif
 
@@ -118,7 +118,7 @@ void Mount::parkFinish() {
     park.state = PS_PARKED;
     nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
 
-    #if ALIGN_MAX_STARS > 1  
+    #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.modelWrite();
     #endif
 
@@ -169,7 +169,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   axis2.enable(false);
 
   // load the pointing model
-  #if ALIGN_MAX_STARS > 1  
+  #if ALIGN_MAX_NUM_STARS > 1  
     transform.align.modelRead();
   #endif
   
