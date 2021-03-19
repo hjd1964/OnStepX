@@ -10,6 +10,10 @@
 
 #include "SerialWrapper.h"
 
+#ifdef SERIAL_2_HWSERIAL
+  HardwareSerial Serial2(SERIAL_2_HWSERIAL_RX, SERIAL_2_HWSERIAL_TX);
+#endif
+
 SerialWrapper::SerialWrapper() {
   static uint8_t channel = 0;
 #ifdef SERIAL_A

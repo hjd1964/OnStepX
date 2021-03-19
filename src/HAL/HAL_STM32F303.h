@@ -20,7 +20,9 @@
 #define SERIAL_A Serial1
 // SerialB is optional
 #if SERIAL_B_BAUD_DEFAULT != OFF
-  HardwareSerial Serial2(PB11, PB10);
+  #define SERIAL_2_HWSERIAL
+  #define SERIAL_2_HWSERIAL_RX PB11
+  #define SERIAL_2_HWSERIAL_TX PB10
   #define SERIAL_B Serial2
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
