@@ -21,23 +21,28 @@ extern Telescope telescope;
 inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
 
 CommandError Mount::validateGoto() {
-  if ( axis1.fault()     ||  axis2.fault())        return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!axis1.isEnabled() || !axis2.isEnabled())    return CE_SLEW_ERR_IN_STANDBY;
-  if (park.state == PS_PARKED)                     return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                       return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE)                       return CE_SLEW_IN_SLEW;
+  if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+  if (park.state == PS_PARKED)                  return CE_SLEW_ERR_IN_PARK;
+  if (guideState != GU_NONE)                    return CE_SLEW_IN_MOTION;
+  if (gotoState  != GS_NONE)                    return CE_SLEW_IN_SLEW;
   return CE_NONE;
 }
 
 CommandError Mount::validateGotoCoords(Coordinate *coords) {
-  if (flt(coords->a, limits.altitude.min))         return CE_SLEW_ERR_BELOW_HORIZON;
-  if (fgt(coords->a, limits.altitude.max))         return CE_SLEW_ERR_ABOVE_OVERHEAD;
-  if (AXIS2_TANGENT_ARM == OFF && transform.mountType != ALTAZM) {
-    if (flt(coords->d, axis2.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (fgt(coords->d, axis2.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (flt(coords->a, limits.altitude.min))           return CE_SLEW_ERR_BELOW_HORIZON;
+  if (fgt(coords->a, limits.altitude.max))           return CE_SLEW_ERR_ABOVE_OVERHEAD;
+  if (transform.mountType == ALTAZM) {
+    if (flt(coords->z, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (fgt(coords->z, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  } else {
+    if (flt(coords->h, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (fgt(coords->h, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (AXIS2_TANGENT_ARM == OFF) {
+      if (flt(coords->d, axis2.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (fgt(coords->d, axis2.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    }
   }
-  if (flt(coords->h, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (fgt(coords->h, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   return CE_NONE;
 }
 
@@ -48,7 +53,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
 
   target = *coords;
   if (native) {
-    transform.rightAscensionToHourAngle(&target);
+    //transform.rightAscensionToHourAngle(&target);
     transform.nativeToMount(&target);
   }
   transform.equToHor(&target);
@@ -110,13 +115,16 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
   // converts from native to mount coordinates and checks for valid target
   CommandError e = setMountTarget(coords, pierSideSelect, native);
-  if (e == CE_SLEW_IN_SLEW) { gotoStop(); return e; }
+  if (e == CE_SLEW_IN_SLEW) {
+  //  gotoStop(); 
+    return e;
+  }
   if (e != CE_NONE) return e;
 
   limitsEnabled = true;
   misc.syncToEncodersOnly = false;
 
-  updatePosition(CR_MOUNT_ALT);
+  updatePosition(CR_MOUNT_HOR);
   start = current;
   destination = target;
 
@@ -124,39 +132,42 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   gotoState = GS_GOTO;
   gotoStage = GG_DESTINATION;
   if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
-    VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
+//    VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
     gotoWaypoint();
   }
+
+//  VF("Start       = "); transform.print(&start);
+//  VF("Destination = "); transform.print(&destination);
 
   // start the goto monitor
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
   gotoTaskHandle = tasks.add(10, 0, true, 1, mountGotoWrapper, "MntGoto");
   if (gotoTaskHandle) {
-    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success"); 
+//    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
 
     axis1.setTracking(false);
     axis2.setTracking(false);
-    VLF("MSG: Mount::gotoEqu(); automatic tracking stopped");
+//    VLF("MSG: Mount::gotoEqu(); automatic tracking stopped");
 
     axis1.markOriginCoordinate();
     axis2.markOriginCoordinate();
-    VLF("MSG: Mount::gotoEqu(); origin coordinates set");
+//    VLF("MSG: Mount::gotoEqu(); origin coordinates set");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
-    VLF("MSG: Mount::gotoEqu(); target coordinates set");
+//    VLF("MSG: Mount::gotoEqu(); target coordinates set");
     if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
 
     // slew rate in rads per second
     axis1.setFrequencyMax(radsPerSecondCurrent);
     axis2.setFrequencyMax(radsPerSecondCurrent);
-    VLF("MSG: Mount::gotoEqu(); slew rate set");
+//    VLF("MSG: Mount::gotoEqu(); slew rate set");
 
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-    VLF("MSG: Mount::gotoEqu(); slew started");
+//    VLF("MSG: Mount::gotoEqu(); slew started");
 
   } else DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!");
 
@@ -173,7 +184,7 @@ void Mount::gotoPoll() {
     gotoStage = GG_ABORT;
   } else
   if (gotoStage == GG_WAYPOINT) {
-    if (axis1.nearTarget() && axis2.nearTarget()) {
+    if (axis1.nearTarget() && axis2.nearTarget() || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
         VLF("MSG: Mount::gotoPoll(); home reached");
         gotoStage = GG_DESTINATION;
@@ -202,8 +213,6 @@ void Mount::gotoPoll() {
       axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
       VLF("MSG: Mount::gotoPoll(); slew started");
     }
-    // keep updating mount target
-    target.h += radsPerCentisecond;
   } else
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
@@ -235,7 +244,7 @@ void Mount::gotoPoll() {
 
       return;
     }
-    
+
     // keep updating the axis targets to match the mount target
     if (transform.mountType == ALTAZM) transform.equToHor(&target);
     double a1, a2;

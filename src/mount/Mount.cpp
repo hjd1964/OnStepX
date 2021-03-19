@@ -28,7 +28,7 @@ inline void mountTrackingWrapper() { telescope.mount.trackPoll(); }
 void Mount::init() {
 
   transform.init();
-  if (transform.mountType == GEM) meridianFlip = MF_ALWAYS;
+  if (transform.mountType != ALTAZM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
 
   // get PEC ready
   #if AXIS1_PEC == ON
@@ -110,12 +110,14 @@ void Mount::updatePosition(CoordReturn coordReturn) {
 }
 
 void Mount::updateTrackingRates() {
-  if (trackingState != TS_SIDEREAL || gotoState != GS_NONE) {
-    trackingRateAxis1 = 0.0F;
-    trackingRateAxis2 = 0.0F;
+  if (gotoState == GS_NONE) {
+    if (trackingState != TS_SIDEREAL) {
+      trackingRateAxis1 = 0.0F;
+      trackingRateAxis2 = 0.0F;
+    }
+    axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
+    axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
   }
-  axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
-  axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
 }
 
 #ifdef HAL_NO_DOUBLE_PRECISION
@@ -222,8 +224,8 @@ float Mount::usPerStepLowerLimit() {
   #endif
 
   // average required goto us rates for each axis with any micro-step mode switching applied
-  float r_us_axis1 = r_us/axis1.getStepsPerStepGoto();
-  float r_us_axis2 = r_us/axis2.getStepsPerStepGoto();
+  float r_us_axis1 = r_us/axis1.getStepsPerStepSlewing();
+  float r_us_axis2 = r_us/axis2.getStepsPerStepSlewing();
   
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
   r_us = (r_us_axis1 + r_us_axis2/timerRateRatio)/2.0F;

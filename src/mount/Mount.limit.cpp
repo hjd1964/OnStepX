@@ -36,6 +36,8 @@ void Mount::limitInit() {
 void Mount::limitPoll() {
   if (!limitsEnabled) return;
 
+  const char* errPre = "MSG: Mount::limitPoll() exceeded ";
+
   updatePosition(CR_MOUNT_ALT); Y;
   double a1, a2;
   if (transform.mountType == ALTAZM) a1 = current.z; else a1 = current.h;
@@ -46,24 +48,20 @@ void Mount::limitPoll() {
     if (transform.mountType == ALTAZM) a2 = current.a; else a2 = current.d;
   #endif
 
-  if (current.a < limits.altitude.min) { limitStop(GA_BREAK); error.altitude.min = true; } else error.altitude.min = false;
-  if (current.a > limits.altitude.max) { limitStop(GA_BREAK); error.altitude.max = true; } else error.altitude.max = false;
+  if (current.a < limits.altitude.min) { limitStop(GA_BREAK); error.altitude.min = true; V(errPre); VLF("min altitude"); } else error.altitude.min = false;
+  if (current.a > limits.altitude.max) { limitStop(GA_BREAK); error.altitude.max = true; V(errPre); VLF("max altitude"); } else error.altitude.max = false;
 
   if (meridianFlip != MF_NEVER && current.pierSide == PIER_SIDE_EAST) {
-  //VF("Axis1: current.h "); V(radToDeg(current.h)); VF(" < "); V(radToDeg(-limits.pastMeridianE)); VLF(" -pastMeridianE");
-    if (current.h < -limits.pastMeridianE) { limitStop(GA_REVERSE); error.meridian.east = true; } else error.meridian.east = false;
+    if (current.h < -limits.pastMeridianE) { limitStop(GA_REVERSE); error.meridian.east = true; V(errPre); VLF("meridian East"); } else error.meridian.east = false;
   } else error.meridian.east = false;
   if (meridianFlip != MF_NEVER && current.pierSide == PIER_SIDE_WEST) {
-  //VF("Axis1: current.h "); V(radToDeg(current.h)); VF(" > "); V(radToDeg(limits.pastMeridianW)); VLF(" pastMeridianW");
-    if (current.h > limits.pastMeridianW) { limitStop(GA_FORWARD); error.meridian.west = true; } else error.meridian.west = false;
+    if (current.h > limits.pastMeridianW) { limitStop(GA_FORWARD); error.meridian.west = true; V(errPre); VLF("meridian West"); } else error.meridian.west = false;
   } else error.meridian.west = false;
 
-//VF("Axis1: Min "); V(radToDeg(axis1.settings.limits.min)); VF(" < "); V(radToDeg(a1)); VF(" < "); VL(radToDeg(axis1.settings.limits.max));
-//VF("Axis2: Min "); V(radToDeg(axis2.settings.limits.min)); VF(" < "); V(radToDeg(a2)); VF(" < "); VL(radToDeg(axis2.settings.limits.max));
-  if (a1 < axis1.settings.limits.min) { limitStopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
-  if (a1 > axis1.settings.limits.max) { limitStopAxis1(GA_FORWARD); error.limit.axis1.max = true; } else error.limit.axis1.max = false;
-  if (a2 < axis2.settings.limits.min) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; } else error.limit.axis2.min = false;
-  if (a2 > axis2.settings.limits.max) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
+  if (a1 < axis1.settings.limits.min) { limitStopAxis1(GA_REVERSE); error.limit.axis1.min = true; V(errPre); VLF(" min axis1"); } else error.limit.axis1.min = false;
+  if (a1 > axis1.settings.limits.max) { limitStopAxis1(GA_FORWARD); error.limit.axis1.max = true; V(errPre); VLF("max axis1"); } else error.limit.axis1.max = false;
+  if (a2 < axis2.settings.limits.min) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; V(errPre); VLF("min axis2"); } else error.limit.axis2.min = false;
+  if (a2 > axis2.settings.limits.max) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; V(errPre); VLF("max axis2"); } else error.limit.axis2.max = false;
 }
 
 void Mount::limitStop(GuideAction stopDirection) {

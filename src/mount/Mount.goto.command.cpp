@@ -187,7 +187,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
 
   // :MA#       Goto the target Alt and Az
   //            Returns: 0..9, see :MS#
-  if (command[1] == 'A' && parameter[0] == 0) {
+  if (cmd("MA")) {
     CommandError e = setMountTarget(&gotoTarget, preferredPierSide);
     if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
     if (e == CE_NONE) reply[0] = '0';
