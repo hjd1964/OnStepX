@@ -118,6 +118,10 @@ void StepDriver::init(uint8_t axisNumber) {
   }
 }
 
+bool StepDriver::modeSwitchAllowed() {
+  return microstepRatio != 1;  
+}
+
 void StepDriver::modeTracking() {
   if (isTmcSPI()) {
     #ifdef HAS_TMC_DRIVER

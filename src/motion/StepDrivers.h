@@ -83,6 +83,7 @@ class StepDriver {
     void init(uint8_t axisNumber);
 
     // set microstep and decay modes for tracking
+    bool modeSwitchAllowed();
     void modeTracking();
     void modeDecayTracking();
 
@@ -93,6 +94,7 @@ class StepDriver {
     #ifdef HAS_TMC_DRIVER
       TmcDriver tmcDriver{pins};
     #endif
+
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
