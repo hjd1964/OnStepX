@@ -15,6 +15,12 @@ extern Tasks tasks;
 
 extern volatile unsigned long centisecondLAST;
 
+void Transform::print(Coordinate *coord) {
+  VF("(a="); V(radToDeg(coord->a)); VF(", z="); V(radToDeg(coord->z));
+  VF("), (r="); V(radToDeg(coord->r)); VF(", h="); V(radToDeg(coord->h)); VF(", d="); V(radToDeg(coord->d));
+  VF("), pierSide="); VL(coord->pierSide);
+}
+
 void Transform::init() {
   mountType = MOUNT_TYPE;
   #if DEBUG != OFF
@@ -159,8 +165,8 @@ void Transform::equToHor(Coordinate *coord) {
   double t1     = sin(coord->h);
   double t2     = cosHA*site.locationEx.latitude.sine - tan(coord->d)*site.locationEx.latitude.cosine;
   coord->z      = atan2(t1,t2);
-  coord->z      += PI;
-  if (coord->z > PI) coord->z -= TWO_PI;
+  coord->z      += Deg180;
+  if (coord->z > Deg180) coord->z -= Deg360;
 }
 
 void Transform::equToAlt(Coordinate *coord) {
@@ -176,8 +182,8 @@ void Transform::horToEqu(Coordinate *coord) {
   double t1     = sin(coord->z);
   double t2     = cosAzm*site.locationEx.latitude.sine - tan(coord->a)*site.locationEx.latitude.cosine;
   coord->h      = atan2(t1,t2);
-  coord->h     += PI;
-  if (coord->h > PI) coord->h -= TWO_PI;
+  coord->h     += Deg180;
+  if (coord->h > Deg180) coord->h -= Deg360;
 }
 
 double Transform::trueRefrac(double altitude) {

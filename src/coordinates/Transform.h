@@ -15,6 +15,9 @@ class Transform {
     // setup for coordinate transformation
     void init();
 
+    // prints a coordinate to the debug serial port, if active
+    void print(Coordinate *coord);
+
     // converts from Mount (equatorial or horizon) to Native (equatorial and optionally horizon also) coordinates
     // returns equatorial RA
     Coordinate mountToNative(Coordinate *coord, bool returnHorizonCoords = false);
