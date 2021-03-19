@@ -53,8 +53,8 @@ class Axis {
     // get steps per measure
     double getStepsPerMeasure();
 
-    // get tracking mode steps per goto mode step
-    int getStepsPerStepGoto();
+    // get tracking mode steps per slewing mode step
+    int getStepsPerStepSlewing();
 
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
@@ -87,9 +87,6 @@ class Axis {
     // returns true if within 2 steps of target
     bool nearTarget();
 
-    // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
-    double getOriginOrTargetDistance();
-
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(float frequency);
     // get frequency in "measures" (degrees, microns, etc.) per second
@@ -116,8 +113,6 @@ class Axis {
     void autoSlewAbort();
     // checks if slew is active on this axis
     bool autoSlewActive();
-    // monitor movement
-    void poll();
 
     // set tracking state (automatic movement of target)
     void setTracking(bool state);
@@ -128,25 +123,9 @@ class Axis {
     void setBacklash(float value);
     // get backlash in "measures" (radians, microns, etc.)
     float getBacklash();
-    // returns true if traveling through backlash
-    bool inBacklash();
-    // disable backlash compensation, to work properly there must be an enable call to match
-    void disableBacklash();
-    // enable backlash compensation, to work properly this must be proceeded by a disable call
-    void enableBacklash();
 
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
-
-    // swaps fast unidirectional movement ISR for slewing in/out
-    void enableMoveFast(bool state);
-
-    // sets dir as required and moves coord toward target; requires two calls to take a step
-    void move(const int8_t stepPin, const int8_t dirPin);
-    // fast axis movement forward only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
-    void moveForwardFast(const int8_t stepPin, const int8_t dirPin);
-    // fast axis movement reverse only, no backlash, no mode switching; requires one or two calls to take a step depending on mode
-    void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
 
     // checks for an error that would disallow forward motion
     bool motionForwardError();
@@ -155,11 +134,34 @@ class Axis {
     // checks for an error that would disallow motion
     bool motionError();
 
+    // callbacks
+
+    // monitor movement
+    void poll();
+    // sets dir as required and moves coord toward target
+    void move(const int8_t stepPin, const int8_t dirPin);
+    // fast axis movement forward only, no backlash, no mode switching
+    void moveForwardFast(const int8_t stepPin, const int8_t dirPin);
+    // fast axis movement reverse only, no backlash, no mode switching
+    void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
+
     AxisSettings settings;
     AxisErrors error;
     StepDriver driver;
 
   private:
+    // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
+    double getOriginOrTargetDistance();
+    // returns true if traveling through backlash
+    bool inBacklash();
+    // disable backlash compensation, to work properly there must be an enable call to match
+    void disableBacklash();
+    // enable backlash compensation, to work properly this must be proceeded by a disable call
+    void enableBacklash();
+
+    // swaps fast unidirectional movement ISR for slewing in/out
+    void enableMoveFast(bool state);
+    
     AxisPins pins;
 
     uint8_t taskHandle = 0;
@@ -185,11 +187,12 @@ class Axis {
     volatile long indexSteps = 0;
     volatile int  trackingStep = 1;
     volatile int  step = 1;
-    volatile int  stepGoto = 1;
+    volatile int  stepsPerStepSlewing = 1;
     volatile bool takeStep = false;
     volatile Direction direction = DIR_NONE;
 
-    unsigned long lastPeriod;
+    unsigned long lastPeriod = 0;
+    unsigned long lastPeriodSet = 0;
 
     float freq = 0.0F;
     float maxFreq;
@@ -203,5 +206,5 @@ class Axis {
     // abort slew rate in measures per second per centisecond
     float abortMpspcs;
 
-    MicrostepModeControl microstepModeControl = MMC_TRACKING;
+    volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

@@ -141,8 +141,8 @@ double Axis::getStepsPerMeasure() {
   return settings.stepsPerMeasure;
 }
 
-int Axis::getStepsPerStepGoto() {
-  return stepGoto;
+int Axis::getStepsPerStepSlewing() {
+  return stepsPerStepSlewing;
 }
 
 void Axis::setMotorCoordinate(double value) {
@@ -263,17 +263,19 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
+  driver.modeDecayGoto();
   VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
 void Axis::autoSlewRateByDistanceStop() {
+  driver.modeDecayTracking();
   autoRate = AR_NONE;
-  poll();
 }
 
 void Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return;
   if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
+  driver.modeDecayGoto();
   VF("MSG: Axis::autoSlewTime(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
@@ -287,7 +289,7 @@ void Axis::autoSlewStop() {
 
 void Axis::autoSlewAbort() {
   if (autoRate != AR_NONE) {
-    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" abort slew");
+    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" aborting slew");
     autoRate = AR_RATE_BY_TIME_ABORT;
     poll();
   }
@@ -315,6 +317,7 @@ void Axis::poll() {
   if (autoRate == AR_RATE_BY_TIME_END) {
     if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < -slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
     if (fabs(freq) <= slewMpspcs) {
+      driver.modeDecayTracking();
       autoRate = AR_NONE;
       freq = 0.0F;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew stopped");
@@ -323,6 +326,7 @@ void Axis::poll() {
   if (autoRate == AR_RATE_BY_TIME_ABORT) {
     if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < -abortMpspcs) freq += abortMpspcs; else freq = 0.0F;
     if (fabs(freq) <= abortMpspcs) {
+      driver.modeDecayTracking();
       autoRate = AR_NONE;
       freq = 0.0F;
       VF("MSG: Axis::poll(); Axis"); V(axisNumber); VLF(" slew aborted");
@@ -362,11 +366,15 @@ void Axis::setFrequency(float frequency) {
   if (!isnan(period) && fabs(period) <= 134000000.0F) {
     // convert microsecond counts to sub-microsecond counts
     period *= 16.0F;
-    lastPeriod = (unsigned long)lround(period);
+    lastPeriodSet = (unsigned long)lround(period);
+
     // adjust period for MCU clock inaccuracy
     period *= (SIDEREAL_PERIOD/periodSubMicros);
-  } else { period = 0.0; lastPeriod = 0; }
-  tasks.setPeriodSubMicros(taskHandle, (unsigned long)lround(period));
+    // if this is the active period, just return
+    if (lastPeriod == (unsigned long)lround(period)) return;
+    lastPeriod = (unsigned long)lround(period);
+  } else { period = 0.0; lastPeriodSet = 0; lastPeriod = 0; }
+  tasks.setPeriodSubMicros(taskHandle, lastPeriod);
 }
 
 float Axis::getFrequency() {
@@ -374,11 +382,11 @@ float Axis::getFrequency() {
 }
 
 float Axis::getFrequencySteps() {
-  if (lastPeriod == 0) return 0;
+  if (lastPeriodSet == 0) return 0;
   #if STEP_WAVE_FORM == SQUARE
-      return 16000000.0F/(lastPeriod*2.0F);
-    #else
-      return 16000000.0F/lastPeriod;
+    return 16000000.0F/(lastPeriodSet*2.0F);
+  #else
+    return 16000000.0F/lastPeriodSet;
   #endif
 }
 
@@ -448,6 +456,13 @@ bool Axis::motionError() {
 void Axis::enableMoveFast(bool fast) {
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     if (fast) {
+      // switch to the slewing microstep mode
+      if (driver.modeSwitchAllowed()) {
+        if (microstepModeControl == MMC_SLEWING_READY) {
+          driver.modeGoto();
+          microstepModeControl = MMC_SLEWING;
+        } else if (microstepModeControl != MMC_SLEWING) return;
+      }
       // swap in the fast ISR's
       disableBacklash();
       if (axisNumber == 1) {
@@ -457,6 +472,13 @@ void Axis::enableMoveFast(bool fast) {
         if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
       }
     } else {
+      // switch to the tracking microstep mode
+      if (driver.modeSwitchAllowed()) {
+        if (microstepModeControl == MMC_SLEWING) {
+          driver.modeTracking();
+          microstepModeControl = MMC_TRACKING;
+        } else if (microstepModeControl != MMC_TRACKING) return;
+      }
       // swap out the fast ISR's
       if (axisNumber == 1) tasks.setCallback(taskHandle, moveAxis1);
       if (axisNumber == 2) tasks.setCallback(taskHandle, moveAxis2);
@@ -467,9 +489,7 @@ void Axis::enableMoveFast(bool fast) {
 
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
-    #if MODE_SWITCH == ON
-      if (microstepModeControl == SLEWING_READY) return;
-    #endif
+    if (microstepModeControl == MMC_SLEWING_READY) return;
     if (takeStep) {
       if (direction == DIR_FORWARD) {
         if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
@@ -479,9 +499,6 @@ void Axis::enableMoveFast(bool fast) {
         if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
         digitalWriteF(stepPin, HIGH);
       }
-      #if MODE_SWITCH == ON
-        if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepGoto == 0) microstepModeControl = SLEWING_READY;
-      #endif
     } else {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps + backlashSteps < targetSteps) {
@@ -492,9 +509,7 @@ void Axis::enableMoveFast(bool fast) {
         digitalWriteF(dirPin, invertDir?LOW:HIGH);
       } else direction = DIR_NONE;
       digitalWriteF(stepPin, LOW);
-      #if MODE_SWITCH == ON
-        if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
-      #endif
+      if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
     }
     takeStep = !takeStep;
   }
@@ -515,9 +530,7 @@ void Axis::enableMoveFast(bool fast) {
 #endif
 #if STEP_WAVE_FORM == PULSE
   IRAM_ATTR void Axis::move(const int8_t stepPin, const int8_t dirPin) {
-    #if MODE_SWITCH == ON
-      if (microstepModeControl == SLEWING_READY) return;
-    #endif
+    if (microstepModeControl == MMC_SLEWING_READY) return;
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps + backlashSteps < targetSteps) {
@@ -531,9 +544,7 @@ void Axis::enableMoveFast(bool fast) {
       if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
     } else { direction = DIR_NONE; return; }
     digitalWriteF(stepPin, HIGH);
-    #if MODE_SWITCH == ON
-      if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepGoto == 0) microstepModeControl = SLEWING_READY;
-    #endif
+    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
   }
   IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
