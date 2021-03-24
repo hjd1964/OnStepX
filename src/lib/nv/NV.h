@@ -116,5 +116,14 @@ class NonVolatileStorage {
     uint8_t* cacheStateWrite;
 
     uint32_t waitMs = 0;
+
+    // a quick to access flag to tell us if delayed commit is enabled
+    bool delayedCommitEnabled = false;
+
+    // true if the entire cache was clean for the pass 
+    bool cacheCleanThisPass = false;
+    // if the entire cache is up to date, skip the scanning
+    bool cacheClean = false;
+
     uint32_t commitReadyTimeMs = 0;
 };

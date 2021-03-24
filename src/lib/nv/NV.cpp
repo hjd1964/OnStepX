@@ -10,6 +10,7 @@ bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bo
   // set cache size, defaults to 0 otherwise
   if (cacheEnable) cacheSize = size;
   waitMs = wait;
+  if (waitMs == 0) delayedCommitEnabled = false; else delayedCommitEnabled = true;
 
   cacheStateSize = cacheSize/8 + 1;
   if (cacheSize == 0) return true;
@@ -31,18 +32,24 @@ void NonVolatileStorage::readOnly(bool state) {
 }
 
 void NonVolatileStorage::poll() {
-  if (cacheSize == 0) return;
+  if (cacheSize == 0 || cacheClean) return;
 
   int8_t dirtyW = 0, dirtyR = 0;
 
   if (busy()) return;
 
   // check 20 byte chunks of cache for data that needs processing
-  for (uint16_t j = 0; j < 20; j++) {
-    cacheIndex++; if (cacheIndex >= cacheSize) cacheIndex = 0;
-    if ((long)(millis() - commitReadyTimeMs) >= 0) dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
+  for (uint8_t j = 0; j < 20; j++) {
+    cacheIndex++;
+    if (cacheIndex >= cacheSize) {
+      if (cacheCleanThisPass) cacheClean = true;
+      cacheIndex = 0;
+      cacheCleanThisPass = true;
+    }
+
+    if (!delayedCommitEnabled || (long)(millis() - commitReadyTimeMs) >= 0) dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
     dirtyR = bitRead(cacheStateRead[cacheIndex/8], cacheIndex%8);
-    if (dirtyW || dirtyR) break;
+    if (dirtyW || dirtyR) { cacheCleanThisPass = false; break; }
   }
 
   if (dirtyW) {
@@ -91,6 +98,9 @@ uint8_t NonVolatileStorage::readFromCache(uint16_t i) {
 }
 
 void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
+  // no longer clean
+  cacheClean = false;
+
   if (cacheSize == 0 || readAndWriteThrough) if (!readOnlyMode) writeToStorage(i, j);
   if (cacheSize == 0) return;
 
