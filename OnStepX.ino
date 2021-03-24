@@ -101,23 +101,23 @@ void setup() {
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   #ifdef SERIAL_A
     VF("MSG: Setup, starting command channel A task (rate 1ms priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsA, "PrcCmdA")) VL("success"); else VL("FAILED!");
+    if (tasks.add(5, 0, true, 6, processCmdsA, "PrcCmdA")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_B
     VF("MSG: Setup, starting command channel B task (rate 1ms priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsB, "PrcCmdB")) VL("success"); else VL("FAILED!");
+    if (tasks.add(5, 0, true, 6, processCmdsB, "PrcCmdB")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_C
     VF("MSG: Setup, starting command channel C task (rate 1ms priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsC, "PrcCmdC")) VL("success"); else VL("FAILED!");
+    if (tasks.add(5, 0, true, 6, processCmdsC, "PrcCmdC")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_D
     VF("MSG: Setup, starting command channel D task (rate 1ms priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsD, "PrcCmdD")) VL("success"); else VL("FAILED!");
+    if (tasks.add(5, 0, true, 6, processCmdsD, "PrcCmdD")) VL("success"); else VL("FAILED!");
   #endif
   #ifdef SERIAL_ST4
     VF("MSG: Setup, starting command channel ST4 task (rate 1ms priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsST4, "PrcCmdS")) VL("success"); else VL("FAILED!");
+    if (tasks.add(5, 0, true, 6, processCmdsST4, "PrcCmdS")) VL("success"); else VL("FAILED!");
   #endif
 
   telescope.init();
