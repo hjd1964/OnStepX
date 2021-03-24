@@ -29,8 +29,8 @@ void Mount::limitInit() {
   nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
 
   // start limit monitor task
-  VF("MSG: Mount, start limit monitor task (rate 10ms priority 3)... ");
-  if (tasks.add(10, 0, true, 3, mountLimitWrapper, "MntLmt")) VL("success"); else VL("FAILED!");
+  VF("MSG: Mount, start limit monitor task (rate 100ms priority 3)... ");
+  if (tasks.add(100, 0, true, 3, mountLimitWrapper, "MntLmt")) VL("success"); else VL("FAILED!");
 }
 
 void Mount::limitPoll() {
