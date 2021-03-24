@@ -20,15 +20,15 @@ extern unsigned long periodSubMicros;
   const AxisPins     Axis1StepPins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
   const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS1_DRIVER_REVERSE, { degToRad(AXIS1_LIMIT_MIN), degToRad(AXIS1_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  IRAM_ATTR void moveForwardFastAxis1() { telescope.mount.axis1.moveForwardFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  IRAM_ATTR void moveReverseFastAxis1() { telescope.mount.axis1.moveReverseFast(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void slewForwardAxis1() { telescope.mount.axis1.slewForward(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void slewReverseAxis1() { telescope.mount.axis1.slewReverse(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const AxisPins     Axis2StepPins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
   const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS2_DRIVER_REVERSE, { degToRad(AXIS2_LIMIT_MIN), degToRad(AXIS2_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  IRAM_ATTR void moveForwardFastAxis2() { telescope.mount.axis2.moveForwardFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  IRAM_ATTR void moveReverseFastAxis2() { telescope.mount.axis2.moveReverseFast(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void slewForwardAxis2() { telescope.mount.axis2.slewForward(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void slewReverseAxis2() { telescope.mount.axis2.slewReverse(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3StepPins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
@@ -75,8 +75,8 @@ inline void pollAxes() {
 
 void Axis::init(uint8_t axisNumber) {
   if (pollingTaskHandle == 0) {
-    VF("MSG: Axis, starting axis polling task (rate 10ms priority 0)... ");
-    pollingTaskHandle = tasks.add(10, 0, true, 0, pollAxes, "AxsPoll");
+    VF("MSG: Axis, starting axis polling task (rate 20ms priority 0)... ");
+    pollingTaskHandle = tasks.add(20, 0, true, 0, pollAxes, "AxsPoll");
     if (pollingTaskHandle) VL("success"); else VL("FAILED!");
   }
 
@@ -263,8 +263,8 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
-  driver.modeDecayGoto();
-  VF("MSG: Axis::autoFrequencyByDistance(); Axis"); V(axisNumber); VLF(" slew started");
+  driver.modeDecaySlewing();
+  VF("MSG: Axis::autoSlewRateByDistance(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
 void Axis::autoSlewRateByDistanceStop() {
@@ -275,13 +275,13 @@ void Axis::autoSlewRateByDistanceStop() {
 void Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return;
   if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
-  driver.modeDecayGoto();
-  VF("MSG: Axis::autoSlewTime(); Axis"); V(axisNumber); VLF(" slew started");
+  driver.modeDecaySlewing();
+  VF("MSG: Axis::autoSlew(); Axis"); V(axisNumber); VLF(" slew started");
 }
 
 void Axis::autoSlewStop() {
   if (autoRate != AR_NONE && autoRate != AR_RATE_BY_TIME_ABORT) {
-    VF("MSG: Axis::autoSlewStop(); Axis"); V(axisNumber); VLF(" stopping slew");
+    VF("MSG: Axis::autoSlewStop(); Axis"); V(axisNumber); VLF(" slew stopping");
     autoRate = AR_RATE_BY_TIME_END;
     poll();
   }
@@ -289,7 +289,7 @@ void Axis::autoSlewStop() {
 
 void Axis::autoSlewAbort() {
   if (autoRate != AR_NONE) {
-    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" aborting slew");
+    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" slew aborting");
     autoRate = AR_RATE_BY_TIME_ABORT;
     poll();
   }
@@ -302,17 +302,21 @@ bool Axis::autoSlewActive() {
 void Axis::poll() {
   // limits
 
-  // acceleration
   if (autoRate == AR_NONE) return;
+
+  // acceleration
   if (autoRate == AR_RATE_BY_DISTANCE) {
-    freq = getOriginOrTargetDistance()/slewAccelerationDistance*maxFreq + siderealToRad(backlashFreq);
+    freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*maxFreq + backlashFreq;
     if (freq < backlashFreq) freq = backlashFreq;
+    if (freq > maxFreq) freq = maxFreq;
   } else
   if (autoRate == AR_RATE_BY_TIME_FORWARD) {
     freq += slewMpspcs;
+    if (freq > maxFreq) freq = maxFreq;
   } else
   if (autoRate == AR_RATE_BY_TIME_REVERSE) {
     freq -= slewMpspcs;
+    if (freq < -maxFreq) freq = -maxFreq;
   } else
   if (autoRate == AR_RATE_BY_TIME_END) {
     if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < -slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
@@ -333,21 +337,29 @@ void Axis::poll() {
     }
   } else freq = 0.0F;
 
-  if (freq < -maxFreq) freq = -maxFreq; else if (freq >  maxFreq) freq = maxFreq;
-  setFrequency(freq);
 
-  // ISR swap
-  if (moveFast && (fabs(freq) <= backlashFreq*1.2F || autoRate == AR_NONE)) {
-     moveFast = false;
-     enableMoveFast(false);
-     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped out at "); VL(radToDeg(freq));
-  } else
-
-  if (!moveFast && fabs(freq) > backlashFreq*1.2F) {
-    moveFast = true;
-    enableMoveFast(true);
-     VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped in at "); VL(radToDeg(freq));
+  // ISR swap and microstep mode switching
+  if (microstepModeControl == MMC_SLEWING) {
+    if (fabs(freq) <= backlashFreq*1.2F || autoRate == AR_NONE) {
+      if (driver.modeSwitchAllowed()) driver.modeMicrostepTracking();
+      microstepModeControl = MMC_TRACKING;
+      enableMoveFast(false);
+      VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped out at "); VL(radToDeg(freq));
+    }
+  } else {
+    if (fabs(freq) > backlashFreq*1.2F) {
+      if (driver.modeSwitchAllowed()) {
+        if (microstepModeControl == MMC_TRACKING) { microstepModeControl = MMC_SLEWING_REQUEST; return; } else
+        if (microstepModeControl != MMC_SLEWING_READY) return;
+        driver.modeMicrostepSlewing();
+      }
+      microstepModeControl = MMC_SLEWING;
+      enableMoveFast(true);
+      VF("MSG: Axis::poll(); Axis"); V(axisNumber); VF(" high speed ISR swapped in at "); VL(radToDeg(freq));
+    }
   }
+
+  setFrequency(freq);
 }
 
 void Axis::setFrequency(float frequency) {
@@ -453,33 +465,17 @@ bool Axis::motionError() {
   return motionForwardError() || motionReverseError();
 }
 
-void Axis::enableMoveFast(bool fast) {
+void Axis::enableMoveFast(const bool fast) {
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     if (fast) {
-      // switch to the slewing microstep mode
-      if (driver.modeSwitchAllowed()) {
-        if (microstepModeControl == MMC_SLEWING_READY) {
-          driver.modeGoto();
-          microstepModeControl = MMC_SLEWING;
-        } else if (microstepModeControl != MMC_SLEWING) return;
-      }
-      // swap in the fast ISR's
       disableBacklash();
       if (axisNumber == 1) {
-        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis1); else tasks.setCallback(taskHandle, moveReverseFastAxis1);
+        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, slewForwardAxis1); else tasks.setCallback(taskHandle, slewReverseAxis1);
       }
       if (axisNumber == 2) {
-        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, moveForwardFastAxis2); else tasks.setCallback(taskHandle, moveReverseFastAxis2);
+        if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, slewForwardAxis2); else tasks.setCallback(taskHandle, slewReverseAxis2);
       }
     } else {
-      // switch to the tracking microstep mode
-      if (driver.modeSwitchAllowed()) {
-        if (microstepModeControl == MMC_SLEWING) {
-          driver.modeTracking();
-          microstepModeControl = MMC_TRACKING;
-        } else if (microstepModeControl != MMC_TRACKING) return;
-      }
-      // swap out the fast ISR's
       if (axisNumber == 1) tasks.setCallback(taskHandle, moveAxis1);
       if (axisNumber == 2) tasks.setCallback(taskHandle, moveAxis2);
       enableBacklash();
@@ -513,14 +509,14 @@ void Axis::enableMoveFast(bool fast) {
     }
     takeStep = !takeStep;
   }
-  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewForward(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
   }
-  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin, const int8_t dirPin) {
     if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
@@ -546,12 +542,12 @@ void Axis::enableMoveFast(bool fast) {
     digitalWriteF(stepPin, HIGH);
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
   }
-  IRAM_ATTR void Axis::moveForwardFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewForward(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
   }
-  IRAM_ATTR void Axis::moveReverseFast(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin, const int8_t dirPin) {
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }

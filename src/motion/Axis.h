@@ -141,9 +141,9 @@ class Axis {
     // sets dir as required and moves coord toward target
     void move(const int8_t stepPin, const int8_t dirPin);
     // fast axis movement forward only, no backlash, no mode switching
-    void moveForwardFast(const int8_t stepPin, const int8_t dirPin);
+    void slewForward(const int8_t stepPin, const int8_t dirPin);
     // fast axis movement reverse only, no backlash, no mode switching
-    void moveReverseFast(const int8_t stepPin, const int8_t dirPin);
+    void slewReverse(const int8_t stepPin, const int8_t dirPin);
 
     AxisSettings settings;
     AxisErrors error;
@@ -160,7 +160,7 @@ class Axis {
     void enableBacklash();
 
     // swaps fast unidirectional movement ISR for slewing in/out
-    void enableMoveFast(bool state);
+    void enableMoveFast(const bool state);
     
     AxisPins pins;
 
@@ -170,14 +170,13 @@ class Axis {
     bool invertEnable = false;
     bool enabled = false;
     bool tracking = false;
-    bool moveFast = false;
 
     long originSteps = 0;
 
     float backlashFreq = siderealToRad(TRACK_BACKLASH_RATE);
-    unsigned long backlashStepsStore;
-    volatile long backlashSteps = 0;
-    volatile long backlashAmountSteps = 0;
+    uint16_t backlashStepsStore;
+    volatile uint16_t backlashSteps = 0;
+    volatile uint16_t backlashAmountSteps = 0;
 
     volatile bool invertStep = false;
     volatile bool invertDir = false;
