@@ -275,7 +275,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //                    1 on success
   if (cmd("hR")) *commandError = parkRestore(true); else
 
-  //  :ST[H.H]# Set Tracking Rate in Hz where 60.0 is solar rate
+  //  :ST[H.H]# Set Tracking Rate in Hz where 60.0 is the solar rate
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("ST"))  {

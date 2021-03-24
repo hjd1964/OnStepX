@@ -122,7 +122,7 @@ bool StepDriver::modeSwitchAllowed() {
   return microstepRatio != 1;  
 }
 
-void StepDriver::modeTracking() {
+void StepDriver::modeMicrostepTracking() {
   if (isTmcSPI()) {
     #ifdef HAS_TMC_DRIVER
       tmcDriver.refresh_CHOPCONF(microstepCode);
@@ -150,7 +150,7 @@ void StepDriver::modeDecayTracking() {
   }
 }
 
-uint8_t StepDriver::modeGoto() {
+uint8_t StepDriver::modeMicrostepSlewing() {
   if (isTmcSPI()) {
     #ifdef HAS_TMC_DRIVER
       tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
@@ -165,7 +165,7 @@ uint8_t StepDriver::modeGoto() {
   return microstepRatio;
 }
 
-void StepDriver::modeDecayGoto() {
+void StepDriver::modeDecaySlewing() {
   if (isTmcSPI()) {
     #ifdef HAS_TMC_DRIVER
       int IRUN = settings.currentGoto;

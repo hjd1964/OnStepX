@@ -84,12 +84,12 @@ class StepDriver {
 
     // set microstep and decay modes for tracking
     bool modeSwitchAllowed();
-    void modeTracking();
+    void modeMicrostepTracking();
     void modeDecayTracking();
 
-    // set microstep and decay modes for goto
-    uint8_t modeGoto();
-    void modeDecayGoto();
+    // set microstep and decay modes for slewing
+    uint8_t modeMicrostepSlewing();
+    void modeDecaySlewing();
 
     #ifdef HAS_TMC_DRIVER
       TmcDriver tmcDriver{pins};

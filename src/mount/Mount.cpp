@@ -136,7 +136,7 @@ void Mount::trackPoll() {
     return;
   }
 
-  // get positions 1 (or 10) arc-min ahead and behind the current
+  // get positions 1 (or 30) arc-min ahead and behind the current
   updatePosition(CR_MOUNT); Y;
   if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
   Coordinate ahead = current;
