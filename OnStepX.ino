@@ -92,9 +92,9 @@ void setup() {
   HAL_INIT();
 
   // System services
-  // add task for system services, runs at 5ms intervals
-  VF("MSG: Setup, starting system service task (rate 5ms priority 7)... ");
-  if (tasks.add(5, 0, true, 7, systemServices, "SysSvcs")) VL("success"); else VL("FAILED!");
+  // add task for system services, runs at 10ms intervals so commiting 1KB of NV takes about 10 seconds
+  VF("MSG: Setup, starting system service task (rate 10ms priority 7)... ");
+  if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) VL("success"); else VL("FAILED!");
 
   // Command processing
   // add tasks to process commands
