@@ -16,6 +16,14 @@ typedef struct InitError {
 
 extern InitError initError;
 
+// ambient temperature (°C), pressure (mb), humidity (RH %), and altitude (meters)
+typedef struct Ambient {
+  float temperature;
+  float pressure;
+  float humidity;
+  float altitude;
+} Ambient;
+
 class Telescope {
   public:
     // setup the location, time keeping, and coordinate converson
@@ -44,8 +52,10 @@ class Telescope {
       Focuser focuser3;
     #endif
 
-    Site site;
+    Ambient ambient = { 10.0, 1010.0, 50, 100 };
 
   private:
-
+    inline float dewPoint(Ambient conditions) { return conditions.temperature - ((100.0F - conditions.humidity) / 5.0F); }
 };
+
+extern Telescope telescope;

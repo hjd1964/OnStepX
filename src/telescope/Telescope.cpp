@@ -62,8 +62,75 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
     if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
     *numericReply = false;
-    return true;
-  }
-  
-  return false;
+  } else
+
+  if (cmdGX("GX9")) {
+
+    // :GX9A#     temperature in deg. C
+    //            Returns: +/-n.n
+    if (parameter[1] == 'A') {
+      sprintF(reply, "%3.1f", ambient.temperature);
+      *numericReply = false;
+     } else
+
+    // :GX9B#     pressure in mb
+    //            Returns: +/-n.n
+    if (parameter[1] == 'B') {
+      sprintF(reply, "%3.1f", ambient.pressure);
+      *numericReply = false;
+    } else
+
+    // :GX9C#     relative humidity in %
+    //            Returns: +/-n.n
+    if (parameter[1] == 'C') {
+      sprintF(reply, "%3.1f", ambient.humidity);
+      *numericReply = false;
+    } else
+
+    // :GX9D#     altitude in meters
+    //            Returns: +/-n.n
+    if (parameter[1] == 'D') {
+      sprintF(reply, "%3.1f", ambient.altitude);
+      *numericReply = false;
+    } else
+
+    // :GX9E#     dew point in deg. C
+    //            Returns: +/-n.n
+    if (parameter[1] == 'E') {
+      sprintF(reply, "%3.1f", dewPoint(ambient));
+      *numericReply = false;
+    } else return false;
+  } else
+ 
+  if (cmdSX("SX9")) {
+    char *conv_end;
+    float f = strtod(&parameter[3], &conv_end);
+    if (&parameter[3] == conv_end) f = NAN;
+    // :SX9A,[sn.n]#
+    //            Set temperature in deg. C
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'A') {
+      if (f >= -100.0 && f < 100.0) ambient.temperature = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9B,[n.n]#
+    //            Set pressure in mb
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'B') {
+      if (f >= 500.0 && f < 1500.0) ambient.pressure = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9C,[n.n]#
+    //            relative humidity in %
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'C') {
+      if (f >= 0.0 && f < 100.0) ambient.humidity = f; else *commandError = CE_PARAM_RANGE;
+    } else
+    // :SX9D,[sn.n]#
+    //            altitude
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'D') {
+      if (f >= -100.0 && f < 20000.0) ambient.altitude = f; else *commandError = CE_PARAM_RANGE;
+    } else return false;
+  } else return false;
+
+  return true;
 }

@@ -30,16 +30,6 @@ typedef struct Location {
 } Location;
 #pragma pack()
 
-// ambient temperature (°C), pressure (mb), humidity (RH %), and altitude (meters)
-typedef struct SiteConditions {
-  float temperature;
-  float pressure;
-  float humidity;
-  float altitude;
-} SiteConditions;
-
-extern SiteConditions siteConditions;
-
 typedef struct SiteErrors {
   bool init;
   bool TLSinit;
@@ -110,8 +100,6 @@ class Site {
 
     // reads the julian date information from NV
     void readJD();
-
-    inline float dewPoint(SiteConditions conditions) { return conditions.temperature - ((100.0F - conditions.humidity) / 5.0F); }
 
     JulianDate ut1;
     double centisecondHOUR = 0;

@@ -134,44 +134,6 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     } else return false;
   } else
 
-  if (cmdGX("GX9")) {
-
-    // :GX9A#     temperature in deg. C
-    //            Returns: +/-n.n
-    if (parameter[1] == 'A') {
-      sprintF(reply, "%3.1f", siteConditions.temperature);
-      *numericReply = false;
-     } else
-
-    // :GX9B#     pressure in mb
-    //            Returns: +/-n.n
-    if (parameter[1] == 'B') {
-      sprintF(reply, "%3.1f", siteConditions.pressure);
-      *numericReply = false;
-    } else
-
-    // :GX9C#     relative humidity in %
-    //            Returns: +/-n.n
-    if (parameter[1] == 'C') {
-      sprintF(reply, "%3.1f", siteConditions.humidity);
-      *numericReply = false;
-    } else
-
-    // :GX9D#     altitude in meters
-    //            Returns: +/-n.n
-    if (parameter[1] == 'D') {
-      sprintF(reply, "%3.1f", siteConditions.altitude);
-      *numericReply = false;
-    } else
-
-    // :GX9E#     dew point in deg. C
-    //            Returns: +/-n.n
-    if (parameter[1] == 'E') {
-      sprintF(reply, "%3.1f", dewPoint(siteConditions));
-      *numericReply = false;
-    } else return false;
-  } else
- 
   // :SC[MM/DD/YY]#
   //            Change standard date to MM/DD/YY
   //            Return: 0 on failure, 1 on success
@@ -261,36 +223,6 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
     } else *commandError = CE_PARAM_FORM;
   } else 
-
-  if (cmdSX("SX9")) {
-    char *conv_end;
-    float f = strtod(&parameter[3], &conv_end);
-    if (&parameter[3] == conv_end) f = NAN;
-    // :SX9A,[sn.n]#
-    //            Set temperature in deg. C
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'A') {
-      if (f >= -100.0 && f < 100.0) siteConditions.temperature = f; else *commandError = CE_PARAM_RANGE;
-    } else
-    // :SX9B,[n.n]#
-    //            Set pressure in mb
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'B') {
-      if (f >= 500.0 && f < 1500.0) siteConditions.pressure = f; else *commandError = CE_PARAM_RANGE;
-    } else
-    // :SX9C,[n.n]#
-    //            relative humidity in %
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'C') {
-      if (f >= 0.0 && f < 100.0) siteConditions.humidity = f; else *commandError = CE_PARAM_RANGE;
-    } else
-    // :SX9D,[sn.n]#
-    //            altitude
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'D') {
-      if (f >= -100.0 && f < 20000.0) siteConditions.altitude = f; else *commandError = CE_PARAM_RANGE;
-    } else return false;
-  } else
 
   // :W[n]#     Sets current site to n, where n = 0..3
   //            Returns: Nothing

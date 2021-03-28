@@ -21,8 +21,6 @@ unsigned long periodSubMicros;
 volatile unsigned long centisecondLAST;
 IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
 
-SiteConditions siteConditions = { 10.0, 1010.0, 50, 100 };
-
 void Site::init() {
   // get location
   VLF("MSG: Site, get Latitude/Longitude");
