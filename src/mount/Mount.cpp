@@ -19,7 +19,6 @@ extern Tasks tasks;
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-extern Telescope telescope;
 #include "Mount.h"
 
 inline void mountGuideWrapper() { telescope.mount.guidePoll(); }
@@ -102,10 +101,10 @@ void Mount::setTrackingState(TrackingState state) {
 void Mount::updatePosition(CoordReturn coordReturn) {
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
   if (transform.mountType == ALTAZM) {
-    if (coordReturn == CR_MOUNT_EQU) transform.horToEqu(&current);
+    if (coordReturn == CR_MOUNT_EQU || coordReturn == CR_MOUNT_ALL) transform.horToEqu(&current);
   } else {
     if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
-    if (coordReturn == CR_MOUNT_HOR) transform.equToHor(&current);
+    if (coordReturn == CR_MOUNT_HOR || coordReturn == CR_MOUNT_ALL) transform.equToHor(&current);
   }
 }
 

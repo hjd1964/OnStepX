@@ -15,7 +15,6 @@ extern Tasks tasks;
 #include "../coordinates/Transform.h"
 #include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-extern Telescope telescope;
 #include "Mount.h"
 
 inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
@@ -137,37 +136,37 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   }
 
 //  VF("Start       = "); transform.print(&start);
-//  VF("Destination = "); transform.print(&destination);
+  VF("Destination = "); transform.print(&destination);
 
   // start the goto monitor
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
   gotoTaskHandle = tasks.add(10, 0, true, 1, mountGotoWrapper, "MntGoto");
   if (gotoTaskHandle) {
-//    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
+    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
 
     axis1.setTracking(false);
     axis2.setTracking(false);
-//    VLF("MSG: Mount::gotoEqu(); automatic tracking stopped");
+    VLF("MSG: Mount::gotoEqu(); automatic tracking stopped");
 
     axis1.markOriginCoordinate();
     axis2.markOriginCoordinate();
-//    VLF("MSG: Mount::gotoEqu(); origin coordinates set");
+    VLF("MSG: Mount::gotoEqu(); origin coordinates set");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
-//    VLF("MSG: Mount::gotoEqu(); target coordinates set");
+    VLF("MSG: Mount::gotoEqu(); target coordinates set");
     if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
+    transform.print(&destination);
 
     // slew rate in rads per second
     axis1.setFrequencyMax(radsPerSecondCurrent);
     axis2.setFrequencyMax(radsPerSecondCurrent);
-//    VLF("MSG: Mount::gotoEqu(); slew rate set");
+    VLF("MSG: Mount::gotoEqu(); slew rate set");
 
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-//    VLF("MSG: Mount::gotoEqu(); slew started");
 
   } else DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!");
 
@@ -184,7 +183,7 @@ void Mount::gotoPoll() {
     gotoStage = GG_ABORT;
   } else
   if (gotoStage == GG_WAYPOINT) {
-    if (axis1.nearTarget() && axis2.nearTarget() || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
+    if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
         VLF("MSG: Mount::gotoPoll(); home reached");
         gotoStage = GG_DESTINATION;
@@ -217,6 +216,8 @@ void Mount::gotoPoll() {
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
+      updatePosition(CR_MOUNT_EQU);
+      transform.print(&current);
 
       VLF("MSG: Mount::gotoPoll(); stopping slew");
       axis1.autoSlewRateByDistanceStop();

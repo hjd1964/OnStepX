@@ -34,7 +34,7 @@ enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X,
 enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE};
 enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
 enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
-enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR};
+enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
 
 #pragma pack(1)
 typedef struct AltitudeLimits {
@@ -118,8 +118,6 @@ typedef struct MountError {
   uint8_t       initSite: 1;
   uint8_t       initNV: 1;
 } MountError;
-
-
 
 class Mount {
   public:
