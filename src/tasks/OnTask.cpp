@@ -530,7 +530,7 @@ void Tasks::updatePriorityRange() {
 void Tasks::updateEventRange() {
   // scan for highest task handle
   highest_task = 0;
-  for (uint8_t e = TASKS_MAX - 1; e >= 0 ; e--) {
+  for (int8_t e = TASKS_MAX - 1; e >= 0 ; e--) {
     if (allocated[e]) {
       highest_task = e;
       break;
