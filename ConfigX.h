@@ -35,4 +35,4 @@
 
 // ALIGN ---------------------------------------------------------------------------------------------------------------------------
 #define ALIGN_MAX_STARS              AUTO //        AUTO, Uses HAL specified default (either 6 or 9 stars.)                   Infreq
-                                          //              Or use n. Where n=1, or 3 to 9.
+                                          //              Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
