@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// non-volatile storage (caching, for 24XX series I2C EEPROMS)
+// non-volatile storage (for 24XX series I2C EEPROMS)
 
 #pragma once
 

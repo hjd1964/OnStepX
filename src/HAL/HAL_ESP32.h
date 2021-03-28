@@ -51,9 +51,10 @@
 
 // Non-volatile storage ----------------------------------------------------------------------------
 #ifdef NV_DEFAULT
+  #define E2END 4095
   #undef  NV_ENDURANCE
   #define NV_ENDURANCE NVE_LOW
-  #include "../lib/nv/NV_ESP32.h"
+  #include "../lib/nv/NV_ESP.h"
 #endif
 
 //--------------------------------------------------------------------------------------------------
