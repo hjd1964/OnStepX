@@ -18,7 +18,6 @@ extern Tasks tasks;
 #include "../coordinates/Transform.h"
 #include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-extern Telescope telescope;
 #include "Mount.h"
 
 #if AXIS1_PEC == ON
