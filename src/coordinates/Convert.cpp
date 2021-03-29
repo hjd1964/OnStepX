@@ -218,7 +218,7 @@ void Convert::doubleToHms(char *reply, double value, bool signPresent, Precision
 
 void Convert::doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p) {
   char sign[2] = "";
-  double deg, minute, second = 0, decimal;
+  double deg, minute, second = 0, decimal = 0;
 
   // setup formatting, handle adding the sign
   if (signPresent) {

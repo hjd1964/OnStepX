@@ -25,5 +25,5 @@ class SoftSpi {
     uint32_t transfer32(uint32_t data_out);
 
   private:
-    const DriverPins Pins = {OFF, OFF, OFF, OFF};
+    const DriverPins Pins = {OFF, OFF, OFF, OFF, OFF};
 };

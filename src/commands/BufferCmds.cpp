@@ -67,7 +67,8 @@ char* Buffer::getCmd() {
 char* Buffer::getParameter() {
   // the remaining parameter
   pb[0] = 0;
-  if (cbp > 4) memmove(pb, (char *)&cb[3], cbp-4); pb[cbp-4] = 0;
+  if (cbp > 4) memmove(pb, (char *)&cb[3], cbp-4);
+  pb[cbp-4] = 0;
   return pb;
 }
 
