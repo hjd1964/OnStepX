@@ -8,7 +8,7 @@ bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bo
   // set nv size
   this->size = size;
   // set cache size, defaults to 0 otherwise
-  if (cacheEnable) cacheSize = size;
+  if (cacheEnable) cacheSize = size; else cacheSize = 0;
   waitMs = wait;
   if (waitMs == 0) delayedCommitEnabled = false; else delayedCommitEnabled = true;
 
@@ -126,7 +126,7 @@ uint32_t NonVolatileStorage::readUL(uint16_t i) { uint32_t j; readBytes(i, (uint
 int32_t  NonVolatileStorage::readL (uint16_t i) { int32_t j;  readBytes(i, (uint8_t*)&j, sizeof(int32_t));  return j; }
 float    NonVolatileStorage::readF (uint16_t i) { float j;    readBytes(i, (uint8_t*)&j, sizeof(float));    return j; }
 double   NonVolatileStorage::readD (uint16_t i) { double j;   readBytes(i, (uint8_t*)&j, sizeof(double));   return j; }
-void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { readBytes(i, (uint8_t*)j, -maxLen); }
+void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { readBytes(i, j, -maxLen); }
 
 void NonVolatileStorage::readBytes(uint16_t i, void *j, int16_t count) {
   if (abs(count) > 64) return;
@@ -140,7 +140,12 @@ void NonVolatileStorage::readBytes(uint16_t i, void *j, int16_t count) {
 
 void NonVolatileStorage::updateBytes(uint16_t i, void *j, int16_t count) {
   if (abs(count) > 64) return;
-  for (int k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
+  if (count < 0) {
+    count = -count;
+    for (uint8_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
+  } else {
+    for (uint8_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
+  }
 }
 
 bool NonVolatileStorage::busy() {

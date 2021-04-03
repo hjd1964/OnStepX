@@ -82,14 +82,16 @@ class NonVolatileStorage {
     inline void update(uint16_t i,  int32_t j) { updateBytes(i, (uint8_t*)&j, sizeof(int32_t)); }
     inline void update(uint16_t i,    float j) { updateBytes(i, (uint8_t*)&j, sizeof(float)); }
     inline void update(uint16_t i,   double j) { updateBytes(i, (uint8_t*)&j, sizeof(double)); }
-    inline void update(uint16_t i,    char* j) { updateBytes(i, (uint8_t*)&j, strlen(j) + 1); }
+    inline void update(uint16_t i,    char* j) { updateBytes(i, j, strlen(j) + 1); }
 
     // read count bytes (up to 64) starting at position i into value j
     // for char arrays a negative count represents the maximum length read (if a terminating null is not found)
     void readBytes(uint16_t i, void *j, int16_t count);
     // update count bytes (up to 64) starting at position i from value j
+    // for char arrays a negative count represents the maximum length to write (if a terminating null is not found)
     void updateBytes(uint16_t i, void *j, int16_t count);
     // write count bytes (up to 64) starting at position i from value j
+    // for char arrays a negative count represents the maximum length to write (if a terminating null is not found)
     inline void writeBytes(uint16_t i, void *j, int16_t count) { updateBytes(i, j, count); }
 
     // NV size in bytes
