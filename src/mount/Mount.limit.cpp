@@ -37,7 +37,7 @@ void Mount::limitPoll() {
   if (!limitsEnabled) return;
   const char* errPre = "MSG: Mount::limitPoll() exceeded ";
 
-  updatePosition(CR_MOUNT_ALT); Y;
+  updatePosition(CR_MOUNT_ALT);
 
   double a1, a2;
   if (transform.mountType == ALTAZM) a1 = current.z; else a1 = current.h;
