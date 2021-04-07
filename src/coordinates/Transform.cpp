@@ -44,13 +44,19 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-  hourAngleToRightAscension(&result);
-  if (returnHorizonCoords) equToHor(&result);
+  if (mountType == ALTAZM) {
+    horToEqu(coord);
+    hourAngleToRightAscension(&result);
+  } else {
+    hourAngleToRightAscension(&result);
+    if (returnHorizonCoords) equToHor(&result);
+  }
   return result;
 }
 
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   rightAscensionToHourAngle(coord);
+  if (mountType == ALTAZM) equToHor(coord);
   #if MOUNT_COORDS == OBSERVED
     observedPlaceToMount(coord);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
@@ -114,7 +120,6 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
   coord->a += trueRefrac(coord->a);
   horToEqu(coord);
 }
-
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
