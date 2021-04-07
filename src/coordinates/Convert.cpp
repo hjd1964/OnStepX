@@ -38,6 +38,7 @@ void sprintF(char *result, const char *source, float f) {
   for (uint8_t i = 0; i < a - source; i++) result[j++] = source[i];
   for (uint8_t i = 0; i < strlen(s); i++) result[j++] = s[i];
   for (uint8_t i = len; i < strlen(a); i++) result[j++] = a[i];
+  result[j++] = 0;
 }
 
 // convert string in format MM/DD/YY to Date

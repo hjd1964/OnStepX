@@ -78,7 +78,7 @@ void Transform::mountToObservedPlace(Coordinate *coord) {
   #if ALIGN_MAX_NUM_STARS > 1  
     //align.mountToObservedPlace(coord);
   #endif
-  if (mountType == ALTAZM) horToEqu(coord);
+  //if (mountType == ALTAZM) horToEqu(coord);
 }
 
 void Transform::observedPlaceToTopocentric(Coordinate *coord) {
@@ -101,7 +101,7 @@ void Transform::topocentricToMount(Coordinate *coord) {
 }
 
 void Transform::observedPlaceToMount(Coordinate *coord) {
-  if (mountType == ALTAZM) equToHor(coord);
+  //if (mountType == ALTAZM) equToHor(coord);
   #if ALIGN_MAX_NUM_STARS > 1  
     //align.observedPlaceToMount(coord);
   #endif

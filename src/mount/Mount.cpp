@@ -136,26 +136,37 @@ void Mount::trackPoll() {
   }
 
   // get positions 1 (or 30) arc-min ahead and behind the current
-  updatePosition(CR_MOUNT); Y;
-  if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
+  updatePosition(CR_MOUNT_ALL);
+  double altitude = current.a;
+  double declination = current.d;
+//  if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
+
   Coordinate ahead = current;
   Coordinate behind = current;
+  Y;
   ahead.h += DiffRange;
   behind.h -= DiffRange;
+
+  // create horizon coordinates that would exist ahead and behind the current position
+  if (transform.mountType == ALTAZM) {
+    transform.equToHor(&ahead); Y;
+    transform.equToHor(&behind); Y;
+  }
 
   // apply (optional) pointing model and refraction
   if (rateCompensation == RC_FULL_RA || rateCompensation == RC_FULL_BOTH) {
     transform.mountToObservedPlace(&ahead); Y;
     transform.mountToObservedPlace(&behind); Y;
+  } else if (rateCompensation == RC_REFR_RA || rateCompensation == RC_REFR_BOTH) {
+    transform.observedPlaceToTopocentric(&ahead); Y;
+    transform.observedPlaceToTopocentric(&behind); Y;
   }
-  transform.topocentricToObservedPlace(&ahead); Y;
-  transform.topocentricToObservedPlace(&behind); Y;
 
   // convert back into horizon coordinates
   float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
   if (transform.mountType == ALTAZM) {
-    transform.equToHor(&ahead); aheadAxis1 = ahead.z; aheadAxis2 = ahead.a; Y;
-    transform.equToHor(&behind); behindAxis1 = behind.z; behindAxis2 = behind.a; Y;
+    aheadAxis1 = ahead.z; aheadAxis2 = ahead.a;
+    behindAxis1 = behind.z; behindAxis2 = behind.a;
   } else {
     aheadAxis1 = ahead.h; aheadAxis2 = ahead.d;
     behindAxis1 = behind.h; behindAxis2 = behind.d;
@@ -177,10 +188,10 @@ void Mount::trackPoll() {
   } else trackingRateAxis2 = 0.0F;
 
   // override for special case of near a celestial pole
-  if (fabs(current.d) > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
+  if (fabs(declination) > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
 
   // override for both rates for special case near the zenith
-  if (current.a > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
+  if (altitude > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
 
   updateTrackingRates();
 }
