@@ -39,11 +39,15 @@
 #pragma once
 #include <Arduino.h>
 
-// Default provision is for 8 tasks, up to 255 are allowed, to change use:
+// default provision is for 8 tasks, up to 255 are allowed, to change use:
 // #define TASKS_MAX 200 (for example)
 #ifndef TASKS_MAX
   #define TASKS_MAX 16
 #endif
+
+// default is to allow only higher priority tasks to run during a yield()
+// comment out and any task can run except the task that yields
+#define TASKS_HIGHER_PRIORITY_ONLY
 
 // ESP32 override cli/sei and use muxes to block the h/w timer ISR's instead
 #ifdef ESP32
@@ -152,55 +156,57 @@ class Tasks {
     ~Tasks();
 
     // add process task
-    // period:   between process calls in milliseconds, use 0 to disable
-    //           software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds.
-    // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
-    // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
-    // priority: software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks.
-    //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
-    //           round robin within their priority levels, the most recently serviced task will be last visited again
-    // callback: function to handle this tasks processing
-    // returns:  handle to the task on success, or 0 on failure
+    // \param period    between process calls in milliseconds, use 0 to disable
+    //                  software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds
+    // \param duration  in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
+    // \param repeat    true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
+    // \param priority  software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks
+    //                  for software timed tasks level 0 must be complete before level 1 are serviced, etc.
+    //                  tasks run round robin in ea priority level, the most recently serviced task will be the last visited again
+    //                  only higher priority tasks are allowed to run when a lower priority task yields
+    // \param callback  function to handle this tasks processing
+    // \return          handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
 
     // add process task
-    // period:   between process calls in milliseconds, use 0 to disable
-    //           software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds.
-    // duration: in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
-    // repeat:   true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
-    // priority: software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks.
-    //           for software timed tasks level 0 must be complete before level 1 are serviced, etc.  tasks are run
-    //           round robin within their priority levels, the most recently serviced task will be last visited again
-    // callback: function to handle this tasks processing
-    // name:     an optional short (max length 7) char str describing the task 
-    // returns:  handle to the task on success, or 0 on failure
+    // \param period    between process calls in milliseconds, use 0 to disable
+    //                  software timers are limited to <= 49 days, hardware timers are limited to <= 139 seconds
+    // \param duration  in milliseconds the task is valid for, use 0 for unlimited (deletes the task on completion)
+    // \param repeat    true if the task is allowed to repeat, false to run once (sets period to 0 on completion)
+    // \param priority  software level highest 0 to 7 lowest.  hardware tasks are always higher priority than software tasks
+    //                  for software timed tasks level 0 must be complete before level 1 are serviced, etc.
+    //                  tasks run round robin in ea priority level, the most recently serviced task will be the last visited again
+    //                  only higher priority tasks are allowed to run when a lower priority task yields
+    // \param callback  function to handle this tasks processing
+    // \param name      an optional short (max length 7) char str describing the task 
+    // \return          handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]);
 
-    // allocates a hardware timer, if available, for this task
-    // handle:       task handle
-    // num:          the hardware timer number, there are up to four (1 to 4) depending on the platform
-    // hwPriority:   hardware interrupt priority, default is 128
-    // returns:      true if successful, or false (in which case the standard polling timer will still be available)
-    // notes:
-    //   "repeat"   must be true
-    //   "priority" must be 0 (all are higher than task priority 0)
-    //   generally it's a good idea to NOT poll tasks (P macro) from within the process associated with this task
-    bool requestHardwareTimer(uint8_t handle, uint8_t num);
+    // allocates a hardware timer, if available, for this task. Note: for the 
+    // associated task: *repeat* must be true, *priority* must be 0 (all are higher than s/w task priority 0.)
+    // \param handle        task handle
+    // \param num           the hardware timer number, there are up to four (1 to 4) depending on the platform
+    // \param hwPriority    optional hardware interrupt priority, default is 128 if not specified
+    // \return              true if successful, or false (in which case the standard polling timer will still be available)
     bool requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority);
+    bool requestHardwareTimer(uint8_t handle, uint8_t num);
 
+    // change task callback
+    // \param handle        task handle
+    // \param callback  function to handle this tasks processing
+    // \return              true if successful, or false if unable to find the associated task
     bool setCallback(uint8_t handle, void (*volatile callback)());
 
-    // remove process task
-    // handle: task handle
-    // note:   do not remove a task if the task process is running
+    // remove process task. Note: do not remove a task if the task process is running
+    // \param handle    task handle
+    // \return          nothing
     void remove(uint8_t handle);
 
-    // set process period ms
-    // handle: task handle
-    // period: in milliseconds, use 0 for disabled
-    // notes:
-    //   the period/frequency change takes effect on the next task cycle
-    //   if the period is > the hardware timers maximum period the task is disabled
+    // set process period ms. Note: the period/frequency change takes effect on the next task cycle, 
+    // if the period is > the hardware timers maximum period the task is disabled
+    // \param handle    task handle
+    // \param period    in milliseconds, use 0 for disabled
+    // \return          nothing
     void setPeriod(uint8_t handle, unsigned long period);
 
     // set process period us
@@ -274,6 +280,9 @@ class Tasks {
 
     uint8_t highest_task     = 0;
     uint8_t highest_priority = 0;
+    #ifdef TASKS_HIGHER_PRIORITY_ONLY
+      uint8_t highest_active_priority = 8;
+    #endif
     uint8_t count            = 0;
     uint8_t num_tasks        = 0;
     uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255};
