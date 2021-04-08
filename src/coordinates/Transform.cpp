@@ -90,9 +90,9 @@ void Transform::observedPlaceToTopocentric(Coordinate *coord) {
     #else  
       if (fabs(coord->d - Deg90) < OneArcSec || fabs(coord->d + Deg90) < OneArcSec) return; else equToHor(coord);
     #endif
-  }
-  coord->a -= apparentRefrac(coord->a);
-  horToEqu(coord);
+    coord->a -= apparentRefrac(coord->a);
+    horToEqu(coord);
+  } else coord->a -= apparentRefrac(coord->a);
 }
 
 void Transform::topocentricToMount(Coordinate *coord) {
@@ -116,9 +116,9 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
     #else
       if (fabs(coord->d - Deg90) < OneArcSec || fabs(coord->d + Deg90) < OneArcSec) return; else equToHor(coord);
     #endif
-  }
-  coord->a += trueRefrac(coord->a);
-  horToEqu(coord);
+    coord->a += trueRefrac(coord->a);
+    horToEqu(coord);
+  } else coord->a += trueRefrac(coord->a);
 }
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {

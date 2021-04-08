@@ -141,6 +141,12 @@ void Mount::trackPoll() {
   double declination = current.d;
 //  if (transform.mountType == ALTAZM) transform.horToEqu(&current); else transform.equToHor(&current); Y;
 
+  // on fast processors calculate true coordinate for a little more accuracy
+  #ifndef HAL_SLOW_PROCESSOR
+    transform.mountToTopocentric(&current);
+    if (transform.mountType == ALTAZM) transform.horToEqu(&current);
+  #endif
+
   Coordinate ahead = current;
   Coordinate behind = current;
   Y;
@@ -155,14 +161,16 @@ void Mount::trackPoll() {
 
   // apply (optional) pointing model and refraction
   if (rateCompensation == RC_FULL_RA || rateCompensation == RC_FULL_BOTH) {
-    transform.mountToObservedPlace(&ahead); Y;
-    transform.mountToObservedPlace(&behind); Y;
+    transform.topocentricToObservedPlace(&ahead); Y;
+    transform.topocentricToObservedPlace(&behind); Y;
+    transform.observedPlaceToMount(&ahead); Y;
+    transform.observedPlaceToMount(&behind); Y;
   } else if (rateCompensation == RC_REFR_RA || rateCompensation == RC_REFR_BOTH) {
-    transform.observedPlaceToTopocentric(&ahead); Y;
-    transform.observedPlaceToTopocentric(&behind); Y;
+    transform.topocentricToObservedPlace(&ahead); Y;
+    transform.topocentricToObservedPlace(&behind); Y;
   }
 
-  // convert back into horizon coordinates
+  // transfer to variables named appropriately for mount coordinates
   float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
   if (transform.mountType == ALTAZM) {
     aheadAxis1 = ahead.z; aheadAxis2 = ahead.a;
