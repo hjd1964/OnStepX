@@ -26,7 +26,7 @@ inline void mountTrackingWrapper() { telescope.mount.trackPoll(); }
 
 void Mount::init(bool validKey) {
 
-  transform.init();
+  transform.init(validKey);
   if (transform.mountType != ALTAZM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
 
   // get PEC ready

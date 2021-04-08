@@ -28,7 +28,7 @@ void Mount::limitInit(bool validKey) {
 
   // write the default limits to NV
   if (!validKey) {
-    VF("MSG: Mount, writing default limits to NV");
+    VLF("MSG: Mount, writing default limits to NV");
     nv.writeBytes(NV_LIMITS_BASE, &limits, LimitsSize);
   }
 

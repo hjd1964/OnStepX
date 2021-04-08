@@ -22,14 +22,14 @@ void Transform::print(Coordinate *coord) {
   VF("), pierSide="); VL(coord->pierSide);
 }
 
-void Transform::init() {
+void Transform::init(bool validKey) {
   mountType = MOUNT_TYPE;
   #if DEBUG != OFF
     const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
     VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
   #endif
 
-  site.init();
+  site.init(validKey);
   #if ALIGN_MAX_NUM_STARS > 1  
     align.init(site.location.latitude, mountType);
   #endif

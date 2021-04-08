@@ -21,15 +21,15 @@ unsigned long periodSubMicros;
 volatile unsigned long centisecondLAST;
 IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
 
-void Site::init() {
+void Site::init(bool validKey) {
   // get location
   VLF("MSG: Site, get Latitude/Longitude");
-  readLocation(number);
+  readLocation(number, validKey);
   update();
 
   // get date/time
   VLF("MSG: Site, get Date/Time");
-  readJD();
+  readJD(validKey);
   setTime(ut1);
 
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
@@ -172,17 +172,31 @@ GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
   return date;
 }
 
-void Site::readLocation(uint8_t locationNumber) {
-  number = locationNumber;
+void Site::readLocation(uint8_t locationNumber, bool validKey) {
   if (LocationSize < sizeof(Location)) { DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (!validKey) {
+    VLF("MSG: Site, writing default sites 0-3 to NV");
+    location.latitude = 0.0;
+    location.longitude = 0.0;
+    location.timezone = 0.0;
+    strcpy(location.name, "");
+    for (uint8_t l = 0; l < 4; l++) nv.updateBytes(NV_LOCATION_BASE + l*LocationSize, &location, LocationSize);
+  }
+  number = locationNumber;
   nv.readBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
   if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; DLF("ERR: Site::readSite, bad NV latitude"); }
   if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; DLF("ERR: Site::readSite, bad NV longitude"); }
   if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; DLF("ERR: Site::readSite,  bad NV timeZone"); }
 }
 
-void Site::readJD() {
+void Site::readJD(bool validKey) {
   if (JulianDateSize < sizeof(ut1)) { DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (!validKey) {
+    VLF("MSG: Site, writing default date/time NV");
+    ut1.day = 2451544.5;
+    ut1.hour = 0.0;
+    nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
+  }
   nv.readBytes(NV_JD_BASE, &ut1, JulianDateSize);
   if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
   if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }

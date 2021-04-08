@@ -38,7 +38,7 @@ typedef struct SiteErrors {
 class Site {
   public:
     // gets date/time/location from NV and/or the various TLS sources
-    void init();
+    void init(bool validKey);
     
     // update/apply the site latitude and longitude, necessary for LAST calculations etc.
     void update();
@@ -96,10 +96,10 @@ class Site {
 
     // reads the location information from NV
     // locationNumber can be 0..3
-    void readLocation(uint8_t locationNumber);
+    void readLocation(uint8_t locationNumber, bool validKey);
 
     // reads the julian date information from NV
-    void readJD();
+    void readJD(bool validKey);
 
     JulianDate ut1;
     double centisecondHOUR = 0;

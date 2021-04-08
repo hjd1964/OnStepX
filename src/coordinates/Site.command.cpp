@@ -229,7 +229,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   if (command[0] == 'W' && (command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
     number = command[1] - '0';
     nv.update(NV_LOCATION_NUMBER, number);
-    readLocation(number);
+    readLocation(number, true);
     update();
     *numericReply = false;
   } else

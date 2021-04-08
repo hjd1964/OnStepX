@@ -13,7 +13,7 @@
 class Transform {
   public:
     // setup for coordinate transformation
-    void init();
+    void init(bool validKey);
 
     // prints a coordinate to the debug serial port, if active
     void print(Coordinate *coord);
