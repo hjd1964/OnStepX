@@ -6,7 +6,7 @@
 #define FirmwareName                "OnStepX"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        01     // minor version 00 to 99
-#define FirmwareVersionPatch        "b"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "c"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 #define FirmwareDate                __DATE__
 #define FirmwareTime                __TIME__
