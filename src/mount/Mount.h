@@ -121,7 +121,7 @@ typedef struct MountError {
 
 class Mount {
   public:
-    void init();
+    void init(bool validKey);
     void pecInit();
 
     // handle mount commands
@@ -244,7 +244,7 @@ class Mount {
     CommandError parkRestore(bool withTrackingOn);
 
     // read in the limit information, start limit monitor
-    void limitInit();
+    void limitInit(bool validKey);
     void limitBroken();
     void limitStop(GuideAction stopDirection);
     void limitStopAxis1(GuideAction stopDirection);

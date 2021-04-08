@@ -24,7 +24,7 @@ extern Tasks tasks;
 inline void mountGuideWrapper() { telescope.mount.guidePoll(); }
 inline void mountTrackingWrapper() { telescope.mount.trackPoll(); }
 
-void Mount::init() {
+void Mount::init(bool validKey) {
 
   transform.init();
   if (transform.mountType != ALTAZM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
@@ -44,7 +44,7 @@ void Mount::init() {
   stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
   // get limits ready
-  limitInit();
+  limitInit(validKey);
 
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }

@@ -23,9 +23,16 @@ extern Telescope telescope;
 
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }
 
-void Mount::limitInit() {
-  // get limit settings from NV
+void Mount::limitInit(bool validKey) {
   if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::limitInit(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
+  // write the default limits to NV
+  if (!validKey) {
+    VF("MSG: Mount, writing default limits to NV");
+    nv.writeBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+  }
+
+  // get limit settings from NV
   nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
 
   // start limit monitor task

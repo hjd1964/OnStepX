@@ -20,19 +20,26 @@ Telescope telescope;
 InitError error;
 
 void Telescope::init() {
+  bool validKey = true;
   if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
+    validKey = false;
+
     VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes (please wait)");
     for (int i = 0; i < nv.size; i++) nv.write(i, (char)0);
     while (!nv.committed()) nv.poll();
-
-    nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
 
     VLF("MSG: Telescope, NV reset to defaults");
   } else VLF("MSG: Telescope, correct NV key found");
 
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-    mount.init();
+    mount.init(validKey);
   #endif
+
+  if (!validKey) {
+    while (!nv.committed()) nv.poll();
+    VLF("MSG: Telescope, NV reset complete");
+    nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
+  }
 }
 
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
