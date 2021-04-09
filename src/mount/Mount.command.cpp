@@ -54,12 +54,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
     if (guideState != GU_NONE)               reply[i++]='g';                     // [g]uide active
     if (guideState != GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
-    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }   // [r]efr enabled [s]ingle axis
       if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                   // [r]efr enabled
       if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }   // on[t]rack enabled [s]ingle axis
       if (rateCompensation == RC_FULL_BOTH){ reply[i++]='t'; }                   // on[t]rack enabled
-    }
     if (waitingHome)                         reply[i++]='w';                     // [w]aiting at home 
     if (misc.meridianFlipPause)              reply[i++]='u';                     // pa[u]se at home enabled?
     if (misc.buzzer)                         reply[i++]='z';                     // bu[z]zer enabled?
@@ -94,12 +92,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (gotoState == GS_NONE)                    reply[0]|=0b10000010;           // No goto
 //  if (ppsSynced)                               reply[0]|=0b10000100;           // PPS sync
     if (guideState == GU_PULSE_GUIDE)            reply[0]|=0b10001000;           // pulse guide active
-    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)        reply[0]|=0b11010000;           // Refr enabled Single axis
       if (rateCompensation == RC_REFR_BOTH)      reply[0]|=0b10010000;           // Refr enabled
       if (rateCompensation == RC_FULL_RA)        reply[0]|=0b11100000;           // OnTrack enabled Single axis
       if (rateCompensation == RC_FULL_BOTH)      reply[0]|=0b10100000;           // OnTrack enabled
-    }
     if (rateCompensation == RC_NONE) {
       double r = siderealToHz(trackingRate);
       if (fequal(r, 57.900))                     reply[1]|=0b10000001; else      // Lunar rate selected
@@ -379,14 +375,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
-    if (command[1] == 'o' && transform.mountType != ALTAZM) { rateCompensation = RC_FULL_RA; } else
-    if (command[1] == 'r' && transform.mountType != ALTAZM) { rateCompensation = RC_REFR_RA; } else
-    if (command[1] == 'n' && transform.mountType != ALTAZM) { rateCompensation = RC_NONE;    } else
-    if (command[1] == '1' && transform.mountType != ALTAZM) {
+    if (command[1] == 'o') { rateCompensation = RC_FULL_RA; } else
+    if (command[1] == 'r') { rateCompensation = RC_REFR_RA; } else
+    if (command[1] == 'n') { rateCompensation = RC_NONE;    } else
+    if (command[1] == '1') {
       if (rateCompensation == RC_REFR_BOTH) rateCompensation = RC_REFR_RA; else
       if (rateCompensation == RC_FULL_BOTH) rateCompensation = RC_FULL_RA;
     } else
-    if (command[1] == '2' && transform.mountType != ALTAZM) {
+    if (command[1] == '2') {
       if (rateCompensation == RC_REFR_RA) rateCompensation = RC_REFR_BOTH; else
       if (rateCompensation == RC_FULL_RA) rateCompensation = RC_FULL_BOTH;
     } else
@@ -406,6 +402,11 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'd') {
       if (gotoState == GS_NONE && guideState == GU_NONE) trackingState = TS_NONE; else *commandError = CE_SLEW_IN_MOTION;
     } else *commandError = CE_CMD_UNKNOWN;
+
+    if (transform.mountType == ALTAZM) {
+      if (rateCompensation == RC_FULL_RA) rateCompensation = RC_FULL_BOTH;
+      if (rateCompensation == RC_REFR_RA) rateCompensation = RC_REFR_BOTH;
+    }
 
     if (*commandError == CE_NONE) {
       switch (command[1]) { case 'S': case 'K': case 'L': case 'Q': case '+': case '-': case 'R': *numericReply = false; }
