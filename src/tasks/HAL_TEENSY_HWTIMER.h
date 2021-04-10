@@ -14,7 +14,7 @@
   const double timerRate16MHzTicks TIMER_RATE_16MHZ_TICKS;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
     float counts;
-  uint16_t reps = 0;
+    uint16_t reps = 0;
     if (period != 0 && period <= 2144000000) {
       if (period < 16) period = 16;         // minimum time is 1us
       double fperiod = period/timerRate16MHzTicks;

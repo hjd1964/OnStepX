@@ -41,6 +41,7 @@
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     // period 0.5... us per count 32.767 ms max
     noInterrupts();
+    OCR1A  = 2000; // startup one millisecond
     TCCR1B = (1 << WGM12) | (1 << CS11);
     TCCR1A = 0;
     TIMSK1 = (1 << OCIE1A);
@@ -70,6 +71,7 @@
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
     noInterrupts();
+    OCR3A  = 2000; // startup one millisecond
     TCCR3B = (1 << WGM12) | (1 << CS11);
     TCCR3A = 0;
     TIMSK3 = (1 << OCIE3A);
@@ -99,6 +101,7 @@
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
     noInterrupts();
+    OCR4A  = 2000; // startup one millisecond
     TCCR4B = (1 << WGM12) | (1 << CS11);
     TCCR4A = 0;
     TIMSK4 = (1 << OCIE4A);
@@ -128,6 +131,7 @@
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
     noInterrupts();
+    OCR5A  = 2000; // startup one millisecond
     TCCR5B = (1 << WGM12) | (1 << CS11);
     TCCR5A = 0;
     TIMSK5 = (1 << OCIE5A);

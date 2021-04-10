@@ -52,7 +52,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
     // timer#, divider, count up
     itimer1 = timerBegin(1, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer1, &HAL_HWTIMER1_WRAPPER, true);
-    timerAlarmWrite(itimer1, 1000*16, true);
+    timerAlarmWrite(itimer1, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer1);
     return true;
   }
@@ -86,7 +86,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
     // timer#, divider, count up
     itimer2 = timerBegin(2, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer2, &HAL_HWTIMER2_WRAPPER, true);
-    timerAlarmWrite(itimer2, 1000*16, true);
+    timerAlarmWrite(itimer2, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer2);
     return true;
   }
@@ -120,7 +120,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
     // timer#, divider, count up
     itimer3 = timerBegin(3, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer3, &HAL_HWTIMER3_WRAPPER, true);
-    timerAlarmWrite(itimer3, 1000*16, true);
+    timerAlarmWrite(itimer3, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer3);
     return true;
   }
@@ -154,7 +154,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
     // timer#, divider, count up
     itimer4 = timerBegin(0, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer4, &HAL_HWTIMER4_WRAPPER, true);
-    timerAlarmWrite(itimer4, 1000*16, true);
+    timerAlarmWrite(itimer4, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer4);
     return true;
   }

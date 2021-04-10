@@ -34,6 +34,7 @@
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     noInterrupts();
+    OCR1A  = 2000; // startup one millisecond
     TCCR1B = (1 << WGM12) | (1 << CS11);
     TCCR1A = 0;
     TIMSK1 = (1 << OCIE1A);

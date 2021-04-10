@@ -81,25 +81,21 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   switch (num) {
     case 1:
       if (HAL_HWTIMER1_FUN != NULL) return false;
-      HAL_HWTIMER1_SET_PERIOD();
       HAL_HWTIMER1_FUN = callback;
       if (!HAL_HWTIMER1_INIT(hwPriority)) return false;
     break;
     case 2:
       if (HAL_HWTIMER2_FUN != NULL) return false;
-      HAL_HWTIMER2_SET_PERIOD();
       HAL_HWTIMER2_FUN = callback;
       if (!HAL_HWTIMER2_INIT(hwPriority)) return false;
     break;
     case 3:
       if (HAL_HWTIMER3_FUN != NULL) return false;
-      HAL_HWTIMER3_SET_PERIOD();
       HAL_HWTIMER3_FUN = callback;
       if (!HAL_HWTIMER3_INIT(hwPriority)) return false;
     break;
     case 4:
       if (HAL_HWTIMER4_FUN != NULL) return false;
-      HAL_HWTIMER4_SET_PERIOD();
       HAL_HWTIMER4_FUN = callback;
       if (HAL_HWTIMER4_INIT(hwPriority)) return false;
     break;
