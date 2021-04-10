@@ -12,7 +12,7 @@
 // New symbols for the Serial ports so they can be remapped if necessary -----------------------------
 
 // SerialA is manidatory
-#define HAL_SERIAL_A Serial
+#define SERIAL_A Serial
 // SerialB is optional
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B Serial2
