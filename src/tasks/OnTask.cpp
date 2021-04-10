@@ -158,7 +158,8 @@ bool Task::poll() {
 
       // set adjusted period
       #ifndef TASKS_QUEUE_MISSED
-        if (-time_to_next_task > period) time_to_next_task = period;
+        if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
+//      if (-time_to_next_task > period) time_to_next_task = period;
       #endif
       next_task_time = t + (long)(period + time_to_next_task);
       if (!repeat) period = 0;
