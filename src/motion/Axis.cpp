@@ -20,15 +20,15 @@ extern unsigned long periodSubMicros;
   const AxisPins     Axis1StepPins = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, false, false, true};
   const AxisSettings Axis1Settings = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS1_DRIVER_REVERSE, { degToRad(AXIS1_LIMIT_MIN), degToRad(AXIS1_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis1() { telescope.mount.axis1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  IRAM_ATTR void slewForwardAxis1() { telescope.mount.axis1.slewForward(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  IRAM_ATTR void slewReverseAxis1() { telescope.mount.axis1.slewReverse(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void slewForwardAxis1() { telescope.mount.axis1.slewForward(AXIS1_STEP_PIN); }
+  IRAM_ATTR void slewReverseAxis1() { telescope.mount.axis1.slewReverse(AXIS1_STEP_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const AxisPins     Axis2StepPins = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, false, false, true};
   const AxisSettings Axis2Settings = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, 0, AXIS2_DRIVER_REVERSE, { degToRad(AXIS2_LIMIT_MIN), degToRad(AXIS2_LIMIT_MAX) } };
   IRAM_ATTR void moveAxis2() { telescope.mount.axis2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  IRAM_ATTR void slewForwardAxis2() { telescope.mount.axis2.slewForward(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  IRAM_ATTR void slewReverseAxis2() { telescope.mount.axis2.slewReverse(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void slewForwardAxis2() { telescope.mount.axis2.slewForward(AXIS2_STEP_PIN); }
+  IRAM_ATTR void slewReverseAxis2() { telescope.mount.axis2.slewReverse(AXIS2_STEP_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3StepPins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true};
@@ -542,12 +542,12 @@ void Axis::enableMoveFast(const bool fast) {
     digitalWriteF(stepPin, HIGH);
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
   }
-  IRAM_ATTR void Axis::slewForward(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewForward(const int8_t stepPin) {
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
   }
-  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin) {
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
     if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }

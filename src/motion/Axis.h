@@ -141,9 +141,9 @@ class Axis {
     // sets dir as required and moves coord toward target
     void move(const int8_t stepPin, const int8_t dirPin);
     // fast axis movement forward only, no backlash, no mode switching
-    void slewForward(const int8_t stepPin, const int8_t dirPin);
+    void slewForward(const int8_t stepPin);
     // fast axis movement reverse only, no backlash, no mode switching
-    void slewReverse(const int8_t stepPin, const int8_t dirPin);
+    void slewReverse(const int8_t stepPin);
 
     AxisSettings settings;
     AxisErrors error;
