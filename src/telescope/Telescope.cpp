@@ -24,9 +24,10 @@ void Telescope::init() {
   if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
     validKey = false;
 
-    VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes (please wait)");
+    VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes");
     for (int i = 0; i < nv.size; i++) nv.write(i, (char)0);
-    while (!nv.committed()) nv.poll();
+    VLF("MSG: Telescope, Wipe NV waiting for commit");
+    while (!nv.committed()) { nv.poll(false); delay(10); }
 
     VLF("MSG: Telescope, NV reset to defaults");
   } else VLF("MSG: Telescope, correct NV key found");
