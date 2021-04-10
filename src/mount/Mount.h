@@ -337,7 +337,7 @@ class Mount {
     Park park = {{0, 0, PIER_SIDE_NONE}, false, PS_NONE, 0};
 
     // misc. settings stored in NV
-    Misc misc = {false, false, false, false, 64.0, GR_20X, 0, 0};
+    Misc misc = {false, false, false, false, 64.0, GR_20X, {0, 0}};
 
     float timerRateRatio = 1.0;
 
