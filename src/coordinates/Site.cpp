@@ -32,9 +32,13 @@ void Site::init(bool validKey) {
   readJD(validKey);
   setTime(ut1);
 
+  VLF("MSG: starting centisecond timer...");
+  delay(1000);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (!tasks.requestHardwareTimer(handle, 3, 1)) DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)");
+  VLF("MSG: centisecond timer running");
+
 
   // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);
@@ -192,7 +196,7 @@ void Site::readLocation(uint8_t locationNumber, bool validKey) {
 void Site::readJD(bool validKey) {
   if (JulianDateSize < sizeof(ut1)) { DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
   if (!validKey) {
-    VLF("MSG: Site, writing default date/time NV");
+    VLF("MSG: Site, writing default date/time to NV");
     ut1.day = 2451544.5;
     ut1.hour = 0.0;
     nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
