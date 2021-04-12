@@ -94,30 +94,30 @@ void setup() {
   // System services
   // add task for system services, runs at 10ms intervals so commiting 1KB of NV takes about 10 seconds
   VF("MSG: Setup, starting system service task (rate 10ms priority 7)... ");
-  if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) VL("success"); else VL("FAILED!");
+  if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) { VL("success"); } else { VL("FAILED!"); }
 
   // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   #ifdef SERIAL_A
-    VF("MSG: Setup, starting command channel A task (rate 1ms priority 6)... ");
-    if (tasks.add(5, 0, true, 6, processCmdsA, "PrcCmdA")) VL("success"); else VL("FAILED!");
+    VF("MSG: Setup, starting command channel A task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsA, "PrcCmdA")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #ifdef SERIAL_B
-    VF("MSG: Setup, starting command channel B task (rate 1ms priority 6)... ");
-    if (tasks.add(5, 0, true, 6, processCmdsB, "PrcCmdB")) VL("success"); else VL("FAILED!");
+    VF("MSG: Setup, starting command channel B task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsB, "PrcCmdB")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #ifdef SERIAL_C
-    VF("MSG: Setup, starting command channel C task (rate 1ms priority 6)... ");
-    if (tasks.add(5, 0, true, 6, processCmdsC, "PrcCmdC")) VL("success"); else VL("FAILED!");
+    VF("MSG: Setup, starting command channel C task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsC, "PrcCmdC")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #ifdef SERIAL_D
-    VF("MSG: Setup, starting command channel D task (rate 1ms priority 6)... ");
-    if (tasks.add(5, 0, true, 6, processCmdsD, "PrcCmdD")) VL("success"); else VL("FAILED!");
+    VF("MSG: Setup, starting command channel D task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #ifdef SERIAL_ST4
-    VF("MSG: Setup, starting command channel ST4 task (rate 1ms priority 6)... ");
-    if (tasks.add(5, 0, true, 6, processCmdsST4, "PrcCmdS")) VL("success"); else VL("FAILED!");
+    VF("MSG: Setup, starting command channel ST4 task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #if SERIAL_BT_MODE == SLAVE
     VF("MSG: Setup, starting command channel BT task (rate 5ms priority 6)... ");
