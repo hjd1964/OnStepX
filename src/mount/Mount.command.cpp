@@ -53,7 +53,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (atHome)                              reply[i++]='H';                     // at [H]ome
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
     if (guideState != GU_NONE)               reply[i++]='g';                     // [g]uide active
-    if (guideState != GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
+    if (guideState == GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
       if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }   // [r]efr enabled [s]ingle axis
       if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                   // [r]efr enabled
       if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }   // on[t]rack enabled [s]ingle axis
