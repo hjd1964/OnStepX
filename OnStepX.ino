@@ -69,6 +69,9 @@ extern Telescope telescope;
 #ifdef SERIAL_ST4
   extern void processCmdsST4();
 #endif
+#if SERIAL_BT_MODE == SLAVE
+  extern void processCmdsBT();
+#endif
 
 #if DEBUG == PROFILER
   extern void profiler();
