@@ -43,7 +43,7 @@ SerialWrapper::SerialWrapper() {
   channel++;
 #endif
 #ifdef SERIAL_BT
-  if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); Serial.println("B1"); return; }
+  if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
   channel++;
 #endif
 }
@@ -73,7 +73,7 @@ void SerialWrapper::begin(long baud) {
   channel++;
 #endif
 #ifdef SERIAL_BT
-  if (isChannel(channel)) { SERIAL_BT.begin(SERIAL_BT_NAME);  Serial.println("B2"); }
+  if (isChannel(channel)) { delay(1000); SERIAL_BT.begin(SERIAL_BT_NAME); delay(1000); }
   channel++;
 #endif
 }
