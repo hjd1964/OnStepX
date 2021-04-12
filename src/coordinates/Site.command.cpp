@@ -51,7 +51,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   // :GtH#      Get current site Latitude, positive for North latitudes
   //            Returns: sDD*MM:SS.SSS# (high precision)
   if (cmdH("Gt")) {
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else precisionMode = PM_LOW;
     convert.doubleToDms(reply, radToDeg(location.latitude), false, true, precisionMode);
     *numericReply = false;
   } else 
@@ -68,7 +68,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   // :GgH#      Get current site Longitude
   //            Returns: sDD*MM:SS.SSS# (high precision)
   if (cmdH("Gg"))  {
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else precisionMode = PM_LOW;
     convert.doubleToDms(reply, radToDeg(location.longitude), true, true, precisionMode);
     *numericReply = false;
   } else 
