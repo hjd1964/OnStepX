@@ -64,7 +64,6 @@
 #define PINMAP_LAST                 70
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-
 // Settings ------------------------------------------------------------------------------------------------------------------------
 
 // basic values
@@ -75,7 +74,8 @@
 #define ON_BOTH                     -3
 #define ON_PULLUP                   -4
 #define ON_PULLDOWN                 -5
-#define TMC_SPI
+#define TMC_SPI                     -6
+#define SLAVE                       -7
 
 // pier side
 #define EAST                        1      // same as PSS_EAST
@@ -218,7 +218,7 @@
 #define NV_ENDURANCE NVE_MID
 
 // NV addresses
-#define INIT_NV_KEY                 583927924UL
+#define INIT_NV_KEY                 583927925UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..3
 #define NV_LOCATION_NUMBER          4      // bytes: 1   , addr:   4..4

@@ -14,6 +14,12 @@
   HardwareSerial Serial2(SERIAL_2_HWSERIAL_RX, SERIAL_2_HWSERIAL_TX);
 #endif
 
+#if SERIAL_BT_MODE == SLAVE
+  #include <BluetoothSerial.h>
+  BluetoothSerial bluetoothSerial;
+  #define SERIAL_BT bluetoothSerial
+#endif
+
 SerialWrapper::SerialWrapper() {
   static uint8_t channel = 0;
 #ifdef SERIAL_A
@@ -34,6 +40,10 @@ SerialWrapper::SerialWrapper() {
 #endif
 #ifdef SERIAL_ST4
   if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
+  channel++;
+#endif
+#ifdef SERIAL_BT
+  if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); Serial.println("B1"); return; }
   channel++;
 #endif
 }
@@ -62,6 +72,10 @@ void SerialWrapper::begin(long baud) {
   if (isChannel(channel)) SERIAL_ST4.begin(baud);
   channel++;
 #endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) { SERIAL_BT.begin(SERIAL_BT_NAME);  Serial.println("B2"); }
+  channel++;
+#endif
 }
 
 void SerialWrapper::end() {
@@ -86,6 +100,10 @@ void SerialWrapper::end() {
   if (isChannel(channel)) SERIAL_ST4.end();
   channel++;
 #endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) SERIAL_BT.end();
+  channel++;
+#endif
 }
 
 size_t SerialWrapper::write(uint8_t data) {
@@ -108,6 +126,10 @@ size_t SerialWrapper::write(uint8_t data) {
 #endif
 #ifdef SERIAL_ST4
   if (isChannel(channel)) return SERIAL_ST4.write(data);
+  channel++;
+#endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) return SERIAL_BT.write(data);
   channel++;
 #endif
   return -1;
@@ -135,6 +157,10 @@ size_t SerialWrapper::write(const uint8_t *data, size_t quantity) {
   if (isChannel(channel)) return SERIAL_ST4.write(data, quantity);
   channel++;
 #endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) return SERIAL_BT.write(data, quantity);
+  channel++;
+#endif
   return -1;
 }
 
@@ -158,6 +184,10 @@ int SerialWrapper::available(void) {
 #endif
 #ifdef SERIAL_ST4
   if (isChannel(channel)) return SERIAL_ST4.available();
+  channel++;
+#endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) return SERIAL_BT.available();
   channel++;
 #endif
   return 0;
@@ -185,6 +215,10 @@ int SerialWrapper::read(void) {
   if (isChannel(channel)) return SERIAL_ST4.read();
   channel++;
 #endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) return SERIAL_BT.read();
+  channel++;
+#endif
   return -1;
 }
 
@@ -210,6 +244,10 @@ int SerialWrapper::peek(void) {
   if (isChannel(channel)) return SERIAL_ST4.peek();
   channel++;
 #endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) return SERIAL_BT.peek();
+  channel++;
+#endif
   return -1;
 }
 
@@ -233,6 +271,10 @@ void SerialWrapper::flush(void) {
 #endif
 #ifdef SERIAL_ST4
   if (isChannel(channel)) SERIAL_ST4.flush();
+  channel++;
+#endif
+#ifdef SERIAL_BT
+  if (isChannel(channel)) SERIAL_BT.flush();
   channel++;
 #endif
 }

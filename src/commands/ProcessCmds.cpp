@@ -35,8 +35,12 @@ extern Telescope telescope;
   void processCmdsD() { processCommandsD.poll(); }
 #endif
 #ifdef SERIAL_ST4
-  CommandProcessor processCommandsST4(9600),'S';
+  CommandProcessor processCommandsST4(9600,'S');
   void processCmdsST4() { processCommandsST4.poll(); }
+#endif
+#if SERIAL_BT_MODE == SLAVE
+  CommandProcessor processCommandsBT(9600,'T');
+  void processCmdsBT() { processCommandsBT.poll(); }
 #endif
 
 CommandProcessor::CommandProcessor(long baud, char channel) {

@@ -119,6 +119,10 @@ void setup() {
     VF("MSG: Setup, starting command channel ST4 task (rate 1ms priority 6)... ");
     if (tasks.add(5, 0, true, 6, processCmdsST4, "PrcCmdS")) VL("success"); else VL("FAILED!");
   #endif
+  #if SERIAL_BT_MODE == SLAVE
+    VF("MSG: Setup, starting command channel BT task (rate 5ms priority 6)... ");
+    if (tasks.add(5, 0, true, 6, processCmdsBT, "PrcCmdT")) { VL("success"); } else { VL("FAILED!"); }
+  #endif
 
   telescope.init();
 
