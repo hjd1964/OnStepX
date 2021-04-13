@@ -152,7 +152,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     *numericReply = false;
     switch (parameter[1]) {
       case '2': sprintF(reply,"%0.3f",misc.usPerStepCurrent); break;             // current
-      case '3': sprintF(reply,"%0.3f",usPerStepDefault); break;                  // default
+      case '3': sprintF(reply,"%0.3f",usPerStepBase); break;                     // default base
       case '4': sprintf(reply,"%d%s",(int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
       case '5': sprintf(reply,"%d",(int)misc.meridianFlipAuto); break;           // autoMeridianFlip
       case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;     // preferred pier side
