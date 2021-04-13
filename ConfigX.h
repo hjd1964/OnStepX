@@ -38,7 +38,7 @@
                                           //              Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
 
 // ESP32 SERIAL PORT BLUETOOTH COMMAND CHANNEL -------------------------------------------------------------------------------------
-#define SERIAL_BT_MODE              SLAVE //         OFF, Use SLAVE to enable the interface (ESP32 only.)                     Option
+#define SERIAL_BT_MODE                OFF //         OFF, Use SLAVE to enable the interface (ESP32 only.)                     Option
 #define SERIAL_BT_NAME           "OnStep" //    "OnStep", Bluetooth device name.                                              Adjust
 
 // DEBUG ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#DEBUG
