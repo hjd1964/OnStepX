@@ -22,7 +22,7 @@ class NonVolatileStorage {
     void readOnly(bool state);
 
     // call frequently to perform any operations that need to happen in the background
-    virtual void poll();
+    virtual void poll(bool disableInterrupts = true);
 
     // returns true if all data in any cache has been written or the commit has been done
     virtual bool committed();

@@ -31,7 +31,7 @@ void NonVolatileStorage::readOnly(bool state) {
   readOnlyMode = state;
 }
 
-void NonVolatileStorage::poll() {
+void NonVolatileStorage::poll(bool disableInterrupts) {
   if (cacheSize == 0 || cacheClean) return;
 
   int8_t dirtyW = 0, dirtyR = 0;

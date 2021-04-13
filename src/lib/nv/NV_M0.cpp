@@ -20,7 +20,7 @@
     return true;
   }
 
-  void NonVolatileStorageM0::poll() {
+  void NonVolatileStorageM0::poll(bool disableInterrupts) {
     if (dirty && ((long)(millis() - commitReadyTimeMs) >= 0)) {
       EEPROM.commit();
       dirty = false;

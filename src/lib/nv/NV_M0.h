@@ -21,7 +21,7 @@
       bool init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire = NULL, uint8_t address = 0);
 
       // call frequently to perform any operations that need to happen in the background
-      void poll();
+      void poll(bool disableInterrupts = true);
 
       // returns true if all data in any cache has been written
       bool committed();
