@@ -41,7 +41,3 @@
 #define SERIAL_BT_MODE                OFF //         OFF, Use SLAVE to enable the interface (ESP32 only.)                     Option
 #define SERIAL_BT_NAME           "OnStep" //    "OnStep", Bluetooth device name.                                              Adjust
 
-// DEBUG ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#DEBUG
-// Enable additional debugging and/or status messages on the specified SERIAL_DEBUG port
-// Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
-
