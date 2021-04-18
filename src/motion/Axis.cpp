@@ -129,8 +129,8 @@ void Axis::init(uint8_t axisNumber) {
 void Axis::enable(bool value) {
   if (pins.enable != OFF) {
     if (value) digitalWrite(pins.enable, invertEnable?HIGH:LOW); else digitalWrite(pins.enable, invertEnable?LOW:HIGH);
-    enabled = value;
   }
+  enabled = value;
 }
 
 bool Axis::isEnabled() {
