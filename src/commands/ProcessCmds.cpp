@@ -42,6 +42,10 @@ extern Telescope telescope;
   CommandProcessor processCommandsBT(9600,'T');
   void processCmdsBT() { processCommandsBT.poll(); }
 #endif
+#ifdef SERIAL_IP
+  CommandProcessor processCommandsIP(9600,'I');
+  void processCmdsIP() { processCommandsIP.poll(); }
+#endif
 
 CommandProcessor::CommandProcessor(long baud, char channel) {
   this->channel = channel;

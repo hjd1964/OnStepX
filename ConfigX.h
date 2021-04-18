@@ -41,3 +41,21 @@
 #define SERIAL_BT_MODE                OFF //         OFF, Use SLAVE to enable the interface (ESP32 only.)                     Option
 #define SERIAL_BT_NAME           "OnStep" //    "OnStep", Bluetooth device name.                                              Adjust
 
+// ESP32 VIRTUAL SERIAL IP COMMAND CHANNEL -----------------------------------------------------------------------------------------
+#define SERIAL_IP_MODE       OFF //         OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)   Option
+
+#define STANDARD_COMMAND_CHANNEL       ON //          ON, Wifi command channel for simultanious connections on port 9999      Option
+#define PERSISTENT_COMMAND_CHANNEL     ON //          ON, Wifi command channel for a single connection on port 9998           Option
+
+#define AP_SSID                 "ONSTEPX" //   "ONSTEPX", Wifi Access Point SSID.                                             Adjust
+#define AP_PASSWORD            "password" //  "password", Wifi Access Point password.                                         Adjust
+#define AP_CHANNEL                      7 //           7, Wifi Access Point channel.                                          Adjust
+#define AP_IP_ADDR          (192,168,0,1) // ..,168,0,1), Wifi Access Point IP Address.                                       Adjust
+#define AP_GW_ADDR          (192,168,0,1) // ..,168,0,1), Wifi Access Point GATEWAY Address.                                  Adjust
+#define AP_SN_MASK        (255,255,255,0) // ..55,255,0), Wifi Access Point SUBNET Mask.                                      Adjust
+
+#define STA_SSID                   "Home" //      "Home", Wifi Station SSID to connnect to.                                   Adjust
+#define STA_PASSWORD           "password" //  "password", Wifi Station mode password.                                         Adjust
+#define STA_IP_ADDR        (192,168,1,55) // ..168,1,55), Wifi Station IP Address.                                            Adjust
+#define STA_GW_ADDR         (192,168,1,1) // ..,168,1,1), Wifi Station GATEWAY Address.                                       Adjust
+#define STA_SN_MASK       (255,255,255,0) // ..55,255,0), Wifi Station SUBNET Mask.                                           Adjust

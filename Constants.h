@@ -76,6 +76,9 @@
 #define ON_PULLDOWN                 -5
 #define TMC_SPI                     -6
 #define SLAVE                       -7
+#define ACCESS_POINT                -8
+#define STATION                     -9
+#define STATION_DHCP                -10
 
 // pier side
 #define EAST                        1      // same as PSS_EAST

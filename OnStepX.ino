@@ -72,6 +72,9 @@ extern Telescope telescope;
 #if SERIAL_BT_MODE == SLAVE
   extern void processCmdsBT();
 #endif
+#ifdef SERIAL_IP
+  extern void processCmdsIP();
+#endif
 
 #if DEBUG == PROFILER
   extern void profiler();
@@ -125,7 +128,12 @@ void setup() {
   #if SERIAL_BT_MODE == SLAVE
     VF("MSG: Setup, starting command channel BT task (rate 5ms priority 6)... ");
     if (tasks.add(5, 0, true, 6, processCmdsBT, "PrcCmdT")) { VL("success"); } else { VL("FAILED!"); }
+  #ifdef SERIAL_IP
+    VF("MSG: Setup, starting command channel IP task (rate 3ms priority 6)... ");
+    if (tasks.add(3, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
   #endif
+
+  tasks.yield(5000);
 
   telescope.init();
 
