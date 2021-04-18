@@ -38,8 +38,12 @@ void Telescope::init() {
 
   if (!validKey) {
     while (!nv.committed()) nv.poll();
-    VLF("MSG: Telescope, NV reset complete");
     nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
+    while (!nv.committed()) { nv.poll(false); delay(10); }
+    nv.ignoreCache(true);
+    uint32_t key = nv.readUL(NV_KEY);
+    if (key != (uint32_t)INIT_NV_KEY) DLF("ERR: Telescope, NV reset failed to read back key!"); else VLF("MSG: Telescope, NV reset complete");
+    nv.ignoreCache(false);
   }
 }
 

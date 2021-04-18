@@ -16,7 +16,7 @@ bool NonVolatileStorage24XX::init(uint16_t size, bool cacheEnable, uint16_t wait
   NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
 
   this->wire = wire;
-  this->eepromAddress = eepromAddress;
+  eepromAddress = address;
   wire->begin();
 
   wire->beginTransmission(eepromAddress);

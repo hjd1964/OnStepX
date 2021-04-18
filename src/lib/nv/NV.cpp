@@ -47,7 +47,8 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
       cacheCleanThisPass = true;
     }
 
-    if (!delayedCommitEnabled || (long)(millis() - commitReadyTimeMs) >= 0) dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8);
+    if (!delayedCommitEnabled || (long)(millis() - commitReadyTimeMs) >= 0)  
+      dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8); else cacheCleanThisPass = false;
     dirtyR = bitRead(cacheStateRead[cacheIndex/8], cacheIndex%8);
     if (dirtyW || dirtyR) { cacheCleanThisPass = false; break; }
   }
