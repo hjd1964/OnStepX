@@ -178,7 +178,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       case '5': sprintf(reply,"%ld",lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
       case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; *numericReply = false; break;
       case 'F': if (AXIS2_TANGENT_ARM != ON) *commandError = CE_0; break;
-//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply,"%d",(int)nv.read(EE_mountType)); break; // return the mount type
+//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply,"%d",(int)nv.read(EE_mountType)); break; 
     default:
       return false;
     }

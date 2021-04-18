@@ -15,8 +15,6 @@ extern Tasks tasks;
 #include "ProcessCmds.h"
 #include "../telescope/Telescope.h"
 
-extern Telescope telescope;
-
 // command processors
 #ifdef SERIAL_A
   CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT,'A');
