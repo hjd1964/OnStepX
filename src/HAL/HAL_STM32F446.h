@@ -29,11 +29,21 @@
 
 // Handle special case of using software serial for a GPS
 #if SerialGPS == SoftwareSerial2
+  #define SWSERIAL_1
+  #define SWSERIAL_1_RX PA3
+  #define SWSERIAL_1_TX PA2
+  #define SERIAL_GPS SWSerial1
+#endif
+
+/*
+// Handle special case of using software serial for a GPS
+#if SerialGPS == SoftwareSerial2
   #include <SoftwareSerial.h>
   SoftwareSerial SWSerialGPS(PA3, PA2); // RX2, TX2
   #undef SerialGPS
   #define SerialGPS SWSerialGPS
 #endif
+*/
 
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>

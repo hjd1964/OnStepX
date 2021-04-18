@@ -12,8 +12,16 @@
 #endif
 #include "SerialWrapper.h"
 
-#ifdef SERIAL_2_HWSERIAL
-  HardwareSerial Serial2(SERIAL_2_HWSERIAL_RX, SERIAL_2_HWSERIAL_TX);
+#ifdef HWSERIAL_1
+  HardwareSerial HWSerial1(HWSERIAL_1_RX, HWSERIAL_1_TX);
+#endif
+
+#ifdef HWSERIAL_2
+  HardwareSerial HWSerial2(HWSERIAL_2_RX, HWSERIAL_2_TX);
+#endif
+
+#ifdef HWSERIAL_3
+  HardwareSerial HWSerial3(HWSERIAL_3_RX, HWSERIAL_3_TX);
 #endif
 
 #if SERIAL_BT_MODE == SLAVE
