@@ -30,7 +30,7 @@ void __pwmDeallocateChannel(int pin) {
 }
 
 // find a PWM channel for this pin, returns -1 if no channel is available
-int __pwmAllocateChannel(int pin, boolean clearExisting=false) {
+int __pwmAllocateChannel(int pin, bool clearExisting=false) {
   if (clearExisting) __pwmDeallocateChannel(pin);
   for (int channel = __ANALOG_PWM_CHANNEL_START; channel < 15; channel++) {
     if (__channelMap[channel] == -1) {
