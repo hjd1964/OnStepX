@@ -509,14 +509,14 @@ void Axis::enableMoveFast(const bool fast) {
     }
     takeStep = !takeStep;
   }
-  IRAM_ATTR void Axis::slewForward(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewForward(const int8_t stepPin) {
     if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps < targetSteps) { motorSteps++; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
   }
-  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void Axis::slewReverse(const int8_t stepPin) {
     if (takeStep) {
       if (tracking) targetSteps += trackingStep;
       if (motorSteps > targetSteps) { motorSteps--; digitalWriteF(stepPin, HIGH); }
