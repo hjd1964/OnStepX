@@ -55,7 +55,9 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
 }
 
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
+//  VF("target1    = "); print(coord);
   rightAscensionToHourAngle(coord);
+//  VF("target2    = "); print(coord);
   if (mountType == ALTAZM) equToHor(coord);
   #if MOUNT_COORDS == OBSERVED
     observedPlaceToMount(coord);
@@ -64,6 +66,7 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   #else
     #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
+//  VF("target3    = "); print(coord);
   if (a1 != NULL && a2 != NULL) {
     if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   }

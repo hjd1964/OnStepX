@@ -195,6 +195,12 @@ void Mount::trackPoll() {
     if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
   } else trackingRateAxis2 = 0.0F;
 
+  //char s[20];
+  //sprintF(s,"%1.8f",trackingRateAxis1);
+  //D("TR Axis1 = "); DL(s);
+  //sprintF(s,"%1.8f",trackingRateAxis2);
+  //D("TR Axis2 = "); DL(s);
+  
   // override for special case of near a celestial pole
   if (fabs(declination) > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
 

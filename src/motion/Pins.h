@@ -8,6 +8,7 @@ typedef struct DriverPins {
   int8_t m2;
   int8_t m3;
   int8_t decay;
+  int8_t fault;
 } DriverPins;
 
 #define mosi m0

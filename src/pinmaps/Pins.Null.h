@@ -81,14 +81,17 @@
 #ifndef AXIS1_DECAY_PIN
   #define AXIS1_DECAY_PIN           OFF
 #endif
+#ifndef AXIS1_FAULT_PIN
+  #define AXIS1_FAULT_PIN           OFF
+#endif
 #ifndef AXIS1_HOME_SENSE_PIN
   #define AXIS1_HOME_SENSE_PIN      OFF
 #endif
 #ifndef AXIS1_LIMIT_SENSE_MIN_PIN
-  #define AXIS1_LIMIT_SENSE_MIN_PIN OFF
+  #define AXIS1_LIMIT_SENSE_MIN_PIN LIMIT_SENSE_PIN
 #endif
 #ifndef AXIS1_LIMIT_SENSE_MAX_PIN
-  #define AXIS1_LIMIT_SENSE_MAX_PIN OFF
+  #define AXIS1_LIMIT_SENSE_MAX_PIN LIMIT_SENSE_PIN
 #endif
 
 #ifndef AXIS2_ENABLE_PIN
@@ -115,14 +118,17 @@
 #ifndef AXIS2_DECAY_PIN
   #define AXIS2_DECAY_PIN           OFF
 #endif
+#ifndef AXIS2_FAULT_PIN
+  #define AXIS2_FAULT_PIN           OFF
+#endif
 #ifndef AXIS2_HOME_SENSE_PIN
   #define AXIS2_HOME_SENSE_PIN      OFF
 #endif
 #ifndef AXIS2_LIMIT_SENSE_MIN_PIN
-  #define AXIS2_LIMIT_SENSE_MIN_PIN OFF
+  #define AXIS2_LIMIT_SENSE_MIN_PIN LIMIT_SENSE_PIN
 #endif
 #ifndef AXIS2_LIMIT_SENSE_MAX_PIN
-  #define AXIS2_LIMIT_SENSE_MAX_PIN OFF
+  #define AXIS2_LIMIT_SENSE_MAX_PIN LIMIT_SENSE_PIN
 #endif
 
 #ifndef AXIS3_ENABLE_PIN
@@ -148,6 +154,9 @@
 #endif
 #ifndef AXIS3_DECAY_PIN
   #define AXIS3_DECAY_PIN           OFF
+#endif
+#ifndef AXIS3_FAULT_PIN
+  #define AXIS3_FAULT_PIN           OFF
 #endif
 #ifndef AXIS3_HOME_SENSE_PIN
   #define AXIS3_HOME_SENSE_PIN      OFF
@@ -183,6 +192,9 @@
 #ifndef AXIS4_DECAY_PIN
   #define AXIS4_DECAY_PIN           OFF
 #endif
+#ifndef AXIS4_FAULT_PIN
+  #define AXIS4_FAULT_PIN           OFF
+#endif
 #ifndef AXIS4_HOME_SENSE_PIN
   #define AXIS4_HOME_SENSE_PIN      OFF
 #endif
@@ -217,6 +229,9 @@
 #ifndef AXIS5_DECAY_PIN
   #define AXIS5_DECAY_PIN           OFF
 #endif
+#ifndef AXIS5_FAULT_PIN
+  #define AXIS5_FAULT_PIN           OFF
+#endif
 #ifndef AXIS5_HOME_SENSE_PIN
   #define AXIS5_HOME_SENSE_PIN      OFF
 #endif
@@ -250,6 +265,9 @@
 #endif
 #ifndef AXIS6_DECAY_PIN
   #define AXIS6_DECAY_PIN           OFF
+#endif
+#ifndef AXIS6_FAULT_PIN
+  #define AXIS6_FAULT_PIN           OFF
 #endif
 #ifndef AXIS6_HOME_SENSE_PIN
   #define AXIS6_HOME_SENSE_PIN      OFF

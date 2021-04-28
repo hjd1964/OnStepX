@@ -59,3 +59,4 @@
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
+//#include "../lib/analog/AN_ESP32.h"

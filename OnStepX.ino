@@ -97,46 +97,63 @@ void setup() {
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
 
+  telescope.init();
+
   // System services
   // add task for system services, runs at 10ms intervals so commiting 1KB of NV takes about 10 seconds
-  VF("MSG: Setup, starting system service task (rate 10ms priority 7)... ");
+  VF("MSG: Setup, start system service task (rate 10ms priority 7)... ");
   if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) { VL("success"); } else { VL("FAILED!"); }
 
   // Command processing
   // add tasks to process commands
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+  uint8_t handle;
+  #ifdef HAL_SLOW_PROCESSOR
+    long comPollRate = 2000;
+  #else
+    long comPollRate = 250;
+  #endif
   #ifdef SERIAL_A
-    VF("MSG: Setup, starting command channel A task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsA, "PrcCmdA")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel A task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsA, "PrcCmdA");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_B
-    VF("MSG: Setup, starting command channel B task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsB, "PrcCmdB")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel B task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsB, "PrcCmdB");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_C
-    VF("MSG: Setup, starting command channel C task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsC, "PrcCmdC")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel C task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsC, "PrcCmdC");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_D
-    VF("MSG: Setup, starting command channel D task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel D task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_ST4
-    VF("MSG: Setup, starting command channel ST4 task (rate 3ms priority 6)... ");
+    VF("MSG: Setup, start command channel ST4 task (priority 6)... ");
     if (tasks.add(3, 0, true, 6, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #if SERIAL_BT_MODE == SLAVE
-    VF("MSG: Setup, starting command channel BT task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsBT, "PrcCmdT")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel BT task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsBT, "PrcCmdT");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_IP
-    VF("MSG: Setup, starting command channel IP task (rate 3ms priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel IP task (priority 6)... ");
+    if (tasks.add(1, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
   #endif
 
   tasks.yield(5000);
 
-  telescope.init();
 
   // ------------------------------------------------------------------------------------------------
   // add task manager debug events

@@ -136,7 +136,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   }
 
 //  VF("Start       = "); transform.print(&start);
-  VF("Destination = "); transform.print(&destination);
+ // VF("Destination = "); transform.print(&destination);
 
   // start the goto monitor
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
@@ -158,7 +158,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     axis2.setTargetCoordinate(a2);
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
     if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
-    transform.print(&destination);
+    //transform.print(&destination);
 
     // slew rate in rads per second
     axis1.setFrequencyMax(radsPerSecondCurrent);
@@ -217,7 +217,7 @@ void Mount::gotoPoll() {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
       updatePosition(CR_MOUNT_EQU);
-      transform.print(&current);
+      //transform.print(&current);
 
       VLF("MSG: Mount::gotoPoll(); stopping slew");
       axis1.autoSlewRateByDistanceStop();

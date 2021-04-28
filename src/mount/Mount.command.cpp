@@ -54,10 +54,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
     if (guideState != GU_NONE)               reply[i++]='g';                     // [g]uide active
     if (guideState == GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
+//    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }   // [r]efr enabled [s]ingle axis
       if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                   // [r]efr enabled
       if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }   // on[t]rack enabled [s]ingle axis
       if (rateCompensation == RC_FULL_BOTH){ reply[i++]='t'; }                   // on[t]rack enabled
+//    }
     if (waitingHome)                         reply[i++]='w';                     // [w]aiting at home 
     if (misc.meridianFlipPause)              reply[i++]='u';                     // pa[u]se at home enabled?
     if (misc.buzzer)                         reply[i++]='z';                     // bu[z]zer enabled?
@@ -92,10 +94,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (gotoState == GS_NONE)                    reply[0]|=0b10000010;           // No goto
 //  if (ppsSynced)                               reply[0]|=0b10000100;           // PPS sync
     if (guideState == GU_PULSE_GUIDE)            reply[0]|=0b10001000;           // pulse guide active
+//    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)        reply[0]|=0b11010000;           // Refr enabled Single axis
       if (rateCompensation == RC_REFR_BOTH)      reply[0]|=0b10010000;           // Refr enabled
       if (rateCompensation == RC_FULL_RA)        reply[0]|=0b11100000;           // OnTrack enabled Single axis
       if (rateCompensation == RC_FULL_BOTH)      reply[0]|=0b10100000;           // OnTrack enabled
+//    }
     if (rateCompensation == RC_NONE) {
       double r = siderealToHz(trackingRate);
       if (fequal(r, 57.900))                     reply[1]|=0b10000001; else      // Lunar rate selected
@@ -196,43 +200,44 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     }
   } else
 
-  // :GXUn#     Get TMC stepper driver statUs (all axes)
+  // :GXUn#     Get stepper driver statUs (all axes)
   //            Returns: Value
   if (cmdGX("GXU")) {
-    #ifdef HAS_TMC_DRIVER
-      TmcDriver* driver = NULL;
-      uint8_t axis = parameter[1] - '0';
-      #ifdef AXIS1_DRIVER_TMC_SPI
-        if (axis == 1) driver == &axis1.driver.tmcDriver;
+    DriverStatus status;
+    uint8_t axis = parameter[1] - '0';
+    bool success = true;
+    switch (axis) {
+      #if AXIS1_DRIVER_MODEL != OFF
+        case 1: status = axis1.driver.getStatus(); break;
       #endif
-      #ifdef AXIS2_DRIVER_TMC_SPI
-        if (axis == 2) driver == &axis2.driver.tmcDriver;
+      #if AXIS2_DRIVER_MODEL != OFF
+        case 2: status = axis2.driver.getStatus(); break;
       #endif
-      #ifdef AXIS3_DRIVER_TMC_SPI
-        if (axis == 3) driver == &axis3.driver.tmcDriver;
+      #if AXIS3_DRIVER_MODEL != OFF
+        case 3: status = axis3.driver.getStatus(); break;
       #endif
-      #ifdef AXIS4_DRIVER_TMC_SPI
-        if (axis == 4) driver == &axis4.driver.tmcDriver;
+      #if AXIS4_DRIVER_MODEL != OFF
+        case 4: status = axis4.driver.getStatus(); break;
       #endif
-      #ifdef AXIS5_DRIVER_TMC_SPI
-        if (axis == 5) driver == &axis5.driver.tmcDriver;
+      #if AXIS5_DRIVER_MODEL != OFF
+        case 5: status = axis5.driver.getStatus(); break;
       #endif
-      #ifdef AXIS6_DRIVER_TMC_SPI
-        if (axis == 6) driver == &axis6.driver.tmcDriver;
+      #if AXIS6_DRIVER_MODEL != OFF
+        case 6: status = axis6.driver.getStatus(); break;
       #endif
-      if (driver != NULL) {
-        driver->refresh_DRVSTATUS();
-        strcat(reply, driver->get_DRVSTATUS_stst() ? "ST," : ",");  // Standstill
-        strcat(reply, driver->get_DRVSTATUS_olA()  ? "OA," : ",");  // Open Load A
-        strcat(reply, driver->get_DRVSTATUS_olB()  ? "OB," : ",");  // Open Load B
-        strcat(reply, driver->get_DRVSTATUS_s2gA() ? "GA," : ",");  // Short to Ground A
-        strcat(reply, driver->get_DRVSTATUS_s2gB() ? "GB," : ",");  // Short to Ground B
-        strcat(reply, driver->get_DRVSTATUS_ot()   ? "OT," : ",");  // Overtemp Shutdown 150C
-        strcat(reply, driver->get_DRVSTATUS_otpw() ? "PW" : "");    // Overtemp Pre-warning 120C
-        *numericReply = false;
-      } else
-    #endif
-    *commandError = CE_0;
+      default: success = false;
+    }
+    if (success) {
+      strcat(reply, status.standstill ? "ST," : ",");
+      strcat(reply, status.outputA.openLoad ? "OA," : ",");
+      strcat(reply, status.outputB.openLoad ? "OB," : ",");
+      strcat(reply, status.outputA.shortToGround ? "GA," : ",");
+      strcat(reply, status.outputB.shortToGround ? "GB," : ",");
+      strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
+      strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
+      strcat(reply, status.fault ? "GF" : "");
+      *numericReply = false;
+    } else *commandError = CE_0;
   } else
 
   // :hC#       Moves telescope to the home position

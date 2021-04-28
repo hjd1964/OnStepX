@@ -32,13 +32,14 @@ void Site::init(bool validKey) {
   readJD(validKey);
   setTime(ut1);
 
-  VLF("MSG: starting centisecond timer...");
+  VF("MSG: Site, start centisecond timer task (rate 10ms priority 0)... ");
   delay(1000);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
-  if (!tasks.requestHardwareTimer(handle, 3, 1)) DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)");
-  VLF("MSG: centisecond timer running");
-
+  if (handle) {
+    VL("success"); 
+    if (!tasks.requestHardwareTimer(handle, 3, 1)) DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)");
+  } else VL("FAILED!");
 
   // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);

@@ -12,19 +12,20 @@
 #include "StepDrivers.h"
 #include "TmcDrivers.h"
 
-void TmcDriver::init(int model) {
-  active = softSpi.init();
+void TmcDriver::init(int model, DriverPins pins) {
   this->model = model;
-
   if (model == TMC5160) rsense = 0.075; else
   if (model == TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
+  VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
+
+  active = softSpi.init(pins);
 }
 
 bool TmcDriver::mode(bool intpol, int decay_mode, byte micro_step_mode, int irun, int ihold) {
   if (!active) return false;
 
   softSpi.begin();
-  uint32_t data_out=0;
+  uint32_t data_out = 0;
 
   // *** My notes are limited, see the TMC2130 datasheet for more info. ***
 

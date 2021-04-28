@@ -10,11 +10,8 @@
 
 class TmcDriver {
   public:
-    // create and set pin values
-    TmcDriver(DriverPins Pins) : Pins{ Pins } {};
-
     // setup SoftSpi and driver model/Rsense
-    void init(int model);
+    void init(int model, DriverPins pins);
 
     // TMC setup most common settings
     // 256x interpolation:   intpol
@@ -172,6 +169,5 @@ class TmcDriver {
     int   model;
     float rsense              = 0.11 + 0.02; // default for TMC2130
 
-    const DriverPins  Pins    = {OFF, OFF, OFF, OFF, OFF};
-    SoftSpi softSpi{Pins};
+    SoftSpi softSpi;
 };

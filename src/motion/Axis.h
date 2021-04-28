@@ -21,14 +21,14 @@ typedef struct AxisPins {
   int8_t step;
   int8_t dir;
   int8_t enable;
+  int8_t min;
+  int8_t max;
   bool   invertStep;
   bool   invertDir;
   bool   invertEnable;
 } AxisPins;
 
 typedef struct AxisErrors {
-  uint8_t driverFault:1;
-  uint8_t motorFault:1;
   uint8_t minExceeded:1;
   uint8_t maxExceeded:1;
   uint8_t minLimitSensed:1;
@@ -127,6 +127,8 @@ class Axis {
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
 
+    // refresh driver status information maximum frequency is 20ms
+    void updateDriverStatus();
     // checks for an error that would disallow forward motion
     bool motionForwardError();
     // checks for an error that would disallow reverse motion
@@ -185,6 +187,7 @@ class Axis {
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;
     volatile int  trackingStep = 1;
+    volatile int  slewStep = 1;
     volatile int  step = 1;
     volatile int  stepsPerStepSlewing = 1;
     volatile bool takeStep = false;

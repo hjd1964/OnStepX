@@ -8,11 +8,8 @@
 
 class SoftSpi {
   public:
-    // create and set pin values
-    SoftSpi(DriverPins Pins) : Pins{ Pins } {};
-
     // check pins and report status
-    bool init();
+    bool init(DriverPins pins);
     // setup pins and activate CS
     void begin();
     // cycle CS to reset conversation
@@ -25,5 +22,5 @@ class SoftSpi {
     uint32_t transfer32(uint32_t data_out);
 
   private:
-    const DriverPins Pins = {OFF, OFF, OFF, OFF, OFF};
+    DriverPins pins = {OFF, OFF, OFF, OFF, OFF};
 };

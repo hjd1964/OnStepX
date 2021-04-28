@@ -47,6 +47,20 @@ typedef struct DriverSettings {
 } DriverSettings;
 #pragma pack()
 
+typedef struct DriverOutputStatus {
+  bool shortToGround;
+  bool openLoad;
+} DriverOutputStatus;
+
+typedef struct DriverStatus {
+  DriverOutputStatus outputA;
+  DriverOutputStatus outputB;
+  bool overTemperaturePreWarning;
+  bool overTemperature;
+  bool standstill;
+  bool fault;
+} DriverStatus;
+
 // check/flag TMC stepper drivers
 #if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160
   #define AXIS1_DRIVER_TMC_SPI
@@ -82,17 +96,25 @@ class StepDriver {
     // and sets up the pin modes
     void init(uint8_t axisNumber);
 
-    // set microstep and decay modes for tracking
+    // true if switching microstep modes is allowed
     bool modeSwitchAllowed();
+    // set microstep mode for tracking
     void modeMicrostepTracking();
+    // set decay mode for tracking
     void modeDecayTracking();
 
-    // set microstep and decay modes for slewing
-    uint8_t modeMicrostepSlewing();
+    // set microstep mode for slewing
+    int modeMicrostepSlewing();
+    // set decay mode for slewing
     void modeDecaySlewing();
 
+    // update status info. for driver
+    void updateStatus();
+    // get status info.
+    DriverStatus getStatus();
+
     #ifdef HAS_TMC_DRIVER
-      TmcDriver tmcDriver{pins};
+      TmcDriver tmcDriver;
     #endif
 
   private:
@@ -112,8 +134,9 @@ class StepDriver {
 
     DriverPins pins;
     DriverSettings settings;
+    DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
-    uint8_t microstepRatio        = 1;
+    int     microstepRatio        = 1;
     int     microstepCode         = OFF;
     int     microstepCodeGoto     = OFF;
     uint8_t microstepBitCode      = 0;
