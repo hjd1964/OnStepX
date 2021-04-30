@@ -29,8 +29,6 @@ typedef struct AxisPins {
 } AxisPins;
 
 typedef struct AxisErrors {
-  uint8_t minExceeded:1;
-  uint8_t maxExceeded:1;
   uint8_t minLimitSensed:1;
   uint8_t maxLimitSensed:1;
 } AxisErrors;
@@ -129,6 +127,9 @@ class Axis {
 
     // refresh driver status information maximum frequency is 20ms
     void updateDriverStatus();
+
+    // enable or disable checking of limits, default enabled
+    void setMotionLimitsCheck(bool state);
     // checks for an error that would disallow forward motion
     bool motionForwardError();
     // checks for an error that would disallow reverse motion
@@ -172,6 +173,7 @@ class Axis {
     bool invertEnable = false;
     bool enabled = false;
     bool tracking = false;
+    bool limitsCheck = true;
 
     long originSteps = 0;
 

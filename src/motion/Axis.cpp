@@ -300,12 +300,33 @@ bool Axis::autoSlewActive() {
 }
 
 void Axis::poll() {
+  // check for limits
+  error.minLimitSensed = digitalReadEx(pins.min);
+  error.maxLimitSensed = digitalReadEx(pins.max);
+
+  // automatically abort slew and stop tracking
+  if (autoRate != AR_RATE_BY_TIME_ABORT) {
+    if (lastPeriod != 0 && trackingStep == -1 && motionReverseError()) {
+      VLF("MSG: Axis::poll(); motion reverse err");
+      autoSlewAbort();
+      if (tracking) { tracking = false; VLF("MSG: Axis::poll(); tracking stopped"); }
+      return;
+    }
+    if (lastPeriod != 0 && trackingStep == 1 && motionForwardError()) {
+      VLF("MSG: Axis::poll(); motion forward err");
+      autoSlewAbort();
+      if (tracking) { tracking = false; VLF("MSG: Axis::poll(); tracking stopped"); }
+      return;
+    }
+  }
+
   if (autoRate != AR_NONE) {
     // acceleration
     if (autoRate == AR_RATE_BY_DISTANCE) {
       freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*maxFreq + backlashFreq;
       if (freq < backlashFreq) freq = backlashFreq;
       if (freq > maxFreq) freq = maxFreq;
+      if (direction == DIR_REVERSE) freq = -freq;
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {
       freq += slewMpspcs;
@@ -368,10 +389,6 @@ void Axis::poll() {
 
   // refresh the driver status
   driver.updateStatus();
-
-  // check for limits
-  error.minLimitSensed = digitalReadEx(pins.min);
-  error.maxLimitSensed = digitalReadEx(pins.max);
 }
 
 void Axis::setFrequency(float frequency) {
@@ -459,15 +476,19 @@ void Axis::enableBacklash() {
   backlashStepsStore = 0;
 }
 
+void Axis::setMotionLimitsCheck(bool state) {
+  limitsCheck = state;
+}
+
 bool Axis::motionForwardError() {
   return driver.getStatus().fault ||
-         error.maxExceeded ||
+         (limitsCheck && getInstrumentCoordinate() > settings.limits.max) ||
          error.maxLimitSensed;
 }
 
 bool Axis::motionReverseError() {
   return driver.getStatus().fault ||
-         error.minExceeded ||
+         (limitsCheck && getInstrumentCoordinate() < settings.limits.min) ||
          error.minLimitSensed;
 }
 
@@ -528,7 +549,7 @@ void Axis::enableMoveFast(const bool fast) {
   }
   IRAM_ATTR void Axis::slewReverse(const int8_t stepPin) {
     if (takeStep) {
-      if (tracking) targetSteps += slewStep;
+      if (tracking) targetSteps -= slewStep;
       if (motorSteps > targetSteps) { motorSteps -= slewStep; digitalWriteF(stepPin, HIGH); }
     } else digitalWriteF(stepPin, LOW);
     takeStep = !takeStep;
@@ -559,7 +580,7 @@ void Axis::enableMoveFast(const bool fast) {
   }
   IRAM_ATTR void Axis::slewReverse(const int8_t stepPin) {
     digitalWriteF(stepPin, LOW);
-    if (tracking) targetSteps += slewStep;
+    if (tracking) targetSteps -= slewStep;
     if (motorSteps > targetSteps) { motorSteps -= slewStep; digitalWriteF(stepPin, HIGH); }
   }
 #endif
