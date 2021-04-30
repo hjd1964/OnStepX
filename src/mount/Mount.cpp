@@ -39,7 +39,9 @@ void Mount::init(bool validKey) {
 
   // get the main axes ready
   axis1.init(1);
+  axis1.setMotionLimitsCheck(false);
   axis2.init(2);
+  axis2.setMotionLimitsCheck(false);
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
