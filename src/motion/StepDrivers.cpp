@@ -13,7 +13,7 @@
 #endif
 #include "StepDrivers.h"
 
-const static int8_t steps[13][9] =
+const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
 {{  0,  1,  2,  3,  7,OFF,OFF,OFF,OFF},   // A4988
  {  0,  1,  2,  3,  4,  5,OFF,OFF,OFF},   // DRV8825
@@ -30,7 +30,7 @@ const static int8_t steps[13][9] =
  {  0,  1,  1,  1,  1,  1,  1,  1,  1}};  // SERVO
 
 #if DEBUG_MODE != OFF
-  const char* DRIVER_NAME[13] = {
+  const char* DRIVER_NAME[DRIVER_MODEL_COUNT] = {
   "A4988","DRV8825","S109","LV8729","RAPS128",
   "TMC2100","TMC2208","TMC2209","ST820","TMC2130",
   "TMC5160","GENERIC","SERVO" };
@@ -40,37 +40,37 @@ const static int8_t steps[13][9] =
   const DriverPins     Axis1DriverModePins     = {AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_DECAY_PIN, AXIS1_FAULT_PIN};
   const DriverSettings Axis1DriverModeSettings = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS1_DRIVER_IHOLD, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_IGOTO,
-                                                  AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO};
+                                                  AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO, AXIS1_DRIVER_STATUS};
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const DriverPins     Axis2DriverModePins     = {AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_M2_PIN, AXIS2_M3_PIN, AXIS2_DECAY_PIN, AXIS2_FAULT_PIN};
   const DriverSettings Axis2DriverModeSettings = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS2_DRIVER_IHOLD, AXIS2_DRIVER_IRUN, AXIS2_DRIVER_IGOTO,
-                                                  AXIS2_DRIVER_DECAY, AXIS2_DRIVER_DECAY_GOTO};
+                                                  AXIS2_DRIVER_DECAY, AXIS2_DRIVER_DECAY_GOTO, AXIS2_DRIVER_STATUS};
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const DriverPins     Axis3DriverModePins     = {AXIS3_M0_PIN, AXIS3_M1_PIN, AXIS3_M2_PIN, AXIS3_M3_PIN, AXIS3_DECAY_PIN, AXIS3_FAULT_PIN};
   const DriverSettings Axis3DriverModeSettings = {AXIS3_DRIVER_MODEL, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS3_DRIVER_IHOLD, AXIS3_DRIVER_IRUN, AXIS3_DRIVER_IGOTO,
-                                                  AXIS3_DRIVER_DECAY, AXIS3_DRIVER_DECAY_GOTO};
+                                                  AXIS3_DRIVER_DECAY, AXIS3_DRIVER_DECAY_GOTO, AXIS3_DRIVER_STATUS};
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
   const DriverPins     Axis4DriverModePins     = {AXIS4_M0_PIN, AXIS4_M1_PIN, AXIS4_M2_PIN, AXIS4_M3_PIN, AXIS4_DECAY_PIN, AXIS4_FAULT_PIN};
   const DriverSettings Axis4DriverModeSettings = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS4_DRIVER_IHOLD, AXIS4_DRIVER_IRUN, AXIS4_DRIVER_IGOTO,
-                                                  AXIS4_DRIVER_DECAY, AXIS4_DRIVER_DECAY_GOTO};
+                                                  AXIS4_DRIVER_DECAY, AXIS4_DRIVER_DECAY_GOTO, AXIS4_DRIVER_STATUS};
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
   const DriverPins     Axis5DriverModePins     = {AXIS5_M0_PIN, AXIS5_M1_PIN, AXIS5_M2_PIN, AXIS5_M3_PIN, AXIS5_DECAY_PIN, AXIS5_FAULT_PIN};
   const DriverSettings Axis5DriverModeSettings = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS5_DRIVER_IHOLD, AXIS5_DRIVER_IRUN, AXIS5_DRIVER_IGOTO,
-                                                  AXIS5_DRIVER_DECAY, AXIS5_DRIVER_DECAY_GOTO};
+                                                  AXIS5_DRIVER_DECAY, AXIS5_DRIVER_DECAY_GOTO, AXIS5_DRIVER_STATUS};
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
   const DriverPins     Axis6DriverModePins     = {AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS6_M2_PIN, AXIS6_M3_PIN, AXIS6_DECAY_PIN, AXIS6_FAULT_PIN};
   const DriverSettings Axis6DriverModeSettings = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_MICROSTEPS_GOTO,
                                                   AXIS6_DRIVER_IHOLD, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_IGOTO,
-                                                  AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO};
+                                                  AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO, AXIS6_DRIVER_STATUS};
 #endif
 
 void StepDriver::init(uint8_t axisNumber) {
@@ -122,6 +122,15 @@ void StepDriver::init(uint8_t axisNumber) {
     pinModeInitEx(pins.m1, OUTPUT, bitRead(microstepBitCode, 1));
     pinModeInitEx(m2Pin,   OUTPUT, bitRead(microstepBitCode, 2));
     pinModeEx    (pins.m3, INPUT);
+  }
+
+  // automatically set fault status for known drivers
+  if (settings.status == ON) {
+    switch (settings.model) {
+      case DRV8825: settings.status = LOW; break;
+      case ST820:   settings.status = LOW; break;
+      default:      settings.status = LOW;
+    }
   }
 }
 
@@ -192,27 +201,31 @@ void StepDriver::modeDecaySlewing() {
 
 void StepDriver::updateStatus() {
   #ifdef HAS_TMC_DRIVER
-    tmcDriver.refresh_DRVSTATUS();
-    status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
-    status.outputA.openLoad      = tmcDriver.get_DRVSTATUS_olA();
-    status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
-    status.outputB.openLoad      = tmcDriver.get_DRVSTATUS_olB();
-    status.overTemperaturePreWarning = tmcDriver.get_DRVSTATUS_otpw();
-    status.overTemperature     = tmcDriver.get_DRVSTATUS_ot();
-    status.standstill          = tmcDriver.get_DRVSTATUS_stst();
+    if (settings.status == ON) {
+        tmcDriver.refresh_DRVSTATUS();
+        status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
+        status.outputA.openLoad      = tmcDriver.get_DRVSTATUS_olA();
+        status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
+        status.outputB.openLoad      = tmcDriver.get_DRVSTATUS_olB();
+        status.overTemperaturePreWarning = tmcDriver.get_DRVSTATUS_otpw();
+        status.overTemperature     = tmcDriver.get_DRVSTATUS_ot();
+        status.standstill          = tmcDriver.get_DRVSTATUS_stst();
 
-    // open load indication is not reliable in standstill
-    if (
-      status.outputA.shortToGround ||
-      (status.outputA.openLoad && !status.standstill) ||
-      status.outputB.shortToGround ||
-      (status.outputB.openLoad && !status.standstill) ||
-      status.overTemperaturePreWarning ||
-      status.overTemperature
-    ) status.fault = true; else status.fault = false;
-  #else
-    status.fault = digitalReadEx(pins.fault);
+        // open load indication is not reliable in standstill
+        if (
+          status.outputA.shortToGround ||
+          (status.outputA.openLoad && !status.standstill) ||
+          status.outputB.shortToGround ||
+          (status.outputB.openLoad && !status.standstill) ||
+          status.overTemperaturePreWarning ||
+          status.overTemperature
+        ) status.fault = true; else status.fault = false;
+    } else
   #endif
+
+  if (settings.status == LOW || settings.status == HIGH) {
+    status.fault = digitalReadEx(pins.fault) == settings.status;
+  }
 }
 
 DriverStatus StepDriver::getStatus() {

@@ -44,6 +44,7 @@ typedef struct DriverSettings {
   int16_t currentGoto;
   int8_t  decay;
   int8_t  decayGoto;
+  int8_t  status;
 } DriverSettings;
 #pragma pack()
 
