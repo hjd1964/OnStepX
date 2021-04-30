@@ -58,18 +58,25 @@ bool Mount::guideValidAxis2(GuideAction guideAction) {
   #if AXIS2_TANGENT_ARM == ON
     a2 = axis2.getInstrumentCoordinate();
   #else
-    if (transform.mountType == ALTAZM) a2 = current.a; else a2 = current.d;
+    if (transform.mountType == ALTAZM) {
+      a2 = current.a;
+      if (a2 < limits.altitude.min || a2 > limits.altitude.max) return false;
+    } else a2 = current.d;
   #endif
 
   if (guideAction == GA_REVERSE) {
-    if (a2 < axis2.settings.limits.min && current.pierSide == PIER_SIDE_EAST) return false;
-    if (a2 > axis2.settings.limits.max && current.pierSide == PIER_SIDE_WEST) return false;
-    if (transform.mountType == ALTAZM && current.a < limits.altitude.min) return false;
+    if (current.pierSide == PIER_SIDE_WEST) {
+      if (a2 > axis2.settings.limits.max) return false;
+    } else {
+      if (a2 < axis2.settings.limits.min) return false;
+    }
   } else
   if (guideAction == GA_FORWARD) {
-    if (a2 < axis2.settings.limits.min && current.pierSide == PIER_SIDE_WEST) return false;
-    if (a2 > axis2.settings.limits.max && current.pierSide == PIER_SIDE_EAST) return false;
-    if (transform.mountType == ALTAZM && current.a > limits.altitude.max) return false;
+    if (current.pierSide == PIER_SIDE_WEST) {
+      if (a2 < axis2.settings.limits.min) return false;
+    } else {
+      if (a2 > axis2.settings.limits.max) return false;
+    }
   }
   return true;
 }
@@ -132,7 +139,12 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
     updateTrackingRates();
   } else {
     axis2.setFrequencyMax(degToRad(rate/240.0F));
-    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
+    updatePosition(CR_MOUNT);
+    if (current.pierSide == PIER_SIDE_WEST) {
+      if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_FORWARD); else axis2.autoSlew(DIR_REVERSE);
+    } else {
+      if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
+    }
   }
   
   // unlimited 0 means the maximum period, about 49 days
