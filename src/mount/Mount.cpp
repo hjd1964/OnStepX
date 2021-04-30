@@ -116,8 +116,10 @@ void Mount::updateTrackingRates() {
       trackingRateAxis1 = 0.0F;
       trackingRateAxis2 = 0.0F;
     }
-    axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
-    axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
+    if (guideActionAxis1 == GA_NONE)
+      axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
+    if (guideActionAxis2 == GA_NONE)
+      axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
   }
 }
 
