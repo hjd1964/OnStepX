@@ -1,23 +1,13 @@
 //--------------------------------------------------------------------------------------------------
 // OnStepX telescope control
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
+#include "../OnStepX.h"
 
+#include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
-#include "../mount/Mount.h"
 #include "Telescope.h"
 
 Telescope telescope;
-InitError error;
+InitError initError;
 
 void Telescope::init() {
   bool validKey = true;
@@ -30,7 +20,7 @@ void Telescope::init() {
     while (!nv.committed()) { nv.poll(false); delay(10); }
 
     VLF("MSG: Telescope, NV reset to defaults");
-  } else VLF("MSG: Telescope, correct NV key found");
+  } else { VLF("MSG: Telescope, correct NV key found"); }
 
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     mount.init(validKey);
@@ -42,7 +32,7 @@ void Telescope::init() {
     while (!nv.committed()) { nv.poll(false); delay(10); }
     nv.ignoreCache(true);
     uint32_t key = nv.readUL(NV_KEY);
-    if (key != (uint32_t)INIT_NV_KEY) DLF("ERR: Telescope, NV reset failed to read back key!"); else VLF("MSG: Telescope, NV reset complete");
+    if (key != (uint32_t)INIT_NV_KEY) { DLF("ERR: Telescope, NV reset failed to read back key!"); } else { VLF("MSG: Telescope, NV reset complete"); }
     nv.ignoreCache(false);
   }
 }
@@ -57,6 +47,51 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.commandPec(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
   
+  //  E - Enter special mode
+  if (command[0] == 'E') {
+    // :EC[s]# Echo string [s] on DebugSer.
+    //            Return: Nothing
+    if (command[1] == 'C') {
+      // spaces are encoded as '_'
+      for (unsigned int i = 0; i < strlen(parameter); i++) if (parameter[i] == '_') parameter[i] = ' ';
+      // a newline is encoded as '&' in the last char of message
+      int l = strlen(parameter);
+      if (l > 0 && parameter[l - 1] == '&') { parameter[l - 1] = 0; DL(parameter); } else D(parameter);
+      *numericReply = false;
+    } else
+
+    // :ERESET#   Reset the MCU.  OnStep must be at home and tracking turned off for this command to work.
+    //            Returns: Nothing
+    if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
+      #ifdef HAL_RESET
+        HAL_RESET;
+      #endif
+      *numericReply = false;
+    } else
+
+    // :ENVRESET# Wipe flash.  OnStep must be at home and tracking turned off for this command to work.
+    if (command[1] == 'N' && parameter[0] == 'V' && parameter[1] == 'R' && parameter[2] == 'E' && parameter[3] == 'S' && parameter[4] == 'E' && parameter[5] == 'T' && parameter[6] == 0) {
+      nv.write(NV_KEY, (uint32_t)0);
+      strcpy(reply, "NV memory will be cleared on the next boot.");
+      *numericReply = false;
+    } else
+
+    // :ESPFLASH# ESP8266 device flash mode.  OnStep must be at home and tracking turned off for this command to work.
+    //            Return: 1 on completion (after up to one minute from start of command.)
+    #if SERIAL_B_ESP_FLASHING == ON
+      if (command[1] == 'S' && parameter[0] == 'P' && parameter[1] == 'F' && parameter[2] == 'L' && parameter[3] == 'A' && parameter[4] == 'S' && parameter[5] == 'H' && parameter[6] == 0) {
+        SerialA.println("The ESP8266 will now be placed in flash upload mode (at 115200 Baud.)");
+        SerialA.println("Arduino's 'Tools -> Upload Speed' should be set to 115200 Baud.");
+        SerialA.println("Waiting for data, you have one minute to start the upload.");
+        delay(1000);
+        fa.go(false); // flash the addon
+        SerialA.println("ESP8266 reset and in run mode, resuming OnStep operation...");
+        delay(1000);
+      } else
+    #endif
+    *commandError = CE_CMD_UNKNOWN;
+  } else
+
   // :GVD#      Get OnStepX Firmware Date
   //            Returns: MTH DD YYYY#
   // :GVM#      General Message
@@ -77,7 +112,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   } else
 
   if (cmdGX("GX9")) {
-
     // :GX9A#     temperature in deg. C
     //            Returns: +/-n.n
     if (parameter[1] == 'A') {
@@ -114,6 +148,13 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     } else return false;
   } else
  
+  // :GXA0#     Get axis/driver revert all state
+  //            Returns: Value
+  if (cmdGX("GXA") && parameter[1] == '0') {
+    uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+    if (!(axesToRevert & 1)) *commandError = CE_0;
+  } else
+
   if (cmdSX("SX9")) {
     char *conv_end;
     float f = strtod(&parameter[3], &conv_end);
@@ -142,6 +183,20 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (parameter[1] == 'D') {
       if (f >= -100.0 && f < 20000.0) ambient.altitude = f; else *commandError = CE_PARAM_RANGE;
     } else return false;
+  } else
+
+  if (cmdSX("SXA")) {
+    // :SXAC,0#   for compile-time Config.h axis settings
+    // :SXAC,1#   for run-time NV (EEPROM) axis settings
+    //            Return: 0 failure, 1 success
+    if (parameter[1] == 'C' && parameter[4] == 0) {
+      if (parameter[3] == '0' || parameter[3] == '1') {
+        uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+        if (parameter[3] == '0') axesToRevert = 1; else axesToRevert = 0;
+        nv.update(NV_REVERT_AXIS_SETTINGS, axesToRevert);
+        return false; // pretend this command wasn't processed so other devices can respond
+      } else *commandError = CE_PARAM_RANGE;
+    }
   } else return false;
 
   return true;

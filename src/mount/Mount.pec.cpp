@@ -1,14 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, PEC
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -90,7 +82,9 @@ void Mount::pecInit() {
 
 void Mount::pecPoll() {
   // PEC is only active when we're tracking at the sidereal rate with a guide rate that makes sense
-  if (trackingState != TS_SIDEREAL || park.state != PS_PARKED || guideState == GU_GUIDE) { pecDisable(); return; }
+  if (trackingState != TS_SIDEREAL ||
+      park.state != PS_PARKED ||
+     (guideState != GU_NONE && guideState != GU_PULSE_GUIDE)) { pecDisable(); return; }
 
   // keep track of our current step position, and when the step position on the worm wraps during playback
   long a1Steps = axis1.getMotorCoordinateSteps();

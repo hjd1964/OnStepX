@@ -5,17 +5,21 @@
 
 #include "StepDrivers.h"
 
+#pragma pack(1)
 typedef struct AxisLimits {
   float min;
   float max;
 } AxisLimits;
 
+#define AxisSettingsSize 21
 typedef struct AxisSettings {
   double     stepsPerMeasure;
-  uint16_t   backlashAmountSteps;
   int8_t     reverse;
   AxisLimits limits;
+  int16_t    microsteps;
+  int16_t    currentRun;
 } AxisSettings;
+#pragma pack()
 
 typedef struct AxisPins {
   int8_t step;
@@ -40,7 +44,10 @@ enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, A
 class Axis {
   public:
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber);
+    void init(uint8_t axisNumber, bool validKey);
+
+    // process commands for this axis
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // enables or disables the associated step/dir driver
     void enable(bool value);
@@ -91,6 +98,8 @@ class Axis {
     float getFrequency();
     // get frequency in steps per second
     float getFrequencySteps();
+    // set base movement frequency in "measures" (radians, microns, etc.) per second
+    void setFrequencyBase(float frequency);
     // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
@@ -164,6 +173,9 @@ class Axis {
 
     // swaps fast unidirectional movement ISR for slewing in/out
     void enableMoveFast(const bool state);
+
+    bool decodeAxisSettings(char *s, AxisSettings &a);
+    bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
     
     AxisPins pins;
 
@@ -199,6 +211,7 @@ class Axis {
     unsigned long lastPeriodSet = 0;
 
     float freq = 0.0F;
+    float baseFreq = 0.0F;
     float maxFreq;
     float lastFreq;
     float minPeriodMicros;

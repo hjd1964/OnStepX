@@ -9,12 +9,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
 
 #if defined(ALIGN_MAX_STARS) && ALIGN_MAX_STARS != AUTO
   #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
@@ -39,6 +33,8 @@ typedef struct Coordinate {
   double d;
   double a;
   double z;
+  double a1;
+  double a2;
   PierSide pierSide;
 } Coordinate;
 

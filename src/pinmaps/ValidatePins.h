@@ -15,63 +15,6 @@
 #define ASSIGNED_AUX7 PIN_NOT_ASSIGNED
 #define ASSIGNED_AUX8 PIN_NOT_ASSIGNED
 
-#if PINMAP == Classic
-  #include "Validate.Classic.h"
-#endif
-#if PINMAP == ClassicShield
-  #include "Validate.Classic.h"
-#endif
-#if PINMAP == Mega2560Alt
-#endif
-#if PINMAP == MiniPCB
-  #include "Validate.MiniPCB.h"
-#endif
-#if PINMAP == MiniPCB13
-  #include "Validate.MiniPCB13.h"
-#endif
-#if PINMAP == MiniPCB2
-  #include "Validate.MiniPCB2.h"
-#endif
-#if PINMAP == MaxPCB
-  #include "Validate.MaxPCB.h"
-#endif
-#if PINMAP == MaxPCB2
-  #include "Validate.MaxPCB2.h"
-#endif
-#if PINMAP == MaxPCB3
-  #include "Validate.MaxPCB3.h"
-#endif
-#if PINMAP == MaxESP
-  #include "Validate.MaxESP.h"
-#endif
-#if PINMAP == MaxESP2
-  #include "Validate.MaxESP2.h"
-#endif
-#if PINMAP == MaxESP3
-  #include "Validate.MaxESP3.h"
-#endif
-#if PINMAP == CNC3
-  #include "Validate.CNC3.h"
-#endif
-#if PINMAP == Ramps14 || PINMAP == MksGenL2 || PINMAP == MksGenL21
-  #include "Validate.Ramps14.h"
-#endif
-#if PINMAP == Rumba
-  #include "Validate.Rumba.h"
-#endif
-#if PINMAP == STM32Blue
-  #include "Validate.STM32Blue.h"
-#endif
-#if PINMAP == FYSETC_S6
-  #include "Validate.FYSETC_S6.h"
-#endif
-#if PINMAP == MaxSTM3 || PINMAP == MaxSTM3I
-  #include "Validate.MaxSTM3.h"
-#endif
-#if PINMAP == InsteinESP1
-  #include "Validate.InsteinESP1.h"
-#endif
-
 // GENERAL PURPOSE PINMAP VALIDATION ---------------
 
 #if AXIS1_DRIVER_STATUS == HIGH || AXIS1_DRIVER_STATUS == LOW

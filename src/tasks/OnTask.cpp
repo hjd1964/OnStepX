@@ -20,13 +20,8 @@
  *
 */
 
-#include <Arduino.h>
-
-// these lines allow configuration of OnTask from OnStep, if this library is used outside OnStep remove them
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../debug/Debug.h"
+// this line allows configuration of OnTask from OnStepX, if this library is used outside of OnStepX remove it
+#include "../OnStepX.h"
 
 // To enable the option to use a given hardware timer (1..4), if available, uncomment that line:
 //#define TASKS_HWTIMER1_ENABLE
@@ -70,9 +65,9 @@ Task::~Task() {
 }
 
 bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
-  if (num < 1 || num > 4) return false;
-  if (repeat != true) return false;
-  if (priority != 0) return false;
+  if (num < 1 || num > 4) { DL("ERR: Task::requestHardwareTimer(), timer number out of range"); return false; }
+  if (repeat != true) { DL("ERR: Task::requestHardwareTimer(), repeat must be true"); return false; }
+  if (priority != 0) { DL("ERR: Task::requestHardwareTimer(), s/w priority must be 0 (highest)"); return false; }
 
   unsigned long hwPeriod = period;
   if (period_units == PU_NONE) hwPeriod = 0; else if (period_units == PU_MILLIS) hwPeriod *= 16000UL; else if (period_units == PU_MICROS) hwPeriod *= 16UL;
@@ -80,24 +75,24 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
 
   switch (num) {
     case 1:
-      if (HAL_HWTIMER1_FUN != NULL) return false;
+      if (HAL_HWTIMER1_FUN != NULL) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER1_FUN not NULL"); return false; }
       HAL_HWTIMER1_FUN = callback;
-      if (!HAL_HWTIMER1_INIT(hwPriority)) return false;
+      if (!HAL_HWTIMER1_INIT(hwPriority)) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER1_INIT() failed"); return false; }
     break;
     case 2:
-      if (HAL_HWTIMER2_FUN != NULL) return false;
+      if (HAL_HWTIMER2_FUN != NULL) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER2_FUN not NULL"); return false; }
       HAL_HWTIMER2_FUN = callback;
-      if (!HAL_HWTIMER2_INIT(hwPriority)) return false;
+      if (!HAL_HWTIMER2_INIT(hwPriority)) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER2_INIT() failed"); return false; }
     break;
     case 3:
-      if (HAL_HWTIMER3_FUN != NULL) return false;
+      if (HAL_HWTIMER3_FUN != NULL) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER3_FUN not NULL"); return false; }
       HAL_HWTIMER3_FUN = callback;
-      if (!HAL_HWTIMER3_INIT(hwPriority)) return false;
+      if (!HAL_HWTIMER3_INIT(hwPriority)) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER3_INIT() failed"); return false; }
     break;
     case 4:
-      if (HAL_HWTIMER4_FUN != NULL) return false;
+      if (HAL_HWTIMER4_FUN != NULL) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER4_FUN not NULL"); return false; }
       HAL_HWTIMER4_FUN = callback;
-      if (HAL_HWTIMER4_INIT(hwPriority)) return false;
+      if (HAL_HWTIMER4_INIT(hwPriority)) { DL("ERR: Task::requestHardwareTimer(), HAL_HWTIMER4_INIT() failed"); return false; }
     break;
   }
   hardwareTimer = num;

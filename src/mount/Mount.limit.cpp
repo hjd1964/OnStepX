@@ -1,30 +1,23 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, limits
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 
 #include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
 #include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-extern Telescope telescope;
+
 #include "Mount.h"
 
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }
 
 void Mount::limitInit(bool validKey) {
-  if (LimitsSize < sizeof(Limits)) { DL("ERR: Mount::limitInit(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (LimitsSize < sizeof(Limits)) { initError.mount = true; DL("ERR: Mount::limitInit(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
 
   // write the default limits to NV
   if (!validKey) {
@@ -37,7 +30,7 @@ void Mount::limitInit(bool validKey) {
 
   // start limit monitor task
   VF("MSG: Mount, start limit monitor task (rate 100ms priority 3)... ");
-  if (tasks.add(100, 0, true, 3, mountLimitWrapper, "MntLmt")) VL("success"); else VL("FAILED!");
+  if (tasks.add(100, 0, true, 3, mountLimitWrapper, "MntLmt")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 void Mount::limitPoll() {
@@ -45,16 +38,6 @@ void Mount::limitPoll() {
   const char* errPre = "MSG: Mount::limitPoll() exceeded ";
 
   updatePosition(CR_MOUNT_ALT);
-
-  double a1, a2;
-  if (transform.mountType == ALTAZM) a1 = current.z; else a1 = current.h;
-
-  #if AXIS2_TANGENT_ARM == ON
-    a2 = axis2.getInstrumentCoordinate();
-  #else
-    if (transform.mountType == ALTAZM) a2 = current.a; else a2 = current.d;
-  #endif
-
   if (current.a < limits.altitude.min) { limitStop(GA_BREAK); error.altitude.min = true; V(errPre); VF("min altitude "); VL(radToDeg(limits.altitude.min)); } else error.altitude.min = false;
   if (current.a > limits.altitude.max) { limitStop(GA_BREAK); error.altitude.max = true; V(errPre); VF("max altitude "); VL(radToDeg(limits.altitude.max)); } else error.altitude.max = false;
 
@@ -65,10 +48,10 @@ void Mount::limitPoll() {
     if (current.h > limits.pastMeridianW) { limitStopAxis1(GA_FORWARD); error.meridian.west = true; V(errPre); VLF("meridian West"); } else error.meridian.west = false;
   } else error.meridian.west = false;
 
-  if (a1 < axis1.settings.limits.min) { limitStopAxis1(GA_REVERSE); error.limit.axis1.min = true; V(errPre); VLF(" min axis1"); } else error.limit.axis1.min = false;
-  if (a1 > axis1.settings.limits.max) { limitStopAxis1(GA_FORWARD); error.limit.axis1.max = true; V(errPre); VLF("max axis1"); } else error.limit.axis1.max = false;
-  if (a2 < axis2.settings.limits.min) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; V(errPre); VLF("min axis2"); } else error.limit.axis2.min = false;
-  if (a2 > axis2.settings.limits.max) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; V(errPre); VLF("max axis2"); } else error.limit.axis2.max = false;
+  if (current.a1 < axis1.settings.limits.min) { limitStopAxis1(GA_REVERSE); error.limit.axis1.min = true; V(errPre); VLF(" min axis1"); } else error.limit.axis1.min = false;
+  if (current.a1 > axis1.settings.limits.max) { limitStopAxis1(GA_FORWARD); error.limit.axis1.max = true; V(errPre); VLF("max axis1"); } else error.limit.axis1.max = false;
+  if (current.a2 < axis2.settings.limits.min) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; V(errPre); VLF("min axis2"); } else error.limit.axis2.min = false;
+  if (current.a2 > axis2.settings.limits.max) { limitStopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; V(errPre); VLF("max axis2"); } else error.limit.axis2.max = false;
 }
 
 void Mount::limitStop(GuideAction stopDirection) {

@@ -1,12 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, homing
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
@@ -16,8 +10,8 @@
 #include "Mount.h"
 
 CommandError Mount::resetHome() {
-  if (guideState != GU_NONE)      return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE)      return CE_SLEW_IN_SLEW;
+  if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
+  if (gotoState  != GS_NONE) return CE_SLEW_IN_SLEW;
 
   // setup where the home position is
   updateHomePosition();

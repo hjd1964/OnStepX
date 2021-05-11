@@ -1,12 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // convert to/from C strings
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 
 #include "Convert.h"
 

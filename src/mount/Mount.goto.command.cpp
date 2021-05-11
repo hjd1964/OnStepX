@@ -1,15 +1,9 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -98,7 +92,8 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
     } else e = syncEqu(&gotoTarget, preferredPierSide);
     if (command[1] == 'M') {
-      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0"); reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
+      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0");
+      reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) strcpy(reply,"N/A");
     }
     *numericReply = false;

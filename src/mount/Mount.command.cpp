@@ -1,19 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../lib/nv/NV.h"
-extern NVS nv;
 
 #include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"
@@ -31,6 +23,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
 
   // process any date/time/location commands
   if (transform.site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+
+  // process any axis1 commands
+  if (axis1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+
+  // process any axis2 commands
+  if (axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
   // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
   //              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
@@ -155,18 +153,18 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   if (cmdGX("GX9")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '2': sprintF(reply,"%0.3f",misc.usPerStepCurrent); break;             // current
-      case '3': sprintF(reply,"%0.3f",usPerStepBase); break;                     // default base
-      case '4': sprintf(reply,"%d%s",(int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
-      case '5': sprintf(reply,"%d",(int)misc.meridianFlipAuto); break;           // autoMeridianFlip
-      case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;     // preferred pier side
-      case '7': sprintF(reply,"%0.1f",(1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure())); break; // slew speed
-      case '8':                                                                  // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
-        if (ROTATOR == ON) {
-          if (transform.mountType == ALTAZM) strcpy(reply,"D"); else strcpy(reply,"R");
-        } else strcpy(reply,"N");
+      case '2': sprintF(reply, "%0.3f", misc.usPerStepCurrent); break;          // current
+      case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                  // default base
+      case '4': sprintf(reply, "%d%s", (int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
+      case '5': sprintf(reply, "%d", (int)misc.meridianFlipAuto); break;        // autoMeridianFlip
+      case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;    // preferred pier side
+      case '7': sprintF(reply, "%0.1f", (1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure())); break; // slew speed
+      case '8':                                                                 // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
+        if (AXIS3_DRIVER_MODEL != OFF) {
+          if (transform.mountType == ALTAZM) strcpy(reply, "D"); else strcpy(reply, "R");
+        } else strcpy(reply, "N");
       break;
-      case '9': sprintF(reply,"%0.3f",usPerStepLowerLimit()); break;             // fastest step rate in microseconds
+      case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;           // fastest step rate in microseconds
       default: return false;
     }
   } else
@@ -175,14 +173,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: n# or 
   if (cmdGX("GXE")) {
     switch (parameter[1]) {
-//    case '1': dtostrf((double)usPerStepBaseActual,3,3,reply); break;
-//    case '2': dtostrf(SLEW_ACCELERATION_DIST,2,1,reply); break;
-//    case '3': sprintf(reply,"%ld",lround(TRACK_BACKLASH_RATE)); break;
-      case '4': sprintf(reply,"%ld",lround(axis1.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
-      case '5': sprintf(reply,"%ld",lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
+//    case '1': dtostrf((double)usPerStepBaseActual, 3, 3, reply); break;
+//    case '2': dtostrf(SLEW_ACCELERATION_DIST, 2, 1, reply); break;
+//    case '3': sprintf(reply, "%ld", lround(TRACK_BACKLASH_RATE)); break;
+      case '4': sprintf(reply, "%ld", lround(axis1.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
+      case '5': sprintf(reply, "%ld", lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
       case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; *numericReply = false; break;
       case 'F': if (AXIS2_TANGENT_ARM != ON) *commandError = CE_0; break;
-//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply,"%d",(int)nv.read(EE_mountType)); break; 
+//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply, "%d", (int)nv.read(EE_mountType)); break;
     default:
       return false;
     }
@@ -192,52 +190,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: Value
   if (cmdGX("GXF")) {
     switch (parameter[1]) {
-      case '3': sprintF(reply,"%0.6f",axis1.getFrequencySteps()); *numericReply = false; break; // Axis1 final tracking rate Hz
-      case '4': sprintF(reply,"%0.6f",axis2.getFrequencySteps()); *numericReply = false; break; // Axis2 final tracking rate Hz
-      case 'A': sprintf(reply,"%d%%", 50); *numericReply = false; break;                        // Workload
+      case '3': sprintF(reply, "%0.6f", axis1.getFrequencySteps()); *numericReply = false; break; // Axis1 final tracking rate Hz
+      case '4': sprintF(reply, "%0.6f", axis2.getFrequencySteps()); *numericReply = false; break; // Axis2 final tracking rate Hz
+      case 'A': sprintf(reply, "%d%%", 50); *numericReply = false; break;                         // Workload
     default:
       return false;
     }
-  } else
-
-  // :GXUn#     Get stepper driver statUs (all axes)
-  //            Returns: Value
-  if (cmdGX("GXU")) {
-    DriverStatus status;
-    uint8_t axis = parameter[1] - '0';
-    bool success = true;
-    switch (axis) {
-      #if AXIS1_DRIVER_MODEL != OFF
-        case 1: status = axis1.driver.getStatus(); break;
-      #endif
-      #if AXIS2_DRIVER_MODEL != OFF
-        case 2: status = axis2.driver.getStatus(); break;
-      #endif
-      #if AXIS3_DRIVER_MODEL != OFF
-        case 3: status = axis3.driver.getStatus(); break;
-      #endif
-      #if AXIS4_DRIVER_MODEL != OFF
-        case 4: status = axis4.driver.getStatus(); break;
-      #endif
-      #if AXIS5_DRIVER_MODEL != OFF
-        case 5: status = axis5.driver.getStatus(); break;
-      #endif
-      #if AXIS6_DRIVER_MODEL != OFF
-        case 6: status = axis6.driver.getStatus(); break;
-      #endif
-      default: success = false;
-    }
-    if (success) {
-      strcat(reply, status.standstill ? "ST," : ",");
-      strcat(reply, status.outputA.openLoad ? "OA," : ",");
-      strcat(reply, status.outputB.openLoad ? "OB," : ",");
-      strcat(reply, status.outputA.shortToGround ? "GA," : ",");
-      strcat(reply, status.outputB.shortToGround ? "GB," : ",");
-      strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
-      strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
-      strcat(reply, status.fault ? "GF" : "");
-      *numericReply = false;
-    } else *commandError = CE_0;
   } else
 
   // :hC#       Moves telescope to the home position
@@ -454,13 +412,15 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   if (cmdP("%B")) {
     if (parameter[0] == 'D' && parameter[1] == 0) {
         int arcSec = radToArcsec(misc.backlash.axis2);
-        if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
+        if (arcSec < 0) arcSec = 0;
+        if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
         *numericReply = false;
     } else
     if (parameter[0] == 'R' && parameter[1] == 0) {
         int arcSec = radToArcsec(misc.backlash.axis1);
-        if (arcSec < 0) arcSec = 0; if (arcSec > 3600) arcSec = 3600;
+        if (arcSec < 0) arcSec = 0;
+        if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
         *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;

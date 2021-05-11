@@ -1,12 +1,9 @@
 // -----------------------------------------------------------------------------------
 // tmc stepper driver configuration control
 #pragma once
-#include <Arduino.h>
-#include "../../Constants.h"
 
-#include "Pins.h"
+#include <Arduino.h>
 #include "SoftSpi.h"
-#include "StepDrivers.h"
 
 class TmcDriver {
   public:

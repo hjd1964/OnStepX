@@ -1,12 +1,8 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control
 #pragma once
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
+
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
@@ -16,7 +12,6 @@
   #define AXIS1_PEC ON
 #endif
 
-#include "../debug/Debug.h"
 #include "../commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 #include "../motion/StepDrivers.h"
@@ -29,9 +24,9 @@ enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
 enum GotoStage: uint8_t        {GG_NONE, GG_WAYPOINT, GG_DESTINATION, GG_READY_ABORT, GG_ABORT};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
-enum GuideState: uint8_t       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE};
+enum GuideState: uint8_t       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE, GU_SPIRAL_GUIDE};
 enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
-enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE};
+enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE, GA_SPIRAL};
 enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
 enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
@@ -212,16 +207,29 @@ class Mount {
     bool guideValidAxis1(GuideAction guideAction);
     // valid guide on Axis2
     bool guideValidAxis2(GuideAction guideAction);
+    // valididate guide request
+    CommandError guideValidate(int axis, GuideAction guideAction);
+    // start axis1 movement
+    void guideAxis1AutoSlew(GuideAction guideAction);
+    // start axis2 movement
+    void guideAxis2AutoSlew(GuideAction guideAction);
+
     // start guide on Axis1
     CommandError guideStartAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
-    // start guide on Axis2
-    CommandError guideStartAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     void guideStopAxis1(GuideAction stopDirection);
+
+    // start guide on Axis2
+    CommandError guideStartAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     void guideStopAxis2(GuideAction stopDirection);
-    // check for spiral guide using both axes
-    bool guideIsSpiral();
+
+    // start spiral guide
+    CommandError guideSpiralStart(GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
+    // stop spiral guide
+    void guideSpiralStop();
+    // manage spiral guide
+    void guideSpiralPoll();
 
     #if AXIS1_PEC == ON
       // disable PEC
@@ -254,6 +262,7 @@ class Mount {
     
     // current position in Mount coordinates (Observed Place with no corrections except index offset)
     // coordinates are either Horizon (a, z) or Equatorial (h, d) depending on the mountType
+    // also includes Mount normalized axis coordinates (a1, a2) where a2 is an instrument coordinate in tangent arm mode
     Coordinate current;
     TrackingState trackingState         = TS_NONE;
     #if TRACK_REFRACTION_RATE_DEFAULT == ON
@@ -306,6 +315,8 @@ class Mount {
     GuideRateSelect guideRateSelectAxis2= GR_20X;
     GuideAction     guideActionAxis1    = GA_NONE;
     GuideAction     guideActionAxis2    = GA_NONE;
+    float         spiralScaleAxis1      = 0.0F;
+    unsigned long spiralStartTime       = 0;
     unsigned long guideFinishTimeAxis1  = 0;
     unsigned long guideFinishTimeAxis2  = 0;
 

@@ -5,8 +5,8 @@
 
 #define HAL_FAST_PROCESSOR
 
-#define HAL_MAXRATE_LOWER_LIMIT 16   // Lower limit (fastest) step rate in uS (in SQW mode) assumes optimization set to Fastest (-O3)
-#define HAL_PULSE_WIDTH         900  // Width of step pulse
+#define HAL_MAXRATE_LOWER_LIMIT 34   // Lower limit (fastest) step rate in uS (in SQW mode) assumes optimization set to Fastest (-O3)
+#define HAL_PULSE_WIDTH         1900 // Width of step pulse
 
 #include <HardwareTimer.h>
 

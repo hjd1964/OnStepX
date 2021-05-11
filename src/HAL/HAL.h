@@ -58,9 +58,10 @@
   #define MCU_STR "Teensy4.0"
   #include "HAL_Teensy_4.0.h"
 
-#elif defined(__STM32F1__) || defined(STM32F103xB)
+#elif defined(STM32F103xB)
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3
-  #error "Please use OnStep release-4.23 (w/STM32Duino) or release-3.16 (w/Arduino_STM32), release-5 has dropped support this platform."
+  #define MCU_STR "STM32F103"
+  #include "HAL_STM32F103.h"
 
 #elif defined(STM32F303xC)
   // RobotDyn BlackPill STM32F303, 256K flash, ARM Cortex M4 (STM32duino board manager)
@@ -93,5 +94,8 @@
   #include "HAL_Due.h"  
   
 #else
-  #error "Unsupported Platform! If this is a new platform, it needs the appropriate entries in the HAL directory."
+  // Generic
+  #warning "Unknown Platform! If this is a new platform, it would probably do best with a new HAL designed for it."
+  #define MCU_STR "Generic (Unknown)"
+  #include "HAL_MISC.h"  
 #endif

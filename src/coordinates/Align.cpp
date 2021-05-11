@@ -9,15 +9,7 @@
 // -----------------------------------------------------------------------------------
 // ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
 
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 

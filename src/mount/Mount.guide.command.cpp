@@ -1,15 +1,9 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -24,7 +18,8 @@ extern Tasks tasks;
 extern unsigned long periodSubMicros;
 
 bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-
+  *supressFrame = false;
+  
   // :GX90#     Get setting pulse guide rate
   //            Returns: n.nn#
   if (cmd2("GX90")) {
@@ -89,7 +84,7 @@ bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supr
     // :Mp#       Move Telescope for sPiral search at current guide rate
     //            Returns: Nothing
     if (command[1] == 'p' && parameter[0] == 0) {
-//    *commandError = startGuideSpiral(GUIDE_SPIRAL_TIME_LIMIT*1000);
+      *commandError = guideSpiralStart(guideRateSelect, GUIDE_SPIRAL_TIME_LIMIT*1000);
       *numericReply = false;
     } else return false;
   } else

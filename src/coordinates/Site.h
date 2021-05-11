@@ -2,7 +2,7 @@
 // observatory time
 #pragma once
 #include <Arduino.h>
-#include "../../Constants.h"
+#include "../Constants.h"
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 

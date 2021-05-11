@@ -1,14 +1,12 @@
 // -----------------------------------------------------------------------------------
 // IP communication routines
 
-#include <Arduino.h>
-#include "../../../Constants.h"
-#include "../../../Config.h"
-#include "../../../ConfigX.h"
-#include "../../HAL/HAL.h"
+#if defined(ESP32)
+
+#include "../../OnStep.h"
 #include "../../debug/Debug.h"
 
-#if defined(ESP32) && SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT
+#if SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT
 
   #include <WiFi.h>
   #include <WiFiClient.h>
@@ -193,5 +191,6 @@
   }
 
   IPSerial ipSerial;
+#endif
 
 #endif

@@ -2,10 +2,6 @@
 // Command processing
 #pragma once
 #include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../pinmaps/Models.h"
 
 #include "BufferCmds.h"
 #include "SerialWrapper.h"

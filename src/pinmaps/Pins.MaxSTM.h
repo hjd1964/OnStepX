@@ -68,7 +68,6 @@
 #define Axis1_DirPORT          GPIOB
 #define Axis1_DirBIT           GPIO_PIN_2
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN        Aux1
 #define AXIS1_HOME_SENSE_PIN   Aux3
 
 // Axis2 Dec/Alt step/dir driver
@@ -92,7 +91,6 @@
 #define Axis2_DirPORT          GPIOB
 #define Axis2_DirBIT           GPIO_PIN_0
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_FAULT_PIN        Aux2
 #define AXIS2_HOME_SENSE_PIN   Aux4
 
 // For rotator stepper driver

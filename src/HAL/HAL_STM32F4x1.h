@@ -68,6 +68,7 @@
   #if PINMAP == MaxSTM3I
     // The MaxPCB3I has an 8192 byte EEPROM built-in (rated for 5M write cycles)
     #define E2END 8191
+    #undef NV_ENDURANCE
     #define NV_ENDURANCE HIGH
     #define NV_EEPROM_ADDRESS 0x50
     #undef  NV_ENDURANCE

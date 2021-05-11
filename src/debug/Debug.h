@@ -1,7 +1,5 @@
 // Helper macros for debugging, with less typing
 #pragma once
-#include "../../Constants.h"
-#include "../../ConfigX.h"
 
 #if DEBUG != OFF
   // command errors

@@ -1,12 +1,8 @@
 // -----------------------------------------------------------------------------------
 // stepper driver control
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
+#include "../lib/nv/NV.h"
+extern NVS nv;
 
 #ifdef HAS_TMC_DRIVER
   #include "TmcDrivers.h"
@@ -74,6 +70,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 #endif
 
 void StepDriver::init(uint8_t axisNumber) {
+  this->axisNumber = axisNumber;
   #if AXIS1_DRIVER_MODEL != OFF
     if (axisNumber == 1) { pins = Axis1DriverModePins; settings = Axis1DriverModeSettings; }
   #endif

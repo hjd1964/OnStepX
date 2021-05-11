@@ -1,17 +1,9 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -24,6 +16,8 @@ extern Tasks tasks;
 #include "Mount.h"
 
 bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  *supressFrame = false;
+  *commandError = CE_NONE;
 
   // :$QZ?      Get PEC status
   //            Returns: s#, one of "IpPrR" (I)gnore, get ready to (p)lay, (P)laying, get ready to (r)ecord, (R)ecording
@@ -74,7 +68,6 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
   } else
 
   #if AXIS1_PEC == ON
-
     // :GX91#     Get PEC analog value
     //            Returns: n#
     if (cmd2("GX91")) {

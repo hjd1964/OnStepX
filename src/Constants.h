@@ -6,7 +6,7 @@
 #define FirmwareName                "OnStepX"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        01     // minor version 00 to 99
-#define FirmwareVersionPatch        "i"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "j"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 #define FirmwareDate                __DATE__
 #define FirmwareTime                __TIME__
@@ -220,6 +220,9 @@
 #define NVE_VHIGH 3
 #define NV_ENDURANCE NVE_MID
 
+// default time for spiral guides is 103.4 seconds
+#define GUIDE_SPIRAL_TIME_LIMIT 103.4
+
 // NV addresses
 #define INIT_NV_KEY                 583927925UL
 
@@ -231,5 +234,7 @@
 #define NV_MOUNT_MISC_BASE          181    // bytes: 14  , addr: 181..194
 #define NV_PEC_BASE                 195    // bytes: 6   , addr: 195..200
 #define NV_PARK_BASE                201    // bytes: 15  , addr: 201..215
-#define NV_ALIGN_MODEL_BASE         216    // butes: 32  , addr: 216..247
+#define NV_ALIGN_MODEL_BASE         216    // bytes: 32  , addr: 216..247
+#define NV_REVERT_AXIS_SETTINGS     248    // bytes: 2   , addr: 248..249
+#define NV_AXIS_SETTINGS_BASE       250    // bytes: 21*9, addr: 250..438
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)

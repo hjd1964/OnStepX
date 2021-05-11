@@ -53,12 +53,12 @@
   #define STM32_TIMER3       TIM17
   #define STM32_TIMER4       TIMX
 #elif defined(STM32F103xB)
-  #define STM32_TIMER1       TIMX    // for STM32F103
-  #define STM32_TIMER2       TIMX
-  #define STM32_TIMER3       TIMX
+  #define STM32_TIMER1       TIM1    // for STM32F103
+  #define STM32_TIMER2       TIM2
+  #define STM32_TIMER3       TIM4
   #define STM32_TIMER4       TIMX
 #endif
-
+ 
 #ifdef TASKS_HWTIMER1_ENABLE
   HardwareTimer *hwtimer1 = new HardwareTimer(STM32_TIMER1);
 

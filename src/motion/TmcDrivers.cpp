@@ -1,12 +1,6 @@
 // -----------------------------------------------------------------------------------
 // tmc stepper driver configuration control
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 
 #include "SoftSpi.h"
 #include "StepDrivers.h"
@@ -37,8 +31,10 @@ bool TmcDriver::mode(bool intpol, int decay_mode, byte micro_step_mode, int irun
   float Ifs = 0.325/rsense;
   long IHOLD = round(( (ihold/1000.0)/Ifs)*32.0)-1;
   long IRUN  = round(( (irun/1000.0)/Ifs)*32.0)-1;
-  if (IHOLD < 0) IHOLD = 0; if (IHOLD > 31) IHOLD = 31;
-  if (IRUN  < 0) IRUN  = 0; if (IRUN  > 31) IRUN  = 31;
+  if (IHOLD < 0) IHOLD = 0;
+  if (IHOLD > 31) IHOLD = 31;
+  if (IRUN < 0) IRUN = 0;
+  if (IRUN > 31) IRUN = 31;
   if (IHOLD == OFF) IHOLD = IRUN/2;
 
   //          IHOLD       +  IRUN       +  IHOLDDELAY

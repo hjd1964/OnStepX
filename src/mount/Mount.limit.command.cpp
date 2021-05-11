@@ -1,19 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../debug/Debug.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../lib/nv/NV.h"
-extern NVS nv;
 
 #include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"
@@ -26,7 +18,8 @@ extern NVS nv;
 extern unsigned long periodSubMicros;
 
 bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-
+  *supressFrame = false;
+  
   // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon
   //            Returns: sDD*#
   if (cmd("Gh"))  { sprintf(reply,"%+02ld*", lround(radToDeg(limits.altitude.min))); *numericReply = false; } else

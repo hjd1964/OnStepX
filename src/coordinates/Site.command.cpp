@@ -1,20 +1,15 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount time and location, commands
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
+#include "../OnStepX.h"
 #include "../lib/nv/NV.h"
 extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
 
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 #include "Site.h"
 
 bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  *supressFrame = false;
   PrecisionMode precisionMode = convert.precision;
 
   // :Ga#       Get standard time in 12 hour format

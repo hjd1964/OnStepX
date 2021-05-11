@@ -1,10 +1,15 @@
 // Helper macros for debugging, with less typing
 #include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
+#include "../Constants.h"
+#include "../../Config.controller.h"
+#include "../../Config.controllerX.h"
+#include "../../Config.mount.h"
+#include "../../Config.mountX.h"
+#include "../../Config.focusers.h"
+#include "../../Config.features.h"
 #include "../HAL/HAL.h"
-#include "../debug/Debug.h"
+#include "../pinmaps/Models.h"
+
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 

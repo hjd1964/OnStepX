@@ -1,12 +1,7 @@
 // -----------------------------------------------------------------------------------
 // SerialWrapper a single class to allow uniform access to other serial port classes
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
+
 #ifdef ESP32
   #include "../lib/serial/IP_ESP32.h"
 #endif

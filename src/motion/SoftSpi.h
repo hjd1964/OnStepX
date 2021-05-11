@@ -2,7 +2,7 @@
 // Simple software SPI routines (CPOL=1, CPHA=1) just for TMC stepper drivers
 #pragma once
 #include <Arduino.h>
-#include "../../Constants.h"
+#include "../Constants.h"
 
 #include "Pins.h"
 
@@ -22,5 +22,5 @@ class SoftSpi {
     uint32_t transfer32(uint32_t data_out);
 
   private:
-    DriverPins pins = {OFF, OFF, OFF, OFF, OFF};
+    DriverPins pins = {OFF, OFF, OFF, OFF, OFF, OFF};
 };

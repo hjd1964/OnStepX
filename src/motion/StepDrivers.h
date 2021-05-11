@@ -2,12 +2,6 @@
 // stepper driver control
 #pragma once
 #include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
 
 #include "Pins.h"
 #include "TmcDrivers.h"
@@ -35,6 +29,7 @@
 #define STEALTHCHOP   4
 
 #pragma pack(1)
+#define StepDriverSettingsSize 15
 typedef struct DriverSettings {
   int16_t model;
   int16_t microsteps;
@@ -114,9 +109,16 @@ class StepDriver {
     // get status info.
     DriverStatus getStatus();
 
+    // different models of stepper drivers have different bit settings for microsteps
+    // translate the human readable microsteps in the configuration to mode bit settings
+    // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
+    int microstepsToCode(uint8_t driverModel, uint8_t microsteps);
+
     #ifdef HAS_TMC_DRIVER
       TmcDriver tmcDriver;
     #endif
+
+    DriverSettings settings;
 
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
@@ -128,13 +130,8 @@ class StepDriver {
     // checkes if decay control is on the M2 pin
     bool isDecayOnM2();
 
-    // different models of stepper drivers have different bit settings for microsteps
-    // translate the human readable microsteps in the configuration to mode bit settings
-    // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
-    int microstepsToCode(uint8_t driverModel, uint8_t microsteps);
-
+    int axisNumber;
     DriverPins pins;
-    DriverSettings settings;
     DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
     int     microstepRatio        = 1;
@@ -144,5 +141,4 @@ class StepDriver {
     uint8_t microstepBitCodeGoto  = 0;
     int8_t  m2Pin                 = OFF;
     int8_t  decayPin              = OFF;
-
 };

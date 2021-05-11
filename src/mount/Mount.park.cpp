@@ -1,25 +1,19 @@
 // -----------------------------------------------------------------------------------
 // telescope mount control, parking
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
 #include "../motion/Axis.h"
+#include "../telescope/Telescope.h"
+
 #include "Mount.h"
 
 void Mount::parkInit() {
   // read the park settings
-  if (ParkSize < sizeof(Park)) { DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (ParkSize < sizeof(Park)) { initError.mount = true; DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_PARK_BASE, &park, ParkSize);
 }
 

@@ -1,18 +1,13 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
+#include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
+#include "../lib/nv/NV.h"
+extern NVS nv;
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 
 #include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
@@ -38,9 +33,11 @@ void Mount::init(bool validKey) {
   parkInit();
 
   // get the main axes ready
-  axis1.init(1);
+  delay(1000);
+  axis1.init(1, validKey);
   axis1.setMotionLimitsCheck(false);
-  axis2.init(2);
+  delay(1000);
+  axis2.init(2, validKey);
   axis2.setMotionLimitsCheck(false);
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
@@ -49,7 +46,7 @@ void Mount::init(bool validKey) {
   limitInit(validKey);
 
   // get misc settings from NV
-  if (MiscSize < sizeof(Misc)) { DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (MiscSize < sizeof(Misc)) { initError.mount = true; DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);

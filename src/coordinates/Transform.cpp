@@ -1,12 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // coordinate transformation
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.h"
-#include "../../ConfigX.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
-#include "../debug/Debug.h"
+#include "../OnStepX.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -78,10 +72,12 @@ void Transform::mountToTopocentric(Coordinate *coord) {
 }
 
 void Transform::mountToObservedPlace(Coordinate *coord) {
-  #if ALIGN_MAX_NUM_STARS > 1  
+  #if ALIGN_MAX_NUM_STARS > 1
     //align.mountToObservedPlace(coord);
+    (void)(*coord);
+  #else
+    (void)(*coord);
   #endif
-  //if (mountType == ALTAZM) horToEqu(coord);
 }
 
 void Transform::observedPlaceToTopocentric(Coordinate *coord) {
@@ -104,10 +100,21 @@ void Transform::topocentricToMount(Coordinate *coord) {
 }
 
 void Transform::observedPlaceToMount(Coordinate *coord) {
-  //if (mountType == ALTAZM) equToHor(coord);
   #if ALIGN_MAX_NUM_STARS > 1  
     //align.observedPlaceToMount(coord);
+    (void)(*coord);
+  #else
+    (void)(*coord);
   #endif
+
+  double a1, a2;
+  if (mountType == ALTAZM) { a1 = coord->z; a2 = coord->a; } else { a1 = coord->h; a2 = coord->d; }
+  #if AXIS2_TANGENT_ARM == ON
+    double unused;
+    mountToInstrument(coord, &unused, &a2);
+  #endif
+  coord->a1 = a1;
+  coord->a2 = a2;
 }
 
 void Transform::topocentricToObservedPlace(Coordinate *coord) {
@@ -126,6 +133,8 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
+
+  mount.a2 = a2;
   if (a2 < -Deg90 || a2 > Deg90) {
     mount.pierSide = PIER_SIDE_WEST;
     a1 -= Deg180;
@@ -135,12 +144,18 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   if (a2 > Deg180) a2 -= Deg360; else if (a2 <= -Deg180) a2 += Deg360;
 
   if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
+
+  mount.a1 = a1;
+  #if AXIS2_TANGENT_ARM == OFF
+    mount.a2 = a2;
+  #endif
+
   return mount;
 }
 
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
-  
+
   if (coord->pierSide == PIER_SIDE_WEST) *a1 += Deg180;
   if (site.location.latitude >= 0.0) {
     if (coord->pierSide == PIER_SIDE_WEST) *a2 = Deg180 - *a2;

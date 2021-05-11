@@ -1,6 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Step driver mode control pins
 #pragma once
+#include <Arduino.h>
 
 typedef struct DriverPins {
   int8_t m0;
