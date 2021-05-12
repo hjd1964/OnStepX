@@ -7,11 +7,7 @@
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "../coordinates/Transform.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-
 #include "Mount.h"
 
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }

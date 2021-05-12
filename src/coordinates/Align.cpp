@@ -10,6 +10,9 @@
 // ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
 
 #include "../OnStepX.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -501,5 +504,7 @@ float GeoAlign::backInRads2(float angle) {
   while (angle < -Deg180) angle += Deg360;
   return angle;
 }
+
+#endif
 
 #endif

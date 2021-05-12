@@ -7,8 +7,6 @@ extern Tasks tasks;
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../coordinates/Site.h"
-#include "../coordinates/Transform.h"
-#include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
@@ -76,7 +74,7 @@ void Mount::pecInit() {
   if (pecMonitorHandle == 0) {
     VF("MSG: Mount, start pec monitor task... ");
     pecMonitorHandle = tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec");
-    if (pecMonitorHandle) VL("success"); else VL("FAILED!");
+    if (pecMonitorHandle) { VL("success"); } else { VL("FAILED!"); }
   }
 }
 

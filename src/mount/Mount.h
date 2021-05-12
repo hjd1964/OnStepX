@@ -258,6 +258,8 @@ class Mount {
     void limitStopAxis1(GuideAction stopDirection);
     void limitStopAxis2(GuideAction stopDirection);
 
+    Convert convert;
+
     const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
     
     // current position in Mount coordinates (Observed Place with no corrections except index offset)

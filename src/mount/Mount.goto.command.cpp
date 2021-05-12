@@ -8,11 +8,7 @@
 extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -106,7 +102,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   if (cmdH("GA")) {
     updatePosition(CR_MOUNT_ALT);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).a), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).a), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -116,7 +112,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Returns: sDD*MM'SS.SSS# (high precision)
   if (cmdH("Ga")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToHms(reply, radToDeg(gotoTarget.a), false, precisionMode);
+    convert.doubleToHms(reply, radToDeg(gotoTarget.a), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -126,7 +122,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   if (cmdH("GD")) {
     updatePosition(CR_MOUNT_EQU);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current).d), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current).d), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -136,7 +132,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Returns: HH:MM:SS.SSS# (high precision)
   if (cmdH("Gd")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToDms(reply, radToDeg(gotoTarget.d), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(gotoTarget.d), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -146,7 +142,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   if (cmdH("GR")) {
     updatePosition(CR_MOUNT_EQU);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToHms(reply, radToHrs(transform.mountToNative(&current).r), false, precisionMode);
+    convert.doubleToHms(reply, radToHrs(transform.mountToNative(&current).r), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -155,7 +151,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   // :GrH#      Returns: HH:MM:SS.SSSS# (high precision)
   if (cmdH("Gr")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToHms(reply, radToHrs(gotoTarget.r), false, precisionMode);
+    convert.doubleToHms(reply, radToHrs(gotoTarget.r), false, precisionMode);
     *numericReply = false;
   } else
 
@@ -166,7 +162,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   if (cmdH("GZ")) {
     updatePosition(CR_MOUNT_HOR);
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).z), true, false, precisionMode);
+    convert.doubleToDms(reply, radToDeg(transform.mountToNative(&current, true).z), true, false, precisionMode);
     *numericReply = false;
   } else
 
@@ -176,7 +172,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Returns: DDD*MM'SS.SSS# (high precision)
   if (cmdH("Gz")) {
     if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
-    transform.site.convert.doubleToDms(reply, radToDeg(gotoTarget.z), false, true, precisionMode);
+    convert.doubleToDms(reply, radToDeg(gotoTarget.z), false, true, precisionMode);
     *numericReply = false;
   } else
 
@@ -280,7 +276,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sa")) {
-    if (!transform.site.convert.dmsToDouble(&gotoTarget.a, parameter, true)) *commandError = CE_PARAM_RANGE; else
+    if (!convert.dmsToDouble(&gotoTarget.a, parameter, true)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.a = degToRad(gotoTarget.a);
   } else
 
@@ -289,7 +285,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sd")) {
-    if (!transform.site.convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE; else
+    if (!convert.dmsToDouble(&gotoTarget.d, parameter, true)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.d = degToRad(gotoTarget.d);
   } else
 
@@ -298,7 +294,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sr")) {
-    if (!transform.site.convert.hmsToDouble(&gotoTarget.r, parameter)) *commandError = CE_PARAM_RANGE; else
+    if (!convert.hmsToDouble(&gotoTarget.r, parameter)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.r = hrsToRad(gotoTarget.r);
   } else
 
@@ -307,7 +303,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("Sz")) {
-    if (!transform.site.convert.dmsToDouble(&gotoTarget.z, parameter, false)) *commandError = CE_PARAM_RANGE; else
+    if (!convert.dmsToDouble(&gotoTarget.z, parameter, false)) *commandError = CE_PARAM_RANGE; else
     gotoTarget.z = degToRad(gotoTarget.z);
   } else return false;
 

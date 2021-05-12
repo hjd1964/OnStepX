@@ -9,10 +9,7 @@ extern NVS nv;
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
@@ -59,7 +56,7 @@ void Mount::init(bool validKey) {
 
   // start guide monitor task
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
-  if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) VL("success"); else VL("FAILED!");
+  if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
 
   // startup state is reset and at home
   resetHome();
@@ -75,7 +72,7 @@ void Mount::init(bool validKey) {
 
   // start tracking monitor task
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 7)... ");
-  if (tasks.add(1000, 0, true, 7, mountTrackingWrapper, "MntTrk")) VL("success"); else VL("FAILED!");
+  if (tasks.add(1000, 0, true, 7, mountTrackingWrapper, "MntTrk")) { VL("success"); } else { VL("FAILED!"); }
 
   updateTrackingRates();
 
@@ -114,9 +111,9 @@ void Mount::updateTrackingRates() {
       trackingRateAxis2 = 0.0F;
     }
     if (guideActionAxis1 == GA_NONE)
-      axis1.setFrequency(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
+      axis1.setFrequencyBase(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
     if (guideActionAxis2 == GA_NONE)
-      axis2.setFrequency(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
+      axis2.setFrequencyBase(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
   }
 }
 

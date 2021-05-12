@@ -8,11 +8,7 @@
 extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -388,7 +384,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //        Set the Backlash values.  Units are arc-seconds
   if (cmdP("$B")) {
     int16_t arcSecs;
-    if (transform.site.convert.atoi2((char*)&parameter[1], &arcSecs)) {
+    if (convert.atoi2((char*)&parameter[1], &arcSecs)) {
       if (arcSecs >= 0 && arcSecs <= 3600) {
         if (parameter[0] == 'D') {
           misc.backlash.axis2 = arcsecToRad(arcSecs);

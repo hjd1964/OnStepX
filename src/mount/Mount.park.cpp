@@ -4,11 +4,7 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../coordinates/Transform.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
-
 #include "Mount.h"
 
 void Mount::parkInit() {

@@ -4,7 +4,6 @@
 #include <Arduino.h>
 
 #include "Pins.h"
-#include "TmcDrivers.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
@@ -84,6 +83,7 @@ typedef struct DriverStatus {
     AXIS5_DRIVER_MODEL == TMC2130 || AXIS5_DRIVER_MODEL == TMC5160 || \
     AXIS6_DRIVER_MODEL == TMC2130 || AXIS6_DRIVER_MODEL == TMC5160
   #define HAS_TMC_DRIVER
+  #include "TmcDrivers.h"
 #endif
 
 class StepDriver {

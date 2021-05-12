@@ -4,10 +4,9 @@
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "BufferCmds.h"
-#include "SerialWrapper.h"
-#include "ProcessCmds.h"
+#include "../coordinates/Convert.h"
 #include "../telescope/Telescope.h"
+#include "ProcessCmds.h"
 
 // command processors
 #ifdef SERIAL_A
@@ -126,4 +125,54 @@ void CommandProcessor::appendChecksum(char *s) {
   uint8_t cks = 0; for (unsigned int cksCount0 = 0; cksCount0 < strlen(s); cksCount0++) { cks += s[cksCount0]; }
   sprintf(HEXS, "%02X", cks);
   strcat(s, HEXS);
+}
+
+void commandChannelInit() {
+  // Command processing
+  // add tasks to process commands
+  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+  uint8_t handle;
+  #ifdef HAL_SLOW_PROCESSOR
+    long comPollRate = 2000;
+  #else
+    long comPollRate = 250;
+  #endif
+  #ifdef SERIAL_A
+    VF("MSG: Setup, start command channel A task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsA, "PrcCmdA");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_B
+    VF("MSG: Setup, start command channel B task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsB, "PrcCmdB");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_C
+    VF("MSG: Setup, start command channel C task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsC, "PrcCmdC");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_D
+    VF("MSG: Setup, start command channel D task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_ST4
+    VF("MSG: Setup, start command channel ST4 task (priority 6)... ");
+    if (tasks.add(3, 0, true, 6, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
+  #endif
+  #if SERIAL_BT_MODE == SLAVE
+    VF("MSG: Setup, start command channel BT task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsBT, "PrcCmdT");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_IP
+    VF("MSG: Setup, start command channel IP task (priority 6)... ");
+    if (tasks.add(1, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
+  #endif
 }

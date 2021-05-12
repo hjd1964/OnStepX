@@ -1,8 +1,6 @@
 // -----------------------------------------------------------------------------------
 // Axis step/dir driver motion
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -94,7 +92,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
   if (pollingTaskHandle == 0) {
     VF("MSG: Axis, start axis polling task (rate 20ms priority 0)... ");
     pollingTaskHandle = tasks.add(20, 0, true, 0, pollAxes, "AxsPoll");
-    if (pollingTaskHandle) VL("success"); else VL("FAILED!");
+    if (pollingTaskHandle) { VL("success"); } else { VL("FAILED!"); }
   }
 
   this->axisNumber = axisNumber;
@@ -163,7 +161,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
   if (!validateAxisSettings(1, MOUNT_TYPE == ALTAZM, settings)) initError.axis = true;
 
   VF("MSG: Axis, start axis"); V(axisNumber); VF(" move task... ");
-  if (taskHandle) VL("success"); else VL("FAILED!");
+  if (taskHandle) { VL("success"); } else { VL("FAILED!"); }
 
   driver.init(axisNumber);
 

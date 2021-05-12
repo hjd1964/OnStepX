@@ -2,15 +2,6 @@
 // Constants
 #pragma once
 
-// Firmware version ----------------------------------------------------------------------------------------------------------------
-#define FirmwareName                "OnStepX"
-#define FirmwareVersionMajor        10
-#define FirmwareVersionMinor        01     // minor version 00 to 99
-#define FirmwareVersionPatch        "j"    // for example major.minor patch: 10.03c
-#define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
-#define FirmwareDate                __DATE__
-#define FirmwareTime                __TIME__
-
 // Configuration options -----------------------------------------------------------------------------------------------------------
 
 // Pinmaps
@@ -237,4 +228,4 @@
 #define NV_ALIGN_MODEL_BASE         216    // bytes: 32  , addr: 216..247
 #define NV_REVERT_AXIS_SETTINGS     248    // bytes: 2   , addr: 248..249
 #define NV_AXIS_SETTINGS_BASE       250    // bytes: 21*9, addr: 250..438
-#define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500.. (max = nv.size - 1)
+#define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500..500 + (PEC_BUFFER_SIZE_LIMIT - 1)

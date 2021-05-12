@@ -43,3 +43,5 @@ class CommandProcessor {
     Buffer buffer;
     SerialWrapper SerialPort;
 };
+
+extern void commandChannelInit();

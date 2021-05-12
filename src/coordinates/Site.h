@@ -61,7 +61,6 @@ class Site {
 
     Location location;
     LocationExtras locationEx;
-    Convert convert;
 
     SiteErrors error = {false, false};
 
@@ -100,6 +99,8 @@ class Site {
 
     // reads the julian date information from NV
     void readJD(bool validKey);
+
+    Convert convert;
 
     JulianDate ut1;
     double centisecondHOUR = 0;

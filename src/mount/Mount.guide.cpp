@@ -4,9 +4,7 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../coordinates/Transform.h"
 #include "../commands/ProcessCmds.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 float Mount::guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis) {
@@ -265,7 +263,10 @@ void Mount::guidePoll() {
   }
 
   // do spiral guiding
-  if (guideState == GU_SPIRAL_GUIDE && guideActionAxis1 > GA_BREAK && guideActionAxis2 > GA_BREAK) guideSpiralPoll();
+  if (guideState == GU_SPIRAL_GUIDE) {
+    if (guideActionAxis1 > GA_BREAK && guideActionAxis2 > GA_BREAK) guideSpiralPoll(); else
+    if (guideActionAxis1 != GA_BREAK || guideActionAxis2 != GA_BREAK) guideSpiralStop();
+  }
 
   // watch for guides finished
   if (guideActionAxis1 == GA_NONE && guideActionAxis2 == GA_NONE) guideState = GU_NONE;

@@ -8,11 +8,7 @@
 extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -36,7 +32,7 @@ bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supr
     //                    1 on success
     if (command[1] == 'g' || command[1] == 'G') {
       int16_t timeMs;
-      if (transform.site.convert.atoi2(&parameter[1], &timeMs)) {
+      if (convert.atoi2(&parameter[1], &timeMs)) {
         if (timeMs >= 0 && timeMs <= 16399) {
           GuideRateSelect rateSelect = guideRateSelect;
           if (SEPARATE_PULSE_GUIDE_RATE == ON) rateSelect = misc.pulseGuideRateSelect;

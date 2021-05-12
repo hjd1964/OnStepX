@@ -8,11 +8,7 @@
 extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -96,7 +92,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     if (cmdP("VR")) {
       int16_t i, j;
       bool conv_result = true;
-      if (parameter[0] == 0) i = pecIndex; else conv_result = transform.site.convert.atoi2(parameter, &i);
+      if (parameter[0] == 0) i = pecIndex; else conv_result = atoi2(parameter, &i);
       if (conv_result) {
         if (i >= 0 && i < pecBufferSize) {
           if (parameter[0] == 0) {
@@ -116,7 +112,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //            Ten rate adjustment factors for 1s worm segments in steps +/- (steps = x0 - 128, etc.)
     if (cmdP("Vr")) {
       int16_t i, j;
-      if (transform.site.convert.atoi2(parameter, &i)) {
+      if (atoi2(parameter, &i)) {
         if (i >= 0 && i < pecBufferSize) {
           j = 0;
           uint8_t b;
@@ -168,9 +164,9 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
         int16_t i, j;
         parameter2[0] = 0;
         parameter2++;
-        if (transform.site.convert.atoi2(parameter, &i)) {
+        if (atoi2(parameter, &i)) {
           if (i >= 0 && i < pecBufferSize) {
-            if (transform.site.convert.atoi2(parameter2, &j)) {
+            if (atoi2(parameter2, &j)) {
               if (j >= -128 && j <= 127) {
                 pecBuffer[i] = j;
                 pec.recorded = true;

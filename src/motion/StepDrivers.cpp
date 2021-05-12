@@ -1,12 +1,7 @@
 // -----------------------------------------------------------------------------------
 // stepper driver control
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
 
-#ifdef HAS_TMC_DRIVER
-  #include "TmcDrivers.h"
-#endif
 #include "StepDrivers.h"
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
@@ -205,8 +200,8 @@ void StepDriver::updateStatus() {
         status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
         status.outputB.openLoad      = tmcDriver.get_DRVSTATUS_olB();
         status.overTemperaturePreWarning = tmcDriver.get_DRVSTATUS_otpw();
-        status.overTemperature     = tmcDriver.get_DRVSTATUS_ot();
-        status.standstill          = tmcDriver.get_DRVSTATUS_stst();
+        status.overTemperature       = tmcDriver.get_DRVSTATUS_ot();
+        status.standstill            = tmcDriver.get_DRVSTATUS_stst();
 
         // open load indication is not reliable in standstill
         if (

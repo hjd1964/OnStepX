@@ -18,8 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Description:
- *   Full featured stepper motor telescope microcontroller for Equatorial and
- *   Alt-Azimuth mounts, with the LX200 derived command set.
+ *   Full featured telescope control for
+ *   Equatorial and Alt-Az mounts
+ *   Rotator
+ *   Focusers
+ *   Accessories (automatic covers, dew heaters, etc.)
  *
  * Author: Howard Dutton
  *   http://www.stellarjourney.com
@@ -35,9 +38,14 @@
  *   https://groups.io/g/onstep
  */
 
-// Use Config.x.h to configure OnStep to your requirements
+// Use tabs "Config..." to configure OnStep to your requirements
 
-// See src/Constants.h for version information
+// Firmware version ----------------------------------------------------------------------------------------------------------------
+#define FirmwareName                "OnStepX"
+#define FirmwareVersionMajor        10
+#define FirmwareVersionMinor        01     // minor version 00 to 99
+#define FirmwareVersionPatch        'j'    // for example major.minor patch: 10.03c
+#define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 
 #include "src/OnStepX.h"
 NVS nv;
@@ -46,28 +54,6 @@ Tasks tasks;
 
 #include "src/telescope/Telescope.h"
 extern Telescope telescope;
-
-#ifdef SERIAL_A
-  extern void processCmdsA();
-#endif
-#ifdef SERIAL_B
-  extern void processCmdsB();
-#endif
-#ifdef SERIAL_C
-  extern void processCmdsC();
-#endif
-#ifdef SERIAL_D
-  extern void processCmdsD();
-#endif
-#ifdef SERIAL_ST4
-  extern void processCmdsST4();
-#endif
-#if SERIAL_BT_MODE == SLAVE
-  extern void processCmdsBT();
-#endif
-#ifdef SERIAL_IP
-  extern void processCmdsIP();
-#endif
 
 #if DEBUG == PROFILER
   extern void profiler();
@@ -87,73 +73,27 @@ void setup() {
     delay(2000);
   #endif
 
+  // start low level hardware
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
 
-  telescope.init();
-
-  // System services
+  // start system service task
+  VF("MSG: Setup, start system service task (rate 10ms priority 7)... ");
   // add task for system services, runs at 10ms intervals so commiting 1KB of NV takes about 10 seconds
   // the cache is scanned (for writing) at 2000 bytes/second but can be slower while reading data into the cache at startup
-  VF("MSG: Setup, start system service task (rate 10ms priority 7)... ");
   if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) { VL("success"); } else { VL("FAILED!"); }
 
-  // Command processing
-  // add tasks to process commands
-  // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  uint8_t handle;
-  #ifdef HAL_SLOW_PROCESSOR
-    long comPollRate = 2000;
-  #else
-    long comPollRate = 250;
-  #endif
-  #ifdef SERIAL_A
-    VF("MSG: Setup, start command channel A task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsA, "PrcCmdA");
-    if (handle) { VL("success"); } else { VL("FAILED!"); }
-    tasks.setPeriodMicros(handle, comPollRate);
-  #endif
-  #ifdef SERIAL_B
-    VF("MSG: Setup, start command channel B task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsB, "PrcCmdB");
-    if (handle) { VL("success"); } else { VL("FAILED!"); }
-    tasks.setPeriodMicros(handle, comPollRate);
-  #endif
-  #ifdef SERIAL_C
-    VF("MSG: Setup, start command channel C task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsC, "PrcCmdC");
-    if (handle) { VL("success"); } else { VL("FAILED!"); }
-    tasks.setPeriodMicros(handle, comPollRate);
-  #endif
-  #ifdef SERIAL_D
-    VF("MSG: Setup, start command channel D task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
-    if (handle) { VL("success"); } else { VL("FAILED!"); }
-    tasks.setPeriodMicros(handle, comPollRate);
-  #endif
-  #ifdef SERIAL_ST4
-    VF("MSG: Setup, start command channel ST4 task (priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
-  #endif
-  #if SERIAL_BT_MODE == SLAVE
-    VF("MSG: Setup, start command channel BT task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsBT, "PrcCmdT");
-    if (handle) { VL("success"); } else { VL("FAILED!"); }
-    tasks.setPeriodMicros(handle, comPollRate);
-  #endif
-  #ifdef SERIAL_IP
-    VF("MSG: Setup, start command channel IP task (priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
-  #endif
+  // start telescope object
+  telescope.init(FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch, FirmwareVersionConfig);
 
-  tasks.yield(5000);
+  // start command channel tasks
+  commandChannelInit();
+  tasks.yield(2000);
 
-  // ------------------------------------------------------------------------------------------------
-  // add task manager debug events
+  // start task manager debug events
   #if DEBUG == PROFILER
     tasks.add(142, 0, true, 7, profiler, "Profilr");
   #endif
-  
   #if DEBUG == CONSOLE
     tasks.add(1000, 0, true, 7, debugConsole);
   #endif

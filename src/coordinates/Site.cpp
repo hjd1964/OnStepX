@@ -1,8 +1,9 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount, time and location
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -201,3 +202,5 @@ void Site::readJD(bool validKey) {
   if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.site = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
   if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.site = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
 }
+
+#endif

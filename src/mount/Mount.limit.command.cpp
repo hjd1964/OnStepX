@@ -8,11 +8,7 @@
 extern Tasks tasks;
 
 #include "../coordinates/Convert.h"
-#include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
-#include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -51,7 +47,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   //                    1 on success
   if (cmdP("Sh")) {
     int16_t deg;
-    if (transform.site.convert.atoi2(parameter, &deg)) {
+    if (convert.atoi2(parameter, &deg)) {
       if (deg >= -30 && deg <= 30) {
         limits.altitude.min = degToRad(deg);
         nv.updateBytes(NV_LIMITS_BASE, &limits, LimitsSize);
@@ -65,7 +61,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   //                    1 on success
   if (cmdP("So"))  {
     int16_t deg;
-    if (transform.site.convert.atoi2(parameter, &deg)) {
+    if (convert.atoi2(parameter, &deg)) {
       if (deg >= 60 && deg <= 90) {
         limits.altitude.max = degToRad(deg);
         if (transform.mountType == ALTAZM && limits.altitude.max > 87) limits.altitude.max = 87;

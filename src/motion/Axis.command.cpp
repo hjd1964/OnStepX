@@ -1,14 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
 
 #include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"
 #include "../coordinates/Site.h"
 #include "../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
 
 #include "Axis.h"
 

@@ -1,8 +1,6 @@
 // -----------------------------------------------------------------------------------
 // Axis motion control
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -138,7 +136,7 @@ void Axis::setFrequencyBase(float frequency) {
 
 void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
-  if (frequency != 0.0) minPeriodMicros = 1000000.0F/(maxFreq*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
+  if (frequency != 0.0) minPeriodMicros = 1000000.0F/((maxFreq + baseFreq)*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
 }
 
 void Axis::setSlewAccelerationRate(float mpsps) {
@@ -284,7 +282,7 @@ void Axis::poll() {
   if (tracking) f += baseFreq;
   if (microstepModeControl == MMC_SLEWING) {
     setFrequency(f/slewStep);
-  } else { 
+  } else {
     if (inBacklash()) { if (f >= 0.0) f = backlashFreq; else f = -backlashFreq; }
     setFrequency(f);
   }

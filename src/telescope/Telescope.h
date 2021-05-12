@@ -25,10 +25,24 @@ typedef struct Ambient {
   float altitude;
 } Ambient;
 
+typedef struct Version {
+  uint8_t major;
+  uint8_t minor;
+  char patch;
+  uint8_t config;
+} Version;
+
+typedef struct Firmware {
+  char name[10];
+  Version version;
+  char date[20];
+  char time[20];
+} Firmware;
+
 class Telescope {
   public:
     // setup the location, time keeping, and coordinate converson
-    void init();
+    void init(const char *fwName, int fwMajor, int fwMinor, char fwPatch, int fwConfig);
 
     // update the location for time keeping and coordinate conversion
     void updateSite();
@@ -57,6 +71,8 @@ class Telescope {
 
   private:
     inline float dewPoint(Ambient conditions) { return conditions.temperature - ((100.0F - conditions.humidity) / 5.0F); }
+
+    Firmware firmware;
 };
 
 extern Telescope telescope;

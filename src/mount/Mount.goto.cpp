@@ -7,8 +7,6 @@
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "../coordinates/Transform.h"
-#include "../motion/Axis.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
@@ -163,7 +161,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
 
-  } else DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!");
+  } else { DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!"); }
 
   return CE_NONE;
 }

@@ -9,7 +9,16 @@
 Telescope telescope;
 InitError initError;
 
-void Telescope::init() {
+void Telescope::init(const char *fwName, int fwMajor, int fwMinor, char fwPatch, int fwConfig) {
+
+  strcpy(telescope.firmware.name, fwName);
+  telescope.firmware.version.major = fwMajor;
+  telescope.firmware.version.minor = fwMinor;
+  telescope.firmware.version.patch = fwPatch;
+  telescope.firmware.version.config = fwConfig;
+  strcpy(telescope.firmware.date, __DATE__);
+  strcpy(telescope.firmware.time, __TIME__);
+
   bool validKey = true;
   if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
     validKey = false;
@@ -56,7 +65,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       for (unsigned int i = 0; i < strlen(parameter); i++) if (parameter[i] == '_') parameter[i] = ' ';
       // a newline is encoded as '&' in the last char of message
       int l = strlen(parameter);
-      if (l > 0 && parameter[l - 1] == '&') { parameter[l - 1] = 0; DL(parameter); } else D(parameter);
+      if (l > 0 && parameter[l - 1] == '&') { parameter[l - 1] = 0; DL(parameter); } else { D(parameter); }
       *numericReply = false;
     } else
 
@@ -103,11 +112,11 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   // :GVT#      Get OnStepX Firmware Time
   //            Returns: HH:MM:SS#
   if (cmdP("GV")) {
-    if (parameter[0] == 'D') strcpy(reply,FirmwareDate); else
-    if (parameter[0] == 'M') sprintf(reply,"%s %i.%02i%s", FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
-    if (parameter[0] == 'N') sprintf(reply,"%i.%02i%s", FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch); else
-    if (parameter[0] == 'P') strcpy(reply,FirmwareName); else
-    if (parameter[0] == 'T') strcpy(reply,FirmwareTime); else *commandError = CE_CMD_UNKNOWN;
+    if (parameter[0] == 'D') strcpy(reply, firmware.date); else
+    if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%c", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
+    if (parameter[0] == 'N') sprintf(reply, "%i.%02i%c", firmware.version.major, firmware.version.minor, firmware.version.patch); else
+    if (parameter[0] == 'P') strcpy(reply, firmware.name); else
+    if (parameter[0] == 'T') strcpy(reply, firmware.time); else *commandError = CE_CMD_UNKNOWN;
     *numericReply = false;
   } else
 

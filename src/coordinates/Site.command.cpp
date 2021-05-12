@@ -1,8 +1,8 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount time and location, commands
 #include "../OnStepX.h"
-#include "../lib/nv/NV.h"
-extern NVS nv;
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
@@ -55,7 +55,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   //            Returns: [s]HH:MM#
   if (cmd("GG"))  {
     convert.doubleToHms(reply, location.timezone, true, PM_LOWEST);
-    *numericReply=false;
+    *numericReply = false;
   } else
 
   // :Gg#       Get Current Site Longitude, east is negative
@@ -238,3 +238,5 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
 
   return true;
 }
+
+#endif
