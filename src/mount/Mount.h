@@ -16,6 +16,7 @@
 #include "../coordinates/Transform.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
+#include "library/Library.h"
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
@@ -258,6 +259,7 @@ class Mount {
     void limitStopAxis1(GuideAction stopDirection);
     void limitStopAxis2(GuideAction stopDirection);
 
+    Library library;
     Convert convert;
 
     const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;

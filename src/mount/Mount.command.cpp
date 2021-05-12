@@ -26,6 +26,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   // process any axis2 commands
   if (axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
+  // process any library commands
+  if (library.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+
   // :GT#         Get tracking rate, 0.0 unless TrackingSidereal
   //              Returns: n.n# (OnStep returns more decimal places than LX200 standard)
   if (cmd("GT"))  {
