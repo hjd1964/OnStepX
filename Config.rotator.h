@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------------------------
- * Configuration for OnStepX rotator optiona
+ * Configuration for OnStepX rotator options
  *
  *          For more information on setting OnStep up see http://www.stellarjourney.com/index.php?r=site/equipment_onstep 
  *                      and join the OnStep Groups.io at https://groups.io/g/onstep

@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------------------------
- * Configuration for OnStepX controller optiona
+ * Configuration for OnStepX controller options
  *
  *          For more information on setting OnStep up see http://www.stellarjourney.com/index.php?r=site/equipment_onstep 
  *                      and join the OnStep Groups.io at https://groups.io/g/onstep
