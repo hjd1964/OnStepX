@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Validates pinmap model for current configuration
+#pragma once
 
 // helps keep track of Aux pin assignments
 #define PIN_NOT_ASSIGNED 0

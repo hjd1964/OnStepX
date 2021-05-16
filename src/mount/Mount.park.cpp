@@ -1,5 +1,6 @@
 // -----------------------------------------------------------------------------------
 // telescope mount control, parking
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
@@ -10,7 +11,7 @@
 void Mount::parkInit() {
   // read the park settings
   if (ParkSize < sizeof(Park)) { initError.mount = true; DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_PARK_BASE, &park, ParkSize);
+  nv.readBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 }
 
 CommandError Mount::parkSet() {
@@ -34,7 +35,7 @@ CommandError Mount::parkSet() {
   park.position.d = current.d;
   park.position.pierSide = current.pierSide;
   park.saved = true;
-  nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
+  nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
   #if ALIGN_MAX_NUM_STARS > 1  
     transform.align.modelWrite();
@@ -77,7 +78,7 @@ CommandError Mount::parkGoto() {
   
   // update state to parking
   park.state = PS_PARKING;
-  nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
+  nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
   // get the park coordinate ready
   Coordinate parkTarget;
@@ -95,7 +96,7 @@ CommandError Mount::parkGoto() {
     updateTrackingRates();
 
     park.state = priorParkState;
-    nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
+    nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
     VLF("ERR, parkGoto(): Failed to start goto");
     return e;
@@ -106,7 +107,7 @@ CommandError Mount::parkGoto() {
 void Mount::parkFinish() {
   if (park.state != PS_PARK_FAILED) {
     park.state = PS_PARKED;
-    nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
+    nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.modelWrite();
@@ -197,7 +198,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   // update our state and start tracking
   if (withTrackingOn) {
     park.state = PS_UNPARKED;
-    nv.updateBytes(NV_PARK_BASE, &park, ParkSize);
+    nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
     setTrackingState(TS_SIDEREAL);
     updateTrackingRates();
   }

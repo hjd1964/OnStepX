@@ -5,7 +5,6 @@
 //
 // Copyright (C) 2012 to 2021 Howard Dutton
 //
-
 #pragma once
 
 #include <Arduino.h>

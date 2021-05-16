@@ -2,9 +2,9 @@
 // telescope mount control
 #pragma once
 
-#include "../OnStepX.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+#include <Arduino.h>
+#include "../Constants.h"
+#include "../Config.common.h"
 
 #if AXIS1_STEPS_PER_WORMROT == 0
   #define AXIS1_PEC OFF
@@ -154,7 +154,7 @@ class Mount {
     // calculate tracking rates for alt/azm, refraction, and pointing model in the background
     void trackPoll();
 
-    Transform  transform;
+    Transform transform;
 
     Axis axis1;
     Axis axis2;
@@ -355,7 +355,4 @@ class Mount {
     Misc misc = {false, false, false, false, 64.0, GR_20X, {0, 0}};
 
     float timerRateRatio = 1.0;
-
 };
-
-#endif

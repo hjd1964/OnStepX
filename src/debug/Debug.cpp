@@ -1,19 +1,12 @@
 // Helper macros for debugging, with less typing
-#include <Arduino.h>
-#include "../Constants.h"
-#include "../../Config.controller.h"
-#include "../../Config.controllerX.h"
-#include "../../Config.mount.h"
-#include "../../Config.mountX.h"
-#include "../../Config.focusers.h"
-#include "../../Config.features.h"
-#include "../HAL/HAL.h"
-#include "../pinmaps/Models.h"
 
-#include "../tasks/OnTask.h"
-extern Tasks tasks;
+#include "Debug.h"
 
 #ifdef TASKS_PROFILER_ENABLE
+
+  #include "../tasks/OnTask.h"
+  extern Tasks tasks;
+
   #warning "MSG: Warning the OnTask PROFILER is for debugging only, there is siginficant overhead associated with enabling this feature."
   #define PROFILER_VT100 ON
   

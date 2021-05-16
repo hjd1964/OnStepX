@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep using RAMPS 1.4 Pin defs (Arduino Mega2560 & Arduino DUE)
+#pragma once
 
 #if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1280__) || defined(__SAM3X8E__)
 
@@ -53,7 +54,7 @@
 #endif
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
+#define SENSE_LIMIT_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED1_PIN        Aux0             // RAMPS SERVO1 (1=GND, 2=+5, 3=LED-) (active LOW)
@@ -64,7 +65,7 @@
 #define BUZZER_PIN             4                // RAMPS SERVO4 (1=GND, 2=+5, 3=TONE+) (active HIGH)
 
 // The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN          2                // RAMPS X+, Interrupt 0 on Pin 2
+#define SENSE_PPS_PIN          2                // RAMPS X+, Interrupt 0 on Pin 2
 
 // Pins to Axis1 RA/Azm on RAMPS X
 #define AXIS1_ENABLE_PIN       38
@@ -83,7 +84,7 @@
 #define AXIS1_DIR_PIN          55
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
 #define AXIS1_FAULT_PIN        Aux1
-#define AXIS1_HOME_SENSE_PIN   Aux3
+#define AXIS1_SENSE_HOME_PIN   Aux3
 
 // Axis2 Dec/Alt step/dir driver on RMAPS Y
 #define AXIS2_ENABLE_PIN       56               // (Pin A2)
@@ -102,7 +103,7 @@
 #define AXIS2_DIR_PIN          61               // (Pin A7)
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
 #define AXIS2_FAULT_PIN        Aux2
-#define AXIS2_HOME_SENSE_PIN   Aux4
+#define AXIS2_SENSE_HOME_PIN   Aux4
 
 // For rotator stepper driver on RAMPS Z
 #define AXIS3_ENABLE_PIN       62               // (Pin A8)

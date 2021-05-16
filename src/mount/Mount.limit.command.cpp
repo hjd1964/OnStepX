@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../coordinates/Convert.h"
 #include "../coordinates/Site.h"
 #include "Mount.h"
@@ -50,7 +50,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
     if (convert.atoi2(parameter, &deg)) {
       if (deg >= -30 && deg <= 30) {
         limits.altitude.min = degToRad(deg);
-        nv.updateBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+        nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -65,7 +65,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
       if (deg >= 60 && deg <= 90) {
         limits.altitude.max = degToRad(deg);
         if (transform.mountType == ALTAZM && limits.altitude.max > 87) limits.altitude.max = 87;
-        nv.updateBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+        nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -82,7 +82,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
           limits.pastMeridianE = degToRad(degs);
           if (limits.pastMeridianE < -axis1.settings.limits.max) limits.pastMeridianE = -axis1.settings.limits.max;
           if (limits.pastMeridianE > -axis1.settings.limits.min) limits.pastMeridianE = -axis1.settings.limits.min;
-          nv.updateBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+          nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
         } else *commandError = CE_PARAM_RANGE;
       break;
       case 'A':
@@ -90,7 +90,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
           limits.pastMeridianW = degToRad(degs);
           if (limits.pastMeridianW < axis1.settings.limits.min) limits.pastMeridianW = axis1.settings.limits.min;
           if (limits.pastMeridianW > axis1.settings.limits.max) limits.pastMeridianW = axis1.settings.limits.max;
-          nv.updateBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+          nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
         } else *commandError = CE_PARAM_RANGE;
       break;
       default: return false;

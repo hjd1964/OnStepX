@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep MaxSTM STM32F411CE/STM32F401CE PCB (or the Blackpill https://github.com/WeActTC/MiniF4-STM32F4x1)
+#pragma once
 
 // For an 8KB EEPROM on the MaxSTM3.6I
 #if PINMAP == MaxSTM3I
@@ -39,13 +40,13 @@
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #ifdef MAXSTM_AUX0_PPS
-  #define PPS_SENSE_PIN        Aux0             // PPS time source, GPS for example (MaxSTM version 3.6)
+  #define SENSE_PPS_PIN        Aux0             // PPS time source, GPS for example (MaxSTM version 3.6)
 #else
-  #define PPS_SENSE_PIN        Aux2             // PPS time source, GPS for example (MaxSTM version 3.61 and later)
+  #define SENSE_PPS_PIN        Aux2             // PPS time source, GPS for example (MaxSTM version 3.61 and later)
 #endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN        Aux7
+#define SENSE_LIMIT_PIN        Aux7
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       OFF
@@ -68,7 +69,7 @@
 #define Axis1_DirPORT          GPIOB
 #define Axis1_DirBIT           GPIO_PIN_2
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_HOME_SENSE_PIN   Aux3
+#define AXIS1_SENSE_HOME_PIN   Aux3
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       OFF
@@ -91,7 +92,7 @@
 #define Axis2_DirPORT          GPIOB
 #define Axis2_DirBIT           GPIO_PIN_0
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_HOME_SENSE_PIN   Aux4
+#define AXIS2_SENSE_HOME_PIN   Aux4
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       OFF

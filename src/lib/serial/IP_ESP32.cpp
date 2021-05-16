@@ -1,18 +1,9 @@
 // -----------------------------------------------------------------------------------
 // IP communication routines
 
-#if defined(ESP32)
+#include "IP_ESP32.h"
 
-#include "../../OnStep.h"
-#include "../../debug/Debug.h"
-
-#if SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT
-
-  #include <WiFi.h>
-  #include <WiFiClient.h>
-  #include <WiFiAP.h>
-
-  #include "IP_ESP32.h"
+#if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
   bool wifiActive = false;
 
@@ -191,6 +182,4 @@
   }
 
   IPSerial ipSerial;
-#endif
-
 #endif

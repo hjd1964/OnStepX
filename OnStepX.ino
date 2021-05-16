@@ -49,6 +49,7 @@
 
 #include "src/OnStepX.h"
 NVS nv;
+#include "src/lib/sense/Sense.h"
 #include "src/tasks/OnTask.h"
 Tasks tasks;
 
@@ -65,6 +66,7 @@ extern Telescope telescope;
 
 void systemServices() {
   nv.poll();
+  senses.poll();
 }
 
 void setup() {
@@ -88,6 +90,7 @@ void setup() {
 
   // start command channel tasks
   commandChannelInit();
+
   tasks.yield(2000);
 
   // start task manager debug events

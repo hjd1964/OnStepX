@@ -1,17 +1,17 @@
 // -----------------------------------------------------------------------------------
 // telescope celestial object library
 
-#include "../../OnStepX.h"
 #include "Library.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 Library library;
 char const * objectStr[] = {"UNK", "OC", "GC", "PN", "DN", "SG", "EG", "IG", "KNT", "SNR", "GAL", "CN", "STR", "PLA", "CMT", "AST"};
 
-Library::Library()
-{
+void Library::init(bool validKey) {
   catalog = 0;
 
-  byteMin = NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT;
+  byteMin = NV_LIBRARY_DATA_BASE;
   byteMax = nv.size - 1;
 
   long byteCount = (byteMax - byteMin) + 1;
@@ -19,20 +19,21 @@ Library::Library()
   if (byteCount > 262143) byteCount = 262143; // maximum 256KB
 
   recMax = byteCount/rec_size; // maximum number of records
-}
 
-Library::~Library()
-{
-}
+  if (recMax == 0) { VLF("WRN: Library::Library(); recMax == 0, no library space available"); return; }
 
-void Library::init() {
-  // This is now in the Init() function, because on boards
-  // with an I2C EEPROM nv.init() has to be called before
-  // anything else
+  // write the default limits to NV
+  if (!validKey) {
+    VLF("MSG: Library, clearing NV storage area");
+    for (uint16_t i = NV_LIBRARY_DATA_BASE; i <= nv.size; i++) nv.write(i, (uint8_t)0);
+  }
+
+   VF("MSG: Library, allocated "); V(recMax); VLF(" catalog records");
+
   firstRec();
 }
 
-bool Library::setCatalog(int16_t num)
+bool Library::setCatalog(int num)
 {
   if (num < 0 || num > 14) return false;
 
@@ -40,7 +41,7 @@ bool Library::setCatalog(int16_t num)
   return firstRec();
 }
 
-void Library::writeVars(char* name, int16_t code, double RA, double Dec)
+void Library::writeVars(char* name, int code, double RA, double Dec)
 {
   libRec_t work;
   for (int16_t l = 0; l < 11; l++) work.libRec.name[l] = name[l];
@@ -61,7 +62,7 @@ void Library::writeVars(char* name, int16_t code, double RA, double Dec)
   writeRec(recPos, work);
 }
 
-void Library::readVars(char* name, int16_t* code, double* RA, double* Dec)
+void Library::readVars(char* name, int* code, double* RA, double* Dec)
 {
   libRec_t work;
   work = readRec(recPos);
@@ -293,3 +294,5 @@ void Library::clearAll()
 {
   for (long l = 0; l < recMax; l++) clearRec(l);
 }
+
+#endif

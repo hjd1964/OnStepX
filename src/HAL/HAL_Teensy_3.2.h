@@ -1,5 +1,6 @@
 // Platform setup ------------------------------------------------------------------------------------
 // Teensy3.0, 3.1, 3.2
+#pragma once
 
 // We define a more generic symbol, in case more Teensy boards based on different lines are supported
 #define __TEENSYDUINO__
@@ -48,6 +49,7 @@
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #ifdef NV_DEFAULT
+  #include "EEPROM.h"
   #include "../lib/nv/NV_EEPROM.h"
 #endif
 

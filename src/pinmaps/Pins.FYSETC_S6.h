@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for FYSETC S6
+#pragma once
 
 #if defined(STM32F446xx)
 
@@ -62,9 +63,9 @@
 #define BUZZER_PIN            PC9                // Tone (on BEEP/EXP1)
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN         PB10               // PPS time source, GPS for example (on EXP2)
+#define SENSE_PPS_PIN         PB10               // PPS time source, GPS for example (on EXP2)
 
-#define LIMIT_SENSE_PIN       PA0                // Limit switch sense (on Z-)
+#define SENSE_LIMIT_PIN       PA0                // Limit switch sense (on Z-)
 
 // Soft SPI bus to stepper drivers
 #if PINMAP == FYSETC_S6_2
@@ -109,7 +110,7 @@
 #define Axis1_DirBIT          GPIO_PIN_10
 #define AXIS1_DECAY_PIN       AXIS1_M2_PIN
 #define AXIS1_FAULT_PIN       AXIS1_M3_PIN
-#define AXIS1_HOME_SENSE_PIN  PB14               // (on X-)
+#define AXIS1_SENSE_HOME_PIN  PB14               // (on X-)
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN      PD9
@@ -131,7 +132,7 @@
 #define Axis2_DirBIT          GPIO_PIN_12
 #define AXIS2_DECAY_PIN       AXIS2_M2_PIN
 #define AXIS2_FAULT_PIN       AXIS2_M3_PIN
-#define AXIS2_HOME_SENSE_PIN  PB13               // (on Y-)
+#define AXIS2_SENSE_HOME_PIN  PB13               // (on Y-)
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN      PD15

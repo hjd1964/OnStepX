@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for CNC Shield Version 3 (with Arduino UNO)
+#pragma once
 
 #if defined(__AVR_ATmega328P__)
 
@@ -23,10 +24,10 @@
 #define BUZZER_PIN                OFF
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN             OFF           // PPS time source, GPS for example
+#define SENSE_PPS_PIN             OFF           // PPS time source, GPS for example
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN           OFF
+#define SENSE_LIMIT_PIN           OFF
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN          OFF
@@ -37,7 +38,7 @@
 #define AXIS1_STEP_PIN            OFF
 #define AXIS1_DIR_PIN             OFF
 #define AXIS1_DECAY_PIN           OFF
-#define AXIS1_HOME_SENSE_PIN      OFF
+#define AXIS1_SENSE_HOME_PIN      OFF
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN          OFF
@@ -48,7 +49,7 @@
 #define AXIS2_STEP_PIN            OFF
 #define AXIS2_DIR_PIN             OFF
 #define AXIS2_DECAY_PIN           OFF
-#define AXIS2_HOME_SENSE_PIN      OFF
+#define AXIS2_SENSE_HOME_PIN      OFF
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN          OFF

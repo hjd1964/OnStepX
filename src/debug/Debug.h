@@ -1,6 +1,11 @@
 // Helper macros for debugging, with less typing
 #pragma once
 
+#include <Arduino.h>
+#include "../Constants.h"
+#include "../Config.common.h"
+#include "../HAL/HAL.h"
+
 #if DEBUG != OFF
   // command errors
   #define L_CE_NONE                    "No Errors"

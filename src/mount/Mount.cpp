@@ -1,14 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../lib/nv/NV.h"
-extern NVS nv;
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../coordinates/Site.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
@@ -26,6 +24,9 @@ void Mount::init(bool validKey) {
     initPec();
   #endif
 
+  // get library ready
+  library.init(validKey);
+
   // get parking ready
   parkInit();
 
@@ -41,6 +42,12 @@ void Mount::init(bool validKey) {
 
   // get limits ready
   limitInit(validKey);
+
+  // write the default misc settings to NV
+  if (!validKey) {
+    VLF("MSG: Mount, writing default misc settings to NV");
+    nv.writeBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+  }
 
   // get misc settings from NV
   if (MiscSize < sizeof(Misc)) { initError.mount = true; DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }

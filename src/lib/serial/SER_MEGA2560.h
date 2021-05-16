@@ -2,6 +2,8 @@
 // Polling serial for Mega2560
 #pragma once
 
+#include "Arduino.h"
+
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 class PollingSerial : public Stream
@@ -12,7 +14,7 @@ class PollingSerial : public Stream
     inline void begin() { begin(9600); }
     virtual void begin(long baud);
     virtual void end();
-    inline virtual bool poll(void) {}
+    inline virtual bool poll(void) { return true; }
 
     virtual int read(void);
 
@@ -34,7 +36,7 @@ class PollingSerial : public Stream
       return 1;
     }
     virtual size_t write(const uint8_t* data, size_t count) {
-      for (int i = 0; i < count; i++) { if (!write(data[i])) return i; }
+      for (int i = 0; i < (int)count; i++) { if (!write(data[i])) return i; }
       return count;
     }
     inline size_t write(unsigned long n) { return write((uint8_t)n); }

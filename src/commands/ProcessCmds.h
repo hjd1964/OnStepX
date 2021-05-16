@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------------
 // Command processing
 #pragma once
-#include <Arduino.h>
 
+#include <Arduino.h>
 #include "BufferCmds.h"
 #include "SerialWrapper.h"
 

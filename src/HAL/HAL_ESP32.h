@@ -1,4 +1,5 @@
 // Platform setup ------------------------------------------------------------------------------------
+#pragma once
 
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR

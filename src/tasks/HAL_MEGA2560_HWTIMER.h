@@ -40,6 +40,7 @@
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     // period 0.5... us per count 32.767 ms max
+    (void)priority;
     noInterrupts();
     OCR1A  = 2000; // startup one millisecond
     TCCR1B = (1 << WGM12) | (1 << CS11);
@@ -70,6 +71,7 @@
   void (*HAL_HWTIMER2_FUN)() = NULL; // points to task/process callback function
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
+    (void)priority;
     noInterrupts();
     OCR3A  = 2000; // startup one millisecond
     TCCR3B = (1 << WGM12) | (1 << CS11);
@@ -100,6 +102,7 @@
   void (*HAL_HWTIMER3_FUN)() = NULL; // points to task/process callback function
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
+    (void)priority;
     noInterrupts();
     OCR4A  = 2000; // startup one millisecond
     TCCR4B = (1 << WGM12) | (1 << CS11);
@@ -130,6 +133,7 @@
   void (*HAL_HWTIMER4_FUN)() = NULL; // points to task/process callback function
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
+    (void)priority;
     noInterrupts();
     OCR5A  = 2000; // startup one millisecond
     TCCR5B = (1 << WGM12) | (1 << CS11);

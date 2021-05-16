@@ -1,16 +1,15 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, PEC
+
 #include "../OnStepX.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF && AXIS1_PEC == ON
+
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../coordinates/Site.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
-
-#if AXIS1_PEC == ON
 
 #if PEC_SENSE == OFF
   bool wormSenseFirst = true;
@@ -23,7 +22,7 @@ inline void mountPecWrapper() { telescope.mount.pecPoll(); }
 void Mount::pecInit() {
   // read the pec settings
   if (PecSize < sizeof(Pec)) { DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_PEC_BASE, &pec, PecSize);
+  nv.readBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
 
   wormRotationSeconds = pec.wormRotationSteps/stepsPerSiderealSecondAxis1;
   pecBufferSize = ceil(pec.wormRotationSteps/(axis1.getStepsPerMeasure()/240.0));
@@ -262,7 +261,5 @@ void Mount::pecCleanup() {
   // a reality check, make sure the buffer data looks good, if not forget it
   if (stepsSum > 2 || stepsSum < -2) { pec.recorded = false; pec.state = PEC_NONE; }
 }
-
-#endif
 
 #endif

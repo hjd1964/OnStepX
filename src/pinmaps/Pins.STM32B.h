@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep on STM32
-// 
+#pragma once
+
 // This pin map is for an STM32F303xC "Blue Pill" boards..
 // They run at 72MHz, with 48K of RAM, and 256K of flash.
 //
@@ -62,11 +63,11 @@
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and
 // adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN          PB5              // Pulse Per Second time source, e.g. GPS, RTC
+#define SENSE_PPS_PIN          PB5              // Pulse Per Second time source, e.g. GPS, RTC
 
 // The limit switch sense is a logic level input which uses the internal pull up,
 // shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN        PA14
+#define SENSE_LIMIT_PIN        PA14
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       PA12
@@ -88,7 +89,7 @@
 #define Axis1_DirBIT           GPIO_PIN_12
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
 #define AXIS1_FAULT_PIN        Aux1
-#define AXIS1_HOME_SENSE_PIN   Aux3
+#define AXIS1_SENSE_HOME_PIN   Aux3
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       PA5
@@ -110,7 +111,7 @@
 #define Axis2_DirBIT           GPIO_PIN_15
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
 #define AXIS2_FAULT_PIN        Aux2
-#define AXIS2_HOME_SENSE_PIN   Aux4
+#define AXIS2_SENSE_HOME_PIN   Aux4
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       PB4

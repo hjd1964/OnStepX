@@ -1,5 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount time and location, commands
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
@@ -85,7 +86,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   if (command[0] == 'G' && (command[1] == 'M' || command[1] == 'N' || command[1] == 'O' || command[1] == 'P') && parameter[0] == 0)  {
     Location tempLocation;
     uint8_t locationNumber = command[1] - 'M';
-    nv.readBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+    nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
     strcpy(reply, tempLocation.name);
     if (reply[0] == 0) { strcat(reply,"None"); }
     *numericReply = false; 
@@ -141,7 +142,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (hour >= 24.0) { hour -= 24.0; ut1.day += 1.0; } else
       if (hour <  0.0)  { hour += 24.0; ut1.day -= 1.0; }
       setSiderealTime(ut1, julianDateToLAST(ut1));
-      if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
+      if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       dateIsReady = true;
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
       delay(10);
@@ -156,7 +157,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     if (convert.tzToDouble(&hour, parameter)) {
       if (hour >= -13.75 || hour <= 12.0) {
         location.timezone = hour;
-        nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
+        nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -174,7 +175,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         if (degs >= 180.0) degs -= 360.0;
         location.longitude = degToRad(degs);
         update();
-        nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
+        nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
   } else
@@ -187,7 +188,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
       ut1.hour = hour + location.timezone;
       setTime(ut1);
-      if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_JD_BASE, &ut1, JulianDateSize);
+      if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       timeIsReady = true;
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
     } else *commandError = CE_PARAM_FORM;
@@ -201,9 +202,9 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     uint8_t locationNumber = command[1] - 'M';
     if (strlen(parameter) <= 15) {
       Location tempLocation;
-      nv.readBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+      nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
       strcpy(tempLocation.name, parameter);
-      nv.updateBytes(NV_LOCATION_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+      nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
     } else *commandError = CE_PARAM_RANGE;
   } else
 
@@ -215,7 +216,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     if (convert.dmsToDouble(&degs, parameter, true)) {
       location.latitude = degToRad(degs);
       update();
-      nv.updateBytes(NV_LOCATION_BASE + number*LocationSize, &location, LocationSize);
+      nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
     } else *commandError = CE_PARAM_FORM;
   } else 
 
@@ -223,7 +224,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   //            Returns: Nothing
   if (command[0] == 'W' && (command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
     number = command[1] - '0';
-    nv.update(NV_LOCATION_NUMBER, number);
+    nv.update(NV_SITE_NUMBER, number);
     readLocation(number, true);
     update();
     *numericReply = false;
@@ -232,7 +233,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   // :W?#       Queries current site
   //            Returns: n#
   if (command[0] == 'W' && command[1] == '?') {
-    sprintf(reply, "%d", (int)nv.read(NV_LOCATION_NUMBER));
+    sprintf(reply, "%d", (int)nv.read(NV_SITE_NUMBER));
     *numericReply = false;
   } else return false;
 

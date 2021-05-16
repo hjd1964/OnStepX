@@ -3,12 +3,11 @@
 #pragma once
 
 #include <Arduino.h>
-#include "../../../Constants.h"
-#include "../../../Config.h"
-#include "../../../ConfigX.h"
+#include "../../Constants.h"
+#include "../../Config.common.h"
 #include "../../HAL/HAL.h"
 
-#if defined(ESP32) && SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT
+#if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
   #include <WiFi.h>
   #include <WiFiClient.h>

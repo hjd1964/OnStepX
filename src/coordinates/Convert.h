@@ -1,6 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // convert to/from C strings
 #pragma once
+
 #include <Arduino.h>
 
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST};

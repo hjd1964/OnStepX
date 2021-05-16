@@ -1,5 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, limits
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
@@ -18,11 +19,11 @@ void Mount::limitInit(bool validKey) {
   // write the default limits to NV
   if (!validKey) {
     VLF("MSG: Mount, writing default limits to NV");
-    nv.writeBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+    nv.writeBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
   }
 
   // get limit settings from NV
-  nv.readBytes(NV_LIMITS_BASE, &limits, LimitsSize);
+  nv.readBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
 
   // start limit monitor task
   VF("MSG: Mount, start limit monitor task (rate 100ms priority 3)... ");

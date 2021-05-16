@@ -1,6 +1,5 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage base class
-
 #pragma once
 
 #include <Arduino.h>

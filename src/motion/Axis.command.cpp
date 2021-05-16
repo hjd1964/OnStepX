@@ -1,5 +1,6 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
+
 #include "../OnStepX.h"
 
 #include "../coordinates/Convert.h"
@@ -13,6 +14,7 @@ int8_t driverModels[9] = {AXIS1_DRIVER_MODEL, AXIS2_DRIVER_MODEL, AXIS3_DRIVER_M
 int8_t driverMicrostepsGoto[2] = {AXIS1_DRIVER_MICROSTEPS_GOTO, AXIS2_DRIVER_MICROSTEPS_GOTO};
 
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  *supressFrame = false;
 
   // :GXA[n]#   Get axis/driver configuration
   //            Returns: Value
@@ -20,7 +22,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
     int index = parameter[1] - '1';
     if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
     if (index + 1 != axisNumber) return false; // command wasn't processed
-    uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
     // check that this axis is not set to revert
     if (!(axesToRevert & (1 << axisNumber))) {
       AxisSettings thisAxis;
@@ -58,7 +60,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
 
   // :SXA[n]#   Set axis/driver configuration
   if (cmdSX("SXA")) {
-    uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
     int index = parameter[1] - '1';
     if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
     if (index + 1 != axisNumber) return false; // command wasn't processed
@@ -68,7 +70,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
         // :SXA[n],R# reverts this axis to defaults
         axesToRevert |= 1 << axisNumber;
         bitSet(axesToRevert, axisNumber);
-        nv.update(NV_REVERT_AXIS_SETTINGS, axesToRevert);
+        nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
       } else {
         // :SXA[n],[sssss...]#
         AxisSettings thisAxis;

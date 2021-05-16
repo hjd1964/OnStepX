@@ -28,12 +28,12 @@ typedef struct Ambient {
 typedef struct Version {
   uint8_t major;
   uint8_t minor;
-  char patch;
+  char patch[2];
   uint8_t config;
 } Version;
 
 typedef struct Firmware {
-  char name[10];
+  char name[8];
   Version version;
   char date[20];
   char time[20];
@@ -42,7 +42,7 @@ typedef struct Firmware {
 class Telescope {
   public:
     // setup the location, time keeping, and coordinate converson
-    void init(const char *fwName, int fwMajor, int fwMinor, char fwPatch, int fwConfig);
+    void init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig);
 
     // update the location for time keeping and coordinate conversion
     void updateSite();

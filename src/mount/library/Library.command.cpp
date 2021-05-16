@@ -1,12 +1,9 @@
 //--------------------------------------------------------------------------------------------------
 // telescope celestial object library, commands
-#include "../../OnStepX.h"
+
+#include "Library.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
-#include "../../commands/ProcessCmds.h"
-#include "../../coordinates/Convert.h"
-#include "Library.h"
 
 char const *ObjectStr[] = {"UNK", "OC", "GC", "PN", "DN", "SG", "EG", "IG", "KNT", "SNR", "GAL", "CN", "STR", "PLA", "CMT", "AST"};
 
@@ -28,7 +25,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       if (command[1] == 'C') {
         int16_t i;
         if (convert.atoi2(parameter, &i)) {
-            if (i >= 0 && i <= 32767) {
+            if (i >= 0) {
             gotoRec(i);
             *numericReply = false;
             } else *commandError = CE_PARAM_RANGE;
@@ -38,7 +35,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       // :LI#       Get Object Information
       //            Returns: s# (string containing the current target object’s name and object type)
       if (command[1] == 'I' && parameter[0] == 0) {
-      int16_t i;
+      int i;
       readVars(reply, &i, &targetRA, &targetDec);
 
       char const *objType = ObjectStr[i];
@@ -50,7 +47,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       // :LIG#      Get catalog object information and goto
       //            Returns: Nothing
       if (command[1] == 'I' && parameter[0] == 'G' && parameter[1] == 0) {
-        int16_t i;
+        int i;
         readVars(reply, &i, &targetRA, &targetDec);
 
 /*      // goto the target RA, Dec
@@ -67,7 +64,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       // :LR#       Get catalog object information including RA and Dec, with advance to next record
       //            Returns: s# (string containing the current target object’s name, type, RA, and Dec)
       if (command[1] == 'R' && parameter[0] == 0) {
-        int16_t i;
+        int i;
         readVars(reply, &i, &targetRA, &targetDec);
 
         char const * objType = ObjectStr[i];

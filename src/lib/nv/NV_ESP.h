@@ -1,12 +1,10 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (default/built-in, flash emulation ESP32)
-
 #pragma once
 
-#if defined(ESP8266) || defined(ESP32)
+#include "NV.h"
 
-  #include "Arduino.h"
-  #include "NV.h"
+#if defined(ESP8266) || defined(ESP32)
 
   class NonVolatileStorageESP : public NonVolatileStorage {
     public:

@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep MaxESP Version 3.x (ESP32S)
+#pragma once
 
 #if defined(ESP32)
 
@@ -32,10 +33,10 @@
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN           Aux7             // PPS time source, GPS for example
+#define SENSE_PPS_PIN           Aux7             // PPS time source, GPS for example
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN         Aux7
+#define SENSE_LIMIT_PIN         Aux7
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN        12
@@ -46,7 +47,7 @@
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           0
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
-#define AXIS1_HOME_SENSE_PIN    Aux3
+#define AXIS1_SENSE_HOME_PIN    Aux3
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        SHARED
@@ -57,7 +58,7 @@
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
-#define AXIS2_HOME_SENSE_PIN    Aux4
+#define AXIS2_SENSE_HOME_PIN    Aux4
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        OFF              // No enable pin control (always enabled)

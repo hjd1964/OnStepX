@@ -1,20 +1,18 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (default/built-in, flash emulation ESP8266/ESP32)
 
+#include "NV_ESP.h"
+
 #if defined(ESP8266) || defined(ESP32)
 
-  #include "Arduino.h"
   #include "EEPROM.h"
   #include "../../tasks/OnTask.h"
-  extern Tasks tasks;
-
-  #include "NV_ESP.h"
 
   bool NonVolatileStorageESP::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
     if (size > 4096 || wait == false) return false;
 
     // setup size, cache, etc.
-    NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
+    NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
     EEPROM.begin(size);
     return true;

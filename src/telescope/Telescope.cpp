@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // OnStepX telescope control
-#include "../OnStepX.h"
 
+#include "../OnStepX.h"
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 #include "Telescope.h"
@@ -9,12 +9,12 @@
 Telescope telescope;
 InitError initError;
 
-void Telescope::init(const char *fwName, int fwMajor, int fwMinor, char fwPatch, int fwConfig) {
+void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig) {
 
   strcpy(telescope.firmware.name, fwName);
   telescope.firmware.version.major = fwMajor;
   telescope.firmware.version.minor = fwMinor;
-  telescope.firmware.version.patch = fwPatch;
+  strcpy(telescope.firmware.version.patch, fwPatch);
   telescope.firmware.version.config = fwConfig;
   strcpy(telescope.firmware.date, __DATE__);
   strcpy(telescope.firmware.time, __TIME__);
@@ -24,7 +24,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, char fwPatch,
     validKey = false;
 
     VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes");
-    for (int i = 0; i < nv.size; i++) nv.write(i, (char)0);
+    for (int i = 0; i < (int)nv.size; i++) nv.write(i, (char)0);
     VLF("MSG: Telescope, Wipe NV waiting for commit");
     while (!nv.committed()) { nv.poll(false); delay(10); }
 
@@ -38,7 +38,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, char fwPatch,
   if (!validKey) {
     while (!nv.committed()) nv.poll();
     nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
-    while (!nv.committed()) { nv.poll(false); delay(10); }
+    while (!nv.committed()) { nv.poll(); delay(10); }
     nv.ignoreCache(true);
     uint32_t key = nv.readUL(NV_KEY);
     if (key != (uint32_t)INIT_NV_KEY) { DLF("ERR: Telescope, NV reset failed to read back key!"); } else { VLF("MSG: Telescope, NV reset complete"); }
@@ -73,7 +73,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     //            Returns: Nothing
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
       #ifdef HAL_RESET
-        HAL_RESET;
+        HAL_RESET();
       #endif
       *numericReply = false;
     } else
@@ -113,8 +113,8 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   //            Returns: HH:MM:SS#
   if (cmdP("GV")) {
     if (parameter[0] == 'D') strcpy(reply, firmware.date); else
-    if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%c", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
-    if (parameter[0] == 'N') sprintf(reply, "%i.%02i%c", firmware.version.major, firmware.version.minor, firmware.version.patch); else
+    if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%s", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
+    if (parameter[0] == 'N') sprintf(reply, "%i.%02i%s", firmware.version.major, firmware.version.minor, firmware.version.patch); else
     if (parameter[0] == 'P') strcpy(reply, firmware.name); else
     if (parameter[0] == 'T') strcpy(reply, firmware.time); else *commandError = CE_CMD_UNKNOWN;
     *numericReply = false;
@@ -160,7 +160,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   // :GXA0#     Get axis/driver revert all state
   //            Returns: Value
   if (cmdGX("GXA") && parameter[1] == '0') {
-    uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
     if (!(axesToRevert & 1)) *commandError = CE_0;
   } else
 
@@ -200,9 +200,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     //            Return: 0 failure, 1 success
     if (parameter[1] == 'C' && parameter[4] == 0) {
       if (parameter[3] == '0' || parameter[3] == '1') {
-        uint16_t axesToRevert = nv.readUI(NV_REVERT_AXIS_SETTINGS);
+        uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
         if (parameter[3] == '0') axesToRevert = 1; else axesToRevert = 0;
-        nv.update(NV_REVERT_AXIS_SETTINGS, axesToRevert);
+        nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
         return false; // pretend this command wasn't processed so other devices can respond
       } else *commandError = CE_PARAM_RANGE;
     }

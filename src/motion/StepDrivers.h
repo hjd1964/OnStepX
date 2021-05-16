@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------------
 // stepper driver control
 #pragma once
-#include <Arduino.h>
 
+#include <Arduino.h>
 #include "Pins.h"
 
 // the various microsteps for different driver models, with the bit modes for each

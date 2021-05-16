@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Null pin map, assigns OFF to all values not already assigned
+#pragma once
 
 #ifndef ONE_WIRE_PIN
   #define ONE_WIRE_PIN              OFF
@@ -37,13 +38,14 @@
   #define BUZZER_PIN                OFF
 #endif
 
-#ifndef PPS_SENSE_PIN
-  #define PPS_SENSE_PIN             OFF
+#ifndef SENSE_PPS_PIN
+  #define SENSE_PPS_PIN             OFF
 #endif
 
-#ifndef LIMIT_SENSE_PIN
-  #define LIMIT_SENSE_PIN           OFF
+#ifndef SENSE_LIMIT_PIN
+  #define SENSE_LIMIT_PIN           OFF
 #endif
+
 #ifndef ST4_RA_W_PIN
   #define ST4_RA_W_PIN              OFF
 #endif
@@ -87,14 +89,14 @@
 #ifndef AXIS1_FAULT_PIN
   #define AXIS1_FAULT_PIN           OFF
 #endif
-#ifndef AXIS1_HOME_SENSE_PIN
-  #define AXIS1_HOME_SENSE_PIN      OFF
+#ifndef AXIS1_SENSE_HOME_PIN
+  #define AXIS1_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS1_LIMIT_SENSE_MIN_PIN
-  #define AXIS1_LIMIT_SENSE_MIN_PIN LIMIT_SENSE_PIN
+#ifndef AXIS1_SENSE_LIMIT_MIN_PIN
+  #define AXIS1_SENSE_LIMIT_MIN_PIN SENSE_LIMIT_PIN
 #endif
-#ifndef AXIS1_LIMIT_SENSE_MAX_PIN
-  #define AXIS1_LIMIT_SENSE_MAX_PIN LIMIT_SENSE_PIN
+#ifndef AXIS1_SENSE_LIMIT_MAX_PIN
+  #define AXIS1_SENSE_LIMIT_MAX_PIN SENSE_LIMIT_PIN
 #endif
 
 #ifndef AXIS2_DRIVER_MODEL
@@ -127,14 +129,14 @@
 #ifndef AXIS2_FAULT_PIN
   #define AXIS2_FAULT_PIN           OFF
 #endif
-#ifndef AXIS2_HOME_SENSE_PIN
-  #define AXIS2_HOME_SENSE_PIN      OFF
+#ifndef AXIS2_SENSE_HOME_PIN
+  #define AXIS2_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS2_LIMIT_SENSE_MIN_PIN
-  #define AXIS2_LIMIT_SENSE_MIN_PIN LIMIT_SENSE_PIN
+#ifndef AXIS2_SENSE_LIMIT_MIN_PIN
+  #define AXIS2_SENSE_LIMIT_MIN_PIN SENSE_LIMIT_PIN
 #endif
-#ifndef AXIS2_LIMIT_SENSE_MAX_PIN
-  #define AXIS2_LIMIT_SENSE_MAX_PIN LIMIT_SENSE_PIN
+#ifndef AXIS2_SENSE_LIMIT_MAX_PIN
+  #define AXIS2_SENSE_LIMIT_MAX_PIN SENSE_LIMIT_PIN
 #endif
 
 #ifndef AXIS3_DRIVER_MODEL
@@ -167,14 +169,14 @@
 #ifndef AXIS3_FAULT_PIN
   #define AXIS3_FAULT_PIN           OFF
 #endif
-#ifndef AXIS3_HOME_SENSE_PIN
-  #define AXIS3_HOME_SENSE_PIN      OFF
+#ifndef AXIS3_SENSE_HOME_PIN
+  #define AXIS3_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS3_LIMIT_SENSE_MIN_PIN
-  #define AXIS3_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS3_SENSE_LIMIT_MIN_PIN
+  #define AXIS3_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS3_LIMIT_SENSE_MAX_PIN
-  #define AXIS3_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS3_SENSE_LIMIT_MAX_PIN
+  #define AXIS3_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS4_DRIVER_MODEL
@@ -207,14 +209,14 @@
 #ifndef AXIS4_FAULT_PIN
   #define AXIS4_FAULT_PIN           OFF
 #endif
-#ifndef AXIS4_HOME_SENSE_PIN
-  #define AXIS4_HOME_SENSE_PIN      OFF
+#ifndef AXIS4_SENSE_HOME_PIN
+  #define AXIS4_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS4_LIMIT_SENSE_MIN_PIN
-  #define AXIS4_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS4_SENSE_LIMIT_MIN_PIN
+  #define AXIS4_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS4_LIMIT_SENSE_MAX_PIN
-  #define AXIS4_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS4_SENSE_LIMIT_MAX_PIN
+  #define AXIS4_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS5_DRIVER_MODEL
@@ -247,14 +249,14 @@
 #ifndef AXIS5_FAULT_PIN
   #define AXIS5_FAULT_PIN           OFF
 #endif
-#ifndef AXIS5_HOME_SENSE_PIN
-  #define AXIS5_HOME_SENSE_PIN      OFF
+#ifndef AXIS5_SENSE_HOME_PIN
+  #define AXIS5_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS5_LIMIT_SENSE_MIN_PIN
-  #define AXIS5_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS5_SENSE_LIMIT_MIN_PIN
+  #define AXIS5_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS5_LIMIT_SENSE_MAX_PIN
-  #define AXIS5_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS5_SENSE_LIMIT_MAX_PIN
+  #define AXIS5_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS6_DRIVER_MODEL
@@ -287,14 +289,14 @@
 #ifndef AXIS6_FAULT_PIN
   #define AXIS6_FAULT_PIN           OFF
 #endif
-#ifndef AXIS6_HOME_SENSE_PIN
-  #define AXIS6_HOME_SENSE_PIN      OFF
+#ifndef AXIS6_SENSE_HOME_PIN
+  #define AXIS6_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS6_LIMIT_SENSE_MIN_PIN
-  #define AXIS6_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS6_SENSE_LIMIT_MIN_PIN
+  #define AXIS6_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS6_LIMIT_SENSE_MAX_PIN
-  #define AXIS6_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS6_SENSE_LIMIT_MAX_PIN
+  #define AXIS6_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS7_DRIVER_MODEL
@@ -327,14 +329,14 @@
 #ifndef AXIS7_FAULT_PIN
   #define AXIS7_FAULT_PIN           OFF
 #endif
-#ifndef AXIS7_HOME_SENSE_PIN
-  #define AXIS7_HOME_SENSE_PIN      OFF
+#ifndef AXIS7_SENSE_HOME_PIN
+  #define AXIS7_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS7_LIMIT_SENSE_MIN_PIN
-  #define AXIS7_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS7_SENSE_LIMIT_MIN_PIN
+  #define AXIS7_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS7_LIMIT_SENSE_MAX_PIN
-  #define AXIS7_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS7_SENSE_LIMIT_MAX_PIN
+  #define AXIS7_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS8_DRIVER_MODEL
@@ -367,14 +369,14 @@
 #ifndef AXIS8_FAULT_PIN
   #define AXIS8_FAULT_PIN           OFF
 #endif
-#ifndef AXIS8_HOME_SENSE_PIN
-  #define AXIS8_HOME_SENSE_PIN      OFF
+#ifndef AXIS8_SENSE_HOME_PIN
+  #define AXIS8_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS8_LIMIT_SENSE_MIN_PIN
-  #define AXIS8_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS8_SENSE_LIMIT_MIN_PIN
+  #define AXIS8_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS8_LIMIT_SENSE_MAX_PIN
-  #define AXIS8_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS8_SENSE_LIMIT_MAX_PIN
+  #define AXIS8_SENSE_LIMIT_MAX_PIN OFF
 #endif
 
 #ifndef AXIS9_DRIVER_MODEL
@@ -407,12 +409,12 @@
 #ifndef AXIS9_FAULT_PIN
   #define AXIS9_FAULT_PIN           OFF
 #endif
-#ifndef AXIS9_HOME_SENSE_PIN
-  #define AXIS9_HOME_SENSE_PIN      OFF
+#ifndef AXIS9_SENSE_HOME_PIN
+  #define AXIS9_SENSE_HOME_PIN      OFF
 #endif
-#ifndef AXIS9_LIMIT_SENSE_MIN_PIN
-  #define AXIS9_LIMIT_SENSE_MIN_PIN OFF
+#ifndef AXIS9_SENSE_LIMIT_MIN_PIN
+  #define AXIS9_SENSE_LIMIT_MIN_PIN OFF
 #endif
-#ifndef AXIS9_LIMIT_SENSE_MAX_PIN
-  #define AXIS9_LIMIT_SENSE_MAX_PIN OFF
+#ifndef AXIS9_SENSE_LIMIT_MAX_PIN
+  #define AXIS9_SENSE_LIMIT_MAX_PIN OFF
 #endif

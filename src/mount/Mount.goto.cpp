@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, sync and goto
+
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 

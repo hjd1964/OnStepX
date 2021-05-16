@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
+#
 #include "../OnStepX.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../coordinates/Convert.h"
 #include "../coordinates/Site.h"
 #include "Mount.h"
@@ -52,7 +52,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       //            Returns: n#
       case '7':
         Pec tempPec;
-        nv.readBytes(NV_PEC_BASE, &tempPec, PecSize);
+        nv.readBytes(NV_MOUNT_PEC_BASE, &tempPec, PecSize);
         sprintf(reply, "%ld", tempPec.wormRotationSteps);
         *numericReply = false;
       break;
@@ -80,7 +80,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       if (l >= 0 && l < 129600000) {
         Pec tempPec = pec;
         tempPec.worm.rotationSteps = l;
-        nv.updateBytes(NV_PEC_BASE, &tempPec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &tempPec, PecSize);
       } else *commandError = CE_PARAM_RANGE;
     } else
 
@@ -185,19 +185,19 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       //            Returns: nothing
       if (parameter[1] == '+') {
         if (pec.recorded) pec.state = PEC_READY_PLAY;
-        nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
       } else
       // :$QZ-      Disable RA PEC Compensation
       //            Returns: nothing
       if (parameter[1] == '-') {
         pec.state = PEC_NONE; 
-        nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
       } else
       // :$QZ/      Ready Record PEC
       //            Returns: nothing
       if (parameter[1] == '/' && trackingState == TS_SIDEREAL) {
         pec.state = PEC_READY_RECORD;
-        nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
       } else
       // :$QZZ      Clear the PEC data buffer
       //            Return: Nothing
@@ -205,13 +205,13 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
         for (int i = 0; i < pecBufferSize; i++) pecBuffer[i] = 128;
         pec.state = PEC_NONE;
         pec.recorded = false;
-        nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
       } else
       // :$QZ!      Write PEC data to NV
       //            Returns: nothing
       if (parameter[1] == '!') {
         pec.recorded = true;
-        nv.updateBytes(NV_PEC_BASE, &pec, PecSize);
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
         for (int i = 0; i < pecBufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, pecBuffer[i]);
       } else { *numericReply = true; *commandError = CE_CMD_UNKNOWN; }
     } else

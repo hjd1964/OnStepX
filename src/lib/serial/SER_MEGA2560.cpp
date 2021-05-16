@@ -1,10 +1,9 @@
 // -----------------------------------------------------------------------------------
 // Low overhead communication routines for Serial0, Serial1
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-
-#include "Arduino.h"
 #include "SER_MEGA2560.h"
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)

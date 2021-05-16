@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for legacy OnStep Classic (Mega2560 or Teensy3.x)
+#pragma once
 
 #if defined(__AVR_ATmega2560__)
 
@@ -22,7 +23,7 @@
 #define PEC_ANALG_PIN            1
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN          3
+#define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_VCC_PIN       8               // LED
@@ -34,7 +35,7 @@
 #define BUZZER_PIN               42              // Tone
 
 // The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
+#define SENSE_PPS_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
 
 // Obsolete pins that would power Big Easy Drivers (A4988) back in the old days
 #define POWER_SUPPLY_PINS_OFF
@@ -116,7 +117,7 @@
 #define PEC_ANALG_PIN            14
 
 // The limit switch sense is a 3.3V logic input which uses the internal pull up, shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN          3
+#define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_VCC_PIN       8               // LED
@@ -128,7 +129,7 @@
 #define BUZZER_PIN               29              // Tone
 
 // The PPS pin is a logic level input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN            23              // PPS time source, GPS for example
+#define SENSE_PPS_PIN            23              // PPS time source, GPS for example
 
 // Obsolete pins that would power stepper drivers in the old days
 #define POWER_SUPPLY_PINS_OFF

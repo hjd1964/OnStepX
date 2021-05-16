@@ -1,8 +1,6 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (for 24XX series I2C EEPROMS)
 
-#include "Arduino.h"
-#include "Wire.h"
 #include "NV_24XX.h"
 
 // universal value works for all known 24XX series, 10ms
@@ -13,7 +11,7 @@
 
 bool NonVolatileStorage24XX::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // setup size, cache, etc.
-  NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
+  NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
   this->wire = wire;
   eepromAddress = address;

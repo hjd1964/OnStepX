@@ -1,17 +1,17 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (default/built-in)
 
+#include "NV_EEPROM.h"
+
 #if !defined(ARDUINO_ARCH_SAMD)
 
-  #include "Arduino.h"
   #include "EEPROM.h"
-  #include "NV_EEPROM.h"
 
   #if defined(E2END)
 
     bool NonVolatileStorageEEPROM::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
       // setup size, cache, etc.
-      NonVolatileStorage::init(size, cacheEnable, wait, checkEnable);
+      NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
       return true;
     }
 
@@ -22,6 +22,7 @@
     void NonVolatileStorageEEPROM::writeToStorage(uint16_t i,  uint8_t j) {
       EEPROM.write(i, j);
     }
+
   #endif
 
 #endif

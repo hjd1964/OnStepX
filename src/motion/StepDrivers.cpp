@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // stepper driver control
-#include "../OnStepX.h"
 
+#include "../OnStepX.h"
 #include "StepDrivers.h"
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =

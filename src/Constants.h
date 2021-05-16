@@ -60,6 +60,7 @@
 // basic values
 #define OFF                         -1
 #define SAME                        -1
+#define HALF                        -1
 #define AUTO                        -1
 #define ON                          -2
 #define ON_BOTH                     -3
@@ -171,8 +172,10 @@
 //#define digitalReadEx(pin)            ( ?(pin != OFF && pin != SHARED):digitalRead(pin):0 )
 #define digitalReadEx(pin)            ( digitalRead(pin) )
 #ifdef HAL_HAS_DIGITAL_FAST
+  #define digitalReadF(pin)           ( digitalReadFast(pin) )
   #define digitalWriteF(pin,value)    { digitalWriteFast(pin,value); }
 #else
+  #define digitalReadF(pin)           ( digitalRead(pin) )
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
 #endif
 
@@ -215,17 +218,17 @@
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
 
 // NV addresses
-#define INIT_NV_KEY                 583927925UL
+#define INIT_NV_KEY                 583927926UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..3
-#define NV_LOCATION_NUMBER          4      // bytes: 1   , addr:   4..4
-#define NV_LOCATION_BASE            5      // bytes: 36*4, addr:   5..148
-#define NV_JD_BASE                  149    // bytes: 16  , addr: 149..164
-#define NV_LIMITS_BASE              165    // bytes: 16  , addr: 165..180
+#define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..4
+#define NV_SITE_BASE                5      // bytes: 36*4, addr:   5..148
+#define NV_SITE_JD_BASE             149    // bytes: 16  , addr: 149..164
+#define NV_MOUNT_LIMITS_BASE        165    // bytes: 16  , addr: 165..180
 #define NV_MOUNT_MISC_BASE          181    // bytes: 14  , addr: 181..194
-#define NV_PEC_BASE                 195    // bytes: 6   , addr: 195..200
-#define NV_PARK_BASE                201    // bytes: 15  , addr: 201..215
+#define NV_MOUNT_PEC_BASE           195    // bytes: 6   , addr: 195..200
+#define NV_MOUNT_PARK_BASE          201    // bytes: 15  , addr: 201..215
 #define NV_ALIGN_MODEL_BASE         216    // bytes: 32  , addr: 216..247
-#define NV_REVERT_AXIS_SETTINGS     248    // bytes: 2   , addr: 248..249
+#define NV_AXIS_SETTINGS_REVERT     248    // bytes: 2   , addr: 248..249
 #define NV_AXIS_SETTINGS_BASE       250    // bytes: 21*9, addr: 250..438
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500..500 + (PEC_BUFFER_SIZE_LIMIT - 1)

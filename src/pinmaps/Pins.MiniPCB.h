@@ -1,5 +1,6 @@
 // -------------------------------------------------------------------------------------------------
 // Pin map for OnStep MiniPCB (Teensy3.0, 3.1, 3.2, and 4.0)
+#pragma once
 
 #if defined(__MK20DX256__) || defined(_mk20dx128_h_) || defined(__MK20DX128__) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
@@ -39,9 +40,9 @@
 #define BUZZER_PIN              29               // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN           28               // PPS time source, GPS for example
+#define SENSE_PPS_PIN           28               // PPS time source, GPS for example
 
-#define LIMIT_SENSE_PIN         Aux3             // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
+#define SENSE_LIMIT_PIN         Aux3             // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN        14
@@ -53,7 +54,7 @@
 #define AXIS1_DIR_PIN           21
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
 #define AXIS1_FAULT_PIN         Aux1             // SPI MISO
-#define AXIS1_HOME_SENSE_PIN    Aux3
+#define AXIS1_SENSE_HOME_PIN    Aux3
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        9
@@ -69,7 +70,7 @@
 #define AXIS2_DIR_PIN           2
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
 #define AXIS2_FAULT_PIN         AXIS2_M3_PIN
-#define AXIS2_HOME_SENSE_PIN    Aux4
+#define AXIS2_SENSE_HOME_PIN    Aux4
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        OFF

@@ -1,6 +1,8 @@
 //--------------------------------------------------------------------------------------------------
 // coordinate transformation
 #pragma once
+
+#include <Arduino.h>
 #include "Convert.h"
 #include "Site.h"
 #include "Align.h"

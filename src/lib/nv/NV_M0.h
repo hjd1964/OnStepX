@@ -1,12 +1,10 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (default/built-in, flash emulation M0)
-
 #pragma once
 
-#include "Arduino.h"
-#if defined(ARDUINO_ARCH_SAMD)
+#include "NV.h"
 
-  #include "NV.h"
+#if defined(ARDUINO_ARCH_SAMD)
 
   class NonVolatileStorageM0 : public NonVolatileStorage {
     public:

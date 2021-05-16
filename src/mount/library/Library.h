@@ -1,11 +1,15 @@
 // -----------------------------------------------------------------------------------
 // telescope celestial object library
-
 #pragma once
 
-#include "Arduino.h"
+#include "../../OnStepX.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include "../../commands/ProcessCmds.h"
 #include "../../coordinates/Convert.h"
+
+#define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT
 
 #pragma pack(1)
 const int rec_size = 16;
@@ -25,24 +29,21 @@ typedef union {
 class Library
 {
   public:
-    Library();
-    ~Library();
-    
-    void init();
+    void init(bool validKey);
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // select catalog by number
-    bool setCatalog(int16_t num);
+    bool setCatalog(int num);
 
     // 16 byte record
     libRec_t list;
     
     // write record at the next available positon from data
     // RA and Dec are in degrees
-    void writeVars(char* name, int16_t code, double RA, double Dec);
+    void writeVars(char* name, int code, double RA, double Dec);
     // read record at the current position
-    void readVars(char* name, int16_t* code, double* RA, double* Dec);
+    void readVars(char* name, int* code, double* RA, double* Dec);
 
     // move to catalogs first rec
     bool firstRec();
@@ -93,3 +94,5 @@ class Library
 
     Convert convert;
 };
+
+#endif

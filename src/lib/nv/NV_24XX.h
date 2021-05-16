@@ -1,10 +1,7 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (for 24XX series I2C EEPROMS)
-
 #pragma once
 
-#include "Arduino.h"
-#include "Wire.h"
 #include "NV.h"
 
 class NonVolatileStorage24XX : public NonVolatileStorage {
