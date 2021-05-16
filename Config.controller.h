@@ -29,5 +29,9 @@
 
 #define TELESCOPE_TEMPERATURE         OFF //    OFF, DS1820, n. Where n is the DS1820 s/n for focuser temperature.            Adjust
 
+// MOTION ---------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOTION
+#define STEP_WAVE_FORM              PULSE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
+                                          //         Applies to all axes.
+
 // ---------------------------------------------------------------------------------------------------------------------------------
 #define FileVersionConfig 5
