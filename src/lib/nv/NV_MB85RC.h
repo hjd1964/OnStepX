@@ -1,7 +1,9 @@
 // -----------------------------------------------------------------------------------
 // non-volatile storage (caching, for 85RC series I2C FRAMS)
+
 #pragma once
 
+#include <Arduino.h>
 #include "NV.h"
 
 class NonVolatileStorageMB85RC : public NonVolatileStorage {

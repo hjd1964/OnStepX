@@ -5,8 +5,6 @@
 
 #if defined(ARDUINO_ARCH_SAMD)
 
-  #include "FlashAsEEPROM.h" // https://github.com/cmaglie/FlashStorage
-
   bool NonVolatileStorageM0::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
     if (size != 1024 || wait == false) return false;
 
@@ -21,6 +19,8 @@
       EEPROM.commit();
       dirty = false;
     }
+    // stop compiler warnings
+    (void)(disableInterrupts);
   }
 
   bool NonVolatileStorageM0::committed() {
@@ -35,5 +35,4 @@
     EEPROM.write(i, j);
     dirty = true;
   }
-
 #endif

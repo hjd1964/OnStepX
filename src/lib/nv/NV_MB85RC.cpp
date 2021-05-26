@@ -10,8 +10,6 @@
 #define FRAM_WRITE_WAIT 3
 
 bool NonVolatileStorageMB85RC::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
-  (void)(address);
-
   // setup size, cache, etc.
   NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
@@ -55,3 +53,4 @@ void NonVolatileStorageMB85RC::writeToStorage(uint16_t i,  uint8_t j) {
   wire->endTransmission();
   nextOpMs = millis() + FRAM_WRITE_WAIT;
 }
+

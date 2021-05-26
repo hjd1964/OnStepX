@@ -6,13 +6,14 @@
 bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // set nv size
   this->size = size;
-
   // set cache size, defaults to 0 otherwise
   if (cacheEnable) cacheSize = size; else cacheSize = 0;
   waitMs = wait;
   if (waitMs == 0) delayedCommitEnabled = false; else delayedCommitEnabled = true;
+
   cacheStateSize = cacheSize/8 + 1;
   if (cacheSize == 0) return true;
+
   cache = new uint8_t[cacheSize];
   cacheStateRead  = new uint8_t[cacheStateSize];
   cacheStateWrite = new uint8_t[cacheStateSize];
@@ -22,6 +23,7 @@ bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bo
   // mark entire write cache as clean
   for (uint16_t i = 0; i < cacheStateSize; i++) cacheStateWrite[i] = 0;
 
+  // stop compiler warnings
   (void)(checkEnable);
   (void)(wire);
   (void)(address);
@@ -34,8 +36,6 @@ void NonVolatileStorage::readOnly(bool state) {
 }
 
 void NonVolatileStorage::poll(bool disableInterrupts) {
-  (void)(disableInterrupts);
-
   if (cacheSize == 0 || cacheClean) return;
 
   int8_t dirtyW = 0, dirtyR = 0;
@@ -66,12 +66,15 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
       bitWrite(cacheStateRead[cacheIndex/8], cacheIndex%8, 0);
     }
   }
+
+  // stop compiler warnings
+  (void)(disableInterrupts);
 }
 
 bool NonVolatileStorage::committed() {
   uint8_t dirty = 0;
 
-  for (uint16_t j = 0; j < cacheSize; j++) {
+  for (int16_t j = 0; j < cacheSize; j++) {
     dirty = bitRead(cacheStateWrite[j/8], j%8);
     if (dirty) break;
   }
@@ -153,8 +156,11 @@ void NonVolatileStorage::updateBytes(uint16_t i, void *j, int16_t count) {
   }
 }
 
-bool NonVolatileStorage::busy() { return false; }
+bool NonVolatileStorage::busy() {
+  return false;
+}
 
-uint8_t NonVolatileStorage::readFromStorage(uint16_t i) { (void)(i); return 0; }
-
-void NonVolatileStorage::writeToStorage(uint16_t i, uint8_t j) { (void)(i); (void)(j); }
+int compare (const void * a, const void * b)
+{
+  return ( *(int*)a - *(int*)b );
+}

@@ -28,7 +28,6 @@ bool NonVolatileStorage24XX::busy() {
 
 uint8_t NonVolatileStorage24XX::readFromStorage(uint16_t i) {
   while (busy()) {}
-
   wire->beginTransmission(eepromAddress);
   wire->write(MSB(i));
   wire->write(LSB(i));
@@ -43,7 +42,6 @@ uint8_t NonVolatileStorage24XX::readFromStorage(uint16_t i) {
 
 void NonVolatileStorage24XX::writeToStorage(uint16_t i,  uint8_t j) {
   while (busy()) {}
-
   wire->beginTransmission(eepromAddress);
   wire->write(MSB(i));
   wire->write(LSB(i));

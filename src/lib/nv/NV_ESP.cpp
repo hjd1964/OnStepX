@@ -5,7 +5,6 @@
 
 #if defined(ESP8266) || defined(ESP32)
 
-  #include "EEPROM.h"
   #include "../../tasks/OnTask.h"
 
   bool NonVolatileStorageESP::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
@@ -29,6 +28,10 @@
       #endif
       dirty = false;
     }
+    #if !defined(ESP32)
+      // stop compiler warnings
+      (void)(disableInterrupts);
+    #endif
   }
 
   bool NonVolatileStorageESP::committed() {
