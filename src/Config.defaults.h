@@ -9,10 +9,10 @@
 
 // serial ports
 #ifndef SERIAL_A_BAUD_DEFAULT
-#define SERIAL_A_BAUD_DEFAULT        9600
+#define SERIAL_A_BAUD_DEFAULT         9600
 #endif
 #ifndef SERIAL_B_BAUD_DEFAULT
-#define SERIAL_B_BAUD_DEFAULT        9600
+#define SERIAL_B_BAUD_DEFAULT         9600
 #endif
 #ifndef SERIAL_B_ESP_FLASHING
 #define SERIAL_B_ESP_FLASHING         OFF
@@ -31,7 +31,7 @@
 
 // step signal
 #ifndef STEP_WAVE_FORM
-#define STEP_WAVE_FORM              PULSE
+#define STEP_WAVE_FORM                PULSE
 #endif
 
 // debug
@@ -42,10 +42,10 @@
 #define DEBUG_ECHO_COMMANDS           OFF
 #endif
 #ifndef SERIAL_DEBUG
-#define SERIAL_DEBUG               Serial
+#define SERIAL_DEBUG                  Serial
 #endif
 #ifndef SERIAL_DEBUG_BAUD
-#define SERIAL_DEBUG_BAUD            9600
+#define SERIAL_DEBUG_BAUD             9600
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -53,13 +53,13 @@
 
 // axes
 #ifndef AXIS1_STEPS_PER_DEGREE
-#define AXIS1_STEPS_PER_DEGREE    12800.0
+#define AXIS1_STEPS_PER_DEGREE        12800.0
 #endif
 #ifndef AXIS2_TANGENT_ARM
 #define AXIS2_TANGENT_ARM             OFF
 #endif
 #ifndef AXIS2_STEPS_PER_DEGREE
-#define AXIS2_STEPS_PER_DEGREE    12800.0
+#define AXIS2_STEPS_PER_DEGREE        12800.0
 #endif
 
 // mount type
@@ -69,7 +69,7 @@
 
 // user feedback
 #ifndef LED_STATUS
-#define LED_STATUS                     ON
+#define LED_STATUS                    ON
 #endif
 #ifndef LED_STATUS2
 #define LED_STATUS2                   OFF
@@ -96,6 +96,9 @@
 #ifndef LIMIT_SENSE
 #define LIMIT_SENSE                   OFF
 #endif
+#ifndef LIMIT_SENSE_INIT
+#define LIMIT_SENSE_INIT              INPUT_PULLUP
+#endif
 
 // st4
 #ifndef ST4_INTERFACE
@@ -116,12 +119,12 @@
 #define PEC_SENSE_ANALOG              OFF
 #endif
 #ifndef PEC_STEPS_PER_WORM_ROTATION
-#define PEC_STEPS_PER_WORM_ROTATION     0
+#define PEC_STEPS_PER_WORM_ROTATION   0
 #endif
 
 // guiding
 #ifndef GUIDE_TIME_LIMIT
-#define GUIDE_TIME_LIMIT                0
+#define GUIDE_TIME_LIMIT              0
 #endif
 #ifndef GUIDE_DISABLE_BACKLASH
 #define GUIDE_DISABLE_BACKLASH        OFF
@@ -135,7 +138,7 @@
 #define TRACK_REFRACTION_RATE_DEFAULT OFF
 #endif
 #ifndef TRACK_BACKLASH_RATE
-#define TRACK_BACKLASH_RATE            25
+#define TRACK_BACKLASH_RATE           25
 #endif
 
 // slewing
@@ -166,7 +169,7 @@
 #define PIER_SIDE_SYNC_CHANGE_SIDES   OFF
 #endif
 #ifndef PIER_SIDE_PREFERRED_DEFAULT
-#define PIER_SIDE_PREFERRED_DEFAULT  BEST
+#define PIER_SIDE_PREFERRED_DEFAULT   BEST
 #endif
 
 // parking
@@ -176,17 +179,17 @@
 
 // mount coordinates
 #ifndef MOUNT_COORDS
-#define MOUNT_COORDS          TOPOCENTRIC
+#define MOUNT_COORDS                  TOPOCENTRIC
 #endif
 
 // mount guiding
 #ifndef SEPARATE_PULSE_GUIDE_RATE
-#define SEPARATE_PULSE_GUIDE_RATE      ON
+#define SEPARATE_PULSE_GUIDE_RATE     ON
 #endif
 
 // mount align
 #ifndef ALIGN_MAX_STARS
-#define ALIGN_MAX_STARS              AUTO
+#define ALIGN_MAX_STARS               AUTO
 #endif
 
 // mount pec
@@ -196,7 +199,7 @@
 
 // non-volatile storage
 #ifndef NV_DEFAULT
-#define NV_DEFAULT                     ON
+#define NV_DEFAULT                    ON
 #endif
 
 // ESP32 virtual serial bluetooth command channel
@@ -204,13 +207,13 @@
 #define SERIAL_BT_MODE                OFF
 #endif
 #ifndef SERIAL_BT_NAME
-#define SERIAL_BT_NAME           "OnStep"
+#define SERIAL_BT_NAME                "OnStep"
 #endif
 
 // -----------------------------------------------------------------------------------
 // rotator settings, ROTATOR
 #ifndef AXIS3_STEPS_PER_DEGREE
-#define AXIS3_STEPS_PER_DEGREE       64.0
+#define AXIS3_STEPS_PER_DEGREE        64.0
 #endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
 #define AXIS3_SLEW_RATE_DESIRED       1.0
@@ -225,7 +228,7 @@
 #define AXIS4_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
-#define AXIS4_SLEW_RATE_MINIMUM        50
+#define AXIS4_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS4_SLEW_RATE_DESIRED
 #define AXIS4_SLEW_RATE_DESIRED       500
@@ -239,7 +242,7 @@
 #define AXIS5_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM        50
+#define AXIS5_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS5_SLEW_RATE_DESIRED
 #define AXIS5_SLEW_RATE_DESIRED       500
@@ -253,7 +256,7 @@
 #define AXIS6_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM        50
+#define AXIS6_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS6_SLEW_RATE_DESIRED
 #define AXIS6_SLEW_RATE_DESIRED       500
@@ -267,7 +270,7 @@
 #define AXIS7_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM        50
+#define AXIS7_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS7_SLEW_RATE_DESIRED
 #define AXIS7_SLEW_RATE_DESIRED       500
@@ -281,7 +284,7 @@
 #define AXIS8_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM        50
+#define AXIS8_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS8_SLEW_RATE_DESIRED
 #define AXIS8_SLEW_RATE_DESIRED       500
@@ -295,7 +298,7 @@
 #define AXIS9_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM        50
+#define AXIS9_SLEW_RATE_MINIMUM       50
 #endif
 #ifndef AXIS9_SLEW_RATE_DESIRED
 #define AXIS9_SLEW_RATE_DESIRED       500
@@ -319,13 +322,13 @@
 #define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS1_DRIVER_IHOLD
-#define AXIS1_DRIVER_IHOLD           HALF
+#define AXIS1_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS1_DRIVER_IRUN
 #define AXIS1_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS1_DRIVER_IGOTO
-#define AXIS1_DRIVER_IGOTO           SAME
+#define AXIS1_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS1_DRIVER_POWER_DOWN
 #define AXIS1_DRIVER_POWER_DOWN       OFF
@@ -337,7 +340,7 @@
 #define AXIS1_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS1_LIMIT_MIN
-#define AXIS1_LIMIT_MIN              -180
+#define AXIS1_LIMIT_MIN               -180
 #endif
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180
@@ -345,11 +348,17 @@
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF
 #endif
+#ifndef AXIS1_SENSE_HOME_INIT
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
 #ifndef AXIS1_SENSE_LIMIT_MIN
-#define AXIS1_SENSE_LIMIT_MIN         OFF
+#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MAX
-#define AXIS1_SENSE_LIMIT_MAX         OFF
+#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE
+#endif
+#ifndef AXIS1_SENSE_LIMIT_INIT
+#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
 #endif
 
 // common axis settings, DEC/ALT
@@ -369,13 +378,13 @@
 #define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS2_DRIVER_IHOLD
-#define AXIS2_DRIVER_IHOLD           HALF
+#define AXIS2_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS2_DRIVER_IRUN
 #define AXIS2_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS2_DRIVER_IGOTO
-#define AXIS2_DRIVER_IGOTO           SAME
+#define AXIS2_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS2_DRIVER_POWER_DOWN
 #define AXIS2_DRIVER_POWER_DOWN       OFF
@@ -390,16 +399,22 @@
 #define AXIS2_LIMIT_MIN               -90
 #endif
 #ifndef AXIS2_LIMIT_MAX
-#define AXIS2_LIMIT_MAX                90
+#define AXIS2_LIMIT_MAX               90
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF
 #endif
+#ifndef AXIS2_SENSE_HOME_INIT
+#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
 #ifndef AXIS2_SENSE_LIMIT_MIN
-#define AXIS2_SENSE_LIMIT_MIN         OFF
+#define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MAX
-#define AXIS2_SENSE_LIMIT_MAX         OFF
+#define AXIS2_SENSE_LIMIT_MAX         LIMIT_SENSE
+#endif
+#ifndef AXIS2_SENSE_LIMIT_INIT
+#define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
 #endif
 
 // common axis settings, ROTATOR
@@ -419,13 +434,13 @@
 #define AXIS3_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS3_DRIVER_IHOLD
-#define AXIS3_DRIVER_IHOLD           HALF
+#define AXIS3_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS3_DRIVER_IRUN
 #define AXIS3_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS3_DRIVER_IGOTO
-#define AXIS3_DRIVER_IGOTO           SAME
+#define AXIS3_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS3_DRIVER_POWER_DOWN
 #define AXIS3_DRIVER_POWER_DOWN       OFF
@@ -437,7 +452,7 @@
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS3_LIMIT_MIN
-#define AXIS3_LIMIT_MIN              -180
+#define AXIS3_LIMIT_MIN               -180
 #endif
 #ifndef AXIS3_LIMIT_MAX
 #define AXIS3_LIMIT_MAX               180
@@ -445,11 +460,17 @@
 #ifndef AXIS3_SENSE_HOME
 #define AXIS3_SENSE_HOME              OFF
 #endif
+#ifndef AXIS3_SENSE_HOME_INIT
+#define AXIS3_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
 #ifndef AXIS3_SENSE_LIMIT_MIN
 #define AXIS3_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS3_SENSE_LIMIT_MAX
 #define AXIS3_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS3_SENSE_LIMIT_INIT
+#define AXIS3_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER1
@@ -469,13 +490,13 @@
 #define AXIS4_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS4_DRIVER_IHOLD
-#define AXIS4_DRIVER_IHOLD           HALF
+#define AXIS4_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS4_DRIVER_IRUN
 #define AXIS4_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS4_DRIVER_IGOTO
-#define AXIS4_DRIVER_IGOTO           SAME
+#define AXIS4_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS4_DRIVER_POWER_DOWN
 #define AXIS4_DRIVER_POWER_DOWN       OFF
@@ -487,19 +508,25 @@
 #define AXIS4_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS4_LIMIT_MIN
-#define AXIS4_LIMIT_MIN                 0
+#define AXIS4_LIMIT_MIN               0
 #endif
 #ifndef AXIS4_LIMIT_MAX
-#define AXIS4_LIMIT_MAX                50
+#define AXIS4_LIMIT_MAX               50
 #endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
+#endif
+#ifndef AXIS4_SENSE_HOME_INIT
+#define AXIS4_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS4_SENSE_LIMIT_MIN
 #define AXIS4_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS4_SENSE_LIMIT_MAX
 #define AXIS4_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS4_SENSE_LIMIT_INIT
+#define AXIS4_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER2
@@ -519,13 +546,13 @@
 #define AXIS5_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS5_DRIVER_IHOLD
-#define AXIS5_DRIVER_IHOLD           HALF
+#define AXIS5_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS5_DRIVER_IRUN
 #define AXIS5_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS5_DRIVER_IGOTO
-#define AXIS5_DRIVER_IGOTO           SAME
+#define AXIS5_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS5_DRIVER_POWER_DOWN
 #define AXIS5_DRIVER_POWER_DOWN       OFF
@@ -537,19 +564,25 @@
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS5_LIMIT_MIN
-#define AXIS5_LIMIT_MIN                 0
+#define AXIS5_LIMIT_MIN               0
 #endif
 #ifndef AXIS5_LIMIT_MAX
-#define AXIS5_LIMIT_MAX                50
+#define AXIS5_LIMIT_MAX               50
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
+#endif
+#ifndef AXIS5_SENSE_HOME_INIT
+#define AXIS5_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS5_SENSE_LIMIT_MIN
 #define AXIS5_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS5_SENSE_LIMIT_MAX
 #define AXIS5_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS5_SENSE_LIMIT_INIT
+#define AXIS5_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER3
@@ -569,13 +602,13 @@
 #define AXIS6_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS6_DRIVER_IHOLD
-#define AXIS6_DRIVER_IHOLD           HALF
+#define AXIS6_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS6_DRIVER_IRUN
 #define AXIS6_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS6_DRIVER_IGOTO
-#define AXIS6_DRIVER_IGOTO           SAME
+#define AXIS6_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS6_DRIVER_POWER_DOWN
 #define AXIS6_DRIVER_POWER_DOWN       OFF
@@ -587,19 +620,25 @@
 #define AXIS6_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS6_LIMIT_MIN
-#define AXIS6_LIMIT_MIN                 0
+#define AXIS6_LIMIT_MIN               0
 #endif
 #ifndef AXIS6_LIMIT_MAX
-#define AXIS6_LIMIT_MAX                50
+#define AXIS6_LIMIT_MAX               50
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
+#endif
+#ifndef AXIS6_SENSE_HOME_INIT
+#define AXIS6_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS6_SENSE_LIMIT_MIN
 #define AXIS6_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS6_SENSE_LIMIT_MAX
 #define AXIS6_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS6_SENSE_LIMIT_INIT
+#define AXIS6_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER4
@@ -619,13 +658,13 @@
 #define AXIS7_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS7_DRIVER_IHOLD
-#define AXIS7_DRIVER_IHOLD           HALF
+#define AXIS7_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS7_DRIVER_IRUN
 #define AXIS7_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS7_DRIVER_IGOTO
-#define AXIS7_DRIVER_IGOTO           SAME
+#define AXIS7_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS7_DRIVER_POWER_DOWN
 #define AXIS7_DRIVER_POWER_DOWN       OFF
@@ -637,19 +676,25 @@
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS7_LIMIT_MIN
-#define AXIS7_LIMIT_MIN                 0
+#define AXIS7_LIMIT_MIN               0
 #endif
 #ifndef AXIS7_LIMIT_MAX
-#define AXIS7_LIMIT_MAX                50
+#define AXIS7_LIMIT_MAX               50
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
+#endif
+#ifndef AXIS7_SENSE_HOME_INIT
+#define AXIS7_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS7_SENSE_LIMIT_MIN
 #define AXIS7_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS7_SENSE_LIMIT_MAX
 #define AXIS7_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS7_SENSE_LIMIT_INIT
+#define AXIS7_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER5
@@ -669,13 +714,13 @@
 #define AXIS8_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS8_DRIVER_IHOLD
-#define AXIS8_DRIVER_IHOLD           HALF
+#define AXIS8_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS8_DRIVER_IRUN
 #define AXIS8_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS8_DRIVER_IGOTO
-#define AXIS8_DRIVER_IGOTO           SAME
+#define AXIS8_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS8_DRIVER_POWER_DOWN
 #define AXIS8_DRIVER_POWER_DOWN       OFF
@@ -687,19 +732,25 @@
 #define AXIS8_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS8_LIMIT_MIN
-#define AXIS8_LIMIT_MIN                 0
+#define AXIS8_LIMIT_MIN               0
 #endif
 #ifndef AXIS8_LIMIT_MAX
-#define AXIS8_LIMIT_MAX                50
+#define AXIS8_LIMIT_MAX               50
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
+#endif
+#ifndef AXIS8_SENSE_HOME_INIT
+#define AXIS8_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS8_SENSE_LIMIT_MIN
 #define AXIS8_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS8_SENSE_LIMIT_MAX
 #define AXIS8_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS8_SENSE_LIMIT_INIT
+#define AXIS8_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // common axis settings, FOCUSER6
@@ -719,13 +770,13 @@
 #define AXIS9_DRIVER_MICROSTEPS_GOTO  OFF
 #endif
 #ifndef AXIS9_DRIVER_IHOLD
-#define AXIS9_DRIVER_IHOLD           HALF
+#define AXIS9_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS9_DRIVER_IRUN
 #define AXIS9_DRIVER_IRUN             OFF
 #endif
 #ifndef AXIS9_DRIVER_IGOTO
-#define AXIS9_DRIVER_IGOTO           SAME
+#define AXIS9_DRIVER_IGOTO            SAME
 #endif
 #ifndef AXIS9_DRIVER_POWER_DOWN
 #define AXIS9_DRIVER_POWER_DOWN       OFF
@@ -737,19 +788,25 @@
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS9_LIMIT_MIN
-#define AXIS9_LIMIT_MIN                 0
+#define AXIS9_LIMIT_MIN               0
 #endif
 #ifndef AXIS9_LIMIT_MAX
-#define AXIS9_LIMIT_MAX                50
+#define AXIS9_LIMIT_MAX               50
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
+#endif
+#ifndef AXIS9_SENSE_HOME_INIT
+#define AXIS9_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
 #ifndef AXIS9_SENSE_LIMIT_MIN
 #define AXIS9_SENSE_LIMIT_MIN         OFF
 #endif
 #ifndef AXIS9_SENSE_LIMIT_MAX
 #define AXIS9_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS9_SENSE_LIMIT_INIT
+#define AXIS9_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -759,7 +816,7 @@
 #define FEATURE1_PURPOSE              OFF
 #endif
 #ifndef FEATURE1_NAME
-#define FEATURE1_NAME          "FEATURE1"
+#define FEATURE1_NAME                "FEATURE1"
 #endif
 #ifndef FEATURE1_TEMP
 #define FEATURE1_TEMP                 OFF
@@ -775,7 +832,7 @@
 #define FEATURE2_PURPOSE              OFF
 #endif
 #ifndef FEATURE2_NAME
-#define FEATURE2_NAME          "FEATURE2"
+#define FEATURE2_NAME                "FEATURE2"
 #endif
 #ifndef FEATURE2_TEMP
 #define FEATURE2_TEMP                 OFF
@@ -791,7 +848,7 @@
 #define FEATURE3_PURPOSE              OFF
 #endif
 #ifndef FEATURE3_NAME
-#define FEATURE3_NAME          "FEATURE3"
+#define FEATURE3_NAME                "FEATURE3"
 #endif
 #ifndef FEATURE3_TEMP
 #define FEATURE3_TEMP                 OFF
@@ -807,7 +864,7 @@
 #define FEATURE4_PURPOSE              OFF
 #endif
 #ifndef FEATURE4_NAME
-#define FEATURE4_NAME          "FEATURE4"
+#define FEATURE4_NAME                "FEATURE4"
 #endif
 #ifndef FEATURE4_TEMP
 #define FEATURE4_TEMP                 OFF
@@ -823,7 +880,7 @@
 #define FEATURE5_PURPOSE              OFF
 #endif
 #ifndef FEATURE5_NAME
-#define FEATURE5_NAME          "FEATURE5"
+#define FEATURE5_NAME                "FEATURE5"
 #endif
 #ifndef FEATURE5_TEMP
 #define FEATURE5_TEMP                 OFF
@@ -839,7 +896,7 @@
 #define FEATURE6_PURPOSE              OFF
 #endif
 #ifndef FEATURE6_NAME
-#define FEATURE6_NAME          "FEATURE6"
+#define FEATURE6_NAME                "FEATURE6"
 #endif
 #ifndef FEATURE6_TEMP
 #define FEATURE6_TEMP                 OFF
@@ -855,7 +912,7 @@
 #define FEATURE7_PURPOSE              OFF
 #endif
 #ifndef FEATURE7_NAME
-#define FEATURE7_NAME          "FEATURE7"
+#define FEATURE7_NAME                "FEATURE7"
 #endif
 #ifndef FEATURE7_TEMP
 #define FEATURE7_TEMP                 OFF
@@ -871,7 +928,7 @@
 #define FEATURE8_PURPOSE              OFF
 #endif
 #ifndef FEATURE8_NAME
-#define FEATURE8_NAME          "FEATURE8"
+#define FEATURE8_NAME                "FEATURE8"
 #endif
 #ifndef FEATURE8_TEMP
 #define FEATURE8_TEMP                 OFF

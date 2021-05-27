@@ -15,9 +15,12 @@
   #define SENSE_MAX 16
 #endif
 
+// largest possible trigger value == 2^21
+#define SENSE_MAX_TRIGGER 2097152
+
 class Sense {
   public:
-    Sense(int8_t pin, int8_t inputMode, bool isAnalog, int threshold, int hysteresis);
+    Sense(int8_t pin, int8_t initState, int32_t trigger);
     int read();
     void poll();
 
@@ -25,11 +28,10 @@ class Sense {
     void reset();
 
     int8_t pin;
-    int8_t inputMode = OFF;
+    int8_t activeState = OFF;
     bool isAnalog;
     int threshold;
     int hysteresis;
-    bool invert;
     int8_t triggerMode;
     int lastValue = LOW;
     int lastResult = LOW;
@@ -39,23 +41,19 @@ class Sense {
 
 class Senses {
   public:
-    // add process sense input
-    // \param pin         MCU pin#
-    // \param inputMode   pin mode (OFF, ON, HIGH, LOW) for OFF, INPUT_PULLUP, INPUT_PULLDOWN
-    // \param isAnalog    specifices if pin is analog (true or false) where false is digital
-    // \param threshold   value (0 to 1023) where result switches from LOW to HIGH
-    // \param hysteresis  range +/- (0 to 1023) where result is ignored (uses last valid reading)
-    //                    for digital input stable period in ms
-    // \param callback    function to call on the triggerMode event
-    // \param triggerMode pin state change event RISING, FALLING, CHANGE
-    // \returns           handle to this sense if successful, 0 otherwise
-    uint8_t add(int8_t pin, int8_t inputMode, bool isAnalog, int threshold, int hysteresis);
+    // add sense input
+    // \param pin        MCU pin to watch
+    // \param initState  initialization state: INPUT, INPUT_PULLUP, or INPUT_PULLDOWN
+    // \param trigger    triggered state: HIGH or LOW, optional
+    //                   analog threshold/hysteresis |THLD(t) |HIST(h) are 10 bit values
+    // \returns          handle to this sense if successful, 0 otherwise
+    uint8_t add(int8_t pin, int8_t initState, int32_t trigger);
 
     // call repeatedly to check inputs for changes
     void poll();
 
-    // read the sense's associated input and process state as configured
-    // \param handle      sense handle to read current input state from
+    // read the senses associated input pin and return state as configured
+    // \param handle      sense handle
     int read(uint8_t handle);
 
   private:

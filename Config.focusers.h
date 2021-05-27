@@ -16,6 +16,10 @@
 // A4988, DRV8825, LV8729, SSS TMC2100, TMC2130*
 // * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
 
+// Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
+// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
+// enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
+
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
 #define AXIS4_DRIVER_MODEL            OFF //    OFF, (See above.) Stepper driver model.                                       Option
 
@@ -30,9 +34,9 @@
 #define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
 #define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
 
-#define AXIS4_SENSE_HOME              OFF //    OFF, ON for HIGH inside of home position. Or use LOW.                         Option
-#define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, ON for HIGH limit sense switch state stops movement. Or use LOW.         Option
-#define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, ON for HIGH limit sense switch state stops movement. Or use LOW.         Option
+#define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_SLEW_RATE_MINIMUM        50 //     50, n. Where n=1..1000 (um/s.) Minimum microns/second. In DC mode, min pwr.  Adjust

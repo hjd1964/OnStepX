@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // coordinate transformation
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "../telescope/Telescope.h"
 #include "Transform.h"
 

@@ -20,8 +20,8 @@
  *
 */
 
-// this line allows configuration of OnTask from OnStepX, if this library is used outside of OnStepX remove it
-#include "../OnStepX.h"
+// this line allows configuration of OnTask from the a given project, if this library is used stand-alone remove it
+#include "../Common.h"
 
 // To enable the option to use a given hardware timer (1..4), if available, uncomment that line:
 //#define TASKS_HWTIMER1_ENABLE

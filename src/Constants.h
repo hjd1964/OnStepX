@@ -179,6 +179,12 @@
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
 #endif
 
+#define THLD(v)                       (v<<1)  // 10 bit analog threshold, bits 1 through 10
+#define HIST(v)                       (v<<11) // 10 bit hysteresis, bits 11 through 20
+#ifndef INPUT_PULLDOWN
+  #define INPUT_PULLDOWN INPUT
+#endif
+
 // commands
 // command of 2 chars
 #define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)

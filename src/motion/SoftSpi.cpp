@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Simple software SPI routines (CPOL=1, CPHA=1) just for TMC stepper drivers
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "SoftSpi.h"
 
 bool SoftSpi::init(DriverPins pins) {

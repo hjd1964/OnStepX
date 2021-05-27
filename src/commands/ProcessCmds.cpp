@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Command processing
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../coordinates/Convert.h"

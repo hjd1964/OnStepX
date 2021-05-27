@@ -47,7 +47,7 @@
 #define FirmwareVersionPatch        "l"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 
-#include "src/OnStepX.h"
+#include "src/Common.h"
 NVS nv;
 #include "src/lib/sense/Sense.h"
 #include "src/tasks/OnTask.h"

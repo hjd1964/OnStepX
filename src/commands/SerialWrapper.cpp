@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // SerialWrapper a single class to allow uniform access to other serial port classes
 
-#include "../OnStepX.h"
+#include "../Common.h"
 
 #ifdef ESP32
   #include "../lib/serial/IP_ESP32.h"

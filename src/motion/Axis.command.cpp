@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
 
-#include "../OnStepX.h"
+#include "../Common.h"
 
 #include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"

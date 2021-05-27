@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // OnStepX telescope control
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 #include "Telescope.h"

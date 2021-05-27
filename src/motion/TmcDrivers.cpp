@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // tmc stepper driver configuration control
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "StepDrivers.h"
 #include "TmcDrivers.h"
 

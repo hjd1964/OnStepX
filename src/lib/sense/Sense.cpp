@@ -4,32 +4,28 @@
 // digital mode reads have basic hf EMI/RFI noise filtering
 
 #include "Sense.h"
+#include "../../Common.h"
 
-Sense::Sense(int8_t pin, int8_t inputMode, bool isAnalog, int threshold, int hysteresis) {
-  if (inputMode == OUTPUT) { this->inputMode = OFF; return; }
-  this->inputMode = inputMode;
-  this->isAnalog = isAnalog;
+Sense::Sense(int8_t pin, int8_t initState, int32_t trigger) {
   this->pin = pin;
-  this->threshold = threshold;
-  this->hysteresis = hysteresis;
-  this->triggerMode = triggerMode;
+
+  activeState = (trigger & 0b0000000000000000000001);
+  threshold   = (trigger & 0b0000000000011111111110) >> 1;
+  hysteresis  = (trigger & 0b0111111111100000000000) >> 11;
+  isAnalog    = threshold != 0;
+
   if (isAnalog) {
-  	if (threshold + hysteresis > 1023) { threshold = (int)(1023*0.95); hysteresis = 0; }
-	  if (threshold - hysteresis < 0) { threshold = (int)(1023*0.05); hysteresis = 0; }
+  	if (threshold + hysteresis > 1023) {
+      hysteresis = 0;
+      VF("WRN: Sense::Sense(); Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range, hysteresis set to 0.");
+    }
+	  if (threshold - hysteresis < 0) {
+      hysteresis = 0;
+      VF("WRN: Sense::Sense(); Threshold - hysteresis for pin "); V(pin); VLF(" below Analog range, hysteresis set to 0.");
+    }
   }
 
-  invert = false;
-  int mode = INPUT;
-  switch (inputMode) {
-    case ON: case HIGH: mode = INPUT_PULLUP; break;
-    case LOW: 
-      invert = true;
-      #ifdef INPUT_PULLDOWN
-        mode = INPUT_PULLDOWN;
-      #endif
-    break;
-  }
-  pinMode(pin, mode);
+  pinMode(pin, initState);
 
   reset();
 }
@@ -38,16 +34,16 @@ int Sense::read() {
   int value = lastValue;
   if (isAnalog) {
     int sample = analogRead(pin);
-    if (sample > threshold + hysteresis ) value = HIGH;
-    if (sample <= threshold - hysteresis ) value = LOW;
+    if (sample >= threshold + hysteresis) value = HIGH;
+    if (sample < threshold - hysteresis) value = LOW;
   } else {
     int sample = digitalRead(pin); delayMicroseconds(10); int sample1 = digitalRead(pin);
     if (stableSample != sample || sample1 != sample) { stableStartMs = millis(); stableSample = sample; }
     long stableMs = (long)(millis() - stableStartMs);
-    if (stableMs > hysteresis) value = stableSample;
+    if (stableMs >= hysteresis) value = stableSample;
   }
   lastValue = value;
-  if (invert) { if (value == LOW) return HIGH; else return LOW; } else return value;
+  return value == activeState;
 }
 
 void Sense::poll() {
@@ -62,20 +58,27 @@ void Sense::poll() {
 }
 
 void Sense::reset() {
-  if (inputMode == OFF) return;
   if (isAnalog) { if (analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalRead(pin);
   stableSample = lastValue;
 }
 
-uint8_t Senses::add(int8_t pin, int8_t inputMode, bool isAnalog, int threshold, int hysteresis) {
-  if (senseCount >= SENSE_MAX) return 0;
-  sense[senseCount] = new Sense(pin, inputMode, isAnalog, threshold, hysteresis);
+// Manage sense pins
+
+uint8_t Senses::add(int8_t pin, int8_t initState, int32_t trigger) {
+  if (pin == OFF || trigger == OFF) return 0;
+  if (senseCount >= SENSE_MAX) { VF("WRN: Senses::add(); senseCount exceeded ignoring pin "); VL(pin); return 0; }
+  if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Senses::add(); trigger value invalid ignoring pin "); VL(pin); return 0; }
+  if (initState != INPUT && initState != INPUT_PULLUP && initState != INPUT_PULLDOWN) {
+    VF("WRN: Senses::add(); initState value invalid ignoring pin "); VL(pin);
+    return 0;
+  }
+  sense[senseCount] = new Sense(pin, initState, trigger);
   senseCount++;
   return senseCount;
 }
 
 int Senses::read(uint8_t handle) {
-  if (handle == 0) return -1;
+  if (handle == 0) return false;
   return (*sense)[handle - 1].read();
 }
 

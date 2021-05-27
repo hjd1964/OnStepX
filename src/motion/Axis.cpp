@@ -1,11 +1,12 @@
 // -----------------------------------------------------------------------------------
 // Axis motion control
 
-#include "../OnStepX.h"
+#include "../Common.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../telescope/Telescope.h"
 #include "Axis.h"
+#include "../lib/sense/Sense.h"
 
 extern unsigned long periodSubMicros;
 
@@ -193,8 +194,8 @@ void Axis::poll() {
   if (axisNumber == 0) return;
 
   // check for limits
-  error.minLimitSensed = digitalReadEx(pins.min);
-  error.maxLimitSensed = digitalReadEx(pins.max);
+  error.minLimitSensed = senses.read(hMinSense);
+  error.maxLimitSensed = senses.read(hMaxSense);
 
   // automatically abort slew and stop tracking
   if (autoRate != AR_RATE_BY_TIME_ABORT) {

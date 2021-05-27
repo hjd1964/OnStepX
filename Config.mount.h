@@ -17,6 +17,10 @@
 // * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
 // ** = SSS TMC5160 you must set stepper driver current (in mA) w/ AXISn_DRIVER_IRUN (IHOLD & IGOTO are optional)
 
+// Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
+// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
+// enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
+
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
 #define AXIS1_DRIVER_MODEL            OFF //    OFF, (See above.) Stepper driver model.                                      <-Often
 
@@ -35,10 +39,13 @@
 #define AXIS1_LIMIT_MAX               180 //    180, n. Where n=  90.. 270 (degrees.) Maximum "Hour Angle" for Eq modes.      Adjust
                                           //         n. Where n= 180.. 360 (degrees.) Maximum Azimuth for AltAzm mode.
 
-#define AXIS1_SENSE_HOME              OFF //    OFF, ON for HIGH clockwise of home position, as seen from front. Or use LOW.  Option
-                                          //         Signal state changes when travel moves past the home position.
-#define AXIS1_SENSE_LIMIT_MIN         OFF //    OFF, ON for HIGH limit sense switch close stops movement. Or use LOW.         Option
-#define AXIS1_SENSE_LIMIT_MAX         OFF //    OFF, ON for HIGH limit sense switch close stops movement. Or use LOW.         Option
+#define AXIS1_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from front. Option
+#define AXIS1_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS1_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+                                          //         Digital, optionally add: |HIST(n) Where n=0..1023 stability time in ms.
+                                          //         Analog capable sense inputs also allow adding:
+                                          //         |THLD(n) Where n=1..1023 (ADU) for Analog threshold.
+                                          //         |HIST(n) Where n=0..1023 (ADU) for +/- Hystersis range.
 
 #define AXIS1_STEPS_PER_DEGREE    12800.0 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -60,10 +67,9 @@
 #define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed declination.                Infreq
 #define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed declination.                 Infreq
 
-#define AXIS2_SENSE_LIMIT_MIN         OFF //    OFF, ON for HIGH limit sense switch state stops movement. Or use LOW.         Option
-#define AXIS2_SENSE_LIMIT_MAX         OFF //    OFF, ON for HIGH limit sense switch state stops movement. Or use LOW.         Option
-#define AXIS2_SENSE_HOME              OFF //    OFF, ON for HIGH clockwise of home position, as seen from above. Or use LOW.  Option
-                                          //         Signal state changes when travel moves past the home position.
+#define AXIS2_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
+#define AXIS2_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define AXIS2_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 #define AXIS2_TANGENT_ARM             OFF //    OFF, ON +limit range below. Set cntr w/[Reset Home] Return cntr w/[Find Home] Infreq
 
@@ -88,7 +94,7 @@
                                           //         Better tracking accuracy especially for Mega2560's w/ceramic resonator.
 
 // SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
-#define LIMIT_SENSE                   OFF //    OFF, ON for HIGH limit sense switch state stops movement. Or use LOW.         Option
+#define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 // ST4 INTERFACE ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#ST4
 // *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
@@ -100,10 +106,8 @@
 #define ST4_HAND_CONTROL_FOCUSER      OFF //    OFF, ON alternate to above: Focuser move [E]f1 [W]f2 [N]-     [S]+            Option
 
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
-#define PEC_SENSE                     OFF //    OFF, ON*. Senses the PEC signal rising edge or use LOW for falling edge.      Option
+#define PEC_SENSE                     OFF //    OFF, HIGH. Senses the PEC signal rising edge or use LOW for falling edge.     Option
                                           //         Ignored in ALTAZM mode.
-#define PEC_SENSE_ANALOG              OFF //    OFF, or n=0 to 1023 (0 to 3.3V or 5V) for an analog threshold (if supported.) Adjust
-
 
 #define PEC_STEPS_PER_WORM_ROTATION     0 //      0, n. Number steps per worm rotation (PEC Eq mode only, 0 disables PEC.)   <-Req'd
                                           //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage

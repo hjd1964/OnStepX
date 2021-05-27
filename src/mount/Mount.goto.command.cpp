@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
 
-#include "../OnStepX.h"
+#include "../Common.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 

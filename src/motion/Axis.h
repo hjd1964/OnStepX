@@ -12,9 +12,11 @@ typedef struct AxisLimits {
 } AxisLimits;
 
 typedef struct AxisSense {
-  int16_t min;
-  int16_t home;
-  int16_t max;
+  int32_t home;
+  int8_t  homeInit;
+  int32_t min;
+  int32_t max;
+  int8_t  minMaxInit;
 } AxisSense;
 
 #define AxisSettingsSize 24
@@ -194,6 +196,10 @@ class Axis {
     bool enabled = false;
     bool tracking = false;
     bool limitsCheck = true;
+
+    uint8_t hHomeSense = 0; // home sensor handle
+    uint8_t hMinSense = 0;  // min sensor handle
+    uint8_t hMaxSense = 0;  // max sensor handle
 
     long originSteps = 0;
 
