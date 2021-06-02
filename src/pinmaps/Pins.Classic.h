@@ -18,9 +18,12 @@
   #endif
 #endif
 
-// The PEC index sense is a 5V logic input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
-#define PEC_SENSE_PIN            2
-#define PEC_ANALG_PIN            1
+// The PEC index sense resets the PEC index then waits for 60 seconds before allowing another reset
+#ifdef PEC_SENSE_ANALOG
+  #define PEC_SENSE_PIN          1               // PEC Sense, analog
+#else
+  #define PEC_SENSE_PIN          2               // PEC Sense, digital
+#endif
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
 #define SENSE_LIMIT_PIN          3
@@ -112,9 +115,12 @@
 
 #elif defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-// The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
-#define PEC_SENSE_PIN            2
-#define PEC_ANALG_PIN            14
+// The PEC index sense resets the PEC index then waits for 60 seconds before allowing another reset
+#ifdef PEC_SENSE_ANALOG
+  #define PEC_SENSE_PIN          14              // PEC Sense, analog
+#else
+  #define PEC_SENSE_PIN          2               // PEC Sense, digital
+#endif
 
 // The limit switch sense is a 3.3V logic input which uses the internal pull up, shorted to ground it stops gotos/tracking
 #define SENSE_LIMIT_PIN          3

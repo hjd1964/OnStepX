@@ -8,6 +8,12 @@ extern Tasks tasks;
 #include "../telescope/Telescope.h"
 #include "ProcessCmds.h"
 
+#if ST4_INTERFACE == ON && ST4_HAND_CONTROL == ON
+  #include "../lib/serial/Serial_ST4_Master.h"
+#endif
+
+#include "../lib/serial/Serial_Local.h"
+
 // command processors
 #ifdef SERIAL_A
   CommandProcessor processCommandsA(SERIAL_A_BAUD_DEFAULT,'A');
@@ -36,6 +42,10 @@ extern Tasks tasks;
 #ifdef SERIAL_IP
   CommandProcessor processCommandsIP(9600,'I');
   void processCmdsIP() { processCommandsIP.poll(); }
+#endif
+#ifdef SERIAL_LOCAL
+  CommandProcessor processCommandsLocal(9600,'S');
+  void processCmdsLocal() { processCommandsLocal.poll(); }
 #endif
 
 CommandProcessor::CommandProcessor(long baud, char channel) {
@@ -174,5 +184,9 @@ void commandChannelInit() {
   #ifdef SERIAL_IP
     VF("MSG: Setup, start command channel IP task (priority 6)... ");
     if (tasks.add(1, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
+  #endif
+  #ifdef SERIAL_LOCAL
+    VF("MSG: Setup, start command channel Local task (priority 6)... ");
+    if (tasks.add(3, 0, true, 6, processCmdsLocal, "PrcCmdL")) { VL("success"); } else { VL("FAILED!"); }
   #endif
 }

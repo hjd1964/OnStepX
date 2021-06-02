@@ -6,7 +6,7 @@
 #include "../Constants.h"
 #include "../Config.common.h"
 
-#if AXIS1_STEPS_PER_WORMROT == 0
+#if PEC_STEPS_PER_WORM_ROTATION == 0
   #define AXIS1_PEC OFF
 #else
   #define AXIS1_PEC ON
@@ -17,6 +17,7 @@
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 #include "library/Library.h"
+#include "../lib/sound/Sound.h"
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
@@ -118,7 +119,6 @@ typedef struct MountError {
 class Mount {
   public:
     void init(bool validKey);
-    void pecInit();
 
     // handle mount commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -135,7 +135,7 @@ class Mount {
 
     // check for any mount related error
     bool errorAny();
-    
+
     // return OnStep general error code
     uint8_t errorNumber();
 
@@ -153,6 +153,9 @@ class Mount {
 
     // calculate tracking rates for alt/azm, refraction, and pointing model in the background
     void trackPoll();
+
+    // monitor ST4 guide port for guiding, basic hand controller, and smart hand controller
+    void st4Poll();
 
     Transform transform;
 
@@ -232,6 +235,9 @@ class Mount {
     // manage spiral guide
     void guideSpiralPoll();
 
+    void st4Init();
+
+    void pecInit();
     #if AXIS1_PEC == ON
       // disable PEC
       void pecDisable();
@@ -239,8 +245,6 @@ class Mount {
       void pecCleanup();
     #endif
 
-    // read in the park information
-    void parkInit();
     // goto park position
     CommandError parkGoto();
     // once parked save park state
@@ -259,6 +263,7 @@ class Mount {
     void limitStopAxis1(GuideAction stopDirection);
     void limitStopAxis2(GuideAction stopDirection);
 
+    Sound sound;
     Library library;
     Convert convert;
 
@@ -278,8 +283,8 @@ class Mount {
     float trackingRateAxis1             = 0.0F;
     float trackingRateAxis2             = 0.0F;
     float stepsPerSiderealSecondAxis1   = 0.0F;
-    double stepsPerCentisecondAxis1     = 0.0F;
-    double stepsPerCentisecondAxis2     = 0.0F;
+    float stepsPerCentisecondAxis1      = 0.0F;
+    float stepsPerCentisecondAxis2      = 0.0F;
 
     // align
     AlignState alignState = {0, 0};
@@ -314,7 +319,7 @@ class Mount {
     float customGuideRateAxis1          = 0.0F;
     float customGuideRateAxis2          = 0.0F;
     GuideState      guideState          = GU_NONE;
-    GuideRateSelect guideRateSelect     = GR_20X;
+    GuideRateSelect guideRateSelect     = GR_20X;  // currently selected guide rate
     GuideRateSelect guideRateSelectAxis1= GR_20X;
     GuideRateSelect guideRateSelectAxis2= GR_20X;
     GuideAction     guideActionAxis1    = GA_NONE;
@@ -325,26 +330,30 @@ class Mount {
     unsigned long guideFinishTimeAxis2  = 0;
 
     // pec
-    long      pecBufferSize             = 0;
-    float     pecRateAxis1              = 0;
+    long      pecBufferSize             = 0;      // pec buffer size in bytes
+    float     pecRateAxis1              = 0;      // tracking rate (in x) due to PEC playing
     #if AXIS1_PEC == ON
       uint8_t  pecMonitorHandle         = 0;
+      uint8_t  pecSenseHandle           = 0;
+
       Pec pec = {false, PEC_NONE, 0};
-      bool     pecIndexSensedSinceLast  = false;
+
       int      pecAnalogValue           = 0;
 
+      bool     wormIndexState           = false;
+      bool     wormIndexSenseThisSecond = false;
+      long     wormRotationSteps        = 0;      // step position in worm rotation sequence
+      long     wormSenseSteps           = 0;      // step position
+
       bool     pecFirstRecording        = false;
-      long     pecRecordStopTime        = 0;
-      float    accPecGuideAxis1         = 0.0F;
-      long     pecIndex                 = 0;
-      int      pecValue                 = 0;
-      long     wormRotationSteps        = 0;
-      long     lastWormRotationSteps    = -1;
-      long     wormSenseSteps           = 0;
-      bool     wormSenseAgain           = false;
-      uint32_t wormPeriodStartCs        = 0;
-      long     wormRotationSeconds      = 0;
+      long     pecRecordStopTimeCs      = 0;
+      uint32_t wormRotationStartTimeCs  = 0;      // start time of worm rotation sequence, in centi-seconds
+      long     wormRotationSeconds      = 0;      // time for a worm rotation, in seconds
+
+      float    pecAccGuideAxis1         = 0.0F;
+
       bool     pecBufferStart           = false;
+      long     pecBufferIndex           = 0;      // index into the pec buffer
       int8_t*  pecBuffer;
     #endif
 

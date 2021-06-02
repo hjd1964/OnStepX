@@ -2,7 +2,10 @@
 // SerialWrapper a single class to allow uniform access to other serial port classes
 #pragma once
 
+#include <Arduino.h>
+
 static uint8_t _wrapper_channels = 0;
+
 #define isChannel(x) (x == thisChannel)
 
 class SerialWrapper : public Stream

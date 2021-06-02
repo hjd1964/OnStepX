@@ -104,6 +104,9 @@
 #ifndef ST4_INTERFACE
 #define ST4_INTERFACE                 OFF
 #endif
+#ifndef ST4_INTERFACE_INIT
+#define ST4_INTERFACE_INIT            INPUT_PULLUP
+#endif
 #ifndef ST4_HAND_CONTROL
 #define ST4_HAND_CONTROL              OFF
 #endif
@@ -115,8 +118,8 @@
 #ifndef PEC_SENSE
 #define PEC_SENSE                     OFF
 #endif
-#ifndef PEC_SENSE_ANALOG
-#define PEC_SENSE_ANALOG              OFF
+#ifndef PEC_SENSE_INIT
+#define PEC_SENSE_INIT                INPUT_PULLUP
 #endif
 #ifndef PEC_STEPS_PER_WORM_ROTATION
 #define PEC_STEPS_PER_WORM_ROTATION   0

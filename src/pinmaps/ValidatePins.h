@@ -76,11 +76,6 @@
   #error "Configuration (Config.h): LED_RETICLE not supported for this PINMAP, must be OFF"
 #endif
 
-// analog PEC allowed?
-#if PEC_SENSE > 0 && PEC_ANALG_PIN == OFF
-  #error "Configuration (Config.h): PEC_SENSE in ANALOG mode not supported for this PINMAP, use ON, etc. NOT a threshold value"
-#endif
-
 // TIME_LOCATION_SOURCE DS3234 SPI allowed?
 #if (TIME_LOCATION_SOURCE == DS3234S || TIME_LOCATION_SOURCE == DS3234M) && !defined(DS3234_CS_PIN)
   #if PINMAP == Classic

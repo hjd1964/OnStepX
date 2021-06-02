@@ -47,10 +47,8 @@
 // The PEC index sense is a 5V logic input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
 #if PINMAP == MksGenL1
   #define PEC_SENSE_PIN        41               // GenL1 EXP2
-  #define PEC_ANALG_PIN        OFF              // N/A
 #else
   #define PEC_SENSE_PIN        57               // RAMPS AUX1, A-OUT (1=+5V, 2=GND, 3=PEC)
-  #define PEC_ANALG_PIN        A3               // Note A3 is (57)
 #endif
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking

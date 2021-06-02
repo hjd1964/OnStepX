@@ -18,10 +18,6 @@
   #define PEC_SENSE_PIN             OFF
 #endif
 
-#ifndef PEC_ANALG_PIN
-  #define PEC_ANALG_PIN             OFF
-#endif
-
 #ifndef STATUS_LED1_PIN
   #define STATUS_LED1_PIN           OFF
 #endif

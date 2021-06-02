@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Low overhead communication routines for Serial0, Serial1
 
-#include "SER_MEGA2560.h"
+#include "Serial_MEGA2560.h"
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 

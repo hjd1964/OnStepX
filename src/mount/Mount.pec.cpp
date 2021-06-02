@@ -2,6 +2,7 @@
 // telescope mount control, PEC
 
 #include "../Common.h"
+#include "Mount.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF && AXIS1_PEC == ON
 
@@ -9,7 +10,7 @@
 extern Tasks tasks;
 #include "../coordinates/Site.h"
 #include "../telescope/Telescope.h"
-#include "Mount.h"
+#include "../lib/sense/Sense.h"
 
 #if PEC_SENSE == OFF
   bool wormSenseFirst = true;
@@ -46,7 +47,8 @@ void Mount::pecInit() {
     pecBufferSize = 0;
     VLF("WRN: Mount, buffer exceeds available RAM PEC disabled");
   } else {
-    VF("MSG: Mount, allocated PEC buffer "); V(pecBufferSize * sizeof(*pecBuffer)); VLF(" bytes");
+    long allocatedSize = pecBufferSize * sizeof(*pecBuffer);
+    VF("MSG: Mount, allocated PEC buffer "); V(allocatedSize); VLF(" bytes");
   }
 
   bool pecBufferNeedsInit = true;
@@ -59,6 +61,9 @@ void Mount::pecInit() {
   #if PEC_SENSE == OFF
     park.wormSensePositionSteps = 0;
     pec.state = PEC_NONE;
+  #else
+    VLF("MSG: Mount, adding pec sense");
+    pecSenseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
   #endif
 
   if (pec.state > PEC_RECORD) {
@@ -84,41 +89,43 @@ void Mount::pecPoll() {
      (guideState != GU_NONE && guideState != GU_PULSE_GUIDE)) { pecDisable(); return; }
 
   // keep track of our current step position, and when the step position on the worm wraps during playback
-  long a1Steps = axis1.getMotorCoordinateSteps();
-  
-  #if PEC_SENSE == ON
-    // for digital or analog sense, with 60 second delay before redetect
-    long dist; if (wormSenseSteps > a1Steps) dist = wormSenseSteps - a1Steps; else dist = a1Steps - wormSenseSteps;
+  long axis1Steps = axis1.getMotorCoordinateSteps();
 
-    static int lastValue;
-    lastValue = pecValue;
-    pecValue = pecSense.read();
-    if (dist > stepsPerSiderealSecondAxis1*60.0 && pecValue != lastValue && pecValue == PEC_SENSE_STATE) {
-      wormSenseSteps = a1Steps;
-      wormSenseAgain = true;
+  #if PEC_SENSE == OFF
+    wormSenseFirst = true;
+  #else
+    static int lastState;
+    lastState = wormIndexState;
+    wormIndexState = senses.read(pecSenseHandle);
+
+    // digital or analog pec sense, with 60 second delay before redetect
+    long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
+    if (dist > stepsPerSiderealSecondAxis1*60.0 && wormIndexState != lastState && wormIndexState == true) {
+      wormSenseSteps = axis1Steps;
       wormSenseFirst = true;
       pecBufferStart = true;
+      wormIndexSenseThisSecond = true;
     } else pecBufferStart = false;
-  #else
-    wormSenseFirst = true;
+
+    if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecondAxis1) wormIndexSenseThisSecond = false;
   #endif
 
   if (pec.state == PEC_NONE) { pecRateAxis1 = 0.0; return; }
   if (!wormSenseFirst) return;
 
   // worm step position corrected for any index found
-  lastWormRotationSteps = wormRotationSteps;
-  wormRotationSteps = a1Steps - wormSenseSteps;
-  wormRotationSteps = ((wormRotationSteps % pec.wormRotationSteps) + pec.wormRotationSteps) % pec.wormRotationSteps;
-
   #if PEC_SENSE == OFF
-    // "soft" PEC index sense
+    static long lastWormRotationSteps = wormRotationSteps;
+  #endif
+  wormRotationSteps = axis1Steps - wormSenseSteps;
+  wormRotationSteps = ((wormRotationSteps % pec.wormRotationSteps) + pec.wormRotationSteps) % pec.wormRotationSteps;
+  #if PEC_SENSE == OFF
     if (wormRotationSteps - lastWormRotationSteps < 0) pecBufferStart = true; else pecBufferStart = false;
   #endif
-    
+
   // handle playing back and recording PEC
   noInterrupts();
-  unsigned long csLAST = centisecondLAST;
+  unsigned long lastCs = centisecondLAST; // local apparent sidereal time in centi-seconds
   interrupts();
 
   // start playing PEC
@@ -126,23 +133,23 @@ void Mount::pecPoll() {
     // makes sure the index is at the start of a second before resuming play
     if ((long)fmod(wormRotationSteps, stepsPerCentisecondAxis1) == 0) {
       pec.state = PEC_PLAY;
-      pecIndex = wormRotationSteps/stepsPerCentisecondAxis1;
-      wormPeriodStartCs = csLAST;
+      pecBufferIndex = wormRotationSteps/stepsPerCentisecondAxis1;
+      wormRotationStartTimeCs = lastCs;
     }
   } else
   // start recording PEC
   if (pec.state == PEC_READY_RECORD) {
     if ((long)fmod(wormRotationSteps, stepsPerCentisecondAxis1) == 0) {
       pec.state = PEC_RECORD;
-      pecIndex = wormRotationSteps/stepsPerCentisecondAxis1;
+      pecBufferIndex = wormRotationSteps/stepsPerCentisecondAxis1;
       pecFirstRecording = !pec.recorded;
-      wormPeriodStartCs = csLAST;
-      pecRecordStopTime = wormPeriodStartCs + wormRotationSeconds*100;
-      accPecGuideAxis1 = 0;
+      wormRotationStartTimeCs = lastCs;
+      pecRecordStopTimeCs = wormRotationStartTimeCs + wormRotationSeconds*100;
+      pecAccGuideAxis1 = 0;
     }
   } else
   // and once the PEC data is all stored, indicate that it's valid and start using it
-  if (pec.state == PEC_RECORD && csLAST - pecRecordStopTime > 0) {
+  if (pec.state == PEC_RECORD && lastCs - pecRecordStopTimeCs > 0) {
     pec.state = PEC_PLAY;
     pec.recorded = true;
     pecCleanup();
@@ -150,53 +157,53 @@ void Mount::pecPoll() {
 
   // reset the buffer index to match the worm index
   if (pecBufferStart && pec.state != PEC_RECORD) {
-    pecIndex = 0;
-    wormPeriodStartCs = csLAST;
+    pecBufferIndex = 0;
+    wormRotationStartTimeCs = lastCs;
   }
 
   // Increment the PEC index once a second and make it go back to zero when the
   // worm finishes a rotation, this code works when crossing zero
-  if (csLAST - wormPeriodStartCs >= 100) { wormPeriodStartCs = csLAST; pecIndex++; }
-  pecIndex = ((pecIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
+  if (lastCs - wormRotationStartTimeCs >= 100) { wormRotationStartTimeCs = lastCs; pecBufferIndex++; }
+  pecBufferIndex = ((pecBufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
 
-  // accumulate steps for PEC
+  // accumulate guide steps for PEC
   if (guideRateAxis1 != 0.0) {
-    if (guideActionAxis1 == GA_FORWARD) accPecGuideAxis1 += stepsPerCentisecondAxis1*guideRateAxis1;
-    if (guideActionAxis1 == GA_REVERSE) accPecGuideAxis1 -= stepsPerCentisecondAxis1*guideRateAxis1;
+    if (guideActionAxis1 == GA_FORWARD) pecAccGuideAxis1 += stepsPerCentisecondAxis1*guideRateAxis1;
+    if (guideActionAxis1 == GA_REVERSE) pecAccGuideAxis1 -= stepsPerCentisecondAxis1*guideRateAxis1;
   }
   
   // falls in whenever the pecIndex changes, which is once a sidereal second
-  static long lastPecIndex = 0;
-  if (pecIndex != lastPecIndex) {
-    lastPecIndex = pecIndex;
+  static long lastPecBufferIndex = 0;
+  if (pecBufferIndex != lastPecBufferIndex) {
+    lastPecBufferIndex = pecBufferIndex;
 
     // assume no change to tracking rate
     pecRateAxis1 = 0.0;
 
     if (pec.state == PEC_RECORD) {
       // get guide steps taken from the accumulator
-      int i = lround(accPecGuideAxis1);
+      int i = lround(pecAccGuideAxis1);
 
       // stay within +/- one sidereal rate for corrections
       if (i < -stepsPerSiderealSecondAxis1) i = -stepsPerSiderealSecondAxis1;
       if (i >  stepsPerSiderealSecondAxis1) i =  stepsPerSiderealSecondAxis1;
 
       // remove steps from the accumulator
-      accPecGuideAxis1 -= i;
+      pecAccGuideAxis1 -= i;
 
       // apply weighted average
-      if (!pecFirstRecording) i = (i + pecBuffer[pecIndex]*2)/3;
+      if (!pecFirstRecording) i = (i + pecBuffer[pecBufferIndex]*2)/3;
 
       // restrict to valid range and store
       if (i < -127) i = -127; else if (i >  127) i =  127;
-      pecBuffer[pecIndex] = i;
+      pecBuffer[pecBufferIndex] = i;
     }
 
     if (pec.state == PEC_PLAY) {
       // adjust one second before the value was recorded, an estimate of the latency between image acquisition and response
       // if sending values directly to OnStep from PECprep, etc. be sure to account for this
       // number of steps ahead or behind for this 1 second slot, up to +/-127
-      int j = pecIndex - 1; if (j == -1) j += wormRotationSeconds;
+      int j = pecBufferIndex - 1; if (j == -1) j += wormRotationSeconds;
       int i = pecBuffer[j];
       if (i >  stepsPerSiderealSecondAxis1) i =  stepsPerSiderealSecondAxis1;
       if (i < -stepsPerSiderealSecondAxis1) i = -stepsPerSiderealSecondAxis1;

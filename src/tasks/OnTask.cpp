@@ -338,17 +338,14 @@ uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t prio
   // find the next free task
   int8_t e = -1;
   for (uint8_t c = 0; c < TASKS_MAX; c++) {
-    if (!allocated[c]) {
-      e = c;
-      break;
-    }
+    if (!allocated[c]) { e = c; break; }
   }
   // no tasks available
   if (e == -1) return false;
 
   // create the task handler
   task[e] = new Task(period, duration, repeat, priority, callback);
-  allocated[e] = true;
+  if (task[e] != NULL) allocated[e] = true; else return false;
 
   updateEventRange();
 

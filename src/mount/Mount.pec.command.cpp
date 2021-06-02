@@ -23,7 +23,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     uint8_t state = 0;
     #if AXIS1_PEC == ON
       state = pec.state;
-      if (pecIndexSensedSinceLast) { reply[1] = '.'; pecIndexSensedSinceLast = false; }
+      if (wormIndexSenseThisSecond) reply[1] = '.';
     #endif
     reply[0] = pecStateStr[state]; reply[1] = 0; reply[2] = 0;
   } else
@@ -79,7 +79,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       if (AXIS1_PEC == OFF) l = 0;
       if (l >= 0 && l < 129600000) {
         Pec tempPec = pec;
-        tempPec.worm.rotationSteps = l;
+        tempPec.wormRotationSteps = l;
         nv.updateBytes(NV_MOUNT_PEC_BASE, &tempPec, PecSize);
       } else *commandError = CE_PARAM_RANGE;
     } else
@@ -92,7 +92,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     if (cmdP("VR")) {
       int16_t i, j;
       bool conv_result = true;
-      if (parameter[0] == 0) i = pecIndex; else conv_result = atoi2(parameter, &i);
+      if (parameter[0] == 0) i = pecBufferIndex; else conv_result = convert.atoi2(parameter, &i);
       if (conv_result) {
         if (i >= 0 && i < pecBufferSize) {
           if (parameter[0] == 0) {
@@ -112,7 +112,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //            Ten rate adjustment factors for 1s worm segments in steps +/- (steps = x0 - 128, etc.)
     if (cmdP("Vr")) {
       int16_t i, j;
-      if (atoi2(parameter, &i)) {
+      if (convert.atoi2(parameter, &i)) {
         if (i >= 0 && i < pecBufferSize) {
           j = 0;
           uint8_t b;
@@ -130,7 +130,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //  :VH#      PEC index sense position in sidereal seconds
     //            Returns: n#
     if (command[0] == 'V' && command[1] == 'H' && parameter[0] == 0) {
-      long s = lround(pec.worm.sensePositionSteps/stepsPerSiderealSecondAxis1);
+      long s = lround(wormSenseSteps/stepsPerSiderealSecondAxis1);
       while (s > wormRotationSeconds) s -= wormRotationSeconds;
       while (s < 0) s += wormRotationSeconds;
       sprintf(reply,"%05ld",s);
@@ -164,9 +164,9 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
         int16_t i, j;
         parameter2[0] = 0;
         parameter2++;
-        if (atoi2(parameter, &i)) {
+        if (convert.atoi2(parameter, &i)) {
           if (i >= 0 && i < pecBufferSize) {
-            if (atoi2(parameter2, &j)) {
+            if (convert.atoi2(parameter2, &j)) {
               if (j >= -128 && j <= 127) {
                 pecBuffer[i] = j;
                 pec.recorded = true;

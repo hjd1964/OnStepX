@@ -53,20 +53,22 @@
   
     char *name = tasks.getNameStr(handle);
     
-    double AA = tasks.getArrivalAvg(handle); Y;
-    double AX = tasks.getArrivalMax(handle); Y;
-    double RT = tasks.getRuntimeTotal(handle); Y;
-    double RTcount = tasks.getRuntimeTotalCount(handle); Y;
-    double RA; if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
-    double RX = tasks.getRuntimeMax(handle); Y;
-    count++; AAA += AA; AXA += AX; RTT += RT; RAA += RA; RXA += RX;
-    aau = scale_unit(&AA); axu = scale_unit(&AX); rtu = scale_unit(&RT); rau = scale_unit(&RA); rxu = scale_unit(&RX);
+    if (!strstr(name, "Profilr")) {
+      double AA = tasks.getArrivalAvg(handle); Y;
+      double AX = tasks.getArrivalMax(handle); Y;
+      double RT = tasks.getRuntimeTotal(handle); Y;
+      double RTcount = tasks.getRuntimeTotalCount(handle); Y;
+      double RA; if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
+      double RX = tasks.getRuntimeMax(handle); Y;
+      count++; AAA += AA; AXA += AX; RTT += RT; RAA += RA; RXA += RX;
+      aau = scale_unit(&AA); axu = scale_unit(&AX); rtu = scale_unit(&RT); rau = scale_unit(&RA); rxu = scale_unit(&RX);
+      
+      sprintf(s, "[%-10s] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
+      name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
     
-    sprintf(s, "[%-10s] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
-    name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
-  
-    SERIAL_DEBUG.print(s); Y;
-    SERIAL_DEBUG.println();
+      SERIAL_DEBUG.print(s); Y;
+      SERIAL_DEBUG.println();
+    }
   }
 #endif
 

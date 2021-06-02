@@ -45,7 +45,7 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { nv.init(2048, true, 0, false); }
+#define HAL_INIT() { nv.init(1024, true, 0, false); }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

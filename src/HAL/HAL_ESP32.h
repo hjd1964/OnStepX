@@ -33,7 +33,8 @@
     #define HAL_SERIAL_C_ENABLED
   #endif
 #endif
-#include "../lib/serial/IP_ESP32.h"
+
+#include "../lib/serial/Serial_IP_ESP32.h"
 
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
@@ -60,4 +61,4 @@
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
-//#include "../lib/analog/AN_ESP32.h"
+#include "../lib/analog/AN_ESP32.h"

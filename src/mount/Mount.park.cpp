@@ -8,12 +8,6 @@
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
-void Mount::parkInit() {
-  // read the park settings
-  if (ParkSize < sizeof(Park)) { initError.mount = true; DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  nv.readBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
-}
-
 CommandError Mount::parkSet() {
   if (park.state == PS_PARK_FAILED)     return CE_PARK_FAILED;
   if (park.state == PS_PARKED)          return CE_PARKED;
@@ -69,8 +63,7 @@ CommandError Mount::parkGoto() {
     // turn off PEC while we park
     pecDisable();
     pec.state = PEC_NONE;
-    // save the worm sense position
-    nv.writeLong(EE_wormSensePos, wormSensePos);
+    park.wormSensePositionSteps = wormSenseSteps;
   #endif
 
   // record our park status
@@ -150,22 +143,29 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
 
   VLF("MSG: Unparking");
 
+  // read the park settings
+  if (ParkSize < sizeof(Park)) {
+    initError.mount = true;
+    DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled");
+    nv.readOnly(true);
+    return CE_NO_PARK_POSITION_SET;
+  }
+  nv.readBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
+
+  #if AXIS1_PEC == ON
+    wormSenseSteps = park.wormSensePositionSteps;
+  #endif
+
+  // reset mount
+  resetHome();
+
   // make sure limits are on
   limitsEnabled = true;
-
-  // stop tracking and disable the stepper drivers
-  setTrackingState(TS_NONE);
-  updateTrackingRates();
-  axis1.enable(false);
-  axis2.enable(false);
 
   // load the pointing model
   #if ALIGN_MAX_NUM_STARS > 1  
     transform.align.modelRead();
   #endif
-  
-  axis1.setMotorCoordinateSteps(0);
-  axis2.setMotorCoordinateSteps(0);
 
   // get the park coordinate ready
   Coordinate parkTarget;

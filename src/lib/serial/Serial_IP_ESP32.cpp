@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // IP communication routines
 
-#include "IP_ESP32.h"
+#include "Serial_IP_ESP32.h"
 
 #if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
