@@ -12,7 +12,7 @@ void SerialLocal::end() { }
 
 void SerialLocal::transmit(const char *data) {
   int data_len = strlen(data);
-    for (int i = 0; i < data_len; i++) {
+  for (int i = 0; i < data_len; i++) {
     recv_buffer[recv_tail] = data[i];
     recv_tail++;
   }

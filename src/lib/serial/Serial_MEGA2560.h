@@ -21,7 +21,7 @@ class PollingSerial : public Stream
     inline int available(void) { 
       uint8_t p = recv_head;
       uint8_t c = 0;
-      while (!recv_buffer[p] && p != recv_tail && c < 255) { c++; p++; } return c;
+      while (recv_buffer[p] && p != recv_tail && c < 255) { c++; p++; } return c;
     }
 
     inline int peek(void) { if (!available()) return -1; char c = recv_buffer[recv_head]; return c; }
