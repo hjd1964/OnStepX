@@ -179,8 +179,8 @@
   #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
 #endif
 
-#define THLD(v)                       (((long)(v))<<1)  // 10 bit analog threshold, bits 1 through 10
-#define HYST(v)                       (((long)(v))<<11) // 10 bit hysteresis, bits 11 through 20
+#define THLD(v)                       ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
+#define HYST(v)                       ((v)<<11) // 10 bit hysteresis, bits 11 through 20
 #ifndef INPUT_PULLDOWN
   #define INPUT_PULLDOWN INPUT
 #endif
