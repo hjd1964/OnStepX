@@ -16,9 +16,9 @@ extern Tasks tasks;
 
   #if ST4_HAND_CONTROL == ON
     #include "../lib/serial/Serial_ST4_Master.h"
-    #define debounceMs 100
+    #define debounceMs 100L
   #else
-    #define debounceMs 5
+    #define debounceMs 5L
   #endif
 
   #include "../lib/serial/Serial_Local.h"
@@ -49,8 +49,10 @@ extern Tasks tasks;
       VF("MSG: Mount, start ST4 monitor task (rate 10ms priority 2)... ");
       if (tasks.add(10, 0, true, 2, mountSt4MonitorWrapper, "st4Mntr")) { VL("success"); } else { VL("FAILED!"); }
     #else
-      VF("MSG: Mount, start ST4 monitor task (rate 2ms priority 2)... ");
-      if (tasks.add(2, 0, true, 2, mountSt4MonitorWrapper, "st4Mntr")) { VL("success"); } else { VL("FAILED!"); }
+      VF("MSG: Mount, start ST4 monitor task (rate 1.5ms priority 2)... ");
+      uint8_t handle = tasks.add(0, 0, true, 2, mountSt4MonitorWrapper, "st4Mntr");
+      if (handle) { VL("success"); } else { VL("FAILED!"); }
+      tasks.setPeriodMicros(handle, 1500);
     #endif
   }
 
