@@ -62,6 +62,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       // start align...
       alignState.lastStar = command[1] - '0';
       alignState.currentStar = 1;
+      VLF("MSG: Mount, align started");
     } else
 
     // :A+#       Align accept target location
@@ -70,7 +71,12 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     if (command[1] == '+' && parameter[0] == 0) {
       if (alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar) {
         CommandError e = alignAddStar();
-        if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
+        if (e != CE_NONE) {
+          alignState.lastStar = 0;
+          alignState.currentStar = 0;
+          *commandError = e;
+          DLF("ERR: Mount, failed to add align point");
+        } else { VLF("MSG: Mount, align point added"); }
       } else *commandError = CE_ALIGN_NOT_ACTIVE;
     } else *commandError = CE_CMD_UNKNOWN;
   }
