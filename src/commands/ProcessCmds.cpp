@@ -44,7 +44,7 @@ extern Tasks tasks;
   void processCmdsIP() { processCommandsIP.poll(); }
 #endif
 #ifdef SERIAL_LOCAL
-  CommandProcessor processCommandsLocal(9600,'S');
+  CommandProcessor processCommandsLocal(9600,'L');
   void processCmdsLocal() { processCommandsLocal.poll(); }
 #endif
 
