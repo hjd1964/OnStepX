@@ -7,9 +7,38 @@
 
 #include "Mount.h"
 
-CommandError Mount::resetHome() {
+CommandError Mount::returnHome() {
   if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE) return CE_SLEW_IN_SLEW;
+
+  // stop tracking
+  setTrackingState(TS_NONE);
+  updateTrackingRates();
+
+  // setup where the home position is
+  updateHomePosition();
+
+  // move to home
+  axis1.setFrequencyMax(radsPerSecondCurrent);
+  if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
+  axis1.autoSlewHome();
+  axis2.setFrequencyMax(radsPerSecondCurrent);
+  if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);
+  axis2.autoSlewHome();
+
+  atHome = true;
+
+  VLF("MSG: Mount, moving to home");
+  return CE_NONE;
+}
+
+CommandError Mount::resetHome() {
+  if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
+  if (gotoState  != GS_NONE) return CE_SLEW_IN_MOTION;
+
+  // stop tracking
+  setTrackingState(TS_NONE);
+  updateTrackingRates();
 
   // setup where the home position is
   updateHomePosition();
@@ -18,17 +47,14 @@ CommandError Mount::resetHome() {
   axis1.enable(false);
   axis1.setMotorCoordinateSteps(0);
   axis1.setBacklash(0);
-  axis1.setInstrumentCoordinate(home.h);
+  if (transform.mountType == ALTAZM) axis1.setInstrumentCoordinate(home.z); else axis1.setInstrumentCoordinate(home.h);
   axis1.setFrequencyMax(degToRad(4.0));
   axis2.enable(false);
   axis2.setMotorCoordinateSteps(0);
   axis2.setBacklash(0);
-  axis2.setInstrumentCoordinate(home.d);
+  if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
   axis2.setFrequencyMax(degToRad(4.0));
   atHome = true;
-
-  setTrackingState(TS_NONE);
-  updateTrackingRates();
 
   VLF("MSG: Mount, reset at home and in standby");
   return CE_NONE;
@@ -36,7 +62,7 @@ CommandError Mount::resetHome() {
 
 void Mount::updateHomePosition() {
   #ifndef AXIS1_HOME_DEFAULT
-    if (transform.mountType == GEM) home.h = Deg90; else home.h = 0;
+    if (transform.mountType == GEM) home.h = Deg90; else { home.h = 0; home.z = 0; }
   #else
     if (transform.mountType == ALTAZM) home.z = AXIS1_HOME_DEFAULT; else home.h = AXIS1_HOME_DEFAULT;
   #endif

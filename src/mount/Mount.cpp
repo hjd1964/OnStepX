@@ -88,12 +88,16 @@ void Mount::init(bool validKey) {
 
 void Mount::setTrackingState(TrackingState state) {
   trackingState = state;
-  axis1.setTracking(true);
-  axis2.setTracking(true);
   if (trackingState == TS_SIDEREAL) {
+    axis1.setTracking(true);
+    axis2.setTracking(true);
     axis1.enable(true);
     axis2.enable(true);
     atHome = false;
+  } else 
+  if (trackingState == TS_NONE) {
+    axis1.setTracking(false);
+    axis2.setTracking(false);
   }
 }
 

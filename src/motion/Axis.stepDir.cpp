@@ -90,7 +90,7 @@ inline void pollAxes() {
 }
 
 void Axis::init(uint8_t axisNumber, bool validKey) {
-  char prefix[] = "MSG: Axis0, "; prefix[9] = '0' + axisNumber;
+  axisPrefix[9] = '0' + axisNumber;
 
   if (pollingTaskHandle == 0) {
     VF("MSG: All Axes, start polling task (rate 20ms priority 0)... ");
@@ -130,7 +130,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
     if (axisNumber == 9) { pins = Axis9Pins; settings = Axis9Settings; move = moveAxis9; }
   #endif
 
-  V(prefix); VF("start timer task... ");
+  V(axisPrefix); VF("start timer task... ");
   char timerName[] = "Axis0"; timerName[4] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, move, timerName);
   if (taskHandle) {
@@ -141,7 +141,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
 
   // init. axis settings
   if (!validKey) {
-    V(prefix); VLF("writing default settings to NV");
+    V(axisPrefix); VLF("writing default settings to NV");
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
     bitSet(axesToRevert, axisNumber);
     nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
@@ -163,12 +163,12 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
   }
   if (!validateAxisSettings(1, MOUNT_TYPE == ALTAZM, settings)) initError.axis = true;
 
-  V(prefix); VLF("adding home and limit senses");
+  V(axisPrefix); VLF("adding home and limit senses");
   hHomeSense = senses.add(pins.home, settings.sense.homeInit, settings.sense.home);
   hMinSense = senses.add(pins.min, settings.sense.minMaxInit, settings.sense.min);
   hMaxSense = senses.add(pins.max, settings.sense.minMaxInit, settings.sense.max);
 
-  V(prefix); VF("start move task... ");
+  V(axisPrefix); VF("start move task... ");
   if (taskHandle) { VL("success"); } else { VL("FAILED!"); }
 
   driver.init(axisNumber);
@@ -178,6 +178,9 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
   pinModeInitEx(pins.step, OUTPUT, !invertStep?LOW:HIGH);
   pinModeInitEx(pins.dir, OUTPUT, !invertDir?LOW:HIGH);
   pinModeEx(pins.enable, OUTPUT); enable(false);
+
+  axisPrefix[10] = ':';
+  axisPrefix[11] = ':';
 }
 
 void Axis::enableMoveFast(const bool fast) {

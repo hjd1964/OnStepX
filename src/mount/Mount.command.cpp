@@ -200,11 +200,8 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   // :hC#       Moves telescope to the home position
   //            Returns: Nothing
   if (cmd("hC")) {
-    trackingState = TS_NONE;
-    if (transform.mountType == ALTAZM) transform.horToEqu(&home);
-    // flag to use the hour angle directly, not RA
-    home.r = NAN;
-    *commandError = gotoEqu(&home, PSS_EAST);
+    updateHomePosition();
+    *commandError = returnHome();
     *numericReply = false;
   } else
 

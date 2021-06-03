@@ -50,6 +50,7 @@ typedef struct AxisErrors {
 enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING_READY, MMC_SLEWING};
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
 enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
+enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 
 class Axis {
   public:
@@ -73,11 +74,12 @@ class Axis {
 
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
+    // get motor coordinate, in "measure" units
     double getMotorCoordinate();
 
     // sets motor and target coordinates in steps, also zeros backlash and index 
     void setMotorCoordinateSteps(long value);
-    // gets motor coordinates in steps
+    // get motor coordinate in steps
     long getMotorCoordinateSteps();
 
     // get instrument coordinate, in steps
@@ -85,7 +87,9 @@ class Axis {
 
     // set and get instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
+    // get instrument coordinate in steps
     double getInstrumentCoordinate();
+    // move instrument coordinate by value, in "measures" (radians, microns, etc.)
     void incrementTargetCoordinate(double value);
 
     // mark origin coordinate as current location
@@ -122,6 +126,8 @@ class Axis {
     void autoSlew(Direction direction);
     // slew, with acceleration in distance (radians to FrequencyMax)
     void autoSlewRateByDistance(float distance);
+    // slew to home, with acceleration in "measures" per second per second
+    void autoSlewHome();
     // stops automatic movement
     void autoSlewRateByDistanceStop();
     // stops automatic movement
@@ -174,6 +180,8 @@ class Axis {
   private:
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
+    // distance target in "measures" (degrees, microns, etc.)
+    double getTargetDistance();
     // returns true if traveling through backlash
     bool inBacklash();
     // disable backlash compensation, to work properly there must be an enable call to match
@@ -191,6 +199,7 @@ class Axis {
 
     uint8_t taskHandle = 0;
     uint8_t axisNumber = 0;
+    char axisPrefix[13] = "MSG: Axis_, ";
 
     bool invertEnable = false;
     bool enabled = false;
@@ -236,6 +245,7 @@ class Axis {
     float slewMpspcs;
     // abort slew rate in measures per second per centisecond
     float abortMpspcs;
+    HomingStage homingStage = HOME_NONE;
 
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

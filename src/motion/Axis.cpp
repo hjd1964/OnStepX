@@ -65,7 +65,7 @@ long Axis::getInstrumentCoordinateSteps() {
 }
 
 void Axis::setInstrumentCoordinate(double value) {
-  long steps = value*settings.stepsPerMeasure;
+  long steps = lround(value*settings.stepsPerMeasure);
   noInterrupts();
   indexSteps = steps - motorSteps;
   interrupts();
@@ -131,13 +131,21 @@ double Axis::getOriginOrTargetDistance() {
   if (distanceOrigin < distanceTarget) return distanceOrigin/settings.stepsPerMeasure; else return distanceTarget/settings.stepsPerMeasure;
 }
 
+double Axis::getTargetDistance() {
+  noInterrupts();
+  long steps = motorSteps;
+  interrupts();
+  long distanceTarget = labs(targetSteps - steps);
+  return distanceTarget/settings.stepsPerMeasure;
+}
+
 void Axis::setFrequencyBase(float frequency) {
   baseFreq = frequency;
 }
 
 void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
-  if (frequency != 0.0) minPeriodMicros = 1000000.0F/((maxFreq + baseFreq)*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
+  if (frequency != 0.0F) minPeriodMicros = 1000000.0F/((maxFreq + baseFreq)*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
 }
 
 void Axis::setSlewAccelerationRate(float mpsps) {
@@ -152,7 +160,7 @@ void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   driver.modeDecaySlewing();
-  VF("MSG: Axis::autoSlewRateByDistance(); Axis"); V(axisNumber); VLF(" slew started");
+  V(axisPrefix); VLF("autoSlewRateByDistance(); slew started");
 }
 
 void Axis::autoSlewRateByDistanceStop() {
@@ -164,14 +172,29 @@ void Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return;
   if (autoRate == AR_NONE) {
     driver.modeDecaySlewing();
-    VF("MSG: Axis::autoSlew(); Axis"); V(axisNumber); VLF(" slew started");
+    V(axisPrefix); VLF("autoSlew(); slew started");
   }
   if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
 }
 
+void Axis::autoSlewHome() {
+  if (settings.sense.home == OFF) {
+    markOriginCoordinate();
+    V(axisPrefix); VLF("autoSlewHome(); origin coordinate set");
+    autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
+  } else {
+    if (autoRate == AR_NONE) {
+      V(axisPrefix); VLF("autoSlewHome(); slew started");
+      driver.modeDecaySlewing();
+    }
+    if (homingStage == HOME_NONE) homingStage = HOME_FAST;
+    if (senses.read(hHomeSense)) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
+  }
+}
+
 void Axis::autoSlewStop() {
   if (autoRate != AR_NONE && autoRate != AR_RATE_BY_TIME_ABORT) {
-    VF("MSG: Axis::autoSlewStop(); Axis"); V(axisNumber); VLF(" slew stopping");
+    V(axisPrefix); VLF("autoSlewStop(); slew stopping");
     autoRate = AR_RATE_BY_TIME_END;
     poll();
   }
@@ -179,7 +202,7 @@ void Axis::autoSlewStop() {
 
 void Axis::autoSlewAbort() {
   if (autoRate != AR_NONE) {
-    VF("MSG: Axis::autoSlewAbort(); Axis"); V(axisNumber); VLF(" slew aborting");
+    V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
     autoRate = AR_RATE_BY_TIME_ABORT;
     poll();
   }
@@ -193,22 +216,30 @@ void Axis::poll() {
   // make sure we're ready
   if (axisNumber == 0) return;
 
+  //static int i = 0; i++; if (i%200 == 0) { D(" I vs. T = "); D(getInstrumentCoordinateSteps()); D(" = "); DL(getTargetCoordinateSteps()); }
+
   // check for limits
   error.minLimitSensed = senses.read(hMinSense);
   error.maxLimitSensed = senses.read(hMaxSense);
 
+  // stop homing as we pass by the sensor
+  if (homingStage != HOME_NONE) {
+    if (autoRate == AR_RATE_BY_TIME_FORWARD && !senses.read(hHomeSense)) autoSlewStop();
+    if (autoRate == AR_RATE_BY_TIME_REVERSE && senses.read(hHomeSense)) autoSlewStop();
+  }
+
   // automatically abort slew and stop tracking
   if (autoRate != AR_RATE_BY_TIME_ABORT) {
     if (lastPeriod != 0 && trackingStep == -1 && motionReverseError()) {
-      VLF("MSG: Axis::poll(); motion reverse err");
+      V(axisPrefix); VLF("poll(); motion reverse err");
       autoSlewAbort();
-      if (tracking) { tracking = false; VLF("MSG: Axis::poll(); tracking stopped"); }
+      if (tracking) { tracking = false; V(axisPrefix); VLF("poll(); tracking stopped"); }
       return;
     }
     if (lastPeriod != 0 && trackingStep == 1 && motionForwardError()) {
-      VLF("MSG: Axis::poll(); motion forward err");
+      V(axisPrefix); VLF("poll(); motion forward err");
       autoSlewAbort();
-      if (tracking) { tracking = false; VLF("MSG: Axis::poll(); tracking stopped"); }
+      if (tracking) { tracking = false; V(axisPrefix); VLF("poll(); tracking stopped"); }
       return;
     }
   }
@@ -216,10 +247,15 @@ void Axis::poll() {
   if (autoRate != AR_NONE) {
     // acceleration
     if (autoRate == AR_RATE_BY_DISTANCE) {
-      freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*maxFreq + backlashFreq;
-      if (freq < backlashFreq) freq = backlashFreq;
-      if (freq > maxFreq) freq = maxFreq;
-      if (direction == DIR_REVERSE) freq = -freq;
+      if (getTargetDistance() == 0) {
+        freq = 0.0F;
+        autoRate = AR_NONE;
+      } else {
+        freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*maxFreq + backlashFreq;
+        if (freq < backlashFreq) freq = backlashFreq;
+        if (freq > maxFreq) freq = maxFreq;
+        if (direction == DIR_REVERSE) freq = -freq;
+      }
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {
       freq += slewMpspcs;
@@ -235,7 +271,15 @@ void Axis::poll() {
         driver.modeDecayTracking();
         autoRate = AR_NONE;
         freq = 0.0F;
-        VF("MSG: Axis::poll(); axis"); V(axisNumber); VLF(" slew stopped");
+        V(axisPrefix); VLF("poll(); slew stopped");
+        // start next phase of homing
+        if (homingStage == HOME_FINE) homingStage = HOME_NONE;
+        if (homingStage != HOME_NONE) {
+          float f = maxFreq/4.0F; if (f < 0.0003) f = 0.0003; // >= ~1 arc-minute per second slew speed
+          setFrequencyMax(f);
+          if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else if (homingStage == HOME_SLOW) homingStage = HOME_FINE;
+          autoSlewHome();
+        }
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_ABORT) {
@@ -244,7 +288,7 @@ void Axis::poll() {
         driver.modeDecayTracking();
         autoRate = AR_NONE;
         freq = 0.0F;
-        VF("MSG: Axis::poll(); axis"); V(axisNumber); VLF(" slew aborted");
+        V(axisPrefix); VLF("poll(); slew aborted");
       }
     } else freq = 0.0F;
 
@@ -252,28 +296,28 @@ void Axis::poll() {
     if (microstepModeControl == MMC_SLEWING) {
       if (fabs(freq) <= backlashFreq*1.2F || autoRate == AR_NONE) {
         if (driver.modeSwitchAllowed()) {
-          VF("MSG: Axis::poll(); axis"); V(axisNumber); VLF(" mode switch tracking set");
+          V(axisPrefix); VLF("poll(); mode switch tracking set");
           driver.modeMicrostepTracking();
         }
         microstepModeControl = MMC_TRACKING;
         enableMoveFast(false);
-        VF("MSG: Axis::poll(); axis"); V(axisNumber); VF(" high speed ISR swapped out at "); VL(radToDeg(freq));
+        V(axisPrefix); VF("poll(); high speed ISR swapped out at "); VL(radToDeg(freq));
       }
     } else {
       if (fabs(freq) > backlashFreq*1.2F) {
         if (driver.modeSwitchAllowed()) {
           if (microstepModeControl == MMC_TRACKING) {
             microstepModeControl = MMC_SLEWING_REQUEST;
-            VF("MSG: Axis::poll(); axis"); V(axisNumber); VLF(" mode switch slewing requested");
+            V(axisPrefix); VLF("poll(); mode switch slewing requested");
             return;
           } else
           if (microstepModeControl != MMC_SLEWING_READY) return;
-          VF("MSG: Axis::poll(); axis"); V(axisNumber); VLF(" mode switch slewing set");
+          V(axisPrefix); VLF("poll(); mode switch slewing set");
           slewStep = driver.modeMicrostepSlewing();
         }
         microstepModeControl = MMC_SLEWING;
         enableMoveFast(true);
-        VF("MSG: Axis::poll(); axis"); V(axisNumber); VF(" high speed ISR swapped in at "); VL(radToDeg(freq));
+        V(axisPrefix); VF("poll(); high speed ISR swapped in at "); VL(radToDeg(freq));
       }
     }
   } else freq = 0.0F;
