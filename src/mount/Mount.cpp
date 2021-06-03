@@ -47,7 +47,7 @@ void Mount::init(bool validKey) {
   }
 
   // get misc settings from NV
-  if (MiscSize < sizeof(Misc)) { initError.mount = true; DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (MiscSize < sizeof(Misc)) { initError.nv = true; DL("ERR: Mount::init(); MiscSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);

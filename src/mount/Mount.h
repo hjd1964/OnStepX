@@ -180,6 +180,8 @@ class Mount {
     // stop any presently active goto
     void gotoStop();
 
+    // return mount to the home position
+    CommandError returnHome();
     // reset mount at home
     CommandError resetHome();
 

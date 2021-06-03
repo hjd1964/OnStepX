@@ -174,7 +174,7 @@ GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
 }
 
 void Site::readLocation(uint8_t locationNumber, bool validKey) {
-  if (LocationSize < sizeof(Location)) { initError.site = true; DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (LocationSize < sizeof(Location)) { initError.nv = true; DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
   if (!validKey) {
     VLF("MSG: Site, writing default sites 0-3 to NV");
     location.latitude = 0.0;
@@ -191,7 +191,7 @@ void Site::readLocation(uint8_t locationNumber, bool validKey) {
 }
 
 void Site::readJD(bool validKey) {
-  if (JulianDateSize < sizeof(ut1)) { initError.site = true; DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (JulianDateSize < sizeof(ut1)) { initError.nv = true; DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
   if (!validKey) {
     VLF("MSG: Site, writing default date/time to NV");
     ut1.day = 2451544.5;

@@ -22,7 +22,7 @@ inline void mountPecWrapper() { telescope.mount.pecPoll(); }
 
 void Mount::pecInit() {
   // read the pec settings
-  if (PecSize < sizeof(Pec)) { DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (PecSize < sizeof(Pec)) { initError.nv = true; DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
 
   wormRotationSeconds = pec.wormRotationSteps/stepsPerSiderealSecondAxis1;
@@ -31,12 +31,12 @@ void Mount::pecInit() {
   if (pecBufferSize != 0) {
     if (pecBufferSize < 61) {
       pecBufferSize = 0;
-      //initError = true;
+      initError.mount = true;
       DLF("ERR: Mount::initPec(); invalid pecBufferSize PEC disabled");
     }
     if (pecBufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
       pecBufferSize = 0;
-      //initError = true;
+      initError.mount = true;
       DLF("ERR: Mount::initPec(); pecBufferSize exceeds available NV, PEC disabled");
     }
   }
@@ -45,6 +45,7 @@ void Mount::pecInit() {
   pecBuffer = (int8_t*)malloc(pecBufferSize * sizeof(*pecBuffer));
   if (pecBuffer == NULL) {
     pecBufferSize = 0;
+    initError.mount = true;
     VLF("WRN: Mount, buffer exceeds available RAM PEC disabled");
   } else {
     long allocatedSize = pecBufferSize * sizeof(*pecBuffer);

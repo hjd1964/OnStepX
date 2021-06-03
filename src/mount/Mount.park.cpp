@@ -145,7 +145,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
 
   // read the park settings
   if (ParkSize < sizeof(Park)) {
-    initError.mount = true;
+    initError.nv = true;
     DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled");
     nv.readOnly(true);
     return CE_NO_PARK_POSITION_SET;

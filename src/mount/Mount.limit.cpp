@@ -14,7 +14,7 @@ extern Tasks tasks;
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }
 
 void Mount::limitInit(bool validKey) {
-  if (LimitsSize < sizeof(Limits)) { initError.mount = true; DL("ERR: Mount::limitInit(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (LimitsSize < sizeof(Limits)) { initError.nv = true; DL("ERR: Mount::limitInit(); LimitsSize error NV subsystem writes disabled"); nv.readOnly(true); }
 
   // write the default limits to NV
   if (!validKey) {
