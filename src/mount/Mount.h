@@ -239,7 +239,7 @@ class Mount {
 
     void st4Init();
 
-    void pecInit();
+    void pecInit(bool validKey);
     #if AXIS1_PEC == ON
       // disable PEC
       void pecDisable();
@@ -338,7 +338,7 @@ class Mount {
       uint8_t  pecMonitorHandle         = 0;
       uint8_t  pecSenseHandle           = 0;
 
-      Pec pec = {false, PEC_NONE, 0};
+      Pec pec = {false, PEC_NONE, PEC_STEPS_PER_WORM_ROTATION};
 
       int      pecAnalogValue           = 0;
 

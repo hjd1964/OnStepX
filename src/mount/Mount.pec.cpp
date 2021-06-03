@@ -20,67 +20,71 @@ extern Tasks tasks;
 
 inline void mountPecWrapper() { telescope.mount.pecPoll(); }
 
-void Mount::pecInit() {
+void Mount::pecInit(bool validKey) {
+  // write the default pec settings to NV
+  if (!validKey) {
+    VLF("MSG: Mount, writing default PEC settings to NV");
+    nv.writeBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
+  }
+
   // read the pec settings
   if (PecSize < sizeof(Pec)) { initError.nv = true; DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
 
   wormRotationSeconds = pec.wormRotationSteps/stepsPerSiderealSecondAxis1;
-  pecBufferSize = ceil(pec.wormRotationSteps/(axis1.getStepsPerMeasure()/240.0));
+  pecBufferSize = wormRotationSeconds;
 
-  if (pecBufferSize != 0) {
+  if (pecBufferSize > 0) {
     if (pecBufferSize < 61) {
       pecBufferSize = 0;
       initError.mount = true;
-      DLF("ERR: Mount::initPec(); invalid pecBufferSize PEC disabled");
-    }
+      DLF("ERR: Mount::initPec(); invalid pecBufferSize, PEC disabled");
+    } else
     if (pecBufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
       pecBufferSize = 0;
       initError.mount = true;
       DLF("ERR: Mount::initPec(); pecBufferSize exceeds available NV, PEC disabled");
+    } else {
+      pecBuffer = (int8_t*)malloc(pecBufferSize * sizeof(*pecBuffer));
+      if (pecBuffer == NULL) {
+        pecBufferSize = 0;
+        initError.mount = true;
+        VLF("WRN: Mount, pecBufferSize exceeds available RAM, PEC disabled");
+      } else {
+        long allocatedSize = pecBufferSize * sizeof(*pecBuffer);
+        VF("MSG: Mount, allocated PEC buffer "); V(allocatedSize); VLF(" bytes");
+
+        bool pecBufferNeedsInit = true;
+        for (int i = 0; i < pecBufferSize; i++) {
+          pecBuffer[i] = nv.read(NV_PEC_BUFFER_BASE + i);
+          if (pecBuffer[i] != 0) pecBufferNeedsInit = false;
+        }
+        if (pecBufferNeedsInit) for (int i = 0; i < pecBufferSize; i++) nv.write(NV_PEC_BUFFER_BASE + i, (int8_t)0);
+
+        if (pec.state > PEC_RECORD) {
+          pec.state = PEC_NONE;
+          initError.mount = true;
+          DLF("ERR: Mount::initPec(); bad NV pec.state");
+        }
+
+        if (!pec.recorded) pec.state = PEC_NONE;
+
+        #if PEC_SENSE == OFF
+          park.wormSensePositionSteps = 0;
+          pec.state = PEC_NONE;
+        #else
+          VLF("MSG: Mount, adding pec sense");
+          pecSenseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
+        #endif
+
+        VF("MSG: Mount, start pec monitor task... ");
+        pecMonitorHandle = tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec");
+        if (pecMonitorHandle) { VL("success"); } else { initError.mount = true; VL("FAILED!"); }
+      }
     }
   }
+  if (pecBufferSize <= 0) { pecBufferSize = 0; pec.state = PEC_NONE; pec.recorded = false; }
   if (wormRotationSeconds > pecBufferSize) wormRotationSeconds = pecBufferSize;
-
-  pecBuffer = (int8_t*)malloc(pecBufferSize * sizeof(*pecBuffer));
-  if (pecBuffer == NULL) {
-    pecBufferSize = 0;
-    initError.mount = true;
-    VLF("WRN: Mount, buffer exceeds available RAM PEC disabled");
-  } else {
-    long allocatedSize = pecBufferSize * sizeof(*pecBuffer);
-    VF("MSG: Mount, allocated PEC buffer "); V(allocatedSize); VLF(" bytes");
-  }
-
-  bool pecBufferNeedsInit = true;
-  for (int i = 0; i < pecBufferSize; i++) {
-    pecBuffer[i] = nv.read(NV_PEC_BUFFER_BASE + i);
-    if (pecBuffer[i] != 0) pecBufferNeedsInit = false;
-  }
-  if (pecBufferNeedsInit) for (int i = 0; i < pecBufferSize; i++) nv.write(NV_PEC_BUFFER_BASE + i, (int8_t)0);
-
-  #if PEC_SENSE == OFF
-    park.wormSensePositionSteps = 0;
-    pec.state = PEC_NONE;
-  #else
-    VLF("MSG: Mount, adding pec sense");
-    pecSenseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
-  #endif
-
-  if (pec.state > PEC_RECORD) {
-    pec.state = PEC_NONE;
-    //initError = true;
-    DLF("ERR: Mount::initPec(); bad NV pec.state");
-  }
-
-  if (!pec.recorded) pec.state = PEC_NONE;
-
-  // start pec monitor task if it's not running
-  if (pecMonitorHandle == 0) {
-    VF("MSG: Mount, start pec monitor task... ");
-    pecMonitorHandle = tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec");
-    if (pecMonitorHandle) { VL("success"); } else { VL("FAILED!"); }
-  }
 }
 
 void Mount::pecPoll() {

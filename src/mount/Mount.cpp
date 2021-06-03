@@ -19,11 +19,6 @@ void Mount::init(bool validKey) {
   transform.init(validKey);
   if (transform.mountType != ALTAZM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
 
-  // get PEC ready
-  #if AXIS1_PEC == ON
-    pecInit();
-  #endif
-
   // get library ready
   library.init(validKey);
 
@@ -61,6 +56,10 @@ void Mount::init(bool validKey) {
   // start guide monitor task
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
+
+  #if AXIS1_PEC == ON
+    pecInit(validKey);
+  #endif
 
   st4Init();
 

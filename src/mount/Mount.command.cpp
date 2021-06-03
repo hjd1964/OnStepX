@@ -200,7 +200,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   // :hC#       Moves telescope to the home position
   //            Returns: Nothing
   if (cmd("hC")) {
-    updateHomePosition();
     *commandError = returnHome();
     *numericReply = false;
   } else
@@ -209,8 +208,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
   //            Returns: Nothing
   if (cmd("hF")) {
-    // setup where the home position is
-    updateHomePosition();
     *commandError = resetHome();
     *numericReply = false;
   } else 
