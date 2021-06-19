@@ -41,4 +41,7 @@
                                           //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
 #define AXIS3_SLEW_RATE_DESIRED       1.0 //    1.0, n, (degrees/second) Maximum speed depends on processor.                  Adjust
 
+// USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
+#define LED_ROTATOR_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 1deg/s.)          Option
+
 // ---------------------------------------------------------------------------------------------------------------------------------

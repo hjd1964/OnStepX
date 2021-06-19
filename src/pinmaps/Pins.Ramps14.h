@@ -55,9 +55,11 @@
 #define SENSE_LIMIT_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED1_PIN        Aux0             // RAMPS SERVO1 (1=GND, 2=+5, 3=LED-) (active LOW)
-#define STATUS_LED2_PIN        6                // RAMPS SERVO2 (1=GND, 2=+5, 3=LED-) (active LOW)
-#define RETICLE_LED_PIN        5                // RAMPS SERVO3 (1=GND, 2=+5, 3=LED-) (active LOW)
+#define LED_STATUS_PIN         Aux0             // Drain RAMPS SERVO1 (1=GND, 2=+5, 3=LED-)
+#define LED_MOUNT_STATUS_PIN   6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
+#define LED_ROTATOR_STATUS_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
+#define LED_FOCUSER_STATUS_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
+#define RETICLE_LED_PIN        5                // Drain RAMPS SERVO3 (1=GND, 2=+5, 3=LED-)
 
 // Pin for a piezo buzzer output on RAMPS Y-MIN
 #define BUZZER_PIN             4                // RAMPS SERVO4 (1=GND, 2=+5, 3=TONE+) (active HIGH)

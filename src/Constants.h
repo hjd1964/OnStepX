@@ -137,6 +137,7 @@
 #define Deg360                      6.283185307179586
 
 // for handling degenerate spherical coordinates near the poles
+#define TenthArcSec                 0.00000048481368
 #define OneArcSec                   0.0000048481368F
 #define SmallestFloat               0.0000001F
 

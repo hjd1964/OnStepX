@@ -185,9 +185,9 @@ void Site::readLocation(uint8_t locationNumber, bool validKey) {
   }
   number = locationNumber;
   nv.readBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
-  if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; initError.site = true; DLF("ERR: Site::readSite, bad NV latitude"); }
-  if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; initError.site = true; DLF("ERR: Site::readSite, bad NV longitude"); }
-  if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; initError.site = true; DLF("ERR: Site::readSite,  bad NV timeZone"); }
+  if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV latitude"); }
+  if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV longitude"); }
+  if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; initError.value = true; DLF("ERR: Site::readSite,  bad NV timeZone"); }
 }
 
 void Site::readJD(bool validKey) {
@@ -199,8 +199,8 @@ void Site::readJD(bool validKey) {
     nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
   }
   nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.site = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
-  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.site = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
+  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
+  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
 }
 
 #endif

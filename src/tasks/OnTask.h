@@ -254,10 +254,14 @@ class Tasks {
     // set the process name
     char *getNameStr(uint8_t handle);
 
-    // allow search for tasks, returns 0 if no handles are found
+    // search for tasks, returns 0 if no handles are found
     uint8_t getFirstHandle();
 
+    // search for tasks, returns 0 if no handles are found
     uint8_t getNextHandle();
+
+    // search for task by name, returns 0 if not found
+    uint8_t getHandleByName(const char name[]);
 
     #ifdef TASKS_PROFILER_ENABLE
       double getArrivalAvg(uint8_t handle);

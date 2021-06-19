@@ -9,6 +9,6 @@ class Sound {
     void click();
     void beep();
 
-    bool enabled = BUZZER_STATE; 
+    bool enabled = BUZZER_DEFAULT; 
   private:
 };

@@ -442,7 +442,8 @@ void Tasks::setNameStr(uint8_t handle, const char name[]) {
 }
 
 char* Tasks::getNameStr(uint8_t handle) {
-  static char empty[1]; strcpy(empty,"");
+  static char empty[1];
+  strcpy(empty, "");
   if (handle != 0 && allocated[handle - 1]) {
     return task[handle - 1]->getNameStr();
   } else return empty;
@@ -459,6 +460,20 @@ uint8_t Tasks::getNextHandle() {
     if (allocated[handleSearch]) return handleSearch + 1;
   } while (handleSearch < highest_task);
   return false;
+}
+
+uint8_t Tasks::getHandleByName(const char name[]) {
+  uint8_t h;
+  char *candidate;
+  handleSearch = 255;
+  do {
+    h = getNextHandle();
+    candidate = getNameStr(h);
+    if (strstr(candidate, name)) {
+      if (strlen(candidate) == strlen(name)) break;
+    }
+  } while (h != 0);
+  return h;
 }
 
 #ifdef TASKS_PROFILER_ENABLE

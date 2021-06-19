@@ -42,7 +42,10 @@
 #define AXIS4_SLEW_RATE_MINIMUM        50 //     50, n. Where n=1..1000 (um/s.) Minimum microns/second. In DC mode, min pwr.  Adjust
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Max microns/second. In DC mode, max pwr %   Adjust
 
-// AXIS6 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
+// AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
+
+// USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
+#define LED_FOCUSER_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
 
 // ---------------------------------------------------------------------------------------------------------------------------------

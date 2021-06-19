@@ -8,16 +8,21 @@
 #include "../commands/ProcessCmds.h"
 #include "Mount.h"
 
+float Mount::limitGuideRate(float rate) {
+  if (rate > radToDeg(radsPerSecondCurrent)*120.0F) rate = radToDeg(radsPerSecondCurrent)*120.0F;
+  return rate;
+}
+
 float Mount::guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis) {
   switch (guideRateSelect) {
     case GR_QUARTER: return 0.25F;
     case GR_HALF: return 0.5F;
     case GR_1X: return 1.0F;
     case GR_2X: return 2.0F;
-    case GR_4X: return 4.0F;
-    case GR_8X: return 8.0F;
-    case GR_20X: return 20.0F;
-    case GR_48X: return 48.0F;
+    case GR_4X: return limitGuideRate(4.0F);
+    case GR_8X: return limitGuideRate(8.0F);
+    case GR_20X: return limitGuideRate(20.0F);
+    case GR_48X: return limitGuideRate(48.0F);
     case GR_HALF_MAX: return radToDeg(radsPerSecondCurrent)*120.0F;
     case GR_MAX: return radToDeg(radsPerSecondCurrent)*240.0F;
     case GR_CUSTOM: if (axis == 1) return customGuideRateAxis1; else if (axis == 2) return customGuideRateAxis2; else return 0.0F;
@@ -70,6 +75,8 @@ CommandError Mount::guideValidate(int axis, GuideAction guideAction) {
   if (axis1.driver.getStatus().fault || axis2.driver.getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (park.state == PS_PARKED)                                          return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)                                             return CE_SLEW_IN_MOTION;
+  if (axis1.autoSlewActive())                                           return CE_SLEW_IN_MOTION;
+  if (axis2.autoSlewActive())                                           return CE_SLEW_IN_MOTION;
   updatePosition(CR_MOUNT_ALT);
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!guideValidAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;

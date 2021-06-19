@@ -29,9 +29,9 @@
 #define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED_VCC_PIN       8               // LED
-#define STATUS_LED1_PIN          9               // GND
-#define STATUS_LED2_PIN          10              // PGND
+#define LED_STATUS_VCC_PIN       8               // LED
+#define LED_STATUS_PIN           9               // GND
+#define LED_MOUNT_STATUS_PIN     10              // PGND
 #define RETICLE_LED_PIN          44              // PGND
 
 // For a piezo buzzer
@@ -126,10 +126,12 @@
 #define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED_VCC_PIN       8               // LED
-#define STATUS_LED1_PIN          9               // GND
-#define STATUS_LED2_PIN          7               // GND
-#define RETICLE_LED_PIN          9               // GND
+#define LED_STATUS_VCC_PIN       8               // LED Annode
+#define LED_STATUS_PIN           9               // Default LED Cathode (-)
+#define LED_MOUNT_STATUS_PIN     7               // Default LED Cathode (-)
+#define LED_ROTATOR_STATUS_PIN   7               // Default LED Cathode (-)
+#define LED_FOCUSER_STATUS_PIN   7               // Default LED Cathode (-)
+#define RETICLE_LED_PIN          9               // Default LED Cathode (-)
 
 // For a piezo buzzer
 #define BUZZER_PIN               29              // Tone

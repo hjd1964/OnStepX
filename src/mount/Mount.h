@@ -207,6 +207,8 @@ class Mount {
     bool alignActive();
     CommandError alignAddStar();
 
+    // keep guide rate <= half max
+    float limitGuideRate(float rate);
     // return guide rate (sidereal x) for guide rate selection
     float guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis = 1);
     // valid guide on Axis1

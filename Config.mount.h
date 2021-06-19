@@ -42,10 +42,10 @@
 #define AXIS1_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from front. Option
 #define AXIS1_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 #define AXIS1_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
-                                          //         Digital, optionally add: |HIST(n) Where n=0..1023 stability time in ms.
+                                          //         Digital, optionally add: |HYST(n) Where n=0..1023 stability time in ms.
                                           //         Analog capable sense inputs also allow adding:
                                           //         |THLD(n) Where n=1..1023 (ADU) for Analog threshold.
-                                          //         |HIST(n) Where n=0..1023 (ADU) for +/- Hystersis range.
+                                          //         |HYST(n) Where n=0..1023 (ADU) for +/- Hystersis range.
 
 #define AXIS1_STEPS_PER_DEGREE    12800.0 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -81,11 +81,9 @@
                                           //         Dobsonian etc. mounts. GEM Eq mounts perform meridian flips.
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define LED_STATUS                     ON //     ON, Blinks w/sidereal tracking otherwise steady on indicates activity.       Option
-#define LED_STATUS2                   OFF //    OFF, ON Blinks 1s interval w/PPS sync, steady for gotos, off if in standby.   Option
-#define LED_RETICLE                   OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
-#define BUZZER                        OFF //    OFF, ON, n. Where n=100..6000 (Hz freq.) for piezo speaker. ON for buzzer.    Option
-#define BUZZER_STATE                  OFF //    OFF, ON starts w/buzzer enabled. MEMORY remembers state across power cycles.  Option
+#define LED_MOUNT_STATUS              OFF //    OFF, ON Flashes proportional to movement rate (2Hz=1x sidereal) on for slews. Option
+#define BUZZER                       2000 //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
+#define BUZZER_DEFAULT                OFF //    OFF, ON starts w/buzzer enabled.                                              Option
 
 // TIME AND LOCATION -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#TLS
 #define TIME_LOCATION_SOURCE          OFF //    OFF, DS3231 (I2c,) DS3234 (Spi,) TEENSY (T3.2 internal,) or GPS source.       Option

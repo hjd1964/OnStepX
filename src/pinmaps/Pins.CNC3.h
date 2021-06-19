@@ -28,9 +28,11 @@
 #define PEC_SENSE_PIN             36             // [input only 36] (also analog A0)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED1_PIN           Aux8           // Drain
-#define STATUS_LED2_PIN           Aux8           // Drain
-#define RETICLE_LED_PIN           Aux8           // Drain
+#define LED_STATUS_PIN            Aux8           // Default LED Cathode (-)
+#define LED_MOUNT_STATUS_PIN      Aux8           // Default LED Cathode (-)
+#define LED_ROTATOR_STATUS_PIN    Aux8           // Default LED Cathode (-)
+#define LED_FOCUSER_STATUS_PIN    Aux8           // Default LED Cathode (-)
+#define RETICLE_LED_PIN           Aux8           // Default LED Cathode (-)
 
 // For a piezo buzzer
 #define BUZZER_PIN                2

@@ -5,6 +5,13 @@
 #include "Stream.h"
 #include "Serial_ST4_Master.h"
 
+// compensate for Mega2560 overhead to give about the same bitrate
+#ifdef HAL_SLOW_PROCESSOR
+  #define XMIT_TIME 20
+#else
+  #define XMIT_TIME 40
+#endif
+
 char SerialST4Master::poll() {
   char c = 0;
   if (trans(&c, xmit_buffer[xmit_head])) {
@@ -20,17 +27,6 @@ char SerialST4Master::poll() {
 }
 
 bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
-  static unsigned long lastMicros = 0;
-
-  // SHC_CLOCK HIGH for more than 1500 us means that a pair of data bytes is done being exchanged
-  #ifdef HAL_SLOW_PROCESSOR
-    #define XMIT_TIME 20
-//  if ((long)(micros() - lastMicros) < 10000L) return false;
-  #else
-    #define XMIT_TIME 40
-//  if ((long)(micros() - lastMicros) < 2000L) return false;
-  #endif
-
   uint8_t s_parity = 0;
   uint8_t r_parity = 0;
 
@@ -46,7 +42,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   digitalWrite(SST4_CLOCK_OUT, HIGH);
   if (digitalRead(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
   delayMicroseconds(XMIT_TIME);
-  if (frame_error) { lastMicros = micros(); return false; }
+  if (frame_error) return false;
 
   for (int i = 7; i >= 0; i--) {
     uint8_t state = bitRead(data_out, i);
@@ -84,8 +80,6 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   digitalWrite(SST4_CLOCK_OUT, HIGH);
   if (digitalRead(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
   delayMicroseconds(XMIT_TIME);
-
-  lastMicros = micros();
 
   if (frame_error) DLF("WRN, SerialST4.trans(): frame error");
   if (send_error) DLF("WRN, SerialST4.trans(): send parity error");

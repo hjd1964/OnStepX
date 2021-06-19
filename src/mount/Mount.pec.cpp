@@ -37,18 +37,18 @@ void Mount::pecInit(bool validKey) {
   if (pecBufferSize > 0) {
     if (pecBufferSize < 61) {
       pecBufferSize = 0;
-      initError.mount = true;
+      initError.value = true;
       DLF("ERR: Mount::initPec(); invalid pecBufferSize, PEC disabled");
     } else
     if (pecBufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
       pecBufferSize = 0;
-      initError.mount = true;
+      initError.value = true;
       DLF("ERR: Mount::initPec(); pecBufferSize exceeds available NV, PEC disabled");
     } else {
       pecBuffer = (int8_t*)malloc(pecBufferSize * sizeof(*pecBuffer));
       if (pecBuffer == NULL) {
         pecBufferSize = 0;
-        initError.mount = true;
+        initError.value = true;
         VLF("WRN: Mount, pecBufferSize exceeds available RAM, PEC disabled");
       } else {
         long allocatedSize = pecBufferSize * sizeof(*pecBuffer);
@@ -63,7 +63,7 @@ void Mount::pecInit(bool validKey) {
 
         if (pec.state > PEC_RECORD) {
           pec.state = PEC_NONE;
-          initError.mount = true;
+          initError.value = true;
           DLF("ERR: Mount::initPec(); bad NV pec.state");
         }
 
@@ -79,7 +79,7 @@ void Mount::pecInit(bool validKey) {
 
         VF("MSG: Mount, start pec monitor task... ");
         pecMonitorHandle = tasks.add(10, 0, true, 1, mountPecWrapper, "MntPec");
-        if (pecMonitorHandle) { VL("success"); } else { initError.mount = true; VL("FAILED!"); }
+        if (pecMonitorHandle) { VL("success"); } else { VL("FAILED!"); }
       }
     }
   }

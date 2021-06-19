@@ -53,9 +53,11 @@
 
 // This is the built in LED for the Black Pill board. There is a pin
 // available from it too, in case you want to power another LED with a wire
-#define STATUS_LED1_PIN        Aux0             // Drain
-#define STATUS_LED2_PIN        OFF              // Drain
-#define RETICLE_LED_PIN        Aux3             // Drain
+#define LED_STATUS_PIN         Aux0             // Default LED Cathode (-)
+#define LED_MOUNT_STATUS_PIN   Aux0             // Default LED Cathode (-)
+#define LED_ROTATOR_STATUS_PIN Aux0             // Default LED Cathode (-)
+#define LED_FOCUSER_STATUS_PIN Aux0             // Default LED Cathode (-)
+#define RETICLE_LED_PIN        Aux3             // Default LED Cathode (-)
 
 // For a piezo buzzer
 #define BUZZER_PIN             PB9              // Tone

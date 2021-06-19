@@ -6,13 +6,11 @@
 #include "../mount/Mount.h"
 
 typedef struct InitError {
-  uint8_t nv:1;
-  uint8_t site:1;
-  uint8_t mount:1;
-  uint8_t axis:1;
-  uint8_t driver:1;
-  uint8_t tls:1;
-  uint8_t weather:1;
+  uint8_t nv:1;       // NV data size/structure error (disables writes to NV)
+  uint8_t value:1;    // invalid value error
+  uint8_t driver:1;   // the stepper driver wasn't detected properly (TMC SPI drivers only)
+  uint8_t weather:1;  // the weather source (BME280, etc.) was not found
+  uint8_t tls:1;      // the time location source (DS3231, GPS, etc.) was not found
 } InitError;
 
 extern InitError initError;

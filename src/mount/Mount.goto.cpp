@@ -16,8 +16,10 @@ CommandError Mount::validateGoto() {
   if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED)                  return CE_SLEW_ERR_IN_PARK;
-  if (guideState != GU_NONE)                    return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE)                    return CE_SLEW_IN_SLEW;
+  if (guideState != GU_NONE)                    return CE_SLEW_IN_MOTION;
+  if (axis1.autoSlewActive())                   return CE_SLEW_IN_MOTION;
+  if (axis2.autoSlewActive())                   return CE_SLEW_IN_MOTION;
   return CE_NONE;
 }
 
@@ -108,7 +110,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   // converts from native to mount coordinates and checks for valid target
   CommandError e = setMountTarget(coords, pierSideSelect, native);
   if (e == CE_SLEW_IN_SLEW) {
-  //  gotoStop(); 
+    gotoStop(); 
     return e;
   }
   if (e != CE_NONE) return e;
@@ -124,12 +126,9 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   gotoState = GS_GOTO;
   gotoStage = GG_DESTINATION;
   if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
-//    VLF("MSG: Mount::gotoEqu, goto changes pier side, attempting to set waypoint");
+    VLF("MSG: Mount::gotoEqu, goto changes pier side, setting waypoint at home");
     gotoWaypoint();
   }
-
-//  VF("Start       = "); transform.print(&start);
- // VF("Destination = "); transform.print(&destination);
 
   // start the goto monitor
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);

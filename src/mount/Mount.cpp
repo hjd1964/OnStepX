@@ -57,11 +57,11 @@ void Mount::init(bool validKey) {
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
 
+  st4Init();
+
   #if AXIS1_PEC == ON
     pecInit(validKey);
   #endif
-
-  st4Init();
 
   // startup state is reset and at home
   resetHome();

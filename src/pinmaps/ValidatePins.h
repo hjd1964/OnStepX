@@ -64,16 +64,16 @@
 #endif
 
 // leds allowed?
-#if LED_STATUS != OFF && STATUS_LED1_PIN == OFF
+#if LED_STATUS != OFF && LED_STATUS_PIN == OFF
   #error "Configuration (Config.h): LED_STATUS not supported for this PINMAP, must be OFF"
 #endif
 
-#if LED_STATUS2 != OFF && STATUS_LED2_PIN == OFF
-  #error "Configuration (Config.h): LED_STATUS2 not supported for this PINMAP, must be OFF"
+#if LED_MOUNT_STATUS != OFF && LED_MOUNT_STATUS_PIN == OFF
+  #error "Configuration (Config.h): LED_MOUNT_STATUS not supported for this PINMAP, must be OFF"
 #endif
 
-#if LED_RETICLE != OFF && RETICLE_LED_PIN == OFF
-  #error "Configuration (Config.h): LED_RETICLE not supported for this PINMAP, must be OFF"
+#if RETICLE_LED != OFF && RETICLE_LED_PIN == OFF
+  #error "Configuration (Config.h): RETICLE_LED not supported for this PINMAP, must be OFF"
 #endif
 
 // TIME_LOCATION_SOURCE DS3234 SPI allowed?

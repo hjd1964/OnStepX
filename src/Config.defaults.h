@@ -71,17 +71,40 @@
 #ifndef LED_STATUS
 #define LED_STATUS                    ON
 #endif
-#ifndef LED_STATUS2
-#define LED_STATUS2                   OFF
+#ifndef LED_STATUS_ON_STATE
+#define LED_STATUS_ON_STATE           LOW
 #endif
-#ifndef LED_RETICLE
-#define LED_RETICLE                   OFF
+#ifndef LED_MOUNT_STATUS
+#define LED_MOUNT_STATUS              OFF
+#endif
+#ifndef LED_MOUNT_STATUS_ON_STATE
+#define LED_MOUNT_STATUS_ON_STATE     LOW
+#endif
+#ifndef LED_ROTATOR_STATUS
+#define LED_ROTATOR_STATUS            OFF
+#endif
+#ifndef LED_ROTATOR_STATUS_ON_STATE
+#define LED_ROTATOR_STATUS_ON_STATE   LOW
+#endif
+#ifndef LED_FOCUSER_STATUS
+#define LED_FOCUSER_STATUS            OFF
+#endif
+#ifndef LED_FOCUSER_STATUS_ON_STATE
+#define LED_FOCUSER_STATUS_ON_STATE   LOW
 #endif
 #ifndef BUZZER
 #define BUZZER                        OFF
 #endif
-#ifndef BUZZER_STATE
-#define BUZZER_STATE                  OFF
+#ifndef BUZZER_ON_STATE
+#define BUZZER_ON_STATE               HIGH
+#endif
+#ifndef BUZZER_DEFAULT
+#define BUZZER_DEFAULT                OFF
+#endif
+
+// reticle
+#ifndef RETICLE_LED
+#define RETICLE_LED                   OFF
 #endif
 
 // time and location

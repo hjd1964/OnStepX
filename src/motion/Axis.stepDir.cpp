@@ -161,7 +161,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
     driver.settings.currentGoto = settings.currentRun;
     driver.settings.currentHold = settings.currentRun/2;
   }
-  if (!validateAxisSettings(1, MOUNT_TYPE == ALTAZM, settings)) initError.axis = true;
+  if (!validateAxisSettings(1, MOUNT_TYPE == ALTAZM, settings)) initError.value = true;
 
   V(axisPrefix); VLF("adding home and limit senses");
   hHomeSense = senses.add(pins.home, settings.sense.homeInit, settings.sense.home);

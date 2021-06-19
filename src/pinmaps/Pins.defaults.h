@@ -18,12 +18,12 @@
   #define PEC_SENSE_PIN             OFF
 #endif
 
-#ifndef STATUS_LED1_PIN
-  #define STATUS_LED1_PIN           OFF
+#ifndef LED_STATUS_PIN
+  #define LED_STATUS_PIN            OFF
 #endif
 
-#ifndef STATUS_LED2_PIN
-  #define STATUS_LED2_PIN           OFF
+#ifndef LED_MOUNT_STATUS_PIN
+  #define LED_MOUNT_STATUS_PIN      OFF
 #endif
 
 #ifndef RETICLE_LED_PIN
