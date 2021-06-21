@@ -75,8 +75,6 @@ CommandError Mount::guideValidate(int axis, GuideAction guideAction) {
   if (axis1.driver.getStatus().fault || axis2.driver.getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (park.state == PS_PARKED)                                          return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)                                             return CE_SLEW_IN_MOTION;
-  if (axis1.autoSlewActive())                                           return CE_SLEW_IN_MOTION;
-  if (axis2.autoSlewActive())                                           return CE_SLEW_IN_MOTION;
   updatePosition(CR_MOUNT_ALT);
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!guideValidAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
