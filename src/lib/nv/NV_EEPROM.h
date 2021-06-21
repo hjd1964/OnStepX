@@ -8,6 +8,7 @@
 #if !defined(ARDUINO_ARCH_SAMD)
 
   #include "NV.h"
+  #include "EEPROM.h"
 
   #if defined(E2END)
 

@@ -2,6 +2,7 @@
 // OnStepX telescope control
 #pragma once
 
+#include "../Common.h"
 #include "../commands/ProcessCmds.h"
 #include "../mount/Mount.h"
 
@@ -47,6 +48,8 @@ class Telescope {
 
     // handle observatory commands
     bool command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError);
+
+    void statusInit();
 
     // equipment
     #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF

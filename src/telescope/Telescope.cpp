@@ -11,27 +11,6 @@ extern Tasks tasks;
 Telescope telescope;
 InitError initError;
 
-#if LED_STATUS != OFF && LED_STATUS_PIN != OFF
-  void stat1() {
-    static uint8_t cycle = 0;
-    if (cycle++ > 16) cycle = 0;
-
-    // show only the most severe error (in order)
-    uint8_t flashes = 0;
-    if (initError.nv)      flashes = 1; else
-    if (initError.value)   flashes = 2; else
-    if (initError.driver)  flashes = 3; else
-    if (initError.tls)     flashes = 4; else
-    if (initError.weather) flashes = 5;
-  
-    // everything is ok, turn on LED and exit
-    if (flashes == 0) { digitalWrite(LED_STATUS_PIN, LED_STATUS_ON_STATE); return; }
-
-    // flash the LED if there's an error
-    if (cycle%1 == 0) { digitalWrite(LED_STATUS_PIN, !LED_STATUS_ON_STATE); } else { if (cycle/2 < flashes) digitalWrite(LED_STATUS_PIN, LED_STATUS_ON_STATE); }
-  }
-#endif
-
 void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig) {
   strcpy(telescope.firmware.name, fwName);
   telescope.firmware.version.major = fwMajor;
@@ -68,10 +47,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   }
 
   // bring up status LED and flash error codes
-  #if LED_STATUS != OFF && LED_STATUS_PIN != OFF
-    VF("MSG: Telescope, start status LED task (rate 500ms priority 7)... ");
-    if (tasks.add(500, 0, true, 1, stat1, "staLed")) { VL("success"); } else { VL("FAILED!"); }
-  #endif
+  statusInit();
 }
 
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {

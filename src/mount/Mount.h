@@ -267,6 +267,9 @@ class Mount {
     void limitStopAxis1(GuideAction stopDirection);
     void limitStopAxis2(GuideAction stopDirection);
 
+    void statusInit();
+    void statusSetPeriodMillis(unsigned long period);
+
     Sound sound;
     Library library;
     Convert convert;
@@ -364,8 +367,11 @@ class Mount {
     // park
     Park park = {{0, 0, PIER_SIDE_NONE}, false, PS_NONE, 0};
 
+    // status LED task
+    uint8_t    statusTaskHandle         = 0;
+
     // misc. settings stored in NV
-    Misc misc = {false, false, false, false, 64.0, GR_20X, {0, 0}};
+    Misc misc = {false, false, false, BUZZER_DEFAULT == ON, 64.0, GR_20X, {0, 0}};
 
     float timerRateRatio = 1.0;
 };

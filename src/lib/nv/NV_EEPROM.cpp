@@ -5,8 +5,6 @@
 
 #if !defined(ARDUINO_ARCH_SAMD)
 
-  #include "EEPROM.h"
-
   #if defined(E2END)
 
     bool NonVolatileStorageEEPROM::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {

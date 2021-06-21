@@ -101,6 +101,9 @@
 #ifndef BUZZER_DEFAULT
 #define BUZZER_DEFAULT                OFF
 #endif
+#ifndef BUZZER_MEMORY
+#define BUZZER_MEMORY                 OFF
+#endif
 
 // reticle
 #ifndef RETICLE_LED

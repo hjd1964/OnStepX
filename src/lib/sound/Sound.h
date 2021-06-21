@@ -5,10 +5,11 @@
 
 class Sound {
   public:
-    void alert();
-    void click();
-    void beep();
+    Sound();
+    void alert(); // sound/buzzer
+    void click(); // sound/beep
+    void beep();  // sound/click
 
-    bool enabled = BUZZER_DEFAULT; 
+    bool enabled = BUZZER_DEFAULT == ON; 
   private:
 };

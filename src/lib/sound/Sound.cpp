@@ -12,7 +12,13 @@ extern Tasks tasks;
   }
 #endif
 
-// sound/buzzer
+Sound::Sound() {
+  #if BUZZER == ON
+    pinModeEx(BUZZER_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, !BUZZER_ON_STATE);
+  #endif
+}
+
 void Sound::alert() {
   if (enabled) {
     #if BUZZER == ON
@@ -25,7 +31,6 @@ void Sound::alert() {
   }
 }
 
-// sound/beep
 void Sound::beep() {
   if (enabled) {
     #if BUZZER == ON
@@ -38,7 +43,6 @@ void Sound::beep() {
   }
 }
 
-// sound/click
 void Sound::click() {
   if (enabled) {
     #if BUZZER == ON

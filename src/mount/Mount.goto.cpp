@@ -160,6 +160,8 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
     axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
 
+    sound.alert();
+
   } else { DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!"); }
 
   return CE_NONE;
@@ -234,6 +236,8 @@ void Mount::gotoPoll() {
       tasks.setDurationComplete(gotoTaskHandle);
       gotoTaskHandle = 0;
       VLF("MSG: Mount::gotoPoll(); goto monitor task terminated");
+
+      sound.alert();
 
       return;
     }

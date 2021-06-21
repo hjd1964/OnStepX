@@ -46,6 +46,9 @@ void Mount::init(bool validKey) {
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
+  #if BUZZER_MEMORY == ON
+    sound.enabled = misc.buzzer;
+  #endif
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
@@ -88,12 +91,14 @@ void Mount::init(bool validKey) {
 void Mount::setTrackingState(TrackingState state) {
   trackingState = state;
   if (trackingState == TS_SIDEREAL) {
+    // bring up mount status LED
+    statusInit();
     axis1.setTracking(true);
     axis2.setTracking(true);
     axis1.enable(true);
     axis2.enable(true);
     atHome = false;
-  } else 
+  } else
   if (trackingState == TS_NONE) {
     axis1.setTracking(false);
     axis2.setTracking(false);
@@ -111,16 +116,27 @@ void Mount::updatePosition(CoordReturn coordReturn) {
 }
 
 void Mount::updateTrackingRates() {
-  if (gotoState == GS_NONE) {
-    if (trackingState != TS_SIDEREAL) {
-      trackingRateAxis1 = 0.0F;
-      trackingRateAxis2 = 0.0F;
-    }
-    if (guideActionAxis1 == GA_NONE)
-      axis1.setFrequencyBase(siderealToRadF(trackingRateAxis1 + guideRateAxis1 + pecRateAxis1)*SIDEREAL_RATIO_F);
-    if (guideActionAxis2 == GA_NONE)
-      axis2.setFrequencyBase(siderealToRadF(trackingRateAxis2 + guideRateAxis2)*SIDEREAL_RATIO_F);
+  if (gotoState != GS_NONE || guideState == GU_SPIRAL_GUIDE || guideState == GU_GUIDE) { statusSetPeriodMillis(1); return; }
+
+  if (trackingState != TS_SIDEREAL) {
+    trackingRateAxis1 = 0.0F;
+    trackingRateAxis2 = 0.0F;
   }
+
+  float f1 = 0, f2 = 0;
+  if (guideActionAxis1 == GA_NONE || guideState == GU_PULSE_GUIDE) {
+    f1 = trackingRateAxis1 + guideRateAxis1 + pecRateAxis1;
+    axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F);
+  }
+  if (guideActionAxis2 == GA_NONE || guideState == GU_PULSE_GUIDE) {
+    f2 = trackingRateAxis2 + guideRateAxis2;
+    axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F);
+  }
+
+  // flash mount status LED porportional to tracking rate
+  f1 = abs(f1); f2 = abs(f2); if (f2 > f1) f1 = f2;
+  if (f1 < 0.20F) statusSetPeriodMillis(0); else
+  if (f1 > 3.0F) statusSetPeriodMillis(1); else statusSetPeriodMillis(500.0F/f1);
 }
 
 #ifdef HAL_NO_DOUBLE_PRECISION

@@ -286,8 +286,11 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       break;
       case '7': // buzzer
         if (parameter[3] == '0' || parameter[3] == '1') {
-          misc.buzzer = parameter[3] - '0';
-          nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+          sound.enabled = parameter[3] - '0';
+          #if BUZZER_MEMORY == ON
+            misc.buzzer = sound.enabled;
+            nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+          #endif
         } else *commandError = CE_PARAM_RANGE;
       break;
       case '8': // pause at home on meridian flip

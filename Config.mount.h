@@ -82,8 +82,9 @@
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define LED_MOUNT_STATUS              OFF //    OFF, ON Flashes proportional to movement rate (2Hz=1x sidereal) on for slews. Option
-#define BUZZER                       2000 //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
-#define BUZZER_DEFAULT                OFF //    OFF, ON starts w/buzzer enabled.                                              Option
+#define BUZZER                        OFF //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
+#define BUZZER_DEFAULT                OFF //    OFF, ON default starts w/buzzer enabled.                                      Option
+#define BUZZER_MEMORY                 OFF //    OFF, ON to remember buzzer setting across power cycles.                       Option
 
 // TIME AND LOCATION -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#TLS
 #define TIME_LOCATION_SOURCE          OFF //    OFF, DS3231 (I2c,) DS3234 (Spi,) TEENSY (T3.2 internal,) or GPS source.       Option
