@@ -75,6 +75,8 @@ CommandError Mount::guideValidate(int axis, GuideAction guideAction) {
   if (axis1.driver.getStatus().fault || axis2.driver.getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (park.state == PS_PARKED)                                          return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)                                             return CE_SLEW_IN_MOTION;
+  if (guideAction == GA_SPIRAL && axis1.autoSlewActive())               return CE_SLEW_IN_MOTION;
+  if (guideAction == GA_SPIRAL && axis2.autoSlewActive())               return CE_SLEW_IN_MOTION;
   updatePosition(CR_MOUNT_ALT);
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!guideValidAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
@@ -160,7 +162,7 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
     updatePosition(CR_MOUNT);
     guideAxis2AutoSlew(guideAction);
   }
-  
+
   return CE_NONE;
 }
 
@@ -281,6 +283,7 @@ void Mount::guidePoll() {
 void Mount::guideAxis1AutoSlew(GuideAction guideAction) {
   if (guideAction == GA_REVERSE) axis1.autoSlew(DIR_REVERSE); else axis1.autoSlew(DIR_FORWARD);
 }
+
 void Mount::guideAxis2AutoSlew(GuideAction guideAction) {
   if (current.pierSide == PIER_SIDE_WEST) {
     if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_FORWARD); else axis2.autoSlew(DIR_REVERSE);
