@@ -139,7 +139,7 @@ void Mount::guideStopAxis1(GuideAction stopDirection) {
 
 CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
-  CommandError e = guideValidate(1, guideAction); if (e != CE_NONE) return e;
+  CommandError e = guideValidate(2, guideAction); if (e != CE_NONE) return e;
 
   guideActionAxis2 = guideAction;
   double rate = guideRateSelectToRate(guideRateSelect);
