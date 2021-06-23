@@ -59,7 +59,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
 //    }
     if (waitingHome)                         reply[i++]='w';                     // [w]aiting at home 
     if (misc.meridianFlipPause)              reply[i++]='u';                     // pa[u]se at home enabled?
-    if (misc.buzzer)                         reply[i++]='z';                     // bu[z]zer enabled?
+    if (sound.enabled)                       reply[i++]='z';                     // bu[z]zer enabled?
     if (transform.mountType==GEM && misc.meridianFlipAuto) reply[i++]='a';       // [a]uto meridian flip
     #if AXIS1_PEC == ON
       if (pec.recorded)                      reply[i++]='R';                     // PEC data has been [R]ecorded
@@ -109,7 +109,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (atHome)                                  reply[2]|=0b10000001;           // At home
     if (waitingHome)                             reply[2]|=0b10000010;           // Waiting at home
     if (misc.meridianFlipPause)                  reply[2]|=0b10000100;           // Pause at home enabled?
-    if (misc.buzzer)                             reply[2]|=0b10001000;           // Buzzer enabled?
+    if (sound.enabled)                           reply[2]|=0b10001000;           // Buzzer enabled?
     if (transform.mountType == GEM && misc.meridianFlipAuto)
                                                  reply[2]|=0b10010000;           // Auto meridian flip
 
