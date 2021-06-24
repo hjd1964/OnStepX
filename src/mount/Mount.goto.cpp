@@ -171,6 +171,8 @@ void Mount::gotoPoll() {
   if (gotoStage == GG_READY_ABORT) {
     VLF("MSG: Mount::gotoPoll(); abort requested");
 
+    meridianFlipPause.waiting = false;
+    meridianFlipPause.resume = false;
     axis1.autoSlewAbort();
     axis2.autoSlewAbort();
 
@@ -179,6 +181,9 @@ void Mount::gotoPoll() {
   if (gotoStage == GG_WAYPOINT) {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       if (destination.h == home.h && destination.d == home.d && destination.pierSide == home.pierSide) {
+        if (misc.meridianFlipPause && !meridianFlipPause.resume) { meridianFlipPause.waiting = true; goto skip; }
+        meridianFlipPause.waiting = false;
+        meridianFlipPause.resume = false;
         VLF("MSG: Mount::gotoPoll(); home reached");
         gotoStage = GG_DESTINATION;
         destination = target;
@@ -242,6 +247,7 @@ void Mount::gotoPoll() {
       return;
     }
 
+  skip:
     // keep updating the axis targets to match the mount target
     if (transform.mountType == ALTAZM) transform.equToHor(&target);
     double a1, a2;

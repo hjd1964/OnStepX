@@ -33,6 +33,11 @@ enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_
 enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
 
+typedef struct MeridianFlipPause {
+  bool waiting;
+  bool resume;
+} MeridianFlipPause;
+
 #pragma pack(1)
 typedef struct AltitudeLimits {
   float min;
@@ -298,7 +303,6 @@ class Mount {
 
     // goto
     PierSideSelect preferredPierSide    = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
-    MeridianFlip meridianFlip           = MF_ALWAYS;
     Coordinate gotoTarget;
     Coordinate start, destination, target;
     GotoState  gotoState                = GS_NONE;
@@ -310,6 +314,9 @@ class Mount {
     float      usPerStepBase            = 128.0F;
     float      radsPerSecondCurrent;
 
+    MeridianFlip meridianFlip           = MF_ALWAYS;
+    MeridianFlipPause meridianFlipPause = {false, false};
+
     // limits
     bool       limitsEnabled            = false;
     Limits limits = { { degToRad(-10), degToRad(85) }, degToRad(15), degToRad(15) };
@@ -317,9 +324,7 @@ class Mount {
     // homing
     Coordinate home;
     bool       atHome                   = true;
-    bool       waitingHome              = false;
-    bool       waitingHomeContinue      = false;
-  
+
     // guiding
     float guideRateAxis1                = 0.0F;
     float guideRateAxis2                = 0.0F;

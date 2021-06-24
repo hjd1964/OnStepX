@@ -49,6 +49,9 @@ void Mount::init(bool validKey) {
   #if BUZZER_MEMORY == ON
     sound.enabled = misc.buzzer;
   #endif
+  #if MFLIP_PAUSE_HOME_MEMORY != ON
+    misc.meridianFlipPause = false;
+  #endif
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
@@ -60,7 +63,9 @@ void Mount::init(bool validKey) {
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
 
-  st4Init();
+  #if ST4_INTERFACE == ON
+    st4Init();
+  #endif
 
   #if AXIS1_PEC == ON
     pecInit(validKey);
