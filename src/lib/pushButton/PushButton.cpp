@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 // Handle push buttons
 
-#include "../../common.h"
+#include "../../Common.h"
 #include "PushButton.h"
 
 Button::Button(int8_t pin, int8_t initState, int32_t trigger) {

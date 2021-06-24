@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------------------
 // Serial ST4 master
 
-#include "../../common.h"
+#include "../../Common.h"
 #include "Stream.h"
 #include "Serial_ST4_Master.h"
 
