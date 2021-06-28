@@ -33,10 +33,10 @@ enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_
 enum PecState: uint8_t         {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
 
-typedef struct MeridianFlipPause {
-  bool waiting;
+typedef struct MeridianFlipHome {
+  bool paused;
   bool resume;
-} MeridianFlipPause;
+} MeridianFlipHome;
 
 #pragma pack(1)
 typedef struct AltitudeLimits {
@@ -315,7 +315,7 @@ class Mount {
     float      radsPerSecondCurrent;
 
     MeridianFlip meridianFlip           = MF_ALWAYS;
-    MeridianFlipPause meridianFlipPause = {false, false};
+    MeridianFlipHome meridianFlipHome = {false, false};
 
     // limits
     bool       limitsEnabled            = false;

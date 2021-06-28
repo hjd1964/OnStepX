@@ -57,7 +57,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       if (rateCompensation == RC_FULL_RA)  { reply[i++]='t'; reply[i++]='s'; }   // on[t]rack enabled [s]ingle axis
       if (rateCompensation == RC_FULL_BOTH){ reply[i++]='t'; }                   // on[t]rack enabled
 //    }
-    if (meridianFlipPause.waiting)           reply[i++]='w';                     // [w]aiting at home 
+    if (meridianFlipHome.paused)             reply[i++]='w';                     // [w]aiting at home 
     if (misc.meridianFlipPause)              reply[i++]='u';                     // pa[u]se at home enabled?
     if (sound.enabled)                       reply[i++]='z';                     // bu[z]zer enabled?
     if (transform.mountType==GEM && misc.meridianFlipAuto) reply[i++]='a';       // [a]uto meridian flip
@@ -107,7 +107,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (misc.syncToEncodersOnly)                 reply[1]|=0b10000100;           // sync to encoders only
     if (guideState != GU_NONE)                   reply[1]|=0b10001000;           // guide active
     if (atHome)                                  reply[2]|=0b10000001;           // At home
-    if (meridianFlipPause.waiting)               reply[2]|=0b10000010;           // Waiting at home
+    if (meridianFlipHome.paused)                 reply[2]|=0b10000010;           // Waiting at home
     if (misc.meridianFlipPause)                  reply[2]|=0b10000100;           // Pause at home enabled?
     if (sound.enabled)                           reply[2]|=0b10001000;           // Buzzer enabled?
     if (transform.mountType == GEM && misc.meridianFlipAuto)
@@ -302,7 +302,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         } else *commandError = CE_PARAM_RANGE;
       break;
       case '9': // continue if paused at home
-        if (parameter[3] == '1') { if (meridianFlipPause.waiting) meridianFlipPause.resume = true; } else *commandError = CE_PARAM_RANGE;
+        if (parameter[3] == '1') { if (meridianFlipHome.paused) meridianFlipHome.resume = true; } else *commandError = CE_PARAM_RANGE;
       break;
       default: return false;
     }
