@@ -23,10 +23,10 @@ void Mount::init(bool validKey) {
   library.init(validKey);
 
   // get the main axes ready
-  tasks.yield(2000);
+  delay(1000);
   axis1.init(1, validKey);
   axis1.setMotionLimitsCheck(false);
-  tasks.yield(1000);
+  delay(1000);
   axis2.init(2, validKey);
   axis2.setMotionLimitsCheck(false);
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
