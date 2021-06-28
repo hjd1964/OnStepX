@@ -3,25 +3,9 @@
 #pragma once
 
 #include <Arduino.h>
+#include "..\lib\calendars\Calendars.h"
 
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST};
-
-typedef struct GregorianDate {
-  int16_t  year;
-  uint8_t  month;
-  uint8_t  day;
-  uint8_t  hour;
-  uint8_t  minute;
-  uint8_t  second;
-  long     centisecond;
-  bool     valid;
-} GregorianDate;
-
-#define JulianDateSize 16
-typedef struct JulianDate {
-  double   day;
-  double   hour;
-} JulianDate;
 
 // sprintf like function for float type, limited to one parameter
 extern void sprintF(char *result, const char *source, float f);

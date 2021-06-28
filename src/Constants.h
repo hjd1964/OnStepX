@@ -108,10 +108,11 @@
 // etc.
 #define INVALID                     -127
 
-// Mutexes -------------------------------------------------------------------------------------------------------------------------
-#define MX_CLOCK_CMD                0
-#define MX_TELESCOPE_CMD            1
-#define MX_TRANSFORM_CMD            2
+// various Time and Location sources supported
+#define DS3231                      1 // DS3231 RTC on I2C
+#define DS3234                      2 // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
+#define TEENSY                      4 // TEENSY3.2 RTC (Built-in)
+#define GPS                         5 // GPS device
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
 

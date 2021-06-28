@@ -7,6 +7,19 @@
 #include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
 
+#if TIME_LOCATION_SOURCE == DS3231
+  #include "../lib/tls/Tls_DS3231.h"
+#endif
+#if TIME_LOCATION_SOURCE == DS3234
+  #include "../lib/tls/Tls_DS3234.h"
+#endif
+#if TIME_LOCATION_SOURCE == Teensy
+  #include "../lib/tls/Tls_Teensy.h"
+#endif
+#if TIME_LOCATION_SOURCE == GPS
+  #include "../lib/tls/Tls_GPS.h"
+#endif
+
 extern volatile unsigned long centisecondLAST;
 
 typedef struct LatitudeExtras {
@@ -60,15 +73,15 @@ class Site {
     // callback to tick the centisecond sidereal clock
     void tick();
 
+    // sets the time in hours that have passed in this Julian Day
+    void setTime(JulianDate julianDate);
+
     Location location;
     LocationExtras locationEx;
 
     SiteErrors error = {false, false};
 
   private:
-
-    // sets the time in hours that have passed in this Julian Day
-    void setTime(JulianDate julianDate);
 
     // gets the time in hours that have passed in this Julian Day
     double getTime();
@@ -87,12 +100,6 @@ class Site {
 
     // convert julian date/time to greenwich apparent sidereal time
     double julianDateToGAST(JulianDate julianDate);
-
-    // convert Gregorian date (year, month, day) to Julian Day
-    JulianDate gregorianToJulianDay(GregorianDate date);
-
-    // convert Julian Day to Gregorian date (year, month, day)
-    GregorianDate julianDayToGregorian(JulianDate julianDate);
 
     // reads the location information from NV
     // locationNumber can be 0..3

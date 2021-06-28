@@ -29,7 +29,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     double hour = getTime() - location.timezone;
     while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
     if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
-    GregorianDate date = julianDayToGregorian(julianDay);
+    GregorianDate date = calendars.julianDayToGregorian(julianDay);
     date.year -= 2000; while (date.year >= 100) date.year -= 100;
     sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
     *numericReply = false;
@@ -117,7 +117,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       double hour = getTime();
       while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
       if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
-      GregorianDate date = julianDayToGregorian(julianDay);
+      GregorianDate date = calendars.julianDayToGregorian(julianDay);
       date.year -= 2000; if (date.year >= 100) date.year -= 100;
       sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
       *numericReply = false;
@@ -136,7 +136,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   if (cmdP("SC"))  {
     GregorianDate date = convert.strToDate(parameter);
     if (date.valid) {
-      ut1 = gregorianToJulianDay(date);
+      ut1 = calendars.gregorianToJulianDay(date);
       ut1.hour = backInHours(getTime());
       double hour = ut1.hour - location.timezone;
       if (hour >= 24.0) { hour -= 24.0; ut1.day += 1.0; } else
@@ -145,7 +145,9 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       dateIsReady = true;
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
-      delay(10);
+      #if TIME_LOCATION_SOURCE != OFF
+        tls.set(ut1);
+      #endif
     } else *commandError = CE_PARAM_FORM;
   } else
 
@@ -191,6 +193,9 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       timeIsReady = true;
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
+      #if TIME_LOCATION_SOURCE != OFF
+        tls.set(ut1);
+      #endif
     } else *commandError = CE_PARAM_FORM;
   } else
 

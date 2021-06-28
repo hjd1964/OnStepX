@@ -17,15 +17,60 @@ unsigned long periodSubMicros;
 volatile unsigned long centisecondLAST;
 IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
 
+#if TIME_LOCATION_SOURCE == GPS
+  void gpsCheck() {
+    if (tls.ready) {
+      VF("MSG: Tls_GPS, setting site from GPS");
+      double latitude, longitude;
+      tls.getSite(latitude, longitude);
+      telescope.mount.transform.site.location.latitude = degToRad(latitude);
+      telescope.mount.transform.site.location.longitude = degToRad(longitude);
+      strcpy(telescope.mount.transform.site.location.name, "GPS");
+
+      VF("MSG: Tls_GPS, setting date/time from GPS");
+      JulianDate ut1;
+      tls.get(ut1);
+      telescope.mount.transform.site.setTime(ut1);
+
+      telescope.mount.transform.site.update();
+
+      VF("MSG: Tls_GPS, stopping GPS polling task.");
+      tasks.remove(tasks.getHandleByName("gpsPoll"));
+      tls.ready = false;
+    }
+  }
+#endif
+
 void Site::init(bool validKey) {
   // get location
-  VLF("MSG: Site, get Latitude/Longitude");
+  VLF("MSG: Site, get Latitude/Longitude from NV");
   readLocation(number, validKey);
   update();
 
-  // get date/time
-  VLF("MSG: Site, get Date/Time");
-  readJD(validKey);
+  // get date/time from the RTC/GPS or NV
+  #if TIME_LOCATION_SOURCE != OFF
+    initError.tls = !tls.init();
+    if (!initError.tls) {
+      #if TIME_LOCATION_SOURCE != GPS
+        tls.get(ut1);
+        setSiderealTime(ut1, julianDateToLAST(ut1));
+        VLF("MSG: Site, get Date/Time from TLS");
+      #else
+        VLF("MSG: Site, using Date/Time from NV");
+        readJD(validKey);
+        VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
+        if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VL("success"); } else { VL("FAILED!"); }
+      #endif
+    } else {
+      DLF("WRN: Site::init(); Warning TLS initialization failed");
+      VLF("WRN: Site, fallback to Date/Time from NV");
+      readJD(validKey);
+    }
+  #else
+    VLF("MSG: Site, get Date/Time from NV");
+    readJD(validKey);
+  #endif
+
   setTime(ut1);
 
   VF("MSG: Site, start centisecond timer task (rate 10ms priority 0)... ");
@@ -105,18 +150,18 @@ double Site::backInHourAngle(double time) {
 }
 
 double Site::julianDateToLAST(JulianDate julianDate) {
- // DL("ST 1"); delay(100);
+  // DL("ST 1"); delay(100);
   double gast = julianDateToGAST(julianDate);
-//  DL("ST 2"); delay(100);
+  // DL("ST 2"); delay(100);
   return backInHours(gast - radToHrs(location.longitude));
 }
 
 double Site::julianDateToGAST(JulianDate julianDate) {
   GregorianDate date;
 
-  date = julianDayToGregorian(julianDate);
+  date = calendars.julianDayToGregorian(julianDate);
   date.hour = 0; date.minute = 0; date.second = 0; date.centisecond = 0;
-  JulianDate julianDay0 = gregorianToJulianDay(date);
+  JulianDate julianDay0 = calendars.gregorianToJulianDay(date);
   double D= (julianDate.day - 2451545.0) + julianDate.hour/24.0;
   double D0=(julianDay0.day - 2451545.0);
   double H = julianDate.hour;
@@ -133,44 +178,6 @@ double Site::julianDateToGAST(JulianDate julianDate) {
   double gast = gmst + eqeq;
 
   return backInHours(gast);
-}
-
-JulianDate Site::gregorianToJulianDay(GregorianDate date) {
-  JulianDate julianDay;
-  
-  int y = date.year;
-  int m = date.month;
-  if (m == 1 || m == 2) { y--; m += 12; }
-  double B = 2.0 - floor(y/100.0) + floor(y/400.0);
-  julianDay.day = B + floor(365.25*y) + floor(30.6001*(m + 1.0)) + date.day + 1720994.5;
-  julianDay.hour = 0;
-
-  return julianDay;
-}
-
-GregorianDate Site::julianDayToGregorian(JulianDate julianDate) {
-  double A, B, C, D, D1, E, F, G, I;
-  GregorianDate date;
-  
-  I = floor(julianDate.day + 0.5);
- 
-  F = 0.0;
-  if (I > 2299160.0) {
-    A = int((I - 1867216.25)/36524.25);
-    B = I + 1.0 + A - floor(A/4.0);
-  } else B = I;
-
-  C = B + 1524.0;
-  D = floor((C - 122.1)/365.25);
-  E = floor(365.25*D);
-  G = floor((C - E)/30.6001);
-
-  D1 = C - E + F - floor(30.6001*G);
-  date.day = floor(D1);
-  if (G < 13.5)         date.month = floor(G - 1.0);    else date.month = floor(G - 13.0);
-  if (date.month > 2.5) date.year  = floor(D - 4716.0); else date.year  = floor(D - 4715.0);
-
-  return date;
 }
 
 void Site::readLocation(uint8_t locationNumber, bool validKey) {
