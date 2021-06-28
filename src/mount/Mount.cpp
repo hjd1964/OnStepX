@@ -74,12 +74,17 @@ void Mount::init(bool validKey) {
   // startup state is reset and at home
   resetHome();
 
-  // get tracking ready
+  // set tracking state
   #if TRACK_AUTOSTART == ON
-    VLF("MSG: Mount, starting tracking");
+    VLF("MSG: Mount, set tracking sidereal");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+    if (!transform.site.dateTimeReady()) {
+      VLF("MSG: Mount, set date/time is unknown so limits are disabled");
+      limitsEnabled = false;
+    }
   #else
+    VLF("MSG: Mount, set tracking stopped");
     setTrackingState(TS_NONE);
   #endif
 
