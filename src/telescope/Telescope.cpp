@@ -59,7 +59,27 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.commandLimit(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (mount.commandPec(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
-  
+
+  //  B - Reticule/Accessory Control
+  // :B+#       Increase reticule Brightness
+  //            Returns: Nothing
+  // :B-#       Decrease Reticule Brightness
+  //            Returns: Nothing
+  if (command[0] == 'B' && (command[1] == '+' || command[1] == '-') && parameter[0] == 0)  {
+    #if LED_RETICLE >= 0 && RETICLE_LED_PIN != OFF
+      int scale;
+      static int reticuleBrightness = LED_RETICLE;
+      if (reticuleBrightness > 255-8) scale = 1; else
+      if (reticuleBrightness > 255-32) scale = 4; else
+      if (reticuleBrightness > 255-64) scale = 12; else
+      if (reticuleBrightness > 255-128) scale = 32; else scale = 64;
+      if (command[1] == '-') reticuleBrightness += scale;  if (reticuleBrightness > 255) reticuleBrightness = 255;
+      if (command[1] == '+') reticuleBrightness -= scale;  if (reticuleBrightness < 0)   reticuleBrightness = 0;
+      analogWrite(RETICLE_LED_PIN, reticuleBrightness);
+    #endif
+    *numericReply = false;
+  } else 
+
   //  E - Enter special mode
   if (command[0] == 'E') {
     // :EC[s]# Echo string [s] on DebugSer.
