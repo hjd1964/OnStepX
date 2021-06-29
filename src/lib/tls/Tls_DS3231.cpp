@@ -57,7 +57,7 @@ void TimeLocationSource::get(JulianDate &ut1) {
 
   RtcDateTime now = _Rtc.GetDateTime();
   if (now.Year() >= 2018 && now.Year() <= 3000 && now.Month() >= 1 && now.Month() <= 12 && now.Day() >= 1 && now.Day() <= 31 &&
-      now.Hour() >= 0 && now.Hour() <= 23 && now.Minute() >= 0 && now.Minute() <= 59 && now.Second() >= 0 && now.Second() <= 59) {
+      now.Hour() <= 23 && now.Minute() <= 59 && now.Second() <= 59) {
     GregorianDate greg; greg.year = now.Year(); greg.month = now.Month(); greg.day = now.Day();
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = now.Hour() + now.Minute()/60.0 + now.Second()/3600.0;

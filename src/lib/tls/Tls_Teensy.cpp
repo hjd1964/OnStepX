@@ -41,7 +41,7 @@ void TimeLocationSource::get(double &JD, double &UT1) {
   setTime(TeensyTime);                        // set system time
 
   if (year() >= 0 && year() <= 3000 && month() >= 1 && month() <= 12 && day() >= 1 && day() <= 31 &&
-      hour() >= 0 && hour() <= 23 && minute() >= 0 && minute() <= 59 && second() >= 0 && second() <= 59) {
+      hour() <= 23 && minute() <= 59 && second() <= 59) {
     GregorianDate greg; greg.year = year(); greg.month = month(); greg.day = day();
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = hour() + minute()/60.0 + second()/3600.0;
