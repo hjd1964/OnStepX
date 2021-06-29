@@ -139,7 +139,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   if (gotoState != GS_NONE)             return CE_SLEW_IN_MOTION;
   if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
-//if (!transform.site.dateTimeReady())  return CE_PARKED;
+  if (!site.dateTimeReady())            return CE_PARKED;
 
   VLF("MSG: Unparking");
 

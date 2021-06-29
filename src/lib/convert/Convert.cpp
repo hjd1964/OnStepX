@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // convert to/from C strings
 
-#include "../Common.h"
+#include "../../Common.h"
 #include "Convert.h"
 
 void sprintF(char *result, const char *source, float f) {

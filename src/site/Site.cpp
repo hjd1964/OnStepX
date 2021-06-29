@@ -1,14 +1,13 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount, time and location
 
-#include "../Common.h"
+#include "Site.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../telescope/Telescope.h"
-#include "Site.h"
 
 // base clock period (in 1/16us units per second) for adjusting the length of a sidereal second and all timing in OnStepX
 unsigned long periodSubMicros;
@@ -23,16 +22,16 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
       VF("MSG: Tls_GPS, setting site from GPS");
       double latitude, longitude;
       tls.getSite(latitude, longitude);
-      telescope.mount.transform.site.location.latitude = degToRad(latitude);
-      telescope.mount.transform.site.location.longitude = degToRad(longitude);
-      strcpy(telescope.mount.transform.site.location.name, "GPS");
+      site.location.latitude = degToRad(latitude);
+      site.location.longitude = degToRad(longitude);
+      strcpy(site.location.name, "GPS");
 
       VF("MSG: Tls_GPS, setting date/time from GPS");
       JulianDate ut1;
       tls.get(ut1);
-      telescope.mount.transform.site.setTime(ut1);
+      site.setTime(ut1);
 
-      telescope.mount.transform.site.update();
+      site.update();
 
       VF("MSG: Tls_GPS, stopping GPS polling task.");
       tasks.remove(tasks.getHandleByName("gpsPoll"));
@@ -209,5 +208,7 @@ void Site::readJD(bool validKey) {
   if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
   if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
 }
+
+Site site;
 
 #endif

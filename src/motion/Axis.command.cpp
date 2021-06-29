@@ -3,9 +3,8 @@
 
 #include "../Common.h"
 
-#include "../coordinates/Convert.h"
 #include "../coordinates/Transform.h"
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "../commands/ProcessCmds.h"
 
 #include "Axis.h"

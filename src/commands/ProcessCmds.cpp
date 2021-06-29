@@ -4,7 +4,7 @@
 #include "../Common.h"
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Convert.h"
+#include "../lib/convert/Convert.h"
 #include "../telescope/Telescope.h"
 #include "ProcessCmds.h"
 
@@ -74,7 +74,7 @@ void CommandProcessor::poll() {
     if (strlen(reply) > 0 || buffer.checksum) {
       if (buffer.checksum) {
         appendChecksum(reply);
-        strcat(reply,buffer.getSeq());
+        strcat(reply, buffer.getSeq());
         supressFrame = false;
       }
       if (!supressFrame) strcat(reply,"#");

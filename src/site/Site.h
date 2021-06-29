@@ -2,9 +2,13 @@
 // observatory time
 #pragma once
 
+#include "../Common.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include <Arduino.h>
 #include "../Constants.h"
-#include "../coordinates/Convert.h"
+#include "../lib/convert/Convert.h"
 #include "../commands/ProcessCmds.h"
 
 #if TIME_LOCATION_SOURCE == DS3231
@@ -123,3 +127,7 @@ class Site {
     // site number 0..3
     uint8_t number = 0;
 };
+
+extern Site site;
+
+#endif

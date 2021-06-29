@@ -8,7 +8,7 @@
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "../telescope/Telescope.h"
 #include "../lib/sense/Sense.h"
 

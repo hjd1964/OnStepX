@@ -284,11 +284,11 @@ void Mount::gotoWaypoint() {
   // if at a low latitude and in the opposite sky, |HA| = 6 is very low on the horizon and we need
   // to delay arriving there during a meridian flip.  In the extreme case, where the user is very
   // near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation
-  if (current.a < Deg20 && transform.site.locationEx.latitude.absval < Deg45) {
-    if (transform.site.location.latitude >= 0) {
-      if (current.d <= Deg90 - transform.site.location.latitude) destination.h = Deg45;
+  if (current.a < Deg20 && site.locationEx.latitude.absval < Deg45) {
+    if (site.location.latitude >= 0) {
+      if (current.d <= Deg90 - site.location.latitude) destination.h = Deg45;
     } else {
-      if (current.d >= -Deg90 - transform.site.location.latitude) destination.h = Deg45;
+      if (current.d >= -Deg90 - site.location.latitude) destination.h = Deg45;
     }
   }
 }

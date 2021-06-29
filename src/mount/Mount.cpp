@@ -7,7 +7,7 @@
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
@@ -79,7 +79,7 @@ void Mount::init(bool validKey) {
     VLF("MSG: Mount, set tracking sidereal");
     setTrackingState(TS_SIDEREAL);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-    if (!transform.site.dateTimeReady()) {
+    if (!site.dateTimeReady()) {
       VLF("MSG: Mount, set date/time is unknown so limits are disabled");
       limitsEnabled = false;
     }
@@ -299,7 +299,7 @@ CommandError Mount::alignAddStar() {
   // first star, get ready for a new pointing model, init/sync then call gta.addStar 
   if (alignState.currentStar == 1) {
     #if ALIGN_MAX_NUM_STARS > 1  
-      transform.align.init(transform.site.location.latitude, transform.mountType);
+      transform.align.init(site.location.latitude, transform.mountType);
     #endif
     e = syncEqu(&gotoTarget, preferredPierSide);
   }

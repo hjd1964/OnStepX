@@ -7,8 +7,7 @@
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Convert.h"
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -218,6 +217,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       updatePosition(CR_MOUNT_EQU);
       Coordinate newTarget = current;
       CommandError e;
+
       if (parameter[0] == 0 ||
         (parameter[0] == 'e' && parameter[1] == 0)) e = gotoEqu(&newTarget, PSS_EAST_ONLY); else
       if (parameter[0] == 'w' && parameter[1] == 0) e = gotoEqu(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;

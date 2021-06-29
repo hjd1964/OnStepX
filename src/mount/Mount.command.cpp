@@ -7,8 +7,7 @@
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Convert.h"
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
@@ -18,7 +17,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   char *conv_end;
 
   // process any date/time/location commands
-  if (transform.site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  if (site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
   // process any axis1 commands
   if (axis1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
@@ -351,9 +350,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'K') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(60.136); } else
     if (command[1] == 'L') { rateCompensation = RC_NONE; trackingRate = hzToSidereal(57.9);   } else
     if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);                   } else
-    if (command[1] == '+') { transform.site.setPeriodSubMicros(periodSubMicros - hzToSubMicros(0.02)); } else
-    if (command[1] == '-') { transform.site.setPeriodSubMicros(periodSubMicros + hzToSubMicros(0.02)); } else
-    if (command[1] == 'R') { transform.site.setPeriodSubMicros(SIDEREAL_PERIOD); } else
+    if (command[1] == '+') { site.setPeriodSubMicros(periodSubMicros - hzToSubMicros(0.02)); } else
+    if (command[1] == '-') { site.setPeriodSubMicros(periodSubMicros + hzToSubMicros(0.02)); } else
+    if (command[1] == 'R') { site.setPeriodSubMicros(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
       if (park.state != PS_PARKED) {
         errorReset();

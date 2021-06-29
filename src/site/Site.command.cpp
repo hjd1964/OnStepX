@@ -1,13 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount time and location, commands
 
-#include "../Common.h"
+#include "Site.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
-#include "../coordinates/Convert.h"
 #include "../commands/ProcessCmds.h"
-#include "Site.h"
 
 bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;

@@ -3,9 +3,9 @@
 
 #include "../Common.h"
 
-  #include "Telescope.h"
-  #include "../tasks/OnTask.h"
-  extern Tasks tasks;
+#include "Telescope.h"
+#include "../tasks/OnTask.h"
+extern Tasks tasks;
 
 void teleStatusFlash() {
   #if LED_STATUS != OFF && LED_STATUS_PIN != OFF

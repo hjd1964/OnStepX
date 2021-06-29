@@ -6,8 +6,8 @@
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
+#include "../../lib/convert/Convert.h"
 #include "../../commands/ProcessCmds.h"
-#include "../../coordinates/Convert.h"
 
 #define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT
 

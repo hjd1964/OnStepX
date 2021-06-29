@@ -3,8 +3,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "Convert.h"
-#include "Site.h"
+#include "../site/Site.h"
 #include "Align.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
@@ -67,7 +66,6 @@ class Transform {
     // returns the amount of refraction at the apparent altitude
     double apparentRefrac(double altitude);
 
-    Site site;
     #if ALIGN_MAX_NUM_STARS > 1  
       GeoAlign align;
     #endif

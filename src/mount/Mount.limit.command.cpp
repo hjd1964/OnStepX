@@ -7,8 +7,7 @@
 
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../coordinates/Convert.h"
-#include "../coordinates/Site.h"
+#include "../site/Site.h"
 #include "Mount.h"
 
 extern unsigned long periodSubMicros;
