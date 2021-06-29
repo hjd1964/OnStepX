@@ -114,7 +114,8 @@ extern Tasks tasks;
       // see if a combination was down for long enough for an alternate mode
       static bool altModeA = false;
       static bool altModeB = false;
-      if (gotoState != GS_NONE && !waitingHome) {
+
+      if (gotoState != GS_NONE && !meridianFlipHome.paused) {
         if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
           if (!altModeA) { altModeA = true; sound.beep(); }
         }
@@ -196,7 +197,7 @@ extern Tasks tasks;
         lastSt4GuideActionAxis1 = st4GuideActionAxis1;
         if (st4GuideActionAxis1 != GA_BREAK) {
           #if ST4_HAND_CONTROL == ON
-            //if (waitingHome) waitingHomeContinue = true; else
+            if (meridianFlipHome.paused) meridianFlipHome.resume = true; else
             if (gotoState == GS_GOTO) gotoStop(); else
           #endif
           {
@@ -217,7 +218,7 @@ extern Tasks tasks;
         lastSt4GuideActionAxis2 = st4GuideActionAxis2;
         if (st4GuideActionAxis2 != GA_BREAK) {
           #if ST4_HAND_CONTROL == ON
-            //if (waitingHome) waitingHomeContinue = true; else
+            if (meridianFlipHome.paused) meridianFlipHome.resume = true; else
             if (gotoState == GS_GOTO) gotoStop(); else
           #endif
           {
