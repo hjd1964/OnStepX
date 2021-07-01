@@ -30,6 +30,8 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
       JulianDate ut1;
       tls.get(ut1);
       site.setTime(ut1);
+      dateIsReady = true;
+      timeIsReady = true;
 
       site.update();
 
@@ -52,7 +54,9 @@ void Site::init(bool validKey) {
     if (!initError.tls) {
       #if TIME_LOCATION_SOURCE != GPS
         tls.get(ut1);
-        setSiderealTime(ut1, julianDateToLAST(ut1));
+        setTime(ut1);
+        dateIsReady = true;
+        timeIsReady = true;
         VLF("MSG: Site, get Date/Time from TLS");
       #else
         VLF("MSG: Site, using Date/Time from NV");
