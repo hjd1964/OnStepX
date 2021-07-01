@@ -135,9 +135,9 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
   taskHandle = tasks.add(0, 0, true, 0, move, timerName);
   if (taskHandle) {
     V("success");
-    if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) VF(" (no hardware timer!)"); }
+    if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
     VL("");
-  } else VL("FAILED!");
+  } else { VL("FAILED!"); }
 
   // init. axis settings
   if (!validKey) {

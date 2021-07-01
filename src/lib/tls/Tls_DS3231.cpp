@@ -28,8 +28,8 @@ bool TimeLocationSource::init() {
       _Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeClock);
       _Rtc.SetSquareWavePinClockFrequency(DS3231SquareWaveClock_1Hz);
       active = true;
-    } else DLF("WRN, tls.init(): DS3231 GetIsRunning() false");
-  } else DLF("WRN, tls.init(): DS3231 not found at I2C address 0x68");
+    } else { DLF("WRN, tls.init(): DS3231 GetIsRunning() false"); }
+  } else { DLF("WRN, tls.init(): DS3231 not found at I2C address 0x68"); }
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
     HAL_Wire.end();
     HAL_Wire.begin();
