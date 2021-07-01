@@ -48,7 +48,8 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (misc.syncToEncodersOnly)             reply[i++]='e';                     // sync to [e]ncoders only
     if (atHome)                              reply[i++]='H';                     // at [H]ome
   //if (ppsSynced)                           reply[i++]='S';                     // PPS [S]ync
-    if (guideState != GU_NONE)               reply[i++]='G';                     // [G]uide active
+    if (guideState == GU_PULSE_GUIDE)        reply[i++]='G';                     // pulse [G]uide active
+    if (guideState != GU_NONE)               reply[i++]='g';                     // [g]uide active
 //    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)  { reply[i++]='r'; reply[i++]='s'; }   // [r]efr enabled [s]ingle axis
       if (rateCompensation == RC_REFR_BOTH){ reply[i++]='r'; }                   // [r]efr enabled
@@ -88,7 +89,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (trackingState == TS_NONE)                reply[0]|=0b10000001;           // Not tracking
     if (gotoState == GS_NONE)                    reply[0]|=0b10000010;           // No goto
 //  if (ppsSynced)                               reply[0]|=0b10000100;           // PPS sync
-    if (guideState != GU_NONE)                   reply[0]|=0b10001000;           // guide active
+    if (guideState == GU_PULSE_GUIDE)            reply[0]|=0b10001000;           // pulse guide active
 //    if (transform.mountType != ALTAZM) {
       if (rateCompensation == RC_REFR_RA)        reply[0]|=0b11010000;           // Refr enabled Single axis
       if (rateCompensation == RC_REFR_BOTH)      reply[0]|=0b10010000;           // Refr enabled
