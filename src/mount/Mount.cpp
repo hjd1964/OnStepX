@@ -52,6 +52,9 @@ void Mount::init(bool validKey) {
   #if MFLIP_PAUSE_HOME_MEMORY != ON
     misc.meridianFlipPause = false;
   #endif
+  #if MFLIP_AUTOMATIC_MEMORY != ON
+    misc.meridianFlipAuto = false;
+  #endif
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
