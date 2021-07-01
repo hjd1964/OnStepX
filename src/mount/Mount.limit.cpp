@@ -31,6 +31,8 @@ void Mount::limitInit(bool validKey) {
 }
 
 void Mount::limitPoll() {
+  static int autoFlipCount = 0;
+
   if (!limitsEnabled) return;
   #if DEBUG == VERBOSE
     MountError lastError = error;
@@ -44,15 +46,19 @@ void Mount::limitPoll() {
     if (current.h < -limits.pastMeridianE) { limitStopAxis1(GA_REVERSE); error.meridian.east = true; } else error.meridian.east = false;
   } else error.meridian.east = false;
   if (meridianFlip != MF_NEVER && current.pierSide == PIER_SIDE_WEST) {
-    if (current.h > limits.pastMeridianW) {
-      if (misc.meridianFlipAuto) {
-        VF("MSG: Mount::limitPoll() Automatic meridian flip... ");
-        updatePosition(CR_MOUNT_EQU);
-        Coordinate newTarget = current;
-        CommandError e = gotoEqu(&newTarget, PSS_EAST_ONLY);
-        if (e == CE_NONE) { VL("success"); } else { limitStopAxis1(GA_FORWARD); error.meridian.west = true; VL("FAILED!"); }
-      } else { limitStopAxis1(GA_FORWARD); error.meridian.west = true; }
-    } else error.meridian.west = false;
+    if (autoFlipCount == 0) {
+      if (current.h > limits.pastMeridianW) {
+        if (misc.meridianFlipAuto && trackingState == TS_SIDEREAL) {
+          // disable meridian limit west for a second to allow goto to exit the out of limits region
+          autoFlipCount = 10;
+          VLF("MSG: Mount::limitPoll() start automatic meridian flip");
+          updatePosition(CR_MOUNT_EQU);
+          Coordinate newTarget = current;
+          CommandError e = gotoEqu(&newTarget, PSS_EAST_ONLY, false);
+          if (e != CE_NONE) { limitStopAxis1(GA_FORWARD); error.meridian.west = true; VF("MSG: Mount::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")"); }
+        } else { limitStopAxis1(GA_FORWARD); error.meridian.west = true; }
+      } else error.meridian.west = false;
+    } else { autoFlipCount--; error.meridian.west = false; }
   } else error.meridian.west = false;
 
   if (flt(current.a1, axis1.settings.limits.min)) { limitStopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
