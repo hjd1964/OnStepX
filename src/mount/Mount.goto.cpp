@@ -118,6 +118,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 
   limitsEnabled = true;
   misc.syncToEncodersOnly = false;
+  if (atHome && park.state != PS_PARKING) setTrackingState(TS_SIDEREAL);
 
   updatePosition(CR_MOUNT_HOR);
   start = current;
