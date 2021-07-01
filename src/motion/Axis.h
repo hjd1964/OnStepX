@@ -19,7 +19,7 @@ typedef struct AxisSense {
   int8_t  minMaxInit;
 } AxisSense;
 
-#define AxisSettingsSize 24
+#define AxisSettingsSize 35
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
@@ -55,7 +55,7 @@ enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 class Axis {
   public:
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber, bool validKey);
+    void init(uint8_t axisNumber, bool alternateLimits, bool validKey);
 
     // process commands for this axis
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);

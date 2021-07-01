@@ -147,6 +147,8 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
     nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
   }
 
+  if (AxisSettingsSize < sizeof(AxisSettings)) { initError.nv = true; DL("ERR: Axis::init(); AxisSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
   // bit 0 = settings at compile (0) or run time (1), bits 1 to 9 = reset axis n on next boot
   uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
   if (!(axesToRevert & 1)) bitSet(axesToRevert, axisNumber);
