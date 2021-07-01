@@ -21,6 +21,9 @@ extern Tasks tasks;
 inline void mountPecWrapper() { telescope.mount.pecPoll(); }
 
 void Mount::pecInit(bool validKey) {
+  // confirm the data structure size
+  if (PecSize < sizeof(Pec)) { initError.nv = true; DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
   // write the default pec settings to NV
   if (!validKey) {
     VLF("MSG: Mount, writing default PEC settings to NV");
@@ -28,7 +31,6 @@ void Mount::pecInit(bool validKey) {
   }
 
   // read the pec settings
-  if (PecSize < sizeof(Pec)) { initError.nv = true; DL("ERR: Mount::initPec(); PecSize error NV subsystem writes disabled"); nv.readOnly(true); }
   nv.readBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
 
   wormRotationSeconds = pec.wormRotationSteps/stepsPerSiderealSecondAxis1;
