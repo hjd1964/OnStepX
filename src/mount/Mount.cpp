@@ -59,8 +59,8 @@ void Mount::init(bool validKey) {
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0F;
-  if (misc.usPerStepCurrent < usPerStepBase) misc.usPerStepCurrent = usPerStepBase;
-  if (misc.usPerStepCurrent > 10000.0F) misc.usPerStepCurrent = 10000.0F;
+  if (misc.usPerStepCurrent < usPerStepBase/2.0F) misc.usPerStepCurrent = usPerStepBase/2.0F;
+  if (misc.usPerStepCurrent > 1000000.0F) misc.usPerStepCurrent = 1000000.0F;
 
   // start guide monitor task
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
