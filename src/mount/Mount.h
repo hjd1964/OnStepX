@@ -117,8 +117,6 @@ typedef struct MountError {
   uint8_t       parkFailed: 1;
   uint8_t       motorFault: 1;
   uint8_t       initWeather: 1;
-  uint8_t       initSite: 1;
-  uint8_t       initNV: 1;
 } MountError;
 
 class Mount {
