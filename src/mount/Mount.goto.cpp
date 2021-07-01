@@ -100,6 +100,7 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 
   limitsEnabled = true;
   misc.syncToEncodersOnly = true;
+  if (atHome) setTrackingState(TS_SIDEREAL);
 
   VLF("MSG: Mount::syncEqu, instrument coordinates updated");
 
