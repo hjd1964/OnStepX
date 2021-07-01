@@ -42,7 +42,6 @@ CommandError Mount::parkSet() {
   park.position.h = current.h;
   park.position.d = current.d;
   park.position.pierSide = current.pierSide;
-  DL(current.pierSide);
   park.saved = true;
   nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
