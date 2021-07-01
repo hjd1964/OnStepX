@@ -63,6 +63,8 @@ void Mount::init(bool validKey) {
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
   if (tasks.add(10, 0, true, 1, mountGuideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
 
+  parkInit(validKey);
+
   #if ST4_INTERFACE == ON
     st4Init();
   #endif
@@ -72,20 +74,24 @@ void Mount::init(bool validKey) {
   #endif
 
   // startup state is reset and at home
-  resetHome();
+  resetHome(false);
 
   // set tracking state
   #if TRACK_AUTOSTART == ON
-    VLF("MSG: Mount, set tracking sidereal");
-    setTrackingState(TS_SIDEREAL);
-    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-    if (!site.dateTimeReady()) {
-      VLF("MSG: Mount, set date/time is unknown so limits are disabled");
-      limitsEnabled = false;
+    if (park.state == PS_PARKED) {
+      VLF("MSG: Mount, parked autostart tracking ignored");
+    } else {
+      VLF("MSG: Mount, set tracking sidereal");
+      setTrackingState(TS_SIDEREAL);
+      trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+      if (!site.dateTimeReady()) {
+        VLF("MSG: Mount, set date/time is unknown so limits are disabled");
+        limitsEnabled = false;
+      }
     }
   #else
-    VLF("MSG: Mount, set tracking stopped");
     setTrackingState(TS_NONE);
+    if (park.state == PS_PARKED) parkRestore(false);
   #endif
 
   // start tracking monitor task

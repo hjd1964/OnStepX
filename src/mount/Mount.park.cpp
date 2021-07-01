@@ -8,6 +8,20 @@
 #include "../telescope/Telescope.h"
 #include "Mount.h"
 
+void Mount::parkInit(bool validKey) {
+  // confirm the data structure size
+  if (ParkSize < sizeof(Park)) { initError.nv = true; DL("ERR: Mount::parkInit(); ParkSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
+  // write the default park settings
+  if (!validKey) {
+    VLF("MSG: Mount, writing default Parking settings to NV");
+    nv.writeBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
+  }
+
+  // read the park settings
+  nv.readBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
+}
+
 CommandError Mount::parkSet() {
   if (park.state == PS_PARK_FAILED)     return CE_PARK_FAILED;
   if (park.state == PS_PARKED)          return CE_PARKED;
@@ -28,6 +42,7 @@ CommandError Mount::parkSet() {
   park.position.h = current.h;
   park.position.d = current.d;
   park.position.pierSide = current.pierSide;
+  DL(current.pierSide);
   park.saved = true;
   nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
@@ -74,16 +89,17 @@ CommandError Mount::parkGoto() {
   nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
   // get the park coordinate ready
+  axis1.setBacklash(0);
+  axis2.setBacklash(0);
   Coordinate parkTarget;
   parkTarget.h = park.position.h;
   parkTarget.d = park.position.d;
   parkTarget.pierSide = park.position.pierSide;
 
-  axis1.setBacklash(0);
-  axis2.setBacklash(0);
-
   // goto the park (mount) target coordinate
-  e = gotoEqu(&parkTarget, PSS_SAME_ONLY, false);
+  if (parkTarget.pierSide == PIER_SIDE_EAST) e = gotoEqu(&parkTarget, PSS_EAST_ONLY, false); else
+  if (parkTarget.pierSide == PIER_SIDE_WEST) e = gotoEqu(&parkTarget, PSS_WEST_ONLY, false);
+
   if (e != CE_NONE) {
     trackingState = priorTrackingState;
     updateTrackingRates();
@@ -113,21 +129,6 @@ void Mount::parkFinish() {
   axis2.enable(false);
 }
 
-#define PARK_MAX_MICROSTEP 256
-void Mount::parkNearest() {
-  long positionSteps = axis1.getTargetCoordinateSteps();
-  positionSteps -= PARK_MAX_MICROSTEP*2L; 
-  for (int l = 0; l < PARK_MAX_MICROSTEP*4; l++) { if (positionSteps % PARK_MAX_MICROSTEP*4L == 0) break; positionSteps++; }
-  axis1.setTargetCoordinateSteps(positionSteps);
-  VLF("MSG: Mount::parkNearest(); target coordinate axis1 (steps) adjusted to nearest %1024 location");
-
-  positionSteps = axis2.getTargetCoordinateSteps();
-  positionSteps -= PARK_MAX_MICROSTEP*2L; 
-  for (int l = 0; l < PARK_MAX_MICROSTEP*4; l++) { if (positionSteps % PARK_MAX_MICROSTEP*4L == 0) break; positionSteps++; }
-  axis2.setTargetCoordinateSteps(positionSteps);
-  VLF("MSG: Mount::parkNearest(); target coordinate axis2 (steps) adjusted to nearest %1024 location");
-}
-
 CommandError Mount::parkRestore(bool withTrackingOn) {
   if (!park.saved)                      return CE_NO_PARK_POSITION_SET;
   if (park.state != PS_PARKED) {
@@ -143,24 +144,12 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
 
   VLF("MSG: Unparking");
 
-  // read the park settings
-  if (ParkSize < sizeof(Park)) {
-    initError.nv = true;
-    DL("ERR: Mount::initPark(); ParkSize error NV subsystem writes disabled");
-    nv.readOnly(true);
-    return CE_NO_PARK_POSITION_SET;
-  }
-  nv.readBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
-
   #if AXIS1_PEC == ON
     wormSenseSteps = park.wormSensePositionSteps;
   #endif
 
-  // reset mount
-  resetHome();
-
-  // make sure limits are on
-  limitsEnabled = true;
+  // reset the mount
+  resetHome(false);
 
   // load the pointing model
   #if ALIGN_MAX_NUM_STARS > 1  
@@ -177,16 +166,9 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   double a1, a2;
   if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
   transform.mountToInstrument(&parkTarget, &a1, &a2);
-  axis1.setTargetCoordinate(a1);
-  axis2.setTargetCoordinate(a2);
+  axis1.setInstrumentCoordinatePark(a1);
+  axis2.setInstrumentCoordinatePark(a2);
 
-  // adjust target to the actual park position (just like we did when we parked)
-  parkNearest();
-
-  // and set the motor coordinates to agree with the target
-  axis1.setMotorCoordinateSteps(axis1.getTargetCoordinateSteps());
-  axis2.setMotorCoordinateSteps(axis2.getTargetCoordinateSteps());
-  
   // set Meridian Flip behaviour to match mount type
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
   atHome = false;
@@ -194,6 +176,9 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   // restore backlash settings, in-case we are unparking without a power cycle
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
+  
+  // make sure limits are on
+  limitsEnabled = true;
 
   // update our state and start tracking
   if (withTrackingOn) {

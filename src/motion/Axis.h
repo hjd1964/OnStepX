@@ -85,7 +85,10 @@ class Axis {
     // get instrument coordinate, in steps
     long getInstrumentCoordinateSteps();
 
-    // set and get instrument coordinate, in "measures" (radians, microns, etc.)
+    // set instrument coordinate, in "measures" (radians, microns, etc.)
+    // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
+    void setInstrumentCoordinatePark(double value);
+    // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
     // get instrument coordinate in steps
     double getInstrumentCoordinate();
@@ -95,6 +98,9 @@ class Axis {
     // mark origin coordinate as current location
     void markOriginCoordinate();
 
+    // set target coordinate, in "measures" (degrees, microns, etc.)
+    // with backlash disabled this moves to the nearest position where the motor doesn't cog
+    void setTargetCoordinatePark(double value);
     // set target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
     // set target coordinate, in steps

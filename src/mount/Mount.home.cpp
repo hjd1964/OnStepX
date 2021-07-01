@@ -32,9 +32,15 @@ CommandError Mount::returnHome() {
   return CE_NONE;
 }
 
-CommandError Mount::resetHome() {
+CommandError Mount::resetHome(bool resetPark) {
   if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
   if (gotoState  != GS_NONE) return CE_SLEW_IN_MOTION;
+
+  // clear park state
+  if (resetPark) {
+    park.state = PS_NONE;
+    nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
+  }
 
   // stop tracking
   setTrackingState(TS_NONE);

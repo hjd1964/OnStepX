@@ -64,6 +64,15 @@ long Axis::getInstrumentCoordinateSteps() {
   return steps;
 }
 
+void Axis::setInstrumentCoordinatePark(double value) {
+  long steps = lround(value*settings.stepsPerMeasure);
+  steps -= settings.microsteps*2L;
+  for (int l = 0; l < settings.microsteps*4; l++) { if (steps % settings.microsteps*4L == 0) break; steps++; }
+  noInterrupts();
+  indexSteps = steps - motorSteps;
+  interrupts();
+}
+
 void Axis::setInstrumentCoordinate(double value) {
   long steps = lround(value*settings.stepsPerMeasure);
   noInterrupts();
@@ -81,6 +90,17 @@ double Axis::getInstrumentCoordinate() {
 void Axis::markOriginCoordinate() {
   noInterrupts();
   originSteps = motorSteps;
+  interrupts();
+}
+
+void Axis::setTargetCoordinatePark(double value) {
+  target = value;
+  long steps = lround(value*settings.stepsPerMeasure);
+  long targetParkSteps = steps - indexSteps;
+  targetParkSteps -= settings.microsteps*2L;
+  for (int l = 0; l < settings.microsteps*4; l++) { if (targetParkSteps % settings.microsteps*4L == 0) break; targetParkSteps++; }
+  noInterrupts();
+  targetSteps = targetParkSteps;
   interrupts();
 }
 

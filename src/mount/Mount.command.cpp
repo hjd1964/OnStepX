@@ -207,7 +207,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
   //            Returns: Nothing
   if (cmd("hF")) {
-    *commandError = resetHome();
+    *commandError = resetHome(true);
     *numericReply = false;
   } else 
 

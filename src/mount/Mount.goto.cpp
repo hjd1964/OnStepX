@@ -146,10 +146,14 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
-    axis1.setTargetCoordinate(a1);
-    axis2.setTargetCoordinate(a2);
+    if (park.state == PS_PARKING) {
+      axis1.setTargetCoordinatePark(a1);
+      axis2.setTargetCoordinatePark(a2);
+    } else {
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
+    }
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
-    if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
     //transform.print(&destination);
 
     // slew rate in rads per second
@@ -204,7 +208,6 @@ void Mount::gotoPoll() {
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
-      if (gotoStage == GG_DESTINATION && park.state == PS_PARKING) parkNearest();
       VLF("MSG: Mount::gotoPoll(); target coordinates set");
 
       axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
