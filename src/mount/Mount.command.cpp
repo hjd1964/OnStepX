@@ -170,6 +170,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   // :GXE[M]#   Get [M]ount setting
   //            Returns: n# or 
   if (cmdGX("GXE")) {
+    uint16_t axesToRevert;
     switch (parameter[1]) {
 //    case '1': dtostrf((double)usPerStepBaseActual, 3, 3, reply); break;
 //    case '2': dtostrf(SLEW_ACCELERATION_DIST, 2, 1, reply); break;
@@ -178,7 +179,11 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       case '5': sprintf(reply, "%ld", lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
       case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; *numericReply = false; break;
       case 'F': if (AXIS2_TANGENT_ARM != ON) *commandError = CE_0; break;
-//    case 'M': if (!runtimeSettings()) strcpy(reply, "0"); else sprintf(reply, "%d", (int)nv.read(EE_mountType)); break;
+      case 'M':
+        axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+        if (axesToRevert & 1) sprintf(reply, "%d", (int)nv.readUC(NV_MOUNT_TYPE_BASE)); else strcpy(reply, "0");
+        *numericReply = false;
+      break;
     default:
       return false;
     }
@@ -309,9 +314,13 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     }
   } else
 
-  if (cmdP2("SXEM")) { // En: Setup value
-    long l = strtol(&parameter[3],NULL,10); float degs = l/4.0;
-  //if (l == 0 || l == GEM || l == FORK || l == ALTAZM) nv.write(EE_mountType, l); else *commandError = CE_PARAM_RANGE;
+  // :SXEM,n#   Set mount type (for next restart) where n=0 for default
+  //            Return: 0 on failure
+  //                    1 on success
+  if (cmdP2("SXEM")) {
+    long l = strtol(&parameter[3], NULL, 10);
+    float degs = l/4.0;
+    if (l == 0 || l == GEM || l == FORK || l == ALTAZM) nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l); else *commandError = CE_PARAM_RANGE;
   } else
 
   // T - Tracking Commands

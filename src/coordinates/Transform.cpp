@@ -14,13 +14,28 @@ void Transform::print(Coordinate *coord) {
 }
 
 void Transform::init(bool validKey) {
-  mountType = MOUNT_TYPE;
+  if (!validKey) {
+    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
+  }
+  mountType = nv.readUC(NV_MOUNT_TYPE_BASE);
+  if (mountType == 0) {
+    mountType = MOUNT_TYPE;
+    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
+    VLF("MSG: Transform, revert mount type to default");
+  } else
+  if (mountType < GEM || mountType > ALTAZM) {
+    mountType = MOUNT_TYPE;
+    initError.value = true;
+    VLF("WRN: Transform, unknown mount type reverting to default");
+  }
+
   #if DEBUG != OFF
     const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
     VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
   #endif
 
   site.init(validKey);
+
   #if ALIGN_MAX_NUM_STARS > 1  
     align.init(site.location.latitude, mountType);
   #endif

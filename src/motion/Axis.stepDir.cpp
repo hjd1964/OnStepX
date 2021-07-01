@@ -89,7 +89,7 @@ inline void pollAxes() {
   #endif
 }
 
-void Axis::init(uint8_t axisNumber, bool validKey) {
+void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   axisPrefix[9] = '0' + axisNumber;
 
   if (pollingTaskHandle == 0) {
@@ -163,7 +163,7 @@ void Axis::init(uint8_t axisNumber, bool validKey) {
     driver.settings.currentGoto = settings.currentRun;
     driver.settings.currentHold = settings.currentRun/2;
   }
-  if (!validateAxisSettings(1, MOUNT_TYPE == ALTAZM, settings)) initError.value = true;
+  if (!validateAxisSettings(axisNumber, alternateLimits, settings)) initError.value = true;
 
   V(axisPrefix); VLF("adding home and limit senses");
   hHomeSense = senses.add(pins.home, settings.sense.homeInit, settings.sense.home);

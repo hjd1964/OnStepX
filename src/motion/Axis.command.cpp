@@ -22,20 +22,24 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
     if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
     if (index + 1 != axisNumber) return false; // command wasn't processed
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-    // check that this axis is not set to revert
-    if (!(axesToRevert & (1 << axisNumber))) {
-      AxisSettings thisAxis;
-      nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
-      if (axisNumber <= 3) thisAxis.stepsPerMeasure /= RAD_DEG_RATIO; // convert into degrees
-      sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
-        (long)thisAxis.stepsPerMeasure,
-        (long)(thisAxis.stepsPerMeasure*1000)%1000,
-        (int)thisAxis.microsteps,
-        (int)thisAxis.currentRun,
-        (int)thisAxis.reverse,
-        (int)round(radToDeg(thisAxis.limits.min)),
-        (int)round(radToDeg(thisAxis.limits.max)));
-      *numericReply = false;
+
+    // check that all axes are not set to revert
+    if (axesToRevert & 1) {
+      // check that this axis is not set to revert
+      if (!(axesToRevert & (1 << axisNumber))) {
+        AxisSettings thisAxis;
+        nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+        if (axisNumber <= 3) thisAxis.stepsPerMeasure /= RAD_DEG_RATIO; // convert into degrees
+        sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
+          (long)thisAxis.stepsPerMeasure,
+          (long)(thisAxis.stepsPerMeasure*1000)%1000,
+          (int)thisAxis.microsteps,
+          (int)thisAxis.currentRun,
+          (int)thisAxis.reverse,
+          (int)round(radToDeg(thisAxis.limits.min)),
+          (int)round(radToDeg(thisAxis.limits.max)));
+        *numericReply = false;
+      } else *commandError = CE_0;
     } else *commandError = CE_0;
   } else
 
@@ -60,35 +64,39 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
   // :SXA[n]#   Set axis/driver configuration
   if (cmdSX("SXA")) {
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+
+    // check for a valid axisNumber
     int index = parameter[1] - '1';
-    if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
-    if (index + 1 != axisNumber) return false; // command wasn't processed
-    // check that this axis is not set to revert
-    if (!(axesToRevert & (1 << axisNumber))) {
-      if (parameter[3] == 'R' && parameter[4] == 0) {
-        // :SXA[n],R# reverts this axis to defaults
-        axesToRevert |= 1 << axisNumber;
-        bitSet(axesToRevert, axisNumber);
-        nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-      } else {
-        // :SXA[n],[sssss...]#
-        AxisSettings thisAxis;
-        if (decodeAxisSettings(&parameter[3], thisAxis)) {
-          // convert axis1, 2, and 3 into radians
-          if (axisNumber <= 3) {
-            thisAxis.stepsPerMeasure *= RAD_DEG_RATIO;
-            thisAxis.limits.min = degToRad(thisAxis.limits.min);
-            thisAxis.limits.max = degToRad(thisAxis.limits.max);
-          }
-          if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
-            if (axisNumber <= 2 && thisAxis.microsteps < driverMicrostepsGoto[index]) thisAxis.microsteps = driverMicrostepsGoto[index];
-            if (driver.microstepsToCode(driverModels[index], thisAxis.microsteps) != OFF) {
-              nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
-              *numericReply = false;
-            } else *commandError = CE_PARAM_RANGE;
+    if (index + 1 != axisNumber) return false;
+    // check that all axes are not set to revert
+    if (axesToRevert & 1) {
+      // check that this axis is not set to revert
+      if (!(axesToRevert & (1 << axisNumber))) {
+        if (parameter[3] == 'R' && parameter[4] == 0) {
+          // :SXA[n],R# reverts this axis to defaults
+          axesToRevert |= 1 << axisNumber;
+          bitSet(axesToRevert, axisNumber);
+          nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
+        } else {
+          // :SXA[n],[sssss...]#
+          AxisSettings thisAxis;
+          if (decodeAxisSettings(&parameter[3], thisAxis)) {
+            // convert axis1, 2, and 3 into radians
+            if (axisNumber <= 3) {
+              thisAxis.stepsPerMeasure *= RAD_DEG_RATIO;
+              thisAxis.limits.min = degToRad(thisAxis.limits.min);
+              thisAxis.limits.max = degToRad(thisAxis.limits.max);
+            }
+            if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
+              if (axisNumber <= 2 && thisAxis.microsteps < driverMicrostepsGoto[index]) thisAxis.microsteps = driverMicrostepsGoto[index];
+              if (driver.microstepsToCode(driverModels[index], thisAxis.microsteps) != OFF) {
+                nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+                *numericReply = false;
+              } else *commandError = CE_PARAM_RANGE;
+            }
           }
         }
-      }
+      } else *commandError = CE_0;
     } else *commandError = CE_0;
   } else return false;
 

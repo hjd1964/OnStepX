@@ -24,10 +24,10 @@ void Mount::init(bool validKey) {
 
   // get the main axes ready
   delay(1000);
-  axis1.init(1, validKey);
+  axis1.init(1, transform.mountType == ALTAZM, validKey);
   axis1.setMotionLimitsCheck(false);
   delay(1000);
-  axis2.init(2, validKey);
+  axis2.init(2, transform.mountType == ALTAZM, validKey);
   axis2.setMotionLimitsCheck(false);
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1    = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
