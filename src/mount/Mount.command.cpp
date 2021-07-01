@@ -272,7 +272,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       case '5': // autoMeridianFlip
         if (parameter[3] == '0' || parameter[3] == '1') {
           misc.meridianFlipAuto = parameter[3] - '0';
-          nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+          #if MFLIP_AUTOMATIC_MEMORY == ON 
+            nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
+          #endif
         } else *commandError = CE_PARAM_RANGE;
       break;
       case '6': // preferred pier side
