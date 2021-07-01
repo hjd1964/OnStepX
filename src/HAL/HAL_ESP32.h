@@ -62,3 +62,6 @@
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
 #include "../lib/analog/AN_ESP32.h"
+
+// Allow MCU reset -----------------------------------------------------------------------------------
+#define HAL_RESET() ESP.restart()
