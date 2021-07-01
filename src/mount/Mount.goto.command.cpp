@@ -223,7 +223,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       CommandError e;
 
       if (parameter[0] == 0 ||
-        (parameter[0] == 'e' && parameter[1] == 0)) e = gotoEqu(&newTarget, PSS_EAST_ONLY); else
+         (parameter[0] == 'e' && parameter[1] == 0)) e = gotoEqu(&newTarget, PSS_EAST_ONLY); else
       if (parameter[0] == 'w' && parameter[1] == 0) e = gotoEqu(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;
       if (e != CE_CMD_UNKNOWN) {
         if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
@@ -242,7 +242,6 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     if (transform.mountType != ALTAZM) {
       updatePosition(CR_MOUNT_EQU);
       Coordinate newTarget = current;
-      validateGoto();
       CommandError e = validateGoto();
       if (e == CE_NONE) e = validateGotoCoords(&newTarget);
       if (e == CE_NONE) {
