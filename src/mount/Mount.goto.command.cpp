@@ -53,7 +53,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       // set current time and date before calling this routine
 
       // telescope should be set in the polar home (CWD) as a starting point
-      resetHome();
+      resetHome(false);
 
       // start tracking
       setTrackingState(TS_SIDEREAL);
