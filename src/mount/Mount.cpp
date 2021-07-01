@@ -132,6 +132,7 @@ void Mount::updatePosition(CoordReturn coordReturn) {
     if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
     if (coordReturn == CR_MOUNT_HOR || coordReturn == CR_MOUNT_ALL) transform.equToHor(&current);
   }
+  if (atHome) current.pierSide = PIER_SIDE_NONE;
 }
 
 void Mount::updateTrackingRates() {
