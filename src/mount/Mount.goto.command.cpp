@@ -91,7 +91,11 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     if (alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar) {
       e = alignAddStar();
       if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
-    } else e = syncEqu(&gotoTarget, preferredPierSide);
+    } else {
+      PierSideSelect pps = preferredPierSide;
+      if (!atHome && PIER_SIDE_SYNC_CHANGE_SIDES == OFF) pps = PSS_SAME_ONLY;
+      e = syncEqu(&gotoTarget, pps);
+    }
     if (command[1] == 'M') {
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0");
       reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
