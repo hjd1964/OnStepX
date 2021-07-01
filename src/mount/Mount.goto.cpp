@@ -99,7 +99,7 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   axis2.setInstrumentCoordinate(a2);
 
   limitsEnabled = true;
-  misc.syncToEncodersOnly = false;
+  misc.syncToEncodersOnly = true;
 
   VLF("MSG: Mount::syncEqu, instrument coordinates updated");
 
