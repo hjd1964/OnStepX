@@ -9,7 +9,11 @@
 #include "../../lib/convert/Convert.h"
 #include "../../commands/ProcessCmds.h"
 
-#define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT
+#if AXIS1_PEC == ON
+  #define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT
+#else
+  #define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + 0
+#endif
 
 #pragma pack(1)
 const int rec_size = 16;
