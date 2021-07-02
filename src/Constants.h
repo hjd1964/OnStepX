@@ -226,7 +226,7 @@
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
 
 // NV addresses
-#define INIT_NV_KEY                 583927925UL
+#define INIT_NV_KEY                 583927924UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..4
@@ -238,6 +238,6 @@
 #define NV_MOUNT_PARK_BASE          201    // bytes: 15  , addr: 201..215
 #define NV_ALIGN_MODEL_BASE         216    // bytes: 32  , addr: 216..247
 #define NV_AXIS_SETTINGS_REVERT     248    // bytes: 2   , addr: 248..249
-#define NV_AXIS_SETTINGS_BASE       250    // bytes: 35*9, addr: 250..564
-#define NV_MOUNT_TYPE_BASE          565    // bytes: 1   , addr: 565..565
-#define NV_PEC_BUFFER_BASE          600    // Bytes: ?   , addr: 600..600 + (PEC_BUFFER_SIZE_LIMIT - 1)
+#define NV_AXIS_SETTINGS_BASE       250    // bytes: 21*9, addr: 250..438
+#define NV_MOUNT_TYPE_BASE          439    // bytes: 1   , addr: 439..439
+#define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500..500 + (PEC_BUFFER_SIZE_LIMIT - 1)

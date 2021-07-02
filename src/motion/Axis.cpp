@@ -198,7 +198,7 @@ void Axis::autoSlew(Direction direction) {
 }
 
 void Axis::autoSlewHome() {
-  if (settings.sense.home == OFF) {
+  if (pins.sense.home == OFF) {
     markOriginCoordinate();
     V(axisPrefix); VLF("autoSlewHome(); origin coordinate set");
     autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));

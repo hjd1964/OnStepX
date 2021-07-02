@@ -11,6 +11,16 @@ typedef struct AxisLimits {
   float max;
 } AxisLimits;
 
+#define AxisSettingsSize 21
+typedef struct AxisSettings {
+  double     stepsPerMeasure;
+  int8_t     reverse;
+  int16_t    microsteps;
+  int16_t    currentRun;
+  AxisLimits limits;
+} AxisSettings;
+#pragma pack()
+
 typedef struct AxisSense {
   int32_t home;
   int8_t  homeInit;
@@ -19,27 +29,17 @@ typedef struct AxisSense {
   int8_t  minMaxInit;
 } AxisSense;
 
-#define AxisSettingsSize 35
-typedef struct AxisSettings {
-  double     stepsPerMeasure;
-  int8_t     reverse;
-  int16_t    microsteps;
-  int16_t    currentRun;
-  AxisLimits limits;
-  AxisSense  sense;
-} AxisSettings;
-#pragma pack()
-
 typedef struct AxisPins {
-  int8_t  step;
-  int8_t  dir;
-  int8_t  enable;
-  int8_t  min;
-  int8_t  home;
-  int8_t  max;
-  bool    invertStep;
-  bool    invertDir;
-  bool    invertEnable;
+  int8_t     step;
+  int8_t     dir;
+  int8_t     enable;
+  bool       invertStep;
+  bool       invertDir;
+  bool       invertEnable;
+  int8_t     min;
+  int8_t     home;
+  int8_t     max;
+  AxisSense  sense;
 } AxisPins;
 
 typedef struct AxisErrors {
