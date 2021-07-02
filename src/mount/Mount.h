@@ -26,7 +26,7 @@ enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
 enum GotoStage: uint8_t        {GG_NONE, GG_WAYPOINT, GG_DESTINATION, GG_READY_ABORT, GG_ABORT};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
-enum GuideState: uint8_t       {GU_NONE, GU_GUIDE, GU_PULSE_GUIDE, GU_SPIRAL_GUIDE};
+enum GuideState: uint8_t       {GU_NONE, GU_PULSE_GUIDE, GU_GUIDE, GU_SPIRAL_GUIDE};
 enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
 enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE, GA_SPIRAL};
 enum ParkState: uint8_t        {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
@@ -356,7 +356,7 @@ class Mount {
       long     wormSenseSteps           = 0;      // step position
 
       bool     pecFirstRecording        = false;
-      long     pecRecordStopTimeCs      = 0;
+      uint32_t pecRecordStopTimeCs      = 0;
       uint32_t wormRotationStartTimeCs  = 0;      // start time of worm rotation sequence, in centi-seconds
       long     wormRotationSeconds      = 0;      // time for a worm rotation, in seconds
 

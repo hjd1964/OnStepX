@@ -91,9 +91,7 @@ void Mount::pecInit(bool validKey) {
 
 void Mount::pecPoll() {
   // PEC is only active when we're tracking at the sidereal rate with a guide rate that makes sense
-  if (trackingState != TS_SIDEREAL ||
-      park.state != PS_PARKED ||
-     (guideState != GU_NONE && guideState != GU_PULSE_GUIDE)) { pecDisable(); return; }
+  if (trackingState != TS_SIDEREAL || park.state > PS_UNPARKED || guideState > GU_PULSE_GUIDE) { pecDisable(); return; }
 
   // keep track of our current step position, and when the step position on the worm wraps during playback
   long axis1Steps = axis1.getMotorCoordinateSteps();
@@ -108,6 +106,7 @@ void Mount::pecPoll() {
     // digital or analog pec sense, with 60 second delay before redetect
     long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
     if (dist > stepsPerSiderealSecondAxis1*60.0 && wormIndexState != lastState && wormIndexState == true) {
+      VL("MSG: pecPoll(), PEC index detected");
       wormSenseSteps = axis1Steps;
       wormSenseFirst = true;
       pecBufferStart = true;
@@ -127,7 +126,10 @@ void Mount::pecPoll() {
   wormRotationSteps = axis1Steps - wormSenseSteps;
   wormRotationSteps = ((wormRotationSteps % pec.wormRotationSteps) + pec.wormRotationSteps) % pec.wormRotationSteps;
   #if PEC_SENSE == OFF
-    if (wormRotationSteps - lastWormRotationSteps < 0) pecBufferStart = true; else pecBufferStart = false;
+    if (wormRotationSteps - lastWormRotationSteps < 0) {
+      VL("MSG: pecPoll(), PEC virtual index detected");
+      pecBufferStart = true;
+     } else pecBufferStart = false;
   #endif
 
   // handle playing back and recording PEC
@@ -138,25 +140,30 @@ void Mount::pecPoll() {
   // start playing PEC
   if (pec.state == PEC_READY_PLAY) {
     // makes sure the index is at the start of a second before resuming play
-    if ((long)fmod(wormRotationSteps, stepsPerCentisecondAxis1) == 0) {
+    if ((long)fmod(wormRotationSteps, stepsPerSiderealSecondAxis1) == 0) {
+      VL("MSG: pecPoll(), started PEC playing");
       pec.state = PEC_PLAY;
-      pecBufferIndex = wormRotationSteps/stepsPerCentisecondAxis1;
+      pecBufferIndex = wormRotationSteps/stepsPerSiderealSecondAxis1;
       wormRotationStartTimeCs = lastCs;
     }
   } else
   // start recording PEC
   if (pec.state == PEC_READY_RECORD) {
-    if ((long)fmod(wormRotationSteps, stepsPerCentisecondAxis1) == 0) {
+    if ((long)fmod(wormRotationSteps, stepsPerSiderealSecondAxis1) == 0) {
+      V("MSG: pecPoll(), started PEC recording at ");
       pec.state = PEC_RECORD;
-      pecBufferIndex = wormRotationSteps/stepsPerCentisecondAxis1;
+      pecBufferIndex = wormRotationSteps/stepsPerSiderealSecondAxis1;
       pecFirstRecording = !pec.recorded;
       wormRotationStartTimeCs = lastCs;
-      pecRecordStopTimeCs = wormRotationStartTimeCs + wormRotationSeconds*100;
-      pecAccGuideAxis1 = 0;
+      V(wormRotationStartTimeCs);
+      pecRecordStopTimeCs = wormRotationStartTimeCs + (uint32_t)(wormRotationSeconds*100);
+      V(" and stopping at "); VL(pecRecordStopTimeCs);
+      pecAccGuideAxis1 = 0.0F;
     }
   } else
   // and once the PEC data is all stored, indicate that it's valid and start using it
-  if (pec.state == PEC_RECORD && lastCs - pecRecordStopTimeCs > 0) {
+  if (pec.state == PEC_RECORD && (long)(lastCs - pecRecordStopTimeCs) > 0) {
+    VL("MSG: pecPoll(), PEC recording complete switched to playing");
     pec.state = PEC_PLAY;
     pec.recorded = true;
     pecCleanup();
@@ -174,35 +181,33 @@ void Mount::pecPoll() {
   pecBufferIndex = ((pecBufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
 
   // accumulate guide steps for PEC
-  if (guideRateAxis1 != 0.0) {
-    if (guideActionAxis1 == GA_FORWARD) pecAccGuideAxis1 += stepsPerCentisecondAxis1*guideRateAxis1;
-    if (guideActionAxis1 == GA_REVERSE) pecAccGuideAxis1 -= stepsPerCentisecondAxis1*guideRateAxis1;
-  }
-  
+  if (guideRateAxis1 != 0.0F) { pecAccGuideAxis1 += stepsPerCentisecondAxis1*guideRateAxis1; }
+
   // falls in whenever the pecIndex changes, which is once a sidereal second
   static long lastPecBufferIndex = 0;
   if (pecBufferIndex != lastPecBufferIndex) {
     lastPecBufferIndex = pecBufferIndex;
 
     // assume no change to tracking rate
-    pecRateAxis1 = 0.0;
+    pecRateAxis1 = 0.0F;
 
     if (pec.state == PEC_RECORD) {
       // get guide steps taken from the accumulator
-      int i = lround(pecAccGuideAxis1);
+      int i = round(pecAccGuideAxis1);
 
       // stay within +/- one sidereal rate for corrections
       if (i < -stepsPerSiderealSecondAxis1) i = -stepsPerSiderealSecondAxis1;
       if (i >  stepsPerSiderealSecondAxis1) i =  stepsPerSiderealSecondAxis1;
 
+      // apply weighted average
+      if (!pecFirstRecording) i = (i + (int)pecBuffer[pecBufferIndex]*2)/3;
+
+      // restrict to valid range and store
+      if (i < -127) i = -127; else if (i >  127) i = 127;
+
       // remove steps from the accumulator
       pecAccGuideAxis1 -= i;
 
-      // apply weighted average
-      if (!pecFirstRecording) i = (i + pecBuffer[pecBufferIndex]*2)/3;
-
-      // restrict to valid range and store
-      if (i < -127) i = -127; else if (i >  127) i =  127;
       pecBuffer[pecBufferIndex] = i;
     }
 
@@ -222,13 +227,22 @@ void Mount::pecPoll() {
 void Mount::pecDisable() {
   // give up recording if we stop tracking at the sidereal rate
   // don't zero the PEC offset, we don't want things moving and it really doesn't matter 
-  if (pec.state == PEC_RECORD) { pec.state = PEC_NONE; pecRateAxis1 = 0.0; } 
+  if (pec.state == PEC_RECORD || pec.state == PEC_READY_RECORD) {
+    VL("MSG: pecDisable(), PEC recording stopped");
+    pec.state = PEC_NONE;
+    pecRateAxis1 = 0.0;
+  } 
   // get ready to re-index when tracking comes back
-  if (pec.state == PEC_PLAY)   { pec.state = PEC_READY_PLAY; pecRateAxis1 = 0.0; } 
+  if (pec.state == PEC_PLAY) {
+    VL("MSG: pecDisable(), PEC playing paused");
+    pec.state = PEC_READY_PLAY;
+    pecRateAxis1 = 0.0;
+  } 
 }
 
 void Mount::pecCleanup() {
   // low pass filter smooths noise in Pec data
+  VL("MSG: pecCleanup(), applying low pass filter to PEC data");
   int i,J1,J4,J9,J17;
   for (int scc = 3; scc < wormRotationSeconds + 3; scc++) {
     i = pecBuffer[scc % wormRotationSeconds];
@@ -247,14 +261,15 @@ void Mount::pecCleanup() {
     pecBuffer[(scc + 3) % wormRotationSeconds] = (pecBuffer[(scc + 3) % wormRotationSeconds]) + J4;
     pecBuffer[(scc + 4) % wormRotationSeconds] = (pecBuffer[(scc + 4) % wormRotationSeconds]) + J1;
   }
-  
+
   // linear regression
+  VL("MSG: pecCleanup(), applying linear regression to PEC data");
   // the number of steps added should equal the number of steps subtracted (from the cycle)
   // first, determine how far we've moved ahead or backward in steps
   long stepsSum = 0; for (int scc = 0; scc < wormRotationSeconds; scc++) stepsSum += pecBuffer[scc];
 
   // this is the correction coefficient for a given location in the sequence
-  float Ccf = round((float)stepsSum/wormRotationSeconds);
+  float Ccf = (float)stepsSum/wormRotationSeconds;
 
   // now, apply the correction to the sequence to make the PEC adjustments null out
   // this process was simulated in a spreadsheet and the roundoff error might leave us at +/- a step which is tacked on at the beginning
@@ -273,7 +288,12 @@ void Mount::pecCleanup() {
   pecBuffer[0] -= stepsSum;
 
   // a reality check, make sure the buffer data looks good, if not forget it
-  if (stepsSum > 2 || stepsSum < -2) { pec.recorded = false; pec.state = PEC_NONE; }
+  if (stepsSum < -2 || stepsSum > 2) {
+    DF("ERR: pecCleanup(), linear regression residual "); D(stepsSum);
+    if (stepsSum > 2) { DLF(" > threshold of 2"); } else { DLF(" < threshold of -2"); }
+    pec.recorded = false;
+    pec.state = PEC_NONE;
+  }
 }
 
 #endif
