@@ -170,12 +170,16 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   } else
   #endif
 
+  // :GX4[n]#   Get encoder setting [n]
+  //            Returns: Value
+  if (cmdGX("GX4")) {
+    *numericReply = false;
     switch (parameter[1]) {
-      case '2': sprintf(reply,"%ld",(long)(0*3600.0)); *numericReply = false; break; // altCor
-      case '3': sprintf(reply,"%ld",(long)(0*3600.0)); *numericReply = false; break; // azmCor
-//    case '2': sprintf(reply,"%ld",(long)(AlignH.altCor*3600.0)); *numericReply = false; break; // altCor
-//    case '3': sprintf(reply,"%ld",(long)(AlignH.azmCor*3600.0)); *numericReply = false; break; // azmCor
-    default: return false;
+      case '0': convert.doubleToDms(reply,axis1.getInstrumentCoordinate(),true,true,PM_HIGH); break; // Get formatted absolute Axis1 angle
+      case '1': convert.doubleToDms(reply,axis2.getInstrumentCoordinate(),true,true,PM_HIGH); break; // Get formatted absolute Axis2 angle 
+      case '2': sprintF(reply, "%0.6f", axis1.getInstrumentCoordinate()); break;                     // Get absolute Axis1 angle in degrees
+      case '3': sprintF(reply, "%0.6f", axis2.getInstrumentCoordinate()); break;                     // Get absolute Axis2 angle in degrees
+      default:  *numericReply = true; *commandError = CE_CMD_UNKNOWN;
     }
   } else
 
@@ -308,6 +312,39 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     }
   } else
   #endif
+
+  // :SX4[m],[n]#   Set encoder axis [m] to value [n]
+  //                Return: 0 on failure
+  //                        1 on success
+  if (cmdSX("SX4")) {
+    switch (parameter[1]) {
+      double d;
+      static double encoderAxis1 = NAN;
+      static double encoderAxis2 = NAN;
+      case '0': // set encoder Axis1 value
+        d = strtod(&parameter[3], &conv_end);
+        if (&parameter[3] != conv_end && fabs(d) <= 360.0) encoderAxis1 = degToRad(d); else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
+        break;
+      case '1': // set encoder Axis2 value
+        d = strtod(&parameter[3], &conv_end);
+        if (&parameter[3] != conv_end && fabs(d) <= 360.0) encoderAxis2 = degToRad(d); else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
+        break;
+      case '2': // sync from encoder values
+        if (parameter[3] == '1' && parameter[4] == 0) {
+          CommandError e = validateGoto(); if (e != CE_NONE) return e;
+          if (misc.syncToEncodersOnly) return CE_NONE;
+          if (isnan(encoderAxis1) || isnan(encoderAxis2)) return CE_NONE;
+          if (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar) return CE_NONE;
+          axis1.setInstrumentCoordinate(encoderAxis1);
+          axis2.setInstrumentCoordinate(encoderAxis2);
+        }
+        break;
+      case '3': // re-enable setting OnStep to Encoders after a Sync 
+        misc.syncToEncodersOnly = false;
+        break;
+      default: *commandError = CE_CMD_UNKNOWN;
+    }
+  } else
 
   if (cmdSX("SX9")) {
     switch (parameter[1]) {
