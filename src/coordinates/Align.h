@@ -81,6 +81,8 @@ class GeoAlign
     // actual: equatorial or horizon coordinate (depending on the mount type) for where the star should be (in mount coordinates)
     // mount:  equatorial or horizon coordinate (depending on the mount type) for where the star should is (in mount coordinates)
     CommandError addStar(int thisStar, int numberStars, Coordinate *actual, Coordinate *mount);
+
+    void createModel(int numberStars);
     
     // convert equatorial (h,d) or horizon (a,z) coordinate from observed place to mount
     void observedPlaceToMount(Coordinate *coord);

@@ -207,7 +207,6 @@ class Mount {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
-    bool alignActive();
     CommandError alignAddStar();
 
     // keep guide rate <= half max

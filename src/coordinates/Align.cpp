@@ -104,12 +104,16 @@ CommandError GeoAlign::addStar(int thisStar, int numberStars, Coordinate *actual
 
   // two or more stars and finished
   if (thisStar >= 2 && thisStar == numberStars) {
-    // start a task to solve for the model
-    modelNumberStars = numberStars;
-    autoModelTask = tasks.add(100, 0, false, 7, autoModelWrapper, "Align");
+    createModel(numberStars);
   }
 
   return CE_NONE;
+}
+
+void GeoAlign::createModel(int numberStars) {
+  // start a task to solve for the model
+  modelNumberStars = numberStars;
+  autoModelTask = tasks.add(100, 0, false, 7, autoModelWrapper, "Align");
 }
 
 // returns the correction to be added to the requested RA,Dec to yield the actual RA,Dec that we will arrive at
