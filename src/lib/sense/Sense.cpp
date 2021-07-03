@@ -79,11 +79,11 @@ uint8_t Senses::add(int8_t pin, int8_t initState, int32_t trigger) {
 
 int Senses::read(uint8_t handle) {
   if (handle == 0) return false;
-  return (*sense)[handle - 1].read();
+  return sense[handle - 1]->read();
 }
 
 void Senses::poll() {
-  for (int i = 0; i < senseCount; i++) { (*sense)[i].poll(); }
+  for (int i = 0; i < senseCount; i++) sense[i]->poll();
 }
 
 Senses senses;
