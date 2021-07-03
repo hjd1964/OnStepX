@@ -79,7 +79,7 @@ class GeoAlign
     // thisStar: 1 for 1st star, 2 for 2nd star, etc. up to numberStars (at which point the mount model is calculated)
     // numberStars: total number of stars for this align (1 to 9)
     // actual: equatorial or horizon coordinate (depending on the mount type) for where the star should be (in mount coordinates)
-    // mount:  equatorial or horizon coordinate (depending on the mount type) for where the star should is (in mount coordinates)
+    // mount:  equatorial or horizon coordinate (depending on the mount type) for where the star is (in mount coordinates)
     CommandError addStar(int thisStar, int numberStars, Coordinate *actual, Coordinate *mount);
 
     void createModel(int numberStars);

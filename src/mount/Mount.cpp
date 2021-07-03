@@ -58,6 +58,9 @@ void Mount::init(bool validKey) {
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
+  #if SLEW_RATE_MEMORY != ON
+    misc.usPerStepCurrent = usPerStepBase;
+  #endif
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0F;
   if (misc.usPerStepCurrent < usPerStepBase/2.0F) misc.usPerStepCurrent = usPerStepBase/2.0F;
   if (misc.usPerStepCurrent > 1000000.0F) misc.usPerStepCurrent = 1000000.0F;

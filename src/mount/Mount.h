@@ -90,8 +90,8 @@ typedef struct Park {
 #pragma pack()
 
 typedef struct AlignState {
-  uint8_t currentStar:1;
-  uint8_t lastStar:1;
+  uint8_t currentStar;
+  uint8_t lastStar;
 } AlignState;
 
 typedef struct MinMaxError {

@@ -175,10 +175,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   if (cmdGX("GX4")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '0': convert.doubleToDms(reply,axis1.getInstrumentCoordinate(),true,true,PM_HIGH); break; // Get formatted absolute Axis1 angle
-      case '1': convert.doubleToDms(reply,axis2.getInstrumentCoordinate(),true,true,PM_HIGH); break; // Get formatted absolute Axis2 angle 
-      case '2': sprintF(reply, "%0.6f", axis1.getInstrumentCoordinate()); break;                     // Get absolute Axis1 angle in degrees
-      case '3': sprintF(reply, "%0.6f", axis2.getInstrumentCoordinate()); break;                     // Get absolute Axis2 angle in degrees
+      case '0': convert.doubleToDms(reply,radToDeg(axis1.getInstrumentCoordinate()),true,true,PM_HIGH); break; // Get formatted absolute Axis1 angle
+      case '1': convert.doubleToDms(reply,radToDeg(axis2.getInstrumentCoordinate()),true,true,PM_HIGH); break; // Get formatted absolute Axis2 angle 
+      case '2': sprintF(reply, "%0.6f", radToDeg(axis1.getInstrumentCoordinate())); break;                     // Get absolute Axis1 angle in degrees
+      case '3': sprintF(reply, "%0.6f", radToDeg(axis2.getInstrumentCoordinate())); break;                     // Get absolute Axis2 angle in degrees
       default:  *numericReply = true; *commandError = CE_CMD_UNKNOWN;
     }
   } else
@@ -331,10 +331,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         break;
       case '2': // sync from encoder values
         if (parameter[3] == '1' && parameter[4] == 0) {
-          CommandError e = validateGoto(); if (e != CE_NONE) return e;
-          if (misc.syncToEncodersOnly) return CE_NONE;
-          if (isnan(encoderAxis1) || isnan(encoderAxis2)) return CE_NONE;
-          if (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar) return CE_NONE;
+          CommandError e = validateGoto(); if (e != CE_NONE) { *commandError = e; return true; }
+          if (isnan(encoderAxis1) || isnan(encoderAxis2) || misc.syncToEncodersOnly ||
+             (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar)) { DL("A"); *commandError = CE_0; return true; }
           axis1.setInstrumentCoordinate(encoderAxis1);
           axis2.setInstrumentCoordinate(encoderAxis2);
         }
