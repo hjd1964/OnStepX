@@ -314,7 +314,6 @@ void GeoAlign::autoModel(int n) {
   // search, this can handle about 9 degrees of polar misalignment, and 4 degrees of cone error
   //              DoPdPzPeTfFf Df OdOh
   doSearch(16384,0 ,0,1,1,0, 0, 0,1,1);
-  doSearch(16384,0 ,0,1,1,0, 0, 0,1,1);
   doSearch( 8192,Do,0,1,1,0, 0, 0,1,1);
   doSearch( 4096,Do,0,1,1,0, 0, 0,1,1);
   doSearch( 2048,Do,0,1,1,0, 0, 0,1,1);
