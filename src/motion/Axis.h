@@ -212,7 +212,7 @@ class Axis {
     bool tracking = false;
     bool limitsCheck = true;
 
-    uint8_t hHomeSense = 0; // home sensor handle
+    uint8_t homeSenseHandle = 0; // home sensor handle
     uint8_t hMinSense = 0;  // min sensor handle
     uint8_t hMaxSense = 0;  // max sensor handle
 

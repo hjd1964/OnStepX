@@ -166,7 +166,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   if (!validateAxisSettings(axisNumber, alternateLimits, settings)) initError.value = true;
 
   V(axisPrefix); VLF("adding home and limit senses");
-  hHomeSense = senses.add(pins.home, pins.sense.homeInit, pins.sense.home);
+  homeSenseHandle = senses.add(pins.home, pins.sense.homeInit, pins.sense.home);
   hMinSense = senses.add(pins.min, pins.sense.minMaxInit, pins.sense.min);
   hMaxSense = senses.add(pins.max, pins.sense.minMaxInit, pins.sense.max);
 

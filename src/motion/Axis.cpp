@@ -203,12 +203,23 @@ void Axis::autoSlewHome() {
     V(axisPrefix); VLF("autoSlewHome(); origin coordinate set");
     autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
   } else {
-    if (autoRate == AR_NONE) {
-      V(axisPrefix); VLF("autoSlewHome(); slew started");
-      driver.modeDecaySlewing();
-    }
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
-    if (senses.read(hHomeSense)) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
+    if (autoRate == AR_NONE) {
+      driver.modeDecaySlewing();
+      V(axisPrefix); VF("autoSlewHome(); slew home ");
+      switch (homingStage) {
+        case HOME_FAST: VL("fast"); break;
+        case HOME_SLOW: VL("slow"); break;
+        case HOME_FINE: VL("fine"); break;
+      }
+    }
+    if (senses.read(homeSenseHandle)) {
+      V(axisPrefix); VLF("autoSlewHome(); moving forward");
+      autoRate = AR_RATE_BY_TIME_FORWARD;
+    } else {
+      V(axisPrefix); VLF("autoSlewHome(); moving reverse");
+      autoRate = AR_RATE_BY_TIME_REVERSE;
+    }
   }
 }
 
@@ -224,6 +235,7 @@ void Axis::autoSlewAbort() {
   if (autoRate != AR_NONE) {
     V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
     autoRate = AR_RATE_BY_TIME_ABORT;
+    homingStage = HOME_NONE;
     poll();
   }
 }
@@ -236,16 +248,14 @@ void Axis::poll() {
   // make sure we're ready
   if (axisNumber == 0) return;
 
-  //static int i = 0; i++; if (i%200 == 0) { D(" I vs. T = "); D(getInstrumentCoordinateSteps()); D(" = "); DL(getTargetCoordinateSteps()); }
-
-  // check for limits
+  // check limits
   error.minLimitSensed = senses.read(hMinSense);
   error.maxLimitSensed = senses.read(hMaxSense);
 
   // stop homing as we pass by the sensor
   if (homingStage != HOME_NONE) {
-    if (autoRate == AR_RATE_BY_TIME_FORWARD && !senses.read(hHomeSense)) autoSlewStop();
-    if (autoRate == AR_RATE_BY_TIME_REVERSE && senses.read(hHomeSense)) autoSlewStop();
+    if (autoRate == AR_RATE_BY_TIME_FORWARD && !senses.read(homeSenseHandle)) autoSlewStop();
+    if (autoRate == AR_RATE_BY_TIME_REVERSE && senses.read(homeSenseHandle)) autoSlewStop();
   }
 
   // automatically abort slew and stop tracking
@@ -287,18 +297,21 @@ void Axis::poll() {
     } else
     if (autoRate == AR_RATE_BY_TIME_END) {
       if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < -slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
-      if (fabs(freq) <= slewMpspcs) {
+      if (abs(freq) <= slewMpspcs) {
         driver.modeDecayTracking();
         autoRate = AR_NONE;
         freq = 0.0F;
-        V(axisPrefix); VLF("poll(); slew stopped");
         // start next phase of homing
+        if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
+        if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
         if (homingStage != HOME_NONE) {
-          float f = maxFreq/4.0F; if (f < 0.0003) f = 0.0003; // >= ~1 arc-minute per second slew speed
-          setFrequencyMax(f);
-          if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else if (homingStage == HOME_SLOW) homingStage = HOME_FINE;
+          float f = maxFreq/4.0F;
+          if (abs(f) < 0.0003) { if (f < 0) f = -0.0003; else f = 0.0003; }
+          setFrequencyMax(abs(f));
           autoSlewHome();
+        } else {
+          V(axisPrefix); VLF("poll(); slew stopped");
         }
       }
     } else

@@ -254,6 +254,7 @@ void Mount::guideSpiralPoll() {
 }
 
 void Mount::guidePoll() {
+
   // check fast guide completion axis1
   if (guideActionAxis1 == GA_BREAK && guideRateAxis1 == 0.0F && !axis1.autoSlewActive()) {
     guideActionAxis1 = GA_NONE;
@@ -274,6 +275,19 @@ void Mount::guidePoll() {
   if (guideState == GU_SPIRAL_GUIDE) {
     if (guideActionAxis1 > GA_BREAK && guideActionAxis2 > GA_BREAK) guideSpiralPoll(); else
     if (guideActionAxis1 != GA_BREAK || guideActionAxis2 != GA_BREAK) guideSpiralStop();
+  }
+
+  // handle end of home guiding
+  if (guideState == GU_HOME_GUIDE) {
+    if (!axis1.autoSlewActive() && !axis2.autoSlewActive()) {
+      VLF("MSG: guidePoll(); arrived at home");
+      guideState = GU_NONE;
+      guideActionAxis1 = GA_NONE;
+      guideActionAxis2 = GA_NONE;
+      resetHome(false);
+      axis1.enable(true);
+      axis2.enable(true);
+    }
   }
 
   // watch for guides finished

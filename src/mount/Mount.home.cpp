@@ -8,33 +8,46 @@
 #include "Mount.h"
 
 CommandError Mount::returnHome() {
-  if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE) return CE_SLEW_IN_SLEW;
+  if (gotoState != GS_NONE || guideState != GU_NONE || axis1.autoSlewActive() || axis2.autoSlewActive()) return CE_SLEW_IN_MOTION;
+
+  if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+    CommandError e = resetHome(false);
+    if (e != CE_NONE) return e;
+  }
 
   // stop tracking
   setTrackingState(TS_NONE);
   updateTrackingRates();
 
-  // setup where the home position is
-  updateHomePosition();
+  // make sure the motors are powered on
+  axis1.enable(true);
+  axis2.enable(true);
 
-  // move to home
   axis1.setFrequencyMax(radsPerSecondCurrent);
-  if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
-  axis1.autoSlewHome();
   axis2.setFrequencyMax(radsPerSecondCurrent);
-  if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);
-  axis2.autoSlewHome();
 
-  atHome = true;
+  if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+    // make each axis track movement 
+    axis1.setTracking(true);
+    axis2.setTracking(true);
+    guideState = GU_HOME_GUIDE;
+    guideActionAxis1 = guideActionAxis2 = GA_HOME;
+    guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + 5UL*60UL*1000UL; // 5 minutes
+  } else {
+    updatePosition(CR_MOUNT);
+    if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
+    if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);
+  }
+
+  axis1.autoSlewHome();
+  axis2.autoSlewHome();
 
   VLF("MSG: Mount, moving to home");
   return CE_NONE;
 }
 
 CommandError Mount::resetHome(bool resetPark) {
-  if (guideState != GU_NONE) return CE_SLEW_IN_MOTION;
-  if (gotoState  != GS_NONE) return CE_SLEW_IN_MOTION;
+  if (gotoState != GS_NONE || guideState != GU_NONE || axis1.autoSlewActive() || axis2.autoSlewActive()) return CE_SLEW_IN_MOTION;
 
   // clear park state
   if (resetPark) {
@@ -46,19 +59,23 @@ CommandError Mount::resetHome(bool resetPark) {
   setTrackingState(TS_NONE);
   updateTrackingRates();
 
+  // make sure the motors are powered down
+  axis1.enable(false);
+  axis2.enable(false);
+
   // setup where the home position is
   updateHomePosition();
   
   // setup axis1 and axis2
-  axis1.enable(false);
-  axis1.setMotorCoordinateSteps(0);
   axis1.setBacklash(0);
-  if (transform.mountType == ALTAZM) axis1.setInstrumentCoordinate(home.z); else axis1.setInstrumentCoordinate(home.h);
-  axis1.setFrequencyMax(degToRad(4.0));
-  axis2.enable(false);
-  axis2.setMotorCoordinateSteps(0);
   axis2.setBacklash(0);
+  axis1.setMotorCoordinateSteps(0);
+  axis2.setMotorCoordinateSteps(0);
+  if (transform.mountType == ALTAZM) axis1.setInstrumentCoordinate(home.z); else axis1.setInstrumentCoordinate(home.h);
   if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
+  axis1.setBacklash(misc.backlash.axis1);
+  axis2.setBacklash(misc.backlash.axis2);
+  axis1.setFrequencyMax(degToRad(4.0));
   axis2.setFrequencyMax(degToRad(4.0));
   atHome = true;
 

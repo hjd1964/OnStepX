@@ -112,9 +112,9 @@ void Mount::init(bool validKey) {
 
 void Mount::setTrackingState(TrackingState state) {
   trackingState = state;
+  // bring up mount status LED
+  statusInit();
   if (trackingState == TS_SIDEREAL) {
-    // bring up mount status LED
-    statusInit();
     axis1.setTracking(true);
     axis2.setTracking(true);
     axis1.enable(true);
@@ -139,7 +139,7 @@ void Mount::updatePosition(CoordReturn coordReturn) {
 }
 
 void Mount::updateTrackingRates() {
-  if (gotoState != GS_NONE || guideState == GU_SPIRAL_GUIDE || guideState == GU_GUIDE) { statusSetPeriodMillis(1); return; }
+  if (gotoState != GS_NONE || guideState >= GU_GUIDE) { statusSetPeriodMillis(1); return; }
 
   if (trackingState != TS_SIDEREAL) {
     trackingRateAxis1 = 0.0F;
