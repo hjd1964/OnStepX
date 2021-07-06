@@ -64,9 +64,6 @@ void TimeLocationSource::get(JulianDate &ut1) {
   }
 }
 
-void TimeLocationSource::getSite(double &latitude, double &longitude) {
-}
-
 TimeLocationSource tls;
 
 #endif

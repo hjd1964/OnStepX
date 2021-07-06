@@ -40,15 +40,12 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     *numericReply = false;
   } else
 
-  // :Gt#       Get current site Latitude, positive for North latitudes
-  //            Returns: sDD*MM#
-  // :GtH#      Get current site Latitude, positive for North latitudes
-  //            Returns: sDD*MM:SS.SSS# (high precision)
-  if (cmdH("Gt")) {
-    if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else precisionMode = PM_LOW;
-    convert.doubleToDms(reply, radToDeg(location.latitude), false, true, precisionMode);
+  // :Ge#       Get the site elevation in meters
+  //            Returns: +/-n.n
+  if (cmd("Ge")) {
+    sprintF(reply, "%3.1f", location.elevation);
     *numericReply = false;
-  } else 
+  } else
 
   // :GG#       Get UTC offset time, hours and minutes to add to local time to convert to UTC
   //            Returns: [s]HH:MM#
@@ -99,6 +96,16 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     *numericReply = false;
   } else
 
+  // :Gt#       Get current site Latitude, positive for North latitudes
+  //            Returns: sDD*MM#
+  // :GtH#      Get current site Latitude, positive for North latitudes
+  //            Returns: sDD*MM:SS.SSS# (high precision)
+  if (cmdH("Gt")) {
+    if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else precisionMode = PM_LOW;
+    convert.doubleToDms(reply, radToDeg(location.latitude), false, true, precisionMode);
+    *numericReply = false;
+  } else 
+
   if (cmdGX("GX8")) {
 
     // :GX80#     Get the UT1 Time as sexagesimal value in 24 hour format
@@ -126,6 +133,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     if (parameter[1] == '9') {
       if (dateIsReady && timeIsReady) *commandError = CE_0;
     } else return false;
+
   } else
 
   // :SC[MM/DD/YY]#
@@ -147,6 +155,17 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         tls.set(ut1);
       #endif
     } else *commandError = CE_PARAM_FORM;
+  } else
+
+  // :Se[sn.n]#
+  //            Sets current site elevation in meters
+  //            Return: 0 failure, 1 success
+  if (cmdP("Se")) {
+    char *conv_end;
+    float f = strtod(&parameter[0], &conv_end);
+    if (&parameter[0] == conv_end) f = NAN;
+    if (!setElevation(f)) *commandError = CE_PARAM_RANGE;
+    nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
   } else
 
   //  :SG[sHH]# or :SG[sHH:MM]# (where MM is 00, 30, or 45)
@@ -212,7 +231,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   } else
 
   //  :St[sDD*MM]# or :St[sDD*MM:SS]# or :St[sDD*MM:SS.SSS]#
-  //            Set current site latitude
+  //            Set current site latitude in degrees
   //            Return: 0 failure, 1 success
   if (cmdP("St"))  {
     double degs;

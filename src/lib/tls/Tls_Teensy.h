@@ -21,9 +21,6 @@ class TimeLocationSource {
     // get the RTC's time
     void get(JulianDate &ut1);
 
-    // get the location (does nothing)
-    void getSite(double &latitude, double &longitude);
-
     bool active = false;
 };
 

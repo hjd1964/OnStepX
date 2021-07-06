@@ -28,7 +28,7 @@ class TimeLocationSource {
     void get(JulianDate &ut1);
 
     // get the location
-    void getSite(double &latitude, double &longitude);
+    void getSite(double &latitude, double &longitude, float &elevation);
 
     // update from GPS
     bool poll();

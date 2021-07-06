@@ -41,14 +41,11 @@ extern Tasks tasks;
   }
 
   // Sets status LED flash period in ms, or use 0 to turn LED off, or 1 to turn LED on
-  void Mount::statusSetPeriodMillis(unsigned long period) {
+  void Mount::statusSetPeriodMillis(int period) {
     #if LED_MOUNT_STATUS != OFF && LED_MOUNT_STATUS_PIN != OFF
-      static unsigned long lastPeriod = 0;
-      if (lastPeriod == period) return;
-      lastPeriod = period;
       if (period == 0) { period = 500; ledOff = true; } else ledOff = false;
       if (period == 1) { period = 500; ledOn = true; } else ledOn = false;
-      tasks.setPeriod(statusTaskHandle, period/2);
+      tasks.setPeriod(statusTaskHandle, period/2UL);
     #endif
   }
 

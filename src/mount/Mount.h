@@ -270,7 +270,7 @@ class Mount {
     void limitStopAxis2(GuideAction stopDirection);
 
     void statusInit();
-    void statusSetPeriodMillis(unsigned long period);
+    void statusSetPeriodMillis(int period);
 
     Sound sound;
     Library library;

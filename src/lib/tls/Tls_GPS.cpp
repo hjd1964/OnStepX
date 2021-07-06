@@ -68,12 +68,13 @@ void TimeLocationSource::get(JulianDate &ut1) {
   ut1.hour = gps.time.hour() + gps.time.minute()/60.0 + gps.time.second()/3600.0;
 }
 
-void TimeLocationSource::getSite(double &latitude, double &longitude) {
+void TimeLocationSource::getSite(double &latitude, double &longitude, float &elevation) {
   if (!active) return;
   if (!siteIsValid()) return;
 
   latitude = gps.location.lat();
   longitude = -gps.location.lng();
+  elevation = gps.altitude.meters();
 }
 
 bool TimeLocationSource::poll() {

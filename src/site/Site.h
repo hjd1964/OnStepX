@@ -39,10 +39,11 @@ typedef struct LocationExtras {
 } LocationExtras;
 
 #pragma pack(1)
-#define LocationSize 36
+#define LocationSize 40
 typedef struct Location {
   double latitude;
   double longitude;
+  float  elevation;
   float  timezone;
   char   name[16];
 } Location;
@@ -111,6 +112,9 @@ class Site {
 
     // reads the julian date information from NV
     void readJD(bool validKey);
+
+    // sets the site altitude in meters
+    bool setElevation(float e);
 
     Convert convert;
 

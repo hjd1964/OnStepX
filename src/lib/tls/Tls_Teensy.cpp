@@ -48,9 +48,6 @@ void TimeLocationSource::get(double &JD, double &UT1) {
   }
 }
 
-void TimeLocationSource::getSite(double &latitude, double &longitude) {
-}
-
 TimeLocationSource tls;
 
 #endif

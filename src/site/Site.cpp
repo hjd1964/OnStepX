@@ -21,9 +21,10 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
     if (tls.ready) {
       VF("MSG: Tls_GPS, setting site from GPS");
       double latitude, longitude;
-      tls.getSite(latitude, longitude);
+      tls.getSite(latitude, longitude, elevation);
       site.location.latitude = degToRad(latitude);
       site.location.longitude = degToRad(longitude);
+      site.location.elevation = degToRad(elevation);
       strcpy(site.location.name, "GPS");
 
       VF("MSG: Tls_GPS, setting date/time from GPS");
@@ -211,6 +212,11 @@ void Site::readJD(bool validKey) {
   nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
   if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
   if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
+}
+
+bool Site::setElevation(float e) {
+ if (e >= -100.0 && e < 20000.0) location.elevation = e; else return false;
+ return true;
 }
 
 Site site;

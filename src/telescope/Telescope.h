@@ -4,6 +4,7 @@
 
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
+#include "../weather/Weather.h"
 #include "../mount/Mount.h"
 
 typedef struct InitError {

@@ -23,26 +23,32 @@ CommandError Mount::returnHome() {
   axis1.enable(true);
   axis2.enable(true);
 
+  // set slew rate limit
   axis1.setFrequencyMax(radsPerSecondCurrent);
   axis2.setFrequencyMax(radsPerSecondCurrent);
 
+  VLF("MSG: Mount, moving to home");
+
   if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
-    // make each axis track movement 
-    axis1.setTracking(true);
-    axis2.setTracking(true);
+    // use guiding and switches to find home
     guideState = GU_HOME_GUIDE;
     guideActionAxis1 = guideActionAxis2 = GA_HOME;
     guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + 5UL*60UL*1000UL; // 5 minutes
+    axis1.autoSlewHome();
+    axis2.autoSlewHome();
   } else {
+    // use a goto to find home
+    axis1.markOriginCoordinate();
+    axis2.markOriginCoordinate();
+    VLF("Mount::returnHome(); origin coordinates set");
     updatePosition(CR_MOUNT);
     if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
     if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);
+    VLF("Mount::returnHome(); target coordinates set");
+    axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
+    axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
   }
 
-  axis1.autoSlewHome();
-  axis2.autoSlewHome();
-
-  VLF("MSG: Mount, moving to home");
   return CE_NONE;
 }
 
@@ -75,9 +81,13 @@ CommandError Mount::resetHome(bool resetPark) {
   if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
-  axis1.setFrequencyMax(degToRad(4.0));
-  axis2.setFrequencyMax(degToRad(4.0));
+  axis1.setFrequencyMax(degToRad(0.1));
+  axis2.setFrequencyMax(degToRad(0.1));
   atHome = true;
+
+  // clear align state
+  alignState.currentStar = 0;
+  alignState.lastStar = 0;
 
   VLF("MSG: Mount, reset at home and in standby");
   return CE_NONE;

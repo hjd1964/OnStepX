@@ -417,6 +417,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP2("SXEM")) {
+    if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
     long l = strtol(&parameter[3], NULL, 10);
     float degs = l/4.0;
     if (l == 0 || l == GEM || l == FORK || l == ALTAZM) nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l); else *commandError = CE_PARAM_RANGE;

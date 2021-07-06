@@ -114,6 +114,16 @@
 #define TEENSY                      4 // TEENSY3.2 RTC (Built-in)
 #define GPS                         5 // GPS device
 
+// various Weather sensors supported
+#define BME280                      1 // BME280 on I2C (at default address 0x77)
+#define BME280_0x77                 1 // BME280 on I2C (at address 0x77)
+#define BME280_0x76                 2 // BME280 on I2C (at address 0x76)
+#define BME280_SPI                  3 // BME280 on SPI (default CS)
+#define BMP280                      4 // BMP280 on I2C (at default address 0x77)
+#define BMP280_0x77                 4 // BMP280 on I2C (at address 0x77)
+#define BMP280_0x76                 5 // BMP280 on I2C (at address 0x76)
+#define BMP280_SPI                  6 // BMP280 on SPI (default CS)
+
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
@@ -226,18 +236,18 @@
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
 
 // NV addresses
-#define INIT_NV_KEY                 583927924UL
+#define INIT_NV_KEY                 583927923UL
 
-#define NV_KEY                      0      // bytes: 4   , addr:   0..3
-#define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..4
-#define NV_SITE_BASE                5      // bytes: 36*4, addr:   5..148
-#define NV_SITE_JD_BASE             149    // bytes: 16  , addr: 149..164
-#define NV_MOUNT_LIMITS_BASE        165    // bytes: 16  , addr: 165..180
-#define NV_MOUNT_MISC_BASE          181    // bytes: 14  , addr: 181..194
-#define NV_MOUNT_PEC_BASE           195    // bytes: 6   , addr: 195..200
-#define NV_MOUNT_PARK_BASE          201    // bytes: 15  , addr: 201..215
-#define NV_ALIGN_MODEL_BASE         216    // bytes: 32  , addr: 216..247
-#define NV_AXIS_SETTINGS_REVERT     248    // bytes: 2   , addr: 248..249
-#define NV_AXIS_SETTINGS_BASE       250    // bytes: 21*9, addr: 250..438
-#define NV_MOUNT_TYPE_BASE          439    // bytes: 1   , addr: 439..439
+#define NV_KEY                      0      // bytes: 4   , addr:   0..  3
+#define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4
+#define NV_SITE_BASE                5      // bytes: 40*4, addr:   5..164
+#define NV_SITE_JD_BASE             165    // bytes: 16  , addr: 165..180
+#define NV_MOUNT_LIMITS_BASE        181    // bytes: 16  , addr: 181..196
+#define NV_MOUNT_MISC_BASE          197    // bytes: 14  , addr: 197..210
+#define NV_MOUNT_PEC_BASE           211    // bytes: 6   , addr: 211..216
+#define NV_MOUNT_PARK_BASE          217    // bytes: 15  , addr: 217..231
+#define NV_ALIGN_MODEL_BASE         232    // bytes: 32  , addr: 232..263
+#define NV_AXIS_SETTINGS_REVERT     264    // bytes: 2   , addr: 264..265
+#define NV_AXIS_SETTINGS_BASE       266    // bytes: 21*9, addr: 266..454
+#define NV_MOUNT_TYPE_BASE          455    // bytes: 1   , addr: 455..455
 #define NV_PEC_BUFFER_BASE          500    // Bytes: ?   , addr: 500..500 + (PEC_BUFFER_SIZE_LIMIT - 1)

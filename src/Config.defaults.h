@@ -25,8 +25,8 @@
 #ifndef WEATHER
 #define WEATHER                       OFF
 #endif
-#ifndef TELESCOPE_TEMPERATURE
-#define TELESCOPE_TEMPERATURE         OFF
+#ifndef FOCUSER_TEMPERATURE
+#define FOCUSER_TEMPERATURE           OFF
 #endif
 
 // step signal

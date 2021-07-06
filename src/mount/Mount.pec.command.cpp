@@ -77,6 +77,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //            Set PEC steps per worm rotation [n]
     //            Return: 0 on failure or 1 on success
     if (cmdP2("SXE7")) {
+      if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
       long l = strtol(&parameter[3], NULL, 10);
       if (l >= 0 && l < 129600000) {
         Pec tempPec = pec;
