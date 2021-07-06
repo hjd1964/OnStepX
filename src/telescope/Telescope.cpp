@@ -32,6 +32,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     VLF("MSG: Telescope, NV reset to defaults");
   } else { VLF("MSG: Telescope, correct NV key found"); }
 
+  weather.init();
+
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
     mount.init(validKey);
   #endif

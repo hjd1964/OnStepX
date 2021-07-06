@@ -42,11 +42,10 @@ class Weather {
 
     bool success = false;
 
-    float temperature = 10.0;
-    float averageTemperature = 10.0;
-    float pressure = 1010.0;
-    float humidity = 70.0;
-    float altitude = 200.0;
+    float temperature = NAN;
+    float averageTemperature = NAN;
+    float pressure = NAN;
+    float humidity = NAN;
 };
 
 extern Weather weather;
