@@ -179,18 +179,21 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 void Axis::autoSlewRateByDistance(float distance) {
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
+  setTracking(false);
   driver.modeDecaySlewing();
   V(axisPrefix); VLF("autoSlewRateByDistance(); slew started");
 }
 
 void Axis::autoSlewRateByDistanceStop() {
   driver.modeDecayTracking();
+  setTracking(true);
   autoRate = AR_NONE;
 }
 
 void Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return;
   if (autoRate == AR_NONE) {
+    setTracking(true);
     driver.modeDecaySlewing();
     V(axisPrefix); VLF("autoSlew(); slew started");
   }
@@ -198,11 +201,8 @@ void Axis::autoSlew(Direction direction) {
 }
 
 void Axis::autoSlewHome() {
-  if (pins.sense.home == OFF) {
-    markOriginCoordinate();
-    V(axisPrefix); VLF("autoSlewHome(); origin coordinate set");
-    autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-  } else {
+  if (pins.sense.home != OFF) {
+    setTracking(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
       driver.modeDecaySlewing();
@@ -236,6 +236,7 @@ void Axis::autoSlewAbort() {
     V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
     autoRate = AR_RATE_BY_TIME_ABORT;
     homingStage = HOME_NONE;
+    setTracking(true);
     poll();
   }
 }
@@ -280,6 +281,7 @@ void Axis::poll() {
       if (getTargetDistance() == 0) {
         freq = 0.0F;
         autoRate = AR_NONE;
+        setTracking(true);
       } else {
         freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*maxFreq + backlashFreq;
         if (freq < backlashFreq) freq = backlashFreq;

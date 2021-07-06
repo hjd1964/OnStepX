@@ -209,7 +209,7 @@ class Axis {
 
     bool invertEnable = false;
     bool enabled = false;
-    bool tracking = false;
+    bool tracking = true;
     bool limitsCheck = true;
 
     uint8_t homeSenseHandle = 0; // home sensor handle

@@ -138,10 +138,6 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   if (gotoTaskHandle) {
     VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
 
-    axis1.setTracking(false);
-    axis2.setTracking(false);
-    VLF("MSG: Mount::gotoEqu(); automatic tracking stopped");
-
     axis1.markOriginCoordinate();
     axis2.markOriginCoordinate();
     VLF("MSG: Mount::gotoEqu(); origin coordinates set");
@@ -156,7 +152,6 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
       axis2.setTargetCoordinate(a2);
     }
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
-    //transform.print(&destination);
 
     // slew rate in rads per second
     axis1.setFrequencyMax(radsPerSecondCurrent);
@@ -214,23 +209,16 @@ void Mount::gotoPoll() {
 
       axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
       axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-      VLF("MSG: Mount::gotoPoll(); slew started");
     }
   } else
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
       VLF("MSG: Mount::gotoPoll(); destination reached");
       updatePosition(CR_MOUNT_EQU);
-      //transform.print(&current);
 
       VLF("MSG: Mount::gotoPoll(); stopping slew");
       axis1.autoSlewRateByDistanceStop();
       axis2.autoSlewRateByDistanceStop();
-
-      // lock tracking with movement
-      axis1.setTracking(true);
-      axis2.setTracking(true);
-      VLF("MSG: Mount::gotoPoll(); automatic tracking resumed");
 
       // check if parking and mark as finished
       if (park.state == PS_PARKING && gotoStage != GG_ABORT) parkFinish();

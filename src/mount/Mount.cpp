@@ -115,15 +115,9 @@ void Mount::setTrackingState(TrackingState state) {
   // bring up mount status LED
   statusInit();
   if (trackingState == TS_SIDEREAL) {
-    axis1.setTracking(true);
-    axis2.setTracking(true);
     axis1.enable(true);
     axis2.enable(true);
     atHome = false;
-  } else
-  if (trackingState == TS_NONE) {
-    axis1.setTracking(false);
-    axis2.setTracking(false);
   }
 }
 
@@ -138,29 +132,42 @@ void Mount::updatePosition(CoordReturn coordReturn) {
   if (atHome) current.pierSide = PIER_SIDE_NONE;
 }
 
+#define SS_STOPPED 0
+#define SS_SLEWING 1
+
 void Mount::updateTrackingRates() {
-  if (gotoState != GS_NONE || guideState >= GU_GUIDE) { statusSetPeriodMillis(1); return; }
+  static int lastSlewingStatus = 0;
+  int slewingStatus = 0;
 
-  if (trackingState != TS_SIDEREAL) {
-    trackingRateAxis1 = 0.0F;
-    trackingRateAxis2 = 0.0F;
-  }
+  if (gotoState == GS_NONE || guideState < GU_GUIDE) {
+    if (trackingState != TS_SIDEREAL) {
+      trackingRateAxis1 = 0.0F;
+      trackingRateAxis2 = 0.0F;
+    }
 
-  float f1 = 0, f2 = 0;
-  if (guideActionAxis1 == GA_NONE || guideState == GU_PULSE_GUIDE) {
-    f1 = trackingRateAxis1 + guideRateAxis1 + pecRateAxis1;
-    axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F);
-  }
-  if (guideActionAxis2 == GA_NONE || guideState == GU_PULSE_GUIDE) {
-    f2 = trackingRateAxis2 + guideRateAxis2;
-    axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F);
-  }
+    float f1 = 0, f2 = 0;
+    if (guideActionAxis1 == GA_NONE || guideState == GU_PULSE_GUIDE) {
+      f1 = trackingRateAxis1 + guideRateAxis1 + pecRateAxis1;
+      axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F);
+    }
+    if (guideActionAxis2 == GA_NONE || guideState == GU_PULSE_GUIDE) {
+      f2 = trackingRateAxis2 + guideRateAxis2;
+      axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F);
+    }
 
-  // flash mount status LED porportional to tracking rate
-  f1 = abs(f1); f2 = abs(f2); if (f2 > f1) f1 = f2;
-  if (f1 < 0.20F) statusSetPeriodMillis(0); else
-  if (f1 > 3.0F) statusSetPeriodMillis(1); else statusSetPeriodMillis(500.0F/f1);
-}
+    f1 = abs(f1); f2 = abs(f2); if (f2 > f1) f1 = f2;
+    if (f1 < 0.20F) slewingStatus = SS_STOPPED; else
+    if (f1 > 3.0F) slewingStatus = SS_SLEWING; else slewingStatus = 500.0F/f1;
+  } else slewingStatus = SS_SLEWING;
+
+  if (slewingStatus != lastSlewingStatus) {
+    lastSlewingStatus = slewingStatus;
+    // flash mount status LED porportional to tracking rate
+    statusSetPeriodMillis(slewingStatus);
+    // disable polling of the weather sensor during slews
+    weather.disable = (slewingStatus == SS_SLEWING);
+  }
+ }
 
 #ifdef HAL_NO_DOUBLE_PRECISION
   #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
