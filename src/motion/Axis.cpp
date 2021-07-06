@@ -211,6 +211,7 @@ void Axis::autoSlewHome() {
         case HOME_FAST: VL("fast"); break;
         case HOME_SLOW: VL("slow"); break;
         case HOME_FINE: VL("fine"); break;
+        case HOME_NONE: VL("????"); break;
       }
     }
     if (senses.read(homeSenseHandle)) {

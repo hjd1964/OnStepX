@@ -229,8 +229,8 @@ void Transform::horToEqu(Coordinate *coord) {
 double Transform::trueRefrac(double altitude) {
   float pressure = 1010.0F;
   float temperature = 10.0F;
-  if (!isnan(telescope.ambient.pressure)) pressure = telescope.ambient.pressure;
-  if (!isnan(telescope.ambient.temperature)) temperature = telescope.ambient.temperature;
+  if (!isnan(weather.getPressure())) pressure = weather.getPressure();
+  if (!isnan(weather.getTemperature())) temperature = weather.getTemperature();
   float TPC = (pressure/1010.0F)*(283.0F/(273.0F + temperature));
   float r   = 2.9670597e-4F*cotf(altitude + 0.0031375594F/(altitude + 0.089186324F))*TPC;
   if (r < 0.0F) r = 0.0F;

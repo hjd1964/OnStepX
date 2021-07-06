@@ -44,8 +44,8 @@ void weatherPollWrapper() { weather.poll(); }
 #endif
 
 bool Weather::init() {
-  success = false;
   #if WEATHER != OFF
+    success = false;
     #if WEATHER == BME280 || WEATHER == BME280_0x76
       if (bmx.begin(BME_ADDRESS, &HAL_Wire)) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN, Weather.init(): BME280 not found"); }
     #elif WEATHER == BMP280 || WEATHER == BMP280_0x76
