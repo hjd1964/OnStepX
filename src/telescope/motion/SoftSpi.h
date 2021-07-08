@@ -23,5 +23,5 @@ class SoftSpi {
     uint32_t transfer32(uint32_t data_out);
 
   private:
-    DriverPins pins = {OFF, OFF, OFF, OFF, OFF, OFF};
+    DriverPins pins = { OFF, OFF, OFF, OFF, OFF, OFF };
 };

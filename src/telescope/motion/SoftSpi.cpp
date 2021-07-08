@@ -12,8 +12,7 @@ bool SoftSpi::init(DriverPins pins) {
   if (pins.cs == OFF || pins.sck == OFF || pins.cs == OFF) return false; else return true;
 }
 
-void SoftSpi::begin()
-{
+void SoftSpi::begin() {
   pinMode(pins.cs, OUTPUT);
   digitalWrite(pins.cs, HIGH);  delayMicroseconds(1);
   pinMode(pins.sck, OUTPUT);
@@ -35,8 +34,7 @@ void SoftSpi::end() {
 uint8_t SoftSpi::transfer(uint8_t data_out)
 {
   uint8_t data_in = 0;
-  for(int i = 7; i >= 0; i--)
-  {
+  for(int i = 7; i >= 0; i--) {
     digitalWrite(pins.sck, LOW);
     digitalWrite(pins.mosi, bitRead(data_out,i)); delayMicroseconds(1);
     digitalWrite(pins.sck, HIGH);
@@ -48,8 +46,7 @@ uint8_t SoftSpi::transfer(uint8_t data_out)
 uint32_t SoftSpi::transfer32(uint32_t data_out)
 {
   uint32_t data_in = 0;
-  for(int i=31; i >= 0; i--)
-  {
+  for(int i=31; i >= 0; i--) {
     digitalWrite(pins.sck, LOW);
     digitalWrite(pins.mosi, bitRead(data_out,i)); delayMicroseconds(1);
     digitalWrite(pins.sck, HIGH);
