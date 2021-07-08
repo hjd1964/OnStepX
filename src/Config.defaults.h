@@ -245,7 +245,16 @@
 #define AXIS3_STEPS_PER_DEGREE        64.0
 #endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
-#define AXIS3_SLEW_RATE_DESIRED       1.0
+#define AXIS3_SLEW_RATE_DESIRED       1.0                         // in degrees/sec
+#endif
+#ifndef AXIS3_ACCELERATION_RATE
+#define AXIS3_ACCELERATION_RATE       AXIS3_SLEW_RATE_DESIRED     // in degrees/sec/sec
+#endif
+#ifndef AXIS3_RAPID_STOP_RATE
+#define AXIS3_RAPID_STOP_RATE         (AXIS3_ACCELERATION_RATE*2) // in degrees/sec/sec
+#endif
+#ifndef AXIS3_BACKLASH_RATE
+#define AXIS3_BACKLASH_RATE           (AXIS3_ACCELERATION_RATE/4) // in degrees/sec
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -257,10 +266,19 @@
 #define AXIS4_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
-#define AXIS4_SLEW_RATE_MINIMUM       50
+#define AXIS4_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS4_SLEW_RATE_DESIRED
-#define AXIS4_SLEW_RATE_DESIRED       500
+#define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS4_ACCELERATION_RATE
+#define AXIS4_ACCELERATION_RATE       AXIS4_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS4_RAPID_STOP_RATE
+#define AXIS4_RAPID_STOP_RATE         (AXIS4_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS4_BACKLASH_RATE
+#define AXIS4_BACKLASH_RATE           (AXIS4_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // focuser settings, FOCUSER2
@@ -271,10 +289,19 @@
 #define AXIS5_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM       50
+#define AXIS5_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS5_SLEW_RATE_DESIRED
-#define AXIS5_SLEW_RATE_DESIRED       500
+#define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS5_ACCELERATION_RATE
+#define AXIS5_ACCELERATION_RATE       AXIS5_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS5_RAPID_STOP_RATE
+#define AXIS5_RAPID_STOP_RATE         (AXIS5_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS5_BACKLASH_RATE
+#define AXIS5_BACKLASH_RATE           (AXIS5_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // focuser settings, FOCUSER3
@@ -285,10 +312,19 @@
 #define AXIS6_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM       50
+#define AXIS6_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS6_SLEW_RATE_DESIRED
-#define AXIS6_SLEW_RATE_DESIRED       500
+#define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS6_ACCELERATION_RATE
+#define AXIS6_ACCELERATION_RATE       AXIS6_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS6_RAPID_STOP_RATE
+#define AXIS6_RAPID_STOP_RATE         (AXIS6_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS6_BACKLASH_RATE
+#define AXIS6_BACKLASH_RATE           (AXIS6_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // focuser settings, FOCUSER4
@@ -299,10 +335,19 @@
 #define AXIS7_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM       50
+#define AXIS7_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS7_SLEW_RATE_DESIRED
-#define AXIS7_SLEW_RATE_DESIRED       500
+#define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS7_ACCELERATION_RATE
+#define AXIS7_ACCELERATION_RATE       AXIS7_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS7_RAPID_STOP_RATE
+#define AXIS7_RAPID_STOP_RATE         (AXIS7_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS7_BACKLASH_RATE
+#define AXIS7_BACKLASH_RATE           (AXIS7_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // focuser settings, FOCUSER5
@@ -313,10 +358,19 @@
 #define AXIS8_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM       50
+#define AXIS8_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS8_SLEW_RATE_DESIRED
-#define AXIS8_SLEW_RATE_DESIRED       500
+#define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS8_ACCELERATION_RATE
+#define AXIS8_ACCELERATION_RATE       AXIS8_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS8_RAPID_STOP_RATE
+#define AXIS8_RAPID_STOP_RATE         (AXIS8_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS8_BACKLASH_RATE
+#define AXIS8_BACKLASH_RATE           (AXIS8_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // focuser settings, FOCUSER6
@@ -327,10 +381,19 @@
 #define AXIS9_STEPS_PER_MICRON        0.5
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM       50
+#define AXIS9_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
 #ifndef AXIS9_SLEW_RATE_DESIRED
-#define AXIS9_SLEW_RATE_DESIRED       500
+#define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
+#endif
+#ifndef AXIS9_ACCELERATION_RATE
+#define AXIS9_ACCELERATION_RATE       AXIS9_SLEW_RATE_DESIRED     // in microns/sec/sec
+#endif
+#ifndef AXIS9_RAPID_STOP_RATE
+#define AXIS9_RAPID_STOP_RATE         (AXIS9_ACCELERATION_RATE*2) // in microns/sec/sec
+#endif
+#ifndef AXIS9_BACKLASH_RATE
+#define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
 #endif
 
 // -----------------------------------------------------------------------------------

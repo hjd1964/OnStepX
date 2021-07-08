@@ -38,6 +38,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     mount.init(validKey);
   #endif
 
+  #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+    focuser.init(validKey);
+  #endif
+
   if (!validKey) {
     while (!nv.committed()) nv.poll();
     nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
@@ -60,6 +64,10 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.commandGuide(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (mount.commandLimit(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (mount.commandPec(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+
+  #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+    if (focuser.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
   //  B - Reticule/Accessory Control

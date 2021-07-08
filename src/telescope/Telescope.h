@@ -5,6 +5,7 @@
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
 #include "../weather/Weather.h"
+#include "../focuser/Focuser.h"
 #include "../mount/Mount.h"
 
 typedef struct InitError {
@@ -49,16 +50,10 @@ class Telescope {
       Mount mount;
     #endif
     #if AXIS3_DRIVER_MODEL != OFF
-      Rotator rotator1;
+      Rotator rotator;
     #endif
-    #if AXIS4_DRIVER_MODEL != OFF
-      Focuser focuser1;
-    #endif
-    #if AXIS5_DRIVER_MODEL != OFF
-      Focuser focuser2;
-    #endif
-    #if AXIS6_DRIVER_MODEL != OFF
-      Focuser focuser3;
+    #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+      Focuser focuser;
     #endif
 
   private:
