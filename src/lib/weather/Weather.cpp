@@ -5,7 +5,7 @@
 
 #if WEATHER != OFF
 
-#include "../tasks/OnTask.h"
+#include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
 #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI

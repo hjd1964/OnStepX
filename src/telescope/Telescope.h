@@ -4,7 +4,7 @@
 
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
-#include "weather/Weather.h"
+#include "../lib/weather/Weather.h"
 #include "focuser/Focuser.h"
 #include "mount/Mount.h"
 
