@@ -38,9 +38,6 @@ CommandError Mount::returnHome() {
     axis2.autoSlewHome();
   } else {
     // use a goto to find home
-    axis1.markOriginCoordinate();
-    axis2.markOriginCoordinate();
-    VLF("Mount::returnHome(); origin coordinates set");
     updatePosition(CR_MOUNT);
     if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
     if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);

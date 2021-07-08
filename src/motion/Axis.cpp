@@ -177,6 +177,7 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 }
 
 void Axis::autoSlewRateByDistance(float distance) {
+  markOriginCoordinate();
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   setTracking(false);

@@ -138,10 +138,6 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   if (gotoTaskHandle) {
     VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
 
-    axis1.markOriginCoordinate();
-    axis2.markOriginCoordinate();
-    VLF("MSG: Mount::gotoEqu(); origin coordinates set");
-
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
     if (park.state == PS_PARKING) {
@@ -196,10 +192,6 @@ void Mount::gotoPoll() {
       axis1.autoSlewStop();
       axis2.autoSlewStop();
       VLF("MSG: Mount::gotoPoll(); slew stopped");
-
-      axis1.markOriginCoordinate();
-      axis2.markOriginCoordinate();
-      VLF("MSG: Mount::gotoPoll(); origin coordinates set");
 
       double a1, a2;
       transform.mountToInstrument(&destination, &a1, &a2);
