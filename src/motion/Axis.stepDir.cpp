@@ -25,37 +25,37 @@ extern Tasks tasks;
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3Pins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true, AXIS3_SENSE_LIMIT_MIN_PIN, AXIS3_SENSE_HOME_PIN, AXIS3_SENSE_LIMIT_MAX_PIN, { AXIS3_SENSE_HOME, AXIS3_SENSE_HOME_INIT, AXIS3_SENSE_LIMIT_MIN, AXIS3_SENSE_LIMIT_MAX, AXIS3_SENSE_LIMIT_INIT } };
   const AxisSettings Axis3Settings = {AXIS3_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS3_DRIVER_REVERSE, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_IRUN, { degToRad(AXIS3_LIMIT_MIN), degToRad(AXIS3_LIMIT_MAX) } };
-  inline void moveAxis3() { telescope.rotator.axis.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
+  inline void moveAxis3() { telescope.rotator.axis3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
   const AxisPins     Axis4Pins = {AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, false, false, true, AXIS4_SENSE_LIMIT_MIN_PIN, AXIS4_SENSE_HOME_PIN, AXIS4_SENSE_LIMIT_MAX_PIN, { AXIS4_SENSE_HOME, AXIS4_SENSE_HOME_INIT, AXIS4_SENSE_LIMIT_MIN, AXIS4_SENSE_LIMIT_MAX, AXIS4_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis4Settings = {AXIS4_STEPS_PER_MICRON, AXIS4_DRIVER_REVERSE, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, { degToRad(AXIS4_LIMIT_MIN), degToRad(AXIS4_LIMIT_MAX) } };
-  inline void moveAxis4() { telescope.focuser1.axis.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
+  const AxisSettings Axis4Settings = {AXIS4_STEPS_PER_MICRON, AXIS4_DRIVER_REVERSE, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, { AXIS4_LIMIT_MIN*1000.0F, AXIS4_LIMIT_MAX*1000.0F } };
+  inline void moveAxis4() { telescope.focuser.axis4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
   const AxisPins     Axis5Pins = {AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, false, false, true, AXIS5_SENSE_LIMIT_MIN_PIN, AXIS5_SENSE_HOME_PIN, AXIS5_SENSE_LIMIT_MAX_PIN, { AXIS5_SENSE_HOME, AXIS5_SENSE_HOME_INIT, AXIS5_SENSE_LIMIT_MIN, AXIS5_SENSE_LIMIT_MAX, AXIS5_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis5Settings = {AXIS5_STEPS_PER_MICRON, AXIS5_DRIVER_REVERSE, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, { degToRad(AXIS5_LIMIT_MIN), degToRad(AXIS5_LIMIT_MAX) } };
-  inline void moveAxis5() { telescope.focuser2.axis.move(AXIS2_STEP_PIN, AXIS5_DIR_PIN); }
+  const AxisSettings Axis5Settings = {AXIS5_STEPS_PER_MICRON, AXIS5_DRIVER_REVERSE, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, { AXIS5_LIMIT_MIN*1000.0F, AXIS5_LIMIT_MAX*1000.0F } };
+  inline void moveAxis5() { telescope.focuser.axis5.move(AXIS2_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
   const AxisPins     Axis6Pins = {AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, false, false, true, AXIS6_SENSE_LIMIT_MIN_PIN, AXIS6_SENSE_HOME_PIN, AXIS6_SENSE_LIMIT_MAX_PIN, { AXIS6_SENSE_HOME, AXIS6_SENSE_HOME_INIT, AXIS6_SENSE_LIMIT_MIN, AXIS6_SENSE_LIMIT_MAX, AXIS6_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis6Settings = {AXIS6_STEPS_PER_MICRON, AXIS6_DRIVER_REVERSE, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, { degToRad(AXIS6_LIMIT_MIN), degToRad(AXIS6_LIMIT_MAX) } };
-  inline void moveAxis6() { telescope.focuser3.axis.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
+  const AxisSettings Axis6Settings = {AXIS6_STEPS_PER_MICRON, AXIS6_DRIVER_REVERSE, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, { AXIS6_LIMIT_MIN*1000.0F, AXIS6_LIMIT_MAX*1000.0F } };
+  inline void moveAxis6() { telescope.focuser.axis6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
 #if AXIS7_DRIVER_MODEL != OFF
   const AxisPins     Axis7Pins = {AXIS7_STEP_PIN, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, false, false, true, AXIS7_SENSE_LIMIT_MIN_PIN, AXIS7_SENSE_HOME_PIN, AXIS7_SENSE_LIMIT_MAX_PIN, { AXIS7_SENSE_HOME, AXIS7_SENSE_HOME_INIT, AXIS7_SENSE_LIMIT_MIN, AXIS7_SENSE_LIMIT_MAX, AXIS7_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis7Settings = {AXIS7_STEPS_PER_MICRON, AXIS7_DRIVER_REVERSE, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, { degToRad(AXIS7_LIMIT_MIN), degToRad(AXIS7_LIMIT_MAX) } };
-  inline void moveAxis7() { telescope.focuser4.axis.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
+  const AxisSettings Axis7Settings = {AXIS7_STEPS_PER_MICRON, AXIS7_DRIVER_REVERSE, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, { AXIS7_LIMIT_MIN*1000.0F, AXIS7_LIMIT_MAX*1000.0F } };
+  inline void moveAxis7() { telescope.focuser.axis7.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
 #endif
 #if AXIS8_DRIVER_MODEL != OFF
   const AxisPins     Axis8Pins = {AXIS8_STEP_PIN, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, false, false, true, AXIS8_SENSE_LIMIT_MIN_PIN, AXIS8_SENSE_HOME_PIN, AXIS8_SENSE_LIMIT_MAX_PIN, { AXIS8_SENSE_HOME, AXIS8_SENSE_HOME_INIT, AXIS8_SENSE_LIMIT_MIN, AXIS8_SENSE_LIMIT_MAX, AXIS8_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis8Settings = {AXIS8_STEPS_PER_MICRON, AXIS8_DRIVER_REVERSE, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, { degToRad(AXIS8_LIMIT_MIN), degToRad(AXIS8_LIMIT_MAX) } };
-  inline void moveAxis8() { telescope.focuser5.axis.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
+  const AxisSettings Axis8Settings = {AXIS8_STEPS_PER_MICRON, AXIS8_DRIVER_REVERSE, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, { AXIS8_LIMIT_MIN*1000.0F, AXIS8_LIMIT_MAX*1000.0F } };
+  inline void moveAxis8() { telescope.focuser.axis8.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
 #endif
 #if AXIS9_DRIVER_MODEL != OFF
   const AxisPins     Axis9Pins = {AXIS9_STEP_PIN, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, false, false, true, AXIS9_SENSE_LIMIT_MIN_PIN, AXIS9_SENSE_HOME_PIN, AXIS9_SENSE_LIMIT_MAX_PIN, { AXIS9_SENSE_HOME, AXIS9_SENSE_HOME_INIT, AXIS9_SENSE_LIMIT_MIN, AXIS9_SENSE_LIMIT_MAX, AXIS9_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis9Settings = {AXIS9_STEPS_PER_MICRON, AXIS9_DRIVER_REVERSE, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, { degToRad(AXIS9_LIMIT_MIN), degToRad(AXIS9_LIMIT_MAX) } };
-  inline void moveAxis8() { telescope.focuser5.axis.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
+  const AxisSettings Axis9Settings = {AXIS9_STEPS_PER_MICRON, AXIS9_DRIVER_REVERSE, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, { AXIS9_LIMIT_MIN*1000.0F, AXIS9_LIMIT_MAX*1000.0F } };
+  inline void moveAxis8() { telescope.focuser.axis9.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
 #endif
 
 static uint8_t pollingTaskHandle  = 0;
@@ -70,22 +70,22 @@ inline void pollAxes() {
     telescope.mount.axis3.poll();
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
-    telescope.mount.axis4.poll();
+    telescope.focuser.axis4.poll();
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    telescope.mount.axis5.poll();
+    telescope.focuser.axis5.poll();
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    telescope.mount.axis6.poll();
+    telescope.focuser.axis6.poll();
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    telescope.mount.axis7.poll();
+    telescope.focuser.axis7.poll();
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    telescope.mount.axis8.poll();
+    telescope.focuser.axis8.poll();
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    telescope.mount.axis9.poll();
+    telescope.focuser.axis9.poll();
   #endif
 }
 
@@ -103,32 +103,35 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 
   taskHandle = 0;
   #if AXIS1_DRIVER_MODEL != OFF
-    if (axisNumber == 1) { pins = Axis1Pins; settings = Axis1Settings; move = moveAxis1; }
+    if (axisNumber == 1) { pins = Axis1Pins; settings = Axis1Settings; move = moveAxis1; backlashFreq = siderealToRad(TRACK_BACKLASH_RATE); }
   #endif
   #if AXIS1_DRIVER_MODEL != OFF
-    if (axisNumber == 2) { pins = Axis2Pins; settings = Axis2Settings; move = moveAxis2; }
+    if (axisNumber == 2) { pins = Axis2Pins; settings = Axis2Settings; move = moveAxis2; backlashFreq = siderealToRad(TRACK_BACKLASH_RATE); }
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    if (axisNumber == 3) { pins = Axis3Pins; settings = Axis3Settings; move = moveAxis3; }
+    if (axisNumber == 3) { pins = Axis3Pins; settings = Axis3Settings; move = moveAxis3; backlashFreq = degToRad(AXIS3_BACKLASH_RATE); }
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
-    if (axisNumber == 4) { pins = Axis4Pins; settings = Axis4Settings; move = moveAxis4; }
+    if (axisNumber == 4) { pins = Axis4Pins; settings = Axis4Settings; move = moveAxis4; backlashFreq = AXIS4_BACKLASH_RATE; }
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    if (axisNumber == 5) { pins = Axis5Pins; settings = Axis5Settings; move = moveAxis5; }
+    if (axisNumber == 5) { pins = Axis5Pins; settings = Axis5Settings; move = moveAxis5; backlashFreq = AXIS5_BACKLASH_RATE; }
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    if (axisNumber == 6) { pins = Axis6Pins; settings = Axis6Settings; move = moveAxis6; }
+    if (axisNumber == 6) { pins = Axis6Pins; settings = Axis6Settings; move = moveAxis6; backlashFreq = AXIS6_BACKLASH_RATE; }
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    if (axisNumber == 7) { pins = Axis7Pins; settings = Axis7Settings; move = moveAxis7; }
+    if (axisNumber == 7) { pins = Axis7Pins; settings = Axis7Settings; move = moveAxis7; backlashFreq = AXIS7_BACKLASH_RATE; }
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    if (axisNumber == 8) { pins = Axis8Pins; settings = Axis8Settings; move = moveAxis8; }
+    if (axisNumber == 8) { pins = Axis8Pins; settings = Axis8Settings; move = moveAxis8; backlashFreq = AXIS8_BACKLASH_RATE; }
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    if (axisNumber == 9) { pins = Axis9Pins; settings = Axis9Settings; move = moveAxis9; }
+    if (axisNumber == 9) { pins = Axis9Pins; settings = Axis9Settings; move = moveAxis9; backlashFreq = AXIS9_BACKLASH_RATE; }
   #endif
+
+  V(axisPrefix); VF("backlash takeup frequency set to "); 
+  if (axisNumber <= 3) { V(radToDeg(backlashFreq)); VL(" deg/sec."); } else { V(backlashFreq); VL(" microns/sec."); }
 
   V(axisPrefix); VF("start timer task... ");
   char timerName[] = "Axis0"; timerName[4] = '0' + axisNumber;
@@ -167,8 +170,8 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 
   V(axisPrefix); VLF("adding home and limit senses");
   homeSenseHandle = senses.add(pins.home, pins.sense.homeInit, pins.sense.home);
-  hMinSense = senses.add(pins.min, pins.sense.minMaxInit, pins.sense.min);
-  hMaxSense = senses.add(pins.max, pins.sense.minMaxInit, pins.sense.max);
+  minSenseHandle = senses.add(pins.min, pins.sense.minMaxInit, pins.sense.min);
+  maxSenseHandle = senses.add(pins.max, pins.sense.minMaxInit, pins.sense.max);
 
   V(axisPrefix); VF("start move task... ");
   if (taskHandle) { VL("success"); } else { VL("FAILED!"); }
@@ -185,21 +188,23 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   axisPrefix[11] = ':';
 }
 
-void Axis::enableMoveFast(const bool fast) {
+bool Axis::enableMoveFast(const bool fast) {
   #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+    if (axisNumber > 2) return false;
     if (fast) {
       disableBacklash();
       if (axisNumber == 1) {
         if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, slewForwardAxis1); else tasks.setCallback(taskHandle, slewReverseAxis1);
-      }
-      if (axisNumber == 2) {
+      } else {
         if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, slewForwardAxis2); else tasks.setCallback(taskHandle, slewReverseAxis2);
       }
     } else {
-      if (axisNumber == 1) tasks.setCallback(taskHandle, moveAxis1);
-      if (axisNumber == 2) tasks.setCallback(taskHandle, moveAxis2);
+      if (axisNumber == 1) tasks.setCallback(taskHandle, moveAxis1); else tasks.setCallback(taskHandle, moveAxis2);
       enableBacklash();
     }
+    return true;
+  #else
+    return false;
   #endif
 }
 
@@ -249,12 +254,12 @@ void Axis::enableMoveFast(const bool fast) {
     if (microstepModeControl == MMC_SLEWING_READY) return;
     digitalWriteF(stepPin, LOW);
     if (tracking) targetSteps += trackingStep;
-    if (motorSteps + backlashSteps < targetSteps) {
+    if (motorSteps < targetSteps) {
       digitalWriteF(dirPin, invertDir?HIGH:LOW);
       direction = DIR_FORWARD;
       if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
     } else
-    if (motorSteps + backlashSteps > targetSteps) {
+    if (motorSteps > targetSteps) {
       digitalWriteF(dirPin, invertDir?LOW:HIGH);
       direction = DIR_REVERSE;
       if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;

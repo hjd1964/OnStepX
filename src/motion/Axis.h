@@ -120,25 +120,29 @@ class Axis {
     float getFrequencySteps();
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);
+    // set slew frequency in "measures" (radians, microns, etc.) per second
+    void setFrequencySlew(float frequency);
+    // set minimum slew frequency in "measures" (radians, microns, etc.) per second
+    void setFrequencyMin(float frequency);
     // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
-    // set time to emergency stop movement, with acceleration in "measures" per second per second
+    // set acceleration rate in "measures" per second per second
     void setSlewAccelerationRate(float mpsps);
     // set time to emergency stop movement, with acceleration in "measures" per second per second
     void setSlewAccelerationRateAbort(float mpsps);
 
+    // slew, with acceleration distance (in "measures" to FrequencySlew)
+    void autoSlewRateByDistance(float distance);
+    // stops, with deacceleration by distance
+    void autoSlewRateByDistanceStop();
     // slew, with acceleration in "measures" per second per second
     void autoSlew(Direction direction);
-    // slew, with acceleration in distance (radians to FrequencyMax)
-    void autoSlewRateByDistance(float distance);
     // slew to home, with acceleration in "measures" per second per second
     void autoSlewHome();
-    // stops automatic movement
-    void autoSlewRateByDistanceStop();
-    // stops automatic movement
+    // stops, with deacceleration by time
     void autoSlewStop();
-    // emergency stops automatic movement
+    // emergency stops, with deacceleration by time
     void autoSlewAbort();
     // checks if slew is active on this axis
     bool autoSlewActive();
@@ -152,6 +156,11 @@ class Axis {
     void setBacklash(float value);
     // get backlash in "measures" (radians, microns, etc.)
     float getBacklash();
+
+    // set backlash in steps
+    void setBacklashSteps(long value);
+    // get backlash in steps
+    long getBacklashSteps();
 
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
@@ -188,6 +197,8 @@ class Axis {
     double getOriginOrTargetDistance();
     // distance target in "measures" (degrees, microns, etc.)
     double getTargetDistance();
+    // distance target in steps
+    long getTargetDistanceSteps();
     // returns true if traveling through backlash
     bool inBacklash();
     // disable backlash compensation, to work properly there must be an enable call to match
@@ -196,7 +207,7 @@ class Axis {
     void enableBacklash();
 
     // swaps fast unidirectional movement ISR for slewing in/out
-    void enableMoveFast(const bool state);
+    bool enableMoveFast(const bool state);
 
     bool decodeAxisSettings(char *s, AxisSettings &a);
     bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
@@ -213,12 +224,12 @@ class Axis {
     bool limitsCheck = true;
 
     uint8_t homeSenseHandle = 0; // home sensor handle
-    uint8_t hMinSense = 0;  // min sensor handle
-    uint8_t hMaxSense = 0;  // max sensor handle
+    uint8_t minSenseHandle = 0;  // min sensor handle
+    uint8_t maxSenseHandle = 0;  // max sensor handle
 
     long originSteps = 0;
 
-    float backlashFreq = siderealToRad(TRACK_BACKLASH_RATE);
+    float backlashFreq = 0.0F;
     uint16_t backlashStepsStore;
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
@@ -241,7 +252,9 @@ class Axis {
 
     float freq = 0.0F;
     float baseFreq = 0.0F;
-    float maxFreq;
+    float slewFreq;
+    float minFreq = 0.0F;
+    float maxFreq = 0.0F;
     float lastFreq;
     float minPeriodMicros;
     AutoRate autoRate = AR_NONE;
