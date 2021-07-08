@@ -4,9 +4,9 @@
 
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
-#include "../weather/Weather.h"
-#include "../focuser/Focuser.h"
-#include "../mount/Mount.h"
+#include "weather/Weather.h"
+#include "focuser/Focuser.h"
+#include "mount/Mount.h"
 
 typedef struct InitError {
   uint8_t nv:1;       // NV data size/structure error (disables writes to NV)
