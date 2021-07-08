@@ -150,8 +150,8 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     VLF("MSG: Mount::gotoEqu(); target coordinates set");
 
     // slew rate in rads per second
-    axis1.setFrequencyMax(radsPerSecondCurrent);
-    axis2.setFrequencyMax(radsPerSecondCurrent);
+    axis1.setFrequencySlew(radsPerSecondCurrent);
+    axis2.setFrequencySlew(radsPerSecondCurrent);
     VLF("MSG: Mount::gotoEqu(); slew rate set");
 
     axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));

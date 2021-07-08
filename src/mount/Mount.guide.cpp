@@ -114,7 +114,7 @@ CommandError Mount::guideStartAxis1(GuideAction guideAction, GuideRateSelect gui
     updateTrackingRates();
   } else {
     guideState = GU_GUIDE;
-    axis1.setFrequencyMax(degToRad(rate/240.0));
+    axis1.setFrequencySlew(degToRad(rate/240.0));
     guideAxis1AutoSlew(guideAction);
   }
 
@@ -158,7 +158,7 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
     updateTrackingRates();
   } else {
     guideState = GU_GUIDE;
-    axis2.setFrequencyMax(degToRad(rate/240.0F));
+    axis2.setFrequencySlew(degToRad(rate/240.0F));
     updatePosition(CR_MOUNT);
     guideAxis2AutoSlew(guideAction);
   }
@@ -249,8 +249,8 @@ void Mount::guideSpiralPoll() {
   if (customGuideRateAxis1 > maxRate) customGuideRateAxis1 = maxRate;
 
   // set the new guide rates
-  axis1.setFrequencyMax(siderealToRadF(customGuideRateAxis1));
-  axis2.setFrequencyMax(siderealToRadF(customGuideRateAxis2));
+  axis1.setFrequencySlew(siderealToRadF(customGuideRateAxis1));
+  axis2.setFrequencySlew(siderealToRadF(customGuideRateAxis2));
 }
 
 void Mount::guidePoll() {

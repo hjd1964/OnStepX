@@ -24,8 +24,8 @@ CommandError Mount::returnHome() {
   axis2.enable(true);
 
   // set slew rate limit
-  axis1.setFrequencyMax(radsPerSecondCurrent);
-  axis2.setFrequencyMax(radsPerSecondCurrent);
+  axis1.setFrequencySlew(radsPerSecondCurrent);
+  axis2.setFrequencySlew(radsPerSecondCurrent);
 
   VLF("MSG: Mount, moving to home");
 
@@ -78,8 +78,8 @@ CommandError Mount::resetHome(bool resetPark) {
   if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
-  axis1.setFrequencyMax(degToRad(0.1));
-  axis2.setFrequencyMax(degToRad(0.1));
+  axis1.setFrequencySlew(degToRad(0.1));
+  axis2.setFrequencySlew(degToRad(0.1));
   atHome = true;
 
   // clear align state
