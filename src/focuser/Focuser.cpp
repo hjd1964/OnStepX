@@ -125,7 +125,7 @@ int Focuser::getTcfDeadband(int index) {
 // set TCF deadband, in microns
 bool Focuser::setTcfDeadband(int index, int value) {
   if (index < 0 || index > 5) return false;
-  if (abs(value) >= 1000) return false;
+  if (value < 1 || value > 32767) return false;
   settings[index].tcf.deadband = value;
   writeSettings(index);
   return true;
