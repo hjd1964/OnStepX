@@ -47,13 +47,13 @@ bool Weather::init() {
   #if WEATHER != OFF
     success = false;
     #if WEATHER == BME280 || WEATHER == BME280_0x76
-      if (bmx.begin(BME_ADDRESS, &HAL_Wire)) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN, Weather.init(): BME280 not found"); }
+      if (bmx.begin(BME_ADDRESS, &HAL_Wire)) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN: Weather.init(), BME280 not found"); }
     #elif WEATHER == BMP280 || WEATHER == BMP280_0x76
-      if (bmx.begin(BMP_ADDRESS)) { weatherSensor = WS_BMP280; success = true; } else { DLF("WRN, Weather.init(): BMP280 not found"); }
+      if (bmx.begin(BMP_ADDRESS)) { weatherSensor = WS_BMP280; success = true; } else { DLF("WRN: Weather.init(), BMP280 not found"); }
     #elif WEATHER == BME280_SPI
-      if (bmx.begin()) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN, Weather.init(): BME280_SPI not found"); }
+      if (bmx.begin()) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN: Weather.init(), BME280_SPI not found"); }
     #elif WEATHER == BMP280_SPI
-      if (bmx.begin()) { weatherSensor = WS_BMP280; success = true; } else { DLF("WRN, Weather.init(): BMP280_SPI not found"); }
+      if (bmx.begin()) { weatherSensor = WS_BMP280; success = true; } else { DLF("WRN: Weather.init(), BMP280_SPI not found"); }
     #else
       #error "Configuration: Setting WEATHER unknown sensor value!"
     #endif
