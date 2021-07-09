@@ -35,12 +35,12 @@ void Intervalometer::poll() {
   if (pressed == P_EXP_DONE && (long)(millis() - expDone) > 0) {
     // finish an exposure
     pressed = P_WAIT;
-    waitDone = millis()+(unsigned long)(expDelay*1000.0); // set wait time in ms
+    waitDone = millis() + (unsigned long)(expDelay*1000.0); // set wait time in ms
   } else
 
   if (pressed == P_WAIT && (long)(millis() - waitDone) > 0) {
     // wait between exposures
-    if (millis()-waitDone > 0) pressed = P_EXP_START;
+    if (millis() - waitDone > 0) pressed = P_EXP_START;
   }
 }
 
