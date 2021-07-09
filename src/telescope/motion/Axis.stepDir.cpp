@@ -24,7 +24,7 @@ extern Tasks tasks;
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const AxisPins     Axis3Pins = {AXIS3_STEP_PIN, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, false, false, true, AXIS3_SENSE_LIMIT_MIN_PIN, AXIS3_SENSE_HOME_PIN, AXIS3_SENSE_LIMIT_MAX_PIN, { AXIS3_SENSE_HOME, AXIS3_SENSE_HOME_INIT, AXIS3_SENSE_LIMIT_MIN, AXIS3_SENSE_LIMIT_MAX, AXIS3_SENSE_LIMIT_INIT } };
-  const AxisSettings Axis3Settings = {AXIS3_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS3_DRIVER_REVERSE, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_IRUN, { degToRad(AXIS3_LIMIT_MIN), degToRad(AXIS3_LIMIT_MAX) } };
+  const AxisSettings Axis3Settings = {AXIS3_STEPS_PER_DEGREE, AXIS3_DRIVER_REVERSE, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_IRUN, { AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX } };
   inline void moveAxis3() { telescope.rotator.axis3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
@@ -67,7 +67,7 @@ inline void pollAxes() {
     telescope.mount.axis2.poll();
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    telescope.mount.axis3.poll();
+    telescope.rotator.axis3.poll();
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
     telescope.focuser.axis4.poll();
@@ -109,7 +109,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
     if (axisNumber == 2) { pins = Axis2Pins; settings = Axis2Settings; move = moveAxis2; backlashFreq = siderealToRad(TRACK_BACKLASH_RATE); }
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    if (axisNumber == 3) { pins = Axis3Pins; settings = Axis3Settings; move = moveAxis3; backlashFreq = degToRad(AXIS3_BACKLASH_RATE); }
+    if (axisNumber == 3) { pins = Axis3Pins; settings = Axis3Settings; move = moveAxis3; backlashFreq = AXIS3_BACKLASH_RATE; }
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
     if (axisNumber == 4) { pins = Axis4Pins; settings = Axis4Settings; move = moveAxis4; backlashFreq = AXIS4_BACKLASH_RATE; }

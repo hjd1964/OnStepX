@@ -29,12 +29,13 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
       if (!(axesToRevert & (1 << axisNumber))) {
         AxisSettings thisAxis;
         nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
-        if (axisNumber <= 3) {
+        if (axisNumber <= 2) {
           // convert axis1, 2, and 3 into degrees
           thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
           thisAxis.limits.min = radToDeg(thisAxis.limits.min);
           thisAxis.limits.max = radToDeg(thisAxis.limits.max);
-        } else {
+        } else
+        if (axisNumber > 3) {
           // convert axis > 3 min/max into mm
           thisAxis.limits.min = thisAxis.limits.min/1000.0F;
           thisAxis.limits.max = thisAxis.limits.max/1000.0F;
@@ -90,12 +91,13 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
           // :SXA[n],[sssss...]#
           AxisSettings thisAxis;
           if (decodeAxisSettings(&parameter[3], thisAxis)) {
-            if (axisNumber <= 3) {
-              // convert axis1, 2, and 3 into radians
+            if (axisNumber <= 2) {
+              // convert axis1, 2 into radians
               thisAxis.stepsPerMeasure *= RAD_DEG_RATIO;
               thisAxis.limits.min = degToRad(thisAxis.limits.min);
               thisAxis.limits.max = degToRad(thisAxis.limits.max);
-            } else {
+            } else
+            if (axisNumber > 3) {
               // convert axis > 3 min/max into um
               thisAxis.limits.min = thisAxis.limits.min*1000.0F;
               thisAxis.limits.max = thisAxis.limits.max*1000.0F;
@@ -157,13 +159,14 @@ bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
     MinLimitL[0] = -360; MinLimitH[0] = -180; MaxLimitL[0] = 180; MaxLimitH[0] = 360;
   }
 
-  if (axisNum <= 3) {
-    // convert axis1, 2, and 3 into degrees
+  if (axisNum <= 2) {
+    // convert axis1, 2 into degrees
     a.stepsPerMeasure /= RAD_DEG_RATIO;
     a.limits.min = radToDeg(a.limits.min);
     a.limits.max = radToDeg(a.limits.max);
-  } else {
-    // convert axis > 3 into min/max into mm
+  } else
+  if (axisNum > 3) {
+    // convert axis > 3 min/max into mm
     a.limits.min = a.limits.min/1000.0F;
     a.limits.max = a.limits.max/1000.0F;
   }

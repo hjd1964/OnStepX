@@ -6,6 +6,7 @@
 #include "../commands/ProcessCmds.h"
 #include "../lib/weather/Weather.h"
 #include "focuser/Focuser.h"
+#include "rotator/Rotator.h"
 #include "mount/Mount.h"
 
 typedef struct InitError {
