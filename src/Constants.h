@@ -124,6 +124,22 @@
 #define BMP280_0x76                 5 // BMP280 on I2C (at address 0x76)
 #define BMP280_SPI                  6 // BMP280 on SPI (default CS)
 
+// auxiliary features
+#define SWITCH                      1 // control an simple on/off switch
+#define ANALOG_OUTPUT               2 // control an analog (pwm) output, depends on MCU support
+#define ANALOG_OUT                  2
+#define DEW_HEATER                  3 // control an dew heater
+#define INTERVALOMETER              4 // control an camera shutter
+#define SWITCH_UNPARKED             5
+
+// various Dallas/Maxim 1-wire devices supported
+#define DS1820     0x2800000000000000 // DS1820 "generic" temperature sensors (DS18B20 or DS18S20) for focusing and dew heaters
+#define DS2413     0x3A00000000000000 // DS2413 GPIO pins for dew heaters
+#define CHAIN      0x3A00000000000001 // DS2413 second GPIO
+
+#define DS_MASK    0x3F00000000000000 // not for use in Config.h
+#define DS18S20    0x1000000000000000 // not for use in Config.h
+
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
@@ -251,4 +267,5 @@
 #define NV_AXIS_SETTINGS_REVERT     264    // bytes: 2   , addr: 265..266
 #define NV_AXIS_SETTINGS_BASE       267    // bytes: 21*9, addr: 267..455
 #define NV_FOCUSER_SETTINGS_BASE    456    // bytes: 18*9, addr: 456..617
+#define NV_ROTATOR_SETTINGS_BASE    618    // bytes: 2   , addr: 618..619
 #define NV_PEC_BUFFER_BASE          650    // Bytes: ?   , addr: 650..650 + (PEC_BUFFER_SIZE_LIMIT - 1)
