@@ -5,6 +5,8 @@
 
 #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
 
+#include "../../lib/weather/Weather.h"
+#include "../../lib/temperature/ds1820.h"
 #include "../Telescope.h"
 
 // initialize all focusers
@@ -63,7 +65,13 @@ void Focuser::init(bool validKey) {
 
 // get focuser temperature in deg. C
 float Focuser::getTemperature() {
-  return 10.0F;
+  #if FOCUSER_TEMPERATURE == OFF
+    float t = weather.getTemperature();
+  #else
+    float t = temperature.getChannel(0);
+  #endif
+  if (isnan(t)) t = 10.0;
+  return t;
 }
 
 // check for DC motor focuser
