@@ -19,28 +19,41 @@ class Convert {
     // (also handles)           sHH
     bool tzToDouble(double *value, char *hm);
 
-    // convert string in format HH:MM:SS to double
-    // (also handles)           HH:MM.M
-    //                          HH:MM:SS
-    //                          HH:MM:SS.SSSS
+    // convert string in format as follows to double:
+    // HH:MM           PM_LOWEST
+    // HH:MM.M         PM_LOW
+    // HH:MM:SS        PM_HIGH (DEFAULT) 
+    // HH:MM:SS.SSSS   PM_HIGHEST
     bool hmsToDouble(double *value, char *hms, PrecisionMode p);
     // automatically detects PrecisionMode (as above)
     bool hmsToDouble(double *value, char *hms);
 
-    // convert string in format sDD:MM:SS to double
-    // (also handles)           sDD:MM:SS.SSS
-    //                          DDD:MM:SS
-    //                          sDD:MM
-    //                          DDD:MM
-    //                          sDD*MM
-    //                          DDD*MM
+    // convert string in format as follows to double:
+    // sDD:MM          PM_LOW
+    // DDD:MM          PM_LOW
+    // sDD*MM          PM_LOW
+    // DDD*MM          PM_LOW
+    // sDD:MM:SS       PM_HIGH
+    // DDD:MM:SS       PM_HIGH
+    // sDD:MM:SS.SSS   PM_HIGHEST
     bool dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p);
     // automatically detects PrecisionMode (as above)
     bool dmsToDouble(double *value, char *dms, bool signPresent);
     
-    // convert double to string in a variety of formats (as above)
+    // convert double to string in format as follows:
+    // HH:MM           PM_LOWEST
+    // HH:MM.M         PM_LOW
+    // HH:MM:SS        PM_HIGH, 
+    // HH:MM:SS.SSSS   PM_HIGHEST
     void doubleToHms(char *reply, double value, bool signPresent, PrecisionMode p);
-    // convert double to string in a variety of formats (as above) 
+    
+    // convert double to string in format as follows:
+    // sDD:MM          PM_LOW
+    // DDD:MM          PM_LOW
+    // sDD*MM          PM_LOW
+    // DDD*MM          PM_LOW
+    // DDD:MM:SS       PM_HIGH
+    // sDD:MM:SS.SSS   PM_HIGHEST
     void doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p);
 
     // string to int with error checking
@@ -55,3 +68,5 @@ class Convert {
   private:
 
 };
+
+extern Convert convert;

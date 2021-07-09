@@ -95,8 +95,6 @@ class Library
 
     double targetRA;
     double targetDec;
-
-    Convert convert;
 };
 
 #endif

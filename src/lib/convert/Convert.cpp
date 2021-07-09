@@ -269,3 +269,5 @@ bool Convert::atof2(char *a, double *d, bool sign) {
   *d = atof(a);
   return true;
 }
+
+Convert convert;

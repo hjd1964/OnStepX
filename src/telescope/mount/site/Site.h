@@ -116,8 +116,6 @@ class Site {
     // sets the site altitude in meters
     bool setElevation(float e);
 
-    Convert convert;
-
     JulianDate ut1;
     double centisecondHOUR = 0;
     unsigned long centisecondSTART = 0;

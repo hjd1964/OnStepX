@@ -79,6 +79,4 @@ class Transform {
     double backInRads(double angle);
     // adjust coordinate back into -180 to 180 "degrees" range (in radians)
     double backInRads2(double angle);
-
-    Convert convert;
 };
