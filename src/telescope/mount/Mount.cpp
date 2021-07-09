@@ -132,6 +132,27 @@ void Mount::updatePosition(CoordReturn coordReturn) {
   if (atHome) current.pierSide = PIER_SIDE_NONE;
 }
 
+// get current equatorial position (Native coordinate system)
+Coordinate Mount::getPosition() {
+  updatePosition(CR_MOUNT_EQU);
+  return transform.mountToNative(&current, false);
+}
+
+// get target equatorial position (Native coordinate system)
+Coordinate Mount::getTarget() {
+  return gotoTarget;
+}
+
+// set target equatorial position (Native coordinate system)
+void Mount::setTarget(Coordinate *coords) {
+  gotoTarget = *coords;
+}
+
+// goto target equatorial position
+void Mount::requestGoto() {
+  gotoEqu(&gotoTarget, preferredPierSide);
+}
+
 #define SS_STOPPED 0
 #define SS_SLEWING 1
 

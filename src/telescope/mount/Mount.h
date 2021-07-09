@@ -130,6 +130,18 @@ class Mount {
     bool commandLimit(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
     bool commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
+    // get current equatorial position (Native coordinate system)
+    Coordinate getPosition();
+
+    // get target equatorial position (Native coordinate system)
+    Coordinate getTarget();
+
+    // set target equatorial position (Native coordinate system)
+    void setTarget(Coordinate *coords);
+
+    // goto target equatorial position
+    void requestGoto();
+
     // update the home position
     void updateHomePosition();
 

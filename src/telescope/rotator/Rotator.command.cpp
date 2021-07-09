@@ -175,7 +175,8 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rP#       Rotator move to parallactic angle
     //            Returns: Nothing
     if (command[1] == 'P') {
-      setDerotatorPA(&telescope.mount.getPosition());
+      Coordinate current = telescope.mount.getPosition();
+      setDerotatorPA(&current);
       *numericReply = false;
     } else
 
