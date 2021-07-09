@@ -518,8 +518,8 @@ uint8_t Tasks::getHandleByName(const char name[]) {
                 highest_active_priority = last_priority;
                 return;
               }
-            }
-          } else remove(number[priority] + 1);
+            } else remove(number[priority] + 1);
+          }
         }
         highest_active_priority = last_priority;
       }
