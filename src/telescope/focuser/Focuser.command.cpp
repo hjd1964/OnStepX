@@ -192,24 +192,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :FF#       Set focuser for fast motion (1mm/s)
-    //            Returns: Nothing
-    if (command[1] == 'F') {
-      focuserAxis[index]->setFrequencySlew(1000);
-      *numericReply = false;
-    } else
-
-    // :FS#       Set focuser for slow motion (0.01mm/s)
-    //            Returns: Nothing
-    if (command[1] == 'S' && parameter[0] == 0) {
-      focuserAxis[index]->setFrequencySlew(10);
-      *numericReply = false;
-    } else
-
     // :F[n]#     Set focuser move rate, where n = 1 for finest, 2 for 0.01mm/second, 3 for 0.1mm/second, 4 for 1mm/second
     //            Returns: Nothing
     if (command[1] >= '1' && command[1] <= '4') {
-      int p[] = {1,10,100,1000};
+      int p[] = {1, 10, 100, 1000};
       moveRate[index] = p[command[1] - '1'];
       *numericReply = false;
     } else
