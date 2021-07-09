@@ -12,7 +12,7 @@ extern Tasks tasks;
 
 inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
 
-CommandError Mount::validateGoto() {
+CommandError Mount::validateGotoState() {
   if ( axis1.fault()     ||  axis2.fault())     return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled() || !axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED)                  return CE_SLEW_ERR_IN_PARK;
@@ -40,9 +40,9 @@ CommandError Mount::validateGotoCoords(Coordinate *coords) {
   return CE_NONE;
 }
 
-CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
-  CommandError e = validateGoto();
-  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { axis1.enable(true); axis2.enable(true); e = validateGoto(); }
+CommandError Mount::setGotoTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
+  CommandError e = validateGotoState();
+  if (e == CE_SLEW_ERR_IN_STANDBY && atHome) { axis1.enable(true); axis2.enable(true); e = validateGotoState(); }
   if (e != CE_NONE) return e;
 
   target = *coords;
@@ -90,7 +90,7 @@ CommandError Mount::setMountTarget(Coordinate *coords, PierSideSelect pierSideSe
 
 CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
   // converts from native to mount coordinates and checks for valid target
-  CommandError e = setMountTarget(coords, pierSideSelect, native);
+  CommandError e = setGotoTarget(coords, pierSideSelect, native);
   if (e != CE_NONE) return e;
   
   double a1, a2;
@@ -109,7 +109,7 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 
 CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
   // converts from native to mount coordinates and checks for valid target
-  CommandError e = setMountTarget(coords, pierSideSelect, native);
+  CommandError e = setGotoTarget(coords, pierSideSelect, native);
   if (e == CE_SLEW_IN_SLEW) {
     gotoStop(); 
     return e;

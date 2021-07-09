@@ -169,14 +169,14 @@ class Mount {
 
   private:
     // general status checks ahead of sync or goto
-    CommandError validateGoto();
+    CommandError validateGotoState();
     // target coordinate checks ahead of sync or goto
     CommandError validateGotoCoords(Coordinate *coords);
     // set goto or sync target
-    CommandError setMountTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
-    // sync. to equatorial coordinates
+    CommandError setGotoTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
+    // sync. to equatorial position (Native coordinate system)
     CommandError syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
-    // goto equatorial coordinates
+    // goto equatorial position (Native coordinate system)
     CommandError gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
     // set any waypoints required for a goto
     void gotoWaypoint();
@@ -274,7 +274,6 @@ class Mount {
 
     Sound sound;
     Library library;
-    Convert convert;
 
     const double radsPerCentisecond  = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
     

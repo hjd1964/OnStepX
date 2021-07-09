@@ -331,7 +331,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         break;
       case '2': // sync from encoder values
         if (parameter[3] == '1' && parameter[4] == 0) {
-          CommandError e = validateGoto(); if (e != CE_NONE) { *commandError = e; return true; }
+          CommandError e = validateGotoState(); if (e != CE_NONE) { *commandError = e; return true; }
           if (isnan(encoderAxis1) || isnan(encoderAxis2) || misc.syncToEncodersOnly ||
              (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar)) { DL("A"); *commandError = CE_0; return true; }
           axis1.setInstrumentCoordinate(encoderAxis1);

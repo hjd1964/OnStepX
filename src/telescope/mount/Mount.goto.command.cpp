@@ -188,7 +188,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   // :MA#       Goto the target Alt and Az
   //            Returns: 0..9, see :MS#
   if (cmd("MA")) {
-    CommandError e = setMountTarget(&gotoTarget, preferredPierSide);
+    CommandError e = setGotoTarget(&gotoTarget, preferredPierSide);
     if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
     if (e == CE_NONE) reply[0] = '0';
     reply[1] = 0;
@@ -203,7 +203,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
   //              1=destination is West of the pier
   //              2=an error occured
   if (cmd("MD"))  {
-    CommandError e = setMountTarget(&gotoTarget, preferredPierSide);
+    CommandError e = setGotoTarget(&gotoTarget, preferredPierSide);
     strcpy(reply, "2");
     if (e == CE_NONE && target.pierSide == PIER_SIDE_EAST) reply[0] = '0';
     if (e == CE_NONE && target.pierSide == PIER_SIDE_WEST) reply[0] = '1';
@@ -242,7 +242,7 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
     if (transform.mountType != ALTAZM) {
       updatePosition(CR_MOUNT_EQU);
       Coordinate newTarget = current;
-      CommandError e = validateGoto();
+      CommandError e = validateGotoState();
       if (e == CE_NONE) e = validateGotoCoords(&newTarget);
       if (e == CE_NONE) {
         transform.align.model.altCor = 0.0;

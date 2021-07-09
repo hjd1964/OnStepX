@@ -65,7 +65,7 @@ CommandError Mount::parkGoto() {
   if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
 
-  CommandError e = validateGoto();
+  CommandError e = validateGotoState();
   if (e != CE_NONE)                     return e;
   
   // stop tracking
