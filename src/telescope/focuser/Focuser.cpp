@@ -6,7 +6,7 @@
 #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
 
 #include "../../lib/weather/Weather.h"
-#include "../../lib/temperature/ds1820.h"
+#include "../../lib/temperature/Ds1820.h"
 #include "../Telescope.h"
 
 // initialize all focusers

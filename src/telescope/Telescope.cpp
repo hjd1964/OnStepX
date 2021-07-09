@@ -38,8 +38,16 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     mount.init(validKey);
   #endif
 
+  #if AXIS3_DRIVER_MODEL != OFF
+    rotator.init(validKey);
+  #endif
+
   #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
     focuser.init(validKey);
+  #endif
+
+  #ifdef FEATURES_PRESENT
+    features.init(validKey);
   #endif
 
   if (!validKey) {

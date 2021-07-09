@@ -27,16 +27,16 @@ class Ds2413 {
     void poll();
 
     // four DS2413 1-wire GPIO's are supported, this gets the last set value
-    // index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
+    // index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
     int getChannel(int index);
 
     // four DS2413 1-wire GPIO's are supported, this sets each output on or off
-    // index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
+    // index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
     void setChannel(int index, bool state);
 
     // four DS2413 1-wire GPIO's are supported, this gets the status of each
-    // index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
-    bool failureChannel(int index);
+    // index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
+    bool failure(int index);
   
   private:
     uint8_t ds2413_device_count = 0;

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Dallas/Maxim 1-Wire ds2413 device support
 
-#include "ds2413.h"
+#include "Ds2413.h"
 
 #ifdef DS2413_DEVICES_PRESENT
 
@@ -12,18 +12,17 @@ extern Tasks tasks;
 #include <DallasGPIO.h>               // my DallasGPIO library https://github.com/hjd1964/Arduino-DS2413GPIO-Control-Library
 DallasGPIO DS2413GPIO(&oneWire);
 
-#include "ds2413.h"
-
 void ds2413PollWrapper() { gpio.poll(); }
 
 // scan for DS18B20 and DS2413 devices on the 1-wire bus
 bool Ds2413::init() {
-  bool success = true;
+  static bool initialized = false;
+  if (initialized) return ds2413_found;
 
   // clear then pre-load any user defined DS2413 addresses
   ds2413_device_count = 0;
   for (int i = 0; i < 4; i++) {
-    if (ds2413_device[i] > 255 && ds2413_device[i] != DS1820) {
+    if (ds2413_device[i] > 255 && ds2413_device[i] != DS2413) {
       for (int j = 0; j < 8; j++) ds2413_address[i][j] = (ds2413_device[i] >> (7 - j)*8) & 0xff;
       ds2413_device_count++;
     } else for (int j = 0; j < 8; j++) ds2413_address[i][j] = 0;
@@ -33,9 +32,7 @@ bool Ds2413::init() {
   oneWire.reset_search();
 
   // only search out DS2413's or DS1820's IF none are explicitly specified
-  #if defined(DS2413_DEVICES_PRESENT) || DEBUG_MODE == VERBOSE
-    bool searchDS2413 = ds2413_device_count == 0;
-  #endif
+  bool searchDS2413 = ds2413_device_count == 0;
   #if DEBUG_MODE == VERBOSE
     bool ds2413_detected = false;
   #endif
@@ -70,15 +67,14 @@ bool Ds2413::init() {
 
   VLF("*********************************************");
 
-  #ifdef DS2413_DEVICES_PRESENT
-    if (ds2413_device_count > 0) {
-      ds2413_found = true;
-      VF("MSG: DS2413, start device monitor task (rate 20ms priority 7)... ");
-      tasks.add(20, 0, true, 7, ds2413PollWrapper, "ds2413");
-    } else success = false;
-  #endif
+  if (ds2413_device_count > 0) {
+    ds2413_found = true;
+    VF("MSG: DS2413, start device monitor task (rate 20ms priority 7)... ");
+    if (tasks.add(20, 0, true, 7, ds2413PollWrapper, "ds2413")) { VL("success"); } else { VL("FAILED!"); }
+  } else ds2413_found = false;
 
-  return success;
+  initialized = true;
+  return ds2413_found;
 }
 
 // read DS2413 devices
@@ -114,21 +110,21 @@ void Ds2413::poll() {
 }
 
 // four DS2413 1-wire GPIO's are supported, this sets each output on or off
-// index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
+// index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
 int Ds2413::getChannel(int index) {
-  if (index >= 1 && index <= 8) return ds2413_state[index - 1]; else return 0;
+  if (index >= 0 && index <= 7) return ds2413_state[index]; else return 0;
 }
 
 // four DS2413 1-wire GPIO's are supported, this sets each output on or off
-// index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
+// index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
 void Ds2413::setChannel(int index, bool state) {
-  if (index >= 1 && index <= 8) ds2413_state[index - 1] = state;
+  if (index >= 0 && index <= 7) ds2413_state[index] = state;
 }
 
 // four DS2413 1-wire GPIO's are supported, this gets the status of each
-// index 1 is auxiliary feature #1, etc. each DS2413 has two GPIO's
-bool Ds2413::failureChannel(int index) {
-  if (index >= 1 || index <= 8) return ds2413_failures[(index - 1)/2] > 2; else return true;
+// index 0 is auxiliary feature #1, etc. each DS2413 has two GPIO's for 8 total
+bool Ds2413::failure(int index) {
+  if (index >= 0 || index <= 7) return ds2413_failures[index/2] > 2; else return true;
 }
 
 Ds2413 gpio;

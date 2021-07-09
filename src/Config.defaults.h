@@ -919,6 +919,9 @@
 #ifndef FEATURE1_DEFAULT_VALUE
 #define FEATURE1_DEFAULT_VALUE        OFF
 #endif
+#ifndef FEATURE1_ACTIVE_STATE
+#define FEATURE1_ACTIVE_STATE         HIGH
+#endif
 
 #ifndef FEATURE2_PURPOSE
 #define FEATURE2_PURPOSE              OFF
@@ -934,6 +937,9 @@
 #endif
 #ifndef FEATURE2_DEFAULT_VALUE
 #define FEATURE2_DEFAULT_VALUE        OFF
+#endif
+#ifndef FEATURE2_ACTIVE_STATE
+#define FEATURE2_ACTIVE_STATE         HIGH
 #endif
 
 #ifndef FEATURE3_PURPOSE
@@ -951,6 +957,9 @@
 #ifndef FEATURE3_DEFAULT_VALUE
 #define FEATURE3_DEFAULT_VALUE        OFF
 #endif
+#ifndef FEATURE3_ACTIVE_STATE
+#define FEATURE3_ACTIVE_STATE         HIGH
+#endif
 
 #ifndef FEATURE4_PURPOSE
 #define FEATURE4_PURPOSE              OFF
@@ -966,6 +975,9 @@
 #endif
 #ifndef FEATURE4_DEFAULT_VALUE
 #define FEATURE4_DEFAULT_VALUE        OFF
+#endif
+#ifndef FEATURE4_ACTIVE_STATE
+#define FEATURE4_ACTIVE_STATE         HIGH
 #endif
 
 #ifndef FEATURE5_PURPOSE
@@ -983,6 +995,9 @@
 #ifndef FEATURE5_DEFAULT_VALUE
 #define FEATURE5_DEFAULT_VALUE        OFF
 #endif
+#ifndef FEATURE5_ACTIVE_STATE
+#define FEATURE5_ACTIVE_STATE         HIGH
+#endif
 
 #ifndef FEATURE6_PURPOSE
 #define FEATURE6_PURPOSE              OFF
@@ -998,6 +1013,9 @@
 #endif
 #ifndef FEATURE6_DEFAULT_VALUE
 #define FEATURE6_DEFAULT_VALUE        OFF
+#endif
+#ifndef FEATURE6_ACTIVE_STATE
+#define FEATURE6_ACTIVE_STATE         HIGH
 #endif
 
 #ifndef FEATURE7_PURPOSE
@@ -1015,6 +1033,9 @@
 #ifndef FEATURE7_DEFAULT_VALUE
 #define FEATURE7_DEFAULT_VALUE        OFF
 #endif
+#ifndef FEATURE7_ACTIVE_STATE
+#define FEATURE7_ACTIVE_STATE         HIGH
+#endif
 
 #ifndef FEATURE8_PURPOSE
 #define FEATURE8_PURPOSE              OFF
@@ -1030,4 +1051,7 @@
 #endif
 #ifndef FEATURE8_DEFAULT_VALUE
 #define FEATURE8_DEFAULT_VALUE        OFF
+#endif
+#ifndef FEATURE8_ACTIVE_STATE
+#define FEATURE8_ACTIVE_STATE         HIGH
 #endif

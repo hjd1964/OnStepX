@@ -5,9 +5,10 @@
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
 #include "../lib/weather/Weather.h"
+#include "mount/Mount.h"
 #include "focuser/Focuser.h"
 #include "rotator/Rotator.h"
-#include "mount/Mount.h"
+#include "auxiliary/Features.h"
 
 typedef struct InitError {
   uint8_t nv:1;       // NV data size/structure error (disables writes to NV)
@@ -55,6 +56,9 @@ class Telescope {
     #endif
     #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
       Focuser focuser;
+    #endif
+    #ifdef FEATURES_PRESENT
+      Features features;
     #endif
 
   private:

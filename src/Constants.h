@@ -268,4 +268,5 @@
 #define NV_AXIS_SETTINGS_BASE       267    // bytes: 21*9, addr: 267..455
 #define NV_FOCUSER_SETTINGS_BASE    456    // bytes: 18*9, addr: 456..617
 #define NV_ROTATOR_SETTINGS_BASE    618    // bytes: 2   , addr: 618..619
+#define NV_FEATURE_SETTINGS_BASE    619    // bytes: 3 *8, addr: 620..643
 #define NV_PEC_BUFFER_BASE          650    // Bytes: ?   , addr: 650..650 + (PEC_BUFFER_SIZE_LIMIT - 1)

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // Dallas/Maxim 1-Wire DS1820 device support
 
-#include "ds1820.h"
+#include "Ds1820.h"
 
 #ifdef DS1820_DEVICES_PRESENT
 
@@ -13,13 +13,13 @@ extern Tasks tasks;
 DallasTemperature DS18B20(&oneWire);
 
 #include "..\weather\Weather.h"
-#include "ds1820.h"
 
 void ds1820PollWrapper() { temperature.poll(); }
 
 // scan for DS1820 devices on the 1-wire bus
 bool Ds1820::init() {
-  bool success = true;
+  static bool initialized = false;
+  if (initialized) return ds1820_found;
 
   // clear then pre-load any user defined DS1820 addresses
   ds1820_device_count = 0;
@@ -75,10 +75,10 @@ bool Ds1820::init() {
   if (ds1820_device_count > 0) {
     ds1820_found = true;
     VF("MSG: DS1820, start device monitor task (rate 60ms priority 7)... ");
-    tasks.add(60, 0, true, 7, ds1820PollWrapper, "ds1820");
-  } else success = false;
+    if (tasks.add(60, 0, true, 7, ds1820PollWrapper, "ds1820")) { VL("success"); } else { VL("FAILED!"); }
+  } else ds1820_found = false;
 
-  return success;
+  return ds1820_found;
 }
 
 // read DS18B20 devices
