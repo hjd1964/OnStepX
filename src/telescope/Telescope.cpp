@@ -74,8 +74,16 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.commandPec(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
+  #if AXIS3_DRIVER_MODEL != OFF
+    if (rotator.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+
   #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
     if (focuser.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+
+  #ifdef FEATURES_PRESENT
+    if (features.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
   //  B - Reticule/Accessory Control
