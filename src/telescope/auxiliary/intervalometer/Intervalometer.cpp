@@ -40,7 +40,7 @@ void Intervalometer::poll() {
 
   if (pressed == P_WAIT && (long)(millis() - waitDone) > 0) {
     // wait between exposures
-    if (millis() - waitDone > 0) pressed = P_EXP_START;
+    pressed = P_EXP_START;
   }
 }
 
