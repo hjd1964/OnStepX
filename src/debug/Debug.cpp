@@ -72,17 +72,17 @@
   }
 #endif
 
+
 // Helper console for debugging
 #if DEBUG == CONSOLE
-  #include "../coordinates/Convert.h"
-  extern Convert convert;
-  #include "../coordinates/Transform.h"
+  #include "../lib/convert/Convert.h"
+  #include "../telescope/mount/coordinates/Transform.h"
   extern Transform transform;
-  #include "../lib/Mount.h"
+  #include "../telescope/mount/Mount.h"
   extern Axis axis1;
   extern Axis axis2;
-  #include "../lib/Clock.h"
-  extern Clock clock;
+  #include "../telescope/mount/site/Site.h"
+  extern Site site;
 
   void debugConsole() {
     Coordinate mount, target;
@@ -97,7 +97,7 @@
   
     D("DATE/TIME = "); D("12/01/21"); D(" "); DL("12:12:12");
     char reply[40];
-    convert.doubleToHms(reply, clock.getSiderealTime(), false, PM_HIGH);
+    convert.doubleToHms(reply, site.getSiderealTime(), false, PM_HIGH);
     D("LST = "); SERIAL_DEBUG.println(reply);
     SERIAL_DEBUG.println();
     D("current HA  = "); SERIAL_DEBUG.print(radToHrs(mount.h), 4); SERIAL_DEBUG.println(" hrs");
