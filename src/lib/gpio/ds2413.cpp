@@ -51,10 +51,10 @@ bool Ds2413::init() {
         }
         #if DEBUG_MODE == VERBOSE
           ds2413_detected = true;
-          VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (address[j] < 16) V("0"); Serial.print(address[j], HEX); }
+          VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (address[j] < 16) { V("0"); } SERIAL_DEBUG.print(address[j], HEX); }
           if (searchDS2413) {
             if (ds2413_index <= 4) { VF(" auto-assigned to FEATURE"); V((ds2413_index - 1)*2 + 1); V("_PIN"); } else { VF(" not assigned"); }
-          } else VF(" auto-assign disabled");
+          } else { VF(" auto-assign disabled"); }
           VL("");
         #endif
       }
@@ -62,7 +62,7 @@ bool Ds2413::init() {
   }
 
   #if DEBUG_MODE == VERBOSE
-    if (!ds2413_detected) VLF("No DS2413 devices found");
+    if (!ds2413_detected) { VLF("No DS2413 devices found"); }
   #endif
 
   VLF("*********************************************");

@@ -1,0 +1,23 @@
+// -----------------------------------------------------------------------------------
+// Dallas/Maxim 1-Wire DS1820 device support
+#pragma once
+
+#include "../../common.h"
+#include "Ds1820.h"
+
+#ifndef DS1820_DEVICES_PRESENT
+
+#define TEMPERATURE_PRESENT
+
+class Temperature {
+  public:
+    bool init();
+
+    float getChannel(int index);
+   
+  private:
+};
+
+extern Temperature temperature;
+
+#endif

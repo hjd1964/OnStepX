@@ -54,7 +54,7 @@ bool Ds1820::init() {
         #if DEBUG_MODE == VERBOSE
           ds1820_detected = true;
           if (address[0] == 0x10) { VF("DS18S20: 0x"); } else { VF("DS18B20: 0x"); }
-          for (int j = 0; j < 8; j++) { if (address[j] < 16) V("0"); Serial.print(address[j],HEX); }
+          for (int j = 0; j < 8; j++) { if (address[j] < 16) { V("0"); } SERIAL_DEBUG.print(address[j], HEX); }
           if (searchDS1820) {
             if (ds1820_index == 1) { VF(" auto-assigned to FOCUSER_TEMPERATURE"); } else
             if (ds1820_index <= 9) { VF(" auto-assigned to FEATURE"); V(ds1820_index - 1); V("_TEMP"); } else { VF(" not assigned"); }
@@ -66,7 +66,7 @@ bool Ds1820::init() {
   }
 
   #if DEBUG_MODE == VERBOSE
-    if (!ds1820_detected) VLF("No DS1820 devices found");
+    if (!ds1820_detected) { VLF("No DS1820 devices found"); }
   #endif
 
   VLF("*********************************************");
