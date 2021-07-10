@@ -244,8 +244,10 @@ bool Mount::commandGoto(char *reply, char *command, char *parameter, bool *supre
       CommandError e = validateGotoState();
       if (e == CE_NONE) e = validateGotoCoords(&newTarget);
       if (e == CE_NONE) {
-        transform.align.model.altCor = 0.0;
-        transform.align.model.azmCor = 0.0;
+        #if ALIGN_MAX_NUM_STARS > 1
+          transform.align.model.altCor = 0.0;
+          transform.align.model.azmCor = 0.0;
+        #endif
         e = gotoEqu(&newTarget, PSS_SAME_ONLY);
       }
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
