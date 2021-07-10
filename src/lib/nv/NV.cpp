@@ -109,8 +109,15 @@ void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
   // no longer clean
   cacheClean = false;
 
-  if (cacheSize == 0 || readAndWriteThrough) if (!readOnlyMode) writeToStorage(i, j);
-  if (cacheSize == 0) return;
+  if (readAndWriteThrough) if (!readOnlyMode) writeToStorage(i, j);
+  if (cacheSize == 0) {
+    if (!readOnlyMode) {
+      if (!readAndWriteThrough) {
+        if (j != readFromStorage(i)) writeToStorage(i, j);
+      } else writeToStorage(i, j);
+    }
+    return;
+  }
 
   uint8_t k = readFromCache(i);
   if (j != k) {
