@@ -5,8 +5,6 @@
 
 #ifdef MOUNT_PRESENT 
 
-#include "../../Common.h"
-
 #if AXIS1_PEC == ON
   #include "../../tasks/OnTask.h"
   extern Tasks tasks;
@@ -55,8 +53,7 @@
           initError.value = true;
           VLF("WRN: Mount, pecBufferSize exceeds available RAM, PEC disabled");
         } else {
-          long allocatedSize = pecBufferSize * sizeof(*pecBuffer);
-          VF("MSG: Mount, allocated PEC buffer "); V(allocatedSize); VLF(" bytes");
+          VF("MSG: Mount, allocated PEC buffer "); V(pecBufferSize * sizeof(*pecBuffer)); VLF(" bytes");
 
           bool pecBufferNeedsInit = true;
           for (int i = 0; i < pecBufferSize; i++) {

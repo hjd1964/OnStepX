@@ -83,8 +83,8 @@ void Site::init(bool validKey) {
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (handle) {
     VL("success"); 
-    if (!tasks.requestHardwareTimer(handle, 3, 1)) DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)");
-  } else VL("FAILED!");
+    if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)"); }
+  } else { VL("FAILED!"); }
 
   // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);

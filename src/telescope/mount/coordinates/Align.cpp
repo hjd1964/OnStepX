@@ -20,7 +20,6 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "../../motion/Axis.h"
 
-
 #if ALIGN_MAX_NUM_STARS > 1
 
 uint8_t modelNumberStars = 0;

@@ -5,7 +5,6 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../../commands/ProcessCmds.h"
 
 float Mount::limitGuideRate(float rate) {

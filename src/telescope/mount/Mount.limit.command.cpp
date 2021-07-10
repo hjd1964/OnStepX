@@ -5,7 +5,6 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "site/Site.h"
@@ -74,7 +73,7 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   //            Set meridian limit east (9) or west (A) to value [M] in minutes
   //            Return: 0 on failure or 1 on success
   if (cmdSX("SXE")) {
-    long l = strtol(&parameter[3],NULL,10); float degs = l/4.0;
+    long l = atol(&parameter[3]); float degs = l/4.0;
     switch (parameter[1]) {
       case '9':
         if (degs >= -270 && degs <= 270) {

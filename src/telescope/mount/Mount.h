@@ -2,9 +2,7 @@
 // telescope mount control
 #pragma once
 
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.common.h"
+#include "../../Common.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
@@ -18,9 +16,9 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "../../lib/sound/Sound.h"
-#include "coordinates/Transform.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
+#include "coordinates/Transform.h"
 #include "library/Library.h"
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};

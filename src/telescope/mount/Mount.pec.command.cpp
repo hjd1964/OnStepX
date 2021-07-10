@@ -1,11 +1,10 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
-#
+
 #include "Mount.h"
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "site/Site.h"
@@ -78,7 +77,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //            Return: 0 on failure or 1 on success
     if (cmdP2("SXE7")) {
       if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
-      long l = strtol(&parameter[3], NULL, 10);
+      long l = atol(&parameter[3]);
       if (l >= 0 && l < 129600000) {
         Pec tempPec = pec;
         tempPec.wormRotationSteps = l;

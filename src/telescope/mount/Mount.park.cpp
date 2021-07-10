@@ -5,7 +5,6 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../Telescope.h"
 
 void Mount::parkInit(bool validKey) {

@@ -125,15 +125,15 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
     char *conv_end;
     double f = strtod(ws, &conv_end); if (&s[0] != conv_end) a.stepsPerMeasure = f; else return false;
     ws = strchr(ws, ','); if (ws != NULL) {
-      ws++; a.microsteps = strtol(ws, NULL, 10);
+      ws++; a.microsteps = atol(ws);
       ws = strchr(ws, ','); if (ws != NULL) {
-        ws++; a.currentRun = strtol(ws, NULL, 10);
+        ws++; a.currentRun = atol(ws);
         ws = strchr(ws, ','); if (ws != NULL) {
-          ws++; a.reverse = strtol(ws, NULL, 10);
+          ws++; a.reverse = atol(ws);
           ws = strchr(ws, ','); if (ws != NULL) {
-            ws++; a.limits.min = strtol(ws, NULL, 10);
+            ws++; a.limits.min = atol(ws);
             ws = strchr(ws, ','); if (ws != NULL) {
-              ws++; a.limits.max = strtol(ws, NULL, 10);
+              ws++; a.limits.max = atol(ws);
               return true;
             }
           }

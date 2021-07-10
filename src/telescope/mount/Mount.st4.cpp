@@ -1,15 +1,13 @@
 // ---------------------------------------------------------------------------------------------------
 // Guide, commands to move the mount in any direction at a series of fixed rates
 
-#include "../../Common.h"
+#include "Mount.h"
 
 #ifdef MOUNT_PRESENT
 
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../Telescope.h"
-#include "Mount.h"
 
 #if ST4_INTERFACE == ON
   #include "../../lib/pushButton/PushButton.h"

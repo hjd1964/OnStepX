@@ -5,10 +5,8 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
-
 #include "../../telescope/Telescope.h"
 
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }

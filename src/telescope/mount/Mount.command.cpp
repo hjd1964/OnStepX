@@ -5,7 +5,6 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../Common.h"
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../../lib/tls/PPS.h"
@@ -139,46 +138,48 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   } else
 
   #if ALIGN_MAX_NUM_STARS > 1
-  // :GX0[p]#   Get align setting [p]
+  // :GX0[n]#   Get align setting [n]
   //            Returns: Value
   if (cmdGX("GX0")) {
     static int star = 0;
     *numericReply = false;
     switch (parameter[1]) {
-      case '0': sprintf(reply,"%ld",(long)(transform.align.model.ax1Cor*3600.0)); break;             // ax1Cor
-      case '1': sprintf(reply,"%ld",(long)(transform.align.model.ax2Cor*3600.0)); break;             // ax2Cor
-      case '2': sprintf(reply,"%ld",(long)(transform.align.model.altCor*3600.0)); break;             // altCor
-      case '3': sprintf(reply,"%ld",(long)(transform.align.model.azmCor*3600.0)); break;             // azmCor
-      case '4': sprintf(reply,"%ld",(long)(transform.align.model.doCor*3600.0));  break;             // doCor
-      case '5': sprintf(reply,"%ld",(long)(transform.align.model.pdCor*3600.0));  break;             // pdCor
-      case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)                    // ffCor
-        sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0)); else sprintf(reply,"%ld",(long)(0));
+      case '0': sprintf(reply,"%ld",(long)(transform.align.model.ax1Cor*3600.0F)); break; // ax1Cor
+      case '1': sprintf(reply,"%ld",(long)(transform.align.model.ax2Cor*3600.0F)); break; // ax2Cor
+      case '2': sprintf(reply,"%ld",(long)(transform.align.model.altCor*3600.0F)); break; // altCor
+      case '3': sprintf(reply,"%ld",(long)(transform.align.model.azmCor*3600.0F)); break; // azmCor
+      case '4': sprintf(reply,"%ld",(long)(transform.align.model.doCor*3600.0F));  break; // doCor
+      case '5': sprintf(reply,"%ld",(long)(transform.align.model.pdCor*3600.0F));  break; // pdCor
+      case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)         // ffCor
+        sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0F)); else sprintf(reply,"%ld",(long)(0));
       break;
-      case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)                    // dfCor
-        sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0)); else sprintf(reply,"%ld",(long)(0));
+      case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)         // dfCor
+        sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0F)); else sprintf(reply,"%ld",(long)(0));
       break;
-      case '8': sprintf(reply,"%ld",(long)(transform.align.model.tfCor*3600.0)); break;              // tfCor
+      case '8': sprintf(reply,"%ld",(long)(transform.align.model.tfCor*3600.0F)); break;  // tfCor
       // Number of stars, reset to first star
       case '9': { int n = 0; if (alignState.currentStar > alignState.lastStar) n = alignState.lastStar; sprintf(reply,"%ld",(long)(n)); star = 0; } break;
       case 'A': { convert.doubleToHms(reply,radToHrs(transform.align.actual[star].ax1),true,PM_HIGH); } break;
       case 'B': { convert.doubleToDms(reply,radToDeg(transform.align.actual[star].ax2),false,true,PM_HIGH); } break;
       case 'C': { convert.doubleToHms(reply,radToHrs(transform.align.mount[star].ax1),true,PM_HIGH); } break;
       case 'D': { convert.doubleToDms(reply,radToDeg(transform.align.mount[star].ax2),false,true,PM_HIGH); } break;
-      case 'E': sprintf(reply,"%ld",(long)(transform.align.mount[star].side)); star++; break;        // Mount PierSide (and increment n)
+      // Mount PierSide (and increment n)
+      case 'E': sprintf(reply,"%ld",(long)(transform.align.mount[star].side)); star++; break;
       default: *numericReply = true; *commandError = CE_CMD_UNKNOWN;
     }
   } else
   #endif
 
-  // :GX4[n]#   Get encoder setting [n]
-  //            Returns: Value
+  // :GX4[n]#   Get encoder absolute angle [n]
+  //            (0 and 1) Returns: DDD:MM:SS
+  //            (2 and 3) Returns: n.nnnnnn
   if (cmdGX("GX4")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '0': convert.doubleToDms(reply,radToDeg(axis1.getInstrumentCoordinate()),true,true,PM_HIGH); break; // Get formatted absolute Axis1 angle
-      case '1': convert.doubleToDms(reply,radToDeg(axis2.getInstrumentCoordinate()),true,true,PM_HIGH); break; // Get formatted absolute Axis2 angle 
-      case '2': sprintF(reply, "%0.6f", radToDeg(axis1.getInstrumentCoordinate())); break;                     // Get absolute Axis1 angle in degrees
-      case '3': sprintF(reply, "%0.6f", radToDeg(axis2.getInstrumentCoordinate())); break;                     // Get absolute Axis2 angle in degrees
+      case '0': convert.doubleToDms(reply,radToDeg(axis1.getInstrumentCoordinate()),true,true,PM_HIGH); break;
+      case '1': convert.doubleToDms(reply,radToDeg(axis2.getInstrumentCoordinate()),true,true,PM_HIGH); break; 
+      case '2': sprintF(reply, "%0.6f", radToDeg(axis1.getInstrumentCoordinate())); break;
+      case '3': sprintF(reply, "%0.6f", radToDeg(axis2.getInstrumentCoordinate())); break;
       default:  *numericReply = true; *commandError = CE_CMD_UNKNOWN;
     }
   } else
@@ -188,11 +189,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   if (cmdGX("GX9")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '2': sprintF(reply, "%0.3f", misc.usPerStepCurrent); break;                               // current
-      case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                                       // default base
-      case '4': sprintf(reply, "%d%s", (int)current.pierSide,(meridianFlip == MF_NEVER)?" N":""); break; // pierSide (N if never)
-      case '5': sprintf(reply, "%d", (int)misc.meridianFlipAuto); break;                             // autoMeridianFlip
-      case '6': reply[0] = "EWB"[preferredPierSide-10]; reply[1] = 0; break;                         // preferred pier side
+      case '2': sprintF(reply, "%0.3f", misc.usPerStepCurrent); break;         // current
+      case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                 // default base
+      // pierSide 0 = None, 1 = East, 2 = West (with suffix 'N' if meridian flips are disabled)
+      case '4': sprintf(reply, "%d%s", (int)current.pierSide, (meridianFlip == MF_NEVER)?" N":""); break;
+      case '5': sprintf(reply, "%d", (int)misc.meridianFlipAuto); break;       // autoMeridianFlip
+      case '6': reply[0] = "EWB"[preferredPierSide - 10]; reply[1] = 0; break; // preferred pier side
       case '7': sprintF(reply, "%0.1f", (1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure())); break; // slew speed
       // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
       case '8':                                                                 
@@ -200,7 +202,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
           if (transform.mountType == ALTAZM) strcpy(reply, "D"); else strcpy(reply, "R");
         } else strcpy(reply, "N");
       break;
-      case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;                                // fastest step rate in us
+      case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;          // fastest step rate in us
       default: return false;
     }
   } else
@@ -231,9 +233,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: Value
   if (cmdGX("GXF")) {
     switch (parameter[1]) {
-      case '3': sprintF(reply, "%0.6f", axis1.getFrequencySteps()); *numericReply = false; break;    // Axis1 final tracking rate Hz
-      case '4': sprintF(reply, "%0.6f", axis2.getFrequencySteps()); *numericReply = false; break;    // Axis2 final tracking rate Hz
-      case 'A': sprintf(reply, "%d%%", 50); *numericReply = false; break;                            // Workload
+      case '3': sprintF(reply, "%0.6f", axis1.getFrequencySteps()); *numericReply = false; break; // Axis1 final tracking rate Hz
+      case '4': sprintF(reply, "%0.6f", axis2.getFrequencySteps()); *numericReply = false; break; // Axis2 final tracking rate Hz
+      case 'A': sprintf(reply, "%d%%", 50); *numericReply = false; break; // Workload
     default:
       return false;
     }
@@ -292,23 +294,35 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     static int star;
     double d;
     switch (parameter[1]) {
-      case '0': transform.align.model.ax1Cor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;      // ax1Cor
-      case '1': transform.align.model.ax2Cor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;      // ax2Cor 
-      case '2': transform.align.model.altCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;      // altCor
-      case '3': transform.align.model.azmCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;      // azmCor
-      case '4': transform.align.model.doCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;       // doCor
-      case '5': transform.align.model.pdCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;       // pdCor
-      case '6': if (transform.mountType == FORK) transform.align.model.dfCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break; // ffCor
-      case '7': if (transform.mountType != FORK) transform.align.model.dfCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break; // dfCor
-      case '8': transform.align.model.tfCor=(float)strtol(&parameter[3],NULL,10)/3600.0F; break;       // tfCor
+      case '0': transform.align.model.ax1Cor = atol(&parameter[3])/3600.0F; break; // ax1Cor
+      case '1': transform.align.model.ax2Cor = atol(&parameter[3])/3600.0F; break; // ax2Cor 
+      case '2': transform.align.model.altCor = atol(&parameter[3])/3600.0F; break; // altCor
+      case '3': transform.align.model.azmCor = atol(&parameter[3])/3600.0F; break; // azmCor
+      case '4': transform.align.model.doCor = atol(&parameter[3])/3600.0F; break;  // doCor
+      case '5': transform.align.model.pdCor = atol(&parameter[3])/3600.0F; break;  // pdCor
+      case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)
+        transform.align.model.dfCor = atol(&parameter[3])/3600.0F; break;          // fdCor or ffCor
+      break;
+      case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)
+        transform.align.model.dfCor = atol(&parameter[3])/3600.0F; break;          // fdCor or ffCor
+      break;
+      case '8': transform.align.model.tfCor = atol(&parameter[3])/3600.0F; break;  // tfCor
       // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model
-      case '9': { int n=strtol(&parameter[3],NULL,10); if (n == 1 && star >= 2) { alignState.lastStar=star; alignState.currentStar=star+1; transform.align.createModel(star); } else star = 0; } break;
-      case 'A': { if (!convert.hmsToDouble(&d,&parameter[3],PM_HIGH))      *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax1 = hrsToRad(d); } break; // Star  #n HA
-      case 'B': { if (!convert.dmsToDouble(&d,&parameter[3],true,PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax2 = degToRad(d); } break; // Star  #n Dec
-      case 'C': { if (!convert.hmsToDouble(&d,&parameter[3],PM_HIGH))      *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax1  = hrsToRad(d); } break; // Mount #n HA
-      case 'D': { if (!convert.dmsToDouble(&d,&parameter[3],true,PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax2  = degToRad(d); } break; // Star  #n Dec
-      case 'E': transform.align.actual[star].side=transform.align.mount[star].side=strtol(&parameter[3],NULL,10); star++; break; // Mount PierSide (and increment n)
-      default:  *commandError = CE_CMD_UNKNOWN;
+      case '9': {
+          int n = atol(&parameter[3]);
+          if (n == 1 && star >= 2) {
+            alignState.lastStar = star;
+            alignState.currentStar = star + 1;
+            transform.align.createModel(star);
+          } else star = 0;
+        }
+      break;
+      case 'A': { if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH))       *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax1 = hrsToRad(d); } break; // Star  #n HA
+      case 'B': { if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax2 = degToRad(d); } break; // Star  #n Dec
+      case 'C': { if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH))       *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax1  = hrsToRad(d); } break; // Mount #n HA
+      case 'D': { if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax2  = degToRad(d); } break; // Star  #n Dec
+      case 'E': transform.align.actual[star].side = transform.align.mount[star].side = atol(&parameter[3]); star++; break; // Mount PierSide (and increment n)
+      default: *commandError = CE_CMD_UNKNOWN;
     }
   } else
   #endif
@@ -323,17 +337,19 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       static double encoderAxis2 = NAN;
       case '0': // set encoder Axis1 value
         d = strtod(&parameter[3], &conv_end);
-        if (&parameter[3] != conv_end && fabs(d) <= 360.0) encoderAxis1 = degToRad(d); else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
+        if (&parameter[3] != conv_end && fabs(d) <= 360.0F) encoderAxis1 = degToRad(d); else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
         break;
       case '1': // set encoder Axis2 value
         d = strtod(&parameter[3], &conv_end);
-        if (&parameter[3] != conv_end && fabs(d) <= 360.0) encoderAxis2 = degToRad(d); else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
+        if (&parameter[3] != conv_end && fabs(d) <= 360.0F) encoderAxis2 = degToRad(d); else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
         break;
       case '2': // sync from encoder values
         if (parameter[3] == '1' && parameter[4] == 0) {
           CommandError e = validateGotoState(); if (e != CE_NONE) { *commandError = e; return true; }
           if (isnan(encoderAxis1) || isnan(encoderAxis2) || misc.syncToEncodersOnly ||
-             (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar)) { DL("A"); *commandError = CE_0; return true; }
+              (alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar)) {
+            DL("A"); *commandError = CE_0; return true;
+          }
           axis1.setInstrumentCoordinate(encoderAxis1);
           axis2.setInstrumentCoordinate(encoderAxis2);
         }
@@ -418,7 +434,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //                    1 on success
   if (cmdP2("SXEM")) {
     if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
-    long l = strtol(&parameter[3], NULL, 10);
+    long l = atol(&parameter[3]);
     float degs = l/4.0;
     if (l == 0 || l == GEM || l == FORK || l == ALTAZM) nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l); else *commandError = CE_PARAM_RANGE;
   } else
