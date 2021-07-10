@@ -6,7 +6,7 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../lib/weather/Weather.h"
-#include "../../lib/temperature/Ds1820.h"
+#include "../../lib/temperature/Temperature.h"
 #include "../Telescope.h"
 
 // initialize all focusers
