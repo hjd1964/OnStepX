@@ -4,6 +4,14 @@
 
 #include "../../../common.h"
 
+#if FEATURE1_PURPOSE != OFF || FEATURE2_PURPOSE != OFF || FEATURE3_PURPOSE != OFF || FEATURE4_PURPOSE != OFF || FEATURE5_PURPOSE != OFF || FEATURE6_PURPOSE != OFF || FEATURE7_PURPOSE != OFF || FEATURE8_PURPOSE != OFF
+  #ifndef FEATURES_PRESENT
+    #define FEATURES_PRESENT
+  #endif
+#endif
+
+#ifdef FEATURES_PRESENT
+
 #ifndef DEW_HEATER_PULSE_WIDTH_MS
   #define DEW_HEATER_PULSE_WIDTH_MS 2000
 #endif
@@ -37,3 +45,5 @@ class DewHeater {
 
     int index = 0;
 };
+
+#endif

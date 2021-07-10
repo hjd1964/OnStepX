@@ -3,13 +3,20 @@
 #pragma once
 
 #include "../../common.h"
-#include "../../commands/ProcessCmds.h"
-#include "../../lib/temperature/Ds1820.h"
-#include "../../lib/gpio/Ds2413.h"
-#include "dewHeater/DewHeater.h"
-#include "intervalometer/Intervalometer.h"
+
+#if FEATURE1_PURPOSE != OFF || FEATURE2_PURPOSE != OFF || FEATURE3_PURPOSE != OFF || FEATURE4_PURPOSE != OFF || FEATURE5_PURPOSE != OFF || FEATURE6_PURPOSE != OFF || FEATURE7_PURPOSE != OFF || FEATURE8_PURPOSE != OFF
+  #ifndef FEATURES_PRESENT
+    #define FEATURES_PRESENT
+  #endif
+#endif
 
 #ifdef FEATURES_PRESENT
+
+#include "../../commands/ProcessCmds.h"
+#include "../../lib/temperature/Temperature.h"
+#include "../../lib/gpio/Gpio.h"
+#include "dewHeater/DewHeater.h"
+#include "intervalometer/Intervalometer.h"
 
 typedef struct Device {
    const char* name;

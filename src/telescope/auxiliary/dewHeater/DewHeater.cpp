@@ -3,6 +3,8 @@
 
 #include "DewHeater.h"
 
+#ifdef FEATURES_PRESENT
+
 void DewHeater::init(int index, bool validKey) {
   this->index = index;
 
@@ -90,3 +92,5 @@ void DewHeater::enable(bool state) {
 bool DewHeater::isOn() {
   return heaterOn;
 }
+
+#endif

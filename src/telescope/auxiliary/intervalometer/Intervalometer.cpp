@@ -3,6 +3,8 @@
 
 #include "Intervalometer.h"
 
+#ifdef FEATURES_PRESENT
+
 void Intervalometer::init(int index, bool validKey) {
   this->index = index;
 
@@ -127,3 +129,5 @@ float Intervalometer::byteToTime(uint8_t b) {
   if (b == 255) v = 3600.0;                 // 1 hour                      (255)
   return v;
 }
+
+#endif
