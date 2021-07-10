@@ -11,6 +11,8 @@
 #include "../motion/Axis.h"
 #include "../mount/coordinates/Transform.h"
 
+#define ROTATOR_PRESENT
+
 class Rotator {
   public:
     // initialize rotator
@@ -24,22 +26,18 @@ class Rotator {
     // set backlash in steps
     bool setBacklash(int value);
 
-    // derotator enable or disable
-    void derotatorEnable(bool value);
-    // derotator get reverse state
-    bool getDerotatorReverse();
-    // derotator set reverse state
-    void setDerotatorReverse(bool value);
-    // derotator move to PA of equatorial coordinate
-    void setDerotatorPA(Coordinate *coord);
+    // poll to set derotator rate
+    void derotatePoll();
 
     Axis axis3;
 
   private:
+    // enable or disable the derotator
+    void setDerotatorEnabled(bool value);
     // returns parallactic angle in degrees
-    double ParallacticAngle(Coordinate *coord);
+    double parallacticAngle(Coordinate *coord);
     // returns parallactic rate in degrees per second
-    double ParallacticRate(Coordinate *coord);
+    double parallacticRate(Coordinate *coord);
 
     void readSettings();
     void writeSettings();

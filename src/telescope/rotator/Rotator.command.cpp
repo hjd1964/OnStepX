@@ -58,7 +58,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'b') {
-      setBacklash(round(atol(parameter)));
+      setBacklash(atol(parameter));
       axis3.setBacklashSteps(getBacklash());
     } else
 
@@ -121,7 +121,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     } else
 
     // :rS[sDDD*MM, etc.]#
-    //            Set rotator target angle (in degrees)
+    //            Move rotator to Set target angle (in degrees)
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'S') {
@@ -133,10 +133,11 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //  *commandError = CE_SLEW_ERR_IN_STANDBY;
     } else
 
-    // :rZ#       Set rotator position as Zero degrees
+    // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
       axis3.setMotorCoordinate(0.0);
+      axis3.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
 
@@ -145,10 +146,11 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'F') {
       float p = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
       axis3.setMotorCoordinate(p);
+      axis3.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
 
-    // :rC#       Set rotator target position at half-travel
+    // :rC#       Move rotator to half-travel target position
     //            Returns: Nothing
     if (command[1] == 'C') {
       long t = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
@@ -161,29 +163,33 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r+#       Derotator Enable
     //            Returns: Nothing
     if (command[1] == '+') {
-      derotatorEnable(true);
+      setDerotatorEnabled(true);
       *numericReply = false;
     } else
 
     // :r-#       Derotator Disable 
     //            Returns: Nothing
     if (command[1] == '-') {
-      derotatorEnable(false);
+      setDerotatorEnabled(false);
       *numericReply = false;
     } else
 
     // :rP#       Rotator move to parallactic angle
     //            Returns: Nothing
     if (command[1] == 'P') {
-      Coordinate current = telescope.mount.getPosition();
-      setDerotatorPA(&current);
+      #ifdef MOUNT_PRESENT
+        Coordinate current = telescope.mount.getPosition();
+        axis3.setTargetCoordinateSteps(parallacticAngle(&current));
+        axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+        axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      #endif
       *numericReply = false;
     } else
 
     // :rR#       Derotator Reverse direction
     //            Returns: Nothing
     if (command[1] == 'R') {
-      setDerotatorReverse(!getDerotatorReverse());
+      derotatorReverse = !derotatorReverse;
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
 
