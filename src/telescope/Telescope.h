@@ -48,13 +48,13 @@ class Telescope {
     void statusInit();
 
     // equipment
-    #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+    #ifdef MOUNT_PRESENT
       Mount mount;
     #endif
-    #if AXIS3_DRIVER_MODEL != OFF
+    #ifdef ROTATOR_PRESENT
       Rotator rotator;
     #endif
-    #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+    #ifdef FOCUSER_PRESENT
       Focuser focuser;
     #endif
     #ifdef FEATURES_PRESENT

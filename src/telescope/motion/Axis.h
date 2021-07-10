@@ -92,8 +92,6 @@ class Axis {
     void setInstrumentCoordinate(double value);
     // get instrument coordinate in steps
     double getInstrumentCoordinate();
-    // move instrument coordinate by value, in "measures" (radians, microns, etc.)
-    void incrementTargetCoordinate(double value);
 
     // mark origin coordinate as current location
     void markOriginCoordinate();
@@ -195,9 +193,9 @@ class Axis {
   private:
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
-    // distance target in "measures" (degrees, microns, etc.)
+    // distance to target in "measures" (degrees, microns, etc.)
     double getTargetDistance();
-    // distance target in steps
+    // distance to target in steps
     long getTargetDistanceSteps();
     // returns true if traveling through backlash
     bool inBacklash();

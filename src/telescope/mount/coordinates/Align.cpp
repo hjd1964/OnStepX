@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------------
 // ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
 
-#include "../../../Common.h"
+#include "Align.h"
 
 #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
@@ -20,7 +20,6 @@ extern Tasks tasks;
 extern Telescope telescope;
 #include "../../motion/Axis.h"
 
-#include "Align.h"
 
 #if ALIGN_MAX_NUM_STARS > 1
 

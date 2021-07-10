@@ -3,7 +3,7 @@
 
 #include "../../Common.h"
 
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+#ifdef MOUNT_PRESENT
 
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;

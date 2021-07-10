@@ -34,15 +34,15 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   weather.init();
 
-  #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+  #ifdef MOUNT_PRESENT
     mount.init(validKey);
   #endif
 
-  #if AXIS3_DRIVER_MODEL != OFF
+  #ifdef ROTATOR_PRESENT
     rotator.init(validKey);
   #endif
 
-  #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+  #ifdef FOCUSER_PRESENT
     focuser.init(validKey);
   #endif
 
@@ -66,7 +66,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
 bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
 
-  #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+  #ifdef MOUNT_PRESENT
     if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (mount.commandGoto(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (mount.commandGuide(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
@@ -74,11 +74,11 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.commandPec(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
-  #if AXIS3_DRIVER_MODEL != OFF
+  #ifdef ROTATOR_PRESENT
     if (rotator.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
-  #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+  #ifdef FOCUSER_PRESENT
     if (focuser.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 

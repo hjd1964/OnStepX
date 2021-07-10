@@ -8,6 +8,9 @@
 #pragma once
 
 #include <Arduino.h>
+#include "../../../Common.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
 
 #if defined(ALIGN_MAX_STARS) && ALIGN_MAX_STARS != AUTO
   #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
@@ -119,4 +122,5 @@ class GeoAlign
     uint8_t autoModelTask = 0;
 };
 
+#endif
 #endif

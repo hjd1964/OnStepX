@@ -1,15 +1,15 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control
 
+#include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
 #include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../Telescope.h"
 #include "site/Site.h"
-#include "Mount.h"
 
 inline void mountGuideWrapper() { telescope.mount.guidePoll(); }
 inline void mountTrackingWrapper() { telescope.mount.trackPoll(); }

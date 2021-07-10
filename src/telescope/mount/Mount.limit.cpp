@@ -1,15 +1,15 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, limits
 
+#include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
 #include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
 #include "../../telescope/Telescope.h"
-#include "Mount.h"
 
 inline void mountLimitWrapper() { telescope.mount.limitPoll(); }
 

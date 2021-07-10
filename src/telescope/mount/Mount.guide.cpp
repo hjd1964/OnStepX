@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, guiding
 
-#include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
-#include "../../commands/ProcessCmds.h"
 #include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
+#include "../../Common.h"
+#include "../../commands/ProcessCmds.h"
 
 float Mount::limitGuideRate(float rate) {
   if (rate > radToDeg(radsPerSecondCurrent)*120.0F) rate = radToDeg(radsPerSecondCurrent)*120.0F;

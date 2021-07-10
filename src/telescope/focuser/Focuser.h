@@ -3,11 +3,14 @@
 #pragma once
 
 #include "../../common.h"
+
+#if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+
 #include "../../commands/ProcessCmds.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 
-#if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+#define FOCUSER_PRESENT
 
 #pragma pack(1)
 typedef struct Tcf {

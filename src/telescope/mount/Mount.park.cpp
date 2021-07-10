@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------------
 // telescope mount control, parking
 
-#include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
-#include "../Telescope.h"
 #include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
+#include "../../Common.h"
+#include "../Telescope.h"
 
 void Mount::parkInit(bool validKey) {
   // confirm the data structure size

@@ -2,6 +2,10 @@
 // coordinate transformation
 #pragma once
 
+#include "../../../Common.h"
+
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
 #include <Arduino.h>
 #include "../site/Site.h"
 #include "Align.h"
@@ -80,3 +84,5 @@ class Transform {
     // adjust coordinate back into -180 to 180 "degrees" range (in radians)
     double backInRads2(double angle);
 };
+
+#endif

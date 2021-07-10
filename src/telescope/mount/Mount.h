@@ -6,6 +6,10 @@
 #include "../../Constants.h"
 #include "../../Config.common.h"
 
+#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+
+#define MOUNT_PRESENT
+
 #if PEC_STEPS_PER_WORM_ROTATION == 0
   #define AXIS1_PEC OFF
 #else
@@ -388,3 +392,5 @@ class Mount {
 
     float timerRateRatio = 1.0;
 };
+
+#endif

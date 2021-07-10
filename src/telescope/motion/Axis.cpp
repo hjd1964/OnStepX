@@ -57,22 +57,6 @@ long Axis::getMotorCoordinateSteps() {
   return steps;
 }
 
-long Axis::getInstrumentCoordinateSteps() {
-  noInterrupts();
-  long steps = motorSteps + indexSteps;
-  interrupts();
-  return steps;
-}
-
-void Axis::setInstrumentCoordinatePark(double value) {
-  long steps = lround(value*settings.stepsPerMeasure);
-  steps -= settings.microsteps*2L;
-  for (int l = 0; l < settings.microsteps*4; l++) { if (steps % settings.microsteps*4L == 0) break; steps++; }
-  noInterrupts();
-  indexSteps = steps - motorSteps;
-  interrupts();
-}
-
 void Axis::setInstrumentCoordinate(double value) {
   long steps = lround(value*settings.stepsPerMeasure);
   noInterrupts();
@@ -87,9 +71,19 @@ double Axis::getInstrumentCoordinate() {
   return steps/settings.stepsPerMeasure;
 }
 
-void Axis::markOriginCoordinate() {
+long Axis::getInstrumentCoordinateSteps() {
   noInterrupts();
-  originSteps = motorSteps;
+  long steps = motorSteps + indexSteps;
+  interrupts();
+  return steps;
+}
+
+void Axis::setInstrumentCoordinatePark(double value) {
+  long steps = lround(value*settings.stepsPerMeasure);
+  steps -= settings.microsteps*2L;
+  for (int l = 0; l < settings.microsteps*4; l++) { if (steps % settings.microsteps*4L == 0) break; steps++; }
+  noInterrupts();
+  indexSteps = steps - motorSteps;
   interrupts();
 }
 
@@ -133,15 +127,19 @@ long Axis::getTargetCoordinateSteps() {
   return steps;
 }
 
-void Axis::incrementTargetCoordinate(double value) {
-  target += value;
-  setTargetCoordinate(value);
+// mark the start coordinate of a autoSlewRateByDistance()
+void Axis::markOriginCoordinate() {
+  noInterrupts();
+  originSteps = motorSteps;
+  interrupts();
 }
 
+// check if we're near the target coordinate during an auto slew
 bool Axis::nearTarget() {
   return labs(motorSteps - targetSteps) <= step * 2;
 }
 
+// distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
 double Axis::getOriginOrTargetDistance() {
   noInterrupts();
   long steps = motorSteps;
@@ -151,6 +149,7 @@ double Axis::getOriginOrTargetDistance() {
   if (distanceOrigin < distanceTarget) return distanceOrigin/settings.stepsPerMeasure; else return distanceTarget/settings.stepsPerMeasure;
 }
 
+// distance to target in "measures" (degrees, microns, etc.)
 double Axis::getTargetDistance() {
   noInterrupts();
   long steps = motorSteps;
@@ -158,7 +157,7 @@ double Axis::getTargetDistance() {
   return labs(targetSteps - steps)/settings.stepsPerMeasure;
 }
 
-// distance target in steps
+// distance to target in steps
 long Axis::getTargetDistanceSteps() {
   noInterrupts();
   long steps = motorSteps;
@@ -206,7 +205,7 @@ void Axis::autoSlewRateByDistance(float distance) {
   markOriginCoordinate();
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
-  setTracking(false);
+  tracking = false;
   driver.modeDecaySlewing();
   V(axisPrefix); VLF("autoSlewRateByDistance(); slew started");
 }
@@ -214,7 +213,7 @@ void Axis::autoSlewRateByDistance(float distance) {
 // stops, with deacceleration by distance
 void Axis::autoSlewRateByDistanceStop() {
   driver.modeDecayTracking();
-  setTracking(true);
+  tracking = true;
   autoRate = AR_NONE;
 }
 
@@ -222,7 +221,7 @@ void Axis::autoSlewRateByDistanceStop() {
 void Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return;
   if (autoRate == AR_NONE) {
-    setTracking(true);
+    tracking = true;
     driver.modeDecaySlewing();
     V(axisPrefix); VLF("autoSlew(); slew started");
   }
@@ -232,7 +231,7 @@ void Axis::autoSlew(Direction direction) {
 // slew to home, with acceleration in "measures" per second per second
 void Axis::autoSlewHome() {
   if (pins.sense.home != OFF) {
-    setTracking(true);
+    tracking = true;
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
       driver.modeDecaySlewing();
@@ -269,11 +268,12 @@ void Axis::autoSlewAbort() {
     V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
     autoRate = AR_RATE_BY_TIME_ABORT;
     homingStage = HOME_NONE;
-    setTracking(true);
+    tracking = true;
     poll();
   }
 }
 
+// checks if slew is active on this axis
 bool Axis::autoSlewActive() {
   return autoRate != AR_NONE;  
 }
@@ -293,30 +293,28 @@ void Axis::poll() {
   }
 
   // automatically abort slew and stop tracking
-  if (autoRate != AR_RATE_BY_TIME_ABORT) {
-    if (lastPeriod != 0 && trackingStep == -1 && motionReverseError()) {
-      V(axisPrefix); VLF("poll(); motion reverse err");
+  if (autoRate != AR_RATE_BY_TIME_ABORT && lastPeriod != 0) {
+    if (trackingStep < 0 && motionReverseError()) {
+      V(axisPrefix); VLF("poll(); motion reverse limit or error");
       autoSlewAbort();
-      if (tracking) { tracking = false; V(axisPrefix); VLF("poll(); tracking stopped"); }
       return;
     }
-    if (lastPeriod != 0 && trackingStep == 1 && motionForwardError()) {
-      V(axisPrefix); VLF("poll(); motion forward err");
+    if (trackingStep > 0 && motionForwardError()) {
+      V(axisPrefix); VLF("poll(); motion forward limit or error");
       autoSlewAbort();
-      if (tracking) { tracking = false; V(axisPrefix); VLF("poll(); tracking stopped"); }
       return;
     }
   }
 
+  // slewing
   if (autoRate != AR_NONE) {
-    // acceleration
     if (autoRate == AR_RATE_BY_DISTANCE) {
       if (getTargetDistanceSteps() == 0) {
         V(axisPrefix); VLF("poll(); slew automatically stopped");
         freq = 0.0F;
         setFrequency(freq);
         autoRate = AR_NONE;
-        setTracking(true);
+        tracking = true;
       } else {
         freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + backlashFreq;
         if (freq < backlashFreq) freq = backlashFreq;
@@ -338,7 +336,6 @@ void Axis::poll() {
         driver.modeDecayTracking();
         autoRate = AR_NONE;
         freq = 0.0F;
-        // start next phase of homing
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
         if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
@@ -456,7 +453,7 @@ float Axis::getFrequencySteps() {
 }
 
 void Axis::setTracking(bool state) {
-  this->tracking = state;
+  tracking = state;
 }
 
 bool Axis::getTracking() {

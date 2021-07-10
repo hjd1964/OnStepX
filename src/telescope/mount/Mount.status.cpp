@@ -1,14 +1,14 @@
 // ---------------------------------------------------------------------------------------------------
 // Mount status LED
 
+#include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
 #include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
-#include "Mount.h"
 
   #if LED_MOUNT_STATUS != OFF && LED_MOUNT_STATUS_PIN != OFF
     bool ledOn = false;

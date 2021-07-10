@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, sync and goto
 
+#include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
 #include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../Telescope.h"
-#include "Mount.h"
 
 inline void mountGotoWrapper() { telescope.mount.gotoPoll(); }
 
@@ -240,9 +240,6 @@ void Mount::gotoPoll() {
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
   }
-
-  //axis1.incrementTargetCoordinate(stepsPerCentisecondAxis1);
-  //axis2.incrementTargetCoordinate(stepsPerCentisecondAxis2);
 
   // keep updating mount target
   target.h += radsPerCentisecond;

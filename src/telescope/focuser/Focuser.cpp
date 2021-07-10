@@ -3,7 +3,7 @@
 
 #include "Focuser.h"
 
-#if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+#ifdef FOCUSER_PRESENT
 
 #include "../../lib/weather/Weather.h"
 #include "../../lib/temperature/Ds1820.h"
@@ -53,14 +53,13 @@ void Focuser::init(bool validKey) {
 
   if (FocuserSettingsSize < sizeof(Settings)) { initError.nv = true; DL("ERR: Focuser::init(); FocuserSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
 
-  // init. focuser settings
+  // get settings stored in NV ready
   if (!validKey) {
     VLF("MSG: Focusers, writing default settings to NV");
     for (int index = 0; index <= 5; index++) writeSettings(index);
   }
-
-  // read focuser settings
   for (int index = 0; index <= 5; index++) readSettings(index);
+
 }
 
 // get focuser temperature in deg. C

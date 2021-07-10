@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, homing
 
-#include "../../Common.h"
-
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
-
 #include "Mount.h"
+
+#ifdef MOUNT_PRESENT
+
+#include "../../Common.h"
 
 CommandError Mount::returnHome() {
   if (gotoState != GS_NONE || guideState != GU_NONE || axis1.autoSlewActive() || axis2.autoSlewActive()) return CE_SLEW_IN_MOTION;

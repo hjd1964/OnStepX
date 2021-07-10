@@ -1,10 +1,11 @@
 //--------------------------------------------------------------------------------------------------
 // OnStepX focuser control
 
-#include "../../lib/convert/Convert.h"
 #include "Focuser.h"
 
-#if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+#ifdef FOCUSER_PRESENT
+
+#include "../../lib/convert/Convert.h"
 
 bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   static int active = 0;
@@ -17,7 +18,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (focuserAxis[active] == NULL) *commandError = CE_0;
   } else
 
-  // :FA[n]#    Select primary focuser where [n] = 1 to 6
+  // :FA[n]#    Select focuser where [n] = 1 to 6
   //            Return: 0 on failure
   //                    1 on success
   if (cmdP("FA") && parameter[1] == 0) {
@@ -25,7 +26,13 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (i >= 0 && i <= 5) active = i; else *commandError = CE_PARAM_RANGE;
   } else
 
-  // F, F1, F2, etc. - Focuser Commands
+  // :F[...]#   Use selected focuser (defaults to the first focuser)
+  // :F1[...]#  Focuser #1 (Axis4)
+  // :F2[...]#  Focuser #2 (Axis5)
+  // :F3[...]#  Focuser #3 (Axis6)
+  // :F4[...]#  Focuser #4 (Axis7)
+  // :F5[...]#  Focuser #5 (Axis8)
+  // :F6[...]#  Focuser #6 (Axis9)
   if (command[0] == 'F') {
     // check that the requested focuser is active
     int i = command[1] - '1';
@@ -223,7 +230,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :FR[sn]#   Set focuser target position relative (in microns or steps)
+    // :FR[sn]#   Move focuser target position relative (in microns or steps)
     //            Returns: Nothing
     if (toupper(command[1]) == 'R') {
       long t = focuserAxis[index]->getTargetCoordinateSteps();
@@ -233,7 +240,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :FS[n]#    Set focuser target position (in microns or steps)
+    // :FS[n]#    Move focuser to Set target position (in microns or steps)
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'S') {
@@ -247,6 +254,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'Z') {
       focuserAxis[index]->setMotorCoordinateSteps(0);
+      focuserAxis[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
 
@@ -255,10 +263,11 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'H') {
       long p = round((focuserAxis[index]->settings.limits.max + focuserAxis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
       focuserAxis[index]->setMotorCoordinateSteps(p);
+      focuserAxis[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
 
-    // :Fh#       Set focuser target position at half-travel
+    // :Fh#       Move focuser target position to half-travel
     //            Returns: Nothing
     if (command[1] == 'h') {
       long t = round((focuserAxis[index]->settings.limits.max + focuserAxis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
