@@ -107,7 +107,7 @@ bool Focuser::getTcfEnable(int index) {
 bool Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index > 5) return false;
   settings[index].tcf.enabled = value;
-  if (value) settings[index].tcf.t0 = getTemperature(); else tcfSteps[index + 4] = 0;
+  if (value) settings[index].tcf.t0 = getTemperature(); else tcfSteps[index] = 0;
   writeSettings(index);
   return true;
 }
@@ -162,10 +162,11 @@ void Focuser::tcfPoll() {
   for (int index = 0; index <= 5; index++) {
     if (focuserAxis[index] != NULL) {
       if (settings[index].tcf.enabled) {
+        Y;
         // get offset in microns due to TCF
         float offset = settings[index].tcf.coef * (getTemperature() - settings[index].tcf.t0);
         // convert to steps
-        offset *= focuserAxis[index + 4]->getStepsPerMeasure();
+        offset *= focuserAxis[index]->getStepsPerMeasure();
         // apply deadband
         long steps = lround(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
         // move focuser if required
