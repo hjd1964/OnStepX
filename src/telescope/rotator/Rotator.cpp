@@ -30,7 +30,7 @@ void Rotator::init(bool validKey) {
 
   // start task for derotation
   VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
-  if (tasks.add(1000, 0, true, 7, derotateWrapper, "DeRot")) { VL("success"); } else { VL("FAILED!"); }
+  if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // get backlash in steps
