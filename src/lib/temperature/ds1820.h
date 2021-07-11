@@ -44,6 +44,7 @@ class Ds1820 {
     float getChannel(int index);
    
   private:
+    bool  ds1820_found = false;
     uint8_t ds1820_device_count = 0;
     uint8_t ds1820_index = 0;
     uint8_t ds1820_address[9][8];
@@ -52,11 +53,8 @@ class Ds1820 {
     bool polling(float f);
     float validated(float f);
 
-    bool  ds1820_found = false;
-    float temperature = 10.0;
-    float averageTemperature = 10.0;
-    float featureTemperature[9] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
-    float averageFeatureTemperature[9] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
+    float averageTemperature[9] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
+    unsigned long expirationTime[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 };
 
 extern Ds1820 temperature;

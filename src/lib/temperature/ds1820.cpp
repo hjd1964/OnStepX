@@ -62,7 +62,7 @@ bool Ds1820::init() {
           VL("");
         #endif
       }
-  }
+    }
   }
 
   #if DEBUG_MODE == VERBOSE
@@ -94,15 +94,21 @@ void Ds1820::poll() {
     // tasks.yield() during the 1-wire command sequence is ok since:
     //   1. only higher priority level tasks are allowed to run during a yield 
     //   2. all 1-wire task polling is run at the lowest priority level
-    float t = NAN;
+    float rawTemperature = NAN;
     for (int i = 0; i < 20; i++) {
-      t = DS18B20.getTempC(ds1820_address[ds1820_index], true);
-      if (polling(t)) tasks.yield(60); else break;
+      rawTemperature = DS18B20.getTempC(ds1820_address[ds1820_index], true);
+      if (polling(rawTemperature)) tasks.yield(60); else break;
     }
 
-    featureTemperature[ds1820_index] = validated(t);
-    if (isnan(averageFeatureTemperature[ds1820_index])) averageFeatureTemperature[ds1820_index] = featureTemperature[ds1820_index];
-    averageFeatureTemperature[ds1820_index] = (averageFeatureTemperature[ds1820_index]*9.0F + featureTemperature[ds1820_index])/10.0F;
+    float temperature = validated(rawTemperature);
+    if (!isnan(temperature)) {
+      if (isnan(averageTemperature[ds1820_index])) averageTemperature[ds1820_index] = temperature;
+      averageTemperature[ds1820_index] = (averageTemperature[ds1820_index]*9.0F + temperature)/10.0F;
+      expirationTime[ds1820_index] = millis() + 30000;
+    } else {
+      // we must get a reading atleast once every 30 seconds otherwise flag the failure with a NAN
+      if ((long)(millis() - expirationTime[ds1820_index]) > 0) averageTemperature[ds1820_index] = NAN;
+    }
   }
   ds1820_index++;
   if (ds1820_index > 8) ds1820_index = 0;
@@ -113,8 +119,8 @@ void Ds1820::poll() {
 // index 0 is the focuser temperature, 1 is auxiliary feature #1, etc.
 float Ds1820::getChannel(int index) {
   if (index >= 0 && index <= 7) {
-    if (ds1820_device[index] == OFF) averageFeatureTemperature[index] = weather.getTemperature();
-    return averageFeatureTemperature[index];
+    if (ds1820_device[index] == OFF) averageTemperature[index] = weather.getTemperature();
+    return averageTemperature[index];
   } else return NAN;
 }
 
