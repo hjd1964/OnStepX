@@ -226,7 +226,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FG#       Get focuser current position (in microns or steps)
     //            Returns: sn#
     if (toupper(command[1]) == 'G') {
-      sprintf(reply,"%ld",(long)round(focuserAxis[index]->getInstrumentCoordinateSteps()*StepsToUnits));
+      sprintf(reply,"%ld",(long)round((focuserAxis[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -236,7 +236,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       long t = focuserAxis[index]->getTargetCoordinateSteps();
       focuserAxis[index]->setTargetCoordinateSteps(t + atol(parameter)*UnitsToSteps);
       focuserAxis[index]->setFrequencySlew(slewRateDesired[index]);
-      focuserAxis[index]->autoSlewRateByDistance(slewRateDesired[index]);
+      focuserAxis[index]->autoSlewRateByDistance(slewRateDesired[index] + tcfSteps[index]);
       *numericReply = false;
     } else
 
@@ -246,7 +246,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (toupper(command[1]) == 'S') {
       focuserAxis[index]->setTargetCoordinateSteps(atol(parameter)*UnitsToSteps);
       focuserAxis[index]->setFrequencySlew(slewRateDesired[index]);
-      focuserAxis[index]->autoSlewRateByDistance(slewRateDesired[index]);
+      focuserAxis[index]->autoSlewRateByDistance(slewRateDesired[index] + tcfSteps[index]);
     //  *commandError = CE_SLEW_ERR_IN_STANDBY;
     } else
 
@@ -271,7 +271,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'h') {
       long t = round((focuserAxis[index]->settings.limits.max + focuserAxis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-      focuserAxis[index]->setTargetCoordinateSteps(t);
+      focuserAxis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
       focuserAxis[index]->setFrequencySlew(slewRateDesired[index]);
       focuserAxis[index]->autoSlewRateByDistance(slewRateDesired[index]);
       *numericReply = false;

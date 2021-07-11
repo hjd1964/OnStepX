@@ -5,9 +5,13 @@
 
 #ifdef FOCUSER_PRESENT
 
+#include "../../tasks/OnTask.h"
+extern Tasks tasks;
 #include "../../lib/weather/Weather.h"
 #include "../../lib/temperature/Temperature.h"
 #include "../Telescope.h"
+
+void tcfWrapper() { telescope.focuser.tcfPoll(); }
 
 // initialize all focusers
 void Focuser::init(bool validKey) {
@@ -60,15 +64,14 @@ void Focuser::init(bool validKey) {
   }
   for (int index = 0; index <= 5; index++) readSettings(index);
 
+  // start task for temperature compensated focusing
+  VF("MSG: Focuser, starting TCF task (rate 1s priority 7)... ");
+  if (tasks.add(1000, 0, true, 7, tcfWrapper, "FocPoll")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // get focuser temperature in deg. C
 float Focuser::getTemperature() {
-  #if FOCUSER_TEMPERATURE == OFF
-    float t = weather.getTemperature();
-  #else
-    float t = temperature.getChannel(0);
-  #endif
+  float t = temperature.getChannel(0);
   if (isnan(t)) t = 10.0;
   return t;
 }
@@ -104,6 +107,7 @@ bool Focuser::getTcfEnable(int index) {
 bool Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index > 5) return false;
   settings[index].tcf.enabled = value;
+  if (value) settings[index].tcf.t0 = getTemperature(); else tcfSteps[index + 4] = 0;
   writeSettings(index);
   return true;
 }
@@ -151,6 +155,30 @@ bool Focuser::setTcfT0(int index, float value) {
   settings[index].tcf.t0 = value;
   writeSettings(index);
   return true;
+}
+
+// poll TCF to move the focusers as required
+void Focuser::tcfPoll() {
+  for (int index = 0; index <= 5; index++) {
+    if (focuserAxis[index] != NULL) {
+      if (settings[index].tcf.enabled) {
+        // get offset in microns due to TCF
+        float offset = settings[index].tcf.coef * (getTemperature() - settings[index].tcf.t0);
+        // convert to steps
+        offset *= focuserAxis[index + 4]->getStepsPerMeasure();
+        // apply deadband
+        long steps = lround(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
+        // move focuser if required
+        if (tcfSteps[index] != steps) {
+          tcfSteps[index] = steps;
+          long t = focuserAxis[index]->getTargetCoordinateSteps();
+          focuserAxis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
+          focuserAxis[index]->setFrequencySlew(10);
+          focuserAxis[index]->autoSlewRateByDistance(10);
+        }
+      }
+    }
+  }
 }
 
 // get backlash in microns

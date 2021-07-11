@@ -62,6 +62,8 @@ class Focuser {
     float getTcfT0(int index);
     // set TCF T0, in deg. C
     bool  setTcfT0(int index, float value);
+    // poll TCF to move the focusers as required
+    void tcfPoll();
 
     // get backlash in microns
     int   getBacklash(int index);
@@ -98,6 +100,7 @@ class Focuser {
     int rapidStopRate[6]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
     int moveRate[6] = { 100, 100, 100, 100, 100, 100 };
     bool dcMode[6] = { AXIS4_DRIVER_DC_MODE == ON, AXIS5_DRIVER_DC_MODE == ON, AXIS6_DRIVER_DC_MODE == ON, AXIS7_DRIVER_DC_MODE == ON, AXIS8_DRIVER_DC_MODE == ON, AXIS9_DRIVER_DC_MODE == ON };
+    int tcfSteps[6] = { 0, 0, 0, 0, 0, 0 };
 
     Settings settings[6] = {
       { {false, 0.0, 1, 10.0}, 50, 0.0 },
