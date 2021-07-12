@@ -20,19 +20,19 @@
 
 class Sense {
   public:
-    Sense(int8_t pin, int8_t initState, int32_t trigger);
+    Sense(int pin, int initState, int32_t trigger);
     int read();
     void poll();
 
   private:
     void reset();
 
-    int8_t pin;
-    int8_t activeState = OFF;
+    int pin;
+    int activeState = OFF;
     bool isAnalog;
     int threshold;
     int hysteresis;
-    int8_t triggerMode;
+    int triggerMode;
     int lastValue = LOW;
     int lastResult = LOW;
     int stableSample = 0;
@@ -47,7 +47,7 @@ class Senses {
     // \param trigger    triggered state: HIGH or LOW, optional
     //                   analog threshold/hysteresis |THLD(t) |HIST(h) are 10 bit values
     // \returns          handle to this sense if successful, 0 otherwise
-    uint8_t add(int8_t pin, int8_t initState, int32_t trigger);
+    uint8_t add(int pin, int initState, int32_t trigger);
 
     // call repeatedly to check inputs for changes
     void poll();

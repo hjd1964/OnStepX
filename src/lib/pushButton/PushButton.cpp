@@ -4,7 +4,7 @@
 #include "../../Common.h"
 #include "PushButton.h"
 
-Button::Button(int8_t pin, int8_t initState, int32_t trigger) {
+Button::Button(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
   long activeState = (trigger & 0b0000000000000000000001);

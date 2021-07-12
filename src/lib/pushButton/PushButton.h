@@ -5,7 +5,7 @@
 
 class Button {
   public:
-    Button(int8_t pin, int8_t initState, int32_t trigger);
+    Button(int pin, int initState, int32_t trigger);
 
     // must be repeatedly called to check status of button
     void poll();

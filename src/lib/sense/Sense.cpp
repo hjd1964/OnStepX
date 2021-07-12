@@ -6,7 +6,7 @@
 #include "Sense.h"
 #include "../../Common.h"
 
-Sense::Sense(int8_t pin, int8_t initState, int32_t trigger) {
+Sense::Sense(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
   activeState = (trigger & 0b0000000000000000000001);
@@ -64,7 +64,7 @@ void Sense::reset() {
 
 // Manage sense pins
 
-uint8_t Senses::add(int8_t pin, int8_t initState, int32_t trigger) {
+uint8_t Senses::add(int pin, int initState, int32_t trigger) {
   if (pin == OFF || trigger == OFF) return 0;
   if (senseCount >= SENSE_MAX) { VF("WRN: Senses::add(); senseCount exceeded ignoring pin "); VL(pin); return 0; }
   if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Senses::add(); trigger value invalid ignoring pin "); VL(pin); return 0; }
