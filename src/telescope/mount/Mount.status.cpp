@@ -12,13 +12,13 @@ extern Tasks tasks;
   bool ledOn = false;
   bool ledOff = false;
   void mountStatusFlash() {
-    if (ledOff) { digitalWriteF(LED_STATUS_PIN, !LED_STATUS_ON_STATE); return; }
-    if (ledOn) { digitalWriteF(LED_STATUS_PIN, LED_STATUS_ON_STATE); return; }
+    if (ledOff) { digitalWriteEx(LED_STATUS_PIN, !LED_STATUS_ON_STATE); return; }
+    if (ledOn) { digitalWriteEx(LED_STATUS_PIN, LED_STATUS_ON_STATE); return; }
     static uint8_t cycle = 0;
     if ((cycle++)%2 == 0) {
-      digitalWriteF(LED_MOUNT_STATUS_PIN, !LED_MOUNT_STATUS_ON_STATE);
+      digitalWriteEx(LED_MOUNT_STATUS_PIN, !LED_MOUNT_STATUS_ON_STATE);
     } else {
-      digitalWriteF(LED_MOUNT_STATUS_PIN, LED_MOUNT_STATUS_ON_STATE);
+      digitalWriteEx(LED_MOUNT_STATUS_PIN, LED_MOUNT_STATUS_ON_STATE);
     }
   }
 #endif
@@ -30,7 +30,7 @@ void Mount::statusInit() {
       #if LED_STATUS == ON
         if (LED_MOUNT_STATUS_PIN == LED_STATUS_PIN) tasks.remove(tasks.getHandleByName("staLed"));
       #endif
-      pinMode(LED_MOUNT_STATUS_PIN, OUTPUT);
+      pinModeEx(LED_MOUNT_STATUS_PIN, OUTPUT);
       VF("MSG: Mount, start status LED task (variable rate priority 6)... ");
       statusTaskHandle = tasks.add(0, 0, true, 6, mountStatusFlash, "mntLed");
       if (statusTaskHandle) { VL("success"); } else { VL("FAILED!"); }

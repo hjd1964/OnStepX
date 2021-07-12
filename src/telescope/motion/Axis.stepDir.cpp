@@ -180,8 +180,10 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 
   if (settings.reverse) invertDir = !invertDir;
 
-  pinModeInitEx(pins.step, OUTPUT, !invertStep?LOW:HIGH);
-  pinModeInitEx(pins.dir, OUTPUT, !invertDir?LOW:HIGH);
+  pinModeEx(pins.step, OUTPUT);
+  digitalWriteEx(pins.step, !invertStep?LOW:HIGH);
+  pinModeEx(pins.dir, OUTPUT);
+  digitalWriteEx(pins.dir, !invertDir?LOW:HIGH);
   pinModeEx(pins.enable, OUTPUT); enable(false);
 
   axisPrefix[10] = ':';

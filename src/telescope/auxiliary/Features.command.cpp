@@ -20,12 +20,12 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
 
       char s[255];
       if (device[i].purpose == SWITCH) {
-        if (device[i].pin >= 0 && device[i].pin <= 255) sprintf(s, "%d", device[i].value); else sprintf(s, "%d", gpio.getChannel(i) == device[i].active);
+        sprintf(s, "%d", device[i].value);
         strcat(reply, s);
       } else
 
       if (device[i].purpose == ANALOG_OUTPUT) {
-        if (device[i].pin >= 0 && device[i].pin <= 255) sprintf(s, "%d", device[i].value); else strcpy(s, "0");
+        sprintf(s, "%d", device[i].value);
         strcat(reply, s);
       } else
 
@@ -123,11 +123,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == SWITCH) {
         if (parameter[3] == 'V') {
           if (v >= 0 && v <= 1) { // value 0..1 for enabled or not
-            if (device[i].purpose == SWITCH) {
-              if (device[i].pin >= 0 && device[i].pin <= 255) {
-                digitalWrite(device[i].pin, v == device[i].active);
-              } else gpio.setChannel(i, v == device[i].active);
-            }
+            digitalWriteEx(device[i].pin, v == device[i].active);
           } else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       } else
@@ -135,7 +131,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == ANALOG_OUTPUT) {
         if (parameter[3] == 'V') { // value 0..255 for 0..100% power
           if (v >= 0 && v <= 255) {
-            if (device[i].pin >= 0 && device[i].pin <= 255) analogWrite(device[i].pin,v);
+            if (device[i].pin >= 0 && device[i].pin <= 255) analogWrite(device[i].pin, v);
           } else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       } else

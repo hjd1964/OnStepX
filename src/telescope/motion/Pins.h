@@ -5,12 +5,12 @@
 #include <Arduino.h>
 
 typedef struct DriverPins {
-  int8_t m0;
-  int8_t m1;
-  int8_t m2;
-  int8_t m3;
-  int8_t decay;
-  int8_t fault;
+  int16_t m0;
+  int16_t m1;
+  int16_t m2;
+  int16_t m3;
+  int16_t decay;
+  int16_t fault;
 } DriverPins;
 
 #define mosi m0

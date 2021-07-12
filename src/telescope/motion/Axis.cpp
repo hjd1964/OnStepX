@@ -12,7 +12,7 @@ extern unsigned long periodSubMicros;
 
 void Axis::enable(bool value) {
   if (pins.enable != OFF) {
-    if (value) digitalWrite(pins.enable, invertEnable?HIGH:LOW); else digitalWrite(pins.enable, invertEnable?LOW:HIGH);
+    if (value) { digitalWriteEx(pins.enable, invertEnable?HIGH:LOW); } else { digitalWriteEx(pins.enable, invertEnable?LOW:HIGH); }
   }
   enabled = value;
 }

@@ -51,4 +51,9 @@
 #define STA_GW_ADDR         (192,168,1,1) // ..,168,1,1), Wifi Station GATEWAY Address.                                       Adjust
 #define STA_SN_MASK       (255,255,255,0) // ..55,255,0), Wifi Station SUBNET Mask.                                           Adjust
 
+// GPIO SUPPORT---------------------------------------------------------------------------------------------------------------------
+#define GPIO_DEVICE                   OFF //         OFF, DS2413 for 2-ch 1-wire GPIO or MCP23008 for 8-ch I2C GPIO.          Option
+                                          //              The device channels are assigned to pin#'s starting at 1000
+                                          //              and can be used for most OnStep features.
+
 // ---------------------------------------------------------------------------------------------------------------------------------

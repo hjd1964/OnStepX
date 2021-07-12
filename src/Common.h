@@ -11,3 +11,4 @@
 #include "debug/Debug.h"
 #include "lib/nv/NV.h"
 extern NVS nv;
+#include "lib/gpio/Gpio.h"

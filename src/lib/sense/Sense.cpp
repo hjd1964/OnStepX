@@ -25,7 +25,7 @@ Sense::Sense(int8_t pin, int8_t initState, int32_t trigger) {
     }
   }
 
-  pinMode(pin, initState);
+  pinModeEx(pin, initState);
 
   reset();
 }
@@ -37,7 +37,7 @@ int Sense::read() {
     if (sample >= threshold + hysteresis) value = HIGH;
     if (sample < threshold - hysteresis) value = LOW;
   } else {
-    int sample = digitalRead(pin); delayMicroseconds(10); int sample1 = digitalRead(pin);
+    int sample = digitalReadEx(pin); delayMicroseconds(10); int sample1 = digitalReadEx(pin);
     if (stableSample != sample || sample1 != sample) { stableStartMs = millis(); stableSample = sample; }
     long stableMs = (long)(millis() - stableStartMs);
     if (stableMs >= hysteresis) value = stableSample;
@@ -49,7 +49,7 @@ int Sense::read() {
 void Sense::poll() {
   int value = lastValue;
   if (!isAnalog) {
-    int sample = digitalRead(pin); delayMicroseconds(10); int sample1 = digitalRead(pin);
+    int sample = digitalReadEx(pin); delayMicroseconds(10); int sample1 = digitalReadEx(pin);
     if (stableSample != sample || sample1 != sample) { stableStartMs = millis(); stableSample = sample; }
     long stableMs = (long)(millis() - stableStartMs);
     if (stableMs > hysteresis) value = stableSample;
@@ -58,7 +58,7 @@ void Sense::poll() {
 }
 
 void Sense::reset() {
-  if (isAnalog) { if (analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalRead(pin);
+  if (isAnalog) { if (analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalReadEx(pin);
   stableSample = lastValue;
 }
 

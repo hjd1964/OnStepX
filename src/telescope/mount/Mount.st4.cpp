@@ -69,9 +69,9 @@ extern Tasks tasks;
         if (!shcActive) {
           // Smart Hand Controller activate
           if (st4Axis1Fwd.hasTone()) {
-            pinMode(ST4_DEC_S_PIN, OUTPUT);    // clock
-            pinMode(ST4_DEC_N_PIN, OUTPUT);    // send data
-            digitalWrite(ST4_DEC_S_PIN, HIGH); // idle
+            pinMode(ST4_DEC_S_PIN, OUTPUT);     // clock
+            pinMode(ST4_DEC_N_PIN, OUTPUT);     // send data
+            digitalWriteF(ST4_DEC_S_PIN, HIGH); // idle
             shcActive = true;
             serialST4.begin();
             VLF("MSG: SerialST4 mode activated");

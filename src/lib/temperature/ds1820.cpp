@@ -122,7 +122,7 @@ void Ds1820::poll() {
 // returns NAN if no temperature source is available or if a communications failure
 // results in no valid readings for > 30 seconds
 float Ds1820::getChannel(int index) {
-  if (index >= 0 && index <= 7) {
+  if (found && index >= 0 && index <= 7) {
     if (device[index] == OFF) averageTemperature[index] = weather.getTemperature();
     return averageTemperature[index];
   } else return NAN;

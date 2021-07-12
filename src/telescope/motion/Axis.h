@@ -30,16 +30,16 @@ typedef struct AxisSense {
 } AxisSense;
 
 typedef struct AxisPins {
-  int8_t     step;
-  int8_t     dir;
-  int8_t     enable;
-  bool       invertStep;
-  bool       invertDir;
-  bool       invertEnable;
-  int8_t     min;
-  int8_t     home;
-  int8_t     max;
-  AxisSense  sense;
+  int16_t   step;
+  int16_t   dir;
+  int16_t   enable;
+  bool      invertStep;
+  bool      invertDir;
+  bool      invertEnable;
+  int16_t   min;
+  int16_t   home;
+  int16_t   max;
+  AxisSense sense;
 } AxisPins;
 
 typedef struct AxisErrors {

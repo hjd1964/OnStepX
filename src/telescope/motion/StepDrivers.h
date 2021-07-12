@@ -139,6 +139,6 @@ class StepDriver {
     int     microstepCodeGoto     = OFF;
     uint8_t microstepBitCode      = 0;
     uint8_t microstepBitCodeGoto  = 0;
-    int8_t  m2Pin                 = OFF;
-    int8_t  decayPin              = OFF;
+    int16_t m2Pin                 = OFF;
+    int16_t decayPin              = OFF;
 };

@@ -21,14 +21,14 @@ Button::Button(int8_t pin, int8_t initState, int32_t trigger) {
   if (activeState == LOW) { UP = HIGH; DOWN = LOW; } else
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
-  pinMode(pin, initState);
+  pinModeEx(pin, initState);
 
   //reset();
 }
 
 void Button::poll() {
   int lastState = state;
-  state = digitalRead(pin);
+  state = digitalReadEx(pin);
   if (lastState != state) {
     avgPulseDuration = ((avgPulseDuration*49.0) + (double)(millis() - stableStartMs))/50.0;
     stableStartMs = millis();

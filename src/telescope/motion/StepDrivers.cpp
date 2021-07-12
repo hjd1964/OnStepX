@@ -106,14 +106,18 @@ void StepDriver::init(uint8_t axisNumber) {
     #endif
   } else {
     if (isDecayOnM2()) { decayPin = pins.m2; m2Pin = OFF; } else { decayPin = pins.decay; m2Pin = pins.m2; }
-    pinModeInitEx(decayPin, OUTPUT, getDecayPinState(settings.decay));
+    pinModeEx(decayPin, OUTPUT);
+    digitalWriteEx(decayPin, getDecayPinState(settings.decay));
 
     microstepBitCode = microstepCode;
     microstepBitCodeGoto = microstepCodeGoto;
-    pinModeInitEx(pins.m0, OUTPUT, bitRead(microstepBitCode, 0));
-    pinModeInitEx(pins.m1, OUTPUT, bitRead(microstepBitCode, 1));
-    pinModeInitEx(m2Pin,   OUTPUT, bitRead(microstepBitCode, 2));
-    pinModeEx    (pins.m3, INPUT);
+    pinModeEx(pins.m0, OUTPUT);
+    digitalWriteEx(pins.m0, bitRead(microstepBitCode, 0));
+    pinModeEx(pins.m1, OUTPUT);
+    digitalWriteEx(pins.m1, bitRead(microstepBitCode, 1));
+    pinModeEx(m2Pin, OUTPUT);
+    digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
+    pinModeEx(pins.m3, INPUT);
   }
 
   // automatically set fault status for known drivers

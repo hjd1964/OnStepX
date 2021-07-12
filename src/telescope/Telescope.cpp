@@ -32,6 +32,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     VLF("MSG: Telescope, NV reset to defaults");
   } else { VLF("MSG: Telescope, correct NV key found"); }
 
+  gpio.init();
+
   weather.init();
 
   #ifdef MOUNT_PRESENT

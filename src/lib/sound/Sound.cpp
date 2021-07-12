@@ -8,21 +8,21 @@ extern Tasks tasks;
 
 #if BUZZER == ON
   void buzzerOff() {
-    digitalWrite(BUZZER_PIN, !BUZZER_ON_STATE);
+    digitalWriteEx(BUZZER_PIN, !BUZZER_ON_STATE);
   }
 #endif
 
 Sound::Sound() {
   #if BUZZER == ON
     pinModeEx(BUZZER_PIN, OUTPUT);
-    digitalWrite(BUZZER_PIN, !BUZZER_ON_STATE);
+    digitalWriteEx(BUZZER_PIN, !BUZZER_ON_STATE);
   #endif
 }
 
 void Sound::alert() {
   if (enabled) {
     #if BUZZER == ON
-      digitalWrite(BUZZER_PIN, BUZZER_ON_STATE);
+      digitalWriteEx(BUZZER_PIN, BUZZER_ON_STATE);
       tasks.add(100, 0, false, 7, buzzerOff);
     #endif
     #if BUZZER >= 0
@@ -34,7 +34,7 @@ void Sound::alert() {
 void Sound::beep() {
   if (enabled) {
     #if BUZZER == ON
-      digitalWrite(BUZZER_PIN, BUZZER_ON_STATE);
+      digitalWriteEx(BUZZER_PIN, BUZZER_ON_STATE);
       tasks.add(25, 0, false, 7, buzzerOff);
     #endif
     #if BUZZER >= 0
@@ -46,7 +46,7 @@ void Sound::beep() {
 void Sound::click() {
   if (enabled) {
     #if BUZZER == ON
-      digitalWrite(BUZZER_PIN, BUZZER_ON_STATE);
+      digitalWriteEx(BUZZER_PIN, BUZZER_ON_STATE);
       tasks.add(5, 0, false, 7, buzzerOff);
     #endif
     #if BUZZER >= 0

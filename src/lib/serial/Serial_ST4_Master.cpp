@@ -36,49 +36,49 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   recv_error = false;
     
   // start bit
-  digitalWrite(SST4_CLOCK_OUT, LOW);
-  digitalWrite(SST4_DATA_OUT, LOW);
+  digitalWriteF(SST4_CLOCK_OUT, LOW);
+  digitalWriteF(SST4_DATA_OUT, LOW);
   delayMicroseconds(XMIT_TIME);
-  digitalWrite(SST4_CLOCK_OUT, HIGH);
-  if (digitalRead(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
+  digitalWriteF(SST4_CLOCK_OUT, HIGH);
+  if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
   delayMicroseconds(XMIT_TIME);
   if (frame_error) return false;
 
   for (int i = 7; i >= 0; i--) {
     uint8_t state = bitRead(data_out, i);
     s_parity += state;
-    digitalWrite(SST4_CLOCK_OUT, LOW);
-    digitalWrite(SST4_DATA_OUT, state);
+    digitalWriteF(SST4_CLOCK_OUT, LOW);
+    digitalWriteF(SST4_DATA_OUT, state);
     delayMicroseconds(XMIT_TIME);
-    digitalWrite(SST4_CLOCK_OUT, HIGH);
-    state = digitalRead(SST4_DATA_IN);
+    digitalWriteF(SST4_CLOCK_OUT, HIGH);
+    state = digitalReadF(SST4_DATA_IN);
     r_parity += state;
     bitWrite(*data_in, i, state);                    
     delayMicroseconds(XMIT_TIME);
   }
 
   // parity bit
-  digitalWrite(SST4_CLOCK_OUT,LOW);
-  digitalWrite(SST4_DATA_OUT, s_parity&1);
+  digitalWriteF(SST4_CLOCK_OUT,LOW);
+  digitalWriteF(SST4_DATA_OUT, s_parity&1);
   delayMicroseconds(XMIT_TIME);
-  digitalWrite(SST4_CLOCK_OUT, HIGH);
-  if ((r_parity&1) != digitalRead(SST4_DATA_IN)) recv_error = true;
+  digitalWriteF(SST4_CLOCK_OUT, HIGH);
+  if ((r_parity&1) != digitalReadF(SST4_DATA_IN)) recv_error = true;
   delayMicroseconds(XMIT_TIME);
 
   // parity ck bit
-  digitalWrite(SST4_CLOCK_OUT, LOW);
-  digitalWrite(SST4_DATA_OUT, recv_error);                  // send local parity check
+  digitalWriteF(SST4_CLOCK_OUT, LOW);
+  digitalWriteF(SST4_DATA_OUT, recv_error);                  // send local parity check
   delayMicroseconds(XMIT_TIME);
-  digitalWrite(SST4_CLOCK_OUT, HIGH);
-  if (digitalRead(SST4_DATA_IN) == HIGH) send_error = true; // recv remote parity, ok?
+  digitalWriteF(SST4_CLOCK_OUT, HIGH);
+  if (digitalReadF(SST4_DATA_IN) == HIGH) send_error = true; // recv remote parity, ok?
   delayMicroseconds(XMIT_TIME);
 
   // stop bit
-  digitalWrite(SST4_CLOCK_OUT, LOW);
-  digitalWrite(SST4_DATA_OUT, LOW);
+  digitalWriteF(SST4_CLOCK_OUT, LOW);
+  digitalWriteF(SST4_DATA_OUT, LOW);
   delayMicroseconds(XMIT_TIME);
-  digitalWrite(SST4_CLOCK_OUT, HIGH);
-  if (digitalRead(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
+  digitalWriteF(SST4_CLOCK_OUT, HIGH);
+  if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
   delayMicroseconds(XMIT_TIME);
 
   if (frame_error) { DLF("WRN, SerialST4.trans(): frame error"); }

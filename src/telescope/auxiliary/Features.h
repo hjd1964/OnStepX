@@ -14,7 +14,6 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "../../lib/temperature/Temperature.h"
-#include "../../lib/gpio/Gpio.h"
 #include "dewHeater/DewHeater.h"
 #include "intervalometer/Intervalometer.h"
 

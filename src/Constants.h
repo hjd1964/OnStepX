@@ -132,13 +132,15 @@
 #define INTERVALOMETER              4 // control an camera shutter
 #define SWITCH_UNPARKED             5
 
-// various Dallas/Maxim 1-wire devices supported
-#define DS1820     0x2800000000000000 // DS1820 "generic" temperature sensors (DS18B20 or DS18S20) for focusing and dew heaters
-#define DS2413     0x3A00000000000000 // DS2413 GPIO pins for dew heaters
-#define CHAIN      0x3A00000000000001 // DS2413 second GPIO
-
-#define DS_MASK    0x3F00000000000000 // not for use in Config.h
+// various temperature sensing devices
+#define DS1820     0x2800000000000000 // DS1820 1-wire temperature sensors (DS18B20 or DS18S20) for focusing and dew heaters
 #define DS18S20    0x1000000000000000 // not for use in Config.h
+#define DS_MASK    0x3F00000000000000 // not for use in Config.h
+
+// various GPIO devices
+// these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
+#define DS2413                      1 // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
+#define MCP23008                    2 // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
@@ -192,20 +194,6 @@
 #define fequal(x,y)                 (fabs((x)-(y))<SmallestFloat)
 #define fgt(x,y)                    ((x)-(y)>SmallestFloat)
 #define flt(x,y)                    ((y)-(x)>SmallestFloat)
-
-// pins
-#define pinModeEx(pin,mode)           { if (pin != OFF && pin != SHARED) { pinMode(pin,mode); } }
-#define pinModeInitEx(pin,mode,state) { pinModeEx(pin,mode); digitalWrite(pin,state); }
-#define digitalWriteEx(pin,value)     { if (pin != OFF && pin != SHARED) digitalWrite(pin,value); }
-//#define digitalReadEx(pin)            ( ?(pin != OFF && pin != SHARED):digitalRead(pin):0 )
-#define digitalReadEx(pin)            ( digitalRead(pin) )
-#ifdef HAL_HAS_DIGITAL_FAST
-  #define digitalReadF(pin)           ( digitalReadFast(pin) )
-  #define digitalWriteF(pin,value)    { digitalWriteFast(pin,value); }
-#else
-  #define digitalReadF(pin)           ( digitalRead(pin) )
-  #define digitalWriteF(pin,value)    { digitalWrite(pin,value); }
-#endif
 
 #define THLD(v)                       ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
 #define HYST(v)                       ((v)<<11) // 10 bit hysteresis, bits 11 through 20
