@@ -141,6 +141,7 @@
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
 #define DS2413                      1 // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
 #define MCP23008                    2 // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
+#define MCP23017                    3 // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
 

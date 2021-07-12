@@ -31,6 +31,9 @@
 #include "Mcp23008.h"
 #if GPIO_DEVICE != MCP23008
 
+#include "Mcp23017.h"
+#if GPIO_DEVICE != MCP23017
+
 class Gpio {
   public:
     bool init();
@@ -46,5 +49,6 @@ class Gpio {
 
 extern Gpio gpio;
 
+#endif
 #endif
 #endif
