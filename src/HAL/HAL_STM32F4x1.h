@@ -6,14 +6,15 @@
 
 #define HAL_FAST_PROCESSOR
 
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #ifdef STM32F401xC
-  #define HAL_MAXRATE_LOWER_LIMIT    16  // Lower limit (fastest) step rate in us (in SQW mode) assumes optimization set to Fastest (-O3)
-  #define HAL_PULSE_WIDTH           500  // Width of step pulse in ns
+  #define HAL_MAXRATE_LOWER_LIMIT    16  // assumes optimization set to Fastest (-O3)
+  #define HAL_PULSE_WIDTH           500  // in ns
 #elif STM32F411xE
   #define HAL_MAXRATE_LOWER_LIMIT    20  // Lower limit (fastest) step rate in us (in SQW mode) assumes optimization set to Fastest (-O3)
-  #define HAL_PULSE_WIDTH           600  // Width of step pulse in ns
+  #define HAL_PULSE_WIDTH           600  // in ns
 #else
-  #define HAL_MAXRATE_LOWER_LIMIT    60  // Conservative defaults
+  #define HAL_MAXRATE_LOWER_LIMIT    60
   #define HAL_PULSE_WIDTH         10000
 #endif
 

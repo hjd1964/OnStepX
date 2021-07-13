@@ -7,10 +7,11 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-// Lower limit (fastest) step rate in uS for this platform, width of step pulse, and set HAL_FAST_PROCESSOR is needed
-#define HAL_MAXRATE_LOWER_LIMIT 1.5
-#define HAL_PULSE_WIDTH 0   // effectively disable pulse mode since the pulse width is unknown at this time
 #define HAL_FAST_PROCESSOR
+
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
+#define HAL_MAXRATE_LOWER_LIMIT 1.5
+#define HAL_PULSE_WIDTH 0  // effectively disable pulse mode since the pulse width is unknown at this time
 
 // New symbols for the Serial ports so they can be remapped if necessary -----------------------------
 

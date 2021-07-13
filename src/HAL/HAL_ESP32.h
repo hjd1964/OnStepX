@@ -4,10 +4,8 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
-// Lower limit (fastest) step rate in uS for this platform (in SQW mode)
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 16
-
-// Width of step pulse
 #define HAL_PULSE_WIDTH 2500
 
 // New symbols for the Serial ports so they can be remapped if necessary -----------------------------

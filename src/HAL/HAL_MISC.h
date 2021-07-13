@@ -3,12 +3,10 @@
 
 // We define a more generic symbol, in case more Platform_Name boards based on different lines are supported
 
-// Lower limit (fastest) step rate in uS for this platform (in SQW mode)
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #ifndef HAL_MAXRATE_LOWER_LIMIT
   #define HAL_MAXRATE_LOWER_LIMIT 60
 #endif
-
-// width of step pulse
 #ifndef HAL_PULSE_WIDTH
   #define HAL_PULSE_WIDTH 10000
 #endif

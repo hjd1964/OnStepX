@@ -14,7 +14,7 @@
 // This is for ~16MHz AVR processors or similar.
 #define HAL_SLOW_PROCESSOR
 
-// Lower limit (fastest) step rate in uS for this platform (in SQW mode)
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 76.8
 #define HAL_PULSE_WIDTH         10000
 

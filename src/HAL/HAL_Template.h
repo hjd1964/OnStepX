@@ -4,11 +4,9 @@
 // We define a more generic symbol, in case more Platform_Name boards based on different lines are supported
 #define __Platform_Name__
 
-// Lower limit (fastest) step rate in uS for this platform (in SQW mode)
+// Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT  60
-
-// width of step pulse
-#define HAL_PULSE_WIDTH          10000
+#define HAL_PULSE_WIDTH          10000  // in ns
 
 // SerialA is manidatory
 #define SerialA Serial
