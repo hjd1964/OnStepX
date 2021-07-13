@@ -13,7 +13,7 @@
 //      Parameter Name              Value   Default  Notes                                                                      Hint
 
 // AUXILIARY FEATURE CONTROL ------------------------------ see https://onstep.groups.io/g/main/wiki/6-ConfigurationMaster#AUXILIARY
-// Note: Temporarily set DEBUG mode to VERBOSE to list ds18b20 and ds2413 device serial numbers.
+// Note: Temporarily set DEBUG mode to VERBOSE to list DS18B20 device serial numbers.
 
 #define FEATURE1_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE1_NAME          "FEATURE1" // "FE..", Name of feature being controlled.                                        Adjust
