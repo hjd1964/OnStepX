@@ -41,3 +41,7 @@
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define HAL_TEMP() ( NAN )
+
+//---------------------------------------------------------------------------------------------------
+// Misc.
+#define strtof strtod // there us no strtof defined for the AVR platform
