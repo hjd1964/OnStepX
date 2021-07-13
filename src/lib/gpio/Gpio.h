@@ -47,8 +47,8 @@ class Gpio {
   private:
 };
 
-extern Gpio gpio;
+#endif
+#endif
+#endif
 
-#endif
-#endif
-#endif
+extern Gpio gpio;
