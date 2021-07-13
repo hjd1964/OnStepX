@@ -3,7 +3,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "..\calendars\Calendars.h"
+#include "../calendars/Calendars.h"
 
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST};
 
