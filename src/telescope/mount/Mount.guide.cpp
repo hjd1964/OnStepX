@@ -8,7 +8,7 @@
 #include "../../commands/ProcessCmds.h"
 
 float Mount::limitGuideRate(float rate) {
-  if (rate > radToDeg(radsPerSecondCurrent)*120.0F) rate = radToDeg(radsPerSecondCurrent)*120.0F;
+  if (rate > radToDegF(radsPerSecondCurrent)*120.0F) rate = radToDegF(radsPerSecondCurrent)*120.0F;
   return rate;
 }
 
@@ -22,8 +22,8 @@ float Mount::guideRateSelectToRate(GuideRateSelect guideRateSelect, uint8_t axis
     case GR_8X: return limitGuideRate(8.0F);
     case GR_20X: return limitGuideRate(20.0F);
     case GR_48X: return limitGuideRate(48.0F);
-    case GR_HALF_MAX: return radToDeg(radsPerSecondCurrent)*120.0F;
-    case GR_MAX: return radToDeg(radsPerSecondCurrent)*240.0F;
+    case GR_HALF_MAX: return radToDegF(radsPerSecondCurrent)*120.0F;
+    case GR_MAX: return radToDegF(radsPerSecondCurrent)*240.0F;
     case GR_CUSTOM: if (axis == 1) return customGuideRateAxis1; else if (axis == 2) return customGuideRateAxis2; else return 0.0F;
     default: return 0.0F;
   }
@@ -97,7 +97,7 @@ CommandError Mount::guideStartAxis1(GuideAction guideAction, GuideRateSelect gui
   CommandError e = guideValidate(1, guideAction); if (e != CE_NONE) return e;
 
   guideActionAxis1 = guideAction;
-  double rate = guideRateSelectToRate(guideRateSelect);
+  float rate = guideRateSelectToRate(guideRateSelect);
 
   VF("MSG: guideStartAxis1(); guide ");
   if (guideAction == GA_REVERSE) { VF("reverse"); } else { VF("forward"); }
@@ -113,7 +113,7 @@ CommandError Mount::guideStartAxis1(GuideAction guideAction, GuideRateSelect gui
     updateTrackingRates();
   } else {
     guideState = GU_GUIDE;
-    axis1.setFrequencySlew(degToRad(rate/240.0));
+    axis1.setFrequencySlew(degToRadF(rate/240.0F));
     guideAxis1AutoSlew(guideAction);
   }
 
@@ -141,7 +141,7 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
   CommandError e = guideValidate(2, guideAction); if (e != CE_NONE) return e;
 
   guideActionAxis2 = guideAction;
-  double rate = guideRateSelectToRate(guideRateSelect);
+  float rate = guideRateSelectToRate(guideRateSelect);
 
   VF("MSG: guideStartAxis2(); guide ");
   if (guideAction == GA_REVERSE) { VF("reverse"); } else { VF("forward"); }
@@ -157,7 +157,7 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
     updateTrackingRates();
   } else {
     guideState = GU_GUIDE;
-    axis2.setFrequencySlew(degToRad(rate/240.0F));
+    axis2.setFrequencySlew(degToRadF(rate/240.0F));
     updatePosition(CR_MOUNT);
     guideAxis2AutoSlew(guideAction);
   }

@@ -30,6 +30,8 @@ typedef struct Settings {
 
 class Focuser {
   public:
+    Focuser();
+
     // initialize all focusers
     void init(bool validKey);
 
@@ -89,7 +91,7 @@ class Focuser {
       Axis axis9;
     #endif
 
-    Axis *focuserAxis[6] = { NULL, NULL, NULL, NULL, NULL, NULL };
+    Axis *focuserAxis[6];
 
   private:
     void readSettings(int index);
@@ -98,18 +100,12 @@ class Focuser {
     int slewRateDesired[6]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
     int accelerationRate[6] = { AXIS4_ACCELERATION_RATE, AXIS5_ACCELERATION_RATE, AXIS6_ACCELERATION_RATE, AXIS7_ACCELERATION_RATE, AXIS8_ACCELERATION_RATE, AXIS9_ACCELERATION_RATE };
     int rapidStopRate[6]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
-    int moveRate[6] = { 100, 100, 100, 100, 100, 100 };
+    int moveRate[6];
     bool dcMode[6] = { AXIS4_DRIVER_DC_MODE == ON, AXIS5_DRIVER_DC_MODE == ON, AXIS6_DRIVER_DC_MODE == ON, AXIS7_DRIVER_DC_MODE == ON, AXIS8_DRIVER_DC_MODE == ON, AXIS9_DRIVER_DC_MODE == ON };
-    int tcfSteps[6] = { 0, 0, 0, 0, 0, 0 };
 
-    Settings settings[6] = {
-      { {false, 0.0, 1, 10.0}, 50, 0.0 },
-      { {false, 0.0, 1, 10.0}, 50, 0.0 },
-      { {false, 0.0, 1, 10.0}, 50, 0.0 },
-      { {false, 0.0, 1, 10.0}, 50, 0.0 },
-      { {false, 0.0, 1, 10.0}, 50, 0.0 },
-      { {false, 0.0, 1, 10.0}, 50, 0.0 }
-    };
+    float tcfSteps[6];
+
+    Settings settings[6];
 };
 
 #endif

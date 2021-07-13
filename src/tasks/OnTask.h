@@ -100,7 +100,7 @@ class Task {
     void setPeriod(unsigned long period);
     void setPeriodMicros(unsigned long period);
     void setPeriodSubMicros(unsigned long period);
-    void setFrequency(double freq);
+    void setFrequency(float freq);
 
     void setDuration(unsigned long duration);
     bool isDurationComplete();
@@ -115,11 +115,11 @@ class Task {
     char *getNameStr();
 
     #ifdef TASKS_PROFILER_ENABLE
-      double getArrivalAvg();
-      double getArrivalMax();
-      double getRuntimeTotal();
+      float getArrivalAvg();
+      float getArrivalMax();
+      float getRuntimeTotal();
       long getRuntimeTotalCount();
-      double getRuntimeMax();
+      float getRuntimeMax();
     #endif
 
   private:

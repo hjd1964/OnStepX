@@ -58,7 +58,7 @@ void Sense::poll() {
 }
 
 void Sense::reset() {
-  if (isAnalog) { if (analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalReadEx(pin);
+  if (isAnalog) { if ((int)analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalReadEx(pin);
   stableSample = lastValue;
 }
 

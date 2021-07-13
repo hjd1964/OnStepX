@@ -10,6 +10,7 @@
 bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   static int active = 0;
   static int index = 0;
+  *supressFrame = false;
 
   // :FA#    Focuser Active?
   //            Return: 0 on failure (no focusers)

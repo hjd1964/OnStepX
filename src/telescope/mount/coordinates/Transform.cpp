@@ -9,11 +9,13 @@
 
 extern volatile unsigned long centisecondLAST;
 
-void Transform::print(Coordinate *coord) {
-  VF("(a="); V(radToDeg(coord->a)); VF(", z="); V(radToDeg(coord->z));
-  VF("), (r="); V(radToDeg(coord->r)); VF(", h="); V(radToDeg(coord->h)); VF(", d="); V(radToDeg(coord->d));
-  VF("), pierSide="); VL(coord->pierSide);
-}
+#if DEBUG != OFF
+  void Transform::print(Coordinate *coord) {
+    VF("(a="); V(radToDeg(coord->a)); VF(", z="); V(radToDeg(coord->z));
+    VF("), (r="); V(radToDeg(coord->r)); VF(", h="); V(radToDeg(coord->h)); VF(", d="); V(radToDeg(coord->d));
+    VF("), pierSide="); VL(coord->pierSide);
+  }
+#endif
 
 void Transform::init(bool validKey) {
   if (!validKey) {

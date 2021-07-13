@@ -173,7 +173,9 @@
 
 // conversion math
 #define degToRad(x)                 ((x)/RAD_DEG_RATIO)
+#define degToRadF(x)                ((x)/RAD_DEG_RATIO_F)
 #define radToDeg(x)                 ((x)*RAD_DEG_RATIO)
+#define radToDegF(x)                ((x)*RAD_DEG_RATIO_F)
 #define hrsToRad(x)                 ((x)/RAD_HOUR_RATIO)
 #define radToHrs(x)                 ((x)*RAD_HOUR_RATIO)
 #define csToRad(x)                  ((x)/1375098.708313976)

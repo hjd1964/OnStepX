@@ -13,6 +13,21 @@ extern Tasks tasks;
 
 void tcfWrapper() { telescope.focuser.tcfPoll(); }
 
+// initialize variables
+Focuser::Focuser() {
+  for (int i = 0; i < 6; i++) {
+    focuserAxis[i] = NULL;
+    moveRate[i] = 100;
+    tcfSteps[i] = 0;
+    settings[i].tcf.enabled = false;
+    settings[i].tcf.coef = 0.0F;
+    settings[i].tcf.deadband = 0;
+    settings[i].tcf.t0 = 0.0F;
+    settings[i].dcPower = 50;
+    settings[i].backlash = 0.0F;
+  }
+}
+
 // initialize all focusers
 void Focuser::init(bool validKey) {
   #if AXIS4_DRIVER_MODEL != OFF
@@ -168,7 +183,7 @@ void Focuser::tcfPoll() {
         // convert to steps
         offset *= focuserAxis[index]->getStepsPerMeasure();
         // apply deadband
-        long steps = lround(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
+        long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
         // move focuser if required
         if (tcfSteps[index] != steps) {
           tcfSteps[index] = steps;

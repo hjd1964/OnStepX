@@ -42,8 +42,8 @@ class Intervalometer {
     Pressed pressed = P_STANDBY;
     bool enabled = false;
 
-    float expTime = 0;
-    float expDelay = 0;
+    float expTime = 0.0F;
+    float expDelay = 0.0F;
     int expCount = 0;
     int thisCount = 0;
 

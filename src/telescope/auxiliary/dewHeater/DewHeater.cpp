@@ -36,10 +36,10 @@ void DewHeater::poll(float deltaAboveDewPointC) {
   if (!enabled) return;
 
   int switchTimeMs = 0;
-  switchTimeMs = map(lround(deltaAboveDewPointC*10.0), lround(zero*10.0), lround(span*10.0), DEW_HEATER_PULSE_WIDTH_MS, 0);
+  switchTimeMs = map(lroundf(deltaAboveDewPointC*10.0F), lroundf(zero*10.0F), lroundf(span*10.0F), DEW_HEATER_PULSE_WIDTH_MS, 0);
   switchTimeMs = constrain(switchTimeMs, 0, DEW_HEATER_PULSE_WIDTH_MS);
   #ifdef DEW_HEATER_MAX_POWER
-    switchTimeMs = lround(switchTimeMs*(DEW_HEATER_MAX_POWER/100.0))
+    switchTimeMs = lroundf(switchTimeMs*(DEW_HEATER_MAX_POWER/100.0))
   #endif
 
   currentTime = millis();

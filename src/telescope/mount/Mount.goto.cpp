@@ -153,8 +153,8 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
     axis2.setFrequencySlew(radsPerSecondCurrent);
     VLF("MSG: Mount::gotoEqu(); slew rate set");
 
-    axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-    axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
+    axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+    axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
 
     sound.alert();
 
@@ -198,8 +198,8 @@ void Mount::gotoPoll() {
       axis2.setTargetCoordinate(a2);
       VLF("MSG: Mount::gotoPoll(); target coordinates set");
 
-      axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-      axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
+      axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     }
   } else
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {

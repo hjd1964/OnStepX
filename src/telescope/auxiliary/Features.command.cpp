@@ -10,6 +10,7 @@
 
 // process auxiliary feature commands
 bool Features::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  *supressFrame = false;
 
   // get auXiliary feature
   if (cmdP("GX")) {
@@ -114,9 +115,9 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == OFF) { *commandError = CE_CMD_UNKNOWN; return true; }
 
       char* conv_end;
-      double f = strtod(&parameter[4], &conv_end);
+      float f = strtof(&parameter[4], &conv_end);
       if (&parameter[4] == conv_end) { *commandError = CE_PARAM_FORM; return true; }
-      long v = lround(f);
+      long v = lroundf(f);
 
       if (parameter[3] == 'V' && v >= 0 && v <= 255) device[i].value = v;
 
@@ -142,11 +143,11 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
         } else
 
         if (parameter[3] == 'Z') { // zero
-          if (f >= -5.0 && f <= 20.0) device[i].dewHeater->setZero(f); else *commandError = CE_PARAM_RANGE;
+          if (f >= -5.0F && f <= 20.0F) device[i].dewHeater->setZero(f); else *commandError = CE_PARAM_RANGE;
         } else
 
         if (parameter[3] == 'S') { // span
-          if (f >= -5.0 && f <= 20.0) device[i].dewHeater->setSpan(f); else *commandError = CE_PARAM_RANGE;
+          if (f >= -5.0F && f <= 20.0F) device[i].dewHeater->setSpan(f); else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       } else
 
@@ -156,15 +157,15 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
         } else
 
         if (parameter[3] == 'E') { // exposure length
-          if (f >= 0.0 && f <= 3600.0) device[i].intervalometer->setExposure(f); else *commandError = CE_PARAM_RANGE;
+          if (f >= 0.0F && f <= 3600.0F) device[i].intervalometer->setExposure(f); else *commandError = CE_PARAM_RANGE;
         } else
 
         if (parameter[3] == 'D') { // delay
-          if (f >= 1.0 && f <= 3600.0) device[i].intervalometer->setDelay(f); else *commandError = CE_PARAM_RANGE;
+          if (f >= 1.0F && f <= 3600.0F) device[i].intervalometer->setDelay(f); else *commandError = CE_PARAM_RANGE;
         } else
 
         if (parameter[3] == 'C') { // count
-          if (f >= 0 && f <= 255.0) device[i].intervalometer->setCount(f); else *commandError = CE_PARAM_RANGE;
+          if (f >= 0.0F && f <= 255.0F) device[i].intervalometer->setCount(f); else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       }
     } else return false;

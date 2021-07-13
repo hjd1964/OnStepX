@@ -32,8 +32,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
         if (axisNumber <= 2) {
           // convert axis1, 2, and 3 into degrees
           thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
-          thisAxis.limits.min = radToDeg(thisAxis.limits.min);
-          thisAxis.limits.max = radToDeg(thisAxis.limits.max);
+          thisAxis.limits.min = radToDegF(thisAxis.limits.min);
+          thisAxis.limits.max = radToDegF(thisAxis.limits.max);
         } else
         if (axisNumber > 3) {
           // convert axis > 3 min/max into mm
@@ -94,8 +94,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             if (axisNumber <= 2) {
               // convert axis1, 2 into radians
               thisAxis.stepsPerMeasure *= RAD_DEG_RATIO;
-              thisAxis.limits.min = degToRad(thisAxis.limits.min);
-              thisAxis.limits.max = degToRad(thisAxis.limits.max);
+              thisAxis.limits.min = degToRadF(thisAxis.limits.min);
+              thisAxis.limits.max = degToRadF(thisAxis.limits.max);
             } else
             if (axisNumber > 3) {
               // convert axis > 3 min/max into um
@@ -162,8 +162,8 @@ bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
   if (axisNum <= 2) {
     // convert axis1, 2 into degrees
     a.stepsPerMeasure /= RAD_DEG_RATIO;
-    a.limits.min = radToDeg(a.limits.min);
-    a.limits.max = radToDeg(a.limits.max);
+    a.limits.min = radToDegF(a.limits.min);
+    a.limits.max = radToDegF(a.limits.max);
   } else
   if (axisNum > 3) {
     // convert axis > 3 min/max into mm

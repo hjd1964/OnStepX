@@ -25,7 +25,7 @@ bool Ds1820::init() {
   deviceCount = 0;
   for (int i = 0; i < 9; i++) {
     // check that it's not OFF and also not an (auto assigned) DS1820, so must be an DS1820 address
-    if (device[i] != OFF && device[i] != DS1820) {
+    if (device[i] != (uint64_t)OFF && device[i] != DS1820) {
       for (int j = 0; j < 8; j++) address[i][j] = (device[i] >> (7 - j)*8) & 0xff;
       deviceCount++;
     } else for (int j = 0; j < 8; j++) address[i][j] = 0;
@@ -123,7 +123,7 @@ void Ds1820::poll() {
 // results in no valid readings for > 30 seconds
 float Ds1820::getChannel(int index) {
   if (found && index >= 0 && index <= 7) {
-    if (device[index] == OFF) averageTemperature[index] = weather.getTemperature();
+    if (device[index] == (uint64_t)OFF) averageTemperature[index] = weather.getTemperature();
     return averageTemperature[index];
   } else return NAN;
 }

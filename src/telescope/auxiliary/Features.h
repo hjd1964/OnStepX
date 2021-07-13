@@ -19,11 +19,11 @@
 
 typedef struct Device {
    const char* name;
-   const int purpose;
+   const int16_t purpose;
    const int64_t temp;
-   const int64_t pin;
-   int value;
-   int active;
+   const int16_t pin;
+   int16_t value;
+   int16_t active;
    DewHeater *dewHeater;
    Intervalometer *intervalometer;
 } Device;

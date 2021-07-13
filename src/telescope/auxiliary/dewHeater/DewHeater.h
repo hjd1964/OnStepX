@@ -40,8 +40,8 @@ class DewHeater {
     bool heaterOn = false;
     bool enabled = false;
 
-    float zero = -5;
-    float span = 15;
+    float zero = -5.0F;
+    float span = 15.0F;
 
     int index = 0;
 };

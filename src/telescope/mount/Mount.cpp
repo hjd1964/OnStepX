@@ -281,10 +281,10 @@ void Mount::trackPoll() {
 }
 
 float Mount::ztr(float a) {
-  if (a > degToRad(89.8F)) return 0.99998667F; else if (a > degToRad(89.5F)) return 0.99996667F;
+  if (a > degToRadF(89.8F)) return 0.99998667F; else if (a > degToRadF(89.5F)) return 0.99996667F;
 
-  float altH = a + degToRad(0.25F); if (altH < 0.0F) altH = 0.0F;
-  float altL = a - degToRad(0.25F); if (altL < 0.0F) altL = 0.0F;
+  float altH = a + degToRadF(0.25F); if (altH < 0.0F) altH = 0.0F;
+  float altL = a - degToRadF(0.25F); if (altL < 0.0F) altL = 0.0F;
 
   float altHr = altH - transform.trueRefrac(altH);
   float altLr = altL - transform.trueRefrac(altL);
@@ -294,8 +294,8 @@ float Mount::ztr(float a) {
 }
 
 void Mount::updateAccelerationRates() {
-  radsPerSecondCurrent = (1000000.0/misc.usPerStepCurrent)/axis1.getStepsPerMeasure();
-  float secondsToAccelerate = (degToRad(SLEW_ACCELERATION_DIST)/radsPerSecondCurrent)*2.0;
+  radsPerSecondCurrent = (1000000.0F/misc.usPerStepCurrent)/(float)axis1.getStepsPerMeasure();
+  float secondsToAccelerate = (degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent)*2.0F;
   float radsPerSecondPerSecond = radsPerSecondCurrent/secondsToAccelerate;
   axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
   axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);

@@ -20,8 +20,10 @@ class Transform {
     // setup for coordinate transformation
     void init(bool validKey);
 
-    // prints a coordinate to the debug serial port, if active
-    void print(Coordinate *coord);
+    #if DEBUG != OFF
+      // prints a coordinate to the debug serial port
+      void print(Coordinate *coord);
+    #endif
 
     // converts from Mount (equatorial or horizon) to Native (equatorial and optionally horizon also) coordinates
     // returns equatorial RA

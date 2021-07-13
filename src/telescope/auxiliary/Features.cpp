@@ -24,10 +24,8 @@ void Features::init(bool validKey) {
     } else
 
     if (device[i].purpose == ANALOG_OUTPUT) {
-      if (device[i].pin >= 0 && device[i].pin <= 255) {
-        pinModeEx(device[i].pin, OUTPUT);
-        analogWrite(device[i].pin, device[i].value);
-      }
+      pinModeEx(device[i].pin, OUTPUT);
+      analogWrite(device[i].pin, device[i].value);
     } else
 
     if (device[i].purpose == DEW_HEATER) {

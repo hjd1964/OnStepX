@@ -99,35 +99,35 @@ bool Intervalometer::isOn() {
 }
 
 uint8_t Intervalometer::timeToByte(float t) {
-  float v = 10;                             // default is 1 second
-  if (t <= 0.0162) v = 0; else              // 0.0156 (1/64 second)        (0)
-  if (t <= 0.0313) v = 1; else              // 0.0313 (1/32 second)        (1)
-  if (t <= 0.0625) v = 2; else              // 0.0625 (1/16 second)        (2)
-  if (t <= 1.0) v = 2.0 + t*8.0; else       // 0.125 seconds to 1 seconds  (2 to 10)
-  if (t <= 10.0) v = 6.0 + t*4.0; else      // 0.25 seconds to 10 seconds  (10 to 46)
-  if (t <= 30.0) v = 26.0 + t*2.0; else     // 0.5 seconds to 30 seconds   (46 to 86)
-  if (t <= 120.0) v = 56.0 + t; else        // 1 second to 120 seconds     (86 to 176)
-  if (t <= 600.0) v = 168.0 + t/15.0; else  // 15 seconds to 300 seconds   (176 to 208)
-  if (t <= 3360.0) v = 198.0 + t/60.0; else // 1 minute to 56 minutes      (208 to 254)
-  if (t <= 3600.0) v = 255;                 // 1 hour                      (255)
-  if (v < 0) v = 0;
-  if (v > 255) v = 255;
-  return lround(v);
+  float f = 10.0F;                             // default is 1 second
+  if (t <= 0.0162F) f = 0.0F; else             // 0.0156 (1/64 second)        (0)
+  if (t <= 0.0313F) f = 1.0F; else             // 0.0313 (1/32 second)        (1)
+  if (t <= 0.0625F) f = 2.0F; else             // 0.0625 (1/16 second)        (2)
+  if (t <= 1.0F) f = 2.0F + t*8.0F; else       // 0.125 seconds to 1 seconds  (2 to 10)
+  if (t <= 10.0F) f = 6.0F + t*4.0F; else      // 0.25 seconds to 10 seconds  (10 to 46)
+  if (t <= 30.0F) f = 26.0F + t*2.0F; else     // 0.5 seconds to 30 seconds   (46 to 86)
+  if (t <= 120.0F) f = 56.0F + t; else         // 1 second to 120 seconds     (86 to 176)
+  if (t <= 600.0F) f = 168.0F + t/15.0F; else  // 15 seconds to 300 seconds   (176 to 208)
+  if (t <= 3360.0F) f = 198.0F + t/60.0F; else // 1 minute to 56 minutes      (208 to 254)
+  if (t <= 3600.0F) f = 255.0F;                // 1 hour                      (255)
+  if (f < 0.0F) f = 0.0F;
+  if (f > 255.0F) f = 255.0F;
+  return lroundf(f);
 }
 
 float Intervalometer::byteToTime(uint8_t b) {
-  float v = 1.0;                            // default is 1 second
-  if (b == 0) v = 0.016125; else            // 0.0156 (1/64 second)        (0)
-  if (b == 1) v = 0.03125; else             // 0.0313 (1/32 second)        (1)
-  if (b == 2) v = 0.0625; else              // 0.0625 (1/16 second)        (2)
-  if (b <= 10) v = (b - 2.0)/8.0; else      // 0.125 seconds to 1 seconds  (2 to 10)
-  if (b <= 46) v = (b - 6.0)/4.0; else      // 0.25 seconds to 10 seconds  (10 to 46)
-  if (b <= 86) v = (b - 26.0)/2.0; else     // 0.5 seconds to 30 seconds   (46 to 86)
-  if (b <= 176) v = (b - 56.0); else        // 1 second to 120 seconds     (86 to 176)
-  if (b <= 208) v = (b - 168.0)*15.0; else  // 15 seconds to 300 seconds   (176 to 208)
-  if (b <= 254) v = (b - 198.0)*60.0; else  // 1 minute to 56 minutes      (208 to 254)
-  if (b == 255) v = 3600.0;                 // 1 hour                      (255)
-  return v;
+  float f = 1.0;                               // default is 1 second
+  if (b == 0) f = 0.016125F; else              // 0.0156 (1/64 second)        (0)
+  if (b == 1) f = 0.03125F; else               // 0.0313 (1/32 second)        (1)
+  if (b == 2) f = 0.0625F; else                // 0.0625 (1/16 second)        (2)
+  if (b <= 10) f = (b - 2.0F)/8.0F; else       // 0.125 seconds to 1 seconds  (2 to 10)
+  if (b <= 46) f = (b - 6.0F)/4.0F; else       // 0.25 seconds to 10 seconds  (10 to 46)
+  if (b <= 86) f = (b - 26.0F)/2.0F; else      // 0.5 seconds to 30 seconds   (46 to 86)
+  if (b <= 176) f = (b - 56.0F); else          // 1 second to 120 seconds     (86 to 176)
+  if (b <= 208) f = (b - 168.0F)*15.0F; else   // 15 seconds to 300 seconds   (176 to 208)
+  if (b <= 254) f = (b - 198.0F)*60.0F; else   // 1 minute to 56 minutes      (208 to 254)
+  if (b == 255) f = 3600.0F;                   // 1 hour                      (255)
+  return f;
 }
 
 #endif

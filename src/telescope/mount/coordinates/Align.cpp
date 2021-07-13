@@ -380,7 +380,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   float a2 = ax2;
 
   // breaks-down near the poles (limited to > 1' from pole)
-  if (fabs(ax2) < degToRad(89.98333333)) {
+  if (fabs(ax2) < degToRadF(89.98333333F)) {
     for (int pass=0; pass < 3; pass++) {
       float sinAx2 = sinf(a2);
       float cosAx2 = cosf(a2);
@@ -451,7 +451,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
   if (ax2 < -Deg90) ax2 = -Deg90;
 
   // breaks-down near the Zenith (limited to > 1' from Zenith)
-  if (fabs(ax2) < degToRad(89.98333333)) {
+  if (fabs(ax2) < degToRadF(89.98333333F)) {
     float sinAx2 = sinf(ax2);
     float cosAx2 = cosf(ax2);
     float sinAx1 = sinf(ax1);

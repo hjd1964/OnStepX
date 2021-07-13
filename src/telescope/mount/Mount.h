@@ -329,7 +329,7 @@ class Mount {
 
     // limits
     bool       limitsEnabled            = false;
-    Limits limits = { { degToRad(-10), degToRad(85) }, degToRad(15), degToRad(15) };
+    Limits limits = { { degToRadF(-10.0F), degToRadF(85.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
 
     // homing
     Coordinate home;

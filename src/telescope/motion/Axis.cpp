@@ -1,18 +1,18 @@
 // -----------------------------------------------------------------------------------
 // Axis motion control
 
-#include "../../Common.h"
+#include "Axis.h"
+
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../Telescope.h"
-#include "Axis.h"
 #include "../../lib/sense/Sense.h"
 
 extern unsigned long periodSubMicros;
 
 void Axis::enable(bool value) {
   if (pins.enable != OFF) {
-    if (value) { digitalWriteEx(pins.enable, invertEnable?HIGH:LOW); } else { digitalWriteEx(pins.enable, invertEnable?LOW:HIGH); }
+    if (value) { digitalWriteEx(pins.enable, pins.enabledState); } else { digitalWriteEx(pins.enable, !pins.enabledState); }
   }
   enabled = value;
 }
@@ -370,7 +370,7 @@ void Axis::poll() {
         if (enableMoveFast(false)) {
           #if DEBUG_MODE == VERBOSE
             V(axisPrefix); VF("poll(); high speed ISR swapped out at ");
-            if (axisNumber <= 3) { V(radToDeg(freq)); VL(" deg/sec."); } else { V(freq); VL(" microns/sec."); }
+            if (axisNumber <= 3) { V(radToDegF(freq)); VL(" deg/sec."); } else { V(freq); VL(" microns/sec."); }
           #endif
         }
       }
@@ -390,7 +390,7 @@ void Axis::poll() {
         if (enableMoveFast(true)) {
           #if DEBUG_MODE == VERBOSE
             V(axisPrefix); VF("poll(); high speed ISR swapped in at ");
-            if (axisNumber <= 3) { V(radToDeg(freq)); VL(" deg/sec."); } else { V(freq); VL(" microns/sec."); }
+            if (axisNumber <= 3) { V(radToDegF(freq)); VL(" deg/sec."); } else { V(freq); VL(" microns/sec."); }
           #endif
         }
       }
@@ -428,14 +428,21 @@ void Axis::setFrequency(float frequency) {
   if (!isnan(period) && fabs(period) <= 134000000.0F) {
     // convert microsecond counts to sub-microsecond counts
     period *= 16.0F;
-    lastPeriodSet = (unsigned long)lround(period);
+    lastPeriodSet = (unsigned long)lroundf(period);
 
     // adjust period for MCU clock inaccuracy
     period *= (SIDEREAL_PERIOD/periodSubMicros);
     // if this is the active period, just return
-    if (lastPeriod == (unsigned long)lround(period)) return;
-    lastPeriod = (unsigned long)lround(period);
-  } else { period = 0.0; lastPeriodSet = 0; lastPeriod = 0; noInterrupts(); trackingStep = 0; interrupts(); }
+    if (lastPeriod == (unsigned long)lroundf(period)) return;
+    lastPeriod = (unsigned long)lroundf(period);
+  } else {
+    period = 0.0;
+    lastPeriodSet = 0;
+    lastPeriod = 0;
+    noInterrupts();
+    trackingStep = 0;
+    interrupts();
+  }
   tasks.setPeriodSubMicros(taskHandle, lastPeriod);
 }
 

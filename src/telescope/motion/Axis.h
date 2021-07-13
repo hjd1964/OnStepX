@@ -3,7 +3,13 @@
 #pragma once
 
 #include <Arduino.h>
+#include "../../Common.h"
+#include "../../commands/ProcessCmds.h"
 #include "StepDrivers.h"
+
+#if AXIS1_DRIVER_STEP == AXIS2_DRIVER_STEP == AXIS3_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == HIGH
+  #define DRIVER_STEP_DEFAULTS
+#endif
 
 #pragma pack(1)
 typedef struct AxisLimits {
@@ -31,11 +37,10 @@ typedef struct AxisSense {
 
 typedef struct AxisPins {
   int16_t   step;
+  uint8_t   stepState;
   int16_t   dir;
   int16_t   enable;
-  bool      invertStep;
-  bool      invertDir;
-  bool      invertEnable;
+  uint8_t   enabledState;
   int16_t   min;
   int16_t   home;
   int16_t   max;
@@ -216,7 +221,6 @@ class Axis {
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
 
-    bool invertEnable = false;
     bool enabled = false;
     bool tracking = true;
     bool limitsCheck = true;
@@ -232,8 +236,16 @@ class Axis {
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
 
-    volatile bool invertStep = false;
-    volatile bool invertDir = false;
+    #ifdef DRIVER_STEP_DEFAULTS
+      #define stepClr LOW
+      #define stepSet HIGH
+    #else
+      volatile uint8_t stepClr = LOW;
+      volatile uint8_t stepSet = HIGH;
+    #endif
+    volatile uint8_t dirFwd = LOW;
+    volatile uint8_t dirRev = HIGH;
+
     double target = 0.0;
     volatile long targetSteps = 0;
     volatile long motorSteps = 0;

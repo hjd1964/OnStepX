@@ -210,22 +210,22 @@ void Task::setPeriodSubMicros(unsigned long period) {
   }
 }
 
-void Task::setFrequency(double freq) {
-  if (freq > 0.0) {
-    freq = 1.0 / freq;            // seconds per call
-    double x = freq * 16000000.0; // sub-micros per call
-    if (x <= 4294967295.0) {
-      setPeriodSubMicros(lround(x));
+void Task::setFrequency(float freq) {
+  if (freq > 0.0F) {
+    freq = 1.0F / freq;            // seconds per call
+    float f = freq * 16000000.0F;  // sub-micros per call
+    if (f <= 4294967295.0F) {
+      setPeriodSubMicros(lroundf(f));
       return;
     }
-    x = freq * 1000000.0;         // micros per call
-    if (x <= 4294967295.0) {
-      setPeriodMicros(lround(x));
+    f = freq * 1000000.0F;         // micros per call
+    if (f <= 4294967295.0F) {
+      setPeriodMicros(lroundf(f));
       return;
     }
-    x = freq * 1000.0;            // millis per call
-    if (x <= 4294967295.0) {
-      setPeriod(lround(x));
+    f = freq * 1000.0F;            // millis per call
+    if (f <= 4294967295.0F) {
+      setPeriod(lroundf(f));
       return;
     }
   }

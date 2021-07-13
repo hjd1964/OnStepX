@@ -195,7 +195,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       case '4': sprintf(reply, "%d%s", (int)current.pierSide, (meridianFlip == MF_NEVER)?" N":""); break;
       case '5': sprintf(reply, "%d", (int)misc.meridianFlipAuto); break;       // autoMeridianFlip
       case '6': reply[0] = "EWB"[preferredPierSide - 10]; reply[1] = 0; break; // preferred pier side
-      case '7': sprintF(reply, "%0.1f", (1000000.0/misc.usPerStepCurrent)/degToRad(axis1.getStepsPerMeasure())); break; // slew speed
+      case '7': sprintF(reply, "%0.1f", (1000000.0F/misc.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break; // slew speed
       // rotator availablity 2=rotate/derotate, 1=rotate, 0=off
       case '8':                                                                 
         if (AXIS3_DRIVER_MODEL != OFF) {
