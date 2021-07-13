@@ -246,10 +246,10 @@
     for (int scc = 3; scc < wormRotationSeconds + 3; scc++) {
       i = pecBuffer[scc % wormRotationSeconds];
 
-      J1 = lround(i*0.01F);
-      J4 = lround(i*0.04F);
-      J9 = lround(i*0.09F);
-      J17 = lround(i*0.17F);
+      J1 = lroundf(i*0.01F);
+      J4 = lroundf(i*0.04F);
+      J9 = lroundf(i*0.09F);
+      J17 = lroundf(i*0.17F);
       pecBuffer[(scc - 4) % wormRotationSeconds] = (pecBuffer[(scc - 4) % wormRotationSeconds]) + J1;
       pecBuffer[(scc - 3) % wormRotationSeconds] = (pecBuffer[(scc - 3) % wormRotationSeconds]) + J4;
       pecBuffer[(scc - 2) % wormRotationSeconds] = (pecBuffer[(scc - 2) % wormRotationSeconds]) + J9;
@@ -275,7 +275,7 @@
     long lp2 = 0; stepsSum = 0; 
     for (int scc = 0; scc < wormRotationSeconds; scc++) {
       // the correction, "now"
-      long lp1 = lround(-scc*Ccf);
+      long lp1 = lroundf(-scc*Ccf);
       
       // if the correction increases or decreases then add or subtract that many steps
       pecBuffer[scc] = pecBuffer[scc] + (lp1 - lp2);

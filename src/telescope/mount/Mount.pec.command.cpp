@@ -59,7 +59,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       break;
       // :GXE8#     Get pec buffer size in seconds
       //            Returns: n#
-      case '8': sprintf(reply,"%ld",lround(pecBufferSize)); *numericReply = false; break;
+      case '8': sprintf(reply,"%ld",pecBufferSize); *numericReply = false; break;
       default: return false;
     }
   } else
@@ -134,7 +134,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     //  :VH#      PEC index sense position in sidereal seconds
     //            Returns: n#
     if (command[0] == 'V' && command[1] == 'H' && parameter[0] == 0) {
-      long s = lround(wormSenseSteps/stepsPerSiderealSecondAxis1);
+      long s = lroundf(wormSenseSteps/stepsPerSiderealSecondAxis1);
       while (s > wormRotationSeconds) s -= wormRotationSeconds;
       while (s < 0) s += wormRotationSeconds;
       sprintf(reply,"%05ld",s);

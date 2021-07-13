@@ -16,25 +16,25 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   
   // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon
   //            Returns: sDD*#
-  if (cmd("Gh"))  { sprintf(reply,"%+02ld*", lround(radToDeg(limits.altitude.min))); *numericReply = false; } else
+  if (cmd("Gh"))  { sprintf(reply,"%+02ld*", lroundf(radToDegF(limits.altitude.min))); *numericReply = false; } else
 
   // :Go#       Get Overhead Limit
   //            Returns: DD*#
   //            The highest elevation above the horizon that the telescope will goto
-  if (cmd("Go"))  { sprintf(reply,"%02ld*", lround(radToDeg(limits.altitude.max))); *numericReply=false; } else
+  if (cmd("Go"))  { sprintf(reply,"%02ld*", lroundf(radToDegF(limits.altitude.max))); *numericReply=false; } else
 
   // :GXE[L]#   Get Other Limit [L]
   //            Returns: n#
   if (cmdGX("GXE")) {
     *numericReply = false;
     switch (parameter[1]) {
-      case '9': sprintf(reply,"%ld",lround(radToDeg(limits.pastMeridianE)*4)); break;         // minutes past meridianE
-      case 'A': sprintf(reply,"%ld",lround(radToDeg(limits.pastMeridianW)*4)); break;         // minutes past meridianW
-      case 'e': sprintf(reply,"%ld",lround(radToDeg(axis1.settings.limits.min))); break;      // RA east or -Az limit, in degrees
-      case 'w': sprintf(reply,"%ld",lround(radToDeg(axis1.settings.limits.max))); break;      // RA west or +Az limit, in degrees
-      case 'B': sprintf(reply,"%ld",lround(radToDeg(axis1.settings.limits.max)/15.0)); break; // RA west or +Az limit, in hours
-      case 'C': sprintf(reply,"%ld",lround(radToDeg(axis2.settings.limits.min))); break;      // Dec south or -Alt limit, in degrees
-      case 'D': sprintf(reply,"%ld",lround(radToDeg(axis2.settings.limits.max))); break;      // Dec north or +Alt limit, in degrees
+      case '9': sprintf(reply,"%ld",lroundf(radToDegF(limits.pastMeridianE)*4.0F)); break;       // minutes past meridianE
+      case 'A': sprintf(reply,"%ld",lroundf(radToDegF(limits.pastMeridianW)*4.0F)); break;       // minutes past meridianW
+      case 'e': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.min))); break;       // RA east or -Az limit, in degrees
+      case 'w': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max))); break;       // RA west or +Az limit, in degrees
+      case 'B': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max)/15.0F)); break; // RA west or +Az limit, in hours
+      case 'C': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.min))); break;       // Dec south or -Alt limit, in degrees
+      case 'D': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.max))); break;       // Dec north or +Alt limit, in degrees
       default: return false;
     }
   } else
@@ -46,8 +46,8 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   if (cmdP("Sh")) {
     int16_t deg;
     if (convert.atoi2(parameter, &deg)) {
-      if (deg >= -30 && deg <= 30) {
-        limits.altitude.min = degToRad(deg);
+      if (deg >= -30.0F && deg <= 30.0F) {
+        limits.altitude.min = degToRadF(deg);
         nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
@@ -60,8 +60,8 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
   if (cmdP("So"))  {
     int16_t deg;
     if (convert.atoi2(parameter, &deg)) {
-      if (deg >= 60 && deg <= 90) {
-        limits.altitude.max = degToRad(deg);
+      if (deg >= 60.0F && deg <= 90.0F) {
+        limits.altitude.max = degToRadF(deg);
         if (transform.mountType == ALTAZM && limits.altitude.max > 87) limits.altitude.max = 87;
         nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
       } else *commandError = CE_PARAM_RANGE;
@@ -76,16 +76,16 @@ bool Mount::commandLimit(char *reply, char *command, char *parameter, bool *supr
     long l = atol(&parameter[3]); float degs = l/4.0;
     switch (parameter[1]) {
       case '9':
-        if (degs >= -270 && degs <= 270) {
-          limits.pastMeridianE = degToRad(degs);
+        if (degs >= -270.0F && degs <= 270.0F) {
+          limits.pastMeridianE = degToRadF(degs);
           if (limits.pastMeridianE < -axis1.settings.limits.max) limits.pastMeridianE = -axis1.settings.limits.max;
           if (limits.pastMeridianE > -axis1.settings.limits.min) limits.pastMeridianE = -axis1.settings.limits.min;
           nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);
         } else *commandError = CE_PARAM_RANGE;
       break;
       case 'A':
-        if (degs >= -270 && degs <= 270) {
-          limits.pastMeridianW = degToRad(degs);
+        if (degs >= -270.0F && degs <= 270.0F) {
+          limits.pastMeridianW = degToRadF(degs);
           if (limits.pastMeridianW < axis1.settings.limits.min) limits.pastMeridianW = axis1.settings.limits.min;
           if (limits.pastMeridianW > axis1.settings.limits.max) limits.pastMeridianW = axis1.settings.limits.max;
           nv.updateBytes(NV_MOUNT_LIMITS_BASE, &limits, LimitsSize);

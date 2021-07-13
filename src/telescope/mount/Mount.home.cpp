@@ -40,8 +40,8 @@ CommandError Mount::returnHome() {
     if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(home.z); else axis1.setTargetCoordinate(home.h);
     if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(home.a); else axis2.setTargetCoordinate(home.d);
     VLF("Mount::returnHome(); target coordinates set");
-    axis1.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
-    axis2.autoSlewRateByDistance(degToRad(SLEW_ACCELERATION_DIST));
+    axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+    axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
   }
 
   return CE_NONE;
@@ -76,8 +76,8 @@ CommandError Mount::resetHome(bool resetPark) {
   if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
-  axis1.setFrequencySlew(degToRad(0.1));
-  axis2.setFrequencySlew(degToRad(0.1));
+  axis1.setFrequencySlew(degToRadF(0.1F));
+  axis2.setFrequencySlew(degToRadF(0.1F));
   atHome = true;
 
   // clear align state

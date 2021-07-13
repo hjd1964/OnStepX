@@ -102,7 +102,7 @@ void Site::update() {
 }
 
 void Site::setPeriodSubMicros(unsigned long period) {
-  tasks.setPeriodSubMicros(handle, lround(period/100.0));
+  tasks.setPeriodSubMicros(handle, lroundf(period/100.0F));
   this->period = period;
   periodSubMicros = period;
   // nv.writeLong(EE_siderealPeriod, period);
