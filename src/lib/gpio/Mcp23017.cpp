@@ -20,7 +20,7 @@ bool Mcp23017::init() {
   if (mcp.begin_I2C(0x20, &HAL_Wire)) {
     found = true;
     for (int i = 0; i < 16; i++) { mcp.pinMode(i, INPUT); }
-  } else { found = false; DLF("WRN: Gpio.init(), Mcp23017 not found at I2C addr 0x20"); }
+  } else { found = false; DLF("WRN: Gpio.init(), Mcp23017 (I2C 0x20) not found"); }
 
   return found;
 }
