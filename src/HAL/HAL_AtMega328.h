@@ -6,6 +6,7 @@
 // __AVR__
 
 // This platform has digitalReadFast, digitalWriteFast, etc.
+#include <digitalWriteFast.h> // https://github.com/watterott/Arduino-Libs/archive/master.zip
 #define HAL_HAS_DIGITAL_FAST
 
 // This platform doesn't support true double precision math
