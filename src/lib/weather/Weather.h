@@ -2,7 +2,7 @@
 // Weather related functions
 #pragma once
 
-#include "..\..\common.h"
+#include "../../Common.h"
 
 enum WeatherSensor: uint8_t {WS_NONE, WS_BMP280, WS_BME280};
 
