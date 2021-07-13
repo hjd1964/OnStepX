@@ -399,7 +399,7 @@
 // -----------------------------------------------------------------------------------
 // common axis settings, RA/AZM
 #ifndef AXIS1_DRIVER_MODEL
-#define AXIS1_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS1_DRIVER_MODEL            OFF // specify drivers for axis 1&2 to enable this feature
 #endif
 #ifndef AXIS1_DRIVER_DECAY
 #define AXIS1_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -461,7 +461,7 @@
 
 // common axis settings, DEC/ALT
 #ifndef AXIS2_DRIVER_MODEL
-#define AXIS2_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS2_DRIVER_MODEL            OFF // specify drivers for axis 1&2 to enable this feature
 #endif
 #ifndef AXIS2_DRIVER_DECAY
 #define AXIS2_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -523,7 +523,7 @@
 
 // common axis settings, ROTATOR
 #ifndef AXIS3_DRIVER_MODEL
-#define AXIS3_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS3_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS3_DRIVER_DECAY
 #define AXIS3_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -585,7 +585,7 @@
 
 // common axis settings, FOCUSER1
 #ifndef AXIS4_DRIVER_MODEL
-#define AXIS4_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS4_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS4_DRIVER_DECAY
 #define AXIS4_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -647,7 +647,7 @@
 
 // common axis settings, FOCUSER2
 #ifndef AXIS5_DRIVER_MODEL
-#define AXIS5_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS5_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS5_DRIVER_DECAY
 #define AXIS5_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -709,7 +709,7 @@
 
 // common axis settings, FOCUSER3
 #ifndef AXIS6_DRIVER_MODEL
-#define AXIS6_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS6_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS6_DRIVER_DECAY
 #define AXIS6_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -771,7 +771,7 @@
 
 // common axis settings, FOCUSER4
 #ifndef AXIS7_DRIVER_MODEL
-#define AXIS7_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS7_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS7_DRIVER_DECAY
 #define AXIS7_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -833,7 +833,7 @@
 
 // common axis settings, FOCUSER5
 #ifndef AXIS8_DRIVER_MODEL
-#define AXIS8_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS8_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS8_DRIVER_DECAY
 #define AXIS8_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
@@ -895,7 +895,7 @@
 
 // common axis settings, FOCUSER6
 #ifndef AXIS9_DRIVER_MODEL
-#define AXIS9_DRIVER_MODEL            OFF // axis 1/2 combination enables this feature
+#define AXIS9_DRIVER_MODEL            OFF // specify a driver to enable this feature
 #endif
 #ifndef AXIS9_DRIVER_DECAY
 #define AXIS9_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
