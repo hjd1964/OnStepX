@@ -428,6 +428,12 @@
 #ifndef AXIS1_DRIVER_REVERSE
 #define AXIS1_DRIVER_REVERSE          OFF
 #endif
+#ifndef AXIS1_DRIVER_ENABLE
+#define AXIS1_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS1_DRIVER_STEP
+#define AXIS1_DRIVER_STEP             HIGH
+#endif
 #ifndef AXIS1_DRIVER_STATUS
 #define AXIS1_DRIVER_STATUS           OFF
 #endif
@@ -483,6 +489,12 @@
 #endif
 #ifndef AXIS2_DRIVER_REVERSE
 #define AXIS2_DRIVER_REVERSE          OFF
+#endif
+#ifndef AXIS2_DRIVER_ENABLE
+#define AXIS2_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS2_DRIVER_STEP
+#define AXIS2_DRIVER_STEP             HIGH
 #endif
 #ifndef AXIS2_DRIVER_STATUS
 #define AXIS2_DRIVER_STATUS           OFF
@@ -540,6 +552,12 @@
 #ifndef AXIS3_DRIVER_REVERSE
 #define AXIS3_DRIVER_REVERSE          OFF
 #endif
+#ifndef AXIS3_DRIVER_ENABLE
+#define AXIS3_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS3_DRIVER_STEP
+#define AXIS3_DRIVER_STEP             HIGH
+#endif
 #ifndef AXIS3_DRIVER_STATUS
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
@@ -595,6 +613,12 @@
 #endif
 #ifndef AXIS4_DRIVER_REVERSE
 #define AXIS4_DRIVER_REVERSE          OFF
+#endif
+#ifndef AXIS4_DRIVER_ENABLE
+#define AXIS4_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS4_DRIVER_STEP
+#define AXIS4_DRIVER_STEP             HIGH
 #endif
 #ifndef AXIS4_DRIVER_STATUS
 #define AXIS4_DRIVER_STATUS           OFF
@@ -652,6 +676,12 @@
 #ifndef AXIS5_DRIVER_REVERSE
 #define AXIS5_DRIVER_REVERSE          OFF
 #endif
+#ifndef AXIS5_DRIVER_ENABLE
+#define AXIS5_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS5_DRIVER_STEP
+#define AXIS5_DRIVER_STEP             HIGH
+#endif
 #ifndef AXIS5_DRIVER_STATUS
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
@@ -707,6 +737,12 @@
 #endif
 #ifndef AXIS6_DRIVER_REVERSE
 #define AXIS6_DRIVER_REVERSE          OFF
+#endif
+#ifndef AXIS6_DRIVER_ENABLE
+#define AXIS6_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS6_DRIVER_STEP
+#define AXIS6_DRIVER_STEP             HIGH
 #endif
 #ifndef AXIS6_DRIVER_STATUS
 #define AXIS6_DRIVER_STATUS           OFF
@@ -764,6 +800,12 @@
 #ifndef AXIS7_DRIVER_REVERSE
 #define AXIS7_DRIVER_REVERSE          OFF
 #endif
+#ifndef AXIS7_DRIVER_ENABLE
+#define AXIS7_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS7_DRIVER_STEP
+#define AXIS7_DRIVER_STEP             HIGH
+#endif
 #ifndef AXIS7_DRIVER_STATUS
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
@@ -819,6 +861,12 @@
 #endif
 #ifndef AXIS8_DRIVER_REVERSE
 #define AXIS8_DRIVER_REVERSE          OFF
+#endif
+#ifndef AXIS8_DRIVER_ENABLE
+#define AXIS8_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS8_DRIVER_STEP
+#define AXIS8_DRIVER_STEP             HIGH
 #endif
 #ifndef AXIS8_DRIVER_STATUS
 #define AXIS8_DRIVER_STATUS           OFF
@@ -876,6 +924,12 @@
 #ifndef AXIS9_DRIVER_REVERSE
 #define AXIS9_DRIVER_REVERSE          OFF
 #endif
+#ifndef AXIS9_DRIVER_ENABLE
+#define AXIS9_DRIVER_ENABLE           LOW
+#endif
+#ifndef AXIS9_DRIVER_STEP
+#define AXIS9_DRIVER_STEP             HIGH
+#endif
 #ifndef AXIS9_DRIVER_STATUS
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
@@ -890,15 +944,6 @@
 #endif
 #ifndef AXIS9_SENSE_HOME_INIT
 #define AXIS9_SENSE_HOME_INIT         INPUT_PULLUP
-#endif
-#ifndef AXIS9_SENSE_LIMIT_MIN
-#define AXIS9_SENSE_LIMIT_MIN         OFF
-#endif
-#ifndef AXIS9_SENSE_LIMIT_MAX
-#define AXIS9_SENSE_LIMIT_MAX         OFF
-#endif
-#ifndef AXIS9_SENSE_LIMIT_INIT
-#define AXIS9_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
 // -----------------------------------------------------------------------------------
