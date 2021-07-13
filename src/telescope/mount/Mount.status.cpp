@@ -44,6 +44,8 @@ void Mount::statusSetPeriodMillis(int period) {
     if (period == 0) { period = 500; ledOff = true; } else ledOff = false;
     if (period == 1) { period = 500; ledOn = true; } else ledOn = false;
     tasks.setPeriod(statusTaskHandle, period/2UL);
+  #else
+    period = period;
   #endif
 }
 

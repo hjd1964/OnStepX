@@ -8,6 +8,7 @@
 #if AXIS3_DRIVER_MODEL != OFF
 
 bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  *supressFrame = false;
 
   // :RA#    rotator Active?
   //            Return: 0 on failure (no rotator)
