@@ -2,7 +2,7 @@
 // OnStepX focuser control
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #if AXIS3_DRIVER_MODEL != OFF
 

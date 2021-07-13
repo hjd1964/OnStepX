@@ -2,7 +2,7 @@
 // OnStepX focuser control
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
 

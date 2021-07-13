@@ -2,7 +2,7 @@
 // Dallas/Maxim 1-Wire DS1820 device support
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #if FEATURE1_PURPOSE != OFF || FEATURE2_PURPOSE != OFF || FEATURE3_PURPOSE != OFF || FEATURE4_PURPOSE != OFF || FEATURE5_PURPOSE != OFF || FEATURE6_PURPOSE != OFF || FEATURE7_PURPOSE != OFF || FEATURE8_PURPOSE != OFF
   #ifndef FEATURES_PRESENT

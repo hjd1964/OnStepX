@@ -2,7 +2,7 @@
 // standard external GPIO library
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 // use Fast functions for digital I/O if available
 #ifdef HAL_HAS_DIGITAL_FAST

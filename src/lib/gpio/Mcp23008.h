@@ -2,7 +2,7 @@
 // I2C MCP23008 GPIO support
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #if GPIO_DEVICE == MCP23008
 

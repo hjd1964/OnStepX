@@ -2,7 +2,7 @@
 // Dallas/Maxim 1-Wire DS2413 device support
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #if GPIO_DEVICE == DS2413
 
