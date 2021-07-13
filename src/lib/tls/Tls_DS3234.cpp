@@ -8,20 +8,20 @@
 
 #include <SPI.h>
 #include <RtcDS3234.h> // https://github.com/Makuna/Rtc/archive/master.zip
-RtcDS3234<SPIClass> _Rtc(SPI, DS3234_CS_PIN);
+RtcDS3234<SPIClass> rtcDS3234(SPI, DS3234_CS_PIN);
 
 #include "Tls_DS3234.h"
 
 bool TimeLocationSource::init() {
   SPI.begin();
-  _Rtc.Begin();
-  if (!_Rtc.GetIsRunning()) _Rtc.SetIsRunning(true);
+  rtcDS3234.Begin();
+  if (!rtcDS3234.GetIsRunning()) rtcDS3234.SetIsRunning(true);
 
   // see if the RTC is present
-  if (_Rtc.GetIsRunning()) {
+  if (rtcDS3234.GetIsRunning()) {
     // frequency 0 (1Hz) on the SQW pin
-    _Rtc.SetSquareWavePin(DS3234SquareWavePin_ModeClock);
-    _Rtc.SetSquareWavePinClockFrequency(DS3234SquareWaveClock_1Hz);
+    rtcDS3234.SetSquareWavePin(DS3234SquareWavePin_ModeClock);
+    rtcDS3234.SetSquareWavePinClockFrequency(DS3234SquareWaveClock_1Hz);
     active = true;
   } else DLF("WRN, tls.init(): DS3234 GetIsRunning() false");
   #ifdef SSPI_SHARED
@@ -44,7 +44,7 @@ void TimeLocationSource::set(JulianDate ut1) {
     SPI.begin();
   #endif
   RtcDateTime updateTime = RtcDateTime(greg.year, greg.month, greg.day, h, floor(m), floor(s));
-  _Rtc.SetDateTime(updateTime);
+  rtcDS3234.SetDateTime(updateTime);
   #ifdef SSPI_SHARED
     SPI.end();
   #endif
@@ -56,7 +56,7 @@ void TimeLocationSource::get(JulianDate &ut1) {
   #ifdef SSPI_SHARED
     SPI.begin();
   #endif
-  RtcDateTime now = _Rtc.GetDateTime();
+  RtcDateTime now = rtcDS3234.GetDateTime();
   if (now.Year() >= 2018 && now.Year() <= 3000 && now.Month() >= 1 && now.Month() <= 12 && now.Day() >= 1 && now.Day() <= 31 &&
       now.Hour() <= 23 && now.Minute() <= 59 && now.Second() <= 59) {
     GregorianDate greg; greg.year = now.Year(); greg.month = now.Month(); greg.day = now.Day();
