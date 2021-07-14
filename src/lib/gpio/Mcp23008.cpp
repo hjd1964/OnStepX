@@ -5,6 +5,9 @@
 
 #if GPIO_DEVICE == MCP23008
 
+#include "../../pinmaps/Models.h"
+#include "../../debug/Debug.h"
+
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
