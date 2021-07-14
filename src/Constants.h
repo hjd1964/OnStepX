@@ -247,7 +247,7 @@
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
 
 // NV addresses
-#define INIT_NV_KEY                 583927927UL
+#define INIT_NV_KEY                 583927928UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..  3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4
@@ -261,7 +261,7 @@
 #define NV_ALIGN_MODEL_BASE         233    // bytes: 32  , addr: 233..264
 #define NV_AXIS_SETTINGS_REVERT     264    // bytes: 2   , addr: 265..266
 #define NV_AXIS_SETTINGS_BASE       267    // bytes: 21*9, addr: 267..455
-#define NV_FOCUSER_SETTINGS_BASE    456    // bytes: 18*9, addr: 456..617
-#define NV_ROTATOR_SETTINGS_BASE    618    // bytes: 2   , addr: 618..619
-#define NV_FEATURE_SETTINGS_BASE    619    // bytes: 3 *8, addr: 620..643
+#define NV_FOCUSER_SETTINGS_BASE    456    // bytes: 14*9, addr: 456..581
+#define NV_ROTATOR_SETTINGS_BASE    582    // bytes: 2   , addr: 582..583
+#define NV_FEATURE_SETTINGS_BASE    584    // bytes: 3 *8, addr: 584..607
 #define NV_PEC_BUFFER_BASE          650    // Bytes: ?   , addr: 650..650 + (PEC_BUFFER_SIZE_LIMIT - 1)

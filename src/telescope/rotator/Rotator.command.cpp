@@ -18,33 +18,33 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
   } else
 
   // r - rotator Commands
-  if (command[0] == 'R') {
+  if (command[0] == 'r') {
 
     // :rT#       Get rotator sTatus
     //            Returns: M# (for moving) or S# (for stopped)
     if (command[1] == 'T') {
-      if (axis3.autoSlewActive()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axis.autoSlewActive()) strcpy(reply,"M"); else strcpy(reply,"S");
       *numericReply = false;
     } else
 
     // :rI#       Get rotator mInimum position (in degrees)
     //            Returns: n#
     if (command[1] == 'I') {
-      sprintf(reply,"%ld",(long)round(axis3.settings.limits.min));
+      sprintf(reply,"%ld",(long)round(axis.settings.limits.min));
       *numericReply = false;
     } else
 
     // :rM#       Get rotator Max position (in degrees)
     //            Returns: n#
     if (command[1] == 'M') {
-      sprintf(reply,"%ld",(long)round(axis3.settings.limits.max));
+      sprintf(reply,"%ld",(long)round(axis.settings.limits.max));
       *numericReply = false;
     } else
 
     // :rD#       Get rotator degrees per step
     //            Returns: n.n#
     if (command[1] == 'u') {
-      sprintF(reply, "%7.5f", 1.0/axis3.getStepsPerMeasure());
+      sprintF(reply, "%7.5f", 1.0/axis.getStepsPerMeasure());
       *numericReply = false;
     } else
 
@@ -60,13 +60,13 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (command[1] == 'b') {
       setBacklash(atol(parameter));
-      axis3.setBacklashSteps(getBacklash());
+      axis.setBacklashSteps(getBacklash());
     } else
 
     // :rQ#       Stop (Quit) rotator movement
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axis3.autoSlewStop();
+      axis.autoSlewStop();
       *numericReply = false;
     } else
 
@@ -88,23 +88,23 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r>#       Move rotator CW
     //            Returns: Nothing
     if (command[1] == '>') {
-      axis3.setFrequencySlew(moveRate);
-      axis3.autoSlew(DIR_FORWARD);
+      axis.setFrequencySlew(moveRate);
+      axis.autoSlew(DIR_FORWARD);
       *numericReply = false;
     } else
 
     // :r<#       Move rotator CCW
     //            Returns: Nothing
     if (command[1] == '<') {
-      axis3.setFrequencySlew(moveRate);
-      axis3.autoSlew(DIR_REVERSE);
+      axis.setFrequencySlew(moveRate);
+      axis.autoSlew(DIR_REVERSE);
       *numericReply = false;
     } else
 
     // :rG#       Get rotator current angle
     //            Returns: sDD*MM#
     if (command[1] == 'G') {
-      convert.doubleToDms(reply, axis3.getInstrumentCoordinate(), true, true, PM_LOW);
+      convert.doubleToDms(reply, axis.getInstrumentCoordinate(), true, true, PM_LOW);
       *numericReply = false;
     } else
 
@@ -114,10 +114,10 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'R') {
       double r;
       convert.dmsToDouble(&r, parameter, true);
-      long t = axis3.getTargetCoordinate();
-      axis3.setTargetCoordinateSteps(t + r);
-      axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      long t = axis.getTargetCoordinate();
+      axis.setTargetCoordinateSteps(t + r);
+      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
       *numericReply = false;
     } else
 
@@ -128,36 +128,36 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'S') {
       double t;
       convert.dmsToDouble(&t, parameter, true);
-      axis3.setTargetCoordinate(t);
-      axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      axis.setTargetCoordinate(t);
+      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
     //  *commandError = CE_SLEW_ERR_IN_STANDBY;
     } else
 
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      axis3.setMotorCoordinate(0.0);
-      axis3.setBacklashSteps(getBacklash());
+      axis.setMotorCoordinate(0.0);
+      axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
 
     // :rF#       Set rotator position as Half-travel
     //            Returns: Nothing
     if (command[1] == 'F') {
-      float p = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
-      axis3.setMotorCoordinate(p);
-      axis3.setBacklashSteps(getBacklash());
+      float p = round((axis.settings.limits.max + axis.settings.limits.min)/2.0F);
+      axis.setMotorCoordinate(p);
+      axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
 
     // :rC#       Move rotator to half-travel target position
     //            Returns: Nothing
     if (command[1] == 'C') {
-      long t = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
-      axis3.setTargetCoordinateSteps(t);
-      axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      long t = round((axis.settings.limits.max + axis.settings.limits.min)/2.0F);
+      axis.setTargetCoordinateSteps(t);
+      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
       *numericReply = false;
     } else
 
@@ -180,9 +180,9 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'P') {
       #ifdef MOUNT_PRESENT
         Coordinate current = telescope.mount.getPosition();
-        axis3.setTargetCoordinateSteps(parallacticAngle(&current));
-        axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-        axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+        axis.setTargetCoordinateSteps(parallacticAngle(&current));
+        axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+        axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
       #endif
       *numericReply = false;
     } else

@@ -15,58 +15,32 @@ void tcfWrapper() { telescope.focuser.tcfPoll(); }
 
 // initialize variables
 Focuser::Focuser() {
-  for (int i = 0; i < 6; i++) {
-    focuserAxis[i] = NULL;
-    moveRate[i] = 100;
-    tcfSteps[i] = 0;
-    settings[i].tcf.enabled = false;
-    settings[i].tcf.coef = 0.0F;
-    settings[i].tcf.deadband = 0;
-    settings[i].tcf.t0 = 0.0F;
-    settings[i].dcPower = 50;
-    settings[i].backlash = 0.0F;
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    axis[index] = NULL;
+    moveRate[index] = 100;
+    tcfSteps[index] = 0;
+    settings[index].tcf.enabled = false;
+    settings[index].tcf.coef = 0.0F;
+    settings[index].tcf.deadband = 1;
+    settings[index].tcf.t0 = 0.0F;
+    settings[index].dcPower = 50;
+    settings[index].backlash = 0.0F;
   }
 }
 
 // initialize all focusers
 void Focuser::init(bool validKey) {
-  #if AXIS4_DRIVER_MODEL != OFF
-    VL("MSG: Focuser1, init. (Axis4)");
-    axis4.init(4, false, validKey);
-    focuserAxis[0] = &axis4;
-  #endif
-  #if AXIS5_DRIVER_MODEL != OFF
-    VL("MSG: Focuser2, init. (Axis5)");
-    axis5.init(5, false, validKey);
-    focuserAxis[1] = &axis5;
-  #endif
-  #if AXIS6_DRIVER_MODEL != OFF
-    VL("MSG: Focuser3, init. (Axis6)");
-    axis6.init(6, false, validKey);
-    focuserAxis[2] = &axis6;
-  #endif
-  #if AXIS7_DRIVER_MODEL != OFF
-    VL("MSG: Focuser4, init. (Axis7)");
-    axis7.init(7, false, validKey);
-    focuserAxis[3] = &axis7;
-  #endif
-  #if AXIS8_DRIVER_MODEL != OFF
-    VL("MSG: Focuser5, init. (Axis8)");
-    axis8.init(8, false, validKey);
-    focuserAxis[4] = &axis8;
-  #endif
-  #if AXIS9_DRIVER_MODEL != OFF
-    VL("MSG: Focuser6, init. (Axis9)");
-    axis9.init(9, false, validKey);
-    focuserAxis[5] = &axis9;
-  #endif
-
-  for (int index = 0; index <= 5; index++) {
-    if (focuserAxis[index] != NULL) {
-      focuserAxis[index]->setFrequencyMax(slewRateDesired[index]);
-      focuserAxis[index]->setFrequencySlew(slewRateDesired[index]);
-      focuserAxis[index]->setSlewAccelerationRate(accelerationRate[index]);
-      focuserAxis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (driverModel[index] != OFF) {
+      axis[index] = new Axis;
+      if (axis[index] != NULL) {
+        V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
+        axis[index]->init(index + 4, false, validKey);
+        axis[index]->setFrequencyMax(slewRateDesired[index]);
+        axis[index]->setFrequencySlew(slewRateDesired[index]);
+        axis[index]->setSlewAccelerationRate(accelerationRate[index]);
+        axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
+      }
     }
   }
 
@@ -75,9 +49,9 @@ void Focuser::init(bool validKey) {
   // get settings stored in NV ready
   if (!validKey) {
     VLF("MSG: Focusers, writing default settings to NV");
-    for (int index = 0; index <= 5; index++) writeSettings(index);
+    for (int index = 0; index < FOCUSER_MAX; index++) writeSettings(index);
   }
-  for (int index = 0; index <= 5; index++) readSettings(index);
+  for (int index = 0; index < FOCUSER_MAX; index++) readSettings(index);
 
   // start task for temperature compensated focusing
   VF("MSG: Focuser, starting TCF task (rate 1s priority 7)... ");
@@ -151,7 +125,7 @@ int Focuser::getTcfDeadband(int index) {
 // set TCF deadband, in microns
 bool Focuser::setTcfDeadband(int index, int value) {
   if (index < 0 || index > 5) return false;
-  if (value < 1 || value > 32767) return false;
+  if (value < 1 || value > 10000) return false;
   settings[index].tcf.deadband = value;
   writeSettings(index);
   return true;
@@ -166,7 +140,7 @@ float Focuser::getTcfT0(int index) {
 // set TCF T0, in deg. C
 bool Focuser::setTcfT0(int index, float value) {
   if (index < 0 || index > 5) return false;
-  if (abs(value) > 100.0F) return false;
+  if (abs(value) > 60.0F) return false;
   settings[index].tcf.t0 = value;
   writeSettings(index);
   return true;
@@ -174,36 +148,36 @@ bool Focuser::setTcfT0(int index, float value) {
 
 // poll TCF to move the focusers as required
 void Focuser::tcfPoll() {
-  for (int index = 0; index <= 5; index++) {
-    if (focuserAxis[index] != NULL) {
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (axis[index] != NULL) {
       if (settings[index].tcf.enabled) {
         Y;
         // get offset in microns due to TCF
         float offset = settings[index].tcf.coef * (getTemperature() - settings[index].tcf.t0);
         // convert to steps
-        offset *= focuserAxis[index]->getStepsPerMeasure();
+        offset *= axis[index]->getStepsPerMeasure();
         // apply deadband
         long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
         // move focuser if required
         if (tcfSteps[index] != steps) {
           tcfSteps[index] = steps;
-          long t = focuserAxis[index]->getTargetCoordinateSteps();
-          focuserAxis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
-          focuserAxis[index]->setFrequencySlew(10);
-          focuserAxis[index]->autoSlewRateByDistance(10);
+          long t = axis[index]->getTargetCoordinateSteps();
+          axis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
+          axis[index]->setFrequencySlew(10);
+          axis[index]->autoSlewRateByDistance(10);
         }
       }
     }
   }
 }
 
-// get backlash in microns
+// get backlash in steps
 int Focuser::getBacklash(int index) {
   if (index < 0 || index > 5) return 0;
   return settings[index].backlash;
 }
 
-// set backlash in microns
+// set backlash in steps
 bool Focuser::setBacklash(int index, int value) {
   if (index < 0 || index > 6) return false;
   if (value < 0 || value > 10000) return false;
@@ -214,6 +188,13 @@ bool Focuser::setBacklash(int index, int value) {
 
 void Focuser::readSettings(int index) {
   nv.readBytes(NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize, &settings[index], sizeof(Settings));
+
+  if (fabs(settings->tcf.coef) > 999.0F) { settings->tcf.coef = 0.0F;  initError.value = true; DLF("ERR, Focuser.init(): bad NV |tcf.coef| > 999.0 um/deg. C (set to 0.0)"); }
+  if (settings->tcf.deadband < 1 )       { settings->tcf.deadband = 1; initError.value = true; DLF("ERR, Focuser.init(): bad NV tcf.deadband < 1 steps (set to 1)"); }
+  if (settings->tcf.deadband > 10000 )   { settings->tcf.deadband = 1; initError.value = true; DLF("ERR, Focuser.init(): bad NV tcf.deadband > 10000 steps (set to 1)"); }
+  if (fabs(settings->tcf.t0) > 60.0F)    { settings->tcf.t0 = 10.0F;   initError.value = true; DLF("ERR, Focuser.init(): bad NV |tcf.t0| > 60.0 deg. C (set to 10.0)"); }
+  if (settings->backlash < 0)            { settings->backlash = 0;     initError.value = true; DLF("ERR, Focuser.init(): bad NV backlash < 0 steps (set to 0)"); }
+  if (settings->backlash > 10000)        { settings->backlash = 0;     initError.value = true; DLF("ERR, Focuser.init(): bad NV backlash > 10000 steps (set to 0)"); }
 }
 
 void Focuser::writeSettings(int index) {

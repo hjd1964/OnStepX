@@ -11,20 +11,21 @@
 #include "../motion/Axis.h"
 
 #define FOCUSER_PRESENT
+#define FOCUSER_MAX 6
 
 #pragma pack(1)
 typedef struct Tcf {
   bool enabled;
   float coef;
-  long deadband;
+  int16_t deadband;
   float t0;
 } Tcf;
 
-#define FocuserSettingsSize 18
+#define FocuserSettingsSize 14
 typedef struct Settings {
   Tcf tcf;
   uint8_t dcPower;
-  float backlash;
+  int16_t backlash;
 } Settings;
 #pragma pack()
 
@@ -72,40 +73,22 @@ class Focuser {
     // set backlash in microns
     bool  setBacklash(int index, int value);
 
-    #if AXIS4_DRIVER_MODEL != OFF
-      Axis axis4;
-    #endif
-    #if AXIS5_DRIVER_MODEL != OFF
-      Axis axis5;
-    #endif
-    #if AXIS6_DRIVER_MODEL != OFF
-      Axis axis6;
-    #endif
-    #if AXIS7_DRIVER_MODEL != OFF
-      Axis axis7;
-    #endif
-    #if AXIS8_DRIVER_MODEL != OFF
-      Axis axis8;
-    #endif
-    #if AXIS9_DRIVER_MODEL != OFF
-      Axis axis9;
-    #endif
-
-    Axis *focuserAxis[6];
+    Axis *axis[6];
 
   private:
     void readSettings(int index);
     void writeSettings(int index);
 
-    int slewRateDesired[6]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
-    int accelerationRate[6] = { AXIS4_ACCELERATION_RATE, AXIS5_ACCELERATION_RATE, AXIS6_ACCELERATION_RATE, AXIS7_ACCELERATION_RATE, AXIS8_ACCELERATION_RATE, AXIS9_ACCELERATION_RATE };
-    int rapidStopRate[6]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
-    int moveRate[6];
-    bool dcMode[6] = { AXIS4_DRIVER_DC_MODE == ON, AXIS5_DRIVER_DC_MODE == ON, AXIS6_DRIVER_DC_MODE == ON, AXIS7_DRIVER_DC_MODE == ON, AXIS8_DRIVER_DC_MODE == ON, AXIS9_DRIVER_DC_MODE == ON };
+    int driverModel[FOCUSER_MAX]      = { AXIS4_DRIVER_MODEL, AXIS5_DRIVER_MODEL, AXIS6_DRIVER_MODEL, AXIS7_DRIVER_MODEL, AXIS8_DRIVER_MODEL, AXIS9_DRIVER_MODEL };
+    int slewRateDesired[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
+    int accelerationRate[FOCUSER_MAX] = { AXIS4_ACCELERATION_RATE, AXIS5_ACCELERATION_RATE, AXIS6_ACCELERATION_RATE, AXIS7_ACCELERATION_RATE, AXIS8_ACCELERATION_RATE, AXIS9_ACCELERATION_RATE };
+    int rapidStopRate[FOCUSER_MAX]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
+    int moveRate[FOCUSER_MAX];
+    bool dcMode[FOCUSER_MAX] = { AXIS4_DRIVER_DC_MODE == ON, AXIS5_DRIVER_DC_MODE == ON, AXIS6_DRIVER_DC_MODE == ON, AXIS7_DRIVER_DC_MODE == ON, AXIS8_DRIVER_DC_MODE == ON, AXIS9_DRIVER_DC_MODE == ON };
 
-    float tcfSteps[6];
+    float tcfSteps[FOCUSER_MAX];
 
-    Settings settings[6];
+    Settings settings[FOCUSER_MAX];
 };
 
 #endif

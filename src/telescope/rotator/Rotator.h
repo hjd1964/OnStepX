@@ -29,7 +29,7 @@ class Rotator {
     // poll to set derotator rate
     void derotatePoll();
 
-    Axis axis3;
+    Axis axis;
 
   private:
     // enable or disable the derotator
