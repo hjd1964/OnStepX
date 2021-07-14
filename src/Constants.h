@@ -133,9 +133,13 @@
 #define SWITCH_UNPARKED             5
 
 // various temperature sensing devices
-#define DS1820     0x2800000000000000 // DS1820 1-wire temperature sensors (DS18B20 or DS18S20) for focusing and dew heaters
-#define DS18S20    0x1000000000000000 // not for use in Config.h
+#define DS1820     0x2800000000000000 // DS18B20 1-wire temperature sensors for focusing and dew heaters
+#define DS18B20    0x2800000000000000 // (as above)
+#define DS18S20    0x1000000000000000 // (as above except for DS18S20)
 #define DS_MASK    0x3F00000000000000 // not for use in Config.h
+#define THERMISTOR                  1 // General purpose thermistor sensor, type 1 (see Config.common.h)
+#define THERMISTOR1                 1 // (as above)
+#define THERMISTOR2                 2 // General purpose thermistor sensor, type 2 (see Config.common.h)
 
 // various GPIO devices
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin

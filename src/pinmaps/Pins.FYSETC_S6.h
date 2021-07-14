@@ -7,12 +7,28 @@
 // TX2/RX2 (PA2/PA3) is on the Y+ and Z+ end stops and is reserved for GPS (etc, no command channel is associated with this port)
 // Use "#define SerialGPS SoftwareSerial2" in Config.h for the GPS only serial port
 
-// Temperature sensors (From Marlin) perhaps these would make better Limit sw and 2x home switches, and PEC.
-// They have built-in pullups and a 10uf cap for ESD but they are not labeled as such so leaving it be.
+// Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define Temp0Pin              PC0                // Temp0   (on TE0, THERMO0)
 #define Temp1Pin              PC1                // Temp1   (on TE1, THERMO1)
 #define Temp2Pin              PC2                // Temp2   (on TE2, THERMO2)
 #define Temp3Pin              PC3                // Temp3   (on TB , THERMO3)
+
+#if FEATURE1_TEMP_PIN == OFF
+  #undef FEATURE1_TEMP_PIN
+  #define FEATURE1_TEMP_PIN   Temp0Pin
+#endif
+#if FEATURE2_TEMP_PIN == OFF
+  #undef FEATURE2_TEMP_PIN
+  #define FEATURE2_TEMP_PIN   Temp1Pin
+#endif
+#if FEATURE3_TEMP_PIN == OFF
+  #undef FEATURE3_TEMP_PIN
+  #define FEATURE3_TEMP_PIN   Temp2Pin
+#endif
+#if FEATURE4_TEMP_PIN == OFF
+  #undef FEATURE4_TEMP_PIN
+  #define FEATURE4_TEMP_PIN   Temp3Pin
+#endif
 
 // Fans (From Marlin) we use for Auxiliary Features (switches etc.)  Probably with a little crafty wiring these can be 3V3 or 5V.
 #define Fan0Pin               PB0                // Fan0    (on FAN0)

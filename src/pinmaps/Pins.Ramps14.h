@@ -4,6 +4,24 @@
 
 #if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1280__) || defined(__SAM3X8E__)
 
+// Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
+#define Temp0Pin              A15                // Thermo0
+#define Temp1Pin              A14                // Thermo1
+#define Temp2Pin              A13                // Thermo2
+
+#if FEATURE1_TEMP_PIN == OFF
+  #undef FEATURE1_TEMP_PIN
+  #define FEATURE1_TEMP_PIN   Temp0Pin
+#endif
+#if FEATURE2_TEMP_PIN == OFF
+  #undef FEATURE2_TEMP_PIN
+  #define FEATURE2_TEMP_PIN   Temp1Pin
+#endif
+#if FEATURE3_TEMP_PIN == OFF
+  #undef FEATURE3_TEMP_PIN
+  #define FEATURE3_TEMP_PIN   Temp2Pin
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog (pwm/dac) if supported)
 #define Aux0                   11               // Status LED
 #define Aux1                   29               // ESP8266 GPIO0, SPI MISO/Fault

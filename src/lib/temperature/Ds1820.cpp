@@ -76,14 +76,14 @@ bool Ds1820::init() {
   DS18B20.setWaitForConversion(false);
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: DS1820, start device monitor task (rate 100ms priority 7)... ");
+    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 7)... ");
     if (tasks.add(100, 0, true, 7, ds1820Wrapper, "ds1820")) { VL("success"); } else { VL("FAILED!"); }
   } else found = false;
 
   return found;
 }
 
-// read DS18B20 devices, designed for a 0.1s polling interval
+// read devices, designed for a 0.1s polling interval
 void Ds1820::poll() {
   static int index = 0;
   static unsigned long requestTime = 0;
@@ -116,8 +116,8 @@ void Ds1820::poll() {
   if (index > 8) index = 0;
 }
 
-// nine DS1820 1-wire temperature sensors are supported, this gets the averaged
-// temperature in deg. C otherwise it falls back to the weather sensor temperature
+// nine temperature sensors are supported, this gets the averaged temperature
+// in deg. C otherwise it falls back to the weather sensor temperature
 // index 0 is the focuser temperature, 1 through 8 are auxiliary features #1, #2, etc.
 // returns NAN if no temperature source is available or if a communications failure
 // results in no valid readings for > 30 seconds

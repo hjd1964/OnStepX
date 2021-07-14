@@ -49,6 +49,6 @@
 #define LED_FOCUSER_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
 
 // SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
-#define FOCUSER_TEMPERATURE           OFF //    OFF, DS1820, n. Where n is the DS1820 s/n for focuser temperature.            Adjust
+#define FOCUSER_TEMPERATURE           OFF //    OFF, THERMISTOR, DS1820, n. Where n is the DS1820 s/n for focuser temp.       Adjust
 
 // ---------------------------------------------------------------------------------------------------------------------------------

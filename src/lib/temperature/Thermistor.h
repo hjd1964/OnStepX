@@ -1,14 +1,21 @@
 // -----------------------------------------------------------------------------------
-// Dallas/Maxim 1-Wire DS1820 device support
+// Thermistor device support
 #pragma once
 
 #include "../../Common.h"
 
-#ifdef DS1820_DEVICES_PRESENT
+#ifdef THERMISTOR_DEVICES_PRESENT
 
-class Ds1820 {
+typedef struct ThermistorSettings {
+  float tNom;
+  float rNom;
+  float beta;
+  float rSeries;
+} ThermistorSettings;
+
+class Thermistor {
   public:
-    // scan for DS18B20 devices on the 1-wire bus and prepare for operation
+    // prepare for operation
     bool init();
 
     // read devices, designed for a 0.1s polling interval
@@ -22,21 +29,17 @@ class Ds1820 {
     float getChannel(int index);
    
   private:
-    // checks for polling status code from DS1820 library
-    bool polling(float f);
-
-    // checks for validated status code from DS1820 library
-    float validated(float f);
-
     bool found = false;
     uint8_t deviceCount = 0;
-    uint8_t address[9][8];
     uint64_t device[9] = { (uint64_t)FOCUSER_TEMPERATURE, (uint64_t)FEATURE1_TEMP, (uint64_t)FEATURE2_TEMP, (uint64_t)FEATURE3_TEMP, (uint64_t)FEATURE4_TEMP, (uint64_t)FEATURE5_TEMP, (uint64_t)FEATURE6_TEMP, (uint64_t)FEATURE7_TEMP, (uint64_t)FEATURE8_TEMP };
+    int16_t devicePin[9] = { FOCUSER_TEMPERATURE_PIN, FEATURE1_TEMP_PIN, FEATURE2_TEMP_PIN, FEATURE3_TEMP_PIN, FEATURE4_TEMP_PIN, FEATURE5_TEMP_PIN, FEATURE6_TEMP_PIN, FEATURE7_TEMP_PIN, FEATURE8_TEMP_PIN };
 
     float averageTemperature[9] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
     unsigned long goodUntil[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    ThermistorSettings settings[2] = { { THERMISTOR1_TNOM, THERMISTOR1_RNOM, THERMISTOR1_BETA, THERMISTOR1_RSERIES }, { THERMISTOR2_TNOM, THERMISTOR2_RNOM, THERMISTOR2_BETA, THERMISTOR2_RSERIES } };
 };
 
-extern Ds1820 temperature;
+extern Thermistor temperature;
 
 #endif

@@ -2,9 +2,10 @@
 // Dallas/Maxim 1-Wire DS1820 device support
 
 #include "Temperature.h"
-#include "../weather/Weather.h"
 
 #ifdef TEMPERATURE_PRESENT
+
+#include "../weather/Weather.h"
 
 bool Temperature::init() {
   return false;

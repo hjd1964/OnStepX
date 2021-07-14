@@ -3,9 +3,12 @@
 #pragma once
 
 #include "../../Common.h"
-#include "Ds1820.h"
 
+#include "Ds1820.h"
 #ifndef DS1820_DEVICES_PRESENT
+
+#include "Thermistor.h"
+#ifndef THERMISTOR_DEVICES_PRESENT
 
 #define TEMPERATURE_PRESENT
 
@@ -20,4 +23,5 @@ class Temperature {
 
 extern Temperature temperature;
 
+#endif
 #endif

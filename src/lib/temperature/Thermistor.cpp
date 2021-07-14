@@ -1,0 +1,90 @@
+// -----------------------------------------------------------------------------------
+// Thermistor device support
+
+#include "Thermistor.h"
+
+#ifdef THERMISTOR_DEVICES_PRESENT
+
+#include "../../tasks/OnTask.h"
+extern Tasks tasks;
+
+#include "../weather/Weather.h"
+
+void thermistorWrapper() { temperature.poll(); }
+
+// prepare for operation
+bool Thermistor::init() {
+  static bool initialized = false;
+  if (initialized) return found;
+
+  deviceCount = 1;
+
+  if (deviceCount > 0) {
+    found = true;
+    VF("MSG: Temperature, start Thermistor monitor task (rate 100ms priority 7)... ");
+    if (tasks.add(100, 0, true, 7, thermistorWrapper, "therm")) { VL("success"); } else { VL("FAILED!"); }
+  } else found = false;
+
+  found = true;
+  initialized = true;
+
+  return found;
+}
+
+// read devices, designed for a 0.1s polling interval
+void Thermistor::poll() {
+  static int index = 0;
+  static unsigned long requestTime = 0;
+
+  if (found) {
+    int thermistorType = -1;
+    if (device[index] == THERMISTOR1) thermistorType = 0; else
+    if (device[index] == THERMISTOR2) thermistorType = 1;
+
+    if (thermistorType >= 0 && devicePin[index] != OFF) {
+      // get the total resistance
+      int r = analogRead(devicePin[index]);
+
+      // calculate the device resistance
+      float resistance = 1023.0F/r - 1.0F;
+      resistance = settings[thermistorType].rSeries / resistance;
+
+      // convert to temperature in degrees C
+      float f = log(resistance/settings[thermistorType].rNom)/settings[thermistorType].beta;
+      f += 1.0F/(settings[thermistorType].tNom + 273.15F);
+      float temperature = 1.0F/f - 273.15F;
+
+      // constrain to a reasonable range, outside of this something is definately wrong
+      if (temperature < -60.0F || temperature > 60.0F) temperature = NAN;
+
+      // do a running average on the temperature
+      if (!isnan(temperature)) {
+        if (isnan(averageTemperature[index])) averageTemperature[index] = temperature;
+        averageTemperature[index] = (averageTemperature[index]*9.0F + temperature)/10.0F;
+        goodUntil[index] = millis() + 30000;
+      } else {
+        // we must get a reading atleast once every 30 seconds otherwise flag the failure with a NAN
+        if ((long)(millis() - goodUntil[index]) > 0) averageTemperature[index] = NAN;
+      }
+    }
+  }
+
+  index++;
+  if (index > 8) index = 0;
+}
+
+// nine temperature sensors are supported, this gets the averaged temperature
+// in deg. C otherwise it falls back to the weather sensor temperature
+// index 0 is the focuser temperature, 1 through 8 are auxiliary features #1, #2, etc.
+// returns NAN if no temperature source is available or if a communications failure
+// results in no valid readings for > 30 seconds
+float Thermistor::getChannel(int index) {
+  if (found && index >= 0 && index <= 7) {
+    if (device[index] == (uint64_t)OFF) averageTemperature[index] = weather.getTemperature();
+    return averageTemperature[index];
+  } else return NAN;
+}
+
+Thermistor temperature;
+
+#endif

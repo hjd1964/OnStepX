@@ -12,7 +12,7 @@
 #define SERIAL_A_BAUD_DEFAULT         9600
 #endif
 #ifndef SERIAL_B_BAUD_DEFAULT
-#define SERIAL_B_BAUD_DEFAULT         9600
+#define SERIAL_B_BAUD_DEFAULT         OFF
 #endif
 #ifndef SERIAL_B_ESP_FLASHING
 #define SERIAL_B_ESP_FLASHING         OFF
@@ -24,9 +24,6 @@
 // sensors
 #ifndef WEATHER
 #define WEATHER                       OFF
-#endif
-#ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE           OFF
 #endif
 
 // step signal
@@ -394,6 +391,13 @@
 #endif
 #ifndef AXIS9_BACKLASH_RATE
 #define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
+#endif
+
+#ifndef FOCUSER_TEMPERATURE
+#define FOCUSER_TEMPERATURE           OFF
+#endif
+#ifndef FOCUSER_TEMPERATURE_PIN
+#define FOCUSER_TEMPERATURE_PIN       OFF   // for thermistors, analog pin
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -956,16 +960,19 @@
 #define FEATURE1_NAME                "FEATURE1"
 #endif
 #ifndef FEATURE1_TEMP
-#define FEATURE1_TEMP                 OFF
+#define FEATURE1_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#endif
+#ifndef FEATURE1_TEMP_PIN
+#define FEATURE1_TEMP_PIN             OFF   // for thermistors, analog pin
 #endif
 #ifndef FEATURE1_PIN
-#define FEATURE1_PIN                  OFF
+#define FEATURE1_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE1_DEFAULT_VALUE
-#define FEATURE1_DEFAULT_VALUE        OFF
+#define FEATURE1_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE1_ACTIVE_STATE
-#define FEATURE1_ACTIVE_STATE         HIGH
+#define FEATURE1_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE2_PURPOSE
@@ -975,16 +982,19 @@
 #define FEATURE2_NAME                "FEATURE2"
 #endif
 #ifndef FEATURE2_TEMP
-#define FEATURE2_TEMP                 OFF
+#define FEATURE2_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#endif
+#ifndef FEATURE2_TEMP_PIN
+#define FEATURE2_TEMP_PIN             OFF   // for thermistors, analog pin
 #endif
 #ifndef FEATURE2_PIN
-#define FEATURE2_PIN                  OFF
+#define FEATURE2_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE2_DEFAULT_VALUE
-#define FEATURE2_DEFAULT_VALUE        OFF
+#define FEATURE2_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE2_ACTIVE_STATE
-#define FEATURE2_ACTIVE_STATE         HIGH
+#define FEATURE2_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE3_PURPOSE
@@ -994,16 +1004,19 @@
 #define FEATURE3_NAME                "FEATURE3"
 #endif
 #ifndef FEATURE3_TEMP
-#define FEATURE3_TEMP                 OFF
+#define FEATURE3_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#endif
+#ifndef FEATURE3_TEMP_PIN
+#define FEATURE3_TEMP_PIN             OFF   // for thermistors, analog pin
 #endif
 #ifndef FEATURE3_PIN
-#define FEATURE3_PIN                  OFF
+#define FEATURE3_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE3_DEFAULT_VALUE
-#define FEATURE3_DEFAULT_VALUE        OFF
+#define FEATURE3_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE3_ACTIVE_STATE
-#define FEATURE3_ACTIVE_STATE         HIGH
+#define FEATURE3_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE4_PURPOSE
@@ -1015,14 +1028,17 @@
 #ifndef FEATURE4_TEMP
 #define FEATURE4_TEMP                 OFF
 #endif
+#ifndef FEATURE4_TEMP_PIN
+#define FEATURE4_TEMP_PIN             OFF   // for thermistors, analog pin
+#endif
 #ifndef FEATURE4_PIN
-#define FEATURE4_PIN                  OFF
+#define FEATURE4_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE4_DEFAULT_VALUE
-#define FEATURE4_DEFAULT_VALUE        OFF
+#define FEATURE4_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE4_ACTIVE_STATE
-#define FEATURE4_ACTIVE_STATE         HIGH
+#define FEATURE4_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE5_PURPOSE
@@ -1034,14 +1050,17 @@
 #ifndef FEATURE5_TEMP
 #define FEATURE5_TEMP                 OFF
 #endif
+#ifndef FEATURE5_TEMP_PIN
+#define FEATURE5_TEMP_PIN             OFF   // for thermistors, analog pin
+#endif
 #ifndef FEATURE5_PIN
-#define FEATURE5_PIN                  OFF
+#define FEATURE5_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE5_DEFAULT_VALUE
-#define FEATURE5_DEFAULT_VALUE        OFF
+#define FEATURE5_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE5_ACTIVE_STATE
-#define FEATURE5_ACTIVE_STATE         HIGH
+#define FEATURE5_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE6_PURPOSE
@@ -1053,14 +1072,17 @@
 #ifndef FEATURE6_TEMP
 #define FEATURE6_TEMP                 OFF
 #endif
+#ifndef FEATURE6_TEMP_PIN
+#define FEATURE6_TEMP_PIN             OFF   // for thermistors, analog pin
+#endif
 #ifndef FEATURE6_PIN
-#define FEATURE6_PIN                  OFF
+#define FEATURE6_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE6_DEFAULT_VALUE
-#define FEATURE6_DEFAULT_VALUE        OFF
+#define FEATURE6_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE6_ACTIVE_STATE
-#define FEATURE6_ACTIVE_STATE         HIGH
+#define FEATURE6_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE7_PURPOSE
@@ -1072,14 +1094,17 @@
 #ifndef FEATURE7_TEMP
 #define FEATURE7_TEMP                 OFF
 #endif
+#ifndef FEATURE7_TEMP_PIN
+#define FEATURE7_TEMP_PIN             OFF   // for thermistors, analog pin
+#endif
 #ifndef FEATURE7_PIN
-#define FEATURE7_PIN                  OFF
+#define FEATURE7_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE7_DEFAULT_VALUE
-#define FEATURE7_DEFAULT_VALUE        OFF
+#define FEATURE7_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE7_ACTIVE_STATE
-#define FEATURE7_ACTIVE_STATE         HIGH
+#define FEATURE7_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE8_PURPOSE
@@ -1091,12 +1116,43 @@
 #ifndef FEATURE8_TEMP
 #define FEATURE8_TEMP                 OFF
 #endif
+#ifndef FEATURE8_TEMP_PIN
+#define FEATURE8_TEMP_PIN             OFF   // for thermistors, analog pin
+#endif
 #ifndef FEATURE8_PIN
-#define FEATURE8_PIN                  OFF
+#define FEATURE8_PIN                  OFF   // OUTPUT control pin
 #endif
 #ifndef FEATURE8_DEFAULT_VALUE
-#define FEATURE8_DEFAULT_VALUE        OFF
+#define FEATURE8_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
 #endif
 #ifndef FEATURE8_ACTIVE_STATE
-#define FEATURE8_ACTIVE_STATE         HIGH
+#define FEATURE8_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#endif
+
+// thermistor configuration settings to support two types
+
+#ifndef THERMISTOR1_TNOM
+#define THERMISTOR1_TNOM              25    // nominal temperature (Celsius)
+#endif
+#ifndef THERMISTOR1_RNOM
+#define THERMISTOR1_RNOM              10000 // nominal resistance (Ohms) at nominal temperature
+#endif
+#ifndef THERMISTOR1_BETA
+#define THERMISTOR1_BETA              3950  // beta coefficient
+#endif
+#ifndef THERMISTOR1_RSERIES
+#define THERMISTOR1_RSERIES           4700  // series resistor value (Ohms)
+#endif
+
+#ifndef THERMISTOR2_TNOM
+#define THERMISTOR2_TNOM              25    // nominal temperature (Celsius)
+#endif
+#ifndef THERMISTOR2_RNOM
+#define THERMISTOR2_RNOM              10000 // nominal resistance (Ohms) at nominal temperature
+#endif
+#ifndef THERMISTOR2_BETA
+#define THERMISTOR2_BETA              3950  // beta coefficient
+#endif
+#ifndef THERMISTOR2_RSERIES
+#define THERMISTOR2_RSERIES           4700  // series resistor value (Ohms)
 #endif
