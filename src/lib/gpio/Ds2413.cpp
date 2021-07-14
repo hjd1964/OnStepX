@@ -5,6 +5,9 @@
 
 #if GPIO_DEVICE == DS2413
 
+#include "../../pinmaps/Models.h"
+#include "../../debug/Debug.h"
+
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
@@ -54,7 +57,7 @@ bool Ds2413::init() {
 
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: DS2413, start device monitor task (rate 20ms priority 7)... ");
+    VF("MSG: Gpio, start DS2413 monitor task (rate 20ms priority 7)... ");
     if (tasks.add(20, 0, true, 7, ds2413Wrapper, "ds2413")) { VL("success"); } else { VL("FAILED!"); }
   } else found = false;
 

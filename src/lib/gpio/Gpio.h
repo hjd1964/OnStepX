@@ -2,7 +2,11 @@
 // standard external GPIO library
 #pragma once
 
-#include "../../Common.h"
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.common.h"
+#include "../../Config.defaults.h"
+#include "../../HAL/HAL.h"
 
 // use Fast functions for digital I/O if available
 #ifdef HAL_HAS_DIGITAL_FAST
@@ -47,8 +51,8 @@ class Gpio {
   private:
 };
 
-#endif
-#endif
-#endif
-
 extern Gpio gpio;
+
+#endif
+#endif
+#endif

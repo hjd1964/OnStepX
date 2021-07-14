@@ -2,7 +2,11 @@
 // Dallas/Maxim 1-Wire DS2413 device support
 #pragma once
 
-#include "../../Common.h"
+#include <Arduino.h>
+#include "../../Constants.h"
+#include "../../Config.common.h"
+#include "../../Config.defaults.h"
+#include "../../HAL/HAL.h"
 
 #if GPIO_DEVICE == DS2413
 
