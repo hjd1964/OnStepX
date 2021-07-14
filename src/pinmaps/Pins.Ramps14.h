@@ -9,17 +9,17 @@
 #define Temp1Pin              A14                // Thermo1
 #define Temp2Pin              A13                // Thermo2
 
+#if FOCUSER_TEMPERATURE_PIN == OFF
+  #undef FOCUSER_TEMPERATURE_PIN
+  #define FOCUSER_TEMPERATURE_PIN Temp0Pin
+#endif
 #if FEATURE1_TEMP_PIN == OFF
   #undef FEATURE1_TEMP_PIN
-  #define FEATURE1_TEMP_PIN   Temp0Pin
+  #define FEATURE1_TEMP_PIN   Temp1Pin
 #endif
 #if FEATURE2_TEMP_PIN == OFF
   #undef FEATURE2_TEMP_PIN
-  #define FEATURE2_TEMP_PIN   Temp1Pin
-#endif
-#if FEATURE3_TEMP_PIN == OFF
-  #undef FEATURE3_TEMP_PIN
-  #define FEATURE3_TEMP_PIN   Temp2Pin
+  #define FEATURE2_TEMP_PIN   Temp2Pin
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog (pwm/dac) if supported)

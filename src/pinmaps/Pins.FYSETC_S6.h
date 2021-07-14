@@ -13,21 +13,21 @@
 #define Temp2Pin              PC2                // Temp2   (on TE2, THERMO2)
 #define Temp3Pin              PC3                // Temp3   (on TB , THERMO3)
 
+#if FOCUSER_TEMPERATURE_PIN == OFF
+  #undef FOCUSER_TEMPERATURE_PIN
+  #define FOCUSER_TEMPERATURE_PIN Temp0Pin
+#endif
 #if FEATURE1_TEMP_PIN == OFF
   #undef FEATURE1_TEMP_PIN
-  #define FEATURE1_TEMP_PIN   Temp0Pin
+  #define FEATURE1_TEMP_PIN   Temp1Pin
 #endif
 #if FEATURE2_TEMP_PIN == OFF
   #undef FEATURE2_TEMP_PIN
-  #define FEATURE2_TEMP_PIN   Temp1Pin
+  #define FEATURE2_TEMP_PIN   Temp2Pin
 #endif
 #if FEATURE3_TEMP_PIN == OFF
   #undef FEATURE3_TEMP_PIN
-  #define FEATURE3_TEMP_PIN   Temp2Pin
-#endif
-#if FEATURE4_TEMP_PIN == OFF
-  #undef FEATURE4_TEMP_PIN
-  #define FEATURE4_TEMP_PIN   Temp3Pin
+  #define FEATURE3_TEMP_PIN   Temp3Pin
 #endif
 
 // Fans (From Marlin) we use for Auxiliary Features (switches etc.)  Probably with a little crafty wiring these can be 3V3 or 5V.
