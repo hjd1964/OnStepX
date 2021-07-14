@@ -35,7 +35,7 @@ void Transform::init(bool validKey) {
 
   #if DEBUG != OFF
     const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
-    VF("MSG: Transform, mount type "); VL(MountTypeStr[mountType]);
+    VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
   site.init(validKey);
