@@ -10,6 +10,9 @@
 bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
+  // process any rotator axis commands
+  if (axis.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+
   // :RA#    rotator Active?
   //            Return: 0 on failure (no rotator)
   //                    1 on success

@@ -12,6 +12,13 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
   static int index = 0;
   *supressFrame = false;
 
+  // process any focuser axis commands
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (axis[index] != NULL) {
+      if (axis[index]->command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    }
+  }
+
   // :FA#    Focuser Active?
   //            Return: 0 on failure (no focusers)
   //                    1 on success
