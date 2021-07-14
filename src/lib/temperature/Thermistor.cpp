@@ -63,7 +63,7 @@ void Thermistor::poll() {
         averageTemperature[index] = (averageTemperature[index]*9.0F + temperature)/10.0F;
         goodUntil[index] = millis() + 30000;
       } else {
-        // we must get a reading atleast once every 30 seconds otherwise flag the failure with a NAN
+        // we must get a reading at least once every 30 seconds otherwise flag the failure with a NAN
         if ((long)(millis() - goodUntil[index]) > 0) averageTemperature[index] = NAN;
       }
     }
