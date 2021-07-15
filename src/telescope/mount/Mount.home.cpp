@@ -72,8 +72,13 @@ CommandError Mount::resetHome(bool resetPark) {
   axis2.setBacklash(0);
   axis1.setMotorCoordinateSteps(0);
   axis2.setMotorCoordinateSteps(0);
-  if (transform.mountType == ALTAZM) axis1.setInstrumentCoordinate(home.z); else axis1.setInstrumentCoordinate(home.h);
-  if (transform.mountType == ALTAZM) axis2.setInstrumentCoordinate(home.a); else axis2.setInstrumentCoordinate(home.d);
+  if (transform.mountType == ALTAZM) {
+    axis1.setInstrumentCoordinate(home.z);
+    axis2.setInstrumentCoordinate(home.a);
+  } else {
+    axis1.setInstrumentCoordinate(home.h);
+    axis2.setInstrumentCoordinate(home.d);
+  }
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
   axis1.setFrequencySlew(degToRadF(0.1F));
