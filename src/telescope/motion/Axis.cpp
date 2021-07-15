@@ -238,6 +238,7 @@ bool Axis::autoSlewRateByDistanceStop() {
 bool Axis::autoSlew(Direction direction) {
   if (autoRate == AR_RATE_BY_DISTANCE) return false;
   if (direction == DIR_NONE) return false;
+  if (motionError(direction)) return false;
   if (autoRate == AR_NONE) {
     tracking = true;
     driver.modeDecaySlewing();
@@ -314,12 +315,12 @@ void Axis::poll() {
 
   // automatically abort slew and stop tracking
   if (autoRate != AR_RATE_BY_TIME_ABORT && lastPeriod != 0) {
-    if (trackingStep < 0 && motionReverseError()) {
+    if (trackingStep < 0 && motionError(DIR_REVERSE)) {
       V(axisPrefix); VLF("poll(); motion reverse limit or error");
       autoSlewAbort();
       return;
     }
-    if (trackingStep > 0 && motionForwardError()) {
+    if (trackingStep > 0 && motionError(DIR_FORWARD)) {
       V(axisPrefix); VLF("poll(); motion forward limit or error");
       autoSlewAbort();
       return;
