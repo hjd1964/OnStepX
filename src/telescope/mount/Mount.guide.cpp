@@ -80,13 +80,13 @@ CommandError Mount::guideValidate(int axis, GuideAction guideAction) {
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!guideValidAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (guideRateSelect < 3) {
-      if (errorAny() || axis1.motionError()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (errorAny() || axis1.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   if (axis == 2 || guideAction == GA_SPIRAL) {
     if (!guideValidAxis2(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (guideRateSelect < 3) {
-      if (errorAny() || axis2.motionError()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (errorAny() || axis2.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   return CE_NONE;

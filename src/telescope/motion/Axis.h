@@ -174,12 +174,8 @@ class Axis {
 
     // enable/disable numeric position range limits (doesn't apply to limit switches)
     void setMotionLimitsCheck(bool state);
-    // checks for an error that would disallow forward motion
-    bool motionForwardError();
-    // checks for an error that would disallow reverse motion
-    bool motionReverseError();
-    // checks for an error that would disallow motion
-    bool motionError();
+    // checks for an error that would disallow motion DIR_NONE for any motion, etc.
+    bool motionError(Direction direction);
 
     // callbacks
 

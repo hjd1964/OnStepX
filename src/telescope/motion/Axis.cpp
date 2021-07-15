@@ -552,18 +552,12 @@ void Axis::setMotionLimitsCheck(bool state) {
   limitsCheck = state;
 }
 
-bool Axis::motionForwardError() {
-  return driver.getStatus().fault ||
-         (limitsCheck && getInstrumentCoordinate() > settings.limits.max) ||
-         error.maxLimitSensed;
-}
-
-bool Axis::motionReverseError() {
-  return driver.getStatus().fault ||
-         (limitsCheck && getInstrumentCoordinate() < settings.limits.min) ||
-         error.minLimitSensed;
-}
-
-bool Axis::motionError() {
-  return motionForwardError() || motionReverseError();
+bool Axis::motionError(Direction direction) {
+  if (direction == DIR_FORWARD || direction == DIR_NONE) {
+    return driver.getStatus().fault || (limitsCheck && getInstrumentCoordinate() > settings.limits.max) || error.maxLimitSensed;
+  }
+  if (direction == DIR_REVERSE || direction == DIR_NONE) {
+    return driver.getStatus().fault || (limitsCheck && getInstrumentCoordinate() < settings.limits.min) || error.minLimitSensed;
+  }
+  return false;
 }
