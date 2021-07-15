@@ -376,84 +376,84 @@
 #endif
 
 #ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE           OFF
+#define FOCUSER_TEMPERATURE           OFF // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
 #endif
 #ifndef FOCUSER_TEMPERATURE_PIN
-#define FOCUSER_TEMPERATURE_PIN       OFF   // for thermistors, analog pin
+#define FOCUSER_TEMPERATURE_PIN       OFF // for thermistors, analog pin
 #endif
 
 // -----------------------------------------------------------------------------------
 // common axis settings, RA/AZM
 #ifndef AXIS1_DRIVER_MODEL
-#define AXIS1_DRIVER_MODEL            OFF // specify drivers for axis 1&2 to enable this feature
+#define AXIS1_DRIVER_MODEL            OFF  // specify a driver to enable this feature
 #endif
 #ifndef AXIS1_DRIVER_DECAY
-#define AXIS1_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS1_DRIVER_DECAY            OFF  // OFF for default, TMC STEALTHCHOP
 #endif
 #ifndef AXIS1_DRIVER_DECAY_GOTO
-#define AXIS1_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS1_DRIVER_DECAY_GOTO       OFF  // OFF for default, TMC SPREADCYCLE
 #endif
 #ifndef AXIS1_DRIVER_MICROSTEPS
-#define AXIS1_DRIVER_MICROSTEPS       OFF
+#define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
 #endif
 #ifndef AXIS1_DRIVER_MICROSTEPS_GOTO
-#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF
+#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF  // microstep mode to use during slews
 #endif
 #ifndef AXIS1_DRIVER_IHOLD
-#define AXIS1_DRIVER_IHOLD            HALF
+#define AXIS1_DRIVER_IHOLD            HALF // in mA
 #endif
 #ifndef AXIS1_DRIVER_IRUN
-#define AXIS1_DRIVER_IRUN             OFF
+#define AXIS1_DRIVER_IRUN             OFF  // in mA
 #endif
 #ifndef AXIS1_DRIVER_IGOTO
-#define AXIS1_DRIVER_IGOTO            SAME
+#define AXIS1_DRIVER_IGOTO            SAME // in mA
 #endif
 #ifndef AXIS1_DRIVER_POWER_DOWN
-#define AXIS1_DRIVER_POWER_DOWN       OFF
+#define AXIS1_DRIVER_POWER_DOWN       OFF  // motor power off if at standstill > 30 sec
 #endif
 #ifndef AXIS1_DRIVER_REVERSE
-#define AXIS1_DRIVER_REVERSE          OFF
+#define AXIS1_DRIVER_REVERSE          OFF  // reverse direction of motion
 #endif
 #ifndef AXIS1_DRIVER_ENABLE
-#define AXIS1_DRIVER_ENABLE           LOW
+#define AXIS1_DRIVER_ENABLE           LOW  // state of ENable pin for motor power on
 #endif
 #ifndef AXIS1_DRIVER_STEP
-#define AXIS1_DRIVER_STEP             HIGH
+#define AXIS1_DRIVER_STEP             HIGH // signal transition state for a step
 #endif
 #ifndef AXIS1_DRIVER_STATUS
-#define AXIS1_DRIVER_STATUS           OFF
+#define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
 #endif
 #ifndef AXIS1_LIMIT_MIN
-#define AXIS1_LIMIT_MIN               -180
+#define AXIS1_LIMIT_MIN               -180 // in "measures" (except Axis1/2 are degrees)
 #endif
 #ifndef AXIS1_LIMIT_MAX
-#define AXIS1_LIMIT_MAX               180
+#define AXIS1_LIMIT_MAX               180  // in "measures" (except Axis1/2 are degrees)
 #endif
 #ifndef AXIS1_SENSE_HOME
-#define AXIS1_SENSE_HOME              OFF
+#define AXIS1_SENSE_HOME              OFF  // HIGH/LOW to activate home sensing and set direction
 #endif
 #ifndef AXIS1_SENSE_HOME_INIT
-#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP // pin mode for home sensing
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MIN
-#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE
+#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE  // HIGH/LOW to activate min limit
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MAX
-#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE
+#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE  // HIGH/LOW to activate max limit
 #endif
 #ifndef AXIS1_SENSE_LIMIT_INIT
-#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
+#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT // pin mode for limit sensing
 #endif
 
 // common axis settings, DEC/ALT
 #ifndef AXIS2_DRIVER_MODEL
-#define AXIS2_DRIVER_MODEL            OFF // specify drivers for axis 1&2 to enable this feature
+#define AXIS2_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS2_DRIVER_DECAY
-#define AXIS2_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS2_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS2_DRIVER_DECAY_GOTO
-#define AXIS2_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS2_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS2_DRIVER_MICROSTEPS
 #define AXIS2_DRIVER_MICROSTEPS       OFF
@@ -509,13 +509,13 @@
 
 // common axis settings, ROTATOR
 #ifndef AXIS3_DRIVER_MODEL
-#define AXIS3_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS3_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS3_DRIVER_DECAY
-#define AXIS3_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS3_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS3_DRIVER_DECAY_GOTO
-#define AXIS3_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS3_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS3_DRIVER_MICROSTEPS
 #define AXIS3_DRIVER_MICROSTEPS       OFF
@@ -571,13 +571,13 @@
 
 // common axis settings, FOCUSER1
 #ifndef AXIS4_DRIVER_MODEL
-#define AXIS4_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS4_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS4_DRIVER_DECAY
-#define AXIS4_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS4_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS4_DRIVER_DECAY_GOTO
-#define AXIS4_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS4_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS4_DRIVER_MICROSTEPS
 #define AXIS4_DRIVER_MICROSTEPS       OFF
@@ -633,13 +633,13 @@
 
 // common axis settings, FOCUSER2
 #ifndef AXIS5_DRIVER_MODEL
-#define AXIS5_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS5_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS5_DRIVER_DECAY
-#define AXIS5_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS5_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS5_DRIVER_DECAY_GOTO
-#define AXIS5_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS5_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS5_DRIVER_MICROSTEPS
 #define AXIS5_DRIVER_MICROSTEPS       OFF
@@ -695,13 +695,13 @@
 
 // common axis settings, FOCUSER3
 #ifndef AXIS6_DRIVER_MODEL
-#define AXIS6_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS6_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS6_DRIVER_DECAY
-#define AXIS6_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS6_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS6_DRIVER_DECAY_GOTO
-#define AXIS6_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS6_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS6_DRIVER_MICROSTEPS
 #define AXIS6_DRIVER_MICROSTEPS       OFF
@@ -757,13 +757,13 @@
 
 // common axis settings, FOCUSER4
 #ifndef AXIS7_DRIVER_MODEL
-#define AXIS7_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS7_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS7_DRIVER_DECAY
-#define AXIS7_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS7_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS7_DRIVER_DECAY_GOTO
-#define AXIS7_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS7_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS7_DRIVER_MICROSTEPS
 #define AXIS7_DRIVER_MICROSTEPS       OFF
@@ -819,13 +819,13 @@
 
 // common axis settings, FOCUSER5
 #ifndef AXIS8_DRIVER_MODEL
-#define AXIS8_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS8_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS8_DRIVER_DECAY
-#define AXIS8_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS8_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS8_DRIVER_DECAY_GOTO
-#define AXIS8_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS8_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS8_DRIVER_MICROSTEPS
 #define AXIS8_DRIVER_MICROSTEPS       OFF
@@ -881,13 +881,13 @@
 
 // common axis settings, FOCUSER6
 #ifndef AXIS9_DRIVER_MODEL
-#define AXIS9_DRIVER_MODEL            OFF // specify a driver to enable this feature
+#define AXIS9_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS9_DRIVER_DECAY
-#define AXIS9_DRIVER_DECAY            OFF // OFF for default, TMC STEALTHCHOP
+#define AXIS9_DRIVER_DECAY            OFF
 #endif
 #ifndef AXIS9_DRIVER_DECAY_GOTO
-#define AXIS9_DRIVER_DECAY_GOTO       OFF // OFF for default, TMC SPREADCYCLE
+#define AXIS9_DRIVER_DECAY_GOTO       OFF
 #endif
 #ifndef AXIS9_DRIVER_MICROSTEPS
 #define AXIS9_DRIVER_MICROSTEPS       OFF
