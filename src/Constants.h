@@ -149,6 +149,8 @@
 
 #define DEFAULT_POWER_DOWN_TIME 30000 // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
 
+#define NV_DEFAULT                 ON // uses HAL specified default for remembering settings when powered off
+
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
