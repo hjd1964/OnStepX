@@ -76,14 +76,9 @@ inline void pollAxes() {
 void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   axisPrefix[9] = '0' + axisNumber;
 
-  if (pollingTaskHandle == 0) {
-    VF("MSG: Axis, start monitor task (rate 20ms priority 0)... ");
-    pollingTaskHandle = tasks.add(20, 0, true, 0, pollAxes, "AxsPoll");
-    if (pollingTaskHandle) { VL("success"); } else { VL("FAILED!"); }
-  }
-
   this->axisNumber = axisNumber;
   void (*move)();
+  move = NULL;
 
   taskHandle = 0;
   #if AXIS1_DRIVER_MODEL != OFF
@@ -113,6 +108,19 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   #if AXIS9_DRIVER_MODEL != OFF
     if (axisNumber == 9) { pins = Axis9Pins; settings = Axis9Settings; move = moveAxis9; }
   #endif
+
+  // make sure there is something to do
+  if (move == NULL) {
+    VF("MSG: Axis, nothing to do exiting!");
+    return;
+  }
+
+  // start monitor
+  if (pollingTaskHandle == 0) {
+    VF("MSG: Axis, start monitor task (rate 20ms priority 0)... ");
+    pollingTaskHandle = tasks.add(20, 0, true, 0, pollAxes, "AxsPoll");
+    if (pollingTaskHandle) { VL("success"); } else { VL("FAILED!"); }
+  }
 
   // init. axis settings
   if (!validKey) {

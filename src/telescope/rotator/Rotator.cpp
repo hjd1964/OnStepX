@@ -14,21 +14,22 @@ void derotateWrapper() { telescope.rotator.derotatePoll(); }
 
 // initialize rotator
 void Rotator::init(bool validKey) {
-  VL("MSG: Rotator, init (Axis3)");
-  axis.init(3, false, validKey);
-  axis.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
-  axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-  axis.setSlewAccelerationRate(AXIS3_ACCELERATION_RATE);
-  axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
-  if (AXIS3_DRIVER_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
-
   // get settings stored in NV ready
   if (!validKey) {
     VLF("MSG: Rotator, writing default settings to NV");
     writeSettings();
   }
   readSettings();
+
+  VL("MSG: Rotator, init (Axis3)");
+  axis.init(3, false, validKey);
+  axis.setMotorCoordinateSteps(0);
   axis.setBacklashSteps(backlash);
+  axis.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
+  axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
+  axis.setSlewAccelerationRate(AXIS3_ACCELERATION_RATE);
+  axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
+  if (AXIS3_DRIVER_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   // start task for derotation
   VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
