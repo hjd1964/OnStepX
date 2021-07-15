@@ -44,6 +44,7 @@ void Focuser::init(bool validKey) {
         axis[index]->init(index + 4, false, validKey);
         axis[index]->setBacklashSteps(settings[index].backlash);
         axis[index]->setFrequencyMax(slewRateDesired[index]);
+        axis[index]->setFrequencyMin(slewRateMinimum[index]);
         axis[index]->setFrequencySlew(slewRateDesired[index]);
         axis[index]->setSlewAccelerationRate(accelerationRate[index]);
         axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
