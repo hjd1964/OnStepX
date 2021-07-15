@@ -236,7 +236,7 @@ bool Axis::autoSlewRateByDistanceStop() {
 
 // slew, with acceleration in "measures" per second per second
 bool Axis::autoSlew(Direction direction) {
-  if (autoRate != AR_NONE) return false;
+  if (autoRate == AR_RATE_BY_DISTANCE) return false;
   if (direction == DIR_NONE) return false;
   if (autoRate == AR_NONE) {
     tracking = true;
