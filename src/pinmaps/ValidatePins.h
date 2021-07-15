@@ -58,7 +58,7 @@
   #endif
 #endif
 #if FOCUSER2 == ON
-  #if (AXIS5_STEP_PIN == OFF || AXIS5_DIR_PIN == OFF) && AXIS5_DRIVER_DC_MODE == OFF
+  #if AXIS5_STEP_PIN == OFF || AXIS5_DIR_PIN == OFF
     #error "Configuration (Config.h): AXIS5 step/dir interface is not supported on this PINMAP"
   #endif
 #endif
@@ -100,45 +100,6 @@
 #if ROTATOR == ON && FOCUSER2 == ON
   #if AXIS3_STEP_PIN == AXIS5_STEP_PIN
     #error "Configuration (Config.h): AXIS3 and AXIS5 step/dir interface is shared, so enabling both is not supported on this PINMAP"
-  #endif
-#endif
-
-// focuser/rotators any invalid focuser DC modes?
-#if FOCUSER1 == ON && AXIS4_DRIVER_DC_MODE == XDIRECT && AXIS4_DRIVER_MODEL != TMC_SPI
-  #error "Configuration (Config.h): AXIS4_DRIVER_DC_MODE error XDIRECT is for TMC stepper drivers only."
-#endif
-
-#if FOCUSER2 == ON && AXIS4_DRIVER_DC_MODE == XDIRECT && AXIS5_DRIVER_MODEL != TMC_SPI
-  #error "Configuration (Config.h): AXIS4_DRIVER_DC_MODE error XDIRECT is for TMC stepper drivers only."
-#endif
-
-#if FOCUSER2 == ON && AXIS5_DRIVER_DC_MODE != OFF
-  #if !(FOCUSER1 == ON && AXIS4_DRIVER_DC_MODE != OFF)
-    #error "Configuration (Config.h): AXIS5_DRIVER_DC_MODE requires enabling FOCUSER1 in AXIS4_DRIVER_DC_MODE.  In this mode FOCUSER2 USES the FOCUSER1 stepper driver"
-  #endif
-#endif
-
-#if ROTATOR == ON && AXIS3_DRIVER_POWER_DOWN == ON
-  #if AXIS3_EN_PIN == OFF || AXIS3_EN_PIN == SHARED
-    #error "Configuration (Config.h): AXIS3_DRIVER_POWER_DOWN enabled but not supported on this PINMAP"
-  #endif
-#endif
-
-#if FOCUSER1 == ON && (AXIS4_DRIVER_POWER_DOWN == ON || AXIS4_DRIVER_DC_MODE != OFF)
-  #if AXIS4_DRIVER_POWER_DOWN == ON && AXIS4_DRIVER_DC_MODE != OFF
-    #error "Configuration (Config.h): AXIS4_DRIVER_POWER_DOWN and AXIS4_DRIVER_DC_MODE can't be used at the same time"
-  #endif
-  #if AXIS4_EN_PIN == OFF || AXIS4_EN_PIN == SHARED
-    #error "Configuration (Config.h): AXIS4_DRIVER_POWER_DOWN and AXIS4_DRIVER_DC_MODE require ENable signal support which this PINMAP doesn't have or is in use for other purposes"
-  #endif
-#endif
-
-#if FOCUSER2 == ON && AXIS5_DRIVER_POWER_DOWN == ON
-  #if AXIS5_DRIVER_POWER_DOWN == ON && AXIS5_DRIVER_DC_MODE != OFF
-    #error "Configuration (Config.h): AXIS5_DRIVER_POWER_DOWN and AXIS5_DRIVER_DC_MODE can't be used at the same time"
-  #endif
-  #if AXIS5_EN_PIN == OFF || AXIS5_EN_PIN == SHARED
-    #error "Configuration (Config.h): AXIS5_DRIVER_POWER_DOWN requires ENable signal support which this PINMAP doesn't have"
   #endif
 #endif
 

@@ -68,7 +68,7 @@ float Focuser::getTemperature() {
 // check for DC motor focuser
 bool Focuser::isDC(int index) {
   if (index < 0 || index > 5) return false;
-  return dcMode[index];
+  return false;
 }
 
 // get DC power in %

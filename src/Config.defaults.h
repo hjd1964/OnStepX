@@ -256,9 +256,6 @@
 
 // -----------------------------------------------------------------------------------
 // focuser settings, FOCUSER1
-#ifndef AXIS4_DRIVER_DC_MODE
-#define AXIS4_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS4_STEPS_PER_MICRON
 #define AXIS4_STEPS_PER_MICRON        0.5
 #endif
@@ -279,9 +276,6 @@
 #endif
 
 // focuser settings, FOCUSER2
-#ifndef AXIS5_DRIVER_DC_MODE
-#define AXIS5_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS5_STEPS_PER_MICRON
 #define AXIS5_STEPS_PER_MICRON        0.5
 #endif
@@ -302,9 +296,6 @@
 #endif
 
 // focuser settings, FOCUSER3
-#ifndef AXIS6_DRIVER_DC_MODE
-#define AXIS6_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS6_STEPS_PER_MICRON
 #define AXIS6_STEPS_PER_MICRON        0.5
 #endif
@@ -325,9 +316,6 @@
 #endif
 
 // focuser settings, FOCUSER4
-#ifndef AXIS7_DRIVER_DC_MODE
-#define AXIS7_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS7_STEPS_PER_MICRON
 #define AXIS7_STEPS_PER_MICRON        0.5
 #endif
@@ -348,9 +336,6 @@
 #endif
 
 // focuser settings, FOCUSER5
-#ifndef AXIS8_DRIVER_DC_MODE
-#define AXIS8_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS8_STEPS_PER_MICRON
 #define AXIS8_STEPS_PER_MICRON        0.5
 #endif
@@ -371,9 +356,6 @@
 #endif
 
 // focuser settings, FOCUSER6
-#ifndef AXIS9_DRIVER_DC_MODE
-#define AXIS9_DRIVER_DC_MODE          OFF
-#endif
 #ifndef AXIS9_STEPS_PER_MICRON
 #define AXIS9_STEPS_PER_MICRON        0.5
 #endif
