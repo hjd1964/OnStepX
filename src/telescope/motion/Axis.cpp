@@ -452,10 +452,8 @@ void Axis::setFrequency(float frequency) {
     }
   }
 
-  if (lastFreq == frequency) return;
-  lastFreq = frequency;
-
   // frequency in measures per second to period in microsecond counts per step
+  lastFreq = frequency;
   float period = 1000000.0F/(frequency*settings.stepsPerMeasure);
   if (period < minPeriodMicros) period = minPeriodMicros;
   if (STEP_WAVE_FORM == SQUARE) period /= 2.0F;
