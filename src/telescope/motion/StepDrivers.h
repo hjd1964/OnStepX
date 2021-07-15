@@ -109,6 +109,9 @@ class StepDriver {
     // get status info.
     DriverStatus getStatus();
 
+    // checks for TMC SPI driver
+    bool isTmcSPI();
+
     // different models of stepper drivers have different bit settings for microsteps
     // translate the human readable microsteps in the configuration to mode bit settings
     // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
@@ -123,9 +126,6 @@ class StepDriver {
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
-
-    // checks if this is a TMC SPI driver
-    bool isTmcSPI();
 
     // checkes if decay control is on the M2 pin
     bool isDecayOnM2();

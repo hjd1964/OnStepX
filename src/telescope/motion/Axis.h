@@ -99,9 +99,6 @@ class Axis {
     // get instrument coordinate in steps
     double getInstrumentCoordinate();
 
-    // mark origin coordinate as current location
-    void markOriginCoordinate();
-
     // set target coordinate, in "measures" (degrees, microns, etc.)
     // with backlash disabled this moves to the nearest position where the motor doesn't cog
     void setTargetCoordinatePark(double value);
@@ -137,13 +134,13 @@ class Axis {
     void setSlewAccelerationRateAbort(float mpsps);
 
     // slew, with acceleration distance (in "measures" to FrequencySlew)
-    void autoSlewRateByDistance(float distance);
+    bool autoSlewRateByDistance(float distance);
     // stops, with deacceleration by distance
-    void autoSlewRateByDistanceStop();
+    bool autoSlewRateByDistanceStop();
     // slew, with acceleration in "measures" per second per second
-    void autoSlew(Direction direction);
+    bool autoSlew(Direction direction);
     // slew to home, with acceleration in "measures" per second per second
-    void autoSlewHome();
+    bool autoSlewHome();
     // stops, with deacceleration by time
     void autoSlewStop();
     // emergency stops, with deacceleration by time
@@ -172,7 +169,7 @@ class Axis {
     // refresh driver status information maximum frequency is 20ms
     void updateDriverStatus();
 
-    // enable or disable checking of limits, default enabled
+    // enable/disable numeric position range limits (doesn't apply to limit switches)
     void setMotionLimitsCheck(bool state);
     // checks for an error that would disallow forward motion
     bool motionForwardError();
@@ -197,6 +194,8 @@ class Axis {
     StepDriver driver;
 
   private:
+    // mark origin coordinate for autoSlewRateByDistance as current location
+    void setSlewOriginCoordinate();
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
     // distance to target in "measures" (degrees, microns, etc.)
@@ -222,17 +221,14 @@ class Axis {
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
 
-    bool enabled = false;
-    bool tracking = true;
-    bool limitsCheck = true;
+    bool enabled = false;        // enable/disable logical state (disabled is powered down)
+    bool tracking = true;        // locks movement of axis target with timer rate
+    bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
 
     uint8_t homeSenseHandle = 0; // home sensor handle
     uint8_t minSenseHandle = 0;  // min sensor handle
     uint8_t maxSenseHandle = 0;  // max sensor handle
 
-    long originSteps = 0;
-
-    float backlashFreq = 0.0F;
     uint16_t backlashStepsStore;
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
@@ -248,6 +244,7 @@ class Axis {
     volatile uint8_t dirRev = HIGH;
 
     double target = 0.0;
+    long originSteps = 0;
     volatile long targetSteps = 0;
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;

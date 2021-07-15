@@ -237,6 +237,8 @@ int8_t StepDriver::getDecayPinState(int8_t decay) {
   return state;
 }
 
+
+// checks for TMC SPI driver
 bool StepDriver::isTmcSPI() {
   #ifdef HAS_TMC_DRIVER
     if (settings.model == TMC2130 || settings.model == TMC5160) return true; else return false;
