@@ -13,45 +13,46 @@ extern Tasks tasks;
 
 void tcfWrapper() { telescope.focuser.tcfPoll(); }
 
-// initialize variables
-Focuser::Focuser() {
+// initialize all focusers
+void Focuser::init(bool validKey) {
+
+  // init settings stored in NV
+  if (!validKey) {
+    VLF("MSG: Focusers, writing default settings to NV");
+    for (int index = 0; index < FOCUSER_MAX; index++) {
+      settings[index].tcf.enabled = false;
+      settings[index].tcf.coef = 0.0F;
+      settings[index].tcf.deadband = 1;
+      settings[index].tcf.t0 = 0.0F;
+      settings[index].dcPower = 50;
+      settings[index].backlash = 0.0F;
+      writeSettings(index);
+    }
+  }
+
+  // get settings
+  for (int index = 0; index < FOCUSER_MAX; index++) readSettings(index);
+
   for (int index = 0; index < FOCUSER_MAX; index++) {
     axis[index] = NULL;
     moveRate[index] = 100;
     tcfSteps[index] = 0;
-    settings[index].tcf.enabled = false;
-    settings[index].tcf.coef = 0.0F;
-    settings[index].tcf.deadband = 1;
-    settings[index].tcf.t0 = 0.0F;
-    settings[index].dcPower = 50;
-    settings[index].backlash = 0.0F;
-  }
-}
-
-// initialize all focusers
-void Focuser::init(bool validKey) {
-  for (int index = 0; index < FOCUSER_MAX; index++) {
     if (driverModel[index] != OFF) {
       axis[index] = new Axis;
       if (axis[index] != NULL) {
         V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
         axis[index]->init(index + 4, false, validKey);
+        axis[index]->setBacklashSteps(settings[index].backlash);
         axis[index]->setFrequencyMax(slewRateDesired[index]);
         axis[index]->setFrequencySlew(slewRateDesired[index]);
         axis[index]->setSlewAccelerationRate(accelerationRate[index]);
         axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
+        if (powerDown[index]) axis[index]->setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
       }
     }
   }
 
   if (FocuserSettingsSize < sizeof(Settings)) { initError.nv = true; DL("ERR: Focuser::init(); FocuserSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
-
-  // get settings stored in NV ready
-  if (!validKey) {
-    VLF("MSG: Focusers, writing default settings to NV");
-    for (int index = 0; index < FOCUSER_MAX; index++) writeSettings(index);
-  }
-  for (int index = 0; index < FOCUSER_MAX; index++) readSettings(index);
 
   // start task for temperature compensated focusing
   VF("MSG: Focuser, starting TCF task (rate 1s priority 7)... ");

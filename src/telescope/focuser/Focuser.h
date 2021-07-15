@@ -17,22 +17,20 @@
 typedef struct Tcf {
   bool enabled;
   float coef;
-  int16_t deadband;
+  int16_t deadband; // in steps
   float t0;
 } Tcf;
 
 #define FocuserSettingsSize 14
 typedef struct Settings {
   Tcf tcf;
-  uint8_t dcPower;
-  int16_t backlash;
+  uint8_t dcPower;   // in %
+  int16_t backlash;  // in steps
 } Settings;
 #pragma pack()
 
 class Focuser {
   public:
-    Focuser();
-
     // initialize all focusers
     void init(bool validKey);
 
@@ -83,8 +81,9 @@ class Focuser {
     int slewRateDesired[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
     int accelerationRate[FOCUSER_MAX] = { AXIS4_ACCELERATION_RATE, AXIS5_ACCELERATION_RATE, AXIS6_ACCELERATION_RATE, AXIS7_ACCELERATION_RATE, AXIS8_ACCELERATION_RATE, AXIS9_ACCELERATION_RATE };
     int rapidStopRate[FOCUSER_MAX]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
-    int moveRate[FOCUSER_MAX];
+    bool powerDown[FOCUSER_MAX]       = { AXIS4_DRIVER_POWER_DOWN == ON, AXIS5_DRIVER_POWER_DOWN == ON, AXIS6_DRIVER_POWER_DOWN == ON, AXIS7_DRIVER_POWER_DOWN == ON, AXIS8_DRIVER_POWER_DOWN == ON, AXIS9_DRIVER_POWER_DOWN == ON };
 
+    int moveRate[FOCUSER_MAX];
     float tcfSteps[FOCUSER_MAX];
 
     Settings settings[FOCUSER_MAX];
