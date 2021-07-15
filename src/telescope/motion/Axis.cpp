@@ -26,7 +26,7 @@ void Axis::powered(bool value) {
   if (pins.enable != OFF) {
     digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
   } else {
-    driver.zeroPower(!state);
+    driver.power(state);
   }
 }
 
