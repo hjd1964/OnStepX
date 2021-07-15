@@ -316,8 +316,8 @@ void Axis::poll() {
         autoRate = AR_NONE;
         tracking = true;
       } else {
-        freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + backlashFreq;
-        if (freq < backlashFreq) freq = backlashFreq;
+        freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + settings.backlashFreq;
+        if (freq < settings.backlashFreq) freq = settings.backlashFreq;
         if (freq > slewFreq) freq = slewFreq;
         if (direction == DIR_REVERSE) freq = -freq;
       }
@@ -361,7 +361,7 @@ void Axis::poll() {
 
     // ISR swap and microstep mode switching
     if (microstepModeControl == MMC_SLEWING) {
-      if (fabs(freq) <= backlashFreq*1.2F || autoRate == AR_NONE) {
+      if (fabs(freq) <= settings.backlashFreq*1.2F || autoRate == AR_NONE) {
         if (driver.modeSwitchAllowed()) {
           V(axisPrefix); VLF("poll(); mode switch tracking set");
           driver.modeMicrostepTracking();
@@ -375,7 +375,7 @@ void Axis::poll() {
         }
       }
     } else {
-      if (fabs(freq) > backlashFreq*1.2F) {
+      if (fabs(freq) > settings.backlashFreq*1.2F) {
         if (driver.modeSwitchAllowed()) {
           if (microstepModeControl == MMC_TRACKING) {
             microstepModeControl = MMC_SLEWING_REQUEST;
@@ -397,13 +397,13 @@ void Axis::poll() {
     }
   } else freq = 0.0F;
 
-  // apply the composite or backlash frequency as required
+  // apply composite or backlash frequency as required
   float f = freq;
   if (tracking) f += baseFreq;
   if (microstepModeControl == MMC_SLEWING) {
     setFrequency(f/slewStep);
   } else {
-    if (inBacklash()) { if (f >= 0.0) f = backlashFreq; else f = -backlashFreq; }
+    if (inBacklash()) { if (f >= 0.0) f = settings.backlashFreq; else f = -settings.backlashFreq; }
     setFrequency(f);
   }
 

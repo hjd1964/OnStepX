@@ -17,13 +17,14 @@ typedef struct AxisLimits {
   float max;
 } AxisLimits;
 
-#define AxisSettingsSize 21
+#define AxisSettingsSize 25
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
   int16_t    microsteps;
   int16_t    currentRun;
   AxisLimits limits;
+  float      backlashFreq;
 } AxisSettings;
 #pragma pack()
 

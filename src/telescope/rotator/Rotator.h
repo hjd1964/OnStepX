@@ -44,7 +44,7 @@ class Rotator {
 
     float moveRate = 3.0F;
 
-    int16_t backlash = 0;
+    int16_t backlash = 0; // in steps
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;

@@ -27,6 +27,7 @@ void Rotator::init(bool validKey) {
     writeSettings();
   }
   readSettings();
+  axis.setBacklashSteps(backlash);
 
   // start task for derotation
   VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
@@ -43,6 +44,7 @@ bool Rotator::setBacklash(int value) {
   if (value < 0 || value > 10000) return false;
   backlash = value;
   writeSettings();
+  axis.setBacklashSteps(backlash);
   return true;
 }
 
