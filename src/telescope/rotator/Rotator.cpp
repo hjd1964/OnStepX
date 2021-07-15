@@ -20,6 +20,7 @@ void Rotator::init(bool validKey) {
   axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
   axis.setSlewAccelerationRate(AXIS3_ACCELERATION_RATE);
   axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
+  if (AXIS3_DRIVER_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   // get settings stored in NV ready
   if (!validKey) {

@@ -10,11 +10,24 @@ extern Tasks tasks;
 
 extern unsigned long periodSubMicros;
 
+// enables or disables the associated step/dir driver
 void Axis::enable(bool value) {
-  if (pins.enable != OFF) {
-    if (value) { digitalWriteEx(pins.enable, pins.enabledState); } else { digitalWriteEx(pins.enable, !pins.enabledState); }
-  }
+  powered(value);
   enabled = value;
+}
+
+// time (in ms) before automatic power down at standstill, use 0 to disable
+void Axis::setPowerDownTime(int value) {
+  if (value == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = value; }
+}
+
+void Axis::powered(bool value) {
+  bool state = value & !poweredDown;
+  if (pins.enable != OFF) {
+    digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
+  } else {
+    driver.zeroPower(!state);
+  }
 }
 
 bool Axis::isEnabled() {
@@ -127,16 +140,16 @@ long Axis::getTargetCoordinateSteps() {
   return steps;
 }
 
-// mark the start coordinate of a autoSlewRateByDistance()
-void Axis::markOriginCoordinate() {
-  noInterrupts();
-  originSteps = motorSteps;
-  interrupts();
-}
-
 // check if we're near the target coordinate during an auto slew
 bool Axis::nearTarget() {
   return labs(motorSteps - targetSteps) <= step * 2;
+}
+
+// mark origin coordinate for autoSlewRateByDistance as current location
+void Axis::setSlewOriginCoordinate() {
+  noInterrupts();
+  originSteps = motorSteps;
+  interrupts();
 }
 
 // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
@@ -201,35 +214,42 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 }
 
 // slew, with acceleration distance (in "measures" to FrequencySlew)
-void Axis::autoSlewRateByDistance(float distance) {
-  markOriginCoordinate();
+bool Axis::autoSlewRateByDistance(float distance) {
+  if (autoRate != AR_NONE) return false;
+  setSlewOriginCoordinate();
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   tracking = false;
   driver.modeDecaySlewing();
   V(axisPrefix); VLF("autoSlewRateByDistance(); slew started");
+  return true;
 }
 
 // stops, with deacceleration by distance
-void Axis::autoSlewRateByDistanceStop() {
+bool Axis::autoSlewRateByDistanceStop() {
+  if (autoRate != AR_RATE_BY_DISTANCE) return false;
   driver.modeDecayTracking();
   tracking = true;
   autoRate = AR_NONE;
+  return true;
 }
 
 // slew, with acceleration in "measures" per second per second
-void Axis::autoSlew(Direction direction) {
-  if (direction == DIR_NONE) return;
+bool Axis::autoSlew(Direction direction) {
+  if (autoRate != AR_NONE) return false;
+  if (direction == DIR_NONE) return false;
   if (autoRate == AR_NONE) {
     tracking = true;
     driver.modeDecaySlewing();
     V(axisPrefix); VLF("autoSlew(); slew started");
   }
   if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
+  return true;
 }
 
 // slew to home, with acceleration in "measures" per second per second
-void Axis::autoSlewHome() {
+bool Axis::autoSlewHome() {
+  if (autoRate != AR_NONE) return false;
   if (pins.sense.home != OFF) {
     tracking = true;
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
@@ -240,7 +260,7 @@ void Axis::autoSlewHome() {
         case HOME_FAST: VL("fast"); break;
         case HOME_SLOW: VL("slow"); break;
         case HOME_FINE: VL("fine"); break;
-        case HOME_NONE: VL("????"); break;
+        case HOME_NONE: VL("?"); break;
       }
     }
     if (senses.read(homeSenseHandle)) {
@@ -251,26 +271,25 @@ void Axis::autoSlewHome() {
       autoRate = AR_RATE_BY_TIME_REVERSE;
     }
   }
+  return true;
 }
 
 // stops, with deacceleration by time
 void Axis::autoSlewStop() {
-  if (autoRate != AR_NONE && autoRate != AR_RATE_BY_TIME_ABORT) {
-    V(axisPrefix); VLF("autoSlewStop(); slew stopping");
-    autoRate = AR_RATE_BY_TIME_END;
-    poll();
-  }
+  if (autoRate == AR_NONE || autoRate == AR_RATE_BY_TIME_ABORT) return;
+  V(axisPrefix); VLF("autoSlewStop(); slew stopping");
+  autoRate = AR_RATE_BY_TIME_END;
+  poll();
 }
 
 // emergency stops, with deacceleration by time
 void Axis::autoSlewAbort() {
-  if (autoRate != AR_NONE) {
-    V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
-    autoRate = AR_RATE_BY_TIME_ABORT;
-    homingStage = HOME_NONE;
-    tracking = true;
-    poll();
-  }
+  if (autoRate == AR_NONE) return;
+  V(axisPrefix); VLF("autoSlewAbort(); slew aborting");
+  autoRate = AR_RATE_BY_TIME_ABORT;
+  homingStage = HOME_NONE;
+  tracking = true;
+  poll();
 }
 
 // checks if slew is active on this axis
@@ -278,15 +297,16 @@ bool Axis::autoSlewActive() {
   return autoRate != AR_NONE;  
 }
 
+// monitor movement
 void Axis::poll() {
   // make sure we're ready
   if (axisNumber == 0) return;
 
-  // check limits
+  // check physical limit switches
   error.minLimitSensed = senses.read(minSenseHandle);
   error.maxLimitSensed = senses.read(maxSenseHandle);
 
-  // stop homing as we pass by the sensor
+  // stop homing as we pass by the switch
   if (homingStage != HOME_NONE) {
     if (autoRate == AR_RATE_BY_TIME_FORWARD && !senses.read(homeSenseHandle)) autoSlewStop();
     if (autoRate == AR_RATE_BY_TIME_REVERSE && senses.read(homeSenseHandle)) autoSlewStop();
@@ -420,7 +440,21 @@ void Axis::setFrequency(float frequency) {
     noInterrupts(); trackingStep =  1; interrupts();
   }
 
+  // automatic standstill power down
+  if (powerDownStandstill) {
+    if (frequency == 0.0F) {
+      if ((long)(millis() - powerDownTime) > 0) {
+        if (!poweredDown) { poweredDown = true; powered(false); V(axisPrefix); VLF("setFrequency(); driver powered down"); }
+      }
+    } else {
+      if (poweredDown) { poweredDown = false; powered(true); V(axisPrefix); VLF("setFrequency(); driver powered up"); }
+      powerDownTime = millis() + powerDownDelay;
+    }
+  }
+
+  if (lastFreq == frequency) return;
   lastFreq = frequency;
+
   // frequency in measures per second to period in microsecond counts per step
   float period = 1000000.0F/(frequency*settings.stepsPerMeasure);
   if (period < minPeriodMicros) period = minPeriodMicros;

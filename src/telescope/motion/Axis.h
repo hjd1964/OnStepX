@@ -72,6 +72,9 @@ class Axis {
     // get the enabled state
     bool isEnabled();
 
+    // time (in ms) before automatic power down at standstill, use 0 to disable
+    void setPowerDownTime(int value);
+
     // get steps per measure
     double getStepsPerMeasure();
 
@@ -194,6 +197,9 @@ class Axis {
     StepDriver driver;
 
   private:
+    // sets driver power on/off
+    void powered(bool value);
+
     // mark origin coordinate for autoSlewRateByDistance as current location
     void setSlewOriginCoordinate();
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
@@ -257,6 +263,11 @@ class Axis {
 
     unsigned long lastPeriod = 0;
     unsigned long lastPeriodSet = 0;
+
+    bool powerDownStandstill = false;
+    unsigned long powerDownDelay;
+    bool poweredDown = false;
+    unsigned long powerDownTime = 0;
 
     float freq = 0.0F;
     float baseFreq = 0.0F;

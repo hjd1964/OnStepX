@@ -147,6 +147,8 @@
 #define MCP23008                    2 // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
 #define MCP23017                    3 // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
 
+#define DEFAULT_POWER_DOWN_TIME 30000 // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
+
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math

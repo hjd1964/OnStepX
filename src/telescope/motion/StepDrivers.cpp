@@ -237,6 +237,14 @@ int8_t StepDriver::getDecayPinState(int8_t decay) {
   return state;
 }
 
+// secondary way to power down the driver not using the enable pin
+void StepDriver::zeroPower(bool state) {
+  #ifdef HAS_TMC_DRIVER
+    int I_run = 0, I_hold = 0;
+    if (!state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
+    tmcDriver.mode(true, settings.decay, microstepCode, I_run, I_hold);
+  #endif
+}
 
 // checks for TMC SPI driver
 bool StepDriver::isTmcSPI() {

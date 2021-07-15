@@ -25,12 +25,15 @@ void Mount::init(bool validKey) {
   delay(1000);
   axis1.init(1, transform.mountType == ALTAZM, validKey);
   axis1.setMotionLimitsCheck(false);
+  if (AXIS1_DRIVER_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
+
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1 = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
   delay(1000);
   axis2.init(2, transform.mountType == ALTAZM, validKey);
   axis2.setMotionLimitsCheck(false);
+  if (AXIS2_DRIVER_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   // get limits ready
   limitInit(validKey);

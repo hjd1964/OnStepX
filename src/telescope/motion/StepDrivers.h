@@ -109,6 +109,9 @@ class StepDriver {
     // get status info.
     DriverStatus getStatus();
 
+    // secondary way to power down driver not using the enable pin
+    void zeroPower(bool state);
+
     // checks for TMC SPI driver
     bool isTmcSPI();
 
