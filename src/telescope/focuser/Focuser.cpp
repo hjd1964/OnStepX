@@ -16,6 +16,9 @@ void tcfWrapper() { telescope.focuser.tcfPoll(); }
 // initialize all focusers
 void Focuser::init(bool validKey) {
 
+  // wait a moment for any background processing that may be needed
+  delay(1000);
+  
   // init settings stored in NV
   if (!validKey) {
     VLF("MSG: Focusers, writing default settings to NV");

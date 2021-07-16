@@ -16,6 +16,10 @@ extern Tasks tasks;
 
 // initialize rotator
 void Rotator::init(bool validKey) {
+
+  // wait a moment for any background processing that may be needed
+  delay(1000);
+
   // get settings stored in NV ready
   if (!validKey) {
     VLF("MSG: Rotator, writing default settings to NV");

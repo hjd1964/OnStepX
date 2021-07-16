@@ -21,8 +21,10 @@ void Mount::init(bool validKey) {
   // get library ready
   library.init(validKey);
 
-  // get the main axes ready
+  // wait a moment for any background processing that may be needed
   delay(1000);
+
+  // get the main axes ready
   axis1.init(1, transform.mountType == ALTAZM, validKey);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_DRIVER_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
