@@ -34,10 +34,13 @@ class Rotator {
   private:
     // enable or disable the derotator
     void setDerotatorEnabled(bool value);
-    // returns parallactic angle in degrees
-    double parallacticAngle(Coordinate *coord);
-    // returns parallactic rate in degrees per second
-    double parallacticRate(Coordinate *coord);
+
+    #ifdef MOUNT_PRESENT
+      // returns parallactic angle in degrees
+      double parallacticAngle(Coordinate *coord);
+      // returns parallactic rate in degrees per second
+      double parallacticRate(Coordinate *coord);
+    #endif
 
     void readSettings();
     void writeSettings();

@@ -8,7 +8,11 @@ extern Tasks tasks;
 #include "../Telescope.h"
 #include "../../lib/sense/Sense.h"
 
-extern unsigned long periodSubMicros;
+#ifdef MOUNT_PRESENT
+  extern unsigned long periodSubMicros;
+#else
+  #define periodSubMicros 1.0
+#endif
 
 // enables or disables the associated step/dir driver
 void Axis::enable(bool value) {

@@ -10,7 +10,9 @@ extern Tasks tasks;
 #include "../Telescope.h"
 #include "../mount/site/Site.h"
 
-void derotateWrapper() { telescope.rotator.derotatePoll(); }
+#ifdef MOUNT_PRESENT
+  void derotateWrapper() { telescope.rotator.derotatePoll(); }
+#endif
 
 // initialize rotator
 void Rotator::init(bool validKey) {
@@ -31,9 +33,11 @@ void Rotator::init(bool validKey) {
   axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
   if (AXIS3_DRIVER_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
-  // start task for derotation
-  VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
-  if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+  #ifdef MOUNT_PRESENT
+    // start task for derotation
+    VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
+    if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+  #endif
 }
 
 // get backlash in steps
@@ -52,44 +56,50 @@ bool Rotator::setBacklash(int value) {
 
 // enable or disable the derotator
 void Rotator::setDerotatorEnabled(bool value) {
-  if (telescope.mount.transform.mountType != ALTAZM) return;
-  derotatorEnabled = value;
-  if (!derotatorEnabled) axis.setFrequencyBase(0.0F);
+  #ifdef MOUNT_PRESENT
+    if (telescope.mount.transform.mountType != ALTAZM) return;
+    derotatorEnabled = value;
+    if (!derotatorEnabled) axis.setFrequencyBase(0.0F);
+  #else
+    value = value;
+  #endif
 }
 
-// poll to set the derotator rate
-void Rotator::derotatePoll() {
-  if (derotatorEnabled) {
-    float pr = 0.0F;
-    #ifdef MOUNT_PRESENT
-    if (!axis.autoSlewActive()) {
-      Coordinate current = telescope.mount.getPosition();
-      pr = parallacticRate(&current);
-      if (derotatorReverse) pr = -pr;
+#ifdef MOUNT_PRESENT
+  // poll to set the derotator rate
+  void Rotator::derotatePoll() {
+    if (derotatorEnabled) {
+      float pr = 0.0F;
+      #ifdef MOUNT_PRESENT
+      if (!axis.autoSlewActive()) {
+        Coordinate current = telescope.mount.getPosition();
+        pr = parallacticRate(&current);
+        if (derotatorReverse) pr = -pr;
+      }
+      #endif
+      axis.setFrequencyBase(pr);
     }
-    #endif
-    axis.setFrequencyBase(pr);
   }
-}
 
-// returns parallactic angle in degrees
-double Rotator::parallacticAngle(Coordinate *coord) {
-  return radToDeg(atan2(sin(coord->h), cos(coord->d)*tan(site.location.latitude) - sin(coord->d)*cos(coord->h)));
-}
+  // returns parallactic angle in degrees
+  double Rotator::parallacticAngle(Coordinate *coord) {
+    return radToDeg(atan2(sin(coord->h), cos(coord->d)*tan(site.location.latitude) - sin(coord->d)*cos(coord->h)));
+  }
 
-// returns parallactic rate in degrees per second
-double Rotator::parallacticRate(Coordinate *coord) {
-  // one minute of hour angle in degrees = 15/60 = 0.25
-  Coordinate ahead = *coord;
-  ahead.h += degToRad(0.125);
-  Coordinate behind = *coord;
-  behind.h -= degToRad(0.125);
-  double b = parallacticAngle(&behind);
-  double a = parallacticAngle(&ahead);
-  if (b >  90.0 && a < -90.0) a += 360.0;
-  if (b < -90.0 && a >  90.0) b += 360.0;
-  return (a - b)/60.0;
-}
+  // returns parallactic rate in degrees per second
+  double Rotator::parallacticRate(Coordinate *coord) {
+    // one minute of hour angle in degrees = 15/60 = 0.25
+    Coordinate ahead = *coord;
+    ahead.h += degToRad(0.125);
+    Coordinate behind = *coord;
+    behind.h -= degToRad(0.125);
+    double b = parallacticAngle(&behind);
+    double a = parallacticAngle(&ahead);
+    if (b >  90.0 && a < -90.0) a += 360.0;
+    if (b < -90.0 && a >  90.0) b += 360.0;
+    return (a - b)/60.0;
+  }
+#endif
 
 void Rotator::readSettings() {
   backlash = nv.readUI(NV_ROTATOR_SETTINGS_BASE);
