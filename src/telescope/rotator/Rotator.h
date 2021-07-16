@@ -4,14 +4,12 @@
 
 #include "../../Common.h"
 
-#if AXIS3_DRIVER_MODEL != OFF
+#ifdef ROTATOR_PRESENT
 
 #include "../../commands/ProcessCmds.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 #include "../mount/coordinates/Transform.h"
-
-#define ROTATOR_PRESENT
 
 class Rotator {
   public:

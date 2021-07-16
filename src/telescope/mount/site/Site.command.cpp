@@ -3,7 +3,7 @@
 
 #include "Site.h"
 
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+#ifdef MOUNT_PRESENT
 
 #include "../../../commands/ProcessCmds.h"
 
@@ -140,7 +140,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   //            Change standard date to MM/DD/YY
   //            Return: 0 on failure, 1 on success
   if (cmdP("SC"))  {
-    GregorianDate date = convert.strToDate(parameter);
+    GregorianDate date = strToDate(parameter);
     if (date.valid) {
       ut1 = calendars.gregorianToJulianDay(date);
       ut1.hour = backInHours(getTime());

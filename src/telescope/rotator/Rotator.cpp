@@ -3,7 +3,7 @@
 
 #include "Rotator.h"
 
-#if AXIS3_DRIVER_MODEL != OFF
+#ifdef ROTATOR_PRESENT
 
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;

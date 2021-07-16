@@ -191,7 +191,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 }
 
 bool Axis::enableMoveFast(const bool fast) {
-  #if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+  #ifdef MOUNT_PRESENT
     if (axisNumber > 2) return false;
     if (fast) {
       disableBacklash();

@@ -4,7 +4,7 @@
 
 #include "../../../Common.h"
 
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+#ifdef MOUNT_PRESENT
 
 #include "../../../lib/convert/Convert.h"
 #include "../../../commands/ProcessCmds.h"

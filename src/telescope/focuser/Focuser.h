@@ -4,13 +4,12 @@
 
 #include "../../Common.h"
 
-#if AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
+#ifdef FOCUSER_PRESENT
 
 #include "../../commands/ProcessCmds.h"
 #include "../motion/StepDrivers.h"
 #include "../motion/Axis.h"
 
-#define FOCUSER_PRESENT
 #define FOCUSER_MAX 6
 
 #pragma pack(1)

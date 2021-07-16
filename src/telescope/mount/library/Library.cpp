@@ -3,7 +3,7 @@
 
 #include "Library.h"
 
-#if AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF
+#ifdef MOUNT_PRESENT
 
 Library library;
 char const * objectStr[] = {"UNK", "OC", "GC", "PN", "DN", "SG", "EG", "IG", "KNT", "SNR", "GAL", "CN", "STR", "PLA", "CMT", "AST"};

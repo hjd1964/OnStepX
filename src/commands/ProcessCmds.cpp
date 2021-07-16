@@ -8,11 +8,12 @@ extern Tasks tasks;
 #include "../telescope/Telescope.h"
 #include "ProcessCmds.h"
 
-#if ST4_INTERFACE == ON && ST4_HAND_CONTROL == ON
-  #include "../lib/serial/Serial_ST4_Master.h"
+#ifdef MOUNT_PRESENT
+  #if ST4_INTERFACE == ON && ST4_HAND_CONTROL == ON
+    #include "../lib/serial/Serial_ST4_Master.h"
+  #endif
+  #include "../lib/serial/Serial_Local.h"
 #endif
-
-#include "../lib/serial/Serial_Local.h"
 
 // command processors
 #ifdef SERIAL_A
