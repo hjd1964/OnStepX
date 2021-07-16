@@ -63,14 +63,11 @@
 #define HALF                        -1
 #define AUTO                        -1
 #define ON                          -2
-#define ON_BOTH                     -3
-#define ON_PULLUP                   -4
-#define ON_PULLDOWN                 -5
-#define TMC_SPI                     -6
-#define SLAVE                       -7
-#define ACCESS_POINT                -8
-#define STATION                     -9
-#define STATION_DHCP                -10
+#define AUX                         -3
+#define SLAVE                       -4
+#define ACCESS_POINT                -5
+#define STATION                     -6
+#define STATION_DHCP                -7
 
 // pier side
 #define EAST                        1      // same as PSS_EAST
@@ -82,7 +79,9 @@
 #define PROFILER                    -21
 
 // pins
-#define SHARED                      -30
+#define SHARED_PIN                  -30
+#define DAC_PIN(v)                  ((v)+0x100)
+#define GPIO_PIN(v)                 ((v)+0x200)
 
 // mount types
 #define MOUNT_TYPE_FIRST            1
