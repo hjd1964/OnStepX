@@ -56,3 +56,6 @@
 // Misc.
 #define strtof strtod // there is no strtof defined for the AVR platform
 
+// Allow MCU reset -----------------------------------------------------------------------------------
+#define HAL_RESET() mega2560restart();
+#define HAL_RESET_FUNC void (*mega2560restart) (void) = 0;

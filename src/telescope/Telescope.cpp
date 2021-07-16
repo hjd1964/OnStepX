@@ -8,6 +8,11 @@
 #include "../tasks/OnTask.h"
 extern Tasks tasks;
 
+// possible reset function for this MCU
+#ifdef HAL_RESET_FUNC
+  HAL_RESET_FUNC;
+#endif
+
 Telescope telescope;
 InitError initError;
 
