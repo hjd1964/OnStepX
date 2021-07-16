@@ -19,7 +19,7 @@
 // GENERAL PURPOSE PINMAP VALIDATION ---------------
 
 #if AXIS1_DRIVER_STATUS == HIGH || AXIS1_DRIVER_STATUS == LOW
-  #if AXIS1_DRIVER_MODEL == TMC_SPI
+  #if AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160
     #error "Configuration (Config.h): AXIS1_DRIVER_STATUS LOW/HIGH doesn't make sense when using TMC_SPI stepper drivers"
   #elif !defined(AXIS1_FAULT_PIN)
     #error "Configuration (Config.h): AXIS1_DRIVER_STATUS LOW/HIGH feature isn't supported on this PINMAP"
@@ -28,7 +28,7 @@
   #endif
 #endif
 #if AXIS2_DRIVER_STATUS == HIGH || AXIS2_DRIVER_STATUS == LOW
-  #if AXIS2_DRIVER_MODEL == TMC_SPI
+  #if AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160
     #error "Configuration (Config.h): AXIS2_DRIVER_STATUS LOW/HIGH doesn't make sense when using TMC_SPI stepper drivers"
   #elif !defined(AXIS2_FAULT_PIN)
     #error "Configuration (Config.h): AXIS2_DRIVER_STATUS LOW/HIGH feature isn't supported on this PINMAP"
@@ -42,7 +42,7 @@
 #endif
 
 // powering down Dec supported only if EN is available and not shared with Axis1
-#if AXIS2_DRIVER_POWER_DOWN == ON && (AXIS2_EN_PIN == OFF || AXIS2_EN_PIN == SHARED)
+#if AXIS2_DRIVER_POWER_DOWN == ON && (AXIS2_EN_PIN == OFF || AXIS2_EN_PIN == SHARED_PIN)
   #error "Configuration (Config.h): AXIS2_DRIVER_POWER_DOWN not supported on this PINMAP"
 #endif
 
@@ -103,60 +103,67 @@
   #endif
 #endif
 
-// ACCESSORIES ------------------------------
-#if FEATURE1_PURPOSE != OFF && FEATURE1_PIN == AUX && defined(Aux1)
-  #if ASSIGNED_AUX1 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE1_PIN AUX enabled but Aux1 is already in use, choose one feature on Aux1"
+#if FEATURE1_PURPOSE != OFF && FEATURE1_PIN == AUX && defined(AUX1_PIN)
+  #ifdef AUX1_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE1_PIN AUX enabled but AUX1_PIN is already in use, choose one feature on AUX1_PIN"
   #endif
   #undef FEATURE1_PIN
-  #define FEATURE1_PIN Aux1
+  #define FEATURE1_PIN AUX1_PIN
+  #define AUX1_PIN_INUSE
 #endif
-#if FEATURE2_PURPOSE != OFF && FEATURE2_PIN == AUX && defined(Aux2)
-  #if ASSIGNED_AUX2 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE2_PIN AUX enabled but Aux2 is already in use, choose one feature on Aux2"
+#if FEATURE2_PURPOSE != OFF && FEATURE2_PIN == AUX && defined(AUX2_PIN)
+  #ifdef AUX2_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE2_PIN AUX enabled but AUX2_PIN is already in use, choose one feature on AUX2_PIN"
   #endif
   #undef FEATURE2_PIN
-  #define FEATURE2_PIN Aux2
+  #define FEATURE2_PIN AUX2_PIN
+  #define AUX2_PIN_INUSE
 #endif
-#if FEATURE3_PURPOSE != OFF && FEATURE3_PIN == AUX && defined(Aux3)
-  #if ASSIGNED_AUX3 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE3_PIN AUX enabled but Aux3 is already in use, choose one feature on Aux3"
+#if FEATURE3_PURPOSE != OFF && FEATURE3_PIN == AUX && defined(AUX3_PIN)
+  #ifdef AUX3_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE3_PIN AUX enabled but AUX3_PIN is already in use, choose one feature on AUX3_PIN"
   #endif
   #undef FEATURE3_PIN
-  #define FEATURE3_PIN Aux3
+  #define FEATURE3_PIN AUX3_PIN
+  #define AUX3_PIN_INUSE
 #endif
-#if FEATURE4_PURPOSE != OFF && FEATURE4_PIN == AUX && defined(Aux3)
-  #if ASSIGNED_AUX4 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE4_PIN AUX enabled but Aux4 is already in use, choose one feature on Aux4"
+#if FEATURE4_PURPOSE != OFF && FEATURE4_PIN == AUX && defined(AUX3_PIN)
+  #ifdef AUX4_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE4_PIN AUX enabled but AUX4_PIN is already in use, choose one feature on AUX4_PIN"
   #endif
   #undef FEATURE4_PIN
-  #define FEATURE4_PIN Aux4
+  #define FEATURE4_PIN AUX4_PIN
+  #define AUX4_PIN_INUSE
 #endif
-#if FEATURE5_PURPOSE != OFF && FEATURE5_PIN == AUX && defined(Aux5)
-  #if ASSIGNED_AUX5 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE5_PIN AUX enabled but Aux5 is already in use, choose one feature on Aux5"
+#if FEATURE5_PURPOSE != OFF && FEATURE5_PIN == AUX && defined(AUX5_PIN)
+  #ifdef AUX5_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE5_PIN AUX enabled but AUX5_PIN is already in use, choose one feature on AUX5_PIN"
   #endif
   #undef FEATURE5_PIN
-  #define FEATURE5_PIN Aux5
+  #define FEATURE5_PIN AUX5_PIN
+  #define AUX5_PIN_INUSE
 #endif
-#if FEATURE6_PURPOSE != OFF && FEATURE6_PIN == AUX && defined(Aux6)
-  #if ASSIGNED_AUX6 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE6_PIN AUX enabled but Aux6 is already in use, choose one feature on Aux6"
+#if FEATURE6_PURPOSE != OFF && FEATURE6_PIN == AUX && defined(AUX6_PIN)
+  #ifdef AUX6_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE6_PIN AUX enabled but AUX6_PIN is already in use, choose one feature on AUX6_PIN"
   #endif
   #undef FEATURE6_PIN
-  #define FEATURE6_PIN Aux6
+  #define FEATURE6_PIN AUX6_PIN
+  #define AUX6_PIN_INUSE
 #endif
-#if FEATURE7_PURPOSE != OFF && FEATURE7_PIN == AUX && defined(Aux7)
-  #if ASSIGNED_AUX7 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE7_PIN AUX enabled but Aux7 is already in use, choose one feature on Aux7"
+#if FEATURE7_PURPOSE != OFF && FEATURE7_PIN == AUX && defined(AUX7_PIN)
+  #ifdef AUX7_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE7_PIN AUX enabled but AUX7_PIN is already in use, choose one feature on AUX7_PIN"
   #endif
   #undef FEATURE7_PIN
-  #define FEATURE7_PIN Aux7
+  #define FEATURE7_PIN AUX7_PIN
+  #define AUX7_PIN_INUSE
 #endif
-#if FEATURE8_PURPOSE != OFF && FEATURE8_PIN == AUX && defined(Aux8)
-  #if ASSIGNED_AUX8 != PIN_NOT_ASSIGNED
-    #error "Configuration (Config.h): FEATURE8_PIN AUX enabled but Aux8 is already in use, choose one feature on Aux8"
+#if FEATURE8_PURPOSE != OFF && FEATURE8_PIN == AUX && defined(AUX8_PIN)
+  #ifdef AUX8_PIN_INUSE
+    #error "Configuration (Config.h): FEATURE8_PIN AUX enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
   #endif
   #undef FEATURE8_PIN
-  #define FEATURE8_PIN Aux8
+  #define FEATURE8_PIN AUX8_PIN
+  #define AUX8_PIN_INUSE
 #endif
