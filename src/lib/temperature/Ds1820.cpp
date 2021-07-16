@@ -10,7 +10,7 @@ extern Tasks tasks;
 
 #include "../1wire/1Wire.h"
 #include <DallasTemperature.h>        // my DallasTemperature library https://github.com/hjd1964/Arduino-Temperature-Control-Library
-DallasTemperature DS18B20(&oneWire);
+DallasTemperature DS18X20(&oneWire);
 
 #include "../weather/Weather.h"
 
@@ -73,7 +73,7 @@ bool Ds1820::init() {
 
   VLF("*********************************************");
 
-  DS18B20.setWaitForConversion(false);
+  DS18X20.setWaitForConversion(false);
   if (deviceCount > 0) {
     found = true;
     VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 7)... ");
@@ -89,7 +89,7 @@ void Ds1820::poll() {
   static unsigned long requestTime = 0;
 
   if (found) {
-    if (index == 0) { DS18B20.requestTemperatures(true); requestTime = millis(); }
+    if (index == 0) { DS18X20.requestTemperatures(true); requestTime = millis(); }
     if ((long)(millis() - requestTime) < 200) return;
 
     // loop to read the temperature
@@ -98,7 +98,7 @@ void Ds1820::poll() {
     //   2. all 1-wire task polling is run at the lowest priority level
     float rawTemperature = NAN;
     for (int i = 0; i < 20; i++) {
-      rawTemperature = DS18B20.getTempC(address[index], true);
+      rawTemperature = DS18X20.getTempC(address[index], true);
       if (polling(rawTemperature)) tasks.yield(100); else break;
     }
 
