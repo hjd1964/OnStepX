@@ -18,15 +18,31 @@
 #endif
 
 // use "Ex" functions to exclude pins that are OFF or SHARED
+// pins in range 0x00 to 0xFF are normal, 0x100 to 0x1FF are DAC as digital outputs, 0x200 to 0x2FF are external GPIO pins
 #if GPIO_DEVICE != OFF
-  // if an external GPIO is enabled use it for pins 1000 and up otherwise use the built-in
-  #define pinModeEx(pin,mode)         { if (pin >= 0) { if (pin < 1000) pinMode(pin,mode); else gpio.pinMode(pin-1000,mode); } }
-  #define digitalWriteEx(pin,value)   { if (pin >= 0) { if (pin < 1000) { digitalWriteF(pin,value); } else gpio.digitalWrite(pin-1000,value); } }
-  #define digitalReadEx(pin)          ( (pin >= 0)?((pin < 1000)?digitalReadF(pin):gpio.digitalRead(pin-1000)):0 )
+  #if defined(DAC_AS_DIGITAL)
+    // external GPIO and DAC as digital
+    #define pinModeEx(pin,mode)         { if (pin >= 0x200) gpio.pinMode(pin-0x200,mode); else if (pin > 0x100) pinMode(pin-0x100,mode); else if (pin >= 0) pinMode(pin,mode); }
+    #define digitalWriteEx(pin,value)   { if (pin >= 0x200) gpio.digitalWrite(pin-0x200,value); else if (pin > 0x100) analogWrite(pin-0x100,value); else if (pin >= 0) digitalWriteF(pin,value); }
+  #else
+    // external GPIO but no DAC as digital
+    #define pinModeEx(pin,mode)         { if (pin >= 0x200) gpio.pinMode(pin-0x200,mode); else if (pin >= 0) pinMode(pin,mode); }
+    #define digitalWriteEx(pin,value)   { if (pin >= 0x200) gpio.digitalWrite(pin-0x200,value); else if (pin >= 0) digitalWriteF(pin,value); }
+  #endif
+  // no support for DAC input
+  #define digitalReadEx(pin)            ( (pin >= 0)?((pin < 0x100)?digitalReadF(pin):gpio.digitalRead(pin-1000)):0 )
 #else
-  #define pinModeEx(pin,mode)         { if (pin >= 0) { pinMode(pin,mode); } }
-  #define digitalWriteEx(pin,value)   { if (pin >= 0) { digitalWriteF(pin,value); } }
-  #define digitalReadEx(pin)          ( (pin >= 0)?digitalReadF(pin):0 )
+  #if defined(DAC_AS_DIGITAL)
+    // DAC but no external GPIO
+    #define pinModeEx(pin,mode)         { if (pin > 0x100) pinMode(pin-0x100,mode); else if (pin >= 0) pinMode(pin,mode); }
+    #define digitalWriteEx(pin,value)   { if (pin > 0x100) analogWrite(pin-0x100,value); else if (pin >= 0) { digitalWriteF(pin,value); } }
+  #else
+    // neither DAC as digital or external GPIO
+    #define pinModeEx(pin,mode)         { if (pin >= 0) pinMode(pin,mode); }
+    #define digitalWriteEx(pin,value)   { if (pin >= 0) { digitalWriteF(pin,value); } }
+  #endif
+  // no support for DAC input and no external GPIO
+  #define digitalReadEx(pin)            ( (pin >= 0)?digitalReadF(pin):0 )
 #endif
 
 #include "Ds2413.h"
