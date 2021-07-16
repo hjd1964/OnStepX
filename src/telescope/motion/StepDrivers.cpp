@@ -243,6 +243,8 @@ void StepDriver::power(bool state) {
     int I_run = 0, I_hold = 0;
     if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
     tmcDriver.mode(true, settings.decay, microstepCode, I_run, I_hold);
+  #else
+    state = state;
   #endif
 }
 
