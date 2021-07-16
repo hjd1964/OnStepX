@@ -506,6 +506,9 @@ uint8_t Tasks::getHandleByName(const char name[]) {
 
 #ifdef TASKS_HIGHER_PRIORITY_ONLY
   void Tasks::yield() {
+    // first let any system level stuff run
+    ::yield();
+    // then check our tasks
     for (uint8_t priority = 0; priority <= highest_priority; priority++) {
       uint8_t last_priority = highest_active_priority;
       if (priority < highest_active_priority) {
