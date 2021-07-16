@@ -151,19 +151,29 @@ extern Tasks tasks;
           }
           if (altModeB) {
             #if ST4_HAND_CONTROL_FOCUSER == ON
-              static int fs=0;
-              static int fn=0;
+              static int fs = 0;
+              static int fn = 0;
               if (!fn && !fs) {
                 if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); sound.click(); }
                 if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); sound.click(); }
               }
               if (!fn) {
-                if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) { if (fs == 0) { cmdSend(":FS#",true); fs++; } else if (fs == 1) { cmdSend(":F-#",true); fs++; } else if ((st4s.timeDown() > 4000) && (fs == 2)) { fs++; cmdSend(":FF#",true); } else if (fs == 3) { cmdSend(":F-#",true); fs++; } }
-                if (st4Axis2Rev.isUp()) { if (fs > 0) { cmdSend(":FQ#",true); fs=0; } }
+                if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) {
+                  if (fs == 0) { SERIAL_LOCAL.transmit(":FS#"); fs++; } else
+                  if (fs == 1) { SERIAL_LOCAL.transmit(":F-#"); fs++; } else
+                  if (fs == 2 && st4Axis2Rev.timeDown() > 4000) { SERIAL_LOCAL.transmit(":FF#"); fs++; } else
+                  if (fs == 3) { SERIAL_LOCAL.transmit(":F-#"); fs++; }
+                }
+                if (st4Axis2Rev.isUp()) { if (fs > 0) { SERIAL_LOCAL.transmit(":FQ#"); fs = 0; } }
               }
               if (!fs) {
-                if (st4Axis2Fwd.isDown() && st4Axis2Rev.isUp()) { if (fn == 0) { cmdSend(":FS#",true); fn++; } else if (fn == 1) { cmdSend(":F+#",true); fn++; } else if ((st4n.timeDown() > 4000) && (fn == 2)) { fn++; cmdSend(":FF#",true); } else if (fn == 3) { cmdSend(":F+#",true); fn++; }  }
-                if (st4Axis2Fwd.isUp()) { if (fn > 0) { cmdSend(":FQ#",true); fn=0; } }
+                if (st4Axis2Fwd.isDown() && st4Axis2Rev.isUp()) {
+                  if (fn == 0) { SERIAL_LOCAL.transmit(":FS#"); fn++; } else
+                  if (fn == 1) { SERIAL_LOCAL.transmit(":F+#"); fn++; } else
+                  if (fn == 2 && st4Axis2Fwd.timeDown() > 4000) { SERIAL_LOCAL.transmit(":FF#"); fn++; } else
+                  if (fn == 3) { SERIAL_LOCAL.transmit(":F+#"); fn++; }
+                }
+                if (st4Axis2Fwd.isUp()) { if (fn > 0) { SERIAL_LOCAL.transmit(":FQ#"); fn = 0; } }
               }
             #else
               if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); sound.click(); }
@@ -176,7 +186,7 @@ extern Tasks tasks;
       } else {
         if (altModeA || altModeB) { 
           #if ST4_HAND_CONTROL_FOCUSER == ON
-            cmdSend(":FQ#",true);
+            SERIAL_LOCAL.transmit(":FQ#");
           #endif
           altModeA = false;
           altModeB = false;
