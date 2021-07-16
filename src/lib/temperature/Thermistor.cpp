@@ -34,7 +34,6 @@ bool Thermistor::init() {
 // read devices, designed for a 0.1s polling interval
 void Thermistor::poll() {
   static int index = 0;
-  static unsigned long requestTime = 0;
 
   if (found) {
     int thermistorType = -1;
