@@ -35,29 +35,6 @@ void sprintF(char *result, const char *source, float f) {
   result[j++] = 0;
 }
 
-// convert string in format MM/DD/YY to Date
-GregorianDate Convert::strToDate(char *ymd) {
-  GregorianDate date;
-  date.valid = false;
-  char m[3], d[3], y[3];
-
-  if (strlen(ymd) !=  8) return date;
-  m[0] = *ymd++; m[1] = *ymd++; m[2] = 0;
-  if (!atoi2(m, &date.month, false)) return date;
-  if (*ymd++ != '/') return date;
-  d[0] = *ymd++; d[1] = *ymd++; d[2]=0;
-  if (!atoi2(d, &date.day, false)) return date;
-  if (*ymd++ != '/') return date;
-  y[0] = *ymd++; y[1] = *ymd++; y[2]=0;
-  if (!atoi2(y, &date.year, false)) return date;
-
-  if (date.month < 1 || date.month > 12 || date.day < 1 || date.day > 31 || date.year < 0 || date.year > 99) return date;
-  if (date.year > 20) date.year += 2000; else date.year += 2100;
-
-  date.valid = true;
-  return date;
-}
-
 bool Convert::tzToDouble(double *value, char *hm) {
   int16_t sign = 1;
   int16_t hour, minute = 0;

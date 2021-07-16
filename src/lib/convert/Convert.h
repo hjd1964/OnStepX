@@ -3,7 +3,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include "../calendars/Calendars.h"
 
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST};
 
@@ -12,9 +11,6 @@ extern void sprintF(char *result, const char *source, float f);
 
 class Convert {
   public:
-    // convert string in format MM/DD/YY to julian date
-    GregorianDate strToDate(char *ymd);
-
     // convert timezone string  sHH:MM to double
     // (also handles)           sHH
     bool tzToDouble(double *value, char *hm);

@@ -10,6 +10,7 @@
 #include "../../../Constants.h"
 #include "../../../lib/convert/Convert.h"
 #include "../../../commands/ProcessCmds.h"
+#include "../../../lib/calendars/Calendars.h"
 
 #if TIME_LOCATION_SOURCE == DS3231
   #include "../../../lib/tls/Tls_DS3231.h"
@@ -115,6 +116,9 @@ class Site {
 
     // sets the site altitude in meters
     bool setElevation(float e);
+    
+    // convert string in format MM/DD/YY to julian date
+    GregorianDate strToDate(char *ymd);
 
     JulianDate ut1;
     double centisecondHOUR = 0;
