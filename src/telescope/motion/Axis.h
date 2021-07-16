@@ -75,6 +75,9 @@ class Axis {
     // time (in ms) before automatic power down at standstill, use 0 to disable
     void setPowerDownTime(int value);
 
+    // time (in ms) to disable automatic power down at standstill, use 0 to disable
+    void setPowerDownOverrideTime(int value);
+
     // get steps per measure
     double getStepsPerMeasure();
 
@@ -261,7 +264,9 @@ class Axis {
     unsigned long lastPeriodSet = 0;
 
     bool powerDownStandstill = false;
+    bool powerDownOverride = false;
     unsigned long powerDownDelay;
+    unsigned long powerDownOverrideEnds;
     bool poweredDown = false;
     unsigned long powerDownTime = 0;
 

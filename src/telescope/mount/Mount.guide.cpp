@@ -109,6 +109,8 @@ CommandError Mount::guideStartAxis1(GuideAction guideAction, GuideRateSelect gui
 
   if (rate <= 2) {
     guideState = GU_PULSE_GUIDE;
+    axis1.setPowerDownOverrideTime(30000);
+    axis2.setPowerDownOverrideTime(30000);
     if (guideAction == GA_REVERSE) guideRateAxis1 = -rate; else guideRateAxis1 = rate;
     updateTrackingRates();
   } else {
@@ -153,6 +155,8 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
 
   if (rate <= 2) {
     guideState = GU_PULSE_GUIDE;
+    axis1.setPowerDownOverrideTime(30000);
+    axis2.setPowerDownOverrideTime(30000);
     if (guideAction == GA_REVERSE) guideRateAxis2 = -rate; else guideRateAxis2 = rate;
     updateTrackingRates();
   } else {

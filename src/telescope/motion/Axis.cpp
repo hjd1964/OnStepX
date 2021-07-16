@@ -25,9 +25,14 @@ void Axis::setPowerDownTime(int value) {
   if (value == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = value; }
 }
 
+// time (in ms) to disable automatic power down at standstill, use 0 to disable
+void Axis::setPowerDownOverrideTime(int value) {
+  if (value == 0) powerDownOverride = false; else { powerDownOverride = true; powerDownOverrideEnds = millis() + value; }
+}
+
 void Axis::powered(bool value) {
   bool state = value & !poweredDown;
-  if (pins.enable != OFF) {
+  if (pins.enable != OFF && pins.enable != SHARED_PIN) {
     digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
   } else {
     driver.power(state);
@@ -448,11 +453,22 @@ void Axis::setFrequency(float frequency) {
   // automatic standstill power down
   if (powerDownStandstill) {
     if (frequency == 0.0F) {
-      if ((long)(millis() - powerDownTime) > 0) {
-        if (!poweredDown) { poweredDown = true; powered(false); V(axisPrefix); VLF("setFrequency(); driver powered down"); }
+      if (!poweredDown) {
+        if (!powerDownOverride || (long)(millis() - powerDownOverrideEnds) > 0) {
+          powerDownOverride = false;
+          if ((long)(millis() - powerDownTime) > 0) {
+            poweredDown = true;
+            powered(false);
+            V(axisPrefix); VLF("setFrequency(); driver powered down");
+          }
+        }
       }
     } else {
-      if (poweredDown) { poweredDown = false; powered(true); V(axisPrefix); VLF("setFrequency(); driver powered up"); }
+      if (poweredDown) {
+        poweredDown = false;
+        powered(true);
+        V(axisPrefix); VLF("setFrequency(); driver powered up");
+      }
       powerDownTime = millis() + powerDownDelay;
     }
   }
