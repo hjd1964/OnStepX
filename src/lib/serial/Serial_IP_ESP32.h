@@ -1,11 +1,12 @@
 // -----------------------------------------------------------------------------------
-// Polling serial for Mega2560
+// Polling serial IP for ESP32
 #pragma once
 
 #include <Arduino.h>
 #include "../../Constants.h"
 #include "../../Config.common.h"
 #include "../../HAL/HAL.h"
+#include "../../debug/Debug.h"
 
 #if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 

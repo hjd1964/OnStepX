@@ -42,7 +42,7 @@ extern Tasks tasks;
 #endif
 #ifdef SERIAL_IP
   CommandProcessor processCommandsIP(9600,'I');
-  void processCmdsIP() { processCommandsIP.poll(); }
+  void processCmdsIP() { ::yield(); processCommandsIP.poll(); }
 #endif
 #ifdef SERIAL_LOCAL
   CommandProcessor processCommandsLocal(9600,'L');

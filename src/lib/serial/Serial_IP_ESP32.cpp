@@ -25,13 +25,12 @@
       WiFi.disconnect();
       WiFi.softAPdisconnect(true);
       btStop();
-      delay(20000);
+      delay(1000);
 
       VF("MSG: WiFi PORT = "); VL(port);
 
-      VF("MSG: WiFi AP Enabled  = "); VL(accessPointEnabled);
-      VF("MSG: WiFi Sta Enabled = "); VL(stationEnabled);
-      VF("MSG: WiFi Sta DHCP En = "); VL(stationDhcpEnabled);
+      VF("MSG: WiFi STA Enabled = "); VL(stationEnabled);
+      VF("MSG: WiFi STA DHCP En = "); VL(stationDhcpEnabled);
 
       VF("MSG: WiFi STA SSID    = "); VL(wifi_sta_ssid);
       VF("MSG: WiFi STA PWD     = "); VL(wifi_sta_pwd);
@@ -39,6 +38,7 @@
       VF("MSG: WiFi STA GATEWAY = "); VL(wifi_sta_gw.toString());
       VF("MSG: WiFi STA SN      = "); VL(wifi_sta_sn.toString());
 
+      VF("MSG: WiFi AP Enabled  = "); VL(accessPointEnabled);
       VF("MSG: WiFi AP SSID     = "); VL(wifi_ap_ssid);
       VF("MSG: WiFi AP PWD      = "); VL(wifi_ap_pwd);
       VF("MSG: WiFi AP CH       = "); VL(wifi_ap_ch);
@@ -47,6 +47,10 @@
       VF("MSG: WiFi AP SN       = "); VL(wifi_ap_sn.toString());
 
     TryAgain:
+      VLF("MSG: WiFi Setting configurion");
+      if (stationEnabled && !stationDhcpEnabled) WiFi.config(wifi_sta_ip, wifi_sta_gw, wifi_sta_sn);
+      if (accessPointEnabled) WiFi.softAPConfig(wifi_ap_ip, wifi_ap_gw, wifi_ap_sn);
+
       if (accessPointEnabled && !stationEnabled) {
         VLF("MSG: WiFi Starting Soft AP");
         WiFi.softAP(wifi_ap_ssid, wifi_ap_pwd, wifi_ap_ch);
@@ -65,10 +69,6 @@
         WiFi.mode(WIFI_AP_STA);
       }
       delay(1000);
-
-      VLF("MSG: WiFi Setting configurion");
-      if (stationEnabled && !stationDhcpEnabled) WiFi.config(wifi_sta_ip, wifi_sta_gw, wifi_sta_sn);
-      if (accessPointEnabled) WiFi.softAPConfig(wifi_ap_ip, wifi_ap_gw, wifi_ap_sn);
 
       // wait for connection in station mode, if it fails fall back to access-point mode
       if (!accessPointEnabled && stationEnabled) {
