@@ -23,20 +23,20 @@
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog (pwm/dac) if supported)
-#define Aux0                   11               // Status LED
-#define Aux1                   29               // ESP8266 GPIO0, SPI MISO/Fault
-#define Aux2                   37               // ESP8266 RST, SPI MISO/Fault
+#define AUX0_PIN               11               // Status LED
+#define AUX1_PIN               29               // ESP8266 GPIO0, SPI MISO/Fault
+#define AUX2_PIN               37               // ESP8266 RST, SPI MISO/Fault
 #if PINMAP == MksGenL1
-  #define Aux3                 14               // Home SW (GenL1 Y- endstop)
-  #define Aux4                 15               // 1-Wire (requires h/w modification,) Home SW (GenL1 Y+ endstop)
+  #define AUX3_PIN             14               // Home SW (GenL1 Y- endstop)
+  #define AUX4_PIN             15               // 1-Wire (requires h/w modification,) Home SW (GenL1 Y+ endstop)
 #else
-  #define Aux3                 32               // Home SW; note modified pinmap 10/2/19 Aux3 and Aux4 were changed, 9/30/19 Aux5 was removed (Aux3 not present Gen-L1)
-  #define Aux4                 39               // 1-Wire, Home SW (Aux4 not present Gen-L1)
+  #define AUX3_PIN             32               // Home SW; note modified pinmap 10/2/19 Aux3 and Aux4 were changed, 9/30/19 Aux5 was removed (Aux3 not present Gen-L1)
+  #define AUX4_PIN             39               // 1-Wire, Home SW (Aux4 not present Gen-L1)
 #endif
-#define Aux5                   7                // Dew Heater0 (E1 , MKS Gen-L)
-#define Aux6                   8                // Dew Heater1 (BED, MKS Gen-L, RAMPS1.4)
-#define Aux7                   9                // Dew Heater2 (FAN, MKS Gen-L, RAMPS1.4)
-#define Aux8                   10               // Dew Heater3 (E0 , MKS Gen-L, RAMPS1.4)
+#define AUX5_PIN               7                // Dew Heater0 (E1 , MKS Gen-L)
+#define AUX6_PIN               8                // Dew Heater1 (BED, MKS Gen-L, RAMPS1.4)
+#define AUX7_PIN               9                // Dew Heater2 (FAN, MKS Gen-L, RAMPS1.4)
+#define AUX8_PIN               10               // Dew Heater3 (E0 , MKS Gen-L, RAMPS1.4)
 
 #ifndef DS3234_CS_PIN
   #define DS3234_CS_PIN        53               // Default CS Pin for DS3234 on SPI
@@ -45,13 +45,13 @@
   #define BME280_CS_PIN        49               // Default CS Pin for BME280 on SPI
 #endif
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN         Aux4             // Default Pin for OneWire bus
+  #define ONE_WIRE_PIN         AUX4_PIN         // Default Pin for OneWire bus
 #endif
 #ifndef ADDON_GPIO0_PIN
-  #define ADDON_GPIO0_PIN      Aux1             // ESP8266 GPIO0 or SPI MISO/Fault
+  #define ADDON_GPIO0_PIN      AUX1_PIN         // ESP8266 GPIO0 or SPI MISO/Fault
 #endif
 #ifndef ADDON_RESET_PIN
-  #define ADDON_RESET_PIN      Aux2             // ESP8266 RST or SPI MISO/Fault
+  #define ADDON_RESET_PIN      AUX2_PIN         // ESP8266 RST or SPI MISO/Fault
 #endif
 
 // For software SPI
@@ -73,7 +73,7 @@
 #define SENSE_LIMIT_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_PIN         Aux0             // Drain RAMPS SERVO1 (1=GND, 2=+5, 3=LED-)
+#define LED_STATUS_PIN         AUX0_PIN         // Drain RAMPS SERVO1 (1=GND, 2=+5, 3=LED-)
 #define LED_MOUNT_STATUS_PIN   6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
 #define LED_ROTATOR_STATUS_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
 #define LED_FOCUSER_STATUS_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
@@ -96,13 +96,13 @@
   #define AXIS1_M0_PIN         23               // SPI MOSI
   #define AXIS1_M1_PIN         25               // SPI SCK
   #define AXIS1_M2_PIN         27               // SPI CS
-  #define AXIS1_M3_PIN         Aux1             // SPI MISO
+  #define AXIS1_M3_PIN         AUX1_PIN         // SPI MISO
 #endif
 #define AXIS1_STEP_PIN         54
 #define AXIS1_DIR_PIN          55
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN        Aux1
-#define AXIS1_SENSE_HOME_PIN   Aux3
+#define AXIS1_FAULT_PIN        AUX1_PIN
+#define AXIS1_SENSE_HOME_PIN   AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver on RMAPS Y
 #define AXIS2_ENABLE_PIN       56               // (Pin A2)
@@ -115,13 +115,13 @@
   #define AXIS2_M0_PIN         31               // SPI MOSI
   #define AXIS2_M1_PIN         33               // SPI SCK
   #define AXIS2_M2_PIN         35               // SPI CS
-  #define AXIS2_M3_PIN         Aux2             // SPI MISO
+  #define AXIS2_M3_PIN         AUX2_PIN         // SPI MISO
 #endif
 #define AXIS2_STEP_PIN         60               // (Pin A6)
 #define AXIS2_DIR_PIN          61               // (Pin A7)
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_FAULT_PIN        Aux2
-#define AXIS2_SENSE_HOME_PIN   Aux4
+#define AXIS2_FAULT_PIN        AUX2_PIN
+#define AXIS2_SENSE_HOME_PIN   AUX4_PIN
 
 // For rotator stepper driver on RAMPS Z
 #define AXIS3_ENABLE_PIN       62               // (Pin A8)

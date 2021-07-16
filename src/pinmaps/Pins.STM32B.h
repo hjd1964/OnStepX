@@ -33,19 +33,19 @@
 #if PINMAP == STM32Blue
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define Aux0                   PC13             // Status LED
-#define Aux1                   PB14             // ESP8266 GPIO0, SPI MISO/Fault
-#define Aux2                   PA1              // ESP8266 RST, SPI MISO/Fault
-#define Aux3                   PB8              // Reticle, Home SW
-#define Aux4                   PA13             // OneWire, Home SW
+#define AUX0_PIN               PC13             // Status LED
+#define AUX1_PIN               PB14             // ESP8266 GPIO0, SPI MISO/Fault
+#define AUX2_PIN               PA1              // ESP8266 RST, SPI MISO/Fault
+#define AUX3_PIN               PB8              // Reticle, Home SW
+#define AUX4_PIN               PA13             // OneWire, Home SW
 
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN         Aux4             // Default Pin for OneWire bus
+  #define ONE_WIRE_PIN         AUX4_PIN         // Default Pin for OneWire bus
 #endif
 
 // For ESP8266 control
-#define ADDON_GPIO0_PIN        Aux1             // ESP8266 GPIO0
-#define ADDON_RESET_PIN        Aux2             // ESP8266 RST
+#define ADDON_GPIO0_PIN        AUX1_PIN         // ESP8266 GPIO0
+#define ADDON_RESET_PIN        AUX2_PIN         // ESP8266 RST
 
 // The PEC index sense is a logic level input, resets the PEC index on rising
 // edge then waits for 60 seconds before allowing another reset
@@ -53,11 +53,11 @@
 
 // This is the built in LED for the Black Pill board. There is a pin
 // available from it too, in case you want to power another LED with a wire
-#define LED_STATUS_PIN         Aux0             // Default LED Cathode (-)
-#define LED_MOUNT_STATUS_PIN   Aux0             // Default LED Cathode (-)
-#define LED_ROTATOR_STATUS_PIN Aux0             // Default LED Cathode (-)
-#define LED_FOCUSER_STATUS_PIN Aux0             // Default LED Cathode (-)
-#define RETICLE_LED_PIN        Aux3             // Default LED Cathode (-)
+#define LED_STATUS_PIN         AUX0_PIN         // Default LED Cathode (-)
+#define LED_MOUNT_STATUS_PIN   AUX0_PIN         // Default LED Cathode (-)
+#define LED_ROTATOR_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
+#define LED_FOCUSER_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
+#define RETICLE_LED_PIN        AUX3_PIN         // Default LED Cathode (-)
 
 // For a piezo buzzer
 #define BUZZER_PIN             PB9              // Tone
@@ -81,7 +81,7 @@
 #define AXIS1_M2_PIN           PB15             // SPI CS
 #define AXIS1_M2_PINPORT       GPIOB
 #define AXIS1_M2_PINBIT        GPIO_PIN_15
-#define AXIS1_M3_PIN           Aux1             // SPI MISO
+#define AXIS1_M3_PIN           AUX1_PIN         // SPI MISO
 #define AXIS1_STEP_PIN         PB13
 #define Axis1_StpPORT          GPIOB
 #define Axis1_StpBIT           GPIO_PIN_13
@@ -89,8 +89,8 @@
 #define Axis1_DirPORT          GPIOB
 #define Axis1_DirBIT           GPIO_PIN_12
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN        Aux1
-#define AXIS1_SENSE_HOME_PIN   Aux3
+#define AXIS1_FAULT_PIN        AUX1_PIN
+#define AXIS1_SENSE_HOME_PIN   AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       PA5
@@ -103,7 +103,7 @@
 #define AXIS2_M2_PIN           PA2              // SPI CS
 #define AXIS2_M2_PINPORT       GPIOA
 #define AXIS2_M2_PINBIT        GPIO_PIN_2
-#define AXIS2_M3_PIN           Aux2             // SPI MISO
+#define AXIS2_M3_PIN           AUX2_PIN         // SPI MISO
 #define AXIS2_STEP_PIN         PA0
 #define Axis2_StpPORT          GPIOA
 #define Axis2_StpBIT           GPIO_PIN_0
@@ -111,8 +111,8 @@
 #define Axis2_DirPORT          GPIOC
 #define Axis2_DirBIT           GPIO_PIN_15
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_FAULT_PIN        Aux2
-#define AXIS2_SENSE_HOME_PIN   Aux4
+#define AXIS2_FAULT_PIN        AUX2_PIN
+#define AXIS2_SENSE_HOME_PIN   AUX4_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       PB4

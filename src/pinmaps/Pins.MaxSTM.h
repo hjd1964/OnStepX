@@ -10,44 +10,44 @@
 #if defined(STM32F411xE) || defined(STM32F401xC)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define Aux0                   PB12             // Status LED
-#define Aux2                   PA13             // PPS
-#define Aux3                   PB13             // Home SW
-#define Aux4                   PB14             // 1-Wire, Home SW
-#define Aux5                   PA9              // TX1 
-#define Aux6                   PA10             // RX1
-#define Aux7                   PB15             // Limit SW
-#define Aux8                   PA8              // Status2 LED, Reticle LED
+#define AUX0_PIN               PB12             // Status LED
+#define AUX2_PIN               PA13             // PPS
+#define AUX3_PIN               PB13             // Home SW
+#define AUX4_PIN               PB14             // 1-Wire, Home SW
+#define AUX5_PIN               PA9              // TX1 
+#define AUX6_PIN               PA10             // RX1
+#define AUX7_PIN               PB15             // Limit SW
+#define AUX8_PIN               PA8              // Status2 LED, Reticle LED
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN         Aux4             // Default Pin for OneWire bus (note: this pin has a 0.1uF capacitor that must be removed for OneWire to function)
+  #define ONE_WIRE_PIN         AUX4_PIN         // Default Pin for OneWire bus (note: this pin has a 0.1uF capacitor that must be removed for OneWire to function)
 #endif
 #define ADDON_GPIO0_PIN        PB0              // ESP8266 GPIO0 (shared with AXIS2_DIR_PIN)
-#define ADDON_RESET_PIN        Aux2             // ESP8266 RST
+#define ADDON_RESET_PIN        AUX2_PIN         // ESP8266 RST
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
 #define PEC_SENSE_PIN          PB1              // PEC Sense, analog or digital
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_PIN         Aux0             // Default LED Cathode (-)
-#define LED_MOUNT_STATUS_PIN   Aux0             // Default LED Cathode (-)
-#define LED_ROTATOR_STATUS_PIN Aux0             // Default LED Cathode (-)
-#define LED_FOCUSER_STATUS_PIN Aux0             // Default LED Cathode (-)
-#define RETICLE_LED_PIN        Aux8             // Default LED Cathode (-)
+#define LED_STATUS_PIN         AUX0_PIN         // Default LED Cathode (-)
+#define LED_MOUNT_STATUS_PIN   AUX0_PIN         // Default LED Cathode (-)
+#define LED_ROTATOR_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
+#define LED_FOCUSER_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
+#define RETICLE_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
 
 // For a piezo buzzer
 #define BUZZER_PIN             PA14             // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #ifdef MAXSTM_AUX0_PPS
-  #define SENSE_PPS_PIN        Aux0             // PPS time source, GPS for example (MaxSTM version 3.6)
+  #define SENSE_PPS_PIN        AUX0_PIN         // PPS time source, GPS for example (MaxSTM version 3.6)
 #else
-  #define SENSE_PPS_PIN        Aux2             // PPS time source, GPS for example (MaxSTM version 3.61 and later)
+  #define SENSE_PPS_PIN        AUX2_PIN         // PPS time source, GPS for example (MaxSTM version 3.61 and later)
 #endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define SENSE_LIMIT_PIN        Aux7
+#define SENSE_LIMIT_PIN        AUX7_PIN
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       OFF
@@ -70,7 +70,7 @@
 #define Axis1_DirPORT          GPIOB
 #define Axis1_DirBIT           GPIO_PIN_2
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_SENSE_HOME_PIN   Aux3
+#define AXIS1_SENSE_HOME_PIN   AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       OFF
@@ -93,7 +93,7 @@
 #define Axis2_DirPORT          GPIOB
 #define Axis2_DirBIT           GPIO_PIN_0
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_SENSE_HOME_PIN   Aux4
+#define AXIS2_SENSE_HOME_PIN   AUX4_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       OFF

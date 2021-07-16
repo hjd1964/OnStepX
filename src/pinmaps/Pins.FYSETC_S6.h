@@ -45,13 +45,13 @@
 // I defined 7 Aux pins so they match up with the first 7 Auxiliary Feature slots avaliable in OnStep
 // Aux1-3 can be used for pretty much anything
 // Aux4-7 are more for dew-heaters
-#define Aux1                  Fan0Pin
-#define Aux2                  Fan1Pin
-#define Aux3                  Fan2Pin
-#define Aux4                  Heater0Pin
-#define Aux5                  Heater1Pin
-#define Aux6                  Heater2Pin
-#define Aux7                  Heater3Pin
+#define AUX1_PIN              Fan0Pin
+#define AUX2_PIN              Fan1Pin
+#define AUX3_PIN              Fan2Pin
+#define AUX4_PIN              Heater0Pin
+#define AUX5_PIN              Heater1Pin
+#define AUX6_PIN              Heater2Pin
+#define AUX7_PIN              Heater3Pin
 
 // Misc. pins
 #ifndef DS3234_CS_PIN
