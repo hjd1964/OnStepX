@@ -126,18 +126,18 @@ class Task {
 
     void setHardwareTimerPeriod();
 
-    char                   processName[8]             = "";
-    unsigned long          period                     = 0;
-    unsigned long          next_period                = 0;
-    unsigned long          duration                   = 0;
-    bool                   repeat                     = false;
-    uint8_t                priority                   = 0;
-    bool                   running                    = false;
-    PeriodUnits            period_units               = PU_MILLIS;
-    PeriodUnits            next_period_units          = PU_NONE;
-    unsigned long          start_time                 = 0;
-    unsigned long          next_task_time             = 0;
-    uint8_t                hardwareTimer              = 0;
+    char                   processName[8]    = "";
+    unsigned long          period            = 0;
+    unsigned long          next_period       = 0;
+    unsigned long          duration          = 0;
+    bool                   repeat            = false;
+    uint8_t                priority          = 0;
+    bool                   running           = false;
+    PeriodUnits            period_units      = PU_MILLIS;
+    PeriodUnits            next_period_units = PU_NONE;
+    unsigned long          start_time        = 0;
+    unsigned long          next_task_time    = 0;
+    uint8_t                hardwareTimer     = 0;
     void (*volatile callback)() = NULL;
 
     #ifdef TASKS_PROFILER_ENABLE

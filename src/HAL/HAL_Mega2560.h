@@ -54,5 +54,5 @@
 
 //---------------------------------------------------------------------------------------------------
 // Misc.
-#define strtof strtod // there us no strtof defined for the AVR platform
+#define strtof strtod // there is no strtof defined for the AVR platform
 

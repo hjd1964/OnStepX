@@ -43,9 +43,9 @@ class Rotator {
     void readSettings();
     void writeSettings();
 
-    float moveRate = 3.0F;
+    float moveRate = 3.0F; // in degs/sec
 
-    int16_t backlash = 0; // in steps
+    int16_t backlash = 0;  // in steps
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;

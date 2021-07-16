@@ -23,7 +23,6 @@ Button::Button(int pin, int initState, int32_t trigger) {
 
   pinModeEx(pin, initState);
 
-  //reset();
 }
 
 void Button::poll() {
