@@ -100,6 +100,9 @@
 #define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X                          Option
 #define SEPARATE_PULSE_GUIDE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding                    Infreq
 
+// SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
+#define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
 #define PEC_BUFFER_SIZE_LIMIT         720 //    720, Seconds of PEC buffer allowed.                                           Adjust
 
@@ -156,6 +159,9 @@
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define LED_FOCUSER_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
+
+// SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
+#define FOCUSER_TEMPERATURE           OFF //    OFF, THERMISTOR, DS1820, n. Where n is the DS1820 s/n for focuser temp.       Adjust
 
 // =================================================================================================================================
 // AUXILIARY FEATURES ==============================================================================================================
