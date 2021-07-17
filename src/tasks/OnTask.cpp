@@ -506,13 +506,13 @@ uint8_t Tasks::getHandleByName(const char name[]) {
 
 #ifdef TASKS_HIGHER_PRIORITY_ONLY
   void Tasks::yield() {
+    ::yield();
     for (uint8_t priority = 0; priority <= highest_priority; priority++) {
       uint8_t last_priority = highest_active_priority;
       if (priority < highest_active_priority) {
         highest_active_priority = priority;
         for (uint8_t i = 0; i <= highest_task; i++) {
           number[priority]++; if (number[priority] > highest_task) number[priority] = 0;
-          ::yield();
           if (allocated[number[priority]]) {
             if (!task[number[priority]]->isDurationComplete()) {
               if (task[number[priority]]->poll()) {
