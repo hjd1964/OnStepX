@@ -28,7 +28,7 @@ CommandError Mount::parkSet() {
   if (guideState != GU_NONE)            return CE_SLEW_IN_MOTION;
   if (axis1.fault() || axis2.fault())   return CE_SLEW_ERR_HARDWARE_FAULT;
 
-  VLF("MSG: Setting park position");
+  VLF("MSG: Mount, setting park position");
 
   TrackingState priorTrackingState = trackingState;
   trackingState = TS_NONE;
@@ -51,7 +51,7 @@ CommandError Mount::parkSet() {
   trackingState = priorTrackingState;
   updateTrackingRates();
   
-  VLF("MSG: Setting park done");
+  VLF("MSG: Mount, setting park done");
   return CE_NONE;
 }
 
@@ -105,9 +105,9 @@ CommandError Mount::parkGoto() {
     park.state = priorParkState;
     nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
-    VLF("ERR, parkGoto(): Failed to start goto");
+    VLF("ERR, Mount::parkGoto(); Failed to start goto");
     return e;
-  } else { VLF("MSG: Parking started"); }
+  } else { VLF("MSG: Mount, parking started"); }
   return CE_NONE;
 }
 
@@ -120,8 +120,8 @@ void Mount::parkFinish() {
       transform.align.modelWrite();
     #endif
 
-    VLF("MSG: Parking done");
-  } else { DLF("ERR, parkFinish(): Parking failed"); }
+    VLF("MSG: Mount, parking done");
+  } else { DLF("ERR, Mount::parkFinish(); Parking failed"); }
 
   axis1.enable(false);
   axis2.enable(false);
@@ -186,7 +186,7 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
     updateTrackingRates();
   }
 
-  VLF("MSG: Unparking done");
+  VLF("MSG: Mount, unparking done");
   return CE_NONE;
 }
 

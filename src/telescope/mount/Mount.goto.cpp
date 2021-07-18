@@ -101,7 +101,7 @@ CommandError Mount::syncEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   misc.syncToEncodersOnly = true;
   if (atHome) setTrackingState(TS_SIDEREAL);
 
-  VLF("MSG: Mount::syncEqu, instrument coordinates updated");
+  VLF("MSG: Mount, sync instrument coordinates updated");
 
   return CE_NONE;
 }
@@ -127,7 +127,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   gotoState = GS_GOTO;
   gotoStage = GG_DESTINATION;
   if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
-    VLF("MSG: Mount::gotoEqu, goto changes pier side, setting waypoint at home");
+    VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
     gotoWaypoint();
   }
 
@@ -135,7 +135,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
   if (gotoTaskHandle != 0) tasks.remove(gotoTaskHandle);
   gotoTaskHandle = tasks.add(10, 0, true, 1, mountGotoWrapper, "MntGoto");
   if (gotoTaskHandle) {
-    VLF("MSG: Mount::gotoEqu(); start goto monitor task (rate 10ms priority 1)... success");
+    VLF("MSG: Mount, start goto monitor task (rate 10ms priority 1)... success");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
@@ -146,26 +146,26 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }
-    VLF("MSG: Mount::gotoEqu(); target coordinates set");
+    VLF("MSG: Mount, goto target coordinates set");
 
     // slew rate in rads per second
     axis1.setFrequencySlew(radsPerSecondCurrent);
     axis2.setFrequencySlew(radsPerSecondCurrent);
-    VLF("MSG: Mount::gotoEqu(); slew rate set");
+    VLF("MSG: Mount, goto slew rate set");
 
     axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
 
     sound.alert();
 
-  } else { DLF("MSG: Mount::gotoEqu(); start goto monitor task... FAILED!"); }
+  } else { DLF("MSG: Mount, start goto monitor task... FAILED!"); }
 
   return CE_NONE;
 }
 
 void Mount::gotoPoll() {
   if (gotoStage == GG_READY_ABORT) {
-    VLF("MSG: Mount::gotoPoll(); abort requested");
+    VLF("MSG: Mount, goto abort requested");
 
     meridianFlipHome.paused = false;
     meridianFlipHome.resume = false;
@@ -180,23 +180,23 @@ void Mount::gotoPoll() {
         if (misc.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
         meridianFlipHome.paused = false;
         meridianFlipHome.resume = false;
-        VLF("MSG: Mount::gotoPoll(); home reached");
+        VLF("MSG: Mount, goto home reached");
         gotoStage = GG_DESTINATION;
         destination = target;
       } else {
-        VLF("MSG: Mount::gotoPoll(); waypoint reached");
+        VLF("MSG: Mount, goto waypoint reached");
         destination = home;
       }
 
       axis1.autoSlewStop();
       axis2.autoSlewStop();
-      VLF("MSG: Mount::gotoPoll(); slew stopped");
+      VLF("MSG: Mount, goto stopped");
 
       double a1, a2;
       transform.mountToInstrument(&destination, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
-      VLF("MSG: Mount::gotoPoll(); target coordinates set");
+      VLF("MSG: Mount, goto next target coordinates set");
 
       axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
       axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
@@ -204,10 +204,10 @@ void Mount::gotoPoll() {
   } else
   if (gotoStage == GG_DESTINATION || gotoStage == GG_ABORT) {
     if ((axis1.nearTarget() && axis2.nearTarget()) || (!axis1.autoSlewActive() && !axis2.autoSlewActive())) {
-      VLF("MSG: Mount::gotoPoll(); destination reached");
+      VLF("MSG: Mount, goto destination reached");
       updatePosition(CR_MOUNT_EQU);
 
-      VLF("MSG: Mount::gotoPoll(); stopping slew");
+      VLF("MSG: Mount, goto stopping");
       axis1.autoSlewRateByDistanceStop();
       axis2.autoSlewRateByDistanceStop();
 
@@ -224,7 +224,7 @@ void Mount::gotoPoll() {
       // kill this monitor
       tasks.setDurationComplete(gotoTaskHandle);
       gotoTaskHandle = 0;
-      VLF("MSG: Mount::gotoPoll(); goto monitor task terminated");
+      VLF("MSG: Mount, goto monitor task terminated");
 
       sound.alert();
 
