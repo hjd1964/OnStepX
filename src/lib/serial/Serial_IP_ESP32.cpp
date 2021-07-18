@@ -47,9 +47,6 @@
       VF("MSG: WiFi AP SN       = "); VL(wifi_ap_sn.toString());
 
     TryAgain:
-      VLF("MSG: WiFi Setting configurion");
-      if (stationEnabled && !stationDhcpEnabled) WiFi.config(wifi_sta_ip, wifi_sta_gw, wifi_sta_sn);
-      if (accessPointEnabled) WiFi.softAPConfig(wifi_ap_ip, wifi_ap_gw, wifi_ap_sn);
 
       if (accessPointEnabled && !stationEnabled) {
         VLF("MSG: WiFi Starting Soft AP");
@@ -69,6 +66,10 @@
         WiFi.mode(WIFI_AP_STA);
       }
       delay(1000);
+
+      VLF("MSG: WiFi Setting configurion");
+      if (stationEnabled && !stationDhcpEnabled) WiFi.config(wifi_sta_ip, wifi_sta_gw, wifi_sta_sn);
+      if (accessPointEnabled) WiFi.softAPConfig(wifi_ap_ip, wifi_ap_gw, wifi_ap_sn);
 
       // wait for connection in station mode, if it fails fall back to access-point mode
       if (!accessPointEnabled && stationEnabled) {
