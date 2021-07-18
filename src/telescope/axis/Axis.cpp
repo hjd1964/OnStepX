@@ -211,7 +211,7 @@ double Axis::getTargetCoordinate() {
 
 // check if we're near the target coordinate during an auto slew
 bool Axis::nearTarget() {
-  return labs(motor.getTargetDistanceSteps()) <= step * 2;
+  return labs(motor.getTargetDistanceSteps()) <= 2;
 }
 
 // distance to target in "measures" (degrees, microns, etc.)
