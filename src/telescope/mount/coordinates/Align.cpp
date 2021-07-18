@@ -18,7 +18,7 @@ extern Tasks tasks;
 
 #include "../../Telescope.h"
 extern Telescope telescope;
-#include "../../motion/Axis.h"
+#include "../../axis/Axis.h"
 
 #if ALIGN_MAX_NUM_STARS > 1
 

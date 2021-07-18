@@ -59,7 +59,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
     int index = parameter[1] - '1';
     if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
     if (index + 1 != axisNumber) return false; // command wasn't processed
-    DriverStatus status = driver.getStatus();
+    DriverStatus status = getStatus();
     strcat(reply, status.standstill ? "ST," : ",");
     strcat(reply, status.outputA.openLoad ? "OA," : ",");
     strcat(reply, status.outputB.openLoad ? "OB," : ",");
@@ -104,7 +104,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             }
             if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
               if (axisNumber <= 2 && thisAxis.microsteps < driverMicrostepsGoto[index]) thisAxis.microsteps = driverMicrostepsGoto[index];
-              if (driver.microstepsToCode(driverModels[index], thisAxis.microsteps) != OFF) {
+              if (motor.stepDriver.microstepsToCode(driverModels[index], thisAxis.microsteps) != OFF) {
                 nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
                 *numericReply = false;
               } else *commandError = CE_PARAM_RANGE;

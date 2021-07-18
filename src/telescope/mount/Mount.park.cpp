@@ -87,8 +87,8 @@ CommandError Mount::parkGoto() {
   nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
   // get the park coordinate ready
-  axis1.setBacklash(0);
-  axis2.setBacklash(0);
+  axis1.setBacklash(0.0L);
+  axis2.setBacklash(0.0L);
   Coordinate parkTarget;
   parkTarget.h = park.position.h;
   parkTarget.d = park.position.d;

@@ -5,11 +5,8 @@
 #include <Arduino.h>
 #include "../../Common.h"
 #include "../../commands/ProcessCmds.h"
-#include "StepDrivers.h"
-
-#if AXIS1_DRIVER_STEP == AXIS2_DRIVER_STEP == AXIS3_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == HIGH
-  #define DRIVER_STEP_DEFAULTS
-#endif
+#include "stepDir/StepDir.h"
+#include "stepDir/StepDrivers.h"
 
 #pragma pack(1)
 typedef struct AxisLimits {
@@ -29,19 +26,15 @@ typedef struct AxisSettings {
 #pragma pack()
 
 typedef struct AxisSense {
-  int32_t home;
+  int32_t homeTrigger;
   int8_t  homeInit;
-  int32_t min;
-  int32_t max;
+  int32_t minTrigger;
+  int32_t maxTrigger;
   int8_t  minMaxInit;
 } AxisSense;
 
 typedef struct AxisPins {
-  int16_t   step;
-  uint8_t   stepState;
-  int16_t   dir;
-  int16_t   enable;
-  uint8_t   enabledState;
+  uint8_t   axis;
   int16_t   min;
   int16_t   home;
   int16_t   max;
@@ -53,8 +46,6 @@ typedef struct AxisErrors {
   uint8_t maxLimitSensed:1;
 } AxisErrors;
 
-enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING_READY, MMC_SLEWING};
-enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE};
 enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
 enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 
@@ -86,45 +77,44 @@ class Axis {
 
     // set motor coordinate, in "measure" units
     void setMotorCoordinate(double value);
+    inline void setMotorCoordinateSteps(long value) { motor.setMotorCoordinateSteps(value); }
     // get motor coordinate, in "measure" units
     double getMotorCoordinate();
-
-    // sets motor and target coordinates in steps, also zeros backlash and index 
-    void setMotorCoordinateSteps(long value);
-    // get motor coordinate in steps
-    long getMotorCoordinateSteps();
-
-    // get instrument coordinate, in steps
-    long getInstrumentCoordinateSteps();
+    inline long getMotorCoordinateSteps() { return motor.getMotorCoordinateSteps(); }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
     void setInstrumentCoordinatePark(double value);
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
-    // get instrument coordinate in steps
+    // get instrument coordinate
     double getInstrumentCoordinate();
+    inline long getInstrumentCoordinateSteps() { return motor.getInstrumentCoordinateSteps(); }
 
     // set target coordinate, in "measures" (degrees, microns, etc.)
     // with backlash disabled this moves to the nearest position where the motor doesn't cog
     void setTargetCoordinatePark(double value);
     // set target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
-    // set target coordinate, in steps
-    void setTargetCoordinateSteps(long value);
+    inline void setTargetCoordinateSteps(long value) { motor.setTargetCoordinateSteps(value); }
     // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();
-    // get target coordinate, in steps
-    long getTargetCoordinateSteps();
+    inline long getTargetCoordinateSteps() { return motor.getTargetCoordinateSteps(); }
     // returns true if within 2 steps of target
     bool nearTarget();
+
+    // set backlash in "measures" (radians, microns, etc.)
+    void setBacklash(float value);
+    inline void setBacklashSteps(long value) { motor.setBacklashSteps(value); }
+    // get backlash in "measures" (radians, microns, etc.)
+    float getBacklash();
 
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(float frequency);
     // get frequency in "measures" (degrees, microns, etc.) per second
     float getFrequency();
     // get frequency in steps per second
-    float getFrequencySteps();
+    long getFrequencySteps() { return motor.getFrequencySteps(); }
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);
     // set slew frequency in "measures" (radians, microns, etc.) per second
@@ -159,75 +149,49 @@ class Axis {
     // get tracking state (automatic movement of target)
     bool getTracking();
 
-    // set backlash in "measures" (radians, microns, etc.)
-    void setBacklash(float value);
-    // get backlash in "measures" (radians, microns, etc.)
-    float getBacklash();
-
-    // set backlash in steps
-    void setBacklashSteps(long value);
-    // get backlash in steps
-    long getBacklashSteps();
-
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
 
     // refresh driver status information maximum frequency is 20ms
     void updateDriverStatus();
 
+    // get associated motor driver status
+    DriverStatus getStatus();
     // enable/disable numeric position range limits (doesn't apply to limit switches)
     void setMotionLimitsCheck(bool state);
     // checks for an error that would disallow motion DIR_NONE for any motion, etc.
     bool motionError(Direction direction);
 
-    // callbacks
-
     // monitor movement
     void poll();
-    // sets dir as required and moves coord toward target
-    void move(const int8_t stepPin, const int8_t dirPin);
-    // fast axis movement forward only, no backlash, no mode switching
-    void slewForward(const int8_t stepPin);
-    // fast axis movement reverse only, no backlash, no mode switching
-    void slewReverse(const int8_t stepPin);
 
     AxisSettings settings;
-    AxisErrors error;
-    StepDriver driver;
+
+    // motors, one type for now
+    StepDir motor; // should not be used outside of the StepDir class
 
   private:
     // sets driver power on/off
     void powered(bool value);
 
-    // mark origin coordinate for autoSlewRateByDistance as current location
-    void setSlewOriginCoordinate();
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
     // distance to target in "measures" (degrees, microns, etc.)
     double getTargetDistance();
-    // distance to target in steps
-    long getTargetDistanceSteps();
     // returns true if traveling through backlash
     bool inBacklash();
-    // disable backlash compensation, to work properly there must be an enable call to match
-    void disableBacklash();
-    // enable backlash compensation, to work properly this must be proceeded by a disable call
-    void enableBacklash();
-
-    // swaps fast unidirectional movement ISR for slewing in/out
-    bool enableMoveFast(const bool state);
 
     bool decodeAxisSettings(char *s, AxisSettings &a);
     bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
     
     AxisPins pins;
+    AxisErrors errors;
 
     uint8_t taskHandle = 0;
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
 
     bool enabled = false;        // enable/disable logical state (disabled is powered down)
-    bool tracking = true;        // locks movement of axis target with timer rate
     bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
 
     uint8_t homeSenseHandle = 0; // home sensor handle
@@ -238,31 +202,11 @@ class Axis {
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
 
-    #ifdef DRIVER_STEP_DEFAULTS
-      #define stepClr LOW
-      #define stepSet HIGH
-    #else
-      volatile uint8_t stepClr = LOW;
-      volatile uint8_t stepSet = HIGH;
-    #endif
-    volatile uint8_t dirFwd = LOW;
-    volatile uint8_t dirRev = HIGH;
-
-    double target = 0.0;
-    long originSteps = 0;
-    volatile long targetSteps = 0;
-    volatile long motorSteps = 0;
-    volatile long indexSteps = 0;
-    volatile int  trackingStep = 1;
-    volatile int  slewStep = 1;
     volatile int  step = 1;
     volatile int  stepsPerStepSlewing = 1;
     volatile bool takeStep = false;
-    volatile Direction direction = DIR_NONE;
 
-    unsigned long lastPeriod = 0;
-    unsigned long lastPeriodSet = 0;
-
+    // power down standstill control
     bool powerDownStandstill = false;
     bool powerDownOverride = false;
     unsigned long powerDownDelay;
@@ -270,13 +214,15 @@ class Axis {
     bool poweredDown = false;
     unsigned long powerDownTime = 0;
 
+    // step rates to control motor movement
     float freq = 0.0F;
     float baseFreq = 0.0F;
     float slewFreq;
     float minFreq = 0.0F;
     float maxFreq = 0.0F;
-    float lastFreq;
     float minPeriodMicros;
+
+    // auto slew mode
     AutoRate autoRate = AR_NONE;
     // auto slew rate distance in radians to max rate
     float slewAccelerationDistance;
@@ -284,7 +230,6 @@ class Axis {
     float slewMpspcs;
     // abort slew rate in measures per second per centisecond
     float abortMpspcs;
+    // homing mode
     HomingStage homingStage = HOME_NONE;
-
-    volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 };

@@ -14,8 +14,7 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "../../lib/sound/Sound.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
+#include "../axis/Axis.h"
 #include "coordinates/Transform.h"
 #include "library/Library.h"
 

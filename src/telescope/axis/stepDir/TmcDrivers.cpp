@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // tmc stepper driver configuration control
 
-#include "../../Common.h"
+#include "../../../Common.h"
 #include "StepDrivers.h"
 #include "TmcDrivers.h"
 
@@ -11,7 +11,7 @@ void TmcDriver::init(int model, DriverPins pins) {
   if (model == TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
   VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
 
-  active = softSpi.init(pins);
+  active = softSpi.init(pins.m0, pins.m1, pins.m2, pins.m3);
 }
 
 bool TmcDriver::mode(bool intpol, int decay_mode, byte micro_step_mode, int irun, int ihold) {

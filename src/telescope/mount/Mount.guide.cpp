@@ -71,7 +71,7 @@ bool Mount::guideValidAxis2(GuideAction guideAction) {
 
 CommandError Mount::guideValidate(int axis, GuideAction guideAction) {
   if (!axis1.isEnabled() || !axis2.isEnabled())                         return CE_SLEW_ERR_IN_STANDBY;
-  if (axis1.driver.getStatus().fault || axis2.driver.getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (axis1.getStatus().fault || axis2.getStatus().fault)               return CE_SLEW_ERR_HARDWARE_FAULT;
   if (park.state == PS_PARKED)                                          return CE_SLEW_ERR_IN_PARK;
   if (gotoState != GS_NONE)                                             return CE_SLEW_IN_MOTION;
   if (guideAction == GA_SPIRAL && axis1.autoSlewActive())               return CE_SLEW_IN_MOTION;

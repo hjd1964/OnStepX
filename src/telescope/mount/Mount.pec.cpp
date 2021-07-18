@@ -53,7 +53,7 @@
           initError.value = true;
           VLF("WRN: Mount, pecBufferSize exceeds available RAM, PEC disabled");
         } else {
-          VF("MSG: Mount, allocated PEC buffer "); V(pecBufferSize * sizeof(*pecBuffer)); VLF(" bytes");
+          VF("MSG: Mount, allocated PEC buffer "); V(pecBufferSize * (long)sizeof(*pecBuffer)); VLF(" bytes");
 
           bool pecBufferNeedsInit = true;
           for (int i = 0; i < pecBufferSize; i++) {

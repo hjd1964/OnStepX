@@ -7,8 +7,7 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
+#include "../axis/Axis.h"
 #include "../mount/coordinates/Transform.h"
 
 class Rotator {

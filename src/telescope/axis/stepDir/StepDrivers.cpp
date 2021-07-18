@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
 // stepper driver control
 
-#include "../../Common.h"
+#include "../../../Common.h"
 #include "StepDrivers.h"
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
@@ -192,6 +192,15 @@ void StepDriver::modeDecaySlewing() {
     noInterrupts();
     if (state != OFF) digitalWriteEx(decayPin, state);
     interrupts();
+  }
+}
+
+// set the driver IRUN current in mA
+void StepDriver::setCurrent(int16_t current) {
+  if (settings.currentRun != OFF && settings.currentRun != current) {
+    settings.currentRun  = current;
+    settings.currentGoto = current;
+    settings.currentHold = current/2;
   }
 }
 

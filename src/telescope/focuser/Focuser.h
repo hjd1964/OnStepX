@@ -7,8 +7,7 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "../motion/StepDrivers.h"
-#include "../motion/Axis.h"
+#include "../axis/Axis.h"
 
 #define FOCUSER_MAX 6
 

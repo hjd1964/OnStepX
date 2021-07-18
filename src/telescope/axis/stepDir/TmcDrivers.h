@@ -3,7 +3,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "SoftSpi.h"
+#include "../../../lib/softSpi/SoftSpi.h"
 
 class TmcDriver {
   public:

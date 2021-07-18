@@ -3,7 +3,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include "Pins.h"
+//#include "Pins.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
@@ -41,6 +41,20 @@ typedef struct DriverSettings {
   int8_t  status;
 } DriverSettings;
 #pragma pack()
+
+typedef struct DriverPins {
+  int16_t m0;
+  int16_t m1;
+  int16_t m2;
+  int16_t m3;
+  int16_t decay;
+  int16_t fault;
+} DriverPins;
+
+#define mosi_pin m0
+#define sck_pin  m1
+#define cs_pin   m2
+#define miso_pin m3
 
 typedef struct DriverOutputStatus {
   bool shortToGround;
@@ -103,6 +117,9 @@ class StepDriver {
     int modeMicrostepSlewing();
     // set decay mode for slewing
     void modeDecaySlewing();
+
+    // set the driver IRUN current in mA
+    void setCurrent(int16_t current);
 
     // update status info. for driver
     void updateStatus();

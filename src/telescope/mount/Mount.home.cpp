@@ -70,8 +70,8 @@ CommandError Mount::resetHome(bool resetPark) {
   // setup axis1 and axis2
   axis1.setBacklash(0);
   axis2.setBacklash(0);
-  axis1.setMotorCoordinateSteps(0);
-  axis2.setMotorCoordinateSteps(0);
+  axis1.setMotorCoordinate(0.0L);
+  axis2.setMotorCoordinate(0.0L);
   if (transform.mountType == ALTAZM) {
     axis1.setInstrumentCoordinate(home.z);
     axis2.setInstrumentCoordinate(home.a);
