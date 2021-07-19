@@ -146,7 +146,7 @@ void commandChannelInit() {
   #ifdef HAL_SLOW_PROCESSOR
     long comPollRate = 2000;
   #else
-    long comPollRate = 250;
+    long comPollRate = 500;
   #endif
   #ifdef SERIAL_A
     VF("MSG: Setup, start command channel A task (priority 6)... ");
