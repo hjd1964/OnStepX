@@ -92,10 +92,6 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
 
   V(axisPrefix); D("init step="); D(pins.step); D(", dir="); D(pins.dir); D(", en="); DL(pins.enable);
 
-  // init default driver enable state (disabled)
-  pinModeEx(pins.enable, OUTPUT);
-  power(false);
-
   // init default driver direction state (forward)
   if (!reverse) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   pinMode(pins.dir, OUTPUT);
@@ -109,9 +105,16 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   pinMode(pins.step, OUTPUT);
   digitalWriteF(pins.step, stepClr);
 
+  // init default driver enable pin
+  pinModeEx(pins.enable, OUTPUT);
+  // driver enabled for possible TMC current calibration
+  digitalWriteEx(pins.enable, pins.enabledState)
+
   // init driver advanced modes, etc.
-  stepDriver.init(axisNumber);
-  stepDriver.setCurrent(currentRun);
+  stepDriver.init(axisNumber, currentRun);
+
+  // now disable the driver
+  power(false);
 
   // start the motor timer
   V(axisPrefix); VF("start task to move motor... ");

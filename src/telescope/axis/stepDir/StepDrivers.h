@@ -104,7 +104,7 @@ class StepDriver {
   public:
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
-    void init(uint8_t axisNumber);
+    void init(uint8_t axisNumber, int16_t current);
 
     // true if switching microstep modes is allowed
     bool modeSwitchAllowed();
@@ -119,9 +119,6 @@ class StepDriver {
     int modeMicrostepSlewing();
     // set decay mode for slewing
     void modeDecaySlewing();
-
-    // set the driver IRUN current in mA
-    void setCurrent(int16_t current);
 
     // update status info. for driver
     void updateStatus();

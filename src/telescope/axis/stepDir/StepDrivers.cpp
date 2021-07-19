@@ -64,7 +64,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
                                                   AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO, AXIS6_DRIVER_STATUS};
 #endif
 
-void StepDriver::init(uint8_t axisNumber) {
+void StepDriver::init(uint8_t axisNumber, int16_t current) {
   this->axisNumber = axisNumber;
   #if AXIS1_DRIVER_MODEL != OFF
     if (axisNumber == 1) { pins = Axis1DriverModePins; settings = Axis1DriverModeSettings; }
@@ -85,6 +85,11 @@ void StepDriver::init(uint8_t axisNumber) {
     if (axisNumber == 6) { pins = Axis6DriverModePins; settings = Axis6DriverModeSettings; }
   #endif
 
+  // update the current from initialization setting
+  if (settings.currentRun != OFF && settings.currentRun != current) {
+    settings.currentRun  = current; settings.currentGoto = current; settings.currentHold = current/2;
+  }
+
   VF("MSG: StepDriver, init model "); V(DRIVER_NAME[settings.model]);
   VF(" u-step mode "); if (settings.microsteps == OFF) VF("OFF"); else { V(settings.microsteps); V("X"); }
   VF(" (goto mode "); if (settings.microstepsGoto == SAME) VLF("SAME)"); else { V(settings.microstepsGoto); VL("X)"); }
@@ -96,10 +101,12 @@ void StepDriver::init(uint8_t axisNumber) {
 
   if (isTmcSPI()) {
     #ifdef HAS_TMC_DRIVER
+      if (settings.decay == OFF) settings.decay = STEALTHCHOP;
+      if (settings.decayGoto == OFF) settings.decayGoto = SPREADCYCLE;
       tmcDriver.init(settings.model, pins);
       if (settings.decay == STEALTHCHOP || settings.decayGoto == STEALTHCHOP) {
         tmcDriver.mode(true, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
-        VLF("MSG: StepDriver, TMC driver stealthChop 100ms pause for standstill automatic current calibration");
+        VLF("MSG: StepDriver, TMC standstill automatic current calibration");
         delay(100);
       }
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
@@ -197,15 +204,6 @@ void StepDriver::modeDecaySlewing() {
     noInterrupts();
     if (state != OFF) digitalWriteEx(decayPin, state);
     interrupts();
-  }
-}
-
-// set the driver IRUN current in mA
-void StepDriver::setCurrent(int16_t current) {
-  if (settings.currentRun != OFF && settings.currentRun != current) {
-    settings.currentRun  = current;
-    settings.currentGoto = current;
-    settings.currentHold = current/2;
   }
 }
 
