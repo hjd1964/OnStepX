@@ -85,8 +85,8 @@
                                           //              Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define BUZZER_DEFAULT                OFF //    OFF, ON default starts w/buzzer enabled.                                      Option
-#define BUZZER_MEMORY                 OFF //    OFF, ON to remember buzzer setting across power cycles.                       Option
+#define STATUS_BUZZER_DEFAULT         OFF //    OFF, ON default starts w/buzzer enabled.                                      Option
+#define STATUS_BUZZER_MEMORY          OFF //    OFF, ON to remember buzzer setting across power cycles.                       Option
 
 // ST4 INTERFACE ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#ST4
 // *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
@@ -138,7 +138,7 @@
 #define AXIS3_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define LED_ROTATOR_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 1deg/s.)          Option
+#define STATUS_ROTATOR_LED            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 1deg/s.)          Option
 
 // =================================================================================================================================
 // FOCUSERS ========================================================================================================================
@@ -158,7 +158,7 @@
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define LED_FOCUSER_STATUS            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
+#define STATUS_FOCUSER_LED            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
 
 // SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
 #define FOCUSER_TEMPERATURE           OFF //    OFF, THERMISTOR, DS1820, n. Where n is the DS1820 s/n for focuser temp.       Adjust
