@@ -34,10 +34,10 @@
 #define SERIAL_BT_NAME           "OnStep" //         "OnStep", Bluetooth device name.                                         Adjust
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413 for 2-ch 1-wire GPIO, MCP23008 for 8-ch I2C GPIO, or              Option
-                                          //         MCP23017 for 16-ch I2C GPIO. The device channels are assigned to
-                                          //         pin#'s starting at 1000 and can be used for most OnStep features.
-                                          
+#define GPIO_DEVICE                   OFF //    OFF, DS2413 for 2-ch 1-wire GPIO, MCP23008 for 8-ch I2C GPIO, or MCP23017     Option
+                                          //         for a 16-ch I2C GPIO. The device can be used for most OnStep features.
+                                          //         Channels are assigned to pin#'s starting at 256 (for channel 0, etc.)
+
 // =================================================================================================================================
 // MOUNT ===========================================================================================================================
 
