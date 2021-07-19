@@ -362,6 +362,7 @@ void StepDir::poll() {
       if (stepDriver.modeSwitchAllowed()) {
         if (microstepModeControl == MMC_TRACKING) {
           microstepModeControl = MMC_SLEWING_REQUEST;
+          switchStep = stepDriver.getMicrostepRatio();
           V(axisPrefix); VLF("mode switch slewing requested");
           return;
         } else
@@ -416,7 +417,7 @@ bool StepDir::enableMoveFast(const bool fast) {
         digitalWriteF(dirPin, dirRev);
       } else direction = DIR_NONE;
       digitalWriteF(stepPin, stepClr);
-      if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
+      if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%switchStep == 0) microstepModeControl = MMC_SLEWING_READY;
     }
     takeStep = !takeStep;
   }
@@ -434,8 +435,7 @@ bool StepDir::enableMoveFast(const bool fast) {
     } else digitalWriteF(stepPin, stepClr);
     takeStep = !takeStep;
   }
-#endif
-#if STEP_WAVE_FORM == PULSE
+#else
   IRAM_ATTR void StepDir::move(const int8_t stepPin, const int8_t dirPin) {
     if (microstepModeControl == MMC_SLEWING_READY) return;
     digitalWriteF(stepPin, stepClr);
@@ -451,7 +451,7 @@ bool StepDir::enableMoveFast(const bool fast) {
       if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
     } else { direction = DIR_NONE; return; }
     digitalWriteF(stepPin, dirRev);
-    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%stepsPerStepSlewing == 0) microstepModeControl = MMC_SLEWING_READY;
+    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%switchStep == 0) microstepModeControl = MMC_SLEWING_READY;
   }
   IRAM_ATTR void StepDir::moveFF(const int8_t stepPin) {
     digitalWriteF(stepPin, stepClr);

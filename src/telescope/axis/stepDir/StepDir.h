@@ -138,9 +138,9 @@ class StepDir {
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;
     volatile int  trackingStep = 1;
+    volatile int  switchStep = 1;
     volatile int  slewStep = 1;
     volatile int  step = 1;
-    volatile int  stepsPerStepSlewing = 1;
     volatile bool takeStep = false;
     volatile Direction direction = DIR_NONE;
 

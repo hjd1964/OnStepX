@@ -162,6 +162,11 @@ void StepDriver::modeDecayTracking() {
   }
 }
 
+// get microstep ratio for slewing
+int StepDriver::getMicrostepRatio() {
+  return microstepRatio;
+}
+
 int StepDriver::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
     if (isTmcSPI()) {

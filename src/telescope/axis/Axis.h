@@ -218,8 +218,8 @@ class Axis {
     float lastFreq = 0.0F;
     float baseFreq = 0.0F;
     float minFreq = 0.0F;
-    float slewFreq = 1.0F;
-    float maxFreq = 1.0F;
+    float slewFreq = 0.0F;
+    float maxFreq = 0.0F;
     float minPeriodMicros;
 
     // auto slew mode

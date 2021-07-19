@@ -113,6 +113,8 @@ class StepDriver {
     // set decay mode for tracking
     void modeDecayTracking();
 
+    // get microstep ratio for slewing
+    int getMicrostepRatio();
     // set microstep mode for slewing
     int modeMicrostepSlewing();
     // set decay mode for slewing
