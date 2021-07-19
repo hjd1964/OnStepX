@@ -53,14 +53,14 @@
 
 // This is the built in LED for the Black Pill board. There is a pin
 // available from it too, in case you want to power another LED with a wire
-#define LED_STATUS_PIN         AUX0_PIN         // Default LED Cathode (-)
-#define LED_MOUNT_STATUS_PIN   AUX0_PIN         // Default LED Cathode (-)
-#define LED_ROTATOR_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
-#define LED_FOCUSER_STATUS_PIN AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_LED_PIN         AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_MOUNT_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define RETICLE_LED_PIN        AUX3_PIN         // Default LED Cathode (-)
 
 // For a piezo buzzer
-#define BUZZER_PIN             PB9              // Tone
+#define STATUS_BUZZER_PIN      PB9              // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and
 // adjusts the internal sidereal clock frequency

@@ -87,38 +87,38 @@
 #ifndef LED_STATUS
 #define LED_STATUS                    ON
 #endif
-#ifndef LED_STATUS_ON_STATE
-#define LED_STATUS_ON_STATE           LOW
+#ifndef STATUS_LED_ON_STATE
+#define STATUS_LED_ON_STATE           LOW
 #endif
-#ifndef LED_MOUNT_STATUS
-#define LED_MOUNT_STATUS              OFF
+#ifndef STATUS_MOUNT_LED
+#define STATUS_MOUNT_LED              OFF
 #endif
-#ifndef LED_MOUNT_STATUS_ON_STATE
-#define LED_MOUNT_STATUS_ON_STATE     LOW
+#ifndef STATUS_MOUNT_LED_ON_STATE
+#define STATUS_MOUNT_LED_ON_STATE     LOW
 #endif
-#ifndef LED_ROTATOR_STATUS
-#define LED_ROTATOR_STATUS            OFF
+#ifndef STATUS_ROTATOR_LED
+#define STATUS_ROTATOR_LED            OFF
 #endif
-#ifndef LED_ROTATOR_STATUS_ON_STATE
-#define LED_ROTATOR_STATUS_ON_STATE   LOW
+#ifndef STATUS_ROTATOR_LED_ON_STATE
+#define STATUS_ROTATOR_LED_ON_STATE   LOW
 #endif
-#ifndef LED_FOCUSER_STATUS
-#define LED_FOCUSER_STATUS            OFF
+#ifndef STATUS_FOCUSER_LED
+#define STATUS_FOCUSER_LED            OFF
 #endif
-#ifndef LED_FOCUSER_STATUS_ON_STATE
-#define LED_FOCUSER_STATUS_ON_STATE   LOW
+#ifndef STATUS_FOCUSER_LED_ON_STATE
+#define STATUS_FOCUSER_LED_ON_STATE   LOW
 #endif
-#ifndef BUZZER
-#define BUZZER                        OFF
+#ifndef STATUS_BUZZER
+#define STATUS_BUZZER                 OFF
 #endif
-#ifndef BUZZER_ON_STATE
-#define BUZZER_ON_STATE               HIGH
+#ifndef STATUS_BUZZER_ON_STATE
+#define STATUS_BUZZER_ON_STATE        HIGH
 #endif
-#ifndef BUZZER_DEFAULT
-#define BUZZER_DEFAULT                OFF
+#ifndef STATUS_BUZZER_DEFAULT
+#define STATUS_BUZZER_DEFAULT         OFF
 #endif
 #ifndef BUZZER_MEMORY
-#define BUZZER_MEMORY                 OFF
+#define STATUS_BUZZER_MEMORY          OFF
 #endif
 
 // reticle

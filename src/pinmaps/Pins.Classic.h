@@ -30,12 +30,12 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define LED_STATUS_VCC_PIN       8               // LED
-#define LED_STATUS_PIN           9               // GND
-#define LED_MOUNT_STATUS_PIN     10              // PGND
+#define STATUS_LED_PIN           9               // GND
+#define STATUS_MOUNT_LED_PIN     10              // PGND
 #define RETICLE_LED_PIN          44              // PGND
 
 // For a piezo buzzer
-#define BUZZER_PIN               42              // Tone
+#define STATUS_BUZZER_PIN        42              // Tone
 
 // The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #define SENSE_PPS_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
@@ -127,14 +127,14 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define LED_STATUS_VCC_PIN       8               // LED Annode
-#define LED_STATUS_PIN           9               // Default LED Cathode (-)
-#define LED_MOUNT_STATUS_PIN     7               // Default LED Cathode (-)
-#define LED_ROTATOR_STATUS_PIN   7               // Default LED Cathode (-)
-#define LED_FOCUSER_STATUS_PIN   7               // Default LED Cathode (-)
+#define STATUS_LED_PIN           9               // Default LED Cathode (-)
+#define STATUS_MOUNT_LED_PIN     7               // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN   7               // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN   7               // Default LED Cathode (-)
 #define RETICLE_LED_PIN          9               // Default LED Cathode (-)
 
 // For a piezo buzzer
-#define BUZZER_PIN               29              // Tone
+#define STATUS_BUZZER_PIN        29              // Tone
 
 // The PPS pin is a logic level input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #define SENSE_PPS_PIN            23              // PPS time source, GPS for example

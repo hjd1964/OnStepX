@@ -70,14 +70,14 @@
 #define PEC_SENSE_PIN         PA1                // PEC Sense, analog or digital (on X+ so it can have 3v3 or 5v on adjacent pin)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_PIN        PC6                // Drain (on EXP2) One could perhaps move these to the RGB leds, there's a header but no +5V present on it.
-#define LED_MOUNT_STATUS_PIN  PC7                // Drain (on EXP2 shared with Reticle/BME280_CS)
-#define LED_ROTATOR_STATUS_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
-#define LED_FOCUSER_STATUS_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
+#define STATUS_LED_PIN        PC6                // Drain (on EXP2) One could perhaps move these to the RGB leds, there's a header but no +5V present on it.
+#define STATUS_MOUNT_LED_PIN  PC7                // Drain (on EXP2 shared with Reticle/BME280_CS)
+#define STATUS_ROTATOR_LED_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
+#define STATUS_FOCUSER_LED_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
 #define RETICLE_LED_PIN       PC7                // Drain (on EXP2 shared with LED2/BME280_CS)
 
 // For a piezo buzzer
-#define BUZZER_PIN            PC9                // Tone (on BEEP/EXP1)
+#define STATUS_BUZZER_PIN     PC9                // Tone (on BEEP/EXP1)
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #define SENSE_PPS_PIN         PB10               // PPS time source, GPS for example (on EXP2)

@@ -383,7 +383,7 @@ class Mount {
     uint8_t    statusTaskHandle         = 0;
 
     // misc. settings stored in NV
-    Misc misc = {false, false, false, BUZZER_DEFAULT == ON, 64.0, GR_1X, {0, 0}};
+    Misc misc = {false, false, false, STATUS_BUZZER_DEFAULT == ON, 64.0, GR_1X, {0, 0}};
 
     float timerRateRatio = 1.0;
 };

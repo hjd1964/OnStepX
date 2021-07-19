@@ -30,14 +30,14 @@
 #define PEC_SENSE_PIN           23               // PEC Sense, analog or digital
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_PIN          AUX0_PIN         // Default LED Cathode (-)
-#define LED_MOUNT_STATUS_PIN    AUX0_PIN         // Default LED Cathode (-)
-#define LED_ROTATOR_STATUS_PIN  AUX0_PIN         // Default LED Cathode (-)
-#define LED_FOCUSER_STATUS_PIN  AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_LED_PIN          AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_MOUNT_LED_PIN    AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
 #define RETICLE_LED_PIN         AUX4_PIN         // Default LED Cathode (-)
 
 // For a piezo buzzer
-#define BUZZER_PIN              29               // Tone
+#define STATUS_BUZZER_PIN       29               // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #define SENSE_PPS_PIN           28               // PPS time source, GPS for example

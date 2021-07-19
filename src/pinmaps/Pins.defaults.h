@@ -18,20 +18,20 @@
   #define PEC_SENSE_PIN             OFF
 #endif
 
-#ifndef LED_STATUS_PIN
-  #define LED_STATUS_PIN            OFF
+#ifndef STATUS_LED_PIN
+  #define STATUS_LED_PIN            OFF
 #endif
 
-#ifndef LED_MOUNT_STATUS_PIN
-  #define LED_MOUNT_STATUS_PIN      OFF
+#ifndef STATUS_MOUNT_LED_PIN
+  #define STATUS_MOUNT_LED_PIN      OFF
 #endif
 
 #ifndef RETICLE_LED_PIN
   #define RETICLE_LED_PIN           OFF
 #endif
 
-#ifndef BUZZER_PIN
-  #define BUZZER_PIN                OFF
+#ifndef STATUS_BUZZER_PIN
+  #define STATUS_BUZZER_PIN         OFF
 #endif
 
 #ifndef SENSE_PPS_PIN

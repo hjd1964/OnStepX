@@ -51,7 +51,7 @@ void Mount::init(bool validKey) {
   nv.readBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
-  #if BUZZER_MEMORY == ON
+  #if STATUS_BUZZER_MEMORY == ON
     sound.enabled = misc.buzzer;
   #endif
   #if MFLIP_PAUSE_HOME_MEMORY != ON

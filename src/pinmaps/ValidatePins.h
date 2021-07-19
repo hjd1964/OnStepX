@@ -64,12 +64,12 @@
 #endif
 
 // leds allowed?
-#if LED_STATUS != OFF && LED_STATUS_PIN == OFF
+#if LED_STATUS != OFF && STATUS_LED_PIN == OFF
   #error "Configuration (Config.h): LED_STATUS not supported for this PINMAP, must be OFF"
 #endif
 
-#if LED_MOUNT_STATUS != OFF && LED_MOUNT_STATUS_PIN == OFF
-  #error "Configuration (Config.h): LED_MOUNT_STATUS not supported for this PINMAP, must be OFF"
+#if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == OFF
+  #error "Configuration (Config.h): STATUS_MOUNT_LED not supported for this PINMAP, must be OFF"
 #endif
 
 #if RETICLE_LED != OFF && RETICLE_LED_PIN == OFF

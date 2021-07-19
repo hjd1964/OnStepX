@@ -408,7 +408,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       case '7': // buzzer
         if (parameter[3] == '0' || parameter[3] == '1') {
           sound.enabled = parameter[3] - '0';
-          #if BUZZER_MEMORY == ON
+          #if STATUS_BUZZER_MEMORY == ON
             misc.buzzer = sound.enabled;
             nv.updateBytes(NV_MOUNT_MISC_BASE, &misc, MiscSize);
           #endif
