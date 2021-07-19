@@ -22,7 +22,7 @@ void Mount::init(bool validKey) {
   library.init(validKey);
 
   // wait a moment for any background processing that may be needed
-  delay(1000);
+  delay(100);
 
   // get the main axes ready
   axis1.init(1, transform.mountType == ALTAZM, validKey);
@@ -32,7 +32,7 @@ void Mount::init(bool validKey) {
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
   stepsPerCentisecondAxis1 = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
 
-  delay(1000);
+  delay(100);
   axis2.init(2, transform.mountType == ALTAZM, validKey);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_DRIVER_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
