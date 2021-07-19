@@ -90,7 +90,7 @@ void SerialWrapper::begin(long baud) {
     if (isChannel(channel++)) SERIAL_ST4.begin(baud);
   #endif
   #ifdef SERIAL_BT
-    if (isChannel(channel++)) { delay(1000); SERIAL_BT.begin(SERIAL_BT_NAME); delay(1000); }
+    if (isChannel(channel++)) SERIAL_BT.begin(SERIAL_BT_NAME);
   #endif
   #ifdef SERIAL_IP
     if (isChannel(channel++)) SERIAL_IP.begin(9999);
