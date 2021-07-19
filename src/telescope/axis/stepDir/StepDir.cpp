@@ -446,12 +446,12 @@ bool StepDir::enableMoveFast(const bool fast) {
       if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
     } else
     if (motorSteps > targetSteps) {
-      digitalWriteF(dirPin, dirFwd);
+      digitalWriteF(dirPin, dirRev);
       direction = DIR_REVERSE;
       if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
     } else { direction = DIR_NONE; return; }
-    digitalWriteF(stepPin, dirRev);
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%switchStep == 0) microstepModeControl = MMC_SLEWING_READY;
+    digitalWriteF(stepPin, stepSet);
   }
   IRAM_ATTR void StepDir::moveFF(const int8_t stepPin) {
     digitalWriteF(stepPin, stepClr);
