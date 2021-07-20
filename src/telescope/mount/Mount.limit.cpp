@@ -32,13 +32,11 @@ void Mount::limitPoll() {
   static int autoFlipCount = 0;
 
   if (!limitsEnabled) return;
-  #if DEBUG == VERBOSE
-    MountError lastError = error;
-  #endif
+  MountError lastError = error;
 
   updatePosition(CR_MOUNT_ALT);
-  if (current.a < limits.altitude.min) { limitStop(GA_BREAK); error.altitude.min = true; } else error.altitude.min = false;
-  if (current.a > limits.altitude.max) { limitStop(GA_BREAK); error.altitude.max = true; } else error.altitude.max = false;
+  if (current.a < limits.altitude.min) error.altitude.min = true; else error.altitude.min = false;
+  if (current.a > limits.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
   if (meridianFlip != MF_NEVER && current.pierSide == PIER_SIDE_EAST) {
     if (current.h < -limits.pastMeridianE) { limitStopAxis1(GA_REVERSE); error.meridian.east = true; } else error.meridian.east = false;
@@ -85,24 +83,32 @@ void Mount::limitPoll() {
       VL(error.limit.axis2.max?"Ax2+!"  :"Ax2+.");
     }
   #endif
+
+  if (transform.mountType == ALTAZM) {
+    if (error.altitude.min) limitStopAxis2(GA_REVERSE);
+    if (error.altitude.max) limitStopAxis2(GA_FORWARD);
+  } else {
+    if (!lastError.altitude.min && error.altitude.min) limitStop(GA_BREAK);
+    if (!lastError.altitude.max && error.altitude.max) limitStop(GA_BREAK);
+  }
 }
 
 void Mount::limitStop(GuideAction stopDirection) {
   gotoStop();
-  guideStopAxis1(stopDirection);
-  guideStopAxis2(stopDirection);
+  guideStopAxis1(stopDirection, true);
+  guideStopAxis2(stopDirection, true);
   trackingState = TS_NONE;
 }
 
 void Mount::limitStopAxis1(GuideAction stopDirection) {
   gotoStop();
-  guideStopAxis1(stopDirection);
+  guideStopAxis1(stopDirection, true);
   if (stopDirection == GA_FORWARD) trackingState = TS_NONE;
 }
 
 void Mount::limitStopAxis2(GuideAction stopDirection) {
   gotoStop();
-  guideStopAxis2(stopDirection);
+  guideStopAxis2(stopDirection, true);
 }
 
 bool Mount::errorAny() {

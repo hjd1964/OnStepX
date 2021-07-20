@@ -122,13 +122,13 @@ CommandError Mount::guideStartAxis1(GuideAction guideAction, GuideRateSelect gui
   return CE_NONE;
 }
 
-void Mount::guideStopAxis1(GuideAction stopDirection) {
+void Mount::guideStopAxis1(GuideAction stopDirection, bool abort) {
   if (guideActionAxis1 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
     if (guideRateAxis1 == 0.0F) {
-      VLF("MSG: guideStopAxis1(); requesting guide stop");
+      VF("MSG: guideStopAxis1(); requesting guide ");
       guideActionAxis1 = GA_BREAK;
-      axis1.autoSlewStop();
+      if (abort) { VL("abort"); axis1.autoSlewAbort(); } else { VL("stop"); axis1.autoSlewStop(); }
     } else {
       VLF("MSG: guideStopAxis1(); guide stopped");
       guideActionAxis1 = GA_NONE;
@@ -169,13 +169,13 @@ CommandError Mount::guideStartAxis2(GuideAction guideAction, GuideRateSelect gui
   return CE_NONE;
 }
 
-void Mount::guideStopAxis2(GuideAction stopDirection) {
+void Mount::guideStopAxis2(GuideAction stopDirection, bool abort) {
   if (guideActionAxis2 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
     if (guideRateAxis2 == 0.0F) {
-      VLF("MSG: guideStopAxis2(); requesting guide stop");
+      VF("MSG: guideStopAxis2(); requesting guide ");
       guideActionAxis2 = GA_BREAK;
-      axis2.autoSlewStop();
+      if (abort) { VL("abort"); axis2.autoSlewAbort(); } else { VL("stop"); axis2.autoSlewStop(); }
     } else {
       VLF("MSG: guideStopAxis2(); guide stopped");
       guideActionAxis2 = GA_NONE;

@@ -242,7 +242,6 @@ void Mount::gotoPoll() {
 
   // keep updating mount target
   target.h += radsPerCentisecond;
-
  }
 
 void Mount::gotoWaypoint() {

@@ -238,12 +238,12 @@ class Mount {
     // start guide on Axis1
     CommandError guideStartAxis1(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
-    void guideStopAxis1(GuideAction stopDirection);
+    void guideStopAxis1(GuideAction stopDirection, bool abort = false);
 
     // start guide on Axis2
     CommandError guideStartAxis2(GuideAction guideAction, GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
     // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
-    void guideStopAxis2(GuideAction stopDirection);
+    void guideStopAxis2(GuideAction stopDirection, bool abort = false);
 
     // start spiral guide
     CommandError guideSpiralStart(GuideRateSelect guideRateSelect, unsigned long guideTimeLimit);
