@@ -22,10 +22,12 @@
 #endif
 
 // ESP32 VIRTUAL SERIAL IP COMMAND CHANNEL (EXPERIMENTAL)
-#define SERIAL_IP_MODE                OFF //         OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
+#ifndef SERIAL_IP_MODE
+#define SERIAL_IP_MODE                 OFF //         OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
+#endif
 
-#define STANDARD_COMMAND_CHANNEL       ON //          ON, Wifi command channel for simultanious connections on port 9999.
-#define PERSISTENT_COMMAND_CHANNEL     ON //          ON, Wifi command channel for a single connection on port 9998.
+#define STANDARD_COMMAND_CHANNEL        ON //          ON, Wifi command channel for simultanious connections on port 9999.
+#define PERSISTENT_COMMAND_CHANNEL     OFF //          ON, Wifi command channel for a single connection on port 9998.
 
 #define AP_SSID                 "ONSTEPX" //   "ONSTEPX", Wifi Access Point SSID.
 #define AP_PASSWORD            "password" //  "password", Wifi Access Point password.

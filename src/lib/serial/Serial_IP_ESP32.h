@@ -14,8 +14,7 @@
   #include <WiFiClient.h>
   #include <WiFiAP.h>
 
-  class IPSerial : public Stream
-  {
+  class IPSerial : public Stream {
     public:
       inline void begin() { begin(9999); }
       void begin(long port);
@@ -32,10 +31,8 @@
 
       size_t write(uint8_t data);
 
-      virtual size_t write(const uint8_t* data, size_t count) {
-        for (int i = 0; i < count; i++) { if (!write(data[i])) return i; }
-        return count;
-      }
+      size_t write(const uint8_t* data, size_t count);
+
       inline size_t write(unsigned long n) { return write((uint8_t)n); }
       inline size_t write(long n) { return write((uint8_t)n); }
       inline size_t write(unsigned int n) { return write((uint8_t)n); }
@@ -43,7 +40,14 @@
 
       using Print::write;
 
-    protected:
+    private:
+      WiFiServer *cmdSvr;
+      WiFiClient cmdSvrClient;
+
+      int port = -1;
+      unsigned long timeout = 60000;
+      unsigned long clientTimeout = 0;
+      bool resetTimeout = false;
 
       bool accessPointEnabled = SERIAL_IP_MODE == ACCESS_POINT;
       bool stationEnabled     = SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == STATION_DHCP;
@@ -63,11 +67,16 @@
       IPAddress wifi_ap_ip = IPAddress AP_IP_ADDR;
       IPAddress wifi_ap_gw = IPAddress AP_GW_ADDR;
       IPAddress wifi_ap_sn = IPAddress AP_SN_MASK;
-
-      unsigned long clientTime = 0;
   };
 
-  extern IPSerial ipSerial;
-  #define SERIAL_IP ipSerial
+  #if STANDARD_COMMAND_CHANNEL == ON
+    extern IPSerial ipSerial;
+    #define SERIAL_IP ipSerial
+  #endif
+
+  #if PERSISTENT_COMMAND_CHANNEL == ON
+    extern IPSerial pipSerial;
+    #define SERIAL_PIP pipSerial
+  #endif
 
 #endif

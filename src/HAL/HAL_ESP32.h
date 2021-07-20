@@ -32,6 +32,12 @@
   #endif
 #endif
 
+#if SERIAL_BT_MODE == SLAVE
+  #include <BluetoothSerial.h>
+  extern BluetoothSerial bluetoothSerial;
+  #define SERIAL_BT bluetoothSerial
+#endif
+
 #include "../lib/serial/Serial_IP_ESP32.h"
 
 // New symbol for the default I2C port ---------------------------------------------------------------
@@ -48,8 +54,24 @@
 #endif
 
 //--------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL
-#define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); }
+// General purpose initialize for HAL, optionally also early init of SERIAL_IP or SERIAL_BT
+#if defined(SERIAL_IP) && defined(SERIAL_PIP) && defined(SERIAL_BT)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_PIP.begin(9998); SERIAL_BT.begin(SERIAL_BT_NAME); }
+#elif defined(SERIAL_IP) && defined(SERIAL_PIP)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_PIP.begin(9998); }
+#elif defined(SERIAL_IP) && defined(SERIAL_BT)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_BT.begin(SERIAL_BT_NAME); }
+#elif defined(SERIAL_PIP) && defined(SERIAL_BT)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_PIP.begin(9998); SERIAL_BT.begin(SERIAL_BT_NAME); }
+#elif defined(SERIAL_IP)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); }
+#elif defined(SERIAL_PIP)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_PIP.begin(9998); }
+#elif defined(SERIAL_BT)
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_BT.begin(SERIAL_BT_NAME); }
+#else
+  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); }
+#endif
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

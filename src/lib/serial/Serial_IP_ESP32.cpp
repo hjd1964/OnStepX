@@ -6,28 +6,23 @@
 #if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
   bool wifiActive = false;
-
-  WiFiServer cmdSvr(9999);
-  WiFiClient cmdSvrClient;
   bool port9999Assigned = false;
-
-//  WiFiServer cmdSvrP(9998);
-//  WiFiClient cmdSvrClientP;
   bool port9998Assigned = false;
 
   void IPSerial::begin(long port) {
-    if (port != 9999 && port != 9998) return;
-    if (port == 9999) { if (port9999Assigned) return; else port9999Assigned = true; }
-    if (port == 9998) { if (port9998Assigned) return; else port9998Assigned = true; }
+    if (port == 9999) { if (port9999Assigned) return; else port9999Assigned = true; } else
+    if (port == 9998) { if (port9998Assigned) return; else port9998Assigned = true; } else return;
+
+    this->port = port;
+
+    cmdSvr = new WiFiServer(port);
 
     if (!wifiActive) {
       VLF("MSG: WiFi disconnecting");
       WiFi.disconnect();
       WiFi.softAPdisconnect(true);
       btStop();
-      delay(1000);
-
-      VF("MSG: WiFi PORT = "); VL(port);
+      delay(100);
 
       VF("MSG: WiFi STA Enabled = "); VL(stationEnabled);
       VF("MSG: WiFi STA DHCP En = "); VL(stationDhcpEnabled);
@@ -48,6 +43,7 @@
 
     TryAgain:
 
+      delay(1000);
       if (accessPointEnabled && !stationEnabled) {
         VLF("MSG: WiFi Starting Soft AP");
         WiFi.softAP(wifi_ap_ssid, wifi_ap_pwd, wifi_ap_ch);
@@ -65,15 +61,15 @@
         WiFi.begin(wifi_sta_ssid, wifi_sta_pwd);
         WiFi.mode(WIFI_AP_STA);
       }
-      delay(1000);
 
+      delay(1000);
       VLF("MSG: WiFi Setting configurion");
       if (stationEnabled && !stationDhcpEnabled) WiFi.config(wifi_sta_ip, wifi_sta_gw, wifi_sta_sn);
       if (accessPointEnabled) WiFi.softAPConfig(wifi_ap_ip, wifi_ap_gw, wifi_ap_sn);
 
       // wait for connection in station mode, if it fails fall back to access-point mode
       if (!accessPointEnabled && stationEnabled) {
-        for (int i=0; i<8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
+        for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
         if (WiFi.status() != WL_CONNECTED) {
           VLF("MSG: WiFi Starting Station, failed");
           WiFi.disconnect(); delay(3000);
@@ -83,104 +79,87 @@
           goto TryAgain;
         }
       }
-      delay(1000);
 
       VLF("MSG: WiFi is ready");
+      wifiActive = true;
     }
-    wifiActive = true;
+
+    delay(1000);
+    cmdSvr->begin();
+    cmdSvr->setNoDelay(true);
+    VF("MSG: WiFi started IP commandServer on port "); VL(port);
+
+    // setup for persistant channel
+    if (port == 9998) {
+      timeout = 120000UL;
+      resetTimeout = true;
+    }
+
+    delay(1000);
   }
 
   void IPSerial::end() {
     if (cmdSvrClient.connected()) {
       cmdSvrClient.stop();
-      VLF("MSG: IPSerial::stop() cmdSvrClient stopped");
     }
   }
 
   int IPSerial::available(void) {
-    if (!cmdSvrClient) {
-      if (cmdSvr.hasClient()) {
-        cmdSvrClient = cmdSvr.available();
-        clientTime = millis() + 60000UL;
-        VLF("MSG: IPSerial::available() cmdSvrClient started");
-      }
-      return 0;
-    }
-    if (!cmdSvrClient.connected()) { 
-      VLF("MSG: IPSerial::available() cmdSvrClient not connected, stopping");
-      cmdSvrClient.stop();
-      return 0;
-    }
-    if ((long)(clientTime - millis()) < 0) {
-      VLF("MSG: IPSerial::available() cmdSvrClient timeout, stopping");
-      cmdSvrClient.stop();
-      return 0;
-    }
+    if (!wifiActive) return 0;
 
-    VLF("MSG: IPSerial::available() -> true");
+    if (!cmdSvrClient) {
+      if (cmdSvr->hasClient()) {
+        clientTimeout = millis() + timeout;
+        cmdSvrClient = cmdSvr->available();
+        cmdSvrClient.setTimeout(1000);
+      }
+    } else {
+      if (!cmdSvrClient.connected()) { 
+        cmdSvrClient.stop();
+        return 0;
+      }
+      if ((long)(clientTimeout - millis()) < 0) {
+        cmdSvrClient.stop();
+        return 0;
+      }
+    }
 
     return cmdSvrClient.available();
   }
 
   int IPSerial::peek(void) {
-    if (!cmdSvrClient) {
-      VLF("MSG: IPSerial::peek() no cmdSvrClient");
-      return -1;
-    }
-    if (!cmdSvrClient.connected()) { 
-      VLF("MSG: IPSerial::peek() cmdSvrClient not connected");
-      return -1;
-    }
-    if (cmdSvrClient.available() > 0) {
-      VLF("MSG: IPSerial::peek() cmdSvrClient no data");
-      return -1;
-    }
-
+    if (!wifiActive || !cmdSvrClient) return -1;
     return cmdSvrClient.peek();
   }
 
   void IPSerial::flush(void) {
-    if (!cmdSvrClient) {
-      VLF("MSG: IPSerial::flush() no cmdSvrClient");
-      return;
-    }
-    if (!cmdSvrClient.connected()) { 
-      VLF("MSG: IPSerial::flush() cmdSvrClient not connected");
-      return;
-    }
-
+    if (!wifiActive || !cmdSvrClient) return;
     cmdSvrClient.flush();
   }
 
   int IPSerial::read(void) {
-    if (!cmdSvrClient) {
-      VLF("MSG: IPSerial::read() no cmdSvrClient");
-      return -1;
-    }
-    if (!cmdSvrClient.connected()) { 
-      VLF("MSG: IPSerial::read() cmdSvrClient not connected");
-      return -1;
-    }
-    if (cmdSvrClient.available() > 0) {
-      VLF("MSG: IPSerial::read() cmdSvrClient no data");
-      return -1;
-    }
-
-    return cmdSvrClient.read();
+    if (!wifiActive || !cmdSvrClient) return -1;
+    if (resetTimeout) clientTimeout = millis() + timeout;
+    int c = cmdSvrClient.read();
+    return c;
   }
 
   size_t IPSerial::write(uint8_t data) {
-    if (!cmdSvrClient) {
-      VLF("MSG: IPSerial::write() no cmdSvrClient");
-      return 0;
-    }
-    if (!cmdSvrClient.connected()) { 
-      VLF("MSG: IPSerial::write() cmdSvrClient not connected");
-      return 0;
-    }
-
+    if (!wifiActive || !cmdSvrClient) return 0;
     return cmdSvrClient.write(data);
   }
 
-  IPSerial ipSerial;
+  size_t IPSerial::write(const uint8_t *data, size_t count) {
+    if (!wifiActive || !cmdSvrClient) return 0;
+    return cmdSvrClient.write(data, count);
+  }
+
+  #if STANDARD_COMMAND_CHANNEL == ON
+    IPSerial ipSerial;
+  #endif
+
+  #if PERSISTENT_COMMAND_CHANNEL == ON
+    IPSerial pipSerial;
+  #endif
+
 #endif

@@ -184,7 +184,9 @@ void commandChannelInit() {
   #endif
   #ifdef SERIAL_IP
     VF("MSG: Setup, start command channel IP task (priority 6)... ");
-    if (tasks.add(1, 0, true, 6, processCmdsIP, "PrcCmdI")) { VL("success"); } else { VL("FAILED!"); }
+    handle = tasks.add(0, 0, true, 6, processCmdsIP, "PrcCmdI");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_LOCAL
     VF("MSG: Setup, start command channel Local task (priority 6)... ");
