@@ -89,7 +89,7 @@
     cmdSvr->setNoDelay(true);
     VF("MSG: WiFi started IP commandServer on port "); VL(port);
 
-    // setup for persistant channel
+    // setup for persistent channel
     if (port == 9998) {
       timeout = 120000UL;
       resetTimeout = true;
