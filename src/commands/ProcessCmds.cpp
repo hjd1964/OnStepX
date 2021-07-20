@@ -44,6 +44,10 @@ extern Tasks tasks;
   CommandProcessor processCommandsIP(9600,'I');
   void processCmdsIP() { ::yield(); processCommandsIP.poll(); }
 #endif
+#ifdef SERIAL_PIP
+  CommandProcessor processCommandsPIP(9600,'P');
+  void processCmdsPIP() { ::yield(); processCommandsPIP.poll(); }
+#endif
 #ifdef SERIAL_LOCAL
   CommandProcessor processCommandsLocal(9600,'L');
   void processCmdsLocal() { processCommandsLocal.poll(); }
@@ -185,6 +189,12 @@ void commandChannelInit() {
   #ifdef SERIAL_IP
     VF("MSG: Setup, start command channel IP task (priority 6)... ");
     handle = tasks.add(0, 0, true, 6, processCmdsIP, "PrcCmdI");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
+    tasks.setPeriodMicros(handle, comPollRate);
+  #endif
+  #ifdef SERIAL_PIP
+    VF("MSG: Setup, start command channel PIP task (priority 6)... ");
+    handle = tasks.add(0, 0, true, 6, processCmdsPIP, "PrcCmdP");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
