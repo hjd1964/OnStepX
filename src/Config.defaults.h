@@ -33,18 +33,22 @@
 #define PERSISTENT_COMMAND_CHANNEL     ON //          ON, Wifi command channel for a single connection on port 9998.
 #endif
 
+#ifndef AP_SSID
 #define AP_SSID                 "ONSTEPX" //   "ONSTEPX", Wifi Access Point SSID.
 #define AP_PASSWORD            "password" //  "password", Wifi Access Point password.
 #define AP_CHANNEL                      7 //           7, Wifi Access Point channel.
 #define AP_IP_ADDR          (192,168,0,1) // ..,168,0,1), Wifi Access Point IP Address.
 #define AP_GW_ADDR          (192,168,0,1) // ..,168,0,1), Wifi Access Point GATEWAY Address.
 #define AP_SN_MASK        (255,255,255,0) // ..55,255,0), Wifi Access Point SUBNET Mask.
+#endif
 
+#ifndef STA_SSID
 #define STA_SSID                   "Home" //      "Home", Wifi Station SSID to connnect to.
 #define STA_PASSWORD           "password" //  "password", Wifi Station mode password.
 #define STA_IP_ADDR        (192,168,1,55) // ..168,1,55), Wifi Station IP Address.
 #define STA_GW_ADDR         (192,168,1,1) // ..,168,1,1), Wifi Station GATEWAY Address.
 #define STA_SN_MASK       (255,255,255,0) // ..55,255,0), Wifi Station SUBNET Mask.
+#endif
 
 // sensors
 #ifndef WEATHER
