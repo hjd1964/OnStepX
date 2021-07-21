@@ -123,7 +123,7 @@ class Site {
     // convert string in format MM/DD/YY to julian date
     GregorianDate strToDate(char *ymd);
 
-    JulianDate ut1;
+    JulianDate ut1; // the current UT1 date and time
     double centisecondHOUR = 0;
     unsigned long centisecondSTART = 0;
 
