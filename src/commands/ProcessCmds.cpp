@@ -88,16 +88,16 @@ void CommandProcessor::poll() {
 
     // debug, log errors and/or commands
     #if DEBUG_ECHO_COMMANDS == ON
-      VF("MSG: cmd"); V(channel); V(" = "); V(buffer.getCmd()); V(buffer.getParameter()); VF(", reply = "); V(reply);
+      DF("MSG: cmd"); D(channel); D(" = "); D(buffer.getCmd()); D(buffer.getParameter()); DF(", reply = "); D(reply);
     #endif
     if (commandError != CE_NULL) {
       lastCommandError = commandError;
       #if DEBUG_ECHO_COMMANDS == ON
-        if (commandError > CE_0) { VF(", Error "); V(commandErrorStr[commandError]); }
+        if (commandError > CE_0) { DF(", Error "); D(commandErrorStr[commandError]); }
       #endif
     }
     #if DEBUG_ECHO_COMMANDS == ON
-      VL("");
+      DL("");
     #endif
 
     buffer.flush();
