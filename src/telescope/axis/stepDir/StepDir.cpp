@@ -96,7 +96,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   V(axisPrefix); V("init step="); V(pins.step); V(", dir="); V(pins.dir); V(", en="); VL(pins.enable);
 
   // init default driver direction state (forward)
-  if (!reverse) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
+  if (reverse == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   pinMode(pins.dir, OUTPUT);
   digitalWriteF(pins.dir, dirFwd);
 
