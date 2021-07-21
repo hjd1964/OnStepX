@@ -121,10 +121,12 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   nv.readBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
   if (!validateAxisSettings(axisNumber, alternateLimits, settings)) initError.value = true;
 
-  V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
-  V(", reverse="); VL(settings.reverse);
-  V(axisPrefix); VF("backlash takeup frequency set to ");
-  if (axisNumber <= 3) { V(radToDegF(settings.backlashFreq)); VL(" deg/sec."); } else { V(settings.backlashFreq); VL(" microns/sec."); }
+  #if DEBUG == VERBOSE
+    V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
+    V(", reverse="); if (settings.reverse == OFF) VL("OFF"); else if (settings.reverse == ON) VL("OFF"); else VL("?");
+    V(axisPrefix); VF("backlash takeup frequency set to ");
+    if (axisNumber <= 3) { V(radToDegF(settings.backlashFreq)); VL(" deg/sec."); } else { V(settings.backlashFreq); VL(" microns/sec."); }
+  #endif
 
   // get the motor ready
   if (!motor.init(axisNumber, settings.reverse, settings.microsteps, settings.currentRun)) {
