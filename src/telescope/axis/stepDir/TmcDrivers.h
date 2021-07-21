@@ -3,12 +3,16 @@
 #pragma once
 
 #include <Arduino.h>
+#include "../../../Common.h"
+
+#ifdef AXIS_PRESENT
+
 #include "../../../lib/softSpi/SoftSpi.h"
 
 class TmcDriver {
   public:
     // setup SoftSpi and driver model/Rsense
-    void init(int model, DriverPins pins);
+    void init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso);
 
     // TMC setup most common settings
     // 256x interpolation:   intpol
@@ -168,3 +172,5 @@ class TmcDriver {
 
     SoftSpi softSpi;
 };
+
+#endif

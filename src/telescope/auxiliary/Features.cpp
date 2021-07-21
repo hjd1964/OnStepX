@@ -15,6 +15,8 @@ void featuresPollWrapper() { telescope.features.poll(); }
 
 void Features::init(bool validKey) {
   for (int i = 0; i < 8; i++) {
+    if (device[i].pin == AUX) device[i].pin = auxPins[i];
+
     if (device[i].value == ON) device[i].value = 1; else
       if (device[i].value < 0 || device[i].value > 255) device[i].value = 0;
 

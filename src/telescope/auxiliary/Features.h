@@ -15,9 +15,9 @@ typedef struct Device {
    const char* name;
    const int16_t purpose;
    const int64_t temp;
-   const int16_t pin;
+   int16_t pin;
    int16_t value;
-   int16_t active;
+   const int16_t active;
    DewHeater *dewHeater;
    Intervalometer *intervalometer;
 } Device;
@@ -47,7 +47,7 @@ class Features {
     bool isDS2413(int64_t v);
  
   private:
-
+    int16_t auxPins[8] = { AUX1_PIN, AUX2_PIN, AUX3_PIN, AUX4_PIN, AUX5_PIN, AUX6_PIN, AUX7_PIN, AUX8_PIN };
     Device device[8] = {
       { FEATURE1_NAME, FEATURE1_PURPOSE, FEATURE1_TEMP, FEATURE1_PIN, FEATURE1_DEFAULT_VALUE, FEATURE1_ACTIVE_STATE, NULL, NULL },
       { FEATURE2_NAME, FEATURE2_PURPOSE, FEATURE2_TEMP, FEATURE2_PIN, FEATURE2_DEFAULT_VALUE, FEATURE2_ACTIVE_STATE, NULL, NULL },

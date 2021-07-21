@@ -3,7 +3,11 @@
 #pragma once
 
 #include <Arduino.h>
-//#include "Pins.h"
+#include "../../../Common.h"
+
+#ifdef AXIS_PRESENT
+
+#include "TmcDrivers.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
@@ -43,6 +47,7 @@ typedef struct DriverSettings {
 #pragma pack()
 
 typedef struct DriverPins {
+  uint8_t axis;
   int16_t m0;
   int16_t m1;
   int16_t m2;
@@ -104,7 +109,7 @@ class StepDriver {
   public:
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
-    void init(uint8_t axisNumber, int16_t current);
+    void init(uint8_t axisNumber, int16_t microsteps, int16_t current);
 
     // true if switching microstep modes is allowed
     bool modeSwitchAllowed();
@@ -150,7 +155,7 @@ class StepDriver {
     bool isDecayOnM2();
 
     int axisNumber;
-    DriverPins pins;
+    int index;
     DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
     int     microstepRatio        = 1;
@@ -161,3 +166,5 @@ class StepDriver {
     int16_t m2Pin                 = OFF;
     int16_t decayPin              = OFF;
 };
+
+#endif

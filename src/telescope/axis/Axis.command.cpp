@@ -3,6 +3,8 @@
 
 #include "../../Common.h"
 
+#ifdef AXIS_PRESENT
+
 #include "../mount/coordinates/Transform.h"
 #include "../mount/site/Site.h"
 #include "../../commands/ProcessCmds.h"
@@ -197,3 +199,5 @@ bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
   }
   return true;
 }
+
+#endif

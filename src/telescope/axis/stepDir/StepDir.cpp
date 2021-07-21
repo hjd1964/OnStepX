@@ -2,6 +2,9 @@
 // Axis step/dir driver motion
 
 #include "StepDir.h"
+
+#ifdef AXIS_PRESENT
+
 #include "../../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../../Telescope.h"
@@ -54,7 +57,7 @@ extern Tasks tasks;
   inline void moveAxis9() { telescope.focuser.axis[5]->motor.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
 #endif
 
-bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t currentRun) {
+bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t current) {
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   
@@ -90,7 +93,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   // make sure there is something to do
   if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
 
-  V(axisPrefix); D("init step="); D(pins.step); D(", dir="); D(pins.dir); D(", en="); DL(pins.enable);
+  V(axisPrefix); V("init step="); V(pins.step); V(", dir="); V(pins.dir); V(", en="); VL(pins.enable);
 
   // init default driver direction state (forward)
   if (!reverse) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
@@ -111,7 +114,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   digitalWriteEx(pins.enable, pins.enabledState)
 
   // init driver advanced modes, etc.
-  stepDriver.init(axisNumber, currentRun);
+  stepDriver.init(axisNumber, microsteps, current);
 
   // now disable the driver
   power(false);
@@ -394,6 +397,7 @@ bool StepDir::enableMoveFast(const bool fast) {
     }
     return true;
   #else
+    (void)(fast);
     return false;
   #endif
 }
@@ -466,4 +470,6 @@ bool StepDir::enableMoveFast(const bool fast) {
     if (tracking) targetSteps -= slewStep;
     if (motorSteps > targetSteps) { motorSteps -= slewStep; digitalWriteF(stepPin, stepSet); }
   }
+#endif
+
 #endif

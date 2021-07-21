@@ -4,6 +4,9 @@
 
 #include <Arduino.h>
 #include "../../Common.h"
+
+#ifdef AXIS_PRESENT
+
 #include "../../commands/ProcessCmds.h"
 #include "stepDir/StepDir.h"
 #include "stepDir/StepDrivers.h"
@@ -184,7 +187,7 @@ class Axis {
     bool decodeAxisSettings(char *s, AxisSettings &a);
     bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
     
-    AxisPins pins;
+    uint8_t index;
     AxisErrors errors;
 
     uint8_t taskHandle = 0;
@@ -233,3 +236,5 @@ class Axis {
     // homing mode
     HomingStage homingStage = HOME_NONE;
 };
+
+#endif

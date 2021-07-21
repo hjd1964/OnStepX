@@ -3,6 +3,8 @@
 
 #include "Axis.h"
 
+#ifdef AXIS_PRESENT
+
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../Telescope.h"
@@ -96,7 +98,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   }
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (Pins[i].axis == axisNumber) { pins = Pins[i]; settings = DefaultSettings[i]; break; } if (i == 9) { VLF("ERR: Axis::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) { if (Pins[i].axis == axisNumber) { index = i; settings = DefaultSettings[i]; break; } if (i == 9) { VLF("ERR: Axis::init(); indexing failed!"); return; } }
 
   // check for reverting axis settings in NV
   if (!validKey) {
@@ -120,7 +122,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   if (!validateAxisSettings(axisNumber, alternateLimits, settings)) initError.value = true;
 
   V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
-  V(", microsteps="); V(settings.microsteps); V(", Irun="); V(settings.currentRun); V(", reverse="); VL(settings.reverse);
+  V(", reverse="); VL(settings.reverse);
   V(axisPrefix); VF("backlash takeup frequency set to ");
   if (axisNumber <= 3) { V(radToDegF(settings.backlashFreq)); VL(" deg/sec."); } else { V(settings.backlashFreq); VL(" microns/sec."); }
 
@@ -133,9 +135,9 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 
   // activate home and limit sense
   V(axisPrefix); VLF("adding any home and/or limit senses");
-  homeSenseHandle = senses.add(pins.home, pins.sense.homeInit, pins.sense.homeTrigger);
-  minSenseHandle = senses.add(pins.min, pins.sense.minMaxInit, pins.sense.minTrigger);
-  maxSenseHandle = senses.add(pins.max, pins.sense.minMaxInit, pins.sense.maxTrigger);
+  homeSenseHandle = senses.add(Pins[index].home, Pins[index].sense.homeInit, Pins[index].sense.homeTrigger);
+  minSenseHandle = senses.add(Pins[index].min, Pins[index].sense.minMaxInit, Pins[index].sense.minTrigger);
+  maxSenseHandle = senses.add(Pins[index].max, Pins[index].sense.minMaxInit, Pins[index].sense.maxTrigger);
 }
 
 // enables or disables the associated step/dir driver
@@ -272,7 +274,7 @@ bool Axis::autoSlew(Direction direction) {
 // slew to home, with acceleration in "measures" per second per second
 bool Axis::autoSlewHome() {
   if (autoRate != AR_NONE) return false;
-  if (pins.sense.homeTrigger != OFF) {
+  if (Pins[index].sense.homeTrigger != OFF) {
     motor.setSynchronized(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
@@ -480,3 +482,5 @@ bool Axis::motionError(Direction direction) {
   }
   return false;
 }
+
+#endif

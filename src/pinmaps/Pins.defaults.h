@@ -2,6 +2,42 @@
 // Null pin map, assigns OFF to all values not already assigned
 #pragma once
 
+#ifndef AUX0_PIN
+  #define AUX0_PIN                  OFF
+#endif
+
+#ifndef AUX1_PIN
+  #define AUX1_PIN                  OFF
+#endif
+
+#ifndef AUX2_PIN
+  #define AUX2_PIN                  OFF
+#endif
+
+#ifndef AUX3_PIN
+  #define AUX3_PIN                  OFF
+#endif
+
+#ifndef AUX4_PIN
+  #define AUX4_PIN                  OFF
+#endif
+
+#ifndef AUX5_PIN
+  #define AUX5_PIN                  OFF
+#endif
+
+#ifndef AUX6_PIN
+  #define AUX6_PIN                  OFF
+#endif
+
+#ifndef AUX7_PIN
+  #define AUX7_PIN                  OFF
+#endif
+
+#ifndef AUX8_PIN
+  #define AUX8_PIN                  OFF
+#endif
+
 #ifndef ONE_WIRE_PIN
   #define ONE_WIRE_PIN              OFF
 #endif

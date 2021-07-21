@@ -4,6 +4,9 @@
 
 #include <Arduino.h>
 #include "../../../Common.h"
+
+#ifdef AXIS_PRESENT
+
 #include "../../../commands/ProcessCmds.h"
 #include "StepDrivers.h"
 
@@ -25,7 +28,7 @@ enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 class StepDir {
   public:
     // sets up the driver step/dir/enable pins and any associated stepDriver mode control
-    bool init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t currentRun);
+    bool init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t current);
 
     // sets motor power on/off (if possible)
     void power(bool value);
@@ -158,3 +161,5 @@ class StepDir {
     void (*_moveFF)() = NULL;
     void (*_moveFR)() = NULL;
 };
+
+#endif
