@@ -5,10 +5,6 @@
 // We define a more generic symbol, in case more Teensy boards based on different lines are supported
 // __AVR__
 
-// This platform has digitalReadFast, digitalWriteFast, etc.
-#include <digitalWriteFast.h> // https://github.com/watterott/Arduino-Libs/archive/master.zip
-#define HAL_HAS_DIGITAL_FAST
-
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION
 
