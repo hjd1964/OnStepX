@@ -61,7 +61,7 @@ class Site {
     void init(bool validKey);
     
     // update/apply the site latitude and longitude, necessary for LAST calculations etc.
-    void update();
+    void updateLocation();
 
     // adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
     // adjust up/down to compensate for MCU oscillator inaccuracy
@@ -79,11 +79,11 @@ class Site {
     // callback to tick the centisecond sidereal clock
     void tick();
 
-    // sets the UT date (Julian Day)
-    void setDate(JulianDate julianDate, bool current = false);
+    // sets the Julian Date (UT1,) also updates the site and sidereal time
+    void setDateTime(JulianDate julianDate);
 
-    // sets the UT time (in hours) that have passed in this Julian Day
-    void setTime(JulianDate julianDate, bool current = false);
+    // sets the sidereal time from the UT date/time
+    void setSiderealTime(JulianDate julianDate);
 
     Location location;
     LocationExtras locationEx;
@@ -96,7 +96,7 @@ class Site {
     double getTime();
 
     // sets the time in sidereal hours
-    void setSiderealTime(JulianDate julianDate, double time);
+    void setLAST(JulianDate julianDate, double time);
 
     // adjust time (hours) into the 0 to 24 range
     double backInHours(double time);

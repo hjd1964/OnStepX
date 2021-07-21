@@ -147,8 +147,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       double hour = ut1.hour - location.timezone;
       if (hour >= 24.0) { hour -= 24.0; ut1.day += 1.0; } else
       if (hour <  0.0)  { hour += 24.0; ut1.day -= 1.0; }
-      setDate(ut1, true);
-      setTime(ut1);
+      dateIsReady = true;
+      setSiderealTime(ut1);
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
       #if TIME_LOCATION_SOURCE != OFF
@@ -182,7 +182,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (degs >= -180.0 && degs <= 360.0) {
         if (degs >= 180.0) degs -= 360.0;
         location.longitude = degToRad(degs);
-        update();
+        updateLocation();
         nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
@@ -195,7 +195,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     double hour;
     if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
       ut1.hour = hour + location.timezone;
-      setTime(ut1, true);
+      timeIsReady = true;
+      setSiderealTime(ut1);
       if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
       if (error.TLSinit && dateIsReady && timeIsReady) error.TLSinit = false;
       #if TIME_LOCATION_SOURCE != OFF
@@ -225,7 +226,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     double degs;
     if (convert.dmsToDouble(&degs, parameter, true)) {
       location.latitude = degToRad(degs);
-      update();
+      updateLocation();
       nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
     } else *commandError = CE_PARAM_FORM;
   } else 
@@ -247,7 +248,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     number = command[1] - '0';
     nv.update(NV_SITE_NUMBER, number);
     readLocation(number, true);
-    update();
+    updateLocation();
     *numericReply = false;
   } else
 

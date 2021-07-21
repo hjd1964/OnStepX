@@ -27,13 +27,12 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
       site.location.longitude = degToRad(longitude);
       site.location.elevation = degToRad(elevation);
       strcpy(site.location.name, "GPS");
+      site.updateLocation();
 
       VF("MSG: Tls_GPS, setting date/time from GPS");
-      JulianDate ut1;
-      tls.get(ut1);
-      site.setDate(ut1);
-      site.setTime(ut1);
-      site.update();
+      JulianDate jd;
+      tls.get(jd);
+      site.setDateTime(jd);
 
       VF("MSG: Tls_GPS, stopping GPS polling task.");
       tasks.remove(tasks.getHandleByName("gpsPoll"));
@@ -46,7 +45,7 @@ void Site::init(bool validKey) {
   // get location
   VLF("MSG: Site, get Latitude/Longitude from NV");
   readLocation(number, validKey);
-  update();
+  updateLocation();
 
   // get date/time from the RTC/GPS or NV
   #if TIME_LOCATION_SOURCE != OFF
@@ -54,7 +53,6 @@ void Site::init(bool validKey) {
     if (!initError.tls) {
       #if TIME_LOCATION_SOURCE != GPS
         tls.get(ut1);
-        setTime(ut1);
         dateIsReady = true;
         timeIsReady = true;
         VLF("MSG: Site, get Date/Time from TLS");
@@ -74,7 +72,7 @@ void Site::init(bool validKey) {
     readJD(validKey);
   #endif
 
-  setTime(ut1);
+  setSiderealTime(ut1);
 
   VF("MSG: Site, start centisecond timer task (rate 10ms priority 0)... ");
   delay(1000);
@@ -89,7 +87,7 @@ void Site::init(bool validKey) {
   setPeriodSubMicros(SIDEREAL_PERIOD);
 }
 
-void Site::update() {
+void Site::updateLocation() {
   locationEx.latitude.cosine = cos(location.latitude);
   locationEx.latitude.sine   = sin(location.latitude);
   locationEx.latitude.absval = fabs(location.latitude);
@@ -97,7 +95,7 @@ void Site::update() {
 
   // same date and time, just calculates the sidereal time again
   ut1.hour = getTime();
-  setSiderealTime(ut1, julianDateToLAST(ut1));
+  setSiderealTime(ut1);
 }
 
 void Site::setPeriodSubMicros(unsigned long period) {
@@ -115,16 +113,17 @@ double Site::getTime() {
   return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
 }
 
-// sets the UT date (Julian Day)
-void Site::setDate(JulianDate julianDate, bool current) {
+// sets the Julian Date (UT1,) also updates the site and sidereal time
+void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
-  if (current) dateIsReady = true;
+  dateIsReady = true;
+  timeIsReady = true;
+  setSiderealTime(julianDate);
 }
 
 // sets the UT time (in hours) that have passed in this Julian Day
-void Site::setTime(JulianDate julianDate, bool current) {
-  setSiderealTime(julianDate, julianDateToLAST(julianDate));
-  if (current) timeIsReady = true;
+void Site::setSiderealTime(JulianDate julianDate) {
+  setLAST(julianDate, julianDateToLAST(julianDate));
 }
 
 double Site::getSiderealTime() {
@@ -135,7 +134,7 @@ double Site::getSiderealTime() {
   return backInHours(csToHours(cs));
 }
 
-void Site::setSiderealTime(JulianDate julianDate, double time) {
+void Site::setLAST(JulianDate julianDate, double time) {
   long cs = lround(hoursToCs(time));
   centisecondHOUR = julianDate.hour;
   centisecondSTART = cs;
