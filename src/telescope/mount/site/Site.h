@@ -79,8 +79,11 @@ class Site {
     // callback to tick the centisecond sidereal clock
     void tick();
 
-    // sets the time in hours that have passed in this Julian Day
-    void setTime(JulianDate julianDate);
+    // sets the UT date (Julian Day)
+    void setDate(JulianDate julianDate, bool current = false);
+
+    // sets the UT time (in hours) that have passed in this Julian Day
+    void setTime(JulianDate julianDate, bool current = false);
 
     Location location;
     LocationExtras locationEx;

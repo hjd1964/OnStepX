@@ -21,6 +21,7 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
     if (tls.ready) {
       VF("MSG: Tls_GPS, setting site from GPS");
       double latitude, longitude;
+      float elevation;
       tls.getSite(latitude, longitude, elevation);
       site.location.latitude = degToRad(latitude);
       site.location.longitude = degToRad(longitude);
@@ -30,10 +31,8 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
       VF("MSG: Tls_GPS, setting date/time from GPS");
       JulianDate ut1;
       tls.get(ut1);
+      site.setDate(ut1);
       site.setTime(ut1);
-      dateIsReady = true;
-      timeIsReady = true;
-
       site.update();
 
       VF("MSG: Tls_GPS, stopping GPS polling task.");
@@ -116,8 +115,16 @@ double Site::getTime() {
   return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
 }
 
-void Site::setTime(JulianDate julianDate) {
+// sets the UT date (Julian Day)
+void Site::setDate(JulianDate julianDate, bool current) {
+  ut1 = julianDate;
+  if (current) dateIsReady = true;
+}
+
+// sets the UT time (in hours) that have passed in this Julian Day
+void Site::setTime(JulianDate julianDate, bool current) {
   setSiderealTime(julianDate, julianDateToLAST(julianDate));
+  if (current) timeIsReady = true;
 }
 
 double Site::getSiderealTime() {
