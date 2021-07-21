@@ -93,7 +93,7 @@ bool TimeLocationSource::waitIsValid() {
 }
 
 bool TimeLocationSource::timeIsValid() {
-  if (gps.date.year() >= 0 && gps.date.year() <= 3000 && gps.date.month() >= 1 && gps.date.month() <= 12 && gps.date.day() >= 1 && gps.date.day() <= 31 &&
+  if (gps.date.year() <= 3000 && gps.date.month() >= 1 && gps.date.month() <= 12 && gps.date.day() >= 1 && gps.date.day() <= 31 &&
       gps.time.hour() <= 23 && gps.time.minute() <= 59 && gps.time.second() <= 59) return true; else return false;
 }
 
