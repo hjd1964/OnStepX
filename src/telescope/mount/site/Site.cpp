@@ -113,7 +113,7 @@ double Site::getTime() {
   return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
 }
 
-// sets the Julian Date (UT1,) also updates the site and sidereal time
+// sets the Julian Date/time (UT1,) and updates sidereal time
 void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
   dateIsReady = true;

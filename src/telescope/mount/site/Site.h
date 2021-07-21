@@ -79,7 +79,7 @@ class Site {
     // callback to tick the centisecond sidereal clock
     void tick();
 
-    // sets the Julian Date (UT1,) also updates the site and sidereal time
+    // sets the Julian Date/time (UT1,) and updates sidereal time
     void setDateTime(JulianDate julianDate);
 
     // sets the sidereal time from the UT date/time

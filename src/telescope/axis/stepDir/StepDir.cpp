@@ -62,7 +62,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   #if AXIS1_DRIVER_MODEL != OFF
     if (axisNumber == 1) { pins = Axis1Pins; _move = moveAxis1; _moveFF = moveFFAxis1; _moveFR = moveFRAxis1; }
   #endif
-  #if AXIS1_DRIVER_MODEL != OFF
+  #if AXIS2_DRIVER_MODEL != OFF
     if (axisNumber == 2) { pins = Axis2Pins; _move = moveAxis2; _moveFF = moveFFAxis2; _moveFR = moveFRAxis2; }
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
