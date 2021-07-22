@@ -11,9 +11,6 @@
 
 #include "Axis.h"
 
-int8_t driverModels[9] = {AXIS1_DRIVER_MODEL, AXIS2_DRIVER_MODEL, AXIS3_DRIVER_MODEL, AXIS4_DRIVER_MODEL, AXIS5_DRIVER_MODEL, AXIS6_DRIVER_MODEL, AXIS7_DRIVER_MODEL, AXIS8_DRIVER_MODEL, AXIS9_DRIVER_MODEL};
-int8_t driverMicrostepsGoto[2] = {AXIS1_DRIVER_MICROSTEPS_GOTO, AXIS2_DRIVER_MICROSTEPS_GOTO};
-
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
@@ -45,8 +42,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
         sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
           (long)thisAxis.stepsPerMeasure,
           (long)(thisAxis.stepsPerMeasure*1000)%1000,
-          (int)thisAxis.microsteps,
-          (int)thisAxis.currentRun,
+          (int)thisAxis.subdivisions,
+          (int)thisAxis.current,
           (int)thisAxis.reverse,
           (int)round(thisAxis.limits.min),
           (int)round(thisAxis.limits.max));
@@ -105,8 +102,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
               thisAxis.limits.max = thisAxis.limits.max*1000.0F;
             }
             if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
-              if (axisNumber <= 2 && thisAxis.microsteps < driverMicrostepsGoto[index]) thisAxis.microsteps = driverMicrostepsGoto[index];
-              if (motor.stepDriver.microstepsToCode(driverModels[index], thisAxis.microsteps) != OFF) {
+              if (axisNumber <= 2 && thisAxis.subdivisions < motor.driver.getSubdivisionsGoto()) thisAxis.subdivisions = motor.driver.getSubdivisionsGoto();
+              if (motor.driver.subdivisionsToCode(thisAxis.subdivisions) != OFF) {
                 nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
                 *numericReply = false;
               } else *commandError = CE_PARAM_RANGE;
@@ -127,9 +124,9 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
     char *conv_end;
     double f = strtod(ws, &conv_end); if (&s[0] != conv_end) a.stepsPerMeasure = f; else return false;
     ws = strchr(ws, ','); if (ws != NULL) {
-      ws++; a.microsteps = atol(ws);
+      ws++; a.subdivisions = atol(ws);
       ws = strchr(ws, ','); if (ws != NULL) {
-        ws++; a.currentRun = atol(ws);
+        ws++; a.current = atol(ws);
         ws = strchr(ws, ','); if (ws != NULL) {
           ws++; a.reverse = atol(ws);
           ws = strchr(ws, ','); if (ws != NULL) {
@@ -177,12 +174,12 @@ bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad stepsPerMeasure="); DL(a.stepsPerMeasure);
     return false;
   }
-  if (a.microsteps != OFF && (a.microsteps < 1 || a.microsteps > 256)) {
-    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad microsteps="); DL(a.microsteps);
+  if (a.subdivisions != OFF && (a.subdivisions < 1 || a.subdivisions > 256)) {
+    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad subdivisions="); DL(a.subdivisions);
     return false;
   }
-  if (a.currentRun != OFF && (a.currentRun < 0 || a.currentRun > IrunLimitH[index])) {
-    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad IRUN="); DL(a.currentRun);
+  if (a.current != OFF && (a.current < 0 || a.current > IrunLimitH[index])) {
+    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad current="); DL(a.current);
     return false;
   }
   if (a.reverse != OFF && a.reverse != ON) {

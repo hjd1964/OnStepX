@@ -45,8 +45,9 @@
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
 #define AXIS1_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
-#define AXIS1_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
 #define AXIS1_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
+
+#define AXIS1_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
 
 #define AXIS1_LIMIT_MIN              -180 //   -180, n. Where n= -90..-270 (degrees.) Minimum "Hour Angle" for Eq modes.      Adjust
                                           //         n. Where n=-180..-360 (degrees.) Minimum Azimuth for AltAzm mode.
@@ -65,7 +66,8 @@
 #define AXIS2_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 #define AXIS2_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
-#define AXIS2_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
+
+#define AXIS2_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
 
 #define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed declination.                Infreq
 #define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed declination.                 Infreq
@@ -129,7 +131,8 @@
 
 // AXIS3 ROTATOR ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS3
 #define AXIS3_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current standstill. HALF uses IRUN/2.0                          Option
-#define AXIS3_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
+
+#define AXIS3_POWER_DOWN              OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
 
 #define AXIS3_LIMIT_MIN              -180 //   -180, n. Where n=-360..0 (degrees.) Minimum allowed rotator angle.             Infreq
 #define AXIS3_LIMIT_MAX               180 //    180, n. Where n=0..360 (degrees.) Maximum allowed rotator angle.              Infreq
@@ -146,7 +149,8 @@
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
 #define AXIS4_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current standstill. HALF uses IRUN/2.0                          Option
-#define AXIS4_DRIVER_POWER_DOWN       OFF //    OFF, ON Powers off 30sec after movement stops.                                Option
+
+#define AXIS4_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops.                                Option
 
 #define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
 #define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
@@ -154,6 +158,8 @@
 #define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 #define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+
+#define AXIS4_SLEW_RATE_MINIMUM        25 //     25, n. Where n=1..200 (um/s.) Minimum microns/second.                        Adjust
 
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc

@@ -20,8 +20,8 @@ typedef struct AxisLimits {
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
-  int16_t    microsteps;
-  int16_t    currentRun;
+  int16_t    subdivisions;
+  int16_t    current;
   AxisLimits limits;
   float      backlashFreq;
 } AxisSettings;

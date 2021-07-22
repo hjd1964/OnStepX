@@ -10,9 +10,7 @@
 #include "../../../commands/ProcessCmds.h"
 #include "StepDrivers.h"
 
-#if AXIS1_DRIVER_STEP == AXIS2_DRIVER_STEP == AXIS3_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == AXIS1_DRIVER_STEP == HIGH
-  #define DRIVER_STEP_DEFAULTS
-#endif
+#include "StepDir.defaults.h"
 
 typedef struct StepDirPins {
   int16_t   step;
@@ -97,7 +95,8 @@ class StepDir {
     // swaps in/out fast unidirectional ISR for slewing 
     bool enableMoveFast(const bool state);
 
-    StepDriver stepDriver;
+    // a stepper motor driver
+    StepDriver driver; // should not be used outside of the StepDir class
 
   private:
     // disable backlash compensation, to work properly there must be an enable call to match
@@ -106,7 +105,7 @@ class StepDir {
     void enableBacklash();
     // returns true if traveling through backlash
     bool inBacklash();
-    
+
     StepDirPins pins;
 
     uint8_t taskHandle = 0;

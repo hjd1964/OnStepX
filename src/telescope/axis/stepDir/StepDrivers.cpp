@@ -58,7 +58,7 @@ const DriverPins ModePins[] = {
   #endif
 };
 
-const DriverSettings DriverModeSettings[] = {
+const DriverSettings ModeSettings[] = {
   #if AXIS1_DRIVER_MODEL != OFF
     { AXIS1_DRIVER_MODEL, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_MICROSTEPS_GOTO, AXIS1_DRIVER_IHOLD, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_IGOTO, AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO, AXIS1_DRIVER_STATUS },
   #endif
@@ -92,7 +92,7 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
   this->axisNumber = axisNumber;
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (ModePins[i].axis == axisNumber) { index = i; settings = DriverModeSettings[i]; break; } if (i == 9) { VLF("ERR: StepDriver::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) { if (ModePins[i].axis == axisNumber) { index = i; settings = ModeSettings[i]; break; } if (i == 9) { VLF("ERR: StepDriver::init(); indexing failed!"); return; } }
 
   // update the current from initialization setting
   if (settings.currentRun != OFF && settings.currentRun != current) {
@@ -112,8 +112,8 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
     if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
   #endif
 
-  microstepCode = microstepsToCode(settings.model, settings.microsteps);
-  microstepCodeGoto = microstepsToCode(settings.model, settings.microstepsGoto);
+  microstepCode = subdivisionsToCode(settings.microsteps);
+  microstepCodeGoto = subdivisionsToCode(settings.microstepsGoto);
   microstepRatio = settings.microsteps/settings.microstepsGoto;
 
   if (isTmcSPI()) {
@@ -293,11 +293,11 @@ bool StepDriver::isDecayOnM2() {
 // different models of stepper drivers have different bit settings for microsteps
 // translate the human readable microsteps in the configuration to mode bit settings
 // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
-int StepDriver::microstepsToCode(uint8_t driverModel, uint8_t microsteps) {
+int StepDriver::subdivisionsToCode(uint8_t microsteps) {
   int allowed[9] = {1,2,4,8,16,32,64,128,256};
-  if (driverModel >= DRIVER_MODEL_COUNT) return OFF;
+  if (settings.model >= DRIVER_MODEL_COUNT) return OFF;
   for (int i = 0; i < 9; i++) {
-    if (microsteps == allowed[i]) return steps[driverModel][i];
+    if (microsteps == allowed[i]) return steps[settings.model][i];
   }
   return OFF;
 }

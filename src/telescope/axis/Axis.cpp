@@ -42,47 +42,47 @@ const AxisPins Pins[] = {
 
 const AxisSettings DefaultSettings[] = {
 #if AXIS1_DRIVER_MODEL != OFF
-  { AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_DRIVER_REVERSE, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_IRUN , { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
+  { AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, AXIS1_SUBDIVISIONS, AXIS1_CURRENT, { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
-  { AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_DRIVER_REVERSE, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_IRUN, { degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
+  { AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_REVERSE, AXIS2_SUBDIVISIONS, AXIS2_CURRENT, { degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
-  { AXIS3_STEPS_PER_DEGREE, AXIS3_DRIVER_REVERSE, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_IRUN, { AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX }, AXIS3_BACKLASH_RATE },
+  { AXIS3_STEPS_PER_DEGREE, AXIS3_REVERSE, AXIS3_SUBDIVISIONS, AXIS3_CURRENT, { AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX }, AXIS3_BACKLASH_RATE },
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
-  { AXIS4_STEPS_PER_MICRON, AXIS4_DRIVER_REVERSE, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, { AXIS4_LIMIT_MIN*1000.0F, AXIS4_LIMIT_MAX*1000.0F }, AXIS4_BACKLASH_RATE },
+  { AXIS4_STEPS_PER_MICRON, AXIS4_REVERSE, AXIS4_SUBDIVISIONS, AXIS4_CURRENT, { AXIS4_LIMIT_MIN*1000.0F, AXIS4_LIMIT_MAX*1000.0F }, AXIS4_BACKLASH_RATE },
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
-  { AXIS5_STEPS_PER_MICRON, AXIS5_DRIVER_REVERSE, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, { AXIS5_LIMIT_MIN*1000.0F, AXIS5_LIMIT_MAX*1000.0F }, AXIS5_BACKLASH_RATE },
+  { AXIS5_STEPS_PER_MICRON, AXIS5_REVERSE, AXIS5_SUBDIVISIONS, AXIS5_CURRENT, { AXIS5_LIMIT_MIN*1000.0F, AXIS5_LIMIT_MAX*1000.0F }, AXIS5_BACKLASH_RATE },
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
-  { AXIS6_STEPS_PER_MICRON, AXIS6_DRIVER_REVERSE, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, { AXIS6_LIMIT_MIN*1000.0F, AXIS6_LIMIT_MAX*1000.0F }, AXIS6_BACKLASH_RATE },
+  { AXIS6_STEPS_PER_MICRON, AXIS6_REVERSE, AXIS6_SUBDIVISIONS, AXIS6_CURRENT, { AXIS6_LIMIT_MIN*1000.0F, AXIS6_LIMIT_MAX*1000.0F }, AXIS6_BACKLASH_RATE },
 #endif
 #if AXIS7_DRIVER_MODEL != OFF
-  { AXIS7_STEPS_PER_MICRON, AXIS7_DRIVER_REVERSE, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, { AXIS7_LIMIT_MIN*1000.0F, AXIS7_LIMIT_MAX*1000.0F }, AXIS7_BACKLASH_RATE },
+  { AXIS7_STEPS_PER_MICRON, AXIS7_REVERSE, AXIS7_SUBDIVISIONS, AXIS7_CURRENT, { AXIS7_LIMIT_MIN*1000.0F, AXIS7_LIMIT_MAX*1000.0F }, AXIS7_BACKLASH_RATE },
 #endif
 #if AXIS8_DRIVER_MODEL != OFF
-  { AXIS8_STEPS_PER_MICRON, AXIS8_DRIVER_REVERSE, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, { AXIS8_LIMIT_MIN*1000.0F, AXIS8_LIMIT_MAX*1000.0F }, AXIS8_BACKLASH_RATE },
+  { AXIS8_STEPS_PER_MICRON, AXIS8_REVERSE, AXIS8_SUBDIVISIONS, AXIS8_CURRENT, { AXIS8_LIMIT_MIN*1000.0F, AXIS8_LIMIT_MAX*1000.0F }, AXIS8_BACKLASH_RATE },
 #endif
 #if AXIS9_DRIVER_MODEL != OFF
-  { AXIS9_STEPS_PER_MICRON, AXIS9_DRIVER_REVERSE, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, { AXIS9_LIMIT_MIN*1000.0F, AXIS9_LIMIT_MAX*1000.0F }, AXIS9_BACKLASH_RATE },
+  { AXIS9_STEPS_PER_MICRON, AXIS9_REVERSE, AXIS9_SUBDIVISIONS, AXIS9_CURRENT, { AXIS9_LIMIT_MIN*1000.0F, AXIS9_LIMIT_MAX*1000.0F }, AXIS9_BACKLASH_RATE },
 #endif
 };
 
 static uint8_t pollingTaskHandle  = 0;
 inline void pollAxes() {
   #if AXIS1_DRIVER_MODEL != OFF
-    telescope.mount.axis1.poll();
+    telescope.mount.axis1.poll(); Y;
   #endif
   #if AXIS2_DRIVER_MODEL != OFF
-    telescope.mount.axis2.poll();
+    telescope.mount.axis2.poll(); Y;
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    telescope.rotator.axis.poll();
+    telescope.rotator.axis.poll(); Y;
   #endif
   #ifdef FOCUSER_PRESENT
-    for (int i = 0; i < FOCUSER_MAX; i++) if (telescope.focuser.axis[i] != NULL) telescope.focuser.axis[i]->poll();
+    for (int i = 0; i < FOCUSER_MAX; i++) if (telescope.focuser.axis[i] != NULL) { telescope.focuser.axis[i]->poll(); Y; }
   #endif
 }
 
@@ -92,8 +92,8 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
 
   // start monitor
   if (pollingTaskHandle == 0) {
-    VF("MSG: Axis, start monitor task (rate 20ms priority 0)... ");
-    pollingTaskHandle = tasks.add(20, 0, true, 0, pollAxes, "AxsPoll");
+    VF("MSG: Axis, start monitor task (rate 20ms priority 1)... ");
+    pollingTaskHandle = tasks.add(20, 0, true, 1, pollAxes, "AxsPoll");
     if (pollingTaskHandle) { VL("success"); } else { VL("FAILED!"); }
   }
 
@@ -129,7 +129,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   #endif
 
   // get the motor ready
-  if (!motor.init(axisNumber, settings.reverse, settings.microsteps, settings.currentRun)) {
+  if (!motor.init(axisNumber, settings.reverse, settings.subdivisions, settings.current)) {
     VF("MSG: Axis, nothing to do exiting!");
     return;
   }
@@ -196,13 +196,13 @@ double Axis::getInstrumentCoordinate() {
 
 void Axis::setInstrumentCoordinatePark(double value) {
   long steps = lround(value*settings.stepsPerMeasure);
-  steps -= settings.microsteps*2L;
-  for (int l = 0; l < settings.microsteps*4; l++) { if (steps % settings.microsteps*4L == 0) break; steps++; }
+  steps -= settings.subdivisions*2L;
+  for (int l = 0; l < settings.subdivisions*4; l++) { if (steps % settings.subdivisions*4L == 0) break; steps++; }
   motor.setInstrumentCoordinateSteps(steps);
 }
 
 void Axis::setTargetCoordinatePark(double value) {
-  motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.microsteps);
+  motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 void Axis::setTargetCoordinate(double value) {

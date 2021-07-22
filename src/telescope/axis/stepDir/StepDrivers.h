@@ -7,8 +7,6 @@
 
 #ifdef AXIS_PRESENT
 
-#include "TmcDrivers.h"
-
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
 #define A4988    0  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
@@ -30,6 +28,15 @@
 #define SLOW          2
 #define SPREADCYCLE   3
 #define STEALTHCHOP   4
+
+#include "StepDrivers.defaults.h"
+
+#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
+    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
+    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
+  #define HAS_TMC_DRIVER
+  #include "TmcDrivers.h"
+#endif
 
 #pragma pack(1)
 #define StepDriverSettingsSize 15
@@ -75,36 +82,6 @@ typedef struct DriverStatus {
   bool fault;
 } DriverStatus;
 
-// check/flag TMC stepper drivers
-#if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160
-  #define AXIS1_DRIVER_TMC_SPI
-#endif
-#if AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160
-  #define AXIS2_DRIVER_TMC_SPI
-#endif
-#if AXIS3_DRIVER_MODEL == TMC2130 || AXIS3_DRIVER_MODEL == TMC5160
-  #define AXIS3_DRIVER_TMC_SPI
-#endif
-#if AXIS4_DRIVER_MODEL == TMC2130 || AXIS4_DRIVER_MODEL == TMC5160
-  #define AXIS4_DRIVER_TMC_SPI
-#endif
-#if AXIS5_DRIVER_MODEL == TMC2130 || AXIS5_DRIVER_MODEL == TMC5160
-  #define AXIS5_DRIVER_TMC_SPI
-#endif
-#if AXIS6_DRIVER_MODEL == TMC2130 || AXIS6_DRIVER_MODEL == TMC5160
-  #define AXIS6_DRIVER_TMC_SPI
-#endif
-
-#if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160 || \
-    AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160 || \
-    AXIS3_DRIVER_MODEL == TMC2130 || AXIS3_DRIVER_MODEL == TMC5160 || \
-    AXIS4_DRIVER_MODEL == TMC2130 || AXIS4_DRIVER_MODEL == TMC5160 || \
-    AXIS5_DRIVER_MODEL == TMC2130 || AXIS5_DRIVER_MODEL == TMC5160 || \
-    AXIS6_DRIVER_MODEL == TMC2130 || AXIS6_DRIVER_MODEL == TMC5160
-  #define HAS_TMC_DRIVER
-  #include "TmcDrivers.h"
-#endif
-
 class StepDriver {
   public:
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
@@ -136,10 +113,19 @@ class StepDriver {
     // checks for TMC SPI driver
     bool isTmcSPI();
 
+    // get the microsteps
+    // this is a required method for the Axis class, even if it only ever returns 1
+    inline int getSubdivisions() { return settings.microsteps; }
+
+    // get the microsteps goto
+    // this is a required method for the Axis class, even if it only ever returns 1
+    inline int getSubdivisionsGoto() { return settings.microstepsGoto; }
+
     // different models of stepper drivers have different bit settings for microsteps
     // translate the human readable microsteps in the configuration to mode bit settings
     // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
-    int microstepsToCode(uint8_t driverModel, uint8_t microsteps);
+    // this is a required method for the Axis class, even if it only ever returns 1
+    int subdivisionsToCode(uint8_t microsteps);
 
     #ifdef HAS_TMC_DRIVER
       TmcDriver tmcDriver;

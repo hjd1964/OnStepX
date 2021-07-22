@@ -42,8 +42,8 @@
 #endif
 
 // powering down Dec supported only if EN is available and not shared with Axis1
-#if AXIS2_DRIVER_POWER_DOWN == ON && (AXIS2_EN_PIN == OFF || AXIS2_EN_PIN == SHARED_PIN)
-  #error "Configuration (Config.h): AXIS2_DRIVER_POWER_DOWN not supported on this PINMAP"
+#if AXIS2_POWER_DOWN == ON && (AXIS2_EN_PIN == OFF || AXIS2_EN_PIN == SHARED_PIN)
+  #error "Configuration (Config.h): AXIS2_POWER_DOWN not supported on this PINMAP"
 #endif
 
 // focusers/rotator allowed?

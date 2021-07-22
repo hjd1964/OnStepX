@@ -52,30 +52,30 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
-#define AXIS1_DRIVER_MODEL            OFF //    OFF, To disable the mount. Enter stepper driver model (above) to activate.   <-Often
+#define AXIS1_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) in both axes to activate the mount.  <-Often
 
 #define AXIS1_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS1_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
 #define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS1_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
-#define AXIS1_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 #define AXIS1_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS1_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS1_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
-#define AXIS2_DRIVER_MODEL            OFF //    OFF, To disable the mount. Enter stepper driver model (above) to activate.   <-Often
+#define AXIS2_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) in both axes to activate the mount.  <-Often
 
 #define AXIS2_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS2_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
 #define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS2_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
-#define AXIS2_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 #define AXIS2_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS2_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS2_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 
 // MOUNT TYPE -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_TYPE                    GEM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
@@ -122,16 +122,16 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS3 ROTATOR ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS3
-#define AXIS3_DRIVER_MODEL            OFF //    OFF, To disable the rotator. Enter stepper driver model (above) to activate.  Option
+#define AXIS3_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the rotator.              Option
 
 #define AXIS3_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 #define AXIS3_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current tracking, appropriate for stepper/driver/etc.           Option
-#define AXIS3_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 #define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
                                           //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
 #define AXIS3_SLEW_RATE_DESIRED       1.0 //    1.0, n, (degrees/second) Maximum speed depends on processor.                  Adjust
+#define AXIS3_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 
 // =================================================================================================================================
 // FOCUSERS ========================================================================================================================
@@ -145,16 +145,16 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
-#define AXIS4_DRIVER_MODEL            OFF //    OFF, To disable the focuser. Enter stepper driver model (above) to activate.  Option
+#define AXIS4_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the focuser.              Option
 
 #define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 #define AXIS4_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS4_DRIVER_REVERSE          OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 #define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_SLEW_RATE_MINIMUM        25 //     25, n. Where n=1..200 (um/s.) Minimum microns/second.                        Adjust
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
+#define AXIS4_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc

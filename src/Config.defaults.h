@@ -81,11 +81,66 @@
 #ifndef AXIS1_STEPS_PER_DEGREE
 #define AXIS1_STEPS_PER_DEGREE        12800.0
 #endif
+#ifndef AXIS1_REVERSE
+#define AXIS1_REVERSE                 OFF
+#endif
+#ifndef AXIS1_POWER_DOWN
+#define AXIS1_POWER_DOWN              OFF  // motor power off if at standstill > 30 sec
+#endif
+#ifndef AXIS1_LIMIT_MIN
+#define AXIS1_LIMIT_MIN               -180 // in "measures" (except Axis1/2 are degrees)
+#endif
+#ifndef AXIS1_LIMIT_MAX
+#define AXIS1_LIMIT_MAX               180  // in "measures" (except Axis1/2 are degrees)
+#endif
+#ifndef AXIS1_SENSE_HOME
+#define AXIS1_SENSE_HOME              OFF  // HIGH/LOW to activate home sensing and set direction
+#endif
+#ifndef AXIS1_SENSE_HOME_INIT
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP // pin mode for home sensing
+#endif
+#ifndef AXIS1_SENSE_LIMIT_MIN
+#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE  // HIGH/LOW to activate min limit
+#endif
+#ifndef AXIS1_SENSE_LIMIT_MAX
+#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE  // HIGH/LOW to activate max limit
+#endif
+#ifndef AXIS1_SENSE_LIMIT_INIT
+#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT // pin mode for limit sensing
+#endif
+
+#ifndef AXIS2_STEPS_PER_DEGREE
+#define AXIS2_STEPS_PER_DEGREE        12800.0
+#endif
+#ifndef AXIS2_REVERSE
+#define AXIS2_REVERSE                 OFF
+#endif
+#ifndef AXIS2_POWER_DOWN
+#define AXIS2_POWER_DOWN              OFF
+#endif
 #ifndef AXIS2_TANGENT_ARM
 #define AXIS2_TANGENT_ARM             OFF
 #endif
-#ifndef AXIS2_STEPS_PER_DEGREE
-#define AXIS2_STEPS_PER_DEGREE        12800.0
+#ifndef AXIS2_LIMIT_MIN
+#define AXIS2_LIMIT_MIN               -90
+#endif
+#ifndef AXIS2_LIMIT_MAX
+#define AXIS2_LIMIT_MAX               90
+#endif
+#ifndef AXIS2_SENSE_HOME
+#define AXIS2_SENSE_HOME              OFF
+#endif
+#ifndef AXIS2_SENSE_HOME_INIT
+#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
+#ifndef AXIS2_SENSE_LIMIT_MIN
+#define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE
+#endif
+#ifndef AXIS2_SENSE_LIMIT_MAX
+#define AXIS2_SENSE_LIMIT_MAX         LIMIT_SENSE
+#endif
+#ifndef AXIS2_SENSE_LIMIT_INIT
+#define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
 #endif
 
 // mount type
@@ -270,6 +325,12 @@
 #ifndef AXIS3_STEPS_PER_DEGREE
 #define AXIS3_STEPS_PER_DEGREE        64.0
 #endif
+#ifndef AXIS3_REVERSE
+#define AXIS3_REVERSE                 OFF
+#endif
+#ifndef AXIS3_POWER_DOWN
+#define AXIS3_POWER_DOWN              OFF
+#endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
 #define AXIS3_SLEW_RATE_DESIRED       1.0                         // in degrees/sec
 #endif
@@ -281,300 +342,6 @@
 #endif
 #ifndef AXIS3_BACKLASH_RATE
 #define AXIS3_BACKLASH_RATE           (AXIS3_ACCELERATION_RATE/4) // in degrees/sec
-#endif
-
-// -----------------------------------------------------------------------------------
-// focuser settings, FOCUSER1
-#ifndef AXIS4_STEPS_PER_MICRON
-#define AXIS4_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS4_SLEW_RATE_MINIMUM
-#define AXIS4_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS4_SLEW_RATE_DESIRED
-#define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS4_ACCELERATION_RATE
-#define AXIS4_ACCELERATION_RATE       AXIS4_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS4_RAPID_STOP_RATE
-#define AXIS4_RAPID_STOP_RATE         (AXIS4_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS4_BACKLASH_RATE
-#define AXIS4_BACKLASH_RATE           (AXIS4_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-// focuser settings, FOCUSER2
-#ifndef AXIS5_STEPS_PER_MICRON
-#define AXIS5_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS5_SLEW_RATE_DESIRED
-#define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS5_ACCELERATION_RATE
-#define AXIS5_ACCELERATION_RATE       AXIS5_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS5_RAPID_STOP_RATE
-#define AXIS5_RAPID_STOP_RATE         (AXIS5_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS5_BACKLASH_RATE
-#define AXIS5_BACKLASH_RATE           (AXIS5_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-// focuser settings, FOCUSER3
-#ifndef AXIS6_STEPS_PER_MICRON
-#define AXIS6_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS6_SLEW_RATE_DESIRED
-#define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS6_ACCELERATION_RATE
-#define AXIS6_ACCELERATION_RATE       AXIS6_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS6_RAPID_STOP_RATE
-#define AXIS6_RAPID_STOP_RATE         (AXIS6_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS6_BACKLASH_RATE
-#define AXIS6_BACKLASH_RATE           (AXIS6_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-// focuser settings, FOCUSER4
-#ifndef AXIS7_STEPS_PER_MICRON
-#define AXIS7_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS7_SLEW_RATE_DESIRED
-#define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS7_ACCELERATION_RATE
-#define AXIS7_ACCELERATION_RATE       AXIS7_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS7_RAPID_STOP_RATE
-#define AXIS7_RAPID_STOP_RATE         (AXIS7_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS7_BACKLASH_RATE
-#define AXIS7_BACKLASH_RATE           (AXIS7_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-// focuser settings, FOCUSER5
-#ifndef AXIS8_STEPS_PER_MICRON
-#define AXIS8_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS8_SLEW_RATE_DESIRED
-#define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS8_ACCELERATION_RATE
-#define AXIS8_ACCELERATION_RATE       AXIS8_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS8_RAPID_STOP_RATE
-#define AXIS8_RAPID_STOP_RATE         (AXIS8_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS8_BACKLASH_RATE
-#define AXIS8_BACKLASH_RATE           (AXIS8_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-// focuser settings, FOCUSER6
-#ifndef AXIS9_STEPS_PER_MICRON
-#define AXIS9_STEPS_PER_MICRON        0.5
-#endif
-#ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM       50                          // in microns/sec
-#endif
-#ifndef AXIS9_SLEW_RATE_DESIRED
-#define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
-#endif
-#ifndef AXIS9_ACCELERATION_RATE
-#define AXIS9_ACCELERATION_RATE       AXIS9_SLEW_RATE_DESIRED     // in microns/sec/sec
-#endif
-#ifndef AXIS9_RAPID_STOP_RATE
-#define AXIS9_RAPID_STOP_RATE         (AXIS9_ACCELERATION_RATE*2) // in microns/sec/sec
-#endif
-#ifndef AXIS9_BACKLASH_RATE
-#define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
-#endif
-
-#ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE           OFF // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
-#endif
-#ifndef FOCUSER_TEMPERATURE_PIN
-#define FOCUSER_TEMPERATURE_PIN       OFF // for thermistors, analog pin
-#endif
-
-// -----------------------------------------------------------------------------------
-// common axis settings, RA/AZM
-#ifndef AXIS1_DRIVER_MODEL
-#define AXIS1_DRIVER_MODEL            OFF  // specify a driver to enable this feature
-#endif
-#ifndef AXIS1_DRIVER_DECAY
-#define AXIS1_DRIVER_DECAY            OFF  // OFF for default, TMC STEALTHCHOP
-#endif
-#ifndef AXIS1_DRIVER_DECAY_GOTO
-#define AXIS1_DRIVER_DECAY_GOTO       OFF  // OFF for default, TMC SPREADCYCLE
-#endif
-#ifndef AXIS1_DRIVER_MICROSTEPS
-#define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
-#endif
-#ifndef AXIS1_DRIVER_MICROSTEPS_GOTO
-#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF  // microstep mode to use during slews
-#endif
-#ifndef AXIS1_DRIVER_IHOLD
-#define AXIS1_DRIVER_IHOLD            HALF // in mA
-#endif
-#ifndef AXIS1_DRIVER_IRUN
-#define AXIS1_DRIVER_IRUN             OFF  // in mA
-#endif
-#ifndef AXIS1_DRIVER_IGOTO
-#define AXIS1_DRIVER_IGOTO            SAME // in mA
-#endif
-#ifndef AXIS1_DRIVER_POWER_DOWN
-#define AXIS1_DRIVER_POWER_DOWN       OFF  // motor power off if at standstill > 30 sec
-#endif
-#ifndef AXIS1_DRIVER_REVERSE
-#define AXIS1_DRIVER_REVERSE          OFF  // reverse direction of motion
-#endif
-#ifndef AXIS1_DRIVER_ENABLE
-#define AXIS1_DRIVER_ENABLE           LOW  // state of ENable pin for motor power on
-#endif
-#ifndef AXIS1_DRIVER_STEP
-#define AXIS1_DRIVER_STEP             HIGH // signal transition state for a step
-#endif
-#ifndef AXIS1_DRIVER_STATUS
-#define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
-#endif
-#ifndef AXIS1_LIMIT_MIN
-#define AXIS1_LIMIT_MIN               -180 // in "measures" (except Axis1/2 are degrees)
-#endif
-#ifndef AXIS1_LIMIT_MAX
-#define AXIS1_LIMIT_MAX               180  // in "measures" (except Axis1/2 are degrees)
-#endif
-#ifndef AXIS1_SENSE_HOME
-#define AXIS1_SENSE_HOME              OFF  // HIGH/LOW to activate home sensing and set direction
-#endif
-#ifndef AXIS1_SENSE_HOME_INIT
-#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP // pin mode for home sensing
-#endif
-#ifndef AXIS1_SENSE_LIMIT_MIN
-#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE  // HIGH/LOW to activate min limit
-#endif
-#ifndef AXIS1_SENSE_LIMIT_MAX
-#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE  // HIGH/LOW to activate max limit
-#endif
-#ifndef AXIS1_SENSE_LIMIT_INIT
-#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT // pin mode for limit sensing
-#endif
-
-// common axis settings, DEC/ALT
-#ifndef AXIS2_DRIVER_MODEL
-#define AXIS2_DRIVER_MODEL            OFF
-#endif
-#ifndef AXIS2_DRIVER_DECAY
-#define AXIS2_DRIVER_DECAY            OFF
-#endif
-#ifndef AXIS2_DRIVER_DECAY_GOTO
-#define AXIS2_DRIVER_DECAY_GOTO       OFF
-#endif
-#ifndef AXIS2_DRIVER_MICROSTEPS
-#define AXIS2_DRIVER_MICROSTEPS       OFF
-#endif
-#ifndef AXIS2_DRIVER_MICROSTEPS_GOTO
-#define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF
-#endif
-#ifndef AXIS2_DRIVER_IHOLD
-#define AXIS2_DRIVER_IHOLD            HALF
-#endif
-#ifndef AXIS2_DRIVER_IRUN
-#define AXIS2_DRIVER_IRUN             OFF
-#endif
-#ifndef AXIS2_DRIVER_IGOTO
-#define AXIS2_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS2_DRIVER_POWER_DOWN
-#define AXIS2_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS2_DRIVER_REVERSE
-#define AXIS2_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS2_DRIVER_ENABLE
-#define AXIS2_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS2_DRIVER_STEP
-#define AXIS2_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS2_DRIVER_STATUS
-#define AXIS2_DRIVER_STATUS           OFF
-#endif
-#ifndef AXIS2_LIMIT_MIN
-#define AXIS2_LIMIT_MIN               -90
-#endif
-#ifndef AXIS2_LIMIT_MAX
-#define AXIS2_LIMIT_MAX               90
-#endif
-#ifndef AXIS2_SENSE_HOME
-#define AXIS2_SENSE_HOME              OFF
-#endif
-#ifndef AXIS2_SENSE_HOME_INIT
-#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP
-#endif
-#ifndef AXIS2_SENSE_LIMIT_MIN
-#define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE
-#endif
-#ifndef AXIS2_SENSE_LIMIT_MAX
-#define AXIS2_SENSE_LIMIT_MAX         LIMIT_SENSE
-#endif
-#ifndef AXIS2_SENSE_LIMIT_INIT
-#define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
-#endif
-
-// common axis settings, ROTATOR
-#ifndef AXIS3_DRIVER_MODEL
-#define AXIS3_DRIVER_MODEL            OFF
-#endif
-#ifndef AXIS3_DRIVER_DECAY
-#define AXIS3_DRIVER_DECAY            OFF
-#endif
-#ifndef AXIS3_DRIVER_DECAY_GOTO
-#define AXIS3_DRIVER_DECAY_GOTO       OFF
-#endif
-#ifndef AXIS3_DRIVER_MICROSTEPS
-#define AXIS3_DRIVER_MICROSTEPS       OFF
-#endif
-#ifndef AXIS3_DRIVER_MICROSTEPS_GOTO
-#define AXIS3_DRIVER_MICROSTEPS_GOTO  OFF
-#endif
-#ifndef AXIS3_DRIVER_IHOLD
-#define AXIS3_DRIVER_IHOLD            HALF
-#endif
-#ifndef AXIS3_DRIVER_IRUN
-#define AXIS3_DRIVER_IRUN             OFF
-#endif
-#ifndef AXIS3_DRIVER_IGOTO
-#define AXIS3_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS3_DRIVER_POWER_DOWN
-#define AXIS3_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS3_DRIVER_REVERSE
-#define AXIS3_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS3_DRIVER_ENABLE
-#define AXIS3_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS3_DRIVER_STEP
-#define AXIS3_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS3_DRIVER_STATUS
-#define AXIS3_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS3_LIMIT_MIN
 #define AXIS3_LIMIT_MIN               -180
@@ -598,45 +365,31 @@
 #define AXIS3_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER1
-#ifndef AXIS4_DRIVER_MODEL
-#define AXIS4_DRIVER_MODEL            OFF
+// -----------------------------------------------------------------------------------
+// focuser settings, FOCUSER1
+#ifndef AXIS4_STEPS_PER_MICRON
+#define AXIS4_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS4_DRIVER_DECAY
-#define AXIS4_DRIVER_DECAY            OFF
+#ifndef AXIS4_REVERSE
+#define AXIS4_REVERSE                 OFF
 #endif
-#ifndef AXIS4_DRIVER_DECAY_GOTO
-#define AXIS4_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS4_POWER_DOWN
+#define AXIS4_POWER_DOWN              OFF
 #endif
-#ifndef AXIS4_DRIVER_MICROSTEPS
-#define AXIS4_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS4_SLEW_RATE_MINIMUM
+#define AXIS4_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS4_DRIVER_MICROSTEPS_GOTO
-#define AXIS4_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS4_SLEW_RATE_DESIRED
+#define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS4_DRIVER_IHOLD
-#define AXIS4_DRIVER_IHOLD            HALF
+#ifndef AXIS4_ACCELERATION_RATE
+#define AXIS4_ACCELERATION_RATE       AXIS4_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS4_DRIVER_IRUN
-#define AXIS4_DRIVER_IRUN             OFF
+#ifndef AXIS4_RAPID_STOP_RATE
+#define AXIS4_RAPID_STOP_RATE         (AXIS4_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS4_DRIVER_IGOTO
-#define AXIS4_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS4_DRIVER_POWER_DOWN
-#define AXIS4_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS4_DRIVER_REVERSE
-#define AXIS4_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS4_DRIVER_ENABLE
-#define AXIS4_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS4_DRIVER_STEP
-#define AXIS4_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS4_DRIVER_STATUS
-#define AXIS4_DRIVER_STATUS           OFF
+#ifndef AXIS4_BACKLASH_RATE
+#define AXIS4_BACKLASH_RATE           (AXIS4_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS4_LIMIT_MIN
 #define AXIS4_LIMIT_MIN               0
@@ -660,45 +413,30 @@
 #define AXIS4_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER2
-#ifndef AXIS5_DRIVER_MODEL
-#define AXIS5_DRIVER_MODEL            OFF
+// focuser settings, FOCUSER2
+#ifndef AXIS5_STEPS_PER_MICRON
+#define AXIS5_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS5_DRIVER_DECAY
-#define AXIS5_DRIVER_DECAY            OFF
+#ifndef AXIS5_REVERSE
+#define AXIS5_REVERSE                 OFF
 #endif
-#ifndef AXIS5_DRIVER_DECAY_GOTO
-#define AXIS5_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS5_POWER_DOWN
+#define AXIS5_POWER_DOWN              OFF
 #endif
-#ifndef AXIS5_DRIVER_MICROSTEPS
-#define AXIS5_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS5_SLEW_RATE_MINIMUM
+#define AXIS5_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS5_DRIVER_MICROSTEPS_GOTO
-#define AXIS5_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS5_SLEW_RATE_DESIRED
+#define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS5_DRIVER_IHOLD
-#define AXIS5_DRIVER_IHOLD            HALF
+#ifndef AXIS5_ACCELERATION_RATE
+#define AXIS5_ACCELERATION_RATE       AXIS5_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS5_DRIVER_IRUN
-#define AXIS5_DRIVER_IRUN             OFF
+#ifndef AXIS5_RAPID_STOP_RATE
+#define AXIS5_RAPID_STOP_RATE         (AXIS5_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS5_DRIVER_IGOTO
-#define AXIS5_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS5_DRIVER_POWER_DOWN
-#define AXIS5_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS5_DRIVER_REVERSE
-#define AXIS5_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS5_DRIVER_ENABLE
-#define AXIS5_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS5_DRIVER_STEP
-#define AXIS5_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS5_DRIVER_STATUS
-#define AXIS5_DRIVER_STATUS           OFF
+#ifndef AXIS5_BACKLASH_RATE
+#define AXIS5_BACKLASH_RATE           (AXIS5_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS5_LIMIT_MIN
 #define AXIS5_LIMIT_MIN               0
@@ -722,45 +460,30 @@
 #define AXIS5_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER3
-#ifndef AXIS6_DRIVER_MODEL
-#define AXIS6_DRIVER_MODEL            OFF
+// focuser settings, FOCUSER3
+#ifndef AXIS6_STEPS_PER_MICRON
+#define AXIS6_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS6_DRIVER_DECAY
-#define AXIS6_DRIVER_DECAY            OFF
+#ifndef AXIS6_REVERSE
+#define AXIS6_REVERSE                 OFF
 #endif
-#ifndef AXIS6_DRIVER_DECAY_GOTO
-#define AXIS6_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS6_POWER_DOWN
+#define AXIS6_POWER_DOWN              OFF
 #endif
-#ifndef AXIS6_DRIVER_MICROSTEPS
-#define AXIS6_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS6_SLEW_RATE_MINIMUM
+#define AXIS6_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS6_DRIVER_MICROSTEPS_GOTO
-#define AXIS6_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS6_SLEW_RATE_DESIRED
+#define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS6_DRIVER_IHOLD
-#define AXIS6_DRIVER_IHOLD            HALF
+#ifndef AXIS6_ACCELERATION_RATE
+#define AXIS6_ACCELERATION_RATE       AXIS6_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS6_DRIVER_IRUN
-#define AXIS6_DRIVER_IRUN             OFF
+#ifndef AXIS6_RAPID_STOP_RATE
+#define AXIS6_RAPID_STOP_RATE         (AXIS6_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS6_DRIVER_IGOTO
-#define AXIS6_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS6_DRIVER_POWER_DOWN
-#define AXIS6_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS6_DRIVER_REVERSE
-#define AXIS6_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS6_DRIVER_ENABLE
-#define AXIS6_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS6_DRIVER_STEP
-#define AXIS6_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS6_DRIVER_STATUS
-#define AXIS6_DRIVER_STATUS           OFF
+#ifndef AXIS6_BACKLASH_RATE
+#define AXIS6_BACKLASH_RATE           (AXIS6_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS6_LIMIT_MIN
 #define AXIS6_LIMIT_MIN               0
@@ -784,45 +507,30 @@
 #define AXIS6_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER4
-#ifndef AXIS7_DRIVER_MODEL
-#define AXIS7_DRIVER_MODEL            OFF
+// focuser settings, FOCUSER4
+#ifndef AXIS7_STEPS_PER_MICRON
+#define AXIS7_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS7_DRIVER_DECAY
-#define AXIS7_DRIVER_DECAY            OFF
+#ifndef AXIS7_REVERSE
+#define AXIS7_REVERSE                 OFF
 #endif
-#ifndef AXIS7_DRIVER_DECAY_GOTO
-#define AXIS7_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS7_POWER_DOWN
+#define AXIS7_POWER_DOWN              OFF
 #endif
-#ifndef AXIS7_DRIVER_MICROSTEPS
-#define AXIS7_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS7_SLEW_RATE_MINIMUM
+#define AXIS7_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS7_DRIVER_MICROSTEPS_GOTO
-#define AXIS7_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS7_SLEW_RATE_DESIRED
+#define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS7_DRIVER_IHOLD
-#define AXIS7_DRIVER_IHOLD            HALF
+#ifndef AXIS7_ACCELERATION_RATE
+#define AXIS7_ACCELERATION_RATE       AXIS7_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS7_DRIVER_IRUN
-#define AXIS7_DRIVER_IRUN             OFF
+#ifndef AXIS7_RAPID_STOP_RATE
+#define AXIS7_RAPID_STOP_RATE         (AXIS7_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS7_DRIVER_IGOTO
-#define AXIS7_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS7_DRIVER_POWER_DOWN
-#define AXIS7_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS7_DRIVER_REVERSE
-#define AXIS7_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS7_DRIVER_ENABLE
-#define AXIS7_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS7_DRIVER_STEP
-#define AXIS7_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS7_DRIVER_STATUS
-#define AXIS7_DRIVER_STATUS           OFF
+#ifndef AXIS7_BACKLASH_RATE
+#define AXIS7_BACKLASH_RATE           (AXIS7_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS7_LIMIT_MIN
 #define AXIS7_LIMIT_MIN               0
@@ -846,45 +554,30 @@
 #define AXIS7_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER5
-#ifndef AXIS8_DRIVER_MODEL
-#define AXIS8_DRIVER_MODEL            OFF
+// focuser settings, FOCUSER5
+#ifndef AXIS8_STEPS_PER_MICRON
+#define AXIS8_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS8_DRIVER_DECAY
-#define AXIS8_DRIVER_DECAY            OFF
+#ifndef AXIS8_REVERSE
+#define AXIS8_REVERSE                 OFF
 #endif
-#ifndef AXIS8_DRIVER_DECAY_GOTO
-#define AXIS8_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS8_POWER_DOWN
+#define AXIS8_POWER_DOWN              OFF
 #endif
-#ifndef AXIS8_DRIVER_MICROSTEPS
-#define AXIS8_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS8_SLEW_RATE_MINIMUM
+#define AXIS8_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS8_DRIVER_MICROSTEPS_GOTO
-#define AXIS8_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS8_SLEW_RATE_DESIRED
+#define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS8_DRIVER_IHOLD
-#define AXIS8_DRIVER_IHOLD            HALF
+#ifndef AXIS8_ACCELERATION_RATE
+#define AXIS8_ACCELERATION_RATE       AXIS8_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS8_DRIVER_IRUN
-#define AXIS8_DRIVER_IRUN             OFF
+#ifndef AXIS8_RAPID_STOP_RATE
+#define AXIS8_RAPID_STOP_RATE         (AXIS8_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS8_DRIVER_IGOTO
-#define AXIS8_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS8_DRIVER_POWER_DOWN
-#define AXIS8_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS8_DRIVER_REVERSE
-#define AXIS8_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS8_DRIVER_ENABLE
-#define AXIS8_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS8_DRIVER_STEP
-#define AXIS8_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS8_DRIVER_STATUS
-#define AXIS8_DRIVER_STATUS           OFF
+#ifndef AXIS8_BACKLASH_RATE
+#define AXIS8_BACKLASH_RATE           (AXIS8_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS8_LIMIT_MIN
 #define AXIS8_LIMIT_MIN               0
@@ -908,45 +601,30 @@
 #define AXIS8_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
 
-// common axis settings, FOCUSER6
-#ifndef AXIS9_DRIVER_MODEL
-#define AXIS9_DRIVER_MODEL            OFF
+// focuser settings, FOCUSER6
+#ifndef AXIS9_STEPS_PER_MICRON
+#define AXIS9_STEPS_PER_MICRON        0.5
 #endif
-#ifndef AXIS9_DRIVER_DECAY
-#define AXIS9_DRIVER_DECAY            OFF
+#ifndef AXIS9_REVERSE
+#define AXIS9_REVERSE                 OFF
 #endif
-#ifndef AXIS9_DRIVER_DECAY_GOTO
-#define AXIS9_DRIVER_DECAY_GOTO       OFF
+#ifndef AXIS9_POWER_DOWN
+#define AXIS9_POWER_DOWN              OFF
 #endif
-#ifndef AXIS9_DRIVER_MICROSTEPS
-#define AXIS9_DRIVER_MICROSTEPS       OFF
+#ifndef AXIS9_SLEW_RATE_MINIMUM
+#define AXIS9_SLEW_RATE_MINIMUM       50                          // in microns/sec
 #endif
-#ifndef AXIS9_DRIVER_MICROSTEPS_GOTO
-#define AXIS9_DRIVER_MICROSTEPS_GOTO  OFF
+#ifndef AXIS9_SLEW_RATE_DESIRED
+#define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS9_DRIVER_IHOLD
-#define AXIS9_DRIVER_IHOLD            HALF
+#ifndef AXIS9_ACCELERATION_RATE
+#define AXIS9_ACCELERATION_RATE       AXIS9_SLEW_RATE_DESIRED     // in microns/sec/sec
 #endif
-#ifndef AXIS9_DRIVER_IRUN
-#define AXIS9_DRIVER_IRUN             OFF
+#ifndef AXIS9_RAPID_STOP_RATE
+#define AXIS9_RAPID_STOP_RATE         (AXIS9_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
-#ifndef AXIS9_DRIVER_IGOTO
-#define AXIS9_DRIVER_IGOTO            SAME
-#endif
-#ifndef AXIS9_DRIVER_POWER_DOWN
-#define AXIS9_DRIVER_POWER_DOWN       OFF
-#endif
-#ifndef AXIS9_DRIVER_REVERSE
-#define AXIS9_DRIVER_REVERSE          OFF
-#endif
-#ifndef AXIS9_DRIVER_ENABLE
-#define AXIS9_DRIVER_ENABLE           LOW
-#endif
-#ifndef AXIS9_DRIVER_STEP
-#define AXIS9_DRIVER_STEP             HIGH
-#endif
-#ifndef AXIS9_DRIVER_STATUS
-#define AXIS9_DRIVER_STATUS           OFF
+#ifndef AXIS9_BACKLASH_RATE
+#define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS9_LIMIT_MIN
 #define AXIS9_LIMIT_MIN               0
@@ -959,6 +637,22 @@
 #endif
 #ifndef AXIS9_SENSE_HOME_INIT
 #define AXIS9_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
+#ifndef AXIS9_SENSE_LIMIT_MIN
+#define AXIS9_SENSE_LIMIT_MIN         OFF
+#endif
+#ifndef AXIS9_SENSE_LIMIT_MAX
+#define AXIS9_SENSE_LIMIT_MAX         OFF
+#endif
+#ifndef AXIS9_SENSE_LIMIT_INIT
+#define AXIS9_SENSE_LIMIT_INIT        INPUT_PULLUP
+#endif
+
+#ifndef FOCUSER_TEMPERATURE
+#define FOCUSER_TEMPERATURE           OFF // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
+#endif
+#ifndef FOCUSER_TEMPERATURE_PIN
+#define FOCUSER_TEMPERATURE_PIN       OFF // for thermistors, analog pin
 #endif
 
 // -----------------------------------------------------------------------------------

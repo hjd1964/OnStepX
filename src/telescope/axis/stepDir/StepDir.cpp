@@ -17,43 +17,43 @@ extern Tasks tasks;
 #endif
 
 #if AXIS1_DRIVER_MODEL != OFF
-  const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_DRIVER_STEP, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_DRIVER_ENABLE };
+  const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_DRIVER_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_DRIVER_ENABLE_STATE };
   IRAM_ATTR void moveAxis1() { telescope.mount.axis1.motor.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   IRAM_ATTR void moveFFAxis1() { telescope.mount.axis1.motor.moveFF(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFRAxis1() { telescope.mount.axis1.motor.moveFR(AXIS1_STEP_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
-  const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_DRIVER_STEP, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_DRIVER_ENABLE };
+  const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_DRIVER_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_DRIVER_ENABLE_STATE };
   IRAM_ATTR void moveAxis2() { telescope.mount.axis2.motor.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   IRAM_ATTR void moveFFAxis2() { telescope.mount.axis2.motor.moveFF(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFRAxis2() { telescope.mount.axis2.motor.moveFR(AXIS2_STEP_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
-  const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_DRIVER_STEP, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_DRIVER_ENABLE };
+  const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_DRIVER_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_DRIVER_ENABLE_STATE };
   inline void moveAxis3() { telescope.rotator.axis.motor.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
-  const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_DRIVER_STEP, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_DRIVER_ENABLE };
+  const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_DRIVER_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_DRIVER_ENABLE_STATE };
   inline void moveAxis4() { telescope.focuser.axis[0]->motor.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
-  const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_DRIVER_STEP, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_DRIVER_ENABLE };
+  const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_DRIVER_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_DRIVER_ENABLE_STATE };
   inline void moveAxis5() { telescope.focuser.axis[1]->motor.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
-  const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_DRIVER_STEP, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_DRIVER_ENABLE };
+  const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_DRIVER_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_DRIVER_ENABLE_STATE };
   inline void moveAxis6() { telescope.focuser.axis[2]->motor.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
 #if AXIS7_DRIVER_MODEL != OFF
-  const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_DRIVER_STEP, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_DRIVER_ENABLE };
+  const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_DRIVER_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_DRIVER_ENABLE_STATE };
   inline void moveAxis7() { telescope.focuser.axis[3]->motor.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
 #endif
 #if AXIS8_DRIVER_MODEL != OFF
-  const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_DRIVER_STEP, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_DRIVER_ENABLE };
+  const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_DRIVER_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_DRIVER_ENABLE_STATE };
   inline void moveAxis8() { telescope.focuser.axis[4]->motor.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
 #endif
 #if AXIS9_DRIVER_MODEL != OFF
-  const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_DRIVER_STEP, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_DRIVER_ENABLE };
+  const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_DRIVER_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_DRIVER_ENABLE_STATE };
   inline void moveAxis9() { telescope.focuser.axis[5]->motor.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
 #endif
 
@@ -114,7 +114,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   digitalWriteEx(pins.enable, pins.enabledState)
 
   // init driver advanced modes, etc.
-  stepDriver.init(axisNumber, microsteps, current);
+  driver.init(axisNumber, microsteps, current);
 
   // now disable the driver
   power(false);
@@ -137,7 +137,7 @@ void StepDir::power(bool state) {
   if (pins.enable != OFF && pins.enable != SHARED_PIN) {
     digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
   } else {
-    stepDriver.power(state);
+    driver.power(state);
   }
 }
 
@@ -268,7 +268,7 @@ Direction StepDir::getDirection() {
 
 // get the associated stepper drivers status
 DriverStatus StepDir::getDriverStatus() {
-  return stepDriver.getStatus();
+  return driver.getStatus();
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
@@ -346,17 +346,17 @@ bool StepDir::getSynchronized() {
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void StepDir::setSlewing(bool state) {
-  if (state == true) stepDriver.modeDecaySlewing(); else stepDriver.modeDecayTracking();
+  if (state == true) driver.modeDecaySlewing(); else driver.modeDecayTracking();
 }
 
 // monitor movement
 void StepDir::poll() {
-  stepDriver.updateStatus();
+  driver.updateStatus();
   if (microstepModeControl == MMC_SLEWING) {
     if (lastFrequency <= backlashFrequency*1.2F) {
-      if (stepDriver.modeSwitchAllowed()) {
+      if (driver.modeSwitchAllowed()) {
         V(axisPrefix); VLF("mode switch tracking set");
-        stepDriver.modeMicrostepTracking();
+        driver.modeMicrostepTracking();
       }
       microstepModeControl = MMC_TRACKING;
       if (enableMoveFast(false)) {
@@ -365,16 +365,16 @@ void StepDir::poll() {
     }
   } else {
     if (lastFrequency > backlashFrequency*1.2F) {
-      if (stepDriver.modeSwitchAllowed()) {
+      if (driver.modeSwitchAllowed()) {
         if (microstepModeControl == MMC_TRACKING) {
           microstepModeControl = MMC_SLEWING_REQUEST;
-          switchStep = stepDriver.getMicrostepRatio();
+          switchStep = driver.getMicrostepRatio();
           V(axisPrefix); VLF("mode switch slewing requested");
           return;
         } else
         if (microstepModeControl != MMC_SLEWING_READY) return;
         V(axisPrefix); VLF("mode switch slewing set");
-        slewStep = stepDriver.modeMicrostepSlewing();
+        slewStep = driver.modeMicrostepSlewing();
       }
       microstepModeControl = MMC_SLEWING;
       if (enableMoveFast(true)) {
