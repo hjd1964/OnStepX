@@ -85,28 +85,28 @@
 #define AXIS1_REVERSE                 OFF
 #endif
 #ifndef AXIS1_POWER_DOWN
-#define AXIS1_POWER_DOWN              OFF  // motor power off if at standstill > 30 sec
+#define AXIS1_POWER_DOWN              OFF                         // motor power off if at standstill > 30 sec
 #endif
 #ifndef AXIS1_LIMIT_MIN
-#define AXIS1_LIMIT_MIN               -180 // in "measures" (except Axis1/2 are degrees)
+#define AXIS1_LIMIT_MIN               -180                        // in degrees
 #endif
 #ifndef AXIS1_LIMIT_MAX
-#define AXIS1_LIMIT_MAX               180  // in "measures" (except Axis1/2 are degrees)
+#define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
 #ifndef AXIS1_SENSE_HOME
-#define AXIS1_SENSE_HOME              OFF  // HIGH/LOW to activate home sensing and set direction
+#define AXIS1_SENSE_HOME              OFF                         // HIGH/LOW to activate home sensing and set direction
 #endif
 #ifndef AXIS1_SENSE_HOME_INIT
-#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP // pin mode for home sensing
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MIN
-#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE  // HIGH/LOW to activate min limit
+#define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE                 // HIGH/LOW to activate min limit
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MAX
-#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE  // HIGH/LOW to activate max limit
+#define AXIS1_SENSE_LIMIT_MAX         LIMIT_SENSE                 // HIGH/LOW to activate max limit
 #endif
 #ifndef AXIS1_SENSE_LIMIT_INIT
-#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT // pin mode for limit sensing
+#define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
 
 #ifndef AXIS2_STEPS_PER_DEGREE
@@ -122,10 +122,10 @@
 #define AXIS2_TANGENT_ARM             OFF
 #endif
 #ifndef AXIS2_LIMIT_MIN
-#define AXIS2_LIMIT_MIN               -90
+#define AXIS2_LIMIT_MIN               -90                         // in degrees
 #endif
 #ifndef AXIS2_LIMIT_MAX
-#define AXIS2_LIMIT_MAX               90
+#define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF
@@ -344,10 +344,10 @@
 #define AXIS3_BACKLASH_RATE           (AXIS3_ACCELERATION_RATE/4) // in degrees/sec
 #endif
 #ifndef AXIS3_LIMIT_MIN
-#define AXIS3_LIMIT_MIN               -180
+#define AXIS3_LIMIT_MIN               -180                        // in degrees
 #endif
 #ifndef AXIS3_LIMIT_MAX
-#define AXIS3_LIMIT_MAX               180
+#define AXIS3_LIMIT_MAX               180                         // in degrees
 #endif
 #ifndef AXIS3_SENSE_HOME
 #define AXIS3_SENSE_HOME              OFF
@@ -392,10 +392,10 @@
 #define AXIS4_BACKLASH_RATE           (AXIS4_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS4_LIMIT_MIN
-#define AXIS4_LIMIT_MIN               0
+#define AXIS4_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS4_LIMIT_MAX
-#define AXIS4_LIMIT_MAX               50
+#define AXIS4_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
@@ -439,10 +439,10 @@
 #define AXIS5_BACKLASH_RATE           (AXIS5_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS5_LIMIT_MIN
-#define AXIS5_LIMIT_MIN               0
+#define AXIS5_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS5_LIMIT_MAX
-#define AXIS5_LIMIT_MAX               50
+#define AXIS5_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
@@ -486,10 +486,10 @@
 #define AXIS6_BACKLASH_RATE           (AXIS6_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS6_LIMIT_MIN
-#define AXIS6_LIMIT_MIN               0
+#define AXIS6_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS6_LIMIT_MAX
-#define AXIS6_LIMIT_MAX               50
+#define AXIS6_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
@@ -533,10 +533,10 @@
 #define AXIS7_BACKLASH_RATE           (AXIS7_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS7_LIMIT_MIN
-#define AXIS7_LIMIT_MIN               0
+#define AXIS7_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS7_LIMIT_MAX
-#define AXIS7_LIMIT_MAX               50
+#define AXIS7_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
@@ -580,10 +580,10 @@
 #define AXIS8_BACKLASH_RATE           (AXIS8_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS8_LIMIT_MIN
-#define AXIS8_LIMIT_MIN               0
+#define AXIS8_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS8_LIMIT_MAX
-#define AXIS8_LIMIT_MAX               50
+#define AXIS8_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
@@ -627,10 +627,10 @@
 #define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
 #endif
 #ifndef AXIS9_LIMIT_MIN
-#define AXIS9_LIMIT_MIN               0
+#define AXIS9_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS9_LIMIT_MAX
-#define AXIS9_LIMIT_MAX               50
+#define AXIS9_LIMIT_MAX               50                          // in mm
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
