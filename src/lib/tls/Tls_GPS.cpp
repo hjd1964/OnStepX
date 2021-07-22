@@ -24,6 +24,13 @@ TinyGPSPlus gps;
 
 #include "Tls_GPS.h"
 
+// provide for using software serial
+#if SERIAL_GPS == SoftSerial
+  #include <SoftwareSerial.h>
+  #undef SoftSerial
+  SoftwareSerial SoftSerial(SOFT_SERIAL_GPS_RX, SOFT_SERIAL_GPS_TX);
+#endif
+
 void gpsPoll() {
   #if TIME_LOCATION_PPS_SENSE == ON
     if (pps.synced) {
@@ -57,6 +64,7 @@ bool TimeLocationSource::init() {
 }
 
 void TimeLocationSource::set(JulianDate ut1) {
+  ut1 = ut1;
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {

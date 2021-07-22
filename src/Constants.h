@@ -112,6 +112,7 @@
 #define DS3234                      2 // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
 #define TEENSY                      4 // TEENSY3.2 RTC (Built-in)
 #define GPS                         5 // GPS device
+#define SoftSerial                  6 // Optional, placeholder for a GPS software serial port object
 
 // various Weather sensors supported
 #define BME280                      1 // BME280 on I2C (at default address 0x77)

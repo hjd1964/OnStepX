@@ -20,8 +20,8 @@
 
 // SerialA is manidatory
 #define SERIAL_A Serial
+// SerialB is optional
 #if SERIAL_B_BAUD_DEFAULT != OFF
-  // SerialB is optional
   #define SERIAL_B Serial1
 #endif
 // SerialC is optional
@@ -30,22 +30,17 @@
 #endif
 
 // Handle special case of using software serial for a GPS
-#if SerialGPS == SoftwareSerial2
-  #define SWSERIAL_1
-  #define SWSERIAL_1_RX PA3
-  #define SWSERIAL_1_TX PA2
-  #define SERIAL_GPS SWSerial1
+#ifdef SERIAL_GPS
+  #if SERIAL_GPS == SoftSerial
+    // For the S6, auto assign the Serial2 port pins
+    #ifndef SOFT_SERIAL_GPS_RX
+      #define SOFT_SERIAL_GPS_RX PA3
+    #endif
+    #ifndef SOFT_SERIAL_GPS_TX
+      #define SOFT_SERIAL_GPS_TX PA2
+    #endif
+  #endif
 #endif
-
-/*
-// Handle special case of using software serial for a GPS
-#if SerialGPS == SoftwareSerial2
-  #include <SoftwareSerial.h>
-  SoftwareSerial SWSerialGPS(PA3, PA2); // RX2, TX2
-  #undef SerialGPS
-  #define SerialGPS SWSerialGPS
-#endif
-*/
 
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
