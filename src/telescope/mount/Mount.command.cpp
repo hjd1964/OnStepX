@@ -534,14 +534,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Return: n#
   if (cmdP("%B")) {
     if (parameter[0] == 'D' && parameter[1] == 0) {
-        int arcSec = radToArcsec(misc.backlash.axis2);
+        int arcSec = round(radToArcsec(misc.backlash.axis2));
         if (arcSec < 0) arcSec = 0;
         if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
         *numericReply = false;
     } else
     if (parameter[0] == 'R' && parameter[1] == 0) {
-        int arcSec = radToArcsec(misc.backlash.axis1);
+        int arcSec = round(radToArcsec(misc.backlash.axis1));
         if (arcSec < 0) arcSec = 0;
         if (arcSec > 3600) arcSec = 3600;
         sprintf(reply,"%d", arcSec);
