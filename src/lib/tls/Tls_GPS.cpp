@@ -28,7 +28,8 @@ TinyGPSPlus gps;
 #if SERIAL_GPS == SoftSerial
   #include <SoftwareSerial.h>
   #undef SoftSerial
-  SoftwareSerial SoftSerial(SOFT_SERIAL_GPS_RX, SOFT_SERIAL_GPS_TX);
+  #define SERIAL_GPS_NO_RXTX_INIT
+  SoftwareSerial SoftSerial(SERIAL_GPS_RX, SERIAL_GPS_TX);
 #endif
 
 void gpsPoll() {
@@ -48,7 +49,7 @@ void gpsPoll() {
 
 // initialize
 bool TimeLocationSource::init() {
-  #if defined(SERIAL_GPS_RX) && defined(SERIAL_GPS_TX)
+  #if defined(SERIAL_GPS_RX) && defined(SERIAL_GPS_TX) && !defined(SERIAL_GPS_NO_RXTX_INIT)
     SERIAL_GPS.begin(SERIAL_GPS_BAUD, SERIAL_8N1, SERIAL_GPS_RX, SERIAL_GPS_TX);
   #else
     SERIAL_GPS.begin(SERIAL_GPS_BAUD);

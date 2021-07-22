@@ -33,11 +33,11 @@
 #ifdef SERIAL_GPS
   #if SERIAL_GPS == SoftSerial
     // For the S6, auto assign the Serial2 port pins
-    #ifndef SOFT_SERIAL_GPS_RX
-      #define SOFT_SERIAL_GPS_RX PA3
+    #ifndef SERIAL_GPS_RX
+      #define SERIAL_GPS_RX PA3
     #endif
-    #ifndef SOFT_SERIAL_GPS_TX
-      #define SOFT_SERIAL_GPS_TX PA2
+    #ifndef SERIAL_GPS_TX
+      #define SERIAL_GPS_TX PA2
     #endif
   #endif
 #endif
