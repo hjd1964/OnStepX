@@ -48,7 +48,7 @@
 #define AXIS1_SENSE_HOME_PIN    AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
-#define AXIS2_ENABLE_PIN        SHARED_PIN
+#define AXIS2_ENABLE_PIN        SHARED
 #define AXIS2_M0_PIN            13               // SPI MOSI
 #define AXIS2_M1_PIN            14               // SPI SCK
 #define AXIS2_M2_PIN            5                // SPI CS

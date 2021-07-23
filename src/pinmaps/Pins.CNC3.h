@@ -55,7 +55,7 @@
 #define AXIS1_SENSE_HOME_PIN      AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
-#define AXIS2_ENABLE_PIN          SHARED_PIN
+#define AXIS2_ENABLE_PIN          SHARED
 #define AXIS2_M0_PIN              32             // SPI MOSI
 #define AXIS2_M1_PIN              33             // SPI SCK
 #define AXIS2_M2_PIN              0              // SPI CS
@@ -66,7 +66,7 @@
 #define AXIS2_SENSE_HOME_PIN      AUX4_PIN
 
 // For rotator stepper driver
-#define AXIS3_ENABLE_PIN          SHARED_PIN
+#define AXIS3_ENABLE_PIN          SHARED
 #define AXIS3_M0_PIN              OFF            // SPI MOSI
 #define AXIS3_M1_PIN              OFF            // SPI SCK
 #define AXIS3_M2_PIN              OFF            // SPI CS
@@ -75,7 +75,7 @@
 #define AXIS3_DIR_PIN             14
 
 // For focuser1 stepper driver
-#define AXIS4_ENABLE_PIN          SHARED_PIN
+#define AXIS4_ENABLE_PIN          SHARED
 #define AXIS4_M0_PIN              OFF            // SPI MOSI
 #define AXIS4_M1_PIN              OFF            // SPI SCK
 #define AXIS4_M2_PIN              OFF            // SPI CS
@@ -84,7 +84,7 @@
 #define AXIS4_DIR_PIN             14
 
 // For focuser2 stepper driver
-#define AXIS5_ENABLE_PIN          SHARED_PIN
+#define AXIS5_ENABLE_PIN          SHARED
 #define AXIS5_M0_PIN              OFF            // SPI MOSI
 #define AXIS5_M1_PIN              OFF            // SPI SCK
 #define AXIS5_M2_PIN              OFF            // SPI CS

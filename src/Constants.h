@@ -79,7 +79,7 @@
 #define PROFILER                    -21
 
 // pins
-#define SHARED_PIN                  -30
+#define SHARED                      -30
 #define DAC_PIN(v)                  ((v)+0x100)
 #define GPIO_PIN(v)                 ((v)+0x200)
 

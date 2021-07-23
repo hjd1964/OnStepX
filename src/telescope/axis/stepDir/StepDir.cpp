@@ -93,7 +93,11 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   // make sure there is something to do
   if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
 
-  V(axisPrefix); V("init step="); V(pins.step); V(", dir="); V(pins.dir); V(", en="); VL(pins.enable);
+  #if DEBUG == VERBOSE
+    V(axisPrefix); V("init step="); if (pins.step == OFF) V("OFF"); else V(pins.step);
+    V(", dir="); if (pins.dir == OFF) V("OFF"); else V(pins.dir);
+    V(", en="); if (pins.enable == OFF) VL("OFF"); else if (pins.enable == SHARED) VL("SHARED"); else VL(pins.enable);
+  #endif
 
   // init default driver direction state (forward)
   if (reverse == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
@@ -134,7 +138,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
 }
 
 void StepDir::power(bool state) {
-  if (pins.enable != OFF && pins.enable != SHARED_PIN) {
+  if (pins.enable != OFF && pins.enable != SHARED) {
     digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
   } else {
     driver.power(state);
