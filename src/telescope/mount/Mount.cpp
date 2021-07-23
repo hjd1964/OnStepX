@@ -301,7 +301,7 @@ float Mount::ztr(float a) {
 
 void Mount::updateAccelerationRates() {
   radsPerSecondCurrent = (1000000.0F/misc.usPerStepCurrent)/(float)axis1.getStepsPerMeasure();
-  float secondsToAccelerate = (degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent)*2.0F;
+  float secondsToAccelerate = degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent;
   float radsPerSecondPerSecond = radsPerSecondCurrent/secondsToAccelerate;
   axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
   axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
