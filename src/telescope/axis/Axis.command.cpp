@@ -146,7 +146,7 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
 // convert axis settings string into numeric form
 bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
   int index = axisNum - 1;
-  if (index > 4) index = 4;
+  if (index > 3) index = 3;
   int   MinLimitL[4]   = {-270,-90,-360,  0};
   int   MinLimitH[4]   = { -90,  0,   0,500};
   int   MaxLimitL[4]   = {  90,  0,   0,  0};
