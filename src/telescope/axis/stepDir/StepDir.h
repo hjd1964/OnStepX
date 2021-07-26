@@ -149,7 +149,7 @@ class StepDir {
     bool poweredDown = false;
 
     float backlashFrequency = 0.0F;
-    float lastFrequency = 0.0F;
+    float lastFrequency = 0.0F; // the last step frequency set, in tracking mode steps per second
 
     float minPeriodMicros;
     unsigned long lastPeriod = 0;
