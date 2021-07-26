@@ -376,7 +376,7 @@ void Axis::poll() {
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
         if (homingStage != HOME_NONE) {
           float f = slewFreq/4.0F;
-          if (abs(f) < 0.0003) { if (f < 0) f = -0.0003; else f = 0.0003; }
+          if (abs(f) < 0.0003F) { if (f < 0.0F) f = -0.0003F; else f = 0.0003F; }
           setFrequencySlew(abs(f));
           autoSlewHome();
         } else {
