@@ -33,7 +33,7 @@ void Transform::init(bool validKey) {
     VLF("WRN: Transform, unknown mount type reverting to default");
   }
 
-  #if DEBUG != OFF
+  #if DEBUG == VERBOSE
     const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
