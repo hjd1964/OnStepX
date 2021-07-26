@@ -109,9 +109,9 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
     VF(" u-step mode "); if (settings.microsteps == OFF) VF("OFF"); else { V(settings.microsteps); V("X"); }
     VF(" (goto mode "); if (settings.microstepsGoto == SAME) VF("SAME)"); else { V(settings.microstepsGoto); V("X)"); }
     if (settings.model == TMC2130 || settings.model == TMC5160) { V(" Irun="); V(current); VL("mA"); } else VL("");
-    if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
   #endif
 
+  if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
   microstepCode = subdivisionsToCode(settings.microsteps);
   microstepCodeGoto = subdivisionsToCode(settings.microstepsGoto);
   microstepRatio = settings.microsteps/settings.microstepsGoto;
