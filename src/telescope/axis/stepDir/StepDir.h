@@ -20,7 +20,7 @@ typedef struct StepDirPins {
   uint8_t   enabledState;
 } StepDirPins;
 
-enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING_READY, MMC_SLEWING};
+enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING, MMC_TRACKING_READY, MMC_SLEWING_READY};
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 class StepDir {
@@ -82,8 +82,8 @@ class StepDir {
     // get the associated stepper driver status
     DriverStatus getDriverStatus();
 
-    // monitor movement
-    void poll();
+    /// switch microstep modes as needed
+    void modeSwitch();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move(const int8_t stepPin, const int8_t dirPin);
@@ -151,7 +151,6 @@ class StepDir {
     float backlashFrequency = 0.0F;
     float lastFrequency = 0.0F; // the last step frequency set, in tracking mode steps per second
 
-    float minPeriodMicros;
     unsigned long lastPeriod = 0;
 
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;

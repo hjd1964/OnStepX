@@ -241,6 +241,7 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 // slew, with acceleration distance (in "measures" to FrequencySlew)
 bool Axis::autoSlewRateByDistance(float distance) {
   if (autoRate != AR_NONE) return false;
+  if (motionError(DIR_BOTH)) return false;
   motor.setOriginCoordinateSteps();
   autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
@@ -393,9 +394,6 @@ void Axis::poll() {
         V(axisPrefix); VLF("slew aborted");
       }
     } else freq = 0.0F;
-    
-    // give the driver some processing time (runs every 20ms)
-    motor.poll();
   } else freq = 0.0F;
 
   // apply composite or normal frequency as required
@@ -429,7 +427,6 @@ void Axis::setFrequencySlew(float frequency) {
   if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
   if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;
   slewFreq = frequency;
-  if (frequency != 0.0F) minPeriodMicros = 1000000.0F/((slewFreq + baseFreq)*settings.stepsPerMeasure); else minPeriodMicros = 0.0F;
 }
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)

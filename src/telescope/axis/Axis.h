@@ -222,7 +222,6 @@ class Axis {
     float minFreq = 0.0F;
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
-    float minPeriodMicros;
 
     // auto slew mode
     AutoRate autoRate = AR_NONE;
