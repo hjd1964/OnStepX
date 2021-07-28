@@ -207,10 +207,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :F[n]#     Set focuser move rate, where n = 1 for finest, 2 for 0.01mm/second, 3 for 0.1mm/second, 4 for 1mm/second
+    // :F[n]#     Set focuser move rate, where n = 1 for 2um/sec, 2 for 20um/sec, 3 for 200um/sec, 4 for 2mm/second
     //            Returns: Nothing
     if (command[1] >= '1' && command[1] <= '4') {
-      int p[] = {1, 10, 100, 1000};
+      int p[] = {2, 20, 200, 2000};
       moveRate[index] = p[command[1] - '1'];
       *numericReply = false;
     } else
