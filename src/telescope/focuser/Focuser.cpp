@@ -45,7 +45,7 @@ void Focuser::init(bool validKey) {
       if (axis[index] != NULL) {
         V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
         axis[index]->init(index + 4, false, validKey);
-        axis[index]->setMotorCoordinateSteps(0);
+        axis[index]->resetPositionSteps(0);
         axis[index]->setBacklashSteps(settings[index].backlash);
         axis[index]->setFrequencyMax(slewRateDesired[index]);
         axis[index]->setFrequencyMin(slewRateMinimum[index]);

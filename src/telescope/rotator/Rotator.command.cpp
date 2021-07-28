@@ -140,7 +140,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      axis.setMotorCoordinate(0.0);
+      axis.resetPosition(0.0);
       axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
@@ -149,7 +149,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'F') {
       float p = round((axis.settings.limits.max + axis.settings.limits.min)/2.0F);
-      axis.setMotorCoordinate(p);
+      axis.resetPosition(p);
       axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else

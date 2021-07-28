@@ -31,15 +31,15 @@ class StepDir {
     // sets motor power on/off (if possible)
     void power(bool value);
 
-    // set backlash in steps
+    // set backlash amount in steps
     void setBacklashSteps(long value);
-    // get backlash in steps
+    // get backlash amount in steps
     long getBacklashSteps();
 
-    // sets motor and target coordinates in steps, also zeros backlash and index 
-    void setMotorCoordinateSteps(long value);
-    // get motor coordinate in steps
-    long getMotorCoordinateSteps();
+    // resets motor and target angular position in steps, also zeros backlash and index 
+    void resetPositionSteps(long value);
+    // get motor angular position in steps
+    long getMotorPositionSteps();
 
     // get instrument coordinate, in steps
     long getInstrumentCoordinateSteps();
@@ -54,6 +54,8 @@ class StepDir {
     long getTargetCoordinateSteps();
     // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)
     void setTargetCoordinateParkSteps(long value, int modulo);
+    // set instrument park coordinate, in steps (should only be called when the axis is not moving)
+    void setInstrumentCoordinateParkSteps(long value, int modulo);
 
     // distance to target in steps (+/-)
     long getTargetDistanceSteps();
@@ -121,6 +123,7 @@ class StepDir {
     uint8_t maxSenseHandle = 0;  // max sensor handle
 
     uint16_t backlashStepsStore;
+    uint16_t backlashAmountStepsStore;
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
 

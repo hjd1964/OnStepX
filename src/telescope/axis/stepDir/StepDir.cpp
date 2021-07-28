@@ -145,7 +145,7 @@ void StepDir::power(bool state) {
   }
 }
 
-void StepDir::setMotorCoordinateSteps(long value) {
+void StepDir::resetPositionSteps(long value) {
   indexSteps    = 0;
   noInterrupts();
   motorSteps    = value;
@@ -154,7 +154,7 @@ void StepDir::setMotorCoordinateSteps(long value) {
   interrupts();
 }
 
-long StepDir::getMotorCoordinateSteps() {
+long StepDir::getMotorPositionSteps() {
   noInterrupts();
   long steps = motorSteps + backlashSteps;
   interrupts();
@@ -205,11 +205,23 @@ long StepDir::getTargetDistanceSteps() {
 // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)
 void StepDir::setTargetCoordinateParkSteps(long value, int modulo) {
   long steps = value - indexSteps;
+  // V(axisPrefix); VF("park target steps before = "); VL(steps);
   steps -= modulo*2L;
-  for (int l = 0; l < modulo*4; l++) { if (steps % modulo*4L == 0) break; steps++; }
+  for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
   noInterrupts();
   targetSteps = steps;
   interrupts();
+  // V(axisPrefix); VF("park target steps after  = "); VL(targetSteps);
+}
+
+// set instrument park coordinate, in steps (should only be called when the axis is not moving)
+void StepDir::setInstrumentCoordinateParkSteps(long value, int modulo) {
+  long steps = value - motorSteps;
+  // V(axisPrefix); VF("park instr steps before = "); VL(steps);
+  steps -= modulo*2L;
+  for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
+  indexSteps = steps;
+  // V(axisPrefix); VF("park instr steps after  = "); VL(indexSteps);
 }
 
 // distance to origin or target, whichever is closer, in steps
@@ -227,23 +239,26 @@ void StepDir::setBacklashFrequencySteps(float frequency) {
   backlashFrequency = frequency;
 }
 
+// set backlash amount in steps
 void StepDir::setBacklashSteps(long value) {
   noInterrupts();
   backlashAmountSteps = value;
   interrupts();
 }
 
+// get backlash amount in steps
 long StepDir::getBacklashSteps() {
   noInterrupts();
-  uint16_t backlash = backlashSteps;
+  uint16_t backlash = backlashAmountSteps;
   interrupts();
   return backlash;
 }
 
 void StepDir::disableBacklash() {
   noInterrupts();
-  backlashStepsStore = backlashSteps;
+  backlashAmountStepsStore = backlashAmountSteps;
   motorSteps += backlashSteps;
+  backlashStepsStore = backlashSteps;
   backlashSteps = 0;
   interrupts();
 }
@@ -252,8 +267,10 @@ void StepDir::enableBacklash() {
   noInterrupts();
   backlashSteps = backlashStepsStore;
   motorSteps -= backlashSteps;
+  backlashAmountSteps = backlashAmountStepsStore;
   interrupts();
   backlashStepsStore = 0;
+  backlashAmountStepsStore = 0;
 }
 
 // returns true if within the backlash travel

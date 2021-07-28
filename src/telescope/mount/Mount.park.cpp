@@ -41,10 +41,15 @@ CommandError Mount::parkSet() {
   park.position.h = current.h;
   park.position.d = current.d;
   park.position.pierSide = current.pierSide;
+  if (park.position.pierSide == PIER_SIDE_NONE) {
+    if (meridianFlip == MF_ALWAYS) {
+      if (current.h < 0) park.position.pierSide = PIER_SIDE_WEST; else park.position.pierSide = PIER_SIDE_EAST;
+    } else park.position.pierSide = PIER_SIDE_EAST;
+  }
   park.saved = true;
   nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
-  #if ALIGN_MAX_NUM_STARS > 1  
+  #if ALIGN_MAX_NUM_STARS > 1
     transform.align.modelWrite();
   #endif
 
@@ -105,7 +110,7 @@ CommandError Mount::parkGoto() {
     park.state = priorParkState;
     nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
-    VLF("ERR, Mount::parkGoto(); Failed to start goto");
+    VF("ERR, Mount::parkGoto(); Failed to start goto (CE "); V(e); V(")");
     return e;
   } else { VLF("MSG: Mount, parking started"); }
   return CE_NONE;
@@ -113,6 +118,16 @@ CommandError Mount::parkGoto() {
 
 void Mount::parkFinish() {
   if (park.state != PS_PARK_FAILED) {
+    #if DEBUG == VERBOSE
+      long index = axis1.getInstrumentCoordinateSteps() - axis1.getMotorPositionSteps();
+      V("MSG: Mount, park axis1 motor target   "); VL(axis1.getTargetCoordinateSteps() - index);
+      V("MSG: Mount, park axis1 motor position "); VL(axis1.getMotorPositionSteps());
+      index = axis2.getInstrumentCoordinateSteps() - axis2.getMotorPositionSteps();
+      V("MSG: Mount, park axis2 motor target   "); VL(axis2.getTargetCoordinateSteps() - index);
+      V("MSG: Mount, park axis2 motor position "); VL(axis2.getMotorPositionSteps());
+    #endif
+
+    // save the axis state
     park.state = PS_PARKED;
     nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
 
@@ -146,8 +161,10 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
     wormSenseSteps = park.wormSensePositionSteps;
   #endif
 
-  // reset the mount
+  // reset the mount, zero backlash
   resetHome(false);
+  axis1.setBacklashSteps(0);
+  axis2.setBacklashSteps(0);
 
   // load the pointing model
   #if ALIGN_MAX_NUM_STARS > 1  
@@ -169,9 +186,11 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
 
   // set Meridian Flip behaviour to match mount type
   if (transform.mountType == GEM) meridianFlip = MF_ALWAYS; else meridianFlip = MF_NEVER;
-  atHome = false;
 
-  // restore backlash settings, in-case we are unparking without a power cycle
+  V("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
+  V("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
+
+  // restore backlash settings
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
   

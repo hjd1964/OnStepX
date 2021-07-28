@@ -261,7 +261,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FZ#       Set focuser position as zero
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      axis[index]->setMotorCoordinateSteps(0);
+      axis[index]->resetPositionSteps(0);
       axis[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
@@ -270,7 +270,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'H') {
       long p = round((axis[index]->settings.limits.max + axis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-      axis[index]->setMotorCoordinateSteps(p);
+      axis[index]->resetPositionSteps(p);
       axis[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else

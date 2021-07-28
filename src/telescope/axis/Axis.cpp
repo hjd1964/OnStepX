@@ -170,24 +170,30 @@ int Axis::getStepsPerStepSlewing() {
   return stepsPerStepSlewing;
 }
 
+// set backlash amount in "measures" (radians, microns, etc.)
 void Axis::setBacklash(float value) {
   motor.setBacklashSteps(round(value*settings.stepsPerMeasure));
 }
 
+// get backlash amount in "measures" (radians, microns, etc.)
 float Axis::getBacklash() {
   return motor.getBacklashSteps()/settings.stepsPerMeasure;
 }
 
-void Axis::setMotorCoordinate(double value) {
-  motor.setMotorCoordinateSteps(lround(value*settings.stepsPerMeasure));
+void Axis::resetPosition(double value) {
+  motor.resetPositionSteps(lround(value*settings.stepsPerMeasure));
 }
 
-double Axis::getMotorCoordinate() {
-  return motor.getMotorCoordinateSteps()/settings.stepsPerMeasure;
+double Axis::getMotorPosition() {
+  return motor.getMotorPositionSteps()/settings.stepsPerMeasure;
 }
 
 void Axis::setInstrumentCoordinate(double value) {
   motor.setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
+}
+
+void Axis::setInstrumentCoordinateSteps(long value) {
+  motor.setInstrumentCoordinateSteps(value);
 }
 
 double Axis::getInstrumentCoordinate() {
@@ -195,10 +201,7 @@ double Axis::getInstrumentCoordinate() {
 }
 
 void Axis::setInstrumentCoordinatePark(double value) {
-  long steps = lround(value*settings.stepsPerMeasure);
-  steps -= settings.subdivisions*2L;
-  for (int l = 0; l < settings.subdivisions*4; l++) { if (steps % settings.subdivisions*4L == 0) break; steps++; }
-  motor.setInstrumentCoordinateSteps(steps);
+  motor.setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 void Axis::setTargetCoordinatePark(double value) {
@@ -215,7 +218,7 @@ double Axis::getTargetCoordinate() {
 
 // check if we're near the target coordinate during an auto slew
 bool Axis::nearTarget() {
-  return labs(motor.getTargetDistanceSteps()) <= 2;
+  return labs(motor.getTargetDistanceSteps()) <= 1;
 }
 
 // distance to target in "measures" (degrees, microns, etc.)

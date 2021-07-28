@@ -93,7 +93,7 @@
     if (trackingState != TS_SIDEREAL || park.state > PS_UNPARKED || guideState > GU_PULSE_GUIDE) { pecDisable(); return; }
 
     // keep track of our current step position, and when the step position on the worm wraps during playback
-    long axis1Steps = axis1.getMotorCoordinateSteps();
+    long axis1Steps = axis1.getMotorPositionSteps();
 
     #if PEC_SENSE == OFF
       wormSenseFirst = true;

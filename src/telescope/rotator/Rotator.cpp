@@ -29,7 +29,7 @@ void Rotator::init(bool validKey) {
 
   VL("MSG: Rotator, init (Axis3)");
   axis.init(3, false, validKey);
-  axis.setMotorCoordinateSteps(0);
+  axis.resetPositionSteps(0);
   axis.setBacklashSteps(backlash);
   axis.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
   axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);

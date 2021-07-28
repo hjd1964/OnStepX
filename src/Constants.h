@@ -154,13 +154,10 @@
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
 // misc. math
-#define RAD_DEG_RATIO_L             57.29577951308232L
 #define RAD_DEG_RATIO               57.29577951308232
 #define RAD_DEG_RATIO_F             57.295780F
-#define RAD_HOUR_RATIO_L            3.819718634205488L
 #define RAD_HOUR_RATIO              3.819718634205488
 #define RAD_HOUR_RATIO_F            3.8197186F
-#define SIDEREAL_RATIO_L            1.002737909350795L
 #define SIDEREAL_RATIO              1.002737909350795
 #define SIDEREAL_RATIO_F            1.0027379F
 #define SIDEREAL_PERIOD             15956313.06126534
@@ -175,9 +172,9 @@
 #define Deg360                      6.283185307179586
 
 // for handling degenerate spherical coordinates near the poles
-#define TenthArcSec                 0.00000048481368
-#define OneArcSec                   0.0000048481368F
-#define SmallestFloat               0.0000001F
+#define TenthArcSec                 0.000000484813681
+#define OneArcSec                   0.000004848136811
+#define SmallestFloat               0.0000005F
 
 // conversion math
 #define degToRad(x)                 ((x)/RAD_DEG_RATIO)
@@ -197,7 +194,6 @@
 #define siderealToRad(x)            ((x)/13750.98708313975)
 #define siderealToRadF(x)           ((x)/13750.987F)
 #define radToSidereal(x)            ((x)*13750.98708313975)
-//#define siderealToRad(x)            ((((x)*SIDEREAL_RATIO*15.0)/3600.0)/RAD)
 // conversion factor to go to/from Hz for sidereal interval
 #define hzToSubMicros(x)            ((x)*266666.666666667)
 #define hzToSidereal(x)             ((x)/SIDEREAL_RATE_HZ)
@@ -206,8 +202,8 @@
 #define fgt(x,y)                    ((x)-(y)>SmallestFloat)
 #define flt(x,y)                    ((y)-(x)>SmallestFloat)
 
-#define THLD(v)                       ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
-#define HYST(v)                       ((v)<<11) // 10 bit hysteresis, bits 11 through 20
+#define THLD(v)                     ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
+#define HYST(v)                     ((v)<<11) // 10 bit hysteresis, bits 11 through 20
 #ifndef INPUT_PULLDOWN
   #define INPUT_PULLDOWN INPUT
 #endif

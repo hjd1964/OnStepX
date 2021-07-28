@@ -77,18 +77,20 @@ class Axis {
     // get tracking mode steps per slewing mode step
     int getStepsPerStepSlewing();
 
-    // set motor coordinate, in "measure" units
-    void setMotorCoordinate(double value);
-    inline void setMotorCoordinateSteps(long value) { motor.setMotorCoordinateSteps(value); }
-    // get motor coordinate, in "measure" units
-    double getMotorCoordinate();
-    inline long getMotorCoordinateSteps() { return motor.getMotorCoordinateSteps(); }
+    // reset motor and target angular position, in "measure" units
+    void resetPosition(double value);
+    inline void resetPositionSteps(long value) { motor.resetPositionSteps(value); }
+    // get motor angular position, in "measure" units
+    double getMotorPosition();
+    inline long getMotorPositionSteps() { return motor.getMotorPositionSteps(); }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
     void setInstrumentCoordinatePark(double value);
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
+    // set instrument coordinate, in steps
+    void setInstrumentCoordinateSteps(long value);
     // get instrument coordinate
     double getInstrumentCoordinate();
     inline long getInstrumentCoordinateSteps() { return motor.getInstrumentCoordinateSteps(); }
@@ -105,10 +107,11 @@ class Axis {
     // returns true if within 2 steps of target
     bool nearTarget();
 
-    // set backlash in "measures" (radians, microns, etc.)
+    // set backlash amount in "measures" (radians, microns, etc.)
     void setBacklash(float value);
+    // set backlash amount in steps
     inline void setBacklashSteps(long value) { motor.setBacklashSteps(value); }
-    // get backlash in "measures" (radians, microns, etc.)
+    // get backlash amount in "measures" (radians, microns, etc.)
     float getBacklash();
 
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)

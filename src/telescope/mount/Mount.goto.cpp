@@ -29,11 +29,26 @@ CommandError Mount::validateGotoCoords(Coordinate *coords) {
     if (flt(coords->z, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (fgt(coords->z, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
-    if (flt(coords->h, axis1.settings.limits.min))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (fgt(coords->h, axis1.settings.limits.max))   return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (flt(coords->h, axis1.settings.limits.min)) {
+        VF("MSG: Mount, validate failed HA past min limit by ");
+        V(radToDeg(coords->h - axis1.settings.limits.min)*3600.0); VL(" arc-secs");
+      return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    }
+    if (fgt(coords->h, axis1.settings.limits.max)) {
+        VF("MSG: Mount, validate failed Dec past min limit by ");
+        V(radToDeg(coords->h - axis1.settings.limits.max)*3600.0); VL(" arc-secs");
+      return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    }
     if (AXIS2_TANGENT_ARM == OFF) {
-      if (flt(coords->d, axis2.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (fgt(coords->d, axis2.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (flt(coords->d, axis2.settings.limits.min)) {
+        VF("MSG: Mount, validate failed Dec past min limit by ");
+        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VL(" arc-secs");
+        return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      }
+      if (fgt(coords->d, axis2.settings.limits.max)) {
+        VF("MSG: Mount, validate failed Dec past max limit by ");
+        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VL(" arc-secs");
+        return CE_SLEW_ERR_OUTSIDE_LIMITS;}
     }
   }
   return CE_NONE;
@@ -45,10 +60,7 @@ CommandError Mount::setGotoTarget(Coordinate *coords, PierSideSelect pierSideSel
   if (e != CE_NONE) return e;
 
   target = *coords;
-  if (native) {
-    //transform.rightAscensionToHourAngle(&target);
-    transform.nativeToMount(&target);
-  }
+  if (native) transform.nativeToMount(&target);
   transform.equToHor(&target);
 
   e = validateGotoCoords(&target);
@@ -139,7 +151,7 @@ CommandError Mount::gotoEqu(Coordinate *coords, PierSideSelect pierSideSelect, b
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
-    if (park.state == PS_PARKING) {
+    if (park.state == PS_PARKING && gotoStage == GG_DESTINATION) {
       axis1.setTargetCoordinatePark(a1);
       axis2.setTargetCoordinatePark(a2);
     } else {
@@ -194,8 +206,13 @@ void Mount::gotoPoll() {
 
       double a1, a2;
       transform.mountToInstrument(&destination, &a1, &a2);
-      axis1.setTargetCoordinate(a1);
-      axis2.setTargetCoordinate(a2);
+      if (park.state == PS_PARKING && gotoStage == GG_DESTINATION) {
+        axis1.setTargetCoordinatePark(a1);
+        axis2.setTargetCoordinatePark(a2);
+      } else {
+        axis1.setTargetCoordinate(a1);
+        axis2.setTargetCoordinate(a2);
+      }
       VLF("MSG: Mount, goto next target coordinates set");
 
       axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
@@ -232,16 +249,18 @@ void Mount::gotoPoll() {
     }
 
   skip:
-    // keep updating the axis targets to match the mount target
-    if (transform.mountType == ALTAZM) transform.equToHor(&target);
-    double a1, a2;
-    transform.mountToInstrument(&target, &a1, &a2);
-    axis1.setTargetCoordinate(a1);
-    axis2.setTargetCoordinate(a2);
+    if (trackingState == TS_SIDEREAL) {
+      // keep updating the axis targets to match the mount target
+      if (transform.mountType == ALTAZM) transform.equToHor(&target);
+      double a1, a2;
+      transform.mountToInstrument(&target, &a1, &a2);
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
+    }
   }
 
   // keep updating mount target
-  target.h += radsPerCentisecond;
+  if (trackingState == TS_SIDEREAL) target.h += radsPerCentisecond;
  }
 
 void Mount::gotoWaypoint() {
