@@ -81,6 +81,7 @@ void setup() {
   // start low level hardware
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
+  delay(2000);
 
   // start system service task
   VF("MSG: Setup, start system service task (rate 10ms priority 7)... ");
