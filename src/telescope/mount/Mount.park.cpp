@@ -194,13 +194,14 @@ CommandError Mount::parkRestore(bool withTrackingOn) {
   axis1.setBacklash(misc.backlash.axis1);
   axis2.setBacklash(misc.backlash.axis2);
   
+  park.state = PS_UNPARKED;
+  nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
+
   // make sure limits are on
   limitsEnabled = true;
 
   // update our state and start tracking
   if (withTrackingOn) {
-    park.state = PS_UNPARKED;
-    nv.updateBytes(NV_MOUNT_PARK_BASE, &park, ParkSize);
     setTrackingState(TS_SIDEREAL);
     updateTrackingRates();
   }
