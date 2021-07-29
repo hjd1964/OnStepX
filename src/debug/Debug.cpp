@@ -46,7 +46,7 @@
         SERIAL_DEBUG.print("\x1b[K");  // clear to end of line
       #endif
       SERIAL_DEBUG.println(); Y;
-      sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler", 1, 0, 'a');
+      sprintf(s, "Profiler %2d.%02d%s                                                           Task Profiler", 1, 0, "a");
       SERIAL_DEBUG.println(s); Y;
       SERIAL_DEBUG.println();
     }

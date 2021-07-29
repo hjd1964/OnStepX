@@ -268,23 +268,23 @@ char* Task::getNameStr() {
 }
 
 #ifdef TASKS_PROFILER_ENABLE
-double Task::getArrivalAvg() {
+float Task::getArrivalAvg() {
   if (hardwareTimer) return 0;
   if (average_arrival_time_count == 0) return 0;
-  double value = -average_arrival_time/average_arrival_time_count;
+  float value = -average_arrival_time/average_arrival_time_count;
   average_arrival_time = 0;
   average_arrival_time_count = 0;
   return value;
 }
-double Task::getArrivalMax() {
+float Task::getArrivalMax() {
   if (hardwareTimer) return 0;
-  double value = max_arrival_time;
+  float value = max_arrival_time;
   max_arrival_time = 0;
   return value;
 }
-double Task::getRuntimeTotal() {
+float Task::getRuntimeTotal() {
   if (hardwareTimer) { noInterrupts(); total_runtime = _task_total_runtime[hardwareTimer-1]; _task_total_runtime[hardwareTimer-1] = 0; total_runtime_count=_task_total_runtime_count[hardwareTimer-1]; interrupts(); };
-  double value = total_runtime;
+  float value = total_runtime;
   total_runtime = 0;
   return value;
 }
@@ -294,9 +294,9 @@ long Task::getRuntimeTotalCount() {
   total_runtime_count = 0;
   return value;
 }
-double Task::getRuntimeMax() {
+float Task::getRuntimeMax() {
   if (hardwareTimer) { noInterrupts(); max_runtime = _task_max_runtime[hardwareTimer-1]; _task_max_runtime[hardwareTimer-1] = 0; interrupts(); };
-  double value = max_runtime;
+  float value = max_runtime;
   max_runtime = 0;
   return value;
 }
