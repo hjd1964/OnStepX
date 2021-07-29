@@ -85,7 +85,7 @@ CommandError Mount::parkGoto() {
   #endif
 
   // record our park status
-  ParkState priorParkState = park.state; 
+  ParkState priorParkState = park.state;
   
   // update state to parking
   park.state = PS_PARKING;
