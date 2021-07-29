@@ -259,8 +259,8 @@ bool Axis::autoSlewRateByDistance(float distance) {
 bool Axis::autoSlewRateByDistanceStop() {
   if (autoRate != AR_RATE_BY_DISTANCE) return false;
   autoRate = AR_NONE;
-  setFrequency(0.0F);
   motor.setSlewing(false);
+  setFrequency(baseFreq);
   motor.setSynchronized(true);
   return true;
 }
@@ -271,6 +271,7 @@ bool Axis::autoSlew(Direction direction) {
   if (direction == DIR_NONE) return false;
   if (motionError(direction)) return false;
   if (autoRate == AR_NONE) {
+    setFrequency(baseFreq);
     motor.setSynchronized(true);
     motor.setSlewing(true);
     V(axisPrefix); VLF("autoSlew started");
@@ -283,6 +284,7 @@ bool Axis::autoSlew(Direction direction) {
 bool Axis::autoSlewHome() {
   if (autoRate != AR_NONE) return false;
   if (Pins[index].sense.homeTrigger != OFF) {
+    setFrequency(baseFreq);
     motor.setSynchronized(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
@@ -320,6 +322,7 @@ void Axis::autoSlewAbort() {
   V(axisPrefix); VLF("slew aborting");
   autoRate = AR_RATE_BY_TIME_ABORT;
   homingStage = HOME_NONE;
+  setFrequency(baseFreq);
   motor.setSynchronized(true);
   poll();
 }
@@ -353,8 +356,8 @@ void Axis::poll() {
       if (motor.getTargetDistanceSteps() == 0) {
         V(axisPrefix); VLF("slew automatically stopped");
         freq = 0.0F;
-        setFrequency(freq);
         autoRate = AR_NONE;
+        setFrequency(baseFreq);
         motor.setSynchronized(true);
       } else {
         freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + settings.backlashFreq;
