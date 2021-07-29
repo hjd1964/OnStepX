@@ -203,6 +203,7 @@ long StepDir::getTargetDistanceSteps() {
 }
 
 // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)
+// should only be called when the axis is not moving
 void StepDir::setTargetCoordinateParkSteps(long value, int modulo) {
   long steps = value - indexSteps;
   V(axisPrefix); VF("park target steps before = "); VL(steps);
@@ -214,7 +215,8 @@ void StepDir::setTargetCoordinateParkSteps(long value, int modulo) {
   V(axisPrefix); VF("park target steps after  = "); VL(targetSteps);
 }
 
-// set instrument park coordinate, in steps (should only be called when the axis is not moving)
+// set instrument park coordinate, in steps
+// should only be called when the axis is not moving
 void StepDir::setInstrumentCoordinateParkSteps(long value, int modulo) {
   long steps = value - motorSteps;
   V(axisPrefix); VF("park instr steps before = "); VL(steps);
