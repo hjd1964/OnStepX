@@ -53,8 +53,10 @@ class StepDir {
     // get target coordinate (with index), in steps
     long getTargetCoordinateSteps();
     // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)
+    // should only be called when the axis is not moving
     void setTargetCoordinateParkSteps(long value, int modulo);
-    // set instrument park coordinate, in steps (should only be called when the axis is not moving)
+    // set instrument park coordinate, in steps
+    // should only be called when the axis is not moving
     void setInstrumentCoordinateParkSteps(long value, int modulo);
 
     // distance to target in steps (+/-)
