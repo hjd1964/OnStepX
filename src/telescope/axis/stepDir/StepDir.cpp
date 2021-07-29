@@ -366,7 +366,6 @@ void StepDir::modeSwitch() {
       if (microstepModeControl == MMC_TRACKING) {
         microstepModeControl = MMC_SLEWING_REQUEST;
         switchStep = driver.getMicrostepRatio();
-        V(axisPrefix); VLF("mode switch slewing requested");
         return;
       } else
       if (microstepModeControl != MMC_SLEWING_READY) return;
