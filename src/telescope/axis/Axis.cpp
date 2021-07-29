@@ -205,6 +205,7 @@ void Axis::setInstrumentCoordinatePark(double value) {
 }
 
 void Axis::setTargetCoordinatePark(double value) {
+  motor.setFrequencySteps(0);
   motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
@@ -257,6 +258,7 @@ bool Axis::autoSlewRateByDistance(float distance) {
 // stops, with deacceleration by distance
 bool Axis::autoSlewRateByDistanceStop() {
   if (autoRate != AR_RATE_BY_DISTANCE) return false;
+  setFrequency(0.0F);
   motor.setSlewing(false);
   motor.setSynchronized(true);
   autoRate = AR_NONE;
