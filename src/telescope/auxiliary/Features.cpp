@@ -46,7 +46,7 @@ void Features::init(bool validKey) {
   }
 
   VF("MSG: Auxiliary, start feature monitor task (rate 20ms priority 7)... ");
-  if (tasks.add(20, 0, true, 7, featuresPollWrapper, "auxPoll")) { VL("success"); } else { VL("FAILED!"); }
+  if (tasks.add(20, 0, true, 7, featuresPollWrapper, "AuxPoll")) { VL("success"); } else { VL("FAILED!"); }
 
   temperature.init();
 }

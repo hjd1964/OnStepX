@@ -32,6 +32,6 @@ void Telescope::statusInit() {
   #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
     pinModeEx(STATUS_LED_PIN, OUTPUT);
     VF("MSG: Telescope, start status LED task (rate 500ms priority 6)... ");
-    if (tasks.add(500, 0, true, 6, teleStatusFlash, "staLed")) { VL("success"); } else { VL("FAILED!"); }
+    if (tasks.add(500, 0, true, 6, teleStatusFlash, "StaLed")) { VL("success"); } else { VL("FAILED!"); }
   #endif
 }

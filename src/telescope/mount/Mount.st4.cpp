@@ -45,10 +45,10 @@ extern Tasks tasks;
     // start st4 monitor task
     #ifdef HAL_SLOW_PROCESSOR
       VF("MSG: Mount, start ST4 monitor task (rate 10ms priority 2)... ");
-      if (tasks.add(10, 0, true, 2, mountSt4MonitorWrapper, "st4Mntr")) { VL("success"); } else { VL("FAILED!"); }
+      if (tasks.add(10, 0, true, 2, mountSt4MonitorWrapper, "St4Mntr")) { VL("success"); } else { VL("FAILED!"); }
     #else
       VF("MSG: Mount, start ST4 monitor task (rate 1.5ms priority 2)... ");
-      uint8_t handle = tasks.add(0, 0, true, 2, mountSt4MonitorWrapper, "st4Mntr");
+      uint8_t handle = tasks.add(0, 0, true, 2, mountSt4MonitorWrapper, "St4Mntr");
       if (handle) { VL("success"); } else { VL("FAILED!"); }
       tasks.setPeriodMicros(handle, 1500);
     #endif

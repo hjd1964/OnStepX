@@ -28,7 +28,7 @@ void Mount::statusInit() {
   #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
       #if LED_STATUS == ON
-        if (STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("staLed"));
+        if (STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
       #endif
       pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
       VF("MSG: Mount, start status LED task (variable rate priority 6)... ");
