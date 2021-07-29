@@ -247,10 +247,10 @@ bool Axis::autoSlewRateByDistance(float distance) {
   if (autoRate != AR_NONE) return false;
   if (motionError(DIR_BOTH)) return false;
   motor.setOriginCoordinateSteps();
-  autoRate = AR_RATE_BY_DISTANCE;
   slewAccelerationDistance = distance;
   motor.setSynchronized(false);
   motor.setSlewing(true);
+  autoRate = AR_RATE_BY_DISTANCE;
   V(axisPrefix); VLF("autoSlewRateByDistance started");
   return true;
 }
@@ -258,10 +258,10 @@ bool Axis::autoSlewRateByDistance(float distance) {
 // stops, with deacceleration by distance
 bool Axis::autoSlewRateByDistanceStop() {
   if (autoRate != AR_RATE_BY_DISTANCE) return false;
+  autoRate = AR_NONE;
   setFrequency(0.0F);
   motor.setSlewing(false);
   motor.setSynchronized(true);
-  autoRate = AR_NONE;
   return true;
 }
 
