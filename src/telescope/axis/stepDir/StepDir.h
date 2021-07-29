@@ -115,7 +115,7 @@ class StepDir {
     char axisPrefix[14] = "MSG: Motor_, ";
 
     bool enabled = false;        // enable/disable logical state (disabled is powered down)
-    bool tracking = true;        // locks movement of axis target with timer rate
+    bool synchronized = true;    // locks movement of axis target with timer rate
     bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
 
     uint8_t homeSenseHandle = 0; // home sensor handle
@@ -142,7 +142,7 @@ class StepDir {
     volatile long targetSteps = 0;
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;
-    volatile int  trackingStep = 1;
+    volatile int  synchronizedStep = 1;
     volatile int  switchStep = 1;
     volatile int  slewStep = 1;
     volatile int  step = 1;

@@ -298,9 +298,9 @@ void StepDir::setFrequencySteps(float frequency) {
   // negative frequency, convert to positive and reverse the direction
   if (frequency < 0.0F) {
     frequency = -frequency;
-    noInterrupts(); trackingStep = -1; interrupts();
+    noInterrupts(); synchronizedStep = -1; interrupts();
   } else {
-    noInterrupts(); trackingStep = 1; interrupts();
+    noInterrupts(); synchronizedStep = 1; interrupts();
   }
 
   modeSwitch();
@@ -336,7 +336,7 @@ void StepDir::setFrequencySteps(float frequency) {
   } else {
     lastPeriod = 0;
     lastFrequency = 0.0F;
-    noInterrupts(); trackingStep = 0; interrupts();
+    noInterrupts(); synchronizedStep = 0; interrupts();
   }
   tasks.setPeriodSubMicros(taskHandle, lastPeriod);
   if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
@@ -392,12 +392,12 @@ float StepDir::getFrequencySteps() {
 
 // set synchronized state (automatic movement of target at setFrequencySteps() rate)
 void StepDir::setSynchronized(bool state) {
-  tracking = state;
+  synchronized = state;
 }
 
 // get synchronized state (automatic movement of target at setFrequencySteps() rate)
 bool StepDir::getSynchronized() {
-  return tracking;
+  return synchronized;
 }
 
 // set slewing state (hint that we are about to slew or are done slewing)
@@ -436,7 +436,7 @@ bool StepDir::enableMoveFast(const bool fast) {
         digitalWriteF(stepPin, stepSet);
       }
     } else {
-      if (tracking) targetSteps += trackingStep;
+      if (synchronized) targetSteps += synchronizedStep;
       if (motorSteps + backlashSteps < targetSteps) {
         direction = DIR_FORWARD;
         digitalWriteF(dirPin, dirFwd);
@@ -452,7 +452,7 @@ bool StepDir::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDir::moveFF(const int8_t stepPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     if (takeStep) {
-      if (tracking) targetSteps += slewStep;
+      if (synchronized) targetSteps += slewStep;
       if (motorSteps < targetSteps) { motorSteps += slewStep; digitalWriteF(stepPin, stepSet); }
     } else digitalWriteF(stepPin, stepClr);
     takeStep = !takeStep;
@@ -460,7 +460,7 @@ bool StepDir::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDir::moveFR(const int8_t stepPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     if (takeStep) {
-      if (tracking) targetSteps -= slewStep;
+      if (synchronized) targetSteps -= slewStep;
       if (motorSteps > targetSteps) { motorSteps -= slewStep; digitalWriteF(stepPin, stepSet); }
     } else digitalWriteF(stepPin, stepClr);
     takeStep = !takeStep;
@@ -469,7 +469,7 @@ bool StepDir::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDir::move(const int8_t stepPin, const int8_t dirPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     digitalWriteF(stepPin, stepClr);
-    if (tracking) targetSteps += trackingStep;
+    if (synchronized) targetSteps += synchronizedStep;
     if (motorSteps < targetSteps) {
       digitalWriteF(dirPin, dirFwd);
       direction = DIR_FORWARD;
@@ -486,13 +486,13 @@ bool StepDir::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDir::moveFF(const int8_t stepPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     digitalWriteF(stepPin, stepClr);
-    if (tracking) targetSteps += slewStep;
+    if (synchronized) targetSteps += slewStep;
     if (motorSteps < targetSteps) { motorSteps += slewStep; digitalWriteF(stepPin, stepSet); }
   }
   IRAM_ATTR void StepDir::moveFR(const int8_t stepPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     digitalWriteF(stepPin, stepClr);
-    if (tracking) targetSteps -= slewStep;
+    if (synchronized) targetSteps -= slewStep;
     if (motorSteps > targetSteps) { motorSteps -= slewStep; digitalWriteF(stepPin, stepSet); }
   }
 #endif
