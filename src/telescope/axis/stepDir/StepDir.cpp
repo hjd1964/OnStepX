@@ -278,7 +278,9 @@ void StepDir::enableBacklash() {
 // get the current direction of motion
 Direction StepDir::getDirection() {
   if (lastPeriod == 0) return DIR_NONE;
-  return direction;
+  if (synchronizedStep == 1) return DIR_FORWARD;
+  if (synchronizedStep == -1) return DIR_REVERSE;
+  return DIR_NONE;
 }
 
 // get the associated stepper drivers status
@@ -290,10 +292,10 @@ DriverStatus StepDir::getDriverStatus() {
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void StepDir::setFrequencySteps(float frequency) {
   // negative frequency, convert to positive and reverse the direction
-  int direction = 1;
-  if (frequency < 0.0F) { frequency = -frequency; direction = -1; }
+  int sign = 1;
+  if (frequency < 0.0F) { frequency = -frequency; sign = -1; }
 
-  modeSwitch();
+  modeSwitch(); Y;
   if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) {
     // if slewing has a larger step size divide the frequency to account for it
     frequency /= slewStep;
@@ -326,14 +328,15 @@ void StepDir::setFrequencySteps(float frequency) {
     } else {
       lastPeriod = 0;
       lastFrequency = 0.0F;
-      direction = 0;
+      sign = 0;
     }
 
     // change the motor rate/direction
+    Y;
     MicrostepModeControl last = microstepModeControl;
     microstepModeControl = MMC_HOLD;
     tasks.setPeriodSubMicros(taskHandle, lastPeriod);
-    synchronizedStep = direction;
+    synchronizedStep = sign;
     microstepModeControl = last;
   }
 
