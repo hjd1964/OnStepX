@@ -154,8 +154,8 @@ void Mount::setTarget(Coordinate *coords) {
 }
 
 // goto target equatorial position
-void Mount::requestGoto() {
-  gotoEqu(&gotoTarget, preferredPierSide);
+CommandError Mount::requestGoto() {
+  return gotoEqu(&gotoTarget, preferredPierSide);
 }
 
 #define SS_STOPPED 0

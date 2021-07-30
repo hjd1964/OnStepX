@@ -44,9 +44,10 @@ class Library
     libRec_t list;
     
     // write record at the next available positon from data
-    // RA and Dec are in degrees
+    // RA and Dec are in radians
     void writeVars(char* name, int code, double RA, double Dec);
     // read record at the current position
+    // RA and Dec are in radians
     void readVars(char* name, int* code, double* RA, double* Dec);
 
     // move to catalogs first rec
@@ -92,9 +93,6 @@ class Library
 
     long byteMin;
     long byteMax;
-
-    double targetRA;
-    double targetDec;
 };
 
 #endif

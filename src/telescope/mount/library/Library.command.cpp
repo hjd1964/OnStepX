@@ -37,29 +37,25 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       // :LI#       Get Object Information
       //            Returns: s# (string containing the current target object’s name and object type)
       if (command[1] == 'I' && parameter[0] == 0) {
-      int i;
-      readVars(reply, &i, &targetRA, &targetDec);
+        int i;
+        Coordinate target;
+        readVars(reply, &i, &target.r, &target.d);
+        telescope.mount.setTarget(&target);
 
-      char const *objType = ObjectStr[i];
-      strcat(reply, ",");
-      strcat(reply, objType);
-      *numericReply = false;
+        char const *objType = ObjectStr[i];
+        strcat(reply, ",");
+        strcat(reply, objType);
+        *numericReply = false;
       } else 
 
       // :LIG#      Get catalog object information and goto
       //            Returns: Nothing
       if (command[1] == 'I' && parameter[0] == 'G' && parameter[1] == 0) {
         int i;
-        readVars(reply, &i, &targetRA, &targetDec);
-
-/*      // goto the target RA, Dec
-        newTargetRA = origTargetRA;
-        newTargetDec = origTargetDec;
-        #if TELESCOPE_COORDINATES == TOPOCENTRIC
-          topocentricToObservedPlace(&newTargetRA,&newTargetDec);
-        #endif
-        commandError = goToEqu(newTargetRA, newTargetDec);
-*/
+        Coordinate target;
+        readVars(reply, &i, &target.r, &target.d);
+        telescope.mount.setTarget(&target);
+        *commandError = telescope.mount.requestGoto();
         *numericReply = false;
       } else 
 
@@ -67,7 +63,9 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
       //            Returns: s# (string containing the current target object’s name, type, RA, and Dec)
       if (command[1] == 'R' && parameter[0] == 0) {
         int i;
-        readVars(reply, &i, &targetRA, &targetDec);
+        Coordinate target;
+        readVars(reply, &i, &target.r, &target.d);
+        telescope.mount.setTarget(&target);
 
         char const * objType = ObjectStr[i];
         char ws[20];
@@ -75,10 +73,8 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         strcat(reply, ",");
         strcat(reply, objType);
         if (strcmp(reply, ",UNK") != 0) {
-          float f = targetRA;
-          f /= 15.0;
-          convert.doubleToHms(ws, f, false, PM_HIGH); strcat(reply, ","); strcat(reply, ws);
-          convert.doubleToDms(ws, targetDec, false, true, PM_HIGH); strcat(reply, ","); strcat(reply, ws);
+          convert.doubleToHms(ws, radToHrs(target.r), false, PM_HIGH); strcat(reply, ","); strcat(reply, ws);
+          convert.doubleToDms(ws, radToDeg(target.d), false, true, PM_HIGH); strcat(reply, ","); strcat(reply, ws);
         }
 
         nextRec();
@@ -121,7 +117,8 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
           for (l = 0; l <= 15; l++) { if (strcmp(objType, ObjectStr[l]) == 0) i = l; }
         }
 
-        if (firstFreeRec()) writeVars(name, i, targetRA, targetDec); else *commandError = CE_LIBRARY_FULL;
+        Coordinate target = telescope.mount.getTarget();
+        if (firstFreeRec()) writeVars(name, i, target.r, target.d); else *commandError = CE_LIBRARY_FULL;
       } else 
 
       // :LN#       Find next deep sky target object subject to the current constraints.

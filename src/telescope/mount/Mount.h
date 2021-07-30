@@ -139,7 +139,7 @@ class Mount {
     void setTarget(Coordinate *coords);
 
     // goto target equatorial position
-    void requestGoto();
+    CommandError requestGoto();
 
     // update the home position
     void updateHomePosition();

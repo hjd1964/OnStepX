@@ -33,19 +33,21 @@ void Library::init(bool validKey) {
   firstRec();
 }
 
-bool Library::setCatalog(int num)
-{
+bool Library::setCatalog(int num) {
   if (num < 0 || num > 14) return false;
 
   catalog = num;
   return firstRec();
 }
 
-void Library::writeVars(char* name, int code, double RA, double Dec)
-{
+void Library::writeVars(char* name, int code, double RA, double Dec) {
   libRec_t work;
   for (int16_t l = 0; l < 11; l++) work.libRec.name[l] = name[l];
   work.libRec.code = (code | (catalog << 4));
+
+  // convert from radians to degrees
+  RA = radToDeg(RA);
+  Dec = radToDeg(Dec);
 
   // convert into ulong, RA=0..360
   RA = degRange(RA)/360.0;
@@ -62,8 +64,7 @@ void Library::writeVars(char* name, int code, double RA, double Dec)
   writeRec(recPos, work);
 }
 
-void Library::readVars(char* name, int* code, double* RA, double* Dec)
-{
+void Library::readVars(char* name, int* code, double* RA, double* Dec) {
   libRec_t work;
   work = readRec(recPos);
 
@@ -84,26 +85,27 @@ void Library::readVars(char* name, int* code, double* RA, double* Dec)
   *RA = (*RA/65536.0)*360.0;
   *Dec = (double)d;
   *Dec = ((*Dec/65536.0)*180.0)-90.0;
+
+  // convert from degrees to radians
+  *RA = degToRad(*RA);
+  *Dec = degToRad(*Dec);
 }
 
-libRec_t Library::readRec(long address)
-{
+libRec_t Library::readRec(long address) {
   libRec_t work;
   long l = address*rec_size + byteMin;
   nv.readBytes(l, (uint8_t*)&work.libRecBytes, 16);
   return work;
 }
 
-void Library::writeRec(long address, libRec_t data)
-{
+void Library::writeRec(long address, libRec_t data) {
   if (address >= 0 && address < recMax) {
     long l = address*rec_size + byteMin;
     for (int m = 0; m < 16; m++) nv.write(l+m, data.libRecBytes[m]);
   }
 }
 
-void Library::clearRec(long address)
-{
+void Library::clearRec(long address) {
   if (address >= 0 && address < recMax) {
     long l = address*rec_size+byteMin;
     int code = 15 << 4;
@@ -111,8 +113,7 @@ void Library::clearRec(long address)
   }
 }
 
-bool Library::firstRec()
-{
+bool Library::firstRec() {
   libRec_t work;
 
   // see if first record is for the currentLib
@@ -126,15 +127,12 @@ bool Library::firstRec()
 }
 
 
-bool Library::nameRec()
-{
+bool Library::nameRec() {
   libRec_t work;
-
   int16_t cat;
+
   recPos = -1;
-  
-  do
-  {
+  do {
     recPos++; if (recPos >= recMax) break;
     work = readRec(recPos);
 
@@ -147,15 +145,12 @@ bool Library::nameRec()
   return true;
 }
 
-bool Library::firstFreeRec()
-{
+bool Library::firstFreeRec() {
   libRec_t work;
-
   int16_t cat;
-  recPos = -1;
-  
-  do
-  {
+
+  recPos = -1;  
+  do {
     recPos++; if (recPos >= recMax) break;
     work = readRec(recPos);
 
@@ -168,14 +163,11 @@ bool Library::firstFreeRec()
   return true;
 }
 
-bool Library::prevRec()
-{
+bool Library::prevRec() {
   libRec_t work;
-
   int16_t cat;
   
-  do
-  {
+  do {
     recPos--; if (recPos < 0) break;
     work = readRec(recPos);
 
@@ -187,14 +179,11 @@ bool Library::prevRec()
   return true;
 }
 
-bool Library::nextRec()
-{
+bool Library::nextRec() {
   libRec_t work;
-
   int16_t cat;
  
-  do
-  {
+  do {
     recPos++; if (recPos >= recMax) break;
     work=readRec(recPos);
 
@@ -206,8 +195,7 @@ bool Library::nextRec()
   return true;
 }
 
-bool Library::gotoRec(long num)
-{
+bool Library::gotoRec(long num) {
   libRec_t work;
 
   int16_t cat;
@@ -241,8 +229,7 @@ long Library::recCount()
   return c;
 }
 
-long Library::recCountAll()
-{
+long Library::recCountAll() {
   libRec_t work;
 
   int16_t cat;
@@ -259,13 +246,11 @@ long Library::recCountAll()
 }
 
 
-long Library::recFreeAll()
-{
+long Library::recFreeAll() {
   return recMax - recCountAll();
 }
 
-void Library::clearCurrentRec()
-{
+void Library::clearCurrentRec() {
   libRec_t work;
 
   int16_t cat;
@@ -276,8 +261,7 @@ void Library::clearCurrentRec()
   if (cat == catalog) clearRec(recPos);
 }
 
-void Library::clearLib()
-{
+void Library::clearLib() {
   libRec_t work;
 
   int16_t cat;
@@ -290,8 +274,7 @@ void Library::clearLib()
   }
 }
 
-void Library::clearAll()
-{
+void Library::clearAll() {
   for (long l = 0; l < recMax; l++) clearRec(l);
 }
 
