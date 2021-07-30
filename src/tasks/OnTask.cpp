@@ -125,9 +125,10 @@ bool Task::poll() {
   if (hardwareTimer) return false;
 
   if (period > 0 && !running) {
-    unsigned long t;
-    if (period_units == PU_MICROS) t = micros(); else if (period_units == PU_SUB_MICROS) t = micros() * 16; else t = millis();
-    unsigned long time_to_next_task = next_task_time - t;
+    if (period_units == PU_MICROS) last_task_time = micros(); else
+      if (period_units == PU_SUB_MICROS) last_task_time = micros() * 16; else last_task_time = millis();
+
+    unsigned long time_to_next_task = next_task_time - last_task_time;
     if ((long)time_to_next_task < 0) {
       running = true;
 
@@ -150,9 +151,8 @@ bool Task::poll() {
       // set adjusted period
       #ifndef TASKS_QUEUE_MISSED
         if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
-//      if (-time_to_next_task > period) time_to_next_task = period;
       #endif
-      next_task_time = t + (long)(period + time_to_next_task);
+      next_task_time = last_task_time + (long)(period + time_to_next_task);
       if (!repeat) period = 0;
     }
   }
@@ -165,10 +165,11 @@ void Task::setPeriod(unsigned long period) {
     next_period_units = PU_MILLIS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0) {
+    if (this->period == 0 || period_units == PU_MILLIS) {
       this->period = period;
       period_units = PU_MILLIS;
       next_period_units = PU_NONE;
+      next_task_time = last_task_time + (long)(period);
     } else {
       next_period = period;
       next_period_units = PU_MILLIS;
@@ -182,10 +183,11 @@ void Task::setPeriodMicros(unsigned long period) {
     next_period_units = PU_MICROS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0) {
+    if (this->period == 0 || period_units == PU_MICROS) {
       this->period = period;
       period_units = PU_MICROS;
       next_period_units = PU_NONE;
+      next_task_time = last_task_time + (long)(period);
     } else {
       next_period = period;
       next_period_units = PU_MICROS;
@@ -199,10 +201,11 @@ void Task::setPeriodSubMicros(unsigned long period) {
     next_period_units = PU_SUB_MICROS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0) {
+    if (this->period == 0 || period_units == PU_SUB_MICROS) {
       this->period = period;
       period_units = PU_SUB_MICROS;
       next_period_units = PU_NONE;
+      next_task_time = last_task_time + (long)(period);
     } else {
       next_period = period;
       next_period_units = PU_SUB_MICROS;

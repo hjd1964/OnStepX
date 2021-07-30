@@ -136,6 +136,7 @@ class Task {
     PeriodUnits            period_units      = PU_MILLIS;
     PeriodUnits            next_period_units = PU_NONE;
     unsigned long          start_time        = 0;
+    unsigned long          last_task_time    = 0;
     unsigned long          next_task_time    = 0;
     uint8_t                hardwareTimer     = 0;
     void (*volatile callback)() = NULL;
