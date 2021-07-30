@@ -407,10 +407,7 @@ void Axis::poll() {
   // apply composite or normal frequency as required
   float compFreq = freq;
   if (motor.getSynchronized() == true) compFreq += baseFreq;
-  if (lastFreq != compFreq) {
-    setFrequency(compFreq);
-    lastFreq = compFreq;
-  }
+  setFrequency(compFreq);
 }
 
 // set minimum slew frequency in "measures" (radians, microns, etc.) per second

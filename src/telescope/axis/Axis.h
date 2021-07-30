@@ -220,7 +220,6 @@ class Axis {
 
     // step rates to control motor movement
     float freq = 0.0F;
-    float lastFreq = 0.0F;
     float baseFreq = 0.0F;
     float minFreq = 0.0F;
     float slewFreq = 0.0F;

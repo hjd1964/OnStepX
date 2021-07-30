@@ -275,14 +275,6 @@ void StepDir::enableBacklash() {
   backlashAmountStepsStore = 0;
 }
 
-// returns true if within the backlash travel
-bool StepDir::inBacklash() {
-  noInterrupts();
-  uint16_t backlash = backlashSteps;
-  interrupts();
-  if (backlash <= 0 || backlash >= backlashAmountSteps) return false; else return true;
-}
-
 // get the current direction of motion
 Direction StepDir::getDirection() {
   if (lastPeriod == 0) return DIR_NONE;
@@ -298,49 +290,58 @@ DriverStatus StepDir::getDriverStatus() {
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void StepDir::setFrequencySteps(float frequency) {
   // negative frequency, convert to positive and reverse the direction
-  if (frequency < 0.0F) {
-    frequency = -frequency;
-    noInterrupts(); synchronizedStep = -1; interrupts();
-  } else {
-    noInterrupts(); synchronizedStep = 1; interrupts();
-  }
+  int direction = 1;
+  if (frequency < 0.0F) { frequency = -frequency; direction = -1; }
 
   modeSwitch();
-
-  // if slewing has a larger step size adjust the frequency to account for it
   if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) {
-    lastFrequency = frequency;
+    // if slewing has a larger step size divide the frequency to account for it
     frequency /= slewStep;
   } else {
-    // if in backlash override the frequency to account for it
-    if (inBacklash()) frequency = backlashFrequency;
+    // if in backlash override the frequency
+    if (inBacklash) frequency = backlashFrequency;
+  }
+  
+  //static long lastMotorSteps;
+  //if (axisNumber == 4 && targetSteps != lastMotorSteps) { lastMotorSteps = targetSteps; D("targetSteps = "); DL(motorSteps); }
+  
+  if (frequency != lastFrequency) {
     lastFrequency = frequency;
+    
+    if (axisNumber == 4) { D(synchronizedStep); D(" @ "); DL(frequency); }
+    
+    // frequency in steps per second to period in microsecond counts per step
+    // also runs the timer twice as fast if using a square wave
+    #if STEP_WAVE_FORM == SQUARE
+      float period = 500000.0F/frequency;
+    #else
+      float period = 1000000.0F/frequency;
+    #endif
+
+    if (!isnan(period) && fabs(period) <= 134000000.0F) {
+      // convert microsecond counts to sub-microsecond counts
+      period *= 16.0F;
+
+      // adjust period for MCU clock inaccuracy
+      period *= (SIDEREAL_PERIOD/periodSubMicros);
+
+      // if this is the active period, just return
+      if (lastPeriod == (unsigned long)lroundf(period)) return;
+      lastPeriod = (unsigned long)lroundf(period);
+    } else {
+      lastPeriod = 0;
+      lastFrequency = 0.0F;
+      direction = 0;
+    }
+
+    // change the motor rate/direction
+    MicrostepModeControl last = microstepModeControl;
+    microstepModeControl = MMC_HOLD;
+    tasks.setPeriodSubMicros(taskHandle, lastPeriod);
+    synchronizedStep = direction;
+    microstepModeControl = last;
   }
 
-  // frequency in steps per second to period in microsecond counts per step
-  // also runs the timer twice as fast if using a square wave
-  #if STEP_WAVE_FORM == SQUARE
-    float period = 500000.0F/frequency;
-  #else
-    float period = 1000000.0F/frequency;
-  #endif
-
-  if (!isnan(period) && fabs(period) <= 134000000.0F) {
-    // convert microsecond counts to sub-microsecond counts
-    period *= 16.0F;
-
-    // adjust period for MCU clock inaccuracy
-    period *= (SIDEREAL_PERIOD/periodSubMicros);
-
-    // if this is the active period, just return
-    if (lastPeriod == (unsigned long)lroundf(period)) return;
-    lastPeriod = (unsigned long)lroundf(period);
-  } else {
-    lastPeriod = 0;
-    lastFrequency = 0.0F;
-    noInterrupts(); synchronizedStep = 0; interrupts();
-  }
-  tasks.setPeriodSubMicros(taskHandle, lastPeriod);
   if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
   if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
 }
@@ -429,19 +430,19 @@ bool StepDir::enableMoveFast(const bool fast) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     if (takeStep) {
       if (direction == DIR_FORWARD) {
-        if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
+        if (backlashSteps < backlashAmountSteps) { inBacklash = true; backlashSteps += step; } else { inBacklash = false; motorSteps += step; }
         digitalWriteF(stepPin, stepSet);
       } else
       if (direction == DIR_REVERSE) {
-        if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+        if (backlashSteps > 0) { inBacklash = true; backlashSteps -= step; } else { inBacklash = false; motorSteps -= step; }
         digitalWriteF(stepPin, stepSet);
       }
     } else {
-      if (synchronized) targetSteps += synchronizedStep;
-      if (motorSteps + backlashSteps < targetSteps) {
+      if (synchronized && !inBacklash) targetSteps += synchronizedStep;
+      if (motorSteps < targetSteps) {
         direction = DIR_FORWARD;
         digitalWriteF(dirPin, dirFwd);
-      } else if (motorSteps + backlashSteps > targetSteps) {
+      } else if (motorSteps > targetSteps) {
         direction = DIR_REVERSE;
         digitalWriteF(dirPin, dirRev);
       } else direction = DIR_NONE;
@@ -470,16 +471,16 @@ bool StepDir::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDir::move(const int8_t stepPin, const int8_t dirPin) {
     if (microstepModeControl >= MMC_TRACKING_READY) return;
     digitalWriteF(stepPin, stepClr);
-    if (synchronized) targetSteps += synchronizedStep;
+    if (synchronized && !inBacklash) targetSteps += synchronizedStep;
     if (motorSteps < targetSteps) {
       digitalWriteF(dirPin, dirFwd);
       direction = DIR_FORWARD;
-      if (backlashSteps < backlashAmountSteps) backlashSteps += step; else motorSteps += step;
+      if (backlashSteps < backlashAmountSteps) { inBacklash = true; backlashSteps += step; } else { inBacklash = false; motorSteps += step; }
     } else
     if (motorSteps > targetSteps) {
       digitalWriteF(dirPin, dirRev);
       direction = DIR_REVERSE;
-      if (backlashSteps > 0) backlashSteps -= step; else motorSteps -= step;
+      if (backlashSteps > 0) { inBacklash = true; backlashSteps -= step; } else { inBacklash = false; motorSteps -= step; }
     } else { direction = DIR_NONE; return; }
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%switchStep == 0) microstepModeControl = MMC_SLEWING_READY;
     digitalWriteF(stepPin, stepSet);

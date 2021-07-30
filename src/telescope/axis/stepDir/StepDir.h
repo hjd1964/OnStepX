@@ -20,7 +20,7 @@ typedef struct StepDirPins {
   uint8_t   enabledState;
 } StepDirPins;
 
-enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING, MMC_TRACKING_READY, MMC_SLEWING_READY};
+enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING, MMC_TRACKING_READY, MMC_SLEWING_READY, MMC_HOLD};
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 class StepDir {
@@ -107,8 +107,6 @@ class StepDir {
     void disableBacklash();
     // enable backlash compensation, to work properly this must be proceeded by a disable call
     void enableBacklash();
-    // returns true if traveling through backlash
-    bool inBacklash();
 
     StepDirPins pins;
 
@@ -128,6 +126,7 @@ class StepDir {
     uint16_t backlashAmountStepsStore;
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
+    volatile bool inBacklash = false; // true if within the backlash travel
 
     #ifdef DRIVER_STEP_DEFAULTS
       #define stepClr LOW
