@@ -1,3 +1,4 @@
+
 //--------------------------------------------------------------------------------------------------
 // OnStepX focuser control
 
@@ -50,8 +51,6 @@ void Focuser::init(bool validKey) {
         axis[index]->setFrequencyMax(slewRateDesired[index]);
         axis[index]->setFrequencyMin(slewRateMinimum[index]);
         axis[index]->setFrequencySlew(slewRateDesired[index]);
-        axis[index]->setSlewAccelerationRate(accelerationRate[index]);
-        axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
         if (powerDown[index]) axis[index]->setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
       }
     }
@@ -190,6 +189,12 @@ bool Focuser::setBacklash(int index, int value) {
   settings[index].backlash = value;
   writeSettings(index);
   return true;
+}
+
+void Focuser::setFrequencySlew(int index, float rate) {
+  axis[index]->setFrequencySlew(rate);
+  axis[index]->setSlewAccelerationRate((rate/accelerationRate[index])*accelerationRate[index]);
+  axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
 }
 
 void Focuser::readSettings(int index) {

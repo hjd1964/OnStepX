@@ -69,6 +69,9 @@ class Focuser {
     // set backlash in microns
     bool  setBacklash(int index, int value);
 
+    // set slew frequency with constant acceleration
+    void setFrequencySlew(int index, float rate);
+
     Axis *axis[6];
 
   private:

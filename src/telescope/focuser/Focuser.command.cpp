@@ -207,10 +207,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :F[n]#     Set focuser move rate, where n = 1 for 2um/sec, 2 for 20um/sec, 3 for 200um/sec, 4 for 2mm/second
+    // :F[n]#     Set focuser move rate, where n = 1 for 1um/sec, 2 for 10um/sec, 3 for 250um/sec, 4 for 5mm/second
     //            Returns: Nothing
     if (command[1] >= '1' && command[1] <= '4') {
-      int p[] = {2, 20, 200, 2000};
+      int p[] = {1, 10, 250, 5000};
       moveRate[index] = p[command[1] - '1'];
       *numericReply = false;
     } else
@@ -218,7 +218,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :F+#       Move focuser in (toward objective)
     //            Returns: Nothing
     if (command[1] == '+') {
-      axis[index]->setFrequencySlew(moveRate[index]);
+      setFrequencySlew(index, moveRate[index]);
       axis[index]->autoSlew(DIR_FORWARD);
       *numericReply = false;
     } else
@@ -226,7 +226,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :F-#       Move focuser out (away from objective)
     //            Returns: Nothing
     if (command[1] == '-') {
-      axis[index]->setFrequencySlew(moveRate[index]);
+      setFrequencySlew(index, moveRate[index]);
       axis[index]->autoSlew(DIR_REVERSE);
       *numericReply = false;
     } else
@@ -243,7 +243,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (toupper(command[1]) == 'R') {
       long t = axis[index]->getTargetCoordinateSteps();
       axis[index]->setTargetCoordinateSteps(t + atol(parameter)*UnitsToSteps);
-      axis[index]->setFrequencySlew(slewRateDesired[index]);
+      setFrequencySlew(index, slewRateDesired[index]);
       axis[index]->autoSlewRateByDistance(slewRateDesired[index] + tcfSteps[index]);
       *numericReply = false;
     } else
@@ -253,7 +253,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (toupper(command[1]) == 'S') {
       axis[index]->setTargetCoordinateSteps(atol(parameter)*UnitsToSteps);
-      axis[index]->setFrequencySlew(slewRateDesired[index]);
+      setFrequencySlew(index, slewRateDesired[index]);
       axis[index]->autoSlewRateByDistance(slewRateDesired[index] + tcfSteps[index]);
     //  *commandError = CE_SLEW_ERR_IN_STANDBY;
     } else
@@ -280,7 +280,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'h') {
       long t = round((axis[index]->settings.limits.max + axis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
       axis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
-      axis[index]->setFrequencySlew(slewRateDesired[index]);
+      setFrequencySlew(index, slewRateDesired[index]);
       axis[index]->autoSlewRateByDistance(slewRateDesired[index]);
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
