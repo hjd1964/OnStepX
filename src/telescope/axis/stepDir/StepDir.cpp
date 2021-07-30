@@ -302,13 +302,8 @@ void StepDir::setFrequencySteps(float frequency) {
     if (inBacklash) frequency = backlashFrequency;
   }
   
-  //static long lastMotorSteps;
-  //if (axisNumber == 4 && targetSteps != lastMotorSteps) { lastMotorSteps = targetSteps; D("targetSteps = "); DL(motorSteps); }
-  
   if (frequency != lastFrequency) {
     lastFrequency = frequency;
-    
-    if (axisNumber == 4) { D(synchronizedStep); D(" @ "); DL(frequency); }
     
     // frequency in steps per second to period in microsecond counts per step
     // also runs the timer twice as fast if using a square wave
