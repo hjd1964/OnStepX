@@ -377,7 +377,7 @@
 #define AXIS4_POWER_DOWN              OFF
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
-#define AXIS4_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS4_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS4_SLEW_RATE_DESIRED
 #define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -424,7 +424,7 @@
 #define AXIS5_POWER_DOWN              OFF
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS5_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS5_SLEW_RATE_DESIRED
 #define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -471,7 +471,7 @@
 #define AXIS6_POWER_DOWN              OFF
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS6_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS6_SLEW_RATE_DESIRED
 #define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -518,7 +518,7 @@
 #define AXIS7_POWER_DOWN              OFF
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS7_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS7_SLEW_RATE_DESIRED
 #define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -565,7 +565,7 @@
 #define AXIS8_POWER_DOWN              OFF
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS8_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS8_SLEW_RATE_DESIRED
 #define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -612,7 +612,7 @@
 #define AXIS9_POWER_DOWN              OFF
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM       50                          // in microns/sec
+#define AXIS9_SLEW_RATE_MINIMUM       2                           // in microns/sec
 #endif
 #ifndef AXIS9_SLEW_RATE_DESIRED
 #define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
