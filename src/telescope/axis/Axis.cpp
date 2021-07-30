@@ -270,13 +270,21 @@ bool Axis::autoSlew(Direction direction) {
   if (autoRate == AR_RATE_BY_DISTANCE) return false;
   if (direction == DIR_NONE) return false;
   if (motionError(direction)) return false;
+  if (direction != DIR_FORWARD && direction != DIR_REVERSE) return false;
+  V(axisPrefix);
   if (autoRate == AR_NONE) {
     setFrequency(baseFreq);
     motor.setSynchronized(true);
     motor.setSlewing(true);
-    V(axisPrefix); VLF("autoSlew started");
+    VF("autoSlew started (");
+  } else { VF("autoSlew resuming ("); }
+  if (direction == DIR_FORWARD) {
+    autoRate = AR_RATE_BY_TIME_FORWARD;
+    VLF("forward)");
+  } else {
+    autoRate = AR_RATE_BY_TIME_REVERSE;
+    VLF("reverse)");
   }
-  if (direction == DIR_FORWARD) autoRate = AR_RATE_BY_TIME_FORWARD; else autoRate = AR_RATE_BY_TIME_REVERSE;
   return true;
 }
 
@@ -346,6 +354,7 @@ void Axis::poll() {
     if (autoRate == AR_RATE_BY_TIME_FORWARD && !senses.read(homeSenseHandle)) autoSlewStop();
     if (autoRate == AR_RATE_BY_TIME_REVERSE && senses.read(homeSenseHandle)) autoSlewStop();
   }
+  Y;
 
   // slewing
   if (autoRate != AR_NONE) {
@@ -403,6 +412,7 @@ void Axis::poll() {
       }
     } else freq = 0.0F;
   } else freq = 0.0F;
+  Y;
 
   // apply composite or normal frequency as required
   float compFreq = freq;
