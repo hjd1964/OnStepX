@@ -119,6 +119,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
 
   // init driver advanced modes, etc.
   driver.init(axisNumber, microsteps, current);
+  switchStep = driver.getMicrostepRatio();
 
   // now disable the driver
   power(false);
@@ -295,18 +296,18 @@ void StepDir::setFrequencySteps(float frequency) {
   int sign = 1;
   if (frequency < 0.0F) { frequency = -frequency; sign = -1; }
 
-  modeSwitch(); Y;
-  if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) {
-    // if slewing has a larger step size divide the frequency to account for it
-    frequency /= slewStep;
-  } else {
-    // if in backlash override the frequency
-    if (inBacklash) frequency = backlashFrequency;
-  }
-  
+  // if in backlash override the frequency
+  if (inBacklash) frequency = backlashFrequency;
+
   if (frequency != lastFrequency) {
     lastFrequency = frequency;
-    
+
+    // change microstep mode and/or swap in fast ISRs as required
+    modeSwitch(); Y;
+
+    // if slewing has a larger step size divide the frequency to account for it
+    if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) frequency /= slewStep;
+
     // frequency in steps per second to period in microsecond counts per step
     // also runs the timer twice as fast if using a square wave
     #if STEP_WAVE_FORM == SQUARE
@@ -362,11 +363,7 @@ void StepDir::modeSwitch() {
   } else {
     if (lastFrequency > backlashFrequency*1.2F) {
 
-      if (microstepModeControl == MMC_TRACKING) {
-        microstepModeControl = MMC_SLEWING_REQUEST;
-        switchStep = driver.getMicrostepRatio();
-        return;
-      } else
+      if (microstepModeControl == MMC_TRACKING) { if (!inBacklash) microstepModeControl = MMC_SLEWING_REQUEST; return; } else
       if (microstepModeControl != MMC_SLEWING_READY) return;
 
       if (driver.modeSwitchAllowed()) {
@@ -410,11 +407,11 @@ bool StepDir::enableMoveFast(const bool fast) {
   #ifdef MOUNT_PRESENT
     if (axisNumber > 2) return false;
     if (fast) {
-      disableBacklash();
+      //disableBacklash();
       if (direction == DIR_FORWARD) tasks.setCallback(taskHandle, _moveFF); else tasks.setCallback(taskHandle, _moveFR);
     } else {
       tasks.setCallback(taskHandle, _move);
-      enableBacklash();
+      //enableBacklash();
     }
     return true;
   #else
