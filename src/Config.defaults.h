@@ -341,7 +341,7 @@
 #define AXIS3_RAPID_STOP_RATE         (AXIS3_ACCELERATION_RATE*2) // in degrees/sec/sec
 #endif
 #ifndef AXIS3_BACKLASH_RATE
-#define AXIS3_BACKLASH_RATE           (AXIS3_ACCELERATION_RATE/4) // in degrees/sec
+#define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_DESIRED/4) // in degrees/sec
 #endif
 #ifndef AXIS3_LIMIT_MIN
 #define AXIS3_LIMIT_MIN               -180                        // in degrees
@@ -389,7 +389,7 @@
 #define AXIS4_RAPID_STOP_RATE         (AXIS4_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS4_BACKLASH_RATE
-#define AXIS4_BACKLASH_RATE           (AXIS4_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS4_LIMIT_MIN
 #define AXIS4_LIMIT_MIN               0                           // in mm
@@ -436,7 +436,7 @@
 #define AXIS5_RAPID_STOP_RATE         (AXIS5_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS5_BACKLASH_RATE
-#define AXIS5_BACKLASH_RATE           (AXIS5_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS5_LIMIT_MIN
 #define AXIS5_LIMIT_MIN               0                           // in mm
@@ -483,7 +483,7 @@
 #define AXIS6_RAPID_STOP_RATE         (AXIS6_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS6_BACKLASH_RATE
-#define AXIS6_BACKLASH_RATE           (AXIS6_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS6_LIMIT_MIN
 #define AXIS6_LIMIT_MIN               0                           // in mm
@@ -530,7 +530,7 @@
 #define AXIS7_RAPID_STOP_RATE         (AXIS7_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS7_BACKLASH_RATE
-#define AXIS7_BACKLASH_RATE           (AXIS7_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS7_LIMIT_MIN
 #define AXIS7_LIMIT_MIN               0                           // in mm
@@ -577,7 +577,7 @@
 #define AXIS8_RAPID_STOP_RATE         (AXIS8_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS8_BACKLASH_RATE
-#define AXIS8_BACKLASH_RATE           (AXIS8_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS8_LIMIT_MIN
 #define AXIS8_LIMIT_MIN               0                           // in mm
@@ -624,7 +624,7 @@
 #define AXIS9_RAPID_STOP_RATE         (AXIS9_ACCELERATION_RATE*2) // in microns/sec/sec
 #endif
 #ifndef AXIS9_BACKLASH_RATE
-#define AXIS9_BACKLASH_RATE           (AXIS9_ACCELERATION_RATE/4) // in microns/sec
+#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS9_LIMIT_MIN
 #define AXIS9_LIMIT_MIN               0                           // in mm
