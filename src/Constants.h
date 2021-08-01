@@ -208,24 +208,6 @@
   #define INPUT_PULLDOWN INPUT
 #endif
 
-// commands
-// command of 2 chars
-#define cmd(a)  (command[0] == a[0] && command[1] == a[1] && parameter[0] == 0)
-// command of 3 chars
-#define cmd1(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == 0)
-// command of 4 chars
-#define cmd2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3] && parameter[2] == 0)
-// command of 2 chars with high precision option
-#define cmdH(a) (command[0] == a[0] && command[1] == a[1] && (command[2] == 0 || (command[2] == 'H' && command[3] == 0)))
-// command of 2 chars with parameter
-#define cmdP(a) (command[0] == a[0] && command[1] == a[1])
-// command of 4 chars with parameter
-#define cmdP2(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[1] == a[3])
-// GX command of 3 chars, with end of string check
-#define cmdGX(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[2] == 0)
-// SX, command of 3 chars, comma, then parameter
-#define cmdSX(a) (command[0] == a[0] && command[1] == a[1] && parameter[0] == a[2] && parameter[2] == ',')
-
 // task manager
 #define TASKS_SKIP_MISSED
 #define TASKS_HWTIMER1_ENABLE              // only the Mega2560 hardware timers are tested and seem to work

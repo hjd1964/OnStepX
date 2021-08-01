@@ -13,7 +13,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
   *supressFrame = false;
 
   // get auXiliary feature
-  if (cmdP("GX")) {
+  if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {
     // :GXXn#
     if (parameter[0] == 'X') { 
       int i = parameter[1] - '1';
@@ -106,7 +106,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
   } else
 
   // set auXiliary feature
-  if (cmdP("SX")) {
+  if (command[0] == 'S' && command[1] == 'X' && parameter[2] == ',') {
     // :SXX[n],V[Z][S][v]#
     // for example :SXX1,V1#  :SXX1,Z0.5#
     if (parameter[0] == 'X') { 

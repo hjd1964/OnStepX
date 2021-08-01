@@ -19,19 +19,21 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     }
   }
 
-  // :FA#    Focuser Active?
-  //            Return: 0 on failure (no focusers)
-  //                    1 on success
-  if (cmd("FA")) {
-    if (axis[active] == NULL) *commandError = CE_0;
-  } else
+  if (command[0] == 'F' && command[1] == 'A') {
+    // :FA#    Focuser Active?
+    //            Return: 0 on failure (no focusers)
+    //                    1 on success
+    if (parameter[0] == 0) {
+      if (axis[active] == NULL) *commandError = CE_0;
+    } else
 
-  // :FA[n]#    Select focuser where [n] = 1 to 6
-  //            Return: 0 on failure
-  //                    1 on success
-  if (cmdP("FA") && parameter[1] == 0) {
-    int i = parameter[0] - '1';
-    if (i >= 0 && i < FOCUSER_MAX) active = i; else *commandError = CE_PARAM_RANGE;
+    // :FA[n]#    Select focuser where [n] = 1 to 6
+    //            Return: 0 on failure
+    //                    1 on success
+    if (parameter[1] == 0) {
+      int i = parameter[0] - '1';
+      if (i >= 0 && i < FOCUSER_MAX) active = i; else *commandError = CE_PARAM_RANGE;
+    } else return false;
   } else
 
   // :F[...]#   Use selected focuser (defaults to the first focuser)
@@ -42,6 +44,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
   // :F5[...]#  Focuser #5 (Axis8)
   // :F6[...]#  Focuser #6 (Axis9)
   if (command[0] == 'F') {
+
     // check that the requested focuser is active
     int i = command[1] - '1';
     if (i >= 0 && i < FOCUSER_MAX && parameter[0] != 0) {

@@ -16,7 +16,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
   // :rA#    rotator Active?
   //            Return: 0 on failure (no rotator)
   //                    1 on success
-  if (cmd("rA")) {
+  if (command[0] == 'r' && command[1] == 'A' && parameter[0] == 0) {
     // empty command for success response 1
   } else
 

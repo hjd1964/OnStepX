@@ -113,7 +113,7 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   // :SB[n]#    Set Baud Rate where n is an ASCII digit (1..9) with the following interpertation
   //            0=115.2K, 1=56.7K, 2=38.4K, 3=28.8K, 4=19.2K, 5=14.4K, 6=9600, 7=4800, 8=2400, 9=1200
   //            Returns: 1 (at the current baud rate and then changes to the new rate for further communication)
-  if (cmdP("SB")) {
+  if (command[0] == 'S' && command[1] == 'B') {
     int rate = parameter[0] - '0';
     if (rate >= 0 && rate <= 9) {
       const static long baud[10] = {115200, 56700, 38400, 28800, 19200, 14400, 9600, 4800, 2400, 1200};
@@ -125,8 +125,9 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
     return commandError;
   } else
 
-  // internal MCU temperature in deg. C
-  if (cmd2("GX9F")) {
+  // :GX9F#     Get internal MCU temperature in deg. C
+  //            Returns: +/-n.n
+  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == 'F' && parameter[2] == 0) {
     float t = HAL_TEMP();
     if (!isnan(t)) sprintF(reply, "%1.0f", t); else { *numericReply = true; commandError = CE_0; }
     return commandError;

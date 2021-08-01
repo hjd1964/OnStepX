@@ -14,64 +14,66 @@
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
-  // :GXA[n]#   Get axis/driver configuration
-  //            Returns: Value
-  if (cmdGX("GXA")) {
-    int index = parameter[1] - '1';
-    if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
-    if (index + 1 != axisNumber) return false; // command wasn't processed
-    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+  if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {
+    // :GXA[n]#   Get axis/driver configuration
+    //            Returns: Value
+    if (parameter[0] == 'A') {
+      int index = parameter[1] - '1';
+      if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
+      if (index + 1 != axisNumber) return false; // command wasn't processed
+      uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
 
-    // check that all axes are not set to revert
-    if (axesToRevert & 1) {
-      // check that this axis is not set to revert
-      if (!(axesToRevert & (1 << axisNumber))) {
-        AxisSettings thisAxis;
-        nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
-        if (axisNumber <= 2) {
-          // convert axis1, 2, and 3 into degrees
-          thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
-          thisAxis.limits.min = radToDegF(thisAxis.limits.min);
-          thisAxis.limits.max = radToDegF(thisAxis.limits.max);
-        } else
-        if (axisNumber > 3) {
-          // convert axis > 3 min/max into mm
-          thisAxis.limits.min = thisAxis.limits.min/1000.0F;
-          thisAxis.limits.max = thisAxis.limits.max/1000.0F;
-        }
-        sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
-          (long)thisAxis.stepsPerMeasure,
-          (long)(thisAxis.stepsPerMeasure*1000)%1000,
-          (int)thisAxis.subdivisions,
-          (int)thisAxis.current,
-          (int)thisAxis.reverse,
-          (int)round(thisAxis.limits.min),
-          (int)round(thisAxis.limits.max));
-        *numericReply = false;
+      // check that all axes are not set to revert
+      if (axesToRevert & 1) {
+        // check that this axis is not set to revert
+        if (!(axesToRevert & (1 << axisNumber))) {
+          AxisSettings thisAxis;
+          nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+          if (axisNumber <= 2) {
+            // convert axis1, 2, and 3 into degrees
+            thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
+            thisAxis.limits.min = radToDegF(thisAxis.limits.min);
+            thisAxis.limits.max = radToDegF(thisAxis.limits.max);
+          } else
+          if (axisNumber > 3) {
+            // convert axis > 3 min/max into mm
+            thisAxis.limits.min = thisAxis.limits.min/1000.0F;
+            thisAxis.limits.max = thisAxis.limits.max/1000.0F;
+          }
+          sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
+            (long)thisAxis.stepsPerMeasure,
+            (long)(thisAxis.stepsPerMeasure*1000)%1000,
+            (int)thisAxis.subdivisions,
+            (int)thisAxis.current,
+            (int)thisAxis.reverse,
+            (int)round(thisAxis.limits.min),
+            (int)round(thisAxis.limits.max));
+          *numericReply = false;
+        } else *commandError = CE_0;
       } else *commandError = CE_0;
-    } else *commandError = CE_0;
-  } else
+    } else
 
-  // :GXUn#     Get stepper driver statUs (all axes)
-  //            Returns: Value
-  if (cmdGX("GXU")) {
-    int index = parameter[1] - '1';
-    if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
-    if (index + 1 != axisNumber) return false; // command wasn't processed
-    DriverStatus status = getStatus();
-    strcat(reply, status.standstill ? "ST," : ",");
-    strcat(reply, status.outputA.openLoad ? "OA," : ",");
-    strcat(reply, status.outputB.openLoad ? "OB," : ",");
-    strcat(reply, status.outputA.shortToGround ? "GA," : ",");
-    strcat(reply, status.outputB.shortToGround ? "GB," : ",");
-    strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
-    strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
-    strcat(reply, status.fault ? "GF" : "");
-    *numericReply = false;
+    // :GXU[n]#   Get stepper driver statUs for axis [n]
+    //            Returns: Value
+    if (parameter[0] == 'U') {
+      int index = parameter[1] - '1';
+      if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
+      if (index + 1 != axisNumber) return false; // command wasn't processed
+      DriverStatus status = getStatus();
+      strcat(reply, status.standstill ? "ST," : ",");
+      strcat(reply, status.outputA.openLoad ? "OA," : ",");
+      strcat(reply, status.outputB.openLoad ? "OB," : ",");
+      strcat(reply, status.outputA.shortToGround ? "GA," : ",");
+      strcat(reply, status.outputB.shortToGround ? "GB," : ",");
+      strcat(reply, status.overTemperature ? "OT," : ",");           // > 150C
+      strcat(reply, status.overTemperaturePreWarning ? "PW," : ","); // > 120C
+      strcat(reply, status.fault ? "GF" : "");
+      *numericReply = false;
+    } else return false;
   } else
 
   // :SXA[n]#   Set axis/driver configuration
-  if (cmdSX("SXA")) {
+  if (command[0] == 'S' && command[1] == 'X' && parameter[0] == 'A' && parameter[2] == ',') {
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
 
     // check for a valid axisNumber

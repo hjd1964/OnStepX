@@ -16,7 +16,7 @@ bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supr
   
   // :GX90#     Get setting pulse guide rate
   //            Returns: n.nn#
-  if (cmd2("GX90")) {
+  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '0' && parameter[2] == 0) {
     sprintF(reply,"%0.2f",guideRateSelectToRate(misc.pulseGuideRateSelect));
   } else
 
@@ -51,7 +51,7 @@ bool Mount::commandGuide(char *reply, char *command, char *parameter, bool *supr
       } else *commandError = CE_PARAM_FORM;
     } else
 
-    // ::Mw#      Move Telescope West at current guide rate
+    // :Mw#       Move Telescope West at current guide rate
     //            Returns: Nothing
     if (command[1] == 'w' && parameter[0] == 0) {
       *commandError = guideStartAxis1(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
