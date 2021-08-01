@@ -158,97 +158,106 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     *commandError = CE_CMD_UNKNOWN;
   } else
 
-  // :GVD#      Get OnStepX Firmware Date
-  //            Returns: MTH DD YYYY#
-  // :GVM#      General Message
-  //            Returns: s# (where s is a string up to 16 chars)
-  // :GVN#      Get OnStepX Firmware Number
-  //            Returns: M.mp#
-  // :GVP#      Get OnStepX Product Name
-  //            Returns: s#
-  // :GVT#      Get OnStepX Firmware Time
-  //            Returns: HH:MM:SS#
-  if (cmdP("GV")) {
-    if (parameter[0] == 'D') strcpy(reply, firmware.date); else
-    if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%s", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
-    if (parameter[0] == 'N') sprintf(reply, "%i.%02i%s", firmware.version.major, firmware.version.minor, firmware.version.patch); else
-    if (parameter[0] == 'P') strcpy(reply, firmware.name); else
-    if (parameter[0] == 'T') strcpy(reply, firmware.time); else *commandError = CE_CMD_UNKNOWN;
-    *numericReply = false;
-  } else
-
-  if (cmdGX("GX9")) {
-    // :GX9A#     temperature in deg. C
-    //            Returns: +/-n.n
-    if (parameter[1] == 'A') {
-      sprintF(reply, "%3.1f", weather.getTemperature());
-      *numericReply = false;
-     } else
-
-    // :GX9B#     pressure in mb
-    //            Returns: +/-n.n
-    if (parameter[1] == 'B') {
-      sprintF(reply, "%3.1f", weather.getPressure());
+  if (command[0] == 'G') {
+    // :GVD#      Get OnStepX Firmware Date
+    //            Returns: MTH DD YYYY#
+    // :GVM#      General Message
+    //            Returns: s# (where s is a string up to 16 chars)
+    // :GVN#      Get OnStepX Firmware Number
+    //            Returns: M.mp#
+    // :GVP#      Get OnStepX Product Name
+    //            Returns: s#
+    // :GVT#      Get OnStepX Firmware Time
+    //            Returns: HH:MM:SS#
+    if (command[1] == 'V' && parameter[1] == 0) {
+      if (parameter[0] == 'D') strcpy(reply, firmware.date); else
+      if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%s", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
+      if (parameter[0] == 'N') sprintf(reply, "%i.%02i%s", firmware.version.major, firmware.version.minor, firmware.version.patch); else
+      if (parameter[0] == 'P') strcpy(reply, firmware.name); else
+      if (parameter[0] == 'T') strcpy(reply, firmware.time); else *commandError = CE_CMD_UNKNOWN;
       *numericReply = false;
     } else
 
-    // :GX9C#     relative humidity in %
-    //            Returns: +/-n.n
-    if (parameter[1] == 'C') {
-      sprintF(reply, "%3.1f", weather.getHumidity());
-      *numericReply = false;
-    } else
+    if (command[1] == 'X' && parameter[2] == 0) {
+      if (parameter[0] == '9') {
+        // :GX9A#     temperature in deg. C
+        //            Returns: +/-n.n
+        if (parameter[1] == 'A') {
+          sprintF(reply, "%3.1f", weather.getTemperature());
+          *numericReply = false;
+        } else
 
-    // :GX9E#     dew point in deg. C
-    //            Returns: +/-n.n
-    if (parameter[1] == 'E') {
-      sprintF(reply, "%3.1f", weather.getDewPoint());
-      *numericReply = false;
-    } else return false;
-  } else
- 
-  // :GXA0#     Get axis/driver revert all state
-  //            Returns: Value
-  if (cmdGX("GXA") && parameter[1] == '0') {
-    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-    if (!(axesToRevert & 1)) *commandError = CE_0;
-  } else
+        // :GX9B#     pressure in mb
+        //            Returns: +/-n.n
+        if (parameter[1] == 'B') {
+          sprintF(reply, "%3.1f", weather.getPressure());
+          *numericReply = false;
+        } else
 
-  if (cmdSX("SX9")) {
-    char *conv_end;
-    float f = strtod(&parameter[3], &conv_end);
-    if (&parameter[3] == conv_end) f = NAN;
-    // :SX9A,[sn.n]#
-    //            Set temperature in deg. C
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'A') {
-      if (!weather.setTemperature(f)) *commandError = CE_PARAM_RANGE;
-    } else
-    // :SX9B,[n.n]#
-    //            Set pressure in mb
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'B') {
-      if (!weather.setPressure(f)) *commandError = CE_PARAM_RANGE;
-    } else
-    // :SX9C,[n.n]#
-    //            relative humidity in %
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'C') {
-      if (!weather.setHumidity(f)) *commandError = CE_PARAM_RANGE;
+        // :GX9C#     relative humidity in %
+        //            Returns: +/-n.n
+        if (parameter[1] == 'C') {
+          sprintF(reply, "%3.1f", weather.getHumidity());
+          *numericReply = false;
+        } else
+
+        // :GX9E#     dew point in deg. C
+        //            Returns: +/-n.n
+        if (parameter[1] == 'E') {
+          sprintF(reply, "%3.1f", weather.getDewPoint());
+          *numericReply = false;
+        } else return false;
+      } else
+
+      if (parameter[0] == 'A') {
+        // :GXA0#     Get axis/driver revert all state
+        //            Returns: Value
+        if (parameter[1] == '0') {
+          uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+          if (!(axesToRevert & 1)) *commandError = CE_0;
+        } else return false;
+      } else return false;
+
     } else return false;
   } else
 
-  if (cmdSX("SXA")) {
-    // :SXAC,0#   for run-time NV (EEPROM) axis settings
-    // :SXAC,1#   for compile-time Config.h axis settings
-    //            Return: 0 failure, 1 success
-    if (parameter[1] == 'C' && parameter[4] == 0) {
-      if (parameter[3] == '0' || parameter[3] == '1') {
-        uint16_t axesToRevert = 0;
-        if (parameter[3] == '0') axesToRevert = 1;
-        nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-      } else *commandError = CE_PARAM_RANGE;
-    }
+  if (command[0] == 'S' && command[1] == 'X' && parameter[2] == ',') {
+    if (parameter[0] == '9') {
+      char *conv_end;
+      float f = strtod(&parameter[3], &conv_end);
+      if (&parameter[3] == conv_end) f = NAN;
+      // :SX9A,[sn.n]#
+      //            Set temperature in deg. C
+      //            Return: 0 failure, 1 success
+      if (parameter[1] == 'A') {
+        if (!weather.setTemperature(f)) *commandError = CE_PARAM_RANGE;
+      } else
+      // :SX9B,[n.n]#
+      //            Set pressure in mb
+      //            Return: 0 failure, 1 success
+      if (parameter[1] == 'B') {
+        if (!weather.setPressure(f)) *commandError = CE_PARAM_RANGE;
+      } else
+      // :SX9C,[n.n]#
+      //            relative humidity in %
+      //            Return: 0 failure, 1 success
+      if (parameter[1] == 'C') {
+        if (!weather.setHumidity(f)) *commandError = CE_PARAM_RANGE;
+      } else return false;
+    } else
+
+    if (parameter[0] == 'A') {
+      // :SXAC,0#   for run-time NV (EEPROM) axis settings
+      // :SXAC,1#   for compile-time Config.h axis settings
+      //            Return: 0 failure, 1 success
+      if (parameter[1] == 'C' && parameter[4] == 0) {
+        if (parameter[3] == '0' || parameter[3] == '1') {
+          uint16_t axesToRevert = 0;
+          if (parameter[3] == '0') axesToRevert = 1;
+          nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
+        } else *commandError = CE_PARAM_RANGE;
+      }
+    } else return false;
   } else return false;
 
   return true;
