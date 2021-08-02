@@ -152,7 +152,6 @@
 #define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
-#define AXIS4_SLEW_RATE_MINIMUM        25 //     25, n. Where n=1..200 (um/s.) Minimum microns/second.                        Adjust
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
 #define AXIS4_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 
