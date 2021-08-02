@@ -10,7 +10,12 @@ bool SoftSpi::init(int16_t mosi, int16_t sck, int16_t cs, int16_t miso) {
   this->sck = sck;
   this->cs = cs;
 
-  VF("MSG: SoftSpi, init MOSI="); V(mosi); VF(", SCK="); V(sck); VF(", CS="); V(cs); VF(", MISO="); VL(miso);
+  #if DEBUG == VERBOSE
+    VF("MSG: SoftSpi, init MOSI="); if (mosi == OFF) { V("OFF"); } else { V(mosi); } 
+    VF(", SCK="); if (sck == OFF) { V("OFF"); } else { V(sck); }
+    VF(", CS="); if (cs == OFF) { V("OFF"); } else { V(cs); }
+    VF(", MISO="); if (miso == OFF) { VL("OFF"); } else { VL(miso); }
+  #endif
 
   if (cs == OFF || sck == OFF || cs == OFF) return false; else return true;
 }

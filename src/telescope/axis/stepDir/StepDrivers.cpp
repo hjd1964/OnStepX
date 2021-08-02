@@ -106,10 +106,10 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
 
   #if DEBUG == VERBOSE
     VF("MSG: StepDriver, init model "); V(DRIVER_NAME[settings.model]);
-    VF(" u-step mode "); if (settings.microsteps == OFF) V("OFF"); else { V(settings.microsteps); V("X"); }
-    VF(" (goto mode "); if (settings.microstepsGoto == SAME) V("SAME)"); else { V(settings.microstepsGoto); V("X)"); }
+    VF(" u-step mode "); if (settings.microsteps == OFF) { V("OFF"); } else { V(settings.microsteps); V("X"); }
+    VF(" (goto mode "); if (settings.microstepsGoto == SAME) { V("SAME)"); } else { V(settings.microstepsGoto); V("X)"); }
     if (settings.model == TMC2130 || settings.model == TMC5160) {
-      if (current == OFF) VL(" Irun=OFF"); else { V(" Irun="); V(current); VL("mA"); }
+      if (current == OFF) { VL(" Irun=OFF"); } else { V(" Irun="); V(current); VL("mA"); }
     } else VL("");
   #endif
 
