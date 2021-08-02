@@ -120,7 +120,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   // init driver advanced modes, etc.
   driver.init(axisNumber, microsteps, current);
   homeSteps = driver.getMicrostepRatio();
-  V(axisPrefix); V("driver ratio "); VL(homeSteps);
+  V(axisPrefix); V("sequencer home every "); V(homeSteps); VL(" step(s)");
 
   // now disable the driver
   power(false);
