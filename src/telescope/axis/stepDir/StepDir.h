@@ -20,7 +20,7 @@ typedef struct StepDirPins {
   uint8_t   enabledState;
 } StepDirPins;
 
-enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING_REQUEST, MMC_SLEWING, MMC_TRACKING_READY, MMC_SLEWING_READY, MMC_HOLD};
+enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUEST, MMC_SLEWING_PAUSE, MMC_SLEWING_READY, MMC_TRACKING_READY};
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 class StepDir {
@@ -143,10 +143,9 @@ class StepDir {
     volatile long targetSteps = 0;
     volatile long motorSteps = 0;
     volatile long indexSteps = 0;
-    volatile int  synchronizedStep = 1;
-    volatile int  switchStep = 1;
-    volatile int  slewStep = 1;
+    volatile int  homeSteps = 1;
     volatile int  step = 1;
+    volatile int  slewStep = 1;
     volatile bool takeStep = false;
     volatile Direction direction = DIR_NONE;
 
