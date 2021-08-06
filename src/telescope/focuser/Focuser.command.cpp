@@ -19,6 +19,28 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     }
   }
 
+  if (command[0] == 'h') {
+    // :hP#       Moves focuser(s) to the park position
+    //            Return: 0 on failure
+    //                    1 on success
+    if (command[1] == 'P' && parameter[0] == 0) {
+      CommandError e = CE_NONE;
+      for (int index = 0; index < FOCUSER_MAX; index++) park(index);
+      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      return false;
+    } else 
+
+    // :hR#       Restore parked focuser(s) to operation
+    //            Return: 0 on failure
+    //                    1 on success
+    if (command[1] == 'R' && parameter[0] == 0) {
+      CommandError e = CE_NONE;
+      for (int index = 0; index < FOCUSER_MAX; index++) unpark(index);
+      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      return false;
+    } else return false;
+  } else
+
   if (command[0] == 'F' && command[1] == 'A') {
     // :FA#    Focuser Active?
     //            Return: 0 on failure (no focusers)

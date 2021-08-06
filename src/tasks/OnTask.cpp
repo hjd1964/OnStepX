@@ -124,38 +124,42 @@ void Task::setCallback(void (*volatile callback)()) {
 bool Task::poll() {
   if (hardwareTimer) return false;
 
-  if (period > 0 && !running) {
-    unsigned long t;
-    if (period_units == PU_MICROS) t = micros(); else if (period_units == PU_SUB_MICROS) t = micros() * 16; else t = millis();
+  if (!running) {
+    if (period > 0) {
 
-    unsigned long time_to_next_task = next_task_time - t;
-    if ((long)time_to_next_task < 0) {
-      last_task_time = t;
-      running = true;
+      unsigned long t;
+      if (period_units == PU_MICROS) t = micros(); else if (period_units == PU_SUB_MICROS) t = micros() * 16; else t = millis();
+      if (idle) { idle = false; next_task_time = t + period; }
 
-      TASKS_PROFILER_PREFIX;
-      callback();
-      TASKS_PROFILER_SUFFIX;
-    
-      running = false;
+      unsigned long time_to_next_task = next_task_time - t;
+      if ((long)time_to_next_task <= 0) {
+        last_task_time = t;
+        running = true;
 
-      if (__task_postpone) { __task_postpone = false; return false; }
+        TASKS_PROFILER_PREFIX;
+        callback();
+        TASKS_PROFILER_SUFFIX;
+      
+        running = false;
 
-      // adopt next period
-      if (next_period_units != PU_NONE) {
-        time_to_next_task = 0;
-        period = next_period;
-        period_units = next_period_units;
-        next_period_units = PU_NONE;
+        if (__task_postpone) { __task_postpone = false; return false; }
+
+        // adopt next period
+        if (next_period_units != PU_NONE) {
+          time_to_next_task = 0;
+          period = next_period;
+          period_units = next_period_units;
+          next_period_units = PU_NONE;
+        }
+
+        // set adjusted period
+        #ifndef TASKS_QUEUE_MISSED
+          if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
+        #endif
+        next_task_time = last_task_time + (long)(period + time_to_next_task);
+        if (!repeat) period = 0;
       }
-
-      // set adjusted period
-      #ifndef TASKS_QUEUE_MISSED
-        if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
-      #endif
-      next_task_time = last_task_time + (long)(period + time_to_next_task);
-      if (!repeat) period = 0;
-    }
+    } else idle = true;
   }
   return false;
 }

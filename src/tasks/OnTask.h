@@ -132,6 +132,7 @@ class Task {
     unsigned long          duration          = 0;
     bool                   repeat            = false;
     uint8_t                priority          = 0;
+    bool                   idle              = true;
     bool                   running           = false;
     PeriodUnits            period_units      = PU_MILLIS;
     PeriodUnits            next_period_units = PU_NONE;
