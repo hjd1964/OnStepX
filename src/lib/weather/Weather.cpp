@@ -8,6 +8,8 @@
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
 
+extern bool xBusy;
+
 #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI
   #include <Adafruit_BME280.h>          // https://github.com/adafruit/Adafruit_BME280_Library/tree/156a0537d6b21aaab1d1f104a7001a38ca1ffce3
                                         // and https://github.com/adafruit/Adafruit_Sensor
@@ -80,7 +82,7 @@ bool Weather::init() {
 // poll the weather sensor once every 5 seconds
 void Weather::poll() {
   #if WEATHER != OFF
-    if (success && !disable) {
+    if (success && !xBusy) {
       temperature = bmx.readTemperature();
       tasks.yield(1000);
       pressure = bmx.readPressure()/100.0;

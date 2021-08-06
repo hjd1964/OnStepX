@@ -2,7 +2,7 @@
 // OnStepX rotator control
 
 #include "../../lib/convert/Convert.h"
-#include "../Telescope.h"
+#include "../mount/Mount.h"
 #include "Rotator.h"
 
 #if AXIS3_DRIVER_MODEL != OFF
@@ -12,6 +12,28 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
 
   // process any rotator axis commands
   if (axis.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+
+  if (command[0] == 'h') {
+    // :hP#       Moves rotator to the park position
+    //            Return: 0 on failure
+    //                    1 on success
+    if (command[1] == 'P' && parameter[0] == 0) {
+      CommandError e = CE_NONE;
+      park();
+      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      return false;
+    } else 
+
+    // :hR#       Restore parked rotator to operation
+    //            Return: 0 on failure
+    //                    1 on success
+    if (command[1] == 'R' && parameter[0] == 0) {
+      CommandError e = CE_NONE;
+      unpark();
+      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      return false;
+    } else return false;
+  } else
 
   // :rA#    rotator Active?
   //            Return: 0 on failure (no rotator)
@@ -26,7 +48,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rT#       Get rotator sTatus
     //            Returns: M# (for moving) or S# (for stopped)
     if (command[1] == 'T') {
-      if (axis.autoSlewActive()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axis.isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
       *numericReply = false;
     } else
 
@@ -182,7 +204,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'P') {
       #ifdef MOUNT_PRESENT
-        Coordinate current = telescope.mount.getPosition();
+        Coordinate current = mount.getPosition();
         axis.setTargetCoordinateSteps(parallacticAngle(&current));
         axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
         axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);

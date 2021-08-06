@@ -34,8 +34,6 @@ class Weather {
     // get dew point in deg. C
     // accurate to +/- 1 deg. C for RH above 50%
     float getDewPoint();
-    
-    bool disable = false;
 
   private:
     WeatherSensor weatherSensor = WS_NONE;

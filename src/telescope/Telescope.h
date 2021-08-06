@@ -4,11 +4,6 @@
 
 #include "../Common.h"
 #include "../commands/ProcessCmds.h"
-#include "../lib/weather/Weather.h"
-#include "mount/Mount.h"
-#include "focuser/Focuser.h"
-#include "rotator/Rotator.h"
-#include "auxiliary/Features.h"
 
 typedef struct InitError {
   uint8_t nv:1;       // NV data size/structure error (disables writes to NV)
@@ -47,22 +42,10 @@ class Telescope {
 
     void statusInit();
 
-    // equipment
-    #ifdef MOUNT_PRESENT
-      Mount mount;
-    #endif
-    #ifdef ROTATOR_PRESENT
-      Rotator rotator;
-    #endif
-    #ifdef FOCUSER_PRESENT
-      Focuser focuser;
-    #endif
-    #ifdef FEATURES_PRESENT
-      Features features;
-    #endif
-
   private:
     Firmware firmware;
 };
 
+extern bool validKey; // true if the NV key matches the Telescope key value
+extern bool xBusy;    // true during timing sensitive operations (for disabling I2C etc.)
 extern Telescope telescope;

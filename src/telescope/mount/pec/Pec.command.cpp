@@ -1,15 +1,15 @@
 //--------------------------------------------------------------------------------------------------
 // telescope mount control, commands
 
-#include "Mount.h"
+#include "Pec.h"
 
 #ifdef MOUNT_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../../tasks/OnTask.h"
 extern Tasks tasks;
-#include "site/Site.h"
+#include "../site/Site.h"
 
-bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Pec::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
   *commandError = CE_NONE;
 
@@ -18,7 +18,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       // :GX91#     Get PEC analog value
       //            Returns: n#
       if (parameter[0] == '9' && parameter[1] == '1') {
-        sprintf(reply, "%d", pecAnalogValue);
+        sprintf(reply, "%d", 0);
         *numericReply = false;
       } else
     #endif
@@ -26,23 +26,23 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     // :GXE6#     Get pec worm rotation steps (from NV)
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '6') {
-      sprintF(reply, "%0.6f", stepsPerSiderealSecondAxis1);
+      sprintF(reply, "%0.6f", stepsPerSiderealSecond);
       *numericReply = false;
     } else
 
     // :GXE7#     Get pec worm rotation steps (from NV)
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '7') {
-      Pec tempPec;
-      nv.readBytes(NV_MOUNT_PEC_BASE, &tempPec, PecSize);
-      sprintf(reply, "%ld", tempPec.wormRotationSteps);
+      PecSettings temp;
+      nv.readBytes(NV_MOUNT_PEC_BASE, &temp, sizeof(PecSettings));
+      sprintf(reply, "%ld", temp.wormRotationSteps);
       *numericReply = false;
     } else
 
     // :GXE8#     Get pec buffer size in seconds
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '8') {
-      sprintf(reply,"%ld",pecBufferSize);
+      sprintf(reply, "%ld", bufferSize);
       *numericReply = false;
     } else return false;
   } else
@@ -55,9 +55,9 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
       long l = atol(&parameter[3]);
       if (l >= 0 && l < 129600000) {
-        Pec tempPec = pec;
-        tempPec.wormRotationSteps = l;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &tempPec, PecSize);
+        PecSettings temp = settings;
+        temp.wormRotationSteps = l;
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &temp, sizeof(PecSettings));
       } else *commandError = CE_PARAM_RANGE;
     } else
   #endif
@@ -68,7 +68,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       //  :VH#      PEC index sense position in sidereal seconds
       //            Returns: n#
       if (command[1] == 'H' && parameter[0] == 0) {
-        long s = lroundf(wormSenseSteps/stepsPerSiderealSecondAxis1);
+        long s = lroundf(wormSenseSteps/stepsPerSiderealSecond);
         while (s > wormRotationSeconds) s -= wormRotationSeconds;
         while (s < 0) s += wormRotationSeconds;
         sprintf(reply,"%05ld",s);
@@ -82,17 +82,17 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       if (command[1] == 'R') {
         int16_t i, j;
         bool conv_result = true;
-        if (parameter[0] == 0) i = pecBufferIndex; else conv_result = convert.atoi2(parameter, &i);
+        if (parameter[0] == 0) i = bufferIndex; else conv_result = convert.atoi2(parameter, &i);
         if (conv_result) {
-          if (i >= 0 && i < pecBufferSize) {
+          if (i >= 0 && i < bufferSize) {
             if (parameter[0] == 0) {
               i -= 1;
               if (i < 0) i += wormRotationSeconds;
               if (i >= wormRotationSeconds) i -= wormRotationSeconds;
-              j = pecBuffer[i];
+              j = buffer[i];
               sprintf(reply,"%+04i,%03i", j, i);
             } else {
-              j = pecBuffer[i];
+              j = buffer[i];
               sprintf(reply,"%+04i", j);
             }
           } else *commandError = CE_PARAM_RANGE;
@@ -106,12 +106,12 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       if (command[1] == 'r') {
         int16_t i, j;
         if (convert.atoi2(parameter, &i)) {
-          if (i >= 0 && i < pecBufferSize) {
+          if (i >= 0 && i < bufferSize) {
             j = 0;
             uint8_t b;
             char s[3] = "  ";
             for (j = 0; j < 10; j++) {
-              if (i + j < pecBufferSize) b = (int)pecBuffer[i + j] + 128; else b = 128;
+              if (i + j < bufferSize) b = (int)buffer[i + j] + 128; else b = 128;
               sprintf(s, "%02X", b);
               strcat(reply, s);
             }
@@ -124,7 +124,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     // :VS#       Get PEC number of steps per sidereal second of worm rotation
     //            Returns: n.n#
     if (command[1] == 'S' && parameter[0] == 0) {
-      sprintF(reply, "%0.6f", stepsPerSiderealSecondAxis1);
+      sprintF(reply, "%0.6f", stepsPerSiderealSecond);
       *numericReply = false;
     } else
 
@@ -133,7 +133,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
     if (command[1] == 'W' && parameter[0] == 0) {
       long steps = 0;
       #if AXIS1_PEC == ON
-        steps = pec.wormRotationSteps;
+        steps = settings.wormRotationSteps;
       #endif
       sprintf(reply, "%06ld", steps);
       *numericReply = false;
@@ -147,18 +147,18 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       //            Return: 0 on failure
       //                    1 on success
       if (command[1] == 'R' && parameter[0] == '+' && parameter[1] == 0) {
-        int8_t i = pecBuffer[wormRotationSeconds - 1];
-        memmove(&pecBuffer[1], &pecBuffer[0], wormRotationSeconds - 1);
-        pecBuffer[0] = i;
+        int8_t i = buffer[wormRotationSeconds - 1];
+        memmove(&buffer[1], &buffer[0], wormRotationSeconds - 1);
+        buffer[0] = i;
       } else
 
       // :WR-#      Move PEC Table back by one sidereal second
       //            Return: 0 on failure
       //                    1 on success
       if (command[1] == 'R' && parameter[0] == '-' && parameter[1] == 0) {
-        int8_t i = pecBuffer[0];
-        memmove(&pecBuffer[0], &pecBuffer[1], wormRotationSeconds - 1);
-        pecBuffer[wormRotationSeconds - 1] = i;
+        int8_t i = buffer[0];
+        memmove(&buffer[0], &buffer[1], wormRotationSeconds - 1);
+        buffer[wormRotationSeconds - 1] = i;
       } else
 
       // :WR[n,sn]# Write PEC table entry for worm segment [n] (in sidereal seconds)
@@ -171,11 +171,11 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
           parameter2[0] = 0;
           parameter2++;
           if (convert.atoi2(parameter, &i)) {
-            if (i >= 0 && i < pecBufferSize) {
+            if (i >= 0 && i < bufferSize) {
               if (convert.atoi2(parameter2, &j)) {
                 if (j >= -128 && j <= 127) {
-                  pecBuffer[i] = j;
-                  pec.recorded = true;
+                  buffer[i] = j;
+                  settings.recorded = true;
                 } else *commandError = CE_PARAM_RANGE;
               } else *commandError = CE_PARAM_FORM;
             } else *commandError = CE_PARAM_RANGE;
@@ -194,37 +194,37 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       // :$QZ+#     Enable RA PEC compensation 
       //            Returns: nothing
       if (parameter[1] == '+') {
-        if (pec.state == PEC_NONE && pec.recorded) pec.state = PEC_READY_PLAY; else *commandError = CE_0;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
+        if (settings.state == PEC_NONE && settings.recorded) settings.state = PEC_READY_PLAY; else *commandError = CE_0;
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
       } else
       // :$QZ-#     Disable RA PEC Compensation
       //            Returns: nothing
       if (parameter[1] == '-') {
-        pec.state = PEC_NONE;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
+        settings.state = PEC_NONE;
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
       } else
       // :$QZ/#     Ready Record PEC
       //            Returns: nothing
       if (parameter[1] == '/') {
-        if (pec.state == PEC_NONE && trackingState == TS_SIDEREAL) {
-          pec.state = PEC_READY_RECORD;
-          nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
+        if (settings.state == PEC_NONE && mount.isTracking()) {
+          settings.state = PEC_READY_RECORD;
+          nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
         } else *commandError = CE_0;
       } else
       // :$QZZ#     Clear the PEC data buffer
       //            Return: Nothing
       if (parameter[1] == 'Z') {
-        for (int i = 0; i < pecBufferSize; i++) pecBuffer[i] = 0;
-        pec.state = PEC_NONE;
-        pec.recorded = false;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
+        for (int i = 0; i < bufferSize; i++) buffer[i] = 0;
+        settings.state = PEC_NONE;
+        settings.recorded = false;
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
       } else
       // :$QZ!#     Write PEC data to NV
       //            Returns: nothing
       if (parameter[1] == '!') {
-        pec.recorded = true;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &pec, PecSize);
-        for (int i = 0; i < pecBufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, pecBuffer[i]);
+        settings.recorded = true;
+        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+        for (int i = 0; i < bufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, buffer[i]);
       } else
     #endif
     // :$QZ?#     Get PEC status
@@ -234,7 +234,7 @@ bool Mount::commandPec(char *reply, char *command, char *parameter, bool *supres
       const char *pecStateStr = "IpPrR";
       uint8_t state = 0;
       #if AXIS1_PEC == ON
-        state = pec.state;
+        state = settings.state;
       #endif
       reply[0] = pecStateStr[state]; reply[1] = 0; reply[2] = 0;
       #if AXIS1_PEC == ON

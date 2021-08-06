@@ -11,9 +11,9 @@ extern Tasks tasks;
 #include "../../lib/weather/Weather.h"
 #include "../../telescope/Telescope.h"
 
-void featuresPollWrapper() { telescope.features.poll(); }
+void featuresPollWrapper() { features.poll(); }
 
-void Features::init(bool validKey) {
+void Features::init() {
   for (int i = 0; i < 8; i++) {
     if (device[i].pin == AUX) device[i].pin = auxPins[i];
 
@@ -66,5 +66,7 @@ void Features::poll() {
     }
   }
 }
+
+Features features;
 
 #endif

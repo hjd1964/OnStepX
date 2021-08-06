@@ -7,10 +7,11 @@
 //
 #pragma once
 
-#include <Arduino.h>
 #include "../../../Common.h"
 
 #ifdef MOUNT_PRESENT
+
+#include "../../../commands/ProcessCmds.h"
 
 #if defined(ALIGN_MAX_STARS) && ALIGN_MAX_STARS != AUTO
   #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
@@ -24,8 +25,6 @@
     #define ALIGN_MAX_NUM_STARS 6
   #endif
 #endif
-
-#include "../../../commands/ProcessCmds.h"
 
 enum PierSide: uint8_t {PIER_SIDE_NONE, PIER_SIDE_EAST, PIER_SIDE_WEST};
 

@@ -5,6 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../../../lib/weather/Weather.h"
 #include "../../Telescope.h"
 
 extern volatile unsigned long centisecondLAST;
@@ -17,7 +18,7 @@ extern volatile unsigned long centisecondLAST;
   }
 #endif
 
-void Transform::init(bool validKey) {
+void Transform::init() {
   if (!validKey) {
     nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
   }
@@ -38,7 +39,7 @@ void Transform::init(bool validKey) {
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  site.init(validKey);
+  if (transform.mountType == GEM) meridianFlips = true; else meridianFlips = false;
 
   #if ALIGN_MAX_NUM_STARS > 1  
     align.init(site.location.latitude, mountType);
@@ -261,5 +262,7 @@ double Transform::backInRads2(double angle) {
   while (angle < -Deg180) angle += Deg360;
   return angle;
 }
+
+Transform transform;
 
 #endif

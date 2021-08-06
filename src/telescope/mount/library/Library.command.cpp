@@ -3,9 +3,10 @@
 
 #include "Library.h"
 
-#ifdef MOUNT_PRESENT
+#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
-#include "../../Telescope.h"
+#include "../coordinates/Transform.h"
+#include "../goto/Goto.h"
 
 char const *ObjectStr[] = {"UNK", "OC", "GC", "PN", "DN", "SG", "EG", "IG", "KNT", "SNR", "GAL", "CN", "STR", "PLA", "CMT", "AST"};
 
@@ -40,7 +41,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        telescope.mount.setTarget(&target);
+        goTo.setTarget(&target);
 
         char const *objType = ObjectStr[i];
         strcat(reply, ",");
@@ -54,8 +55,8 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        telescope.mount.setTarget(&target);
-        *commandError = telescope.mount.requestGoto();
+        goTo.setTarget(&target);
+        *commandError = goTo.request();
         *numericReply = false;
       } else 
 
@@ -65,7 +66,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        telescope.mount.setTarget(&target);
+        goTo.setTarget(&target);
 
         char const * objType = ObjectStr[i];
         char ws[20];
@@ -117,7 +118,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
           for (l = 0; l <= 15; l++) { if (strcmp(objType, ObjectStr[l]) == 0) i = l; }
         }
 
-        Coordinate target = telescope.mount.getTarget();
+        Coordinate target = goTo.getTarget();
         if (firstFreeRec()) writeVars(name, i, target.r, target.d); else *commandError = CE_LIBRARY_FULL;
       } else 
 

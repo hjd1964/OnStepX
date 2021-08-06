@@ -18,7 +18,7 @@
 class Transform {
   public:
     // setup for coordinate transformation
-    void init(bool validKey);
+    void init();
 
     #if DEBUG != OFF
       // prints a coordinate to the debug serial port
@@ -76,7 +76,8 @@ class Transform {
       GeoAlign align;
     #endif
     int8_t mountType = MOUNT_TYPE;
-
+    bool meridianFlips;
+ 
   private:
 
     float cotf(float n);
@@ -86,5 +87,7 @@ class Transform {
     // adjust coordinate back into -180 to 180 "degrees" range (in radians)
     double backInRads2(double angle);
 };
+
+extern Transform transform;
 
 #endif

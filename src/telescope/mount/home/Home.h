@@ -1,0 +1,36 @@
+//--------------------------------------------------------------------------------------------------
+// telescope mount home control
+#pragma once
+
+#include "../../../Common.h"
+
+#ifdef MOUNT_PRESENT
+
+#include "../../../commands/ProcessCmds.h"
+#include "../coordinates/Transform.h"
+
+class Home {
+  public:
+    // init the home position (according to settings and mount type)
+    void init();
+
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+
+    // move mount to the home position
+    CommandError request();
+
+    // reset mount at home
+    CommandError reset(bool resetPark = false);
+
+    // at the home (default startup) position
+    inline bool isHome() { return atHome; }
+
+    Coordinate position;
+
+  private:
+    bool atHome = true;
+};
+
+extern Home home;
+
+#endif

@@ -4,7 +4,7 @@
 
 #include "../../../Common.h"
 
-#ifdef MOUNT_PRESENT
+#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
 #include "../../../lib/convert/Convert.h"
 #include "../../../commands/ProcessCmds.h"
@@ -33,66 +33,84 @@ typedef union {
 class Library
 {
   public:
-    void init(bool validKey);
+    void init();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // select catalog by number
+    // select catalog by number (0 to 14)
     bool setCatalog(int num);
 
-    // 16 byte record
-    libRec_t list;
-    
-    // write record at the next available positon from data
-    // RA and Dec are in radians
+    // write current record from data
+    // \param name: object name (to 12 chars)
+    // \param code: object classification (0 to 15)
+    // \param RA: in radians
+    // \param Dec: in radians
     void writeVars(char* name, int code, double RA, double Dec);
-    // read record at the current position
-    // RA and Dec are in radians
+
+    // read data for the current record
+    // \param name: object name (to 12 chars)
+    // \param code: object classification (0 to 15)
+    // \param RA: in radians
+    // \param Dec: in radians
     void readVars(char* name, int* code, double* RA, double* Dec);
 
     // move to catalogs first rec
     bool firstRec();
+
     // move to the catalog name rec
     bool nameRec();
-    // move to first unused record for this catalog
+
+    // move to the first unused record for this catalog
     bool firstFreeRec();
-    // read the previous record, if it exists
+
+    // move to the previous record, if it exists
     bool prevRec();
-    // read the next record, if it exists
+
+    // move to the next record, if it exists
     bool nextRec();
-    // read the specified record (of this catalog), if it exists
+
+    // move to the specified record (of this catalog), if it exists
     bool gotoRec(long num);
 
-    // clears this record
-    void clearCurrentRec(); 
-    // clears this library
-    void clearLib();    
-    // clears all libraries    
-    void clearAll();        
-
     // actual number of records for this catalog
-    long recCount(); 
-    // number records available for this catalog       
-    long recFree();   
-    // actual number of records for this library      
+    long recCount();
+
+    // actual number of records for this library
     long recCountAll();
-    // number records available for this library     
-    long recFreeAll();   
+
+    // clears this record
+    void clearCurrentRec();
+
+    // clears this library
+    void clearLib();
+
+    // clears all libraries    
+    void clearAll();
+
+    // number records available for this library
+    long recFreeAll();
+
+  private:
     // currently selected record#   
     long recPos;            
+
     // last record#
     long recMax;            
-    
-  private:
+
+    // 16 byte record
+    libRec_t list;
+
     libRec_t readRec(long address);
     void writeRec(long address, libRec_t data);
     void clearRec(long address);
-    inline double degRange(double d) { while (d >= 360.0) d-=360.0; while (d < 0.0)  d+=360.0; return d; }
+    inline double degRange(double d) { while (d >= 360.0) d -= 360.0; while (d < 0.0)  d += 360.0; return d; }
 
     int catalog;
 
     long byteMin;
     long byteMax;
 };
+
+extern Library library;
 
 #endif

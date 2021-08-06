@@ -4,6 +4,9 @@
 
 #if defined(ESP32)
 
+// clue that the direction pins are shared so we can set direction early before each step
+#define SHARED_DIRECTION_PINS
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                4                // ESP8266 RST control, or MISO for Axis1&2, or Axis4 EN support
 #define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA

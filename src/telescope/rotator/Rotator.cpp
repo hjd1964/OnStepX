@@ -7,15 +7,17 @@
 
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
+
 #include "../Telescope.h"
+#include "../mount/Mount.h"
 #include "../mount/site/Site.h"
 
 #ifdef MOUNT_PRESENT
-  void derotateWrapper() { telescope.rotator.derotatePoll(); }
+  void derotateWrapper() { rotator.poll(); }
 #endif
 
 // initialize rotator
-void Rotator::init(bool validKey) {
+void Rotator::init() {
 
   // wait a moment for any background processing that may be needed
   delay(1000);
@@ -28,7 +30,7 @@ void Rotator::init(bool validKey) {
   readSettings();
 
   VL("MSG: Rotator, init (Axis3)");
-  axis.init(3, false, validKey);
+  axis.init(3, false);
   axis.resetPositionSteps(0);
   axis.setBacklashSteps(backlash);
   axis.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
@@ -37,10 +39,14 @@ void Rotator::init(bool validKey) {
   axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
   if (AXIS3_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
+  axis.enable(true);
+
   #ifdef MOUNT_PRESENT
-    // start task for derotation
-    VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
-    if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+    if (transform.mountType == ALTAZM) {
+      // start task for derotation
+      VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
+      if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+    }
   #endif
 }
 
@@ -61,30 +67,16 @@ bool Rotator::setBacklash(int value) {
 // enable or disable the derotator
 void Rotator::setDerotatorEnabled(bool value) {
   #ifdef MOUNT_PRESENT
-    if (telescope.mount.transform.mountType != ALTAZM) return;
-    derotatorEnabled = value;
-    if (!derotatorEnabled) axis.setFrequencyBase(0.0F);
+    if (transform.mountType == ALTAZM) {
+      derotatorEnabled = value;
+      if (!derotatorEnabled) axis.setFrequencyBase(0.0F);
+    }
   #else
     value = value;
   #endif
 }
 
 #ifdef MOUNT_PRESENT
-  // poll to set the derotator rate
-  void Rotator::derotatePoll() {
-    if (derotatorEnabled) {
-      float pr = 0.0F;
-      #ifdef MOUNT_PRESENT
-      if (!axis.autoSlewActive()) {
-        Coordinate current = telescope.mount.getPosition();
-        pr = parallacticRate(&current);
-        if (derotatorReverse) pr = -pr;
-      }
-      #endif
-      axis.setFrequencyBase(pr);
-    }
-  }
-
   // returns parallactic angle in degrees
   double Rotator::parallacticAngle(Coordinate *coord) {
     return radToDeg(atan2(sin(coord->h), cos(coord->d)*tan(site.location.latitude) - sin(coord->d)*cos(coord->h)));
@@ -105,15 +97,65 @@ void Rotator::setDerotatorEnabled(bool value) {
   }
 #endif
 
+// parks rotator at current position
+void Rotator::park() {
+  setDerotatorEnabled(false);
+  axis.setBacklash(0.0F);
+  float position = axis.getInstrumentCoordinate();
+  axis.setTargetCoordinatePark(position);
+  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+  axis.enable(false);
+  #if DEBUG == VERBOSE
+    tasks.yield(500);
+    long offset = axis.getInstrumentCoordinateSteps() - axis.getMotorPositionSteps();
+    V("MSG: Rotator, park motor target   "); VL(axis.getTargetCoordinateSteps() - offset);
+    V("MSG: Rotator, park motor position "); VL(axis.getMotorPositionSteps());
+  #endif
+  writeSettings();
+}
+
+// unparks rotator
+void Rotator::unpark() {
+  axis.setBacklash(0.0F);
+  position = axis.getInstrumentCoordinate();
+  axis.setInstrumentCoordinatePark(position);
+  V("MSG: Rotator, unpark motor position "); VL(axis.getMotorPositionSteps());
+  axis.setBacklash(backlash);
+  axis.setTargetCoordinate(position);
+  axis.enable(true);
+  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+}
+
 void Rotator::readSettings() {
   backlash = nv.readUI(NV_ROTATOR_SETTINGS_BASE);
+  position = nv.readF(NV_ROTATOR_SETTINGS_BASE + 2);
 
   if (backlash < 0)     { backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash < 0 steps (set to 0)"); }
   if (backlash > 10000) { backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash > 10000 steps (set to 0)"); }
+
+  if (position < AXIS3_LIMIT_MIN) { position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos < AXIS3_LIMIT_MIN (set to 0.0)"); }
+  if (position > AXIS3_LIMIT_MAX) { position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos > AXIS3_LIMIT_MAX (set to 0.0)"); }
 }
 
 void Rotator::writeSettings() {
   nv.write(NV_ROTATOR_SETTINGS_BASE, backlash);
 }
+
+// poll to set derotator rate
+void Rotator::poll() {
+  if (derotatorEnabled) {
+    float pr = 0.0F;
+    #ifdef MOUNT_PRESENT
+      if (!axis.isSlewing()) {
+        Coordinate current = mount.getPosition();
+        pr = parallacticRate(&current);
+        if (derotatorReverse) pr = -pr;
+      }
+    #endif
+    axis.setFrequencyBase(pr);
+  }
+}
+
+Rotator rotator;
 
 #endif

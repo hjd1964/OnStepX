@@ -57,33 +57,31 @@ typedef struct SiteErrors {
 
 class Site {
   public:
-    // gets date/time/location from NV and/or the various TLS sources
-    void init(bool validKey);
+    void init();
     
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+
     // update/apply the site latitude and longitude, necessary for LAST calculations etc.
     void updateLocation();
+
+    // sets the Julian Date/time (UT1,) and updates sidereal time
+    void setDateTime(JulianDate julianDate);
+
+    // gets the time in sidereal hours
+    double getSiderealTime();
+
+    // sets the sidereal time from the UT date/time
+    void setSiderealTime(JulianDate julianDate);
+
+    // checks if the date and time were set
+    bool isDateTimeReady();
 
     // adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
     // adjust up/down to compensate for MCU oscillator inaccuracy
     void setPeriodSubMicros(unsigned long period);
 
-    // handle date/time commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
-
-    // gets the time in sidereal hours
-    double getSiderealTime();
-
-    // checks if date and time were set
-    bool dateTimeReady();
-
     // callback to tick the centisecond sidereal clock
     void tick();
-
-    // sets the Julian Date/time (UT1,) and updates sidereal time
-    void setDateTime(JulianDate julianDate);
-
-    // sets the sidereal time from the UT date/time
-    void setSiderealTime(JulianDate julianDate);
 
     Location location;
     LocationExtras locationEx;
@@ -91,18 +89,11 @@ class Site {
     SiteErrors error = {false, false};
 
   private:
-
     // gets the time in hours that have passed in this Julian Day
     double getTime();
 
     // sets the time in sidereal hours
     void setLAST(JulianDate julianDate, double time);
-
-    // adjust time (hours) into the 0 to 24 range
-    double backInHours(double time);
-
-    // adjust time (hours) into the -12 to 12 range
-    double backInHourAngle(double time);
 
     // convert julian date/time to local apparent sidereal time
     double julianDateToLAST(JulianDate julianDate);
@@ -110,20 +101,27 @@ class Site {
     // convert julian date/time to greenwich apparent sidereal time
     double julianDateToGAST(JulianDate julianDate);
 
+    // reads the julian date information from NV
+    void readJD(bool validKey);
+
     // reads the location information from NV
     // locationNumber can be 0..3
     void readLocation(uint8_t locationNumber, bool validKey);
 
-    // reads the julian date information from NV
-    void readJD(bool validKey);
-
     // sets the site altitude in meters
     bool setElevation(float e);
-    
+
+    // adjust time (hours) into the 0 to 24 range
+    double backInHours(double time);
+
+    // adjust time (hours) into the -12 to 12 range
+    double backInHourAngle(double time);
+
     // convert string in format MM/DD/YY to julian date
     GregorianDate strToDate(char *ymd);
 
-    JulianDate ut1; // the current UT1 date and time
+    // the current UT1 date and time
+    JulianDate ut1;
     double centisecondHOUR = 0;
     unsigned long centisecondSTART = 0;
 

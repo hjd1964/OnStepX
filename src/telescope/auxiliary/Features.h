@@ -24,27 +24,11 @@ typedef struct Device {
 
 class Features {
   public:
-    // initialize the auxiliary feature devices
-    void init(bool validKey);
+    void init();
 
-    // scan the auxiliary feature devices for service
-    void poll();
-
-    // process auxiliary feature commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // :GXXn#
-    void getCommand(char *parameter, char *reply, bool &boolReply);
- 
-    // :GXYn#
-    void getInfoCommand(char *parameter, char *reply, bool &boolReply);
-
-    // :SXX[n],V[Z][S][v]#
-    // for example :SXX1,V1#  :SXX1,Z0.5#
-    void setCommand(char *parameter);
-
-    // work-around for Mega2560 64 bit conditional comparison bug ((feature[i].pin & DS_MASK) == DS2413)
-    bool isDS2413(int64_t v);
+    void poll();
  
   private:
     int16_t auxPins[8] = { AUX1_PIN, AUX2_PIN, AUX3_PIN, AUX4_PIN, AUX5_PIN, AUX6_PIN, AUX7_PIN, AUX8_PIN };
@@ -59,5 +43,7 @@ class Features {
       { FEATURE8_NAME, FEATURE8_PURPOSE, FEATURE8_TEMP, FEATURE8_PIN, FEATURE8_DEFAULT_VALUE, FEATURE8_ACTIVE_STATE, NULL, NULL }
     };
 };
+
+extern Features features;
 
 #endif

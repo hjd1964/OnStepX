@@ -1,25 +1,30 @@
 // ---------------------------------------------------------------------------------------------------
 // Guide, commands to move the mount in any direction at a series of fixed rates
 
-#include "Mount.h"
+#include "St4.h"
 
 #ifdef MOUNT_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../../tasks/OnTask.h"
 extern Tasks tasks;
-#include "../Telescope.h"
+#include "../../Telescope.h"
+
+#include "../Mount.h"
+#include "../guide/Guide.h"
+#include "../goto/Goto.h"
+#include "../status/Status.h"
 
 #if ST4_INTERFACE == ON
-  #include "../../lib/pushButton/PushButton.h"
+  #include "../../../lib/pushButton/PushButton.h"
 
   #if ST4_HAND_CONTROL == ON
-    #include "../../lib/serial/Serial_ST4_Master.h"
+    #include "../../../lib/serial/Serial_ST4_Master.h"
     #define debounceMs 100L
   #else
     #define debounceMs 5L
   #endif
 
-  #include "../../lib/serial/Serial_Local.h"
+  #include "../../../lib/serial/Serial_Local.h"
 
   Button st4Axis1Rev(ST4_RA_E_PIN, ST4_INTERFACE_INIT, LOW | HYST(debounceMs));
   Button st4Axis1Fwd(ST4_RA_W_PIN, ST4_INTERFACE_INIT, LOW | HYST(debounceMs));
@@ -36,26 +41,25 @@ extern Tasks tasks;
   #define ccQn 20
   #define ccQs 21
 
-  void mountSt4MonitorWrapper() {
-    telescope.mount.st4Poll();
+  void st4Wrapper() {
+    st4.poll();
   }
 
-  // initialize guiding
-  void Mount::st4Init() {
-    // start st4 monitor task
+  void St4::init() {
     #ifdef HAL_SLOW_PROCESSOR
-      VF("MSG: Mount, start ST4 monitor task (rate 10ms priority 2)... ");
-      if (tasks.add(10, 0, true, 2, mountSt4MonitorWrapper, "St4Mntr")) { VL("success"); } else { VL("FAILED!"); }
+      VF("MSG: Mount, ST4 start monitor task (rate 10ms priority 2)... ");
+      if (tasks.add(10, 0, true, 2, st4Wrapper, "St4Mntr")) { VL("success"); } else { VL("FAILED!"); }
     #else
-      VF("MSG: Mount, start ST4 monitor task (rate 1.5ms priority 2)... ");
-      uint8_t handle = tasks.add(0, 0, true, 2, mountSt4MonitorWrapper, "St4Mntr");
+      VF("MSG: Mount, ST4 start monitor task (rate 1.5ms priority 2)... ");
+      uint8_t handle = tasks.add(0, 0, true, 2, st4Wrapper, "St4Mntr");
       if (handle) { VL("success"); } else { VL("FAILED!"); }
       tasks.setPeriodMicros(handle, 1500);
     #endif
   }
 
-  // handle the ST4 interface and hand controller features
-  void Mount::st4Poll() {
+  // monitor ST4 port for guiding, basic hand controller, and smart hand controller
+  void St4::poll() {
+
     st4Axis1Rev.poll();
     static bool shcActive = false;
     if (!shcActive) {
@@ -81,12 +85,12 @@ extern Tasks tasks;
           // Smart Hand Controller active
           char c = serialST4.poll();
           // process any single byte guide commands
-          if (c == ccMe) guideStartAxis1(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMw) guideStartAxis1(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMn) guideStartAxis2(GA_FORWARD, guideRateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMs) guideStartAxis2(GA_REVERSE, guideRateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccQe || c == ccQw) guideStopAxis1(GA_BREAK);
-          if (c == ccQn || c == ccQs) guideStopAxis2(GA_BREAK);
+          if (c == ccMe) guide.startAxis1(GA_REVERSE, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMw) guide.startAxis1(GA_FORWARD, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMn) guide.startAxis2(GA_FORWARD, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMs) guide.startAxis2(GA_REVERSE, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccQe || c == ccQw) guide.stopAxis1(GA_BREAK);
+          if (c == ccQn || c == ccQs) guide.stopAxis2(GA_BREAK);
           return;
         }
       } else {
@@ -103,24 +107,26 @@ extern Tasks tasks;
 
       // standard hand control
       const long Shed_ms = 4000;
-      const long AltMode_ms = 2000;
 
       // stop any guide that might be triggered by combination button presses
-      if (st4Axis1Rev.isDown() && st4Axis1Fwd.isDown()) guideStopAxis1(GA_BREAK);
-      if (st4Axis2Fwd.isDown() && st4Axis2Rev.isDown()) guideStopAxis2(GA_BREAK);
+      if (st4Axis1Rev.isDown() && st4Axis1Fwd.isDown()) guide.stopAxis1(GA_BREAK);
+      if (st4Axis2Fwd.isDown() && st4Axis2Rev.isDown()) guide.stopAxis2(GA_BREAK);
   
       // see if a combination was down for long enough for an alternate mode
       static bool altModeA = false;
       static bool altModeB = false;
 
-      if (gotoState != GS_NONE && !meridianFlipHome.paused) {
-        if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
-          if (!altModeA) { altModeA = true; sound.beep(); }
+      #if SLEW_GOTO == ON
+        const long AltMode_ms = 2000;
+        if (goTo.state != GS_NONE && !goTo.isHomePaused()) {
+          if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
+            if (!altModeA) { altModeA = true; status.sound.beep(); }
+          }
+          if (st4Axis2Fwd.timeDown() > AltMode_ms && st4Axis2Rev.timeDown() > AltMode_ms && !altModeA) {
+            if (!altModeB) { altModeB = true; status.sound.beep(); }
+          }
         }
-        if (st4Axis2Fwd.timeDown() > AltMode_ms && st4Axis2Rev.timeDown() > AltMode_ms && !altModeA) {
-          if (!altModeB) { altModeB = true; sound.beep(); }
-        }
-      }
+      #endif
   
       // if the alternate mode is allowed & selected & hasn't timed out, handle it
       if ( (altModeA || altModeB) && (st4Axis2Fwd.timeUp() < Shed_ms || st4Axis2Rev.timeUp() < Shed_ms || st4Axis1Rev.timeUp() < Shed_ms || st4Axis1Fwd.timeUp() < Shed_ms) ) {
@@ -129,33 +135,42 @@ extern Tasks tasks;
         //if (!cmdWaiting())
         {
           if (altModeA) {
-            int r = (int)guideRateSelect;
+            int r = (int)guide.settings.rateSelect;
             if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
-              if (gotoState == GS_NONE) SERIAL_LOCAL.transmit(":B+#"); else { if (r >= 7) r=8; else if (r >= 5) r=7; else if (r >= 2) r=5; else if (r < 2) r=2; }
-              sound.click();
+              #if SLEW_GOTO == ON
+                if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B+#"); else { if (r >= 7) r=8; else if (r >= 5) r=7; else if (r >= 2) r=5; else if (r < 2) r=2; }
+              #else
+                SERIAL_LOCAL.transmit(":B+#");
+              #endif
+              status.sound.click();
             }
             if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
-              if (gotoState == GS_NONE) SERIAL_LOCAL.transmit(":B-#"); else { if (r <= 5) r=2; else if (r <= 7) r=5; else if (r <= 8) r=7; else if (r > 8) r=8; }
-              sound.click();
+              #if SLEW_GOTO == ON
+                if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B-#"); else { if (r <= 5) r=2; else if (r <= 7) r=5; else if (r <= 8) r=7; else if (r > 8) r=8; }
+              #else
+                SERIAL_LOCAL.transmit(":B-#");
+              #endif
+              status.sound.click();
             }
             if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
-              if (alignState.lastStar > 0 && alignState.currentStar > alignState.lastStar) SERIAL_LOCAL.transmit(":CS#"); else alignAddStar();
-              sound.click();
+              #if SLEW_GOTO == ON
+                if (goTo.isAlignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
+              #else
+                SERIAL_LOCAL.transmit(":CS#");
+              #endif
+              status.sound.click();
             }
-            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) {
-              if (trackingState == TS_SIDEREAL) { setTrackingState(TS_NONE); sound.click(); } else
-              if (trackingState == TS_NONE) { setTrackingState(TS_SIDEREAL); sound.click(); }
-            }
-            guideRateSelect = (GuideRateSelect)r;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && guideRateSelect <= GR_1X) misc.pulseGuideRateSelect = guideRateSelect;
+            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); status.sound.click(); }
+            guide.settings.rateSelect = (GuideRateSelect)r;
+            if (SEPARATE_PULSE_GUIDE_RATE == ON && guide.settings.rateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.rateSelect;
           }
           if (altModeB) {
             #if ST4_HAND_CONTROL_FOCUSER == ON
               static int fs = 0;
               static int fn = 0;
               if (!fn && !fs) {
-                if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); sound.click(); }
-                if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); sound.click(); }
+                if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); status.sound.click(); }
+                if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); status.sound.click(); }
               }
               if (!fn) {
                 if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) {
@@ -190,11 +205,11 @@ extern Tasks tasks;
           #endif
           altModeA = false;
           altModeB = false;
-          sound.beep();
+          status.sound.beep();
         }
     #endif
 
-    if (axis1.isEnabled()) {
+    if (mount.axis1.isEnabled()) {
       // guide E/W
       GuideAction st4GuideActionAxis1 = GA_BREAK;
       static GuideAction lastSt4GuideActionAxis1 = GA_BREAK;
@@ -204,16 +219,16 @@ extern Tasks tasks;
       if (st4GuideActionAxis1 != lastSt4GuideActionAxis1) {
         lastSt4GuideActionAxis1 = st4GuideActionAxis1;
         if (st4GuideActionAxis1 != GA_BREAK) {
-          #if ST4_HAND_CONTROL == ON
-            if (meridianFlipHome.paused) meridianFlipHome.resume = true; else
-            if (gotoState == GS_GOTO) gotoStop(); else
+          #if ST4_HAND_CONTROL == ON && SLEW_GOTO == ON
+            if (goTo.isHomePaused()) goTo.homeContinue(); else
+            if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
           {
-            GuideRateSelect rateSelect = guideRateSelect;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = misc.pulseGuideRateSelect;
-            guideStartAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
+            GuideRateSelect rateSelect = guide.settings.rateSelect;
+            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
+            guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
-        } else guideStopAxis1(GA_BREAK);
+        } else guide.stopAxis1(GA_BREAK);
       }
 
       // guide N/S
@@ -225,16 +240,16 @@ extern Tasks tasks;
       if (st4GuideActionAxis2 != lastSt4GuideActionAxis2) {
         lastSt4GuideActionAxis2 = st4GuideActionAxis2;
         if (st4GuideActionAxis2 != GA_BREAK) {
-          #if ST4_HAND_CONTROL == ON
-            if (meridianFlipHome.paused) meridianFlipHome.resume = true; else
-            if (gotoState == GS_GOTO) gotoStop(); else
+          #if ST4_HAND_CONTROL == ON && SLEW_GOTO == ON
+            if (goTo.isHomePaused()) goTo.homeContinue(); else
+            if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
           {
-            GuideRateSelect rateSelect = guideRateSelect;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = misc.pulseGuideRateSelect;
-            guideStartAxis2(st4GuideActionAxis2, rateSelect, GUIDE_TIME_LIMIT*1000);
+            GuideRateSelect rateSelect = guide.settings.rateSelect;
+            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
+            guide.startAxis2(st4GuideActionAxis2, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
-        } else guideStopAxis2(GA_BREAK);
+        } else guide.stopAxis2(GA_BREAK);
       }
 
     }
@@ -243,5 +258,7 @@ extern Tasks tasks;
     #endif
   }
 #endif
+
+St4 st4;
 
 #endif

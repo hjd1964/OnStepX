@@ -105,7 +105,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FT#       Get status
     //            Returns: M# (for moving) or S# (for stopped)
     if (command[1] == 'T') {
-      if (axis[index]->autoSlewActive()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axis[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
       *numericReply = false;
     } else
 

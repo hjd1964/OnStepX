@@ -8,6 +8,9 @@
 #include "../../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../../Telescope.h"
+#include "../../mount/Mount.h"
+#include "../../rotator/Rotator.h"
+#include "../../focuser/Focuser.h"
 #include "../../../lib/sense/Sense.h"
 
 #ifdef MOUNT_PRESENT
@@ -18,43 +21,43 @@ extern Tasks tasks;
 
 #if AXIS1_DRIVER_MODEL != OFF
   const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_DRIVER_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_DRIVER_ENABLE_STATE };
-  IRAM_ATTR void moveAxis1() { telescope.mount.axis1.motor.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
-  IRAM_ATTR void moveFFAxis1() { telescope.mount.axis1.motor.moveFF(AXIS1_STEP_PIN); }
-  IRAM_ATTR void moveFRAxis1() { telescope.mount.axis1.motor.moveFR(AXIS1_STEP_PIN); }
+  IRAM_ATTR void moveAxis1() { mount.axis1.motor.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void moveFFAxis1() { mount.axis1.motor.moveFF(AXIS1_STEP_PIN); }
+  IRAM_ATTR void moveFRAxis1() { mount.axis1.motor.moveFR(AXIS1_STEP_PIN); }
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
   const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_DRIVER_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_DRIVER_ENABLE_STATE };
-  IRAM_ATTR void moveAxis2() { telescope.mount.axis2.motor.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
-  IRAM_ATTR void moveFFAxis2() { telescope.mount.axis2.motor.moveFF(AXIS2_STEP_PIN); }
-  IRAM_ATTR void moveFRAxis2() { telescope.mount.axis2.motor.moveFR(AXIS2_STEP_PIN); }
+  IRAM_ATTR void moveAxis2() { mount.axis2.motor.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void moveFFAxis2() { mount.axis2.motor.moveFF(AXIS2_STEP_PIN); }
+  IRAM_ATTR void moveFRAxis2() { mount.axis2.motor.moveFR(AXIS2_STEP_PIN); }
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
   const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_DRIVER_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_DRIVER_ENABLE_STATE };
-  inline void moveAxis3() { telescope.rotator.axis.motor.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
+  inline void moveAxis3() { rotator.axis.motor.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
   const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_DRIVER_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_DRIVER_ENABLE_STATE };
-  inline void moveAxis4() { telescope.focuser.axis[0]->motor.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
+  inline void moveAxis4() { focuser.axis[0]->motor.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
   const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_DRIVER_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_DRIVER_ENABLE_STATE };
-  inline void moveAxis5() { telescope.focuser.axis[1]->motor.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
+  inline void moveAxis5() { focuser.axis[1]->motor.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
   const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_DRIVER_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_DRIVER_ENABLE_STATE };
-  inline void moveAxis6() { telescope.focuser.axis[2]->motor.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
+  inline void moveAxis6() { focuser.axis[2]->motor.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
 #if AXIS7_DRIVER_MODEL != OFF
   const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_DRIVER_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_DRIVER_ENABLE_STATE };
-  inline void moveAxis7() { telescope.focuser.axis[3]->motor.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
+  inline void moveAxis7() { focuser.axis[3]->motor.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
 #endif
 #if AXIS8_DRIVER_MODEL != OFF
   const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_DRIVER_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_DRIVER_ENABLE_STATE };
-  inline void moveAxis8() { telescope.focuser.axis[4]->motor.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
+  inline void moveAxis8() { focuser.axis[4]->motor.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
 #endif
 #if AXIS9_DRIVER_MODEL != OFF
   const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_DRIVER_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_DRIVER_ENABLE_STATE };
-  inline void moveAxis9() { telescope.focuser.axis[5]->motor.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
+  inline void moveAxis9() { focuser.axis[5]->motor.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
 #endif
 
 bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t current) {
@@ -120,7 +123,7 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   // init driver advanced modes, etc.
   driver.init(axisNumber, microsteps, current);
   homeSteps = driver.getMicrostepRatio();
-  V(axisPrefix); V("sequencer home every "); V(homeSteps); VL(" step(s)");
+  V(axisPrefix); V("sequencer homes every "); V(homeSteps); VL(" step(s)");
 
   // now disable the driver
   power(false);
@@ -301,7 +304,6 @@ void StepDir::setFrequencySteps(float frequency) {
   if (inBacklash) frequency = backlashFrequency;
 
   if (frequency != lastFrequency || microstepModeControl >= MMC_SLEWING_PAUSE) {
-
     // if slewing has a larger step size divide the frequency to account for it
     float baseFrequency = frequency;
     if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) frequency /= slewStep;
@@ -313,12 +315,13 @@ void StepDir::setFrequencySteps(float frequency) {
     #else
       float period = 1000000.0F/frequency;
     #endif
-
-    if (!isnan(period) && fabs(period) <= 134000000.0F) {
+   
+    // range is 0 to 134 seconds/step
+    if (!isnan(period) && period <= 130000000.0F) {
       // convert microsecond counts to sub-microsecond counts
       period *= 16.0F;
 
-      // adjust period for MCU clock inaccuracy
+      // adjust period for MCU clock inaccuracy (signed 32bit numeric range covers about +/- 3% here)
       period *= (SIDEREAL_PERIOD/periodSubMicros);
 
       // remember the last active period
@@ -426,6 +429,9 @@ bool StepDir::enableMoveFast(const bool fast) {
 
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void StepDir::move(const int8_t stepPin, const int8_t dirPin) {
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { if (direction == DIR_REVERSE) { digitalWriteF(dirPin, dirRev); } else { digitalWriteF(dirPin, dirFwd); } }
+    #endif
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%homeSteps == 0) microstepModeControl = MMC_SLEWING_PAUSE;
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
     if (takeStep) {
@@ -469,6 +475,9 @@ bool StepDir::enableMoveFast(const bool fast) {
   }
 #else
   IRAM_ATTR void StepDir::move(const int8_t stepPin, const int8_t dirPin) {
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { if (direction == DIR_REVERSE) { digitalWriteF(dirPin, dirRev); } else { digitalWriteF(dirPin, dirFwd); } }
+    #endif
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%homeSteps == 0) microstepModeControl = MMC_SLEWING_PAUSE;
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
     digitalWriteF(stepPin, stepClr);

@@ -41,9 +41,9 @@ IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
   }
 #endif
 
-void Site::init(bool validKey) {
+void Site::init() {
   // get location
-  VLF("MSG: Site, get Latitude/Longitude from NV");
+  VLF("MSG: Mount, site get Latitude/Longitude from NV");
   readLocation(number, validKey);
   updateLocation();
 
@@ -55,7 +55,7 @@ void Site::init(bool validKey) {
         tls.get(ut1);
         dateIsReady = true;
         timeIsReady = true;
-        VLF("MSG: Site, get Date/Time from TLS");
+        VLF("MSG: Mount, site get Date/Time from TLS");
       #else
         VLF("MSG: Site, using Date/Time from NV");
         readJD(validKey);
@@ -64,7 +64,7 @@ void Site::init(bool validKey) {
       #endif
     } else {
       DLF("WRN: Site::init(); Warning TLS initialization failed");
-      VLF("WRN: Site, fallback to Date/Time from NV");
+      VLF("WRN: Site::init(); fallback to Date/Time from NV");
       readJD(validKey);
     }
   #else
@@ -74,19 +74,19 @@ void Site::init(bool validKey) {
 
   setSiderealTime(ut1);
 
-  VF("MSG: Site, start centisecond timer task (rate 10ms priority 0)... ");
+  VF("MSG: Mount, site start centisecond timer task (rate 10ms priority 0)... ");
   delay(1000);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (handle) {
     VL("success"); 
-    if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(); Warning didn't get h/w timer for Clock (using s/w timer)"); }
+    if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(); didn't get h/w timer for Clock (using s/w timer)"); }
   } else { VL("FAILED!"); }
 
-  // period = nv.readLong(EE_siderealPeriod);
   setPeriodSubMicros(SIDEREAL_PERIOD);
 }
 
+// update/apply the site latitude and longitude, necessary for LAST calculations etc.
 void Site::updateLocation() {
   locationEx.latitude.cosine = cos(location.latitude);
   locationEx.latitude.sine   = sin(location.latitude);
@@ -98,21 +98,6 @@ void Site::updateLocation() {
   setSiderealTime(ut1);
 }
 
-void Site::setPeriodSubMicros(unsigned long period) {
-  tasks.setPeriodSubMicros(handle, lroundf(period/100.0F));
-  this->period = period;
-  periodSubMicros = period;
-  // nv.writeLong(EE_siderealPeriod, period);
-}
-
-double Site::getTime() {
-  unsigned long cs;
-  noInterrupts();
-  cs = centisecondLAST;
-  interrupts();
-  return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
-}
-
 // sets the Julian Date/time (UT1,) and updates sidereal time
 void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
@@ -121,11 +106,7 @@ void Site::setDateTime(JulianDate julianDate) {
   setSiderealTime(julianDate);
 }
 
-// sets the UT time (in hours) that have passed in this Julian Day
-void Site::setSiderealTime(JulianDate julianDate) {
-  setLAST(julianDate, julianDateToLAST(julianDate));
-}
-
+// gets the time in sidereal hours
 double Site::getSiderealTime() {
   long cs;
   noInterrupts();
@@ -134,6 +115,35 @@ double Site::getSiderealTime() {
   return backInHours(csToHours(cs));
 }
 
+// sets the UT time (in hours) that have passed in this Julian Day
+void Site::setSiderealTime(JulianDate julianDate) {
+  setLAST(julianDate, julianDateToLAST(julianDate));
+}
+
+// checks if the date and time were set
+bool Site::isDateTimeReady() {
+  return dateIsReady && timeIsReady;
+}
+
+// adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
+// adjust up/down to compensate for MCU oscillator inaccuracy
+void Site::setPeriodSubMicros(unsigned long period) {
+  tasks.setPeriodSubMicros(handle, lroundf(period/100.0F));
+  this->period = period;
+  periodSubMicros = period;
+  // nv.writeLong(EE_siderealPeriod, period);
+}
+
+// gets the time in hours that have passed in this Julian Day
+double Site::getTime() {
+  unsigned long cs;
+  noInterrupts();
+  cs = centisecondLAST;
+  interrupts();
+  return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
+}
+
+// sets the time in sidereal hours
 void Site::setLAST(JulianDate julianDate, double time) {
   long cs = lround(hoursToCs(time));
   centisecondHOUR = julianDate.hour;
@@ -143,22 +153,7 @@ void Site::setLAST(JulianDate julianDate, double time) {
   interrupts();
 }
 
-bool Site::dateTimeReady() {
-  return dateIsReady && timeIsReady;
-}
-
-double Site::backInHours(double time) {
-  while (time >= 24.0) time -= 24.0;
-  while (time < 0.0)   time += 24.0;
-  return time;
-}
-
-double Site::backInHourAngle(double time) {
-  while (time >= 12.0) time -= 24.0;
-  while (time < -12.0) time += 24.0;
-  return time;
-}
-
+// convert julian date/time to local apparent sidereal time
 double Site::julianDateToLAST(JulianDate julianDate) {
   // DL("ST 1"); delay(100);
   double gast = julianDateToGAST(julianDate);
@@ -166,6 +161,7 @@ double Site::julianDateToLAST(JulianDate julianDate) {
   return backInHours(gast - radToHrs(location.longitude));
 }
 
+// convert julian date/time to greenwich apparent sidereal time
 double Site::julianDateToGAST(JulianDate julianDate) {
   GregorianDate date;
 
@@ -190,10 +186,26 @@ double Site::julianDateToGAST(JulianDate julianDate) {
   return backInHours(gast);
 }
 
+// reads the julian date information from NV
+void Site::readJD(bool validKey) {
+  if (JulianDateSize < sizeof(ut1)) { initError.nv = true; DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (!validKey) {
+    VLF("MSG: Mount, site writing default date/time to NV");
+    ut1.day = 2451544.5;
+    ut1.hour = 0.0;
+    nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+  }
+  nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
+  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
+}
+
+// reads the location information from NV
+// locationNumber can be 0..3
 void Site::readLocation(uint8_t locationNumber, bool validKey) {
   if (LocationSize < sizeof(Location)) { initError.nv = true; DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
   if (!validKey) {
-    VLF("MSG: Site, writing default sites 0-3 to NV");
+    VLF("MSG: Mount, site writing default sites 0-3 to NV");
     location.latitude = 0.0;
     location.longitude = 0.0;
     location.timezone = 0.0;
@@ -207,22 +219,24 @@ void Site::readLocation(uint8_t locationNumber, bool validKey) {
   if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; initError.value = true; DLF("ERR: Site::readSite,  bad NV timeZone"); }
 }
 
-void Site::readJD(bool validKey) {
-  if (JulianDateSize < sizeof(ut1)) { initError.nv = true; DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  if (!validKey) {
-    VLF("MSG: Site, writing default date/time to NV");
-    ut1.day = 2451544.5;
-    ut1.hour = 0.0;
-    nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  }
-  nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
-  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
-}
-
+// sets the site altitude in meters
 bool Site::setElevation(float e) {
  if (e >= -100.0 && e < 20000.0) location.elevation = e; else return false;
  return true;
+}
+
+// adjust time (hours) into the 0 to 24 range
+double Site::backInHours(double time) {
+  while (time >= 24.0) time -= 24.0;
+  while (time < 0.0)   time += 24.0;
+  return time;
+}
+
+// adjust time (hours) into the -12 to 12 range
+double Site::backInHourAngle(double time) {
+  while (time >= 12.0) time -= 24.0;
+  while (time < -12.0) time += 24.0;
+  return time;
 }
 
 // convert string in format MM/DD/YY to Date

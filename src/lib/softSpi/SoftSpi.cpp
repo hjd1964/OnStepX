@@ -17,7 +17,7 @@ bool SoftSpi::init(int16_t mosi, int16_t sck, int16_t cs, int16_t miso) {
     VF(", MISO="); if (miso == OFF) { VL("OFF"); } else { VL(miso); }
   #endif
 
-  if (cs == OFF || sck == OFF || cs == OFF) return false; else return true;
+  if (mosi == OFF || sck == OFF || cs == OFF) return false; else return true;
 }
 
 void SoftSpi::begin() {

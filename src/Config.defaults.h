@@ -234,7 +234,10 @@
 
 // guiding
 #ifndef GUIDE_TIME_LIMIT
-#define GUIDE_TIME_LIMIT              0
+#define GUIDE_TIME_LIMIT              0              // in seconds
+#endif
+#ifndef GUIDE_HOME_TIME_LIMIT
+#define GUIDE_HOME_TIME_LIMIT         5*60           // in seconds
 #endif
 #ifndef GUIDE_DISABLE_BACKLASH
 #define GUIDE_DISABLE_BACKLASH        OFF
@@ -252,6 +255,9 @@
 #endif
 
 // slewing
+#ifndef SLEW_GOTO
+#define SLEW_GOTO                     ON
+#endif
 #ifndef SLEW_RATE_BASE_DESIRED
 #define SLEW_RATE_BASE_DESIRED        1.0
 #endif

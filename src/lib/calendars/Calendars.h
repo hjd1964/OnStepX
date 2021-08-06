@@ -23,8 +23,10 @@ typedef struct JulianDate {
 
 class Calendars {
   public:
+    // convert from Gregorian date to Julian Day (does not handle hours)
     JulianDate gregorianToJulianDay(GregorianDate date);
 
+    // convert from Julian Day to Gregorian date (does not handle hours)
     GregorianDate julianDayToGregorian(JulianDate julianDate);
   
   private:

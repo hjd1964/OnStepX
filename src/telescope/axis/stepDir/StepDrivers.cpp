@@ -151,7 +151,7 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
     switch (settings.model) {
       case DRV8825: settings.status = LOW; break;
       case ST820:   settings.status = LOW; break;
-      default:      settings.status = LOW;
+      default: break;
     }
   }
 }
@@ -229,7 +229,7 @@ void StepDriver::modeDecaySlewing() {
 void StepDriver::updateStatus() {
   #ifdef HAS_TMC_DRIVER
     if (settings.status == ON) {
-        tmcDriver.refresh_DRVSTATUS();
+      if (tmcDriver.refresh_DRVSTATUS()) {
         status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
         status.outputA.openLoad      = tmcDriver.get_DRVSTATUS_olA();
         status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
@@ -247,9 +247,19 @@ void StepDriver::updateStatus() {
           status.overTemperaturePreWarning ||
           status.overTemperature
         ) status.fault = true; else status.fault = false;
+
+      } else {
+        status.outputA.shortToGround = true;
+        status.outputA.openLoad      = true;
+        status.outputB.shortToGround = true;
+        status.outputB.openLoad      = true;
+        status.overTemperaturePreWarning = true;
+        status.overTemperature       = true;
+        status.standstill            = true;
+        status.fault                 = true;
+      }
     } else
   #endif
-
   if (settings.status == LOW || settings.status == HIGH) {
     status.fault = digitalReadEx(ModePins[index].fault) == settings.status;
   }

@@ -1,0 +1,113 @@
+//--------------------------------------------------------------------------------------------------
+// telescope mount control
+#pragma once
+
+#include "../../../Common.h"
+
+#ifdef MOUNT_PRESENT
+
+#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/sound/Sound.h"
+#include "../../axis/Axis.h"
+#include "../coordinates/Transform.h"
+
+enum GuideState: uint8_t       {GU_NONE, GU_PULSE_GUIDE, GU_GUIDE, GU_SPIRAL_GUIDE, GU_HOME_GUIDE};
+enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
+enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE, GA_SPIRAL, GA_HOME };
+
+#pragma pack(1)
+#define GuideSettingsSize 2
+typedef struct GuideSettings {
+  GuideRateSelect pulseRateSelect;
+  GuideRateSelect rateSelect;
+} GuideSettings;
+#pragma pack()
+
+class Guide {
+  public:
+    void init();
+
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+
+    // start guide at a given direction and rate on Axis1
+    CommandError startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);
+
+    // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
+    // set abort true to rapidly stop (broken limit, etc)
+    void stopAxis1(GuideAction stopDirection, bool abort = false);
+
+    // start guide at a given direction and rate on Axis2
+    CommandError startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);
+
+    // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
+    // set abort true to rapidly stop (broken limit, etc)
+    void stopAxis2(GuideAction stopDirection, bool abort = false);
+
+    // start spiral guide at the specified rate (spiral size is porportional to rate)
+    CommandError startSpiral(GuideRateSelect rateSelect, unsigned long guideTimeLimit);
+
+    // stop spiral guide
+    void stopSpiral();
+
+    // start guide home (for use with home switches)
+    CommandError startHome(unsigned long guideTimeLimit);
+
+    // returns true if any guide is happening on Axis1
+    inline bool activeAxis1() { return guideActionAxis1 != GA_NONE; }
+
+    // returns true if any guide is happening on Axis2
+    inline bool activeAxis2() { return guideActionAxis2 != GA_NONE; }
+
+    void poll();
+
+    void spiralPoll();
+
+    GuideState state = GU_NONE;
+
+    float rateAxis1 = 0.0F;
+    float rateAxis2 = 0.0F;
+
+    GuideSettings settings = { GR_HALF, GR_20X };
+
+  private:
+    // keep guide rate <= half max
+    float limitGuideRate(float rate);
+
+    // return guide rate (sidereal x) for guide rate selection
+    float rateSelectToRate(GuideRateSelect rateSelect, uint8_t axis = 1);
+
+    // valid guide for Axis1
+    bool validAxis1(GuideAction guideAction);
+
+    // valid guide for Axis2
+    bool validAxis2(GuideAction guideAction);
+
+    // general validation of guide request
+    CommandError validate(int axis, GuideAction guideAction);
+
+    // start axis1 movement
+    void axis1AutoSlew(GuideAction guideAction);
+
+    // start axis2 movement
+    void axis2AutoSlew(GuideAction guideAction);
+
+    GuideRateSelect rateSelectAxis1    = GR_20X;
+    GuideRateSelect rateSelectAxis2    = GR_20X;
+    
+    GuideAction     guideActionAxis1   = GA_NONE;
+    GuideAction     guideActionAxis2   = GA_NONE;
+
+    float         customRateAxis1      = 0.0F;
+    float         customRateAxis2      = 0.0F;
+
+    float         spiralScaleAxis1     = 0.0F;
+    unsigned long spiralStartTime      = 0;
+
+    unsigned long guideFinishTimeAxis1 = 0;
+    unsigned long guideFinishTimeAxis2 = 0;
+
+};
+
+extern Guide guide;
+
+#endif

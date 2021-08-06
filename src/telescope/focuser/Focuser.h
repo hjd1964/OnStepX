@@ -19,20 +19,19 @@ typedef struct Tcf {
   float t0;
 } Tcf;
 
-#define FocuserSettingsSize 14
-typedef struct Settings {
+#define FocuserSettingsSize 18
+typedef struct FocuserSettings {
   Tcf tcf;
   uint8_t dcPower;   // in %
   int16_t backlash;  // in steps
-} Settings;
+  float position;    // in microns
+} FocuserSettings;
 #pragma pack()
 
 class Focuser {
   public:
-    // initialize all focusers
-    void init(bool validKey);
+    void init();
 
-    // process focuser commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // get focuser temperature in deg. C
@@ -40,37 +39,54 @@ class Focuser {
 
     // check for DC motor focuser
     bool  isDC(int index);
+
     // get DC power in %
     int   getDcPower(int index);
+
     // set DC power in %
     bool  setDcPower(int index, int value);
 
     // get TCF enable
     bool  getTcfEnable(int index);
+
     // set TCF enable
     bool  setTcfEnable(int index, bool value);
+
     // get TCF coefficient, in microns per deg. C
     float getTcfCoef(int index);
+
     // set TCF coefficient, in microns per deg. C
     bool  setTcfCoef(int index, float value);
+
     // get TCF deadband, in microns
     int   getTcfDeadband(int index);
+
     // set TCF deadband, in microns
     bool  setTcfDeadband(int index, int value);
+
     // get TCF T0, in deg. C
     float getTcfT0(int index);
+
     // set TCF T0, in deg. C
     bool  setTcfT0(int index, float value);
-    // poll TCF to move the focusers as required
-    void tcfPoll();
+
+    // park focuser at its current position
+    void park(int index);
+
+    // unpark focuser
+    void unpark(int index);
 
     // get backlash in microns
-    int   getBacklash(int index);
+    int  getBacklash(int index);
+
     // set backlash in microns
-    bool  setBacklash(int index, int value);
+    bool setBacklash(int index, int value);
 
     // set slew frequency with constant acceleration
     void setFrequencySlew(int index, float rate);
+
+    // poll TCF to move the focusers as required
+    void poll();
 
     Axis *axis[6];
 
@@ -88,7 +104,9 @@ class Focuser {
     int moveRate[FOCUSER_MAX];
     float tcfSteps[FOCUSER_MAX];
 
-    Settings settings[FOCUSER_MAX];
+    FocuserSettings settings[FOCUSER_MAX];
 };
+
+extern Focuser focuser;
 
 #endif

@@ -16,14 +16,13 @@
 #include "../../../tasks/OnTask.h"
 extern Tasks tasks;
 
+#include "../coordinates/Transform.h"
 #include "../../Telescope.h"
-extern Telescope telescope;
-#include "../../axis/Axis.h"
 
 #if ALIGN_MAX_NUM_STARS > 1
 
 uint8_t modelNumberStars = 0;
-void autoModelWrapper() { telescope.mount.transform.align.autoModel(modelNumberStars); }
+void autoModelWrapper() { transform.align.autoModel(modelNumberStars); }
 
 void GeoAlign::init(uint8_t mountType, float latitude) {
   modelClear();

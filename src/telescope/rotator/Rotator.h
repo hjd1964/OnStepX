@@ -13,18 +13,19 @@
 class Rotator {
   public:
     // initialize rotator
-    void init(bool validKey);
+    void init();
 
     // process rotator commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // get backlash in steps
     int  getBacklash();
+
     // set backlash in steps
     bool setBacklash(int value);
 
     // poll to set derotator rate
-    void derotatePoll();
+    void poll();
 
     Axis axis;
 
@@ -35,19 +36,29 @@ class Rotator {
     #ifdef MOUNT_PRESENT
       // returns parallactic angle in degrees
       double parallacticAngle(Coordinate *coord);
+
       // returns parallactic rate in degrees per second
       double parallacticRate(Coordinate *coord);
     #endif
 
+    // parks rotator at current position
+    void park();
+
+    // unparks rotator
+    void unpark();
+
     void readSettings();
     void writeSettings();
 
-    float moveRate = 3.0F; // in degs/sec
+    float moveRate = 3.0F;  // in degs/sec
 
-    int16_t backlash = 0;  // in steps
+    int16_t backlash = 0;   // in steps
+    float position = 0.0F;  // in degrees
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;
 };
+
+extern Rotator rotator;
 
 #endif

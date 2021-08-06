@@ -7,7 +7,11 @@
 
 #include "../../tasks/OnTask.h"
 extern Tasks tasks;
+
 #include "../Telescope.h"
+#include "../mount/Mount.h"
+#include "../rotator/Rotator.h"
+#include "../focuser/Focuser.h"
 #include "../../lib/sense/Sense.h"
 
 const AxisPins Pins[] = {
@@ -73,20 +77,20 @@ const AxisSettings DefaultSettings[] = {
 static uint8_t pollingTaskHandle  = 0;
 inline void pollAxes() {
   #if AXIS1_DRIVER_MODEL != OFF
-    telescope.mount.axis1.poll(); Y;
+    mount.axis1.poll(); Y;
   #endif
   #if AXIS2_DRIVER_MODEL != OFF
-    telescope.mount.axis2.poll(); Y;
+    mount.axis2.poll(); Y;
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    telescope.rotator.axis.poll(); Y;
+    rotator.axis.poll(); Y;
   #endif
   #ifdef FOCUSER_PRESENT
-    for (int i = 0; i < FOCUSER_MAX; i++) if (telescope.focuser.axis[i] != NULL) { telescope.focuser.axis[i]->poll(); Y; }
+    for (int i = 0; i < FOCUSER_MAX; i++) if (focuser.axis[i] != NULL) { focuser.axis[i]->poll(); Y; }
   #endif
 }
 
-void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
+void Axis::init(uint8_t axisNumber, bool alternateLimits) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
 
@@ -98,7 +102,14 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits, bool validKey) {
   }
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (Pins[i].axis == axisNumber) { index = i; settings = DefaultSettings[i]; break; } if (i == 9) { VLF("ERR: Axis::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) {
+    if (Pins[i].axis == axisNumber) {
+      index = i;
+      settings = DefaultSettings[i];
+      break;
+    }
+    if (i == 9) { VLF("ERR: Axis::init(); indexing failed!"); return; }
+  }
 
   // check for reverting axis settings in NV
   if (!validKey) {
@@ -180,8 +191,17 @@ float Axis::getBacklash() {
   return motor.getBacklashSteps()/settings.stepsPerMeasure;
 }
 
-void Axis::resetPosition(double value) {
-  motor.resetPositionSteps(lround(value*settings.stepsPerMeasure));
+// reset motor and target angular position, in "measure" units
+bool Axis::resetPosition(double value) {
+  return resetPositionSteps(lround(value*settings.stepsPerMeasure));
+}
+
+// reset motor and target angular position, in steps
+bool Axis::resetPositionSteps(long value) {
+  if (autoRate != AR_NONE) return false;
+  if (motor.getFrequencySteps() != 0) return false;
+  motor.resetPositionSteps(value);
+  return true;
 }
 
 double Axis::getMotorPosition() {
@@ -217,8 +237,8 @@ double Axis::getTargetCoordinate() {
   return motor.getTargetCoordinateSteps()/settings.stepsPerMeasure;
 }
 
-// check if we're near the target coordinate during an auto slew
-bool Axis::nearTarget() {
+// check if we're at the target coordinate during an auto slew
+bool Axis::atTarget() {
   return labs(motor.getTargetDistanceSteps()) < 1;
 }
 
@@ -244,6 +264,7 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
 
 // slew, with acceleration distance (in "measures" to FrequencySlew)
 bool Axis::autoSlewRateByDistance(float distance) {
+  if (!enabled) return false;
   if (autoRate != AR_NONE) return false;
   if (motionError(DIR_BOTH)) return false;
   motor.setOriginCoordinateSteps();
@@ -267,10 +288,10 @@ bool Axis::autoSlewRateByDistanceStop() {
 
 // slew, with acceleration in "measures" per second per second
 bool Axis::autoSlew(Direction direction) {
+  if (!enabled) return false;
   if (autoRate == AR_RATE_BY_DISTANCE) return false;
-  if (direction == DIR_NONE) return false;
-  if (motionError(direction)) return false;
   if (direction != DIR_FORWARD && direction != DIR_REVERSE) return false;
+  if (motionError(direction)) return false;
   V(axisPrefix);
   if (autoRate == AR_NONE) {
     setFrequency(baseFreq);
@@ -290,6 +311,7 @@ bool Axis::autoSlew(Direction direction) {
 
 // slew to home, with acceleration in "measures" per second per second
 bool Axis::autoSlewHome() {
+  if (!enabled) return false;
   if (autoRate != AR_NONE) return false;
   if (Pins[index].sense.homeTrigger != OFF) {
     setFrequency(baseFreq);
@@ -336,7 +358,7 @@ void Axis::autoSlewAbort() {
 }
 
 // checks if slew is active on this axis
-bool Axis::autoSlewActive() {
+bool Axis::isSlewing() {
   return autoRate != AR_NONE;  
 }
 
@@ -416,7 +438,7 @@ void Axis::poll() {
 
   // apply composite or normal frequency as required
   float compFreq = freq;
-  if (motor.getSynchronized() == true) compFreq += baseFreq;
+  if (motor.getSynchronized() == true && enabled) compFreq += baseFreq;
   setFrequency(compFreq);
 }
 

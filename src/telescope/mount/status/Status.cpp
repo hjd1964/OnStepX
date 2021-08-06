@@ -1,17 +1,17 @@
 // ---------------------------------------------------------------------------------------------------
-// Mount status LED
+// Mount status LED and buzzer
 
-#include "Mount.h"
+#include "Status.h"
 
 #ifdef MOUNT_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../../tasks/OnTask.h"
 extern Tasks tasks;
 
 #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
   bool ledOn = false;
   bool ledOff = false;
-  void mountStatusFlash() {
+  void flash() {
     if (ledOff) { digitalWriteEx(STATUS_LED_PIN, !STATUS_LED_ON_STATE); return; }
     if (ledOn) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
@@ -23,23 +23,25 @@ extern Tasks tasks;
   }
 #endif
 
-// Prepare status LED feature for use
-void Mount::statusInit() {
+void Status::init() {
+  #if STATUS_BUZZER_MEMORY == ON
+    sound.enabled = misc.buzzer;
+  #endif
   #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
       #if LED_STATUS == ON
         if (STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
       #endif
       pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
-      VF("MSG: Mount, start status LED task (variable rate priority 6)... ");
-      statusTaskHandle = tasks.add(0, 0, true, 6, mountStatusFlash, "mntLed");
+      VF("MSG: Mount, status start LED task (variable rate priority 6)... ");
+      statusTaskHandle = tasks.add(0, 0, true, 6, flash, "mntLed");
       if (statusTaskHandle) { VL("success"); } else { VL("FAILED!"); }
     }
   #endif
 }
 
-// Sets status LED flash period in ms, or use 0 to turn LED off, or 1 to turn LED on
-void Mount::statusSetPeriodMillis(int period) {
+// mount status LED flash rate (in ms)
+void Status::flashRate(int period) {
   #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
     if (period == 0) { period = 500; ledOff = true; } else ledOff = false;
     if (period == 1) { period = 500; ledOn = true; } else ledOn = false;
@@ -48,5 +50,7 @@ void Mount::statusSetPeriodMillis(int period) {
     period = period;
   #endif
 }
+
+Status status;
 
 #endif

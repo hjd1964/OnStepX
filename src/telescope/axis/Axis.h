@@ -54,7 +54,7 @@ enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 class Axis {
   public:
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber, bool alternateLimits, bool validKey);
+    void init(uint8_t axisNumber, bool alternateLimits);
 
     // process commands for this axis
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -78,8 +78,9 @@ class Axis {
     int getStepsPerStepSlewing();
 
     // reset motor and target angular position, in "measure" units
-    void resetPosition(double value);
-    inline void resetPositionSteps(long value) { motor.resetPositionSteps(value); }
+    bool resetPosition(double value);
+    // reset motor and target angular position, in steps
+    bool resetPositionSteps(long value);
     // get motor angular position, in "measure" units
     double getMotorPosition();
     inline long getMotorPositionSteps() { return motor.getMotorPositionSteps(); }
@@ -104,8 +105,8 @@ class Axis {
     // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();
     inline long getTargetCoordinateSteps() { return motor.getTargetCoordinateSteps(); }
-    // returns true if within 2 steps of target
-    bool nearTarget();
+    // returns true if at target
+    bool atTarget();
 
     // set backlash amount in "measures" (radians, microns, etc.)
     void setBacklash(float value);
@@ -147,7 +148,7 @@ class Axis {
     // emergency stops, with deacceleration by time
     void autoSlewAbort();
     // checks if slew is active on this axis
-    bool autoSlewActive();
+    bool isSlewing();
 
     // set tracking state (automatic movement of target)
     void setTracking(bool state);

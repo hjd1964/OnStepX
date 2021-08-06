@@ -1,0 +1,314 @@
+//--------------------------------------------------------------------------------------------------
+// telescope mount control, PEC
+
+#include "Pec.h"
+
+#ifdef MOUNT_PRESENT 
+
+#if AXIS1_PEC == ON
+  #include "../../../tasks/OnTask.h"
+  extern Tasks tasks;
+  #include "../../../lib/sense/Sense.h"
+  #include "../../Telescope.h"
+
+  #include "../goto/Goto.h"
+  #include "../guide/Guide.h"
+  #include "../park/Park.h"
+
+  #if PEC_SENSE == OFF
+    bool wormSenseFirst = true;
+  #else
+    bool wormSenseFirst = false;
+  #endif
+
+  inline void pecWrapper() { pec.poll(); }
+
+  void Pec::init(long stepsPerSiderealSecond) {
+    // confirm the data structure size
+    if (PecSettingsSize < sizeof(PecSettings)) { initError.nv = true; DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
+    // write the default settings to NV
+    if (!validKey) {
+      VLF("MSG: Mount, PEC writing default settings to NV");
+      nv.writeBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+    }
+
+    // read the settings
+    nv.readBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+
+    this->stepsPerSiderealSecond = stepsPerSiderealSecond;
+    stepsPerCentisecond = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/100.0F;
+
+    wormRotationSeconds = round(settings.wormRotationSteps/stepsPerSiderealSecond);
+    bufferSize = wormRotationSeconds;
+
+    if (bufferSize > 0) {
+      if (bufferSize < 61) {
+        bufferSize = 0;
+        initError.value = true;
+        DLF("ERR: Pec::init(); invalid bufferSize, PEC disabled");
+      } else
+      if (bufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
+        bufferSize = 0;
+        initError.value = true;
+        DLF("ERR: Pec::init(); bufferSize exceeds available NV, PEC disabled");
+      } else {
+        buffer = (int8_t*)malloc(bufferSize * sizeof(*buffer));
+        if (buffer == NULL) {
+          bufferSize = 0;
+          initError.value = true;
+          VLF("WRN: Pec::init(), bufferSize exceeds available RAM, PEC disabled");
+        } else {
+          VF("MSG: Mount, PEC allocated buffer "); V(bufferSize * (long)sizeof(*buffer)); VLF(" bytes");
+
+          bool bufferNeedsInit = true;
+          for (int i = 0; i < bufferSize; i++) {
+            buffer[i] = nv.read(NV_PEC_BUFFER_BASE + i);
+            if (buffer[i] != 0) bufferNeedsInit = false;
+          }
+          if (bufferNeedsInit) for (int i = 0; i < bufferSize; i++) nv.write(NV_PEC_BUFFER_BASE + i, (int8_t)0);
+
+          if (settings.state > PEC_RECORD) {
+            settings.state = PEC_NONE;
+            initError.value = true;
+            DLF("ERR: Pec::init(); bad NV settings.state");
+          }
+
+          if (!settings.recorded) settings.state = PEC_NONE;
+
+          #if PEC_SENSE == OFF
+            #if SLEW_GOTO == ON
+              park.settings.wormSensePositionSteps = 0;
+            #endif
+            settings.state = PEC_NONE;
+          #else
+            VLF("MSG: Mount, PEC adding sense");
+            senseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
+          #endif
+
+          VF("MSG: Mount, PEC start monitor task... ");
+          monitorHandle = tasks.add(10, 0, true, 1, pecWrapper, "MntPec");
+          if (monitorHandle) { VL("success"); } else { VL("FAILED!"); }
+        }
+      }
+    }
+    if (bufferSize <= 0) { bufferSize = 0; settings.state = PEC_NONE; settings.recorded = false; }
+    if (wormRotationSeconds > bufferSize) wormRotationSeconds = bufferSize;
+  }
+
+  void Pec::poll() {
+    // PEC is only active when we're tracking at the sidereal rate with a guide rate that makes sense
+    #if SLEW_GOTO == ON
+      if (park.state > PS_UNPARKED) { disable(); return; }
+    #endif
+    if (!mount.isTracking() || guide.state > GU_PULSE_GUIDE) { disable(); return; }
+
+    // keep track of our current step position, and when the step position on the worm wraps during playback
+    long axis1Steps = mount.axis1.getMotorPositionSteps();
+
+    #if PEC_SENSE == OFF
+      wormSenseFirst = true;
+    #else
+      static int lastState;
+      lastState = wormIndexState;
+      wormIndexState = senses.read(senseHandle);
+
+      // digital or analog pec sense, with 60 second delay before redetect
+      long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
+      if (dist > stepsPerSiderealSecondAxis1*60.0 && wormIndexState != lastState && wormIndexState == true) {
+        VL("MSG: Mount, PEC index detected");
+        wormSenseSteps = axis1Steps;
+        wormSenseFirst = true;
+        bufferStart = true;
+        wormIndexSenseThisSecond = true;
+      } else bufferStart = false;
+
+      if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecondAxis1) wormIndexSenseThisSecond = false;
+    #endif
+
+    if (settings.state == PEC_NONE) { rate = 0.0F; return; }
+    if (!wormSenseFirst) return;
+
+    // worm step position corrected for any index found
+    #if PEC_SENSE == OFF
+      static long lastWormRotationSteps = wormRotationSteps;
+    #endif
+    wormRotationSteps = axis1Steps - wormSenseSteps;
+    wormRotationSteps = ((wormRotationSteps % settings.wormRotationSteps) + settings.wormRotationSteps) % settings.wormRotationSteps;
+    #if PEC_SENSE == OFF
+      if (wormRotationSteps - lastWormRotationSteps < 0) {
+        VL("MSG: Mount, virtual index detected");
+        bufferStart = true;
+      } else bufferStart = false;
+    #endif
+
+    // handle playing back and recording PEC
+    noInterrupts();
+    unsigned long lastCs = centisecondLAST; // local apparent sidereal time in centi-seconds
+    interrupts();
+
+    // start playing PEC
+    if (settings.state == PEC_READY_PLAY) {
+      // makes sure the index is at the start of a second before resuming play
+      if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
+        VL("MSG: Mount, started PEC playing");
+        settings.state = PEC_PLAY;
+        bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
+        wormRotationStartTimeCs = lastCs;
+      }
+    } else
+    // start recording PEC
+    if (settings.state == PEC_READY_RECORD) {
+      if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
+        V("MSG: Mount, started PEC recording at ");
+        settings.state = PEC_RECORD;
+        bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
+        firstRecording = !settings.recorded;
+        wormRotationStartTimeCs = lastCs;
+        V(wormRotationStartTimeCs);
+        recordStopTimeCs = wormRotationStartTimeCs + (uint32_t)(wormRotationSeconds*100);
+        V(" and stopping at "); VL(recordStopTimeCs);
+        accGuideAxis1 = 0.0F;
+      }
+    } else
+    // and once the PEC data is all stored, indicate that it's valid and start using it
+    if (settings.state == PEC_RECORD && (long)(lastCs - recordStopTimeCs) > 0) {
+      VL("MSG: Mount, PEC recording complete switched to playing");
+      settings.state = PEC_PLAY;
+      settings.recorded = true;
+      cleanup();
+    }
+
+    // reset the buffer index to match the worm index
+    if (bufferStart && settings.state != PEC_RECORD) {
+      bufferIndex = 0;
+      wormRotationStartTimeCs = lastCs;
+    }
+
+    // Increment the PEC index once a second and make it go back to zero when the
+    // worm finishes a rotation, this code works when crossing zero
+    if (lastCs - wormRotationStartTimeCs >= 100) { wormRotationStartTimeCs = lastCs; bufferIndex++; }
+    bufferIndex = ((bufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
+
+    // accumulate guide steps for PEC
+    if (guide.rateAxis1 != 0.0F) { accGuideAxis1 += stepsPerCentisecond*guide.rateAxis1; }
+
+    // falls in whenever the pecIndex changes, which is once a sidereal second
+    static long lastBufferIndex = 0;
+    if (bufferIndex != lastBufferIndex) {
+      lastBufferIndex = bufferIndex;
+
+      // assume no change to tracking rate
+      rate = 0.0F;
+
+      if (settings.state == PEC_RECORD) {
+        // get guide steps taken from the accumulator
+        int i = round(accGuideAxis1);
+
+        // stay within +/- one sidereal rate for corrections
+        if (i < -stepsPerSiderealSecond) i = -stepsPerSiderealSecond;
+        if (i >  stepsPerSiderealSecond) i =  stepsPerSiderealSecond;
+
+        // apply weighted average
+        if (!firstRecording) i = (i + (int)buffer[bufferIndex]*2)/3;
+
+        // restrict to valid range and store
+        if (i < -127) i = -127; else if (i >  127) i = 127;
+
+        // remove steps from the accumulator
+        accGuideAxis1 -= i;
+
+        buffer[bufferIndex] = i;
+      }
+
+      if (settings.state == PEC_PLAY) {
+        // adjust one second before the value was recorded, an estimate of the latency between image acquisition and response
+        // if sending values directly to OnStep from PECprep, etc. be sure to account for this
+        // number of steps ahead or behind for this 1 second slot, up to +/-127
+        int j = bufferIndex - 1; if (j == -1) j += wormRotationSeconds;
+        int i = buffer[j];
+        if (i >  stepsPerSiderealSecond) i =  stepsPerSiderealSecond;
+        if (i < -stepsPerSiderealSecond) i = -stepsPerSiderealSecond;
+        rate = (float)i/stepsPerSiderealSecond;
+      }
+    }
+  }
+
+  // disable PEC
+  void Pec::disable() {
+    // give up recording if we stop tracking at the sidereal rate
+    // don't zero the PEC offset, we don't want things moving and it really doesn't matter 
+    if (settings.state == PEC_RECORD || settings.state == PEC_READY_RECORD) {
+      VL("MSG: Mount, PEC recording stopped");
+      settings.state = PEC_NONE;
+      rate = 0.0;
+    } 
+    // get ready to re-index when tracking comes back
+    if (settings.state == PEC_PLAY) {
+      VL("MSG: Mount, PEC playing paused");
+      settings.state = PEC_READY_PLAY;
+      rate = 0.0;
+    } 
+  }
+
+  // applies low pass filter to smooth noise in PEC data and linear regression
+  void Pec::cleanup() {
+    VL("MSG: Mount, applying low pass filter to PEC data");
+    int i,J1,J4,J9,J17;
+    for (int scc = 3; scc < wormRotationSeconds + 3; scc++) {
+      i = buffer[scc % wormRotationSeconds];
+
+      J1 = lroundf(i*0.01F);
+      J4 = lroundf(i*0.04F);
+      J9 = lroundf(i*0.09F);
+      J17 = lroundf(i*0.17F);
+      buffer[(scc - 4) % wormRotationSeconds] = (buffer[(scc - 4) % wormRotationSeconds]) + J1;
+      buffer[(scc - 3) % wormRotationSeconds] = (buffer[(scc - 3) % wormRotationSeconds]) + J4;
+      buffer[(scc - 2) % wormRotationSeconds] = (buffer[(scc - 2) % wormRotationSeconds]) + J9;
+      buffer[(scc - 1) % wormRotationSeconds] = (buffer[(scc - 1) % wormRotationSeconds]) + J17;
+      buffer[(scc    ) % wormRotationSeconds] = (buffer[(scc    ) % wormRotationSeconds]) - (J17+J17+J9+J9+J4+J4+J1+J1);
+      buffer[(scc + 1) % wormRotationSeconds] = (buffer[(scc + 1) % wormRotationSeconds]) + J17;
+      buffer[(scc + 2) % wormRotationSeconds] = (buffer[(scc + 2) % wormRotationSeconds]) + J9;
+      buffer[(scc + 3) % wormRotationSeconds] = (buffer[(scc + 3) % wormRotationSeconds]) + J4;
+      buffer[(scc + 4) % wormRotationSeconds] = (buffer[(scc + 4) % wormRotationSeconds]) + J1;
+    }
+
+    // linear regression
+    VL("MSG: Mount, applying linear regression to PEC data");
+    // the number of steps added should equal the number of steps subtracted (from the cycle)
+    // first, determine how far we've moved ahead or backward in steps
+    long stepsSum = 0; for (int scc = 0; scc < wormRotationSeconds; scc++) stepsSum += buffer[scc];
+
+    // this is the correction coefficient for a given location in the sequence
+    float Ccf = (float)stepsSum/wormRotationSeconds;
+
+    // now, apply the correction to the sequence to make the PEC adjustments null out
+    // this process was simulated in a spreadsheet and the roundoff error might leave us at +/- a step which is tacked on at the beginning
+    long lp2 = 0; stepsSum = 0; 
+    for (int scc = 0; scc < wormRotationSeconds; scc++) {
+      // the correction, "now"
+      long lp1 = lroundf(-scc*Ccf);
+      
+      // if the correction increases or decreases then add or subtract that many steps
+      buffer[scc] = buffer[scc] + (lp1 - lp2);
+
+      // sum the values for a final adjustment, if necessary
+      stepsSum += buffer[scc];
+      lp2 = lp1;
+    }
+    buffer[0] -= stepsSum;
+
+    // a reality check, make sure the buffer data looks good, if not forget it
+    if (stepsSum < -2 || stepsSum > 2) {
+      DF("ERR: Pec::cleanup(), linear regression residual "); D(stepsSum);
+      if (stepsSum > 2) { DLF(" > threshold of 2"); } else { DLF(" < threshold of -2"); }
+      settings.recorded = false;
+      settings.state = PEC_NONE;
+    }
+  }
+
+#endif
+
+  Pec pec;
+
+#endif
