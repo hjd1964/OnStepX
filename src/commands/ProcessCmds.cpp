@@ -73,7 +73,7 @@ void CommandProcessor::poll() {
     commandError = command(reply, buffer.getCmd(), buffer.getParameter(), &supressFrame, &numericReply);
 
     if (numericReply) {
-      if (commandError != CE_NONE) strcpy(reply,"0"); else strcpy(reply,"1");
+      if (commandError != CE_NONE && commandError != CE_1) strcpy(reply,"0"); else strcpy(reply,"1");
       supressFrame = true;
     }
     if (strlen(reply) > 0 || buffer.checksum) {
@@ -107,8 +107,10 @@ void CommandProcessor::poll() {
 CommandError CommandProcessor::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply) {
   commandError = CE_NONE;
 
-  // Handle telescope commands
+  // handle telescope commands
   if (telescope.command(reply, command, parameter, supressFrame, numericReply, &commandError)) return commandError;
+  // silent boolean "errors" allow processing commands more than once
+  if (commandError == CE_0 || commandError == CE_1) return commandError;
 
   // :SB[n]#    Set Baud Rate where n is an ASCII digit (1..9) with the following interpertation
   //            0=115.2K, 1=56.7K, 2=38.4K, 3=28.8K, 4=19.2K, 5=14.4K, 6=9600, 7=4800, 8=2400, 9=1200
