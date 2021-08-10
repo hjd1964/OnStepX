@@ -70,20 +70,20 @@ class Focuser {
     // set TCF T0, in deg. C
     bool  setTcfT0(int index, float value);
 
-    // park focuser at its current position
-    void park(int index);
-
-    // unpark focuser
-    void unpark(int index);
-
     // get backlash in microns
     int  getBacklash(int index);
 
     // set backlash in microns
     bool setBacklash(int index, int value);
 
-    // set slew frequency with constant acceleration
-    void setFrequencySlew(int index, float rate);
+    // move focuser to a specific location
+    CommandError gotoTarget(int index, long target);
+
+    // park focuser at its current position
+    void park(int index);
+
+    // unpark focuser
+    void unpark(int index);
 
     // poll TCF to move the focusers as required
     void poll();
@@ -97,8 +97,8 @@ class Focuser {
     int driverModel[FOCUSER_MAX]      = { AXIS4_DRIVER_MODEL, AXIS5_DRIVER_MODEL, AXIS6_DRIVER_MODEL, AXIS7_DRIVER_MODEL, AXIS8_DRIVER_MODEL, AXIS9_DRIVER_MODEL };
     int slewRateDesired[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
     int slewRateMinimum[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_MINIMUM, AXIS5_SLEW_RATE_MINIMUM, AXIS6_SLEW_RATE_MINIMUM, AXIS7_SLEW_RATE_MINIMUM, AXIS8_SLEW_RATE_MINIMUM, AXIS9_SLEW_RATE_MINIMUM };
-    int accelerationRate[FOCUSER_MAX] = { AXIS4_ACCELERATION_RATE, AXIS5_ACCELERATION_RATE, AXIS6_ACCELERATION_RATE, AXIS7_ACCELERATION_RATE, AXIS8_ACCELERATION_RATE, AXIS9_ACCELERATION_RATE };
-    int rapidStopRate[FOCUSER_MAX]    = { AXIS4_RAPID_STOP_RATE, AXIS5_RAPID_STOP_RATE, AXIS6_RAPID_STOP_RATE, AXIS7_RAPID_STOP_RATE, AXIS8_RAPID_STOP_RATE, AXIS9_RAPID_STOP_RATE };
+    int accelerationTime[FOCUSER_MAX] = { AXIS4_ACCELERATION_TIME, AXIS5_ACCELERATION_TIME, AXIS6_ACCELERATION_TIME, AXIS7_ACCELERATION_TIME, AXIS8_ACCELERATION_TIME, AXIS9_ACCELERATION_TIME };
+    int rapidStopTime[FOCUSER_MAX]    = { AXIS4_RAPID_STOP_TIME, AXIS5_RAPID_STOP_TIME, AXIS6_RAPID_STOP_TIME, AXIS7_RAPID_STOP_TIME, AXIS8_RAPID_STOP_TIME, AXIS9_RAPID_STOP_TIME };
     bool powerDown[FOCUSER_MAX]       = { AXIS4_POWER_DOWN == ON, AXIS5_POWER_DOWN == ON, AXIS6_POWER_DOWN == ON, AXIS7_POWER_DOWN == ON, AXIS8_POWER_DOWN == ON, AXIS9_POWER_DOWN == ON };
 
     int moveRate[FOCUSER_MAX];

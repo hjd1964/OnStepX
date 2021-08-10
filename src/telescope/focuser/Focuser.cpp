@@ -65,6 +65,8 @@ void Focuser::init() {
         axis[index]->setFrequencyMax(slewRateDesired[index]);
         axis[index]->setFrequencyMin(slewRateMinimum[index]);
         axis[index]->setFrequencySlew(slewRateDesired[index]);
+        axis[index]->setSlewAccelerationTime(accelerationTime[index]);
+        axis[index]->setSlewAccelerationTimeAbort(rapidStopTime[index]);
         if (powerDown[index]) axis[index]->setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
         axis[index]->enable(true);
@@ -180,10 +182,12 @@ bool Focuser::setBacklash(int index, int value) {
   return true;
 }
 
-void Focuser::setFrequencySlew(int index, float rate) {
-  axis[index]->setFrequencySlew(rate);
-  axis[index]->setSlewAccelerationRate((rate/accelerationRate[index])*accelerationRate[index]);
-  axis[index]->setSlewAccelerationRateAbort(rapidStopRate[index]);
+// move focuser to a specific location
+CommandError Focuser::gotoTarget(int index, long target) {
+  VF("MSG: Focuser, goto target coordinate set ("); V(target*axis[index]->getStepsPerMeasure()); VL("um)");
+  VF("MSG: Focuser, starting goto at slew rate ("); V(slewRateDesired[index]); VL("um/s)");
+  axis[index]->setTargetCoordinateSteps(target);
+  return axis[index]->autoSlewRateByDistance(slewRateDesired[index]*accelerationTime[index], slewRateDesired[index]);
 }
 
 // park focuser at its current position
@@ -236,7 +240,7 @@ void Focuser::writeSettings(int index) {
 // poll TCF to move the focusers as required
 void Focuser::poll() {
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (axis[index] != NULL) {
+    if (axis[index] != NULL && !axis[index]->isSlewing()) {
       if (settings[index].tcf.enabled) {
         Y;
         // get offset in microns due to TCF

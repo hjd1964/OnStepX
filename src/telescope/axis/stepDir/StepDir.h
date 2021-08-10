@@ -40,6 +40,8 @@ class StepDir {
     void resetPositionSteps(long value);
     // get motor angular position in steps
     long getMotorPositionSteps();
+    // sets target position to the motor position
+    void syncTargetToMotorPosition();
 
     // get instrument coordinate, in steps
     long getInstrumentCoordinateSteps();
@@ -152,7 +154,8 @@ class StepDir {
     bool poweredDown = false;
 
     float backlashFrequency = 0.0F;
-    float lastFrequency = 0.0F; // the last step frequency set, in tracking mode steps per second
+    float currentFrequency = 0.0F; // last frequency set 
+    float lastFrequency = 0.0F; // last frequency requested
 
     unsigned long lastPeriod = 0;
 

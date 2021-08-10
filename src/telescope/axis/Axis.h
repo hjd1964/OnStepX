@@ -78,9 +78,9 @@ class Axis {
     int getStepsPerStepSlewing();
 
     // reset motor and target angular position, in "measure" units
-    bool resetPosition(double value);
+    CommandError resetPosition(double value);
     // reset motor and target angular position, in steps
-    bool resetPositionSteps(long value);
+    CommandError resetPositionSteps(long value);
     // get motor angular position, in "measure" units
     double getMotorPosition();
     inline long getMotorPositionSteps() { return motor.getMotorPositionSteps(); }
@@ -101,9 +101,11 @@ class Axis {
     void setTargetCoordinatePark(double value);
     // set target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
-    inline void setTargetCoordinateSteps(long value) { motor.setTargetCoordinateSteps(value); }
+    // set target coordinate, in steps
+    void setTargetCoordinateSteps(long value);
     // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();
+    // get target coordinate, in steps
     inline long getTargetCoordinateSteps() { return motor.getTargetCoordinateSteps(); }
     // returns true if at target
     bool atTarget();
@@ -111,7 +113,7 @@ class Axis {
     // set backlash amount in "measures" (radians, microns, etc.)
     void setBacklash(float value);
     // set backlash amount in steps
-    inline void setBacklashSteps(long value) { motor.setBacklashSteps(value); }
+    inline void setBacklashSteps(long value) { if (autoRate == AR_NONE) motor.setBacklashSteps(value); }
     // get backlash amount in "measures" (radians, microns, etc.)
     float getBacklash();
 
@@ -130,23 +132,32 @@ class Axis {
     // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
-    // set acceleration rate in "measures" per second per second
+    // set acceleration rate in "measures" per second per second (for autoSlew)
     void setSlewAccelerationRate(float mpsps);
-    // set time to emergency stop movement, with acceleration in "measures" per second per second
+    // set acceleration rate in seconds (for autoSlew)
+    void setSlewAccelerationTime(float seconds);
+    // set acceleration for emergency stop movement in "measures" per second per second
     void setSlewAccelerationRateAbort(float mpsps);
+    // set acceleration for emergency stop movement in seconds (for autoSlewStop)
+    void setSlewAccelerationTimeAbort(float seconds);
 
-    // slew, with acceleration distance (in "measures" to FrequencySlew)
-    bool autoSlewRateByDistance(float distance);
+    // slew with rate by distance
+    // \param distance: acceleration distance in measures (to frequency)
+    // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
+    CommandError autoSlewRateByDistance(float distance, float frequency = NAN);
     // stops, with deacceleration by distance
     bool autoSlewRateByDistanceStop();
-    // slew, with acceleration in "measures" per second per second
-    bool autoSlew(Direction direction);
+    // auto slew with acceleration in "measures" per second per second
+    // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
+    // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
+    CommandError autoSlew(Direction direction, float frequency = NAN);
     // slew to home, with acceleration in "measures" per second per second
-    bool autoSlewHome();
+    CommandError autoSlewHome();
     // stops, with deacceleration by time
     void autoSlewStop();
     // emergency stops, with deacceleration by time
     void autoSlewAbort();
+
     // checks if slew is active on this axis
     bool isSlewing();
 
@@ -234,6 +245,10 @@ class Axis {
     float slewMpspcs;
     // abort slew rate in measures per second per centisecond
     float abortMpspcs;
+    // auto slew acceleration time in seconds
+    float slewAccelTime = NAN;
+    // abort slew acceleration time in seconds
+    float abortAccelTime = NAN;
     // homing mode
     HomingStage homingStage = HOME_NONE;
 };

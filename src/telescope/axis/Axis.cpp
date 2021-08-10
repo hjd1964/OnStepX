@@ -183,7 +183,7 @@ int Axis::getStepsPerStepSlewing() {
 
 // set backlash amount in "measures" (radians, microns, etc.)
 void Axis::setBacklash(float value) {
-  motor.setBacklashSteps(round(value*settings.stepsPerMeasure));
+  if (autoRate == AR_NONE) motor.setBacklashSteps(round(value*settings.stepsPerMeasure));
 }
 
 // get backlash amount in "measures" (radians, microns, etc.)
@@ -192,16 +192,16 @@ float Axis::getBacklash() {
 }
 
 // reset motor and target angular position, in "measure" units
-bool Axis::resetPosition(double value) {
+CommandError Axis::resetPosition(double value) {
   return resetPositionSteps(lround(value*settings.stepsPerMeasure));
 }
 
 // reset motor and target angular position, in steps
-bool Axis::resetPositionSteps(long value) {
-  if (autoRate != AR_NONE) return false;
-  if (motor.getFrequencySteps() != 0) return false;
+CommandError Axis::resetPositionSteps(long value) {
+  if (autoRate != AR_NONE) return CE_SLEW_IN_MOTION;
+  if (motor.getFrequencySteps() != 0) return CE_SLEW_IN_MOTION;
   motor.resetPositionSteps(value);
-  return true;
+  return CE_NONE;
 }
 
 double Axis::getMotorPosition() {
@@ -209,11 +209,11 @@ double Axis::getMotorPosition() {
 }
 
 void Axis::setInstrumentCoordinate(double value) {
-  motor.setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  if (autoRate == AR_NONE) motor.setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
 }
 
 void Axis::setInstrumentCoordinateSteps(long value) {
-  motor.setInstrumentCoordinateSteps(value);
+  if (autoRate == AR_NONE) motor.setInstrumentCoordinateSteps(value);
 }
 
 double Axis::getInstrumentCoordinate() {
@@ -221,16 +221,23 @@ double Axis::getInstrumentCoordinate() {
 }
 
 void Axis::setInstrumentCoordinatePark(double value) {
-  motor.setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  if (autoRate == AR_NONE) motor.setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 void Axis::setTargetCoordinatePark(double value) {
-  motor.setFrequencySteps(0);
-  motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  if (autoRate == AR_NONE) {
+    motor.setFrequencySteps(0);
+    motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  }
 }
 
 void Axis::setTargetCoordinate(double value) {
-  motor.setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  if (autoRate == AR_NONE) setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
+}
+
+// set target coordinate, in steps
+void Axis::setTargetCoordinateSteps(long value) {
+  if (autoRate == AR_NONE) motor.setTargetCoordinateSteps(value);
 }
 
 double Axis::getTargetCoordinate() {
@@ -252,28 +259,48 @@ double Axis::getOriginOrTargetDistance() {
   return motor.getOriginOrTargetDistanceSteps()/settings.stepsPerMeasure;
 }
 
-// set acceleration rate in "measures" per second per second
+// set acceleration rate in "measures" per second per second (for autoSlew)
 void Axis::setSlewAccelerationRate(float mpsps) {
-  slewMpspcs = mpsps/100.0F;
+  if (autoRate == AR_NONE) {
+    slewMpspcs = mpsps/100.0F;
+    slewAccelTime = NAN;
+  }
 }
 
-// set time to emergency stop movement, with acceleration in "measures" per second per second
+// set acceleration rate in seconds (for autoSlew)
+void Axis::setSlewAccelerationTime(float seconds) {
+  if (autoRate == AR_NONE) slewAccelTime = seconds;
+}
+
+// set acceleration for emergency stop movement in "measures" per second per second
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
-  abortMpspcs = mpsps/100.0F;
+  if (autoRate == AR_NONE) {
+    abortMpspcs = mpsps/100.0F;
+    abortAccelTime = NAN;
+  }
 }
 
-// slew, with acceleration distance (in "measures" to FrequencySlew)
-bool Axis::autoSlewRateByDistance(float distance) {
-  if (!enabled) return false;
-  if (autoRate != AR_NONE) return false;
-  if (motionError(DIR_BOTH)) return false;
+// set acceleration for emergency stop movement in seconds (for autoSlewStop)
+void Axis::setSlewAccelerationTimeAbort(float seconds) {
+  if (autoRate == AR_NONE) abortAccelTime = seconds;
+}
+
+// slew with rate by distance
+// \param distance: acceleration distance in measures (to frequency)
+// \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
+CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
+  if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
+  if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
+  if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
+  if (!isnan(frequency)) setFrequencySlew(frequency);
+
   motor.setOriginCoordinateSteps();
   slewAccelerationDistance = distance;
   motor.setSynchronized(false);
   motor.setSlewing(true);
   autoRate = AR_RATE_BY_DISTANCE;
-  V(axisPrefix); VLF("autoSlewRateByDistance started");
-  return true;
+  return CE_NONE;
 }
 
 // stops, with deacceleration by distance
@@ -281,40 +308,50 @@ bool Axis::autoSlewRateByDistanceStop() {
   if (autoRate != AR_RATE_BY_DISTANCE) return false;
   autoRate = AR_NONE;
   motor.setSlewing(false);
-  setFrequency(baseFreq);
   motor.setSynchronized(true);
   return true;
 }
 
-// slew, with acceleration in "measures" per second per second
-bool Axis::autoSlew(Direction direction) {
-  if (!enabled) return false;
-  if (autoRate == AR_RATE_BY_DISTANCE) return false;
-  if (direction != DIR_FORWARD && direction != DIR_REVERSE) return false;
-  if (motionError(direction)) return false;
+// auto slew with acceleration in "measures" per second per second
+// \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
+// \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
+CommandError Axis::autoSlew(Direction direction, float frequency) {
+  if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
+  if (autoRate == AR_RATE_BY_DISTANCE) return CE_SLEW_IN_SLEW;
+  if (motionError(direction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (direction != DIR_FORWARD && direction != DIR_REVERSE) return CE_SLEW_ERR_UNSPECIFIED;
+
+  if (!isnan(frequency)) setFrequencySlew(frequency);
+
   V(axisPrefix);
   if (autoRate == AR_NONE) {
-    setFrequency(baseFreq);
     motor.setSynchronized(true);
     motor.setSlewing(true);
-    VF("autoSlew started (");
-  } else { VF("autoSlew resuming ("); }
+    VF("autoSlew start ");
+  } else { VF("autoSlew resum "); }
   if (direction == DIR_FORWARD) {
     autoRate = AR_RATE_BY_TIME_FORWARD;
-    VLF("forward)");
+    VF("fwd@ ");
   } else {
     autoRate = AR_RATE_BY_TIME_REVERSE;
-    VLF("reverse)");
+    VF("rev@ ");
   }
-  return true;
+  #if DEBUG == VERBOSE
+    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspcs)*100.0F, 3); VL("°/s/s"); }
+    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspcs*100.0F, 3); VL("°/s/s"); }
+    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspcs*100.0F, 3); VL("um/s/s"); }
+  #endif
+
+  return CE_NONE;
 }
 
 // slew to home, with acceleration in "measures" per second per second
-bool Axis::autoSlewHome() {
-  if (!enabled) return false;
-  if (autoRate != AR_NONE) return false;
+CommandError Axis::autoSlewHome() {
+  if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
+  if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
+  if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
   if (Pins[index].sense.homeTrigger != OFF) {
-    setFrequency(baseFreq);
     motor.setSynchronized(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
@@ -328,14 +365,14 @@ bool Axis::autoSlewHome() {
       }
     }
     if (senses.read(homeSenseHandle)) {
-      V(axisPrefix); VLF("move forward");
+      V(axisPrefix); VLF("move fwd");
       autoRate = AR_RATE_BY_TIME_FORWARD;
     } else {
-      V(axisPrefix); VLF("move reverse");
+      V(axisPrefix); VLF("move rev");
       autoRate = AR_RATE_BY_TIME_REVERSE;
     }
   }
-  return true;
+  return CE_NONE;
 }
 
 // stops, with deacceleration by time
@@ -352,7 +389,6 @@ void Axis::autoSlewAbort() {
   V(axisPrefix); VLF("slew aborting");
   autoRate = AR_RATE_BY_TIME_ABORT;
   homingStage = HOME_NONE;
-  setFrequency(baseFreq);
   motor.setSynchronized(true);
   poll();
 }
@@ -385,11 +421,11 @@ void Axis::poll() {
     }
     if (autoRate == AR_RATE_BY_DISTANCE) {
       if (motor.getTargetDistanceSteps() == 0) {
-        V(axisPrefix); VLF("slew automatically stopped");
-        freq = 0.0F;
+        motor.setSlewing(false);
         autoRate = AR_NONE;
-        setFrequency(baseFreq);
+        freq = 0.0F;
         motor.setSynchronized(true);
+        V(axisPrefix); VLF("slew stopped");
       } else {
         freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + settings.backlashFreq;
         if (freq < settings.backlashFreq) freq = settings.backlashFreq;
@@ -411,6 +447,8 @@ void Axis::poll() {
         motor.setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
+        motor.setSynchronized(true);
+        motor.syncTargetToMotorPosition();
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
         if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
@@ -436,10 +474,7 @@ void Axis::poll() {
   } else freq = 0.0F;
   Y;
 
-  // apply composite or normal frequency as required
-  float compFreq = freq;
-  if (motor.getSynchronized() == true && enabled) compFreq += baseFreq;
-  setFrequency(compFreq);
+  setFrequency(freq);
 }
 
 // set minimum slew frequency in "measures" (radians, microns, etc.) per second
@@ -464,6 +499,10 @@ void Axis::setFrequencySlew(float frequency) {
   if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
   if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;
   slewFreq = frequency;
+
+  // adjust acceleration rates if they depend on slewFreq
+  if (!isnan(slewAccelTime)) slewMpspcs = (slewFreq/slewAccelTime)/100.0F;
+  if (!isnan(abortAccelTime)) abortMpspcs = (slewFreq/abortAccelTime)/100.0F;
 }
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
@@ -488,7 +527,22 @@ void Axis::setFrequency(float frequency) {
     powerDownTime = millis() + powerDownDelay;
   }
 
-  motor.setFrequencySteps(frequency*settings.stepsPerMeasure);
+  if (frequency != 0.0F) {
+    if (frequency < 0.0F) {
+      if (maxFreq != 0.0F && frequency < -maxFreq) frequency = -maxFreq;
+      if (minFreq != 0.0F && frequency > -minFreq) frequency = -minFreq;
+    } else {
+      if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
+      if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;
+    }
+  }
+
+  // apply base frequency as required
+  if (motor.getSynchronized() == true && enabled) {
+    motor.setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
+  } else {
+    motor.setFrequencySteps(frequency*settings.stepsPerMeasure);
+  }
 }
 
 float Axis::getFrequency() {
