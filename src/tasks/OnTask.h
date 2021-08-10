@@ -133,6 +133,7 @@ class Task {
     bool                   repeat            = false;
     uint8_t                priority          = 0;
     bool                   idle              = true;
+    bool                   wasIdle           = true;
     bool                   running           = false;
     PeriodUnits            period_units      = PU_MILLIS;
     PeriodUnits            next_period_units = PU_NONE;

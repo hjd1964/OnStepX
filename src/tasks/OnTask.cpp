@@ -45,6 +45,7 @@ unsigned char __task_postpone = false;
 
 // Task object
 Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)()) {
+  idle = period == 0;
   this->period   = period;
   period_units   = PU_MILLIS;
   this->duration = duration;
@@ -122,45 +123,44 @@ void Task::setCallback(void (*volatile callback)()) {
 }
 
 bool Task::poll() {
-  if (hardwareTimer) return false;
+  if (hardwareTimer || running) return false;
 
-  if (!running) {
-    if (period > 0) {
+  if (period != 0) {
+    unsigned long t, time_to_next_task;
 
-      unsigned long t;
-      if (period_units == PU_MICROS) t = micros(); else if (period_units == PU_SUB_MICROS) t = micros() * 16; else t = millis();
-      if (idle) { idle = false; next_task_time = t + period; }
+    if (period_units == PU_SUB_MICROS) t = micros() * 16; else if (period_units == PU_MICROS) t = micros(); else t = millis();
+    if (wasIdle) { wasIdle = false; next_task_time = t; }
+    time_to_next_task = next_task_time - t;
 
-      unsigned long time_to_next_task = next_task_time - t;
-      if ((long)time_to_next_task <= 0) {
-        last_task_time = t;
-        running = true;
+    if ((long)time_to_next_task < 0) {
+      running = true;
 
-        TASKS_PROFILER_PREFIX;
-        callback();
-        TASKS_PROFILER_SUFFIX;
-      
-        running = false;
+      TASKS_PROFILER_PREFIX;
+      callback();
+      TASKS_PROFILER_SUFFIX;
+    
+      running = false;
 
-        if (__task_postpone) { __task_postpone = false; return false; }
+      if (__task_postpone) { __task_postpone = false; return false; }
 
-        // adopt next period
-        if (next_period_units != PU_NONE) {
-          time_to_next_task = 0;
-          period = next_period;
-          period_units = next_period_units;
-          next_period_units = PU_NONE;
-        }
-
-        // set adjusted period
-        #ifndef TASKS_QUEUE_MISSED
-          if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
-        #endif
-        next_task_time = last_task_time + (long)(period + time_to_next_task);
-        if (!repeat) period = 0;
+      // adopt next period
+      if (next_period_units != PU_NONE) {
+        time_to_next_task = 0;
+        period = next_period;
+        period_units = next_period_units;
+        next_period_units = PU_NONE;
       }
-    } else idle = true;
-  }
+
+      // set adjusted period
+      #ifndef TASKS_QUEUE_MISSED
+        if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
+//      if (-time_to_next_task > period) time_to_next_task = period;
+      #endif
+      next_task_time = t + (long)(period + time_to_next_task);
+      if (!repeat) period = 0;
+    }
+  } else wasIdle = true;
+
   return false;
 }
 
@@ -170,12 +170,13 @@ void Task::setPeriod(unsigned long period) {
     next_period_units = PU_MILLIS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0 || period_units == PU_MILLIS) {
+    if (this->period == 0) {
+      idle = true;
       this->period = period;
       period_units = PU_MILLIS;
       next_period_units = PU_NONE;
-      next_task_time = last_task_time + period;
     } else {
+      idle = false;
       next_period = period;
       next_period_units = PU_MILLIS;
     }
@@ -188,12 +189,13 @@ void Task::setPeriodMicros(unsigned long period) {
     next_period_units = PU_MICROS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0 || period_units == PU_MICROS) {
+    if (this->period == 0) {
+      idle = true;
       this->period = period;
       period_units = PU_MICROS;
       next_period_units = PU_NONE;
-      next_task_time = last_task_time + period;
     } else {
+      idle = false;
       next_period = period;
       next_period_units = PU_MICROS;
     }
@@ -206,12 +208,13 @@ void Task::setPeriodSubMicros(unsigned long period) {
     next_period_units = PU_SUB_MICROS;
     setHardwareTimerPeriod();
   } else {
-    if (this->period == 0 || period_units == PU_SUB_MICROS) {
+    if (this->period == 0) {
+      idle = true;
       this->period = period;
       period_units = PU_SUB_MICROS;
       next_period_units = PU_NONE;
-      next_task_time = last_task_time + period;
     } else {
+      idle = false;
       next_period = period;
       next_period_units = PU_SUB_MICROS;
     }
