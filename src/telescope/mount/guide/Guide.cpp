@@ -48,10 +48,6 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   guideActionAxis1 = guideAction;
   float rate = rateSelectToRate(rateSelect);
 
-  VF("MSG: guideStartAxis1(); guide ");
-  if (guideAction == GA_REVERSE) { VF("reverse"); } else { VF("forward"); }
-  VF(" started at "); V(rate); VL("X");
-
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
@@ -77,11 +73,9 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
   if (guideActionAxis1 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
     if (rateAxis1 == 0.0F) {
-      VF("MSG: guideStopAxis1(); requesting guide ");
       guideActionAxis1 = GA_BREAK;
-      if (abort) { VL("abort"); mount.axis1.autoSlewAbort(); } else { VL("stop"); mount.axis1.autoSlewStop(); }
+      if (abort) mount.axis1.autoSlewAbort(); else mount.axis1.autoSlewStop();
     } else {
-      VLF("MSG: guideStopAxis1(); guide stopped");
       guideActionAxis1 = GA_NONE;
       rateAxis1 = 0.0F;
       mount.update();
@@ -96,10 +90,6 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 
   guideActionAxis2 = guideAction;
   float rate = rateSelectToRate(rateSelect);
-
-  VF("MSG: guideStartAxis2(); guide ");
-  if (guideAction == GA_REVERSE) { VF("reverse"); } else { VF("forward"); }
-  VF(" started at "); V(rate); VL("X");
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
@@ -126,11 +116,9 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
   if (guideActionAxis2 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
     if (rateAxis2 == 0.0F) {
-      VF("MSG: guideStopAxis2(); requesting guide ");
       guideActionAxis2 = GA_BREAK;
-      if (abort) { VL("abort"); mount.axis2.autoSlewAbort(); } else { VL("stop"); mount.axis2.autoSlewStop(); }
+      if (abort) mount.axis2.autoSlewAbort(); else mount.axis2.autoSlewStop();
     } else {
-      VLF("MSG: guideStopAxis2(); guide stopped");
       guideActionAxis2 = GA_NONE;
       rateAxis2 = 0.0F;
       mount.update();
