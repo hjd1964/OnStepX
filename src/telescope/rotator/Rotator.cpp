@@ -34,9 +34,10 @@ void Rotator::init() {
   axis.resetPositionSteps(0);
   axis.setBacklashSteps(backlash);
   axis.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
+  axis.setFrequencyMin(0.01F);
   axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-  axis.setSlewAccelerationRate(AXIS3_ACCELERATION_RATE);
-  axis.setSlewAccelerationRateAbort(AXIS3_RAPID_STOP_RATE);
+  axis.setSlewAccelerationTime(AXIS3_ACCELERATION_TIME);
+  axis.setSlewAccelerationTimeAbort(AXIS3_RAPID_STOP_TIME);
   if (AXIS3_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   axis.enable(true);
@@ -64,18 +65,6 @@ bool Rotator::setBacklash(int value) {
   return true;
 }
 
-// enable or disable the derotator
-void Rotator::setDerotatorEnabled(bool value) {
-  #ifdef MOUNT_PRESENT
-    if (transform.mountType == ALTAZM) {
-      derotatorEnabled = value;
-      if (!derotatorEnabled) axis.setFrequencyBase(0.0F);
-    }
-  #else
-    value = value;
-  #endif
-}
-
 #ifdef MOUNT_PRESENT
   // returns parallactic angle in degrees
   double Rotator::parallacticAngle(Coordinate *coord) {
@@ -97,13 +86,22 @@ void Rotator::setDerotatorEnabled(bool value) {
   }
 #endif
 
+// move rotator to a specific location
+CommandError Rotator::gotoTarget(float target) {
+  VF("MSG: Rotator, goto target coordinate set ("); V(target*axis.getStepsPerMeasure()); VL("°)");
+  VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
+  axis.setTargetCoordinate(target);
+  return axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+}
+
 // parks rotator at current position
 void Rotator::park() {
-  setDerotatorEnabled(false);
+  derotatorEnabled = false;
+  axis.setFrequencyBase(0.0F);
   axis.setBacklash(0.0F);
   float position = axis.getInstrumentCoordinate();
   axis.setTargetCoordinatePark(position);
-  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
   axis.enable(false);
   #if DEBUG == VERBOSE
     tasks.yield(500);

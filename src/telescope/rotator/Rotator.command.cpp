@@ -95,11 +95,11 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :r[n]#     Set rotator move rate where n = 1 for .01 deg/s, 2 for 0.1 deg/s, 3 for 1.0 deg/s, 4 for 5.0 deg/s
+    // :r[n]#     Set rotator move rate where n = 1 for .01 deg/s, 2 for 0.1 deg/s, 3 for 1.0 deg/s, 4 for 10.0 deg/s
     //            Returns: Nothing
     if (command[1] >= '1' && command[1] <= '4') {
-      float p[] = {0.01F, 0.1F, 1.0F, 5.0F};
-      moveRate = p[command[1] - '1'];
+      float p[] = {0.01F, 0.1F, 1.0F, 10.0F};
+      slewRate = p[command[1] - '1'];
       *numericReply = false;
     } else
 
@@ -113,16 +113,14 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r>#       Move rotator CW
     //            Returns: Nothing
     if (command[1] == '>') {
-      axis.setFrequencySlew(moveRate);
-      axis.autoSlew(DIR_FORWARD);
+      *commandError = axis.autoSlew(DIR_FORWARD, slewRate);
       *numericReply = false;
     } else
 
     // :r<#       Move rotator CCW
     //            Returns: Nothing
     if (command[1] == '<') {
-      axis.setFrequencySlew(moveRate);
-      axis.autoSlew(DIR_REVERSE);
+      *commandError = axis.autoSlew(DIR_REVERSE, slewRate);
       *numericReply = false;
     } else
 
@@ -137,12 +135,10 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Set rotator target angle Relative (in degrees)
     //            Returns: Nothing
     if (command[1] == 'R') {
-      double r;
+      double r, t;
       convert.dmsToDouble(&r, parameter, true);
-      long t = axis.getTargetCoordinate();
-      axis.setTargetCoordinateSteps(t + r);
-      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      t = axis.getTargetCoordinate();
+      *commandError = gotoTarget(t + r);
       *numericReply = false;
     } else
 
@@ -153,16 +149,13 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'S') {
       double t;
       convert.dmsToDouble(&t, parameter, true);
-      axis.setTargetCoordinate(t);
-      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
-    //  *commandError = CE_SLEW_ERR_IN_STANDBY;
+      *commandError = gotoTarget(t);
     } else
 
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      axis.resetPosition(0.0);
+      *commandError = axis.resetPosition(0.0);
       axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
@@ -170,8 +163,8 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rF#       Set rotator position as Half-travel
     //            Returns: Nothing
     if (command[1] == 'F') {
-      float p = round((axis.settings.limits.max + axis.settings.limits.min)/2.0F);
-      axis.resetPosition(p);
+      double t = round((axis.settings.limits.max + axis.settings.limits.min)/2.0);
+      *commandError = axis.resetPosition(t);
       axis.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
@@ -179,24 +172,24 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rC#       Move rotator to half-travel target position
     //            Returns: Nothing
     if (command[1] == 'C') {
-      long t = round((axis.settings.limits.max + axis.settings.limits.min)/2.0F);
-      axis.setTargetCoordinateSteps(t);
-      axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-      axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+      *commandError = gotoTarget(round((axis.settings.limits.max + axis.settings.limits.min)/2.0));
       *numericReply = false;
     } else
 
     // :r+#       Derotator Enable
     //            Returns: Nothing
     if (command[1] == '+') {
-      setDerotatorEnabled(true);
+      #ifdef MOUNT_PRESENT
+        if (transform.mountType == ALTAZM) derotatorEnabled = true;
+      #endif
       *numericReply = false;
     } else
 
     // :r-#       Derotator Disable 
     //            Returns: Nothing
     if (command[1] == '-') {
-      setDerotatorEnabled(false);
+      derotatorEnabled = false;
+      axis.setFrequencyBase(0.0F);
       *numericReply = false;
     } else
 
@@ -205,9 +198,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == 'P') {
       #ifdef MOUNT_PRESENT
         Coordinate current = mount.getPosition();
-        axis.setTargetCoordinateSteps(parallacticAngle(&current));
-        axis.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
-        axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+        *commandError = gotoTarget(parallacticAngle(&current));
       #endif
       *numericReply = false;
     } else

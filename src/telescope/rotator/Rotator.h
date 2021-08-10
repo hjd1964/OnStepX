@@ -30,9 +30,6 @@ class Rotator {
     Axis axis;
 
   private:
-    // enable or disable the derotator
-    void setDerotatorEnabled(bool value);
-
     #ifdef MOUNT_PRESENT
       // returns parallactic angle in degrees
       double parallacticAngle(Coordinate *coord);
@@ -40,6 +37,9 @@ class Rotator {
       // returns parallactic rate in degrees per second
       double parallacticRate(Coordinate *coord);
     #endif
+
+    // move rotator to a specific location
+    CommandError gotoTarget(float target);
 
     // parks rotator at current position
     void park();
@@ -50,7 +50,7 @@ class Rotator {
     void readSettings();
     void writeSettings();
 
-    float moveRate = 3.0F;  // in degs/sec
+    float slewRate = AXIS3_SLEW_RATE_DESIRED;  // in degs/sec
 
     int16_t backlash = 0;   // in steps
     float position = 0.0F;  // in degrees
