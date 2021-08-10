@@ -96,14 +96,10 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
       mount.axis2.setTargetCoordinate(a2);
     }
     VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
+    VF("MSG: Mount, starting goto at slew rate ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
 
-    // slew rate in rads per second
-    mount.axis1.setFrequencySlew(radsPerSecondCurrent);
-    mount.axis2.setFrequencySlew(radsPerSecondCurrent);
-    VF("MSG: Mount, goto slew rate set ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
-
-    mount.axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-    mount.axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+    mount.axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    mount.axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
 
     status.sound.alert();
 
