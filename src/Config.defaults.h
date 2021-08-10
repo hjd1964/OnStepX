@@ -338,13 +338,13 @@
 #define AXIS3_POWER_DOWN              OFF
 #endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
-#define AXIS3_SLEW_RATE_DESIRED       1.0                         // in degrees/sec
+#define AXIS3_SLEW_RATE_DESIRED       3.0                         // in degrees/sec
 #endif
-#ifndef AXIS3_ACCELERATION_RATE
-#define AXIS3_ACCELERATION_RATE       AXIS3_SLEW_RATE_DESIRED     // in degrees/sec/sec
+#ifndef AXIS3_ACCELERATION_TIME
+#define AXIS3_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS3_RAPID_STOP_RATE
-#define AXIS3_RAPID_STOP_RATE         (AXIS3_ACCELERATION_RATE*2) // in degrees/sec/sec
+#ifndef AXIS3_RAPID_STOP_TIME
+#define AXIS3_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS3_BACKLASH_RATE
 #define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_DESIRED/4) // in degrees/sec
@@ -388,11 +388,11 @@
 #ifndef AXIS4_SLEW_RATE_DESIRED
 #define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS4_ACCELERATION_RATE
-#define AXIS4_ACCELERATION_RATE       AXIS4_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS4_ACCELERATION_TIME
+#define AXIS4_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS4_RAPID_STOP_RATE
-#define AXIS4_RAPID_STOP_RATE         (AXIS4_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS4_RAPID_STOP_TIME
+#define AXIS4_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS4_BACKLASH_RATE
 #define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_DESIRED/4) // in microns/sec
@@ -435,11 +435,11 @@
 #ifndef AXIS5_SLEW_RATE_DESIRED
 #define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS5_ACCELERATION_RATE
-#define AXIS5_ACCELERATION_RATE       AXIS5_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS5_ACCELERATION_TIME
+#define AXIS5_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS5_RAPID_STOP_RATE
-#define AXIS5_RAPID_STOP_RATE         (AXIS5_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS5_RAPID_STOP_TIME
+#define AXIS5_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS5_BACKLASH_RATE
 #define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4) // in microns/sec
@@ -482,11 +482,11 @@
 #ifndef AXIS6_SLEW_RATE_DESIRED
 #define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS6_ACCELERATION_RATE
-#define AXIS6_ACCELERATION_RATE       AXIS6_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS6_ACCELERATION_TIME
+#define AXIS6_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS6_RAPID_STOP_RATE
-#define AXIS6_RAPID_STOP_RATE         (AXIS6_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS6_RAPID_STOP_TIME
+#define AXIS6_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS6_BACKLASH_RATE
 #define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4) // in microns/sec
@@ -529,11 +529,11 @@
 #ifndef AXIS7_SLEW_RATE_DESIRED
 #define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS7_ACCELERATION_RATE
-#define AXIS7_ACCELERATION_RATE       AXIS7_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS7_ACCELERATION_TIME
+#define AXIS7_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS7_RAPID_STOP_RATE
-#define AXIS7_RAPID_STOP_RATE         (AXIS7_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS7_RAPID_STOP_TIME
+#define AXIS7_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS7_BACKLASH_RATE
 #define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4) // in microns/sec
@@ -576,11 +576,11 @@
 #ifndef AXIS8_SLEW_RATE_DESIRED
 #define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS8_ACCELERATION_RATE
-#define AXIS8_ACCELERATION_RATE       AXIS8_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS8_ACCELERATION_TIME
+#define AXIS8_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS8_RAPID_STOP_RATE
-#define AXIS8_RAPID_STOP_RATE         (AXIS8_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS8_RAPID_STOP_TIME
+#define AXIS8_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS8_BACKLASH_RATE
 #define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4) // in microns/sec
@@ -623,11 +623,11 @@
 #ifndef AXIS9_SLEW_RATE_DESIRED
 #define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
 #endif
-#ifndef AXIS9_ACCELERATION_RATE
-#define AXIS9_ACCELERATION_RATE       AXIS9_SLEW_RATE_DESIRED     // in microns/sec/sec
+#ifndef AXIS9_ACCELERATION_TIME
+#define AXIS9_ACCELERATION_TIME       2                           // in seconds, to selected rate
 #endif
-#ifndef AXIS9_RAPID_STOP_RATE
-#define AXIS9_RAPID_STOP_RATE         (AXIS9_ACCELERATION_RATE*2) // in microns/sec/sec
+#ifndef AXIS9_RAPID_STOP_TIME
+#define AXIS9_RAPID_STOP_TIME         1                           // in seconds, to stop
 #endif
 #ifndef AXIS9_BACKLASH_RATE
 #define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4) // in microns/sec
