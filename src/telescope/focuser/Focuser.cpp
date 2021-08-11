@@ -82,7 +82,6 @@ void Focuser::init() {
 // get focuser temperature in deg. C
 float Focuser::getTemperature() {
   float t = temperature.getChannel(0);
-  if (isnan(t)) t = 10.0;
   return t;
 }
 
@@ -184,9 +183,9 @@ bool Focuser::setBacklash(int index, int value) {
 
 // move focuser to a specific location
 CommandError Focuser::gotoTarget(int index, long target) {
-  VF("MSG: Focuser, goto target coordinate set ("); V(target*axis[index]->getStepsPerMeasure()); VL("um)");
-  VF("MSG: Focuser, starting goto at slew rate ("); V(slewRateDesired[index]); VL("um/s)");
-  axis[index]->setTargetCoordinateSteps(target);
+  VF("MSG: Focuser"); V(index + 1); V(", goto target coordinate set ("); V(target*axis[index]->getStepsPerMeasure()); VL("um)");
+  VF("MSG: Focuser"); V(index + 1); V(", starting goto at slew rate ("); V(slewRateDesired[index]); VL("um/s)");
+  axis[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
   return axis[index]->autoSlewRateByDistance(slewRateDesired[index]*accelerationTime[index], slewRateDesired[index]);
 }
 
@@ -197,7 +196,7 @@ void Focuser::park(int index) {
   axis[index]->setBacklash(0.0F);
   float position = axis[index]->getInstrumentCoordinate();
   axis[index]->setTargetCoordinatePark(position);
-  axis[index]->autoSlewRateByDistance(slewRateDesired[index]);
+  axis[index]->autoSlewRateByDistance(slewRateDesired[index]*accelerationTime[index], slewRateDesired[index]);
   axis[index]->enable(false);
   #if DEBUG == VERBOSE
     tasks.yield(500);
@@ -221,6 +220,7 @@ void Focuser::unpark(int index) {
   axis[index]->enable(true);
   axis[index]->autoSlewRateByDistance(slewRateDesired[index]);
   settings[index].position = position;
+  target[index] = position - tcfSteps[index];
 }
 
 void Focuser::readSettings(int index) {
@@ -239,24 +239,44 @@ void Focuser::writeSettings(int index) {
 
 // poll TCF to move the focusers as required
 void Focuser::poll() {
+  float t = getTemperature();
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (axis[index] != NULL && !axis[index]->isSlewing()) {
-      if (settings[index].tcf.enabled) {
-        Y;
-        // get offset in microns due to TCF
-        float offset = settings[index].tcf.coef * (getTemperature() - settings[index].tcf.t0);
-        // convert to steps
-        offset *= axis[index]->getStepsPerMeasure();
-        // apply deadband
-        long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
-        // move focuser if required
-        if (tcfSteps[index] != steps) {
-          tcfSteps[index] = steps;
-          long t = axis[index]->getTargetCoordinateSteps();
-          axis[index]->setTargetCoordinateSteps(t + tcfSteps[index]);
-          axis[index]->setFrequencySlew(10);
-          axis[index]->autoSlewRateByDistance(10);
+    if (axis[index] != NULL) {
+      if (!axis[index]->isSlewing()) {
+        if ((long)(millis() - afterSlewWait[index]) > 0) {
+          afterSlewWait[index] = millis();
+          if (settings[index].tcf.enabled) {
+            Y;
+
+            // only allow TCF if telescope temperature is good
+            if (!isnan(t)) {
+              // get offset in microns due to TCF
+              float offset = settings[index].tcf.coef * (t - settings[index].tcf.t0);
+              // convert to steps
+              offset *= axis[index]->getStepsPerMeasure();
+              // apply deadband
+              long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
+              // update target if required
+              if (tcfSteps[index] != steps) {
+                VF("MSG: Focuser"); V(index + 1); V(", goto TCF offset changed ("); V(steps/axis[index]->getStepsPerMeasure()); VL("um)");
+                tcfSteps[index] = steps;
+                axis[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
+              }
+            }
+
+            // move to the target at 20 um/s
+            if (!axis[index]->atTarget()) {
+              axis[index]->setSynchronized(false);
+              axis[index]->setFrequency(20.0F);
+            } else {
+              axis[index]->setFrequency(0.0F);
+            }
+
+          } else tcfSteps[index] = 0;
         }
+      } else {
+        afterSlewWait[index] = millis() + 2000;
+        target[index] = axis[index]->getInstrumentCoordinateSteps() - tcfSteps[index];
       }
     }
   }

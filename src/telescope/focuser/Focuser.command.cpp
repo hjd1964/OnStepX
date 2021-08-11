@@ -263,7 +263,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FR[sn]#   Move focuser target position relative (in microns or steps)
     //            Returns: Nothing
     if (toupper(command[1]) == 'R') {
-      *commandError = gotoTarget(index, axis[index]->getTargetCoordinateSteps() + atol(parameter)*UnitsToSteps);
+      *commandError = gotoTarget(index, target[index] + atol(parameter)*UnitsToSteps);
       *numericReply = false;
     } else
 
@@ -271,7 +271,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'S') {
-      *commandError = gotoTarget(index, atol(parameter)*UnitsToSteps + tcfSteps[index]);
+      *commandError = gotoTarget(index, atol(parameter)*UnitsToSteps);
     } else
 
     // :FZ#       Set focuser position as zero
@@ -295,7 +295,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'h') {
       long t = round((axis[index]->settings.limits.max + axis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-      *commandError = gotoTarget(index, t + tcfSteps[index]);
+      *commandError = gotoTarget(index, t);
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
 

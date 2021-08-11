@@ -105,6 +105,9 @@ class Focuser {
     long tcfSteps[FOCUSER_MAX];
 
     FocuserSettings settings[FOCUSER_MAX];
+
+    long target[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
+    unsigned long afterSlewWait[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
 };
 
 extern Focuser focuser;
