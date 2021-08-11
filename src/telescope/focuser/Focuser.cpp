@@ -75,8 +75,8 @@ void Focuser::init() {
   }
 
   // start task for temperature compensated focusing
-  VF("MSG: Focuser, starting TCF task (rate 1s priority 7)... ");
-  if (tasks.add(1000, 0, true, 7, tcfWrapper, "FocPoll")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: Focuser, starting TCF task (rate 1s priority 6)... ");
+  if (tasks.add(1000, 0, true, 6, tcfWrapper, "FocPoll")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // get focuser temperature in deg. C

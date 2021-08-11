@@ -33,8 +33,8 @@ void Status::init() {
         if (STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
       #endif
       pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
-      VF("MSG: Mount, status start LED task (variable rate priority 6)... ");
-      statusTaskHandle = tasks.add(0, 0, true, 6, flash, "mntLed");
+      VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
+      statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VL("success"); } else { VL("FAILED!"); }
     }
   #endif

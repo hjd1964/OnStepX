@@ -45,8 +45,8 @@ void Rotator::init() {
   #ifdef MOUNT_PRESENT
     if (transform.mountType == ALTAZM) {
       // start task for derotation
-      VF("MSG: Rotator, start derotation task (rate 1s priority 7)... ");
-      if (tasks.add(1000, 0, true, 7, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+      VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
+      if (tasks.add(1000, 0, true, 6, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
     }
   #endif
 }

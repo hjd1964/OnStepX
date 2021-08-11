@@ -29,8 +29,8 @@ void Limits::init() {
   nv.readBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
 
   // start limit monitor task
-  VF("MSG: Mount, limits start monitor task (rate 100ms priority 3)... ");
-  if (tasks.add(100, 0, true, 3, limitsWrapper, "MntLmt")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: Mount, limits start monitor task (rate 100ms priority 2)... ");
+  if (tasks.add(100, 0, true, 2, limitsWrapper, "MntLmt")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // target coordinate check ahead of sync, goto, etc.

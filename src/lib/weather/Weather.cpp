@@ -71,7 +71,7 @@ bool Weather::init() {
 
     if (success) {
       VF("MSG: Weather, start weather monitor task (rate 5000ms priority 7)... ");
-      tasks.add(5000, 0, true, 7, weatherPollWrapper, "WeaPoll");
+      if (tasks.add(5000, 0, true, 7, weatherPollWrapper, "WeaPoll")) { VL("success"); } else { VL("FAILED!"); }
     }
   #else
     success = true;

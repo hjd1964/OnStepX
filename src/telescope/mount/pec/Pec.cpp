@@ -86,8 +86,8 @@
             senseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
           #endif
 
-          VF("MSG: Mount, PEC start monitor task... ");
-          monitorHandle = tasks.add(10, 0, true, 1, pecWrapper, "MntPec");
+          VF("MSG: Mount, PEC start monitor task (rate 10ms priority 3)... ");
+          monitorHandle = tasks.add(10, 0, true, 3, pecWrapper, "MntPec");
           if (monitorHandle) { VL("success"); } else { VL("FAILED!"); }
         }
       }

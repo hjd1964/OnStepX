@@ -102,8 +102,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   // bring up status LED and flash error codes
   #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
     pinModeEx(STATUS_LED_PIN, OUTPUT);
-    VF("MSG: Telescope, start status LED task (rate 500ms priority 6)... ");
-    if (tasks.add(500, 0, true, 6, statusFlash, "StaLed")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Telescope, start status LED task (rate 500ms priority 4)... ");
+    if (tasks.add(500, 0, true, 4, statusFlash, "StaLed")) { VL("success"); } else { VL("FAILED!"); }
   #endif
 }
 

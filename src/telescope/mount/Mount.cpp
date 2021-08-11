@@ -96,8 +96,8 @@ void Mount::init() {
     #endif
   #endif
 
-  VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 7)... ");
-  if (tasks.add(1000, 0, true, 7, mountWrapper, "MntTrk")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");
+  if (tasks.add(1000, 0, true, 6, mountWrapper, "MntTrk")) { VL("success"); } else { VL("FAILED!"); }
 
   update();
 }

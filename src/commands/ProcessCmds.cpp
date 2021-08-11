@@ -156,53 +156,53 @@ void commandChannelInit() {
     long comPollRate = 500;
   #endif
   #ifdef SERIAL_A
-    VF("MSG: Setup, start command channel A task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsA, "PrcCmdA");
+    VF("MSG: Setup, start command channel A task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsA, "PrcCmdA");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_B
-    VF("MSG: Setup, start command channel B task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsB, "PrcCmdB");
+    VF("MSG: Setup, start command channel B task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsB, "PrcCmdB");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_C
-    VF("MSG: Setup, start command channel C task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsC, "PrcCmdC");
+    VF("MSG: Setup, start command channel C task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsC, "PrcCmdC");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_D
-    VF("MSG: Setup, start command channel D task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel D task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsD, "PrcCmdD")) { VL("success"); } else { VL("FAILED!"); }
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_ST4
-    VF("MSG: Setup, start command channel ST4 task (priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel ST4 task (priority 5)... ");
+    if (tasks.add(3, 0, true, 5, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
   #endif
   #if SERIAL_BT_MODE == SLAVE
-    VF("MSG: Setup, start command channel BT task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsBT, "PrcCmdT");
+    VF("MSG: Setup, start command channel BT task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsBT, "PrcCmdT");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_IP
-    VF("MSG: Setup, start command channel IP task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsIP, "PrcCmdI");
+    VF("MSG: Setup, start command channel IP task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsIP, "PrcCmdI");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_PIP
-    VF("MSG: Setup, start command channel PIP task (priority 6)... ");
-    handle = tasks.add(0, 0, true, 6, processCmdsPIP, "PrcCmdP");
+    VF("MSG: Setup, start command channel PIP task (priority 5)... ");
+    handle = tasks.add(0, 0, true, 5, processCmdsPIP, "PrcCmdP");
     if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_LOCAL
-    VF("MSG: Setup, start command channel Local task (priority 6)... ");
-    if (tasks.add(3, 0, true, 6, processCmdsLocal, "PrcCmdL")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Setup, start command channel Local task (priority 5)... ");
+    if (tasks.add(3, 0, true, 5, processCmdsLocal, "PrcCmdL")) { VL("success"); } else { VL("FAILED!"); }
   #endif
 }

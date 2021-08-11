@@ -58,7 +58,7 @@ bool Ds2413::init() {
   if (deviceCount > 0) {
     found = true;
     VF("MSG: Gpio, start DS2413 monitor task (rate 20ms priority 7)... ");
-    if (tasks.add(20, 0, true, 7, ds2413Wrapper, "ds2413")) { VL("success"); } else { VL("FAILED!"); }
+    if (tasks.add(20, 0, true, 6, ds2413Wrapper, "ds2413")) { VL("success"); } else { VL("FAILED!"); }
   } else found = false;
 
   initialized = true;

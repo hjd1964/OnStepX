@@ -36,8 +36,8 @@ void Guide::init() {
   settings.rateSelect = GR_20X;
 
   // start guide monitor task
-  VF("MSG: Mount, start guide monitor task (rate 10ms priority 1)... ");
-  if (tasks.add(10, 0, true, 1, guideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: Mount, start guide monitor task (rate 10ms priority 3)... ");
+  if (tasks.add(10, 0, true, 3, guideWrapper, "MntGuid")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // start guide at a given direction and rate on Axis1

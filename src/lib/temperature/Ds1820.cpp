@@ -76,8 +76,8 @@ bool Ds1820::init() {
   DS18X20.setWaitForConversion(false);
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 7)... ");
-    if (tasks.add(100, 0, true, 7, ds1820Wrapper, "ds1820")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 6)... ");
+    if (tasks.add(100, 0, true, 6, ds1820Wrapper, "ds1820")) { VL("success"); } else { VL("FAILED!"); }
   } else found = false;
 
   return found;

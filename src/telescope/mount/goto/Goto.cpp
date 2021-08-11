@@ -82,9 +82,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
   // start the goto monitor
   if (taskHandle != 0) tasks.remove(taskHandle);
-  taskHandle = tasks.add(10, 0, true, 1, gotoWrapper, "MntGoto");
+  taskHandle = tasks.add(10, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
-    VLF("MSG: Mount, start goto monitor task (rate 10ms priority 1)... success");
+    VLF("MSG: Mount, start goto monitor task (rate 10ms priority 3)... success");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);

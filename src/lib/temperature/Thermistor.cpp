@@ -21,8 +21,8 @@ bool Thermistor::init() {
 
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: Temperature, start Thermistor monitor task (rate 100ms priority 7)... ");
-    if (tasks.add(100, 0, true, 7, thermistorWrapper, "therm")) { VL("success"); } else { VL("FAILED!"); }
+    VF("MSG: Temperature, start Thermistor monitor task (rate 100ms priority 6)... ");
+    if (tasks.add(100, 0, true, 6, thermistorWrapper, "therm")) { VL("success"); } else { VL("FAILED!"); }
   } else found = false;
 
   found = true;
