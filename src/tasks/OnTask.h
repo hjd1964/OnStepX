@@ -285,14 +285,14 @@ class Tasks {
     // keep track of the range of tasks so we don't waste cycles looking at empty ones
     void updateEventRange();
 
-    uint8_t highest_task     = 0;
-    uint8_t highest_priority = 0;
+    uint8_t highest_task     = 0; // the highest task# assigned
+    uint8_t highest_priority = 0; // the highest task priority
     #ifdef TASKS_HIGHER_PRIORITY_ONLY
       uint8_t highest_active_priority = 8;
     #endif
     uint8_t count            = 0;
-    uint8_t num_tasks        = 0;
-    uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255};
+    uint8_t num_tasks        = 0; // the total number of tasks
+    uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255}; // the task# were are servicing at this priority level
     bool    allocated[TASKS_MAX];
     uint8_t handleSearch     = 255;
     Task    *task[TASKS_MAX];
