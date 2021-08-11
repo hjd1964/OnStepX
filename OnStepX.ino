@@ -44,7 +44,7 @@
 #define FirmwareName                "OnStepX"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        03     // minor version 00 to 99
-#define FirmwareVersionPatch        "b"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "c"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -84,14 +84,14 @@ void setup() {
   delay(2000);
 
   // start system service task
-  VF("MSG: Setup, start system service task (rate 10ms priority 6)... ");
+  VF("MSG: Setup, start system service task (rate 10ms priority 7)... ");
   // add task for system services, runs at 10ms intervals so commiting 1KB of NV takes about 10 seconds
   // the cache is scanned (for writing) at 2000 bytes/second but can be slower while reading data into the cache at startup
-  if (tasks.add(10, 0, true, 6, systemServices, "SysSvcs")) { VL("success"); } else { VL("FAILED!"); }
+  if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) { VL("success"); } else { VL("FAILED!"); }
 
   // start input sense polling task
-  VF("MSG: Setup, start input sense polling task (rate 1ms priority 6)... ");
-  if (tasks.add(1, 0, true, 6, sensesPoll, "SenPoll")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: Setup, start input sense polling task (rate 1ms priority 7)... ");
+  if (tasks.add(1, 0, true, 7, sensesPoll, "SenPoll")) { VL("success"); } else { VL("FAILED!"); }
 
   // start telescope object
   telescope.init(FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch, FirmwareVersionConfig);
@@ -103,10 +103,10 @@ void setup() {
 
   // start task manager debug events
   #if DEBUG == PROFILER
-    tasks.add(142, 0, true, 4, profiler, "Profilr");
+    tasks.add(142, 0, true, 7, profiler, "Profilr");
   #endif
   #if DEBUG == CONSOLE
-    tasks.add(1000, 0, true, 4, debugConsole);
+    tasks.add(1000, 0, true, 7, debugConsole);
   #endif
 }
 
