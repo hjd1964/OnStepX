@@ -166,14 +166,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       axis[index]->setBacklash(getBacklash(index));
     } else
 
-    // :FC#       Get focuser temperature compensation coefficient
+    // :FC#       Get focuser temperature compensation coefficient in microns per °C)
     //            Return: n.n#
     if (command[1] == 'C' && parameter[0] == 0) {
       sprintF(reply, "%7.5f", getTcfCoef(index));
       *numericReply = false;
     } else
 
-    // :FC[sn.n]# Set focuser temperature compensation coefficient in um per deg. C (+ moves out as temperature falls)
+    // :FC[sn.n]# Set focuser temperature compensation coefficient in microns per °C (+ moves out as temperature falls)
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'C') {

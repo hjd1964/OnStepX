@@ -76,10 +76,10 @@ class Focuser {
     // set backlash in microns
     bool setBacklash(int index, int value);
 
-    // move focuser to a specific location
+    // move focuser to a specific location (in steps)
     CommandError gotoTarget(int index, long target);
 
-    // park focuser at its current position
+    // park focuser at its current location
     void park(int index);
 
     // unpark focuser
