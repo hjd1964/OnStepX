@@ -38,10 +38,10 @@ class StepDir {
 
     // resets motor and target angular position in steps, also zeros backlash and index 
     void resetPositionSteps(long value);
+    // resets target position to the motor position
+    void resetTargetToMotorPosition();
     // get motor angular position in steps
     long getMotorPositionSteps();
-    // sets target position to the motor position
-    void syncTargetToMotorPosition();
 
     // get instrument coordinate, in steps
     long getInstrumentCoordinateSteps();

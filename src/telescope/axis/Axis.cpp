@@ -448,7 +448,6 @@ void Axis::poll() {
         autoRate = AR_NONE;
         freq = 0.0F;
         motor.setSynchronized(true);
-        motor.syncTargetToMotorPosition();
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
         if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;

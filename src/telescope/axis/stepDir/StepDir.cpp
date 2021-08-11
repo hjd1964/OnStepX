@@ -161,19 +161,19 @@ void StepDir::resetPositionSteps(long value) {
   interrupts();
 }
 
+// resets target position to the motor position
+void StepDir::resetTargetToMotorPosition() {
+  noInterrupts();
+  targetSteps = motorSteps;
+  interrupts();
+}
+
 // get motor angular position in steps
 long StepDir::getMotorPositionSteps() {
   noInterrupts();
   long steps = motorSteps + backlashSteps;
   interrupts();
   return steps;
-}
-
-// sets target position to the motor position
-void StepDir::syncTargetToMotorPosition() {
-  noInterrupts();
-  targetSteps = motorSteps;
-  interrupts();
 }
 
 // get instrument coordinate, in steps

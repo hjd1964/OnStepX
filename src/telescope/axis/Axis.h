@@ -161,10 +161,10 @@ class Axis {
     // checks if slew is active on this axis
     bool isSlewing();
 
-    // set tracking state (automatic movement of target)
-    void setTracking(bool state);
-    // get tracking state (automatic movement of target)
-    bool getTracking();
+    // set synchronized state (automatic movement of target at setFrequencySteps() rate)
+    inline void setSynchronized(bool state) { motor.setSynchronized(state); }
+    // get synchronized state (automatic movement of target at setFrequencySteps() rate)
+    inline bool getSynchronized() { return motor.getSynchronized(); }
 
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
