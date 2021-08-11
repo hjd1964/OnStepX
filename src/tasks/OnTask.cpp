@@ -523,14 +523,12 @@ uint8_t Tasks::getHandleByName(const char name[]) {
       if (priority < highest_active_priority) {
         highest_active_priority = priority;
         for (uint8_t i = 0; i <= highest_task; i++) {
-          number[priority]++; if (number[priority] > highest_task) number[priority] = 0;
+          if (++number[priority] > highest_task) number[priority] = 0;
           if (allocated[number[priority]]) {
-            if (!task[number[priority]]->isDurationComplete()) {
-              if (task[number[priority]]->poll()) {
-                highest_active_priority = last_priority;
-                return;
-              }
-            } else remove(number[priority] + 1);
+            if (task[number[priority]]->getPriority() == priority) {
+              if (task[number[priority]]->isDurationComplete()) { remove(number[priority] + 1); highest_active_priority = last_priority; return; }
+              if (task[number[priority]]->poll()) { highest_active_priority = last_priority; return; }
+            }
           }
         }
         highest_active_priority = last_priority;
@@ -541,11 +539,12 @@ uint8_t Tasks::getHandleByName(const char name[]) {
   void Tasks::yield() {
     for (uint8_t priority = 0; priority <= highest_priority; priority++) {
       for (uint8_t i = 0; i <= highest_task; i++) {
-        number[priority]++; if (number[priority] > highest_task) number[priority] = 0;
+        if (++number[priority] > highest_task) number[priority] = 0;
         if (allocated[number[priority]]) {
-          if (!task[number[priority]]->isDurationComplete()) {
+          if (task[number[priority]]->getPriority() == priority) {
+            if (task[number[priority]]->isDurationComplete()) { remove(number[priority] + 1); return; }
             if (task[number[priority]]->poll()) return;
-          } else remove(number[priority] + 1);
+          }
         }
       }
     }
