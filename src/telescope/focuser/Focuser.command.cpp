@@ -242,6 +242,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :F+#       Move focuser in (toward objective)
     //            Returns: Nothing
     if (command[1] == '+') {
+      axis[index]->motor.resetTargetToMotorPosition();
       *commandError = axis[index]->autoSlew(DIR_FORWARD, moveRate[index]);
       *numericReply = false;
     } else
@@ -249,6 +250,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :F-#       Move focuser out (away from objective)
     //            Returns: Nothing
     if (command[1] == '-') {
+      axis[index]->motor.resetTargetToMotorPosition();
       *commandError = axis[index]->autoSlew(DIR_REVERSE, moveRate[index]);
       *numericReply = false;
     } else

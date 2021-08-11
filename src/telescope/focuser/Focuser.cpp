@@ -48,6 +48,9 @@ void Focuser::init() {
         V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
         axis[index]->init(index + 4, false);
 
+        // TCF defaults to disabled at startup
+        settings[index].tcf.enabled = false;
+
         if (settings[index].position < axis[index]->settings.limits.min) {
           settings[index].position = axis[index]->settings.limits.min;
           initError.value = true;
@@ -116,7 +119,12 @@ bool Focuser::getTcfEnable(int index) {
 bool Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index > 5) return false;
   settings[index].tcf.enabled = value;
-  if (value) settings[index].tcf.t0 = getTemperature(); else tcfSteps[index] = 0;
+  if (value) {
+    settings[index].tcf.t0 = getTemperature();
+   } else {
+     target[index] += tcfSteps[index];
+     tcfSteps[index] = 0;
+   }
   writeSettings(index);
   return true;
 }
@@ -181,15 +189,15 @@ bool Focuser::setBacklash(int index, int value) {
   return true;
 }
 
-// move focuser to a specific location
+// move focuser to a specific location (in steps)
 CommandError Focuser::gotoTarget(int index, long target) {
-  VF("MSG: Focuser"); V(index + 1); V(", goto target coordinate set ("); V(target*axis[index]->getStepsPerMeasure()); VL("um)");
+  VF("MSG: Focuser"); V(index + 1); V(", goto target coordinate set ("); V(target/axis[index]->getStepsPerMeasure()); VL("um)");
   VF("MSG: Focuser"); V(index + 1); V(", starting goto at slew rate ("); V(slewRateDesired[index]); VL("um/s)");
   axis[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
   return axis[index]->autoSlewRateByDistance(slewRateDesired[index]*accelerationTime[index], slewRateDesired[index]);
 }
 
-// park focuser at its current position
+// park focuser at its current location
 void Focuser::park(int index) {
   if (axis[index] == NULL) return;
   setTcfEnable(index, false);
@@ -251,14 +259,15 @@ void Focuser::poll() {
             // only allow TCF if telescope temperature is good
             if (!isnan(t)) {
               // get offset in microns due to TCF
-              float offset = settings[index].tcf.coef * (t - settings[index].tcf.t0);
+              float offset = settings[index].tcf.coef * (settings[index].tcf.t0 - t);
               // convert to steps
-              offset *= axis[index]->getStepsPerMeasure();
+              offset *= (float)axis[index]->getStepsPerMeasure();
               // apply deadband
               long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
               // update target if required
               if (tcfSteps[index] != steps) {
-                VF("MSG: Focuser"); V(index + 1); V(", goto TCF offset changed ("); V(steps/axis[index]->getStepsPerMeasure()); VL("um)");
+                VF("MSG: Focuser"); V(index + 1); V(", TCF offset changed moving to target "); 
+                if (steps >=0 ) V("+ "); else V("- "); V(fabs(steps/axis[index]->getStepsPerMeasure())); VL("um");
                 tcfSteps[index] = steps;
                 axis[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
               }
