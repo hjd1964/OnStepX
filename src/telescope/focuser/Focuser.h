@@ -58,10 +58,10 @@ class Focuser {
     // set TCF coefficient, in microns per deg. C
     bool  setTcfCoef(int index, float value);
 
-    // get TCF deadband, in microns
+    // get TCF deadband, in steps
     int   getTcfDeadband(int index);
 
-    // set TCF deadband, in microns
+    // set TCF deadband, in steps
     bool  setTcfDeadband(int index, int value);
 
     // get TCF T0, in deg. C
@@ -102,7 +102,7 @@ class Focuser {
     bool powerDown[FOCUSER_MAX]       = { AXIS4_POWER_DOWN == ON, AXIS5_POWER_DOWN == ON, AXIS6_POWER_DOWN == ON, AXIS7_POWER_DOWN == ON, AXIS8_POWER_DOWN == ON, AXIS9_POWER_DOWN == ON };
 
     int moveRate[FOCUSER_MAX];
-    float tcfSteps[FOCUSER_MAX];
+    long tcfSteps[FOCUSER_MAX];
 
     FocuserSettings settings[FOCUSER_MAX];
 };

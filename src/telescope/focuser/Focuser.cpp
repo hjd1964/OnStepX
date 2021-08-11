@@ -137,13 +137,13 @@ bool Focuser::setTcfCoef(int index, float value) {
   return true;
 }
 
-// get TCF deadband, in microns
+// get TCF deadband, in steps
 int Focuser::getTcfDeadband(int index) {
   if (index < 0 || index > 5) return 0;
   return settings[index].tcf.deadband;
 }
 
-// set TCF deadband, in microns
+// set TCF deadband, in steps
 bool Focuser::setTcfDeadband(int index, int value) {
   if (index < 0 || index > 5) return false;
   if (value < 1 || value > 10000) return false;

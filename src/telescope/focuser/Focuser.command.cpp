@@ -198,7 +198,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FD#       Get focuser temperature compensation deadband amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'D' && parameter[0] == 0) {
-      sprintf(reply,"%ld",(long)round(getTcfDeadband(index)*MicronsToUnits));
+      sprintf(reply,"%ld",(long)round(getTcfDeadband(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -206,7 +206,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'D') {
-      if (!setTcfDeadband(index, round(atol(parameter)*UnitsToMicrons))) *commandError = CE_PARAM_RANGE;
+      if (!setTcfDeadband(index, round(atol(parameter)*UnitsToSteps))) *commandError = CE_PARAM_RANGE;
     } else
 
     // :FP#       Get focuser DC Motor Power Level (in %)
