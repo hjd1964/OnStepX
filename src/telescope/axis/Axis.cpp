@@ -488,8 +488,6 @@ void Axis::setFrequencyMax(float frequency) {
 
 // frequency for base movement in "measures" (radians, microns, etc.) per second
 void Axis::setFrequencyBase(float frequency) {
-  if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
-  if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;
   baseFreq = frequency;
 }
 
@@ -537,15 +535,21 @@ void Axis::setFrequency(float frequency) {
   }
 
   // apply base frequency as required
-  if (motor.getSynchronized() == true && enabled) {
+  if (enabled) {
     motor.setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
   } else {
-    motor.setFrequencySteps(frequency*settings.stepsPerMeasure);
+    motor.setFrequencySteps(0.0F);
   }
 }
 
+// get frequency in "measures" (degrees, microns, etc.) per second
 float Axis::getFrequency() {
   return motor.getFrequencySteps()/settings.stepsPerMeasure;
+}
+
+// gets backlash frequency in "measures" (degrees, microns, etc.) per second
+float Axis::getBacklashFrequency() {
+  return settings.backlashFreq;
 }
 
 // get associated motor driver status

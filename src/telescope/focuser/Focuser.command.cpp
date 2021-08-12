@@ -25,8 +25,11 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (command[1] == 'P' && parameter[0] == 0) {
       CommandError e = CE_NONE;
-      for (int index = 0; index < FOCUSER_MAX; index++) park(index);
-      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      for (int index = 0; index < FOCUSER_MAX; index++) {
+        CommandError e1 = park(index);
+        if (e1 != CE_NONE) e = e1;
+      }
+      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Focusers, park FAIL "); VL(e); *commandError = e; }
       return false;
     } else 
 
@@ -35,8 +38,11 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (command[1] == 'R' && parameter[0] == 0) {
       CommandError e = CE_NONE;
-      for (int index = 0; index < FOCUSER_MAX; index++) unpark(index);
-      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      for (int index = 0; index < FOCUSER_MAX; index++) {
+        CommandError e1 = unpark(index);
+        if (e1 != CE_NONE) e = e1;
+      }
+      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Focusers, unpark FAIL "); VL(e); *commandError = e; }
       return false;
     } else return false;
   } else
@@ -162,8 +168,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'B') {
-      setBacklash(index, round(atol(parameter)*UnitsToSteps));
-      axis[index]->setBacklash(getBacklash(index));
+      *commandError = setBacklash(index, round(atol(parameter)*UnitsToSteps));
     } else
 
     // :FC#       Get focuser temperature compensation coefficient in microns per °C)
@@ -177,8 +182,8 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'C') {
-      float value = atof(parameter); if (!setTcfCoef(index, value))
-      *commandError = CE_PARAM_RANGE;
+      float value = atof(parameter);
+      if (!setTcfCoef(index, value)) *commandError = CE_PARAM_RANGE;
     } else
 
     // :Fc#       Get focuser temperature compensation enable status
@@ -192,7 +197,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'c' && parameter[1] == 0) {
-      setTcfEnable(index, parameter[0] != '0');
+      *commandError = setTcfEnable(index, parameter[0] != '0');
     } else
 
     // :FD#       Get focuser temperature compensation deadband amount (in steps or microns)
@@ -242,16 +247,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :F+#       Move focuser in (toward objective)
     //            Returns: Nothing
     if (command[1] == '+') {
-      axis[index]->motor.resetTargetToMotorPosition();
-      *commandError = axis[index]->autoSlew(DIR_FORWARD, moveRate[index]);
+      *commandError = slew(index, DIR_FORWARD);
       *numericReply = false;
     } else
 
     // :F-#       Move focuser out (away from objective)
     //            Returns: Nothing
     if (command[1] == '-') {
-      axis[index]->motor.resetTargetToMotorPosition();
-      *commandError = axis[index]->autoSlew(DIR_REVERSE, moveRate[index]);
+      *commandError = slew(index, DIR_REVERSE);
       *numericReply = false;
     } else
 
@@ -279,6 +282,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FZ#       Set focuser position as zero
     //            Returns: Nothing
     if (command[1] == 'Z') {
+      parked[index] = false;
       *commandError = axis[index]->resetPositionSteps(0);
       axis[index]->setBacklash(getBacklash(index));
       *numericReply = false;
@@ -287,6 +291,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FH#       Set focuser position as half-travel
     //            Returns: Nothing
     if (command[1] == 'H') {
+      parked[index] = false;
       long p = round((axis[index]->settings.limits.max + axis[index]->settings.limits.min)/2.0F)*MicronsToSteps;
       *commandError = axis[index]->resetPositionSteps(p);
       axis[index]->setBacklash(getBacklash(index));

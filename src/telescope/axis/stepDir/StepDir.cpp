@@ -216,9 +216,9 @@ long StepDir::getTargetCoordinateSteps() {
 // distance to target in steps (+/-)
 long StepDir::getTargetDistanceSteps() {
   noInterrupts();
-  long steps = motorSteps;
+  long dist = targetSteps - motorSteps;
   interrupts();
-  return targetSteps - steps;
+  return dist;
 }
 
 // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)

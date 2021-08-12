@@ -50,7 +50,7 @@ class Focuser {
     bool  getTcfEnable(int index);
 
     // set TCF enable
-    bool  setTcfEnable(int index, bool value);
+    CommandError setTcfEnable(int index, bool value);
 
     // get TCF coefficient, in microns per deg. C
     float getTcfCoef(int index);
@@ -74,22 +74,31 @@ class Focuser {
     int  getBacklash(int index);
 
     // set backlash in microns
-    bool setBacklash(int index, int value);
+    CommandError setBacklash(int index, int value);
+
+    // start slew in the specified direction
+    CommandError slew(int index, Direction dir);
 
     // move focuser to a specific location (in steps)
     CommandError gotoTarget(int index, long target);
 
     // park focuser at its current location
-    void park(int index);
+    CommandError park(int index);
 
     // unpark focuser
-    void unpark(int index);
+    CommandError unpark(int index);
+
+    // start park/unpark monitor
+    void startParkMonitor(int index);
 
     // poll TCF to move the focusers as required
-    void poll();
+    void tcfMonitor();
+
+    // poll for park completion
+    void parkMonitor(int index);
 
     Axis *axis[6];
-
+  
   private:
     void readSettings(int index);
     void writeSettings(int index);
@@ -108,6 +117,9 @@ class Focuser {
 
     long target[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
     unsigned long afterSlewWait[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
+
+    bool parked[6];
+    uint8_t parkHandle[6];
 };
 
 extern Focuser focuser;

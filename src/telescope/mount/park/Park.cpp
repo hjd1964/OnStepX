@@ -24,6 +24,7 @@ void Park::init() {
 
   // read the settings
   nv.readBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  state = settings.state;
 }
 
 // sets the park position
@@ -68,12 +69,14 @@ CommandError Park::set() {
 // move the mount to the park position
 CommandError Park::request() {
   #if SLEW_GOTO == ON
-    if (!settings.saved)        return CE_NO_PARK_POSITION_SET;
-    if (state == PS_PARKED)     return CE_PARKED;
-    if (!mount.isEnabled())     return CE_SLEW_ERR_IN_STANDBY;
-    if (mount.isFault())        return CE_SLEW_ERR_HARDWARE_FAULT;
-    if (goTo.state != GS_NONE)  return CE_SLEW_IN_MOTION;
-    if (guide.state != GU_NONE) return CE_SLEW_IN_MOTION;
+    if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
+    if (state == PS_PARKED)      return CE_PARK_FAILED;
+    if (state == PS_PARKING)     return CE_PARK_FAILED;
+    if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
+    if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
+    if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
+    if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
+    if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
 
     CommandError e = goTo.validate();
     if (e != CE_NONE) return e;
@@ -90,10 +93,11 @@ CommandError Park::request() {
     #endif
 
     // record our park status
-    ParkState priorParkState = settings.state;
+    ParkState priorParkState = state;
     
     // update state to parking
-    settings.state = PS_PARKING;
+    state = PS_PARKING;
+    settings.state = state;
     nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
     // get the park coordinate ready
@@ -105,25 +109,27 @@ CommandError Park::request() {
     parkTarget.pierSide = settings.position.pierSide;
 
     // goto the park (mount) target coordinate
+    VLF("MSG: Mount, parking");
     if (parkTarget.pierSide == PIER_SIDE_EAST) e = goTo.request(&parkTarget, PSS_EAST_ONLY, false); else
     if (parkTarget.pierSide == PIER_SIDE_WEST) e = goTo.request(&parkTarget, PSS_WEST_ONLY, false);
 
     if (e != CE_NONE) {
       mount.tracking(wasTracking);
 
-      settings.state = priorParkState;
+      state = priorParkState;
+      settings.state = state;
       nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
       VF("ERR, Mount::parkGoto(); Failed to start goto (CE "); V(e); V(")");
       return e;
-    } else { VLF("MSG: Mount, parking started"); }
+    }
   #endif
   return CE_NONE;
 }
 
 // once parked save the park state
 void Park::requestDone() {
-  if (settings.state != PS_PARK_FAILED) {
+  if (state != PS_PARK_FAILED) {
     #if DEBUG == VERBOSE
       long index = mount.axis1.getInstrumentCoordinateSteps() - mount.axis1.getMotorPositionSteps();
       V("MSG: Mount, park axis1 motor target   "); VL(mount.axis1.getTargetCoordinateSteps() - index);
@@ -134,7 +140,8 @@ void Park::requestDone() {
     #endif
 
     // save the axis state
-    settings.state = PS_PARKED;
+    state = PS_PARKED;
+    settings.state = state;
     nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
     #if ALIGN_MAX_NUM_STARS > 1  
@@ -151,7 +158,7 @@ void Park::requestDone() {
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
-  if (settings.state != PS_PARKED) {
+  if (state != PS_PARKED) {
     #if STRICT_PARKING == ON
       VLF("MSG: Unpark ignored, not parked");
       return CE_NOT_PARKED;
@@ -199,7 +206,8 @@ CommandError Park::restore(bool withTrackingOn) {
   mount.axis1.setBacklash(mount.settings.backlash.axis1);
   mount.axis2.setBacklash(mount.settings.backlash.axis2);
   
-  settings.state = PS_UNPARKED;
+  state = PS_UNPARKED;
+  settings.state = state;
   nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
   // make sure limits are on

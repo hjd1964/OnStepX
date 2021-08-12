@@ -13,7 +13,8 @@ extern Tasks tasks;
 #include "../mount/site/Site.h"
 
 #ifdef MOUNT_PRESENT
-  void derotateWrapper() { rotator.poll(); }
+  void derotateWrapper() { rotator.derotMonitor(); }
+  void parkWrapper() { rotator.parkMonitor(); }
 #endif
 
 // initialize rotator
@@ -40,15 +41,15 @@ void Rotator::init() {
   axis.setSlewAccelerationTimeAbort(AXIS3_RAPID_STOP_TIME);
   if (AXIS3_POWER_DOWN == ON) axis.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
-  axis.enable(true);
-
   #ifdef MOUNT_PRESENT
     if (transform.mountType == ALTAZM) {
       // start task for derotation
       VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
-      if (tasks.add(1000, 0, true, 6, derotateWrapper, "RotPoll")) { VL("success"); } else { VL("FAILED!"); }
+      if (tasks.add(1000, 0, true, 6, derotateWrapper, "Derotate")) { VL("success"); } else { VL("FAILED!"); }
     }
   #endif
+
+  unpark();
 }
 
 // get backlash in steps
@@ -57,12 +58,15 @@ int Rotator::getBacklash() {
 }
 
 // set backlash in steps
-bool Rotator::setBacklash(int value) {
-  if (value < 0 || value > 10000) return false;
+CommandError Rotator::setBacklash(int value) {
+  if (value < 0 || value > 10000) return CE_PARAM_RANGE;
+  if (parked) return CE_PARKED;
+
   backlash = value;
   writeSettings();
   axis.setBacklashSteps(backlash);
-  return true;
+
+  return CE_NONE;
 }
 
 #ifdef MOUNT_PRESENT
@@ -88,40 +92,56 @@ bool Rotator::setBacklash(int value) {
 
 // move rotator to a specific location
 CommandError Rotator::gotoTarget(float target) {
+  if (parked) return CE_PARKED;
+
   VF("MSG: Rotator, goto target coordinate set ("); V(target*axis.getStepsPerMeasure()); VL("°)");
   VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
+
+  axis.setFrequencyBase(0.0F);
   axis.setTargetCoordinate(target);
   return axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
 }
 
 // parks rotator at current position
-void Rotator::park() {
+CommandError Rotator::park() {
+  if (parked) return CE_PARKED;
+
   derotatorEnabled = false;
-  axis.setFrequencyBase(0.0F);
+
+  VLF("MSG: Rotator, parking");
   axis.setBacklash(0.0F);
-  float position = axis.getInstrumentCoordinate();
+  position = axis.getInstrumentCoordinate();
   axis.setTargetCoordinatePark(position);
-  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
-  axis.enable(false);
-  #if DEBUG == VERBOSE
-    tasks.yield(500);
-    long offset = axis.getInstrumentCoordinateSteps() - axis.getMotorPositionSteps();
-    V("MSG: Rotator, park motor target   "); VL(axis.getTargetCoordinateSteps() - offset);
-    V("MSG: Rotator, park motor position "); VL(axis.getMotorPositionSteps());
-  #endif
   writeSettings();
+  parked = true;
+
+  startParkMonitor();
+  return axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
 }
 
 // unparks rotator
-void Rotator::unpark() {
+CommandError Rotator::unpark() {
+  if (!parked) return CE_NONE;
+
   axis.setBacklash(0.0F);
-  position = axis.getInstrumentCoordinate();
   axis.setInstrumentCoordinatePark(position);
   V("MSG: Rotator, unpark motor position "); VL(axis.getMotorPositionSteps());
+
+  axis.enable(true);
   axis.setBacklash(backlash);
   axis.setTargetCoordinate(position);
-  axis.enable(true);
-  axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED);
+  parked = false;
+
+  startParkMonitor();
+  return axis.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+}
+
+// start park/unpark monitor
+void Rotator::startParkMonitor() {
+  VF("MSG: Rotator, start park monitor task (rate 1s priority 6)... ");
+  if (parkHandle != 0) tasks.remove(parkHandle);
+  parkHandle = tasks.add(1000, 0, true, 6, parkWrapper, "RotPark"); 
+  if (parkHandle) { VL("success"); } else { VL("FAILED!"); }
 }
 
 void Rotator::readSettings() {
@@ -137,21 +157,46 @@ void Rotator::readSettings() {
 
 void Rotator::writeSettings() {
   nv.write(NV_ROTATOR_SETTINGS_BASE, backlash);
+  nv.write(NV_ROTATOR_SETTINGS_BASE + 2, position);
 }
 
 // poll to set derotator rate
-void Rotator::poll() {
+void Rotator::derotMonitor() {
   if (derotatorEnabled) {
     float pr = 0.0F;
     #ifdef MOUNT_PRESENT
       if (!axis.isSlewing()) {
+        // needs synchronized movement
+        if (!axis.getSynchronized()) axis.setSynchronized(true);
         Coordinate current = mount.getPosition();
         pr = parallacticRate(&current);
         if (derotatorReverse) pr = -pr;
       }
     #endif
+    axis.setSynchronized(true);
     axis.setFrequencyBase(pr);
   }
+}
+
+// poll for park completion
+void Rotator::parkMonitor() {
+  #ifdef MOUNT_PRESENT
+    if (!axis.isSlewing()) {
+
+      if (parked == true) {
+        axis.enable(false);
+        #if DEBUG == VERBOSE
+          long offset = axis.getInstrumentCoordinateSteps() - axis.getMotorPositionSteps();
+          VF("MSG: Rotator, parked motor target   "); VL(axis.getTargetCoordinateSteps() - offset);
+          VF("MSG: Rotator, parked motor position "); VL(axis.getMotorPositionSteps());
+        #endif
+      }
+
+      tasks.setDurationComplete(parkHandle);
+      parkHandle = 0;
+      VLF("MSG: Rotator, stop park monitor task");
+    }
+  #endif
 }
 
 Rotator rotator;

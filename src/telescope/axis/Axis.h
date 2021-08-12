@@ -107,6 +107,8 @@ class Axis {
     double getTargetCoordinate();
     // get target coordinate, in steps
     inline long getTargetCoordinateSteps() { return motor.getTargetCoordinateSteps(); }
+    // distance to target in "measures" (degrees, microns, etc.)
+    double getTargetDistance();
     // returns true if at target
     bool atTarget();
 
@@ -117,12 +119,12 @@ class Axis {
     // get backlash amount in "measures" (radians, microns, etc.)
     float getBacklash();
 
-    // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
-    void setFrequency(float frequency);
     // get frequency in "measures" (degrees, microns, etc.) per second
     float getFrequency();
     // get frequency in steps per second
     long getFrequencySteps() { return motor.getFrequencySteps(); }
+    // gets backlash frequency in "measures" (degrees, microns, etc.) per second
+    float getBacklashFrequency();
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);
     // set slew frequency in "measures" (radians, microns, etc.) per second
@@ -188,13 +190,14 @@ class Axis {
     StepDir motor; // should not be used outside of the StepDir class
 
   private:
+    // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
+    void setFrequency(float frequency);
+
     // sets driver power on/off
     void powered(bool value);
 
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
-    // distance to target in "measures" (degrees, microns, etc.)
-    double getTargetDistance();
     // returns true if traveling through backlash
     bool inBacklash();
 

@@ -18,9 +18,8 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'P' && parameter[0] == 0) {
-      CommandError e = CE_NONE;
-      park();
-      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      CommandError e = park();
+      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Rotator, park FAIL"); VL(e); *commandError = e; }
       return false;
     } else 
 
@@ -28,9 +27,8 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'R' && parameter[0] == 0) {
-      CommandError e = CE_NONE;
-      unpark();
-      if (e != CE_NONE) *commandError = e; else *commandError = CE_1;
+      CommandError e = unpark();
+      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Rotator, unpark FAIL"); VL(e); *commandError = e; }
       return false;
     } else return false;
   } else
@@ -84,8 +82,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'b') {
-      setBacklash(atol(parameter));
-      axis.setBacklashSteps(getBacklash());
+      *commandError = setBacklash(atol(parameter));
     } else
 
     // :rQ#       Stop (Quit) rotator movement
@@ -113,14 +110,20 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r>#       Move rotator CW
     //            Returns: Nothing
     if (command[1] == '>') {
-      *commandError = axis.autoSlew(DIR_FORWARD, slewRate);
+      if (!parked) {
+        axis.setFrequencyBase(0.0F);
+        *commandError = axis.autoSlew(DIR_FORWARD, slewRate);
+      } else *commandError = CE_PARKED;
       *numericReply = false;
     } else
 
     // :r<#       Move rotator CCW
     //            Returns: Nothing
     if (command[1] == '<') {
-      *commandError = axis.autoSlew(DIR_REVERSE, slewRate);
+      if (!parked) {
+        axis.setFrequencyBase(0.0F);
+        *commandError = axis.autoSlew(DIR_REVERSE, slewRate);
+      } else *commandError = CE_PARKED;
       *numericReply = false;
     } else
 
@@ -155,6 +158,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
+      parked = false;
       *commandError = axis.resetPosition(0.0);
       axis.setBacklashSteps(getBacklash());
       *numericReply = false;
@@ -163,6 +167,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rF#       Set rotator position as Half-travel
     //            Returns: Nothing
     if (command[1] == 'F') {
+      parked = false;
       double t = round((axis.settings.limits.max + axis.settings.limits.min)/2.0);
       *commandError = axis.resetPosition(t);
       axis.setBacklashSteps(getBacklash());
@@ -180,7 +185,9 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == '+') {
       #ifdef MOUNT_PRESENT
-        if (transform.mountType == ALTAZM) derotatorEnabled = true;
+        if (transform.mountType == ALTAZM) {
+          if (!parked) derotatorEnabled = true; else *commandError = CE_PARKED;
+        }
       #endif
       *numericReply = false;
     } else
