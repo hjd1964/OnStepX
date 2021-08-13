@@ -118,6 +118,18 @@
 #ifndef AXIS1_DECAY_PIN
   #define AXIS1_DECAY_PIN           OFF
 #endif
+#ifndef AXIS1_DC_IN1_PIN
+  #define AXIS1_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS1_DC_IN2_PIN
+  #define AXIS1_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS1_ENC_A_PIN
+  #define AXIS1_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS1_ENC_B_PIN
+  #define AXIS1_ENC_B_PIN           OFF
+#endif
 #ifndef AXIS1_FAULT_PIN
   #define AXIS1_FAULT_PIN           OFF
 #endif
@@ -157,6 +169,18 @@
 #endif
 #ifndef AXIS2_DECAY_PIN
   #define AXIS2_DECAY_PIN           OFF
+#endif
+#ifndef AXIS2_DC_IN1_PIN
+  #define AXIS2_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS2_DC_IN2_PIN
+  #define AXIS2_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS2_ENC_A_PIN
+  #define AXIS2_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS2_ENC_B_PIN
+  #define AXIS2_ENC_B_PIN           OFF
 #endif
 #ifndef AXIS2_FAULT_PIN
   #define AXIS2_FAULT_PIN           OFF
@@ -198,6 +222,18 @@
 #ifndef AXIS3_DECAY_PIN
   #define AXIS3_DECAY_PIN           OFF
 #endif
+#ifndef AXIS3_DC_IN1_PIN
+  #define AXIS3_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS3_DC_IN2_PIN
+  #define AXIS3_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS3_ENC_A_PIN
+  #define AXIS3_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS3_ENC_B_PIN
+  #define AXIS3_ENC_B_PIN           OFF
+#endif
 #ifndef AXIS3_FAULT_PIN
   #define AXIS3_FAULT_PIN           OFF
 #endif
@@ -237,6 +273,18 @@
 #endif
 #ifndef AXIS4_DECAY_PIN
   #define AXIS4_DECAY_PIN           OFF
+#endif
+#ifndef AXIS4_DC_IN1_PIN
+  #define AXIS4_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS4_DC_IN2_PIN
+  #define AXIS4_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS4_ENC_A_PIN
+  #define AXIS4_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS4_ENC_B_PIN
+  #define AXIS4_ENC_B_PIN           OFF
 #endif
 #ifndef AXIS4_FAULT_PIN
   #define AXIS4_FAULT_PIN           OFF
@@ -278,6 +326,18 @@
 #ifndef AXIS5_DECAY_PIN
   #define AXIS5_DECAY_PIN           OFF
 #endif
+#ifndef AXIS5_DC_IN1_PIN
+  #define AXIS5_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS5_DC_IN2_PIN
+  #define AXIS5_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS5_ENC_A_PIN
+  #define AXIS5_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS5_ENC_B_PIN
+  #define AXIS5_ENC_B_PIN           OFF
+#endif
 #ifndef AXIS5_FAULT_PIN
   #define AXIS5_FAULT_PIN           OFF
 #endif
@@ -317,6 +377,18 @@
 #endif
 #ifndef AXIS6_DECAY_PIN
   #define AXIS6_DECAY_PIN           OFF
+#endif
+#ifndef AXIS6_DC_IN1_PIN
+  #define AXIS6_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS6_DC_IN2_PIN
+  #define AXIS6_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS6_ENC_A_PIN
+  #define AXIS6_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS6_ENC_B_PIN
+  #define AXIS6_ENC_B_PIN           OFF
 #endif
 #ifndef AXIS6_FAULT_PIN
   #define AXIS6_FAULT_PIN           OFF
@@ -358,6 +430,18 @@
 #ifndef AXIS7_DECAY_PIN
   #define AXIS7_DECAY_PIN           OFF
 #endif
+#ifndef AXIS7_DC_IN1_PIN
+  #define AXIS7_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS7_DC_IN2_PIN
+  #define AXIS7_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS7_ENC_A_PIN
+  #define AXIS7_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS7_ENC_B_PIN
+  #define AXIS7_ENC_B_PIN           OFF
+#endif
 #ifndef AXIS7_FAULT_PIN
   #define AXIS7_FAULT_PIN           OFF
 #endif
@@ -398,6 +482,18 @@
 #ifndef AXIS8_DECAY_PIN
   #define AXIS8_DECAY_PIN           OFF
 #endif
+#ifndef AXIS8_DC_IN1_PIN
+  #define AXIS8_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS8_DC_IN2_PIN
+  #define AXIS8_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS8_ENC_A_PIN
+  #define AXIS8_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS8_ENC_B_PIN
+  #define AXIS8_ENC_B_PIN           OFF
+#endif
 #ifndef AXIS8_FAULT_PIN
   #define AXIS8_FAULT_PIN           OFF
 #endif
@@ -437,6 +533,18 @@
 #endif
 #ifndef AXIS9_DECAY_PIN
   #define AXIS9_DECAY_PIN           OFF
+#endif
+#ifndef AXIS9_DC_IN1_PIN
+  #define AXIS9_DC_IN1_PIN          OFF
+#endif
+#ifndef AXIS9_DC_IN2_PIN
+  #define AXIS9_DC_IN2_PIN          OFF
+#endif
+#ifndef AXIS9_ENC_A_PIN
+  #define AXIS9_ENC_A_PIN           OFF
+#endif
+#ifndef AXIS9_ENC_B_PIN
+  #define AXIS9_ENC_B_PIN           OFF
 #endif
 #ifndef AXIS9_FAULT_PIN
   #define AXIS9_FAULT_PIN           OFF

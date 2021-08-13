@@ -104,52 +104,81 @@
 #define PULSE                       2
 #define STEP_MODE_LAST              2
 
+// motor drivers
+#define SD_DRIVER_FIRST             0
+#define A4988                       0      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
+#define DRV8825                     1      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define S109                        2      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define LV8729                      3      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define RAPS128                     4      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define TMC2100                     5      // step/dir stepper driver, allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
+#define TMC2208                     6      // step/dir stepper driver, allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
+#define TMC2209                     7      // step/dir stepper driver, allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define ST820                       8      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
+#define TMC2130                     9      // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC5160                     10     // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define GENERIC                     11     // step/dir stepper driver, allows                        for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
+#define SERVO_SD                    12     // step/dir servo   driver, allows M0 bit pattern for LOW = native mode & goto HIGH = 2x,4x,8x,16x,32x,64x, or 128x *larger* steps
+#define SD_DRIVER_LAST              12
+
+#define SERVO_DRIVER_FIRST          100
+#define SERVO_DP                    100    // servo driver, direction and phase connections
+#define SERVO_II                    101    // servo driver, dual input connections
+#define SERVO_DRIVER_LAST           101
+
+// stepper driver decay modes
+#define MIXED                       0
+#define FAST                        1
+#define SLOW                        2
+#define SPREADCYCLE                 3
+#define STEALTHCHOP                 4
+
 // etc.
 #define INVALID                     -127
 
 // various Time and Location sources supported
-#define DS3231                      1 // DS3231 RTC on I2C
-#define DS3234                      2 // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
-#define TEENSY                      4 // TEENSY3.2 RTC (Built-in)
-#define GPS                         5 // GPS device
-#define SoftSerial                  6 // Optional, placeholder for a GPS software serial port object
+#define DS3231                      1      // DS3231 RTC on I2C
+#define DS3234                      2      // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
+#define TEENSY                      4      // TEENSY3.2 RTC (Built-in)
+#define GPS                         5      // GPS device
+#define SoftSerial                  6      // Optional, placeholder for a GPS software serial port object
 
 // various Weather sensors supported
-#define BME280                      1 // BME280 on I2C (at default address 0x77)
-#define BME280_0x77                 1 // BME280 on I2C (at address 0x77)
-#define BME280_0x76                 2 // BME280 on I2C (at address 0x76)
-#define BME280_SPI                  3 // BME280 on SPI (default CS)
-#define BMP280                      4 // BMP280 on I2C (at default address 0x77)
-#define BMP280_0x77                 4 // BMP280 on I2C (at address 0x77)
-#define BMP280_0x76                 5 // BMP280 on I2C (at address 0x76)
-#define BMP280_SPI                  6 // BMP280 on SPI (default CS)
+#define BME280                      1      // BME280 on I2C (at default address 0x77)
+#define BME280_0x77                 1      // BME280 on I2C (at address 0x77)
+#define BME280_0x76                 2      // BME280 on I2C (at address 0x76)
+#define BME280_SPI                  3      // BME280 on SPI (default CS)
+#define BMP280                      4      // BMP280 on I2C (at default address 0x77)
+#define BMP280_0x77                 4      // BMP280 on I2C (at address 0x77)
+#define BMP280_0x76                 5      // BMP280 on I2C (at address 0x76)
+#define BMP280_SPI                  6      // BMP280 on SPI (default CS)
 
 // auxiliary features
-#define SWITCH                      1 // control an simple on/off switch
-#define ANALOG_OUTPUT               2 // control an analog (pwm) output, depends on MCU support
+#define SWITCH                      1      // control an simple on/off switch
+#define ANALOG_OUTPUT               2      // control an analog (pwm) output, depends on MCU support
 #define ANALOG_OUT                  2
-#define DEW_HEATER                  3 // control an dew heater
-#define INTERVALOMETER              4 // control an camera shutter
+#define DEW_HEATER                  3      // control an dew heater
+#define INTERVALOMETER              4      // control an camera shutter
 #define SWITCH_UNPARKED             5
 
 // various temperature sensing devices
-#define DS1820     0x2800000000000000 // DS18B20 1-wire temperature sensors for focusing and dew heaters
-#define DS18B20    0x2800000000000000 // (as above)
-#define DS18S20    0x1000000000000000 // (as above except for DS18S20)
-#define DS_MASK    0x3F00000000000000 // not for use in Config.h
-#define THERMISTOR                  1 // General purpose thermistor sensor, type 1 (see Config.common.h)
-#define THERMISTOR1                 1 // (as above)
-#define THERMISTOR2                 2 // General purpose thermistor sensor, type 2 (see Config.common.h)
+#define DS1820     0x2800000000000000      // DS18B20 1-wire temperature sensors for focusing and dew heaters
+#define DS18B20    0x2800000000000000      // (as above)
+#define DS18S20    0x1000000000000000      // (as above except for DS18S20)
+#define DS_MASK    0x3F00000000000000      // not for use in Config.h
+#define THERMISTOR                  1      // General purpose thermistor sensor, type 1 (see Config.common.h)
+#define THERMISTOR1                 1      // (as above)
+#define THERMISTOR2                 2      // General purpose thermistor sensor, type 2 (see Config.common.h)
 
 // various GPIO devices
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
-#define DS2413                      1 // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
-#define MCP23008                    2 // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
-#define MCP23017                    3 // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
+#define DS2413                      1      // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
+#define MCP23008                    2      // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
+#define MCP23017                    3      // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
 
-#define DEFAULT_POWER_DOWN_TIME 30000 // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
+#define DEFAULT_POWER_DOWN_TIME 30000      // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
 
-#define NV_DEFAULT                 ON // uses HAL specified default for remembering settings when powered off
+#define NV_DEFAULT                 ON      // uses HAL specified default for remembering settings when powered off
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
@@ -227,6 +256,9 @@
 
 // default time for spiral guides is 103.4 seconds
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
+
+// directions in OnStepX
+enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 // NV addresses
 #define INIT_NV_KEY                 583927928UL
