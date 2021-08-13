@@ -14,8 +14,8 @@ extern Tasks tasks;
 
 #ifdef MOUNT_PRESENT
   void derotateWrapper() { rotator.derotMonitor(); }
-  void parkWrapper() { rotator.parkMonitor(); }
 #endif
+void parkWrapper() { rotator.parkMonitor(); }
 
 // initialize rotator
 void Rotator::init() {
@@ -89,6 +89,14 @@ CommandError Rotator::setBacklash(int value) {
     return (a - b)/60.0;
   }
 #endif
+
+// start slew in the specified direction
+CommandError Rotator::slew(Direction dir) {
+  if (parked) return CE_PARKED;
+
+  axis.setFrequencyBase(0.0F);
+  return axis.autoSlew(dir, slewRate);
+}
 
 // move rotator to a specific location
 CommandError Rotator::gotoTarget(float target) {
@@ -178,7 +186,7 @@ void Rotator::derotMonitor() {
   }
 }
 
-// poll for park completion
+// poll for park/unpark completion
 void Rotator::parkMonitor() {
   #ifdef MOUNT_PRESENT
     if (!axis.isSlewing()) {

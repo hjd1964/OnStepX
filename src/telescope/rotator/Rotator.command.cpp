@@ -110,20 +110,14 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r>#       Move rotator CW
     //            Returns: Nothing
     if (command[1] == '>') {
-      if (!parked) {
-        axis.setFrequencyBase(0.0F);
-        *commandError = axis.autoSlew(DIR_FORWARD, slewRate);
-      } else *commandError = CE_PARKED;
+      *commandError = slew(DIR_FORWARD);
       *numericReply = false;
     } else
 
     // :r<#       Move rotator CCW
     //            Returns: Nothing
     if (command[1] == '<') {
-      if (!parked) {
-        axis.setFrequencyBase(0.0F);
-        *commandError = axis.autoSlew(DIR_REVERSE, slewRate);
-      } else *commandError = CE_PARKED;
+      *commandError = slew(DIR_REVERSE);
       *numericReply = false;
     } else
 

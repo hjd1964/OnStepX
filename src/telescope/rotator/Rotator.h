@@ -18,21 +18,21 @@ class Rotator {
     // process rotator commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
+    // poll to set derotator rate
+    void derotMonitor();
+
+    // poll for park/unpark completion
+    void parkMonitor();
+
+    Axis axis;
+
+  private:
     // get backlash in steps
     int getBacklash();
 
     // set backlash in steps
     CommandError setBacklash(int value);
 
-    // poll to set derotator rate
-    void derotMonitor();
-
-    // poll for park completion
-    void parkMonitor();
-
-    Axis axis;
-
-  private:
     #ifdef MOUNT_PRESENT
       // returns parallactic angle in degrees
       double parallacticAngle(Coordinate *coord);
@@ -40,6 +40,9 @@ class Rotator {
       // returns parallactic rate in degrees per second
       double parallacticRate(Coordinate *coord);
     #endif
+
+    // start slew in the specified direction
+    CommandError slew(Direction dir);
 
     // move rotator to a specific location
     CommandError gotoTarget(float target);
