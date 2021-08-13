@@ -9,14 +9,38 @@
 #include "../../commands/ProcessCmds.h"
 #include "../axis/Axis.h"
 
-#define FOCUSER_MAX 6
+#if AXIS9_DRIVER_MODEL != OFF
+  #define FOCUSER_MAX 6
+#else
+  #if AXIS8_DRIVER_MODEL != OFF
+    #define FOCUSER_MAX 5
+  #else
+    #if AXIS7_DRIVER_MODEL != OFF
+      #define FOCUSER_MAX 4
+    #else
+      #if AXIS6_DRIVER_MODEL != OFF
+        #define FOCUSER_MAX 3
+      #else
+        #if AXIS5_DRIVER_MODEL != OFF
+          #define FOCUSER_MAX 2
+        #else
+          #if AXIS4_DRIVER_MODEL != OFF
+            #define FOCUSER_MAX 1
+          #else
+            #define FOCUSER_MAX 0
+          #endif
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
 
 #pragma pack(1)
 typedef struct Tcf {
   bool enabled;
-  float coef;
+  float coef;       // in um/°C
   int16_t deadband; // in steps
-  float t0;
+  float t0;         // in °C, temperature when first enabled
 } Tcf;
 
 #define FocuserSettingsSize 18
@@ -33,6 +57,16 @@ class Focuser {
     void init();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+
+    // poll TCF to move the focusers as required
+    void tcfMonitor();
+
+    // poll for park completion
+    void parkMonitor(int index);
+
+    Axis *axis[6];
+  
+  private:
 
     // get focuser temperature in deg. C
     float getTemperature();
@@ -91,35 +125,19 @@ class Focuser {
     // start park/unpark monitor
     void startParkMonitor(int index);
 
-    // poll TCF to move the focusers as required
-    void tcfMonitor();
-
-    // poll for park completion
-    void parkMonitor(int index);
-
-    Axis *axis[6];
-  
-  private:
     void readSettings(int index);
     void writeSettings(int index);
-
-    int driverModel[FOCUSER_MAX]      = { AXIS4_DRIVER_MODEL, AXIS5_DRIVER_MODEL, AXIS6_DRIVER_MODEL, AXIS7_DRIVER_MODEL, AXIS8_DRIVER_MODEL, AXIS9_DRIVER_MODEL };
-    int slewRateDesired[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_DESIRED, AXIS5_SLEW_RATE_DESIRED, AXIS6_SLEW_RATE_DESIRED, AXIS7_SLEW_RATE_DESIRED, AXIS8_SLEW_RATE_DESIRED, AXIS9_SLEW_RATE_DESIRED };
-    int slewRateMinimum[FOCUSER_MAX]  = { AXIS4_SLEW_RATE_MINIMUM, AXIS5_SLEW_RATE_MINIMUM, AXIS6_SLEW_RATE_MINIMUM, AXIS7_SLEW_RATE_MINIMUM, AXIS8_SLEW_RATE_MINIMUM, AXIS9_SLEW_RATE_MINIMUM };
-    int accelerationTime[FOCUSER_MAX] = { AXIS4_ACCELERATION_TIME, AXIS5_ACCELERATION_TIME, AXIS6_ACCELERATION_TIME, AXIS7_ACCELERATION_TIME, AXIS8_ACCELERATION_TIME, AXIS9_ACCELERATION_TIME };
-    int rapidStopTime[FOCUSER_MAX]    = { AXIS4_RAPID_STOP_TIME, AXIS5_RAPID_STOP_TIME, AXIS6_RAPID_STOP_TIME, AXIS7_RAPID_STOP_TIME, AXIS8_RAPID_STOP_TIME, AXIS9_RAPID_STOP_TIME };
-    bool powerDown[FOCUSER_MAX]       = { AXIS4_POWER_DOWN == ON, AXIS5_POWER_DOWN == ON, AXIS6_POWER_DOWN == ON, AXIS7_POWER_DOWN == ON, AXIS8_POWER_DOWN == ON, AXIS9_POWER_DOWN == ON };
 
     int moveRate[FOCUSER_MAX];
     long tcfSteps[FOCUSER_MAX];
 
     FocuserSettings settings[FOCUSER_MAX];
 
-    long target[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
-    unsigned long afterSlewWait[FOCUSER_MAX] = { 0, 0, 0, 0, 0, 0 };
+    long target[FOCUSER_MAX];
+    unsigned long wait[FOCUSER_MAX];
 
-    bool parked[6];
-    uint8_t parkHandle[6];
+    bool parked[FOCUSER_MAX];
+    uint8_t parkHandle[FOCUSER_MAX];
 };
 
 extern Focuser focuser;

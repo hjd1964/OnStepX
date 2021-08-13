@@ -92,12 +92,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     const float MicronsToSteps = axis[index]->getStepsPerMeasure();
     const float StepsToMicrons = 1.0F/MicronsToSteps;
     float MicronsToUnits = 1.0F;
-    float UnitsToMicrons = 1.0F;
     float StepsToUnits  = StepsToMicrons;
     float UnitsToSteps  = MicronsToSteps;
     if (strchr("bdgimrs",command[1])) {
       MicronsToUnits = MicronsToSteps;
-      UnitsToMicrons = StepsToMicrons;
       StepsToUnits = 1.0F;
       UnitsToSteps = 1.0F;
     }
