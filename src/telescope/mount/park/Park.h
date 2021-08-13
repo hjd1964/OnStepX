@@ -8,7 +8,7 @@
 
 #include "../coordinates/Transform.h"
 
-enum ParkState: uint8_t { PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED };
+enum ParkState: uint8_t {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
 
 #pragma pack(1)
 typedef struct ParkPosition {
