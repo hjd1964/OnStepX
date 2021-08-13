@@ -3,7 +3,7 @@
 
 #include "StepDrivers.h"
 
-#ifdef AXIS_PRESENT
+#ifdef SD_DRIVER_PRESENT
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
@@ -29,61 +29,61 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 #endif
 
 const DriverPins ModePins[] = {
-  #if AXIS1_DRIVER_MODEL != OFF
+  #ifdef AXIS1_DRIVER_SD
     { 1, AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_DECAY_PIN, AXIS1_FAULT_PIN },
   #endif
-  #if AXIS2_DRIVER_MODEL != OFF
+  #ifdef AXIS2_DRIVER_SD
     { 2, AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_M2_PIN, AXIS2_M3_PIN, AXIS2_DECAY_PIN, AXIS2_FAULT_PIN },
   #endif
-  #if AXIS3_DRIVER_MODEL != OFF
+  #ifdef AXIS3_DRIVER_SD
     { 3, AXIS3_M0_PIN, AXIS3_M1_PIN, AXIS3_M2_PIN, AXIS3_M3_PIN, AXIS3_DECAY_PIN, AXIS3_FAULT_PIN },
   #endif
-  #if AXIS4_DRIVER_MODEL != OFF
+  #ifdef AXIS4_DRIVER_SD
     { 4, AXIS4_M0_PIN, AXIS4_M1_PIN, AXIS4_M2_PIN, AXIS4_M3_PIN, AXIS4_DECAY_PIN, AXIS4_FAULT_PIN },
   #endif
-  #if AXIS5_DRIVER_MODEL != OFF
+  #ifdef AXIS5_DRIVER_SD
     { 5, AXIS5_M0_PIN, AXIS5_M1_PIN, AXIS5_M2_PIN, AXIS5_M3_PIN, AXIS5_DECAY_PIN, AXIS5_FAULT_PIN },
   #endif
-  #if AXIS6_DRIVER_MODEL != OFF
+  #ifdef AXIS6_DRIVER_SD
     { 6, AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS6_M2_PIN, AXIS6_M3_PIN, AXIS6_DECAY_PIN, AXIS6_FAULT_PIN },
   #endif
-  #if AXIS7_DRIVER_MODEL != OFF
+  #ifdef AXIS7_DRIVER_SD
     { 7, AXIS7_M0_PIN, AXIS7_M1_PIN, AXIS7_M2_PIN, AXIS7_M3_PIN, AXIS7_DECAY_PIN, AXIS7_FAULT_PIN },
   #endif
-  #if AXIS8_DRIVER_MODEL != OFF
+  #ifdef AXIS8_DRIVER_SD
     { 8, AXIS8_M0_PIN, AXIS8_M1_PIN, AXIS8_M2_PIN, AXIS8_M3_PIN, AXIS8_DECAY_PIN, AXIS8_FAULT_PIN },
   #endif
-  #if AXIS9_DRIVER_MODEL != OFF
+  #ifdef AXIS9_DRIVER_SD
     { 9, AXIS9_M0_PIN, AXIS9_M1_PIN, AXIS9_M2_PIN, AXIS9_M3_PIN, AXIS9_DECAY_PIN, AXIS9_FAULT_PIN },
   #endif
 };
 
 const DriverSettings ModeSettings[] = {
-  #if AXIS1_DRIVER_MODEL != OFF
+  #ifdef AXIS1_DRIVER_SD
     { AXIS1_DRIVER_MODEL, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_MICROSTEPS_GOTO, AXIS1_DRIVER_IHOLD, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_IGOTO, AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO, AXIS1_DRIVER_STATUS },
   #endif
-  #if AXIS2_DRIVER_MODEL != OFF
+  #ifdef AXIS2_DRIVER_SD
     { AXIS2_DRIVER_MODEL, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_MICROSTEPS_GOTO, AXIS2_DRIVER_IHOLD, AXIS2_DRIVER_IRUN, AXIS2_DRIVER_IGOTO, AXIS2_DRIVER_DECAY, AXIS2_DRIVER_DECAY_GOTO, AXIS2_DRIVER_STATUS },
   #endif
-  #if AXIS3_DRIVER_MODEL != OFF
+  #ifdef AXIS3_DRIVER_SD
     { AXIS3_DRIVER_MODEL, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_MICROSTEPS_GOTO, AXIS3_DRIVER_IHOLD, AXIS3_DRIVER_IRUN, AXIS3_DRIVER_IGOTO, AXIS3_DRIVER_DECAY, AXIS3_DRIVER_DECAY_GOTO, AXIS3_DRIVER_STATUS },
   #endif
-  #if AXIS4_DRIVER_MODEL != OFF
+  #ifdef AXIS4_DRIVER_SD
     { AXIS4_DRIVER_MODEL, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_MICROSTEPS_GOTO, AXIS4_DRIVER_IHOLD, AXIS4_DRIVER_IRUN, AXIS4_DRIVER_IGOTO, AXIS4_DRIVER_DECAY, AXIS4_DRIVER_DECAY_GOTO, AXIS4_DRIVER_STATUS },
   #endif
-  #if AXIS5_DRIVER_MODEL != OFF
+  #ifdef AXIS5_DRIVER_SD
     { AXIS5_DRIVER_MODEL, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_MICROSTEPS_GOTO, AXIS5_DRIVER_IHOLD, AXIS5_DRIVER_IRUN, AXIS5_DRIVER_IGOTO, AXIS5_DRIVER_DECAY, AXIS5_DRIVER_DECAY_GOTO, AXIS5_DRIVER_STATUS },
   #endif
-  #if AXIS6_DRIVER_MODEL != OFF
+  #ifdef AXIS6_DRIVER_SD
     { AXIS6_DRIVER_MODEL, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_MICROSTEPS_GOTO, AXIS6_DRIVER_IHOLD, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_IGOTO, AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO, AXIS6_DRIVER_STATUS },
   #endif
-  #if AXIS7_DRIVER_MODEL != OFF
+  #ifdef AXIS7_DRIVER_SD
     { AXIS7_DRIVER_MODEL, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_MICROSTEPS_GOTO, AXIS7_DRIVER_IHOLD, AXIS7_DRIVER_IRUN, AXIS7_DRIVER_IGOTO, AXIS7_DRIVER_DECAY, AXIS7_DRIVER_DECAY_GOTO, AXIS7_DRIVER_STATUS },
   #endif
-  #if AXIS8_DRIVER_MODEL != OFF
+  #ifdef AXIS8_DRIVER_SD
     { AXIS8_DRIVER_MODEL, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_MICROSTEPS_GOTO, AXIS8_DRIVER_IHOLD, AXIS8_DRIVER_IRUN, AXIS8_DRIVER_IGOTO, AXIS8_DRIVER_DECAY, AXIS8_DRIVER_DECAY_GOTO, AXIS8_DRIVER_STATUS },
   #endif
-  #if AXIS9_DRIVER_MODEL != OFF
+  #ifdef AXIS9_DRIVER_SD
     { AXIS9_DRIVER_MODEL, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_MICROSTEPS_GOTO, AXIS9_DRIVER_IHOLD, AXIS9_DRIVER_IRUN, AXIS9_DRIVER_IGOTO, AXIS9_DRIVER_DECAY, AXIS9_DRIVER_DECAY_GOTO, AXIS9_DRIVER_STATUS },
   #endif
 };
@@ -119,7 +119,7 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
   microstepRatio = settings.microsteps/settings.microstepsGoto;
 
   if (isTmcSPI()) {
-    #ifdef HAS_TMC_DRIVER
+    #ifdef TMC_DRIVER_PRESENT
       if (settings.decay == OFF) settings.decay = STEALTHCHOP;
       if (settings.decayGoto == OFF) settings.decayGoto = SPREADCYCLE;
       tmcDriver.init(settings.model, ModePins[index].m0, ModePins[index].m1, ModePins[index].m2, ModePins[index].m3);
@@ -162,7 +162,7 @@ bool StepDriver::modeSwitchAllowed() {
 
 void StepDriver::modeMicrostepTracking() {
   if (isTmcSPI()) {
-    #ifdef HAS_TMC_DRIVER
+    #ifdef TMC_DRIVER_PRESENT
       tmcDriver.refresh_CHOPCONF(microstepCode);
     #endif
   } else {
@@ -176,7 +176,7 @@ void StepDriver::modeMicrostepTracking() {
 
 void StepDriver::modeDecayTracking() {
   if (isTmcSPI()) {
-    #ifdef HAS_TMC_DRIVER
+    #ifdef TMC_DRIVER_PRESENT
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
     #endif
   } else {
@@ -196,7 +196,7 @@ int StepDriver::getMicrostepRatio() {
 int StepDriver::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
     if (isTmcSPI()) {
-      #ifdef HAS_TMC_DRIVER
+      #ifdef TMC_DRIVER_PRESENT
         tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
       #endif
     } else {
@@ -212,7 +212,7 @@ int StepDriver::modeMicrostepSlewing() {
 
 void StepDriver::modeDecaySlewing() {
   if (isTmcSPI()) {
-    #ifdef HAS_TMC_DRIVER
+    #ifdef TMC_DRIVER_PRESENT
       int IRUN = settings.currentGoto;
       if (IRUN == OFF) IRUN = settings.currentRun;
       tmcDriver.mode(true, settings.decayGoto, microstepCodeGoto, IRUN, settings.currentHold);
@@ -227,7 +227,7 @@ void StepDriver::modeDecaySlewing() {
 }
 
 void StepDriver::updateStatus() {
-  #ifdef HAS_TMC_DRIVER
+  #ifdef TMC_DRIVER_PRESENT
     if (settings.status == ON) {
       if (tmcDriver.refresh_DRVSTATUS()) {
         status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
@@ -280,7 +280,7 @@ int8_t StepDriver::getDecayPinState(int8_t decay) {
 
 // secondary way to power down not using the enable pin
 void StepDriver::power(bool state) {
-  #ifdef HAS_TMC_DRIVER
+  #ifdef TMC_DRIVER_PRESENT
     int I_run = 0, I_hold = 0;
     if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
     tmcDriver.mode(true, settings.decay, microstepCode, I_run, I_hold);
@@ -291,7 +291,7 @@ void StepDriver::power(bool state) {
 
 // checks for TMC SPI driver
 bool StepDriver::isTmcSPI() {
-  #ifdef HAS_TMC_DRIVER
+  #ifdef TMC_DRIVER_PRESENT
     if (settings.model == TMC2130 || settings.model == TMC5160) return true; else return false;
   #else
     return false;

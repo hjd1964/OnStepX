@@ -4,39 +4,14 @@
 
 #include <Arduino.h>
 #include "../../../Common.h"
-
-#ifdef AXIS_PRESENT
+#include "StepDrivers.defaults.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
-#define A4988    0  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
-#define DRV8825  1  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define S109     2  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define LV8729   3  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define RAPS128  4  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define TMC2100  5  // step/dir stepper driver, allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2208  6  // step/dir stepper driver, allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209  7  // step/dir stepper driver, allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define ST820    8  // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
-#define TMC2130  9  // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC5160  10 // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define GENERIC  11 // step/dir stepper driver, allows                        for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
-#define SERVO    12 // step/dir servo   driver, allows M0 bit pattern for LOW = native mode & goto HIGH = 2x,4x,8x,16x,32x,64x, or 128x *larger* steps
 
-#define MIXED         0
-#define FAST          1
-#define SLOW          2
-#define SPREADCYCLE   3
-#define STEALTHCHOP   4
+#ifdef SD_DRIVER_PRESENT
 
-#include "StepDrivers.defaults.h"
-
-#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
-    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
-    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
-  #define HAS_TMC_DRIVER
-  #include "TmcDrivers.h"
-#endif
+#include "TmcDrivers.h"
 
 #pragma pack(1)
 #define StepDriverSettingsSize 15
@@ -127,7 +102,7 @@ class StepDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     int subdivisionsToCode(uint8_t microsteps);
 
-    #ifdef HAS_TMC_DRIVER
+    #ifdef TMC_DRIVER_PRESENT
       TmcDriver tmcDriver;
     #endif
 

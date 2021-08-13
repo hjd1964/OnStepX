@@ -5,12 +5,11 @@
 #include <Arduino.h>
 #include "../../../Common.h"
 
-#ifdef AXIS_PRESENT
-
-#include "../../../commands/ProcessCmds.h"
 #include "StepDrivers.h"
 
-#include "StepDir.defaults.h"
+#ifdef SD_DRIVER_PRESENT
+
+#include "../../../commands/ProcessCmds.h"
 
 typedef struct StepDirPins {
   int16_t   step;
@@ -21,7 +20,6 @@ typedef struct StepDirPins {
 } StepDirPins;
 
 enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUEST, MMC_SLEWING_PAUSE, MMC_SLEWING_READY, MMC_TRACKING_READY};
-enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 class StepDir {
   public:

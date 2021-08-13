@@ -1,5 +1,38 @@
 #pragma once
 
+// check/flag SD stepper drivers
+#if AXIS1_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS1_DRIVER_SD
+#endif
+#if AXIS2_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS2_DRIVER_SD
+#endif
+#if AXIS3_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS3_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS3_DRIVER_SD
+#endif
+#if AXIS4_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS4_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS4_DRIVER_SD
+#endif
+#if AXIS5_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS5_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS5_DRIVER_SD
+#endif
+#if AXIS6_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS6_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS6_DRIVER_SD
+#endif
+#if AXIS7_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS7_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS7_DRIVER_SD
+#endif
+#if AXIS8_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS8_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS8_DRIVER_SD
+#endif
+#if AXIS9_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS9_DRIVER_MODEL <= SD_DRIVER_LAST
+  #define AXIS9_DRIVER_SD
+#endif
+
+#if defined(AXIS1_DRIVER_SD) || defined(AXIS2_DRIVER_SD) || defined(AXIS3_DRIVER_SD) || defined(AXIS4_DRIVER_SD) || defined(AXIS5_DRIVER_SD) || defined(AXIS6_DRIVER_SD) || defined(AXIS7_DRIVER_SD) || defined(AXIS8_DRIVER_SD) || defined(AXIS9_DRIVER_SD)
+  #define SD_DRIVER_PRESENT
+#endif
+
 // check/flag TMC stepper drivers
 #if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160
   #define AXIS1_DRIVER_TMC_SPI
@@ -29,7 +62,14 @@
   #define AXIS9_DRIVER_TMC_SPI
 #endif
 
+#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
+    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
+    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
+  #define TMC_DRIVER_PRESENT
+#endif
+
 // common axis driver settings, RA/AZM
+#ifdef AXIS1_DRIVER_SD
 #ifndef AXIS1_DRIVER_MICROSTEPS
 #define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
 #endif
@@ -54,8 +94,12 @@
 #ifndef AXIS1_DRIVER_STATUS
 #define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
 #endif
+#define AXIS1_SUBDIVISIONS            AXIS1_DRIVER_MICROSTEPS
+#define AXIS1_CURRENT                 AXIS1_DRIVER_IRUN
+#endif
 
 // common axis driver settings, DEC/ALT
+#ifdef AXIS2_DRIVER_SD
 #ifndef AXIS2_DRIVER_MICROSTEPS
 #define AXIS2_DRIVER_MICROSTEPS       OFF
 #endif
@@ -80,8 +124,12 @@
 #ifndef AXIS2_DRIVER_STATUS
 #define AXIS2_DRIVER_STATUS           OFF
 #endif
+#define AXIS2_SUBDIVISIONS            AXIS2_DRIVER_MICROSTEPS
+#define AXIS2_CURRENT                 AXIS2_DRIVER_IRUN
+#endif
 
 // common axis driver settings, ROTATOR
+#ifdef AXIS3_DRIVER_SD
 #ifndef AXIS3_DRIVER_MICROSTEPS
 #define AXIS3_DRIVER_MICROSTEPS       OFF
 #endif
@@ -106,8 +154,12 @@
 #ifndef AXIS3_DRIVER_STATUS
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
+#define AXIS3_SUBDIVISIONS            AXIS3_DRIVER_MICROSTEPS
+#define AXIS3_CURRENT                 AXIS3_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER1
+#ifdef AXIS4_DRIVER_SD
 #ifndef AXIS4_DRIVER_MICROSTEPS
 #define AXIS4_DRIVER_MICROSTEPS       OFF
 #endif
@@ -132,8 +184,12 @@
 #ifndef AXIS4_DRIVER_STATUS
 #define AXIS4_DRIVER_STATUS           OFF
 #endif
+#define AXIS4_SUBDIVISIONS            AXIS4_DRIVER_MICROSTEPS
+#define AXIS4_CURRENT                 AXIS4_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER2
+#ifdef AXIS5_DRIVER_SD
 #ifndef AXIS5_DRIVER_MICROSTEPS
 #define AXIS5_DRIVER_MICROSTEPS       OFF
 #endif
@@ -158,8 +214,12 @@
 #ifndef AXIS5_DRIVER_STATUS
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
+#define AXIS5_SUBDIVISIONS            AXIS5_DRIVER_MICROSTEPS
+#define AXIS5_CURRENT                 AXIS5_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER3
+#ifdef AXIS6_DRIVER_SD
 #ifndef AXIS6_DRIVER_MICROSTEPS
 #define AXIS6_DRIVER_MICROSTEPS       OFF
 #endif
@@ -184,8 +244,12 @@
 #ifndef AXIS6_DRIVER_STATUS
 #define AXIS6_DRIVER_STATUS           OFF
 #endif
+#define AXIS6_SUBDIVISIONS            AXIS6_DRIVER_MICROSTEPS
+#define AXIS6_CURRENT                 AXIS6_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER4
+#ifdef AXIS7_DRIVER_SD
 #ifndef AXIS7_DRIVER_MICROSTEPS
 #define AXIS7_DRIVER_MICROSTEPS       OFF
 #endif
@@ -210,8 +274,12 @@
 #ifndef AXIS7_DRIVER_STATUS
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
+#define AXIS7_SUBDIVISIONS            AXIS7_DRIVER_MICROSTEPS
+#define AXIS7_CURRENT                 AXIS7_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER5
+#ifdef AXIS8_DRIVER_SD
 #ifndef AXIS8_DRIVER_MICROSTEPS
 #define AXIS8_DRIVER_MICROSTEPS       OFF
 #endif
@@ -236,8 +304,12 @@
 #ifndef AXIS8_DRIVER_STATUS
 #define AXIS8_DRIVER_STATUS           OFF
 #endif
+#define AXIS8_SUBDIVISIONS            AXIS8_DRIVER_MICROSTEPS
+#define AXIS8_CURRENT                 AXIS8_DRIVER_IRUN
+#endif
 
 // common axis driver settings, FOCUSER6
+#ifdef AXIS9_DRIVER_SD
 #ifndef AXIS9_DRIVER_MICROSTEPS
 #define AXIS9_DRIVER_MICROSTEPS       OFF
 #endif
@@ -262,40 +334,6 @@
 #ifndef AXIS9_DRIVER_STATUS
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
-
-#if AXIS1_DRIVER_MODEL != OFF
-  #define AXIS1_SUBDIVISIONS  AXIS1_DRIVER_MICROSTEPS
-  #define AXIS1_CURRENT       AXIS1_DRIVER_IRUN
-#endif
-#if AXIS2_DRIVER_MODEL != OFF
-  #define AXIS2_SUBDIVISIONS  AXIS2_DRIVER_MICROSTEPS
-  #define AXIS2_CURRENT       AXIS2_DRIVER_IRUN
-#endif
-#if AXIS3_DRIVER_MODEL != OFF
-  #define AXIS3_SUBDIVISIONS  AXIS3_DRIVER_MICROSTEPS
-  #define AXIS3_CURRENT       AXIS3_DRIVER_IRUN
-#endif
-#if AXIS4_DRIVER_MODEL != OFF
-  #define AXIS4_SUBDIVISIONS  AXIS4_DRIVER_MICROSTEPS
-  #define AXIS4_CURRENT       AXIS4_DRIVER_IRUN
-#endif
-#if AXIS5_DRIVER_MODEL != OFF
-  #define AXIS5_SUBDIVISIONS  AXIS5_DRIVER_MICROSTEPS
-  #define AXIS5_CURRENT       AXIS5_DRIVER_IRUN
-#endif
-#if AXIS6_DRIVER_MODEL != OFF
-  #define AXIS6_SUBDIVISIONS  AXIS6_DRIVER_MICROSTEPS
-  #define AXIS6_CURRENT       AXIS6_DRIVER_IRUN
-#endif
-#if AXIS7_DRIVER_MODEL != OFF
-  #define AXIS7_SUBDIVISIONS  AXIS7_DRIVER_MICROSTEPS
-  #define AXIS7_CURRENT       AXIS7_DRIVER_IRUN
-#endif
-#if AXIS8_DRIVER_MODEL != OFF
-  #define AXIS8_SUBDIVISIONS  AXIS8_DRIVER_MICROSTEPS
-  #define AXIS8_CURRENT       AXIS8_DRIVER_IRUN
-#endif
-#if AXIS9_DRIVER_MODEL != OFF
-  #define AXIS9_SUBDIVISIONS  AXIS9_DRIVER_MICROSTEPS
-  #define AXIS9_CURRENT       AXIS9_DRIVER_IRUN
+#define AXIS9_SUBDIVISIONS            AXIS9_DRIVER_MICROSTEPS
+#define AXIS9_CURRENT                 AXIS9_DRIVER_IRUN
 #endif

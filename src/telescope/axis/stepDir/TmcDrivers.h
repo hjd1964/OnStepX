@@ -4,8 +4,9 @@
 
 #include <Arduino.h>
 #include "../../../Common.h"
+#include "StepDrivers.defaults.h"
 
-#ifdef AXIS_PRESENT
+#ifdef TMC_DRIVER_PRESENT
 
 #include "../../../lib/softSpi/SoftSpi.h"
 

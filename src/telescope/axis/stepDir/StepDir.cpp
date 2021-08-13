@@ -3,7 +3,7 @@
 
 #include "StepDir.h"
 
-#ifdef AXIS_PRESENT
+#ifdef SD_DRIVER_PRESENT
 
 #include "../../../tasks/OnTask.h"
 extern Tasks tasks;
@@ -12,6 +12,7 @@ extern Tasks tasks;
 #include "../../rotator/Rotator.h"
 #include "../../focuser/Focuser.h"
 #include "../../../lib/sense/Sense.h"
+#include "StepDir.defaults.h"
 
 #ifdef MOUNT_PRESENT
   extern unsigned long periodSubMicros;
@@ -19,44 +20,44 @@ extern Tasks tasks;
   #define periodSubMicros 1.0
 #endif
 
-#if AXIS1_DRIVER_MODEL != OFF
-  const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_DRIVER_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_DRIVER_ENABLE_STATE };
+#ifdef AXIS1_DRIVER_SD
+  const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE };
   IRAM_ATTR void moveAxis1() { mount.axis1.motor.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   IRAM_ATTR void moveFFAxis1() { mount.axis1.motor.moveFF(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFRAxis1() { mount.axis1.motor.moveFR(AXIS1_STEP_PIN); }
 #endif
-#if AXIS2_DRIVER_MODEL != OFF
-  const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_DRIVER_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_DRIVER_ENABLE_STATE };
+#ifdef AXIS2_DRIVER_SD
+  const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE };
   IRAM_ATTR void moveAxis2() { mount.axis2.motor.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   IRAM_ATTR void moveFFAxis2() { mount.axis2.motor.moveFF(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFRAxis2() { mount.axis2.motor.moveFR(AXIS2_STEP_PIN); }
 #endif
-#if AXIS3_DRIVER_MODEL != OFF
-  const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_DRIVER_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_DRIVER_ENABLE_STATE };
+#ifdef AXIS3_DRIVER_SD
+  const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE };
   inline void moveAxis3() { rotator.axis.motor.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
 #endif
-#if AXIS4_DRIVER_MODEL != OFF
-  const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_DRIVER_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_DRIVER_ENABLE_STATE };
+#ifdef AXIS4_DRIVER_SD
+  const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE };
   inline void moveAxis4() { focuser.axis[0]->motor.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
 #endif
-#if AXIS5_DRIVER_MODEL != OFF
-  const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_DRIVER_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_DRIVER_ENABLE_STATE };
+#ifdef AXIS5_DRIVER_SD
+  const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE };
   inline void moveAxis5() { focuser.axis[1]->motor.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
 #endif
-#if AXIS6_DRIVER_MODEL != OFF
-  const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_DRIVER_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_DRIVER_ENABLE_STATE };
+#ifdef AXIS6_DRIVER_SD
+  const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE };
   inline void moveAxis6() { focuser.axis[2]->motor.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
 #endif
-#if AXIS7_DRIVER_MODEL != OFF
-  const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_DRIVER_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_DRIVER_ENABLE_STATE };
+#ifdef AXIS7_DRIVER_SD
+  const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE };
   inline void moveAxis7() { focuser.axis[3]->motor.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
 #endif
-#if AXIS8_DRIVER_MODEL != OFF
-  const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_DRIVER_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_DRIVER_ENABLE_STATE };
+#ifdef AXIS8_DRIVER_SD
+  const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE };
   inline void moveAxis8() { focuser.axis[4]->motor.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
 #endif
-#if AXIS9_DRIVER_MODEL != OFF
-  const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_DRIVER_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_DRIVER_ENABLE_STATE };
+#ifdef AXIS9_DRIVER_SD
+  const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE };
   inline void moveAxis9() { focuser.axis[5]->motor.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
 #endif
 
@@ -65,31 +66,31 @@ bool StepDir::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16
   this->axisNumber = axisNumber;
   
   taskHandle = 0;
-  #if AXIS1_DRIVER_MODEL != OFF
+  #ifdef AXIS1_DRIVER_SD
     if (axisNumber == 1) { pins = Axis1Pins; _move = moveAxis1; _moveFF = moveFFAxis1; _moveFR = moveFRAxis1; }
   #endif
-  #if AXIS2_DRIVER_MODEL != OFF
+  #ifdef AXIS2_DRIVER_SD
     if (axisNumber == 2) { pins = Axis2Pins; _move = moveAxis2; _moveFF = moveFFAxis2; _moveFR = moveFRAxis2; }
   #endif
-  #if AXIS3_DRIVER_MODEL != OFF
+  #ifdef AXIS3_DRIVER_SD
     if (axisNumber == 3) { pins = Axis3Pins; _move = moveAxis3; }
   #endif
-  #if AXIS4_DRIVER_MODEL != OFF
+  #ifdef AXIS4_DRIVER_SD
     if (axisNumber == 4) { pins = Axis4Pins; _move = moveAxis4; }
   #endif
-  #if AXIS5_DRIVER_MODEL != OFF
+  #ifdef AXIS5_DRIVER_SD
     if (axisNumber == 5) { pins = Axis5Pins; _move = moveAxis5; }
   #endif
-  #if AXIS6_DRIVER_MODEL != OFF
+  #ifdef AXIS6_DRIVER_SD
     if (axisNumber == 6) { pins = Axis6Pins; _move = moveAxis6; }
   #endif
-  #if AXIS7_DRIVER_MODEL != OFF
+  #ifdef AXIS7_DRIVER_SD
     if (axisNumber == 7) { pins = Axis7Pins; _move = moveAxis7; }
   #endif
-  #if AXIS8_DRIVER_MODEL != OFF
+  #ifdef AXIS8_DRIVER_SD
     if (axisNumber == 8) { pins = Axis8Pins; _move = moveAxis8; }
   #endif
-  #if AXIS9_DRIVER_MODEL != OFF
+  #ifdef AXIS9_DRIVER_SD
     if (axisNumber == 9) { pins = Axis9Pins; _move = moveAxis9; }
   #endif
 

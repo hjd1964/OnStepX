@@ -2,9 +2,8 @@
 // tmc stepper driver configuration control
 
 #include "TmcDrivers.h"
-#include "StepDrivers.h"
 
-#ifdef AXIS_PRESENT
+#ifdef TMC_DRIVER_PRESENT
 
 void TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso) {
   this->model = model;

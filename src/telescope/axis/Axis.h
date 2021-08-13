@@ -9,6 +9,7 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "stepDir/StepDir.h"
+#include "servo/Servo.h"
 
 #pragma pack(1)
 typedef struct AxisLimits {
@@ -16,12 +17,16 @@ typedef struct AxisLimits {
   float max;
 } AxisLimits;
 
+// helpers for servo parameters
+#define integral subdivisions
+#define current  porportional
+
 #define AxisSettingsSize 25
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
-  int16_t    subdivisions;
-  int16_t    current;
+  int16_t    subdivisions; // aka integral
+  int16_t    current;      // aka proportional
   AxisLimits limits;
   float      backlashFreq;
 } AxisSettings;
@@ -187,7 +192,7 @@ class Axis {
     AxisSettings settings;
 
     // motors, one type for now
-    StepDir motor; // should not be used outside of the StepDir class
+    StepDir motor;
 
   private:
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
