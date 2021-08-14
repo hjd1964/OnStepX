@@ -37,168 +37,281 @@
   #define SERVO_DRIVER_PRESENT
 #endif
 
-//$$$$$$$$$$$$$$$$
-
-
 // common axis driver settings, RA/AZM
+#ifdef AXIS1_DRIVER_SERVO
 #ifndef AXIS1_DRIVER_STATUS
-#define AXIS1_DRIVER_STATUS    OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
+#define AXIS1_DRIVER_STATUS           OFF    // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
+#endif
+#ifndef AXIS1_ENABLE_STATE
+#define AXIS1_ENABLE_STATE            LOW    // default state of ENable pin for motor power on
+#endif
+#ifndef AXIS1_DC_IN1_STATE
+#define AXIS1_DC_IN1_STATE            LOW    // IN1 also doubles for DIR
+#endif
+#ifndef AXIS1_DC_IN2_STATE
+#define AXIS1_DC_IN2_STATE            LOW    // IN2 also doubles for PHASE
+#endif
+#ifndef AXIS1_DRIVER_SERVO_P
+#define AXIS1_DRIVER_SERVO_P          1      // P = porportional, steps for +/- 100% response (power)
+#endif
+#ifndef AXIS1_DRIVER_SERVO_I
+#define AXIS1_DRIVER_SERVO_I          1000   // I = integral, time in ms to integrate
+#endif
+#ifndef AXIS1_DRIVER_SERVO_D
+#define AXIS1_DRIVER_SERVO_D          1      // D = derivative, rate of change in steps/sec/sec for +/- 100% response (power)
+#endif
+#ifndef AXIS1_SUBDIVISIONS
+#define AXIS1_SUBDIVISIONS            AXIS1_DRIVER_SERVO_I
+#endif
+#ifndef AXIS1_CURRENT
+#define AXIS1_CURRENT                 AXIS1_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, DEC/ALT
+#ifdef AXIS2_DRIVER_SERVO
 #ifndef AXIS2_DRIVER_STATUS
-#define AXIS2_DRIVER_STATUS    OFF
+#define AXIS2_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS2_ENABLE_STATE
+#define AXIS2_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS2_DC_IN1_STATE
+#define AXIS2_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS2_DC_IN2_STATE
+#define AXIS2_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS2_DRIVER_SERVO_P
+#define AXIS2_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS2_DRIVER_SERVO_I
+#define AXIS2_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS2_DRIVER_SERVO_D
+#define AXIS2_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS2_SUBDIVISIONS
+#define AXIS2_SUBDIVISIONS            AXIS2_DRIVER_SERVO_I
+#endif
+#ifndef AXIS2_CURRENT
+#define AXIS2_CURRENT                 AXIS2_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, ROTATOR
+#ifdef AXIS3_DRIVER_SERVO
 #ifndef AXIS3_DRIVER_STATUS
-#define AXIS3_DRIVER_STATUS    OFF
+#define AXIS3_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS3_ENABLE_STATE
+#define AXIS3_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS3_DC_IN1_STATE
+#define AXIS3_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS3_DC_IN2_STATE
+#define AXIS3_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS3_DRIVER_SERVO_P
+#define AXIS3_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS3_DRIVER_SERVO_I
+#define AXIS3_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS3_DRIVER_SERVO_D
+#define AXIS3_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS3_SUBDIVISIONS
+#define AXIS3_SUBDIVISIONS            AXIS3_DRIVER_SERVO_I
+#endif
+#ifndef AXIS3_CURRENT
+#define AXIS3_CURRENT                 AXIS3_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER1
+#ifdef AXIS4_DRIVER_SERVO
 #ifndef AXIS4_DRIVER_STATUS
-#define AXIS4_DRIVER_STATUS    OFF
+#define AXIS4_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS4_ENABLE_STATE
+#define AXIS4_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS4_DC_IN1_STATE
+#define AXIS4_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS4_DC_IN2_STATE
+#define AXIS4_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS4_DRIVER_SERVO_P
+#define AXIS4_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS4_DRIVER_SERVO_I
+#define AXIS4_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS4_DRIVER_SERVO_D
+#define AXIS4_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS4_SUBDIVISIONS
+#define AXIS4_SUBDIVISIONS            AXIS4_DRIVER_SERVO_I
+#endif
+#ifndef AXIS4_CURRENT
+#define AXIS4_CURRENT                 AXIS4_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER2
+#ifdef AXIS5_DRIVER_SERVO
 #ifndef AXIS5_DRIVER_STATUS
-#define AXIS5_DRIVER_STATUS    OFF
+#define AXIS5_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS5_ENABLE_STATE
+#define AXIS5_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS5_DC_IN1_STATE
+#define AXIS5_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS5_DC_IN2_STATE
+#define AXIS5_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS5_DRIVER_SERVO_P
+#define AXIS5_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS5_DRIVER_SERVO_I
+#define AXIS5_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS5_DRIVER_SERVO_D
+#define AXIS5_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS5_SUBDIVISIONS
+#define AXIS5_SUBDIVISIONS            AXIS5_DRIVER_SERVO_I
+#endif
+#ifndef AXIS5_CURRENT
+#define AXIS5_CURRENT                 AXIS5_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER3
+#ifdef AXIS6_DRIVER_SERVO
 #ifndef AXIS6_DRIVER_STATUS
-#define AXIS6_DRIVER_STATUS    OFF
+#define AXIS6_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS6_ENABLE_STATE
+#define AXIS6_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS6_DC_IN1_STATE
+#define AXIS6_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS6_DC_IN2_STATE
+#define AXIS6_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS6_DRIVER_SERVO_P
+#define AXIS6_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS6_DRIVER_SERVO_I
+#define AXIS6_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS6_DRIVER_SERVO_D
+#define AXIS6_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS6_SUBDIVISIONS
+#define AXIS6_SUBDIVISIONS            AXIS6_DRIVER_SERVO_I
+#endif
+#ifndef AXIS6_CURRENT
+#define AXIS6_CURRENT                 AXIS6_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER4
+#ifdef AXIS7_DRIVER_SERVO
 #ifndef AXIS7_DRIVER_STATUS
-#define AXIS7_DRIVER_STATUS    OFF
+#define AXIS7_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS4_ENABLE_STATE
+#define AXIS7_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS7_DC_IN1_STATE
+#define AXIS7_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS7_DC_IN2_STATE
+#define AXIS7_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS7_DRIVER_SERVO_P
+#define AXIS7_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS7_DRIVER_SERVO_I
+#define AXIS7_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS7_DRIVER_SERVO_D
+#define AXIS7_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS7_SUBDIVISIONS
+#define AXIS7_SUBDIVISIONS            AXIS7_DRIVER_SERVO_I
+#endif
+#ifndef AXIS7_CURRENT
+#define AXIS7_CURRENT                 AXIS7_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER5
+#ifdef AXIS8_DRIVER_SERVO
 #ifndef AXIS8_DRIVER_STATUS
-#define AXIS8_DRIVER_STATUS    OFF
+#define AXIS8_DRIVER_STATUS           OFF
+#endif
+#ifndef AXIS8_ENABLE_STATE
+#define AXIS8_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS8_DC_IN1_STATE
+#define AXIS8_DC_IN1_STATE            LOW
+#endif
+#ifndef AXIS8_DC_IN2_STATE
+#define AXIS8_DC_IN2_STATE            LOW
+#endif
+#ifndef AXIS8_DRIVER_SERVO_P
+#define AXIS8_DRIVER_SERVO_P          1
+#endif
+#ifndef AXIS8_DRIVER_SERVO_I
+#define AXIS8_DRIVER_SERVO_I          1000
+#endif
+#ifndef AXIS8_DRIVER_SERVO_D
+#define AXIS8_DRIVER_SERVO_D          1
+#endif
+#ifndef AXIS8_SUBDIVISIONS
+#define AXIS8_SUBDIVISIONS            AXIS8_DRIVER_SERVO_I
+#endif
+#ifndef AXIS8_CURRENT
+#define AXIS8_CURRENT                 AXIS8_DRIVER_SERVO_P
+#endif
 #endif
 
 // common axis driver settings, FOCUSER6
+#ifdef AXIS9_DRIVER_SERVO
 #ifndef AXIS9_DRIVER_STATUS
-#define AXIS9_DRIVER_STATUS    OFF
-#endif
-
-// state of ENable pin for motor power on
-#ifndef AXIS1_ENABLE_STATE
-#define AXIS1_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS2_ENABLE_STATE
-#define AXIS2_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS3_ENABLE_STATE
-#define AXIS3_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS4_ENABLE_STATE
-#define AXIS4_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS5_ENABLE_STATE
-#define AXIS5_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS6_ENABLE_STATE
-#define AXIS6_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS7_ENABLE_STATE
-#define AXIS7_ENABLE_STATE     LOW
-#endif
-#ifndef AXIS8_ENABLE_STATE
-#define AXIS8_ENABLE_STATE     LOW
+#define AXIS9_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS9_ENABLE_STATE
-#define AXIS9_ENABLE_STATE     LOW
-#endif
-
-// PHASE1 also doubles for DIR
-#ifndef AXIS1_DC_IN1_STATE
-#define AXIS1_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS2_DC_IN1_STATE
-#define AXIS2_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS3_DC_IN1_STATE
-#define AXIS3_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS4_DC_IN1_STATE
-#define AXIS4_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS5_DC_IN1_STATE
-#define AXIS5_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS6_DC_IN1_STATE
-#define AXIS6_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS7_DC_IN1_STATE
-#define AXIS7_DC_IN1_STATE     HIGH
-#endif
-#ifndef AXIS8_DC_IN1_STATE
-#define AXIS8_DC_IN1_STATE     HIGH
+#define AXIS9_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS9_DC_IN1_STATE
-#define AXIS9_DC_IN1_STATE     HIGH
-#endif
-
-// PHASE2 is the primary phase (pwm) pin for DIR/PHASE drivers
-#ifndef AXIS1_DC_IN2_STATE
-#define AXIS1_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS2_DC_IN2_STATE
-#define AXIS2_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS3_DC_IN2_STATE
-#define AXIS3_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS4_DC_IN2_STATE
-#define AXIS4_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS5_DC_IN2_STATE
-#define AXIS5_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS6_DC_IN2_STATE
-#define AXIS6_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS7_DC_IN2_STATE
-#define AXIS7_DC_IN2_STATE     HIGH
-#endif
-#ifndef AXIS8_DC_IN2_STATE
-#define AXIS8_DC_IN2_STATE     HIGH
+#define AXIS9_DC_IN1_STATE            LOW
 #endif
 #ifndef AXIS9_DC_IN2_STATE
-#define AXIS9_DC_IN2_STATE     HIGH
+#define AXIS9_DC_IN2_STATE            LOW
 #endif
-
-#ifndef AXIS1_DRIVER_SERVO_P
-#define AXIS1_DRIVER_SERVO_P      1   // 1% response
+#ifndef AXIS9_DRIVER_SERVO_P
+#define AXIS9_DRIVER_SERVO_P          1
 #endif
-#ifndef AXIS1_DRIVER_SERVO_I
-#define AXIS1_DRIVER_SERVO_I      1   // integrate time in ms
+#ifndef AXIS9_DRIVER_SERVO_I
+#define AXIS9_DRIVER_SERVO_I          1000
 #endif
-#ifndef AXIS1_DRIVER_SERVO_D
-#define AXIS1_DRIVER_SERVO_D      1   //
+#ifndef AXIS9_DRIVER_SERVO_D
+#define AXIS9_DRIVER_SERVO_D          1
 #endif
-
-#ifndef AXIS3_DRIVER_SERVO_P
-#define AXIS3_DRIVER_SERVO_P      1
+#ifndef AXIS9_SUBDIVISIONS
+#define AXIS9_SUBDIVISIONS            AXIS9_DRIVER_SERVO_I
 #endif
-#ifndef AXIS3_DRIVER_SERVO_I
-#define AXIS3_DRIVER_SERVO_I      1
+#ifndef AXIS9_CURRENT
+#define AXIS9_CURRENT                 AXIS9_DRIVER_SERVO_P
 #endif
-#ifndef AXIS3_DRIVER_SERVO_D
-#define AXIS3_DRIVER_SERVO_D      1
 #endif
-
-#ifndef AXIS3_DRIVER_SERVO_P
-#define AXIS3_DRIVER_SERVO_P      1
-#endif
-#ifndef AXIS3_DRIVER_SERVO_I
-#define AXIS3_DRIVER_SERVO_I      1
-#endif
-#ifndef AXIS3_DRIVER_SERVO_D
-#define AXIS3_DRIVER_SERVO_D      1
-#endif
-
