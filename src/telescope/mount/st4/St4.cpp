@@ -209,7 +209,7 @@ extern Tasks tasks;
         }
     #endif
 
-    if (mount.axis1.isEnabled()) {
+    if (axis1.isEnabled()) {
       // guide E/W
       GuideAction st4GuideActionAxis1 = GA_BREAK;
       static GuideAction lastSt4GuideActionAxis1 = GA_BREAK;

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
-// stepper driver control
+// step/dir driver control
 
-#include "StepDrivers.h"
+#include "StepDirDrivers.h"
 
 #ifdef SD_DRIVER_PRESENT
 
@@ -88,11 +88,11 @@ const DriverSettings ModeSettings[] = {
   #endif
 };
 
-void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
+void StepDirDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
   this->axisNumber = axisNumber;
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (ModePins[i].axis == axisNumber) { index = i; settings = ModeSettings[i]; break; } if (i == 9) { VLF("ERR: StepDriver::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) { if (ModePins[i].axis == axisNumber) { index = i; settings = ModeSettings[i]; break; } if (i == 9) { VLF("ERR: StepDirDriver::init(); indexing failed!"); return; } }
 
   // update the current from initialization setting
   if (settings.currentRun != OFF && settings.currentRun != current) {
@@ -156,11 +156,11 @@ void StepDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current) {
   }
 }
 
-bool StepDriver::modeSwitchAllowed() {
+bool StepDirDriver::modeSwitchAllowed() {
   return microstepRatio != 1;  
 }
 
-void StepDriver::modeMicrostepTracking() {
+void StepDirDriver::modeMicrostepTracking() {
   if (isTmcSPI()) {
     #ifdef TMC_DRIVER_PRESENT
       tmcDriver.refresh_CHOPCONF(microstepCode);
@@ -174,7 +174,7 @@ void StepDriver::modeMicrostepTracking() {
   }
 }
 
-void StepDriver::modeDecayTracking() {
+void StepDirDriver::modeDecayTracking() {
   if (isTmcSPI()) {
     #ifdef TMC_DRIVER_PRESENT
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
@@ -189,11 +189,11 @@ void StepDriver::modeDecayTracking() {
 }
 
 // get microstep ratio for slewing
-int StepDriver::getMicrostepRatio() {
+int StepDirDriver::getMicrostepRatio() {
   return microstepRatio;
 }
 
-int StepDriver::modeMicrostepSlewing() {
+int StepDirDriver::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
     if (isTmcSPI()) {
       #ifdef TMC_DRIVER_PRESENT
@@ -210,7 +210,7 @@ int StepDriver::modeMicrostepSlewing() {
   return microstepRatio;
 }
 
-void StepDriver::modeDecaySlewing() {
+void StepDirDriver::modeDecaySlewing() {
   if (isTmcSPI()) {
     #ifdef TMC_DRIVER_PRESENT
       int IRUN = settings.currentGoto;
@@ -226,7 +226,7 @@ void StepDriver::modeDecaySlewing() {
   }
 }
 
-void StepDriver::updateStatus() {
+void StepDirDriver::updateStatus() {
   #ifdef TMC_DRIVER_PRESENT
     if (settings.status == ON) {
       if (tmcDriver.refresh_DRVSTATUS()) {
@@ -265,11 +265,11 @@ void StepDriver::updateStatus() {
   }
 }
 
-DriverStatus StepDriver::getStatus() {
+DriverStatus StepDirDriver::getStatus() {
   return status;
 }
 
-int8_t StepDriver::getDecayPinState(int8_t decay) {
+int8_t StepDirDriver::getDecayPinState(int8_t decay) {
   uint8_t state = OFF;
   if (decay == SPREADCYCLE) state = LOW;  else
   if (decay == STEALTHCHOP) state = HIGH; else
@@ -279,7 +279,7 @@ int8_t StepDriver::getDecayPinState(int8_t decay) {
 }
 
 // secondary way to power down not using the enable pin
-void StepDriver::power(bool state) {
+void StepDirDriver::power(bool state) {
   #ifdef TMC_DRIVER_PRESENT
     int I_run = 0, I_hold = 0;
     if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
@@ -290,7 +290,7 @@ void StepDriver::power(bool state) {
 }
 
 // checks for TMC SPI driver
-bool StepDriver::isTmcSPI() {
+bool StepDirDriver::isTmcSPI() {
   #ifdef TMC_DRIVER_PRESENT
     if (settings.model == TMC2130 || settings.model == TMC5160) return true; else return false;
   #else
@@ -298,14 +298,14 @@ bool StepDriver::isTmcSPI() {
   #endif
 }
 
-bool StepDriver::isDecayOnM2() {
+bool StepDirDriver::isDecayOnM2() {
   if (settings.model == TMC2209) return true; else return false;
 }
 
 // different models of stepper drivers have different bit settings for microsteps
 // translate the human readable microsteps in the configuration to mode bit settings
 // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
-int StepDriver::subdivisionsToCode(uint8_t microsteps) {
+int StepDirDriver::subdivisionsToCode(uint8_t microsteps) {
   int allowed[9] = {1,2,4,8,16,32,64,128,256};
   if (settings.model >= DRIVER_MODEL_COUNT) return OFF;
   for (int i = 0; i < 9; i++) {

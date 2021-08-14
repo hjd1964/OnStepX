@@ -47,14 +47,14 @@ CommandError Home::request() {
       guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
     } else {
       // set slew rate limit
-      mount.axis1.setFrequencySlew(goTo.rate);
-      mount.axis2.setFrequencySlew(goTo.rate);
+      axis1.setFrequencySlew(goTo.rate);
+      axis2.setFrequencySlew(goTo.rate);
       // use a goto to find home
-      if (transform.mountType == ALTAZM) mount.axis1.setTargetCoordinate(position.z); else mount.axis1.setTargetCoordinate(position.h);
-      if (transform.mountType == ALTAZM) mount.axis2.setTargetCoordinate(position.a); else mount.axis2.setTargetCoordinate(position.d);
+      if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(position.z); else axis1.setTargetCoordinate(position.h);
+      if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(position.a); else axis2.setTargetCoordinate(position.d);
       VLF("Mount::returnHome(); target coordinates set");
-      mount.axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-      mount.axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     }
   #endif
   return CE_NONE;
@@ -66,7 +66,7 @@ CommandError Home::reset(bool resetPark) {
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
 
-  if (guide.state != GU_NONE || mount.axis1.isSlewing() || mount.axis2.isSlewing()) return CE_SLEW_IN_MOTION;
+  if (guide.state != GU_NONE || axis1.isSlewing() || axis2.isSlewing()) return CE_SLEW_IN_MOTION;
 
   #if SLEW_GOTO == ON
     // clear park state
@@ -80,23 +80,23 @@ CommandError Home::reset(bool resetPark) {
   mount.enable(false);
   
   // setup axis1 and axis2
-  mount.axis1.resetPosition(0.0L);
-  mount.axis2.resetPosition(0.0L);
+  axis1.resetPosition(0.0L);
+  axis2.resetPosition(0.0L);
 
   if (transform.mountType == ALTAZM) {
-    mount.axis1.setInstrumentCoordinate(position.z);
-    mount.axis2.setInstrumentCoordinate(position.a);
+    axis1.setInstrumentCoordinate(position.z);
+    axis2.setInstrumentCoordinate(position.a);
   } else {
-    mount.axis1.setInstrumentCoordinate(position.h);
-    mount.axis2.setInstrumentCoordinate(position.d);
+    axis1.setInstrumentCoordinate(position.h);
+    axis2.setInstrumentCoordinate(position.d);
   }
   atHome = true;
 
-  mount.axis1.setBacklash(mount.settings.backlash.axis1);
-  mount.axis2.setBacklash(mount.settings.backlash.axis2);
+  axis1.setBacklash(mount.settings.backlash.axis1);
+  axis2.setBacklash(mount.settings.backlash.axis2);
 
-  mount.axis1.setFrequencySlew(degToRadF(0.1F));
-  mount.axis2.setFrequencySlew(degToRadF(0.1F));
+  axis1.setFrequencySlew(degToRadF(0.1F));
+  axis2.setFrequencySlew(degToRadF(0.1F));
 
   #if SLEW_GOTO == ON
     goTo.alignReset();

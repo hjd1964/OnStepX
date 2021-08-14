@@ -54,13 +54,13 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
 
   if (rate <= 2) {
     state = GU_PULSE_GUIDE;
-    mount.axis1.setPowerDownOverrideTime(30000);
-    mount.axis2.setPowerDownOverrideTime(30000);
+    axis1.setPowerDownOverrideTime(30000);
+    axis2.setPowerDownOverrideTime(30000);
     if (guideAction == GA_REVERSE) rateAxis1 = -rate; else rateAxis1 = rate;
     mount.update();
   } else {
     state = GU_GUIDE;
-    mount.axis1.setFrequencySlew(degToRadF(rate/240.0F));
+    axis1.setFrequencySlew(degToRadF(rate/240.0F));
     axis1AutoSlew(guideAction);
   }
 
@@ -74,7 +74,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
     if (rateAxis1 == 0.0F) {
       guideActionAxis1 = GA_BREAK;
-      if (abort) mount.axis1.autoSlewAbort(); else mount.axis1.autoSlewStop();
+      if (abort) axis1.autoSlewAbort(); else axis1.autoSlewStop();
     } else {
       guideActionAxis1 = GA_NONE;
       rateAxis1 = 0.0F;
@@ -97,13 +97,13 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 
   if (rate <= 2) {
     state = GU_PULSE_GUIDE;
-    mount.axis1.setPowerDownOverrideTime(30000);
-    mount.axis2.setPowerDownOverrideTime(30000);
+    axis1.setPowerDownOverrideTime(30000);
+    axis2.setPowerDownOverrideTime(30000);
     if (guideAction == GA_REVERSE) rateAxis2 = -rate; else rateAxis2 = rate;
     mount.update();
   } else {
     state = GU_GUIDE;
-    mount.axis2.setFrequencySlew(degToRadF(rate/240.0F));
+    axis2.setFrequencySlew(degToRadF(rate/240.0F));
     axis2AutoSlew(guideAction);
   }
 
@@ -117,7 +117,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
     if (rateAxis2 == 0.0F) {
       guideActionAxis2 = GA_BREAK;
-      if (abort) mount.axis2.autoSlewAbort(); else mount.axis2.autoSlewStop();
+      if (abort) axis2.autoSlewAbort(); else axis2.autoSlewStop();
     } else {
       guideActionAxis2 = GA_NONE;
       rateAxis2 = 0.0F;
@@ -164,19 +164,19 @@ void Guide::stopSpiral() {
 // start guide home (for use with home switches)
 CommandError Guide::startHome(unsigned long guideTimeLimit) {
   #if SLEW_GOTO == ON
-    mount.axis1.setFrequencySlew(goTo.rate);
-    mount.axis2.setFrequencySlew(goTo.rate);
+    axis1.setFrequencySlew(goTo.rate);
+    axis2.setFrequencySlew(goTo.rate);
   #else
-    mount.axis1.setFrequencySlew(degToRadF(0.2F));
-    mount.axis2.setFrequencySlew(degToRadF(0.2F));
+    axis1.setFrequencySlew(degToRadF(0.2F));
+    axis2.setFrequencySlew(degToRadF(0.2F));
   #endif
 
   // use guiding and switches to find home
   guide.state = GU_HOME_GUIDE;
   guideActionAxis1 = guideActionAxis2 = GA_HOME;
   guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-  mount.axis1.autoSlewHome();
-  mount.axis2.autoSlewHome();
+  axis1.autoSlewHome();
+  axis2.autoSlewHome();
 
   return CE_NONE;
 }
@@ -221,11 +221,11 @@ bool Guide::validAxis1(GuideAction guideAction) {
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
     if (transform.meridianFlips && location.pierSide == PIER_SIDE_EAST) { if (location.h < -limits.settings.pastMeridianE) return false; }
-    if (a1 < mount.axis1.settings.limits.min) return false;
+    if (a1 < axis1.settings.limits.min) return false;
   }
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
     if (transform.meridianFlips && location.pierSide == PIER_SIDE_WEST) { if (location.h > limits.settings.pastMeridianW) return false; }
-    if (a1 > mount.axis1.settings.limits.max) return false;
+    if (a1 > axis1.settings.limits.max) return false;
   }
   return true;
 }
@@ -238,16 +238,16 @@ bool Guide::validAxis2(GuideAction guideAction) {
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
     if (location.pierSide == PIER_SIDE_WEST) {
-      if (location.a2 > mount.axis2.settings.limits.max) return false;
+      if (location.a2 > axis2.settings.limits.max) return false;
     } else {
-      if (location.a2 < mount.axis2.settings.limits.min) return false;
+      if (location.a2 < axis2.settings.limits.min) return false;
     }
   }
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
     if (location.pierSide == PIER_SIDE_WEST) {
-      if (location.a2 < mount.axis2.settings.limits.min) return false;
+      if (location.a2 < axis2.settings.limits.min) return false;
     } else {
-      if (location.a2 > mount.axis2.settings.limits.max) return false;
+      if (location.a2 > axis2.settings.limits.max) return false;
     }
   }
   if (guideAction == GA_SPIRAL) {
@@ -272,13 +272,13 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!validAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (settings.rateSelect < 3) {
-      if (limits.isError() || mount.axis1.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (limits.isError() || axis1.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   if (axis == 2 || guideAction == GA_SPIRAL) {
     if (!validAxis2(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (settings.rateSelect < 3) {
-      if (limits.isError() || mount.axis2.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (limits.isError() || axis2.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   return CE_NONE;
@@ -286,16 +286,16 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
 
 // start axis1 movement
 void Guide::axis1AutoSlew(GuideAction guideAction) {
-  if (guideAction == GA_REVERSE) mount.axis1.autoSlew(DIR_REVERSE); else mount.axis1.autoSlew(DIR_FORWARD);
+  if (guideAction == GA_REVERSE) axis1.autoSlew(DIR_REVERSE); else axis1.autoSlew(DIR_FORWARD);
 }
 
 // start axis2 movement
 void Guide::axis2AutoSlew(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT);
   if (location.pierSide == PIER_SIDE_WEST) {
-    if (guideAction == GA_REVERSE) mount.axis2.autoSlew(DIR_FORWARD); else mount.axis2.autoSlew(DIR_REVERSE);
+    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_FORWARD); else axis2.autoSlew(DIR_REVERSE);
   } else {
-    if (guideAction == GA_REVERSE) mount.axis2.autoSlew(DIR_REVERSE); else mount.axis2.autoSlew(DIR_FORWARD);
+    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
   }
 }
 
@@ -334,13 +334,13 @@ void Guide::spiralPoll() {
   if (customRateAxis1 > maxRate) customRateAxis1 = maxRate;
 
   // set the new guide rates
-  mount.axis1.setFrequencySlew(siderealToRadF(customRateAxis1));
-  mount.axis2.setFrequencySlew(siderealToRadF(customRateAxis2));
+  axis1.setFrequencySlew(siderealToRadF(customRateAxis1));
+  axis2.setFrequencySlew(siderealToRadF(customRateAxis2));
 }
 
 void Guide::poll() {
   // check fast guide completion axis1
-  if (guideActionAxis1 == GA_BREAK && rateAxis1 == 0.0F && !mount.axis1.isSlewing()) {
+  if (guideActionAxis1 == GA_BREAK && rateAxis1 == 0.0F && !axis1.isSlewing()) {
     guideActionAxis1 = GA_NONE;
     mount.update();
   } else {
@@ -348,7 +348,7 @@ void Guide::poll() {
   }
 
   // check fast guide completion axis2
-  if (guideActionAxis2 == GA_BREAK && rateAxis2 == 0.0F && !mount.axis2.isSlewing()) {
+  if (guideActionAxis2 == GA_BREAK && rateAxis2 == 0.0F && !axis2.isSlewing()) {
     guideActionAxis2 = GA_NONE;
     mount.update();
   } else {

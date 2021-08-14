@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// tmc stepper driver configuration control
+// tmc spi stepper driver control
 
 #include "TmcDrivers.h"
 

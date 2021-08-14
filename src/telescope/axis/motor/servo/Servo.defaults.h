@@ -1,4 +1,8 @@
+// -----------------------------------------------------------------------------------
+// axis servo driver motion default settings
+
 #pragma once
+#include "../../../../Common.h"
 
 // assign DRIVER_TYPE
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -32,6 +36,9 @@
 #if defined(AXIS1_DRIVER_SERVO) || defined(AXIS2_DRIVER_SERVO) || defined(AXIS3_DRIVER_SERVO) || defined(AXIS4_DRIVER_SERVO) || defined(AXIS5_DRIVER_SERVO) || defined(AXIS6_DRIVER_SERVO) || defined(AXIS7_DRIVER_SERVO) || defined(AXIS8_DRIVER_SERVO) || defined(AXIS9_DRIVER_SERVO)
   #define SERVO_DRIVER_PRESENT
 #endif
+
+//$$$$$$$$$$$$$$$$
+
 
 // common axis driver settings, RA/AZM
 #ifndef AXIS1_DRIVER_STATUS

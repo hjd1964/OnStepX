@@ -44,8 +44,8 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (limits.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (home.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (pec.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (mount.axis1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (mount.axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (axis1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
   #ifdef ROTATOR_PRESENT

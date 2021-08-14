@@ -1,16 +1,18 @@
 // -----------------------------------------------------------------------------------
-// stepper driver control
+// step/dir driver control
 #pragma once
 
 #include <Arduino.h>
-#include "../../../Common.h"
-#include "StepDrivers.defaults.h"
+#include "../../../../Common.h"
+
+#include "StepDir.defaults.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 13
 
 #ifdef SD_DRIVER_PRESENT
 
+#include "../Drivers.h"
 #include "TmcDrivers.h"
 
 #pragma pack(1)
@@ -43,21 +45,7 @@ typedef struct DriverPins {
 #define cs_pin   m2
 #define miso_pin m3
 
-typedef struct DriverOutputStatus {
-  bool shortToGround;
-  bool openLoad;
-} DriverOutputStatus;
-
-typedef struct DriverStatus {
-  DriverOutputStatus outputA;
-  DriverOutputStatus outputB;
-  bool overTemperaturePreWarning;
-  bool overTemperature;
-  bool standstill;
-  bool fault;
-} DriverStatus;
-
-class StepDriver {
+class StepDirDriver {
   public:
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes

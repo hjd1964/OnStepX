@@ -105,6 +105,9 @@
 #define STEP_MODE_LAST              2
 
 // motor drivers
+#define SERVO                      -1      // general purpose flag for a SERVO driver motor
+#define STEP_DIR                   -2      // general purpose flag for a STEP_DIR driver motor
+
 #define SD_DRIVER_FIRST             0
 #define A4988                       0      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
 #define DRV8825                     1      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x

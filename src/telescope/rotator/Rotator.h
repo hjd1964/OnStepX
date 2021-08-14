@@ -7,7 +7,6 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "../axis/Axis.h"
 #include "../mount/coordinates/Transform.h"
 
 class Rotator {
@@ -23,8 +22,6 @@ class Rotator {
 
     // poll for park/unpark completion
     void parkMonitor();
-
-    Axis axis;
 
   private:
     // get backlash in steps

@@ -1,14 +1,14 @@
 // -----------------------------------------------------------------------------------
-// stepper driver control
+// servo driver control
 #pragma once
 
 #include <Arduino.h>
-#include "../../../Common.h"
+#include "../../../../Common.h"
 
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_SERVO_MODEL_COUNT 2
 
-#include "DcDrivers.defaults.h"
+#include "Servo.defaults.h"
 
 #ifdef SERVO_DRIVER_PRESENT
 

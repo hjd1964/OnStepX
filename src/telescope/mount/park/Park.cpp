@@ -101,8 +101,8 @@ CommandError Park::request() {
     nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
     // get the park coordinate ready
-    mount.axis1.setBacklash(0.0L);
-    mount.axis2.setBacklash(0.0L);
+    axis1.setBacklash(0.0L);
+    axis2.setBacklash(0.0L);
     Coordinate parkTarget;
     parkTarget.h = settings.position.h;
     parkTarget.d = settings.position.d;
@@ -131,12 +131,12 @@ CommandError Park::request() {
 void Park::requestDone() {
   if (state != PS_PARK_FAILED) {
     #if DEBUG == VERBOSE
-      long index = mount.axis1.getInstrumentCoordinateSteps() - mount.axis1.getMotorPositionSteps();
-      V("MSG: Mount, park axis1 motor target   "); VL(mount.axis1.getTargetCoordinateSteps() - index);
-      V("MSG: Mount, park axis1 motor position "); VL(mount.axis1.getMotorPositionSteps());
-      index = mount.axis2.getInstrumentCoordinateSteps() - mount.axis2.getMotorPositionSteps();
-      V("MSG: Mount, park axis2 motor target   "); VL(mount.axis2.getTargetCoordinateSteps() - index);
-      V("MSG: Mount, park axis2 motor position "); VL(mount.axis2.getMotorPositionSteps());
+      long index = axis1.getInstrumentCoordinateSteps() - axis1.getMotorPositionSteps();
+      V("MSG: Mount, park axis1 motor target   "); VL(axis1.getTargetCoordinateSteps() - index);
+      V("MSG: Mount, park axis1 motor position "); VL(axis1.getMotorPositionSteps());
+      index = axis2.getInstrumentCoordinateSteps() - axis2.getMotorPositionSteps();
+      V("MSG: Mount, park axis2 motor target   "); VL(axis2.getTargetCoordinateSteps() - index);
+      V("MSG: Mount, park axis2 motor position "); VL(axis2.getMotorPositionSteps());
     #endif
 
     // save the axis state
@@ -151,8 +151,8 @@ void Park::requestDone() {
     VLF("MSG: Mount, parking done");
   } else { DLF("ERR, Mount::parkFinish(); Parking failed"); }
 
-  mount.axis1.enable(false);
-  mount.axis2.enable(false);
+  axis1.enable(false);
+  axis2.enable(false);
 }
 
 // returns a parked telescope to operation
@@ -178,8 +178,8 @@ CommandError Park::restore(bool withTrackingOn) {
 
   // reset the mount, zero backlash
   home.reset();
-  mount.axis1.setBacklashSteps(0);
-  mount.axis2.setBacklashSteps(0);
+  axis1.setBacklashSteps(0);
+  axis2.setBacklashSteps(0);
 
   // load the pointing model
   #if ALIGN_MAX_NUM_STARS > 1  
@@ -196,15 +196,15 @@ CommandError Park::restore(bool withTrackingOn) {
   double a1, a2;
   if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
   transform.mountToInstrument(&parkTarget, &a1, &a2);
-  mount.axis1.setInstrumentCoordinatePark(a1);
-  mount.axis2.setInstrumentCoordinatePark(a2);
+  axis1.setInstrumentCoordinatePark(a1);
+  axis2.setInstrumentCoordinatePark(a2);
 
-  V("MSG: Mount, unpark axis1 motor position "); VL(mount.axis1.getMotorPositionSteps());
-  V("MSG: Mount, unpark axis2 motor position "); VL(mount.axis2.getMotorPositionSteps());
+  V("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
+  V("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
 
   // restore backlash settings
-  mount.axis1.setBacklash(mount.settings.backlash.axis1);
-  mount.axis2.setBacklash(mount.settings.backlash.axis2);
+  axis1.setBacklash(mount.settings.backlash.axis1);
+  axis2.setBacklash(mount.settings.backlash.axis2);
   
   state = PS_UNPARKED;
   settings.state = state;

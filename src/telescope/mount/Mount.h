@@ -84,9 +84,6 @@ class Mount {
     float trackingRate = 1.0F;
     MountSettings settings = { RC_DEFAULT, false, { 0, 0 } };
 
-    Axis axis1;
-    Axis axis2;
-
   private:
     // alternate tracking rate calculation method
     float ztr(float a);

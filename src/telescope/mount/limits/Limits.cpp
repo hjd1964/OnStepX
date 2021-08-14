@@ -38,28 +38,28 @@ CommandError Limits::validateCoords(Coordinate *coords) {
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;
   if (fgt(coords->a, settings.altitude.max)) return CE_SLEW_ERR_ABOVE_OVERHEAD;
   if (transform.mountType == ALTAZM) {
-    if (flt(coords->z, mount.axis1.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (fgt(coords->z, mount.axis1.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (flt(coords->z, axis1.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (fgt(coords->z, axis1.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
-    if (flt(coords->h, mount.axis1.settings.limits.min)) {
+    if (flt(coords->h, axis1.settings.limits.min)) {
         VF("MSG: Mount, validate failed HA past min limit by ");
-        V(radToDeg(coords->h - mount.axis1.settings.limits.min)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->h - axis1.settings.limits.min)*3600.0); VL(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
-    if (fgt(coords->h, mount.axis1.settings.limits.max)) {
+    if (fgt(coords->h, axis1.settings.limits.max)) {
         VF("MSG: Mount, validate failed Dec past min limit by ");
-        V(radToDeg(coords->h - mount.axis1.settings.limits.max)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->h - axis1.settings.limits.max)*3600.0); VL(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
     if (AXIS2_TANGENT_ARM == OFF) {
-      if (flt(coords->d, mount.axis2.settings.limits.min)) {
+      if (flt(coords->d, axis2.settings.limits.min)) {
         VF("MSG: Mount, validate failed Dec past min limit by ");
-        V(radToDeg(coords->d - mount.axis2.settings.limits.min)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VL(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;
       }
-      if (fgt(coords->d, mount.axis2.settings.limits.max)) {
+      if (fgt(coords->d, axis2.settings.limits.max)) {
         VF("MSG: Mount, validate failed Dec past max limit by ");
-        V(radToDeg(coords->d - mount.axis2.settings.limits.max)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VL(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;}
     }
   }
@@ -173,10 +173,10 @@ void Limits::poll() {
     } else { autoFlipCount--; error.meridian.west = false; }
   } else error.meridian.west = false;
 
-  if (flt(current.a1, mount.axis1.settings.limits.min)) { stopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
-  if (fgt(current.a1, mount.axis1.settings.limits.max)) { stopAxis1(GA_FORWARD); error.limit.axis1.max = true; } else error.limit.axis1.max = false;
-  if (flt(current.a2, mount.axis2.settings.limits.min)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; } else error.limit.axis2.min = false;
-  if (fgt(current.a2, mount.axis2.settings.limits.max)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
+  if (flt(current.a1, axis1.settings.limits.min)) { stopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
+  if (fgt(current.a1, axis1.settings.limits.max)) { stopAxis1(GA_FORWARD); error.limit.axis1.max = true; } else error.limit.axis1.max = false;
+  if (flt(current.a2, axis2.settings.limits.min)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; } else error.limit.axis2.min = false;
+  if (fgt(current.a2, axis2.settings.limits.max)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
 
   #if DEBUG == VERBOSE
     const char* errPre = "MSG: Mount::limitPoll() Error state changed: ";

@@ -1,14 +1,14 @@
 // -----------------------------------------------------------------------------------
-// tmc stepper driver configuration control
+// tmc spi stepper driver control
 #pragma once
 
 #include <Arduino.h>
-#include "../../../Common.h"
-#include "StepDrivers.defaults.h"
+#include "../../../../Common.h"
+#include "StepDir.defaults.h"
 
 #ifdef TMC_DRIVER_PRESENT
 
-#include "../../../lib/softSpi/SoftSpi.h"
+#include "../../../../lib/softSpi/SoftSpi.h"
 
 class TmcDriver {
   public:

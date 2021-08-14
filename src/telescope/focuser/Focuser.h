@@ -7,7 +7,6 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "../axis/Axis.h"
 
 #if AXIS9_DRIVER_MODEL != OFF
   #define FOCUSER_MAX 6
@@ -63,8 +62,6 @@ class Focuser {
 
     // poll for park completion
     void parkMonitor(int index);
-
-    Axis *axis[6];
   
   private:
 

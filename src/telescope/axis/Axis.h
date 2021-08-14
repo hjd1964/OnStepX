@@ -8,8 +8,8 @@
 #ifdef AXIS_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "stepDir/StepDir.h"
-#include "servo/Servo.h"
+#include "motor/stepDir/StepDir.h"
+#include "motor/servo/Servo.h"
 
 #pragma pack(1)
 typedef struct AxisLimits {
@@ -58,6 +58,9 @@ enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 
 class Axis {
   public:
+    // setup array of axes for easy access
+    Axis();
+
     // sets up the driver step/dir/enable pins and any associated driver mode control
     void init(uint8_t axisNumber, bool alternateLimits);
 
@@ -84,67 +87,96 @@ class Axis {
 
     // reset motor and target angular position, in "measure" units
     CommandError resetPosition(double value);
+
     // reset motor and target angular position, in steps
     CommandError resetPositionSteps(long value);
+
+    // resets target position to the motor position
+    inline void resetTargetToMotorPosition() { motor->resetTargetToMotorPosition(); }
+
     // get motor angular position, in "measure" units
     double getMotorPosition();
-    inline long getMotorPositionSteps() { return motor.getMotorPositionSteps(); }
+
+    // get motor angular position, in steps
+    inline long getMotorPositionSteps() { return motor->getMotorPositionSteps(); }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
     void setInstrumentCoordinatePark(double value);
+
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
+
     // set instrument coordinate, in steps
     void setInstrumentCoordinateSteps(long value);
+
     // get instrument coordinate
     double getInstrumentCoordinate();
-    inline long getInstrumentCoordinateSteps() { return motor.getInstrumentCoordinateSteps(); }
+
+    // get instrument coordinate, in steps
+    inline long getInstrumentCoordinateSteps() { return motor->getInstrumentCoordinateSteps(); }
 
     // set target coordinate, in "measures" (degrees, microns, etc.)
     // with backlash disabled this moves to the nearest position where the motor doesn't cog
     void setTargetCoordinatePark(double value);
+
     // set target coordinate, in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
+
     // set target coordinate, in steps
     void setTargetCoordinateSteps(long value);
+
     // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();
+
     // get target coordinate, in steps
-    inline long getTargetCoordinateSteps() { return motor.getTargetCoordinateSteps(); }
+    inline long getTargetCoordinateSteps() { return motor->getTargetCoordinateSteps(); }
+
     // distance to target in "measures" (degrees, microns, etc.)
     double getTargetDistance();
+
     // returns true if at target
     bool atTarget();
 
     // set backlash amount in "measures" (radians, microns, etc.)
     void setBacklash(float value);
+
     // set backlash amount in steps
-    inline void setBacklashSteps(long value) { if (autoRate == AR_NONE) motor.setBacklashSteps(value); }
+    inline void setBacklashSteps(long value) { if (autoRate == AR_NONE) motor->setBacklashSteps(value); }
+
     // get backlash amount in "measures" (radians, microns, etc.)
     float getBacklash();
 
     // get frequency in "measures" (degrees, microns, etc.) per second
     float getFrequency();
+
     // get frequency in steps per second
-    long getFrequencySteps() { return motor.getFrequencySteps(); }
+    long getFrequencySteps() { return motor->getFrequencySteps(); }
+
     // gets backlash frequency in "measures" (degrees, microns, etc.) per second
     float getBacklashFrequency();
+
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);
+
     // set slew frequency in "measures" (radians, microns, etc.) per second
     void setFrequencySlew(float frequency);
+
     // set minimum slew frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMin(float frequency);
+
     // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
     // set acceleration rate in "measures" per second per second (for autoSlew)
     void setSlewAccelerationRate(float mpsps);
+
     // set acceleration rate in seconds (for autoSlew)
     void setSlewAccelerationTime(float seconds);
+
     // set acceleration for emergency stop movement in "measures" per second per second
     void setSlewAccelerationRateAbort(float mpsps);
+
     // set acceleration for emergency stop movement in seconds (for autoSlewStop)
     void setSlewAccelerationTimeAbort(float seconds);
 
@@ -152,16 +184,21 @@ class Axis {
     // \param distance: acceleration distance in measures (to frequency)
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlewRateByDistance(float distance, float frequency = NAN);
+
     // stops, with deacceleration by distance
     bool autoSlewRateByDistanceStop();
+
     // auto slew with acceleration in "measures" per second per second
     // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlew(Direction direction, float frequency = NAN);
+
     // slew to home, with acceleration in "measures" per second per second
     CommandError autoSlewHome();
+
     // stops, with deacceleration by time
     void autoSlewStop();
+
     // emergency stops, with deacceleration by time
     void autoSlewAbort();
 
@@ -169,9 +206,10 @@ class Axis {
     bool isSlewing();
 
     // set synchronized state (automatic movement of target at setFrequencySteps() rate)
-    inline void setSynchronized(bool state) { motor.setSynchronized(state); }
+    inline void setSynchronized(bool state) { motor->setSynchronized(state); }
+
     // get synchronized state (automatic movement of target at setFrequencySteps() rate)
-    inline bool getSynchronized() { return motor.getSynchronized(); }
+    inline bool getSynchronized() { return motor->getSynchronized(); }
 
     // for TMC drivers, etc. report status
     inline bool fault() { return false; };
@@ -181,18 +219,20 @@ class Axis {
 
     // get associated motor driver status
     DriverStatus getStatus();
+
     // enable/disable numeric position range limits (doesn't apply to limit switches)
     void setMotionLimitsCheck(bool state);
+
     // checks for an error that would disallow motion DIR_NONE for any motion, etc.
     bool motionError(Direction direction);
 
     // monitor movement
     void poll();
 
-    AxisSettings settings;
+    // associated motor
+    Motor *motor;
 
-    // motors, one type for now
-    StepDir motor;
+    AxisSettings settings;
 
   private:
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
@@ -203,16 +243,17 @@ class Axis {
 
     // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
     double getOriginOrTargetDistance();
+
     // returns true if traveling through backlash
     bool inBacklash();
 
     bool decodeAxisSettings(char *s, AxisSettings &a);
+
     bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
     
     uint8_t index;
     AxisErrors errors;
 
-    uint8_t taskHandle = 0;
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
 
@@ -245,20 +286,44 @@ class Axis {
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
 
-    // auto slew mode
-    AutoRate autoRate = AR_NONE;
-    // auto slew rate distance in radians to max rate
-    float slewAccelerationDistance;
-    // auto slew rate in measures per second per centisecond
-    float slewMpspcs;
-    // abort slew rate in measures per second per centisecond
-    float abortMpspcs;
-    // auto slew acceleration time in seconds
-    float slewAccelTime = NAN;
-    // abort slew acceleration time in seconds
-    float abortAccelTime = NAN;
-    // homing mode
+    AutoRate autoRate = AR_NONE;    // auto slew mode
+    float slewAccelerationDistance; // auto slew rate distance in measures to max rate
+    float slewMpspcs;               // auto slew rate in measures per second per centisecond
+    float abortMpspcs;              // abort slew rate in measures per second per centisecond
+    float slewAccelTime = NAN;      // auto slew acceleration time in seconds
+    float abortAccelTime = NAN;     // abort slew acceleration time in seconds
+
     HomingStage homingStage = HOME_NONE;
 };
+
+// globals for easy access to telescope axes
+#if AXIS1_DRIVER_MODEL != OFF
+  extern Axis axis1;
+#endif
+#if AXIS2_DRIVER_MODEL != OFF
+  extern Axis axis2;
+#endif
+#if AXIS3_DRIVER_MODEL != OFF
+  extern Axis axis3;
+#endif
+#if AXIS4_DRIVER_MODEL != OFF
+  extern Axis axis4;
+#endif
+#if AXIS5_DRIVER_MODEL != OFF
+  extern Axis axis5;
+#endif
+#if AXIS6_DRIVER_MODEL != OFF
+  extern Axis axis6;
+#endif
+#if AXIS7_DRIVER_MODEL != OFF
+  extern Axis axis7;
+#endif
+#if AXIS8_DRIVER_MODEL != OFF
+  extern Axis axis8;
+#endif
+#if AXIS9_DRIVER_MODEL != OFF
+  extern Axis axis9;
+#endif
+extern Axis *axes[9];
 
 #endif

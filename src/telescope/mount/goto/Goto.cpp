@@ -42,7 +42,7 @@ void Goto::init() {
   #endif
 
   // calculate base and current maximum step rates
-  usPerStepBase = 1000000.0/((mount.axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
+  usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
   #if SLEW_RATE_MEMORY != ON
     settings.usPerStepCurrent = usPerStepBase;
   #endif
@@ -89,17 +89,17 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
     if (park.state == PS_PARKING && stage == GG_DESTINATION) {
-      mount.axis1.setTargetCoordinatePark(a1);
-      mount.axis2.setTargetCoordinatePark(a2);
+      axis1.setTargetCoordinatePark(a1);
+      axis2.setTargetCoordinatePark(a2);
     } else {
-      mount.axis1.setTargetCoordinate(a1);
-      mount.axis2.setTargetCoordinate(a2);
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
     }
     VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
     VF("MSG: Mount, starting goto at slew rate ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
 
-    mount.axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
-    mount.axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
 
     status.sound.alert();
 
@@ -122,8 +122,8 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
   double a1, a2;
   transform.mountToInstrument(&target, &a1, &a2);
 
-  mount.axis1.setInstrumentCoordinate(a1);
-  mount.axis2.setInstrumentCoordinate(a2);
+  axis1.setInstrumentCoordinate(a1);
+  axis2.setInstrumentCoordinate(a2);
   mount.syncToEncoders(true);
 
   limits.enabled(true);
@@ -198,10 +198,10 @@ void Goto::stop() {
 
 // general status checks ahead of sync or goto
 CommandError Goto::validate() {
-  if (mount.axis1.fault())      return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (mount.axis2.fault())      return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!mount.axis1.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
-  if (!mount.axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+  if (axis1.fault())      return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (axis2.fault())      return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!axis1.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+  if (!axis2.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED)  return CE_SLEW_ERR_IN_PARK;
   if (state != GS_NONE)         return CE_SLEW_IN_SLEW;
   if (guide.state != GU_NONE)   return CE_SLEW_IN_MOTION;
@@ -267,14 +267,14 @@ void Goto::waypoint(Coordinate *current) {
 
 // update acceleration rates for goto and guiding
 void Goto::updateAccelerationRates() {
-  radsPerSecondCurrent = (1000000.0F/settings.usPerStepCurrent)/(float)mount.axis1.getStepsPerMeasure();
+  radsPerSecondCurrent = (1000000.0F/settings.usPerStepCurrent)/(float)axis1.getStepsPerMeasure();
   rate = radsPerSecondCurrent;
   float secondsToAccelerate = degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent;
   float radsPerSecondPerSecond = radsPerSecondCurrent/secondsToAccelerate;
-  mount.axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
-  mount.axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
-  mount.axis2.setSlewAccelerationRate(radsPerSecondPerSecond);
-  mount.axis2.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
+  axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
+  axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
+  axis2.setSlewAccelerationRate(radsPerSecondPerSecond);
+  axis2.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
 }
 
 // estimate average microseconds per step lower limit
@@ -293,8 +293,8 @@ float Goto::usPerStepLowerLimit() {
   #endif
 
   // average required goto us rates for each axis with any micro-step mode switching applied
-  float r_us_axis1 = r_us/mount.axis1.getStepsPerStepSlewing();
-  float r_us_axis2 = r_us/mount.axis2.getStepsPerStepSlewing();
+  float r_us_axis1 = r_us/axis1.getStepsPerStepSlewing();
+  float r_us_axis2 = r_us/axis2.getStepsPerStepSlewing();
   
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
   r_us = (r_us_axis1 + r_us_axis2)/2.0F;
@@ -313,13 +313,13 @@ void Goto::poll() {
 
     meridianFlipHome.paused = false;
     meridianFlipHome.resume = false;
-    mount.axis1.autoSlewAbort();
-    mount.axis2.autoSlewAbort();
+    axis1.autoSlewAbort();
+    axis2.autoSlewAbort();
 
     stage = GG_ABORT;
   } else
   if (stage == GG_WAYPOINT) {
-    if ((mount.axis1.atTarget() && mount.axis2.atTarget()) || !mount.isSlewing()) {
+    if ((axis1.atTarget() && axis2.atTarget()) || !mount.isSlewing()) {
       if (destination.h == home.position.h && destination.d == home.position.d && destination.pierSide == home.position.pierSide) {
 
         if (settings.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
@@ -334,30 +334,30 @@ void Goto::poll() {
         destination = home.position;
       }
 
-      mount.axis1.autoSlewStop();
-      mount.axis2.autoSlewStop();
+      axis1.autoSlewStop();
+      axis2.autoSlewStop();
       VLF("MSG: Mount, goto stopped");
 
       double a1, a2;
       transform.mountToInstrument(&destination, &a1, &a2);
       if (park.state == PS_PARKING && stage == GG_DESTINATION) {
-        mount.axis1.setTargetCoordinatePark(a1);
-        mount.axis2.setTargetCoordinatePark(a2);
+        axis1.setTargetCoordinatePark(a1);
+        axis2.setTargetCoordinatePark(a2);
       } else {
-        mount.axis1.setTargetCoordinate(a1);
-        mount.axis2.setTargetCoordinate(a2);
+        axis1.setTargetCoordinate(a1);
+        axis2.setTargetCoordinate(a2);
       }
       VLF("MSG: Mount, goto next target coordinates set");
 
-      mount.axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-      mount.axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     }
   } else
   if (stage == GG_DESTINATION || stage == GG_ABORT) {
-    if ((mount.axis1.atTarget() && mount.axis2.atTarget()) || !mount.isSlewing()) {
+    if ((axis1.atTarget() && axis2.atTarget()) || !mount.isSlewing()) {
       VLF("MSG: Mount, goto destination reached (stopping)");
-      mount.axis1.autoSlewRateByDistanceStop();
-      mount.axis2.autoSlewRateByDistanceStop();
+      axis1.autoSlewRateByDistanceStop();
+      axis2.autoSlewRateByDistanceStop();
 
       // check if parking and mark as finished
       if (park.state == PS_PARKING && stage != GG_ABORT) park.requestDone();
@@ -385,8 +385,8 @@ void Goto::poll() {
       double a1, a2;
       if (transform.mountType == ALTAZM) transform.equToHor(&target);
       transform.mountToInstrument(&target, &a1, &a2);
-      mount.axis1.setTargetCoordinate(a1);
-      mount.axis2.setTargetCoordinate(a2);
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
     }
   }
 

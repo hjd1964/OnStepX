@@ -40,11 +40,11 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *supressF
       switch (parameter[1]) {
         case '9': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianE)*4.0F)); break;           // minutes past meridianE
         case 'A': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianW)*4.0F)); break;           // minutes past meridianW
-        case 'e': sprintf(reply,"%ld",lroundf(radToDegF(mount.axis1.settings.limits.min))); break;       // RA east or -Az limit, in degrees
-        case 'w': sprintf(reply,"%ld",lroundf(radToDegF(mount.axis1.settings.limits.max))); break;       // RA west or +Az limit, in degrees
-        case 'B': sprintf(reply,"%ld",lroundf(radToDegF(mount.axis1.settings.limits.max)/15.0F)); break; // RA west or +Az limit, in hours
-        case 'C': sprintf(reply,"%ld",lroundf(radToDegF(mount.axis2.settings.limits.min))); break;       // Dec south or -Alt limit, in degrees
-        case 'D': sprintf(reply,"%ld",lroundf(radToDegF(mount.axis2.settings.limits.max))); break;       // Dec north or +Alt limit, in degrees
+        case 'e': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.min))); break;       // RA east or -Az limit, in degrees
+        case 'w': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max))); break;       // RA west or +Az limit, in degrees
+        case 'B': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max)/15.0F)); break; // RA west or +Az limit, in hours
+        case 'C': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.min))); break;       // Dec south or -Alt limit, in degrees
+        case 'D': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.max))); break;       // Dec north or +Alt limit, in degrees
         default: return false;
       }
     } else return false;
@@ -90,16 +90,16 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *supressF
         case '9':
           if (degs >= -270.0F && degs <= 270.0F) {
             settings.pastMeridianE = degToRadF(degs);
-            if (settings.pastMeridianE < -mount.axis1.settings.limits.max) settings.pastMeridianE = -mount.axis1.settings.limits.max;
-            if (settings.pastMeridianE > -mount.axis1.settings.limits.min) settings.pastMeridianE = -mount.axis1.settings.limits.min;
+            if (settings.pastMeridianE < -axis1.settings.limits.max) settings.pastMeridianE = -axis1.settings.limits.max;
+            if (settings.pastMeridianE > -axis1.settings.limits.min) settings.pastMeridianE = -axis1.settings.limits.min;
             nv.updateBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
           } else *commandError = CE_PARAM_RANGE;
         break;
         case 'A':
           if (degs >= -270.0F && degs <= 270.0F) {
             settings.pastMeridianW = degToRadF(degs);
-            if (settings.pastMeridianW < mount.axis1.settings.limits.min) settings.pastMeridianW = mount.axis1.settings.limits.min;
-            if (settings.pastMeridianW > mount.axis1.settings.limits.max) settings.pastMeridianW = mount.axis1.settings.limits.max;
+            if (settings.pastMeridianW < axis1.settings.limits.min) settings.pastMeridianW = axis1.settings.limits.min;
+            if (settings.pastMeridianW > axis1.settings.limits.max) settings.pastMeridianW = axis1.settings.limits.max;
             nv.updateBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
           } else *commandError = CE_PARAM_RANGE;
         break;

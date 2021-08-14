@@ -1,4 +1,7 @@
+// -----------------------------------------------------------------------------------
+// axis step/dir driver defaults
 #pragma once
+#include "../../../../Common.h"
 
 // check/flag SD stepper drivers
 #if AXIS1_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SD_DRIVER_LAST
@@ -94,8 +97,18 @@
 #ifndef AXIS1_DRIVER_STATUS
 #define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
 #endif
+#ifndef AXIS1_SUBDIVISIONS
 #define AXIS1_SUBDIVISIONS            AXIS1_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS1_CURRENT
 #define AXIS1_CURRENT                 AXIS1_DRIVER_IRUN
+#endif
+#ifndef AXIS1_ENABLE_STATE
+#define AXIS1_ENABLE_STATE            LOW  // default state of ENable pin for motor power on
+#endif
+#ifndef AXIS1_STEP_STATE
+#define AXIS1_STEP_STATE              HIGH // default signal transition state for a step
+#endif
 #endif
 
 // common axis driver settings, DEC/ALT
@@ -124,8 +137,18 @@
 #ifndef AXIS2_DRIVER_STATUS
 #define AXIS2_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS2_SUBDIVISIONS
 #define AXIS2_SUBDIVISIONS            AXIS2_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS2_CURRENT
 #define AXIS2_CURRENT                 AXIS2_DRIVER_IRUN
+#endif
+#ifndef AXIS2_ENABLE_STATE
+#define AXIS2_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS2_STEP_STATE
+#define AXIS2_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, ROTATOR
@@ -154,8 +177,18 @@
 #ifndef AXIS3_DRIVER_STATUS
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS3_SUBDIVISIONS
 #define AXIS3_SUBDIVISIONS            AXIS3_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS3_CURRENT
 #define AXIS3_CURRENT                 AXIS3_DRIVER_IRUN
+#endif
+#ifndef AXIS3_ENABLE_STATE
+#define AXIS3_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS3_STEP_STATE
+#define AXIS3_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER1
@@ -184,8 +217,18 @@
 #ifndef AXIS4_DRIVER_STATUS
 #define AXIS4_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS4_SUBDIVISIONS
 #define AXIS4_SUBDIVISIONS            AXIS4_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS4_CURRENT
 #define AXIS4_CURRENT                 AXIS4_DRIVER_IRUN
+#endif
+#ifndef AXIS4_ENABLE_STATE
+#define AXIS4_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS4_STEP_STATE
+#define AXIS4_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER2
@@ -214,8 +257,18 @@
 #ifndef AXIS5_DRIVER_STATUS
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS5_SUBDIVISIONS
 #define AXIS5_SUBDIVISIONS            AXIS5_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS5_CURRENT
 #define AXIS5_CURRENT                 AXIS5_DRIVER_IRUN
+#endif
+#ifndef AXIS5_ENABLE_STATE
+#define AXIS5_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS5_STEP_STATE
+#define AXIS5_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER3
@@ -244,8 +297,18 @@
 #ifndef AXIS6_DRIVER_STATUS
 #define AXIS6_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS6_SUBDIVISIONS
 #define AXIS6_SUBDIVISIONS            AXIS6_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS6_CURRENT
 #define AXIS6_CURRENT                 AXIS6_DRIVER_IRUN
+#endif
+#ifndef AXIS6_ENABLE_STATE
+#define AXIS6_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS6_STEP_STATE
+#define AXIS6_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER4
@@ -274,8 +337,18 @@
 #ifndef AXIS7_DRIVER_STATUS
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS7_SUBDIVISIONS
 #define AXIS7_SUBDIVISIONS            AXIS7_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS7_CURRENT
 #define AXIS7_CURRENT                 AXIS7_DRIVER_IRUN
+#endif
+#ifndef AXIS7_ENABLE_STATE
+#define AXIS7_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS7_STEP_STATE
+#define AXIS7_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER5
@@ -304,8 +377,18 @@
 #ifndef AXIS8_DRIVER_STATUS
 #define AXIS8_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS8_SUBDIVISIONS
 #define AXIS8_SUBDIVISIONS            AXIS8_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS8_CURRENT
 #define AXIS8_CURRENT                 AXIS8_DRIVER_IRUN
+#endif
+#ifndef AXIS8_ENABLE_STATE
+#define AXIS8_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS8_STEP_STATE
+#define AXIS8_STEP_STATE              HIGH
+#endif
 #endif
 
 // common axis driver settings, FOCUSER6
@@ -334,6 +417,20 @@
 #ifndef AXIS9_DRIVER_STATUS
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
+#ifndef AXIS9_SUBDIVISIONS
 #define AXIS9_SUBDIVISIONS            AXIS9_DRIVER_MICROSTEPS
+#endif
+#ifndef AXIS9_CURRENT
 #define AXIS9_CURRENT                 AXIS9_DRIVER_IRUN
+#endif
+#ifndef AXIS9_ENABLE_STATE
+#define AXIS9_ENABLE_STATE            LOW
+#endif
+#ifndef AXIS9_STEP_STATE
+#define AXIS9_STEP_STATE              HIGH
+#endif
+#endif
+
+#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
+  #define DRIVER_STEP_DEFAULTS
 #endif

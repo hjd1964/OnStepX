@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
-// stepper driver control
+// servo driver control
 
-#include "DcDrivers.h"
+#include "ServoDrivers.h"
 
 #ifdef SERVO_DRIVER_PRESENT
 

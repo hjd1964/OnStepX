@@ -104,7 +104,7 @@
     if (!mount.isTracking() || guide.state > GU_PULSE_GUIDE) { disable(); return; }
 
     // keep track of our current step position, and when the step position on the worm wraps during playback
-    long axis1Steps = mount.axis1.getMotorPositionSteps();
+    long axis1Steps = axis1.getMotorPositionSteps();
 
     #if PEC_SENSE == OFF
       wormSenseFirst = true;

@@ -9,9 +9,6 @@
 extern Tasks tasks;
 
 #include "../Telescope.h"
-#include "../mount/Mount.h"
-#include "../rotator/Rotator.h"
-#include "../focuser/Focuser.h"
 #include "../../lib/sense/Sense.h"
 
 const AxisPins Pins[] = {
@@ -74,22 +71,100 @@ const AxisSettings DefaultSettings[] = {
 #endif
 };
 
+#if AXIS1_DRIVER_MODEL != OFF
+  Axis axis1;
+#endif
+#if AXIS2_DRIVER_MODEL != OFF
+  Axis axis2;
+#endif
+#if AXIS3_DRIVER_MODEL != OFF
+  Axis axis3;
+#endif
+#if AXIS4_DRIVER_MODEL != OFF
+  Axis axis4;
+#endif
+#if AXIS5_DRIVER_MODEL != OFF
+  Axis axis5;
+#endif
+#if AXIS6_DRIVER_MODEL != OFF
+  Axis axis6;
+#endif
+#if AXIS7_DRIVER_MODEL != OFF
+  Axis axis7;
+#endif
+#if AXIS8_DRIVER_MODEL != OFF
+  Axis axis8;
+#endif
+#if AXIS9_DRIVER_MODEL != OFF
+  Axis axis9;
+#endif
+
+Axis *axes[9] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+
 static uint8_t pollingTaskHandle  = 0;
+
 inline void pollAxes() {
   #if AXIS1_DRIVER_MODEL != OFF
-    mount.axis1.poll(); Y;
+    axis1.poll(); Y;
   #endif
   #if AXIS2_DRIVER_MODEL != OFF
-    mount.axis2.poll(); Y;
+    axis2.poll(); Y;
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    rotator.axis.poll(); Y;
+    axis3.poll(); Y;
   #endif
-  #ifdef FOCUSER_PRESENT
-    for (int i = 0; i < FOCUSER_MAX; i++) if (focuser.axis[i] != NULL) { focuser.axis[i]->poll(); Y; }
+  #if AXIS4_DRIVER_MODEL != OFF
+    axis4.poll(); Y;
+  #endif
+  #if AXIS5_DRIVER_MODEL != OFF
+    axis5.poll(); Y;
+  #endif
+  #if AXIS6_DRIVER_MODEL != OFF
+    axis6.poll(); Y;
+  #endif
+  #if AXIS7_DRIVER_MODEL != OFF
+    axis7.poll(); Y;
+  #endif
+  #if AXIS8_DRIVER_MODEL != OFF
+    axis8.poll(); Y;
+  #endif
+  #if AXIS9_DRIVER_MODEL != OFF
+    axis9.poll(); Y;
   #endif
 }
 
+// setup array of axes for easy access
+Axis::Axis() {
+  #if AXIS1_DRIVER_MODEL != OFF
+    axes[0] = &axis1;
+  #endif
+  #if AXIS2_DRIVER_MODEL != OFF
+    axes[1] = &axis2;
+  #endif
+  #if AXIS3_DRIVER_MODEL != OFF
+    axes[2] = &axis3;
+  #endif
+  #if AXIS4_DRIVER_MODEL != OFF
+    axes[3] = &axis4;
+  #endif
+  #if AXIS5_DRIVER_MODEL != OFF
+    axes[4] = &axis5;
+  #endif
+  #if AXIS6_DRIVER_MODEL != OFF
+    axes[5] = &axis6;
+  #endif
+  #if AXIS7_DRIVER_MODEL != OFF
+    axes[6] = &axis7;
+  #endif
+  #if AXIS8_DRIVER_MODEL != OFF
+    axes[7] = &axis8;
+  #endif
+  #if AXIS9_DRIVER_MODEL != OFF
+    axes[8] = &axis9;
+  #endif
+}
+
+// sets up the driver step/dir/enable pins and any associated driver mode control
 void Axis::init(uint8_t axisNumber, bool alternateLimits) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
@@ -108,7 +183,41 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits) {
       settings = DefaultSettings[i];
       break;
     }
-    if (i == 9) { VLF("ERR: Axis::init(); indexing failed!"); return; }
+    if (i == 9) { DLF("ERR: Axis::init(); indexing failed!"); return; }
+  }
+
+  // assign axis to array and set motor
+  switch (axisNumber) {
+    #if AXIS1_DRIVER_MODEL != OFF
+      case 1: motor = &motor1; break;
+    #endif
+    #if AXIS2_DRIVER_MODEL != OFF
+      case 2: motor = &motor2; break;
+    #endif
+    #if AXIS3_DRIVER_MODEL != OFF
+      case 3: motor = &motor3; break;
+    #endif
+    #if AXIS4_DRIVER_MODEL != OFF
+      case 4: motor = &motor4; break;
+    #endif
+    #if AXIS5_DRIVER_MODEL != OFF
+      case 5: motor = &motor5; break;
+    #endif
+    #if AXIS6_DRIVER_MODEL != OFF
+      case 6: motor = &motor6; break;
+    #endif
+    #if AXIS7_DRIVER_MODEL != OFF
+      case 7:  motor = &motor7; break;
+    #endif
+    #if AXIS8_DRIVER_MODEL != OFF
+      case 8: motor = &motor8; break;
+    #endif
+    #if AXIS9_DRIVER_MODEL != OFF
+      case 9: motor = &motor9; break;
+    #endif
+    default:
+      DLF("ERR: Axis::init(); couldn't find a motor!");
+      return;
   }
 
   // check for reverting axis settings in NV
@@ -140,11 +249,11 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits) {
   #endif
 
   // get the motor ready
-  if (!motor.init(axisNumber, settings.reverse, settings.subdivisions, settings.current)) {
+  if (!motor->init(axisNumber, settings.reverse, settings.subdivisions, settings.current)) {
     VF("MSG: Axis, nothing to do exiting!");
     return;
   }
-  motor.setBacklashFrequencySteps(settings.backlashFreq*settings.stepsPerMeasure);
+  motor->setBacklashFrequencySteps(settings.backlashFreq*settings.stepsPerMeasure);
 
   // activate home and limit sense
   V(axisPrefix); VLF("adding any home and/or limit senses");
@@ -156,7 +265,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits) {
 // enables or disables the associated step/dir driver
 void Axis::enable(bool state) {
   enabled = state;
-  motor.power(state & !poweredDown);
+  motor->power(state & !poweredDown);
 }
 
 bool Axis::isEnabled() {
@@ -183,12 +292,12 @@ int Axis::getStepsPerStepSlewing() {
 
 // set backlash amount in "measures" (radians, microns, etc.)
 void Axis::setBacklash(float value) {
-  if (autoRate == AR_NONE) motor.setBacklashSteps(round(value*settings.stepsPerMeasure));
+  if (autoRate == AR_NONE) motor->setBacklashSteps(round(value*settings.stepsPerMeasure));
 }
 
 // get backlash amount in "measures" (radians, microns, etc.)
 float Axis::getBacklash() {
-  return motor.getBacklashSteps()/settings.stepsPerMeasure;
+  return motor->getBacklashSteps()/settings.stepsPerMeasure;
 }
 
 // reset motor and target angular position, in "measure" units
@@ -199,64 +308,62 @@ CommandError Axis::resetPosition(double value) {
 // reset motor and target angular position, in steps
 CommandError Axis::resetPositionSteps(long value) {
   if (autoRate != AR_NONE) return CE_SLEW_IN_MOTION;
-  if (motor.getFrequencySteps() != 0) return CE_SLEW_IN_MOTION;
-  motor.resetPositionSteps(value);
+  if (motor->getFrequencySteps() != 0) return CE_SLEW_IN_MOTION;
+  motor->resetPositionSteps(value);
   return CE_NONE;
 }
 
 double Axis::getMotorPosition() {
-  return motor.getMotorPositionSteps()/settings.stepsPerMeasure;
+  return motor->getMotorPositionSteps()/settings.stepsPerMeasure;
 }
 
 void Axis::setInstrumentCoordinate(double value) {
-  if (autoRate == AR_NONE) motor.setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
 }
 
 void Axis::setInstrumentCoordinateSteps(long value) {
-  if (autoRate == AR_NONE) motor.setInstrumentCoordinateSteps(value);
+  motor->setInstrumentCoordinateSteps(value);
 }
 
 double Axis::getInstrumentCoordinate() {
-  return motor.getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
+  return motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
 }
 
 void Axis::setInstrumentCoordinatePark(double value) {
-  if (autoRate == AR_NONE) motor.setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  motor->setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 void Axis::setTargetCoordinatePark(double value) {
-  if (autoRate == AR_NONE) {
-    motor.setFrequencySteps(0);
-    motor.setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
-  }
+  motor->setFrequencySteps(0);
+  motor->setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 void Axis::setTargetCoordinate(double value) {
-  if (autoRate == AR_NONE) setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
 }
 
 // set target coordinate, in steps
 void Axis::setTargetCoordinateSteps(long value) {
-  if (autoRate == AR_NONE) motor.setTargetCoordinateSteps(value);
+  motor->setTargetCoordinateSteps(value);
 }
 
 double Axis::getTargetCoordinate() {
-  return motor.getTargetCoordinateSteps()/settings.stepsPerMeasure;
+  return motor->getTargetCoordinateSteps()/settings.stepsPerMeasure;
 }
 
 // check if we're at the target coordinate during an auto slew
 bool Axis::atTarget() {
-  return labs(motor.getTargetDistanceSteps()) < 1;
+  return labs(motor->getTargetDistanceSteps()) < 1;
 }
 
 // distance to target in "measures" (degrees, microns, etc.)
 double Axis::getTargetDistance() {
-  return labs(motor.getTargetDistanceSteps())/settings.stepsPerMeasure;
+  return labs(motor->getTargetDistanceSteps())/settings.stepsPerMeasure;
 }
 
 // distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
 double Axis::getOriginOrTargetDistance() {
-  return motor.getOriginOrTargetDistanceSteps()/settings.stepsPerMeasure;
+  return motor->getOriginOrTargetDistanceSteps()/settings.stepsPerMeasure;
 }
 
 // set acceleration rate in "measures" per second per second (for autoSlew)
@@ -295,10 +402,10 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
 
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
-  motor.setOriginCoordinateSteps();
+  motor->markOriginCoordinateSteps();
   slewAccelerationDistance = distance;
-  motor.setSynchronized(false);
-  motor.setSlewing(true);
+  motor->setSynchronized(false);
+  motor->setSlewing(true);
   autoRate = AR_RATE_BY_DISTANCE;
   return CE_NONE;
 }
@@ -307,8 +414,8 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
 bool Axis::autoSlewRateByDistanceStop() {
   if (autoRate != AR_RATE_BY_DISTANCE) return false;
   autoRate = AR_NONE;
-  motor.setSlewing(false);
-  motor.setSynchronized(true);
+  motor->setSlewing(false);
+  motor->setSynchronized(true);
   return true;
 }
 
@@ -325,8 +432,8 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
 
   V(axisPrefix);
   if (autoRate == AR_NONE) {
-    motor.setSynchronized(true);
-    motor.setSlewing(true);
+    motor->setSynchronized(true);
+    motor->setSlewing(true);
     VF("autoSlew start ");
   } else { VF("autoSlew resum "); }
   if (direction == DIR_FORWARD) {
@@ -352,10 +459,10 @@ CommandError Axis::autoSlewHome() {
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
   if (Pins[index].sense.homeTrigger != OFF) {
-    motor.setSynchronized(true);
+    motor->setSynchronized(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
-      motor.setSlewing(true);
+      motor->setSlewing(true);
       V(axisPrefix); VF("autoSlewHome started");
       switch (homingStage) {
         case HOME_FAST: VL("fast"); break;
@@ -389,7 +496,7 @@ void Axis::autoSlewAbort() {
   V(axisPrefix); VLF("slew aborting");
   autoRate = AR_RATE_BY_TIME_ABORT;
   homingStage = HOME_NONE;
-  motor.setSynchronized(true);
+  motor->setSynchronized(true);
   poll();
 }
 
@@ -417,20 +524,20 @@ void Axis::poll() {
   // slewing
   if (autoRate != AR_NONE) {
     if (autoRate != AR_RATE_BY_TIME_ABORT) {
-      if (motionError(motor.getDirection())) { autoSlewAbort(); return; }
+      if (motionError(motor->getDirection())) { autoSlewAbort(); return; }
     }
     if (autoRate == AR_RATE_BY_DISTANCE) {
-      if (motor.getTargetDistanceSteps() == 0) {
-        motor.setSlewing(false);
+      if (motor->getTargetDistanceSteps() == 0) {
+        motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
-        motor.setSynchronized(true);
+        motor->setSynchronized(true);
         V(axisPrefix); VLF("slew stopped");
       } else {
         freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq + settings.backlashFreq;
         if (freq < settings.backlashFreq) freq = settings.backlashFreq;
         if (freq > slewFreq) freq = slewFreq;
-        if (motor.getTargetDistanceSteps() < 0) freq = -freq;
+        if (motor->getTargetDistanceSteps() < 0) freq = -freq;
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {
@@ -444,10 +551,10 @@ void Axis::poll() {
     if (autoRate == AR_RATE_BY_TIME_END) {
       if (freq > slewMpspcs) freq -= slewMpspcs; else if (freq < -slewMpspcs) freq += slewMpspcs; else freq = 0.0F;
       if (abs(freq) <= slewMpspcs) {
-        motor.setSlewing(false);
+        motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
-        motor.setSynchronized(true);
+        motor->setSynchronized(true);
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
         if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
@@ -464,7 +571,7 @@ void Axis::poll() {
     if (autoRate == AR_RATE_BY_TIME_ABORT) {
       if (freq > abortMpspcs) freq -= abortMpspcs; else if (freq < -abortMpspcs) freq += abortMpspcs; else freq = 0.0F;
       if (fabs(freq) <= abortMpspcs) {
-        motor.setSlewing(false);
+        motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
         V(axisPrefix); VLF("slew aborted");
@@ -510,7 +617,7 @@ void Axis::setFrequency(float frequency) {
         powerDownOverride = false;
         if ((long)(millis() - powerDownTime) > 0) {
           poweredDown = true;
-          motor.power(false);
+          motor->power(false);
           V(axisPrefix); VLF("driver powered down");
         }
       }
@@ -518,7 +625,7 @@ void Axis::setFrequency(float frequency) {
   } else {
     if (poweredDown) {
       poweredDown = false;
-      motor.power(true);
+      motor->power(true);
       V(axisPrefix); VLF("driver powered up");
     }
     powerDownTime = millis() + powerDownDelay;
@@ -536,15 +643,15 @@ void Axis::setFrequency(float frequency) {
 
   // apply base frequency as required
   if (enabled) {
-    motor.setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
+    motor->setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
   } else {
-    motor.setFrequencySteps(0.0F);
+    motor->setFrequencySteps(0.0F);
   }
 }
 
 // get frequency in "measures" (degrees, microns, etc.) per second
 float Axis::getFrequency() {
-  return motor.getFrequencySteps()/settings.stepsPerMeasure;
+  return motor->getFrequencySteps()/settings.stepsPerMeasure;
 }
 
 // gets backlash frequency in "measures" (degrees, microns, etc.) per second
@@ -554,7 +661,7 @@ float Axis::getBacklashFrequency() {
 
 // get associated motor driver status
 DriverStatus Axis::getStatus() {
-  return motor.getDriverStatus();
+  return motor->getDriverStatus();
 }
 
 void Axis::setMotionLimitsCheck(bool state) {
@@ -562,7 +669,7 @@ void Axis::setMotionLimitsCheck(bool state) {
 }
 
 bool Axis::motionError(Direction direction) {
-  if (motor.getDriverStatus().fault) { V(axisPrefix); VLF("motion error driver fault"); return true; }
+  if (motor->getDriverStatus().fault) { V(axisPrefix); VLF("motion error driver fault"); return true; }
   if (direction == DIR_FORWARD) {
     bool result = (limitsCheck && getInstrumentCoordinate() > settings.limits.max) || errors.maxLimitSensed;
     if (result == true) { V(axisPrefix); VLF("motion error forward limit"); }
