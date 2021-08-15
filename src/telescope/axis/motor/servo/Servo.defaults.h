@@ -60,11 +60,11 @@
 #ifndef AXIS1_ENABLE_STATE
 #define AXIS1_ENABLE_STATE            LOW    // default state of ENable pin for motor power on
 #endif
-#ifndef AXIS1_DCMOTOR1_STATE
-#define AXIS1_DCMOTOR1_STATE          LOW    // to IN1 or DIR
+#ifndef AXIS1_DCMOTOR_PH1_STATE
+#define AXIS1_DCMOTOR_PH1_STATE       LOW    // to IN1 or DIR
 #endif
-#ifndef AXIS1_DCMOTOR2_STATE
-#define AXIS1_DCMOTOR2_STATE          LOW    // to IN2 or PHASE
+#ifndef AXIS1_DCMOTOR_PH2_STATE
+#define AXIS1_DCMOTOR_PH2_STATE       LOW    // to IN2 or PHASE
 #endif
 #endif
 
@@ -91,11 +91,11 @@
 #ifndef AXIS2_ENABLE_STATE
 #define AXIS2_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS2_DCMOTOR1_STATE
-#define AXIS2_DCMOTOR1_STATE          LOW
+#ifndef AXIS2_DCMOTOR_PH1_STATE
+#define AXIS2_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS2_DCMOTOR2_STATE
-#define AXIS2_DCMOTOR2_STATE          LOW
+#ifndef AXIS2_DCMOTOR_PH2_STATE
+#define AXIS2_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -122,11 +122,11 @@
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS3_DCMOTOR1_STATE
-#define AXIS3_DCMOTOR1_STATE          LOW
+#ifndef AXIS3_DCMOTOR_PH1_STATE
+#define AXIS3_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS3_DCMOTOR2_STATE
-#define AXIS3_DCMOTOR2_STATE          LOW
+#ifndef AXIS3_DCMOTOR_PH2_STATE
+#define AXIS3_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -153,11 +153,11 @@
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS4_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS4_DCMOTOR1_STATE
-#define AXIS4_DCMOTOR1_STATE          LOW
+#ifndef AXIS4_DCMOTOR_PH1_STATE
+#define AXIS4_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS4_DCMOTOR2_STATE
-#define AXIS4_DCMOTOR2_STATE          LOW
+#ifndef AXIS4_DCMOTOR_PH2_STATE
+#define AXIS4_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -184,11 +184,11 @@
 #ifndef AXIS5_ENABLE_STATE
 #define AXIS5_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS5_DCMOTOR1_STATE
-#define AXIS5_DCMOTOR1_STATE          LOW
+#ifndef AXIS5_DCMOTOR_PH1_STATE
+#define AXIS5_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS5_DCMOTOR2_STATE
-#define AXIS5_DCMOTOR2_STATE          LOW
+#ifndef AXIS5_DCMOTOR_PH2_STATE
+#define AXIS5_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -215,11 +215,11 @@
 #ifndef AXIS6_ENABLE_STATE
 #define AXIS6_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS6_DCMOTOR1_STATE
-#define AXIS6_DCMOTOR1_STATE          LOW
+#ifndef AXIS6_DCMOTOR_PH1_STATE
+#define AXIS6_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS6_DCMOTOR2_STATE
-#define AXIS6_DCMOTOR2_STATE          LOW
+#ifndef AXIS6_DCMOTOR_PH2_STATE
+#define AXIS6_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -246,11 +246,11 @@
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS7_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS7_DCMOTOR1_STATE
-#define AXIS7_DCMOTOR1_STATE          LOW
+#ifndef AXIS7_DCMOTOR_PH1_STATE
+#define AXIS7_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS7_DCMOTOR2_STATE
-#define AXIS7_DCMOTOR2_STATE          LOW
+#ifndef AXIS7_DCMOTOR_PH2_STATE
+#define AXIS7_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -277,11 +277,11 @@
 #ifndef AXIS8_ENABLE_STATE
 #define AXIS8_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS8_DCMOTOR1_STATE
-#define AXIS8_DCMOTOR1_STATE          LOW
+#ifndef AXIS8_DCMOTOR_PH1_STATE
+#define AXIS8_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS8_DCMOTOR2_STATE
-#define AXIS8_DCMOTOR2_STATE          LOW
+#ifndef AXIS8_DCMOTOR_PH2_STATE
+#define AXIS8_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
 
@@ -308,10 +308,10 @@
 #ifndef AXIS9_ENABLE_STATE
 #define AXIS9_ENABLE_STATE            LOW
 #endif
-#ifndef AXIS9_DCMOTOR1_STATE
-#define AXIS9_DCMOTOR1_STATE          LOW
+#ifndef AXIS9_DCMOTOR_PH1_STATE
+#define AXIS9_DCMOTOR_PH1_STATE       LOW
 #endif
-#ifndef AXIS9_DCMOTOR2_STATE
-#define AXIS9_DCMOTOR2_STATE          LOW
+#ifndef AXIS9_DCMOTOR_PH2_STATE
+#define AXIS9_DCMOTOR_PH2_STATE       LOW
 #endif
 #endif
