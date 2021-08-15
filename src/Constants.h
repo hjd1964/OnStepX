@@ -125,8 +125,8 @@
 #define SD_DRIVER_LAST              12
 
 #define SERVO_DRIVER_FIRST          100
-#define SERVO_DP                    100    // servo driver, direction and phase connections
-#define SERVO_II                    101    // servo driver, dual input connections
+#define SERVO_DP                    100    // servo driver, direction and pwm connections
+#define SERVO_II                    101    // servo driver, dual pwm input connections
 #define SERVO_DRIVER_LAST           101
 
 // stepper driver decay modes
