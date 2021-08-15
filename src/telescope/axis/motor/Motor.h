@@ -11,7 +11,7 @@
 class Motor {
   public:
     // sets up the motor identification
-    virtual bool init(uint8_t axisNumber, int8_t param1, int16_t param2, int16_t param3);
+    virtual bool init(uint8_t axisNumber, int8_t reverse, int16_t param1, int16_t param2);
 
     // sets motor power on/off (if possible)
     virtual void power(bool value);
@@ -20,7 +20,7 @@ class Motor {
     virtual DriverStatus getDriverStatus();
 
     // resets motor and target angular position in steps, also zeros backlash and index 
-    void resetPositionSteps(long value);
+    virtual void resetPositionSteps(long value);
 
     // resets target position to the motor position
     void resetTargetToMotorPosition();

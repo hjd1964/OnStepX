@@ -97,11 +97,11 @@
 #ifndef AXIS1_DRIVER_STATUS
 #define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
 #endif
-#ifndef AXIS1_SUBDIVISIONS
-#define AXIS1_SUBDIVISIONS            AXIS1_DRIVER_MICROSTEPS
+#ifndef AXIS1_PARAMETER1      
+#define AXIS1_PARAMETER1              AXIS1_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS1_CURRENT
-#define AXIS1_CURRENT                 AXIS1_DRIVER_IRUN
+#ifndef AXIS1_PARAMETER2 
+#define AXIS1_PARAMETER2              AXIS1_DRIVER_IRUN
 #endif
 #ifndef AXIS1_ENABLE_STATE
 #define AXIS1_ENABLE_STATE            LOW  // default state of ENable pin for motor power on
@@ -137,11 +137,11 @@
 #ifndef AXIS2_DRIVER_STATUS
 #define AXIS2_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS2_SUBDIVISIONS
-#define AXIS2_SUBDIVISIONS            AXIS2_DRIVER_MICROSTEPS
+#ifndef AXIS2_PARAMETER1      
+#define AXIS2_PARAMETER1              AXIS2_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS2_CURRENT
-#define AXIS2_CURRENT                 AXIS2_DRIVER_IRUN
+#ifndef AXIS2_PARAMETER2 
+#define AXIS2_PARAMETER2              AXIS2_DRIVER_IRUN
 #endif
 #ifndef AXIS2_ENABLE_STATE
 #define AXIS2_ENABLE_STATE            LOW
@@ -177,11 +177,11 @@
 #ifndef AXIS3_DRIVER_STATUS
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS3_SUBDIVISIONS
-#define AXIS3_SUBDIVISIONS            AXIS3_DRIVER_MICROSTEPS
+#ifndef AXIS3_PARAMETER1      
+#define AXIS3_PARAMETER1              AXIS3_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS3_CURRENT
-#define AXIS3_CURRENT                 AXIS3_DRIVER_IRUN
+#ifndef AXIS3_PARAMETER2 
+#define AXIS3_PARAMETER2              AXIS3_DRIVER_IRUN
 #endif
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW
@@ -217,11 +217,11 @@
 #ifndef AXIS4_DRIVER_STATUS
 #define AXIS4_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS4_SUBDIVISIONS
-#define AXIS4_SUBDIVISIONS            AXIS4_DRIVER_MICROSTEPS
+#ifndef AXIS4_PARAMETER1      
+#define AXIS4_PARAMETER1              AXIS4_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS4_CURRENT
-#define AXIS4_CURRENT                 AXIS4_DRIVER_IRUN
+#ifndef AXIS4_PARAMETER2 
+#define AXIS4_PARAMETER2              AXIS4_DRIVER_IRUN
 #endif
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS4_ENABLE_STATE            LOW
@@ -257,11 +257,11 @@
 #ifndef AXIS5_DRIVER_STATUS
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS5_SUBDIVISIONS
-#define AXIS5_SUBDIVISIONS            AXIS5_DRIVER_MICROSTEPS
+#ifndef AXIS5_PARAMETER1      
+#define AXIS5_PARAMETER1              AXIS5_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS5_CURRENT
-#define AXIS5_CURRENT                 AXIS5_DRIVER_IRUN
+#ifndef AXIS5_PARAMETER2 
+#define AXIS5_PARAMETER2              AXIS5_DRIVER_IRUN
 #endif
 #ifndef AXIS5_ENABLE_STATE
 #define AXIS5_ENABLE_STATE            LOW
@@ -297,11 +297,11 @@
 #ifndef AXIS6_DRIVER_STATUS
 #define AXIS6_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS6_SUBDIVISIONS
-#define AXIS6_SUBDIVISIONS            AXIS6_DRIVER_MICROSTEPS
+#ifndef AXIS6_PARAMETER1      
+#define AXIS6_PARAMETER1              AXIS6_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS6_CURRENT
-#define AXIS6_CURRENT                 AXIS6_DRIVER_IRUN
+#ifndef AXIS6_PARAMETER2 
+#define AXIS6_PARAMETER2              AXIS6_DRIVER_IRUN
 #endif
 #ifndef AXIS6_ENABLE_STATE
 #define AXIS6_ENABLE_STATE            LOW
@@ -337,11 +337,11 @@
 #ifndef AXIS7_DRIVER_STATUS
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS7_SUBDIVISIONS
-#define AXIS7_SUBDIVISIONS            AXIS7_DRIVER_MICROSTEPS
+#ifndef AXIS7_PARAMETER1      
+#define AXIS7_PARAMETER1              AXIS7_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS7_CURRENT
-#define AXIS7_CURRENT                 AXIS7_DRIVER_IRUN
+#ifndef AXIS7_PARAMETER2 
+#define AXIS7_PARAMETER2              AXIS7_DRIVER_IRUN
 #endif
 #ifndef AXIS7_ENABLE_STATE
 #define AXIS7_ENABLE_STATE            LOW
@@ -377,11 +377,11 @@
 #ifndef AXIS8_DRIVER_STATUS
 #define AXIS8_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS8_SUBDIVISIONS
-#define AXIS8_SUBDIVISIONS            AXIS8_DRIVER_MICROSTEPS
+#ifndef AXIS8_PARAMETER1      
+#define AXIS8_PARAMETER1              AXIS8_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS8_CURRENT
-#define AXIS8_CURRENT                 AXIS8_DRIVER_IRUN
+#ifndef AXIS8_PARAMETER2 
+#define AXIS8_PARAMETER2              AXIS8_DRIVER_IRUN
 #endif
 #ifndef AXIS8_ENABLE_STATE
 #define AXIS8_ENABLE_STATE            LOW
@@ -417,11 +417,11 @@
 #ifndef AXIS9_DRIVER_STATUS
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
-#ifndef AXIS9_SUBDIVISIONS
-#define AXIS9_SUBDIVISIONS            AXIS9_DRIVER_MICROSTEPS
+#ifndef AXIS9_PARAMETER1      
+#define AXIS9_PARAMETER1              AXIS9_DRIVER_MICROSTEPS
 #endif
-#ifndef AXIS9_CURRENT
-#define AXIS9_CURRENT                 AXIS9_DRIVER_IRUN
+#ifndef AXIS9_PARAMETER2 
+#define AXIS9_PARAMETER2              AXIS9_DRIVER_IRUN
 #endif
 #ifndef AXIS9_ENABLE_STATE
 #define AXIS9_ENABLE_STATE            LOW

@@ -28,7 +28,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
   "TMC5160","GENERIC","SERVO" };
 #endif
 
-const DriverPins ModePins[] = {
+const DriverModePins ModePins[] = {
   #ifdef AXIS1_DRIVER_SD
     { 1, AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_DECAY_PIN, AXIS1_FAULT_PIN },
   #endif
@@ -92,7 +92,12 @@ void StepDirDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current
   this->axisNumber = axisNumber;
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (ModePins[i].axis == axisNumber) { index = i; settings = ModeSettings[i]; break; } if (i == 9) { VLF("ERR: StepDirDriver::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) {
+    if (ModePins[i].axis == axisNumber) {
+      settings = ModeSettings[i]; pins = &ModePins[i]; break;
+    }
+    if (i == 9) { VLF("ERR: StepDirDriver::init(); indexing failed!"); return; }
+  }
 
   // update the current from initialization setting
   if (settings.currentRun != OFF && settings.currentRun != current) {
@@ -122,7 +127,7 @@ void StepDirDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current
     #ifdef TMC_DRIVER_PRESENT
       if (settings.decay == OFF) settings.decay = STEALTHCHOP;
       if (settings.decayGoto == OFF) settings.decayGoto = SPREADCYCLE;
-      tmcDriver.init(settings.model, ModePins[index].m0, ModePins[index].m1, ModePins[index].m2, ModePins[index].m3);
+      tmcDriver.init(settings.model, pins->m0, pins->m1, pins->m2, pins->m3);
       if (settings.decay == STEALTHCHOP || settings.decayGoto == STEALTHCHOP) {
         tmcDriver.mode(true, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
         VLF("MSG: StepDriver, TMC standstill automatic current calibration");
@@ -131,19 +136,19 @@ void StepDirDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
     #endif
   } else {
-    if (isDecayOnM2()) { decayPin = ModePins[index].m2; m2Pin = OFF; } else { decayPin = ModePins[index].decay; m2Pin = ModePins[index].m2; }
+    if (isDecayOnM2()) { decayPin = pins->m2; m2Pin = OFF; } else { decayPin = pins->decay; m2Pin = pins->m2; }
     pinModeEx(decayPin, OUTPUT);
     digitalWriteEx(decayPin, getDecayPinState(settings.decay));
 
     microstepBitCode = microstepCode;
     microstepBitCodeGoto = microstepCodeGoto;
-    pinModeEx(ModePins[index].m0, OUTPUT);
-    digitalWriteEx(ModePins[index].m0, bitRead(microstepBitCode, 0));
-    pinModeEx(ModePins[index].m1, OUTPUT);
-    digitalWriteEx(ModePins[index].m1, bitRead(microstepBitCode, 1));
+    pinModeEx(pins->m0, OUTPUT);
+    digitalWriteEx(pins->m0, bitRead(microstepBitCode, 0));
+    pinModeEx(pins->m1, OUTPUT);
+    digitalWriteEx(pins->m1, bitRead(microstepBitCode, 1));
     pinModeEx(m2Pin, OUTPUT);
     digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
-    pinModeEx(ModePins[index].m3, INPUT);
+    pinModeEx(pins->m3, INPUT);
   }
 
   // automatically set fault status for known drivers
@@ -154,6 +159,14 @@ void StepDirDriver::init(uint8_t axisNumber, int16_t microsteps, int16_t current
       default: break;
     }
   }
+
+  // set fault pin mode
+  if (settings.status == LOW) pinModeEx(pins->fault, INPUT_PULLUP);
+  #ifdef PULLDOWN
+    if (settings.status == HIGH) pinModeEx(pins->fault, INPUT_PULLDOWN);
+  #else
+    if (settings.status == HIGH) pinModeEx(pins->fault, INPUT);
+  #endif
 }
 
 bool StepDirDriver::modeSwitchAllowed() {
@@ -167,9 +180,9 @@ void StepDirDriver::modeMicrostepTracking() {
     #endif
   } else {
     noInterrupts();
-    digitalWriteEx(ModePins[index].m0, bitRead(microstepBitCode, 0));
-    digitalWriteEx(ModePins[index].m1, bitRead(microstepBitCode, 1));
-    digitalWriteEx(ModePins[index].m2, bitRead(microstepBitCode, 2));
+    digitalWriteEx(pins->m0, bitRead(microstepBitCode, 0));
+    digitalWriteEx(pins->m1, bitRead(microstepBitCode, 1));
+    digitalWriteEx(pins->m2, bitRead(microstepBitCode, 2));
     interrupts();
   }
 }
@@ -183,7 +196,7 @@ void StepDirDriver::modeDecayTracking() {
     if (settings.decay == OFF) return;
     int8_t state = getDecayPinState(settings.decay);
     noInterrupts();
-    if (state != OFF) digitalWriteEx(decayPin,state);
+    if (state != OFF) digitalWriteEx(decayPin, state);
     interrupts();
   }
 }
@@ -201,9 +214,9 @@ int StepDirDriver::modeMicrostepSlewing() {
       #endif
     } else {
       noInterrupts();
-      digitalWriteEx(ModePins[index].m0, bitRead(microstepBitCodeGoto, 0));
-      digitalWriteEx(ModePins[index].m1, bitRead(microstepBitCodeGoto, 1));
-      digitalWriteEx(ModePins[index].m2, bitRead(microstepBitCodeGoto, 2));
+      digitalWriteEx(pins->m0, bitRead(microstepBitCodeGoto, 0));
+      digitalWriteEx(pins->m1, bitRead(microstepBitCodeGoto, 1));
+      digitalWriteEx(pins->m2, bitRead(microstepBitCodeGoto, 2));
       interrupts();
     }
   }
@@ -261,7 +274,7 @@ void StepDirDriver::updateStatus() {
     } else
   #endif
   if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(ModePins[index].fault) == settings.status;
+    status.fault = digitalReadEx(pins->fault) == settings.status;
   }
 }
 

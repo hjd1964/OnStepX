@@ -17,16 +17,18 @@ typedef struct AxisLimits {
   float max;
 } AxisLimits;
 
-// helpers for servo parameters
-#define integral subdivisions
-#define current  porportional
+// helpers for step/dir and servo parameters
+#define subdivisions param1
+#define integral param1
+#define current param2
+#define porportional param2
 
 #define AxisSettingsSize 25
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
-  int16_t    subdivisions; // aka integral
-  int16_t    current;      // aka proportional
+  int16_t    param1;       // subdivision or integral
+  int16_t    param2;       // current or proportional
   AxisLimits limits;
   float      backlashFreq;
 } AxisSettings;

@@ -10,10 +10,17 @@
 #ifdef SERVO_DRIVER_PRESENT
 
 #include <Encoder.h> // https://github.com/PaulStoffregen/Encoder
+#include <PID_v1.h>  // https://github.com/hjd1964/Arduino-PID-Library
 
 #include "../../../../commands/ProcessCmds.h"
 #include "ServoDrivers.h"
 #include "../Motor.h"
+
+typedef struct PidControl {
+  double in;
+  double out;
+  double set;
+} PidSettings;
 
 class ServoMotor : public Motor {
   public:
@@ -23,44 +30,40 @@ class ServoMotor : public Motor {
     // sets motor power on/off (if possible)
     void power(bool value);
 
+    // get the associated stepper driver status
+    DriverStatus getDriverStatus();
+
+    // resets motor and target angular position in steps, also zeros backlash and index 
+    void resetPositionSteps(long value);
+
     // get movement frequency in steps per second
     float getFrequencySteps();
 
     // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
     void setFrequencySteps(float frequency);
 
-    // get the associated stepper driver status
-    DriverStatus getDriverStatus();
-
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
+
+    // updates PID and sets servo motor power/direction
+    void poll();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
 
-    // a DC motor driver
-    DcDriver driver;
+    // DC servo motor driver
+    ServoDriver driver;
 
   private:
+    uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
 
     bool enabled = false;               // enable/disable logical state (disabled is powered down)
     bool synchronized = true;           // locks movement of axis target with timer rate
     bool limitsCheck = true;            // enable/disable numeric position range limits (doesn't apply to limit switches)
 
-    volatile Direction direction = DIR_NONE;
-    #ifdef DRIVER_STEP_DEFAULTS
-      #define stepClr LOW               // pin state to reset driver before taking a step
-      #define stepSet HIGH              // pin state to take a step
-    #else
-      volatile uint8_t stepClr = LOW;   // pin state to reset driver before taking a step
-      volatile uint8_t stepSet = HIGH;  // pin state to take a step
-    #endif
-    volatile uint8_t dirFwd = LOW;      // pin state for forward direction
-    volatile uint8_t dirRev = HIGH;     // pin state for reverse direction
-
+    volatile int  stepSize = 1;         // step size
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
-    volatile int  slewStep = 1;         // step size during slews (for micro-step mode switching)
     volatile bool takeStep = false;     // should we take a step
 
     float currentFrequency = 0.0F;      // last frequency set 
@@ -69,6 +72,7 @@ class ServoMotor : public Motor {
 
     void (*_move)() = NULL;
 
+    PID *pid = NULL;
     Encoder *enc = NULL;
 };
 

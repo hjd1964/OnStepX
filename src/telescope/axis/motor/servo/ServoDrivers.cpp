@@ -6,13 +6,13 @@
 #ifdef SERVO_DRIVER_PRESENT
 
 #if DEBUG_MODE != OFF
-  const char* DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = {
+  const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = {
   "SERVO_DIR_PHASE",
   "SERVO_IN_IN",
   };
 #endif
 
-const DriverPins Pins[] = {
+const ServoDriverPins ServoPins[] = {
   #ifdef AXIS1_DRIVER_SERVO
     { 1, AXIS1_DC_IN1_PIN, AXIS1_DC_IN1_STATE, AXIS1_DC_IN2_PIN, AXIS1_DC_IN2_STATE, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE, AXIS1_FAULT_PIN },
   #endif
@@ -42,116 +42,133 @@ const DriverPins Pins[] = {
   #endif
 };
 
-const DriverSettings ModeSettings[] = {
+const ServoDriverSettings ServoSettings[] = {
   #ifdef AXIS1_DRIVER_SERVO
-    { AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS },
+    { AXIS1_DRIVER_MODEL, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, AXIS1_DRIVER_STATUS },
   #endif
   #ifdef AXIS2_DRIVER_SERVO
-    { AXIS2_DRIVER_MODEL, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, AXIS2_DRIVER_STATUS },
+    { AXIS2_DRIVER_MODEL, AXIS2_DRIVER_SERVO_P, AXIS2_DRIVER_SERVO_I, AXIS2_DRIVER_SERVO_D, AXIS2_DRIVER_STATUS },
   #endif
   #ifdef AXIS3_DRIVER_SERVO
-    { AXIS3_DRIVER_MODEL, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, AXIS3_DRIVER_STATUS },
+    { AXIS3_DRIVER_MODEL, AXIS3_DRIVER_SERVO_P, AXIS3_DRIVER_SERVO_I, AXIS3_DRIVER_SERVO_D, AXIS3_DRIVER_STATUS },
   #endif
   #ifdef AXIS4_DRIVER_SERVO
-    { AXIS4_DRIVER_MODEL, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, AXIS4_DRIVER_STATUS },
+    { AXIS4_DRIVER_MODEL, AXIS4_DRIVER_SERVO_P, AXIS4_DRIVER_SERVO_I, AXIS4_DRIVER_SERVO_D, AXIS4_DRIVER_STATUS },
   #endif
   #ifdef AXIS5_DRIVER_SERVO
-    { AXIS5_DRIVER_MODEL, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, AXIS5_DRIVER_STATUS },
+    { AXIS5_DRIVER_MODEL, AXIS5_DRIVER_SERVO_P, AXIS5_DRIVER_SERVO_I, AXIS5_DRIVER_SERVO_D, AXIS5_DRIVER_STATUS },
   #endif
   #ifdef AXIS6_DRIVER_SERVO
-    { AXIS6_DRIVER_MODEL, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_MICROSTEPS_GOTO, AXIS6_DRIVER_IHOLD, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_IGOTO, AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO, AXIS6_DRIVER_STATUS },
+    { AXIS6_DRIVER_MODEL, AXIS6_DRIVER_SERVO_P, AXIS6_DRIVER_SERVO_I, AXIS6_DRIVER_SERVO_D, AXIS6_DRIVER_STATUS },
   #endif
   #ifdef AXIS7_DRIVER_SERVO
-    { AXIS7_DRIVER_MODEL, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_MICROSTEPS_GOTO, AXIS7_DRIVER_IHOLD, AXIS7_DRIVER_IRUN, AXIS7_DRIVER_IGOTO, AXIS7_DRIVER_DECAY, AXIS7_DRIVER_DECAY_GOTO, AXIS7_DRIVER_STATUS },
+    { AXIS7_DRIVER_MODEL, AXIS7_DRIVER_SERVO_P, AXIS7_DRIVER_SERVO_I, AXIS7_DRIVER_SERVO_D, AXIS7_DRIVER_STATUS },
   #endif
   #ifdef AXIS8_DRIVER_SERVO
-    { AXIS8_DRIVER_MODEL, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_MICROSTEPS_GOTO, AXIS8_DRIVER_IHOLD, AXIS8_DRIVER_IRUN, AXIS8_DRIVER_IGOTO, AXIS8_DRIVER_DECAY, AXIS8_DRIVER_DECAY_GOTO, AXIS8_DRIVER_STATUS },
+    { AXIS8_DRIVER_MODEL, AXIS8_DRIVER_SERVO_P, AXIS8_DRIVER_SERVO_I, AXIS8_DRIVER_SERVO_D, AXIS8_DRIVER_STATUS },
   #endif
   #ifdef AXIS9_DRIVER_SERVO
-    { AXIS9_DRIVER_MODEL, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_MICROSTEPS_GOTO, AXIS9_DRIVER_IHOLD, AXIS9_DRIVER_IRUN, AXIS9_DRIVER_IGOTO, AXIS9_DRIVER_DECAY, AXIS9_DRIVER_DECAY_GOTO, AXIS9_DRIVER_STATUS },
+    { AXIS9_DRIVER_MODEL, AXIS9_DRIVER_SERVO_P, AXIS9_DRIVER_SERVO_I, AXIS9_DRIVER_SERVO_D, AXIS9_DRIVER_STATUS },
   #endif
 };
 
-void DcDriver::init(uint8_t axisNumber) {
+void ServoDriver::init(uint8_t axisNumber) {
   this->axisNumber = axisNumber;
 
   // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) { if (Pins[i].axis == axisNumber) { index = i; pins = Pins[i]; settings = ModeSettings[i]; break; } if (i == 9) { VLF("ERR: Servo::init(); indexing failed!"); return; } }
+  for (uint8_t i = 0; i < 10; i++) {
+    if (ServoPins[i].axis == axisNumber) {
+      pins = &ServoPins[i]; settings = ServoSettings[i]; break;
+    } if (i == 9) { VLF("ERR: Servo::init(); indexing failed!"); return; }
+  }
+
+  #if DEBUG == VERBOSE
+    VF("MSG: ServoDriver, init model "); V(SERVO_DRIVER_NAME[settings.model]);
+    VF(" p = "); V(settings.p); VF(", i = "); V(settings.i); VF(", d = "); VL(settings.d);
+  #endif
 
   // init default driver control pins
-  pinModeEx(pins.enable, OUTPUT);
-  digitalWriteEx(pins.enable, !pins.enabledState);
-  pinMode(pins.in1, OUTPUT);
-  digitalWriteF(pins.in1, pins.inState1); // either in1 or direction, state should default to inactive
-  pinMode(pins.in2, OUTPUT);
-  digitalWriteF(pins.in2, pins.inState2); // either in2 or phase (PWM,) state should default to inactive
+  pinModeEx(pins->enable, OUTPUT);
+  digitalWriteEx(pins->enable, !pins->enabledState);
+  pinMode(pins->in1, OUTPUT);
+  digitalWriteF(pins->in1, pins->inState1); // either in1 or direction, state should default to inactive
+  pinMode(pins->in2, OUTPUT);
+  digitalWriteF(pins->in2, pins->inState2); // either in2 or phase (PWM,) state should default to inactive
 
   // automatically set fault status for known drivers
   if (settings.status == ON) {
     settings.status = LOW;
   }
+
+  // set fault pin mode
+  if (settings.status == LOW) pinModeEx(pins->fault, INPUT_PULLUP);
+  #ifdef PULLDOWN
+    if (settings.status == HIGH) pinModeEx(pins->fault, INPUT_PULLDOWN);
+  #else
+    if (settings.status == HIGH) pinModeEx(pins->fault, INPUT);
+  #endif
 }
 
-void DcDriver::updateStatus() {
+void ServoDriver::updateStatus() {
   if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(pins.fault) == settings.status;
+    status.fault = digitalReadEx(pins->fault) == settings.status;
   }
 }
 
-DriverStatus DcDriver::getStatus() {
+DriverStatus ServoDriver::getStatus() {
   return status;
 }
 
 // power down using the enable pin
-void DcDriver::power(bool state) {
+void ServoDriver::power(bool state) {
   powered = state;
-  if (!powered) { digitalWriteF(pins.enable, !pins.enabledState); } else { digitalWriteF(pins.enable, pins.enabledState); }
+  if (!powered) { digitalWriteF(pins->enable, !pins->enabledState); } else { digitalWriteF(pins->enable, pins->enabledState); }
  }
 
-// power level to the motor (0.0 to 1.0 = 0..100%)
-void DcDriver::motorPower(float power) {
-  if (!powered) dcPower = 0.0F; else dcPower = power;
+// power level to the motor (-255 to 255, negative for reverse)
+void ServoDriver::setMotorPower(int power) {
+  if (!powered) motorPwr = 0; else motorPwr = abs(power);
+  if (power >= 0) setMotorDirection(DIR_FORWARD); else setMotorDirection(DIR_REVERSE);
   update();
  }
 
 // motor direction (DIR_FORMWARD or DIR_REVERSE)
-void DcDriver::motorDirection(Direction dir) {
-  dcDirection = dir;
+void ServoDriver::setMotorDirection(Direction dir) {
+  motorDir = dir;
   update();
 }
 
-void DcDriver::update() {
-  long p = dcPower*255;
-
+void ServoDriver::update() {
   if (settings.model == SERVO_II) {
-    if (dcDirection == DIR_FORWARD) {
-      digitalWriteF(pins.in1, pins.inState1);
-      if (pins.inState2 == HIGH) p = 255 - p;
-      analogWrite(pins.in2, p);
+    if (motorDir == DIR_FORWARD) {
+      digitalWriteF(pins->in1, pins->inState1);
+      if (pins->inState2 == HIGH) motorPwr = 255 - motorPwr;
+      analogWrite(pins->in2, motorPwr);
     } else
-    if (dcDirection == DIR_REVERSE) {
-      if (pins.inState1 == HIGH) p = 255 - p;
-      analogWrite(pins.in1, p);
-      digitalWriteF(pins.in2, pins.inState2);
+    if (motorDir == DIR_REVERSE) {
+      if (pins->inState1 == HIGH) motorPwr = 255 - motorPwr;
+      analogWrite(pins->in1, motorPwr);
+      digitalWriteF(pins->in2, pins->inState2);
     } else {
-      digitalWriteF(pins.in1, pins.inState1);
-      digitalWriteF(pins.in2, pins.inState2);
+      digitalWriteF(pins->in1, pins->inState1);
+      digitalWriteF(pins->in2, pins->inState2);
     }
   } else
   if (settings.model == SERVO_DP) {
-    if (dcDirection == DIR_FORWARD) {
-      digitalWriteF(pins.in1, pins.inState1);
-      if (pins.inState2 == HIGH) p = 255 - p;
-      analogWrite(pins.in2, p);
+    if (motorDir == DIR_FORWARD) {
+      digitalWriteF(pins->in1, pins->inState1);
+      if (pins->inState2 == HIGH) motorPwr = 255 - motorPwr;
+      analogWrite(pins->in2, motorPwr);
     } else
-    if (dcDirection == DIR_REVERSE) {
-      digitalWriteF(pins.in1, !pins.inState1);
-      if (pins.inState2 == HIGH) p = 255 - p;
-      analogWrite(pins.in2, p);
+    if (motorDir == DIR_REVERSE) {
+      digitalWriteF(pins->in1, !pins->inState1);
+      if (pins->inState2 == HIGH) motorPwr = 255 - motorPwr;
+      analogWrite(pins->in2, motorPwr);
     } else {
-      digitalWriteF(pins.in1, pins.inState1);
-      digitalWriteF(pins.in2, pins.inState2);
+      digitalWriteF(pins->in1, pins->inState1);
+      digitalWriteF(pins->in2, pins->inState2);
     }
   }
+}
 
 #endif

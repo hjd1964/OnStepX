@@ -30,7 +30,7 @@ typedef struct DriverSettings {
 } DriverSettings;
 #pragma pack()
 
-typedef struct DriverPins {
+typedef struct DriverModePins {
   uint8_t axis;
   int16_t m0;
   int16_t m1;
@@ -38,7 +38,7 @@ typedef struct DriverPins {
   int16_t m3;
   int16_t decay;
   int16_t fault;
-} DriverPins;
+} DriverModePins;
 
 #define mosi_pin m0
 #define sck_pin  m1
@@ -104,7 +104,6 @@ class StepDirDriver {
     bool isDecayOnM2();
 
     int axisNumber;
-    int index;
     DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
     int     microstepRatio        = 1;
@@ -114,6 +113,7 @@ class StepDirDriver {
     uint8_t microstepBitCodeGoto  = 0;
     int16_t m2Pin                 = OFF;
     int16_t decayPin              = OFF;
+    const DriverModePins *pins;
 };
 
 #endif

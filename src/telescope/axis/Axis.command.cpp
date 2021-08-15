@@ -103,8 +103,9 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
               thisAxis.limits.min = thisAxis.limits.min*1000.0F;
               thisAxis.limits.max = thisAxis.limits.max*1000.0F;
             }
-            if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
-              if (motor->driverType == STEP_DIR) {
+            // validate settings for step/dir drivers
+            if (motor->driverType == STEP_DIR) {
+              if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
                 #ifdef SD_DRIVER_PRESENT
                   int subdivGoto = ((StepDirMotor*)motor)->driver.getSubdivisionsGoto();
                   if (axisNumber <= 2 && thisAxis.subdivisions < subdivGoto) thisAxis.subdivisions = subdivGoto;
@@ -113,8 +114,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
                     *numericReply = false;
                   } else *commandError = CE_PARAM_RANGE;
                 #endif
-              }
-            } else *commandError = CE_PARAM_FORM;
+              } else *commandError = CE_PARAM_FORM;
+            }
           } else *commandError = CE_PARAM_FORM;
         }
       } else *commandError = CE_0;

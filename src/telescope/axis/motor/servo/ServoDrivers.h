@@ -8,22 +8,23 @@
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_SERVO_MODEL_COUNT 2
 
+#include "../Drivers.h"
 #include "Servo.defaults.h"
 
 #ifdef SERVO_DRIVER_PRESENT
 
 #pragma pack(1)
 #define StepDriverSettingsSize 15
-typedef struct DriverSettings {
+typedef struct ServoDriverSettings {
   int16_t model;
   int16_t p;
   int16_t i;
   int16_t d;
   int8_t  status;
-} DriverSettings;
+} ServoDriverSettings;
 #pragma pack()
 
-typedef struct DriverPins {
+typedef struct ServoDriverPins {
   uint8_t axis;
   int16_t in1;
   uint8_t inState1;
@@ -32,23 +33,9 @@ typedef struct DriverPins {
   int16_t enable;
   uint8_t enabledState;
   int16_t fault;
-} DriverPins;
+} ServoDriverPins;
 
-typedef struct DriverOutputStatus {
-  bool shortToGround;
-  bool openLoad;
-} DriverOutputStatus;
-
-typedef struct DriverStatus {
-  DriverOutputStatus outputA;
-  DriverOutputStatus outputB;
-  bool overTemperaturePreWarning;
-  bool overTemperature;
-  bool standstill;
-  bool fault;
-} DriverStatus;
-
-class DcDriver {
+class ServoDriver {
   public:
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
@@ -70,26 +57,26 @@ class DcDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     inline int getSubdivisionsGoto() { return 1; }
 
-    // power level to the motor (0 to 100%)
-    void DcDriver::motorPower(float percent);
+    // power level to the motor (-255 to 255, negative for reverse)
+    void setMotorPower(int power);
 
-    // motor direction (DIR_FORMWARD or DIR_REVERSE)
-    void DcDriver::motorDirection(Direction dir);
-
-    DriverSettings settings;
+    ServoDriverSettings settings;
 
   private:
-    void DcDriver::update();
+    // motor direction (DIR_FORMWARD or DIR_REVERSE)
+    void setMotorDirection(Direction dir);
+
+    void update();
 
     int axisNumber;
-    int index;
     bool powered = false;
-    float dcPower = 0.0F;
-    Direction dcDirection = DIR_FORWARD;
+
+    float motorPwr = 0.0F;
+    Direction motorDir = DIR_FORWARD;
 
     DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
-    DriverPins pins;
+    const ServoDriverPins *pins;
 };
 
 #endif
