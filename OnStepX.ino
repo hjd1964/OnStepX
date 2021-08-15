@@ -44,7 +44,7 @@
 #define FirmwareName                "OnStepX"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        03     // minor version 00 to 99
-#define FirmwareVersionPatch        "d"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "e"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       1      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
