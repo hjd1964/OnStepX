@@ -159,12 +159,12 @@ void Limits::poll() {
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
             // disable meridian limit west for a second to allow goto to exit the out of limits region
             autoFlipCount = 10;
-            VLF("MSG: Mount::limitPoll() start automatic meridian flip");
+            VLF("MSG: Mount, start automatic meridian flip");
             Coordinate target = mount.getMountPosition();
             CommandError e = goTo.request(&target, PSS_EAST_ONLY, false);
             if (e != CE_NONE) {
               stopAxis1(GA_FORWARD);
-              error.meridian.west = true; VF("MSG: Mount::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+              error.meridian.west = true; VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
             }
           } else
         #endif
@@ -179,7 +179,7 @@ void Limits::poll() {
   if (fgt(current.a2, axis2.settings.limits.max)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
 
   #if DEBUG == VERBOSE
-    const char* errPre = "MSG: Mount::limitPoll() Error state changed: ";
+    const char* errPre = "MSG: Mount, Error state changed: ";
     if (lastError.altitude.min != error.altitude.min ||
         lastError.altitude.max != error.altitude.max ||
         lastError.meridian.east != error.meridian.east ||
