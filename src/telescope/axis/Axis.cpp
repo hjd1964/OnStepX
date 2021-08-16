@@ -531,7 +531,11 @@ void Axis::setFrequency(float frequency) {
 
   // apply base frequency as required
   if (enabled) {
-    motor->setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
+    if (autoRate == AR_NONE) {
+      motor->setFrequencySteps((frequency + baseFreq)*settings.stepsPerMeasure);
+    } else {
+      motor->setFrequencySteps(frequency*settings.stepsPerMeasure);
+    }
   } else {
     motor->setFrequencySteps(0.0F);
   }
