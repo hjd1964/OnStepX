@@ -55,7 +55,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure (no focusers)
     //                    1 on success
     if (parameter[0] == 0) {
-      if (axes[active + 3] == NULL) *commandError = CE_0;
+      if (axes[active] == NULL) *commandError = CE_0;
     } else
 
     // :FA[n]#    Select focuser where [n] = 1 to 6

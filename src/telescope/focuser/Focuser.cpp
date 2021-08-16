@@ -310,6 +310,7 @@ CommandError Focuser::park(int index) {
   VF("MSG: Focuser"); V(index + 1); VLF(", parking");
   axes[index]->setBacklash(0.0F);
   float position = axes[index]->getInstrumentCoordinate();
+  axes[index]->setTargetCoordinatePark(position);
 
   settings[index].position = position;
   writeSettings(index);
