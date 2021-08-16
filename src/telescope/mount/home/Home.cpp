@@ -31,7 +31,7 @@ CommandError Home::request() {
     if (goTo.state != GS_NONE || guide.state != GU_NONE || mount.isSlewing()) return CE_SLEW_IN_MOTION;
 
     if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
-      CommandError e = reset(false);
+      CommandError e = reset();
       if (e != CE_NONE) return e;
     }
 
@@ -69,7 +69,6 @@ CommandError Home::reset(bool resetPark) {
   if (guide.state != GU_NONE || axis1.isSlewing() || axis2.isSlewing()) return CE_SLEW_IN_MOTION;
 
   #if SLEW_GOTO == ON
-    // clear park state
     if (resetPark) park.reset();
   #endif
 
@@ -90,7 +89,6 @@ CommandError Home::reset(bool resetPark) {
     axis1.setInstrumentCoordinate(position.h);
     axis2.setInstrumentCoordinate(position.d);
   }
-  atHome = true;
 
   axis1.setBacklash(mount.settings.backlash.axis1);
   axis2.setBacklash(mount.settings.backlash.axis2);
@@ -101,6 +99,8 @@ CommandError Home::reset(bool resetPark) {
   #if SLEW_GOTO == ON
     goTo.alignReset();
   #endif
+
+  atHome = true;
 
   VLF("MSG: Mount, reset at home and in standby");
   return CE_NONE;
