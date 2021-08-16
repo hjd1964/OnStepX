@@ -146,12 +146,12 @@ uint32_t TmcDriver::read_CHOPCONF() {
   if (!active) return false;
   softSpi.begin();
 
-  uint32_t data_out=0;
-  read(REG_CHOPCONF,&data_out);
+  uint32_t data_out = 0;
+  read(REG_CHOPCONF, &data_out);
 
   // first write returns nothing, second the data
-  data_out=0;
-  read(REG_DRVSTATUS,&data_out);
+  data_out = 0;
+  read(REG_DRVSTATUS, &data_out);
   
   softSpi.end();
   return data_out;
@@ -164,7 +164,7 @@ int TmcDriver::refresh_DRVSTATUS() {
   // get global status register, look for driver error bit
   uint32_t sgResult=0;
   uint32_t data_out=0;
-  uint8_t  result = read(REG_DRVSTATUS,&data_out);
+  uint8_t  result = read(REG_DRVSTATUS, &data_out);
   
   softSpi.pause();
   
@@ -186,8 +186,8 @@ int TmcDriver::refresh_DRVSTATUS() {
     ds_fs_active  = (bool)bitRead(data_out,15); // DRV_STATUS 15 Full step active indicator
     ds_result     = data_out & 0b1111111111;    // DRV_STATUS  0 stallGuard2 result
   } else {
-    ds_stst=true; ds_olb=true; ds_ola=true; ds_s2ga=true; ds_s2gb=true; ds_otpw=true; ds_ot=true;
-    ds_stallguard=false; ds_cs_actual=0; ds_fs_active=false; ds_result=0;       
+    ds_stst = true; ds_olb = true; ds_ola = true; ds_s2ga = true; ds_s2gb = true; ds_otpw = true;
+    ds_ot = true; ds_stallguard = false; ds_cs_actual = 0; ds_fs_active = false; ds_result = 0;       
   }
 
   softSpi.end();
@@ -205,16 +205,14 @@ bool TmcDriver::refresh_COOLCONF() {
   return true;
 }
 
-uint8_t TmcDriver::write(byte Address, uint32_t data_out)
-{
+uint8_t TmcDriver::write(byte Address, uint32_t data_out) {
   Address = Address | 0x80;
   uint8_t status_byte = softSpi.transfer(Address);
   softSpi.transfer32(data_out);
   return status_byte;
 }
 
-uint8_t TmcDriver::read(byte Address, uint32_t* data_out)
-{
+uint8_t TmcDriver::read(byte Address, uint32_t* data_out) {
   Address = Address & ~0x80;
   uint8_t status_byte = softSpi.transfer(Address);
   *data_out = softSpi.transfer32(*data_out);

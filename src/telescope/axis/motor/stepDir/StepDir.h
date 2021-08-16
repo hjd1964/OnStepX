@@ -24,8 +24,11 @@ enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUE
 
 class StepDirMotor : public Motor {
   public:
+    // constructor
+    StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver, void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
+
     // sets up the driver step/dir/enable pins and any associated stepDriver mode control
-    bool init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t current);
+    bool init(int8_t reverse, int16_t microsteps, int16_t current);
 
     // sets motor power on/off (if possible)
     void power(bool value);
@@ -58,10 +61,10 @@ class StepDirMotor : public Motor {
     void moveFR(const int8_t stepPin);
 
     // a stepper motor driver, should not be used outside of the StepDir class
-    StepDirDriver driver;
+    StepDirDriver *driver;
 
   private:
-    StepDirPins pins;
+    const StepDirPins *Pins;
 
     uint8_t taskHandle = 0;
 

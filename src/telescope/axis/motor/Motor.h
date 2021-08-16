@@ -11,7 +11,7 @@
 class Motor {
   public:
     // sets up the motor identification
-    virtual bool init(uint8_t axisNumber, int8_t reverse, int16_t param1, int16_t param2);
+    virtual bool init(int8_t reverse, int16_t param1, int16_t param2);
 
     // sets motor power on/off (if possible)
     virtual void power(bool value);

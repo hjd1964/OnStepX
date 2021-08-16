@@ -8,6 +8,8 @@
 #include "../../lib/convert/Convert.h"
 #include "../axis/Axis.h"
 
+extern Axis *axes[6];
+
 bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   static int active = 0;
   static int index = 0;
@@ -15,8 +17,8 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
 
   // process any focuser axis commands
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (axes[index + 3] != NULL) {
-      if (axes[index + 3]->command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (axes[index] != NULL) {
+      if (axes[index]->command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     }
   }
 
@@ -90,7 +92,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     if (strchr("TpIMtuQF1234+-GZHh", command[1]) && parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
 
     // get ready for commands that convert to microns or steps (these commands are upper-case for microns OR lower-case for steps)
-    const float MicronsToSteps = axes[index + 3]->getStepsPerMeasure();
+    const float MicronsToSteps = axes[index]->getStepsPerMeasure();
     const float StepsToMicrons = 1.0F/MicronsToSteps;
     float MicronsToUnits = 1.0F;
     float StepsToUnits  = StepsToMicrons;
@@ -110,7 +112,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FT#       Get status
     //            Returns: M# (for moving) or S# (for stopped)
     if (command[1] == 'T') {
-      if (axes[index + 3]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axes[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
       *numericReply = false;
     } else
 
@@ -124,14 +126,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FI#       Get full in position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'I') {
-      sprintf(reply,"%ld",(long)round(axes[index + 3]->settings.limits.min*MicronsToUnits));
+      sprintf(reply,"%ld",(long)round(axes[index]->settings.limits.min*MicronsToUnits));
       *numericReply = false;
     } else
 
     // :FM#       Get max position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'M') {
-      sprintf(reply,"%ld",(long)round(axes[index + 3]->settings.limits.max*MicronsToUnits));
+      sprintf(reply,"%ld",(long)round(axes[index]->settings.limits.max*MicronsToUnits));
       *numericReply = false;
     } else
 
@@ -152,7 +154,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :Fu#       Get focuser microns per step
     //            Returns: n.n#
     if (command[1] == 'u') {
-      sprintF(reply, "%7.5f", 1.0/axes[index + 3]->getStepsPerMeasure());
+      sprintF(reply, "%7.5f", 1.0/axes[index]->getStepsPerMeasure());
       *numericReply = false;
     } else
 
@@ -231,7 +233,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FQ#       Stop the focuser
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axes[index + 3]->autoSlewStop();
+      axes[index]->autoSlewStop();
       *numericReply = false;
     } else
 
@@ -260,7 +262,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FG#       Get focuser current position (in microns or steps)
     //            Returns: sn#
     if (toupper(command[1]) == 'G') {
-      sprintf(reply,"%ld",(long)round((axes[index + 3]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
+      sprintf(reply,"%ld",(long)round((axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -282,8 +284,8 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'Z') {
       parked[index] = false;
-      *commandError = axes[index + 3]->resetPositionSteps(0);
-      axes[index + 3]->setBacklash(getBacklash(index));
+      *commandError = axes[index]->resetPositionSteps(0);
+      axes[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
 
@@ -291,16 +293,16 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'H') {
       parked[index] = false;
-      long p = round((axes[index + 3]->settings.limits.max + axes[index + 3]->settings.limits.min)/2.0F)*MicronsToSteps;
-      *commandError = axes[index + 3]->resetPositionSteps(p);
-      axes[index + 3]->setBacklash(getBacklash(index));
+      long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
+      *commandError = axes[index]->resetPositionSteps(p);
+      axes[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
 
     // :Fh#       Move focuser target position to half-travel
     //            Returns: Nothing
     if (command[1] == 'h') {
-      long t = round((axes[index + 3]->settings.limits.max + axes[index + 3]->settings.limits.min)/2.0F)*MicronsToSteps;
+      long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
       *commandError = gotoTarget(index, t);
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;

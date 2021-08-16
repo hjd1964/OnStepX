@@ -43,13 +43,13 @@ void Mount::init() {
 
   // get the main axes ready
   delay(100);
-  axis1.init(1, transform.mountType == ALTAZM);
+  axis1.init(transform.mountType == ALTAZM);
   axis1.setBacklash(settings.backlash.axis1);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   delay(100);
-  axis2.init(2, transform.mountType == ALTAZM);
+  axis2.init(transform.mountType == ALTAZM);
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);

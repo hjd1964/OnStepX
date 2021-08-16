@@ -107,9 +107,9 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             if (motor->driverType == STEP_DIR) {
               if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
                 #ifdef SD_DRIVER_PRESENT
-                  int subdivGoto = ((StepDirMotor*)motor)->driver.getSubdivisionsGoto();
+                  int subdivGoto = ((StepDirMotor*)motor)->driver->getSubdivisionsGoto();
                   if (axisNumber <= 2 && thisAxis.subdivisions < subdivGoto) thisAxis.subdivisions = subdivGoto;
-                  if (((StepDirMotor*)motor)->driver.subdivisionsToCode(thisAxis.subdivisions) != OFF) {
+                  if (((StepDirMotor*)motor)->driver->subdivisionsToCode(thisAxis.subdivisions) != OFF) {
                     nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
                     *numericReply = false;
                   } else *commandError = CE_PARAM_RANGE;

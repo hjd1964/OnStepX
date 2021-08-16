@@ -24,8 +24,11 @@ typedef struct PidControl {
 
 class ServoMotor : public Motor {
   public:
+    // constructor
+    ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, Encoder *enc, ServoDriver *driver, void (*volatile move)());
+
     // sets up the servo pins and any associated driver
-    bool init(uint8_t axisNumber, int8_t reverse, int16_t integral, int16_t porportional);
+    bool init(int8_t reverse, int16_t integral, int16_t porportional);
 
     // sets motor power on/off (if possible)
     void power(bool value);
@@ -52,7 +55,7 @@ class ServoMotor : public Motor {
     void move();
 
     // DC servo motor driver
-    ServoDriver driver;
+    ServoDriver *driver;
 
   private:
     uint8_t servoMonitorHandle = 0;
@@ -73,6 +76,7 @@ class ServoMotor : public Motor {
     void (*_move)() = NULL;
 
     PID *pid = NULL;
+    PidControl pidControl;
     Encoder *enc = NULL;
 };
 

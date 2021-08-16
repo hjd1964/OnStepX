@@ -35,19 +35,18 @@ typedef struct AxisSettings {
 #pragma pack()
 
 typedef struct AxisSense {
-  int32_t homeTrigger;
-  int8_t  homeInit;
-  int32_t minTrigger;
-  int32_t maxTrigger;
-  int8_t  minMaxInit;
+  int32_t    homeTrigger;
+  int8_t     homeInit;
+  int32_t    minTrigger;
+  int32_t    maxTrigger;
+  int8_t     minMaxInit;
 } AxisSense;
 
 typedef struct AxisPins {
-  uint8_t   axis;
-  int16_t   min;
-  int16_t   home;
-  int16_t   max;
-  AxisSense sense;
+  int16_t    min;
+  int16_t    home;
+  int16_t    max;
+  AxisSense  sense;
 } AxisPins;
 
 typedef struct AxisErrors {
@@ -60,11 +59,11 @@ enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 
 class Axis {
   public:
-    // setup array of axes for easy access
-    Axis();
+    // constructor
+    Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, Motor *motor);
 
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(uint8_t axisNumber, bool alternateLimits);
+    void init(bool alternateLimits);
 
     // process commands for this axis
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -253,7 +252,6 @@ class Axis {
 
     bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
     
-    uint8_t index;
     AxisErrors errors;
 
     uint8_t axisNumber = 0;
@@ -296,6 +294,8 @@ class Axis {
     float abortAccelTime = NAN;     // abort slew acceleration time in seconds
 
     HomingStage homingStage = HOME_NONE;
+
+    const AxisPins *pins;
 };
 
 // globals for easy access to telescope axes
@@ -326,6 +326,5 @@ class Axis {
 #if AXIS9_DRIVER_MODEL != OFF
   extern Axis axis9;
 #endif
-extern Axis *axes[9];
 
 #endif

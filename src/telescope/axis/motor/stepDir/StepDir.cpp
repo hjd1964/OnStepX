@@ -17,119 +17,99 @@ extern Tasks tasks;
 #endif
 
 #ifdef AXIS1_DRIVER_SD
-  StepDirMotor motor1;
-  const StepDirPins Axis1Pins = { AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE };
+  const StepDirPins PinsAxis1 = {AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE};
   IRAM_ATTR void moveAxis1() { motor1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   IRAM_ATTR void moveFFAxis1() { motor1.moveFF(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFRAxis1() { motor1.moveFR(AXIS1_STEP_PIN); }
+  StepDirMotor motor1(1, &PinsAxis1, &stepDirDriver1, &moveAxis1, &moveFFAxis1, &moveFRAxis1);
 #endif
 #ifdef AXIS2_DRIVER_SD
-  StepDirMotor motor2;
-  const StepDirPins Axis2Pins = { AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE };
+  const StepDirPins PinsAxis2 = {AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE};
   IRAM_ATTR void moveAxis2() { motor2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   IRAM_ATTR void moveFFAxis2() { motor2.moveFF(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFRAxis2() { motor2.moveFR(AXIS2_STEP_PIN); }
+  StepDirMotor motor2(2, &PinsAxis2, &stepDirDriver2, &moveAxis2, &moveFFAxis2, &moveFRAxis2);
 #endif
 #ifdef AXIS3_DRIVER_SD
-  StepDirMotor motor3;
-  const StepDirPins Axis3Pins = { AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE };
+  const StepDirPins PinsAxis3 = {AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE};
   inline void moveAxis3() { motor3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
+  StepDirMotor motor3(3, &PinsAxis3, &stepDirDriver3, &moveAxis3);
 #endif
 #ifdef AXIS4_DRIVER_SD
-  StepDirMotor motor4;
-  const StepDirPins Axis4Pins = { AXIS4_STEP_PIN, AXIS4_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE };
+  const StepDirPins PinsAxis4 = {AXIS4_STEP_PIN, AXIS4_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE};
   inline void moveAxis4() { motor4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
+  StepDirMotor motor4(4, &PinsAxis4, &stepDirDriver4, &moveAxis4);
 #endif
 #ifdef AXIS5_DRIVER_SD
-  StepDirMotor motor5;
-  const StepDirPins Axis5Pins = { AXIS5_STEP_PIN, AXIS5_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE };
+  const StepDirPins PinsAxis5 = {AXIS5_STEP_PIN, AXIS5_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE};
   inline void moveAxis5() { motor5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
+  StepDirMotor motor5(5, &PinsAxis5, &stepDirDriver5, &moveAxis5);
 #endif
 #ifdef AXIS6_DRIVER_SD
-  StepDirMotor motor6;
-  const StepDirPins Axis6Pins = { AXIS6_STEP_PIN, AXIS6_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE };
+  const StepDirPins PinsAxis6 = {AXIS6_STEP_PIN, AXIS6_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE};
   inline void moveAxis6() { motor6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
+  StepDirMotor motor6(6, &PinsAxis6, &stepDirDriver6, &moveAxis6);
 #endif
 #ifdef AXIS7_DRIVER_SD
+  const StepDirPins PinsAxis7 = {AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE};
   StepDirMotor motor7;
-  const StepDirPins Axis7Pins = { AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE };
   inline void moveAxis7() { motor7.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
+  StepDirMotor motor7(7, &PinsAxis7, &stepDirDriver7, &moveAxis7);
 #endif
 #ifdef AXIS8_DRIVER_SD
+  const StepDirPins PinsAxis8 = {AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE};
   StepDirMotor motor8;
-  const StepDirPins Axis8Pins = { AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE };
   inline void moveAxis8() { motor8.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
+  StepDirMotor motor8(8, &PinsAxis8, &stepDirDriver8, &moveAxis8);
 #endif
 #ifdef AXIS9_DRIVER_SD
-  StepDirMotor motor9;
-  const StepDirPins Axis9Pins = { AXIS9_STEP_PIN, AXIS9_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE };
+  const StepDirPins PinsAxis9 = {AXIS9_STEP_PIN, AXIS9_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE};
   inline void moveAxis9() { motor9.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
+  StepDirMotor motor9(9, &PinsAxis9, &stepDirDriver9, &moveAxis9);
 #endif
 
-bool StepDirMotor::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, int16_t current) {
+StepDirMotor::StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver,
+                           void (*volatile move)(), void (*volatile moveFF)(), void (*volatile moveFR)()) {
   axisPrefix[10] = '0' + axisNumber;
-  this->axisNumber = axisNumber;
   driverType = STEP_DIR;
+  this->axisNumber = axisNumber;
+  this->Pins = Pins;
+  this->driver = driver;
+  this->_move = move;
+  this->_moveFF = moveFF;
+  this->_moveFR = moveFR;
+}
 
-  taskHandle = 0;
-  #ifdef AXIS1_DRIVER_SD
-    if (axisNumber == 1) { pins = Axis1Pins; _move = moveAxis1; _moveFF = moveFFAxis1; _moveFR = moveFRAxis1; }
-  #endif
-  #ifdef AXIS2_DRIVER_SD
-    if (axisNumber == 2) { pins = Axis2Pins; _move = moveAxis2; _moveFF = moveFFAxis2; _moveFR = moveFRAxis2; }
-  #endif
-  #ifdef AXIS3_DRIVER_SD
-    if (axisNumber == 3) { pins = Axis3Pins; _move = moveAxis3; }
-  #endif
-  #ifdef AXIS4_DRIVER_SD
-    if (axisNumber == 4) { pins = Axis4Pins; _move = moveAxis4; }
-  #endif
-  #ifdef AXIS5_DRIVER_SD
-    if (axisNumber == 5) { pins = Axis5Pins; _move = moveAxis5; }
-  #endif
-  #ifdef AXIS6_DRIVER_SD
-    if (axisNumber == 6) { pins = Axis6Pins; _move = moveAxis6; }
-  #endif
-  #ifdef AXIS7_DRIVER_SD
-    if (axisNumber == 7) { pins = Axis7Pins; _move = moveAxis7; }
-  #endif
-  #ifdef AXIS8_DRIVER_SD
-    if (axisNumber == 8) { pins = Axis8Pins; _move = moveAxis8; }
-  #endif
-  #ifdef AXIS9_DRIVER_SD
-    if (axisNumber == 9) { pins = Axis9Pins; _move = moveAxis9; }
-  #endif
-
-  // make sure there is something to do
+bool StepDirMotor::init(int8_t reverse, int16_t microsteps, int16_t current) {
   if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
 
   #if DEBUG == VERBOSE
-    V(axisPrefix); V("init step="); if (pins.step == OFF) V("OFF"); else V(pins.step);
-    V(", dir="); if (pins.dir == OFF) V("OFF"); else V(pins.dir);
-    V(", en="); if (pins.enable == OFF) VL("OFF"); else if (pins.enable == SHARED) VL("SHARED"); else VL(pins.enable);
+    V(axisPrefix); V("init step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
+    V(", dir="); if (Pins->dir == OFF) V("OFF"); else V(Pins->dir);
+    V(", en="); if (Pins->enable == OFF) VL("OFF"); else if (Pins->enable == SHARED) VL("SHARED"); else VL(Pins->enable);
   #endif
 
   // init default driver direction state (forward)
   if (reverse == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
-  pinMode(pins.dir, OUTPUT);
-  digitalWriteF(pins.dir, dirFwd);
+  pinMode(Pins->dir, OUTPUT);
+  digitalWriteF(Pins->dir, dirFwd);
 
   // init default driver step state (clear)
   #ifndef DRIVER_STEP_DEFAULTS
-    stepSet = pins.stepState;
+    stepSet = Pins->stepState;
     stepClr = !stepSet;
   #endif
-  pinMode(pins.step, OUTPUT);
-  digitalWriteF(pins.step, stepClr);
+  pinMode(Pins->step, OUTPUT);
+  digitalWriteF(Pins->step, stepClr);
 
   // init default driver enable pin
-  pinModeEx(pins.enable, OUTPUT);
+  pinModeEx(Pins->enable, OUTPUT);
   // driver enabled for possible TMC current calibration
-  digitalWriteEx(pins.enable, pins.enabledState)
+  digitalWriteEx(Pins->enable, Pins->enabledState)
 
   // init driver advanced modes, etc.
-  driver.init(axisNumber, microsteps, current);
-  homeSteps = driver.getMicrostepRatio();
+  driver->init(microsteps, current);
+  homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); V("sequencer homes every "); V(homeSteps); VL(" step(s)");
 
   // now disable the driver
@@ -151,17 +131,17 @@ bool StepDirMotor::init(uint8_t axisNumber, int8_t reverse, int16_t microsteps, 
 
 // sets motor power on/off (if possible)
 void StepDirMotor::power(bool state) {
-  if (pins.enable != OFF && pins.enable != SHARED) {
-    digitalWriteEx(pins.enable, state?pins.enabledState:!pins.enabledState);
+  if (Pins->enable != OFF && Pins->enable != SHARED) {
+    digitalWriteEx(Pins->enable, state?Pins->enabledState:!Pins->enabledState);
   } else {
-    driver.power(state);
+    driver->power(state);
   }
 }
 
 // get the associated stepper drivers status
 DriverStatus StepDirMotor::getDriverStatus() {
-  driver.updateStatus();
-  return driver.getStatus();
+  driver->updateStatus();
+  return driver->getStatus();
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
@@ -230,9 +210,9 @@ void StepDirMotor::modeSwitch() {
 
     if (microstepModeControl >= MMC_SLEWING) {
 
-      if (driver.modeSwitchAllowed()) {
+      if (driver->modeSwitchAllowed()) {
         V(axisPrefix); VLF("mode switch tracking set");
-        driver.modeMicrostepTracking();
+        driver->modeMicrostepTracking();
       }
 
       if (enableMoveFast(false)) {
@@ -248,9 +228,9 @@ void StepDirMotor::modeSwitch() {
     } else
     if (microstepModeControl == MMC_SLEWING_PAUSE) {
 
-      if (driver.modeSwitchAllowed()) {
+      if (driver->modeSwitchAllowed()) {
         V(axisPrefix); VLF("mode switch slewing set");
-        slewStep = driver.modeMicrostepSlewing();
+        slewStep = driver->modeMicrostepSlewing();
       }
 
       if (enableMoveFast(true)) {
@@ -273,7 +253,7 @@ float StepDirMotor::getFrequencySteps() {
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void StepDirMotor::setSlewing(bool state) {
-  if (state == true) driver.modeDecaySlewing(); else driver.modeDecayTracking();
+  if (state == true) driver->modeDecaySlewing(); else driver->modeDecayTracking();
 }
 
 // swaps in/out fast unidirectional ISR for slewing 

@@ -11,95 +11,51 @@ extern Tasks tasks;
 #include "../Telescope.h"
 #include "../../lib/sense/Sense.h"
 
-const AxisPins Pins[] = {
 #if AXIS1_DRIVER_MODEL != OFF
-  { 1, AXIS1_SENSE_LIMIT_MIN_PIN, AXIS1_SENSE_HOME_PIN, AXIS1_SENSE_LIMIT_MAX_PIN, { AXIS1_SENSE_HOME, AXIS1_SENSE_HOME_INIT, AXIS1_SENSE_LIMIT_MIN, AXIS1_SENSE_LIMIT_MAX, AXIS1_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis1 = {AXIS1_SENSE_LIMIT_MIN_PIN, AXIS1_SENSE_HOME_PIN, AXIS1_SENSE_LIMIT_MAX_PIN, { AXIS1_SENSE_HOME, AXIS1_SENSE_HOME_INIT, AXIS1_SENSE_LIMIT_MIN, AXIS1_SENSE_LIMIT_MAX, AXIS1_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis1 = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, AXIS1_PARAMETER1, AXIS1_PARAMETER2, { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE)};
+  Axis axis1(1, &PinsAxis1, &SettingsAxis1, &motor1);
 #endif
 #if AXIS2_DRIVER_MODEL != OFF
-  { 2, AXIS2_SENSE_LIMIT_MIN_PIN, AXIS2_SENSE_HOME_PIN, AXIS2_SENSE_LIMIT_MAX_PIN, { AXIS2_SENSE_HOME, AXIS2_SENSE_HOME_INIT, AXIS2_SENSE_LIMIT_MIN, AXIS2_SENSE_LIMIT_MAX, AXIS2_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis2 = {AXIS2_SENSE_LIMIT_MIN_PIN, AXIS2_SENSE_HOME_PIN, AXIS2_SENSE_LIMIT_MAX_PIN, { AXIS2_SENSE_HOME, AXIS2_SENSE_HOME_INIT, AXIS2_SENSE_LIMIT_MIN, AXIS2_SENSE_LIMIT_MAX, AXIS2_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis2 = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_REVERSE, AXIS2_PARAMETER1, AXIS2_PARAMETER2, { degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE)};
+  Axis axis2(2, &PinsAxis2, &SettingsAxis2, &motor2);
 #endif
 #if AXIS3_DRIVER_MODEL != OFF
-  { 3, AXIS3_SENSE_LIMIT_MIN_PIN, AXIS3_SENSE_HOME_PIN, AXIS3_SENSE_LIMIT_MAX_PIN, { AXIS3_SENSE_HOME, AXIS3_SENSE_HOME_INIT, AXIS3_SENSE_LIMIT_MIN, AXIS3_SENSE_LIMIT_MAX, AXIS3_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis3 = {AXIS3_SENSE_LIMIT_MIN_PIN, AXIS3_SENSE_HOME_PIN, AXIS3_SENSE_LIMIT_MAX_PIN, { AXIS3_SENSE_HOME, AXIS3_SENSE_HOME_INIT, AXIS3_SENSE_LIMIT_MIN, AXIS3_SENSE_LIMIT_MAX, AXIS3_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis3 = {AXIS3_STEPS_PER_DEGREE, AXIS3_REVERSE, AXIS3_PARAMETER1, AXIS3_PARAMETER2, { AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX }, AXIS3_BACKLASH_RATE};
+  Axis axis3(3, &PinsAxis3, &SettingsAxis3, &motor3);
 #endif
 #if AXIS4_DRIVER_MODEL != OFF
-  { 4, AXIS4_SENSE_LIMIT_MIN_PIN, AXIS4_SENSE_HOME_PIN, AXIS4_SENSE_LIMIT_MAX_PIN, { AXIS4_SENSE_HOME, AXIS4_SENSE_HOME_INIT, AXIS4_SENSE_LIMIT_MIN, AXIS4_SENSE_LIMIT_MAX, AXIS4_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis4 = {AXIS4_SENSE_LIMIT_MIN_PIN, AXIS4_SENSE_HOME_PIN, AXIS4_SENSE_LIMIT_MAX_PIN, { AXIS4_SENSE_HOME, AXIS4_SENSE_HOME_INIT, AXIS4_SENSE_LIMIT_MIN, AXIS4_SENSE_LIMIT_MAX, AXIS4_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis4 = {AXIS4_STEPS_PER_MICRON, AXIS4_REVERSE, AXIS4_PARAMETER1, AXIS4_PARAMETER2, { AXIS4_LIMIT_MIN*1000.0F, AXIS4_LIMIT_MAX*1000.0F }, AXIS4_BACKLASH_RATE};
+  Axis axis4(4, &PinsAxis4, &SettingsAxis4, &motor4);
 #endif
 #if AXIS5_DRIVER_MODEL != OFF
-  { 5, AXIS5_SENSE_LIMIT_MIN_PIN, AXIS5_SENSE_HOME_PIN, AXIS5_SENSE_LIMIT_MAX_PIN, { AXIS5_SENSE_HOME, AXIS5_SENSE_HOME_INIT, AXIS5_SENSE_LIMIT_MIN, AXIS5_SENSE_LIMIT_MAX, AXIS5_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis5 = {AXIS5_SENSE_LIMIT_MIN_PIN, AXIS5_SENSE_HOME_PIN, AXIS5_SENSE_LIMIT_MAX_PIN, { AXIS5_SENSE_HOME, AXIS5_SENSE_HOME_INIT, AXIS5_SENSE_LIMIT_MIN, AXIS5_SENSE_LIMIT_MAX, AXIS5_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis5 = {AXIS5_STEPS_PER_MICRON, AXIS5_REVERSE, AXIS5_PARAMETER1, AXIS5_PARAMETER2, { AXIS5_LIMIT_MIN*1000.0F, AXIS5_LIMIT_MAX*1000.0F }, AXIS5_BACKLASH_RATE};
+  Axis axis5(5, &PinsAxis5, &SettingsAxis5, &motor5);
 #endif
 #if AXIS6_DRIVER_MODEL != OFF
-  { 6, AXIS6_SENSE_LIMIT_MIN_PIN, AXIS6_SENSE_HOME_PIN, AXIS6_SENSE_LIMIT_MAX_PIN, { AXIS6_SENSE_HOME, AXIS6_SENSE_HOME_INIT, AXIS6_SENSE_LIMIT_MIN, AXIS6_SENSE_LIMIT_MAX, AXIS6_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis6 = {AXIS6_SENSE_LIMIT_MIN_PIN, AXIS6_SENSE_HOME_PIN, AXIS6_SENSE_LIMIT_MAX_PIN, { AXIS6_SENSE_HOME, AXIS6_SENSE_HOME_INIT, AXIS6_SENSE_LIMIT_MIN, AXIS6_SENSE_LIMIT_MAX, AXIS6_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis6 = {AXIS6_STEPS_PER_MICRON, AXIS6_REVERSE, AXIS6_PARAMETER1, AXIS6_PARAMETER2, { AXIS6_LIMIT_MIN*1000.0F, AXIS6_LIMIT_MAX*1000.0F }, AXIS6_BACKLASH_RATE};
+  Axis axis6(6, &PinsAxis6, &SettingsAxis6, &motor6);
 #endif
 #if AXIS7_DRIVER_MODEL != OFF
-  { 7, AXIS7_SENSE_LIMIT_MIN_PIN, AXIS7_SENSE_HOME_PIN, AXIS7_SENSE_LIMIT_MAX_PIN, { AXIS7_SENSE_HOME, AXIS7_SENSE_HOME_INIT, AXIS7_SENSE_LIMIT_MIN, AXIS7_SENSE_LIMIT_MAX, AXIS7_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis7 = {AXIS7_SENSE_LIMIT_MIN_PIN, AXIS7_SENSE_HOME_PIN, AXIS7_SENSE_LIMIT_MAX_PIN, { AXIS7_SENSE_HOME, AXIS7_SENSE_HOME_INIT, AXIS7_SENSE_LIMIT_MIN, AXIS7_SENSE_LIMIT_MAX, AXIS7_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis7 = {AXIS7_STEPS_PER_MICRON, AXIS7_REVERSE, AXIS7_PARAMETER1, AXIS7_PARAMETER2, { AXIS7_LIMIT_MIN*1000.0F, AXIS7_LIMIT_MAX*1000.0F }, AXIS7_BACKLASH_RATE};
+  Axis axis7(7, &PinsAxis7, &SettingsAxis7, &motor7);
 #endif
 #if AXIS8_DRIVER_MODEL != OFF
-  { 8, AXIS8_SENSE_LIMIT_MIN_PIN, AXIS8_SENSE_HOME_PIN, AXIS8_SENSE_LIMIT_MAX_PIN, { AXIS8_SENSE_HOME, AXIS8_SENSE_HOME_INIT, AXIS8_SENSE_LIMIT_MIN, AXIS8_SENSE_LIMIT_MAX, AXIS8_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis8 = {AXIS8_SENSE_LIMIT_MIN_PIN, AXIS8_SENSE_HOME_PIN, AXIS8_SENSE_LIMIT_MAX_PIN, { AXIS8_SENSE_HOME, AXIS8_SENSE_HOME_INIT, AXIS8_SENSE_LIMIT_MIN, AXIS8_SENSE_LIMIT_MAX, AXIS8_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis8 = {AXIS8_STEPS_PER_MICRON, AXIS8_REVERSE, AXIS8_PARAMETER1, AXIS8_PARAMETER2, { AXIS8_LIMIT_MIN*1000.0F, AXIS8_LIMIT_MAX*1000.0F }, AXIS8_BACKLASH_RATE};
+  Axis axis8(8, &PinsAxis8, &SettingsAxis8, &motor8);
 #endif
 #if AXIS9_DRIVER_MODEL != OFF
-  { 9, AXIS9_SENSE_LIMIT_MIN_PIN, AXIS9_SENSE_HOME_PIN, AXIS9_SENSE_LIMIT_MAX_PIN, { AXIS9_SENSE_HOME, AXIS9_SENSE_HOME_INIT, AXIS9_SENSE_LIMIT_MIN, AXIS9_SENSE_LIMIT_MAX, AXIS9_SENSE_LIMIT_INIT } },
+  const AxisPins PinsAxis9 = {AXIS9_SENSE_LIMIT_MIN_PIN, AXIS9_SENSE_HOME_PIN, AXIS9_SENSE_LIMIT_MAX_PIN, { AXIS9_SENSE_HOME, AXIS9_SENSE_HOME_INIT, AXIS9_SENSE_LIMIT_MIN, AXIS9_SENSE_LIMIT_MAX, AXIS9_SENSE_LIMIT_INIT} };
+  const AxisSettings SettingsAxis9 = {AXIS9_STEPS_PER_MICRON, AXIS9_REVERSE, AXIS9_PARAMETER1, AXIS9_PARAMETER2, { AXIS9_LIMIT_MIN*1000.0F, AXIS9_LIMIT_MAX*1000.0F }, AXIS9_BACKLASH_RATE};
+  Axis axis9(9, &PinsAxis9, &SettingsAxis9, &motor9);
 #endif
-};
-
-const AxisSettings DefaultSettings[] = {
-#if AXIS1_DRIVER_MODEL != OFF
-  { AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, AXIS1_PARAMETER1, AXIS1_PARAMETER2, { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
-#endif
-#if AXIS2_DRIVER_MODEL != OFF
-  { AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_REVERSE, AXIS2_PARAMETER1, AXIS2_PARAMETER2, { degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX) }, siderealToRad(TRACK_BACKLASH_RATE) },
-#endif
-#if AXIS3_DRIVER_MODEL != OFF
-  { AXIS3_STEPS_PER_DEGREE, AXIS3_REVERSE, AXIS3_PARAMETER1, AXIS3_PARAMETER2, { AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX }, AXIS3_BACKLASH_RATE },
-#endif
-#if AXIS4_DRIVER_MODEL != OFF
-  { AXIS4_STEPS_PER_MICRON, AXIS4_REVERSE, AXIS4_PARAMETER1, AXIS4_PARAMETER2, { AXIS4_LIMIT_MIN*1000.0F, AXIS4_LIMIT_MAX*1000.0F }, AXIS4_BACKLASH_RATE },
-#endif
-#if AXIS5_DRIVER_MODEL != OFF
-  { AXIS5_STEPS_PER_MICRON, AXIS5_REVERSE, AXIS5_PARAMETER1, AXIS5_PARAMETER2, { AXIS5_LIMIT_MIN*1000.0F, AXIS5_LIMIT_MAX*1000.0F }, AXIS5_BACKLASH_RATE },
-#endif
-#if AXIS6_DRIVER_MODEL != OFF
-  { AXIS6_STEPS_PER_MICRON, AXIS6_REVERSE, AXIS6_PARAMETER1, AXIS6_PARAMETER2, { AXIS6_LIMIT_MIN*1000.0F, AXIS6_LIMIT_MAX*1000.0F }, AXIS6_BACKLASH_RATE },
-#endif
-#if AXIS7_DRIVER_MODEL != OFF
-  { AXIS7_STEPS_PER_MICRON, AXIS7_REVERSE, AXIS7_PARAMETER1, AXIS7_PARAMETER2, { AXIS7_LIMIT_MIN*1000.0F, AXIS7_LIMIT_MAX*1000.0F }, AXIS7_BACKLASH_RATE },
-#endif
-#if AXIS8_DRIVER_MODEL != OFF
-  { AXIS8_STEPS_PER_MICRON, AXIS8_REVERSE, AXIS8_PARAMETER1, AXIS8_PARAMETER2, { AXIS8_LIMIT_MIN*1000.0F, AXIS8_LIMIT_MAX*1000.0F }, AXIS8_BACKLASH_RATE },
-#endif
-#if AXIS9_DRIVER_MODEL != OFF
-  { AXIS9_STEPS_PER_MICRON, AXIS9_REVERSE, AXIS9_PARAMETER1, AXIS9_PARAMETER2, { AXIS9_LIMIT_MIN*1000.0F, AXIS9_LIMIT_MAX*1000.0F }, AXIS9_BACKLASH_RATE },
-#endif
-};
-
-#if AXIS1_DRIVER_MODEL != OFF
-  Axis axis1;
-#endif
-#if AXIS2_DRIVER_MODEL != OFF
-  Axis axis2;
-#endif
-#if AXIS3_DRIVER_MODEL != OFF
-  Axis axis3;
-#endif
-#if AXIS4_DRIVER_MODEL != OFF
-  Axis axis4;
-#endif
-#if AXIS5_DRIVER_MODEL != OFF
-  Axis axis5;
-#endif
-#if AXIS6_DRIVER_MODEL != OFF
-  Axis axis6;
-#endif
-#if AXIS7_DRIVER_MODEL != OFF
-  Axis axis7;
-#endif
-#if AXIS8_DRIVER_MODEL != OFF
-  Axis axis8;
-#endif
-#if AXIS9_DRIVER_MODEL != OFF
-  Axis axis9;
-#endif
-
-Axis *axes[9] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static uint8_t pollingTaskHandle  = 0;
 
@@ -133,91 +89,23 @@ inline void pollAxes() {
   #endif
 }
 
-// setup array of axes for easy access
-Axis::Axis() {
-  #if AXIS1_DRIVER_MODEL != OFF
-    axes[0] = &axis1;
-  #endif
-  #if AXIS2_DRIVER_MODEL != OFF
-    axes[1] = &axis2;
-  #endif
-  #if AXIS3_DRIVER_MODEL != OFF
-    axes[2] = &axis3;
-  #endif
-  #if AXIS4_DRIVER_MODEL != OFF
-    axes[3] = &axis4;
-  #endif
-  #if AXIS5_DRIVER_MODEL != OFF
-    axes[4] = &axis5;
-  #endif
-  #if AXIS6_DRIVER_MODEL != OFF
-    axes[5] = &axis6;
-  #endif
-  #if AXIS7_DRIVER_MODEL != OFF
-    axes[6] = &axis7;
-  #endif
-  #if AXIS8_DRIVER_MODEL != OFF
-    axes[7] = &axis8;
-  #endif
-  #if AXIS9_DRIVER_MODEL != OFF
-    axes[8] = &axis9;
-  #endif
-}
-
-// sets up the driver step/dir/enable pins and any associated driver mode control
-void Axis::init(uint8_t axisNumber, bool alternateLimits) {
+// constructor
+Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, Motor *motor) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
 
+  this->pins = pins;
+  this->settings = *settings;
+  this->motor = motor;
+}
+
+// sets up the driver step/dir/enable pins and any associated driver mode control
+void Axis::init(bool alternateLimits) {
   // start monitor
   if (pollingTaskHandle == 0) {
-    VF("MSG: Axis, start monitor task (rate 20ms priority 1)... ");
+    VF("MSG: Axes, start monitor task (rate 20ms priority 1)... ");
     pollingTaskHandle = tasks.add(20, 0, true, 1, pollAxes, "AxsPoll");
     if (pollingTaskHandle) { VL("success"); } else { VL("FAILED!"); }
-  }
-
-  // load constants for this axis
-  for (uint8_t i = 0; i < 10; i++) {
-    if (Pins[i].axis == axisNumber) {
-      index = i;
-      settings = DefaultSettings[i];
-      break;
-    }
-    if (i == 9) { DLF("ERR: Axis::init(); indexing failed!"); return; }
-  }
-
-  // assign axis to array and set motor
-  switch (axisNumber) {
-    #if AXIS1_DRIVER_MODEL != OFF
-      case 1: motor = &motor1; break;
-    #endif
-    #if AXIS2_DRIVER_MODEL != OFF
-      case 2: motor = &motor2; break;
-    #endif
-    #if AXIS3_DRIVER_MODEL != OFF
-      case 3: motor = &motor3; break;
-    #endif
-    #if AXIS4_DRIVER_MODEL != OFF
-      case 4: motor = &motor4; break;
-    #endif
-    #if AXIS5_DRIVER_MODEL != OFF
-      case 5: motor = &motor5; break;
-    #endif
-    #if AXIS6_DRIVER_MODEL != OFF
-      case 6: motor = &motor6; break;
-    #endif
-    #if AXIS7_DRIVER_MODEL != OFF
-      case 7:  motor = &motor7; break;
-    #endif
-    #if AXIS8_DRIVER_MODEL != OFF
-      case 8: motor = &motor8; break;
-    #endif
-    #if AXIS9_DRIVER_MODEL != OFF
-      case 9: motor = &motor9; break;
-    #endif
-    default:
-      DLF("ERR: Axis::init(); couldn't find a motor!");
-      return;
   }
 
   // check for reverting axis settings in NV
@@ -249,7 +137,7 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits) {
   #endif
 
   // get the motor ready
-  if (!motor->init(axisNumber, settings.reverse, settings.param1, settings.param2)) {
+  if (!motor->init(settings.reverse, settings.param1, settings.param2)) {
     VF("MSG: Axis, nothing to do exiting!");
     return;
   }
@@ -257,9 +145,9 @@ void Axis::init(uint8_t axisNumber, bool alternateLimits) {
 
   // activate home and limit sense
   V(axisPrefix); VLF("adding any home and/or limit senses");
-  homeSenseHandle = senses.add(Pins[index].home, Pins[index].sense.homeInit, Pins[index].sense.homeTrigger);
-  minSenseHandle = senses.add(Pins[index].min, Pins[index].sense.minMaxInit, Pins[index].sense.minTrigger);
-  maxSenseHandle = senses.add(Pins[index].max, Pins[index].sense.minMaxInit, Pins[index].sense.maxTrigger);
+  homeSenseHandle = senses.add(pins->home, pins->sense.homeInit, pins->sense.homeTrigger);
+  minSenseHandle = senses.add(pins->min, pins->sense.minMaxInit, pins->sense.minTrigger);
+  maxSenseHandle = senses.add(pins->max, pins->sense.minMaxInit, pins->sense.maxTrigger);
 }
 
 // enables or disables the associated step/dir driver
@@ -458,7 +346,7 @@ CommandError Axis::autoSlewHome() {
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
-  if (Pins[index].sense.homeTrigger != OFF) {
+  if (pins->sense.homeTrigger != OFF) {
     motor->setSynchronized(true);
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {

@@ -31,7 +31,6 @@ typedef struct DriverSettings {
 #pragma pack()
 
 typedef struct DriverModePins {
-  uint8_t axis;
   int16_t m0;
   int16_t m1;
   int16_t m2;
@@ -47,9 +46,12 @@ typedef struct DriverModePins {
 
 class StepDirDriver {
   public:
+    // constructor
+    StepDirDriver(uint8_t axisNumber, const DriverModePins *Pins, const DriverSettings *Settings);
+
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
-    void init(uint8_t axisNumber, int16_t microsteps, int16_t current);
+    void init(int16_t microsteps, int16_t current);
 
     // true if switching microstep modes is allowed
     bool modeSwitchAllowed();
@@ -113,7 +115,35 @@ class StepDirDriver {
     uint8_t microstepBitCodeGoto  = 0;
     int16_t m2Pin                 = OFF;
     int16_t decayPin              = OFF;
-    const DriverModePins *pins;
+    const DriverModePins *Pins;
 };
+
+#ifdef AXIS1_DRIVER_SD
+  extern StepDirDriver stepDirDriver1;
+#endif
+#ifdef AXIS2_DRIVER_SD
+  extern StepDirDriver stepDirDriver2;
+#endif
+#ifdef AXIS3_DRIVER_SD
+  extern StepDirDriver stepDirDriver3;
+#endif
+#ifdef AXIS4_DRIVER_SD
+  extern StepDirDriver stepDirDriver4;
+#endif
+#ifdef AXIS5_DRIVER_SD
+  extern StepDirDriver stepDirDriver5;
+#endif
+#ifdef AXIS6_DRIVER_SD
+  extern StepDirDriver stepDirDriver6;
+#endif
+#ifdef AXIS7_DRIVER_SD
+  extern StepDirDriver stepDirDriver7;
+#endif
+#ifdef AXIS8_DRIVER_SD
+  extern StepDirDriver stepDirDriver8;
+#endif
+#ifdef AXIS9_DRIVER_SD
+  extern StepDirDriver stepDirDriver9;
+#endif
 
 #endif
