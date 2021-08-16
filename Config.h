@@ -42,13 +42,13 @@
 // =================================================================================================================================
 // MOUNT ===========================================================================================================================
 
-// Stepper driver models (also see ~/OnStepX/src/motion/StepDrivers.h for additional infrequently used models and more info.): 
+// Stepper driver models (also see ~/OnStepX/src/motion/StepDrivers.h for additional infrequently used models and more info.):
 // A4988, DRV8825, LV8729, S109, TMC2130*, and TMC5160**
 // * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
 // ** = SSS TMC5160 you must set stepper driver current (in mA) w/ AXISn_DRIVER_IRUN (IHOLD & IGOTO are optional)
 
 // Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
-// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
+// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
