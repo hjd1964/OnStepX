@@ -10,7 +10,12 @@
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin
     extern void noTone(uint8_t pin);
-    // analog pwm of value (10 bit) on the specified pin
+
+    // analog pwm of value (default 8 bit) on the specified pin
     extern void analogWrite(uint8_t pin, int value);
+    // analog pwm resolution (8 to 16 bit)
+    extern void analogWriteResolution(int value);
+    // analog pwm frequency (500 to 10000Hz)
+    extern void analogWriteFrequency(int value);
 
 #endif

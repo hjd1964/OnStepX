@@ -8,6 +8,11 @@
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION
 
+// This platform has 8 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // This is for ~16MHz AVR processors or similar.
 #define HAL_SLOW_PROCESSOR
 

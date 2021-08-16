@@ -9,6 +9,11 @@
 #include <digitalWriteFast.h> // https://github.com/watterott/Arduino-Libs/archive/master.zip
 #define HAL_HAS_DIGITAL_FAST
 
+// This platform has 8 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION
 

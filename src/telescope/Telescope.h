@@ -46,6 +46,9 @@ class Telescope {
     Firmware firmware;
 };
 
-extern bool validKey; // true if the NV key matches the Telescope key value
-extern bool xBusy;    // true during timing sensitive operations (for disabling I2C etc.)
+extern bool validKey;         // true if the NV key matches the Telescope key value
+extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
+extern const int AnalogRange; // help for analogWrite() range conversions
+#define analog8BitToAnalogRange(v) roundf((v/255.0F)*AnalogRange)
+
 extern Telescope telescope;

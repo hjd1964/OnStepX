@@ -8,6 +8,11 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
+// This platform has 16 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 12
 #define HAL_PULSE_WIDTH 750
@@ -50,13 +55,13 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { analogReadResolution(10); nv.init(E2END + 1, true, 0, false); }
+#define HAL_INIT() { \
+  analogReadResolution(10); \
+  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  nv.init(E2END + 1, true, 0, false); \
+}
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define _Tpin 70
 #define HAL_TEMP() ( (-((analogRead(_Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
-
-//--------------------------------------------------------------------------------------------------
-// for using the DAC as a digital output on Teensy3.6 A21=66 A22=67
-//#define digitalWrite(x,y) { if (x==66 || x==67) { if ((y)==LOW) analogWrite(x,0); else analogWrite(x,255); } else digitalWrite(x,y); }

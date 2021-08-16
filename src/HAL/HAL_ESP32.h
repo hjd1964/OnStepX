@@ -4,6 +4,11 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
+// This platform has 16 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 16
 #define HAL_PULSE_WIDTH 2500
@@ -54,24 +59,30 @@
 #endif
 
 //--------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL, optionally also early init of SERIAL_IP or SERIAL_BT
-#if defined(SERIAL_IP) && defined(SERIAL_PIP) && defined(SERIAL_BT)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_PIP.begin(9998); SERIAL_BT.begin(SERIAL_BT_NAME); }
-#elif defined(SERIAL_IP) && defined(SERIAL_PIP)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_PIP.begin(9998); }
-#elif defined(SERIAL_IP) && defined(SERIAL_BT)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); SERIAL_BT.begin(SERIAL_BT_NAME); }
-#elif defined(SERIAL_PIP) && defined(SERIAL_BT)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_PIP.begin(9998); SERIAL_BT.begin(SERIAL_BT_NAME); }
-#elif defined(SERIAL_IP)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_IP.begin(9999); }
-#elif defined(SERIAL_PIP)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_PIP.begin(9998); }
-#elif defined(SERIAL_BT)
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); SERIAL_BT.begin(SERIAL_BT_NAME); }
+// General purpose initialize for HAL, optionally also early init of SERIAL_IP/PIP or SERIAL_BT
+#if defined(SERIAL_IP)
+  #define SERIAL_IP_BEGIN() SERIAL_IP.begin(9999);
 #else
-  #define HAL_INIT() { nv.init(E2END + 1, false, 5000, false); }
+  #define SERIAL_IP_BEGIN()
 #endif
+#if defined(SERIAL_PIP)
+  #define SERIAL_PIP_BEGIN() SERIAL_PIP.begin(9998);
+#else
+  #define SERIAL_PIP_BEGIN()
+#endif
+#if defined(SERIAL_BT)
+  #define SERIAL_BT_BEGIN() SERIAL_BT.begin(SERIAL_BT_NAME);
+#else
+  #define SERIAL_BT_BEGIN()
+#endif
+
+#define HAL_INIT() { \
+  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  nv.init(E2END + 1, false, 5000, false); \
+  SERIAL_IP_BEGIN(); \
+  SERIAL_PIP_BEGIN(); \
+  SERIAL_BT_BEGIN(); \
+}
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

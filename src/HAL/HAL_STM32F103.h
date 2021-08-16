@@ -6,6 +6,11 @@
 
 #define HAL_FAST_PROCESSOR
 
+// This platform has 16 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 34   // assumes optimization set to Fastest (-O3)
 #define HAL_PULSE_WIDTH         1900 // in ns
@@ -46,7 +51,10 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { analogWriteResolution(8); nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_EEPROM_ADDRESS); }
+#define HAL_INIT() { \
+  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_EEPROM_ADDRESS); \
+}
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

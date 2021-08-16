@@ -12,6 +12,8 @@
 
   #define __ANALOG_PWM_CHANNEL_START 8  // set aside 8 channels for use elsewhere, use 0 to dedicate all 16 channels here
 
+  volatile unsigned int __an_resolution = 8;
+  volatile unsigned int __an_frequency = 5000;
   volatile uint8_t __tone_p = 0;
   volatile unsigned int __tone_f = 0;
   volatile unsigned long __tone_d = 0;
@@ -98,7 +100,7 @@
     // allocate using option to clear/detach any existing channel for this pin
     int channel = __pwmAllocateChannel(pin, true);
     if (channel >= 0) {
-      ledcSetup(channel, 1000, 10); // 1000Hz, 10 bit
+      ledcSetup(channel, __an_frequency, __an_resolution); // was 1000Hz at 10 bit
       ledcAttachPin(pin, channel);
       ledcWrite(channel, value);
       // just disconnect and go digital if value is 0 or 1023
@@ -106,6 +108,18 @@
       if (value == 1023) { noTone(pin); digitalWrite(pin, HIGH); }
     } else { log_e("analogWrite, PWM channel in use or unavailable."); }
     portEXIT_CRITICAL(&__analogOutMux);
+  }
+
+  __attribute__ ((weak)) void analogWriteResolution(int value) {
+    // reasonable limits?
+    if (__an_resolution < 8 || __an_resolution > 16) return;
+    __an_resolution = value;
+  }
+
+  __attribute__ ((weak)) void analogWriteFrequency(int value) {
+    // not sure what the range is but enforce some limits anyway?
+    if (__an_frequency < 100 || __an_frequency > 10000) return;
+    __an_frequency = value;
   }
 
 #endif

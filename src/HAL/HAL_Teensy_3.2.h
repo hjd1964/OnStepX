@@ -8,6 +8,11 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
+// This platform has 16 bit PWM
+#ifndef HAL_ANALOG_WRITE_BITS
+  #define HAL_ANALOG_WRITE_BITS 8
+#endif
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #if F_CPU >= 120000000
   #define HAL_MAXRATE_LOWER_LIMIT 10
@@ -55,7 +60,11 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { analogReadResolution(10); nv.init(E2END + 1, true, 0, false); }
+#define HAL_INIT() { \
+  analogReadResolution(10); \
+  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  nv.init(E2END + 1, true, 0, false); \
+}
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

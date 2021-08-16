@@ -27,7 +27,7 @@ void Features::init() {
 
     if (device[i].purpose == ANALOG_OUTPUT) {
       pinModeEx(device[i].pin, OUTPUT);
-      analogWrite(device[i].pin, device[i].value);
+      analogWrite(device[i].pin, analog8BitToAnalogRange(device[i].value));
     } else
 
     if (device[i].purpose == DEW_HEATER) {
