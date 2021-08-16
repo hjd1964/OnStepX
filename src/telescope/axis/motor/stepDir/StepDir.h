@@ -68,10 +68,6 @@ class StepDirMotor : public Motor {
 
     uint8_t taskHandle = 0;
 
-    bool enabled = false;               // enable/disable logical state (disabled is powered down)
-    bool synchronized = true;           // locks movement of axis target with timer rate
-    bool limitsCheck = true;            // enable/disable numeric position range limits (doesn't apply to limit switches)
-
     volatile Direction direction = DIR_NONE;
     #ifdef DRIVER_STEP_DEFAULTS
       #define stepClr LOW               // pin state to reset driver before taking a step

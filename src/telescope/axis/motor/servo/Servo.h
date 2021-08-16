@@ -61,10 +61,6 @@ class ServoMotor : public Motor {
     uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
 
-    bool enabled = false;               // enable/disable logical state (disabled is powered down)
-    bool synchronized = true;           // locks movement of axis target with timer rate
-    bool limitsCheck = true;            // enable/disable numeric position range limits (doesn't apply to limit switches)
-
     int  stepSize = 1;                  // step size
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile bool takeStep = false;     // should we take a step
