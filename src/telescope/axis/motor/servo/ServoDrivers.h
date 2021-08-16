@@ -76,7 +76,7 @@ class ServoDriver {
     int motorPwr = 0;
     Direction motorDir = DIR_FORWARD;
 
-    DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
+    DriverStatus status = { {false, false}, {false, false}, false, false, false, false };
 
     const ServoDriverPins *Pins;
 };
