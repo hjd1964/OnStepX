@@ -34,49 +34,49 @@ extern Tasks tasks;
   PidControl pca3;
   PID pidAxis3(&pca3.in, &pca3.out, &pca3.set, AXIS3_DRIVER_SERVO_P, AXIS3_DRIVER_SERVO_I, AXIS3_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis3(AXIS3_ENC_A_PIN, AXIS3_ENC_B_PIN);
-  IRAM_ATTR void moveAxis3() { motor3.move(); }
+  void moveAxis3() { motor3.move(); }
   ServoMotor motor3(3, &pidAxis3, pca3, &encAxis3, &servoDriver3, moveAxis3);
 #endif
 #ifdef AXIS4_DRIVER_SERVO
   PidControl pca4;
   PID pidAxis4(&pca4.in, &pca4.out, &pca4.set, AXIS4_DRIVER_SERVO_P, AXIS4_DRIVER_SERVO_I, AXIS4_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis4(AXIS4_ENC_A_PIN, AXIS4_ENC_B_PIN);
-  IRAM_ATTR void moveAxis4() { motor4.move(); }
+  void moveAxis4() { motor4.move(); }
   ServoMotor motor4(4, &pidAxis4, pca4, &encAxis4, &servoDriver4, moveAxis4);
 #endif
 #ifdef AXIS5_DRIVER_SERVO
   PidControl pca5;
   PID pidAxis5(&pca5.in, &pca5.out, &pca5.set, AXIS5_DRIVER_SERVO_P, AXIS5_DRIVER_SERVO_I, AXIS5_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis5(AXIS5_ENC_A_PIN, AXIS5_ENC_B_PIN);
-  IRAM_ATTR void moveAxis5() { motor5.move(); }
+  void moveAxis5() { motor5.move(); }
   ServoMotor motor5(5, &pidAxis5, pca5, &encAxis5, &servoDriver5, moveAxis5);
 #endif
 #ifdef AXIS6_DRIVER_SERVO
   PidControl pca6;
   PID pidAxis6(&pca6.in, &pca6.out, &pca6.set, AXIS6_DRIVER_SERVO_P, AXIS6_DRIVER_SERVO_I, AXIS6_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis6(AXIS6_ENC_A_PIN, AXIS6_ENC_B_PIN);
-  IRAM_ATTR void moveAxis6() { motor6.move(); }
+  void moveAxis6() { motor6.move(); }
   ServoMotor motor1(6, &pidAxis6, pca6, &encAxis6, &servoDriver6, moveAxis6);
 #endif
 #ifdef AXIS7_DRIVER_SERVO
   PidControl pca7;
   PID pidAxis7(&pca7.in, &pca7.out, &pca7.set, AXIS7_DRIVER_SERVO_P, AXIS7_DRIVER_SERVO_I, AXIS7_DRIVER_SERVO_D, DIRECT);
   Encoder encAaxis7(AXIS7_ENC_A_PIN, AXIS7_ENC_B_PIN);
-  IRAM_ATTR void moveAxis7() { motor7.move(); }
+  void moveAxis7() { motor7.move(); }
   ServoMotor motor7(7, &pidAxis7, pca7, &encAxis7, &servoDriver7, moveAxis7);
 #endif
 #ifdef AXIS8_DRIVER_SERVO
   PidControl pca8;
   PID pidAxis8(&pca8.in, &pca8.out, &pca8.set, AXIS8_DRIVER_SERVO_P, AXIS8_DRIVER_SERVO_I, AXIS8_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis8(AXIS8_ENC_A_PIN, AXIS8_ENC_B_PIN);
-  IRAM_ATTR void moveAxis8() { motor8.move(); }
+  void moveAxis8() { motor8.move(); }
   ServoMotor motor8(8, &pidAxis8, pca8, &encAxis8, &servoDriver8, moveAxis8);
 #endif
 #ifdef AXIS9_DRIVER_SERVO
   PidControl pca9;
   PID pidAxis9(&pca9.in, &pca9.out, &pca9.set, AXIS9_DRIVER_SERVO_P, AXIS9_DRIVER_SERVO_I, AXIS9_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis9(AXIS9_ENC_A_PIN, AXIS9_ENC_B_PIN);
-  IRAM_ATTR void moveAxis9() { motor9.move(); }
+  void moveAxis9() { motor9.move(); }
   ServoMotor motor9(9, &pidAxis9, pca9, &encAxis9, &servoDriver9, moveAxis9);
 #endif
 

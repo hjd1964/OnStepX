@@ -17,52 +17,52 @@ extern Tasks tasks;
 #endif
 
 #ifdef AXIS1_DRIVER_SD
-  const StepDirPins PinsAxis1 = {AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE};
+  const StepDirPins PinsAxis1 = { AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE };
   IRAM_ATTR void moveAxis1() { motor1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
   IRAM_ATTR void moveFFAxis1() { motor1.moveFF(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFRAxis1() { motor1.moveFR(AXIS1_STEP_PIN); }
   StepDirMotor motor1(1, &PinsAxis1, &stepDirDriver1, &moveAxis1, &moveFFAxis1, &moveFRAxis1);
 #endif
 #ifdef AXIS2_DRIVER_SD
-  const StepDirPins PinsAxis2 = {AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE};
+  const StepDirPins PinsAxis2 = { AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE };
   IRAM_ATTR void moveAxis2() { motor2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
   IRAM_ATTR void moveFFAxis2() { motor2.moveFF(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFRAxis2() { motor2.moveFR(AXIS2_STEP_PIN); }
   StepDirMotor motor2(2, &PinsAxis2, &stepDirDriver2, &moveAxis2, &moveFFAxis2, &moveFRAxis2);
 #endif
 #ifdef AXIS3_DRIVER_SD
-  const StepDirPins PinsAxis3 = {AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE};
-  inline void moveAxis3() { motor3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
+  const StepDirPins PinsAxis3 = { AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE };
+  void moveAxis3() { motor3.move(AXIS3_STEP_PIN, AXIS3_DIR_PIN); }
   StepDirMotor motor3(3, &PinsAxis3, &stepDirDriver3, &moveAxis3);
 #endif
 #ifdef AXIS4_DRIVER_SD
-  const StepDirPins PinsAxis4 = {AXIS4_STEP_PIN, AXIS4_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE};
-  inline void moveAxis4() { motor4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
+  const StepDirPins PinsAxis4 = { AXIS4_STEP_PIN, AXIS4_STEP_STATE, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE };
+  void moveAxis4() { motor4.move(AXIS4_STEP_PIN, AXIS4_DIR_PIN); }
   StepDirMotor motor4(4, &PinsAxis4, &stepDirDriver4, &moveAxis4);
 #endif
 #ifdef AXIS5_DRIVER_SD
-  const StepDirPins PinsAxis5 = {AXIS5_STEP_PIN, AXIS5_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE};
-  inline void moveAxis5() { motor5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
+  const StepDirPins PinsAxis5 = { AXIS5_STEP_PIN, AXIS5_STEP_STATE, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE };
+  void moveAxis5() { motor5.move(AXIS5_STEP_PIN, AXIS5_DIR_PIN); }
   StepDirMotor motor5(5, &PinsAxis5, &stepDirDriver5, &moveAxis5);
 #endif
 #ifdef AXIS6_DRIVER_SD
-  const StepDirPins PinsAxis6 = {AXIS6_STEP_PIN, AXIS6_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE};
-  inline void moveAxis6() { motor6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
+  const StepDirPins PinsAxis6 = { AXIS6_STEP_PIN, AXIS6_STEP_STATE, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE };
+  void moveAxis6() { motor6.move(AXIS6_STEP_PIN, AXIS6_DIR_PIN); }
   StepDirMotor motor6(6, &PinsAxis6, &stepDirDriver6, &moveAxis6);
 #endif
 #ifdef AXIS7_DRIVER_SD
-  const StepDirPins PinsAxis7 = {AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE};
-  inline void moveAxis7() { motor7.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
+  const StepDirPins PinsAxis7 = { AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE };
+  void moveAxis7() { motor7.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
   StepDirMotor motor7(7, &PinsAxis7, &stepDirDriver7, &moveAxis7);
 #endif
 #ifdef AXIS8_DRIVER_SD
-  const StepDirPins PinsAxis8 = {AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE};
-  inline void moveAxis8() { motor8.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
+  const StepDirPins PinsAxis8 = { AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE };
+  void moveAxis8() { motor8.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
   StepDirMotor motor8(8, &PinsAxis8, &stepDirDriver8, &moveAxis8);
 #endif
 #ifdef AXIS9_DRIVER_SD
-  const StepDirPins PinsAxis9 = {AXIS9_STEP_PIN, AXIS9_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE};
-  inline void moveAxis9() { motor9.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
+  const StepDirPins PinsAxis9 = { AXIS9_STEP_PIN, AXIS9_STEP_STATE, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE };
+  void moveAxis9() { motor9.move(AXIS9_STEP_PIN, AXIS9_DIR_PIN); }
   StepDirMotor motor9(9, &PinsAxis9, &stepDirDriver9, &moveAxis9);
 #endif
 

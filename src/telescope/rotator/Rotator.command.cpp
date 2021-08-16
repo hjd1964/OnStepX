@@ -20,7 +20,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (command[1] == 'P' && parameter[0] == 0) {
       CommandError e = park();
-      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Rotator, park FAIL"); VL(e); *commandError = e; }
+      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Rotator, park error "); VL(e); *commandError = e; }
       return false;
     } else 
 
