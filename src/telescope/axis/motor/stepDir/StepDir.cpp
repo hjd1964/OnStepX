@@ -52,13 +52,11 @@ extern Tasks tasks;
 #endif
 #ifdef AXIS7_DRIVER_SD
   const StepDirPins PinsAxis7 = {AXIS7_STEP_PIN, AXIS7_STEP_STATE, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE};
-  StepDirMotor motor7;
   inline void moveAxis7() { motor7.move(AXIS7_STEP_PIN, AXIS7_DIR_PIN); }
   StepDirMotor motor7(7, &PinsAxis7, &stepDirDriver7, &moveAxis7);
 #endif
 #ifdef AXIS8_DRIVER_SD
   const StepDirPins PinsAxis8 = {AXIS8_STEP_PIN, AXIS8_STEP_STATE, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE};
-  StepDirMotor motor8;
   inline void moveAxis8() { motor8.move(AXIS8_STEP_PIN, AXIS8_DIR_PIN); }
   StepDirMotor motor8(8, &PinsAxis8, &stepDirDriver8, &moveAxis8);
 #endif
