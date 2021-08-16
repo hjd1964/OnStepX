@@ -56,7 +56,7 @@ extern Tasks tasks;
   PID pidAxis6(&pca6.in, &pca6.out, &pca6.set, AXIS6_DRIVER_SERVO_P, AXIS6_DRIVER_SERVO_I, AXIS6_DRIVER_SERVO_D, DIRECT);
   Encoder encAxis6(AXIS6_ENC_A_PIN, AXIS6_ENC_B_PIN);
   void moveAxis6() { motor6.move(); }
-  ServoMotor motor1(6, &pidAxis6, pca6, &encAxis6, &servoDriver6, moveAxis6);
+  ServoMotor motor6(6, &pidAxis6, pca6, &encAxis6, &servoDriver6, moveAxis6);
 #endif
 #ifdef AXIS7_DRIVER_SERVO
   PidControl pca7;
