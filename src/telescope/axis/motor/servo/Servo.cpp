@@ -224,12 +224,13 @@ void ServoMotor::setFrequencySteps(float frequency) {
 
   noInterrupts();
   step = dir * stepSize;
+  absStep = abs(step);
   interrupts();
 }
 
 float ServoMotor::getFrequencySteps() {
   if (lastPeriod == 0) return 0;
-  return 16000000.0F/lastPeriod;
+  return (16000000.0F/lastPeriod)*absStep;
 }
 
 // set slewing state (hint that we are about to slew or are done slewing)
@@ -255,10 +256,10 @@ void ServoMotor::poll() {
 IRAM_ATTR void ServoMotor::move() {
   if (synchronized && !inBacklash) targetSteps += step;
   if (motorSteps > targetSteps) {
-    if (backlashSteps > 0) { inBacklash = true; backlashSteps--; } else { inBacklash = false; motorSteps--; }
+    if (backlashSteps > 0) { inBacklash = true; backlashSteps -= absStep; } else { inBacklash = false; motorSteps -= absStep; }
   } else 
   if (motorSteps < targetSteps || inBacklash) {
-    if (backlashSteps < backlashAmountSteps) { inBacklash = true; backlashSteps++; } else { inBacklash = false; motorSteps++; }
+    if (backlashSteps < backlashAmountSteps) { inBacklash = true; backlashSteps += absStep; } else { inBacklash = false; motorSteps += absStep; }
   }
 }
 

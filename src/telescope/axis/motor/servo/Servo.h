@@ -65,13 +65,15 @@ class ServoMotor : public Motor {
     bool synchronized = true;           // locks movement of axis target with timer rate
     bool limitsCheck = true;            // enable/disable numeric position range limits (doesn't apply to limit switches)
 
-    volatile int  stepSize = 1;         // step size
+    int  stepSize = 1;                  // step size
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile bool takeStep = false;     // should we take a step
 
     float currentFrequency = 0.0F;      // last frequency set 
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
+
+    volatile int  absStep = 1;          // absolute step size (unsigned)
 
     void (*_move)() = NULL;
 
