@@ -5,6 +5,8 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
+//#define DEBUG_SERVO
+
 #include "../../../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../../../Telescope.h"

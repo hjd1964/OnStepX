@@ -64,7 +64,7 @@
 #define AXIS1_DRIVER_STATUS           OFF    // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
 #endif
 #ifndef AXIS1_PARAMETER1      
-#define AXIS1_PARAMETER1              0      // not used
+#define AXIS1_PARAMETER1              1      // subdivisions always 1
 #endif
 #ifndef AXIS1_PARAMETER2 
 #define AXIS1_PARAMETER2              0      // not used
@@ -101,7 +101,7 @@
 #define AXIS2_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS2_PARAMETER1      
-#define AXIS2_PARAMETER1              0
+#define AXIS2_PARAMETER1              1
 #endif
 #ifndef AXIS2_PARAMETER2 
 #define AXIS2_PARAMETER2              0
@@ -138,7 +138,7 @@
 #define AXIS3_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS3_PARAMETER1      
-#define AXIS3_PARAMETER1              0
+#define AXIS3_PARAMETER1              1
 #endif
 #ifndef AXIS3_PARAMETER2 
 #define AXIS3_PARAMETER2              0
@@ -175,7 +175,7 @@
 #define AXIS4_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS4_PARAMETER1      
-#define AXIS4_PARAMETER1              0
+#define AXIS4_PARAMETER1              1
 #endif
 #ifndef AXIS4_PARAMETER2 
 #define AXIS4_PARAMETER2              0
@@ -212,7 +212,7 @@
 #define AXIS5_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS5_PARAMETER1      
-#define AXIS5_PARAMETER1              0
+#define AXIS5_PARAMETER1              1
 #endif
 #ifndef AXIS5_PARAMETER2 
 #define AXIS5_PARAMETER2              0
@@ -249,7 +249,7 @@
 #define AXIS6_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS6_PARAMETER1      
-#define AXIS6_PARAMETER1              0
+#define AXIS6_PARAMETER1              1
 #endif
 #ifndef AXIS6_PARAMETER2 
 #define AXIS6_PARAMETER2              0
@@ -286,7 +286,7 @@
 #define AXIS7_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS7_PARAMETER1      
-#define AXIS7_PARAMETER1              0
+#define AXIS7_PARAMETER1              1
 #endif
 #ifndef AXIS7_PARAMETER2 
 #define AXIS7_PARAMETER2              0
@@ -323,7 +323,7 @@
 #define AXIS8_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS8_PARAMETER1      
-#define AXIS8_PARAMETER1              0
+#define AXIS8_PARAMETER1              1
 #endif
 #ifndef AXIS8_PARAMETER2 
 #define AXIS8_PARAMETER2              0
@@ -360,7 +360,7 @@
 #define AXIS9_DRIVER_STATUS           OFF
 #endif
 #ifndef AXIS9_PARAMETER1      
-#define AXIS9_PARAMETER1              0
+#define AXIS9_PARAMETER1              1
 #endif
 #ifndef AXIS9_PARAMETER2 
 #define AXIS9_PARAMETER2              0
