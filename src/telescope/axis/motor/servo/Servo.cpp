@@ -29,7 +29,7 @@ extern Tasks tasks;
   PidControl pca1;
   PID pidAxis1(&pca1.in, &pca1.out, &pca1.set, AXIS1_SERVO_P, AXIS1_SERVO_I, AXIS1_SERVO_D, DIRECT);
   IRAM_ATTR void moveAxis1() { motor1.move(); }
-  ServoMotor motor1(1, &pidAxis1, pca1, &servoDriver1, moveAxis1);
+  ServoMotor motor1(1, &pidAxis1, &pca1, &servoDriver1, moveAxis1);
 #endif
 #ifdef AXIS2_SERVO
   #if AXIS2_SERVO_ENCODER == ENCODER_AB
@@ -44,7 +44,7 @@ extern Tasks tasks;
   PidControl pca2;
   PID pidAxis2(&pca2.in, &pca2.out, &pca2.set, AXIS2_SERVO_P, AXIS2_SERVO_I, AXIS2_SERVO_D, DIRECT);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
-  ServoMotor motor2(2, &pidAxis2, pca2, &servoDriver2, moveAxis2);
+  ServoMotor motor2(2, &pidAxis2, &pca2, &servoDriver2, moveAxis2);
 #endif
 #ifdef AXIS3_SERVO
   #if AXIS3_SERVO_ENCODER == ENCODER_AB
@@ -59,7 +59,7 @@ extern Tasks tasks;
   PidControl pca3;
   PID pidAxis3(&pca3.in, &pca3.out, &pca3.set, AXIS3_SERVO_P, AXIS3_SERVO_I, AXIS3_SERVO_D, DIRECT);
   void moveAxis3() { motor3.move(); }
-  ServoMotor motor3(3, &pidAxis3, pca3, &servoDriver3, moveAxis3);
+  ServoMotor motor3(3, &pidAxis3, &pca3, &servoDriver3, moveAxis3);
 #endif
 #ifdef AXIS4_SERVO
   #if AXIS4_SERVO_ENCODER == ENCODER_AB
@@ -74,7 +74,7 @@ extern Tasks tasks;
   PidControl pca4;
   PID pidAxis4(&pca4.in, &pca4.out, &pca4.set, AXIS4_SERVO_P, AXIS4_SERVO_I, AXIS4_SERVO_D, DIRECT);
   void moveAxis4() { motor4.move(); }
-  ServoMotor motor4(4, &pidAxis4, pca4, &servoDriver4, moveAxis4);
+  ServoMotor motor4(4, &pidAxis4, &pca4, &servoDriver4, moveAxis4);
 #endif
 #ifdef AXIS5_SERVO
   #if AXIS5_SERVO_ENCODER == ENCODER_AB
@@ -104,7 +104,7 @@ extern Tasks tasks;
   PidControl pca6;
   PID pidAxis6(&pca6.in, &pca6.out, &pca6.set, AXIS6_SERVO_P, AXIS6_SERVO_I, AXIS6_SERVO_D, DIRECT);
   void moveAxis6() { motor6.move(); }
-  ServoMotor motor6(6, &pidAxis6, pca6, &servoDriver6, moveAxis6);
+  ServoMotor motor6(6, &pidAxis6, &pca6, &servoDriver6, moveAxis6);
 #endif
 #ifdef AXIS7_SERVO
   #if AXIS7_SERVO_ENCODER == ENCODER_AB
@@ -119,7 +119,7 @@ extern Tasks tasks;
   PidControl pca7;
   PID pidAxis7(&pca7.in, &pca7.out, &pca7.set, AXIS7_SERVO_P, AXIS7_SERVO_I, AXIS7_SERVO_D, DIRECT);
   void moveAxis7() { motor7.move(); }
-  ServoMotor motor7(7, &pidAxis7, pca7, &servoDriver7, moveAxis7);
+  ServoMotor motor7(7, &pidAxis7, &pca7, &servoDriver7, moveAxis7);
 #endif
 #ifdef AXIS8_SERVO
   #if AXIS8_SERVO_ENCODER == ENCODER_AB
@@ -134,7 +134,7 @@ extern Tasks tasks;
   PidControl pca8;
   PID pidAxis8(&pca8.in, &pca8.out, &pca8.set, AXIS8_SERVO_P, AXIS8_SERVO_I, AXIS8_SERVO_D, DIRECT);
   void moveAxis8() { motor8.move(); }
-  ServoMotor motor8(8, &pidAxis8, pca8, &servoDriver8, moveAxis8);
+  ServoMotor motor8(8, &pidAxis8, &pca8, &servoDriver8, moveAxis8);
 #endif
 #ifdef AXIS9_SERVO
   #if AXIS9_SERVO_ENCODER == ENCODER_AB
@@ -149,7 +149,7 @@ extern Tasks tasks;
   PidControl pca9;
   PID pidAxis9(&pca9.in, &pca9.out, &pca9.set, AXIS9_SERVO_P, AXIS9_SERVO_I, AXIS9_SERVO_D, DIRECT);
   void moveAxis9() { motor9.move(); }
-  ServoMotor motor9(9, &pidAxis9, pca9, &servoDriver9, moveAxis9);
+  ServoMotor motor9(9, &pidAxis9, &pca9, &servoDriver9, moveAxis9);
 #endif
 
 inline void pollServos() {
@@ -183,7 +183,7 @@ inline void pollServos() {
 }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, ServoDriver *driver, void (*volatile move)()) {
+ServoMotor::ServoMotor(uint8_t axisNumber, PID *pid, PidControl *pidControl, ServoDriver *driver, void (*volatile move)()) {
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->pid = pid;
@@ -207,10 +207,14 @@ bool ServoMotor::init(int8_t reverse, int16_t integral, int16_t porportional) {
   }
 
   // setup the PID
-  pid->SetMode(AUTOMATIC);
+  V(axisPrefix); VF("setting PID range +/-"); VL(AnalogRange);
+
+  pidControl->in = 0;
+  pidControl->set = 0;
   pid->SetSampleTime(10);
   pid->SetOutputLimits(-AnalogRange, AnalogRange);
   if (reverse == ON) pid->SetControllerDirection(REVERSE);
+  pid->SetMode(AUTOMATIC);
 
   // init driver advanced modes, etc.
   driver->init();
@@ -341,11 +345,20 @@ void ServoMotor::poll(int32_t position) {
   long target = motorSteps + backlashSteps;
   interrupts();
 
-  pidControl.set = target;
-  pidControl.in = position;
+  pidControl->set = target;
+  pidControl->in = position;
   pid->Compute();
 
-  driver->setMotorPower(round(pidControl.out));
+  if (axisNumber == 1) {
+    static uint16_t count = 0;
+    count++;
+    if (count%100 == 0) {
+      char s[80];
+      sprintf(s, "%sdelta = %6ld, power = %8.6f\r\n", axisPrefix, target - position, pidControl->out); V(s);
+    }
+  }
+  
+  driver->setMotorPower(round(pidControl->out));
 
   #if AXIS1_SERVO_ENCODER == ENCODER_PULSE
     if (driver->getMotorDirection() == DIR_FORWARD) directionHint = 1; else directionHint = -1;
