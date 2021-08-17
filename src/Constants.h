@@ -104,6 +104,14 @@
 #define PULSE                       2
 #define STEP_MODE_LAST              2
 
+// encoder types
+#define ENCODER_FIRST               1
+#define ENCODER_AB                  1      // AB quadrature encoder
+#define ENCODER_CW_CCW              2      // clockwise/counter-clockwise encoder
+#define ENCODER_PULSE_DIR           3      // pulse/direction encoder
+#define ENCODER_PULSE               4      // pulse only encoder
+#define ENCODER_LAST                4
+
 // motor drivers
 #define SERVO                      -1      // general purpose flag for a SERVO driver motor
 #define STEP_DIR                   -2      // general purpose flag for a STEP_DIR driver motor
@@ -125,7 +133,7 @@
 #define SD_DRIVER_LAST              12
 
 #define SERVO_DRIVER_FIRST          100
-#define SERVO_DP                    100    // servo driver, direction and pwm connections
+#define SERVO_PD                    100    // servo driver, pwm and direction connections
 #define SERVO_II                    101    // servo driver, dual pwm input connections
 #define SERVO_DRIVER_LAST           101
 

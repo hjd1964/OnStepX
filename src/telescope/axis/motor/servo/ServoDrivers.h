@@ -13,16 +13,13 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
-#pragma pack(1)
-#define StepDriverSettingsSize 15
 typedef struct ServoDriverSettings {
   int16_t model;
-  int16_t p;
-  int16_t i;
-  int16_t d;
+  float p;
+  float i;
+  float d;
   int8_t  status;
 } ServoDriverSettings;
-#pragma pack()
 
 typedef struct ServoDriverPins {
   int16_t in1;
@@ -62,10 +59,13 @@ class ServoDriver {
     // power level to the motor (-AnalogRange to AnalogRange, negative for reverse)
     void setMotorPower(int power);
 
+    // returns motor direction (DIR_FORMWARD or DIR_REVERSE)
+    Direction getMotorDirection() { return motorDir; };
+
     ServoDriverSettings settings;
 
   private:
-    // motor direction (DIR_FORMWARD or DIR_REVERSE)
+    // sets motor direction (DIR_FORMWARD or DIR_REVERSE)
     void setMotorDirection(Direction dir);
 
     void update();
@@ -81,31 +81,31 @@ class ServoDriver {
     const ServoDriverPins *Pins;
 };
 
-#ifdef AXIS1_DRIVER_SERVO
+#ifdef AXIS1_SERVO
   extern ServoDriver servoDriver1;
 #endif
-#ifdef AXIS2_DRIVER_SERVO
+#ifdef AXIS2_SERVO
   extern ServoDriver servoDriver2;
 #endif
-#ifdef AXIS3_DRIVER_SERVO
+#ifdef AXIS3_SERVO
   extern ServoDriver servoDriver3;
 #endif
-#ifdef AXIS4_DRIVER_SERVO
+#ifdef AXIS4_SERVO
   extern ServoDriver servoDriver4;
 #endif
-#ifdef AXIS5_DRIVER_SERVO
+#ifdef AXIS5_SERVO
   extern ServoDriver servoDriver5;
 #endif
-#ifdef AXIS6_DRIVER_SERVO
+#ifdef AXIS6_SERVO
   extern ServoDriver servoDriver6;
 #endif
-#ifdef AXIS7_DRIVER_SERVO
+#ifdef AXIS7_SERVO
   extern ServoDriver servoDriver7;
 #endif
-#ifdef AXIS8_DRIVER_SERVO
+#ifdef AXIS8_SERVO
   extern ServoDriver servoDriver8;
 #endif
-#ifdef AXIS9_DRIVER_SERVO
+#ifdef AXIS9_SERVO
   extern ServoDriver servoDriver9;
 #endif
 

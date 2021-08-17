@@ -9,7 +9,6 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
-#include <Encoder.h> // https://github.com/PaulStoffregen/Encoder
 #include <PID_v1.h>  // https://github.com/hjd1964/Arduino-PID-Library
 
 #include "../../../../commands/ProcessCmds.h"
@@ -25,7 +24,7 @@ typedef struct PidControl {
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, Encoder *enc, ServoDriver *driver, void (*volatile move)());
+    ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, ServoDriver *driver, void (*volatile move)());
 
     // sets up the servo pins and any associated driver
     bool init(int8_t reverse, int16_t integral, int16_t porportional);
@@ -49,13 +48,16 @@ class ServoMotor : public Motor {
     void setSlewing(bool state);
 
     // updates PID and sets servo motor power/direction
-    void poll();
+    void poll(int32_t position);
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
 
     // DC servo motor driver
     ServoDriver *driver;
+
+    // for Pulse only encoders
+    volatile int8_t directionHint = 1;
 
   private:
     uint8_t servoMonitorHandle = 0;
@@ -75,34 +77,33 @@ class ServoMotor : public Motor {
 
     PID *pid = NULL;
     PidControl pidControl;
-    Encoder *enc = NULL;
 };
 
-#ifdef AXIS1_DRIVER_SERVO
+#ifdef AXIS1_SERVO
   extern ServoMotor motor1;
 #endif
-#ifdef AXIS2_DRIVER_SERVO
+#ifdef AXIS2_SERVO
   extern ServoMotor motor2;
 #endif
-#ifdef AXIS3_DRIVER_SERVO
+#ifdef AXIS3_SERVO
   extern ServoMotor motor3;
 #endif
-#ifdef AXIS4_DRIVER_SERVO
+#ifdef AXIS4_SERVO
   extern ServoMotor motor4;
 #endif
-#ifdef AXIS5_DRIVER_SERVO
+#ifdef AXIS5_SERVO
   extern ServoMotor motor5;
 #endif
-#ifdef AXIS6_DRIVER_SERVO
+#ifdef AXIS6_SERVO
   extern ServoMotor motor6;
 #endif
-#ifdef AXIS7_DRIVER_SERVO
+#ifdef AXIS7_SERVO
   extern ServoMotor motor7;
 #endif
-#ifdef AXIS8_DRIVER_SERVO
+#ifdef AXIS8_SERVO
   extern ServoMotor motor8;
 #endif
-#ifdef AXIS9_DRIVER_SERVO
+#ifdef AXIS9_SERVO
   extern ServoMotor motor9;
 #endif
 

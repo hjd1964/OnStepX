@@ -16,107 +16,178 @@ extern Tasks tasks;
   #define periodSubMicros 1.0
 #endif
 
-#ifdef AXIS1_DRIVER_SERVO
+#ifdef AXIS1_SERVO
+  #if AXIS1_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN);
+  #elif AXIS1_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN, AXIS1_SERVO_ENCODER_TRIGGER);
+  #elif AXIS1_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN, AXIS1_SERVO_ENCODER_TRIGGER);
+  #elif AXIS1_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis1(AXIS1_SERVO_ENC1_PIN, &motor1.directionHint, AXIS1_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca1;
-  PID pidAxis1(&pca1.in, &pca1.out, &pca1.set, AXIS1_DRIVER_SERVO_P, AXIS1_DRIVER_SERVO_I, AXIS1_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis1(AXIS1_ENC_A_PIN, AXIS1_ENC_B_PIN);
+  PID pidAxis1(&pca1.in, &pca1.out, &pca1.set, AXIS1_SERVO_P, AXIS1_SERVO_I, AXIS1_SERVO_D, DIRECT);
   IRAM_ATTR void moveAxis1() { motor1.move(); }
-  ServoMotor motor1(1, &pidAxis1, pca1, &encAxis1, &servoDriver1, moveAxis1);
+  ServoMotor motor1(1, &pidAxis1, pca1, &servoDriver1, moveAxis1);
 #endif
-#ifdef AXIS2_DRIVER_SERVO
+#ifdef AXIS2_SERVO
+  #if AXIS2_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN);
+  #elif AXIS2_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN, AXIS2_SERVO_ENCODER_TRIGGER);
+  #elif AXIS2_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN, AXIS2_SERVO_ENCODER_TRIGGER);
+  #elif AXIS2_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis2(AXIS2_SERVO_ENC1_PIN, &motor2.directionHint, AXIS2_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca2;
-  PID pidAxis2(&pca2.in, &pca2.out, &pca2.set, AXIS2_DRIVER_SERVO_P, AXIS2_DRIVER_SERVO_I, AXIS2_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis2(AXIS2_ENC_A_PIN, AXIS2_ENC_B_PIN);
+  PID pidAxis2(&pca2.in, &pca2.out, &pca2.set, AXIS2_SERVO_P, AXIS2_SERVO_I, AXIS2_SERVO_D, DIRECT);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
-  ServoMotor motor2(2, &pidAxis2, pca2, &encAxis2, &servoDriver2, moveAxis2);
+  ServoMotor motor2(2, &pidAxis2, pca2, &servoDriver2, moveAxis2);
 #endif
-#ifdef AXIS3_DRIVER_SERVO
+#ifdef AXIS3_SERVO
+  #if AXIS3_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN);
+  #elif AXIS3_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN, AXIS3_SERVO_ENCODER_TRIGGER);
+  #elif AXIS3_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN, AXIS3_SERVO_ENCODER_TRIGGER);
+  #elif AXIS3_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis3(AXIS3_SERVO_ENC1_PIN, &motor3.directionHint, AXIS3_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca3;
-  PID pidAxis3(&pca3.in, &pca3.out, &pca3.set, AXIS3_DRIVER_SERVO_P, AXIS3_DRIVER_SERVO_I, AXIS3_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis3(AXIS3_ENC_A_PIN, AXIS3_ENC_B_PIN);
+  PID pidAxis3(&pca3.in, &pca3.out, &pca3.set, AXIS3_SERVO_P, AXIS3_SERVO_I, AXIS3_SERVO_D, DIRECT);
   void moveAxis3() { motor3.move(); }
-  ServoMotor motor3(3, &pidAxis3, pca3, &encAxis3, &servoDriver3, moveAxis3);
+  ServoMotor motor3(3, &pidAxis3, pca3, &servoDriver3, moveAxis3);
 #endif
-#ifdef AXIS4_DRIVER_SERVO
+#ifdef AXIS4_SERVO
+  #if AXIS4_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN);
+  #elif AXIS4_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN, AXIS4_SERVO_ENCODER_TRIGGER);
+  #elif AXIS4_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN, AXIS4_SERVO_ENCODER_TRIGGER);
+  #elif AXIS4_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis4(AXIS4_SERVO_ENC1_PIN, &motor4.directionHint, AXIS4_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca4;
-  PID pidAxis4(&pca4.in, &pca4.out, &pca4.set, AXIS4_DRIVER_SERVO_P, AXIS4_DRIVER_SERVO_I, AXIS4_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis4(AXIS4_ENC_A_PIN, AXIS4_ENC_B_PIN);
+  PID pidAxis4(&pca4.in, &pca4.out, &pca4.set, AXIS4_SERVO_P, AXIS4_SERVO_I, AXIS4_SERVO_D, DIRECT);
   void moveAxis4() { motor4.move(); }
-  ServoMotor motor4(4, &pidAxis4, pca4, &encAxis4, &servoDriver4, moveAxis4);
+  ServoMotor motor4(4, &pidAxis4, pca4, &servoDriver4, moveAxis4);
 #endif
-#ifdef AXIS5_DRIVER_SERVO
+#ifdef AXIS5_SERVO
+  #if AXIS5_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN);
+  #elif AXIS5_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN, AXIS5_SERVO_ENCODER_TRIGGER);
+  #elif AXIS5_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN, AXIS5_SERVO_ENCODER_TRIGGER);
+  #elif AXIS5_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis5(AXIS5_SERVO_ENC1_PIN, &motor5.directionHint, AXIS5_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca5;
-  PID pidAxis5(&pca5.in, &pca5.out, &pca5.set, AXIS5_DRIVER_SERVO_P, AXIS5_DRIVER_SERVO_I, AXIS5_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis5(AXIS5_ENC_A_PIN, AXIS5_ENC_B_PIN);
+  PID pidAxis5(&pca5.in, &pca5.out, &pca5.set, AXIS5_SERVO_P, AXIS5_SERVO_I, AXIS5_SERVO_D, DIRECT);
   void moveAxis5() { motor5.move(); }
-  ServoMotor motor5(5, &pidAxis5, pca5, &encAxis5, &servoDriver5, moveAxis5);
+  ServoMotor motor5(5, &pidAxis5, pca5, &servoDriver5, moveAxis5);
 #endif
-#ifdef AXIS6_DRIVER_SERVO
+#ifdef AXIS6_SERVO
+  #if AXIS6_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN);
+  #elif AXIS6_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN, AXIS6_SERVO_ENCODER_TRIGGER);
+  #elif AXIS6_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN, AXIS6_SERVO_ENCODER_TRIGGER);
+  #elif AXIS6_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis6(AXIS6_SERVO_ENC1_PIN, &motor6.directionHint, AXIS6_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca6;
-  PID pidAxis6(&pca6.in, &pca6.out, &pca6.set, AXIS6_DRIVER_SERVO_P, AXIS6_DRIVER_SERVO_I, AXIS6_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis6(AXIS6_ENC_A_PIN, AXIS6_ENC_B_PIN);
+  PID pidAxis6(&pca6.in, &pca6.out, &pca6.set, AXIS6_SERVO_P, AXIS6_SERVO_I, AXIS6_SERVO_D, DIRECT);
   void moveAxis6() { motor6.move(); }
-  ServoMotor motor6(6, &pidAxis6, pca6, &encAxis6, &servoDriver6, moveAxis6);
+  ServoMotor motor6(6, &pidAxis6, pca6, &servoDriver6, moveAxis6);
 #endif
-#ifdef AXIS7_DRIVER_SERVO
+#ifdef AXIS7_SERVO
+  #if AXIS7_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN);
+  #elif AXIS7_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN, AXIS7_SERVO_ENCODER_TRIGGER);
+  #elif AXIS7_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN, AXIS7_SERVO_ENCODER_TRIGGER);
+  #elif AXIS7_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis7(AXIS7_SERVO_ENC1_PIN, &motor7.directionHint, AXIS7_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca7;
-  PID pidAxis7(&pca7.in, &pca7.out, &pca7.set, AXIS7_DRIVER_SERVO_P, AXIS7_DRIVER_SERVO_I, AXIS7_DRIVER_SERVO_D, DIRECT);
-  Encoder encAaxis7(AXIS7_ENC_A_PIN, AXIS7_ENC_B_PIN);
+  PID pidAxis7(&pca7.in, &pca7.out, &pca7.set, AXIS7_SERVO_P, AXIS7_SERVO_I, AXIS7_SERVO_D, DIRECT);
   void moveAxis7() { motor7.move(); }
-  ServoMotor motor7(7, &pidAxis7, pca7, &encAxis7, &servoDriver7, moveAxis7);
+  ServoMotor motor7(7, &pidAxis7, pca7, &servoDriver7, moveAxis7);
 #endif
-#ifdef AXIS8_DRIVER_SERVO
+#ifdef AXIS8_SERVO
+  #if AXIS8_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN);
+  #elif AXIS8_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN, AXIS8_SERVO_ENCODER_TRIGGER);
+  #elif AXIS8_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN, AXIS8_SERVO_ENCODER_TRIGGER);
+  #elif AXIS8_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis8(AXIS8_SERVO_ENC1_PIN, &motor8.directionHint, AXIS8_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca8;
-  PID pidAxis8(&pca8.in, &pca8.out, &pca8.set, AXIS8_DRIVER_SERVO_P, AXIS8_DRIVER_SERVO_I, AXIS8_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis8(AXIS8_ENC_A_PIN, AXIS8_ENC_B_PIN);
+  PID pidAxis8(&pca8.in, &pca8.out, &pca8.set, AXIS8_SERVO_P, AXIS8_SERVO_I, AXIS8_SERVO_D, DIRECT);
   void moveAxis8() { motor8.move(); }
-  ServoMotor motor8(8, &pidAxis8, pca8, &encAxis8, &servoDriver8, moveAxis8);
+  ServoMotor motor8(8, &pidAxis8, pca8, &servoDriver8, moveAxis8);
 #endif
-#ifdef AXIS9_DRIVER_SERVO
+#ifdef AXIS9_SERVO
+  #if AXIS9_SERVO_ENCODER == ENCODER_AB
+    Encoder encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN);
+  #elif AXIS9_SERVO_ENCODER == ENCODER_CW_CCW
+    EncoderCC encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN, AXIS9_SERVO_ENCODER_TRIGGER);
+  #elif AXIS9_SERVO_ENCODER == ENCODER_PULSE_DIR
+    EncoderPD encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN, AXIS9_SERVO_ENCODER_TRIGGER);
+  #elif AXIS9_SERVO_ENCODER == ENCODER_PULSE
+    EncoderP encAxis9(AXIS9_SERVO_ENC1_PIN, &motor9.directionHint, AXIS9_SERVO_ENCODER_TRIGGER);
+  #endif
   PidControl pca9;
-  PID pidAxis9(&pca9.in, &pca9.out, &pca9.set, AXIS9_DRIVER_SERVO_P, AXIS9_DRIVER_SERVO_I, AXIS9_DRIVER_SERVO_D, DIRECT);
-  Encoder encAxis9(AXIS9_ENC_A_PIN, AXIS9_ENC_B_PIN);
+  PID pidAxis9(&pca9.in, &pca9.out, &pca9.set, AXIS9_SERVO_P, AXIS9_SERVO_I, AXIS9_SERVO_D, DIRECT);
   void moveAxis9() { motor9.move(); }
-  ServoMotor motor9(9, &pidAxis9, pca9, &encAxis9, &servoDriver9, moveAxis9);
+  ServoMotor motor9(9, &pidAxis9, pca9, &servoDriver9, moveAxis9);
 #endif
 
 inline void pollServos() {
-  #ifdef AXIS1_DRIVER_SERVO
-    motor1.poll(); Y;
+  #ifdef AXIS1_SERVO
+    motor1.poll(encAxis1.read()); Y;
   #endif
-  #ifdef AXIS2_DRIVER_SERVO
-    motor2.poll(); Y;
+  #ifdef AXIS2_SERVO
+    motor2.poll(encAxis2.read()); Y;
   #endif
-  #ifdef AXIS3_DRIVER_SERVO
-    motor3.poll(); Y;
+  #ifdef AXIS3_SERVO
+    motor3.poll(encAxis3.read()); Y;
   #endif
-  #ifdef AXIS4_DRIVER_SERVO
-    motor4.poll(); Y;
+  #ifdef AXIS4_SERVO
+    motor4.poll(encAxis4.read()); Y;
   #endif
-  #ifdef AXIS5_DRIVER_SERVO
-    motor5.poll(); Y;
+  #ifdef AXIS5_SERVO
+    motor5.poll(encAxis5.read()); Y;
   #endif
-  #ifdef AXIS6_DRIVER_SERVO
-    motor6.poll(); Y;
+  #ifdef AXIS6_SERVO
+    motor6.poll(encAxis6.read()); Y;
   #endif
-  #ifdef AXIS7_DRIVER_SERVO
-    motor7.poll(); Y;
+  #ifdef AXIS7_SERVO
+    motor7.poll(encAxis7.read()); Y;
   #endif
-  #ifdef AXIS8_DRIVER_SERVO
-    motor8.poll(); Y;
+  #ifdef AXIS8_SERVO
+    motor8.poll(encAxis8.read()); Y;
   #endif
-  #ifdef AXIS9_DRIVER_SERVO
-    motor9.poll(); Y;
+  #ifdef AXIS9_SERVO
+    motor9.poll(encAxis9.read()); Y;
   #endif
 }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, Encoder *enc, ServoDriver *driver, void (*volatile move)()) {
+ServoMotor::ServoMotor(uint8_t axisNumber, PID *pid, PidControl pidControl, ServoDriver *driver, void (*volatile move)()) {
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->pid = pid;
   this->pidControl = pidControl;
-  this->enc = enc;
   this->_move = move;
   this->driver = driver;
   driverType = SERVO;
@@ -175,7 +246,33 @@ DriverStatus ServoMotor::getDriverStatus() {
 // resets motor and target angular position in steps, also zeros backlash and index 
 void ServoMotor::resetPositionSteps(long value) {
   Motor::resetPositionSteps(value);
-  enc->write(motorSteps);
+  #ifdef AXIS1_SERVO
+    if (axisNumber == 1) encAxis1.write(motorSteps);
+  #endif
+  #ifdef AXIS2_SERVO
+    if (axisNumber == 2) encAxis2.write(motorSteps);
+  #endif
+  #ifdef AXIS3_SERVO
+    if (axisNumber == 3) encAxis3.write(motorSteps);
+  #endif
+  #ifdef AXIS4_SERVO
+    if (axisNumber == 4) encAxis4.write(motorSteps);
+  #endif
+  #ifdef AXIS5_SERVO
+    if (axisNumber == 5) encAxis5.write(motorSteps);
+  #endif
+  #ifdef AXIS6_SERVO
+    if (axisNumber == 6) encAxis6.write(motorSteps);
+  #endif
+  #ifdef AXIS7_SERVO
+    if (axisNumber == 7) encAxis7.write(motorSteps);
+  #endif
+  #ifdef AXIS8_SERVO
+    if (axisNumber == 8) encAxis8.write(motorSteps);
+  #endif
+  #ifdef AXIS9_SERVO
+    if (axisNumber == 9) encAxis9.write(motorSteps);
+  #endif
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
@@ -239,8 +336,7 @@ void ServoMotor::setSlewing(bool state) {
 }
 
 // updates PID and sets servo motor power/direction
-void ServoMotor::poll() {
-  long position = enc->read();
+void ServoMotor::poll(int32_t position) {
   noInterrupts();
   long target = motorSteps + backlashSteps;
   interrupts();
@@ -250,6 +346,10 @@ void ServoMotor::poll() {
   pid->Compute();
 
   driver->setMotorPower(round(pidControl.out));
+
+  #if AXIS1_SERVO_ENCODER == ENCODER_PULSE
+    if (driver->getMotorDirection() == DIR_FORWARD) directionHint = 1; else directionHint = -1;
+  #endif
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
