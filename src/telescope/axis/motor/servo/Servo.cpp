@@ -349,14 +349,16 @@ void ServoMotor::poll(int32_t position) {
   pidControl->in = position;
   pid->Compute();
 
-  if (axisNumber == 1) {
-    static uint16_t count = 0;
-    count++;
-    if (count%100 == 0) {
-      char s[80];
-      sprintf(s, "%sdelta = %6ld, power = %8.6f\r\n", axisPrefix, target - position, pidControl->out); V(s);
+  #if DEBUG == VERBOSE && defined(DEBUG_SERVO)
+    if (axisNumber == 1) {
+      static uint16_t count = 0;
+      count++;
+      if (count%100 == 0) {
+        char s[80];
+        sprintf(s, "%sdelta = %6ld, power = %8.6f\r\n", axisPrefix, target - position, pidControl->out); V(s);
+      }
     }
-  }
+  #endif
   
   driver->setMotorPower(round(pidControl->out));
 
