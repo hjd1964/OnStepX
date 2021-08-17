@@ -77,7 +77,6 @@
 #if DEBUG == CONSOLE
   #include "../lib/convert/Convert.h"
   #include "../telescope/mount/coordinates/Transform.h"
-  extern Transform transform;
   #include "../telescope/mount/Mount.h"
   extern Axis axis1;
   extern Axis axis2;
