@@ -48,12 +48,12 @@ void Transform::init() {
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   Coordinate result = *coord;
-  #if MOUNT_COORDS == OBSERVED
+  #if MOUNT_COORDS == OBSERVED_PLACE
     mountToObservedPlace(&result);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
     mountToTopocentric(&result);
   #else
-    #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
+    #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
   if (mountType == ALTAZM) {
     horToEqu(coord);
@@ -70,12 +70,12 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   rightAscensionToHourAngle(coord);
 //  VF("target2    = "); print(coord);
   if (mountType == ALTAZM) equToHor(coord);
-  #if MOUNT_COORDS == OBSERVED
+  #if MOUNT_COORDS == OBSERVED_PLACE
     observedPlaceToMount(coord);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
     topocentricToMount(coord);
   #else
-    #error "Configuration (ConfigX.h): MOUNT_COORDS, Unknown native mount coordinate system!"
+    #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
 //  VF("target3    = "); print(coord);
   if (a1 != NULL && a2 != NULL) {
