@@ -43,7 +43,9 @@ void Guide::init() {
 // start guide at a given direction and rate on Axis1
 CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
-  CommandError e = validate(1, guideAction); if (e != CE_NONE) return e;
+
+  CommandError e = validate(1, guideAction);
+  if (e != CE_NONE) return e;
 
   guideActionAxis1 = guideAction;
   float rate = rateSelectToRate(rateSelect);
@@ -56,7 +58,9 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(30000);
     axis2.setPowerDownOverrideTime(30000);
-    if (guideAction == GA_REVERSE) rateAxis1 = -rate; else rateAxis1 = rate;
+    if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
+    V(rate); VL("X");
+
     mount.update();
   } else {
     state = GU_GUIDE;
@@ -76,6 +80,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
       guideActionAxis1 = GA_BREAK;
       if (abort) axis1.autoSlewAbort(); else axis1.autoSlewStop();
     } else {
+      VLF("MSG: Guide, axis1 stopped");
       guideActionAxis1 = GA_NONE;
       rateAxis1 = 0.0F;
       mount.update();
@@ -86,7 +91,9 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
 // start guide at a given direction and rate on Axis2
 CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
-  CommandError e = validate(2, guideAction); if (e != CE_NONE) return e;
+
+  CommandError e = validate(2, guideAction);
+  if (e != CE_NONE) return e;
 
   guideActionAxis2 = guideAction;
   float rate = rateSelectToRate(rateSelect);
@@ -99,7 +106,9 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(30000);
     axis2.setPowerDownOverrideTime(30000);
-    if (guideAction == GA_REVERSE) rateAxis2 = -rate; else rateAxis2 = rate;
+    if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
+    V(rate); VL("X");
+
     mount.update();
   } else {
     state = GU_GUIDE;
@@ -119,6 +128,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
       guideActionAxis2 = GA_BREAK;
       if (abort) axis2.autoSlewAbort(); else axis2.autoSlewStop();
     } else {
+      VLF("MSG: Guide, axis2 stopped");
       guideActionAxis2 = GA_NONE;
       rateAxis2 = 0.0F;
       mount.update();
