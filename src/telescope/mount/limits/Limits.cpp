@@ -179,7 +179,7 @@ void Limits::poll() {
   if (fgt(current.a2, axis2.settings.limits.max)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
 
   #if DEBUG == VERBOSE
-    const char* errPre = "MSG: Mount, Error state changed: ";
+    const char* errPre = "MSG: Mount, error state changed: ";
     if (lastError.altitude.min != error.altitude.min ||
         lastError.altitude.max != error.altitude.max ||
         lastError.meridian.east != error.meridian.east ||
