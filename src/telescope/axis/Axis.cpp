@@ -373,6 +373,10 @@ CommandError Axis::autoSlewHome() {
 // stops, with deacceleration by time
 void Axis::autoSlewStop() {
   if (autoRate == AR_NONE || autoRate == AR_RATE_BY_TIME_ABORT) return;
+
+  resetTargetToMotorPosition();
+  motor->setSynchronized(true);
+
   V(axisPrefix); VLF("slew stopping");
   autoRate = AR_RATE_BY_TIME_END;
   poll();
@@ -381,10 +385,13 @@ void Axis::autoSlewStop() {
 // emergency stops, with deacceleration by time
 void Axis::autoSlewAbort() {
   if (autoRate == AR_NONE) return;
+
+  resetTargetToMotorPosition();
+  motor->setSynchronized(true);
+
   V(axisPrefix); VLF("slew aborting");
   autoRate = AR_RATE_BY_TIME_ABORT;
   homingStage = HOME_NONE;
-  motor->setSynchronized(true);
   poll();
 }
 
@@ -442,7 +449,6 @@ void Axis::poll() {
         motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
-        motor->setSynchronized(true);
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
         if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;

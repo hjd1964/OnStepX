@@ -61,6 +61,7 @@ void Mount::init() {
   home.init();
   home.reset();
   limits.init();
+  guide.init();
 
   #if SLEW_GOTO == ON
     goTo.init();
