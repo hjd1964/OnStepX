@@ -104,7 +104,7 @@
 #define PULSE                       2
 #define STEP_MODE_LAST              2
 
-// encoder types
+// encoder types (must match Encoder library)
 #define ENCODER_FIRST               1
 #define ENCODER_AB                  1      // AB quadrature encoder
 #define ENCODER_CW_CCW              2      // clockwise/counter-clockwise encoder

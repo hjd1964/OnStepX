@@ -9,6 +9,9 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
+#include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
+                     // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
+
 #include <PID_v1.h>  // https://github.com/hjd1964/Arduino-PID-Library
 
 #include "../../../../commands/ProcessCmds.h"
@@ -24,7 +27,7 @@ typedef struct PidControl {
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, PID *pid, PidControl *pidControl, ServoDriver *driver, void (*volatile move)());
+    ServoMotor(uint8_t axisNumber, Encoder *enc, PID *pid, PidControl *pidControl, ServoDriver *driver, void (*volatile move)());
 
     // sets up the servo pins and any associated driver
     bool init(int8_t reverse, int16_t integral, int16_t porportional);
@@ -48,7 +51,7 @@ class ServoMotor : public Motor {
     void setSlewing(bool state);
 
     // updates PID and sets servo motor power/direction
-    void poll(int32_t position);
+    void poll();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
@@ -75,6 +78,7 @@ class ServoMotor : public Motor {
 
     void (*_move)() = NULL;
 
+    Encoder *enc;
     PID *pid = NULL;
     PidControl *pidControl;
 };
