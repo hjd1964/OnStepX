@@ -18,14 +18,12 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {  0,  1,  2,  3,  4,  5,OFF,  6,  7},   // ST820
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
- {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC
- {  0,  1,  1,  1,  1,  1,  1,  1,  1}};  // SERVO
+ {  0,  0,  0,  0,  0,  0,  0,  0,  0}};  // GENERIC
 
 #if DEBUG_MODE != OFF
   const char* DRIVER_NAME[DRIVER_MODEL_COUNT] = {
-  "A4988","DRV8825","S109","LV8729","RAPS128",
-  "TMC2100","TMC2208","TMC2209","ST820","TMC2130",
-  "TMC5160","GENERIC","SERVO" };
+  "A4988", "DRV8825", "S109", "LV8729", "RAPS128", "TMC2100",
+  "TMC2208", "TMC2209", "ST820", "TMC2130", "TMC5160", "GENERIC" };
 #endif
 
 #ifdef AXIS1_DRIVER_SD
@@ -209,9 +207,9 @@ int StepDirDriver::modeMicrostepSlewing() {
 void StepDirDriver::modeDecaySlewing() {
   if (isTmcSPI()) {
     #ifdef TMC_DRIVER_PRESENT
-      int IRUN = settings.currentGoto;
-      if (IRUN == OFF) IRUN = settings.currentRun;
-      tmcDriver.mode(true, settings.decayGoto, microstepCodeGoto, IRUN, settings.currentHold);
+      int IGOTO = settings.currentGoto;
+      if (IGOTO == OFF) IGOTO = settings.currentRun;
+      tmcDriver.mode(true, settings.decayGoto, microstepCode, IGOTO, settings.currentHold);
     #endif
   } else {
     if (settings.decayGoto == OFF) return;
