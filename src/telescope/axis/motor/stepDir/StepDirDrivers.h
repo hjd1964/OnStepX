@@ -8,7 +8,7 @@
 #include "StepDir.defaults.h"
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 13
+#define DRIVER_MODEL_COUNT 12
 
 #ifdef SD_DRIVER_PRESENT
 
