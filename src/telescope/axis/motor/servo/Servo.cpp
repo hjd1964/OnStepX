@@ -19,7 +19,7 @@ extern Tasks tasks;
 #endif
 
 #ifdef AXIS1_SERVO
-  #if AXIS1_SERVO_ENCODER == ENCODER_AB
+  #if AXIS1_SERVO_ENCODER == ENC_AB
     Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN);
   #else
     Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN, AXIS1_SERVO_ENCODER, AXIS1_SERVO_ENCODER_TRIGGER, &motor1.directionHint);
@@ -30,7 +30,7 @@ extern Tasks tasks;
   ServoMotor motor1(1, &encAxis1, &pidAxis1, &pca1, &servoDriver1, moveAxis1);
 #endif
 #ifdef AXIS2_SERVO
-  #if AXIS2_SERVO_ENCODER == ENCODER_AB
+  #if AXIS2_SERVO_ENCODER == ENC_AB
     Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN);
   #else
     Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN, AXIS2_SERVO_ENCODER, AXIS2_SERVO_ENCODER_TRIGGER, &motor2.directionHint);
@@ -41,7 +41,7 @@ extern Tasks tasks;
   ServoMotor motor2(2, &encAxis2, &pidAxis2, &pca2, &servoDriver2, moveAxis2);
 #endif
 #ifdef AXIS3_SERVO
-  #if AXIS3_SERVO_ENCODER == ENCODER_AB
+  #if AXIS3_SERVO_ENCODER == ENC_AB
     Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN);
   #else
     Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN, AXIS3_SERVO_ENCODER, AXIS3_SERVO_ENCODER_TRIGGER, &motor3.directionHint);
@@ -52,7 +52,7 @@ extern Tasks tasks;
   ServoMotor motor3(3, &encAxis3, &pidAxis3, &pca3, &servoDriver3, moveAxis3);
 #endif
 #ifdef AXIS4_SERVO
-  #if AXIS4_SERVO_ENCODER == ENCODER_AB
+  #if AXIS4_SERVO_ENCODER == ENC_AB
     Encoder encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN);
   #else
     Encoder encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN, AXIS4_SERVO_ENCODER, AXIS4_SERVO_ENCODER_TRIGGER, &motor4.directionHint);
@@ -63,7 +63,7 @@ extern Tasks tasks;
   ServoMotor motor4(4, &encAxis4, &pidAxis4, &pca4, &servoDriver4, moveAxis4);
 #endif
 #ifdef AXIS5_SERVO
-  #if AXIS5_SERVO_ENCODER == ENCODER_AB
+  #if AXIS5_SERVO_ENCODER == ENC_AB
     Encoder encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN);
   #else
     Encoder encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN, AXIS5_SERVO_ENCODER, AXIS5_SERVO_ENCODER_TRIGGER, &motor5.directionHint);
@@ -74,7 +74,7 @@ extern Tasks tasks;
   ServoMotor motor5(5, &encAxis5, &pidAxis5, pca5, &servoDriver5, moveAxis5);
 #endif
 #ifdef AXIS6_SERVO
-  #if AXIS6_SERVO_ENCODER == ENCODER_AB
+  #if AXIS6_SERVO_ENCODER == ENC_AB
     Encoder encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN);
   #else
     Encoder encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN, AXIS6_SERVO_ENCODER, AXIS6_SERVO_ENCODER_TRIGGER, &motor6.directionHint);
@@ -85,7 +85,7 @@ extern Tasks tasks;
   ServoMotor motor6(6, &encAxis6, &pidAxis6, &pca6, &servoDriver6, moveAxis6);
 #endif
 #ifdef AXIS7_SERVO
-  #if AXIS7_SERVO_ENCODER == ENCODER_AB
+  #if AXIS7_SERVO_ENCODER == ENC_AB
     Encoder encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN);
   #else
     Encoder encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN, AXIS7_SERVO_ENCODER, AXIS7_SERVO_ENCODER_TRIGGER, &motor7.directionHint);
@@ -96,7 +96,7 @@ extern Tasks tasks;
   ServoMotor motor7(7, &encAxis7, &pidAxis7, &pca7, &servoDriver7, moveAxis7);
 #endif
 #ifdef AXIS8_SERVO
-  #if AXIS8_SERVO_ENCODER == ENCODER_AB
+  #if AXIS8_SERVO_ENCODER == ENC_AB
     Encoder encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN);
   #else
     Encoder encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN, AXIS8_SERVO_ENCODER, AXIS8_SERVO_ENCODER_TRIGGER, &motor8.directionHint);
@@ -107,7 +107,7 @@ extern Tasks tasks;
   ServoMotor motor8(8, &encAxis8, &pidAxis8, &pca8, &servoDriver8, moveAxis8);
 #endif
 #ifdef AXIS9_SERVO
-  #if AXIS9_SERVO_ENCODER == ENCODER_AB
+  #if AXIS9_SERVO_ENCODER == ENC_AB
     Encoder encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN);
   #else
     Encoder encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN, AXIS9_SERVO_ENCODER, AXIS9_SERVO_ENCODER_TRIGGER, &motor9.directionHint);
