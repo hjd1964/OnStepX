@@ -104,38 +104,39 @@
 #define PULSE                       2
 #define STEP_MODE_LAST              2
 
-// encoder types (must match Encoder library)
-#define ENCODER_FIRST               1
-#define ENCODER_AB                  1      // AB quadrature encoder
-#define ENCODER_CW_CCW              2      // clockwise/counter-clockwise encoder
-#define ENCODER_PULSE_DIR           3      // pulse/direction encoder
-#define ENCODER_PULSE               4      // pulse only encoder
-#define ENCODER_LAST                4
-
 // motor drivers
 #define SERVO                      -1      // general purpose flag for a SERVO driver motor
 #define STEP_DIR                   -2      // general purpose flag for a STEP_DIR driver motor
 
+// step/dir drivers (usually for stepper motors)
 #define SD_DRIVER_FIRST             0
-#define A4988                       0      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
-#define DRV8825                     1      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define S109                        2      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define LV8729                      3      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define RAPS128                     4      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define TMC2100                     5      // step/dir stepper driver, allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2208                     6      // step/dir stepper driver, allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209                     7      // step/dir stepper driver, allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define ST820                       8      // step/dir stepper driver, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
-#define TMC2130                     9      // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC5160                     10     // step/dir stepper driver, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define GENERIC                     11     // step/dir stepper driver, allows                        for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
-#define SERVO_SD                    12     // step/dir servo   driver, allows M0 bit pattern for LOW = native mode & goto HIGH = 2x,4x,8x,16x,32x,64x, or 128x *larger* steps
-#define SD_DRIVER_LAST              12
+#define A4988                       0      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
+#define DRV8825                     1      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define S109                        2      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define LV8729                      3      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define RAPS128                     4      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define TMC2100                     5      // DRIVER, allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
+#define TMC2208                     6      // DRIVER, allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
+#define TMC2209                     7      // DRIVER, allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define ST820                       8      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
+#define TMC2130                     9      // DRIVER, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC5160                     10     // DRIVER, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define GENERIC                     11     // DRIVER, generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
+#define SD_DRIVER_LAST              11
 
+// servo drivers (usually for DC motors equipped with encoders)
 #define SERVO_DRIVER_FIRST          100
-#define SERVO_PD                    100    // servo driver, pwm and direction connections
-#define SERVO_II                    101    // servo driver, dual pwm input connections
+#define SERVO_PD                    100    // SERVO, pwm and direction connections
+#define SERVO_II                    101    // SERVO, dual pwm input connections
 #define SERVO_DRIVER_LAST           101
+
+// encoder types (must match Encoder library)
+#define ENC_FIRST                   1
+#define ENC_AB                      1      // AB quadrature encoder
+#define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
+#define ENC_PULSE_DIR               3      // pulse/direction encoder
+#define ENC_PULSE                   4      // pulse only encoder
+#define ENC_LAST                    4
 
 // stepper driver decay modes
 #define MIXED                       0
@@ -250,9 +251,9 @@
 
 // task manager
 #define TASKS_SKIP_MISSED
-#define TASKS_HWTIMER1_ENABLE              // only the Mega2560 hardware timers are tested and seem to work
-#define TASKS_HWTIMER2_ENABLE              // if the Teensy, etc. don't work comment these out to use the
-#define TASKS_HWTIMER3_ENABLE              // software task scheduler instead
+#define TASKS_HWTIMER1_ENABLE
+#define TASKS_HWTIMER2_ENABLE
+#define TASKS_HWTIMER3_ENABLE
 
 // NV write endurance constants
 // low (< 100K writes)
