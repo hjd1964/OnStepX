@@ -89,7 +89,7 @@
 #define AXIS1_DRIVER_IHOLD            HALF // in mA
 #endif
 #ifndef AXIS1_DRIVER_IRUN
-#define AXIS1_DRIVER_IRUN             OFF  // in mA
+#define AXIS1_DRIVER_IRUN             400  // in mA
 #endif
 #ifndef AXIS1_DRIVER_IGOTO
 #define AXIS1_DRIVER_IGOTO            SAME // in mA
@@ -129,7 +129,7 @@
 #define AXIS2_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS2_DRIVER_IRUN
-#define AXIS2_DRIVER_IRUN             OFF
+#define AXIS2_DRIVER_IRUN             400
 #endif
 #ifndef AXIS2_DRIVER_IGOTO
 #define AXIS2_DRIVER_IGOTO            SAME
@@ -169,7 +169,7 @@
 #define AXIS3_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS3_DRIVER_IRUN
-#define AXIS3_DRIVER_IRUN             OFF
+#define AXIS3_DRIVER_IRUN             200
 #endif
 #ifndef AXIS3_DRIVER_IGOTO
 #define AXIS3_DRIVER_IGOTO            SAME
@@ -209,7 +209,7 @@
 #define AXIS4_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS4_DRIVER_IRUN
-#define AXIS4_DRIVER_IRUN             OFF
+#define AXIS4_DRIVER_IRUN             200
 #endif
 #ifndef AXIS4_DRIVER_IGOTO
 #define AXIS4_DRIVER_IGOTO            SAME
@@ -249,7 +249,7 @@
 #define AXIS5_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS5_DRIVER_IRUN
-#define AXIS5_DRIVER_IRUN             OFF
+#define AXIS5_DRIVER_IRUN             200
 #endif
 #ifndef AXIS5_DRIVER_IGOTO
 #define AXIS5_DRIVER_IGOTO            SAME
@@ -289,7 +289,7 @@
 #define AXIS6_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS6_DRIVER_IRUN
-#define AXIS6_DRIVER_IRUN             OFF
+#define AXIS6_DRIVER_IRUN             200
 #endif
 #ifndef AXIS6_DRIVER_IGOTO
 #define AXIS6_DRIVER_IGOTO            SAME
@@ -329,7 +329,7 @@
 #define AXIS7_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS7_DRIVER_IRUN
-#define AXIS7_DRIVER_IRUN             OFF
+#define AXIS7_DRIVER_IRUN             200
 #endif
 #ifndef AXIS7_DRIVER_IGOTO
 #define AXIS7_DRIVER_IGOTO            SAME
@@ -369,7 +369,7 @@
 #define AXIS8_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS8_DRIVER_IRUN
-#define AXIS8_DRIVER_IRUN             OFF
+#define AXIS8_DRIVER_IRUN             200
 #endif
 #ifndef AXIS8_DRIVER_IGOTO
 #define AXIS8_DRIVER_IGOTO            SAME
@@ -409,7 +409,7 @@
 #define AXIS9_DRIVER_IHOLD            HALF
 #endif
 #ifndef AXIS9_DRIVER_IRUN
-#define AXIS9_DRIVER_IRUN             OFF
+#define AXIS9_DRIVER_IRUN             200
 #endif
 #ifndef AXIS9_DRIVER_IGOTO
 #define AXIS9_DRIVER_IGOTO            SAME

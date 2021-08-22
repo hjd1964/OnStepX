@@ -122,6 +122,8 @@ class Task {
       float getRuntimeMax();
     #endif
 
+    volatile bool immediate = true;
+
   private:
 
     void setHardwareTimerPeriod();
@@ -133,7 +135,6 @@ class Task {
     bool                   repeat            = false;
     uint8_t                priority          = 0;
     bool                   idle              = true;
-    bool                   wasIdle           = true;
     bool                   running           = false;
     PeriodUnits            period_units      = PU_MILLIS;
     PeriodUnits            next_period_units = PU_NONE;
@@ -236,6 +237,9 @@ class Tasks {
     //   when setting a frequency the most appropriate setPeriod is used automatically
     //   if the period is > ~49 days (or > the hardware timers maximum period) the task is disabled
     void setFrequency(uint8_t handle, double freq);
+
+    // set process to run immediately on the next pass (within its priority level)
+    IRAM_ATTR inline void immediate(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { task[handle - 1]->immediate = true; } }
 
     // change process duration (milliseconds,) use 0 for disabled
     void setDuration(uint8_t handle, unsigned long duration);

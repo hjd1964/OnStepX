@@ -129,7 +129,7 @@ bool Task::poll() {
     unsigned long t, time_to_next_task;
 
     if (period_units == PU_SUB_MICROS) t = micros() * 16; else if (period_units == PU_MICROS) t = micros(); else t = millis();
-    if (wasIdle) { wasIdle = false; next_task_time = t; }
+    if (immediate) { immediate = false; next_task_time = t; }
     time_to_next_task = next_task_time - t;
 
     if ((long)time_to_next_task < 0) {
@@ -159,7 +159,7 @@ bool Task::poll() {
       next_task_time = t + (long)(period + time_to_next_task);
       if (!repeat) period = 0;
     }
-  } else wasIdle = true;
+  } else immediate = true;
 
   return false;
 }

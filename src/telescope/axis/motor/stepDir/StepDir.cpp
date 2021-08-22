@@ -79,7 +79,13 @@ StepDirMotor::StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirD
 }
 
 bool StepDirMotor::init(int8_t reverse, int16_t microsteps, int16_t current) {
-  if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
+  if (_move == NULL) { D(axisPrefix); DLF("nothing to do exiting!"); return false; }
+
+  // get the axis monitor handle, by name
+  char monitorName[] = "mtrAx_";
+  monitorName[5] = axisNumber + '0';
+  mtrHandle = tasks.getHandleByName(monitorName);
+  if (mtrHandle == 0) { D(axisPrefix); DLF("no axis monitor, exiting!"); return false; }
 
   #if DEBUG == VERBOSE
     V(axisPrefix); V("init step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
@@ -149,7 +155,10 @@ void StepDirMotor::setFrequencySteps(float frequency) {
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
 
   // if in backlash override the frequency
-  if (inBacklash) frequency = backlashFrequency;
+  if (inBacklash) frequency = backlashFrequency; else
+
+  // change microstep mode and/or swap in fast ISRs as required
+  modeSwitch();
 
   if (frequency != currentFrequency || microstepModeControl >= MMC_SLEWING_PAUSE) {
     lastFrequency = frequency;
@@ -180,9 +189,6 @@ void StepDirMotor::setFrequencySteps(float frequency) {
       frequency = 0.0F;
       dir = 0;
     }
-
-    // change microstep mode and/or swap in fast ISRs as required
-    modeSwitch();
 
     currentFrequency = frequency;
 
@@ -269,7 +275,11 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
     #ifdef SHARED_DIRECTION_PINS
       if (axisNumber > 2 && takeStep) { if (direction == DIR_REVERSE) { digitalWriteF(dirPin, dirRev); } else { digitalWriteF(dirPin, dirFwd); } }
     #endif
-    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%homeSteps == 0) microstepModeControl = MMC_SLEWING_PAUSE;
+    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%homeSteps == 0) {
+      microstepModeControl = MMC_SLEWING_PAUSE;
+      // make the axis monitor run ASAP to adopt the mode and change the timer rate
+      tasks.immediate(mtrHandle);
+    }
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
     if (takeStep) {
       takeStep = !takeStep;

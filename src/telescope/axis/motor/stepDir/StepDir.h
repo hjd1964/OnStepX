@@ -67,6 +67,7 @@ class StepDirMotor : public Motor {
     const StepDirPins *Pins;
 
     uint8_t taskHandle = 0;
+    volatile uint8_t mtrHandle = 0;
 
     volatile Direction direction = DIR_NONE;
     #ifdef DRIVER_STEP_DEFAULTS
