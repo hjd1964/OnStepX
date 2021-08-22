@@ -42,10 +42,10 @@
 // =================================================================================================================================
 // MOUNT ===========================================================================================================================
 
-// Stepper driver models (also see ~/OnStepX/src/motion/StepDrivers.h for additional infrequently used models and more info.):
-// A4988, DRV8825, LV8729, S109, TMC2130*, and TMC5160**
-// * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
-// ** = SSS TMC5160 you must set stepper driver current (in mA) w/ AXISn_DRIVER_IRUN (IHOLD & IGOTO are optional)
+// Driver models (Step/Dir and Servo) see "~/OnStepX/Constants.h" for a complete list.
+// Typically: A4988, DRV8825, LV8729, S109, TMC2130*, or TMC5160
+// Settings for TMC SPI and SERVO drivers are in Extended.config.h
+// * = SSS TMC2130 set Vref to 2.5V (IRUN defaults to 300mA.)
 
 // Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
 // can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are
@@ -53,12 +53,10 @@
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
 #define AXIS1_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) in both axes to activate the mount.  <-Often
+#define AXIS1_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
 #define AXIS1_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS1_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
-#define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS1_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
-#define AXIS1_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS1_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -66,12 +64,10 @@
 
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 #define AXIS2_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) in both axes to activate the mount.  <-Often
+#define AXIS2_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS2_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS2_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
-#define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS2_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
-#define AXIS2_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 #define AXIS2_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -113,20 +109,20 @@
 // =================================================================================================================================
 // ROTATOR =========================================================================================================================
 
-// Stepper driver models (also see ~/OnStepX/src/motion/StepDrivers.h for additional infrequently used models and more info.): 
+// Driver models (Step/Dir and Servo) see "~/OnStepX/Constants.h" for a complete list.
 // A4988, DRV8825, LV8729, SSS TMC2100, TMC2130*
-// * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
+// Settings for TMC SPI and SERVO drivers are in Extended.config.h
+// * = SSS TMC2130 set Vref to 2.5V (IRUN defaults to 300mA.)
 
 // Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
 // can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS3 ROTATOR ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS3
-#define AXIS3_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the rotator.              Option
+#define AXIS3_DRIVER_MODEL        TMC2130 //    OFF, Enter stepper driver model (above) to activate the rotator.              Option
+#define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
-#define AXIS3_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
-#define AXIS3_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current tracking, appropriate for stepper/driver/etc.           Option
-#define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
+#define AXIS3_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                         Option
 
 #define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
                                           //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
@@ -136,20 +132,20 @@
 // =================================================================================================================================
 // FOCUSERS ========================================================================================================================
 
-// Stepper driver models (also see ~/OnStepX/src/motion/StepDrivers.h for additional infrequently used models and more info.): 
-// A4988, DRV8825, LV8729, SSS TMC2100, TMC2130*
-// * = SSS TMC2130 if you choose to set stepper driver current (in mA) set Vref pot. 2.5V instead of by motor current as usual.
+// Driver models (Step/Dir and Servo) see "~/OnStepX/Constants.h" for a complete list.
+// Typically: A4988, DRV8825, LV8729, SSS TMC2100, TMC2130*
+// Settings for TMC SPI and SERVO drivers are in Extended.config.h
+// * = SSS TMC2130 set Vref to 2.5V (IRUN defaults to 300mA.)
 
 // Settings for driver Microsteps, IRUN, Reverse, Limit Min, and Limit Max are stored in NV (EEPROM.) These runtime settings
-// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are 
+// can be changed (or reverted to the defaults below) from the SmartWebServer's Config webpage.  If runtime axis settings are
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
-#define AXIS4_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the focuser.              Option
+#define AXIS4_DRIVER_MODEL        TMC2130 //    OFF, Enter stepper driver model (above) to activate the focuser.              Option
+#define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
-#define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
-#define AXIS4_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
+#define AXIS4_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                         Option
 
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
