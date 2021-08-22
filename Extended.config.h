@@ -82,7 +82,7 @@
 #define AXIS2_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
-// for SERVO driver models PID and encoder settings:
+// for SERVO_II and SERVO_SD driver models, PID and encoder settings:
 #define AXIS2_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS2_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS2_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
@@ -165,7 +165,7 @@
 #define AXIS3_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS3_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
-// for SERVO driver models PID and encoder settings:
+// for SERVO_II and SERVO_SD driver models, PID and encoder settings:
 #define AXIS3_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS3_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS3_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
@@ -197,7 +197,7 @@
 #define AXIS4_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS4_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
-// for SERVO driver models PID and encoder settings:
+// for SERVO_II and SERVO_SD driver models, PID and encoder settings:
 #define AXIS4_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS4_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS4_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
