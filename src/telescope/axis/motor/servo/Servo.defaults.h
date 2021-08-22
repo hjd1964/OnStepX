@@ -49,10 +49,10 @@
 #define AXIS1_SERVO_D                 1.0    // D = derivative
 #endif
 #ifndef AXIS1_SERVO_ENCODER
-#define AXIS1_SERVO_ENCODER           ENCODER_AB
+#define AXIS1_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS1_SERVO_ENCODER_TRIGGER
-#define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE // ignored for ENCODER_AB
+#define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE // ignored for ENC_AB
 #endif
 #ifndef AXIS1_SERVO_PH1_STATE
 #define AXIS1_SERVO_PH1_STATE         LOW    // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PD) pin
@@ -86,7 +86,7 @@
 #define AXIS2_SERVO_D                 1.0
 #endif
 #ifndef AXIS2_SERVO_ENCODER
-#define AXIS2_SERVO_ENCODER           ENCODER_AB
+#define AXIS2_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS2_SERVO_ENCODER_TRIGGER
 #define AXIS2_SERVO_ENCODER_TRIGGER   CHANGE
@@ -123,7 +123,7 @@
 #define AXIS3_SERVO_D                 1.0
 #endif
 #ifndef AXIS3_SERVO_ENCODER
-#define AXIS3_SERVO_ENCODER           ENCODER_AB
+#define AXIS3_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS3_SERVO_ENCODER_TRIGGER
 #define AXIS3_SERVO_ENCODER_TRIGGER   CHANGE
@@ -160,7 +160,7 @@
 #define AXIS4_SERVO_D                 1.0
 #endif
 #ifndef AXIS4_SERVO_ENCODER
-#define AXIS4_SERVO_ENCODER           ENCODER_AB
+#define AXIS4_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS4_SERVO_ENCODER_TRIGGER
 #define AXIS4_SERVO_ENCODER_TRIGGER   CHANGE
@@ -197,7 +197,7 @@
 #define AXIS5_SERVO_D                 1.0
 #endif
 #ifndef AXIS5_SERVO_ENCODER
-#define AXIS5_SERVO_ENCODER           ENCODER_AB
+#define AXIS5_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS5_SERVO_ENCODER_TRIGGER
 #define AXIS5_SERVO_ENCODER_TRIGGER   CHANGE
@@ -234,7 +234,7 @@
 #define AXIS6_SERVO_D                 1.0
 #endif
 #ifndef AXIS6_SERVO_ENCODER
-#define AXIS6_SERVO_ENCODER           ENCODER_AB
+#define AXIS6_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS6_SERVO_ENCODER_TRIGGER
 #define AXIS6_SERVO_ENCODER_TRIGGER   CHANGE
@@ -271,7 +271,7 @@
 #define AXIS7_SERVO_D                 1.0
 #endif
 #ifndef AXIS7_SERVO_ENCODER
-#define AXIS7_SERVO_ENCODER           ENCODER_AB
+#define AXIS7_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS7_SERVO_ENCODER_TRIGGER
 #define AXIS7_SERVO_ENCODER_TRIGGER   CHANGE
@@ -308,7 +308,7 @@
 #define AXIS8_SERVO_D                 1.0
 #endif
 #ifndef AXIS8_SERVO_ENCODER
-#define AXIS8_SERVO_ENCODER           ENCODER_AB
+#define AXIS8_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS8_SERVO_ENCODER_TRIGGER
 #define AXIS8_SERVO_ENCODER_TRIGGER   CHANGE
@@ -345,7 +345,7 @@
 #define AXIS9_SERVO_D                 1.0
 #endif
 #ifndef AXIS9_SERVO_ENCODER
-#define AXIS9_SERVO_ENCODER           ENCODER_AB
+#define AXIS9_SERVO_ENCODER           ENC_AB
 #endif
 #ifndef AXIS9_SERVO_ENCODER_TRIGGER
 #define AXIS9_SERVO_ENCODER_TRIGGER   CHANGE
