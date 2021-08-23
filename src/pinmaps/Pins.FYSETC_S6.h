@@ -57,8 +57,8 @@
 #ifndef DS3234_CS_PIN
   #define DS3234_CS_PIN       PA4                // Default CS Pin for DS3234 on SPI (on EXP2 shared with the ESP8266 RST pin)
 #endif
-#ifndef BME280_CS_PIN
-  #define BME280_CS_PIN       PC7                // Default CS Pin for BME280 on SPI (on EXP2 shared with LED2/Reticle)
+#ifndef BMx280_CS_PIN
+  #define BMx280_CS_PIN       PC7                // Default CS Pin for BME280/BMP280 on SPI (on EXP2 shared with LED2/Reticle)
 #endif
 #ifndef ONE_WIRE_PIN
   #define ONE_WIRE_PIN        PE0                // Default Pin for OneWire bus (on E2-MOT PD-EN, right hand pin)

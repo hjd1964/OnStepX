@@ -41,8 +41,8 @@
 #ifndef DS3234_CS_PIN
   #define DS3234_CS_PIN        53               // Default CS Pin for DS3234 on SPI
 #endif
-#ifndef BME280_CS_PIN
-  #define BME280_CS_PIN        49               // Default CS Pin for BME280 on SPI
+#ifndef BMx280_CS_PIN
+  #define BMx280_CS_PIN        49               // Default CS Pin for BME280 or BMP280 on SPI
 #endif
 #ifndef ONE_WIRE_PIN
   #define ONE_WIRE_PIN         AUX4_PIN         // Default Pin for OneWire bus

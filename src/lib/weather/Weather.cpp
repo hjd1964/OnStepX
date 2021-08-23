@@ -20,9 +20,9 @@ extern bool xBusy;
     #define BME_ADDRESS 0x76
     Adafruit_BME280 bmx;
   #elif WEATHER == BME280_SPI && defined(SSPI_SHARED)
-    Adafruit_BME280 bmx(BME280_CS_PIN, SSPI_MOSI, SSPI_MISO, SSPI_SCK); // software SPI
+    Adafruit_BME280 bmx(BMx280_CS_PIN, SSPI_MOSI, SSPI_MISO, SSPI_SCK); // software SPI
   #elif WEATHER == BME280_SPI
-    Adafruit_BME280 bmx(BME280_CS_PIN); // hardware SPI
+    Adafruit_BME280 bmx(BMx280_CS_PIN); // hardware SPI
   #endif
 #endif
 
@@ -37,7 +37,7 @@ extern bool xBusy;
     #define BMP_ADDRESS 0x76
     Adafruit_BMP280 bmx(&HAL_Wire);
   #elif WEATHER == BMP280_SPI
-    Adafruit_BMP280 bmx(BMP280_CS_PIN); // hardware SPI
+    Adafruit_BMP280 bmx(BMx280_CS_PIN); // hardware SPI
   #endif
 #endif
 

@@ -13,8 +13,8 @@
   #ifndef DS3234_CS_PIN
     #define DS3234_CS_PIN        53              // Default CS Pin for DS3234 on SPI
   #endif
-  #ifndef BME280_CS_PIN
-    #define BME280_CS_PIN        48              // Default CS Pin for BME280 on SPI
+  #ifndef BMx280_CS_PIN
+    #define BMx280_CS_PIN        48              // Default CS Pin for BME280 or BMP280 on SPI
   #endif
 #endif
 

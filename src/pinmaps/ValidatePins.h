@@ -86,8 +86,13 @@
 #endif
 
 // WEATHER BME280 SPI allowed?
-#if WEATHER == BME280_SPI && !defined(BME280_CS_PIN)
+#if WEATHER == BME280_SPI && !defined(BMx280_CS_PIN)
   #error "Configuration (Config.h): BME280 weather using SPI is not supported for this PINMAP"
+#endif
+
+// WEATHER BMP280 SPI allowed?
+#if WEATHER == BMP280_SPI && !defined(BMx280_CS_PIN)
+  #error "Configuration (Config.h): BMP280 weather using SPI is not supported for this PINMAP"
 #endif
 
 // focuser/rotators any invalid combinations?
