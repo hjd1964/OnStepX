@@ -29,7 +29,7 @@ bool xBusy = false;
 InitError initError;
 
 // help for analogWrite() range conversions
-const int AnalogRange = round(powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F);
+const int AnalogRange = roundl(powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F);
 
 #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
   void statusFlash() {
@@ -44,11 +44,13 @@ const int AnalogRange = round(powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F);
     if (initError.tls)     flashes = 4; else
     if (initError.weather) flashes = 5;
 
+    int pin = STATUS_LED_PIN;
+ 
     // everything is ok, turn on LED and exit
-    if (flashes == 0) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
+    if (flashes == 0) { digitalWriteEx(pin, STATUS_LED_ON_STATE); return; }
 
     // flash the LED if there's an error
-    if (cycle%2 == 0) { digitalWriteEx(STATUS_LED_PIN, !STATUS_LED_ON_STATE); } else { if (cycle/2 < flashes) digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); }
+    if (cycle%2 == 0) { digitalWriteEx(pin, !STATUS_LED_ON_STATE); } else { if (cycle/2 < flashes) digitalWriteEx(pin, STATUS_LED_ON_STATE); }
   }
 #endif
 
@@ -104,7 +106,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   // bring up status LED and flash error codes
   #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
-    pinModeEx(STATUS_LED_PIN, OUTPUT);
+    int pin = STATUS_LED_PIN;
+    pinModeEx(pin, OUTPUT);
     VF("MSG: Telescope, start status LED task (rate 500ms priority 4)... ");
     if (tasks.add(500, 0, true, 4, statusFlash, "StaLed")) { VL("success"); } else { VL("FAILED!"); }
   #endif
