@@ -69,6 +69,9 @@ class Motor {
     // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
     virtual void setFrequencySteps(float frequency);
 
+    // get tracking mode steps per slewing mode step
+    virtual inline int getStepsPerStepSlewing();
+
     // set backlash frequency in steps per second
     void setBacklashFrequencySteps(float frequency);
 

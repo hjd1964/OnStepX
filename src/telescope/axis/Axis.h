@@ -268,7 +268,6 @@ class Axis {
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
 
-    volatile int  stepsPerStepSlewing = 1;
     volatile bool takeStep = false;
 
     // power down standstill control

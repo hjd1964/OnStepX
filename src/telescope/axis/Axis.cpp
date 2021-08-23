@@ -176,7 +176,7 @@ double Axis::getStepsPerMeasure() {
 }
 
 int Axis::getStepsPerStepSlewing() {
-  return stepsPerStepSlewing;
+  return motor->getStepsPerStepSlewing();
 }
 
 // set backlash amount in "measures" (radians, microns, etc.)

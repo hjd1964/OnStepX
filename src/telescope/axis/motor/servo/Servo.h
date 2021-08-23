@@ -41,6 +41,9 @@ class ServoMotor : public Motor {
     // resets motor and target angular position in steps, also zeros backlash and index 
     void resetPositionSteps(long value);
 
+    // get tracking mode steps per slewing mode step
+    inline int getStepsPerStepSlewing() { return 64; }
+
     // get movement frequency in steps per second
     float getFrequencySteps();
 

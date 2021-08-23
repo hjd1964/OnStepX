@@ -287,11 +287,6 @@ float Goto::usPerStepLowerLimit() {
     r_us /= 1.6F;
   #endif
   
-  // on-the-fly mode switching used?
-  #if MODE_SWITCH_BEFORE_SLEW == OFF
-    if (axis1StepsGoto != 1 || axis2StepsGoto != 1) r_us *= 1.7F;
-  #endif
-
   // average required goto us rates for each axis with any micro-step mode switching applied
   float r_us_axis1 = r_us/axis1.getStepsPerStepSlewing();
   float r_us_axis2 = r_us/axis2.getStepsPerStepSlewing();

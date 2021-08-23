@@ -42,6 +42,9 @@ class StepDirMotor : public Motor {
     // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
     void setFrequencySteps(float frequency);
 
+    // get tracking mode steps per slewing mode step
+    inline int getStepsPerStepSlewing() { return driver->getMicrostepRatio(); }
+
     // switch microstep modes as needed
     void modeSwitch();
 
