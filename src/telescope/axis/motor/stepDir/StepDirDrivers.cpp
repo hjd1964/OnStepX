@@ -177,7 +177,7 @@ void StepDirDriver::modeDecayTracking() {
     if (settings.decay == OFF) return;
     int8_t state = getDecayPinState(settings.decay);
     noInterrupts();
-    if (state != OFF) digitalWriteEx(decayPin, state);
+    digitalWriteEx(decayPin, state);
     interrupts();
   }
 }
