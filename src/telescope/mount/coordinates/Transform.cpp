@@ -19,7 +19,11 @@ extern volatile unsigned long centisecondLAST;
 #endif
 
 void Transform::init() {
-  if (!validKey) {
+  // NV_AXIS_SETTINGS_REVERT bit 0 = settings at compile (0) or run time (1), bits 1 to 9 = reset axis n on next boot
+  bool revert = !(nv.readUI(NV_AXIS_SETTINGS_REVERT) & 1);
+
+  // write axis settings to NV
+  if (!validKey || revert) {
     nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
   }
   mountType = nv.readUC(NV_MOUNT_TYPE_BASE);
