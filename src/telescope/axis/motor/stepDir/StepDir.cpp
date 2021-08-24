@@ -214,13 +214,13 @@ void StepDirMotor::modeSwitch() {
 
     if (microstepModeControl >= MMC_SLEWING) {
 
+      if (enableMoveFast(false)) {
+        V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
+      }
+
       if (driver->modeSwitchAllowed()) {
         V(axisPrefix); VLF("mode switch tracking set");
         driver->modeMicrostepTracking();
-      }
-
-      if (enableMoveFast(false)) {
-        V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
       }
 
       microstepModeControl = MMC_TRACKING_READY;
