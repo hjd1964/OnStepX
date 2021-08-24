@@ -405,7 +405,7 @@ void Focuser::tcfMonitor() {
               // update target if required
               if (tcfSteps[index] != steps) {
                 VF("MSG: Focuser"); V(index + 1); V(", TCF offset changed moving to target "); 
-                if (steps >=0 ) V("+ "); else V("- "); V(fabs(steps/axes[index]->getStepsPerMeasure())); VL("um");
+                if (steps >=0 ) { V("+ "); } else { V("- "); } V(fabs(steps/axes[index]->getStepsPerMeasure())); VL("um");
                 tcfSteps[index] = steps;
                 axes[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
               }
