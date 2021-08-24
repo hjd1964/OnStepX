@@ -78,6 +78,9 @@
 // mount settings
 
 // axes
+#ifndef AXIS1_DRIVER_MODEL
+#define AXIS1_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS1_STEPS_PER_DEGREE
 #define AXIS1_STEPS_PER_DEGREE        12800.0
 #endif
@@ -109,6 +112,9 @@
 #define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
 
+#ifndef AXIS2_DRIVER_MODEL
+#define AXIS2_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS2_STEPS_PER_DEGREE
 #define AXIS2_STEPS_PER_DEGREE        12800.0
 #endif
@@ -328,6 +334,9 @@
 
 // -----------------------------------------------------------------------------------
 // rotator settings, ROTATOR
+#ifndef AXIS3_DRIVER_MODEL
+#define AXIS3_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS3_STEPS_PER_DEGREE
 #define AXIS3_STEPS_PER_DEGREE        64.0
 #endif
@@ -373,6 +382,9 @@
 
 // -----------------------------------------------------------------------------------
 // focuser settings, FOCUSER1
+#ifndef AXIS4_DRIVER_MODEL
+#define AXIS4_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS4_STEPS_PER_MICRON
 #define AXIS4_STEPS_PER_MICRON        0.5
 #endif
@@ -420,6 +432,9 @@
 #endif
 
 // focuser settings, FOCUSER2
+#ifndef AXIS5_DRIVER_MODEL
+#define AXIS5_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS5_STEPS_PER_MICRON
 #define AXIS5_STEPS_PER_MICRON        0.5
 #endif
@@ -467,6 +482,9 @@
 #endif
 
 // focuser settings, FOCUSER3
+#ifndef AXIS6_DRIVER_MODEL
+#define AXIS6_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS6_STEPS_PER_MICRON
 #define AXIS6_STEPS_PER_MICRON        0.5
 #endif
@@ -514,6 +532,9 @@
 #endif
 
 // focuser settings, FOCUSER4
+#ifndef AXIS7_DRIVER_MODEL
+#define AXIS7_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS7_STEPS_PER_MICRON
 #define AXIS7_STEPS_PER_MICRON        0.5
 #endif
@@ -561,6 +582,9 @@
 #endif
 
 // focuser settings, FOCUSER5
+#ifndef AXIS8_DRIVER_MODEL
+#define AXIS8_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS8_STEPS_PER_MICRON
 #define AXIS8_STEPS_PER_MICRON        0.5
 #endif
@@ -608,6 +632,9 @@
 #endif
 
 // focuser settings, FOCUSER6
+#ifndef AXIS9_DRIVER_MODEL
+#define AXIS9_DRIVER_MODEL            OFF                         // specify a driver to enable
+#endif
 #ifndef AXIS9_STEPS_PER_MICRON
 #define AXIS9_STEPS_PER_MICRON        0.5
 #endif
