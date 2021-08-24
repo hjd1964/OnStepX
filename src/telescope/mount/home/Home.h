@@ -22,13 +22,10 @@ class Home {
     // reset mount at home
     CommandError reset(bool resetPark = false);
 
-    // at the home (default startup) position
-    inline bool isHome() { return atHome; }
-
     Coordinate position;
 
   private:
-    bool atHome = true;
+
 };
 
 extern Home home;

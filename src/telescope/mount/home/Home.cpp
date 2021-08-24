@@ -100,7 +100,7 @@ CommandError Home::reset(bool resetPark) {
     goTo.alignReset();
   #endif
 
-  atHome = true;
+  mount.setHome(true);
 
   VLF("MSG: Mount, reset at home and in standby");
   return CE_NONE;
