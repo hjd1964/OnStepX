@@ -352,11 +352,11 @@ CommandError Axis::autoSlewHome() {
     if (homingStage == HOME_NONE) homingStage = HOME_FAST;
     if (autoRate == AR_NONE) {
       motor->setSlewing(true);
-      V(axisPrefix); VF("autoSlewHome started");
+      V(axisPrefix); VF("autoSlewHome ");
       switch (homingStage) {
-        case HOME_FAST: VL("fast"); break;
-        case HOME_SLOW: VL("slow"); break;
-        case HOME_FINE: VL("fine"); break;
+        case HOME_FAST: VL("fast started"); break;
+        case HOME_SLOW: VL("slow started"); break;
+        case HOME_FINE: VL("fine started"); break;
         case HOME_NONE: VL("?"); break;
       }
     }
