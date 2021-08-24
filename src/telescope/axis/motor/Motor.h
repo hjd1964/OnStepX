@@ -70,7 +70,7 @@ class Motor {
     virtual void setFrequencySteps(float frequency);
 
     // get tracking mode steps per slewing mode step
-    virtual inline int getStepsPerStepSlewing();
+    virtual int getStepsPerStepSlewing();
 
     // set backlash frequency in steps per second
     void setBacklashFrequencySteps(float frequency);
