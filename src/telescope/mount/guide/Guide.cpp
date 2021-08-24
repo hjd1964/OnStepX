@@ -176,18 +176,14 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
   #if SLEW_GOTO == ON
     axis1.setFrequencySlew(goTo.rate);
     axis2.setFrequencySlew(goTo.rate);
-  #else
-    axis1.setFrequencySlew(degToRadF(0.2F));
-    axis2.setFrequencySlew(degToRadF(0.2F));
+
+    // use guiding and switches to find home
+    guide.state = GU_HOME_GUIDE;
+    guideActionAxis1 = guideActionAxis2 = GA_HOME;
+    guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + guideTimeLimit; 
+    axis1.autoSlewHome();
+    axis2.autoSlewHome();
   #endif
-
-  // use guiding and switches to find home
-  guide.state = GU_HOME_GUIDE;
-  guideActionAxis1 = guideActionAxis2 = GA_HOME;
-  guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-  axis1.autoSlewHome();
-  axis2.autoSlewHome();
-
   return CE_NONE;
 }
 
