@@ -273,7 +273,7 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void StepDirMotor::move(const int8_t stepPin, const int8_t dirPin) {
     #ifdef SHARED_DIRECTION_PINS
-      if (axisNumber > 2 && takeStep) { if (direction == DIR_REVERSE) { digitalWriteF(dirPin, dirRev); } else { digitalWriteF(dirPin, dirFwd); } }
+      if (takeStep) { if (direction == DIR_REVERSE) { digitalWriteF(dirPin, dirRev); } else { digitalWriteF(dirPin, dirFwd); } }
     #endif
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps)%homeSteps == 0) {
       microstepModeControl = MMC_SLEWING_PAUSE;
