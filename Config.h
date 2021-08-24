@@ -58,6 +58,11 @@
 #define AXIS1_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS1_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
 
+// for TMC2130 & TMC5160 STEP/DIR driver models:
+#define AXIS1_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS1_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
+#define AXIS1_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
+
 #define AXIS1_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
 #define AXIS1_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
@@ -68,6 +73,11 @@
 
 #define AXIS2_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Often
 #define AXIS2_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
+
+// for TMC2130 & TMC5160 STEP/DIR driver models:
+#define AXIS2_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS2_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
+#define AXIS2_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 
 #define AXIS2_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -91,6 +101,9 @@
 // *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
 #define ST4_INTERFACE                 OFF //    OFF, ON enables interface. <= 1X guides unless hand control mode.             Option
                                           //         During goto btn press: aborts slew or continue meridian flip pause home
+
+// SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
+#define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
 #define PEC_STEPS_PER_WORM_ROTATION     0 //      0, n. Steps per worm rotation (0 disables else 720 sec buffer allocated.)  <-Req'd
@@ -119,10 +132,15 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS3 ROTATOR ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS3
-#define AXIS3_DRIVER_MODEL        TMC2130 //    OFF, Enter stepper driver model (above) to activate the rotator.              Option
+#define AXIS3_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the rotator.              Option
 #define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
-#define AXIS3_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                         Option
+// for TMC2130 & TMC5160 STEP/DIR driver models:
+#define AXIS3_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS3_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
+#define AXIS3_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
+
+#define AXIS3_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 
 #define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
                                           //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
@@ -142,10 +160,15 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
-#define AXIS4_DRIVER_MODEL        TMC2130 //    OFF, Enter stepper driver model (above) to activate the focuser.              Option
+#define AXIS4_DRIVER_MODEL            OFF //    OFF, Enter stepper driver model (above) to activate the focuser.              Option
 #define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
-#define AXIS4_DRIVER_MICROSTEPS        16 //    OFF, n. Microstep mode when tracking.                                         Option
+// for TMC2130 & TMC5160 STEP/DIR driver models:
+#define AXIS4_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS4_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
+#define AXIS4_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
+
+#define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust

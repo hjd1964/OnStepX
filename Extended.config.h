@@ -44,10 +44,6 @@
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
 
-// for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS1_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS1_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
-#define AXIS1_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 #define AXIS1_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
@@ -75,10 +71,6 @@
 
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 
-// for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS2_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS2_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
-#define AXIS2_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 #define AXIS2_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
@@ -124,9 +116,6 @@
 #define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X                          Option
 #define SEPARATE_PULSE_GUIDE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding                    Infreq
 
-// SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
-#define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
-
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
 #define PEC_BUFFER_SIZE_LIMIT         720 //    720, Seconds of PEC buffer allowed.                                           Adjust
 
@@ -158,10 +147,6 @@
 
 // AXIS3 ROTATOR ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS3
 
-// for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS3_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS3_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
-#define AXIS3_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 #define AXIS3_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS3_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
@@ -170,8 +155,6 @@
 #define AXIS3_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS3_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
 #define AXIS3_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
-
-#define AXIS3_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current standstill. HALF uses IRUN/2.0                          Option
 
 #define AXIS3_POWER_DOWN              OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
 
@@ -190,10 +173,6 @@
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
 
-// for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS4_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
-#define AXIS4_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
-#define AXIS4_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 #define AXIS4_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
 #define AXIS4_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
@@ -202,8 +181,6 @@
 #define AXIS4_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS4_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
 #define AXIS4_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
-
-#define AXIS4_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current standstill. HALF uses IRUN/2.0                          Option
 
 #define AXIS4_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops.                                Option
 
