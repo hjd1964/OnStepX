@@ -258,7 +258,7 @@ class Tasks {
     // set the process name
     void setNameStr(uint8_t handle, const char name[]);
 
-    // set the process name
+    // get the process name
     char *getNameStr(uint8_t handle);
 
     // search for tasks, returns 0 if no handles are found
