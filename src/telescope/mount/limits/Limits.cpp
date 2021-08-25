@@ -155,7 +155,7 @@ void Limits::poll() {
   if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
     if (autoFlipCount == 0) {
       if (current.h > settings.pastMeridianW) {
-        #if SLEW_GOTO == ON
+        #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
             // disable meridian limit west for a second to allow goto to exit the out of limits region
             autoFlipCount = 10;
@@ -172,6 +172,10 @@ void Limits::poll() {
       } else error.meridian.west = false;
     } else { autoFlipCount--; error.meridian.west = false; }
   } else error.meridian.west = false;
+
+  #if AXIS2_TANGENT_ARM == ON
+    current.a2 = axis2.getMotorPosition();
+  #endif
 
   if (flt(current.a1, axis1.settings.limits.min)) { stopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
   if (fgt(current.a1, axis1.settings.limits.max)) { stopAxis1(GA_FORWARD); error.limit.axis1.max = true; } else error.limit.axis1.max = false;

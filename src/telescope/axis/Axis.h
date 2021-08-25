@@ -72,7 +72,7 @@ class Axis {
     void enable(bool value);
 
     // get the enabled state
-    bool isEnabled();
+    inline bool isEnabled() { return enabled; }
 
     // time (in ms) before automatic power down at standstill, use 0 to disable
     void setPowerDownTime(int value);
@@ -81,10 +81,10 @@ class Axis {
     void setPowerDownOverrideTime(int value);
 
     // get steps per measure
-    double getStepsPerMeasure();
+    inline double getStepsPerMeasure() { return settings.stepsPerMeasure; }
 
     // get tracking mode steps per slewing mode step
-    int getStepsPerStepSlewing();
+    inline int getStepsPerStepSlewing() { return motor->getStepsPerStepSlewing(); }
 
     // reset motor and target angular position, in "measure" units
     CommandError resetPosition(double value);
@@ -95,21 +95,23 @@ class Axis {
     // resets target position to the motor position
     inline void resetTargetToMotorPosition() { motor->resetTargetToMotorPosition(); }
 
-    // get motor angular position, in "measure" units
+    // get motor position, in "measure" units
     double getMotorPosition();
 
-    // get motor angular position, in steps
+    // get motor position, in steps
     inline long getMotorPositionSteps() { return motor->getMotorPositionSteps(); }
 
-    // set instrument coordinate, in "measures" (radians, microns, etc.)
-    // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
-    void setInstrumentCoordinatePark(double value);
+    // get index position, in "measure" units
+    double getIndexPosition();
+
+    // get index position, in steps
+    inline long getIndexPositionSteps() { return motor->getIndexPositionSteps(); }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
 
     // set instrument coordinate, in steps
-    void setInstrumentCoordinateSteps(long value);
+    inline void setInstrumentCoordinateSteps(long value) { motor->setInstrumentCoordinateSteps(value); }
 
     // get instrument coordinate
     double getInstrumentCoordinate();
@@ -117,7 +119,11 @@ class Axis {
     // get instrument coordinate, in steps
     inline long getInstrumentCoordinateSteps() { return motor->getInstrumentCoordinateSteps(); }
 
-    // set target coordinate, in "measures" (degrees, microns, etc.)
+    // set instrument coordinate park, in "measures" (radians, microns, etc.)
+    // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
+    void setInstrumentCoordinatePark(double value);
+
+    // set target coordinate park, in "measures" (degrees, microns, etc.)
     // with backlash disabled this moves to the nearest position where the motor doesn't cog
     void setTargetCoordinatePark(double value);
 
@@ -125,7 +131,7 @@ class Axis {
     void setTargetCoordinate(double value);
 
     // set target coordinate, in steps
-    void setTargetCoordinateSteps(long value);
+    inline void setTargetCoordinateSteps(long value) { motor->setTargetCoordinateSteps(value); }
 
     // get target coordinate, in "measures" (degrees, microns, etc.)
     double getTargetCoordinate();

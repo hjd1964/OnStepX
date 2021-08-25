@@ -28,7 +28,7 @@ void Motor::resetTargetToMotorPosition() {
   interrupts();
 }
 
-// get motor angular position in steps
+// get motor position in steps (including backlash)
 long Motor::getMotorPositionSteps() {
   noInterrupts();
   long steps = motorSteps + backlashSteps;

@@ -64,6 +64,15 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   if (e == CE_SLEW_IN_SLEW) { stop(); return e; }
   if (e != CE_NONE) return e;
 
+  // handle special case of a tangent arm mount
+  #if AXIS2_TANGENT_ARM == ON
+    double a1, a2;
+    transform.mountToInstrument(&target, &a1, &a2);
+    a2 = a2 - axis2.getIndexPosition();
+    if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  #endif
+
   limits.enabled(true);
   mount.syncToEncoders(false);
   if (mount.isHome() && park.state != PS_PARKING) mount.tracking(true);

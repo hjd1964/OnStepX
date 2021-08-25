@@ -157,10 +157,6 @@ void Axis::enable(bool state) {
   motor->power(state & !poweredDown);
 }
 
-bool Axis::isEnabled() {
-  return enabled;
-}
-
 // time (in ms) before automatic power down at standstill, use 0 to disable
 void Axis::setPowerDownTime(int value) {
   if (value == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = value; }
@@ -169,14 +165,6 @@ void Axis::setPowerDownTime(int value) {
 // time (in ms) to disable automatic power down at standstill, use 0 to disable
 void Axis::setPowerDownOverrideTime(int value) {
   if (value == 0) powerDownOverride = false; else { powerDownOverride = true; powerDownOverrideEnds = millis() + value; }
-}
-
-double Axis::getStepsPerMeasure() {
-  return settings.stepsPerMeasure;
-}
-
-int Axis::getStepsPerStepSlewing() {
-  return motor->getStepsPerStepSlewing();
 }
 
 // set backlash amount in "measures" (radians, microns, etc.)
@@ -202,40 +190,45 @@ CommandError Axis::resetPositionSteps(long value) {
   return CE_NONE;
 }
 
+// get motor position, in "measure" units
 double Axis::getMotorPosition() {
   return motor->getMotorPositionSteps()/settings.stepsPerMeasure;
 }
 
+// get index position, in "measure" units
+double Axis::getIndexPosition() {
+  return motor->getIndexPositionSteps()/settings.stepsPerMeasure;
+}
+
+// set instrument coordinate, in "measures" (radians, microns, etc.)
 void Axis::setInstrumentCoordinate(double value) {
   setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
 }
 
-void Axis::setInstrumentCoordinateSteps(long value) {
-  motor->setInstrumentCoordinateSteps(value);
-}
-
+// get instrument coordinate
 double Axis::getInstrumentCoordinate() {
   return motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
 }
 
+// set instrument coordinate park, in "measures" (radians, microns, etc.)
+// with backlash disabled this indexes to the nearest position where the motor wouldn't cog
 void Axis::setInstrumentCoordinatePark(double value) {
   motor->setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
+// set target coordinate park, in "measures" (degrees, microns, etc.)
+// with backlash disabled this moves to the nearest position where the motor doesn't cog
 void Axis::setTargetCoordinatePark(double value) {
   motor->setFrequencySteps(0);
   motor->setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
 }
 
+// set target coordinate, in "measures" (degrees, microns, etc.)
 void Axis::setTargetCoordinate(double value) {
   setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
 }
 
-// set target coordinate, in steps
-void Axis::setTargetCoordinateSteps(long value) {
-  motor->setTargetCoordinateSteps(value);
-}
-
+// get target coordinate, in "measures" (degrees, microns, etc.)
 double Axis::getTargetCoordinate() {
   return motor->getTargetCoordinateSteps()/settings.stepsPerMeasure;
 }

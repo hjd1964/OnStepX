@@ -25,8 +25,11 @@ class Motor {
     // resets target position to the motor position
     void resetTargetToMotorPosition();
 
-    // get motor angular position in steps
+    // get motor position in steps (including backlash)
     long getMotorPositionSteps();
+
+    // get index position in steps
+    inline long getIndexPositionSteps() { return indexSteps; }
 
     // get instrument coordinate, in steps
     long getInstrumentCoordinateSteps();

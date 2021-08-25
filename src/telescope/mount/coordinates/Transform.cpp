@@ -130,10 +130,6 @@ void Transform::observedPlaceToMount(Coordinate *coord) {
 
   double a1, a2;
   if (mountType == ALTAZM) { a1 = coord->z; a2 = coord->a; } else { a1 = coord->h; a2 = coord->d; }
-  #if AXIS2_TANGENT_ARM == ON
-    double unused;
-    mountToInstrument(coord, &unused, &a2);
-  #endif
   coord->a1 = a1;
   coord->a2 = a2;
 }
@@ -167,9 +163,7 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
 
   mount.a1 = a1;
-  #if AXIS2_TANGENT_ARM == OFF
-    mount.a2 = a2;
-  #endif
+  mount.a2 = a2;
 
   return mount;
 }

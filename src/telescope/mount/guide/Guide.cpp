@@ -174,14 +174,19 @@ void Guide::stopSpiral() {
 // start guide home (for use with home switches)
 CommandError Guide::startHome(unsigned long guideTimeLimit) {
   #if SLEW_GOTO == ON
-    axis1.setFrequencySlew(goTo.rate);
-    axis2.setFrequencySlew(goTo.rate);
-
     // use guiding and switches to find home
     guide.state = GU_HOME_GUIDE;
-    guideActionAxis1 = guideActionAxis2 = GA_HOME;
-    guideFinishTimeAxis1 = guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-    axis1.autoSlewHome();
+
+    #if AXIS2_TANGENT_ARM == OFF
+      axis1.setFrequencySlew(goTo.rate);
+      guideActionAxis1 = GA_HOME;
+      guideFinishTimeAxis1 = millis() + guideTimeLimit; 
+      axis1.autoSlewHome();
+    #endif
+
+    axis2.setFrequencySlew(goTo.rate);
+    guideActionAxis2 = GA_HOME;
+    guideFinishTimeAxis2 = millis() + guideTimeLimit; 
     axis2.autoSlewHome();
   #endif
   return CE_NONE;
@@ -241,6 +246,10 @@ bool Guide::validAxis2(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT_ALT);
 
   if (!limits.isEnabled()) return true;
+
+  #if AXIS2_TANGENT_ARM == ON
+    location.a2 = axis2.getMotorPosition();
+  #endif
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
     if (location.pierSide == PIER_SIDE_WEST) {
@@ -369,12 +378,16 @@ void Guide::poll() {
 
   // handle end of home guiding
   if (state == GU_HOME_GUIDE && !mount.isSlewing()) {
-    VLF("MSG: guidePoll(); arrived at home");
-    state = GU_NONE;
-    guideActionAxis1 = GA_NONE;
-    guideActionAxis2 = GA_NONE;
-    home.reset();
-    mount.enable(true);
+    #if AXIS2_TANGENT_ARM == OFF
+      VLF("MSG: guidePoll(); arrived at home");
+      state = GU_NONE;
+      guideActionAxis1 = GA_NONE;
+      guideActionAxis2 = GA_NONE;
+      home.reset();
+      mount.enable(true);
+    #else
+
+    #endif
   }
 
   // watch for guides finished

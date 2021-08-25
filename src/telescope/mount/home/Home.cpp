@@ -29,14 +29,20 @@ void Home::init() {
 CommandError Home::request() {
   #if SLEW_GOTO == ON
     if (goTo.state != GS_NONE || guide.state != GU_NONE || mount.isSlewing()) return CE_SLEW_IN_MOTION;
+    if (guide.state != GU_NONE) {
+      if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
+      return CE_SLEW_IN_MOTION;
+    }
 
     if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
       CommandError e = reset();
       if (e != CE_NONE) return e;
     }
 
-    // stop tracking
-    mount.tracking(false);
+    #if AXIS2_TANGENT_ARM == OFF
+      // stop tracking
+      mount.tracking(false);
+    #endif
 
     // make sure the motors are powered on
     mount.enable(true);
@@ -46,14 +52,24 @@ CommandError Home::request() {
     if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
       guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
     } else {
-      // set slew rate limit
-      axis1.setFrequencySlew(goTo.rate);
+      #if AXIS2_TANGENT_ARM == OFF
+        axis1.setFrequencySlew(goTo.rate);
+        if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(position.z); else axis1.setTargetCoordinate(position.h);
+      #endif
+
       axis2.setFrequencySlew(goTo.rate);
-      // use a goto to find home
-      if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(position.z); else axis1.setTargetCoordinate(position.h);
-      if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(position.a); else axis2.setTargetCoordinate(position.d);
+      if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(position.a); else {
+        #if AXIS2_TANGENT_ARM == OFF
+          axis2.setTargetCoordinate(position.d);
+        #else
+          axis2.setTargetCoordinate(axis2.getIndexPosition());
+        #endif
+      }
+
       VLF("Mount::returnHome(); target coordinates set");
-      axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      #if AXIS2_TANGENT_ARM == OFF
+        axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+      #endif
       axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     }
   #endif
@@ -65,8 +81,10 @@ CommandError Home::reset(bool resetPark) {
   #if SLEW_GOTO == ON
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
-
-  if (guide.state != GU_NONE || axis1.isSlewing() || axis2.isSlewing()) return CE_SLEW_IN_MOTION;
+  if (guide.state != GU_NONE) {
+    if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
+    return CE_SLEW_IN_MOTION;
+  }
 
   #if SLEW_GOTO == ON
     if (resetPark) park.reset();
