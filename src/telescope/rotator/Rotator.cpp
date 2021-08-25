@@ -147,7 +147,7 @@ CommandError Rotator::unpark() {
 
 // start park/unpark monitor
 void Rotator::startParkMonitor() {
-  VF("MSG: Rotator, start park monitor task (rate 1s priority 6)... ");
+  VF("MSG: Rotator, start "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
   if (parkHandle != 0) tasks.remove(parkHandle);
   parkHandle = tasks.add(1000, 0, true, 6, parkWrapper, "RotPark"); 
   if (parkHandle) { VL("success"); } else { VL("FAILED!"); }
@@ -203,7 +203,8 @@ void Rotator::parkMonitor() {
 
       tasks.setDurationComplete(parkHandle);
       parkHandle = 0;
-      VLF("MSG: Rotator, stop park monitor task");
+
+      VF("MSG: Rotator, stop "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
     }
   #endif
 }

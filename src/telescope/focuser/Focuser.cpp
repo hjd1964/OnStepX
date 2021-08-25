@@ -344,7 +344,7 @@ CommandError Focuser::unpark(int index) {
 
 // start park/unpark monitor
 void Focuser::startParkMonitor(int index) {
-  VF("MSG: Focuser"); V(index + 1); VF(", start park monitor task (rate 1s priority 6)... ");
+  VF("MSG: Focuser"); V(index + 1); VF(", start "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
   if (parkHandle != 0) tasks.remove(parkHandle[index]);
   switch (index) {
     #if FOCUSER_MAX >= 1
@@ -445,7 +445,8 @@ void Focuser::parkMonitor(int index) {
 
       tasks.setDurationComplete(parkHandle[index]);
       parkHandle[index] = 0;
-      VF("MSG: Focuser"); V(index + 1); VLF(", stop park monitor task");
+
+      VF("MSG: Focuser"); V(index + 1); VF(", stop "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
     }
   #endif
 }
