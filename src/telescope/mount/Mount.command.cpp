@@ -101,6 +101,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
           case '3': sprintF(reply, "%0.6f", axis1.getFrequencySteps()); *numericReply = false; break;
           case '4': sprintF(reply, "%0.6f", axis2.getFrequencySteps()); *numericReply = false; break;
           case 'A': sprintf(reply, "%d%%", 50); *numericReply = false; break; // workload
+          case 'G': // index position for Axis2
+            sprintF(reply, "%0.6f", radToDeg(transform.instrumentToMount(0.0, axis2.getIndexPosition()).a2));
+            *numericReply = false;
+          break;
         default:
           return false;
         }
