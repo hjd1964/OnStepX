@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include "Constants.h"
 #include "Config.common.h"
+#include "Validate.h"
 #include "HAL/HAL.h"
 #include "pinmaps/Models.h"
 #include "debug/Debug.h"
