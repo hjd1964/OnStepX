@@ -9,7 +9,7 @@
 #define AUX1_PIN                18               // ESP8266 GPIO0, SPI MISO/Fault
 #define AUX2_PIN                5                // ESP8266 RST, SPI MISO/Fault
 #define AUX3_PIN                4                // Limit SW, Home SW
-#define AUX4_PIN                22               // Status2 LED, Reticle LED, Home SW
+#define AUX4_PIN                22               // Reticle LED, Home SW
 #if !defined(_mk20dx128_h_) && !defined(__MK20DX128__) && !defined(__IMXRT1052__) && !defined(__IMXRT1062__)
   #define AUX5_PIN              DAC_PIN(A14)     // true analog output
 #endif
@@ -53,7 +53,7 @@
 #define AXIS1_STEP_PIN          20
 #define AXIS1_DIR_PIN           21
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN         AUX1_PIN         // SPI MISO
+#define AXIS1_FAULT_PIN         AXIS1_M3_PIN     // SPI MISO
 #define AXIS1_SENSE_HOME_PIN    AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver

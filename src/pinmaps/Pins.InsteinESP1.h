@@ -5,8 +5,6 @@
 #if defined(ESP32)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX1_PIN                26               // ESP8266 GPIO0 control (Axis2DirPin)
-#define AUX2_PIN                4                // MISO for Axis1&2, or ESP8266 RST control, or Axis4 EN support
 #define AUX3_PIN                21               // Home SW for Axis1 (or I2C SDA)
 #define AUX4_PIN                22               // Home SW for Axis2 (or I2C SCL)
 #define AUX7_PIN                39               // Limit SW, PPS, etc.
@@ -51,7 +49,7 @@
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           19
 #define AXIS1_SENSE_HOME_PIN    AUX3_PIN
-#define AXIS1_FAULT_PIN         AXIS2_M3_PIN
+#define AXIS1_FAULT_PIN         AXIS1_M3_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        SHARED
@@ -75,7 +73,7 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#define AXIS4_ENABLE_PIN        AUX2_PIN
+#define AXIS4_ENABLE_PIN        4
 #define AXIS4_M0_PIN            OFF              // SPI MOSI
 #define AXIS4_M1_PIN            OFF              // SPI SCK
 #define AXIS4_M2_PIN            OFF              // SPI CS

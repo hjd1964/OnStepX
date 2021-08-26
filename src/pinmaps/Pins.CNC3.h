@@ -11,7 +11,7 @@
 #define SERIAL_B_TX               5
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX2_PIN                  18             // ESP8266 RST control, or Axis2 CS support
+#define AUX2_PIN                  18             // ESP8266 RST control, or SPI MISO Axis1&2
 #define AUX3_PIN                  21             // Home SW for Axis1, or I2C SDA {assuming default SCL/SDA pins are present}
 #define AUX4_PIN                  22             // Home SW for Axis2, or I2C SCL
 #define AUX7_PIN                  39             // Limit SW, PPS, etc.

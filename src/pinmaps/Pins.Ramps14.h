@@ -97,11 +97,11 @@
   #define AXIS1_M1_PIN         25               // SPI SCK
   #define AXIS1_M2_PIN         27               // SPI CS
   #define AXIS1_M3_PIN         AUX1_PIN         // SPI MISO
+  #define AXIS1_FAULT_PIN      AXIS1_M3_PIN
 #endif
 #define AXIS1_STEP_PIN         54
 #define AXIS1_DIR_PIN          55
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN        AUX1_PIN
 #define AXIS1_SENSE_HOME_PIN   AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver on RMAPS Y
@@ -116,11 +116,11 @@
   #define AXIS2_M1_PIN         33               // SPI SCK
   #define AXIS2_M2_PIN         35               // SPI CS
   #define AXIS2_M3_PIN         AUX2_PIN         // SPI MISO
+  #define AXIS2_FAULT_PIN      AXIS2_M3_PIN
 #endif
 #define AXIS2_STEP_PIN         60               // (Pin A6)
 #define AXIS2_DIR_PIN          61               // (Pin A7)
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_FAULT_PIN        AUX2_PIN
 #define AXIS2_SENSE_HOME_PIN   AUX4_PIN
 
 // For rotator stepper driver on RAMPS Z

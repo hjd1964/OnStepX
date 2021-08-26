@@ -5,7 +5,7 @@
 #if defined(ESP32)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX1_PIN                12               // pullup driver RST, SPI MISO, or Fault
+#define AUX1_PIN                12               // pullup driver RST, SPI MISO/Fault
 #define AUX3_PIN                21               // Home SW, I2C SDA
 #define AUX4_PIN                22               // Home SW, I2C SCL
 #define AUX7_PIN                39               // PPS, Limit SW, etc.
@@ -44,7 +44,7 @@
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           19
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
-#define AXIS1_FAULT_PIN         AUX1_PIN
+#define AXIS1_FAULT_PIN         AXIS1_M3_PIN
 #define AXIS1_SENSE_HOME_PIN    AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
@@ -56,7 +56,7 @@
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
-#define AXIS2_FAULT_PIN         AUX1_PIN
+#define AXIS2_FAULT_PIN         AXIS2_M3_PIN
 #define AXIS2_SENSE_HOME_PIN    AUX4_PIN
 
 // For rotator stepper driver
