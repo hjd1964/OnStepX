@@ -151,6 +151,10 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
 Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
 
+  #if AXIS2_TANGENT_ARM_CORRECTION == ON
+    a2 = atan(a2);
+  #endif
+
   mount.a2 = a2;
   if (a2 < -Deg90 || a2 > Deg90) {
     mount.pierSide = PIER_SIDE_WEST;
@@ -178,6 +182,10 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
     if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
   }
   if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
+
+  #if AXIS2_TANGENT_ARM_CORRECTION == ON
+    a2 = tan(a2);
+  #endif
 }
 
 void Transform::hourAngleToRightAscension(Coordinate *coord) {

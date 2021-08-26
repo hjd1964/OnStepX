@@ -194,7 +194,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       //                      1 on success
       if (parameter[0] == 'E' && parameter[1] == 'M') {
         long l = atol(&parameter[3]);
-        if (l == 0 || l == GEM || l == FORK || l == ALTAZM) {
+        if (l == 0 || l == GEM || l == FORK || (l == ALTAZM && AXIS2_TANGENT_ARM == OFF)) {
           nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l);
         } else *commandError = CE_PARAM_RANGE;
 
