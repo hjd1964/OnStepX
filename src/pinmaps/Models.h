@@ -31,8 +31,13 @@
   #include "Pins.MaxPCB.h"
 #endif
 #if PINMAP == MaxPCB3
-  #define PINMAP_STR "MaxPCB v3"
-  #include "Pins.MaxPCB3.h"
+  #ifdef ARDUINO_TEENSY41
+    #define PINMAP_STR "MaxPCB v3.6"
+    #include "Pins.MaxPCB36.h"
+  #else
+    #define PINMAP_STR "MaxPCB v3"
+    #include "Pins.MaxPCB3.h"
+  #endif
 #endif
 #if PINMAP == MaxESP2
   #define PINMAP_STR "MaxESP v2"

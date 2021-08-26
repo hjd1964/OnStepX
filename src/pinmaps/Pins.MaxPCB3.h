@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------------------------------
-// Pin map for OnStep MaxPCB (Teensy3.5/3.6)
+// Pin map for OnStep MaxPCB 3.0 and 3.5 (Teensy3.5/3.6)
 #pragma once
 
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__)

@@ -2,8 +2,6 @@
 // Validates pinmap model for current configuration
 #pragma once
 
-#include "..\common.h"
-
 // --------------------------------------------------------------------------------------
 
 // can we flash an ESP8266?
