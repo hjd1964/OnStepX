@@ -4,11 +4,10 @@ OnStepX Telescope Controller
 There is no release of OnStepX yet but it has basic testing done now and all features are implemented so I consider it ready testing by advanced OnStep users.
 
 # What is OnStepX?
-OnStepX is the advanced version of the OnStep computerized telescope goto controller with support for control of both stepper motors (step/dir interface) and servo motors (PD or II interface using AB quadrature or CW/CCW or Pulse/Dir encoders.)
+OnStepX is the advanced version of the OnStep computerized telescope controller with support for both stepper motors (step/dir interface) and servo motors (PD or II interface using AB quadrature or CW/CCW or Pulse/Dir encoders.)
 
 It supports:
-* Telescope Mount control (Alt/Azm and Equatorial GEM/Fork.)  OnStep was designed, from the beginning, as a more or less general purpose
-system and provisions were made in the firmware to allow for use on a variety of mounts even those with tangent arm declination.
+* Telescope Mount control (Alt/Azm and Equatorial GEM/Fork.)  Optional support for Eq mounts with Tangent Arm Declination.  Usually the Goto capability is enabled, but that's optional as well for those who just want basic mount control.
 * Telescope Rotator control (including Alt/Azm de-rotation.)
 * Telescope Focuser control (up to 6 focusers so it can handle collimation as well as focusing.)
 * Telescope Accessory control (combination of up to 8 dew-heaters, switches, analog PWM.)
