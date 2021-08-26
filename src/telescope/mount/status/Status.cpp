@@ -24,14 +24,18 @@ extern Tasks tasks;
 #endif
 
 void Status::init() {
+  #if LED_STATUS == ON
+    // if anything else is using the status LED, disable it
+    if ((STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) || 
+        (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN)) tasks.remove(tasks.getHandleByName("StaLed"));
+  #endif
+
   #if STATUS_BUZZER_MEMORY == ON
     sound.enabled = misc.buzzer;
   #endif
+
   #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
-      #if LED_STATUS == ON
-        if (STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
-      #endif
       pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
       VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
