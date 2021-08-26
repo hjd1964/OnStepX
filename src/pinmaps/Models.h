@@ -32,7 +32,7 @@
 #endif
 #if PINMAP == MaxPCB3
   #define PINMAP_STR "MaxPCB v3"
-  #include "Pins.MaxPCB.h"
+  #include "Pins.MaxPCB3.h"
 #endif
 #if PINMAP == MaxESP2
   #define PINMAP_STR "MaxESP v2"
@@ -93,3 +93,5 @@
 
 // all unassigned pins OFF
 #include "../pinmaps/Pins.defaults.h"
+
+#include "Validate.h"
