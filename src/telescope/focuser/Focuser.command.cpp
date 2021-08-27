@@ -53,9 +53,12 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
   if (command[0] == 'F' && command[1] == 'A') {
     // :FA#    Focuser Active?
     //            Return: 0 on failure (no focusers)
-    //                    1 on success
+    //                    1 to 6 on success
     if (parameter[0] == 0) {
-      if (axes[active] == NULL) *commandError = CE_0;
+      if (axes[active] == NULL) { *commandError = CE_0; return true; }
+      sprintf(reply, "%d", active + 1);
+      *numericReply = false;
+      *supressFrame = true;
     } else
 
     // :FA[n]#    Select focuser where [n] = 1 to 6
@@ -80,7 +83,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     int i = command[1] - '1';
     if (i >= 0 && i < FOCUSER_MAX && parameter[0] != 0) {
       // if not active return false so other focuser devices may process the command
-      if (axes[i + 3] == NULL) return false;
+      if (axes[i] == NULL) return false;
       index = i;
       command[1] = parameter[0];
       char temp[32];
@@ -89,7 +92,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     } else index = active;
 
     // check for commands that shouldn't have a parameter
-    if (strchr("TpIMtuQF1234+-GZHh", command[1]) && parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
+    if (strchr("aTpIMtuQF1234+-GZHh", command[1]) && parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
 
     // get ready for commands that convert to microns or steps (these commands are upper-case for microns OR lower-case for steps)
     const float MicronsToSteps = axes[index]->getStepsPerMeasure();
@@ -104,9 +107,9 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     }
 
     // :Fa#       Get primary focuser
-    //            Returns: 1 if primary focuser is focuser 1, 0 otherwise
+    //            Returns: 1 true if active
     if (command[1] == 'a') {
-      if (index != 0) *commandError = CE_0;
+      // always return true
     } else
 
     // :FT#       Get status
