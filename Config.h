@@ -59,7 +59,7 @@
 #define AXIS1_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
 
 // for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS1_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS1_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
 #define AXIS1_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 
@@ -75,7 +75,7 @@
 #define AXIS2_DRIVER_MICROSTEPS_GOTO SAME //   SAME, n. Microstep mode used during gotos. SAME uses MICROSTEPS.               Option
 
 // for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS2_DRIVER_IRUN             400 //    400, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS2_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
 #define AXIS2_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 
@@ -136,7 +136,7 @@
 #define AXIS3_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
 // for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS3_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS3_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS3_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
 #define AXIS3_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 
@@ -164,7 +164,7 @@
 #define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
 // for TMC2130 & TMC5160 STEP/DIR driver models:
-#define AXIS4_DRIVER_IRUN             200 //    200, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
+#define AXIS4_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS4_DRIVER_IHOLD           HALF //   HALF, n, (mA.) Current during standstill. HALF uses IRUN/2.0                   Option
 #define AXIS4_DRIVER_IGOTO           SAME //   SAME, n, (mA.) Current during slews. SAME uses IRUN.                           Option
 
