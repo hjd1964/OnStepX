@@ -139,7 +139,7 @@ void Axis::init(bool alternateLimits) {
 
   // get the motor ready
   if (!motor->init(settings.reverse, settings.param1, settings.param2)) {
-    VF("MSG: Axis, nothing to do exiting!");
+    VLF("MSG: Axis, nothing to do exiting!");
     return;
   }
   motor->setBacklashFrequencySteps(settings.backlashFreq*settings.stepsPerMeasure);

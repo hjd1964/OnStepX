@@ -93,6 +93,12 @@ bool StepDirMotor::init(int8_t reverse, int16_t microsteps, int16_t current) {
     V(", en="); if (Pins->enable == OFF) VL("OFF"); else if (Pins->enable == SHARED) VL("SHARED"); else VL(Pins->enable);
   #endif
 
+  // this driver requires available pins to function
+  if (Pins->dir == OFF || Pins->step == OFF) {
+    D(axisPrefix); DLF("step or dir pin not present, exiting!");
+    return false;
+  }
+
   // init default driver direction state (forward)
   if (reverse == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   pinMode(Pins->dir, OUTPUT);
