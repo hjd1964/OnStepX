@@ -483,6 +483,9 @@
 #define AXIS8_SENSE_LIMIT_MAX_PIN   OFF
 #endif
 
+#ifndef AXIS9_ENABLE_PIN
+#define AXIS9_ENABLE_PIN            OFF
+#endif
 #ifndef AXIS9_M0_PIN
 #define AXIS9_M0_PIN                OFF
 #endif
