@@ -6,9 +6,8 @@
 
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
+#include "../../Telescope.h"
 #include "../coordinates/Transform.h"
-
-enum ParkState: uint8_t {PS_NONE, PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED};
 
 #pragma pack(1)
 typedef struct ParkPosition {

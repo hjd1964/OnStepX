@@ -286,7 +286,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FZ#       Set focuser position as zero
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      parked[index] = false;
+      settings[index].parkState = PS_UNPARKED;
       *commandError = axes[index]->resetPositionSteps(0);
       axes[index]->setBacklash(getBacklash(index));
       *numericReply = false;
@@ -295,7 +295,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FH#       Set focuser position as half-travel
     //            Returns: Nothing
     if (command[1] == 'H') {
-      parked[index] = false;
+      settings[index].parkState = PS_UNPARKED;
       long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
       *commandError = axes[index]->resetPositionSteps(p);
       axes[index]->setBacklash(getBacklash(index));

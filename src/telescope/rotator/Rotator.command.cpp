@@ -3,6 +3,7 @@
 
 #include "../../lib/convert/Convert.h"
 #include "../axis/Axis.h"
+
 #include "../mount/Mount.h"
 #include "Rotator.h"
 
@@ -153,7 +154,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      parked = false;
+      parkState = PS_UNPARKED;
       *commandError = axis3.resetPosition(0.0);
       axis3.setBacklashSteps(getBacklash());
       *numericReply = false;
@@ -162,7 +163,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rF#       Set rotator position as Half-travel
     //            Returns: Nothing
     if (command[1] == 'F') {
-      parked = false;
+      parkState = PS_UNPARKED;
       double t = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0);
       *commandError = axis3.resetPosition(t);
       axis3.setBacklashSteps(getBacklash());
@@ -181,7 +182,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == '+') {
       #ifdef MOUNT_PRESENT
         if (transform.mountType == ALTAZM) {
-          if (!parked) derotatorEnabled = true; else *commandError = CE_PARKED;
+          if (parkState < PS_PARKED) derotatorEnabled = true; else *commandError = CE_PARKED;
         }
       #endif
       *numericReply = false;

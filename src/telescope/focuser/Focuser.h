@@ -7,6 +7,7 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../commands/ProcessCmds.h"
+#include "../Telescope.h"
 
 #if AXIS9_DRIVER_MODEL != OFF
   #define FOCUSER_MAX 6
@@ -34,6 +35,17 @@
   #endif
 #endif
 
+// time to write position to nv after last movement of Focuser
+#ifndef FOCUSER_WRITE_DELAY
+  #if NV_ENDURANCE == VHIGH
+    #define FOCUSER_WRITE_DELAY 5000L
+  #elif NV_ENDURANCE == HIGH
+    #define FOCUSER_WRITE_DELAY 60000L
+  #else
+    #define FOCUSER_WRITE_DELAY 300000L
+  #endif
+#endif
+
 #pragma pack(1)
 typedef struct Tcf {
   bool enabled;
@@ -45,7 +57,7 @@ typedef struct Tcf {
 #define FocuserSettingsSize 18
 typedef struct FocuserSettings {
   Tcf tcf;
-  uint8_t dcPower;   // in %
+  ParkState parkState;
   int16_t backlash;  // in steps
   float position;    // in microns
 } FocuserSettings;
@@ -57,8 +69,8 @@ class Focuser {
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // poll TCF to move the focusers as required
-    void tcfMonitor();
+    // poll focusers as required
+    void monitor();
 
     // poll for park completion
     void parkMonitor(int index);
@@ -72,10 +84,10 @@ class Focuser {
     bool  isDC(int index);
 
     // get DC power in %
-    int   getDcPower(int index);
+    int getDcPower(int index);
 
     // set DC power in %
-    bool  setDcPower(int index, int value);
+    bool setDcPower(int index, int value);
 
     // get TCF enable
     bool  getTcfEnable(int index);
@@ -119,9 +131,6 @@ class Focuser {
     // unpark focuser
     CommandError unpark(int index);
 
-    // start park/unpark monitor
-    void startParkMonitor(int index);
-
     void readSettings(int index);
     void writeSettings(int index);
 
@@ -131,9 +140,10 @@ class Focuser {
     FocuserSettings settings[FOCUSER_MAX];
 
     long target[FOCUSER_MAX];
-    unsigned long wait[FOCUSER_MAX];
 
-    bool parked[FOCUSER_MAX];
+    bool wasSlewing[FOCUSER_MAX];
+    unsigned long lastSlewTime[FOCUSER_MAX];
+
     uint8_t parkHandle[FOCUSER_MAX];
 };
 

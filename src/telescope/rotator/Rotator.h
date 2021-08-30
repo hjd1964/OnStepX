@@ -8,6 +8,18 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "../mount/coordinates/Transform.h"
+#include "../Telescope.h"
+
+// time to write position to nv after last movement of Rotator
+#ifndef ROTATOR_WRITE_DELAY
+  #if NV_ENDURANCE == VHIGH
+    #define ROTATOR_WRITE_DELAY 5000L
+  #elif NV_ENDURANCE == HIGH
+    #define ROTATOR_WRITE_DELAY 60000L
+  #else
+    #define ROTATOR_WRITE_DELAY 300000L
+  #endif
+#endif
 
 class Rotator {
   public:
@@ -64,8 +76,11 @@ class Rotator {
     bool derotatorEnabled = false;
     bool derotatorReverse = false;
 
+    bool wasSlewing = false;
+    unsigned long lastSlewTime = 0;
+
     uint8_t parkHandle = 0;
-    bool parked = true;
+    ParkState parkState;
 };
 
 extern Rotator rotator;

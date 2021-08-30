@@ -43,26 +43,7 @@ const FocuserConfiguration configuration[] = {
 #endif
 };
 
-void tcfWrapper() { focuser.tcfMonitor(); }
-
-#if FOCUSER_MAX >= 1
-  void parkWrapper0() { focuser.parkMonitor(0); }
-#endif
-#if FOCUSER_MAX >= 2
-  void parkWrapper1() { focuser.parkMonitor(1); }
-#endif
-#if FOCUSER_MAX >= 3
-  void parkWrapper2() { focuser.parkMonitor(2); }
-#endif
-#if FOCUSER_MAX >= 4
-  void parkWrapper3() { focuser.parkMonitor(3); }
-#endif
-#if FOCUSER_MAX >= 5
-  void parkWrapper4() { focuser.parkMonitor(4); }
-#endif
-#if FOCUSER_MAX >= 6
-  void parkWrapper5() { focuser.parkMonitor(5); }
-#endif
+void focWrapper() { focuser.monitor(); }
 
 // setup arrays for easy access to focuser axes
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
@@ -101,7 +82,7 @@ void Focuser::init() {
       settings[index].tcf.coef = 0.0F;
       settings[index].tcf.deadband = 1;
       settings[index].tcf.t0 = 0.0F;
-      settings[index].dcPower = 50;
+      settings[index].parkState = PS_NONE;
       settings[index].backlash = 0.0F;
       settings[index].position = 0.0F;
       writeSettings(index);
@@ -113,12 +94,12 @@ void Focuser::init() {
     readSettings(index);
 
     // init. some defaults
-    target[index] = 0;
-    wait[index] = 0;
-    parked[index] = true;
-    parkHandle[index] = 0;
     moveRate[index] = 100;
     tcfSteps[index] = 0;
+    target[index] = 0;
+    wasSlewing[index] = false;
+    lastSlewTime[index] = 0;
+    parkHandle[index] = 0;
 
     if (configuration[index].present) {
       if (axes[index] != NULL) {
@@ -156,7 +137,7 @@ void Focuser::init() {
 
   // start task for temperature compensated focusing
   VF("MSG: Focusers, starting TCF task (rate 1s priority 6)... ");
-  if (tasks.add(1000, 0, true, 6, tcfWrapper, "FocPoll")) { VL("success"); } else { VL("FAILED!"); }
+  if (tasks.add(1000, 0, true, 6, focWrapper, "FocPoll")) { VL("success"); } else { VL("FAILED!"); }
 }
 
 // get focuser temperature in deg. C
@@ -174,15 +155,13 @@ bool Focuser::isDC(int index) {
 // get DC power in %
 int Focuser::getDcPower(int index) {
   if (index < 0 || index >= FOCUSER_MAX) return 0;
-  return settings[index].dcPower;
+  return 0;
 }
 
 // set DC power in %
 bool Focuser::setDcPower(int index, int value) {
   if (index < 0 || index >= FOCUSER_MAX) return false;
   if (value < 0 || value > 100) return false;
-  settings[index].dcPower = value;
-  writeSettings(index);
   return true;
 }
 
@@ -195,7 +174,7 @@ bool Focuser::getTcfEnable(int index) {
 // set TCF enable
 CommandError Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
-  if (parked[index]) return CE_PARKED;
+  if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   settings[index].tcf.enabled = value;
   if (value) {
@@ -263,7 +242,7 @@ int Focuser::getBacklash(int index) {
 CommandError Focuser::setBacklash(int index, int value) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
   if (value < 0 || value > 10000) return CE_PARAM_RANGE;
-  if (parked[index]) return CE_PARKED;
+  if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   settings[index].backlash = value;
   writeSettings(index);
@@ -275,7 +254,7 @@ CommandError Focuser::setBacklash(int index, int value) {
 CommandError Focuser::slew(int index, Direction dir) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
   if (axes[index] == NULL) return CE_PARAM_RANGE;
-  if (parked[index]) return CE_PARKED;
+  if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   if (!axes[index]->isSlewing()) {
     axes[index]->setFrequencyBase(0.0F);
@@ -289,7 +268,7 @@ CommandError Focuser::slew(int index, Direction dir) {
 CommandError Focuser::gotoTarget(int index, long target) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
   if (axes[index] == NULL) return CE_PARAM_RANGE;
-  if (parked[index]) return CE_PARKED;
+  if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Focuser"); V(index + 1); V(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VL("um)");
   VF("MSG: Focuser"); V(index + 1); V(", starting goto at slew rate ("); V(configuration[index].slewRateDesired); VL("um/s)");
@@ -301,9 +280,12 @@ CommandError Focuser::gotoTarget(int index, long target) {
 
 // park focuser at its current location
 CommandError Focuser::park(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_PARAM_RANGE;
-  if (axes[index] == NULL) return CE_NONE;
-  if (parked[index]) return CE_NONE;
+  if (index < 0 || index >= FOCUSER_MAX)           return CE_PARAM_RANGE;
+  if (axes[index] == NULL)                         return CE_NONE;
+  if (settings[index].parkState == PS_PARKED)      return CE_NONE;
+  if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   setTcfEnable(index, false);
 
@@ -312,19 +294,28 @@ CommandError Focuser::park(int index) {
   float position = axes[index]->getInstrumentCoordinate();
   axes[index]->setTargetCoordinatePark(position);
 
-  settings[index].position = position;
-  writeSettings(index);
-  parked[index] = true;
+  CommandError e = axes[index]->autoSlewRateByDistance(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
 
-  startParkMonitor(index);
-  return axes[index]->autoSlewRateByDistance(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
+  if (e == CE_NONE) {
+    settings[index].position = position;
+    settings[index].parkState = PS_PARKING;
+    writeSettings(index);
+  }
+
+  return e;
 }
 
 // unpark focuser
 CommandError Focuser::unpark(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_PARAM_RANGE;
-  if (axes[index] == NULL) return CE_NONE;
-  if (!parked[index]) return CE_NOT_PARKED;
+  if (index < 0 || index >= FOCUSER_MAX)           return CE_PARAM_RANGE;
+  if (axes[index] == NULL)                         return CE_NONE;
+  if (settings[index].parkState == PS_UNPARKED)    return CE_NONE;
+  if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+  if (FOCUSER_WRITE_DELAY == 0) {
+    if (settings[index].parkState != PS_PARKED)    return CE_NOT_PARKED;
+  }
 
   axes[index]->setBacklash(0.0F);
   float position = settings[index].position;
@@ -334,39 +325,17 @@ CommandError Focuser::unpark(int index) {
   axes[index]->enable(true);
   axes[index]->setBacklash(settings[index].backlash);
   axes[index]->setTargetCoordinate(position);
-  parked[index] = false;
-  settings[index].position = position;
-  target[index] = position - tcfSteps[index];
 
-  startParkMonitor(index);
-  return axes[index]->autoSlewRateByDistance(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
-}
+  CommandError e = axes[index]->autoSlewRateByDistance(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
 
-// start park/unpark monitor
-void Focuser::startParkMonitor(int index) {
-  VF("MSG: Focuser"); V(index + 1); VF(", start "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
-  if (parkHandle != 0) tasks.remove(parkHandle[index]);
-  switch (index) {
-    #if FOCUSER_MAX >= 1
-      case 0: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper0, "FocPrk1"); break;
-    #endif
-    #if FOCUSER_MAX >= 2
-      case 1: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper1, "FocPrk2"); break;
-    #endif
-    #if FOCUSER_MAX >= 3
-      case 2: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper2, "FocPrk3"); break;
-    #endif
-    #if FOCUSER_MAX >= 4
-      case 3: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper3, "FocPrk4"); break;
-    #endif
-    #if FOCUSER_MAX >= 5
-      case 4: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper4, "FocPrk5"); break;
-    #endif
-    #if FOCUSER_MAX >= 6
-      case 5: parkHandle[index] = tasks.add(1000, 0, true, 6, parkWrapper5, "FocPrk6"); break;
-    #endif
+  if (e == CE_NONE) {
+    settings[index].parkState = PS_UNPARKING;
+    settings[index].position = position;
+    target[index] = position - tcfSteps[index];
+    writeSettings(index);
   }
-  if (parkHandle[index]) { VL("success"); } else { VL("FAILED!"); }
+
+  return e;
 }
 
 void Focuser::readSettings(int index) {
@@ -383,72 +352,72 @@ void Focuser::writeSettings(int index) {
   nv.updateBytes(NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize, &settings[index], sizeof(FocuserSettings));
 }
 
-// poll TCF to move the focusers as required
-void Focuser::tcfMonitor() {
+// poll focusers as required
+void Focuser::monitor() {
   float t = getTemperature();
   for (int index = 0; index < FOCUSER_MAX; index++) {
     if (axes[index] != NULL) {
       if (!axes[index]->isSlewing()) {
-        if ((long)(millis() - wait[index]) > 0) {
-          wait[index] = millis();
-          if (settings[index].tcf.enabled) {
-            Y;
+        if ((long)(millis() - lastSlewTime[index]) > 2000) {
+          lastSlewTime[index] = (long)(millis() - 2000UL);
 
-            // only allow TCF if telescope temperature is good
-            if (!isnan(t)) {
-              // get offset in microns due to TCF
-              float offset = settings[index].tcf.coef * (settings[index].tcf.t0 - t);
-              // convert to steps
-              offset *= (float)axes[index]->getStepsPerMeasure();
-              // apply deadband
-              long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
-              // update target if required
-              if (tcfSteps[index] != steps) {
-                VF("MSG: Focuser"); V(index + 1); V(", TCF offset changed moving to target "); 
-                if (steps >=0 ) { V("+ "); } else { V("- "); } V(fabs(steps/axes[index]->getStepsPerMeasure())); VL("um");
-                tcfSteps[index] = steps;
-                axes[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
+          if (settings[index].parkState == PS_PARKING) {
+            if (axes[index]->atTarget()) {
+              axes[index]->enable(false);
+              settings[index].parkState = PS_PARKED;
+              #if DEBUG == VERBOSE
+                long offset = axes[index]->getInstrumentCoordinateSteps() - axes[index]->getMotorPositionSteps();
+                VF("MSG: Focuser"); V(index + 1); VF(", park motor target   "); VL(axes[index]->getTargetCoordinateSteps() - offset);
+                VF("MSG: Focuser"); V(index + 1); VF(", park motor position "); VL(axes[index]->getMotorPositionSteps());
+              #endif
+            }
+          } else
+
+          if (settings[index].parkState == PS_UNPARKING) {
+            if (axes[index]->atTarget()) settings[index].parkState = PS_UNPARKED;
+          } else
+
+          if (settings[index].parkState == PS_UNPARKED) {
+            if (settings[index].tcf.enabled) {
+              Y;
+              if (!isnan(t)) {
+                float offset = settings[index].tcf.coef * (settings[index].tcf.t0 - t);
+                offset *= (float)axes[index]->getStepsPerMeasure();
+                long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
+                if (tcfSteps[index] != steps) {
+                  VF("MSG: Focuser"); V(index + 1); V(", TCF offset changed moving to target "); 
+                  if (steps >= 0) { V("+ "); } else { V("- "); } V(fabs(steps/axes[index]->getStepsPerMeasure())); VL("um");
+                  tcfSteps[index] = steps;
+                  axes[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
+                }
               }
-            }
+              if (!axes[index]->atTarget()) {
+                axes[index]->setSynchronized(false);
+                axes[index]->setFrequencyBase(20.0F); // 20um/s
+              } else {
+                axes[index]->setFrequencyBase(0.0F);
+              }
+            } else tcfSteps[index] = 0;
+          }
 
-            // move to the target at 20 um/s
-            if (!axes[index]->atTarget()) {
-              axes[index]->setSynchronized(false);
-              axes[index]->setFrequencyBase(20.0F);
-            } else {
-              axes[index]->setFrequencyBase(0.0F);
+          // delayed write of focuser position
+          if (FOCUSER_WRITE_DELAY != 0) {
+            if (wasSlewing[index] && (long)(millis() - lastSlewTime[index]) > FOCUSER_WRITE_DELAY) {
+              wasSlewing[index] = false;
+              settings[index].position = target[index];
+              writeSettings(index);
+              VF("MSG: Focuser"); V(index + 1); V(", writing position to NV"); 
             }
-
-          } else tcfSteps[index] = 0;
+          }
         }
+
       } else {
-        wait[index] = millis() + 2000;
+        wasSlewing[index] = true;
+        lastSlewTime[index] = millis();
         target[index] = axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index];
       }
     }
   }
-}
-
-// poll for park/unpark completion
-void Focuser::parkMonitor(int index) {
-  #ifdef MOUNT_PRESENT
-    if (!axes[index]->isSlewing()) {
-
-      if (parked[index]) {
-        axes[index]->enable(false);
-        #if DEBUG == VERBOSE
-          long offset = axes[index]->getInstrumentCoordinateSteps() - axes[index]->getMotorPositionSteps();
-          VF("MSG: Focuser"); V(index + 1); VF(", parked motor target   "); VL(axes[index]->getTargetCoordinateSteps() - offset);
-          VF("MSG: Focuser"); V(index + 1); VF(", parked motor position "); VL(axes[index]->getMotorPositionSteps());
-        #endif
-      }
-
-      tasks.setDurationComplete(parkHandle[index]);
-      parkHandle[index] = 0;
-
-      VF("MSG: Focuser"); V(index + 1); VF(", stop "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
-    }
-  #endif
 }
 
 Focuser focuser;

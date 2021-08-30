@@ -70,7 +70,7 @@ CommandError Park::set() {
 CommandError Park::request() {
   #if SLEW_GOTO == ON
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
-    if (state == PS_PARKED)      return CE_PARK_FAILED;
+    if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
     if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;

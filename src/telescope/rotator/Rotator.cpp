@@ -61,7 +61,7 @@ int Rotator::getBacklash() {
 // set backlash in steps
 CommandError Rotator::setBacklash(int value) {
   if (value < 0 || value > 10000) return CE_PARAM_RANGE;
-  if (parked) return CE_PARKED;
+  if (parkState >= PS_PARKED) return CE_PARKED;
 
   backlash = value;
   writeSettings();
@@ -93,7 +93,7 @@ CommandError Rotator::setBacklash(int value) {
 
 // start slew in the specified direction
 CommandError Rotator::slew(Direction dir) {
-  if (parked) return CE_PARKED;
+  if (parkState >= PS_PARKED) return CE_PARKED;
 
   axis3.setFrequencyBase(0.0F);
   return axis3.autoSlew(dir, slewRate);
@@ -101,7 +101,7 @@ CommandError Rotator::slew(Direction dir) {
 
 // move rotator to a specific location
 CommandError Rotator::gotoTarget(float target) {
-  if (parked) return CE_PARKED;
+  if (parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target*axis3.getStepsPerMeasure()); VL("°)");
   VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
@@ -113,7 +113,10 @@ CommandError Rotator::gotoTarget(float target) {
 
 // parks rotator at current position
 CommandError Rotator::park() {
-  if (parked) return CE_PARKED;
+  if (parkState == PS_PARKED)      return CE_NONE;
+  if (parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   derotatorEnabled = false;
 
@@ -121,16 +124,27 @@ CommandError Rotator::park() {
   axis3.setBacklash(0.0F);
   position = axis3.getInstrumentCoordinate();
   axis3.setTargetCoordinatePark(position);
-  writeSettings();
-  parked = true;
 
-  startParkMonitor();
-  return axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+  CommandError e = axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+
+  if (e == CE_NONE) {
+    startParkMonitor();
+    parkState = PS_PARKING;
+    writeSettings();
+  }
+
+  return e;
 }
 
 // unparks rotator
 CommandError Rotator::unpark() {
-  if (!parked) return CE_NONE;
+  if (parkState == PS_UNPARKED)    return CE_NONE;
+  if (parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+  if (ROTATOR_WRITE_DELAY == 0) {
+    if (parkState != PS_PARKED)    return CE_NOT_PARKED;
+  }
 
   axis3.setBacklash(0.0F);
   axis3.setInstrumentCoordinatePark(position);
@@ -139,15 +153,23 @@ CommandError Rotator::unpark() {
   axis3.enable(true);
   axis3.setBacklash(backlash);
   axis3.setTargetCoordinate(position);
-  parked = false;
 
-  startParkMonitor();
-  return axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+  CommandError e = axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+
+  if (e == CE_NONE) {
+    startParkMonitor();
+    parkState = PS_UNPARKING;
+    writeSettings();
+  }
+
+  return e;
 }
 
 // start park/unpark monitor
 void Rotator::startParkMonitor() {
-  VF("MSG: Rotator, start "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
+  VF("MSG: Rotator, start ");
+  if (parkState == PS_PARKING) { VF("park"); } else { VF("unpark"); }
+  VF(" monitor task... ");
   if (parkHandle != 0) tasks.remove(parkHandle);
   parkHandle = tasks.add(1000, 0, true, 6, parkWrapper, "RotPark"); 
   if (parkHandle) { VL("success"); } else { VL("FAILED!"); }
@@ -171,11 +193,10 @@ void Rotator::writeSettings() {
 
 // poll to set derotator rate
 void Rotator::derotMonitor() {
-  if (derotatorEnabled) {
+  if (derotatorEnabled && parkState == PS_UNPARKED) {
     float pr = 0.0F;
     #ifdef MOUNT_PRESENT
       if (!axis3.isSlewing()) {
-        // needs synchronized movement
         if (!axis3.getSynchronized()) axis3.setSynchronized(true);
         Coordinate current = mount.getPosition();
         pr = parallacticRate(&current);
@@ -185,6 +206,20 @@ void Rotator::derotMonitor() {
     axis3.setSynchronized(true);
     axis3.setFrequencyBase(pr);
   }
+
+  if (!axis3.isSlewing()) {
+    if (ROTATOR_WRITE_DELAY != 0) {
+      if (wasSlewing && (long)(millis() - lastSlewTime) > ROTATOR_WRITE_DELAY) {
+        wasSlewing = false;
+        position = axis3.getInstrumentCoordinate();
+        writeSettings();
+        VF("MSG: Rotator, writing position to NV"); 
+      }
+    }
+  } else {
+    wasSlewing = true;
+    lastSlewTime = millis();
+  }
 }
 
 // poll for park/unpark completion
@@ -192,19 +227,21 @@ void Rotator::parkMonitor() {
   #ifdef MOUNT_PRESENT
     if (!axis3.isSlewing()) {
 
-      if (parked == true) {
+      if (parkState == PS_PARKING) {
         axis3.enable(false);
         #if DEBUG == VERBOSE
           long offset = axis3.getInstrumentCoordinateSteps() - axis3.getMotorPositionSteps();
-          VF("MSG: Rotator, parked motor target   "); VL(axis3.getTargetCoordinateSteps() - offset);
-          VF("MSG: Rotator, parked motor position "); VL(axis3.getMotorPositionSteps());
+          VF("MSG: Rotator, park motor target   "); VL(axis3.getTargetCoordinateSteps() - offset);
+          VF("MSG: Rotator, park motor position "); VL(axis3.getMotorPositionSteps());
         #endif
-      }
+        parkState = PS_PARKED;
+      } else parkState = PS_UNPARKED;
+      writeSettings();
 
       tasks.setDurationComplete(parkHandle);
       parkHandle = 0;
 
-      VF("MSG: Rotator, stop "); if (parked[index]) { VF("unpark"); } else { VF("park"); } VLF(" monitor task");
+      VF("MSG: Rotator, stop "); if (parkState == PS_PARKED) { VF("park"); } else { VF("unpark"); } VLF(" monitor task");
     }
   #endif
 }
