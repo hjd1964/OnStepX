@@ -316,10 +316,9 @@ CommandError Focuser::unpark(int index) {
     if (settings[index].parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
-  // simple unpark if any stepper driver indexer would be ok here or we didn't actually park
-  if (axes[index]->settings.subdivisions == 1 || settings[index].parkState != PS_UNPARKED) {
+  // simple unpark if we didn't actually park
+  if (settings[index].parkState == PS_UNPARKED) {
     axes[index]->setInstrumentCoordinate(settings[index].position);
-    settings[index].parkState = PS_UNPARKED;
     target[index] = lround(settings[index].position*axes[index]->getStepsPerMeasure()) - tcfSteps[index];
     writeSettings(index);
     return CE_NONE;

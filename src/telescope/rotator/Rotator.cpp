@@ -141,10 +141,9 @@ CommandError Rotator::unpark() {
     if (parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
-  // simple unpark if any stepper driver indexer would be ok here or we didn't actually park
-  if (axis3.settings.subdivisions == 1 || parkState == PS_UNPARKED) {
+  // simple unpark if we didn't actually park
+  if (parkState == PS_UNPARKED) {
     axis3.setInstrumentCoordinate(position);
-    parkState = PS_UNPARKED;
     writeSettings();
     return CE_NONE;
   }
