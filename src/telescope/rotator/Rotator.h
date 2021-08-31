@@ -12,12 +12,12 @@
 
 // time to write position to nv after last movement of Rotator
 #ifndef ROTATOR_WRITE_DELAY
-  #if NV_ENDURANCE == VHIGH
-    #define ROTATOR_WRITE_DELAY 5000L
-  #elif NV_ENDURANCE == HIGH
-    #define ROTATOR_WRITE_DELAY 60000L
+  #if NV_ENDURANCE == NVE_VHIGH
+    #define ROTATOR_WRITE_DELAY 5
+  #elif NV_ENDURANCE == NVE_HIGH
+    #define ROTATOR_WRITE_DELAY 60
   #else
-    #define ROTATOR_WRITE_DELAY 300000L
+    #define ROTATOR_WRITE_DELAY 300
   #endif
 #endif
 
@@ -29,11 +29,8 @@ class Rotator {
     // process rotator commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // poll to set derotator rate
-    void derotMonitor();
-
-    // poll for park/unpark completion
-    void parkMonitor();
+    // poll rotator to handle parking and derotation
+    void monitor();
 
   private:
     // get backlash in steps
@@ -62,22 +59,19 @@ class Rotator {
     // unparks rotator
     CommandError unpark();
 
-    // starts park/unpark monitor
-    void startParkMonitor();
-
     void readSettings();
     void writeSettings();
 
     float slewRate = AXIS3_SLEW_RATE_DESIRED;  // in degs/sec
 
-    int16_t backlash = 0;   // in steps
-    float position = 0.0F;  // in degrees
+    int16_t backlash = 0;    // in steps
+    double position = 0.0F;  // in degrees
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;
 
-    bool wasSlewing = false;
-    unsigned long lastSlewTime = 0;
+    unsigned long writeTime = 0;
+    unsigned long secs = 0;
 
     uint8_t parkHandle = 0;
     ParkState parkState;

@@ -37,12 +37,12 @@
 
 // time to write position to nv after last movement of Focuser
 #ifndef FOCUSER_WRITE_DELAY
-  #if NV_ENDURANCE == VHIGH
-    #define FOCUSER_WRITE_DELAY 5000L
-  #elif NV_ENDURANCE == HIGH
-    #define FOCUSER_WRITE_DELAY 60000L
+  #if NV_ENDURANCE == NVE_VHIGH
+    #define FOCUSER_WRITE_DELAY 5
+  #elif NV_ENDURANCE == NVE_HIGH
+    #define FOCUSER_WRITE_DELAY 60
   #else
-    #define FOCUSER_WRITE_DELAY 300000L
+    #define FOCUSER_WRITE_DELAY 300
   #endif
 #endif
 
@@ -69,11 +69,8 @@ class Focuser {
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // poll focusers as required
+    // poll focusers to handle parking and TCF
     void monitor();
-
-    // poll for park completion
-    void parkMonitor(int index);
   
   private:
 
@@ -139,12 +136,13 @@ class Focuser {
 
     FocuserSettings settings[FOCUSER_MAX];
 
-    long target[FOCUSER_MAX];
+    long target[FOCUSER_MAX]; // in steps
 
-    bool wasSlewing[FOCUSER_MAX];
-    unsigned long lastSlewTime[FOCUSER_MAX];
+    unsigned long writeTime[FOCUSER_MAX];
 
     uint8_t parkHandle[FOCUSER_MAX];
+
+    unsigned long secs = 0;
 };
 
 extern Focuser focuser;
