@@ -310,12 +310,14 @@ CommandError Focuser::unpark(int index) {
   if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+
+  // setting write delay to 0 disables on-the-fly position writes and forces strict parking
   if (FOCUSER_WRITE_DELAY == 0) {
-    if (settings[index].parkState != PS_PARKED)    return CE_NOT_PARKED;
+    if (settings[index].parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
-  // simple unpark if any stepper driver indexer would be ok here
-  if (axes[index]->settings.subdivisions == 1) {
+  // simple unpark if any stepper driver indexer would be ok here or we didn't actually park
+  if (axes[index]->settings.subdivisions == 1 || settings[index].parkState != PS_UNPARKED) {
     axes[index]->setInstrumentCoordinate(settings[index].position);
     settings[index].parkState = PS_UNPARKED;
     target[index] = lround(settings[index].position*axes[index]->getStepsPerMeasure()) - tcfSteps[index];
@@ -325,7 +327,7 @@ CommandError Focuser::unpark(int index) {
 
   axes[index]->setBacklash(0.0F);
   axes[index]->setInstrumentCoordinatePark(settings[index].position);
-  V("MSG: Focuser"); V(index + 1); V(", unpark motor position "); V(axes[index]->getInstrumentCoordinate()); VL("um");
+  V("MSG: Focuser"); V(index + 1); V(", unpark position "); V(axes[index]->getInstrumentCoordinate()); VL("um");
 
   axes[index]->enable(true);
   axes[index]->setBacklash(settings[index].backlash);

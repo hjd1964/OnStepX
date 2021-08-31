@@ -135,12 +135,14 @@ CommandError Rotator::unpark() {
   if (parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+
+  // setting write delay to 0 disables on-the-fly position writes and forces strict parking
   if (ROTATOR_WRITE_DELAY == 0) {
-    if (parkState != PS_PARKED)    return CE_NOT_PARKED;
+    if (parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
-  // simple unpark if any stepper driver indexer would be ok here
-  if (axis3.settings.subdivisions == 1) {
+  // simple unpark if any stepper driver indexer would be ok here or we didn't actually park
+  if (axis3.settings.subdivisions == 1 || parkState == PS_UNPARKED) {
     axis3.setInstrumentCoordinate(position);
     parkState = PS_UNPARKED;
     writeSettings();
@@ -149,7 +151,7 @@ CommandError Rotator::unpark() {
 
   axis3.setBacklash(0.0F);
   axis3.setInstrumentCoordinatePark(position);
-  V("MSG: Rotator, unpark motor position "); VL(axis3.getMotorPositionSteps());
+  V("MSG: Rotator, unpark position "); V(axis3.getInstrumentCoordinate()); VL("°");
 
   axis3.enable(true);
   axis3.setBacklash(backlash);
