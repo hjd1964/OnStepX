@@ -54,10 +54,12 @@ void Motor::setInstrumentCoordinateSteps(long value) {
 // set instrument park coordinate, in steps
 // should only be called when the axis is not moving
 void Motor::setInstrumentCoordinateParkSteps(long value, int modulo) {
-  long steps = value - motorSteps;
-  steps -= modulo*2L;
-  for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
-  indexSteps = steps;
+  if (driverType == STEP_DIR) {
+    long steps = value - motorSteps;
+    steps -= modulo*2L;
+    for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
+    indexSteps = steps;
+  } else setInstrumentCoordinateSteps(value);
   V(axisPrefix); VF("setInstrumentCoordinateParkSteps at "); V(indexSteps); V(" (was "); V(value - motorSteps); VL(")");
 }
 
@@ -79,12 +81,14 @@ void Motor::setTargetCoordinateSteps(long value) {
 // set target park coordinate, in steps (taking into account stepper motor cogging when powered off)
 // should only be called when the axis is not moving
 void Motor::setTargetCoordinateParkSteps(long value, int modulo) {
-  long steps = value - indexSteps;
-  steps -= modulo*2L;
-  for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
-  noInterrupts();
-  targetSteps = steps;
-  interrupts();
+  if (driverType == STEP_DIR) {
+    long steps = value - indexSteps;
+    steps -= modulo*2L;
+    for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
+    noInterrupts();
+    targetSteps = steps;
+    interrupts();
+  } else setTargetCoordinateSteps(value);
   V(axisPrefix); VF("setTargetCoordinateParkSteps at "); V(targetSteps); V(" (was "); V(value - indexSteps); VL(")");
 }
 
