@@ -273,7 +273,7 @@
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 // NV addresses
-#define INIT_NV_KEY                 583927928UL
+#define INIT_NV_KEY                 583927927UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..  3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4
@@ -292,6 +292,6 @@ enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 #define NV_AXIS_SETTINGS_REVERT     268    // bytes: 2   , addr: 268..269
 #define NV_AXIS_SETTINGS_BASE       270    // bytes: 25*9, addr: 270..494
 #define NV_FOCUSER_SETTINGS_BASE    495    // bytes: 18*9, addr: 495..656
-#define NV_ROTATOR_SETTINGS_BASE    657    // bytes: 6   , addr: 657..662
-#define NV_FEATURE_SETTINGS_BASE    663    // bytes: 3 *8, addr: 663..687
+#define NV_ROTATOR_SETTINGS_BASE    657    // bytes: 7   , addr: 657..663
+#define NV_FEATURE_SETTINGS_BASE    664    // bytes: 3 *8, addr: 664..688
 #define NV_PEC_BUFFER_BASE          700    // Bytes: ?   , addr: 700..700 + (PEC_BUFFER_SIZE_LIMIT - 1)
