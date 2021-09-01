@@ -21,6 +21,9 @@ void Rotator::init() {
   // wait a moment for any background processing that may be needed
   delay(1000);
 
+  // confirm the data structure size
+  if (RotatorSettingsSize < sizeof(RotatorSettings)) { initError.nv = true; DL("ERR: Rotator::init(); RotatorSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+
   // get settings stored in NV ready
   if (!validKey) {
     VLF("MSG: Rotator, writing default settings to NV");
@@ -31,7 +34,7 @@ void Rotator::init() {
   VL("MSG: Rotator, init (Axis3)");
   axis3.init(false);
   axis3.resetPositionSteps(0);
-  axis3.setBacklashSteps(backlash);
+  axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);
   axis3.setFrequencyMin(0.01F);
   axis3.setFrequencySlew(AXIS3_SLEW_RATE_DESIRED);
@@ -48,17 +51,17 @@ void Rotator::init() {
 
 // get backlash in steps
 int Rotator::getBacklash() {
-  return backlash;
+  return settings.backlash;
 }
 
 // set backlash in steps
 CommandError Rotator::setBacklash(int value) {
   if (value < 0 || value > 10000) return CE_PARAM_RANGE;
-  if (parkState >= PS_PARKED) return CE_PARKED;
+  if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
-  backlash = value;
+  settings.backlash = value;
   writeSettings();
-  axis3.setBacklashSteps(backlash);
+  axis3.setBacklashSteps(settings.backlash);
 
   return CE_NONE;
 }
@@ -86,7 +89,7 @@ CommandError Rotator::setBacklash(int value) {
 
 // start slew in the specified direction
 CommandError Rotator::slew(Direction dir) {
-  if (parkState >= PS_PARKED) return CE_PARKED;
+  if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   axis3.setFrequencyBase(0.0F);
 
@@ -95,7 +98,7 @@ CommandError Rotator::slew(Direction dir) {
 
 // move rotator to a specific location
 CommandError Rotator::gotoTarget(float target) {
-  if (parkState >= PS_PARKED) return CE_PARKED;
+  if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target*axis3.getStepsPerMeasure()); VL("°)");
   VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
@@ -108,22 +111,22 @@ CommandError Rotator::gotoTarget(float target) {
 
 // parks rotator at current position
 CommandError Rotator::park() {
-  if (parkState == PS_PARKED)      return CE_NONE;
-  if (parkState == PS_PARKING)     return CE_PARK_FAILED;
-  if (parkState == PS_UNPARKING)   return CE_PARK_FAILED;
-  if (parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+  if (settings.parkState == PS_PARKED)      return CE_NONE;
+  if (settings.parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (settings.parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (settings.parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   derotatorEnabled = false;
 
   VLF("MSG: Rotator, parking");
   axis3.setBacklash(0.0F);
-  position = axis3.getInstrumentCoordinate();
-  axis3.setTargetCoordinatePark(position);
+  settings.position = axis3.getInstrumentCoordinate();
+  axis3.setTargetCoordinatePark(settings.position);
 
   CommandError e = axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
 
   if (e == CE_NONE) {
-    parkState = PS_PARKING;
+    settings.parkState = PS_PARKING;
     writeSettings();
   }
 
@@ -132,34 +135,37 @@ CommandError Rotator::park() {
 
 // unparks rotator
 CommandError Rotator::unpark() {
-  if (parkState == PS_PARKING)     return CE_PARK_FAILED;
-  if (parkState == PS_UNPARKING)   return CE_PARK_FAILED;
-  if (parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
+  if (settings.parkState == PS_PARKING)     return CE_PARK_FAILED;
+  if (settings.parkState == PS_UNPARKING)   return CE_PARK_FAILED;
+  if (settings.parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   // setting write delay to 0 disables on-the-fly position writes and forces strict parking
   if (ROTATOR_WRITE_DELAY == 0) {
-    if (parkState != PS_PARKED) return CE_NOT_PARKED;
+    if (settings.parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
+  axis3.enable(true);
+  V("MSG: Rotator, unpark position "); V(settings.position); VL("°");
+
   // simple unpark if we didn't actually park
-  if (parkState == PS_UNPARKED) {
-    axis3.setInstrumentCoordinate(position);
+  if (settings.parkState == PS_UNPARKED) {
+    axis3.setInstrumentCoordinate(settings.position);
     writeSettings();
     return CE_NONE;
   }
 
   axis3.setBacklash(0.0F);
-  axis3.setInstrumentCoordinatePark(position);
   V("MSG: Rotator, unpark position "); V(axis3.getInstrumentCoordinate()); VL("°");
+  axis3.setInstrumentCoordinatePark(settings.position);
 
   axis3.enable(true);
-  axis3.setBacklash(backlash);
-  axis3.setTargetCoordinate(position);
+  axis3.setBacklash(settings.backlash);
+  axis3.setTargetCoordinate(settings.position);
 
   CommandError e = axis3.autoSlewRateByDistance(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
 
   if (e == CE_NONE) {
-    parkState = PS_UNPARKING;
+    settings.parkState = PS_UNPARKING;
     writeSettings();
   }
 
@@ -167,33 +173,31 @@ CommandError Rotator::unpark() {
 }
 
 void Rotator::readSettings() {
-  backlash = nv.readUI(NV_ROTATOR_SETTINGS_BASE);
-  position = nv.readF(NV_ROTATOR_SETTINGS_BASE + 2);
+  nv.readBytes(NV_ROTATOR_SETTINGS_BASE + RotatorSettingsSize, &settings, sizeof(RotatorSettings));
 
-  if (backlash < 0)     { backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash < 0 steps (set to 0)"); }
-  if (backlash > 10000) { backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash > 10000 steps (set to 0)"); }
+  if (settings.backlash < 0)     { settings.backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash < 0 steps (set to 0)"); }
+  if (settings.backlash > 10000) { settings.backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash > 10000 steps (set to 0)"); }
 
-  if (position < AXIS3_LIMIT_MIN) { position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos < AXIS3_LIMIT_MIN (set to 0.0)"); }
-  if (position > AXIS3_LIMIT_MAX) { position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos > AXIS3_LIMIT_MAX (set to 0.0)"); }
+  if (settings.position < AXIS3_LIMIT_MIN) { settings.position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos < AXIS3_LIMIT_MIN (set to 0.0)"); }
+  if (settings.position > AXIS3_LIMIT_MAX) { settings.position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos > AXIS3_LIMIT_MAX (set to 0.0)"); }
 }
 
 void Rotator::writeSettings() {
-  nv.write(NV_ROTATOR_SETTINGS_BASE, backlash);
-  nv.write(NV_ROTATOR_SETTINGS_BASE + 2, (float)position);
+  nv.updateBytes(NV_ROTATOR_SETTINGS_BASE + RotatorSettingsSize, &settings, sizeof(RotatorSettings));
 }
 
 // poll rotator to handle parking and derotation
 void Rotator::monitor() {
   secs++;
 
-  if (axis3.isSlewing() || position == axis3.getInstrumentCoordinate()) writeTime = secs + ROTATOR_WRITE_DELAY;
+  if (axis3.isSlewing() || settings.position == axis3.getInstrumentCoordinate()) writeTime = secs + ROTATOR_WRITE_DELAY;
 
   if (!axis3.isSlewing()) {
 
-    if (parkState == PS_PARKING) {
+    if (settings.parkState == PS_PARKING) {
       if (axis3.atTarget()) {
         axis3.enable(false);
-        parkState = PS_PARKED;
+        settings.parkState = PS_PARKED;
         writeSettings();
         #if DEBUG == VERBOSE
           long offset = axis3.getInstrumentCoordinateSteps() - axis3.getMotorPositionSteps();
@@ -203,14 +207,14 @@ void Rotator::monitor() {
       }
     } else
 
-    if (parkState == PS_UNPARKING) {
+    if (settings.parkState == PS_UNPARKING) {
       if (axis3.atTarget()) {
-        parkState = PS_UNPARKED;
+        settings.parkState = PS_UNPARKED;
         writeSettings();
       }
     } else
 
-    if (parkState == PS_UNPARKED) {
+    if (settings.parkState == PS_UNPARKED) {
       #ifdef MOUNT_PRESENT
         if (derotatorEnabled && transform.mountType == ALTAZM) {
           float pr = 0.0F;
@@ -226,9 +230,9 @@ void Rotator::monitor() {
       // delayed write of focuser position
       if (ROTATOR_WRITE_DELAY != 0) {
         if (secs > writeTime) {
-          position = axis3.getInstrumentCoordinate();
+          settings.position = axis3.getInstrumentCoordinate();
           writeSettings();
-          VF("MSG: Rotator, writing position ("); V(position); VL("°) to NV"); 
+          VF("MSG: Rotator, writing position ("); V(settings.position); VL("°) to NV"); 
         }
       }
     }

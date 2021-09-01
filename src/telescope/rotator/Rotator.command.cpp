@@ -146,15 +146,17 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'S') {
-      double t;
-      convert.dmsToDouble(&t, parameter, true);
-      *commandError = gotoTarget(t);
+      double t, s = 1.0;
+      char ws[50];
+      if (parameter[0] == '-') s = -1.0;
+      if (parameter[0] == '-' || parameter[0] == '+') strcpy(ws, &parameter[1]); else strcpy(ws, parameter);
+      if (convert.dmsToDouble(&t, ws, false)) *commandError = gotoTarget(s*t); else *commandError = CE_PARAM_FORM;
     } else
 
     // :rZ#       Set rotator position to Zero degrees
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      parkState = PS_UNPARKED;
+      settings.parkState = PS_UNPARKED;
       *commandError = axis3.resetPosition(0.0);
       axis3.setBacklashSteps(getBacklash());
       *numericReply = false;
@@ -163,7 +165,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rF#       Set rotator position as Half-travel
     //            Returns: Nothing
     if (command[1] == 'F') {
-      parkState = PS_UNPARKED;
+      settings.parkState = PS_UNPARKED;
       double t = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0);
       *commandError = axis3.resetPosition(t);
       axis3.setBacklashSteps(getBacklash());
@@ -182,7 +184,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == '+') {
       #ifdef MOUNT_PRESENT
         if (transform.mountType == ALTAZM) {
-          if (parkState < PS_PARKED) derotatorEnabled = true; else *commandError = CE_PARKED;
+          if (settings.parkState < PS_PARKED) derotatorEnabled = true; else *commandError = CE_PARKED;
         }
       #endif
       *numericReply = false;

@@ -21,6 +21,15 @@
   #endif
 #endif
 
+#pragma pack(1)
+#define RotatorSettingsSize 7
+typedef struct RotatorSettings {
+  ParkState parkState;
+  int16_t backlash;  // in steps
+  float position;    // in degrees
+} RotatorSettings;
+#pragma pack()
+
 class Rotator {
   public:
     // initialize rotator
@@ -64,8 +73,7 @@ class Rotator {
 
     float slewRate = AXIS3_SLEW_RATE_DESIRED;  // in degs/sec
 
-    int16_t backlash = 0;    // in steps
-    double position = 0.0F;  // in degrees
+    RotatorSettings settings = {PS_NONE, 0, 0.0F};
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;
@@ -74,7 +82,6 @@ class Rotator {
     unsigned long secs = 0;
 
     uint8_t parkHandle = 0;
-    ParkState parkState;
 };
 
 extern Rotator rotator;
