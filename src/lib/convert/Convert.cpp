@@ -107,6 +107,14 @@ bool Convert::hmsToDouble(double *value, char *hms) {
   return true;
 }
 
+// convert string in format as follows to double (in degrees):
+// sDD:MM          PM_LOW
+// DDD:MM          PM_LOW
+// sDD*MM          PM_LOW
+// DDD*MM          PM_LOW
+// sDD:MM:SS       PM_HIGH
+// DDD:MM:SS       PM_HIGH
+// sDD:MM:SS.SSS   PM_HIGHEST
 bool Convert::dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p) {
   char d[4], m[5];
   int16_t length;
@@ -152,6 +160,15 @@ bool Convert::dmsToDouble(double *value, char *dms, bool signPresent, PrecisionM
   return true;
 }
 
+// convert string in format as follows to double (in degrees):
+// sDD:MM          PM_LOW
+// DDD:MM          PM_LOW
+// sDD*MM          PM_LOW
+// DDD*MM          PM_LOW
+// sDD:MM:SS       PM_HIGH
+// DDD:MM:SS       PM_HIGH
+// sDD:MM:SS.SSS   PM_HIGHEST
+// automatically detects PrecisionMode
 bool Convert::dmsToDouble(double *value, char *dms, bool signPresent) {
   if (!dmsToDouble(value, dms, signPresent, PM_HIGHEST))
     if (!dmsToDouble(value, dms, signPresent, PM_HIGH))
@@ -188,6 +205,13 @@ void Convert::doubleToHms(char *reply, double value, bool signPresent, Precision
                        sprintf(reply, form, sign, (int)hour, (int)minute, (int)second);
 }
 
+// convert double (in degrees) to string in format as follows:
+// sDD:MM          PM_LOW
+// DDD:MM          PM_LOW
+// sDD*MM          PM_LOW
+// DDD*MM          PM_LOW
+// DDD:MM:SS       PM_HIGH
+// sDD:MM:SS.SSS   PM_HIGHEST
 void Convert::doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p) {
   char sign[2] = "";
   double deg, minute, second = 0, decimal = 0;

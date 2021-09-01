@@ -11,20 +11,26 @@ extern void sprintF(char *result, const char *source, float f);
 
 class Convert {
   public:
-    // convert timezone string  sHH:MM to double
+    // convert timezone string  sHH:MM to double (in hours):
     // (also handles)           sHH
     bool tzToDouble(double *value, char *hm);
 
-    // convert string in format as follows to double:
+    // convert string in format as follows to double (in hours):
     // HH:MM           PM_LOWEST
     // HH:MM.M         PM_LOW
     // HH:MM:SS        PM_HIGH (DEFAULT) 
     // HH:MM:SS.SSSS   PM_HIGHEST
     bool hmsToDouble(double *value, char *hms, PrecisionMode p);
-    // automatically detects PrecisionMode (as above)
+
+    // convert string in format as follows to double (in hours):
+    // HH:MM           PM_LOWEST
+    // HH:MM.M         PM_LOW
+    // HH:MM:SS        PM_HIGH (DEFAULT) 
+    // HH:MM:SS.SSSS   PM_HIGHEST
+    // automatically detects PrecisionMode
     bool hmsToDouble(double *value, char *hms);
 
-    // convert string in format as follows to double:
+    // convert string in format as follows to double (in degrees):
     // sDD:MM          PM_LOW
     // DDD:MM          PM_LOW
     // sDD*MM          PM_LOW
@@ -33,17 +39,26 @@ class Convert {
     // DDD:MM:SS       PM_HIGH
     // sDD:MM:SS.SSS   PM_HIGHEST
     bool dmsToDouble(double *value, char *dms, bool signPresent, PrecisionMode p);
-    // automatically detects PrecisionMode (as above)
+
+    // convert string in format as follows to double (in degrees):
+    // sDD:MM          PM_LOW
+    // DDD:MM          PM_LOW
+    // sDD*MM          PM_LOW
+    // DDD*MM          PM_LOW
+    // sDD:MM:SS       PM_HIGH
+    // DDD:MM:SS       PM_HIGH
+    // sDD:MM:SS.SSS   PM_HIGHEST
+    // automatically detects PrecisionMode
     bool dmsToDouble(double *value, char *dms, bool signPresent);
     
-    // convert double to string in format as follows:
+    // convert double (in hours) to string in format as follows:
     // HH:MM           PM_LOWEST
     // HH:MM.M         PM_LOW
     // HH:MM:SS        PM_HIGH, 
     // HH:MM:SS.SSSS   PM_HIGHEST
     void doubleToHms(char *reply, double value, bool signPresent, PrecisionMode p);
     
-    // convert double to string in format as follows:
+    // convert double (in degrees) to string in format as follows:
     // sDD:MM          PM_LOW
     // DDD:MM          PM_LOW
     // sDD*MM          PM_LOW
@@ -54,9 +69,11 @@ class Convert {
 
     // string to int with error checking
     bool atoi2(char *a, int16_t *i, bool sign = true);
+
     // string to byte with error checking
     bool atoi2(char *a, uint8_t *u, bool sign = true);
-    // string to float with error checking
+
+    // string to double with error checking
     bool atof2(char *a, double *d, bool sign = true);
 
     PrecisionMode precision = PM_HIGH;
