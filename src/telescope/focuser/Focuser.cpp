@@ -316,6 +316,9 @@ CommandError Focuser::unpark(int index) {
     if (settings[index].parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
+  axes[index]->enable(true);
+  V("MSG: Focuser"); V(index + 1); V(", unpark position "); V(settings[index].position); VL("um");
+
   // simple unpark if we didn't actually park
   if (settings[index].parkState == PS_UNPARKED) {
     axes[index]->setInstrumentCoordinate(settings[index].position);
@@ -326,9 +329,7 @@ CommandError Focuser::unpark(int index) {
 
   axes[index]->setBacklash(0.0F);
   axes[index]->setInstrumentCoordinatePark(settings[index].position);
-  V("MSG: Focuser"); V(index + 1); V(", unpark position "); V(axes[index]->getInstrumentCoordinate()); VL("um");
 
-  axes[index]->enable(true);
   axes[index]->setBacklash(settings[index].backlash);
   axes[index]->setTargetCoordinate(settings[index].position);
 
