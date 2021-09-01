@@ -100,7 +100,7 @@ CommandError Rotator::slew(Direction dir) {
 CommandError Rotator::gotoTarget(float target) {
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
-  VF("MSG: Rotator, goto target coordinate set ("); V(target*axis3.getStepsPerMeasure()); VL("°)");
+  VF("MSG: Rotator, goto target coordinate set ("); V(target); VL("°)");
   VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
 
   axis3.setFrequencyBase(0.0F);
@@ -155,10 +155,8 @@ CommandError Rotator::unpark() {
   }
 
   axis3.setBacklash(0.0F);
-  V("MSG: Rotator, unpark position "); V(axis3.getInstrumentCoordinate()); VL("°");
   axis3.setInstrumentCoordinatePark(settings.position);
 
-  axis3.enable(true);
   axis3.setBacklash(settings.backlash);
   axis3.setTargetCoordinate(settings.position);
 
