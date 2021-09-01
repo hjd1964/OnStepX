@@ -146,11 +146,11 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == 'S') {
+      int i = 0;
       double t, s = 1.0;
-      char ws[50];
       if (parameter[0] == '-') s = -1.0;
-      if (parameter[0] == '-' || parameter[0] == '+') strcpy(ws, &parameter[1]); else strcpy(ws, parameter);
-      if (convert.dmsToDouble(&t, ws, false)) *commandError = gotoTarget(s*t); else *commandError = CE_PARAM_FORM;
+      if (parameter[0] == '+' || parameter[0] == '-') i = 1;
+      if (convert.dmsToDouble(&t, &parameter[i], false)) *commandError = gotoTarget(s*t); else *commandError = CE_PARAM_FORM;
     } else
 
     // :rZ#       Set rotator position to Zero degrees
