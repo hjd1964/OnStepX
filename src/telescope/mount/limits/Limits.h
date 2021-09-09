@@ -15,7 +15,7 @@ typedef struct AltitudeLimits {
 } AltitudeLimits;
 
 #define LimitSettingsSize 16
-typedef struct LimitsSettings {
+typedef struct LimitSettings {
   AltitudeLimits altitude;
   float pastMeridianE;
   float pastMeridianW;
@@ -68,7 +68,7 @@ class Limits {
 
     void poll();
 
-    LimitsSettings settings = { { degToRadF(-10.0F), degToRadF(85.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
+    LimitSettings settings = { { degToRadF(-10.0F), degToRadF(85.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
 
   private:
     void stop(GuideAction stopDirection);
