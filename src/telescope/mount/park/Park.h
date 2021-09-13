@@ -44,11 +44,11 @@ class Park {
     CommandError restore(bool withTrackingOn);
 
     // resets park state, clears any errors but does not erase the park position
-    inline void reset() { state = PS_NONE; nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings)); }
+    inline void reset() { state = PS_UNPARKED; nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings)); }
 
     ParkState state;
 
-    ParkSettings settings = {{0, 0, PIER_SIDE_NONE}, false, PS_NONE, 0};
+    ParkSettings settings = {{0, 0, PIER_SIDE_NONE}, false, PS_UNPARKED, 0};
 
   private:
 

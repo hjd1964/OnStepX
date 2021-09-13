@@ -73,7 +73,7 @@ class Rotator {
 
     float slewRate = AXIS3_SLEW_RATE_DESIRED;  // in degs/sec
 
-    RotatorSettings settings = {PS_NONE, 0, 0.0F};
+    RotatorSettings settings = {PS_UNPARKED, 0, 0.0F};
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;

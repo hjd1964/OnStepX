@@ -82,7 +82,7 @@ void Focuser::init() {
       settings[index].tcf.coef = 0.0F;
       settings[index].tcf.deadband = 1;
       settings[index].tcf.t0 = 0.0F;
-      settings[index].parkState = PS_NONE;
+      settings[index].parkState = PS_UNPARKED;
       settings[index].backlash = 0.0F;
       settings[index].position = 0.0F;
       writeSettings(index);
