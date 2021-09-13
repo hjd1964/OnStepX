@@ -132,6 +132,16 @@ long Motor::getOriginOrTargetDistanceSteps() {
   if (distanceOrigin < distanceTarget) return distanceOrigin; else return distanceTarget;
 }
 
+// returns 1 if distance to origin is closer else -1 if target is closer
+int Motor::getRampDirection() {
+  noInterrupts();
+  long steps = motorSteps;
+  interrupts();
+  long distanceOrigin = labs(originSteps - steps);
+  long distanceTarget = labs(targetSteps - steps);
+  if (distanceOrigin < distanceTarget) return 1; else return -1;
+}
+
 // set backlash frequency in steps per second
 void Motor::setBacklashFrequencySteps(float frequency) {
   backlashFrequency = frequency;

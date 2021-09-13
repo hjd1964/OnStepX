@@ -66,6 +66,9 @@ class Motor {
     // distance to origin or target, whichever is closer, in steps
     long getOriginOrTargetDistanceSteps();
 
+    // returns 1 if distance to origin is closer else -1 if target is closer
+    int getRampDirection();
+
     // get movement frequency in steps per second
     virtual float getFrequencySteps();
 
