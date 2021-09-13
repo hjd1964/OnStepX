@@ -219,9 +219,15 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       //            Return: 0 failure, 1 success
       if (parameter[1] == 'C' && parameter[4] == 0) {
         if (parameter[3] == '0' || parameter[3] == '1') {
-          uint16_t axesToRevert = 0;
-          if (parameter[3] == '0') axesToRevert = 1;
-          nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
+          uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+          if (parameter[3] == '0') {
+             VLF("MSG: Using Axes settings from NV (EEPROM)");
+             bitSet(axesToRevert, 0);
+           } else {
+             VLF("MSG: Using Axes settings from Config.h");
+             bitClear(axesToRevert, 0);
+           }
+          nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
         } else *commandError = CE_PARAM_RANGE;
       }
     } else return false;

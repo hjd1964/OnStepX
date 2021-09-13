@@ -85,7 +85,6 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
       if (!(axesToRevert & (1 << axisNumber))) {
         if (parameter[3] == 'R' && parameter[4] == 0) {
           // :SXA[n],R# reverts this axis to defaults
-          axesToRevert |= 1 << axisNumber;
           bitSet(axesToRevert, axisNumber);
           nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
         } else {

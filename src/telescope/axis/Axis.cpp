@@ -122,7 +122,10 @@ void Axis::init(bool alternateLimits) {
   if (AxisSettingsSize < sizeof(AxisSettings)) { initError.nv = true; DL("ERR: Axis::init(); AxisSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
   uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
   if (!(axesToRevert & 1)) bitSet(axesToRevert, axisNumber);
-  if (bitRead(axesToRevert, axisNumber)) nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
+  if (bitRead(axesToRevert, axisNumber)) {
+    V(axisPrefix); VLF("reverting settings to Config.h defaults");
+    nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
+  }
   bitClear(axesToRevert, axisNumber);
   nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
 
