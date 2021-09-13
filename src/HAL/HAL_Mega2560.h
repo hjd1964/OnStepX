@@ -9,6 +9,9 @@
 #include <digitalWriteFast.h> // https://github.com/watterott/Arduino-Libs/archive/master.zip
 #define HAL_HAS_DIGITAL_FAST
 
+// 1/100 second sidereal timer
+#define HAL_SIDEREAL_FRAC 100.0
+
 // This platform has 8 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS
   #define HAL_ANALOG_WRITE_BITS 8

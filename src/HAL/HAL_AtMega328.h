@@ -5,6 +5,9 @@
 // We define a more generic symbol, in case more Teensy boards based on different lines are supported
 // __AVR__
 
+// 1/100 second sidereal timer
+#define HAL_SIDEREAL_FRAC 100.0
+
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION
 

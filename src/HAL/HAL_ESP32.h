@@ -4,6 +4,9 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
+// 1/200 second sidereal timer
+#define HAL_SIDEREAL_FRAC 200.0
+
 // This platform has 16 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS
   #define HAL_ANALOG_WRITE_BITS 8
