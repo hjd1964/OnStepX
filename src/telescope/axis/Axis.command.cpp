@@ -90,7 +90,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
           nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
         } else {
           // :SXA[n],[sssss...]#
-          AxisSettings thisAxis;
+          AxisSettings thisAxis = settings;
           if (decodeAxisSettings(&parameter[3], thisAxis)) {
             if (axisNumber <= 2) {
               // convert axis1, 2 into radians

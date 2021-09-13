@@ -212,6 +212,9 @@ class Axis {
     // checks if slew is active on this axis
     bool isSlewing();
 
+    // returns 1 if departing origin or -1 if approaching target
+    inline int getRampDirection() { return motor->getRampDirection(); }
+
     // set synchronized state (automatic movement of target at setFrequencySteps() rate)
     inline void setSynchronized(bool state) { motor->setSynchronized(state); }
 
@@ -284,8 +287,9 @@ class Axis {
     bool poweredDown = false;
     unsigned long powerDownTime = 0;
 
-    // step rates to control motor movement
+    // rates (in measures per second) to control motor movement
     float freq = 0.0F;
+    float rampFreq = 0.0F;
     float baseFreq = 0.0F;
     float minFreq = 0.0F;
     float slewFreq = 0.0F;
