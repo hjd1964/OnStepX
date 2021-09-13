@@ -37,7 +37,7 @@
     nv.readBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
 
     this->stepsPerSiderealSecond = stepsPerSiderealSecond;
-    stepsPerCentisecond = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/100.0F;
+    stepsPerSiderealFrac = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/SIDEREAL_FRAC;
 
     wormRotationSeconds = round(settings.wormRotationSteps/stepsPerSiderealSecond);
     bufferSize = wormRotationSeconds;
@@ -144,7 +144,7 @@
 
     // handle playing back and recording PEC
     noInterrupts();
-    unsigned long lastCs = centisecondLAST; // local apparent sidereal time in centi-seconds
+    unsigned long lastFs = fracLAST;
     interrupts();
 
     // start playing PEC
@@ -154,7 +154,7 @@
         VL("MSG: Mount, started PEC playing");
         settings.state = PEC_PLAY;
         bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
-        wormRotationStartTimeCs = lastCs;
+        wormRotationStartTimeFs = lastFs;
       }
     } else
     // start recording PEC
@@ -164,15 +164,15 @@
         settings.state = PEC_RECORD;
         bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
         firstRecording = !settings.recorded;
-        wormRotationStartTimeCs = lastCs;
-        V(wormRotationStartTimeCs);
-        recordStopTimeCs = wormRotationStartTimeCs + (uint32_t)(wormRotationSeconds*100);
-        V(" and stopping at "); VL(recordStopTimeCs);
+        wormRotationStartTimeFs = lastFs;
+        V(wormRotationStartTimeFs);
+        recordStopTimeFs = wormRotationStartTimeFs + (uint32_t)(wormRotationSeconds*(long)SIDEREAL_FRAC);
+        V(" and stopping at "); VL(recordStopTimeFs);
         accGuideAxis1 = 0.0F;
       }
     } else
     // and once the PEC data is all stored, indicate that it's valid and start using it
-    if (settings.state == PEC_RECORD && (long)(lastCs - recordStopTimeCs) > 0) {
+    if (settings.state == PEC_RECORD && (long)(lastFs - recordStopTimeFs) > 0) {
       VL("MSG: Mount, PEC recording complete switched to playing");
       settings.state = PEC_PLAY;
       settings.recorded = true;
@@ -182,16 +182,16 @@
     // reset the buffer index to match the worm index
     if (bufferStart && settings.state != PEC_RECORD) {
       bufferIndex = 0;
-      wormRotationStartTimeCs = lastCs;
+      wormRotationStartTimeFs = lastFs;
     }
 
     // Increment the PEC index once a second and make it go back to zero when the
     // worm finishes a rotation, this code works when crossing zero
-    if (lastCs - wormRotationStartTimeCs >= 100) { wormRotationStartTimeCs = lastCs; bufferIndex++; }
+    if (lastFs - wormRotationStartTimeFs >= SIDEREAL_FRAC) { wormRotationStartTimeFs = lastFs; bufferIndex++; }
     bufferIndex = ((bufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
 
     // accumulate guide steps for PEC
-    if (guide.rateAxis1 != 0.0F) { accGuideAxis1 += stepsPerCentisecond*guide.rateAxis1; }
+    if (guide.rateAxis1 != 0.0F) { accGuideAxis1 += stepsPerSiderealFrac*guide.rateAxis1; }
 
     // falls in whenever the pecIndex changes, which is once a sidereal second
     static long lastBufferIndex = 0;

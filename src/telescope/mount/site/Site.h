@@ -25,7 +25,7 @@
   #include "../../../lib/tls/Tls_GPS.h"
 #endif
 
-extern volatile unsigned long centisecondLAST;
+extern volatile unsigned long fracLAST;
 
 typedef struct LatitudeExtras {
   double sine;
@@ -50,11 +50,6 @@ typedef struct Location {
 } Location;
 #pragma pack()
 
-typedef struct SiteErrors {
-  bool init;
-  bool TLSinit;
-} SiteErrors;
-
 class Site {
   public:
     void init();
@@ -76,17 +71,15 @@ class Site {
     // checks if the date and time were set
     bool isDateTimeReady();
 
-    // adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
+    // adjusts the period of the fracsec sidereal frac, in sub-micro counts per second
     // adjust up/down to compensate for MCU oscillator inaccuracy
     void setPeriodSubMicros(unsigned long period);
 
-    // callback to tick the centisecond sidereal clock
+    // callback to tick the fracsec sidereal frac
     void tick();
 
     Location location;
     LocationExtras locationEx;
-
-    SiteErrors error = {false, false};
 
   private:
     // gets the time in hours that have passed in this Julian Day
@@ -122,14 +115,14 @@ class Site {
 
     // the current UT1 date and time
     JulianDate ut1;
-    double centisecondHOUR = 0;
-    unsigned long centisecondSTART = 0;
+    double fracHOUR = 0;
+    unsigned long fracSTART = 0;
 
     bool dateIsReady = false;
     bool timeIsReady = false;
 
     unsigned long period = 0;
-    // handle to centisecond LAST task
+    // handle to fracsec LAST task
     uint8_t handle = 0;
     // site number 0..3
     uint8_t number = 0;

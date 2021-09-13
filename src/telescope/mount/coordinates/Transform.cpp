@@ -8,7 +8,7 @@
 #include "../../../lib/weather/Weather.h"
 #include "../../Telescope.h"
 
-extern volatile unsigned long centisecondLAST;
+extern volatile unsigned long fracLAST;
 
 #if DEBUG != OFF
   void Transform::print(Coordinate *coord) {
@@ -190,18 +190,18 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
 
 void Transform::hourAngleToRightAscension(Coordinate *coord) {
   noInterrupts();
-  unsigned long cs = centisecondLAST;
+  unsigned long fs = fracLAST;
   interrupts();
-  coord->r = csToRad(cs) - coord->h;
+  coord->r = fsToRad(fs) - coord->h;
   coord->r = backInRads(coord->r);
 }
 
 void Transform::rightAscensionToHourAngle(Coordinate *coord) {
   if (isnan(coord->r)) return; // NAN flags mount coordinates
   noInterrupts();
-  unsigned long cs = centisecondLAST;
+  unsigned long fs = fracLAST;
   interrupts();
-  coord->h = csToRad(cs) - coord->r;
+  coord->h = fsToRad(fs) - coord->r;
   coord->h = backInRads2(coord->h);
 }
 

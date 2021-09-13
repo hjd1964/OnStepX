@@ -82,7 +82,7 @@ class Mount {
     void poll();
 
     float trackingRate = 1.0F;
-    MountSettings settings = { RC_DEFAULT, false, { 0, 0 } };
+    MountSettings settings = {RC_DEFAULT, false, { 0, 0 }};
 
   private:
     // alternate tracking rate calculation method
@@ -104,8 +104,8 @@ class Mount {
     float trackingRateAxis1            = 0.0F;
     float trackingRateAxis2            = 0.0F;
     float stepsPerSiderealSecondAxis1  = 0.0F;
-    float stepsPerCentisecondAxis1     = 0.0F;
-    float stepsPerCentisecondAxis2     = 0.0F;
+    float stepsPerFracAxis1            = 0.0F;
+    float stepsPerFracAxis2            = 0.0F;
 
     bool atHome = true;
 };

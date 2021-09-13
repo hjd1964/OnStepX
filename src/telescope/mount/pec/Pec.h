@@ -46,7 +46,7 @@ class Pec {
     #endif
 
     long      stepsPerSiderealSecond    = 0;
-    float     stepsPerCentisecond       = 0.0F;
+    float     stepsPerSiderealFrac      = 0.0F;
     long      bufferSize                = 0;      // in bytes
     #if AXIS1_PEC == ON
       uint8_t  monitorHandle            = 0;
@@ -60,8 +60,8 @@ class Pec {
       long     wormSenseSteps           = 0;      // step position
 
       bool     firstRecording           = false;
-      uint32_t recordStopTimeCs         = 0;
-      uint32_t wormRotationStartTimeCs  = 0;      // start time of worm rotation sequence, in centi-seconds
+      uint32_t recordStopTimeFs         = 0;
+      uint32_t wormRotationStartTimeFs  = 0;      // start time of worm rotation sequence, in fracsecs or milliseconds
       long     wormRotationSeconds      = 0;      // time for a worm rotation, in seconds
 
       float    accGuideAxis1            = 0.0F;

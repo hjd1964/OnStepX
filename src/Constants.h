@@ -224,12 +224,6 @@
 #define radToDegF(x)                ((x)*RAD_DEG_RATIO_F)
 #define hrsToRad(x)                 ((x)/RAD_HOUR_RATIO)
 #define radToHrs(x)                 ((x)*RAD_HOUR_RATIO)
-#define csToRad(x)                  ((x)/1375098.708313976)
-#define radToCs(x)                  ((x)*1375098.708313976)
-#define csToHours(x)                ((x)/360000.0)
-#define hoursToCs(x)                ((x)*360000.0)
-#define csToDays(x)                 ((x)/8640000.0)
-#define daysToCs(x)                 ((x)*8640000.0)
 #define arcsecToRad(x)              ((x)/206264.8062470963)
 #define radToArcsec(x)              ((x)*206264.8062470963)
 #define siderealToRad(x)            ((x)/13750.98708313975)
@@ -273,7 +267,7 @@
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
 // NV addresses
-#define INIT_NV_KEY                 583927927UL
+#define INIT_NV_KEY                 583927926UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..  3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4

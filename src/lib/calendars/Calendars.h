@@ -11,7 +11,7 @@ typedef struct GregorianDate {
   uint8_t  hour;
   uint8_t  minute;
   uint8_t  second;
-  long     centisecond;
+  long     fracsec;
   bool     valid;
 } GregorianDate;
 

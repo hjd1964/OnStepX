@@ -12,9 +12,9 @@ extern Tasks tasks;
 // base clock period (in 1/16us units per second) for adjusting the length of a sidereal second and all timing in OnStepX
 unsigned long periodSubMicros;
 
-// centisecond sidereal clock
-volatile unsigned long centisecondLAST;
-IRAM_ATTR void clockTickWrapper() { centisecondLAST++; }
+// fractional second sidereal clock (fracsec or millisecond)
+volatile unsigned long fracLAST;
+IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 
 #if TIME_LOCATION_SOURCE == GPS
   void gpsCheck() {
@@ -74,7 +74,7 @@ void Site::init() {
 
   setSiderealTime(ut1);
 
-  VF("MSG: Mount, site start centisecond timer task (rate 10ms priority 0)... ");
+  VF("MSG: Mount, site start fracsec timer task (rate 10ms priority 0)... ");
   delay(1000);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
@@ -108,11 +108,11 @@ void Site::setDateTime(JulianDate julianDate) {
 
 // gets the time in sidereal hours
 double Site::getSiderealTime() {
-  long cs;
+  long fs;
   noInterrupts();
-  cs = centisecondLAST;
+  fs = fracLAST;
   interrupts();
-  return backInHours(csToHours(cs));
+  return backInHours(fsToHours(fs));
 }
 
 // sets the UT time (in hours) that have passed in this Julian Day
@@ -125,10 +125,10 @@ bool Site::isDateTimeReady() {
   return dateIsReady && timeIsReady;
 }
 
-// adjusts the period of the centisecond sidereal clock, in sub-micro counts per second
+// adjusts fracsec or millisecond sidereal frac, in sub-micro counts per second
 // adjust up/down to compensate for MCU oscillator inaccuracy
 void Site::setPeriodSubMicros(unsigned long period) {
-  tasks.setPeriodSubMicros(handle, lroundf(period/100.0F));
+  tasks.setPeriodSubMicros(handle, lroundf(period/SIDEREAL_FRAC));
   this->period = period;
   periodSubMicros = period;
   // nv.writeLong(EE_siderealPeriod, period);
@@ -138,18 +138,18 @@ void Site::setPeriodSubMicros(unsigned long period) {
 double Site::getTime() {
   unsigned long cs;
   noInterrupts();
-  cs = centisecondLAST;
+  cs = fracLAST;
   interrupts();
-  return centisecondHOUR + csToHours((cs - centisecondSTART)/SIDEREAL_RATIO);
+  return fracHOUR + fsToHours((cs - fracSTART)/SIDEREAL_RATIO);
 }
 
 // sets the time in sidereal hours
 void Site::setLAST(JulianDate julianDate, double time) {
-  long cs = lround(hoursToCs(time));
-  centisecondHOUR = julianDate.hour;
-  centisecondSTART = cs;
+  long fs = lround(hoursToFs(time));
+  fracHOUR = julianDate.hour;
+  fracSTART = fs;
   noInterrupts();
-  centisecondLAST = cs;
+  fracLAST = fs;
   interrupts();
 }
 
@@ -166,7 +166,7 @@ double Site::julianDateToGAST(JulianDate julianDate) {
   GregorianDate date;
 
   date = calendars.julianDayToGregorian(julianDate);
-  date.hour = 0; date.minute = 0; date.second = 0; date.centisecond = 0;
+  date.hour = 0; date.minute = 0; date.second = 0; date.fracsec = 0;
   JulianDate julianDay0 = calendars.gregorianToJulianDay(date);
   double D= (julianDate.day - 2451545.0) + julianDate.hour/24.0;
   double D0=(julianDay0.day - 2451545.0);

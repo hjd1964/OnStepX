@@ -118,16 +118,16 @@ class Goto {
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;
 
-    MeridianFlipHome meridianFlipHome = { false, false };
+    MeridianFlipHome meridianFlipHome = {false, false};
 
-    AlignState alignState = { 0, 0 };
+    AlignState alignState = {0, 0};
 
     float      usPerStepDefault     = 64.0F;
     float      usPerStepBase        = 128.0F;
     float      radsPerSecondCurrent;
-    const double radsPerCentisecond = (degToRad(15.0/3600.0)/100.0)*SIDEREAL_RATIO;
+    const double radsPerFrac = (degToRad(15.0/3600.0)/SIDEREAL_FRAC)*SIDEREAL_RATIO;
 
-    GotoSettings settings = { false, false, 128.0F };
+    GotoSettings settings = {false, false, 128.0F};
 };
 
 extern Goto goTo;

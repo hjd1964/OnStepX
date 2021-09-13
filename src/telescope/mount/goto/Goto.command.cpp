@@ -425,12 +425,14 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           break;
           // autoMeridianFlip
           case '5':
-            if (parameter[3] == '0' || parameter[3] == '1') {
-              settings.meridianFlipAuto = parameter[3] - '0';
-              #if MFLIP_AUTOMATIC_MEMORY == ON 
-                nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
-              #endif
-            } else *commandError = CE_PARAM_RANGE;
+            if (transform.meridianFlips) {
+              if (parameter[3] == '0' || parameter[3] == '1') {
+                settings.meridianFlipAuto = parameter[3] - '0';
+                #if MFLIP_AUTOMATIC_MEMORY == ON
+                  nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
+                #endif
+              } else *commandError = CE_PARAM_RANGE;
+            }
           break;
           // preferred pier side
           case '6':

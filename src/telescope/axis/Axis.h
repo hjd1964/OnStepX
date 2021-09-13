@@ -293,8 +293,8 @@ class Axis {
 
     AutoRate autoRate = AR_NONE;    // auto slew mode
     float slewAccelerationDistance; // auto slew rate distance in measures to max rate
-    float slewMpspcs;               // auto slew rate in measures per second per centisecond
-    float abortMpspcs;              // abort slew rate in measures per second per centisecond
+    float slewMpspfs;               // auto slew rate in measures per second per frac-sec
+    float abortMpspfs;              // abort slew rate in measures per second per fracsec
     float slewAccelTime = NAN;      // auto slew acceleration time in seconds
     float abortAccelTime = NAN;     // abort slew acceleration time in seconds
 

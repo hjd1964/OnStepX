@@ -37,9 +37,7 @@ void Goto::init() {
     settings.meridianFlipPause = false;
   #endif
 
-  #if MFLIP_AUTOMATIC_MEMORY != ON
-    misc.meridianFlipAuto = false;
-  #endif
+  if (MFLIP_AUTOMATIC_MEMORY != ON || !transform.meridianFlips) settings.meridianFlipAuto = false;
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
@@ -91,9 +89,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
   // start the goto monitor
   if (taskHandle != 0) tasks.remove(taskHandle);
-  taskHandle = tasks.add(10, 0, true, 3, gotoWrapper, "MntGoto");
+  taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
-    VLF("MSG: Mount, start goto monitor task (rate 10ms priority 3)... success");
+    VF("MSG: Mount, start goto monitor task (rate "); V(SIDEREAL_IV_MS); VLF("ms priority 3)... success");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
@@ -278,7 +276,7 @@ void Goto::waypoint(Coordinate *current) {
 void Goto::updateAccelerationRates() {
   radsPerSecondCurrent = (1000000.0F/settings.usPerStepCurrent)/(float)axis1.getStepsPerMeasure();
   rate = radsPerSecondCurrent;
-  float secondsToAccelerate = degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent;
+  float secondsToAccelerate = (degToRadF((float)(SLEW_ACCELERATION_DIST))/radsPerSecondCurrent)*2.0F;
   float radsPerSecondPerSecond = radsPerSecondCurrent/secondsToAccelerate;
   axis1.setSlewAccelerationRate(radsPerSecondPerSecond);
   axis1.setSlewAccelerationRateAbort(radsPerSecondPerSecond*2.0F);
@@ -395,7 +393,7 @@ void Goto::poll() {
   }
 
   // keep updating mount target
-  if (mount.isTracking()) target.h += radsPerCentisecond;
+  if (mount.isTracking()) target.h += radsPerFrac;
 }
 
 Goto goTo;

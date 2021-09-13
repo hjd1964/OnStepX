@@ -55,7 +55,7 @@ void Mount::init() {
   if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
-  stepsPerCentisecondAxis1 = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/100.0F;
+  stepsPerFracAxis1 = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/SIDEREAL_FRAC;
 
   // initialize the other subsystems
   home.init();

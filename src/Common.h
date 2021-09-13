@@ -12,6 +12,15 @@
 #include "lib/nv/NV.h"
 extern NVS nv;
 
+#define SIDEREAL_FRAC  HAL_SIDEREAL_FRAC
+#define SIDEREAL_IV_MS (lround(1000.0F/SIDEREAL_FRAC))
+#define fsToRad(x)     ((x)/(13750.98708313976*SIDEREAL_FRAC))
+#define radToFs(x)     ((x)*(13750.98708313976*SIDEREAL_FRAC))
+#define fsToHours(x)   ((x)/(3600.0*SIDEREAL_FRAC))
+#define hoursToFs(x)   ((x)*(3600.0*SIDEREAL_FRAC))
+#define fsToDays(x)    ((x)/(86400.0*SIDEREAL_FRAC))
+#define daysToFs(x)    ((x)*(86400.0*SIDEREAL_FRAC))
+
 #if (AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF) || AXIS3_DRIVER_MODEL != OFF || AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
   #define AXIS_PRESENT
 #endif
