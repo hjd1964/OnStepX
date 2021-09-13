@@ -85,7 +85,7 @@ bool Limits::isError() {
          error.meridian.west;
 }
 
-// return limit error code
+// return general error code
 uint8_t Limits::errorCode() {
   enum GeneralErrors: uint8_t {
   ERR_NONE, ERR_MOTOR_FAULT, ERR_ALT_MIN, ERR_LIMIT_SENSE, ERR_DEC, ERR_AZM,

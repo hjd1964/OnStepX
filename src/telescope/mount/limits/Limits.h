@@ -57,7 +57,7 @@ class Limits {
     // true if an limit related error is exists
     bool isError();
 
-    // return limit error code
+    // return general error code
     uint8_t errorCode();
 
     // enable or disable limit enforcement
