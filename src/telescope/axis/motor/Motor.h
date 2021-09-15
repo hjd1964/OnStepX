@@ -102,7 +102,7 @@ class Motor {
     // enable backlash compensation, to work properly this must be proceeded by a disable call
     void enableBacklash();
 
-    uint8_t axisNumber = 0;                    // axis number for this motor (1 to 9 in OnStepX)
+    volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
     char axisPrefix[14] = "MSG: Motor_, ";     // prefix for debug messages
 
     bool enabled = false;                      // enable/disable logical state (disabled is powered down)

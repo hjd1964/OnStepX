@@ -72,7 +72,6 @@ class StepDirMotor : public Motor {
     uint8_t taskHandle = 0;
     volatile uint8_t mtrHandle = 0;
 
-    volatile Direction direction = DIR_NONE;
     #ifdef DRIVER_STEP_DEFAULTS
       #define stepClr LOW               // pin state to reset driver before taking a step
       #define stepSet HIGH              // pin state to take a step
@@ -82,6 +81,7 @@ class StepDirMotor : public Motor {
     #endif
     volatile uint8_t dirFwd = LOW;      // pin state for forward direction
     volatile uint8_t dirRev = HIGH;     // pin state for reverse direction
+    volatile uint8_t direction = LOW;   // current direction in use
 
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile int  slewStep = 1;         // step size during slews (for micro-step mode switching)
