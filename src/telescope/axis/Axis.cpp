@@ -372,7 +372,6 @@ CommandError Axis::autoSlewHome() {
 void Axis::autoSlewStop() {
   if (autoRate == AR_NONE || autoRate == AR_RATE_BY_TIME_ABORT) return;
 
-  resetTargetToMotorPosition();
   motor->setSynchronized(true);
 
   V(axisPrefix); VLF("slew stopping");
@@ -384,7 +383,6 @@ void Axis::autoSlewStop() {
 void Axis::autoSlewAbort() {
   if (autoRate == AR_NONE) return;
 
-  resetTargetToMotorPosition();
   motor->setSynchronized(true);
 
   V(axisPrefix); VLF("slew aborting");
@@ -415,7 +413,7 @@ void Axis::poll() {
   Y;
 
   // slewing
-  if (autoRate != AR_NONE) {
+  if (autoRate != AR_NONE && !motor->inBacklash) {
     if (autoRate != AR_RATE_BY_TIME_ABORT) {
       if (motionError(motor->getDirection())) { autoSlewAbort(); return; }
     }
