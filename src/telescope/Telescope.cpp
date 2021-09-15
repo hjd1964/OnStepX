@@ -29,7 +29,7 @@ bool xBusy = false;
 InitError initError;
 
 // help for analogWrite() range conversions
-const int AnalogRange = roundl(powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F);
+const int AnalogRange = powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F;
 
 #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
   void statusFlash() {
