@@ -308,13 +308,22 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
       }
     } else {
       if (synchronized && !inBacklash) targetSteps += step;
-      if (motorSteps > targetSteps) direction = dirRev; else
-      if (motorSteps < targetSteps) direction = dirFwd; else direction = 255;
-      #ifdef SHARED_DIRECTION_PINS
-        if (axisNumber <= 2) digitalWriteF(dirPin, direction);
-      #else
-        digitalWriteF(dirPin, direction);
-      #endif
+      if (motorSteps > targetSteps) {
+        direction = dirRev;
+        #ifdef SHARED_DIRECTION_PINS
+          if (axisNumber <= 2) digitalWriteF(dirPin, direction);
+        #else
+          digitalWriteF(dirPin, direction);
+        #endif
+      } else
+      if (motorSteps < targetSteps) {
+        direction = dirFwd;
+        #ifdef SHARED_DIRECTION_PINS
+          if (axisNumber <= 2) digitalWriteF(dirPin, direction);
+        #else
+          digitalWriteF(dirPin, direction);
+        #endif
+      } else direction = 255;
       digitalWriteF(stepPin, stepClr);
     }
 
@@ -358,9 +367,14 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
     if (synchronized && !inBacklash) targetSteps += step;
 
-    if (motorSteps > targetSteps) direction = dirRev; else
-    if (motorSteps < targetSteps) direction = dirFwd; else direction = 255;
-    digitalWriteF(dirPin, direction);
+    if (motorSteps > targetSteps) {
+      direction = dirRev;
+      digitalWriteF(dirPin, direction);
+    } else
+    if (motorSteps < targetSteps) {
+      direction = dirFwd;
+      digitalWriteF(dirPin, direction);
+    } else direction = 255;
 
     if (direction == dirRev) {
       if (backlashSteps > 0) {
