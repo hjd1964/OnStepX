@@ -77,17 +77,16 @@ void Mount::init() {
     st4.init();
   #endif
 
-  // start mount operation
   #if TRACK_AUTOSTART == ON
     if (park.state == PS_PARKED) {
       VLF("MSG: Mount, parked autostart tracking ignored");
     } else {
       VLF("MSG: Mount, set tracking sidereal");
-      setTrackingState(TS_SIDEREAL);
+      tracking(true);
       trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-      if (!site.dateTimeReady()) {
+      if (!site.isDateTimeReady()) {
         VLF("MSG: Mount, set date/time is unknown so limits are disabled");
-        limitsEnabled = false;
+        limits.enabled(false);
       }
     }
   #else
