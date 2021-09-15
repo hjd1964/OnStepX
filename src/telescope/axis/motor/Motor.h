@@ -94,6 +94,7 @@ class Motor {
     virtual void setSlewing(bool state);
 
     int driverType = OFF;
+    volatile bool inBacklash = false;          // must be true if within the backlash travel
 
   protected:
     // disable backlash compensation, to work properly there must be an enable call to match
@@ -118,7 +119,6 @@ class Motor {
     uint16_t backlashStepsStore;               // temporary storage for the position in backlash
     volatile uint16_t backlashAmountSteps = 0; // the amount of backlash travel
     uint16_t backlashAmountStepsStore;         // temporary storage for the amount of backlash travel
-    volatile bool inBacklash = false;          // must be true if within the backlash travel
 
     long originSteps = 0;                      // start position for an autoSlewRateByDistance()
     volatile long targetSteps = 0;             // where we want the motor
