@@ -14,7 +14,7 @@
   #define AXIS1_PEC ON
 #endif
 
-enum PecState: uint8_t { PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD };
+enum PecState: uint8_t {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 
 #pragma pack(1)
 #define PecSettingsSize 6
