@@ -203,7 +203,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         timeIsReady = true;
         setSiderealTime(ut1);
         if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-        if (initError.tls && dateIsReady && timeIsReady) initError.tls = false;
+        if (dateIsReady && timeIsReady) initError.tls = false;
         #if TIME_LOCATION_SOURCE != OFF
           tls.set(ut1);
         #endif
