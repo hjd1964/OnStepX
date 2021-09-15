@@ -21,7 +21,7 @@ inline void gotoWrapper() { goTo.poll(); }
 
 void Goto::init() {
   // confirm the data structure size
-  if (GotoSettingsSize < sizeof(GotoSettings)) { initError.nv = true; DL("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (GotoSettingsSize < sizeof(GotoSettings)) { initError.nv = true; DLF("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
 
   // write the default settings to NV
   if (!validKey) {
@@ -110,7 +110,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
     status.sound.alert();
 
-  } else { DLF("MSG: Mount, start goto monitor task... FAILED!"); }
+  } else { DLF("WRN: Mount, start goto monitor task... FAILED!"); }
 
   return CE_NONE;
 }
@@ -170,26 +170,66 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   // west side of pier - we're in the eastern sky and the HA's are negative
 
   Coordinate current = mount.getMountPosition(CR_MOUNT);
-  target.pierSide = current.pierSide;
 
   double a1;
   if (transform.mountType == ALTAZM) a1 = target.z; else a1 = target.h;
 
+  target.pierSide = current.pierSide;
+
   if (!transform.meridianFlips) { target.pierSide = PIER_SIDE_EAST; return CE_NONE; }
 
+  double a1e = a1, a1w = a1;
+  if (a1 < -limits.settings.pastMeridianE) a1e += Deg360; // range 0 to 360 degrees, east of pier
+  if (a1 > limits.settings.pastMeridianW) a1w -= Deg360; // range 0 to -360 degrees, west of pier
+
   if (mount.isHome()) {
+    VL("MSG: Mount, set target from HOME");
     if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
   } else
   if (pierSideSelect == PSS_EAST || pierSideSelect == PSS_EAST_ONLY) {
-    if (a1 < -limits.settings.pastMeridianE) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+    target.pierSide = PIER_SIDE_EAST;
+    if (a1 < -limits.settings.pastMeridianE && a1e > axis1.settings.limits.max) {
+      V("MSG: Mount, set target EAST TO WEST: ");
+      target.pierSide = PIER_SIDE_WEST;
+    } else { V("MSG: Mount, set target EAST stays EAST: !("); }
+    V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
   } else
   if (pierSideSelect == PSS_WEST || pierSideSelect == PSS_WEST_ONLY) {
-    if (a1 >  limits.settings.pastMeridianW) target.pierSide = PIER_SIDE_EAST; else target.pierSide = PIER_SIDE_WEST;
+    target.pierSide = PIER_SIDE_WEST;
+    VL("MSG: Mount, set target ");
+    if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
+      V("MSG: Mount, set target WEST TO EAST: (");
+      target.pierSide = PIER_SIDE_EAST;
+    } else { V("MSG: Mount, set target WEST stays WEST: !(");  }
+    V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); V(" && "); V(radToDeg(a1w)); V(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
   } else
   if (pierSideSelect == PSS_BEST || pierSideSelect == PSS_SAME_ONLY) {
-    if (current.pierSide == PIER_SIDE_WEST && a1 >  limits.settings.pastMeridianW) target.pierSide = PIER_SIDE_EAST;
-    if (current.pierSide == PIER_SIDE_EAST && a1 < -limits.settings.pastMeridianE) target.pierSide = PIER_SIDE_WEST;
+    if (current.pierSide == PIER_SIDE_EAST) { 
+      if (a1 < -limits.settings.pastMeridianE && a1e > axis1.settings.limits.max) {
+        V("MSG: Mount, set target BEST EAST TO WEST: (");
+        target.pierSide = PIER_SIDE_WEST;
+      } else V("MSG: Mount, set target BEST stays EAST: !(");
+      V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
+    }
+    if (current.pierSide == PIER_SIDE_WEST) {
+        if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
+        V("MSG: Mount, set target BEST WEST TO EAST: (");
+        target.pierSide = PIER_SIDE_EAST;
+      } else V("MSG: Mount, set target BEST stays WEST: !(");
+      V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); D(" && "); V(radToDeg(a1w)); D(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
+    }
   }
+
+  if (target.pierSide == PIER_SIDE_EAST) {
+    if (target.pierSide == current.pierSide) a1 = a1e;
+    D("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
+  } else
+  if (target.pierSide == PIER_SIDE_WEST) {
+    if (target.pierSide == current.pierSide) a1 = a1w;
+    D("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
+  }
+
+  if (transform.mountType == ALTAZM) target.z = a1; else target.h = a1;
 
   if (pierSideSelect == PSS_EAST_ONLY && target.pierSide != PIER_SIDE_EAST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
   if (pierSideSelect == PSS_WEST_ONLY && target.pierSide != PIER_SIDE_WEST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
