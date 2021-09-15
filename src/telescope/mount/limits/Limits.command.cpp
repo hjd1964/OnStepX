@@ -88,18 +88,16 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *supressF
       long l = atol(&parameter[3]); float degs = l/4.0;
       switch (parameter[1]) {
         case '9':
-          if (degs >= -270.0F && degs <= 270.0F) {
+          if (degs >= -180.0F && degs <= 180.0F) {
             settings.pastMeridianE = degToRadF(degs);
-            if (settings.pastMeridianE < -axis1.settings.limits.max) settings.pastMeridianE = -axis1.settings.limits.max;
-            if (settings.pastMeridianE > -axis1.settings.limits.min) settings.pastMeridianE = -axis1.settings.limits.min;
+            constrainMeridianLimits();
             nv.updateBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
           } else *commandError = CE_PARAM_RANGE;
         break;
         case 'A':
-          if (degs >= -270.0F && degs <= 270.0F) {
+          if (degs >= -180.0F && degs <= 180.0F) {
             settings.pastMeridianW = degToRadF(degs);
-            if (settings.pastMeridianW < axis1.settings.limits.min) settings.pastMeridianW = axis1.settings.limits.min;
-            if (settings.pastMeridianW > axis1.settings.limits.max) settings.pastMeridianW = axis1.settings.limits.max;
+            constrainMeridianLimits();
             nv.updateBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
           } else *commandError = CE_PARAM_RANGE;
         break;

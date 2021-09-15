@@ -28,9 +28,31 @@ void Limits::init() {
   // get settings from NV
   nv.readBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
 
+  constrainMeridianLimits();
+
   // start limit monitor task
   VF("MSG: Mount, limits start monitor task (rate 100ms priority 2)... ");
   if (tasks.add(100, 0, true, 2, limitsWrapper, "MntLmt")) { VL("success"); } else { VL("FAILED!"); }
+}
+
+// constrain meridian limits to the allowed range
+void Limits::constrainMeridianLimits() {
+  if (settings.pastMeridianE > axis1.settings.limits.max) {
+    settings.pastMeridianE = axis1.settings.limits.max;
+    DLF("WRN: Limits::init(), pastMeridianE > limits.max setting to limits.max");
+  }
+  if (settings.pastMeridianE < axis1.settings.limits.min) {
+    settings.pastMeridianE = axis1.settings.limits.min;
+    DLF("WRN: Limits::init(), pastMeridianE < limits.min setting to limits.min");
+  }
+  if (-settings.pastMeridianW > axis1.settings.limits.max) {
+    settings.pastMeridianW = -axis1.settings.limits.max;
+    DLF("WRN: Limits::init(), pastMeridianW > limits.max setting to limits.max");
+  }
+  if (-settings.pastMeridianW < axis1.settings.limits.min) {
+    settings.pastMeridianW = -axis1.settings.limits.min;
+    DLF("WRN: Limits::init(), pastMeridianW < limits.min setting to limits.min");
+  }
 }
 
 // target coordinate check ahead of sync, goto, etc.
@@ -142,8 +164,8 @@ void Limits::stopAxis2(GuideAction stopDirection) {
 void Limits::poll() {
   if (!limitsEnabled) return;
 
-  static int autoFlipCount = 0;
-  if (autoFlipCount > 0) autoFlipCount--;
+  static int autoFlipDelayCycles = 0;
+  if (autoFlipDelayCycles > 0) autoFlipDelayCycles--;
 
   LimitsError lastError = error;
 
@@ -153,25 +175,32 @@ void Limits::poll() {
   if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
   if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
-    if (current.h < -settings.pastMeridianE) { stopAxis1(GA_REVERSE); error.meridian.east = true; } else error.meridian.east = false;
+    if (current.h < -settings.pastMeridianE) {
+      stopAxis1(GA_REVERSE);
+      error.meridian.east = true;
+    } else error.meridian.east = false;
   } else error.meridian.east = false;
 
   if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
-    if (current.h > settings.pastMeridianW && autoFlipCount == 0) {
+    if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
       #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
         if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
-          // disable meridian limits for a second to allow goto to exit the out of limits region
-          autoFlipCount = 10;
+          // disable this limit for a second to allow goto to exit the out of limits region
+          autoFlipDelayCycles = 10;
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
-          CommandError e = goTo.request(&target, PSS_WEST_ONLY, false);
+          CommandError e = goTo.request(&target, PSS_EAST_ONLY, false);
           if (e != CE_NONE) {
             stopAxis1(GA_FORWARD);
-            error.meridian.west = true; VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+            error.meridian.west = true;
+            VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
           }
         } else
       #endif
-      { stopAxis1(GA_FORWARD); error.meridian.west = true; }
+      {
+        stopAxis1(GA_FORWARD);
+        error.meridian.west = true;
+      }
     } else error.meridian.west = false;
   } else error.meridian.west = false;
 
@@ -179,25 +208,41 @@ void Limits::poll() {
     current.a2 = axis2.getMotorPosition();
   #endif
 
-  if (flt(current.a1, axis1.settings.limits.min)) { stopAxis1(GA_REVERSE); error.limit.axis1.min = true; } else error.limit.axis1.min = false;
-  if (fgt(current.a1, axis1.settings.limits.max) && autoFlipCount == 0) {
+  if (flt(current.a1, axis1.settings.limits.min)) {
+    stopAxis1(GA_REVERSE);
+    error.limit.axis1.min = true;
+  } else error.limit.axis1.min = false;
+
+  if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
     #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
       if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
-        // disable meridian limits for a second to allow goto to exit the out of limits region
-        autoFlipCount = 10;
+        // disable this limit for a second to allow goto to exit the out of limits region
+        autoFlipDelayCycles = 10;
         VLF("MSG: Mount, start automatic meridian flip");
         Coordinate target = mount.getMountPosition();
         CommandError e = goTo.request(&target, PSS_WEST_ONLY, false);
         if (e != CE_NONE) {
           stopAxis1(GA_FORWARD);
-          error.meridian.west = true; VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+          error.limit.axis1.max = true;
+          VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
         }
       } else
     #endif
-    { stopAxis1(GA_FORWARD); error.limit.axis1.max = true; }
+    {
+      stopAxis1(GA_FORWARD);
+      error.limit.axis1.max = true;
+    }
   } else error.limit.axis1.max = false;
-  if (flt(current.a2, axis2.settings.limits.min)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_REVERSE:GA_FORWARD); error.limit.axis2.min = true; } else error.limit.axis2.min = false;
-  if (fgt(current.a2, axis2.settings.limits.max)) { stopAxis2((current.pierSide == PIER_SIDE_EAST)?GA_FORWARD:GA_REVERSE); error.limit.axis2.max = true; } else error.limit.axis2.max = false;
+
+  if (flt(current.a2, axis2.settings.limits.min)) {
+    stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+    error.limit.axis2.min = true;
+  } else error.limit.axis2.min = false;
+
+  if (fgt(current.a2, axis2.settings.limits.max)) {
+    stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
+    error.limit.axis2.max = true;
+  } else error.limit.axis2.max = false;
 
   #if DEBUG == VERBOSE
     const char* errPre = "MSG: Mount, error state changed: ";

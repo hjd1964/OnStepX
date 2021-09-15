@@ -51,6 +51,9 @@ class Limits {
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
+    // constrain meridian limits to the allowed range
+    void constrainMeridianLimits();
+
     // target coordinate check ahead of sync, goto, etc.
     CommandError validateCoords(Coordinate *coords);
 
