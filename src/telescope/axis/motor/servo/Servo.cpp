@@ -313,10 +313,22 @@ void ServoMotor::poll() {
 IRAM_ATTR void ServoMotor::move() {
   if (synchronized && !inBacklash) targetSteps += step;
   if (motorSteps > targetSteps) {
-    if (backlashSteps > 0) { inBacklash = true; backlashSteps -= absStep; } else { inBacklash = false; motorSteps -= absStep; }
+    if (backlashSteps > 0) {
+      backlashSteps -= absStep;
+      inBacklash = backlashSteps > 0;
+    } else {
+      motorSteps -= absStep;
+      inBacklash = false;
+    }
   } else 
   if (motorSteps < targetSteps || inBacklash) {
-    if (backlashSteps < backlashAmountSteps) { inBacklash = true; backlashSteps += absStep; } else { inBacklash = false; motorSteps += absStep; }
+    if (backlashSteps < backlashAmountSteps) {
+      backlashSteps += absStep;
+      inBacklash = backlashSteps < backlashAmountSteps;
+    } else {
+      motorSteps += absStep;
+      inBacklash = false;
+    }
   }
 }
 
