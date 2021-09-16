@@ -191,10 +191,10 @@ extern Tasks tasks;
                 if (st4Axis2Fwd.isUp()) { if (fn > 0) { SERIAL_LOCAL.transmit(":FQ#"); fn = 0; } }
               }
             #else
-              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); sound.click(); }
-              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); sound.click(); }
-              if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); sound.click(); }
-              if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { sound.click(); sound.enabled = !sound.enabled; sound.click(); }
+              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); status.sound.click(); }
+              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); status.sound.click(); }
+              if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); status.sound.click(); }
+              if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { status.sound.click(); status.sound.enabled = !status.sound.enabled; status.sound.click(); }
             #endif
           }
         }
