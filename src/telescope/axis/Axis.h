@@ -238,7 +238,7 @@ class Axis {
     // enable/disable numeric position range limits (doesn't apply to limit switches)
     void setMotionLimitsCheck(bool state);
 
-    // checks for an error that would disallow motion DIR_NONE for any motion, etc.
+    // checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
     bool motionError(Direction direction);
 
     // monitor movement

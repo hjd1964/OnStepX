@@ -287,13 +287,13 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!validAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (settings.rateSelect < 3) {
-      if (limits.isError() || axis1.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (limits.isError() || axis1.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   if (axis == 2 || guideAction == GA_SPIRAL) {
     if (!validAxis2(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (settings.rateSelect < 3) {
-      if (limits.isError() || axis2.motionError(DIR_NONE)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (limits.isError() || axis2.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   return CE_NONE;

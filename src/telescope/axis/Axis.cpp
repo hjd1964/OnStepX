@@ -517,7 +517,10 @@ void Axis::poll() {
         V(axisPrefix); VLF("slew aborted");
       }
     } else freq = 0.0F;
-  } else freq = 0.0F;
+  } else {
+    freq = 0.0F;
+    if (motionError(DIR_BOTH)) baseFreq = 0.0F;
+  }
   Y;
 
   setFrequency(freq);
@@ -612,18 +615,26 @@ void Axis::setMotionLimitsCheck(bool state) {
   limitsCheck = state;
 }
 
+// checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
 bool Axis::motionError(Direction direction) {
   if (motor->getDriverStatus().fault) { V(axisPrefix); VLF("motion error driver fault"); return true; }
-  if (direction == DIR_FORWARD) {
-    bool result = (limitsCheck && getInstrumentCoordinate() > settings.limits.max) || errors.maxLimitSensed;
+
+  if (direction == DIR_FORWARD || direction == DIR_BOTH) {
+    bool result = getInstrumentCoordinateSteps() > lroundf(0.9F*INT32_MAX) ||
+                  (limitsCheck && getInstrumentCoordinate() > settings.limits.max) ||
+                  errors.maxLimitSensed;
     if (result == true) { V(axisPrefix); VLF("motion error forward limit"); }
     return result;
-  }
-  if (direction == DIR_REVERSE) {
-    bool result =(limitsCheck && getInstrumentCoordinate() < settings.limits.min) || errors.minLimitSensed;
+  } else
+
+  if (direction == DIR_REVERSE || direction == DIR_BOTH) {
+    bool result = getInstrumentCoordinateSteps() < lroundf(0.9F*INT32_MIN) ||
+                  (limitsCheck && getInstrumentCoordinate() < settings.limits.min) ||
+                  errors.minLimitSensed;
     if (result == true) { V(axisPrefix); VLF("motion error reverse limit"); }
     return result;
   }
+
   return false;
 }
 
