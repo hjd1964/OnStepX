@@ -15,8 +15,6 @@ bool TimeLocationSource::init() {
 }
 
 void TimeLocationSource::set(JulianDate ut1) {
-  int y, mo, d, h;
-  double m, s;
     
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
   greg.year -= 2000;
@@ -34,7 +32,7 @@ void TimeLocationSource::set(JulianDate ut1) {
   Teensy3Clock.set(TeensyTime);               // set Teensy time
 }
 
-void TimeLocationSource::get(double &JD, double &UT1) {
+void TimeLocationSource::get(JulianDate &ut1) {
   unsigned long TeensyTime;
 
   TeensyTime = Teensy3Clock.get();            // get time from Teensy RTC

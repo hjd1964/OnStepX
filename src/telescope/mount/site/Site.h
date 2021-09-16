@@ -18,7 +18,7 @@
 #if TIME_LOCATION_SOURCE == DS3234
   #include "../../../lib/tls/Tls_DS3234.h"
 #endif
-#if TIME_LOCATION_SOURCE == Teensy
+#if TIME_LOCATION_SOURCE == TEENSY
   #include "../../../lib/tls/Tls_Teensy.h"
 #endif
 #if TIME_LOCATION_SOURCE == GPS
