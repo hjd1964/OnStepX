@@ -71,9 +71,12 @@ class Site {
     // checks if the date and time were set
     bool isDateTimeReady();
 
-    // adjusts the period of the fracsec sidereal frac, in sub-micro counts per second
-    // adjust up/down to compensate for MCU oscillator inaccuracy
+    // sets centisecond or millisecond sidereal frac, in sub-micro counts per second
     void setPeriodSubMicros(unsigned long period);
+
+    // adjusts centisec or millisecond sidereal frac, in sub-micro counts per second
+    // up/down to compensate for MCU oscillator inaccuracy
+    void refreshPeriod();
 
     // callback to tick the fracsec sidereal frac
     void tick();

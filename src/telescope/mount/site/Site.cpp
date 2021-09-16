@@ -8,6 +8,7 @@
 #include "../../../tasks/OnTask.h"
 extern Tasks tasks;
 #include "../../Telescope.h"
+#include "../../../lib/tls/PPS.h"
 
 // base clock period (in 1/16us units per second) for adjusting the length of a sidereal second and all timing in OnStepX
 unsigned long periodSubMicros;
@@ -125,13 +126,21 @@ bool Site::isDateTimeReady() {
   return dateIsReady && timeIsReady;
 }
 
-// adjusts fracsec or millisecond sidereal frac, in sub-micro counts per second
-// adjust up/down to compensate for MCU oscillator inaccuracy
+// sets centisecond or millisecond sidereal clock rate, in sub-micro counts per second
 void Site::setPeriodSubMicros(unsigned long period) {
-  tasks.setPeriodSubMicros(handle, lroundf(period/SIDEREAL_FRAC));
   this->period = period;
   periodSubMicros = period;
-  // nv.writeLong(EE_siderealPeriod, period);
+  refreshPeriod();
+}
+
+// adjusts centisec or millisecond sidereal clock rate, in sub-micro counts per second
+// up/down to compensate for MCU oscillator inaccuracy
+void Site::refreshPeriod() {
+  float ppsRateRatio = 1.0F;
+  #if TIME_LOCATION_PPS_SENSE == ON
+    ppsRateRatio = roundf(pps.averageMicros/1000000.0F);
+  #endif
+  tasks.setPeriodSubMicros(handle, lroundf((period/SIDEREAL_FRAC)*ppsRateRatio));
 }
 
 // gets the time in hours that have passed in this Julian Day

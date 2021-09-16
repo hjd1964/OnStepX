@@ -174,6 +174,8 @@ void Mount::update() {
 }
 
 void Mount::poll() {
+  site.refreshPeriod();
+
   #ifdef HAL_NO_DOUBLE_PRECISION
     #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
     #define DiffRange2 0.017453292F          // 60 arc-minutes in radians

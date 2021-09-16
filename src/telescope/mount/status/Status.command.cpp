@@ -7,6 +7,7 @@
 
 #include "../Mount.h"
 #include "../coordinates/Transform.h"
+#include "../../../lib/tls/PPS.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
 #include "../home/Home.h"
