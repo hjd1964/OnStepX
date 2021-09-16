@@ -32,7 +32,7 @@ void Rotator::init() {
   readSettings();
 
   VL("MSG: Rotator, init (Axis3)");
-  axis3.init(false);
+  axis3.init();
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);

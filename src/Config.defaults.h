@@ -90,6 +90,9 @@
 #ifndef AXIS1_POWER_DOWN
 #define AXIS1_POWER_DOWN              OFF                         // motor power off if at standstill > 30 sec
 #endif
+#ifndef AXIS1_WRAP
+#define AXIS1_WRAP                    OFF                         // wrap for unlimited range
+#endif
 #ifndef AXIS1_LIMIT_MIN
 #define AXIS1_LIMIT_MIN               -180                        // in degrees
 #endif

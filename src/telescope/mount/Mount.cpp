@@ -43,13 +43,13 @@ void Mount::init() {
 
   // get the main axes ready
   delay(100);
-  axis1.init(transform.mountType == ALTAZM);
+  axis1.init();
   axis1.setBacklash(settings.backlash.axis1);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   delay(100);
-  axis2.init(transform.mountType == ALTAZM);
+  axis2.init();
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
@@ -62,6 +62,14 @@ void Mount::init() {
   home.reset();
   limits.init();
   guide.init();
+
+  if (AXIS1_WRAP == ON) {
+    axis1.coordinateWrap(Deg360);
+    axis1.settings.limits.min = -Deg360;
+    axis1.settings.limits.max = Deg360;
+    limits.settings.pastMeridianE = Deg360;
+    limits.settings.pastMeridianW = Deg360;
+  }
 
   #if SLEW_GOTO == ON
     goTo.init();

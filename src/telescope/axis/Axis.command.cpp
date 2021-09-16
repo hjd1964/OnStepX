@@ -5,7 +5,6 @@
 
 #ifdef AXIS_PRESENT
 
-#include "../mount/coordinates/Transform.h"
 #include "../mount/site/Site.h"
 #include "../../commands/ProcessCmds.h"
 
@@ -104,7 +103,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             }
             // validate settings for step/dir drivers
             if (motor->driverType == STEP_DIR) {
-              if (validateAxisSettings(axisNumber, MOUNT_TYPE == ALTAZM, thisAxis)) {
+              if (validateAxisSettings(axisNumber, thisAxis)) {
                 #ifdef SD_DRIVER_PRESENT
                   int subdivGoto = ((StepDirMotor*)motor)->driver->getSubdivisionsGoto();
                   if (axisNumber <= 2 && thisAxis.subdivisions < subdivGoto) thisAxis.subdivisions = subdivGoto;
@@ -151,22 +150,19 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
 }
 
 // convert axis settings string into numeric form
-bool Axis::validateAxisSettings(int axisNum, bool altAz, AxisSettings a) {
+bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
   int index = axisNum - 1;
   if (index > 3) index = 3;
-  int   MinLimitL[4]   = {     -270,       -90,    -360,     0};
-  int   MinLimitH[4]   = {      -90,         0,       0,   500};
-  int   MaxLimitL[4]   = {       90,         0,       0,     0};
-  int   MaxLimitH[4]   = {      270,        90,     360,   500};
-  float StepsLimitL[4] = {    150.0,     150.0,     5.0, 0.005};
-  float StepsLimitH[4] = {3600000.0, 3600000.0, 36000.0, 100.0};
-  int   IrunLimitH[4]  = {     3000,      3000,    1000,  1000};
-  if (altAz) {
-    MinLimitL[0] = -360; MinLimitH[0] = -180; MaxLimitL[0] = 180; MaxLimitH[0] = 360;
-  }
+  int   MinLimitL[4]   = {    -360,      -90,    -360,     0};
+  int   MinLimitH[4]   = {     -90,        0,       0,   500};
+  int   MaxLimitL[4]   = {      90,        0,       0,     0};
+  int   MaxLimitH[4]   = {     360,       90,     360,   500};
+  float StepsLimitL[4] = {   150.0,    150.0,     5.0, 0.005};
+  float StepsLimitH[4] = {360000.0, 360000.0, 36000.0, 100.0};
+  int   IrunLimitH[4]  = {    3000,     3000,    1000,  1000};
 
   if (axisNum <= 2) {
-    // convert axis1, 2 into degrees
+    // convert axis1 & 2 into degrees
     a.stepsPerMeasure /= RAD_DEG_RATIO;
     a.limits.min = radToDegF(a.limits.min);
     a.limits.max = radToDegF(a.limits.max);

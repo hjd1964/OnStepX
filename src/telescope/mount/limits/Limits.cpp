@@ -37,21 +37,21 @@ void Limits::init() {
 
 // constrain meridian limits to the allowed range
 void Limits::constrainMeridianLimits() {
-  if (settings.pastMeridianE > axis1.settings.limits.max) {
-    settings.pastMeridianE = axis1.settings.limits.max;
-    DLF("WRN: Limits::init(), pastMeridianE > limits.max setting to limits.max");
+  if (settings.pastMeridianE > Deg360) {
+    settings.pastMeridianE = Deg360;
+    DLF("WRN: Limits::init(), pastMeridianE > 360° setting to 360°");
   }
-  if (settings.pastMeridianE < axis1.settings.limits.min) {
-    settings.pastMeridianE = axis1.settings.limits.min;
-    DLF("WRN: Limits::init(), pastMeridianE < limits.min setting to limits.min");
+  if (settings.pastMeridianE < -Deg360) {
+    settings.pastMeridianE = -Deg360;
+    DLF("WRN: Limits::init(), pastMeridianE < -360° setting to -360°");
   }
-  if (-settings.pastMeridianW > axis1.settings.limits.max) {
-    settings.pastMeridianW = -axis1.settings.limits.max;
-    DLF("WRN: Limits::init(), pastMeridianW > limits.max setting to limits.max");
+  if (-settings.pastMeridianW > Deg360) {
+    settings.pastMeridianW = Deg360;
+    DLF("WRN: Limits::init(), pastMeridianW > 360° setting to 360°");
   }
-  if (-settings.pastMeridianW < axis1.settings.limits.min) {
-    settings.pastMeridianW = -axis1.settings.limits.min;
-    DLF("WRN: Limits::init(), pastMeridianW < limits.min setting to limits.min");
+  if (-settings.pastMeridianW < -Deg360) {
+    settings.pastMeridianW = -Deg360;
+    DLF("WRN: Limits::init(), pastMeridianW < -360° setting to -360°");
   }
 }
 

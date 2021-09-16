@@ -63,7 +63,7 @@ class Axis {
     Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, Motor *motor);
 
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(bool alternateLimits);
+    void init();
 
     // process commands for this axis
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -106,6 +106,11 @@ class Axis {
 
     // get index position, in steps
     inline long getIndexPositionSteps() { return motor->getIndexPositionSteps(); }
+
+    // coordinate wrap, in "measures" (radians, microns, etc.)
+    // wrap occurs when the coordinate exceeds the min or max limits
+    // default 0.0 (disabled)
+    inline void coordinateWrap(double value) { wrapAmount = value; wrapEnabled = abs(value) > 0.0F; }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
@@ -257,9 +262,19 @@ class Axis {
     // returns true if traveling through backlash
     bool inBacklash();
 
+    // convert from unwrapped (full range) to normal (+/- wrapAmount) coordinate
+    double wrap(double value);
+
+    // convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
+    double unwrap(double value);
+
+    // convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
+    // nearest the instrument coordinate
+    double unwrapNearest(double value);
+
     bool decodeAxisSettings(char *s, AxisSettings &a);
 
-    bool validateAxisSettings(int axisNum, bool altAz, AxisSettings a);
+    bool validateAxisSettings(int axisNum, AxisSettings a);
     
     AxisErrors errors;
 
@@ -278,6 +293,10 @@ class Axis {
     volatile uint16_t backlashAmountSteps = 0;
 
     volatile bool takeStep = false;
+
+    // coordinate handling
+    double wrapAmount = 0.0L;
+    bool wrapEnabled = false;
 
     // power down standstill control
     bool powerDownStandstill = false;

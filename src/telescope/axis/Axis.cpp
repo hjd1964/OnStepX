@@ -76,7 +76,7 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
 }
 
 // sets up the driver step/dir/enable pins and any associated driver mode control
-void Axis::init(bool alternateLimits) {
+void Axis::init() {
   // start monitor
   V(axisPrefix); VF("start monitor task (rate "); V(SIDEREAL_IV_MS); VF("ms priority 1)... ");
   uint8_t taskHandle = 0;
@@ -131,7 +131,7 @@ void Axis::init(bool alternateLimits) {
 
   // read axis settings from NV
   nv.readBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
-  if (!validateAxisSettings(axisNumber, alternateLimits, settings)) initError.value = true;
+  if (!validateAxisSettings(axisNumber, settings)) initError.value = true;
 
   #if DEBUG == VERBOSE
     V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
@@ -203,37 +203,79 @@ double Axis::getIndexPosition() {
   return motor->getIndexPositionSteps()/settings.stepsPerMeasure;
 }
 
+double distance(double c1, double c2) {
+  double d1 = abs(c1 - c2);
+  double d2 = abs(c2 - c1);
+  if (d1 <= d2) return d1; else return d2;
+}
+
+// convert from unwrapped (full range) to normal (+/- wrapAmount) coordinate
+double Axis::wrap(double value) {
+  if (wrapEnabled) {
+    while (value > settings.limits.max) value -= wrapAmount;
+    while (value < settings.limits.min) value += wrapAmount;
+  }
+  return value;
+}
+
+// convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
+double Axis::unwrap(double value) {
+  if (wrapEnabled) {
+    double position = motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
+    while (value > position + wrapAmount/2.0L) value -= wrapAmount;
+    while (value < position - wrapAmount/2.0L) value += wrapAmount;
+  }
+  return value;
+}
+
+// convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
+// nearest the instrument coordinate
+double Axis::unwrapNearest(double value) {
+  if (wrapEnabled) {
+    value = unwrap(value);
+    double instr = motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
+//    V(axisPrefix);
+//    VF("unwrapNearest instr "); V(radToDeg(instr));
+//    VF(", before "); V(radToDeg(value));
+    double dist = distance(value, instr);
+    if (distance(value + wrapAmount, instr) < dist) value += wrapAmount; else
+    if (distance(value - wrapAmount, instr) < dist) value -= wrapAmount;
+//    VF(", after "); VL(radToDeg(value));
+  }
+  return value;
+}
+
 // set instrument coordinate, in "measures" (radians, microns, etc.)
 void Axis::setInstrumentCoordinate(double value) {
-  setInstrumentCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  setInstrumentCoordinateSteps(lround(unwrap(value)*settings.stepsPerMeasure));
 }
 
 // get instrument coordinate
 double Axis::getInstrumentCoordinate() {
-  return motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
+  return wrap(motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure);
 }
 
 // set instrument coordinate park, in "measures" (radians, microns, etc.)
 // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
 void Axis::setInstrumentCoordinatePark(double value) {
-  motor->setInstrumentCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  motor->setInstrumentCoordinateParkSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 // set target coordinate park, in "measures" (degrees, microns, etc.)
 // with backlash disabled this moves to the nearest position where the motor doesn't cog
 void Axis::setTargetCoordinatePark(double value) {
   motor->setFrequencySteps(0);
-  motor->setTargetCoordinateParkSteps(lround(value*settings.stepsPerMeasure), settings.subdivisions);
+  motor->setTargetCoordinateParkSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure), settings.subdivisions);
 }
 
 // set target coordinate, in "measures" (degrees, microns, etc.)
 void Axis::setTargetCoordinate(double value) {
-  setTargetCoordinateSteps(lround(value*settings.stepsPerMeasure));
+  setTargetCoordinateSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure));
 }
 
 // get target coordinate, in "measures" (degrees, microns, etc.)
 double Axis::getTargetCoordinate() {
-  return motor->getTargetCoordinateSteps()/settings.stepsPerMeasure;
+  return wrap(motor->getTargetCoordinateSteps()/settings.stepsPerMeasure);
 }
 
 // check if we're at the target coordinate during an auto slew
