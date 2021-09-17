@@ -133,12 +133,12 @@
 #define SLEW_RATE_MEMORY              OFF //    OFF, ON Remembers rates set across power cycles.                              Option
 
 // PIER SIDE BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SYNCING
-#define MFLIP_SKIP_HOME                ON //     ON, ON Goto directly to the destination without visiting home position.      Option
+#define MFLIP_SKIP_HOME               OFF //    OFF, ON Goto directly to the destination without visiting home position.      Option
 #define MFLIP_PAUSE_HOME_MEMORY       OFF //    OFF, ON Remember meridian flip pause at home setting across power cycles.     Option
 #define MFLIP_AUTOMATIC_MEMORY         ON //     ON, ON Remember automatic meridian flip setting across power cycles.         Option
 
 #define PIER_SIDE_SYNC_CHANGE_SIDES   OFF //    OFF, ON Allows sync to change pier side, for GEM mounts.                      Option
-#define PIER_SIDE_PREFERRED_DEFAULT  BEST //   BEST, Stays on current side if possible. EAST or WEST switch if possible.      Option
+#define PIER_SIDE_PREFERRED_DEFAULT  EAST //   EAST, BEST Stays on current side if possible. EAST or WEST switch if possible. Option
 
 // PARKING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PARKING
 #define STRICT_PARKING                OFF //    OFF, ON Un-parking is only allowed if successfully parked.                    Option
