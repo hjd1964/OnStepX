@@ -231,18 +231,25 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       *commandError = e;
     } else
 
-    //  :MN#   Goto current RA/Dec but East of the Pier (within meridian limit overlap for GEM mounts)
-    //  :MNe#  as above
-    //  :MNw#  Goto current RA/Dec but West of the Pier (within meridian limit overlap for GEM mounts)
+    //  :MN#   Goto current RA/Dec but opposite Pier side (within meridian limit overlap)
+    //  :MNe#  Goto current RA/Dec but East of the Pier (within meridian limit overlap)
+    //  :MNw#  Goto current RA/Dec but West of the Pier (within meridian limit overlap)
     //         Returns: 0..9, see :MS#
     if (command[1] == 'N') {
       if (transform.mountType != ALTAZM) {
         Coordinate newTarget = mount.getPosition();
-        CommandError e;
+        CommandError e = CE_NONE;
 
-        if (parameter[0] == 0 ||
-           (parameter[0] == 'e' && parameter[1] == 0)) e = request(&newTarget, PSS_EAST_ONLY); else
-        if (parameter[0] == 'w' && parameter[1] == 0) e = request(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;
+        if (parameter[0] == 0) {
+          parameter[1] = 0;
+          if (newTarget.pierSide == PIER_SIDE_EAST) parameter[0] = 'w'; else
+          if (newTarget.pierSide == PIER_SIDE_WEST) parameter[0] = 'e'; else e = CE_SLEW_ERR_UNSPECIFIED;
+        }
+
+        if (e != CE_SLEW_ERR_UNSPECIFIED) {
+          if (parameter[0] == 'e' && parameter[1] == 0) e = request(&newTarget, PSS_EAST_ONLY); else
+          if (parameter[0] == 'w' && parameter[1] == 0) e = request(&newTarget, PSS_WEST_ONLY); else e = CE_CMD_UNKNOWN;
+        }
 
         if (e != CE_CMD_UNKNOWN) {
           if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';

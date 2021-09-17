@@ -44,11 +44,11 @@ void Limits::constrainMeridianLimits() {
     settings.pastMeridianE = -Deg360;
     DLF("WRN: Limits::init(), pastMeridianE < -360° setting to -360°");
   }
-  if (-settings.pastMeridianW > Deg360) {
+  if (settings.pastMeridianW > Deg360) {
     settings.pastMeridianW = Deg360;
     DLF("WRN: Limits::init(), pastMeridianW > 360° setting to 360°");
   }
-  if (-settings.pastMeridianW < -Deg360) {
+  if (settings.pastMeridianW < -Deg360) {
     settings.pastMeridianW = -Deg360;
     DLF("WRN: Limits::init(), pastMeridianW < -360° setting to -360°");
   }

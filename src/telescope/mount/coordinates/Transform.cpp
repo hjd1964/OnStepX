@@ -43,9 +43,9 @@ void Transform::init() {
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  if (transform.mountType == GEM) meridianFlips = true; else meridianFlips = false;
+  if (transform.mountType == ALTAZM) meridianFlips = false; else meridianFlips = true;
 
-  #if ALIGN_MAX_NUM_STARS > 1  
+  #if ALIGN_MAX_NUM_STARS > 1
     align.init(site.location.latitude, mountType);
   #endif
 }

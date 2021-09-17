@@ -61,6 +61,11 @@ void Mount::init() {
   limits.init();
   guide.init();
 
+  if (transform.mountType == FORK) {
+    limits.settings.pastMeridianE = Deg360;
+    limits.settings.pastMeridianW = Deg360;
+  }
+
   if (AXIS1_WRAP == ON) {
     axis1.coordinateWrap(Deg360);
     axis1.settings.limits.min = -Deg360;
@@ -157,11 +162,11 @@ void Mount::update() {
     float f1 = 0, f2 = 0;
     if (!guide.activeAxis1() || guide.state == GU_PULSE_GUIDE) {
       f1 = trackingRateAxis1 + guide.rateAxis1 + pec.rate;
-      axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F);
+      axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
     if (!guide.activeAxis2() || guide.state == GU_PULSE_GUIDE) {
       f2 = trackingRateAxis2 + guide.rateAxis2;
-      axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F);
+      axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
     f1 = abs(f1); f2 = abs(f2); if (f2 > f1) f1 = f2;
@@ -180,8 +185,6 @@ void Mount::update() {
 }
 
 void Mount::poll() {
-  site.refreshPeriod();
-
   #ifdef HAL_NO_DOUBLE_PRECISION
     #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
     #define DiffRange2 0.017453292F          // 60 arc-minutes in radians
