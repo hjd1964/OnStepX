@@ -8,15 +8,9 @@
 //#define DEBUG_SERVO
 
 #include "../../../../tasks/OnTask.h"
-extern Tasks tasks;
+
 #include "../../../Telescope.h"
 #include "../Motor.h"
-
-#ifdef MOUNT_PRESENT
-  extern unsigned long periodSubMicros;
-#else
-  #define periodSubMicros 1.0
-#endif
 
 #ifdef AXIS1_SERVO
   #if AXIS1_SERVO_ENCODER == ENC_AB
@@ -241,13 +235,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
-      // convert microsecond counts to sub-microsecond counts
       period *= 16.0F;
-
-      // adjust period for MCU clock inaccuracy (signed 32bit numeric range covers about +/- 3% here)
-      period *= (SIDEREAL_PERIOD/periodSubMicros);
-
-      // remember the last active period
       lastPeriod = (unsigned long)lroundf(period);
     } else {
       lastPeriod = 0;

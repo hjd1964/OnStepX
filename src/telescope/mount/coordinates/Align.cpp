@@ -14,7 +14,6 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../coordinates/Transform.h"
 #include "../../Telescope.h"

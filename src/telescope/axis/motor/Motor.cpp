@@ -5,12 +5,6 @@
 
 #ifdef AXIS_PRESENT
 
-#ifdef MOUNT_PRESENT
-  extern unsigned long periodSubMicros;
-#else
-  #define periodSubMicros 1.0
-#endif
-
 // resets motor and target angular position in steps, also zeros backlash and index 
 void Motor::resetPositionSteps(long value) {
   indexSteps    = 0;

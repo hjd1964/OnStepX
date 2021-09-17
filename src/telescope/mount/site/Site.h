@@ -71,12 +71,15 @@ class Site {
     // checks if the date and time were set
     bool isDateTimeReady();
 
-    // sets centisecond or millisecond sidereal frac, in sub-micro counts per second
-    void setPeriodSubMicros(unsigned long period);
+    // gets sidereal period, in sub-micro counts per second
+    unsigned long getSiderealPeriod();
 
-    // adjusts centisec or millisecond sidereal frac, in sub-micro counts per second
-    // up/down to compensate for MCU oscillator inaccuracy
-    void refreshPeriod();
+    // sets sidereal period, in sub-micro counts per second
+    void setSiderealPeriod(unsigned long period);
+
+    // gets sidereal ratio
+    // slower rates are < 1.0, faster rates are > 1.0
+    inline float getSiderealRatio() { return (float)SIDEREAL_PERIOD/siderealPeriod; }
 
     // callback to tick the fracsec sidereal frac
     void tick();
@@ -124,8 +127,10 @@ class Site {
     bool dateIsReady = false;
     bool timeIsReady = false;
 
-    unsigned long period = 0;
-    // handle to fracsec LAST task
+    // sidereal period in sub-microsecond counts
+    unsigned long siderealPeriod = 0;
+
+    // handle to sidereal timer LAST task
     uint8_t handle = 0;
     // site number 0..3
     uint8_t number = 0;

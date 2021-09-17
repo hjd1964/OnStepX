@@ -6,7 +6,6 @@
 #ifdef DS1820_DEVICES_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../1wire/1Wire.h"
 #include <DallasTemperature.h>        // my DallasTemperature library https://github.com/hjd1964/Arduino-Temperature-Control-Library

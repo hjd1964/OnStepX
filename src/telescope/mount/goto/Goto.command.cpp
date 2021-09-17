@@ -6,15 +6,12 @@
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../site/Site.h"
 #include "../Mount.h"
 #include "../guide/Guide.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
-
-extern unsigned long periodSubMicros;
 
 bool Goto::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;

@@ -17,7 +17,6 @@
 #include "PPS.h"
 #include "../../telescope/Telescope.h"
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include <TinyGPS++.h> // http://arduiniana.org/libraries/tinygpsplus/
 TinyGPSPlus gps;

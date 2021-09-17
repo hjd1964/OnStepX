@@ -6,7 +6,6 @@
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../../Telescope.h"
 #include "../Mount.h"

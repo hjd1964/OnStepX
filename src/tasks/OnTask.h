@@ -97,9 +97,8 @@ class Task {
     //       the task occurs late the next call is scheduled earlier to make up the difference
     bool poll();
 
-    void setPeriod(unsigned long period);
-    void setPeriodMicros(unsigned long period);
-    void setPeriodSubMicros(unsigned long period);
+    void refreshPeriod();
+    void setPeriod(unsigned long period, PeriodUnits units = PU_MILLIS);
     void setFrequency(float freq);
 
     void setDuration(unsigned long duration);
@@ -206,6 +205,10 @@ class Tasks {
     // \return          nothing
     void remove(uint8_t handle);
 
+    // refresh process period, causes setPeriodRatioSubMicros() ratio to be recognized by hardware timers
+    // handle: task handle
+    void refreshPeriod(uint8_t handle);
+
     // set process period ms. Note: the period/frequency change takes effect on the next task cycle, 
     // if the period is > the hardware timers maximum period the task is disabled
     // \param handle    task handle
@@ -237,6 +240,14 @@ class Tasks {
     //   when setting a frequency the most appropriate setPeriod is used automatically
     //   if the period is > ~49 days (or > the hardware timers maximum period) the task is disabled
     void setFrequency(uint8_t handle, double freq);
+
+    // set the period ratio to compensate for MCU clock inaccuracy
+    // in sub-microseconds per second, this is safe to call from within an ISR
+    // software based timers are automatically updated on-the-fly
+    // hardware based timers need their period set to be updated
+    // values above 16M cause the timers to compensate by running slower
+    // values below 16M cause the timers to compensate by running faster
+    IRAM_ATTR void setPeriodRatioSubMicros(unsigned long value);
 
     // set process to run immediately on the next pass (within its priority level)
     IRAM_ATTR inline void immediate(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { task[handle - 1]->immediate = true; } }
@@ -301,3 +312,5 @@ class Tasks {
     uint8_t handleSearch     = 255;
     Task    *task[TASKS_MAX];
 };
+
+extern Tasks tasks;

@@ -6,15 +6,9 @@
 #ifdef SD_DRIVER_PRESENT
 
 #include "../../../../tasks/OnTask.h"
-extern Tasks tasks;
+
 #include "../../../Telescope.h"
 #include "StepDir.defaults.h"
-
-#ifdef MOUNT_PRESENT
-  extern unsigned long periodSubMicros;
-#else
-  #define periodSubMicros 1.0
-#endif
 
 #ifdef AXIS1_DRIVER_SD
   const StepDirPins PinsAxis1 = { AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE };
@@ -181,8 +175,6 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
       period *= 16.0F;
-      // adjust period for MCU clock inaccuracy (signed 32bit numeric range covers about +/- 3% here)
-      period *= (SIDEREAL_PERIOD/periodSubMicros);
       lastPeriod = (unsigned long)lroundf(period);
     } else {
       lastPeriod = 0;

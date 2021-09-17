@@ -8,12 +8,13 @@
 
 class Pps {
   public:
-    // attach interrupt
+    // attach interrupt and start PPS
     void init();
 
-    volatile unsigned long averageMicros = 0;
-    volatile unsigned long lastMicros = 0;
     volatile bool synced = false;
+
+    volatile unsigned long averageMicros = 1000000;
+    volatile unsigned long lastMicros = 1000000;
   private:
 };
 

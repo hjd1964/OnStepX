@@ -3,7 +3,6 @@
 
 #include "../Common.h"
 #include "../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../lib/convert/Convert.h"
 #include "../commands/ProcessCmds.h"

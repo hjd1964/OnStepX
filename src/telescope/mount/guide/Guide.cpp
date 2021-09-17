@@ -7,7 +7,6 @@
 
 #include "../../../commands/ProcessCmds.h"
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../../Telescope.h"
 #include "../Mount.h"

@@ -40,8 +40,10 @@
 #include "HAL_HWTIMERS.h"
 #include "OnTask.h"
 
-unsigned char __task_mutex[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-unsigned char __task_postpone = false;
+#define roundPeriod(x) ((unsigned long)((x)+0.5))
+
+unsigned char _task_postpone = false;
+unsigned long _taskMasterFrequencyRatio = 16000000;
 
 // Task object
 Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)()) {
@@ -70,9 +72,16 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   if (repeat != true) { DL("ERR: Task::requestHardwareTimer(), repeat must be true"); return false; }
   if (priority != 0) { DL("ERR: Task::requestHardwareTimer(), s/w priority must be 0 (highest)"); return false; }
 
-  unsigned long hwPeriod = period;
-  if (period_units == PU_NONE) hwPeriod = 0; else if (period_units == PU_MILLIS) hwPeriod *= 16000UL; else if (period_units == PU_MICROS) hwPeriod *= 16UL;
-  HAL_HWTIMER_PREPARE_PERIOD(num, hwPeriod);
+  unsigned long hardware_timer_period = period;
+  if (period_units == PU_NONE) hardware_timer_period = 0; else
+  if (period_units == PU_MILLIS) hardware_timer_period *= 16000UL; else
+  if (period_units == PU_MICROS) hardware_timer_period *= 16UL;
+  
+  unsigned long temp = roundPeriod(hardware_timer_period*(_taskMasterFrequencyRatio/(double)16000000.0L));
+  noInterrupts();
+  hardware_timer_period = temp;
+  interrupts();
+  HAL_HWTIMER_PREPARE_PERIOD(num, hardware_timer_period);
 
   switch (num) {
     case 1:
@@ -97,7 +106,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
     break;
   }
   hardwareTimer = num;
-  period = hwPeriod;
+  period = hardware_timer_period;
   period_units = PU_SUB_MICROS;
   return true;
 }
@@ -128,7 +137,7 @@ bool Task::poll() {
   if (period != 0) {
     unsigned long t, time_to_next_task;
 
-    if (period_units == PU_SUB_MICROS) t = micros() * 16; else if (period_units == PU_MICROS) t = micros(); else t = millis();
+    if (period_units == PU_MICROS) t = micros(); else t = millis();
     if (immediate) { immediate = false; next_task_time = t; }
     time_to_next_task = next_task_time - t;
 
@@ -141,12 +150,15 @@ bool Task::poll() {
     
       running = false;
 
-      if (__task_postpone) { __task_postpone = false; return false; }
+      if (_task_postpone) { _task_postpone = false; return false; }
 
       // adopt next period
       if (next_period_units != PU_NONE) {
         time_to_next_task = 0;
-        period = next_period;
+        unsigned long temp = roundPeriod(next_period*(_taskMasterFrequencyRatio/(double)16000000.0L));
+        noInterrupts();
+        period = temp;
+        interrupts();
         period_units = next_period_units;
         next_period_units = PU_NONE;
       }
@@ -154,7 +166,6 @@ bool Task::poll() {
       // set adjusted period
       #ifndef TASKS_QUEUE_MISSED
         if ((long)(period + time_to_next_task) < 0) time_to_next_task = -period;
-//      if (-time_to_next_task > period) time_to_next_task = period;
       #endif
       next_task_time = t + (long)(period + time_to_next_task);
       if (!repeat) period = 0;
@@ -164,59 +175,27 @@ bool Task::poll() {
   return false;
 }
 
-void Task::setPeriod(unsigned long period) {
-  if (hardwareTimer) {
-    next_period = period;
-    next_period_units = PU_MILLIS;
-    setHardwareTimerPeriod();
-  } else {
-    if (this->period == 0) {
-      idle = true;
-      this->period = period;
-      period_units = PU_MILLIS;
-      next_period_units = PU_NONE;
-    } else {
-      idle = false;
-      next_period = period;
-      next_period_units = PU_MILLIS;
-    }
-  }
+void Task::refreshPeriod() {
+  if (hardwareTimer) setHardwareTimerPeriod();
 }
 
-void Task::setPeriodMicros(unsigned long period) {
+void Task::setPeriod(unsigned long period, PeriodUnits units) {
   if (hardwareTimer) {
     next_period = period;
-    next_period_units = PU_MICROS;
+    next_period_units = units;
     setHardwareTimerPeriod();
   } else {
+    if (units == PU_SUB_MICROS) { period = lroundf(period/16.0F); units = PU_MICROS; }
+    if (units == PU_MILLIS && period < 1000) { period *= 1000; units = PU_MICROS; }
     if (this->period == 0) {
       idle = true;
       this->period = period;
-      period_units = PU_MICROS;
+      period_units = units;
       next_period_units = PU_NONE;
     } else {
       idle = false;
       next_period = period;
-      next_period_units = PU_MICROS;
-    }
-  }
-}
-
-void Task::setPeriodSubMicros(unsigned long period) {
-  if (hardwareTimer) {
-    next_period = period;
-    next_period_units = PU_SUB_MICROS;
-    setHardwareTimerPeriod();
-  } else {
-    if (this->period == 0) {
-      idle = true;
-      this->period = period;
-      period_units = PU_SUB_MICROS;
-      next_period_units = PU_NONE;
-    } else {
-      idle = false;
-      next_period = period;
-      next_period_units = PU_SUB_MICROS;
+      next_period_units = units;
     }
   }
 }
@@ -226,12 +205,12 @@ void Task::setFrequency(float freq) {
     freq = 1.0F / freq;            // seconds per call
     float f = freq * 16000000.0F;  // sub-micros per call
     if (f <= 4294967295.0F) {
-      setPeriodSubMicros(lroundf(f));
+      setPeriod(lroundf(f), PU_SUB_MICROS);
       return;
     }
     f = freq * 1000000.0F;         // micros per call
     if (f <= 4294967295.0F) {
-      setPeriodMicros(lroundf(f));
+      setPeriod(lroundf(f), PU_MICROS);
       return;
     }
     f = freq * 1000.0F;            // millis per call
@@ -319,8 +298,20 @@ void Task::setHardwareTimerPeriod() {
     if (next_period_units == PU_MILLIS) next_period *= 16000UL; else if (next_period_units == PU_MICROS) next_period *= 16UL;
     next_period_units = PU_NONE;
     period_units = PU_SUB_MICROS;
-    period = next_period;
+    unsigned long temp = roundPeriod(next_period*(_taskMasterFrequencyRatio/(double)16000000.0L));
+    noInterrupts();
+    period = temp;
+    interrupts();
     HAL_HWTIMER_PREPARE_PERIOD(hardwareTimer, period);
+  }
+}
+
+void tasksMonitor() {
+  uint8_t handle = tasks.getFirstHandle();
+  for (int i = 0; i < TASKS_MAX; i++) {
+    if (handle == 0) break;
+    tasks.refreshPeriod(handle);
+    uint8_t handle = tasks.getNextHandle();
   }
 }
 
@@ -330,8 +321,9 @@ Tasks::Tasks() {
     task[c] = NULL;
     allocated[c] = false;
   }
-  
-  for (uint8_t c = 0; c < 8; c++) __task_mutex[c] = 0;
+
+  // start the tasks monitor
+  tasks.add(1000, 0, true, 7, tasksMonitor);
 }
 
 Tasks::~Tasks() {
@@ -395,6 +387,12 @@ void Tasks::remove(uint8_t handle) {
   }
 }
 
+void Tasks::refreshPeriod(uint8_t handle) {
+  if (handle != 0 && allocated[handle - 1]) {
+    task[handle - 1]->refreshPeriod();
+  }
+}
+
 void Tasks::setPeriod(uint8_t handle, unsigned long period) {
   if (handle != 0 && allocated[handle - 1]) {
     task[handle - 1]->setPeriod(period);
@@ -403,13 +401,13 @@ void Tasks::setPeriod(uint8_t handle, unsigned long period) {
 
 void Tasks::setPeriodMicros(uint8_t handle, unsigned long period) {
   if (handle != 0 && allocated[handle - 1]) {
-    task[handle - 1]->setPeriodMicros(period);
+    task[handle - 1]->setPeriod(period, PU_MICROS);
   }
 }
 
 void Tasks::setPeriodSubMicros(uint8_t handle, unsigned long period) {
   if (handle != 0 && allocated[handle - 1]) {
-    task[handle - 1]->setPeriodSubMicros(period);
+    task[handle - 1]->setPeriod(period, PU_SUB_MICROS);
   }
 }
 
@@ -417,6 +415,10 @@ void Tasks::setFrequency(uint8_t handle, double freq) {
   if (handle != 0 && allocated[handle - 1]) {
     task[handle - 1]->setFrequency(freq);
   }
+}
+
+IRAM_ATTR void Tasks::setPeriodRatioSubMicros(unsigned long value) {
+  _taskMasterFrequencyRatio = value;
 }
 
 void Tasks::setDuration(uint8_t handle, unsigned long duration) {
@@ -575,3 +577,5 @@ void Tasks::updateEventRange() {
     }
   }
 }
+
+Tasks tasks;

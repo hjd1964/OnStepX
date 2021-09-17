@@ -6,7 +6,6 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../axis/Axis.h"
 #include "../Telescope.h"

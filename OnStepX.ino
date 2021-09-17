@@ -51,7 +51,6 @@
 NVS nv;
 #include "src/lib/sense/Sense.h"
 #include "src/tasks/OnTask.h"
-Tasks tasks;
 
 #include "src/telescope/Telescope.h"
 extern Telescope telescope;

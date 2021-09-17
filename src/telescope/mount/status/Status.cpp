@@ -6,7 +6,6 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
   bool ledOn = false;

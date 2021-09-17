@@ -6,7 +6,7 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
+
 #include "../site/Site.h"
 
 bool Pec::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {

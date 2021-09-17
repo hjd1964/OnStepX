@@ -3,7 +3,6 @@
 
 #include "../../Common.h"
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 #include "Sound.h"
 
 #if STATUS_BUZZER == ON

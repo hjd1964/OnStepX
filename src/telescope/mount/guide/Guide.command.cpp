@@ -6,12 +6,9 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
+
 #include "../site/Site.h"
-
 #include "../goto/Goto.h"
-
-extern unsigned long periodSubMicros;
 
 bool Guide::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;

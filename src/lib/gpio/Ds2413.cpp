@@ -9,7 +9,6 @@
 #include "../../debug/Debug.h"
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../1wire/1Wire.h"
 #include <DallasGPIO.h>               // my DallasGPIO library https://github.com/hjd1964/Arduino-DS2413GPIO-Control-Library

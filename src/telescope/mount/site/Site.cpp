@@ -6,12 +6,8 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
-#include "../../Telescope.h"
-#include "../../../lib/tls/PPS.h"
 
-// base clock period (in 1/16us units per second) for adjusting the length of a sidereal second and all timing in OnStepX
-unsigned long periodSubMicros;
+#include "../../Telescope.h"
 
 // fractional second sidereal clock (fracsec or millisecond)
 volatile unsigned long fracLAST;
@@ -84,7 +80,7 @@ void Site::init() {
     if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(); didn't get h/w timer for Clock (using s/w timer)"); }
   } else { VL("FAILED!"); }
 
-  setPeriodSubMicros(SIDEREAL_PERIOD);
+  setSiderealPeriod(SIDEREAL_PERIOD);
 }
 
 // update/apply the site latitude and longitude, necessary for LAST calculations etc.
@@ -126,21 +122,15 @@ bool Site::isDateTimeReady() {
   return dateIsReady && timeIsReady;
 }
 
-// sets centisecond or millisecond sidereal clock rate, in sub-micro counts per second
-void Site::setPeriodSubMicros(unsigned long period) {
-  this->period = period;
-  periodSubMicros = period;
-  refreshPeriod();
+// gets sidereal period, in sub-micro counts per second
+unsigned long Site::getSiderealPeriod() {
+  return siderealPeriod;
 }
 
-// adjusts centisec or millisecond sidereal clock rate, in sub-micro counts per second
-// up/down to compensate for MCU oscillator inaccuracy
-void Site::refreshPeriod() {
-  float ppsRateRatio = 1.0F;
-  #if TIME_LOCATION_PPS_SENSE == ON
-    ppsRateRatio = roundf(pps.averageMicros/1000000.0F);
-  #endif
-  tasks.setPeriodSubMicros(handle, lroundf((period/SIDEREAL_FRAC)*ppsRateRatio));
+// sets sidereal period, in sub-micro counts per second
+void Site::setSiderealPeriod(unsigned long period) {
+  siderealPeriod = period;
+  tasks.setPeriodSubMicros(handle, lround(siderealPeriod/SIDEREAL_FRAC));
 }
 
 // gets the time in hours that have passed in this Julian Day

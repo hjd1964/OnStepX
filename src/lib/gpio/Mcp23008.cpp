@@ -9,7 +9,6 @@
 #include "../../debug/Debug.h"
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 // needs: https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library and https://github.com/adafruit/Adafruit_BusIO
 #include "Adafruit_MCP23X08.h"

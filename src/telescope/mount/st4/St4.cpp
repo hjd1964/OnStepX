@@ -6,9 +6,8 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
-#include "../../Telescope.h"
 
+#include "../../Telescope.h"
 #include "../Mount.h"
 #include "../guide/Guide.h"
 #include "../goto/Goto.h"

@@ -7,7 +7,7 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
+
 #include "../../lib/weather/Weather.h"
 #include "../../lib/temperature/Temperature.h"
 #include "../axis/Axis.h"

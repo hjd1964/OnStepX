@@ -6,7 +6,6 @@
 #ifdef THERMISTOR_DEVICES_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../weather/Weather.h"
 

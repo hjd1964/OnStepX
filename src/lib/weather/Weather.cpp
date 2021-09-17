@@ -6,7 +6,6 @@
 #if WEATHER != OFF
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 extern bool xBusy;
 

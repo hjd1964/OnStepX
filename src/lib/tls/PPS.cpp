@@ -1,6 +1,7 @@
 // handle PPS interrupt
 
 #include "../../Common.h"
+#include "../../tasks/OnTask.h"
 
 #if TIME_LOCATION_PPS_SENSE == ON
 
@@ -12,7 +13,11 @@ void ppsIsr() {
   if (oneSecond > 1000000 - PPS_WINDOW_MICROS && oneSecond < 1000000 + PPS_WINDOW_MICROS) {
     pps.averageMicros = (pps.averageMicros*(PPS_SECS_TO_AVERAGE - 1) + oneSecond)/PPS_SECS_TO_AVERAGE;
     pps.synced = true;
-  } else pps.synced = false;
+    tasks.setPeriodRatioSubMicros(pps.averageMicros*16UL);
+  } else {
+    pps.synced = false;
+    tasks.setPeriodRatioSubMicros(16000000UL);
+  }
   pps.lastMicros = t;
 }
 

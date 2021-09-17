@@ -6,17 +6,13 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
-#include "../../lib/tls/PPS.h"
-#include "site/Site.h"
 
+#include "site/Site.h"
 #include "coordinates/Transform.h"
 #include "goto/Goto.h"
 #include "guide/Guide.h"
 #include "limits/Limits.h"
 #include "park/Park.h"
-
-extern unsigned long periodSubMicros;
 
 bool Mount::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   char *conv_end;
@@ -240,9 +236,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'K') { settings.rc = RC_NONE; trackingRate = hzToSidereal(60.136); } else
     if (command[1] == 'L') { settings.rc = RC_NONE; trackingRate = hzToSidereal(57.9);   } else
     if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);              } else
-    if (command[1] == '+') { site.setPeriodSubMicros(periodSubMicros - hzToSubMicros(0.02)); } else
-    if (command[1] == '-') { site.setPeriodSubMicros(periodSubMicros + hzToSubMicros(0.02)); } else
-    if (command[1] == 'R') { site.setPeriodSubMicros(SIDEREAL_PERIOD); } else
+    if (command[1] == '+') { site.setSiderealPeriod(site.getSiderealPeriod() - hzToSubMicros(0.02)); } else
+    if (command[1] == '-') { site.setSiderealPeriod(site.getSiderealPeriod() + hzToSubMicros(0.02)); } else
+    if (command[1] == 'R') { site.setSiderealPeriod(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
       #if SLEW_GOTO == ON
         if (park.state != PS_PARKED) tracking(true); else *commandError = CE_PARKED;

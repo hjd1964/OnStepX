@@ -6,7 +6,6 @@
 #ifdef AXIS_PRESENT
 
 #include "../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../Telescope.h"
 #include "../../lib/sense/Sense.h"

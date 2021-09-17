@@ -7,10 +7,9 @@
 
 #if AXIS1_PEC == ON
   #include "../../../tasks/OnTask.h"
-  extern Tasks tasks;
+
   #include "../../../lib/sense/Sense.h"
   #include "../../Telescope.h"
-
   #include "../goto/Goto.h"
   #include "../guide/Guide.h"
   #include "../park/Park.h"

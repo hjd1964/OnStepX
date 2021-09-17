@@ -6,13 +6,10 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../tasks/OnTask.h"
-extern Tasks tasks;
 
 #include "../../Telescope.h"
 #include "../Mount.h"
 #include "../site/Site.h"
-
-extern unsigned long periodSubMicros;
 
 bool Limits::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
