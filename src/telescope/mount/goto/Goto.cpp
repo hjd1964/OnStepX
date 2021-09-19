@@ -364,7 +364,7 @@ void Goto::poll() {
     stage = GG_ABORT;
   } else
   if (stage == GG_WAYPOINT) {
-    if ((axis1.atTarget() && axis2.atTarget()) || !mount.isSlewing()) {
+    if (!mount.isSlewing()) {
       if (destination.h == home.position.h && destination.d == home.position.d && destination.pierSide == home.position.pierSide) {
 
         if (settings.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
@@ -399,7 +399,7 @@ void Goto::poll() {
     }
   } else
   if (stage == GG_DESTINATION || stage == GG_ABORT) {
-    if ((axis1.atTarget() && axis2.atTarget()) || !mount.isSlewing()) {
+    if (!mount.isSlewing()) {
       VLF("MSG: Mount, goto destination reached (stopping)");
       axis1.autoSlewRateByDistanceStop();
       axis2.autoSlewRateByDistanceStop();
