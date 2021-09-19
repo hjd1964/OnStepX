@@ -392,7 +392,7 @@ void Goto::poll() {
         axis1.setTargetCoordinate(a1);
         axis2.setTargetCoordinate(a2);
       }
-      VLF("MSG: Mount, goto next target coordinates set");
+      VF("MSG: Mount, goto next target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
 
       axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
       axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
