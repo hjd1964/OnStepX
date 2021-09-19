@@ -8,6 +8,7 @@
 #include "../../../tasks/OnTask.h"
 
 #include "../../Telescope.h"
+#include "../park/Park.h"
 
 // fractional second sidereal clock (fracsec or millisecond)
 volatile unsigned long fracLAST;
@@ -30,6 +31,9 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       JulianDate jd;
       tls.get(jd);
       site.setDateTime(jd);
+      #if SLEW_GOTO == ON
+        if (park.state == PS_PARKED) park.restore(false);
+      #endif
 
       VF("MSG: Tls_GPS, stopping GPS polling task.");
       tasks.remove(tasks.getHandleByName("gpsPoll"));
