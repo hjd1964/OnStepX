@@ -184,7 +184,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (mount.isHome()) {
     VL("MSG: Mount, set target from HOME");
     if (transform.mountType == FORK) {
-      if (preferredPierSide == PIER_SIDE_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+      if (preferredPierSide == PSS_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
     } else {
       if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
     }
