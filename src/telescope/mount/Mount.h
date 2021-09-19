@@ -45,12 +45,6 @@ class Mount {
     // get current equatorial position (Mount coordinate system)
     Coordinate getMountPosition(CoordReturn coordReturn = CR_MOUNT_EQU);
 
-    // enables or disables power to the mount motors
-    inline void enable(bool state) { axis1.enable(state); axis2.enable(state); }
-
-    // returns true if the mount motors are powered on
-    inline bool isEnabled() { return axis1.isEnabled() || axis2.isEnabled(); }
-
     // returns true if either of the mount motor drivers reported a fault
     inline bool isFault() { return axis1.fault() || axis2.fault(); }
 
@@ -60,14 +54,21 @@ class Mount {
     // returns true if the mount is at the home (startup) position
     inline bool isHome() { return atHome; }
 
+    // returns true if the mount is slewing (doing a goto or guide > 2X)
+    inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }
+
     // enables or disables tracking, enabling tracking powers on the motors if necessary
     void tracking(bool state);
 
     // returns true if the mount is tracking
     inline bool isTracking() { return trackingState == TS_SIDEREAL; }
 
-    // returns true if the mount is slewing (doing a goto or guide > 2X)
-    inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }
+    // enables or disables power to the mount motors
+    // first enable starts the mount status indications
+    void enable(bool state);
+
+    // returns true if the mount motors are powered on
+    inline bool isEnabled() { return axis1.isEnabled() || axis2.isEnabled(); }
 
     // allow syncing to the encoders instead of from them
     void syncToEncoders(bool state);

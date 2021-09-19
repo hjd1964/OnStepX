@@ -72,7 +72,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
   limits.enabled(true);
   mount.syncToEncoders(false);
-  if (mount.isHome() && park.state != PS_PARKING) mount.tracking(true);
+  if (mount.isHome()) mount.tracking(true);
 
   Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
   start = current;
@@ -130,9 +130,9 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
 
   axis1.setInstrumentCoordinate(a1);
   axis2.setInstrumentCoordinate(a2);
-  mount.syncToEncoders(true);
 
   limits.enabled(true);
+  mount.syncToEncoders(true);
   if (mount.isHome()) mount.tracking(true);
 
   VLF("MSG: Mount, sync instrument coordinates updated");

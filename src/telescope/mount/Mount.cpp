@@ -128,14 +128,28 @@ Coordinate Mount::getMountPosition(CoordReturn coordReturn) {
 // enables or disables tracking, enabling tracking powers on the motors if necessary
 void Mount::tracking(bool state) {
   if (state) {
+    axis1.enable(state);
+    axis2.enable(state);
+
     trackingState = TS_SIDEREAL;
-    status.init();
-    axis1.enable(true);
-    axis2.enable(true);
     atHome = false;
   } else trackingState = TS_NONE;
 
   update();
+}
+
+// enables or disables power to the mount motors
+// first enable starts the mount status indications
+void Mount::enable(bool state) {
+  static bool firstTime = true;
+  if (state) {
+    if (firstTime) status.init();
+    firstTime = false;
+  }
+
+  if (state == false) tracking(false);
+  axis1.enable(state);
+  axis2.enable(state);
 }
 
 // allow syncing to the encoders instead of from them
