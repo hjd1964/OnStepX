@@ -102,6 +102,9 @@ void Focuser::init() {
 
     if (configuration[index].present) {
       if (axes[index] != NULL) {
+
+        if (active == -1) active = index;
+
         V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
         axes[index]->init();
 

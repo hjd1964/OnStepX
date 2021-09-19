@@ -143,6 +143,9 @@ class Focuser {
     uint8_t parkHandle[FOCUSER_MAX];
 
     unsigned long secs = 0;
+
+    // the default focuser is the first found
+    int active = -1;
 };
 
 extern Focuser focuser;

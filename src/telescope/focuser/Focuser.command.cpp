@@ -11,7 +11,6 @@
 extern Axis *axes[6];
 
 bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  static int active = 0;
   static int index = 0;
   *supressFrame = false;
 
@@ -90,6 +89,9 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       strcpy(temp, &parameter[1]);
       strcpy(&parameter[0], temp);
     } else index = active;
+
+    // check for no default focuser
+    if (index < 0) { *commandError = CE_CMD_UNKNOWN; return true; }
 
     // check for commands that shouldn't have a parameter
     if (strchr("aTpIMtuQF1234+-GZHh", command[1]) && parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
