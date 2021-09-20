@@ -21,6 +21,9 @@ class TimeLocationSource {
     // initialize (also enables the RTC PPS if available)
     bool init();
 
+    // true if date/time/site ready
+    inline bool isReady() { return ready; }
+
     // set the RTC's time
     void set(JulianDate ut1);
     
@@ -31,10 +34,7 @@ class TimeLocationSource {
     void getSite(double &latitude, double &longitude, float &elevation);
 
     // update from GPS
-    bool poll();
-
-    bool active = false;
-    bool ready = false;
+    void poll();
 
   private:
     // validate wait time
@@ -47,6 +47,8 @@ class TimeLocationSource {
     bool siteIsValid();
 
     unsigned long startTime = 0;
+    bool ready = false;
+    bool active = false;
 };
 
 extern TimeLocationSource tls;

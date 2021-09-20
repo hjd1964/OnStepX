@@ -10,8 +10,8 @@
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 
 bool TimeLocationSource::init() {
-  active = true;
-  return active;
+  ready = true;
+  return ready;
 }
 
 void TimeLocationSource::set(JulianDate ut1) {

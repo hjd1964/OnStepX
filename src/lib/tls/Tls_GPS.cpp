@@ -14,6 +14,15 @@
   #error "SERIAL_GPS_BAUD must be set to the baud rate if TIME_LOCATION_SOURCE GPS is used"
 #endif
 
+#if SERIAL_GPS == SoftSerial || SERIAL_GPS == HardSerial
+  #ifndef SERIAL_GPS_RX
+    #error "SERIAL_GPS_RX must be set to the serial port RX pin if SoftSerial or HardSerial is used"
+  #endif
+  #ifndef SERIAL_GPS_TX
+    #error "SERIAL_GPS_TX must be set to the serial port TX pin if SoftSerial or HardSerial is used"
+  #endif
+#endif
+
 #include "PPS.h"
 #include "../../telescope/Telescope.h"
 #include "../../tasks/OnTask.h"
@@ -26,40 +35,55 @@ TinyGPSPlus gps;
 // provide for using software serial
 #if SERIAL_GPS == SoftSerial
   #include <SoftwareSerial.h>
-  #undef SoftSerial
-  #define SERIAL_GPS_NO_RXTX_INIT
-  SoftwareSerial SoftSerial(SERIAL_GPS_RX, SERIAL_GPS_TX);
+  #undef SERIAL_GPS
+  SoftwareSerial SWSerialGPS(SERIAL_GPS_RX, SERIAL_GPS_TX);
+  #define SERIAL_GPS SWSerialGPS
+  #define SERIAL_GPS_RXTX_SET
+#endif
+
+// provide for using hardware serial
+#if SERIAL_GPS == HardSerial
+  #include <HardwareSerial.h>
+  #undef SERIAL_GPS
+  HardwareSerial HWSerialGPS(SERIAL_GPS_RX, SERIAL_GPS_TX);
+  #define SERIAL_GPS HWSerialGPS
+  #define SERIAL_GPS_RXTX_SET
 #endif
 
 void gpsPoll() {
-  #if TIME_LOCATION_PPS_SENSE == ON
+  #if TIME_LOCATION_PPS_SENSE != OFF
     if (pps.synced) {
   #endif
 
-  if (!tls.active && tls.poll()) {
-    SERIAL_GPS.end();
-    initError.tls = false;
-  }
+  if (!tls.isReady()) tls.poll();
 
-  #if TIME_LOCATION_PPS_SENSE == ON
+  #if TIME_LOCATION_PPS_SENSE != OFF
     }
   #endif
 }
 
 // initialize
 bool TimeLocationSource::init() {
-  #if defined(SERIAL_GPS_RX) && defined(SERIAL_GPS_TX) && !defined(SERIAL_GPS_NO_RXTX_INIT)
+  #if defined(SERIAL_GPS_RX) && defined(SERIAL_GPS_TX) && !defined(SERIAL_GPS_RXTX_SET)
     SERIAL_GPS.begin(SERIAL_GPS_BAUD, SERIAL_8N1, SERIAL_GPS_RX, SERIAL_GPS_TX);
   #else
     SERIAL_GPS.begin(SERIAL_GPS_BAUD);
   #endif
 
-  VF("MSG: Tls_GPS, start GPS poll task (rate 10ms priority 7)... ");
-  if (tasks.add(10, GPS_TIMEOUT_MINUTES*60000UL, true, 7, gpsPoll, "gpsPoll")) { VL("success"); } else { VL("FAILED!"); }
+  VF("MSG: TLS, start GPS monitor task (rate 10ms priority 7)... ");
+  if (tasks.add(1, GPS_TIMEOUT_MINUTES*60000UL, true, 7, gpsPoll, "gpsPoll")) {
+    VL("success");
+    active = true;
+  } else {
+    VL("FAILED!");
+    active = false;
+  }
 
-  startTime = millis();
-  active = false;
+  // flag that start time is unknown
+  startTime = 0;
+
   ready = false;
+
   return active;
 }
 
@@ -68,7 +92,7 @@ void TimeLocationSource::set(JulianDate ut1) {
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {
-  if (!active) return;
+  if (!ready) return;
   if (!timeIsValid()) return;
 
   GregorianDate greg; greg.year = gps.date.year(); greg.month = gps.date.month(); greg.day = gps.date.day();
@@ -77,7 +101,7 @@ void TimeLocationSource::get(JulianDate &ut1) {
 }
 
 void TimeLocationSource::getSite(double &latitude, double &longitude, float &elevation) {
-  if (!active) return;
+  if (!ready) return;
   if (!siteIsValid()) return;
 
   latitude = gps.location.lat();
@@ -85,17 +109,32 @@ void TimeLocationSource::getSite(double &latitude, double &longitude, float &ele
   elevation = gps.altitude.meters();
 }
 
-bool TimeLocationSource::poll() {
-  if (gps.location.isValid() && siteIsValid() && gps.date.isValid() && gps.time.isValid() && timeIsValid() && waitIsValid()) {
-    active = true;
-    ready = true;
-    return true;
+void TimeLocationSource::poll() {
+  
+  while (SERIAL_GPS.available() > 0) {
+    gps.encode(SERIAL_GPS.read());
   }
-  while (SERIAL_GPS.available() > 0) gps.encode(SERIAL_GPS.read());
-  return false;
+
+  if (gps.location.isValid() && siteIsValid()) {
+    if (gps.date.isValid() && gps.time.isValid() && timeIsValid()) {
+      if (waitIsValid()) {
+        VLF("MSG: TLS, GPS date/time/location is ready");
+
+        VLF("MSG: TLS, closing GPS serial port");
+        SERIAL_GPS.end();
+
+        VLF("MSG: TLS, stopping GPS monitor task");
+        tasks.setDurationComplete(tasks.getHandleByName("gpsPoll"));
+
+        ready = true;
+      }
+    }
+  }
 }
 
+// starts keeping track of the wait once (PPS is synced, if applicable) and GPS has a lock 
 bool TimeLocationSource::waitIsValid() {
+  if (startTime == 0) startTime = millis();
   unsigned long t = millis() - startTime;
   return (t/1000UL)/3600UL >= GPS_MIN_WAIT_MINUTES;
 }

@@ -16,8 +16,8 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 
 #if TIME_LOCATION_SOURCE == GPS
   void gpsCheck() {
-    if (tls.ready) {
-      VF("MSG: Tls_GPS, setting site from GPS");
+    if (tls.isReady()) {
+      VLF("MSG: Mount, setting site from GPS");
       double latitude, longitude;
       float elevation;
       tls.getSite(latitude, longitude, elevation);
@@ -27,7 +27,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       strcpy(site.location.name, "GPS");
       site.updateLocation();
 
-      VF("MSG: Tls_GPS, setting date/time from GPS");
+      VLF("MSG: Mount, setting date/time from GPS");
       JulianDate jd;
       tls.get(jd);
       site.setDateTime(jd);
@@ -35,9 +35,8 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
         if (park.state == PS_PARKED) park.restore(false);
       #endif
 
-      VF("MSG: Tls_GPS, stopping GPS polling task.");
-      tasks.remove(tasks.getHandleByName("gpsPoll"));
-      tls.ready = false;
+      VLF("MSG: Mount, stopping GPS monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
     }
   }
 #endif
@@ -52,17 +51,19 @@ void Site::init() {
   #if TIME_LOCATION_SOURCE != OFF
     initError.tls = !tls.init();
     if (!initError.tls) {
-      #if TIME_LOCATION_SOURCE != GPS
+      if (tls.isReady()) {
         tls.get(ut1);
         dateIsReady = true;
         timeIsReady = true;
         VLF("MSG: Mount, site get Date/Time from TLS");
-      #else
-        VLF("MSG: Site, using Date/Time from NV");
+      } else {
+        VLF("MSG: Site, falling back to Date/Time from NV");
         readJD(validKey);
-        VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
-        if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VL("success"); } else { VL("FAILED!"); }
-      #endif
+        #if TIME_LOCATION_SOURCE == GPS
+          VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
+          if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VL("success"); } else { VL("FAILED!"); }
+        #endif
+      }
     } else {
       DLF("WRN: Site::init(); Warning TLS initialization failed");
       VLF("WRN: Site::init(); fallback to Date/Time from NV");

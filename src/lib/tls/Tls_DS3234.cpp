@@ -22,16 +22,16 @@ bool TimeLocationSource::init() {
     // frequency 0 (1Hz) on the SQW pin
     rtcDS3234.SetSquareWavePin(DS3234SquareWavePin_ModeClock);
     rtcDS3234.SetSquareWavePinClockFrequency(DS3234SquareWaveClock_1Hz);
-    active = true;
-  } else DLF("WRN, tls.init(): DS3234 GetIsRunning() false");
+    ready = true;
+  } else DLF("WRN: tls.init(), DS3234 GetIsRunning() false");
   #ifdef SSPI_SHARED
     SPI.end();
   #endif
-  return active;
+  return ready;
 }
 
 void TimeLocationSource::set(JulianDate ut1) {
-  if (!active) return;
+  if (!ready) return;
 
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
 
@@ -51,7 +51,7 @@ void TimeLocationSource::set(JulianDate ut1) {
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {
-  if (!active) return;
+  if (!ready) return;
 
   #ifdef SSPI_SHARED
     SPI.begin();

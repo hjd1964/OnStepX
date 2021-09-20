@@ -27,19 +27,19 @@ bool TimeLocationSource::init() {
       // frequency 0 (1Hz) on the SQW pin
       rtcDS3231.SetSquareWavePin(DS3231SquareWavePin_ModeClock);
       rtcDS3231.SetSquareWavePinClockFrequency(DS3231SquareWaveClock_1Hz);
-      active = true;
-    } else { DLF("WRN, tls.init(): DS3231 GetIsRunning() false"); }
-  } else { DLF("WRN, tls.init(): DS3231 (I2C 0x68) not found"); }
+      ready = true;
+    } else { DLF("WRN: tls.init(), DS3231 GetIsRunning() false"); }
+  } else { DLF("WRN: tls.init(), DS3231 (I2C 0x68) not found"); }
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
     HAL_Wire.end();
     HAL_Wire.begin();
     HAL_Wire.setClock(HAL_WIRE_CLOCK);
   #endif
-  return active;
+  return ready;
 }
 
 void TimeLocationSource::set(JulianDate ut1) {
-  if (!active) return;
+  if (!ready) return;
 
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
 
@@ -53,7 +53,7 @@ void TimeLocationSource::set(JulianDate ut1) {
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {
-  if (!active) return;
+  if (!ready) return;
 
   RtcDateTime now = rtcDS3231.GetDateTime();
   if (now.Year() >= 2018 && now.Year() <= 3000 && now.Month() >= 1 && now.Month() <= 12 && now.Day() >= 1 && now.Day() <= 31 &&

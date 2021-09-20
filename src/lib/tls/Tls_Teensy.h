@@ -14,14 +14,18 @@ class TimeLocationSource {
   public:
     // initialize (also enables the RTC PPS if available)
     bool init();
- 
+
+     // true if date/time ready
+    inline bool isReady() { return ready; }
+
     // set the RTC's time
     void set(JulianDate ut1);
     
     // get the RTC's time
     void get(JulianDate &ut1);
 
-    bool active = false;
+  private:
+    bool ready = false;
 };
 
 extern TimeLocationSource tls;
