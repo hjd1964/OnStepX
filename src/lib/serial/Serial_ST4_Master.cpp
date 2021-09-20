@@ -5,6 +5,9 @@
 #include "Stream.h"
 #include "Serial_ST4_Master.h"
 
+// SerialSt4 needs a minimum of 1500us between bytes transferred
+#define LOOP_TIME 1900
+
 // compensate for Mega2560 overhead to give about the same bitrate
 #ifdef HAL_SLOW_PROCESSOR
   #define XMIT_TIME 20
@@ -21,7 +24,12 @@ char SerialST4Master::poll() {
     }
     // data coming in was good?
     if (!recv_error) {
-      if (c >= (char)32) { recv_buffer[recv_tail] = c; recv_tail++; recv_buffer[recv_tail]=(char)0; return (char)0; } else return c;
+      if (c >= (char)32) {
+        recv_buffer[recv_tail] = c;
+        recv_tail++;
+        recv_buffer[recv_tail] = (char)0;
+        return (char)0;
+      } else return c;
     } else return (char)0;
   } else return (char)0;
 }
@@ -30,11 +38,15 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   uint8_t s_parity = 0;
   uint8_t r_parity = 0;
 
+  // SHC_CLOCK HIGH for more than 1500us means that a pair of data bytes is done being exchanged
+  static unsigned long lastMicros = 0;
+  if ((long)(micros() - lastMicros) < LOOP_TIME) return false;
+
   // assume no errors
   frame_error = false;
   send_error = false;
   recv_error = false;
-    
+
   // start bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, LOW);
@@ -42,7 +54,10 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
   delayMicroseconds(XMIT_TIME);
-  if (frame_error) return false;
+  if (!frame_error) {
+    lastMicros = micros();
+    return false;
+  }
 
   for (int i = 7; i >= 0; i--) {
     uint8_t state = bitRead(data_out, i);
@@ -85,6 +100,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   if (send_error) { DLF("WRN, SerialST4.trans(): send parity error"); }
   if (recv_error) { DLF("WRN, SerialST4.trans(): recv parity error"); }
 
+  lastMicros = micros();
   if (frame_error) return false; else return true;
 }
 
