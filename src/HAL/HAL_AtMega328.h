@@ -23,11 +23,6 @@
 #define HAL_MAXRATE_LOWER_LIMIT 76.8
 #define HAL_PULSE_WIDTH         10000
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-
-// SerialA is manidatory
-#define SERIAL_A Serial
-
 // New symbol for the default I2C port -------------------------------------------------------------
 //#include <Wire.h>
 #define HAL_Wire Wire

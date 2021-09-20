@@ -4,6 +4,24 @@
 
 #if defined(__MK20DX256__) || defined(_mk20dx128_h_) || defined(__MK20DX128__) || defined(__IMXRT1052__) || defined(__IMXRT1062__)
 
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial1: RX1 Pin 0, TX1 Pin 1
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B              Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
+#endif
+#if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_D              SerialUSB1
+  #define SERIAL_D_BAUD_DEFAULT 9600
+#endif
+#if defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_E              SerialUSB2
+  #define SERIAL_E_BAUD_DEFAULT 9600
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN                19               // Status LED
 #define AUX1_PIN                18               // ESP8266 GPIO0, SPI MISO/Fault

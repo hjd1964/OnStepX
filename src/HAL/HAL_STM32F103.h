@@ -24,21 +24,6 @@
 #define cli() noInterrupts()
 #define sei() interrupts()
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-
-// SerialA is manidatory
-#define SERIAL_A Serial1
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define HWSERIAL_1
-  #define HWSERIAL_1_RX PB11
-  #define HWSERIAL_1_TX PB10
-  #define SERIAL_B HWSerial1
-#endif
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
-#endif
-
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire

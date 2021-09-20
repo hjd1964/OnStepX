@@ -12,6 +12,35 @@
 
 #if defined(STM32F411xE) || defined(STM32F401xC)
 
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial1 RX1 Pin PA10, TX1 Pin PA9
+// Serial2 RX2 Pin PA3 , TX2 Pin PA2
+// Serial6 RX6 Pin PA12, TX6 Pin PA11 (used for USB virtual serial)
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B             HardSerial
+  #define SERIAL_B_RX          PA3
+  #define SERIAL_B_TX          PA2
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #define SERIAL_C             HardSerial
+  #define SERIAL_C_RX          PA10
+  #define SERIAL_C_TX          PA9
+#endif
+
+// Auto assign the Serial1 port pins for GPS
+#if defined(SERIAL_GPS_BAUD) && SERIAL_GPS_BAUD != OFF
+  #ifndef SERIAL_GPS
+    #define SERIAL_GPS         HardSerial
+  #endif
+  #ifndef SERIAL_GPS_RX
+    #define SERIAL_GPS_RX      PA10
+  #endif
+  #ifndef SERIAL_GPS_TX
+    #define SERIAL_GPS_TX      PA9
+  #endif
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN               PB12             // Status LED
 #define AUX2_PIN               PA13             // PPS

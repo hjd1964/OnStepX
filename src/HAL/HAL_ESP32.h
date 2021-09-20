@@ -16,38 +16,6 @@
 #define HAL_MAXRATE_LOWER_LIMIT 16
 #define HAL_PULSE_WIDTH 2500
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-
-// SerialA is manidatory
-#define SERIAL_A Serial
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B Serial2
-#endif
-// SerialC is optional
-#if PINMAP == InsteinESP1
-  #ifndef SERIAL_C_BAUD_DEFAULT
-    #define SERIAL_C_BAUD_DEFAULT 9600
-  #endif
-  #define SERIAL_C Serial1
-  #define SERIAL_C_RX 21
-  #define SERIAL_C_TX 22
-  #define HAL_SERIAL_C_ENABLED
-#elif defined(SERIAL_C_BAUD_DEFAULT)
-  #if SERIAL_C_BAUD_DEFAULT != OFF
-    #define SERIAL_C Serial1
-    #define HAL_SERIAL_C_ENABLED
-  #endif
-#endif
-
-#if SERIAL_BT_MODE == SLAVE
-  #include <BluetoothSerial.h>
-  extern BluetoothSerial bluetoothSerial;
-  #define SERIAL_BT bluetoothSerial
-#endif
-
-#include "../lib/serial/Serial_IP_ESP32.h"
-
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire
@@ -63,6 +31,8 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL, optionally also early init of SERIAL_IP/PIP or SERIAL_BT
+
+#include "../lib/serial/Serial_IP_ESP32.h"
 #if defined(SERIAL_IP)
   #define SERIAL_IP_BEGIN() SERIAL_IP.begin(9999);
 #else
@@ -73,10 +43,20 @@
 #else
   #define SERIAL_PIP_BEGIN()
 #endif
+
+#if SERIAL_BT_MODE == SLAVE
+  #include <BluetoothSerial.h>
+  extern BluetoothSerial bluetoothSerial;
+  #define SERIAL_BT bluetoothSerial
+#endif
 #if defined(SERIAL_BT)
   #define SERIAL_BT_BEGIN() SERIAL_BT.begin(SERIAL_BT_NAME);
 #else
   #define SERIAL_BT_BEGIN()
+#endif
+
+#if SERIAL_BT_MODE != OFF && SERIAL_IP_MODE != OFF
+  #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
 #define HAL_INIT() { \

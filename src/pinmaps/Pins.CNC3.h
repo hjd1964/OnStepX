@@ -2,13 +2,23 @@
 // Pin map for CNC Shield Version 3 (with WeMos D1 R32)
 #pragma once
 
-// Note: SPI for TMC drivers: GPIO32 (MOSI), GPIO33 (SCK), GPIO15 (CS Axis1) on WeMos D1 R32 PCB are more difficult to wire into but optional. GPIO18 (CS Axis2) is on top.
+// Note: SPI for TMC drivers: GPIO32 (MOSI), GPIO33 (SCK), GPIO15 (CS Axis1)
+// on WeMos D1 R32 PCB are somewhat difficult to wire into, but optional
+// GPIO18 (CS Axis2) is on top
 
 #if defined(ESP32)
 
-// Serial2 (SerialB) needs to be re-mapped to GPIO13 (RX) and GPIO5 (TX)
-#define SERIAL_B_RX               13
-#define SERIAL_B_TX               5
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial0: RX Pin GPIO3, TX Pin GPIO1 (to USB serial adapter)
+// Serial1: RX1 Pin GPIO10, TX1 Pin GPIO9 (on SPI Flash pins, must be moved to be used)
+// Serial2: RX2 Pin GPIO16, TX2 Pin GPIO17
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B                Serial2
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
+#endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                  18             // ESP8266 RST control, or SPI MISO Axis1&2

@@ -4,10 +4,22 @@
 
 #if defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1280__) || defined(__SAM3X8E__)
 
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial0: RX Pin 0, TX Pin 1 (to USB serial adapter)
+// Serial1: RX1 Pin 19, TX1 Pin 17
+// Serial2: RX2 Pin 17, TX2 Pin 16
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B             Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #define SERIAL_C             Serial2
+#endif
+
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
-#define Temp0Pin              A15                // Thermo0
-#define Temp1Pin              A14                // Thermo1
-#define Temp2Pin              A13                // Thermo2
+#define Temp0Pin               A15              // Thermo0
+#define Temp1Pin               A14              // Thermo1
+#define Temp2Pin               A13              // Thermo2
 
 #if FOCUSER_TEMPERATURE_PIN == OFF
   #undef FOCUSER_TEMPERATURE_PIN
@@ -15,11 +27,11 @@
 #endif
 #if FEATURE1_TEMP_PIN == OFF
   #undef FEATURE1_TEMP_PIN
-  #define FEATURE1_TEMP_PIN   Temp1Pin
+  #define FEATURE1_TEMP_PIN    Temp1Pin
 #endif
 #if FEATURE2_TEMP_PIN == OFF
   #undef FEATURE2_TEMP_PIN
-  #define FEATURE2_TEMP_PIN   Temp2Pin
+  #define FEATURE2_TEMP_PIN    Temp2Pin
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog (pwm/dac) if supported)

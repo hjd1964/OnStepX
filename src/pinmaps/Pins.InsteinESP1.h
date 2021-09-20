@@ -4,6 +4,23 @@
 
 #if defined(ESP32)
 
+#warning "This an an experimental PINMAP, use at your own risk!!!"
+
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial0: RX Pin GPIO3, TX Pin GPIO1 (to USB serial adapter)
+// Serial1: RX1 Pin GPIO21, TX1 Pin GPIO22
+// Serial2: RX2 Pin GPIO16, TX2 Pin GPIO17
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B              Serial2
+#endif
+#ifndef SERIAL_C_BAUD_DEFAULT
+  #define SERIAL_C_BAUD_DEFAULT 9600
+  #define SERIAL_C              Serial1
+  #define SERIAL_C_RX           21
+  #define SERIAL_C_TX           22
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX3_PIN                21               // Home SW for Axis1 (or I2C SDA)
 #define AUX4_PIN                22               // Home SW for Axis2 (or I2C SCL)

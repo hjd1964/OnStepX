@@ -24,32 +24,6 @@
 #define cli() noInterrupts()
 #define sei() interrupts()
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-
-// SerialA is manidatory
-#define SERIAL_A Serial
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B Serial1
-#endif
-// SerialC is optional
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #define SERIAL_C Serial3
-#endif
-
-// Handle special case of using software serial for a GPS
-#ifdef SERIAL_GPS
-  #if SERIAL_GPS == SoftSerial
-    // For the S6, auto assign the Serial2 port pins
-    #ifndef SERIAL_GPS_RX
-      #define SERIAL_GPS_RX PA3
-    #endif
-    #ifndef SERIAL_GPS_TX
-      #define SERIAL_GPS_TX PA2
-    #endif
-  #endif
-#endif
-
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire

@@ -16,16 +16,32 @@
 
 #include "SerialWrapper.h"
 
-#ifdef HWSERIAL_1
-  HardwareSerial HWSerial1(HWSERIAL_1_RX, HWSERIAL_1_TX);
+#if SERIAL_A == HardSerial
+  #undef SERIAL_A
+  HardwareSerial HWSerialA(SERIAL_A_RX, SERIAL_A_TX);
+  #define SERIAL_A HWSerialA
+  #define SERIAL_A_RXTX_SET
 #endif
 
-#ifdef HWSERIAL_2
-  HardwareSerial HWSerial2(HWSERIAL_2_RX, HWSERIAL_2_TX);
+#if SERIAL_B == HardSerial
+  #undef SERIAL_B
+  HardwareSerial HWSerialB(SERIAL_B_RX, SERIAL_B_TX);
+  #define SERIAL_B HWSerialB
+  #define SERIAL_B_RXTX_SET
 #endif
 
-#ifdef HWSERIAL_3
-  HardwareSerial HWSerial3(HWSERIAL_3_RX, HWSERIAL_3_TX);
+#if SERIAL_C == HardSerial
+  #undef SERIAL_C
+  HardwareSerial HWSerialC(SERIAL_C_RX, SERIAL_C_TX);
+  #define SERIAL_C HWSerialC
+  #define SERIAL_C_RXTX_SET
+#endif
+
+#if SERIAL_D == HardSerial
+  #undef SERIAL_D
+  HardwareSerial HWSerialD(SERIAL_D_RX, SERIAL_D_TX);
+  #define SERIAL_D HWSerialD
+  #define SERIAL_D_RXTX_SET
 #endif
 
 #if SERIAL_BT_MODE == SLAVE
@@ -79,16 +95,36 @@ void SerialWrapper::begin() { begin(9600); }
 void SerialWrapper::begin(long baud) {
   uint8_t channel = 0;
   #ifdef SERIAL_A
-    if (isChannel(channel++)) SERIAL_A.begin(baud);
+    if (isChannel(channel++))
+      #if defined(SERIAL_A_RX) && defined(SERIAL_A_TX) && !defined(SERIAL_A_RXTX_SET)
+        SERIAL_A.begin(baud, SERIAL_8N1, SERIAL_A_RX, SERIAL_A_TX);
+      #else
+        SERIAL_A.begin(baud);
+      #endif
   #endif
   #ifdef SERIAL_B
-    if (isChannel(channel++)) SERIAL_B.begin(baud);
+    if (isChannel(channel++))
+      #if defined(SERIAL_B_RX) && defined(SERIAL_B_TX) && !defined(SERIAL_B_RXTX_SET)
+        SERIAL_B.begin(baud, SERIAL_8N1, SERIAL_B_RX, SERIAL_B_TX);
+      #else
+        SERIAL_B.begin(baud);
+      #endif
   #endif
   #ifdef SERIAL_C
-    if (isChannel(channel++)) SERIAL_C.begin(baud);
+    if (isChannel(channel++))
+      #if defined(SERIAL_C_RX) && defined(SERIAL_C_TX) && !defined(SERIAL_C_RXTX_SET)
+        SERIAL_C.begin(baud, SERIAL_8N1, SERIAL_C_RX, SERIAL_C_TX);
+      #else
+        SERIAL_C.begin(baud);
+      #endif
   #endif
   #ifdef SERIAL_D
-    if (isChannel(channel++)) SERIAL_D.begin(baud);
+    if (isChannel(channel++))
+      #if defined(SERIAL_D_RX) && defined(SERIAL_D_TX) && !defined(SERIAL_D_RXTX_SET)
+        SERIAL_D.begin(baud, SERIAL_8N1, SERIAL_D_RX, SERIAL_D_TX);
+      #else
+        SERIAL_D.begin(baud);
+      #endif
   #endif
   #ifdef SERIAL_ST4
     if (isChannel(channel++)) SERIAL_ST4.begin(baud);

@@ -5,7 +5,32 @@
 #if defined(STM32F446xx)
 
 // TX2/RX2 (PA2/PA3) is on the Y+ and Z+ end stops and is reserved for GPS (etc, no command channel is associated with this port)
-// Use "#define SerialGPS SoftwareSerial2" in Config.h for the GPS only serial port
+
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Schematic isn't entirely clear, best guess:
+// Serial1 RX1 Pin PB7, TX1 Pin PB6
+// Serial2 RX2 Pin PA3, TX2 Pin PA2
+// Serial3 RX3 Pin PC11, TX3 Pin PC10
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B            Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #define SERIAL_C            Serial3
+#endif
+
+// Auto assign the Serial2 port pins for GPS
+#if defined(SERIAL_GPS_BAUD) && SERIAL_GPS_BAUD != OFF
+  #ifndef SERIAL_GPS
+    #define SERIAL_GPS         SoftSerial
+  #endif
+  #ifndef SERIAL_GPS_RX
+    #define SERIAL_GPS_RX      PA3
+  #endif
+  #ifndef SERIAL_GPS_TX
+    #define SERIAL_GPS_TX      PA2
+  #endif
+#endif
 
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define Temp0Pin              PC0                // Temp0   (on TE0, THERMO0)

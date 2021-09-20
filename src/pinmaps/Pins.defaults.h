@@ -2,6 +2,11 @@
 // Null pin map, assigns OFF to all values not already assigned
 #pragma once
 
+// SerialA is manidatory
+#ifndef SERIAL_A
+#define SERIAL_A                    Serial
+#endif
+
 #ifndef AUX0_PIN
 #define AUX0_PIN                    OFF
 #endif

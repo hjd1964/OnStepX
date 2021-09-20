@@ -2,8 +2,9 @@
 // Pin map for OnStep on STM32
 #pragma once
 
-// This pin map is for an STM32F303xC "Blue Pill" boards..
-// They run at 72MHz, with 48K of RAM, and 256K of flash.
+// This pin map is for the STM32F103CB (or C8 with 128KB)
+// and STM32F303xC "Blue Pill" boards...
+// They run at 72MHz, with 48K of RAM, and 256K of flash
 //
 // More info, schematic at:
 //   http://wiki.stm32duino.com/index.php?title=Blue_Pill
@@ -12,16 +13,20 @@
 
 #if defined(STM32F103xB) || defined(STM32F303xC)
 
-// === Pins for USB 
-// In HAL, Serial_A is mapped to USART1, with the following pins:
-// STM32 pin PA9  TX -> RX on CP2102 UART to TTL board
-// STM32 pin PA10 RX -> TX on CP2102 UART to TTL board
+// Serial ports
+// Serial1 RX1 Pin PA10, TX1 Pin PA9 (to CP2102 USB serial adapter)
+// Serial2 RX2 Pin PA3 , TX2 Pin PA2 (pins are used for other purposes)
+// Serial3 RX3 Pin PB11, TX3 Pin PB10
 
-// === Pins for WiFi
-// In HAL, Serial_B is mapped to USART3, with the following pins:
-//
-// STM32 pin PB10 TX -> RX on ESP8266
-// STM32 pin PB11 RX -> TX on ESP8266
+#define SERIAL_A               Serial1
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B             HardSerial
+  #define SERIAL_B_RX          PB11
+  #define SERIAL_B_TX          PB10
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
+#endif
 
 // === Pins for DS3231 RTC/EEPROM
 // The STM32 has no built in EEPROM. Therefore, we use a DS3231 RTC module 

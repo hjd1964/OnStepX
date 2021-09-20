@@ -7,6 +7,25 @@
 
 #if defined(ARDUINO_TEENSY41)
 
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial1: RX1 Pin 0, TX1 Pin 1
+// Serial2: RX2 Pin 7, TX2 Pin 8
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B              Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #define SERIAL_C              Serial2
+#endif
+#if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_D              SerialUSB1
+  #define SERIAL_D_BAUD_DEFAULT 9600
+#endif
+#if defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_E              SerialUSB2
+  #define SERIAL_E_BAUD_DEFAULT 9600
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN               23               // Status LED
 #define AUX2_PIN               20               // PPS

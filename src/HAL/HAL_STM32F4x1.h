@@ -32,41 +32,6 @@
 #define cli() noInterrupts()
 #define sei() interrupts()
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-// HardwareSerial HWSerial1(PA10, PA9);  // RX1, TX1
-// HardwareSerial HWSerial2(PA3 , PA2);  // RX2, TX2
-// HardwareSerial HWSerial6(PA12, PA11); // RX6, TX6
-
-// SerialA is manidatory
-#define SERIAL_A Serial
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define HWSERIAL_1
-  #define HWSERIAL_1_RX PA3
-  #define HWSERIAL_1_TX PA2
-  #define SERIAL_B HWSerial1
-#endif
-// SerialC is optional
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #define HWSERIAL_2
-  #define HWSERIAL_2_RX PA10
-  #define HWSERIAL_2_TX PA9
-  #define SERIAL_C HWSerial2
-#endif
-
-/*
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  HardwareSerial HWSerial2(PA3, PA2);    // RX2, TX2
-  #define SERIAL_B HWSerial2
-#endif
-// SerialC is optional
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  HardwareSerial HWSerial1(PA10, PA9); // RX1, TX1
-  #define SERIAL_C HWSerial1
-#endif
-*/
-  
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire

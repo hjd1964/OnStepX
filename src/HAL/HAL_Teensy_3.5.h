@@ -21,30 +21,6 @@
 #define HAL_PULSE_WIDTH 750
 #define HAL_FAST_PROCESSOR
 
-// New symbols for the Serial ports so they can be remapped if necessary -----------------------------
-
-// SerialA is manidatory
-#define SERIAL_A Serial
-// SerialB is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B Serial1
-#endif
-// SerialC is optional
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_C Serial4
-#endif
-// SerialD/E are optional
-#if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
-  #if defined(SERIAL_D_BAUD_DEFAULT) && SERIAL_D_BAUD_DEFAULT != OFF
-    #define SERIAL_D SerialUSB1
-  #endif
-#endif
-#if defined(USB_TRIPLE_SERIAL)
-  #if defined(SERIAL_E_BAUD_DEFAULT) && SERIAL_E_BAUD_DEFAULT != OFF
-    #define SERIAL_E SerialUSB2
-  #endif
-#endif
-
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire1

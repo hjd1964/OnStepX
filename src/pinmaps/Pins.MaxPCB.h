@@ -4,6 +4,25 @@
 
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial1: RX1 Pin 0, TX1 Pin 1
+// Serial4: RX2 Pin 31, TX2 Pin 32
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B              Serial1
+#endif
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_C              Serial4
+#endif
+#if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_D              SerialUSB1
+  #define SERIAL_D_BAUD_DEFAULT 9600
+#endif
+#if defined(USB_TRIPLE_SERIAL)
+  #define SERIAL_E              SerialUSB2
+  #define SERIAL_E_BAUD_DEFAULT 9600
+#endif
+
 #define DAC_AS_DIGITAL                          // turn on support for using DACs to output digital signals using Arduino standard commands
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)

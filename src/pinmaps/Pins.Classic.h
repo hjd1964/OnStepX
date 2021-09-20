@@ -5,7 +5,19 @@
 #if defined(__AVR_ATmega2560__)
 
 #if PINMAP == ClassicInstein
-  #warning "This an an highly experimental PINMAP, use at your own risk!!!"
+  #warning "This an an experimental PINMAP, use at your own risk!!!"
+#endif
+
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial0: RX Pin 0, TX Pin 1 (to USB serial adapter)
+// Serial1: RX1 Pin 19, TX1 Pin 17
+// Serial2: RX2 Pin 17, TX2 Pin 16
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B               Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
 // Misc. pins
@@ -114,6 +126,16 @@
 #endif
 
 #elif defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+
+// Serial ports (see Pins.defaults.h for SERIAL_A)
+// Serial1: RX1 Pin 0, TX1 Pin 1
+
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B               Serial1
+#endif
+#if SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
+#endif
 
 // The PEC index sense resets the PEC index then waits for 60 seconds before allowing another reset
 #ifdef PEC_SENSE_ANALOG
