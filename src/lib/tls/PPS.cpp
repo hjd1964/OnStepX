@@ -28,7 +28,7 @@ void Pps::init() {
       attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, RISING);
     #elif TIME_LOCATION_PPS_SENSE == LOW
       attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, FALLING);
-    #elif TIME_LOCATION_PPS_SENSE == CHANGE
+    #elif TIME_LOCATION_PPS_SENSE == BOTH
       attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, CHANGE);
     #endif
   #endif

@@ -68,6 +68,7 @@
 #define ACCESS_POINT                -5
 #define STATION                     -6
 #define STATION_DHCP                -7
+#define BOTH                        -8
 
 // pier side
 #define EAST                        1      // same as PSS_EAST
