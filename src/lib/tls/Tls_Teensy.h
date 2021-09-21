@@ -24,6 +24,9 @@ class TimeLocationSource {
     // get the RTC's time
     void get(JulianDate &ut1);
 
+    // not used, date/time is stored as UT1
+    double DUT1 = 0.0L;
+
   private:
     bool ready = false;
 };

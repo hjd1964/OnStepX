@@ -37,6 +37,14 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 
       VLF("MSG: Mount, stopping GPS monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
+    } else
+
+    if ((long)(millis() - site.updateTimeoutTime) > 0) {
+      VLF("MSG: Mount, GPS timed out stopping monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
+      VLF("WRN: TLS, GPS timed out stopping monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("gpsPoll"));
+      initError.tls = true; 
     }
   }
 #endif
@@ -60,6 +68,7 @@ void Site::init() {
         VLF("MSG: Site, falling back to Date/Time from NV");
         readJD(validKey);
         #if TIME_LOCATION_SOURCE == GPS
+          updateTimeoutTime = millis() + GPS_TIMEOUT_MINUTES*60000UL;
           VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
           if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VL("success"); } else { VL("FAILED!"); }
         #endif

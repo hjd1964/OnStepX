@@ -163,7 +163,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     } else
 
     //  :SG[sHH]# or :SG[sHH:MM]# (where MM is 00, 30, or 45)
-    //            Set the number of hours added to local time to yield UTC
+    //            Set the number of hours added to local time to yield UT1
     //            Return: 0 failure, 1 success
     if (command[1] == 'G') {
       double hour;
@@ -235,6 +235,20 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
       } else *commandError = CE_PARAM_FORM;
     } else 
+
+    //  :SU[s.s]#
+    //            Set the number of seconds (up to +/-0.9) added to UTC to yield UT1 (DUT1)
+    //            presently only applied to GPS UTC time for UT1 conversion
+    //            Return: 0 failure, 1 success
+    if (command[1] == 'U') {
+      char *conv_end;
+      double dut1 = strtod(parameter, &conv_end);
+      if (dut1 >= -0.9 && dut1 <= 0.9) {
+        #if TIME_LOCATION_SOURCE != OFF
+          tls.DUT1 = dut1;
+        #endif
+      } else *commandError = CE_PARAM_FORM;
+    } else
 
     // :Sv[sn.n]#
     //            Sets current site eleVation in meters

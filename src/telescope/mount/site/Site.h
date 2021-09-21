@@ -87,6 +87,9 @@ class Site {
     Location location;
     LocationExtras locationEx;
 
+    // for internal use, when to timeout date/time updates
+    unsigned long updateTimeoutTime = 0;
+
   private:
     // gets the time in hours that have passed in this Julian Day
     double getTime();
@@ -132,6 +135,7 @@ class Site {
 
     // handle to sidereal timer LAST task
     uint8_t handle = 0;
+
     // site number 0..3
     uint8_t number = 0;
 };

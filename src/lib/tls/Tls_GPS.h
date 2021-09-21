@@ -26,7 +26,7 @@ class TimeLocationSource {
 
     // set the RTC's time
     void set(JulianDate ut1);
-    
+
     // get the RTC's time
     void get(JulianDate &ut1);
 
@@ -35,6 +35,9 @@ class TimeLocationSource {
 
     // update from GPS
     void poll();
+
+    // for conversion from UTC to UT1
+    double DUT1 = 0.0L;
 
   private:
     // validate wait time

@@ -71,7 +71,7 @@ bool TimeLocationSource::init() {
   #endif
 
   VF("MSG: TLS, start GPS monitor task (rate 10ms priority 7)... ");
-  if (tasks.add(1, GPS_TIMEOUT_MINUTES*60000UL, true, 7, gpsPoll, "gpsPoll")) {
+  if (tasks.add(1, 0, true, 7, gpsPoll, "gpsPoll")) {
     VL("success");
     active = true;
   } else {
@@ -97,7 +97,13 @@ void TimeLocationSource::get(JulianDate &ut1) {
 
   GregorianDate greg; greg.year = gps.date.year(); greg.month = gps.date.month(); greg.day = gps.date.day();
   ut1 = calendars.gregorianToJulianDay(greg);
-  ut1.hour = gps.time.hour() + gps.time.minute()/60.0 + gps.time.second()/3600.0;
+  // DUT1 = UT1 − UTC
+  // UT1 = DUT1 + UTC
+  ut1.hour = gps.time.hour() + gps.time.minute()/60.0 + (gps.time.second() + DUT1)/3600.0;
+
+  // adjust date/time for DUT1 as needed
+  if (ut1.hour >= 24.0L) { ut1.hour -= 24.0L; ut1 += 1.0L; } else
+  if (ut1.hour < 0.0L) { ut1.hour += 24.0L; ut1 -= 1.0L; }
 }
 
 void TimeLocationSource::getSite(double &latitude, double &longitude, float &elevation) {
@@ -110,7 +116,6 @@ void TimeLocationSource::getSite(double &latitude, double &longitude, float &ele
 }
 
 void TimeLocationSource::poll() {
-  
   while (SERIAL_GPS.available() > 0) {
     gps.encode(SERIAL_GPS.read());
   }
