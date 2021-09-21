@@ -180,7 +180,8 @@ void commandChannelInit() {
   #endif
   #ifdef SERIAL_ST4
     VF("MSG: Setup, start command channel ST4 task (priority 5)... ");
-    if (tasks.add(0, 0, true, 5, processCmdsST4, "PrcCmdS")) { VL("success"); } else { VL("FAILED!"); }
+    handle = tasks.add(0, 0, true, 5, processCmdsST4, "PrcCmdS");
+    if (handle) { VL("success"); } else { VL("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate*4);
   #endif
   #if SERIAL_BT_MODE == SLAVE

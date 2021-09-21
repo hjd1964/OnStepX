@@ -6,7 +6,7 @@
 #include "Serial_ST4_Master.h"
 
 // SerialSt4 needs a minimum of 1500us between bytes transferred
-#define LOOP_TIME 1900
+#define LOOP_TIME 1600
 
 // compensate for Mega2560 overhead to give about the same bitrate
 #ifdef HAL_SLOW_PROCESSOR
@@ -39,7 +39,6 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   uint8_t r_parity = 0;
 
   // SHC_CLOCK HIGH for more than 1500us means that a pair of data bytes is done being exchanged
-  static unsigned long lastMicros = 0;
   if ((long)(micros() - lastMicros) < LOOP_TIME) return false;
 
   // assume no errors
@@ -54,7 +53,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
   delayMicroseconds(XMIT_TIME);
-  if (!frame_error) {
+  if (frame_error) {
     lastMicros = micros();
     return false;
   }
@@ -107,6 +106,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
 void SerialST4Master::begin() {
   xmit_head = 0; xmit_tail = 0; xmit_buffer[0] = 0;
   recv_head = 0; recv_tail = 0; recv_buffer[0] = 0;
+  lastMicros = micros();
 }
 
 void SerialST4Master::begin(long baud) {
