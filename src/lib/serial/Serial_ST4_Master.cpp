@@ -54,6 +54,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
   delayMicroseconds(XMIT_TIME);
   if (frame_error) {
+    DLF("WRN, SerialST4.trans(): frame/start error");
     lastMicros = micros();
     return false;
   }
@@ -95,7 +96,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
   delayMicroseconds(XMIT_TIME);
 
-  if (frame_error) { DLF("WRN, SerialST4.trans(): frame error"); }
+  if (frame_error) { DLF("WRN, SerialST4.trans(): frame/stop error"); }
   if (send_error) { DLF("WRN, SerialST4.trans(): send parity error"); }
   if (recv_error) { DLF("WRN, SerialST4.trans(): recv parity error"); }
 
