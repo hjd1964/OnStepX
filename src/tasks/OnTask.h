@@ -308,6 +308,7 @@ class Tasks {
     // processes that are already running are ignored so it's ok to poll() within a process
     void yield();
     void yield(unsigned long milliseconds);
+    void yieldMicros(unsigned long microseconds);
 
   private:
     // keep track of the range of priorities so we don't waste cycles looking at empty ones

@@ -2,6 +2,8 @@
 // Serial ST4 master
 
 #include "../../Common.h"
+#include "../../tasks/OnTask.h"
+
 #include "Stream.h"
 #include "Serial_ST4_Master.h"
 
@@ -39,7 +41,7 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   uint8_t r_parity = 0;
 
   // SHC_CLOCK HIGH for more than 1500us means that a pair of data bytes is done being exchanged
-  if ((long)(micros() - lastMicros) < LOOP_TIME) return false;
+//  if ((long)(micros() - lastMicros) < LOOP_TIME) return false;
 
   // assume no errors
   frame_error = false;
@@ -49,13 +51,15 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   // start bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, LOW);
-  delayMicroseconds(XMIT_TIME);
+  // yield from the st4 task at priority level 1
+  // lets motor s/w timers at priority level level 0 run
+  tasks.yieldMicros(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
   if (frame_error) {
     DLF("WRN, SerialST4.trans(): frame/start error");
-    lastMicros = micros();
+  //  lastMicros = micros();
     return false;
   }
 
@@ -64,43 +68,43 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
     s_parity += state;
     digitalWriteF(SST4_CLOCK_OUT, LOW);
     digitalWriteF(SST4_DATA_OUT, state);
-    delayMicroseconds(XMIT_TIME);
+    tasks.yieldMicros(XMIT_TIME);
     digitalWriteF(SST4_CLOCK_OUT, HIGH);
     state = digitalReadF(SST4_DATA_IN);
     r_parity += state;
     bitWrite(*data_in, i, state);                    
-    delayMicroseconds(XMIT_TIME);
+    tasks.yieldMicros(XMIT_TIME);
   }
 
   // parity bit
   digitalWriteF(SST4_CLOCK_OUT,LOW);
   digitalWriteF(SST4_DATA_OUT, s_parity&1);
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if ((r_parity&1) != digitalReadF(SST4_DATA_IN)) recv_error = true;
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
 
   // parity ck bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, recv_error);                  // send local parity check
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) == HIGH) send_error = true; // recv remote parity, ok?
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
 
   // stop bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, LOW);
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
-  delayMicroseconds(XMIT_TIME);
+  tasks.yieldMicros(XMIT_TIME);
 
   if (frame_error) { DLF("WRN, SerialST4.trans(): frame/stop error"); }
   if (send_error) { DLF("WRN, SerialST4.trans(): send parity error"); }
   if (recv_error) { DLF("WRN, SerialST4.trans(): recv parity error"); }
 
-  lastMicros = micros();
+ // lastMicros = micros();
   if (frame_error) return false; else return true;
 }
 
@@ -124,7 +128,11 @@ size_t SerialST4Master::write(uint8_t data) {
   unsigned long t_start = millis();
   uint8_t xh = xmit_head;
   xh--;
-  while (xmit_tail == xh) { poll(); if ((millis() - t_start) > timeout) return 0; }
+  while (xmit_tail == xh) {
+  //  poll();
+    Y; // yield from the command channel at priority level 5 (lets poll() run)
+    if ((millis() - t_start) > timeout) return 0;
+  }
   xmit_buffer[xmit_tail] = data; xmit_tail++;
   xmit_buffer[xmit_tail] = 0;
   return 1;
@@ -161,7 +169,8 @@ void SerialST4Master::flush(void) {
   unsigned long startMs = millis();
   int c;
   do {
-    poll();
+//    poll();
+    Y; // yield from the command channel at priority level 5 (lets poll() run)
     c = xmit_buffer[xmit_head];
   } while (c != 0 || (millis() - startMs < timeout));
 }

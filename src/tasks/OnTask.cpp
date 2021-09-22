@@ -577,6 +577,11 @@ void Tasks::yield(unsigned long milliseconds) {
   while ((long)(millis() - endTime) < 0) this->yield();
 }
 
+void Tasks::yieldMicros(unsigned long microseconds) {
+  unsigned long endTime = micros() + microseconds;
+  while ((long)(micros() - endTime) < 0) this->yield();
+}
+
 void Tasks::updatePriorityRange() {
   // scan for highest priority
   highest_priority = 0;
