@@ -53,7 +53,7 @@
       uint8_t handle = tasks.add(0, 0, true, 1, st4Wrapper, "St4Mntr");
       if (handle) { VL("success"); } else { VL("FAILED!"); }
       tasks.setPeriodMicros(handle, 1515);
-      tasks.setTimingMode(handle, TM_GAP);
+      tasks.setTimingMode(handle, TM_MINIMUM);
     #endif
   }
 
