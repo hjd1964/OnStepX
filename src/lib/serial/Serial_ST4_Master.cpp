@@ -53,10 +53,10 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
   digitalWriteF(SST4_DATA_OUT, LOW);
   // yield from the st4 task at priority level 1
   // lets motor s/w timers at priority level level 0 run
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv start bit
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
   if (frame_error) {
     DLF("WRN, SerialST4.trans(): frame/start error");
   //  lastMicros = micros();
@@ -68,37 +68,37 @@ bool SerialST4Master::trans(char *data_in, uint8_t data_out) {
     s_parity += state;
     digitalWriteF(SST4_CLOCK_OUT, LOW);
     digitalWriteF(SST4_DATA_OUT, state);
-    tasks.yieldMicros(XMIT_TIME);
+    delayMicroseconds(XMIT_TIME);
     digitalWriteF(SST4_CLOCK_OUT, HIGH);
     state = digitalReadF(SST4_DATA_IN);
     r_parity += state;
     bitWrite(*data_in, i, state);                    
-    tasks.yieldMicros(XMIT_TIME);
+    delayMicroseconds(XMIT_TIME);
   }
 
   // parity bit
   digitalWriteF(SST4_CLOCK_OUT,LOW);
   digitalWriteF(SST4_DATA_OUT, s_parity&1);
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if ((r_parity&1) != digitalReadF(SST4_DATA_IN)) recv_error = true;
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
 
   // parity ck bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, recv_error);                  // send local parity check
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) == HIGH) send_error = true; // recv remote parity, ok?
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
 
   // stop bit
   digitalWriteF(SST4_CLOCK_OUT, LOW);
   digitalWriteF(SST4_DATA_OUT, LOW);
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
   digitalWriteF(SST4_CLOCK_OUT, HIGH);
   if (digitalReadF(SST4_DATA_IN) != LOW) frame_error = true; // recv stop bit
-  tasks.yieldMicros(XMIT_TIME);
+  delayMicroseconds(XMIT_TIME);
 
   if (frame_error) { DLF("WRN, SerialST4.trans(): frame/stop error"); }
   if (send_error) { DLF("WRN, SerialST4.trans(): send parity error"); }
