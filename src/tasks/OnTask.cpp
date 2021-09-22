@@ -131,6 +131,10 @@ void Task::setCallback(void (*volatile callback)()) {
   interrupts();
 }
 
+void Task::setTimingMode(TimingMode mode) {
+  timingMode = mode;
+}
+
 bool Task::poll() {
   if (hardwareTimer || running) return false;
 
@@ -151,6 +155,14 @@ bool Task::poll() {
       running = false;
 
       if (_task_postpone) { _task_postpone = false; return false; }
+
+      // set timing for guaranteed minimum (or gap) period
+      if (timingMode != TM_BALANCED) {
+        if (timingMode == TM_GAP) {
+          if (period_units == PU_MICROS) t = micros(); else t = millis();
+        }
+        time_to_next_task = 0;
+      }
 
       // adopt next period
       if (next_period_units != PU_NONE) {
@@ -374,6 +386,13 @@ bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority
 bool Tasks::setCallback(uint8_t handle, void (*volatile callback)()) {
   if (handle != 0 && allocated[handle - 1]) {
     task[handle - 1]->setCallback(callback);
+    return true;
+  } else return false;
+}
+
+bool Tasks::setTimingMode(uint8_t handle, TimingMode mode) {
+  if (handle != 0 && allocated[handle - 1]) {
+    task[handle - 1]->setTimingMode(mode);
     return true;
   } else return false;
 }

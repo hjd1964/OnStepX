@@ -81,7 +81,13 @@ extern unsigned char __task_mutex[];
 #define tasks_mutex_exit(m)  bitClear(__task_mutex[(m)/8],(m)%8);
 #define tasks_mutex_busy(m)  (bitRead(__task_mutex[(m)/8],(m)%8))
 
-enum PeriodUnits {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
+enum PeriodUnits: uint8_t {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
+
+// Timing modes
+// TM_BALANCED (default) to maintain the specified frequency/period where a task that runs late is next run early to compensate
+// TM_MINIMUM to run the task at an interval not less than the specified frequency/period from task start to next start
+// TM_GAP to run the task at an interval not less than the specified frequency/period from task exit to next start
+enum TimingMode: uint8_t {TM_BALANCED, TM_MINIMUM, TM_GAP};
 
 class Task {
   public:
@@ -91,6 +97,8 @@ class Task {
     bool requestHardwareTimer(uint8_t num, uint8_t hwPriority);
 
     void setCallback(void (*volatile callback)());
+
+    void setTimingMode(TimingMode mode);
 
     // run task at the prescribed interval
     // note: tasks are timed in such a way as to achieve an accurate average frequency, if
@@ -141,6 +149,7 @@ class Task {
     unsigned long          last_task_time    = 0;
     unsigned long          next_task_time    = 0;
     uint8_t                hardwareTimer     = 0;
+    TimingMode             timingMode        = TM_BALANCED;
     void (*volatile callback)() = NULL;
 
     #ifdef TASKS_PROFILER_ENABLE
@@ -196,9 +205,15 @@ class Tasks {
 
     // change task callback
     // \param handle        task handle
-    // \param callback  function to handle this tasks processing
+    // \param callback      function to handle this tasks processing
     // \return              true if successful, or false if unable to find the associated task
     bool setCallback(uint8_t handle, void (*volatile callback)());
+
+    // change task timing mode
+    // \param handle        task handle
+    // \param mode          either TM_BALANCED (default) or TM_MINIMUM
+    // \return              true if successful, or false if unable to find the associated task
+    bool setTimingMode(uint8_t handle, TimingMode mode);
 
     // remove process task. Note: do not remove a task if the task process is running
     // \param handle    task handle
