@@ -104,9 +104,6 @@ class Mount {
     TrackingState trackingState = TS_NONE;
     float trackingRateAxis1            = 0.0F;
     float trackingRateAxis2            = 0.0F;
-    float stepsPerSiderealSecondAxis1  = 0.0F;
-    float stepsPerFracAxis1            = 0.0F;
-    float stepsPerFracAxis2            = 0.0F;
 
     bool atHome = true;
 };

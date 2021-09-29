@@ -22,7 +22,7 @@
 
   inline void pecWrapper() { pec.poll(); }
 
-  void Pec::init(long stepsPerSiderealSecond) {
+  void Pec::init() {
     // confirm the data structure size
     if (PecSettingsSize < sizeof(PecSettings)) { initError.nv = true; DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
 
@@ -35,7 +35,8 @@
     // read the settings
     nv.readBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
 
-    this->stepsPerSiderealSecond = stepsPerSiderealSecond;
+    stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
+    stepsPerSiderealSecondI = lroundf(stepsPerSiderealSecond);
     stepsPerSiderealFrac = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/SIDEREAL_FRAC;
 
     wormRotationSeconds = round(settings.wormRotationSteps/stepsPerSiderealSecond);
@@ -114,7 +115,7 @@
 
       // digital or analog pec sense, with 60 second delay before redetect
       long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
-      if (dist > stepsPerSiderealSecondAxis1*60.0 && wormIndexState != lastState && wormIndexState == true) {
+      if (dist > stepsPerSiderealSecond*60.0 && wormIndexState != lastState && wormIndexState == true) {
         VL("MSG: Mount, PEC index detected");
         wormSenseSteps = axis1Steps;
         wormSenseFirst = true;
@@ -122,7 +123,7 @@
         wormIndexSenseThisSecond = true;
       } else bufferStart = false;
 
-      if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecondAxis1) wormIndexSenseThisSecond = false;
+      if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecond) wormIndexSenseThisSecond = false;
     #endif
 
     if (settings.state == PEC_NONE) { rate = 0.0F; return; }
@@ -152,7 +153,7 @@
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
         VL("MSG: Mount, started PEC playing");
         settings.state = PEC_PLAY;
-        bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
+        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         wormRotationStartTimeFs = lastFs;
       }
     } else
@@ -161,7 +162,7 @@
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
         V("MSG: Mount, started PEC recording at ");
         settings.state = PEC_RECORD;
-        bufferIndex = wormRotationSteps/stepsPerSiderealSecond;
+        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         firstRecording = !settings.recorded;
         wormRotationStartTimeFs = lastFs;
         V(wormRotationStartTimeFs);
@@ -205,8 +206,8 @@
         int i = round(accGuideAxis1);
 
         // stay within +/- one sidereal rate for corrections
-        if (i < -stepsPerSiderealSecond) i = -stepsPerSiderealSecond;
-        if (i >  stepsPerSiderealSecond) i =  stepsPerSiderealSecond;
+        if (i < -stepsPerSiderealSecondI) i = -stepsPerSiderealSecondI;
+        if (i >  stepsPerSiderealSecondI) i =  stepsPerSiderealSecondI;
 
         // apply weighted average
         if (!firstRecording) i = (i + (int)buffer[bufferIndex]*2)/3;
@@ -226,9 +227,9 @@
         // number of steps ahead or behind for this 1 second slot, up to +/-127
         int j = bufferIndex - 1; if (j == -1) j += wormRotationSeconds;
         int i = buffer[j];
-        if (i >  stepsPerSiderealSecond) i =  stepsPerSiderealSecond;
-        if (i < -stepsPerSiderealSecond) i = -stepsPerSiderealSecond;
-        rate = (float)i/stepsPerSiderealSecond;
+        if (i >  stepsPerSiderealSecondI) i =  stepsPerSiderealSecondI;
+        if (i < -stepsPerSiderealSecondI) i = -stepsPerSiderealSecondI;
+        rate = i/stepsPerSiderealSecond;
       }
     }
   }

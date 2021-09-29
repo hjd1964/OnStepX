@@ -27,7 +27,7 @@ typedef struct PecSettings {
 
 class Pec {
   public:
-    void init(long stepsPerSiderealSecond);
+    void init();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
@@ -44,8 +44,9 @@ class Pec {
       // applies low pass filter to smooth noise in PEC data and linear regression
       void cleanup();
     #endif
-
-    long      stepsPerSiderealSecond    = 0;
+  
+    float     stepsPerSiderealSecond    = 0.0F;
+    int       stepsPerSiderealSecondI   = 0;
     float     stepsPerSiderealFrac      = 0.0F;
     long      bufferSize                = 0;      // in bytes
     #if AXIS1_PEC == ON

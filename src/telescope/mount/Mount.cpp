@@ -52,9 +52,6 @@ void Mount::init() {
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
-  stepsPerSiderealSecondAxis1 = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
-  stepsPerFracAxis1 = (stepsPerSiderealSecondAxis1*SIDEREAL_RATIO_F)/SIDEREAL_FRAC;
-
   // initialize the other subsystems
   home.init();
   home.reset();
@@ -81,7 +78,7 @@ void Mount::init() {
   #endif
 
   #if AXIS1_PEC == ON
-    pec.init(stepsPerSiderealSecondAxis1);
+    pec.init();
   #endif
 
   #if ST4_INTERFACE == ON
