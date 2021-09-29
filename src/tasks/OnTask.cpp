@@ -323,7 +323,7 @@ void tasksMonitor() {
   for (int i = 0; i < TASKS_MAX; i++) {
     if (handle == 0) break;
     tasks.refreshPeriod(handle);
-    uint8_t handle = tasks.getNextHandle();
+    handle = tasks.getNextHandle();
   }
 }
 
