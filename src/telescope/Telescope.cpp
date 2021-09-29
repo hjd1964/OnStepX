@@ -54,13 +54,13 @@ const int AnalogRange = powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F;
 #endif
 
 void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig) {
-  strcpy(telescope.firmware.name, fwName);
-  telescope.firmware.version.major = fwMajor;
-  telescope.firmware.version.minor = fwMinor;
-  strcpy(telescope.firmware.version.patch, fwPatch);
-  telescope.firmware.version.config = fwConfig;
-  strcpy(telescope.firmware.date, __DATE__);
-  strcpy(telescope.firmware.time, __TIME__);
+  strcpy(firmware.name, fwName);
+  firmware.version.major = fwMajor;
+  firmware.version.minor = fwMinor;
+  strcpy(firmware.version.patch, fwPatch);
+  firmware.version.config = fwConfig;
+  strcpy(firmware.date, __DATE__);
+  strcpy(firmware.time, __TIME__);
 
   if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
     validKey = false;
