@@ -16,10 +16,6 @@
  */
 #pragma once
 
-#ifndef IRAM_ATTR
-  #define IRAM_ATTR
-#endif
-
 #if defined(__AVR_ATmega328P__)
   #define MCU_STR "AtMega328"
   #include "HAL_AtMega328.h"
@@ -97,4 +93,17 @@
   #warning "Unknown Platform! If this is a new platform, it would probably do best with a new HAL designed for it."
   #define MCU_STR "Generic (Unknown)"
   #include "HAL_MISC.h"  
+#endif
+
+// create null decoration for non-ESP processors
+#ifndef IRAM_ATTR
+  #define IRAM_ATTR
+#endif
+
+#ifndef ICACHE_RAM_ATTR
+  #define ICACHE_RAM_ATTR
+#endif
+
+#ifndef FPSTR
+  #define FPSTR
 #endif
