@@ -72,6 +72,11 @@
   nv.init(E2END + 1, true, 0, false); \
 }
 
+#define HAL_RESET() { \
+  SCB_AIRCR = 0x05FA0004; \
+  asm volatile ("dsb"); \
+}
+
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define _Tpin 70

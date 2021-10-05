@@ -36,14 +36,18 @@
 // General purpose initialize for HAL
 #include "imxrt.h"
 
-//--------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL
 #define HAL_INIT() { \
   analogReadResolution(10); \
   analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
   nv.init(E2END + 1, true, 0, false); \
 }
 
+#define HAL_RESET() { \
+  SCB_AIRCR = 0x05FA0004; \
+  asm volatile ("dsb"); \
+}
+
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define HAL_TEMP() ( NAN )
+
