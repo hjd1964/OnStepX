@@ -11,19 +11,10 @@
 #include "../../../lib/convert/Convert.h"
 #include "../../../commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
-
-#if TIME_LOCATION_SOURCE == DS3231
-  #include "../../../lib/tls/Tls_DS3231.h"
-#endif
-#if TIME_LOCATION_SOURCE == DS3234
-  #include "../../../lib/tls/Tls_DS3234.h"
-#endif
-#if TIME_LOCATION_SOURCE == TEENSY
-  #include "../../../lib/tls/Tls_Teensy.h"
-#endif
-#if TIME_LOCATION_SOURCE == GPS
-  #include "../../../lib/tls/Tls_GPS.h"
-#endif
+#include "../../../lib/tls/Tls_DS3231.h"
+#include "../../../lib/tls/Tls_DS3234.h"
+#include "../../../lib/tls/Tls_Teensy.h"
+#include "../../../lib/tls/Tls_GPS.h"
 
 extern volatile unsigned long fracLAST;
 
