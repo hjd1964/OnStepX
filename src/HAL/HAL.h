@@ -48,10 +48,15 @@
   #define MCU_STR "Teensy3.6"
   #include "HAL_Teensy_3.6.h"
 
-#elif defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#elif defined(ARDUINO_TEENSY40)
   // Teensy 4.0
   #define MCU_STR "Teensy4.0"
   #include "HAL_Teensy_4.0.h"
+
+#elif defined(ARDUINO_TEENSY41)
+  // Teensy 4.1
+  #define MCU_STR "Teensy4.1"
+  #include "HAL_Teensy_4.1.h"
 
 #elif defined(STM32F103xB)
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3
