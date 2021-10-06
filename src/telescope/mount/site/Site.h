@@ -50,6 +50,9 @@ class Site {
     // update/apply the site latitude and longitude, necessary for LAST calculations etc.
     void updateLocation();
 
+    // update the initError status and restore the park position if necessary
+    void Site::updateTlsStatus();
+
     // sets the Julian Date/time (UT1,) and updates sidereal time
     void setDateTime(JulianDate julianDate);
 

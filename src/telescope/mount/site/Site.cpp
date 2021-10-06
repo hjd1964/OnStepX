@@ -109,6 +109,16 @@ void Site::updateLocation() {
   setSiderealTime(ut1);
 }
 
+// update the initError status and restore the park position if necessary
+void Site::updateTlsStatus() {
+  if (initError.tls && dateIsReady && timeIsReady) {
+    initError.tls = false;
+    #if SLEW_GOTO == ON
+      if (park.state == PS_PARKED) park.restore(false);
+    #endif
+  }
+}
+
 // sets the Julian Date/time (UT1,) and updates sidereal time
 void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
