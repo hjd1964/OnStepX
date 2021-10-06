@@ -197,10 +197,8 @@ void Mount::update() {
     statusFlashMs = SF_SLEWING;
     axis2.setFrequencyBase(0.0F);
   }
-  V(statusFlashMs); V(",");
   if (statusFlashMs != lastStatusFlashMs) {
     lastStatusFlashMs = statusFlashMs;
-    VL(statusFlashMs);
     status.flashRate(statusFlashMs);
     xBusy = statusFlashMs == SF_SLEWING;
   }
