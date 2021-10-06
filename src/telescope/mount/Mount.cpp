@@ -164,11 +164,11 @@ void Mount::syncToEncoders(bool state) {
 // updates the tracking rates, etc. as appropriate for the mount state
 // called once a second by poll() but available here for immediate action
 void Mount::update() {
-  static int lastSlewingStatus = 0;
+  static int lastStatusFlashMs = 0;
   int statusFlashMs = 0;
 
 #if SLEW_GOTO == ON
-  if (goTo.state == GS_NONE || guide.state < GU_GUIDE) {
+  if (goTo.state == GS_NONE && guide.state < GU_GUIDE) {
 #else
   if (guide.state < GU_GUIDE) {
 #endif
@@ -182,21 +182,25 @@ void Mount::update() {
       f1 = trackingRateAxis1 + guide.rateAxis1 + pec.rate;
       axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
+
     if (!guide.activeAxis2() || guide.state == GU_PULSE_GUIDE) {
       f2 = trackingRateAxis2 + guide.rateAxis2;
       axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
-    f1 = abs(f1); f2 = abs(f2); if (f2 > f1) f1 = f2;
+    f1 = abs(f1);
+    f2 = abs(f2);
+    if (f2 > f1) f1 = f2;
     if (f1 < 0.20F) statusFlashMs = SF_STOPPED; else
     if (f1 > 3.0F) statusFlashMs = SF_SLEWING; else statusFlashMs = 500.0F/f1;
   } else {
     statusFlashMs = SF_SLEWING;
     axis2.setFrequencyBase(0.0F);
   }
-
-  if (statusFlashMs != lastSlewingStatus) {
-    lastSlewingStatus = statusFlashMs;
+  V(statusFlashMs); V(",");
+  if (statusFlashMs != lastStatusFlashMs) {
+    lastStatusFlashMs = statusFlashMs;
+    VL(statusFlashMs);
     status.flashRate(statusFlashMs);
     xBusy = statusFlashMs == SF_SLEWING;
   }
@@ -211,8 +215,15 @@ void Mount::poll() {
     #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
   #endif
 
-  if (trackingState != TS_SIDEREAL || (transform.mountType != ALTAZM && settings.rc == RC_NONE)) {
-    if (trackingState == TS_SIDEREAL) trackingRateAxis1 = trackingRate; else trackingRateAxis1 = 0.0F;
+  if (trackingState != TS_SIDEREAL) {
+    trackingRateAxis1 = 0.0F;
+    trackingRateAxis2 = 0.0F;
+    update();
+    return;
+  }
+
+  if (transform.mountType != ALTAZM && settings.rc == RC_NONE) {
+    trackingRateAxis1 = trackingRate;
     trackingRateAxis2 = 0.0F;
     update();
     return;
@@ -255,11 +266,15 @@ void Mount::poll() {
   // transfer to variables named appropriately for mount coordinates
   float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
   if (transform.mountType == ALTAZM) {
-    aheadAxis1 = ahead.z; aheadAxis2 = ahead.a;
-    behindAxis1 = behind.z; behindAxis2 = behind.a;
+    aheadAxis1 = ahead.z;
+    aheadAxis2 = ahead.a;
+    behindAxis1 = behind.z;
+    behindAxis2 = behind.a;
   } else {
-    aheadAxis1 = ahead.h; aheadAxis2 = ahead.d;
-    behindAxis1 = behind.h; behindAxis2 = behind.d;
+    aheadAxis1 = ahead.h;
+    aheadAxis2 = ahead.d;
+    behindAxis1 = behind.h;
+    behindAxis2 = behind.d;
   }
 
   // calculate the Axis1 tracking rate
@@ -278,10 +293,16 @@ void Mount::poll() {
   } else trackingRateAxis2 = 0.0F;
 
   // override for special case of near a celestial pole
-  if (fabs(declination) > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate; trackingRateAxis2 = 0.0F; }
+  if (fabs(declination) > Deg85) {
+    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate;
+    trackingRateAxis2 = 0.0F;
+  }
 
   // override for both rates for special case near the zenith
-  if (altitude > Deg85) { if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a); trackingRateAxis2 = 0.0F; }
+  if (altitude > Deg85) {
+    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a);
+    trackingRateAxis2 = 0.0F;
+  }
 
   update();
 }
