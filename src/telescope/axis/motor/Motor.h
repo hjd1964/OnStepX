@@ -8,6 +8,8 @@
 #include "Motor.defaults.h"
 #include "Drivers.h"
 
+enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
+
 class Motor {
   public:
     // sets up the motor identification

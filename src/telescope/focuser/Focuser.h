@@ -8,6 +8,7 @@
 
 #include "../../commands/ProcessCmds.h"
 #include "../Telescope.h"
+#include "../axis/Axis.h"
 
 #if AXIS9_DRIVER_MODEL != OFF
   #define FOCUSER_MAX 6

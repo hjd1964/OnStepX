@@ -133,12 +133,12 @@
 // TEMPERATURE sensing devices
 #define TEMPERATURE_FIRST           1
 #define DS1820     0x2800000000000000      // DS18B20 1-wire temperature sensors for focusing and dew heaters
-#define DS18B20    0x2800000000000000      // (as above)
-#define DS18S20    0x1000000000000000      // (as above except for DS18S20)
+#define DS18B20    0x2800000000000000      // as above
+#define DS18S20    0x1000000000000000      // as above, except for DS18S20
 #define DS_MASK    0x3F00000000000000      // not for use in Config.h
-#define THERMISTOR                  1      // General purpose thermistor sensor, type 1 (see Config.common.h)
-#define THERMISTOR1                 1      // (as above)
-#define THERMISTOR2                 2      // General purpose thermistor sensor, type 2 (see Config.common.h)
+#define THERMISTOR                  1      // General purpose thermistor sensor, type 1 (see Config.defaults.h)
+#define THERMISTOR1                 1      // as above
+#define THERMISTOR2                 2      // General purpose thermistor sensor, type 2 (see Config.defaults.h)
 #define TEMPERATURE_LAST            2
 
 // AUXILIARY FEATURE purpose
@@ -217,7 +217,6 @@
 #define siderealToRad(x)            ((x)/(double)13750.98708313975L)
 #define siderealToRadF(x)           ((x)/13750.987F)
 #define radToSidereal(x)            ((x)*(double)13750.98708313975L)
-// conversion factor to go to/from Hz for sidereal interval
 #define hzToSubMicros(x)            ((x)*(double)266666.666666667L)
 #define hzToSidereal(x)             ((x)/(double)SIDEREAL_RATE_HZ)
 #define siderealToHz(x)             ((x)*(double)SIDEREAL_RATE_HZ)
@@ -238,7 +237,6 @@
 
 // motor drivers
 #define DEFAULT_POWER_DOWN_TIME     30000  // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
-
 #define SERVO                       -1     // general purpose flag for a SERVO driver motor
 #define STEP_DIR                    -2     // general purpose flag for a STEP_DIR driver motor
 
@@ -248,24 +246,13 @@
 #define TASKS_HWTIMER2_ENABLE
 #define TASKS_HWTIMER3_ENABLE
 
-// NV write endurance constants
-// low (< 100K writes)
-#define NVE_LOW 0
-// mid (~ 100K writes)
-#define NVE_MID 1
-// high (~ 1M writes)
-#define NVE_HIGH 2
-// very high (> 1M writes)
-#define NVE_VHIGH 3
-#define NV_ENDURANCE NVE_MID
-// uses HAL specified default for remembering settings when powered off
-#define NV_DEFAULT                  ON
-
-// default time for spiral guides is 103.4 seconds
-#define GUIDE_SPIRAL_TIME_LIMIT 103.4
-
-// directions in OnStepX
-enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
+// NV write endurance
+#define NVE_LOW                     0      // low (< 100K writes)
+#define NVE_MID                     1      // mid (~ 100K writes)
+#define NVE_HIGH                    2      // high (~ 1M writes)
+#define NVE_VHIGH                   3      // very high (> 1M writes)
+#define NV_ENDURANCE                NVE_MID
+#define NV_DEFAULT                  ON     // uses HAL specified default device
 
 // NV addresses
 #define INIT_NV_KEY                 583927926UL

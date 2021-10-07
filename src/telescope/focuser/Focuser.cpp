@@ -10,7 +10,6 @@
 
 #include "../../lib/weather/Weather.h"
 #include "../../lib/temperature/Temperature.h"
-#include "../axis/Axis.h"
 #include "../Telescope.h"
 
 typedef struct FocuserConfiguration {

@@ -7,8 +7,9 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../commands/ProcessCmds.h"
-#include "../mount/coordinates/Transform.h"
 #include "../Telescope.h"
+#include "../axis/Axis.h"
+#include "../mount/coordinates/Transform.h"
 
 // time to write position to nv after last movement of Rotator
 #ifndef ROTATOR_WRITE_DELAY
