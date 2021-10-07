@@ -2,78 +2,48 @@
 // Constants
 #pragma once
 
-// Configuration options -----------------------------------------------------------------------------------------------------------
+// Configuration options ----------------------------------------------------------------------------------------------------
 
-// Pinmaps
+// PINMAPS
 #define PINMAP_FIRST                1
-#define Classic                     1      // Original pin-map
+#define Classic                     1      // original pin-map
 #define ClassicShield               2      // " for Steve's shield where ST4 port is on the Mega2560's "alternate pins"
 #define ClassicInstein              3      // "  w/Instein ST4 port... this isn't tested, I have no idea if it's safe to use!
+
 #define InsteinESP1                 4      // ESP32 Instein PINMAP (latest variant September/2020)
 
-// RAMPS - 3D printer shields/boards that work with OnStep, all are 5-axis designs
-#define Ramps14                     10     // Ramps v1.4 shield for Mega2560
-#define Ramps15                     10     // Ramps v1.5
-#define MksGenL                     11     // Like Ramps above but better, Mega2560 built-in, crystal oscillator, 24V support
-#define MksGenL1                    11
-#define MksGenL2                    12     // Adds SPI bus to all stepper drivers (TMC only)
-#define MksGenL21                   13     // As above except Focuser2 CS is on pin12
+#define Ramps14                     10     // Ramps v1.4 3D printer shields/boards for Mega2560, a 5-axis design
+#define Ramps15                     10     // Ramps v1.5 3D printer shields/boards for Mega2560, a 5-axis design
+#define MksGenL                     11     // Ramps clone, all-in-one
+#define MksGenL1                    11     // Ramps clone, all-in-one
+#define MksGenL2                    12     // as above, SPI bus to all stepper drivers
+#define MksGenL21                   13     // as above, SPI bus to all stepper drivers, the best Mega2560 based board
 
-// FYSETC S6 - 3D printer board that works with OnStep, a 6-axis design with 5-axes supported
-#define FYSETC_S6                   15     // FYSETC S6 Version 1.2
+#define FYSETC_S6                   15     // FYSETC S6 Version 1.2, 3D printer board, a 6-axis design
 #define FYSETC_S6_1                 15     // FYSETC S6 Version 1.2
-#define FYSETC_S6_2                 16     // FYSETC S6 Version 2.0
+#define FYSETC_S6_2                 16     // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design
 
-// Mini - Small 2-axis design suitable for embedded or mounting behind a panel can even be built with connectors up
-#define MiniPCB                     20     // All for Teensy3.2
-#define MiniPCB13                   21     // MiniPCB v1.3 adds better support for ESP-01 flashing and optional I2C
+#define MiniPCB                     20     // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
+#define MiniPCB13                   21     // improved version 1.3 adds better support for ESP-01 flashing and optional I2C
 
-// Mini2 - Small 2-axis design for aluminum mini-case
-#define MiniPCB2                    30     // Teensy3.2
+#define MiniPCB2                    30     // 2-axis design for small alum. case, Teensy3.2
 
-// Max - Larger 4-axis design suitable for embedded or mounting behind a panel
-#define MaxPCB                      40     // First custom "full feature" board. Teensy3.5/Teensy3.6
+#define MaxPCB                      40     // first generation custom 4-axis board, Teensy3.5/Teensy3.6
+#define MaxPCB2                     41     // improved second generation for alum. case, Teensy3.5/Teensy3.6
+#define MaxPCB3                     42     // improved third generation for alum. case, Teensy4.1
+#define MaxSTM3                     43     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
+#define MaxSTM3I                    44     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
-// Max2 & Max3 - Larger 4-axis design for aluminum case
-#define MaxPCB2                     41     // Improved "full feature" board, Teensy3.5/Teensy3.6
-#define MaxPCB3                     42     // Adds SPI bus to all stepper drivers (TMC only,) flashes WeMos D1 Mini through OnStep
-#define MaxSTM3                     43     // Update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
-#define MaxSTM3I                    44     // As above but using an onboard STM32F411CE with M24C64 EEPROM as default
+#define MaxESP2                     50     // similar to MaxPCB2 except 3 axes and uses cheaper/more available ESP32 MCU
+#define MaxESP3                     51     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
 
-#define MaxESP2                     50     // Similar to MaxPCB2 except 3 axes and uses cheaper/more available ESP32 MCU
-#define MaxESP3                     51     // Adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
+#define CNC3                        52     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
 
-// Arduino CNC Sheild on WeMos D2 R32 (ESP32)
-#define CNC3                        52     // Similar features to MaxESP3
-
-// Khalid and Dave's PCB for STM32 Blue pill (STM32F303CC)
-#define STM32Blue                   60
+#define STM32Blue                   60     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
 #define PINMAP_LAST                 60
-// ---------------------------------------------------------------------------------------------------------------------------------
 
-// Settings ------------------------------------------------------------------------------------------------------------------------
-
-// basic values
-#define OFF                         -1
-#define SAME                        -1
-#define HALF                        -1
-#define AUTO                        -1
-#define ON                          -2
-#define AUX                         -3
-#define SLAVE                       -4
-#define ACCESS_POINT                -5
-#define STATION                     -6
-#define STATION_DHCP                -7
-#define BOTH                        -8
-#define SoftSerial                  -9
-#define HardSerial                  -10
-#define CONSOLE                     -20
-#define PROFILER                    -21
-#define SHARED                      -30
-#define INVALID                     -127
-
-// various Weather sensors supported
+// WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1
 #define BME280                      1      // BME280 on I2C (at default address 0x77)
 #define BME280_0x77                 1      // BME280 on I2C (at address 0x77)
@@ -189,7 +159,28 @@
 #define MCP23017                    3      // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
 #define GPIO_LAST                   3
 
-// Macros --------------------------------------------------------------------------------------------------------------------------
+// misc. values
+#define OFF                         -1
+#define SAME                        -1
+#define HALF                        -1
+#define AUTO                        -1
+#define ON                          -2
+#define AUX                         -3
+#define SLAVE                       -4
+#define ACCESS_POINT                -5
+#define STATION                     -6
+#define STATION_DHCP                -7
+#define BOTH                        -8
+#define SoftSerial                  -9
+#define HardSerial                  -10
+#define CONSOLE                     -20
+#define PROFILER                    -21
+#define SHARED                      -30
+#define INVALID                     -127
+
+// --------------------------------------------------------------------------------------------------------------------------
+
+// Macros -------------------------------------------------------------------------------------------------------------------
 
 // misc. math
 #define RAD_DEG_RATIO               57.29577951308232L

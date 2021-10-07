@@ -114,7 +114,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   return CE_NONE;
 }
 
-// sync to equatorial target position (Native coordinate system) using the defaut preferredPierSide
+// sync to equatorial target position (Native coordinate system) using the default preferredPierSide
 CommandError Goto::requestSync() {
   return requestSync(&target, preferredPierSide);
 }

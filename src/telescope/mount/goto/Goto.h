@@ -46,7 +46,7 @@ class Goto {
     // goto equatorial position (Native or Mount coordinate system)
     CommandError request(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
 
-    // sync to equatorial target position (Native coordinate system) using the defaut preferredPierSide
+    // sync to equatorial target position (Native coordinate system) using the default preferredPierSide
     CommandError requestSync();
 
     // sync to equatorial position (Native or Mount coordinate system)
