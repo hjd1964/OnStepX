@@ -2,6 +2,9 @@
 // controller settings
 #pragma once
 
+#include "telescope/axis/motor/stepDir/StepDir.defaults.h"
+#include "telescope/axis/motor/servo/Servo.defaults.h"
+
 // pinmap
 #ifndef PINMAP
 #define PINMAP                        OFF

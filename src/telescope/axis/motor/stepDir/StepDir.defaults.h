@@ -4,31 +4,31 @@
 #include "../../../../Common.h"
 
 // check/flag SD stepper drivers
-#if AXIS1_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS1_DRIVER_MODEL >= DRIVER_FIRST && AXIS1_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS1_DRIVER_SD
 #endif
-#if AXIS2_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS2_DRIVER_MODEL >= DRIVER_FIRST && AXIS2_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS2_DRIVER_SD
 #endif
-#if AXIS3_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS3_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS3_DRIVER_MODEL >= DRIVER_FIRST && AXIS3_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS3_DRIVER_SD
 #endif
-#if AXIS4_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS4_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS4_DRIVER_MODEL >= DRIVER_FIRST && AXIS4_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS4_DRIVER_SD
 #endif
-#if AXIS5_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS5_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS5_DRIVER_MODEL >= DRIVER_FIRST && AXIS5_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS5_DRIVER_SD
 #endif
-#if AXIS6_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS6_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS6_DRIVER_MODEL >= DRIVER_FIRST && AXIS6_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS6_DRIVER_SD
 #endif
-#if AXIS7_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS7_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS7_DRIVER_MODEL >= DRIVER_FIRST && AXIS7_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS7_DRIVER_SD
 #endif
-#if AXIS8_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS8_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS8_DRIVER_MODEL >= DRIVER_FIRST && AXIS8_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS8_DRIVER_SD
 #endif
-#if AXIS9_DRIVER_MODEL >= SD_DRIVER_FIRST && AXIS9_DRIVER_MODEL <= SD_DRIVER_LAST
+#if AXIS9_DRIVER_MODEL >= DRIVER_FIRST && AXIS9_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS9_DRIVER_SD
 #endif
 
@@ -72,7 +72,6 @@
 #endif
 
 // common axis driver settings, RA/AZM
-#ifdef AXIS1_DRIVER_SD
 #ifndef AXIS1_DRIVER_MICROSTEPS
 #define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
 #endif
@@ -109,10 +108,8 @@
 #ifndef AXIS1_STEP_STATE
 #define AXIS1_STEP_STATE              HIGH // default signal transition state for a step
 #endif
-#endif
 
 // common axis driver settings, DEC/ALT
-#ifdef AXIS2_DRIVER_SD
 #ifndef AXIS2_DRIVER_MICROSTEPS
 #define AXIS2_DRIVER_MICROSTEPS       OFF
 #endif
@@ -149,10 +146,8 @@
 #ifndef AXIS2_STEP_STATE
 #define AXIS2_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, ROTATOR
-#ifdef AXIS3_DRIVER_SD
 #ifndef AXIS3_DRIVER_MICROSTEPS
 #define AXIS3_DRIVER_MICROSTEPS       OFF
 #endif
@@ -189,10 +184,8 @@
 #ifndef AXIS3_STEP_STATE
 #define AXIS3_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER1
-#ifdef AXIS4_DRIVER_SD
 #ifndef AXIS4_DRIVER_MICROSTEPS
 #define AXIS4_DRIVER_MICROSTEPS       OFF
 #endif
@@ -229,10 +222,8 @@
 #ifndef AXIS4_STEP_STATE
 #define AXIS4_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER2
-#ifdef AXIS5_DRIVER_SD
 #ifndef AXIS5_DRIVER_MICROSTEPS
 #define AXIS5_DRIVER_MICROSTEPS       OFF
 #endif
@@ -269,10 +260,8 @@
 #ifndef AXIS5_STEP_STATE
 #define AXIS5_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER3
-#ifdef AXIS6_DRIVER_SD
 #ifndef AXIS6_DRIVER_MICROSTEPS
 #define AXIS6_DRIVER_MICROSTEPS       OFF
 #endif
@@ -309,10 +298,8 @@
 #ifndef AXIS6_STEP_STATE
 #define AXIS6_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER4
-#ifdef AXIS7_DRIVER_SD
 #ifndef AXIS7_DRIVER_MICROSTEPS
 #define AXIS7_DRIVER_MICROSTEPS       OFF
 #endif
@@ -349,10 +336,8 @@
 #ifndef AXIS7_STEP_STATE
 #define AXIS7_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER5
-#ifdef AXIS8_DRIVER_SD
 #ifndef AXIS8_DRIVER_MICROSTEPS
 #define AXIS8_DRIVER_MICROSTEPS       OFF
 #endif
@@ -389,10 +374,8 @@
 #ifndef AXIS8_STEP_STATE
 #define AXIS8_STEP_STATE              HIGH
 #endif
-#endif
 
 // common axis driver settings, FOCUSER6
-#ifdef AXIS9_DRIVER_SD
 #ifndef AXIS9_DRIVER_MICROSTEPS
 #define AXIS9_DRIVER_MICROSTEPS       OFF
 #endif
@@ -428,7 +411,6 @@
 #endif
 #ifndef AXIS9_STEP_STATE
 #define AXIS9_STEP_STATE              HIGH
-#endif
 #endif
 
 #if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH

@@ -38,7 +38,6 @@
 #endif
 
 // common axis driver settings, RA/AZM
-#ifdef AXIS1_SERVO
 #ifndef AXIS1_SERVO_P
 #define AXIS1_SERVO_P                 2.0    // P = proportional
 #endif
@@ -72,10 +71,8 @@
 #ifndef AXIS1_ENABLE_STATE
 #define AXIS1_ENABLE_STATE            LOW    // default state of ENable pin for motor power on
 #endif
-#endif
 
 // common axis driver settings, DEC/ALT
-#ifdef AXIS2_SERVO
 #ifndef AXIS2_SERVO_P
 #define AXIS2_SERVO_P                 2.0
 #endif
@@ -109,10 +106,8 @@
 #ifndef AXIS2_ENABLE_STATE
 #define AXIS2_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, ROTATOR
-#ifdef AXIS3_SERVO
 #ifndef AXIS3_SERVO_P
 #define AXIS3_SERVO_P                 2.0
 #endif
@@ -146,10 +141,8 @@
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER1
-#ifdef AXIS4_SERVO
 #ifndef AXIS4_SERVO_P
 #define AXIS4_SERVO_P                 2.0
 #endif
@@ -183,10 +176,8 @@
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS4_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER2
-#ifdef AXIS5_SERVO
 #ifndef AXIS5_SERVO_P
 #define AXIS5_SERVO_P                 2.0
 #endif
@@ -220,10 +211,8 @@
 #ifndef AXIS5_ENABLE_STATE
 #define AXIS5_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER3
-#ifdef AXIS6_SERVO
 #ifndef AXIS6_SERVO_P
 #define AXIS6_SERVO_P                 2.0
 #endif
@@ -257,10 +246,8 @@
 #ifndef AXIS6_ENABLE_STATE
 #define AXIS6_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER4
-#ifdef AXIS7_SERVO
 #ifndef AXIS7_SERVO_P
 #define AXIS7_SERVO_P                 2.0
 #endif
@@ -294,10 +281,8 @@
 #ifndef AXIS7_ENABLE_STATE
 #define AXIS7_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER5
-#ifdef AXIS8_SERVO
 #ifndef AXIS8_SERVO_P
 #define AXIS8_SERVO_P                 2.0
 #endif
@@ -331,10 +316,8 @@
 #ifndef AXIS8_ENABLE_STATE
 #define AXIS8_ENABLE_STATE            LOW
 #endif
-#endif
 
 // common axis driver settings, FOCUSER6
-#ifdef AXIS9_SERVO
 #ifndef AXIS9_SERVO_P
 #define AXIS9_SERVO_P                 2.0
 #endif
@@ -367,5 +350,4 @@
 #endif
 #ifndef AXIS9_ENABLE_STATE
 #define AXIS9_ENABLE_STATE            LOW
-#endif
 #endif

@@ -49,10 +49,7 @@
 // Khalid and Dave's PCB for STM32 Blue pill (STM32F303CC)
 #define STM32Blue                   60
 
-// Etc.
-#define UNO                         70     // Arduino UNO for focuser (etc?) only
-
-#define PINMAP_LAST                 70
+#define PINMAP_LAST                 60
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 // Settings ------------------------------------------------------------------------------------------------------------------------
@@ -69,95 +66,15 @@
 #define STATION                     -6
 #define STATION_DHCP                -7
 #define BOTH                        -8
-
-// pier side
-#define EAST                        1      // same as PSS_EAST
-#define WEST                        2      // same as PSS_WEST
-#define BEST                        3      // same as PSS_BEST
-
-// debug values
+#define SoftSerial                  -9
+#define HardSerial                  -10
 #define CONSOLE                     -20
 #define PROFILER                    -21
-
-// pins
 #define SHARED                      -30
-#define DAC_PIN(v)                  ((v)+0x100)
-#define GPIO_PIN(v)                 ((v)+0x200)
-
-// mount types
-#define MOUNT_TYPE_FIRST            1
-#define GEM                         1      // German Equatorial Mount, meridian flips enabled
-#define FORK                        2      // Fork Mount, meridian flips disabled
-#define ALTAZM                      3      // Altitude Azimuth Mounts, Dobsonians, etc.
-#define MOUNT_TYPE_LAST             3
-
-// coordinate modes
-#define COORD_MODE_FIRST            1
-#define OBSERVED_PLACE              1
-#define TOPOCENTRIC                 2
-#define TOPO_STRICT                 3
-#define ASTROMETRIC_J2000           4
-#define COORD_MODE_LAST             4
-
-// step modes
-#define STEP_MODE_FIRST             1
-#define SQUARE                      1
-#define PULSE                       2
-#define STEP_MODE_LAST              2
-
-// motor drivers
-#define SERVO                      -1      // general purpose flag for a SERVO driver motor
-#define STEP_DIR                   -2      // general purpose flag for a STEP_DIR driver motor
-
-// step/dir drivers (usually for stepper motors)
-#define SD_DRIVER_FIRST             0
-#define A4988                       0      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
-#define DRV8825                     1      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define S109                        2      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define LV8729                      3      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define RAPS128                     4      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define TMC2100                     5      // DRIVER, allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2208                     6      // DRIVER, allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209                     7      // DRIVER, allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define ST820                       8      // DRIVER, allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
-#define TMC2130                     9      // DRIVER, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC5160                     10     // DRIVER, uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define GENERIC                     11     // DRIVER, generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
-#define SD_DRIVER_LAST              11
-
-// servo drivers (usually for DC motors equipped with encoders)
-#define SERVO_DRIVER_FIRST          100
-#define SERVO_PD                    100    // SERVO, pwm and direction connections
-#define SERVO_II                    101    // SERVO, dual pwm input connections
-#define SERVO_DRIVER_LAST           101
-
-// encoder types (must match Encoder library)
-#define ENC_FIRST                   1
-#define ENC_AB                      1      // AB quadrature encoder
-#define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
-#define ENC_PULSE_DIR               3      // pulse/direction encoder
-#define ENC_PULSE                   4      // pulse only encoder
-#define ENC_LAST                    4
-
-// stepper driver decay modes
-#define MIXED                       0
-#define FAST                        1
-#define SLOW                        2
-#define SPREADCYCLE                 3
-#define STEALTHCHOP                 4
-
-// etc.
 #define INVALID                     -127
 
-// various Time and Location sources supported
-#define DS3231                      1      // DS3231 RTC on I2C
-#define DS3234                      2      // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
-#define TEENSY                      4      // TEENSY3.2 RTC (Built-in)
-#define GPS                         5      // GPS device
-#define SoftSerial                  6      // placeholder for a software serial port object
-#define HardSerial                  7      // placeholder for a hardware serial port object
-
 // various Weather sensors supported
+#define WEATHER_FIRST               1
 #define BME280                      1      // BME280 on I2C (at default address 0x77)
 #define BME280_0x77                 1      // BME280 on I2C (at address 0x77)
 #define BME280_0x76                 2      // BME280 on I2C (at address 0x76)
@@ -166,16 +83,85 @@
 #define BMP280_0x77                 4      // BMP280 on I2C (at address 0x77)
 #define BMP280_0x76                 5      // BMP280 on I2C (at address 0x76)
 #define BMP280_SPI                  6      // BMP280 on SPI (default CS)
+#define WEATHER_LAST                6
 
-// auxiliary features
-#define SWITCH                      1      // control an simple on/off switch
-#define ANALOG_OUTPUT               2      // control an analog (pwm) output, depends on MCU support
-#define ANALOG_OUT                  2
-#define DEW_HEATER                  3      // control an dew heater
-#define INTERVALOMETER              4      // control an camera shutter
-#define SWITCH_UNPARKED             5
+// STEP WAVE FORM
+#define STEP_WAVE_FORM_FIRST        1
+#define SQUARE                      1
+#define PULSE                       2
+#define STEP_WAVE_FORM_LAST         2
 
-// various temperature sensing devices
+// MOUNT TYPE
+#define MOUNT_TYPE_FIRST            1
+#define GEM                         1      // German Equatorial Mount, meridian flips enabled
+#define FORK                        2      // Fork Mount, meridian flips disabled
+#define ALTAZM                      3      // Altitude Azimuth Mounts, Dobsonians, etc.
+#define MOUNT_TYPE_LAST             3
+
+// MOUNT COORDS
+#define MOUNT_COORDS_FIRST          1
+#define OBSERVED_PLACE              1
+#define TOPOCENTRIC                 2
+#define TOPO_STRICT                 3
+#define ASTROMETRIC_J2000           4
+#define MOUNT_COORDS_LAST           4
+
+// DRIVER (step/direction interface, usually for stepper motors)
+#define DRIVER_FIRST                0
+#define A4988                       0      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
+#define DRV8825                     1      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define S109                        2      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define LV8729                      3      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define RAPS128                     4      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define TMC2100                     5      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
+#define TMC2208                     6      // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
+#define TMC2209                     7      // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define ST820                       8      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
+#define TMC2130                     9      // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC5160                     10     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define GENERIC                     11     // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
+#define DRIVER_LAST                 11
+
+// DRIVER DECAY MODE
+#define DRIVER_DECAY_MODE_FIRST     1
+#define MIXED                       2
+#define FAST                        3
+#define SLOW                        4
+#define SPREADCYCLE                 5
+#define STEALTHCHOP                 6
+#define DRIVER_DECAY_MODE_LAST      6
+
+// SERVO DRIVER (usually for DC motors equipped with encoders)
+#define SERVO_DRIVER_FIRST          100
+#define SERVO_PD                    100    // SERVO, pwm and direction connections
+#define SERVO_II                    101    // SERVO, dual pwm input connections
+#define SERVO_DRIVER_LAST           101
+
+// SERVO ENCODER (must match Encoder library)
+#define SERVO_ENCODER_FIRST         1
+#define ENC_AB                      1      // AB quadrature encoder
+#define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
+#define ENC_PULSE_DIR               3      // pulse/direction encoder
+#define ENC_PULSE                   4      // pulse only encoder
+#define SERVO_ENCODER_LAST          4
+
+// TIME LOCATION SOURCE devices supported
+#define TLS_FIRST                   1
+#define DS3231                      1      // DS3231 RTC on I2C
+#define DS3234                      2      // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
+#define TEENSY                      4      // TEENSY3.2 RTC (Built-in)
+#define GPS                         5      // GPS device
+#define TLS_LAST                    7
+
+// PIER SIDE
+#define PIER_SIDE_FIRST             1
+#define EAST                        1      // same as PSS_EAST
+#define WEST                        2      // same as PSS_WEST
+#define BEST                        3      // same as PSS_BEST
+#define PIER_SIDE_LAST              3
+
+// TEMPERATURE sensing devices
+#define TEMPERATURE_FIRST           1
 #define DS1820     0x2800000000000000      // DS18B20 1-wire temperature sensors for focusing and dew heaters
 #define DS18B20    0x2800000000000000      // (as above)
 #define DS18S20    0x1000000000000000      // (as above except for DS18S20)
@@ -183,16 +169,25 @@
 #define THERMISTOR                  1      // General purpose thermistor sensor, type 1 (see Config.common.h)
 #define THERMISTOR1                 1      // (as above)
 #define THERMISTOR2                 2      // General purpose thermistor sensor, type 2 (see Config.common.h)
+#define TEMPERATURE_LAST            2
 
-// various GPIO devices
+// AUXILIARY FEATURE purpose
+#define AUX_FEATURE_PURPOSE_FIRST   1
+#define SWITCH                      1      // control an simple on/off switch
+#define ANALOG_OUTPUT               2      // control an analog (pwm) output, depends on MCU support
+#define ANALOG_OUT                  2
+#define DEW_HEATER                  3      // control an dew heater
+#define INTERVALOMETER              4      // control an camera shutter
+#define SWITCH_UNPARKED             5
+#define AUX_FEATURE_PURPOSE_LAST    5
+
+// GPIO devices
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
+#define GPIO_FIRST                  1
 #define DS2413                      1      // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
 #define MCP23008                    2      // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
 #define MCP23017                    3      // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
-
-#define DEFAULT_POWER_DOWN_TIME 30000      // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
-
-#define NV_DEFAULT                 ON      // uses HAL specified default for remembering settings when powered off
+#define GPIO_LAST                   3
 
 // Macros --------------------------------------------------------------------------------------------------------------------------
 
@@ -239,11 +234,22 @@
 #define fgt(x,y)                    ((x)-(y)>SmallestFloat)
 #define flt(x,y)                    ((y)-(x)>SmallestFloat)
 
+// pins
+#define DAC_PIN(v)                  ((v)+0x100)
+#define GPIO_PIN(v)                 ((v)+0x200)
+
+// sense
 #define THLD(v)                     ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
 #define HYST(v)                     ((v)<<11) // 10 bit hysteresis, bits 11 through 20
 #ifndef INPUT_PULLDOWN
   #define INPUT_PULLDOWN INPUT
 #endif
+
+// motor drivers
+#define DEFAULT_POWER_DOWN_TIME     30000  // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
+
+#define SERVO                       -1     // general purpose flag for a SERVO driver motor
+#define STEP_DIR                    -2     // general purpose flag for a STEP_DIR driver motor
 
 // task manager
 #define TASKS_SKIP_MISSED
@@ -261,6 +267,8 @@
 // very high (> 1M writes)
 #define NVE_VHIGH 3
 #define NV_ENDURANCE NVE_MID
+// uses HAL specified default for remembering settings when powered off
+#define NV_DEFAULT                  ON
 
 // default time for spiral guides is 103.4 seconds
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4

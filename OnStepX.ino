@@ -49,6 +49,7 @@
 
 #include "src/Common.h"
 NVS nv;
+#include "src/Validate.h"
 #include "src/lib/sense/Sense.h"
 #include "src/tasks/OnTask.h"
 
