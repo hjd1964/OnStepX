@@ -75,7 +75,7 @@ void Site::init() {
       }
     } else {
       DLF("WRN: Site::init(); Warning TLS initialization failed");
-      VLF("WRN: Site::init(); fallback to Date/Time from NV");
+      VLF("WRN: Site::init(); fallback to last Date/Time from NV");
       readJD(validKey);
     }
   #else
