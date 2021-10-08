@@ -56,6 +56,7 @@ Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, vo
   this->callback = callback;
   start_time     = millis();
   next_task_time = start_time + period;
+  strcpy(processName, "");
 }
 
 Task::~Task() {

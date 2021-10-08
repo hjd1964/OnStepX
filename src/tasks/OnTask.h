@@ -139,7 +139,7 @@ class Task {
 
     void setHardwareTimerPeriod();
 
-    char                   processName[8]    = "";
+    char                   processName[8];
     unsigned long          period            = 0;
     unsigned long          next_period       = 0;
     unsigned long          duration          = 0;
