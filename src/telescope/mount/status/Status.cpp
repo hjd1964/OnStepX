@@ -38,7 +38,7 @@ void Status::init() {
       pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
       VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
-      if (statusTaskHandle) { VL("success"); } else { VL("FAILED!"); }
+      if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
     }
   #endif
 }

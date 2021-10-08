@@ -47,11 +47,11 @@
   void St4::init() {
     #ifdef HAL_SLOW_PROCESSOR
       VF("MSG: Mount, ST4 start monitor task (rate 5ms priority 1)... ");
-      if (tasks.add(5, 0, true, 1, st4Wrapper, "St4Mntr")) { VL("success"); } else { VL("FAILED!"); }
+      if (tasks.add(5, 0, true, 1, st4Wrapper, "St4Mntr")) { VLF("success"); } else { VLF("FAILED!"); }
     #else
       VF("MSG: Mount, ST4 start monitor task (rate 1.7ms priority 1)... ");
       uint8_t handle = tasks.add(0, 0, true, 1, st4Wrapper, "St4Mntr");
-      if (handle) { VL("success"); } else { VL("FAILED!"); }
+      if (handle) { VLF("success"); } else { VLF("FAILED!"); }
       tasks.setPeriodMicros(handle, 1700);
       tasks.setTimingMode(handle, TM_MINIMUM);
     #endif

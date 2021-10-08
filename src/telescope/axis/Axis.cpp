@@ -106,7 +106,7 @@ void Axis::init() {
   #if AXIS9_DRIVER_MODEL != OFF
     if (axisNumber == 9) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis9, "mtrAx9"); }
   #endif
-  if (taskHandle) { VL("success"); } else { VL("FAILED!"); }
+  if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
 
   // check for reverting axis settings in NV
   if (!validKey) {

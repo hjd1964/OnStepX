@@ -128,7 +128,7 @@ bool StepDirMotor::init(int8_t reverse, int16_t microsteps, int16_t current) {
     V("success");
     if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
     VL("");
-  } else { VL("FAILED!"); return false; }
+  } else { VLF("FAILED!"); return false; }
 
   return true;
 }

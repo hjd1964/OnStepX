@@ -164,7 +164,7 @@ bool ServoMotor::init(int8_t reverse, int16_t integral, int16_t porportional) {
     char timerName[] = "Servos_";
     timerName[6] = '0' + axisNumber;
     servoMonitorHandle = tasks.add(5, 0, true, 1, pollServos, timerName);
-    if (servoMonitorHandle) { VL("success"); } else { VL("FAILED!"); return false; }
+    if (servoMonitorHandle) { VLF("success"); } else { VLF("FAILED!"); return false; }
   }
 
   // setup the PID
@@ -192,7 +192,7 @@ bool ServoMotor::init(int8_t reverse, int16_t integral, int16_t porportional) {
     V("success");
     if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
     VL("");
-  } else { VL("FAILED!"); return false; }
+  } else { VLF("FAILED!"); return false; }
 
   return true;
 }

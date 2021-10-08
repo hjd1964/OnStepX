@@ -72,10 +72,10 @@ bool TimeLocationSource::init() {
 
   VF("MSG: TLS, start GPS monitor task (rate 10ms priority 7)... ");
   if (tasks.add(1, 0, true, 7, gpsPoll, "gpsPoll")) {
-    VL("success");
+    VLF("success");
     active = true;
   } else {
-    VL("FAILED!");
+    VLF("FAILED!");
     active = false;
   }
 

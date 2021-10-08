@@ -113,7 +113,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     int pin = STATUS_LED_PIN;
     pinModeEx(pin, OUTPUT);
     VF("MSG: Telescope, start status LED task (rate 500ms priority 4)... ");
-    if (tasks.add(500, 0, true, 4, statusFlash, "StaLed")) { VL("success"); } else { VL("FAILED!"); }
+    if (tasks.add(500, 0, true, 4, statusFlash, "StaLed")) { VLF("success"); } else { VLF("FAILED!"); }
   #endif
 }
 

@@ -70,7 +70,7 @@ void Site::init() {
         #if TIME_LOCATION_SOURCE == GPS
           updateTimeoutTime = millis() + GPS_TIMEOUT_MINUTES*60000UL;
           VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
-          if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VL("success"); } else { VL("FAILED!"); }
+          if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VLF("success"); } else { VLF("FAILED!"); }
         #endif
       }
     } else {
@@ -90,9 +90,9 @@ void Site::init() {
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (handle) {
-    VL("success"); 
+    VLF("success"); 
     if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(); didn't get h/w timer for Clock (using s/w timer)"); }
-  } else { VL("FAILED!"); }
+  } else { VLF("FAILED!"); }
 
   setSiderealPeriod(SIDEREAL_PERIOD);
 }
