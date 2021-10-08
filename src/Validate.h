@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------------------------------
 // Validate configuration
 #pragma once
+#include "Common.h"
 
 #if FileVersionConfig != 5
   #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 5 for this OnStep."
