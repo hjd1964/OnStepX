@@ -9,6 +9,7 @@
 #include "Telescope.h"
 #include "../lib/weather/Weather.h"
 
+#include "addonFlasher/AddonFlasher.h"
 #include "mount/Mount.h"
 #include "mount/goto/Goto.h"
 #include "mount/guide/Guide.h"
@@ -74,6 +75,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   } else { VLF("MSG: Telescope, correct NV key found"); }
 
   gpio.init();
+
+  addonFlasher.init();
 
   weather.init();
 

@@ -9,6 +9,7 @@
 #include "../lib/weather/Weather.h"
 #include "Telescope.h"
 
+#include "addonFlasher/AddonFlasher.h"
 #include "mount/Mount.h"
 #include "mount/goto/Goto.h"
 #include "mount/guide/Guide.h"
@@ -112,13 +113,13 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     //            Return: 1 on completion (after up to one minute from start of command.)
     #if SERIAL_B_ESP_FLASHING == ON
       if (command[1] == 'S' && parameter[0] == 'P' && parameter[1] == 'F' && parameter[2] == 'L' && parameter[3] == 'A' && parameter[4] == 'S' && parameter[5] == 'H' && parameter[6] == 0) {
-        SerialA.println("The ESP8266 will now be placed in flash upload mode (at 115200 Baud.)");
-        SerialA.println("Arduino's 'Tools -> Upload Speed' should be set to 115200 Baud.");
-        SerialA.println("Waiting for data, you have one minute to start the upload.");
-        delay(1000);
-        fa.go(false); // flash the addon
-        SerialA.println("ESP8266 reset and in run mode, resuming OnStep operation...");
-        delay(1000);
+        SERIAL_A.println("The ESP8266 will now be placed in flash upload mode (at 115200 Baud.)");
+        SERIAL_A.println("Arduino's 'Tools -> Upload Speed' should be set to 115200 Baud.");
+        SERIAL_A.println("Waiting for data, you have one minute to start the upload.");
+        tasks.yield(1000);
+        addonFlasher.go();
+        SERIAL_A.println("ESP8266 reset and in run mode, resuming operation...");
+        tasks.yield(1000);
       } else
     #endif
     *commandError = CE_CMD_UNKNOWN;

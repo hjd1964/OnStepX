@@ -24,6 +24,14 @@
   #error "Configuration (Config.h): Setting SERIAL_B_ESP_FLASHING unknown, use OFF or ON."
 #endif
 
+#if SERIAL_B_ESP_FLASHING == ON && SERIAL_B_BAUD_DEFAULT == OFF
+  #error "Configuration (Config.h): Setting SERIAL_B_ESP_FLASHING only supported if SERIAL_B_BAUD_DEFAULT is defined."
+#endif
+
+#if SERIAL_B_ESP_FLASHING == ON && (ADDON_GPIO0_PIN == OFF || ADDON_RESET_PIN == OFF)
+  #error "Configuration (Config.h): Setting SERIAL_B_ESP_FLASHING only supported if ADDON_GPIO0_PIN and ADDON_RESET_PIN are defined."
+#endif
+
 #if SERIAL_C_BAUD_DEFAULT != OFF && SERIAL_C_BAUD_DEFAULT != 9600 && SERIAL_C_BAUD_DEFAULT != 19200 && SERIAL_C_BAUD_DEFAULT != 38400 && SERIAL_C_BAUD_DEFAULT != 57600 && SERIAL_C_BAUD_DEFAULT != 115200
   #warning "Configuration (Config.h): Setting SERIAL_C_BAUD_DEFAULT unknown, use OFF or 9600, 19200, 38400, 57600 or 115200 (baud.)"
 #endif

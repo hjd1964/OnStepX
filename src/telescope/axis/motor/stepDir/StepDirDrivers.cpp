@@ -139,7 +139,6 @@ void StepDirDriver::init(int16_t microsteps, int16_t current) {
     digitalWriteEx(Pins->m1, bitRead(microstepBitCode, 1));
     pinModeEx(m2Pin, OUTPUT);
     digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
-    pinModeEx(Pins->m3, INPUT);
   }
 
   // automatically set fault status for known drivers
