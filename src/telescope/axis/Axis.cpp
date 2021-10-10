@@ -77,34 +77,34 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
 // sets up the driver step/dir/enable pins and any associated driver mode control
 void Axis::init() {
   // start monitor
-  V(axisPrefix); VF("start monitor task (rate "); V(SIDEREAL_IV_MS); VF("ms priority 1)... ");
+  V(axisPrefix); VF("start monitor task (rate "); V(FRACTIONAL_SEC_MS); VF("ms priority 1)... ");
   uint8_t taskHandle = 0;
   #if AXIS1_DRIVER_MODEL != OFF
-    if (axisNumber == 1) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis1, "mtrAx1"); }
+    if (axisNumber == 1) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis1, "mtrAx1"); }
   #endif
   #if AXIS2_DRIVER_MODEL != OFF
-    if (axisNumber == 2) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis2, "mtrAx2"); }
+    if (axisNumber == 2) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis2, "mtrAx2"); }
   #endif
   #if AXIS3_DRIVER_MODEL != OFF
-    if (axisNumber == 3) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis3, "mtrAx3"); }
+    if (axisNumber == 3) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis3, "mtrAx3"); }
   #endif
   #if AXIS4_DRIVER_MODEL != OFF
-    if (axisNumber == 4) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis4, "mtrAx4"); }
+    if (axisNumber == 4) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis4, "mtrAx4"); }
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    if (axisNumber == 5) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis5, "mtrAx5"); }
+    if (axisNumber == 5) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis5, "mtrAx5"); }
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    if (axisNumber == 6) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis6, "mtrAx6"); }
+    if (axisNumber == 6) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis6, "mtrAx6"); }
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    if (axisNumber == 7) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis7, "mtrAx7"); }
+    if (axisNumber == 7) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis7, "mtrAx7"); }
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    if (axisNumber == 8) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis8, "mtrAx8"); }
+    if (axisNumber == 8) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis8, "mtrAx8"); }
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    if (axisNumber == 9) { taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 1, pollAxis9, "mtrAx9"); }
+    if (axisNumber == 9) { taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 1, pollAxis9, "mtrAx9"); }
   #endif
   if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
 
@@ -295,7 +295,7 @@ double Axis::getOriginOrTargetDistance() {
 // set acceleration rate in "measures" per second per second (for autoSlew)
 void Axis::setSlewAccelerationRate(float mpsps) {
   if (autoRate == AR_NONE) {
-    slewMpspfs = mpsps/SIDEREAL_FRAC;
+    slewMpspfs = mpsps/FRACTIONAL_SEC;
     slewAccelTime = NAN;
   }
 }
@@ -308,7 +308,7 @@ void Axis::setSlewAccelerationTime(float seconds) {
 // set acceleration for emergency stop movement in "measures" per second per second
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
   if (autoRate == AR_NONE) {
-    abortMpspfs = mpsps/SIDEREAL_FRAC;
+    abortMpspfs = mpsps/FRACTIONAL_SEC;
     abortAccelTime = NAN;
   }
 }
@@ -371,9 +371,9 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
     VF("rev@ ");
   }
   #if DEBUG == VERBOSE
-    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*SIDEREAL_FRAC, 3); VL("°/s/s"); }
-    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*SIDEREAL_FRAC, 3); VL("°/s/s"); }
-    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*SIDEREAL_FRAC, 3); VL("um/s/s"); }
+    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VL("°/s/s"); }
+    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VL("°/s/s"); }
+    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VL("um/s/s"); }
   #endif
 
   return CE_NONE;
@@ -547,8 +547,8 @@ void Axis::setFrequencySlew(float frequency) {
   slewFreq = frequency;
 
   // adjust acceleration rates if they depend on slewFreq
-  if (!isnan(slewAccelTime)) slewMpspfs = (slewFreq/slewAccelTime)/SIDEREAL_FRAC;
-  if (!isnan(abortAccelTime)) abortMpspfs = (slewFreq/abortAccelTime)/SIDEREAL_FRAC;
+  if (!isnan(slewAccelTime)) slewMpspfs = (slewFreq/slewAccelTime)/FRACTIONAL_SEC;
+  if (!isnan(abortAccelTime)) abortMpspfs = (slewFreq/abortAccelTime)/FRACTIONAL_SEC;
 }
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)

@@ -6,7 +6,7 @@
 // __AVR__
 
 // 1/100 second sidereal timer
-#define HAL_SIDEREAL_FRAC 100.0
+#define HAL_FRACTIONAL_SEC 100.0
 
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION

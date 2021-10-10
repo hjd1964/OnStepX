@@ -88,9 +88,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
   // start the goto monitor
   if (taskHandle != 0) tasks.remove(taskHandle);
-  taskHandle = tasks.add(SIDEREAL_IV_MS, 0, true, 3, gotoWrapper, "MntGoto");
+  taskHandle = tasks.add(FRACTIONAL_SEC_MS, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
-    VF("MSG: Mount, start goto monitor task (rate "); V(SIDEREAL_IV_MS); VLF("ms priority 3)... success");
+    VF("MSG: Mount, start goto monitor task (rate "); V(FRACTIONAL_SEC_MS); VLF("ms priority 3)... success");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);

@@ -10,7 +10,7 @@
 #define HAL_HAS_DIGITAL_FAST
 
 // 1/100 second sidereal timer
-#define HAL_SIDEREAL_FRAC 100.0
+#define HAL_FRACTIONAL_SEC 100.0
 
 // This platform has 8 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS

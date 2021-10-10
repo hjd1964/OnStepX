@@ -4,7 +4,7 @@
 // We define a more generic symbol, in case more Platform_Name boards based on different lines are supported
 
 // 1/100 second sidereal timer
-#define HAL_SIDEREAL_FRAC 100.0
+#define HAL_FRACTIONAL_SEC 100.0
 
 // Most platforms default to 8 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS

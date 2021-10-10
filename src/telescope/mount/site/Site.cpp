@@ -154,7 +154,7 @@ unsigned long Site::getSiderealPeriod() {
 // sets sidereal period, in sub-micro counts per second
 void Site::setSiderealPeriod(unsigned long period) {
   siderealPeriod = period;
-  tasks.setPeriodSubMicros(handle, lround(siderealPeriod/SIDEREAL_FRAC));
+  tasks.setPeriodSubMicros(handle, lround(siderealPeriod/FRACTIONAL_SEC));
 }
 
 // gets the time in hours that have passed in this Julian Day

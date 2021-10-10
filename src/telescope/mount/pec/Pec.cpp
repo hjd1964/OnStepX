@@ -37,7 +37,7 @@
 
     stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
     stepsPerSiderealSecondI = lroundf(stepsPerSiderealSecond);
-    stepsPerSiderealFrac = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/SIDEREAL_FRAC;
+    stepsPerSiderealFrac = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/FRACTIONAL_SEC;
 
     wormRotationSeconds = round(settings.wormRotationSteps/stepsPerSiderealSecond);
     bufferSize = wormRotationSeconds;
@@ -166,7 +166,7 @@
         firstRecording = !settings.recorded;
         wormRotationStartTimeFs = lastFs;
         V(wormRotationStartTimeFs);
-        recordStopTimeFs = wormRotationStartTimeFs + (uint32_t)(wormRotationSeconds*(long)SIDEREAL_FRAC);
+        recordStopTimeFs = wormRotationStartTimeFs + (uint32_t)(wormRotationSeconds*(long)FRACTIONAL_SEC);
         V(" and stopping at "); VL(recordStopTimeFs);
         accGuideAxis1 = 0.0F;
       }
@@ -187,7 +187,7 @@
 
     // Increment the PEC index once a second and make it go back to zero when the
     // worm finishes a rotation, this code works when crossing zero
-    if (lastFs - wormRotationStartTimeFs >= SIDEREAL_FRAC) { wormRotationStartTimeFs = lastFs; bufferIndex++; }
+    if (lastFs - wormRotationStartTimeFs >= FRACTIONAL_SEC) { wormRotationStartTimeFs = lastFs; bufferIndex++; }
     bufferIndex = ((bufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
 
     // accumulate guide steps for PEC
