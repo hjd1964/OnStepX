@@ -8,5 +8,3 @@
 #include "telescope/rotator/Rotator.defaults.h"
 #include "telescope/focuser/Focuser.defaults.h"
 #include "Config.defaults.h"
-#include "lib/Constants.h"
-#include "lib/Macros.h"
