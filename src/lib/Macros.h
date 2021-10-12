@@ -40,7 +40,8 @@
 
 // use "Ex" functions to exclude pins that are OFF or SHARED
 // pins in range 0x00 to 0xFF are normal, 0x100 to 0x1FF are DAC as digital outputs, 0x200 to 0x2FF are external GPIO pins
-#if GPIO_DEVICE != OFF
+#if defined(GPIO_DEVICE) && GPIO_DEVICE != OFF
+  #include "gpio/Gpio.h"
   #if defined(DAC_AS_DIGITAL)
     // external GPIO and DAC as digital
     #define pinModeEx(pin,mode)       { if (pin >= 0x200) gpio.pinMode(pin-0x200,mode); else if (pin > 0x100) pinMode(pin-0x100,mode); else if (pin >= 0) pinMode(pin,mode); }
@@ -68,11 +69,11 @@
 
 // automatically use fast I/O if available
 #ifndef digitalReadF
-#ifdef HAL_HAS_DIGITAL_FAST
-  #define digitalReadF(pin)           ( digitalReadFast(pin) )
-#else
-  #define digitalReadF(pin)           ( digitalRead(pin) )
-#endif
+  #ifdef HAL_HAS_DIGITAL_FAST
+    #define digitalReadF(pin)           ( digitalReadFast(pin) )
+  #else
+    #define digitalReadF(pin)           ( digitalRead(pin) )
+  #endif
 #endif
 #ifndef digitalWriteF
   #ifdef HAL_HAS_DIGITAL_FAST
