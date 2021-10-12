@@ -1,13 +1,15 @@
+// -----------------------------------------------------------------------------------------------------------------------------
+// General purpose "virtual" watchdog
 #pragma once
 
 #include "../../Common.h"
 
-#if defined(TEENSYDUINO) && defined(WATCHDOG) && WATCHDOG != OFF
+#if !defined(__AVR_ATmega2560__) && defined(WATCHDOG) && WATCHDOG != OFF
 
 class Watchdog {
   public:
     // initialize and start the watchdog with timeout (to reset MCU) of seconds
-    inline void enable(int seconds);
+    void enable(int seconds);
 
     // call atleast once every (seconds) to reset the count or the MCU will be reset if WD is enabled
     inline void reset() { count = 0; }

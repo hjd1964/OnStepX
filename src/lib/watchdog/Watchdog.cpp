@@ -1,8 +1,10 @@
+// -----------------------------------------------------------------------------------------------------------------------------
+// General purpose "virtual" watchdog
 #include "Watchdog.h"
 
 #include "../tasks/OnTask.h"
 
-#if defined(TEENSYDUINO) && defined(WATCHDOG) && WATCHDOG != OFF
+#if !defined(__AVR_ATmega2560__) && defined(WATCHDOG) && WATCHDOG != OFF
 
 void watchdogWrapper() { watchdog.poll(); }
 
