@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
 #include "../Telescope.h"
 #include "coordinates/Transform.h"
@@ -41,13 +41,15 @@ void Mount::init() {
 
   // get the main axes ready
   delay(100);
-  axis1.init();
+  axis1.init(&motor1, pollAxis1);
+  if (!motor1.init(moveAxis1, moveFFAxis1, moveFRAxis1)) { DLF("ERR: Axis1, no motor exiting!"); return; }
   axis1.setBacklash(settings.backlash.axis1);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   delay(100);
-  axis2.init();
+  axis2.init(&motor2, pollAxis2);
+  if (!motor2.init(moveAxis2, moveFFAxis2, moveFRAxis2)) { DLF("ERR: Axis2, no motor exiting!"); return; }
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);

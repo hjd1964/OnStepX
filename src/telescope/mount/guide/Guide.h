@@ -6,9 +6,9 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/commands/ProcessCmds.h"
 #include "../../../lib/sound/Sound.h"
-#include "../../axis/Axis.h"
+#include "../../../lib/axis/Axis.h"
 #include "../coordinates/Transform.h"
 
 // default time for spiral guides is 103.4 seconds

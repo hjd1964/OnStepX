@@ -2,11 +2,9 @@
 // Polling serial IP for ESP32
 #pragma once
 
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.common.h"
-#include "../../HAL/HAL.h"
-#include "../../debug/Debug.h"
+#include "../../Common.h"
+
+#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI
 
 #if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
@@ -78,5 +76,7 @@
     extern IPSerial pipSerial;
     #define SERIAL_PIP pipSerial
   #endif
+
+#endif
 
 #endif

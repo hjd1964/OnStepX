@@ -1,6 +1,9 @@
 // -----------------------------------------------------------------------------------
-// Local Serial for sending commands internal to OnStepX
+// Local Serial for sending internal commands
+
 #include "Serial_Local.h"
+
+#ifdef SERIAL_LOCAL_PRESENT
 
 void SerialLocal::begin(long baud) {
   // init the buffers
@@ -37,3 +40,5 @@ int SerialLocal::read(void) {
 }
 
 SerialLocal serialLocal;
+
+#endif

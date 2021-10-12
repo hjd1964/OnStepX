@@ -5,7 +5,6 @@
 #include "Arduino.h"
 
 #ifdef ESP32
-
     // starts tone on the specified pin of frequency (Hz) for the duration (in ms)
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin
@@ -17,5 +16,4 @@
     extern void analogWriteResolution(int value);
     // analog pwm frequency (500 to 10000Hz)
     extern void analogWriteFrequency(int value);
-
 #endif

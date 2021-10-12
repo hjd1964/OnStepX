@@ -4,6 +4,8 @@
 
 #include "../../Common.h"
 
+#ifdef STATUS_BUZZER
+
 class Sound {
   public:
     Sound();
@@ -14,3 +16,5 @@ class Sound {
     bool enabled = STATUS_BUZZER_DEFAULT == ON; 
   private:
 };
+
+#endif

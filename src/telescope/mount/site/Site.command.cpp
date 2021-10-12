@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/commands/ProcessCmds.h"
 #include "../../Telescope.h"
 
 bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {

@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
 #include "../../Telescope.h"
 #include "../park/Park.h"
@@ -13,6 +13,11 @@
 // fractional second sidereal clock (fracsec or millisecond)
 volatile unsigned long fracLAST;
 IRAM_ATTR void clockTickWrapper() { fracLAST++; }
+
+#define fsToHours(x) ((x)/(3600.0*FRACTIONAL_SEC))
+#define hoursToFs(x) ((x)*(3600.0*FRACTIONAL_SEC))
+#define fsToDays(x)  ((x)/(86400.0*FRACTIONAL_SEC))
+#define daysToFs(x)  ((x)*(86400.0*FRACTIONAL_SEC))
 
 #if TIME_LOCATION_SOURCE == GPS
   void gpsCheck() {

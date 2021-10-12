@@ -1,11 +1,16 @@
 // ------------------------------------------------------------------------------------
 // Serial ST4 master
 
-#include "../../Common.h"
-#include "../../tasks/OnTask.h"
+#include "Serial_ST4_Master.h"
+
+#ifdef SERIAL_ST4_SERVER_PRESENT
+
+#if SST4_CLOCK_OUT != OFF && SST4_DATA_OUT != OFF && SST4_DATA_IN != OFF && SST4_TONE != OFF
+
+#include "../Constants.h"
+#include "../tasks/OnTask.h"
 
 #include "Stream.h"
-#include "Serial_ST4_Master.h"
 
 // SerialSt4 needs a minimum of 1500us between bytes transferred
 #define LOOP_TIME 1600
@@ -176,3 +181,7 @@ void SerialST4Master::flush(void) {
 }
 
 SerialST4Master serialST4;
+
+#endif
+
+#endif

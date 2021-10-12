@@ -6,7 +6,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 
 class Home {

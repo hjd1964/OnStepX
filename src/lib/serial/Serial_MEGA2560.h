@@ -2,12 +2,13 @@
 // Polling serial for Mega2560
 #pragma once
 
-#include "Arduino.h"
+#include "../../Common.h"
+
+#ifdef SERIAL_MEGA2560_PRESENT
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
-class PollingSerial : public Stream
-{
+class PollingSerial : public Stream {
   public:
     PollingSerial();
     
@@ -57,8 +58,7 @@ class PollingSerial : public Stream
 };
 
 #ifdef HAL_POLLING_MEGA2560_SERIAL_A
-class PollingSerialA : public PollingSerial
-{
+class PollingSerialA : public PollingSerial {
   public:
     void begin(long baud);
     void end();
@@ -70,8 +70,7 @@ extern PollingSerialA SerialA;
 #endif
 
 #ifdef HAL_POLLING_MEGA2560_SERIAL_B
-class PollingSerialB : public PollingSerial
-{
+class PollingSerialB : public PollingSerial {
   public:
     void begin(long baud);
     void end();
@@ -83,8 +82,7 @@ extern PollingSerialB SerialB;
 #endif
 
 #ifdef HAL_POLLING_MEGA2560_SERIAL_C
-class PollingSerialC : public PollingSerial
-{
+class PollingSerialC : public PollingSerial {
   public:
     void begin(long baud);
     void end();
@@ -96,8 +94,7 @@ extern PollingSerialC SerialC;
 #endif
 
 #ifdef HAL_POLLING_MEGA2560_SERIAL_D
-class PollingSerialD : public PollingSerial
-{
+class PollingSerialD : public PollingSerial {
   public:
     void begin(long baud);
     void end();
@@ -105,7 +102,11 @@ class PollingSerialD : public PollingSerial
 
     int read(void);
 };
+
 extern PollingSerialD SerialD;
+
+#endif
+
 #endif
 
 #endif

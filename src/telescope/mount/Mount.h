@@ -6,9 +6,9 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../commands/ProcessCmds.h"
+#include "../../lib/axis/Axis.h"
+#include "../../lib/commands/ProcessCmds.h"
 #include "coordinates/Transform.h"
-#include "../axis/Axis.h"
 
 enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
 #if TRACK_REFRACTION_RATE_DEFAULT == ON
@@ -32,6 +32,9 @@ typedef struct MountSettings {
   Backlash backlash;
 } MountSettings;
 #pragma pack()
+
+extern Axis axis1;
+extern Axis axis2;
 
 class Mount {
   public:
@@ -102,11 +105,33 @@ class Mount {
     Coordinate current;
 
     TrackingState trackingState = TS_NONE;
-    float trackingRateAxis1            = 0.0F;
-    float trackingRateAxis2            = 0.0F;
+    float trackingRateAxis1     = 0.0F;
+    float trackingRateAxis2     = 0.0F;
 
     bool atHome = true;
 };
+
+#ifdef AXIS1_DRIVER_SD
+  extern StepDirMotor motor1;
+#elif defined(AXIS1_SERVO)
+  extern ServoMotor motor1;
+#endif
+extern IRAM_ATTR void moveAxis1();
+extern IRAM_ATTR void moveFFAxis1();
+extern IRAM_ATTR void moveFRAxis1();
+extern IRAM_ATTR void pollAxis1();
+extern Axis axis1;
+
+#ifdef AXIS2_DRIVER_SD
+  extern StepDirMotor motor2;
+#elif defined(AXIS2_SERVO)
+  extern ServoMotor motor2;
+#endif
+extern IRAM_ATTR void moveAxis2();
+extern IRAM_ATTR void moveFFAxis2();
+extern IRAM_ATTR void moveFRAxis2();
+extern IRAM_ATTR void pollAxis2();
+extern Axis axis2;
 
 extern Mount mount;
 

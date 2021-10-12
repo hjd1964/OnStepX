@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
 #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
   bool ledOn = false;

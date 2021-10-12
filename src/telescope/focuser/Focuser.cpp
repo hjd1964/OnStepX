@@ -1,15 +1,13 @@
-
 //--------------------------------------------------------------------------------------------------
-// OnStepX focuser control
+// telescope focuser control
 
 #include "Focuser.h"
 
 #ifdef FOCUSER_PRESENT
 
-#include "../../tasks/OnTask.h"
-
-#include "../../lib/weather/Weather.h"
-#include "../../lib/temperature/Temperature.h"
+#include "../../lib/tasks/OnTask.h"
+#include "../../libApp/weather/Weather.h"
+#include "../../libApp/temperature/Temperature.h"
 #include "../Telescope.h"
 
 typedef struct FocuserConfiguration {
@@ -48,26 +46,48 @@ void focWrapper() { focuser.monitor(); }
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 void Focuser::init() {
-  // wait a moment for any background processing that may be needed
-  delay(1000);
-
+  // get the motion controllers ready
   #if AXIS4_DRIVER_MODEL != OFF
-    axes[0] = &axis4;
+    axis4.init(&motor4, pollAxis4);
+    if (motor4.init(moveAxis4)) {
+      VLF("MSG: Focuser1, init (Axis4)");
+      axes[0] = &axis4;
+    } else { DLF("ERR: Axis4, no motor!"); }
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    axes[1] = &axis5;
+    axis5.init(&motor5, pollAxis5);
+    if (motor5.init(moveAxis5)) {
+      VLF("MSG: Focuser2, init (Axis5)");
+      axes[1] = &axis5;
+    } else { DLF("ERR: Axis5, no motor!"); }
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    axes[2] = &axis6;
+    axis6.init(&motor6, pollAxis6);
+    if (motor6.init(moveAxis6)) {
+      VLF("MSG: Focuser3, init (Axis6)");
+      axes[2] = &axis6;
+    } else { DLF("ERR: Axis6, no motor!"); }
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    axes[3] = &axis7;
+    axis7.init(&motor7, pollAxis7);
+    if (motor7.init(moveAxis7)) {
+      VLF("MSG: Focuser4, init (Axis7)");
+      axes[3] = &axis7;
+    } else { DLF("ERR: Axis7, no motor!"); }
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    axes[4] = &axis8;
+    axis8.init(&motor8, pollAxis8);
+    if (motor8.init(moveAxis8)) {
+      VLF("MSG: Focuser5, init (Axis8)");
+      axes[4] = &axis8;
+    } else { DLF("ERR: Axis8, no motor!"); }
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    axes[5] = &axis9;
+    axis9.init(&motor9, pollAxis9);
+    if (motor9.init(moveAxis9)) {
+      VLF("MSG: Focuser6, init (Axis9)");
+      axes[5] = &axis9;
+    } else { DLF("ERR: Axis9, no motor!"); }
   #endif
 
   // confirm the data structure size
@@ -103,9 +123,6 @@ void Focuser::init() {
       if (axes[index] != NULL) {
 
         if (active == -1) active = index;
-
-        V("MSG: Focuser"); V(index + 1); V(", init (Axis"); V(index + 4); VL(")");
-        axes[index]->init();
 
         // TCF defaults to disabled at startup
         settings[index].tcf.enabled = false;

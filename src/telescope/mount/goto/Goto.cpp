@@ -5,7 +5,7 @@
 
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
-#include "../../../tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
 #include "../../Telescope.h"
 #include "../Mount.h"
@@ -211,14 +211,14 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
       if (a1 < -limits.settings.pastMeridianE && a1e > axis1.settings.limits.max) {
         V("MSG: Mount, set target BEST EAST TO WEST: (");
         target.pierSide = PIER_SIDE_WEST;
-      } else V("MSG: Mount, set target BEST stays EAST: !(");
+      } else { V("MSG: Mount, set target BEST stays EAST: !("); }
       V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
     }
     if (current.pierSide == PIER_SIDE_WEST) {
         if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
         V("MSG: Mount, set target BEST WEST TO EAST: (");
         target.pierSide = PIER_SIDE_EAST;
-      } else V("MSG: Mount, set target BEST stays WEST: !(");
+      } else { V("MSG: Mount, set target BEST stays WEST: !("); }
       V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); D(" && "); V(radToDeg(a1w)); D(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
     }
   }

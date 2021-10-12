@@ -2,11 +2,11 @@
 // OnStepX telescope control
 
 #include "../Common.h"
-#include "../tasks/OnTask.h"
+#include "../lib/tasks/OnTask.h"
 
 #include "../lib/convert/Convert.h"
-#include "../commands/ProcessCmds.h"
-#include "../lib/weather/Weather.h"
+#include "../lib/commands/ProcessCmds.h"
+#include "../libApp/weather/Weather.h"
 #include "Telescope.h"
 
 #include "addonFlasher/AddonFlasher.h"

@@ -6,15 +6,10 @@
 
 #ifdef MOUNT_PRESENT
 
-#include <Arduino.h>
-#include "../../../Constants.h"
 #include "../../../lib/convert/Convert.h"
-#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
-#include "../../../lib/tls/Tls_DS3231.h"
-#include "../../../lib/tls/Tls_DS3234.h"
-#include "../../../lib/tls/Tls_Teensy.h"
-#include "../../../lib/tls/Tls_GPS.h"
+#include "../../../lib/tls/Tls.h"
 
 extern volatile unsigned long fracLAST;
 

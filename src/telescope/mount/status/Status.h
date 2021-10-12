@@ -6,7 +6,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../commands/ProcessCmds.h"
+#include "../../../lib/commands/ProcessCmds.h"
 #include "../../../lib/sound/Sound.h"
 
 #define SF_STOPPED 0

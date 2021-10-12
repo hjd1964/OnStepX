@@ -6,6 +6,8 @@
 #ifdef MOUNT_PRESENT
 
 bool Home::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(supressFrame);
   if (command[0] == 'h') {
     // :hC#       Moves mount to the home position
     //            Returns: Nothing

@@ -16,6 +16,7 @@
 #include "../status/Status.h"
 
 bool Status::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(supressFrame);
 
   if (command[0] == 'G') {
 

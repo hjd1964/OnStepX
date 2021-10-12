@@ -97,6 +97,10 @@ class NonVolatileStorage {
     // NV size in bytes
     uint16_t size = 0;
 
+    // for keeping track of initialization errors
+    bool initError = false;
+    bool validKey = false;
+
   protected:
     // returns false if ready to read or write immediately
     virtual bool busy();

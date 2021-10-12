@@ -2,13 +2,9 @@
 // I2C MCP23008 GPIO support
 #pragma once
 
-#include <Arduino.h>
-#include "../../Constants.h"
-#include "../../Config.common.h"
-#include "../../Config.defaults.h"
-#include "../../HAL/HAL.h"
+#include "../../Common.h"
 
-#if GPIO_DEVICE == MCP23008
+#if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23008
 
 class Mcp23008 {
   public:

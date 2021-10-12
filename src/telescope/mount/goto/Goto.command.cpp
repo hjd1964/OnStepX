@@ -5,7 +5,7 @@
 
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
-#include "../../../tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
 #include "../site/Site.h"
 #include "../Mount.h"

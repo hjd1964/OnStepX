@@ -4,9 +4,8 @@
 // digital mode reads have basic hf EMI/RFI noise filtering
 
 #include "Sense.h"
-#include "../../Common.h"
 
-Sense::Sense(int pin, int initState, int32_t trigger) {
+SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
   activeState = (trigger & 0b0000000000000000000001);
@@ -30,7 +29,7 @@ Sense::Sense(int pin, int initState, int32_t trigger) {
   reset();
 }
 
-int Sense::read() {
+int SenseInput::isOn() {
   int value = lastValue;
   if (isAnalog) {
     int sample = analogRead(pin);
@@ -46,7 +45,22 @@ int Sense::read() {
   return value == activeState;
 }
 
-void Sense::poll() {
+int SenseInput::changed() {
+  int value = lastValue;
+  if (isAnalog) {
+    int sample = analogRead(pin);
+    if (sample >= threshold + hysteresis) value = HIGH;
+    if (sample < threshold - hysteresis) value = LOW;
+  } else {
+    int sample = digitalReadEx(pin); delayMicroseconds(10); int sample1 = digitalReadEx(pin);
+    if (stableSample != sample || sample1 != sample) { stableStartMs = millis(); stableSample = sample; }
+    long stableMs = (long)(millis() - stableStartMs);
+    if (stableMs >= hysteresis) value = stableSample;
+  }
+  return lastValue != value;
+}
+
+void SenseInput::poll() {
   int value = lastValue;
   if (!isAnalog) {
     int sample = digitalReadEx(pin); delayMicroseconds(10); int sample1 = digitalReadEx(pin);
@@ -57,33 +71,38 @@ void Sense::poll() {
   lastValue = value;
 }
 
-void Sense::reset() {
+void SenseInput::reset() {
   if (isAnalog) { if ((int)analogRead(pin) > threshold) lastValue = HIGH; else lastValue = LOW; } else lastValue = digitalReadEx(pin);
   stableSample = lastValue;
 }
 
 // Manage sense pins
 
-uint8_t Senses::add(int pin, int initState, int32_t trigger) {
-  if (pin == OFF || trigger == OFF) return 0;
+uint8_t Sense::add(int pin, int initState, int32_t trigger, bool force) {
+  if ((pin == OFF || trigger == OFF) && !force) return 0;
   if (senseCount >= SENSE_MAX) { VF("WRN: Senses::add(); senseCount exceeded ignoring pin "); VL(pin); return 0; }
   if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Senses::add(); trigger value invalid ignoring pin "); VL(pin); return 0; }
   if (initState != INPUT && initState != INPUT_PULLUP && initState != INPUT_PULLDOWN) {
     VF("WRN: Senses::add(); initState value invalid ignoring pin "); VL(pin);
     return 0;
   }
-  sense[senseCount] = new Sense(pin, initState, trigger);
+  senseInput[senseCount] = new SenseInput(pin, initState, trigger);
   senseCount++;
   return senseCount;
 }
 
-int Senses::read(uint8_t handle) {
+int Sense::isOn(uint8_t handle) {
   if (handle == 0) return false;
-  return sense[handle - 1]->read();
+  return senseInput[handle - 1]->isOn();
 }
 
-void Senses::poll() {
-  for (int i = 0; i < senseCount; i++) sense[i]->poll();
+int Sense::changed(uint8_t handle) {
+  if (handle == 0) return false;
+  return senseInput[handle - 1]->changed();
 }
 
-Senses senses;
+void Sense::poll() {
+  for (int i = 0; i < senseCount; i++) senseInput[i]->poll();
+}
+
+Sense sense;

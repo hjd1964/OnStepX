@@ -112,3 +112,9 @@
 #ifndef FPSTR
   #define FPSTR
 #endif
+
+#ifdef HAL_FRACTIONAL_SEC
+  #define FRACTIONAL_SEC  HAL_FRACTIONAL_SEC
+#else
+  #define FRACTIONAL_SEC  100
+#endif

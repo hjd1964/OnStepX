@@ -7,18 +7,34 @@
 #include "Config.common.h"
 #include "HAL/HAL.h"
 #include "pinmaps/Models.h"
-#include "debug/Debug.h"
+#include "lib/debug/Debug.h"
 #include "lib/nv/NV.h"
 extern NVS nv;
 
-#define FRACTIONAL_SEC    HAL_FRACTIONAL_SEC
-#define FRACTIONAL_SEC_MS (lround(1000.0F/FRACTIONAL_SEC))
-#define fsToRad(x)        ((x)/(13750.98708313976*FRACTIONAL_SEC))
-#define radToFs(x)        ((x)*(13750.98708313976*FRACTIONAL_SEC))
-#define fsToHours(x)      ((x)/(3600.0*FRACTIONAL_SEC))
-#define hoursToFs(x)      ((x)*(3600.0*FRACTIONAL_SEC))
-#define fsToDays(x)       ((x)/(86400.0*FRACTIONAL_SEC))
-#define daysToFs(x)       ((x)*(86400.0*FRACTIONAL_SEC))
+#if DEBUG != OFF
+  #define D(x)       SERIAL_DEBUG.print(x)
+  #define DF(x)      SERIAL_DEBUG.print(F(x))
+  #define DL(x)      SERIAL_DEBUG.println(x)
+  #define DLF(x)     SERIAL_DEBUG.println(F(x))
+#else
+  #define D(x)
+  #define DF(x)
+  #define DL(x)
+  #define DLF(x)
+#endif
+
+#if DEBUG == VERBOSE
+  #define V(x)       SERIAL_DEBUG.print(x)
+  #define VF(x)      SERIAL_DEBUG.print(F(x))
+  #define VL(x)      SERIAL_DEBUG.println(x)
+  #define VLF(x)     SERIAL_DEBUG.println(F(x))
+  #define VLCCHK(P)  { VF("Constant? "); VL(__builtin_constant_p(P)); }
+#else
+  #define V(x)
+  #define VF(x)
+  #define VL(x)
+  #define VLF(x)
+#endif
 
 #if (AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF) || AXIS3_DRIVER_MODEL != OFF || AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
   #define AXIS_PRESENT

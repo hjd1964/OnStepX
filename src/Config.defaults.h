@@ -2,8 +2,29 @@
 // controller settings
 #pragma once
 
-#include "telescope/axis/motor/stepDir/StepDir.defaults.h"
-#include "telescope/axis/motor/servo/Servo.defaults.h"
+#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == \
+    AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == \
+    AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
+  #define DRIVER_STEP_DEFAULTS
+#endif
+
+#if defined(AXIS1_DRIVER_SD) || defined(AXIS2_DRIVER_SD) || defined(AXIS3_DRIVER_SD) || \
+    defined(AXIS4_DRIVER_SD) || defined(AXIS5_DRIVER_SD) || defined(AXIS6_DRIVER_SD) || \
+    defined(AXIS7_DRIVER_SD) || defined(AXIS8_DRIVER_SD) || defined(AXIS9_DRIVER_SD)
+  #define SD_DRIVER_PRESENT
+#endif
+
+#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
+    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
+    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
+  #define TMC_DRIVER_PRESENT
+#endif
+
+#if defined(AXIS1_SERVO) || defined(AXIS2_SERVO) || defined(AXIS3_SERVO) || \
+    defined(AXIS4_SERVO) || defined(AXIS5_SERVO) || defined(AXIS6_SERVO) || \
+    defined(AXIS7_SERVO) || defined(AXIS8_SERVO) || defined(AXIS9_SERVO)
+  #define SERVO_DRIVER_PRESENT
+#endif
 
 // pinmap
 #ifndef PINMAP

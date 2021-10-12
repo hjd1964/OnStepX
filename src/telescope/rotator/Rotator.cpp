@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------------------------
-// OnStepX focuser control
+// telescope rotator control
 
 #include "Rotator.h"
 
 #ifdef ROTATOR_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
 #include "../Telescope.h"
 #include "../mount/Mount.h"
@@ -15,7 +15,6 @@ void rotWrapper() { rotator.monitor(); }
 
 // initialize rotator
 void Rotator::init() {
-
   // wait a moment for any background processing that may be needed
   delay(1000);
 
@@ -30,7 +29,8 @@ void Rotator::init() {
   readSettings();
 
   VL("MSG: Rotator, init (Axis3)");
-  axis3.init();
+  axis3.init(&motor3, pollAxis3);
+  if (!motor3.init(moveAxis3)) { DLF("ERR: Axis3, no motor exiting!"); return; }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);

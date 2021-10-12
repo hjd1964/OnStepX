@@ -6,7 +6,7 @@
 #ifdef MOUNT_PRESENT 
 
 #if AXIS1_PEC == ON
-  #include "../../../tasks/OnTask.h"
+  #include "../../../lib/tasks/OnTask.h"
 
   #include "../../../lib/sense/Sense.h"
   #include "../../Telescope.h"
@@ -83,7 +83,7 @@
             settings.state = PEC_NONE;
           #else
             VLF("MSG: Mount, PEC adding sense");
-            senseHandle = senses.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
+            senseHandle = sense.add(PEC_SENSE_PIN, PEC_SENSE_INIT, PEC_SENSE);
           #endif
 
           VF("MSG: Mount, PEC start monitor task (rate 10ms priority 3)... ");
@@ -111,7 +111,7 @@
     #else
       static int lastState;
       lastState = wormIndexState;
-      wormIndexState = senses.read(senseHandle);
+      wormIndexState = sense.isOn(senseHandle);
 
       // digital or analog pec sense, with 60 second delay before redetect
       long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;

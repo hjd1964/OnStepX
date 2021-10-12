@@ -5,7 +5,7 @@
 
 #if defined(ESP8266) || defined(ESP32)
 
-  #include "../../tasks/OnTask.h"
+  #include "../tasks/OnTask.h"
 
   bool NonVolatileStorageESP::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
     if (size > 4096 || wait == false) return false;

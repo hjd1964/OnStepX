@@ -4,7 +4,7 @@
 
 #include "../../Common.h"
 
-#if defined(DS1820_DEVICES_PRESENT) || GPIO_DEVICE == DS2413
+#if defined(DS1820_DEVICES_PRESENT) || (defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413)
 
 #include <OneWire.h>    // my OneWire library https://github.com/hjd1964/OneWire
 

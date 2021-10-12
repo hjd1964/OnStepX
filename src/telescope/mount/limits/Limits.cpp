@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
 #include "../../../telescope/Telescope.h"
 #include "../Mount.h"

@@ -7,7 +7,6 @@
 #include "AN_ESP32.h"
 
 #ifdef ESP32
-
   portMUX_TYPE __analogOutMux = portMUX_INITIALIZER_UNLOCKED;
 
   #define __ANALOG_PWM_CHANNEL_START 8  // set aside 8 channels for use elsewhere, use 0 to dedicate all 16 channels here

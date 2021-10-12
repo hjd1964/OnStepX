@@ -6,6 +6,9 @@
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
 bool Park::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
   if (command[0] == 'h') {
     // :hP#       Moves mount to the park position
     //            Return: 0 on failure

@@ -15,6 +15,9 @@
 #ifndef HAL_ANALOG_WRITE_BITS
   #define HAL_ANALOG_WRITE_BITS 8
 #endif
+#ifndef HAL_ANALOG_WRITE_RANGE
+  #define HAL_ANALOG_WRITE_RANGE 255
+#endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 12

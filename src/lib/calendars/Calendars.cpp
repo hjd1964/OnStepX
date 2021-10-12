@@ -3,6 +3,8 @@
 
 #include "Calendars.h"
 
+#ifdef CALENDARS_PRESENT
+
 // convert from Gregorian date to Julian Day (does not handle hours)
 JulianDate Calendars::gregorianToJulianDay(GregorianDate date) {
   JulianDate julianDay;
@@ -44,3 +46,5 @@ GregorianDate Calendars::julianDayToGregorian(JulianDate julianDate) {
 }
 
 Calendars calendars;
+
+#endif

@@ -6,9 +6,9 @@
 
 #ifdef ROTATOR_PRESENT
 
-#include "../../commands/ProcessCmds.h"
+#include "../../lib/axis/Axis.h"
+#include "../../lib/commands/ProcessCmds.h"
 #include "../Telescope.h"
-#include "../axis/Axis.h"
 #include "../mount/coordinates/Transform.h"
 
 // time to write position to nv after last movement of Rotator
@@ -84,6 +84,15 @@ class Rotator {
 
     uint8_t parkHandle = 0;
 };
+
+#ifdef AXIS3_DRIVER_SD
+  extern StepDirMotor motor3;
+#elif defined(AXIS3_SERVO)
+  extern ServoMotor motor3;
+#endif
+extern IRAM_ATTR void moveAxis3();
+extern IRAM_ATTR void pollAxis3();
+extern Axis axis3;
 
 extern Rotator rotator;
 

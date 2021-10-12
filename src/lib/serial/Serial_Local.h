@@ -1,8 +1,10 @@
 // -----------------------------------------------------------------------------------
-// Local Serial for sending commands internal to OnStepX
+// Local Serial for sending internal commands
 #pragma once
 
-#include "Arduino.h"
+#include "../../Common.h"
+
+#ifdef SERIAL_LOCAL_PRESENT
 
 class SerialLocal : public Stream {
   public:
@@ -56,4 +58,7 @@ class SerialLocal : public Stream {
 };
 
 extern SerialLocal serialLocal;
+
 #define SERIAL_LOCAL serialLocal
+
+#endif

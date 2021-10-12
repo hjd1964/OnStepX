@@ -2,12 +2,12 @@
 // OnStepX telescope control
 
 #include "../Common.h"
-#include "../tasks/OnTask.h"
+#include "../lib/tasks/OnTask.h"
 
 #include "../lib/convert/Convert.h"
-#include "../commands/ProcessCmds.h"
+#include "../lib/commands/ProcessCmds.h"
 #include "Telescope.h"
-#include "../lib/weather/Weather.h"
+#include "../libApp/weather/Weather.h"
 
 #include "addonFlasher/AddonFlasher.h"
 #include "mount/Mount.h"
@@ -76,7 +76,9 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   gpio.init();
 
-  addonFlasher.init();
+  #if SERIAL_B_ESP_FLASHING == ON
+    addonFlasher.init();
+  #endif
 
   weather.init();
 

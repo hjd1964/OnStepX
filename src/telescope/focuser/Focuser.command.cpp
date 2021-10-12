@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------------------------------
-// OnStepX focuser control
+// telescope focuser control, commands
 
 #include "Focuser.h"
 
 #ifdef FOCUSER_PRESENT
 
 #include "../../lib/convert/Convert.h"
-#include "../axis/Axis.h"
+#include "../../lib/axis/Axis.h"
 
 extern Axis *axes[6];
 

@@ -16,6 +16,9 @@
 #ifndef HAL_ANALOG_WRITE_BITS
   #define HAL_ANALOG_WRITE_BITS 8
 #endif
+#ifndef HAL_ANALOG_WRITE_RANGE
+  #define HAL_ANALOG_WRITE_RANGE 255
+#endif
 
 // This platform doesn't support true double precision math
 #define HAL_NO_DOUBLE_PRECISION

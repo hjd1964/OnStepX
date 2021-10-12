@@ -5,10 +5,13 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../lib/weather/Weather.h"
+#include "../../../libApp/weather/Weather.h"
 #include "../../Telescope.h"
 
 extern volatile unsigned long fracLAST;
+
+#define fsToRad(x) ((x)/(13750.98708313976*FRACTIONAL_SEC))
+#define radToFs(x) ((x)*(13750.98708313976*FRACTIONAL_SEC))
 
 #if DEBUG != OFF
   void Transform::print(Coordinate *coord) {

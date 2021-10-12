@@ -1,9 +1,9 @@
-// handle PPS interrupt
+// -----------------------------------------------------------------------------------
+// Pulse Per Second precision timer skew
 
-#include "../../Common.h"
-#include "../../tasks/OnTask.h"
+#include "../tasks/OnTask.h"
 
-#if TIME_LOCATION_PPS_SENSE != OFF
+#if defined(TIME_LOCATION_PPS_SENSE) && TIME_LOCATION_PPS_SENSE != OFF
 
 #include "PPS.h"
 

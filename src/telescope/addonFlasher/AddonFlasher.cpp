@@ -1,7 +1,7 @@
 // Flashes an esp8266 based SWS on the SERIAL_B interface by passing data to/from SERIAL_A
 
 #include "AddonFlasher.h"
-#include "..\..\tasks\OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
 // ADDON_TRIGR_PIN  HIGH for run and LOW for trigger serial passthrough mode
 // ADDON_RESET_PIN  HIGH for run and LOW for reset

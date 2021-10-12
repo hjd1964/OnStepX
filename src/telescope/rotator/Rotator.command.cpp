@@ -1,13 +1,15 @@
 //--------------------------------------------------------------------------------------------------
-// OnStepX rotator control
+// telescope rotator control, commands
 
 #include "../../lib/convert/Convert.h"
-#include "../axis/Axis.h"
+#include "../../lib/axis/Axis.h"
 
 #include "../mount/Mount.h"
 #include "Rotator.h"
 
 #if AXIS3_DRIVER_MODEL != OFF
+
+extern Axis axis3;
 
 bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;

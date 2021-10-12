@@ -5,7 +5,7 @@
 
 #ifdef FEATURES_PRESENT
 
-#include "../../tasks/OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
 #include "../../lib/weather/Weather.h"
 #include "../../telescope/Telescope.h"

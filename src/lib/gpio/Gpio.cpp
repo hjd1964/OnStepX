@@ -3,7 +3,7 @@
 
 #include "Gpio.h"
 
-#if GPIO_DEVICE == OFF
+#if defined(GPIO_DEVICE) && GPIO_DEVICE == OFF
 
 bool Gpio::init() {
   return true;

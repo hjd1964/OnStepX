@@ -3,12 +3,11 @@
 
 #include "Ds2413.h"
 
-#if GPIO_DEVICE == DS2413
+#if defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413
 
 #include "../../pinmaps/Models.h"
-#include "../../debug/Debug.h"
 
-#include "../../tasks/OnTask.h"
+#include "../tasks/OnTask.h"
 
 #include "../1wire/1Wire.h"
 #include <DallasGPIO.h>               // my DallasGPIO library https://github.com/hjd1964/Arduino-DS2413GPIO-Control-Library

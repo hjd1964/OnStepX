@@ -3,6 +3,8 @@
 
 #include "Serial_MEGA2560.h"
 
+#ifdef SERIAL_MEGA2560_PRESENT
+
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #define MSB(i) (i >> 8)
@@ -209,6 +211,8 @@ ISR(USART3_RX_vect)  {
   SerialD.recv_buffer[SerialD.recv_tail] = UDR3; 
   SerialD.recv_tail++; 
 }
+
+#endif
 
 #endif
 

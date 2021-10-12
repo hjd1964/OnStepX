@@ -1,9 +1,11 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 // Sound
 
-#include "../../Common.h"
-#include "../../tasks/OnTask.h"
 #include "Sound.h"
+
+#ifdef STATUS_BUZZER
+
+#include "../tasks/OnTask.h"
 
 #if STATUS_BUZZER == ON
   void buzzerOff() {
@@ -53,3 +55,5 @@ void Sound::click() {
     #endif
   }
 }
+
+#endif

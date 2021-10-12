@@ -3,6 +3,8 @@
 
 #include "Serial_IP_ESP32.h"
 
+#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI
+
 #if defined(ESP32) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
   bool wifiActive = false;
@@ -161,5 +163,7 @@
   #if PERSISTENT_COMMAND_CHANNEL == ON
     IPSerial pipSerial;
   #endif
+
+#endif
 
 #endif

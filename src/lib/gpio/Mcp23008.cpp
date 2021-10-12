@@ -3,7 +3,7 @@
 
 #include "Mcp23008.h"
 
-#if GPIO_DEVICE == MCP23008
+#if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23008
 
 #include "../../pinmaps/Models.h"
 #include "../../debug/Debug.h"

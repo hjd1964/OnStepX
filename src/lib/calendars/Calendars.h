@@ -4,6 +4,10 @@
 
 #include <Arduino.h>
 
+#define CALENDARS_PRESENT
+
+#ifdef CALENDARS_PRESENT
+
 typedef struct GregorianDate {
   int16_t  year;
   uint8_t  month;
@@ -33,3 +37,5 @@ class Calendars {
 };
 
 extern Calendars calendars;
+
+#endif

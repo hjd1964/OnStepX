@@ -6,9 +6,9 @@
 
 #ifdef FOCUSER_PRESENT
 
-#include "../../commands/ProcessCmds.h"
+#include "../../lib/axis/Axis.h"
+#include "../../lib/commands/ProcessCmds.h"
 #include "../Telescope.h"
-#include "../axis/Axis.h"
 
 #if AXIS9_DRIVER_MODEL != OFF
   #define FOCUSER_MAX 6
@@ -148,6 +148,72 @@ class Focuser {
     // the default focuser is the first found
     int active = -1;
 };
+
+#if AXIS4_DRIVER_MODEL != OFF
+  #ifdef AXIS4_DRIVER_SD
+    extern StepDirMotor motor4;
+  #elif defined(AXIS4_SERVO)
+    extern ServoMotor motor4;
+  #endif
+  extern IRAM_ATTR void moveAxis4();
+  extern IRAM_ATTR void pollAxis4();
+  extern Axis axis4;
+#endif
+
+#if AXIS5_DRIVER_MODEL != OFF
+  #ifdef AXIS5_DRIVER_SD
+    extern StepDirMotor motor5;
+  #elif defined(AXIS5_SERVO)
+    extern ServoMotor motor5;
+  #endif
+  extern IRAM_ATTR void moveAxis5();
+  extern IRAM_ATTR void pollAxis5();
+  extern Axis axis5;
+#endif
+
+#if AXIS6_DRIVER_MODEL != OFF
+  #ifdef AXIS6_DRIVER_SD
+    extern StepDirMotor motor6;
+  #elif defined(AXIS6_SERVO)
+    extern ServoMotor motor6;
+  #endif
+  extern IRAM_ATTR void moveAxis6();
+  extern IRAM_ATTR void pollAxis6();
+  extern Axis axis6;
+#endif
+
+#if AXIS7_DRIVER_MODEL != OFF
+  #ifdef AXIS7_DRIVER_SD
+    extern StepDirMotor motor7;
+  #elif defined(AXIS7_SERVO)
+    extern ServoMotor motor7;
+  #endif
+  extern IRAM_ATTR void moveAxis7();
+  extern IRAM_ATTR void pollAxis7();
+  extern Axis axis7;
+#endif
+
+#if AXIS8_DRIVER_MODEL != OFF
+  #ifdef AXIS8_DRIVER_SD
+    extern StepDirMotor motor8;
+  #elif defined(AXIS8_SERVO)
+    extern ServoMotor motor8;
+  #endif
+  extern IRAM_ATTR void moveAxis8();
+  extern IRAM_ATTR void pollAxis8();
+  extern Axis axis8;
+#endif
+
+#if AXIS9_DRIVER_MODEL != OFF
+  #ifdef AXIS9_DRIVER_SD
+    extern StepDirMotor motor9;
+  #elif defined(AXIS9_SERVO)
+    extern ServoMotor motor9;
+  #endif
+  extern IRAM_ATTR void moveAxis9();
+  extern IRAM_ATTR void pollAxis9();
+  extern Axis axis9;
+#endif
 
 extern Focuser focuser;
 

@@ -3,6 +3,17 @@
 
 #pragma once
 
+#include "../../Common.h"
+
+#ifdef SERIAL_ST4_SERVER_PRESENT
+
+#define SST4_CLOCK_OUT ST4_DEC_S_PIN
+#define SST4_DATA_OUT  ST4_DEC_N_PIN
+#define SST4_DATA_IN   ST4_RA_W_PIN
+#define SST4_TONE      ST4_RA_E_PIN
+
+#if SST4_CLOCK_OUT != OFF && SST4_DATA_OUT != OFF && SST4_DATA_IN != OFF && SST4_TONE != OFF
+
 /*
 ST4 port data communication scheme:
 
@@ -23,11 +34,6 @@ all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
 */
 
 #include "Stream.h"
-
-#define SST4_CLOCK_OUT ST4_DEC_S_PIN
-#define SST4_DATA_OUT  ST4_DEC_N_PIN
-#define SST4_DATA_IN   ST4_RA_W_PIN
-#define SST4_TONE      ST4_RA_E_PIN
 
 class SerialST4Master : public Stream {
   public:
@@ -71,3 +77,7 @@ class SerialST4Master : public Stream {
 
 extern SerialST4Master serialST4;
 #define SERIAL_ST4 serialST4
+
+#endif
+
+#endif

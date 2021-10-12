@@ -51,7 +51,7 @@
 NVS nv;
 #include "src/Validate.h"
 #include "src/lib/sense/Sense.h"
-#include "src/tasks/OnTask.h"
+#include "src/lib/tasks/OnTask.h"
 
 #include "src/telescope/Telescope.h"
 extern Telescope telescope;
@@ -69,7 +69,7 @@ void systemServices() {
 }
 
 void sensesPoll() {
-  senses.poll();
+  sense.poll();
 }
 
 void setup() {
