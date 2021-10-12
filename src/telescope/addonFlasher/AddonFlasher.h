@@ -1,6 +1,6 @@
 // Flashes an esp8266 based SWS on the SERIAL_B interface by passing data to/from SERIAL_A
 #pragma once
-#include "../../common.h"
+#include "../../Common.h"
 
 #if SERIAL_B_ESP_FLASHING == ON
   class AddonFlasher {
