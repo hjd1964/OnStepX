@@ -3,7 +3,7 @@
 #pragma once
 
 #include "../Common.h"
-#include "../lib/commands/ProcessCmds.h"
+#include "../libApp/commands/ProcessCmds.h"
 
 enum ParkState: uint8_t {PS_UNPARKED, PS_PARKED, PS_UNPARKING, PS_PARKING, PS_PARK_FAILED};
 
@@ -48,7 +48,6 @@ class Telescope {
     Firmware firmware;
 };
 
-extern bool validKey;         // true if the NV key matches the Telescope key value
 extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
 extern const int AnalogRange; // help for analogWrite() range conversions
 #define analog8BitToAnalogRange(v) roundf((v/255.0F)*AnalogRange)

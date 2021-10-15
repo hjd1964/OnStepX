@@ -5,11 +5,11 @@
 
 #ifdef FEATURES_PRESENT
 
-void Intervalometer::init(int index, bool validKey) {
+void Intervalometer::init(int index) {
   this->index = index;
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VF("MSG: Intervalometer/Feature"); V(index + 1); VLF(", writing default settings to NV");
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3, timeToByte(expTime));
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, timeToByte(expDelay));

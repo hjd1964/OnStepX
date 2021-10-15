@@ -6,7 +6,7 @@
 
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};

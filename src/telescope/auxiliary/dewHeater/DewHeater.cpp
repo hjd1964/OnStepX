@@ -5,11 +5,11 @@
 
 #ifdef FEATURES_PRESENT
 
-void DewHeater::init(int index, bool validKey) {
+void DewHeater::init(int index) {
   this->index = index;
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VF("MSG: DewHeater/Feature"); V(index + 1); VLF(", writing default settings to NV");
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3, (uint8_t)round((zero + 5.0)*10.0));
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, (uint8_t)round((span + 5.0)*10.0));

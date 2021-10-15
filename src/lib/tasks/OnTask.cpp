@@ -264,6 +264,7 @@ uint8_t Task::getPriority() {
 
 void Task::setNameStr(const char name[]) {
   strncpy(processName, name, 7);
+  processName[7] = 0;
 }
 
 char* Task::getNameStr() {
@@ -324,7 +325,7 @@ void tasksMonitor() {
   for (int i = 0; i < TASKS_MAX; i++) {
     if (handle == 0) break;
     tasks.refreshPeriod(handle);
-    handle = tasks.getNextHandle();
+    handle = tasks.getNextHandle(handle);
   }
 }
 
@@ -335,8 +336,8 @@ Tasks::Tasks() {
     allocated[c] = false;
   }
 
-  // start the tasks monitor
-  tasks.add(1000, 0, true, 7, tasksMonitor);
+  // start the task monitor
+  tasks.add(1000, 0, true, 7, tasksMonitor, "TaskMtr");
 }
 
 Tasks::~Tasks() {
@@ -364,7 +365,6 @@ uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t prio
   if (task[e] != NULL) allocated[e] = true; else return false;
 
   updateEventRange();
-
   return e + 1;
 }
 
@@ -483,30 +483,30 @@ char* Tasks::getNameStr(uint8_t handle) {
 }
 
 uint8_t Tasks::getFirstHandle() {
-  handleSearch = 255;
-  return getNextHandle();
+  return getNextHandle(0);
 }
 
-uint8_t Tasks::getNextHandle() {
+uint8_t Tasks::getNextHandle(uint8_t handle) {
   do {
-    handleSearch++;
-    if (allocated[handleSearch]) return handleSearch + 1;
-  } while (handleSearch < highest_task);
+    if (allocated[handle]) {
+      return handle + 1;
+    }
+  } while (handle < highest_task);
   return false;
 }
 
 uint8_t Tasks::getHandleByName(const char name[]) {
-  uint8_t h;
   char *candidate;
-  handleSearch = 255;
-  do {
-    h = getNextHandle();
-    candidate = getNameStr(h);
+  uint8_t handle = getFirstHandle();
+  while (handle) {
+    candidate = getNameStr(handle);
     if (strstr(candidate, name)) {
       if (strlen(candidate) == strlen(name)) break;
     }
-  } while (h != 0);
-  return h;
+    handle = getNextHandle(handle);
+  }
+
+  return handle;
 }
 
 #ifdef TASKS_PROFILER_ENABLE

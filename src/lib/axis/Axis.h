@@ -20,7 +20,7 @@
 #endif
 #define FRACTIONAL_SEC_MS           (lround(1000.0F/FRACTIONAL_SEC))
 
-#include "../commands/ProcessCmds.h"
+#include "../../libApp/commands/ProcessCmds.h"
 #include "motor/Motor.h"
 #include "motor/stepDir/StepDir.h"
 #include "motor/servo/Servo.h"

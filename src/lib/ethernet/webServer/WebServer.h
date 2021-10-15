@@ -4,15 +4,10 @@
 
 #include "../../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
-  #ifdef ESP8266
-    #ifndef ETHERNET_W5500
-      #error "The ESP8266 Ethernet option supports the W5500 only"
-    #endif
-    #include <Ethernet2.h>  // https://github.com/adafruit/Ethernet2
-  #else
-    #include <Ethernet.h>
-  #endif
+#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+   (defined(WEB_SERVER) && WEB_SERVER == ON)
+
+  #include "../EthernetManager.h"
 
   // Turn ON to allow webserver debug messages
   #ifndef DEBUG_WEBSERVER
@@ -51,9 +46,6 @@
   class WebServer {
     public:
       void init();
-
-      // restart web server
-      void restart();
 
       void handleClient();
       void setResponseHeader(const char *str);

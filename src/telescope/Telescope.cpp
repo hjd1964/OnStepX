@@ -5,7 +5,7 @@
 #include "../lib/tasks/OnTask.h"
 
 #include "../lib/convert/Convert.h"
-#include "../lib/commands/ProcessCmds.h"
+#include "../libApp/commands/ProcessCmds.h"
 #include "Telescope.h"
 #include "../libApp/weather/Weather.h"
 
@@ -24,7 +24,6 @@
 #include "focuser/Focuser.h"
 #include "auxiliary/Features.h"
 
-bool validKey = true;
 bool xBusy = false;
 InitError initError;
 
@@ -63,14 +62,11 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   strcpy(firmware.date, __DATE__);
   strcpy(firmware.time, __TIME__);
 
-  if (nv.readUL(NV_KEY) != INIT_NV_KEY) {
-    validKey = false;
-
+  if (!nv.isKeyValid(INIT_NV_KEY)) {
     VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes");
-    for (int i = 0; i < (int)nv.size; i++) nv.write(i, (char)0);
+    nv.wipe();
     VLF("MSG: Telescope, Wipe NV waiting for commit");
-    while (!nv.committed()) { nv.poll(false); delay(10); }
-
+    nv.wait();
     VLF("MSG: Telescope, NV reset to defaults");
   } else { VLF("MSG: Telescope, correct NV key found"); }
 
@@ -98,15 +94,14 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     features.init();
   #endif
 
-  if (!validKey) {
-    while (!nv.committed()) nv.poll();
-    nv.write(NV_KEY, (uint32_t)INIT_NV_KEY);
-    while (!nv.committed()) { nv.poll(); delay(10); }
+  if (!nv.isKeyValid()) {
+    nv.writeKey((uint32_t)INIT_NV_KEY);
     nv.ignoreCache(true);
-    uint32_t key = nv.readUL(NV_KEY);
-    if (key != (uint32_t)INIT_NV_KEY) { DLF("ERR: Telescope, NV reset failed to read back key!"); } else { VLF("MSG: Telescope, NV reset complete"); }
+    if (nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: Telescope, NV reset failed to read back key!"); } else { VLF("MSG: Telescope, NV reset complete"); }
     nv.ignoreCache(false);
   }
+
+  if (nv.isReadOnly()) initError.nv = true;
 
   #if RETICLE_LED != OFF && RETICLE_LED_PIN != OFF
     pinMode(RETICLE_LED_PIN, OUTPUT);

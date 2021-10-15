@@ -178,7 +178,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583927926UL
+#define INIT_NV_KEY                 583927925UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..  3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4

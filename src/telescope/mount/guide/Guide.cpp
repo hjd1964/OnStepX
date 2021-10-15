@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/tasks/OnTask.h"
 
 #include "../../Telescope.h"
@@ -20,10 +20,10 @@ inline void guideWrapper() { guide.poll(); }
 
 void Guide::init() {
   // confirm the data structure size
-  if (GuideSettingsSize < sizeof(GuideSettings)) { initError.nv = true; DL("ERR: Guide::init(); GuideSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.readOnly(true); DL("ERR: Guide::init(); GuideSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, guide writing default settings to NV");
     nv.writeBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
   }

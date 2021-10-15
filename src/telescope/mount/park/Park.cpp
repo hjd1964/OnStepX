@@ -14,10 +14,10 @@
 
 void Park::init() {
   // confirm the data structure size
-  if (ParkSettingsSize < sizeof(ParkSettings)) { initError.nv = true; DL("ERR: Park::Init(); ParkSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.readOnly(true); DL("ERR: Park::Init(); ParkSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, park writing default settings to NV");
     nv.writeBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
   }

@@ -1,0 +1,23 @@
+// -----------------------------------------------------------------------------------
+// Web server
+#pragma once
+
+#include "../../../Common.h"
+
+#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI && \
+   (defined(WEB_SERVER) && WEB_SERVER == ON)
+
+  #include "../WifiManager.h"
+
+  #if defined(ESP32)
+    extern WebServer www;
+  #elif defined(ESP8266)
+    extern ESP8266WebServer www;
+  #endif
+
+  // macros to help with sending webpage data, chunked
+  #define sendHtmlStart() www.setContentLength(CONTENT_LENGTH_UNKNOWN); www.sendHeader("Cache-Control","no-cache"); www.send(200, "text/html", String());
+  #define sendHtml(x) www.sendContent(x); x = ""
+  #define sendHtmlDone(x) www.sendContent("");
+
+#endif

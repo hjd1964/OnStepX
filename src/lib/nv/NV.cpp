@@ -167,7 +167,6 @@ bool NonVolatileStorage::busy() {
   return false;
 }
 
-int compare (const void * a, const void * b)
-{
+int compare (const void * a, const void * b) {
   return ( *(int*)a - *(int*)b );
 }

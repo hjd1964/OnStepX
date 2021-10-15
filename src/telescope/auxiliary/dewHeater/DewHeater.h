@@ -18,7 +18,7 @@
 
 class DewHeater {
   public:
-    void init(int index, bool validKey);
+    void init(int index);
 
     void poll(float deltaAboveDewPointC);
 

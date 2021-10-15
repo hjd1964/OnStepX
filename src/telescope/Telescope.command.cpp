@@ -5,7 +5,7 @@
 #include "../lib/tasks/OnTask.h"
 
 #include "../lib/convert/Convert.h"
-#include "../lib/commands/ProcessCmds.h"
+#include "../libApp/commands/ProcessCmds.h"
 #include "../libApp/weather/Weather.h"
 #include "Telescope.h"
 
@@ -82,7 +82,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
 
   //  E - Enter special mode
   if (command[0] == 'E') {
-    // :EC[s]# Echo string [s] on DebugSer.
+    // :EC[s]# Echo string [s] as a debug message
     //            Return: Nothing
     if (command[1] == 'C') {
       // spaces are encoded as '_'
@@ -93,7 +93,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       *numericReply = false;
     } else
 
-    // :ERESET#   Reset the MCU.  OnStep must be at home and tracking turned off for this command to work.
+    // :ERESET#   Reset the MCU
     //            Returns: Nothing
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
       #ifdef HAL_RESET
@@ -102,14 +102,14 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       *numericReply = false;
     } else
 
-    // :ENVRESET# Wipe flash.  OnStep must be at home and tracking turned off for this command to work.
+    // :ENVRESET# Wipe flash
     if (command[1] == 'N' && parameter[0] == 'V' && parameter[1] == 'R' && parameter[2] == 'E' && parameter[3] == 'S' && parameter[4] == 'E' && parameter[5] == 'T' && parameter[6] == 0) {
-      nv.write(NV_KEY, (uint32_t)0);
+      nv.writeKey(0);
       strcpy(reply, "NV memory will be cleared on the next boot.");
       *numericReply = false;
     } else
 
-    // :ESPFLASH# ESP8266 device flash mode.  OnStep must be at home and tracking turned off for this command to work.
+    // :ESPFLASH# ESP8266 device flash mode
     //            Return: 1 on completion (after up to one minute from start of command.)
     #if SERIAL_B_ESP_FLASHING == ON
       if (command[1] == 'S' && parameter[0] == 'P' && parameter[1] == 'F' && parameter[2] == 'L' && parameter[3] == 'A' && parameter[4] == 'S' && parameter[5] == 'H' && parameter[6] == 0) {

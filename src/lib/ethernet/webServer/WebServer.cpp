@@ -4,7 +4,8 @@
 #include "WebServer.h"
 #include "../../tasks/OnTask.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+   (defined(WEB_SERVER) && WEB_SERVER == ON)
   // SD CARD support, simply enable and provide a webserver.on("filename.htm") to serve each file
   #ifndef SD_CARD
     #define SD_CARD OFF
@@ -34,29 +35,7 @@
       #endif
     #endif
 
-    if (!eth_active) {
-      #ifdef W5500_CS_PIN
-        Ethernet.init(W5500_CS_PIN);
-      #endif
-      Ethernet.begin(eth_mac, eth_ip, eth_dns, eth_gw, eth_sn);
-
-      VF("MSG: Ethernet DHCP En = "); VL(eth_dhcp_enabled);
-      VF("MSG: Ethernet IP = "); V(eth_ip[0]); V("."); V(eth_ip[1]); V("."); V(eth_ip[2]); V("."); VL(eth_ip[3]);
-      VF("MSG: Ethernet GW = "); V(eth_gw[0]); V("."); V(eth_gw[1]); V("."); V(eth_gw[2]); V("."); VL(eth_gw[3]);
-      VF("MSG: Ethernet SN = "); V(eth_sn[0]); V("."); V(eth_sn[1]); V("."); V(eth_sn[2]); V("."); VL(eth_sn[3]);
-
-      if (ETH_RESET_PIN != OFF) {
-        VF("MSG: Resetting Ethernet Adapter using ETH_RESET_PIN ("); V(ETH_RESET_PIN); VL(")");
-        pinMode(ETH_RESET_PIN, OUTPUT); 
-        digitalWrite(ETH_RESET_PIN, LOW);
-        delay(1000);
-        digitalWrite(ETH_RESET_PIN, HIGH);
-        delay(1000);
-      }
-
-      VLF("MSG: Ethernet initialized");
-      eth_active = true;
-    }
+    ethernetManager.init();
 
     // start the Ethernet connection and the server:
     setResponseHeader(http_defaultHeader);
@@ -65,10 +44,6 @@
     VLF("MSG: Ethernet started www Server on port 80");
 
     handler_count = 0;
-  }
-
-  void WebServer::restart() {
-    Ethernet.begin(eth_mac, eth_ip, eth_dns, eth_gw, eth_sn);
   }
 
   void WebServer::handleClient() {

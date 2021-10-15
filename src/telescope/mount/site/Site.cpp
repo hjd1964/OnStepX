@@ -57,7 +57,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 void Site::init() {
   // get location
   VLF("MSG: Mount, site get Latitude/Longitude from NV");
-  readLocation(number, validKey);
+  readLocation(number);
   updateLocation();
 
   // get date/time from the RTC/GPS or NV
@@ -71,7 +71,7 @@ void Site::init() {
         VLF("MSG: Mount, site get Date/Time from TLS");
       } else {
         VLF("MSG: Site, falling back to Date/Time from NV");
-        readJD(validKey);
+        readJD();
         #if TIME_LOCATION_SOURCE == GPS
           updateTimeoutTime = millis() + GPS_TIMEOUT_MINUTES*60000UL;
           VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
@@ -81,11 +81,11 @@ void Site::init() {
     } else {
       DLF("WRN: Site::init(); Warning TLS initialization failed");
       VLF("WRN: Site::init(); fallback to last Date/Time from NV");
-      readJD(validKey);
+      readJD();
     }
   #else
     VLF("MSG: Site, get Date/Time from NV");
-    readJD(validKey);
+    readJD();
   #endif
 
   setSiderealTime(ut1);
@@ -215,9 +215,9 @@ double Site::julianDateToGAST(JulianDate julianDate) {
 }
 
 // reads the julian date information from NV
-void Site::readJD(bool validKey) {
-  if (JulianDateSize < sizeof(ut1)) { initError.nv = true; DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  if (!validKey) {
+void Site::readJD() {
+  if (JulianDateSize < sizeof(ut1)) { nv.readOnly(true); DL("ERR: Site::readJD(); JulianDateSize error NV subsystem writes disabled"); }
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, site writing default date/time to NV");
     ut1.day = 2451544.5;
     ut1.hour = 0.0;
@@ -230,9 +230,9 @@ void Site::readJD(bool validKey) {
 
 // reads the location information from NV
 // locationNumber can be 0..3
-void Site::readLocation(uint8_t locationNumber, bool validKey) {
-  if (LocationSize < sizeof(Location)) { initError.nv = true; DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); nv.readOnly(true); }
-  if (!validKey) {
+void Site::readLocation(uint8_t locationNumber) {
+  if (LocationSize < sizeof(Location)) { nv.readOnly(true); DL("ERR: Site::readLocation(); LocationSize error NV subsystem writes disabled"); }
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, site writing default sites 0-3 to NV");
     location.latitude = 0.0;
     location.longitude = 0.0;

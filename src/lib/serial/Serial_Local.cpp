@@ -3,7 +3,7 @@
 
 #include "Serial_Local.h"
 
-#ifdef SERIAL_LOCAL_PRESENT
+#if defined(SERIAL_LOCAL_MODE) && SERIAL_LOCAL_MODE == ON
 
 void SerialLocal::begin(long baud) {
   // init the buffers

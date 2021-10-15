@@ -4,7 +4,7 @@
 
 #include "../../Common.h"
 
-#ifdef SERIAL_MEGA2560_PRESENT
+#if defined(SERIAL_MEGA2560) && SERIAL_MEGA2560 == ON
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 

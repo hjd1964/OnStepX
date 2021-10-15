@@ -7,7 +7,7 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../lib/axis/Axis.h"
-#include "../../lib/commands/ProcessCmds.h"
+#include "../../libApp/commands/ProcessCmds.h"
 #include "../Telescope.h"
 #include "../mount/coordinates/Transform.h"
 

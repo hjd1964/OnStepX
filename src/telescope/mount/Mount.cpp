@@ -24,10 +24,10 @@ inline void mountWrapper() { mount.poll(); }
 
 void Mount::init() {
   // confirm the data structure size
-  if (MountSettingsSize < sizeof(MountSettings)) { initError.nv = true; DL("ERR: Mount::init(); MountSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (MountSettingsSize < sizeof(MountSettings)) { nv.readOnly(true); DL("ERR: Mount::init(); MountSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, writing default settings to NV");
     nv.writeBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
   }

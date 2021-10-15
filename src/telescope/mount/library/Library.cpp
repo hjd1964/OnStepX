@@ -24,7 +24,7 @@ void Library::init() {
   if (recMax == 0) { VLF("WRN: Library::Library(); recMax == 0, no library space available"); return; }
 
   // write the default limits to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, library clearing NV storage area");
     for (uint16_t i = NV_LIBRARY_DATA_BASE; i <= nv.size; i++) nv.write(i, (uint8_t)0);
   }

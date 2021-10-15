@@ -4,7 +4,7 @@
 
 #include "../../Common.h"
 
-#ifdef SERIAL_LOCAL_PRESENT
+#if defined(SERIAL_LOCAL_MODE) && SERIAL_LOCAL_MODE == ON
 
 class SerialLocal : public Stream {
   public:

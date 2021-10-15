@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 #include "../../Telescope.h"
 
 bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
@@ -268,7 +268,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     if ((command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
       number = command[1] - '0';
       nv.update(NV_SITE_NUMBER, number);
-      readLocation(number, true);
+      readLocation(number);
       updateLocation();
       *numericReply = false;
     } else

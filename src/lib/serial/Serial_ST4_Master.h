@@ -5,7 +5,7 @@
 
 #include "../../Common.h"
 
-#ifdef SERIAL_ST4_SERVER_PRESENT
+#if defined(SERIAL_ST4_MASTER) && SERIAL_ST4_MASTER == ON
 
 #define SST4_CLOCK_OUT ST4_DEC_S_PIN
 #define SST4_DATA_OUT  ST4_DEC_N_PIN

@@ -18,7 +18,8 @@ typedef enum CommandError {
 
   CE_ROOF_IN_MOTION,
 
-  CE_NULL} CommandError;
+  CE_NULL
+} CommandError;
 
 class CommandProcessor {
   public:

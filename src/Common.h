@@ -13,30 +13,8 @@
 #include "lib/nv/NV.h"
 extern NVS nv;
 
-#if DEBUG != OFF
-  #define D(x)       SERIAL_DEBUG.print(x)
-  #define DF(x)      SERIAL_DEBUG.print(F(x))
-  #define DL(x)      SERIAL_DEBUG.println(x)
-  #define DLF(x)     SERIAL_DEBUG.println(F(x))
-#else
-  #define D(x)
-  #define DF(x)
-  #define DL(x)
-  #define DLF(x)
-#endif
-
-#if DEBUG == VERBOSE
-  #define V(x)       SERIAL_DEBUG.print(x)
-  #define VF(x)      SERIAL_DEBUG.print(F(x))
-  #define VL(x)      SERIAL_DEBUG.println(x)
-  #define VLF(x)     SERIAL_DEBUG.println(F(x))
-  #define VLCCHK(P)  { VF("Constant? "); VL(__builtin_constant_p(P)); }
-#else
-  #define V(x)
-  #define VF(x)
-  #define VL(x)
-  #define VLF(x)
-#endif
+#define SERIAL_LOCAL_MODE ON
+#define SERIAL_ST4_MASTER ON
 
 #if (AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF) || AXIS3_DRIVER_MODEL != OFF || AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
   #define AXIS_PRESENT

@@ -7,7 +7,6 @@
 #ifdef SD_DRIVER_PRESENT
 
 #include "StepDirDrivers.h"
-#include "../../../commands/ProcessCmds.h"
 #include "../Motor.h"
 
 typedef struct StepDirPins {

@@ -24,10 +24,10 @@
 
   void Pec::init() {
     // confirm the data structure size
-    if (PecSettingsSize < sizeof(PecSettings)) { initError.nv = true; DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+    if (PecSettingsSize < sizeof(PecSettings)) { nv.readOnly(true); DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); }
 
     // write the default settings to NV
-    if (!validKey) {
+    if (!nv.isKeyValid()) {
       VLF("MSG: Mount, PEC writing default settings to NV");
       nv.writeBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
     }

@@ -91,10 +91,10 @@ void Focuser::init() {
   #endif
 
   // confirm the data structure size
-  if (FocuserSettingsSize < sizeof(FocuserSettings)) { initError.nv = true; DL("ERR: Focuser::init(); FocuserSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.readOnly(true); DL("ERR: Focuser::init(); FocuserSettingsSize error NV subsystem writes disabled"); }
 
   // init settings stored in NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     for (int index = 0; index < FOCUSER_MAX; index++) {
       VF("MSG: Focuser"); V(index + 1); VLF(", writing default settings to NV");
       settings[index].tcf.enabled = false;

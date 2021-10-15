@@ -4,9 +4,10 @@
 
 #include "../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON)
 
-  #include "../ethernet/Ethernet.h"
+  #include "../ethernet/EthernetManager.h"
 
   #ifdef ESP8266
     #ifndef ETHERNET_W5500
@@ -55,12 +56,12 @@
       bool resetTimeout = false;
   };
 
-  #if STANDARD_COMMAND_CHANNEL == ON
+  #if defined(STANDARD_COMMAND_CHANNEL) && STANDARD_COMMAND_CHANNEL == ON
     extern IPSerial ipSerial;
     #define SERIAL_IP ipSerial
   #endif
 
-  #if PERSISTENT_COMMAND_CHANNEL == ON
+  #if defined(PERSISTENT_COMMAND_CHANNEL) && PERSISTENT_COMMAND_CHANNEL == ON
     extern IPSerial pipSerial;
     #define SERIAL_PIP pipSerial
   #endif

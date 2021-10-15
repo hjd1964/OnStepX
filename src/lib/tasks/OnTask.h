@@ -285,11 +285,11 @@ class Tasks {
     // get the process name
     char *getNameStr(uint8_t handle);
 
-    // search for tasks, returns 0 if no handles are found
+    // search for tasks, returns 0 if no tasks are found
     uint8_t getFirstHandle();
 
-    // search for tasks, returns 0 if no handles are found
-    uint8_t getNextHandle();
+    // return next task (after task handle) or 0 if no tasks are found
+    uint8_t getNextHandle(uint8_t handle);
 
     // search for task by name, returns 0 if not found
     uint8_t getHandleByName(const char name[]);
@@ -323,7 +323,6 @@ class Tasks {
     uint8_t num_tasks        = 0; // the total number of tasks
     uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255}; // the task# were are servicing at this priority level
     bool    allocated[TASKS_MAX];
-    uint8_t handleSearch     = 255;
     Task    *task[TASKS_MAX];
 };
 

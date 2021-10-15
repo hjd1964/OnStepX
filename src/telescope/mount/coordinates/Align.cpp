@@ -39,7 +39,7 @@ void GeoAlign::init(uint8_t mountType, float latitude) {
 
 void GeoAlign::modelRead() {
   // get misc settings from NV
-  if (AlignModelSize < sizeof(AlignModel)) { initError.nv = true; DL("ERR: GeoAlign::readModel(); AlignModelSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (AlignModelSize < sizeof(AlignModel)) { nv.readOnly(true); DL("ERR: GeoAlign::readModel(); AlignModelSize error NV subsystem writes disabled"); }
   nv.readBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
   if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR, GeoAlign::readModel(): bad NV ax1Cor"); }
   if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR, GeoAlign::readModel(): bad NV ax2Cor"); }
@@ -52,7 +52,7 @@ void GeoAlign::modelRead() {
 }
 
 void GeoAlign::modelWrite() {
-  if (AlignModelSize < sizeof(AlignModel)) { initError.nv = true; DL("ERR: GeoAlign::writeModel(); AlignModelSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (AlignModelSize < sizeof(AlignModel)) { nv.readOnly(true); DL("ERR: GeoAlign::writeModel(); AlignModelSize error NV subsystem writes disabled"); }
   nv.updateBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
 }
 

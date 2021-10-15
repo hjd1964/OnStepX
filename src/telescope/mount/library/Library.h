@@ -7,7 +7,7 @@
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
 #include "../../../lib/convert/Convert.h"
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 
 #if AXIS1_PEC == ON
   #define NV_LIBRARY_DATA_BASE NV_PEC_BUFFER_BASE + PEC_BUFFER_SIZE_LIMIT

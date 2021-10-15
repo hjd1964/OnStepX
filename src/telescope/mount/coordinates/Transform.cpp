@@ -26,7 +26,7 @@ void Transform::init() {
   bool revert = !(nv.readUI(NV_AXIS_SETTINGS_REVERT) & 1);
 
   // write axis settings to NV
-  if (!validKey || revert) {
+  if (!nv.isKeyValid() || revert) {
     nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
   }
   mountType = nv.readUC(NV_MOUNT_TYPE_BASE);

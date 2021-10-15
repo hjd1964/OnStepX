@@ -7,7 +7,7 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../lib/axis/Axis.h"
-#include "../../lib/commands/ProcessCmds.h"
+#include "../../libApp/commands/ProcessCmds.h"
 #include "coordinates/Transform.h"
 
 enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};

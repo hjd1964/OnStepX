@@ -5,8 +5,6 @@
 
 #ifdef AXIS_PRESENT
 
-#include "../commands/ProcessCmds.h"
-
 #include "Axis.h"
 
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {

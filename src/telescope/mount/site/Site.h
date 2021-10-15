@@ -7,7 +7,7 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../lib/convert/Convert.h"
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
 #include "../../../lib/tls/Tls.h"
 
@@ -93,11 +93,11 @@ class Site {
     double julianDateToGAST(JulianDate julianDate);
 
     // reads the julian date information from NV
-    void readJD(bool validKey);
+    void readJD();
 
     // reads the location information from NV
     // locationNumber can be 0..3
-    void readLocation(uint8_t locationNumber, bool validKey);
+    void readLocation(uint8_t locationNumber);
 
     // sets the site altitude in meters
     bool setElevation(float e);

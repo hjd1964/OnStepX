@@ -16,10 +16,10 @@ inline void limitsWrapper() { limits.poll(); }
 
 void Limits::init() {
   // confirm the data structure size
-  if (LimitSettingsSize < sizeof(LimitSettings)) { initError.nv = true; DL("ERR: Limits::init(); LimitSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.readOnly(true); DL("ERR: Limits::init(); LimitSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, limits writing defaults to NV");
     nv.writeBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
   }

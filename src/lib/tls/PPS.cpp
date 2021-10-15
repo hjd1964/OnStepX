@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------------
 // Pulse Per Second precision timer skew
 
-#include "../tasks/OnTask.h"
+#include "PPS.h"
 
 #if defined(TIME_LOCATION_PPS_SENSE) && TIME_LOCATION_PPS_SENSE != OFF
 
-#include "PPS.h"
+#include "../tasks/OnTask.h"
 
 void ppsIsr() {
   unsigned long t = micros();

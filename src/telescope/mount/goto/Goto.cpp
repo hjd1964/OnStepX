@@ -20,10 +20,10 @@ inline void gotoWrapper() { goTo.poll(); }
 
 void Goto::init() {
   // confirm the data structure size
-  if (GotoSettingsSize < sizeof(GotoSettings)) { initError.nv = true; DLF("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); nv.readOnly(true); }
+  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.readOnly(true); DLF("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
-  if (!validKey) {
+  if (!nv.isKeyValid()) {
     VLF("MSG: Mount, goto writing default settings to NV");
     nv.writeBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
   }

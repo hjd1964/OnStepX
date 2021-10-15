@@ -11,7 +11,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../lib/commands/ProcessCmds.h"
+#include "../../../libApp/commands/ProcessCmds.h"
 
 #if defined(ALIGN_MAX_STARS) && ALIGN_MAX_STARS != AUTO
   #if (ALIGN_MAX_STARS < 3 || ALIGN_MAX_STARS > 9) && ALIGN_MAX_STARS != 1
