@@ -27,6 +27,9 @@
   #define SERIAL_B_RXTX_SET
 #endif
 
+#ifdef SERIAL_BT
+  BluetoothSerial bluetoothSerial;
+#endif
 
 SerialWrapper::SerialWrapper() {
   static uint8_t channel = 0;
