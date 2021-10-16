@@ -32,7 +32,7 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
   // check for reverting axis settings in NV
   if (!nv.isKeyValid()) {
-    V(axisPrefix); VLF("writing default settings to NV");
+    V(axisPrefix); VLF("writing defaults to NV");
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
     bitSet(axesToRevert, axisNumber);
     nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);

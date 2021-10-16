@@ -96,7 +96,7 @@ void Focuser::init() {
   // init settings stored in NV
   if (!nv.isKeyValid()) {
     for (int index = 0; index < FOCUSER_MAX; index++) {
-      VF("MSG: Focuser"); V(index + 1); VLF(", writing default settings to NV");
+      VF("MSG: Focuser"); V(index + 1); VLF(", writing defaults to NV");
       settings[index].tcf.enabled = false;
       settings[index].tcf.coef = 0.0F;
       settings[index].tcf.deadband = 1;

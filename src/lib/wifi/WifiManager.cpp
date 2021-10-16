@@ -10,7 +10,7 @@ void WifiManager::init() {
       if (WifiSettingsSize < sizeof(WifiSettings)) { nv.readOnly(true); DL("ERR: WifiManager::init(); WifiSettingsSize error NV subsystem writes disabled"); }
 
       if (!nv.isKeyValid()) {
-        VLF("MSG: WifiManager, writing default settings to NV");
+        VLF("MSG: WifiManager, writing defaults to NV");
         nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
       }
 

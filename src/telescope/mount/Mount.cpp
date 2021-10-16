@@ -28,7 +28,7 @@ void Mount::init() {
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
-    VLF("MSG: Mount, writing default settings to NV");
+    VLF("MSG: Mount, writing defaults to NV");
     nv.writeBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
   }
 

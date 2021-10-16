@@ -24,7 +24,7 @@ void Guide::init() {
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
-    VLF("MSG: Mount, guide writing default settings to NV");
+    VLF("MSG: Mount, guide writing defaults to NV");
     nv.writeBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
   }
 

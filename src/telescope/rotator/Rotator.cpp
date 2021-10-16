@@ -23,7 +23,7 @@ void Rotator::init() {
 
   // get settings stored in NV ready
   if (!nv.isKeyValid()) {
-    VLF("MSG: Rotator, writing default settings to NV");
+    VLF("MSG: Rotator, writing defaults to NV");
     writeSettings();
   }
   readSettings();

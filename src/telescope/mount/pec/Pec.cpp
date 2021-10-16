@@ -28,7 +28,7 @@
 
     // write the default settings to NV
     if (!nv.isKeyValid()) {
-      VLF("MSG: Mount, PEC writing default settings to NV");
+      VLF("MSG: Mount, PEC writing defaults to NV");
       nv.writeBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
     }
 

@@ -18,7 +18,7 @@ void Park::init() {
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
-    VLF("MSG: Mount, park writing default settings to NV");
+    VLF("MSG: Mount, park writing defaults to NV");
     nv.writeBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
   }
 

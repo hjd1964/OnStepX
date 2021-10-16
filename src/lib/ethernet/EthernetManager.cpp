@@ -9,7 +9,7 @@ void EthernetManager::init() {
       if (EthernetSettingsSize < sizeof(EthernetSettings)) { nv.readOnly(true); DL("ERR: EthernetManager::init(); EthernetSettingsSize error NV subsystem writes disabled"); }
 
       if (!nv.isKeyValid()) {
-        VLF("MSG: Mount, writing default settings to NV");
+        VLF("MSG: Mount, writing defaults to NV");
         nv.writeBytes(NV_ETHERNET_SETTINGS_BASE, &settings, sizeof(EthernetSettings));
       }
 

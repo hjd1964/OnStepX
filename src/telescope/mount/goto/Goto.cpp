@@ -24,7 +24,7 @@ void Goto::init() {
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
-    VLF("MSG: Mount, goto writing default settings to NV");
+    VLF("MSG: Mount, goto writing defaults to NV");
     nv.writeBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
   }
 
