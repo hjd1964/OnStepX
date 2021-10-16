@@ -7,6 +7,8 @@
 #if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI && \
     defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
+  #include "../ethernet/WifiManager.h"
+
   #include <WiFi.h>
   #include <WiFiClient.h>
   #include <WiFiAP.h>
