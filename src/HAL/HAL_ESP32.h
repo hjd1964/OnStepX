@@ -34,17 +34,20 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL, optionally also early init of SERIAL_IP/PIP or SERIAL_BT
-
-#include "../lib/serial/Serial_IP_Wifi.h"
-#if defined(SERIAL_IP)
-  #define SERIAL_IP_BEGIN() SERIAL_IP.begin(9999);
-#else
-  #define SERIAL_IP_BEGIN()
-#endif
-#if defined(SERIAL_PIP)
-  #define SERIAL_PIP_BEGIN() SERIAL_PIP.begin(9998);
-#else
-  #define SERIAL_PIP_BEGIN()
+#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI
+  #include "../lib/serial/Serial_IP_Wifi.h"
+  #if defined(SERIAL_IP_MODE) && SERIAL_IP_MODE != OFF
+    #if defined(SERIAL_IP)
+      #define SERIAL_IP_BEGIN() SERIAL_IP.begin(9999);
+    #else
+      #define SERIAL_IP_BEGIN()
+    #endif
+    #if defined(SERIAL_PIP)
+      #define SERIAL_PIP_BEGIN() SERIAL_PIP.begin(9998);
+    #else
+      #define SERIAL_PIP_BEGIN()
+    #endif
+  #endif
 #endif
 
 #if SERIAL_BT_MODE == SLAVE

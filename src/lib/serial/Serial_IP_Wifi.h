@@ -7,11 +7,19 @@
 #if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI && \
     defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
 
-  #include "../ethernet/WifiManager.h"
+  #include "../wifi/WifiManager.h"
 
-  #include <WiFi.h>
-  #include <WiFiClient.h>
-  #include <WiFiAP.h>
+  #if defined(ESP32)
+    #include <WiFi.h>
+    #include <WiFiClient.h>
+    #include <WiFiAP.h>
+  #elif defined(ESP8266)
+    #include <ESP8266WiFi.h>
+    #include <WiFiClient.h>
+    #include <ESP8266WiFiAP.h>
+  #else
+    #error "Configuration (Config.h): No Wifi support is present for this device"
+  #endif
 
   class IPSerial : public Stream {
     public:
