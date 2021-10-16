@@ -4,6 +4,8 @@
 
 #define SERIAL_LOCAL_MODE ON
 #define SERIAL_ST4_MASTER ON
+#define STANDARD_IPSERIAL_CHANNEL ON
+#define PERSISTENT_IPSERIAL_CHANNEL ON
 
 #include <Arduino.h>
 #include "Constants.h"
