@@ -8,13 +8,9 @@ Button::Button(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
   long activeState = (trigger & 0b0000000000000000000001);
-  long threshold   = (trigger & 0b0000000000011111111110) >> 1;
-  long hysteresis  = (trigger & 0b0111111111100000000000) >> 11;
-  bool isAnalog    = threshold != 0;
-
-  if (isAnalog) {
-    VLF("WRN: Button::Button(); Analog sense not supported.");
-  }
+  threshold        = (trigger & 0b0000000000011111111110) >> 1;
+  hysteresis       = (trigger & 0b0111111111100000000000) >> 11;
+  isAnalog         = threshold != 0;
 
   debounceMs = hysteresis;
 
@@ -22,12 +18,15 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
   pinModeEx(pin, initState);
-
 }
 
 void Button::poll() {
   int lastState = state;
-  state = digitalReadEx(pin);
+  if (isAnalog) {
+    int analogValue = analogRead(pin);
+    if (analogValue >= threshold + hysteresis) state = HIGH; else
+    if (analogValue < threshold - hysteresis) state = LOW; else state = lastState;
+  } else state = digitalReadEx(pin);
   if (lastState != state) {
     avgPulseDuration = ((avgPulseDuration*49.0) + (double)(millis() - stableStartMs))/50.0;
     stableStartMs = millis();

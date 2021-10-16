@@ -6,6 +6,11 @@
 
 class Button {
   public:
+    // create object
+    // \param pin        MCU pin
+    // \param initState  initialization state: INPUT, INPUT_PULLUP, or INPUT_PULLDOWN
+    // \param trigger    triggered state: HIGH or LOW, optional
+    //                   analog threshold/hysteresis |THLD(t) |HIST(h) are 10 bit values
     Button(int pin, int initState, int32_t trigger);
 
     // must be repeatedly called to check status of button
@@ -45,9 +50,12 @@ class Button {
     int pin;
     int state = HIGH;
     int lastStableState = HIGH;
+    int threshold;
+    int hysteresis;
     unsigned long debounceMs = 0;
     unsigned long stableStartMs = 0;
     unsigned long stableMs = 0;
+    bool isAnalog = false;
     bool pressed = false;
     bool doublePressed = false;
     double avgPulseDuration = 2000.0;
