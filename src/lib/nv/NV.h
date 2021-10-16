@@ -33,7 +33,7 @@ class NonVolatileStorage {
     // returns true if the NV key was checked and correct
     inline bool isKeyValid() { return keyMatches; }
 
-    // write the key value into addresses 0..4, blocking waits for all commits
+    // write the key value into addresses 0..3, blocking waits for all commits
     void writeKey(uint32_t uniqueKey);
 
     // clear the nv memory

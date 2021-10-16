@@ -43,7 +43,7 @@ bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
   return keyMatches;
 };
 
-// write the key value into addresses 0..4, blocking waits for all commits
+// write the key value into addresses 0..3, blocking waits for all commits
 void NonVolatileStorage::writeKey(uint32_t uniqueKey) {
   wait();
   bool state = readAndWriteThrough;
