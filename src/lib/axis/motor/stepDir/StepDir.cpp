@@ -55,7 +55,6 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
   // driver enabled for possible TMC current calibration
   digitalWriteEx(Pins->enable, Pins->enabledState)
 
-
   // now disable the driver
   power(false);
 
