@@ -52,6 +52,7 @@ Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, vo
   period_units   = PU_MILLIS;
   this->duration = duration;
   this->repeat   = repeat;
+  if (!repeat) immediate = false;
   this->priority = priority;
   this->callback = callback;
   start_time     = millis();
