@@ -63,12 +63,12 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   strcpy(firmware.time, __TIME__);
 
   if (!nv.isKeyValid(INIT_NV_KEY)) {
-    VF("MSG: Telescope, Wipe NV "); V(nv.size); VLF(" Bytes");
+    VF("MSG: NV invalid key reset "); V(nv.size); VLF(" bytes");
     nv.wipe();
-    VLF("MSG: Telescope, Wipe NV waiting for commit");
+    VLF("MSG: NV wipe waiting for commit");
     nv.wait();
-    VLF("MSG: Telescope, NV reset to defaults");
-  } else { VLF("MSG: Telescope, correct NV key found"); }
+    VLF("MSG: NV reset to defaults");
+  } else { VLF("MSG: NV correct key found"); }
 
   gpio.init();
 
@@ -94,11 +94,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     features.init();
   #endif
 
+  // init is done, write the NV key if necessary
   if (!nv.isKeyValid()) {
     nv.writeKey((uint32_t)INIT_NV_KEY);
-    nv.ignoreCache(true);
-    if (nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: Telescope, NV reset failed to read back key!"); } else { VLF("MSG: Telescope, NV reset complete"); }
-    nv.ignoreCache(false);
+    if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV reset failed to read back key!"); } else { VLF("MSG: NV reset complete"); }
   }
 
   if (nv.isReadOnly()) initError.nv = true;

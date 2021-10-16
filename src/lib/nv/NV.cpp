@@ -35,6 +35,23 @@ void NonVolatileStorage::readOnly(bool state) {
   readOnlyMode = state;
 }
 
+bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
+  bool state = readAndWriteThrough;
+  readAndWriteThrough = true;
+  keyMatches = readUL(0) == uniqueKey;
+  readAndWriteThrough = state;
+  return keyMatches;
+};
+
+// write the key value into addresses 0..4, blocking waits for all commits
+void NonVolatileStorage::writeKey(uint32_t uniqueKey) {
+  wait();
+  bool state = readAndWriteThrough;
+  readAndWriteThrough = true;
+  write(0, uniqueKey);
+  readAndWriteThrough = state;
+}
+
 void NonVolatileStorage::poll(bool disableInterrupts) {
   if (cacheSize == 0 || cacheClean) return;
 
