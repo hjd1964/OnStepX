@@ -5,10 +5,6 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413
 
-#include "../../pinmaps/Models.h"
-
-#include "../tasks/OnTask.h"
-
 #include "../1wire/1Wire.h"
 #include <DallasGPIO.h>               // my DallasGPIO library https://github.com/hjd1964/Arduino-DS2413GPIO-Control-Library
 DallasGPIO DS2413GPIO(&oneWire);

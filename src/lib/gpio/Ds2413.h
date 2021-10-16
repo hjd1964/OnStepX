@@ -6,8 +6,6 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413
 
-#include "../Constants.h"
-
 class Ds2413 {
   public:
     // scan for DS2413 devices on the 1-wire bus
