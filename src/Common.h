@@ -2,19 +2,19 @@
 // Common includes
 #pragma once
 
+#define SERIAL_LOCAL_MODE ON
+#define SERIAL_ST4_MASTER ON
+
 #include <Arduino.h>
 #include "Constants.h"
 #include "lib/Constants.h"
-#include "lib/Macros.h"
 #include "Config.common.h"
 #include "HAL/HAL.h"
+#include "lib/Macros.h"
 #include "pinmaps/Models.h"
 #include "lib/debug/Debug.h"
 #include "lib/nv/NV.h"
 extern NVS nv;
-
-#define SERIAL_LOCAL_MODE ON
-#define SERIAL_ST4_MASTER ON
 
 #if (AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL != OFF) || AXIS3_DRIVER_MODEL != OFF || AXIS4_DRIVER_MODEL != OFF || AXIS5_DRIVER_MODEL != OFF || AXIS6_DRIVER_MODEL != OFF || AXIS7_DRIVER_MODEL != OFF || AXIS8_DRIVER_MODEL != OFF || AXIS9_DRIVER_MODEL != OFF
   #define AXIS_PRESENT

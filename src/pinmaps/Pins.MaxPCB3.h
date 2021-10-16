@@ -23,8 +23,6 @@
   #define SERIAL_E_BAUD_DEFAULT 9600
 #endif
 
-#define DAC_AS_DIGITAL                          // turn on support for using DACs to output digital signals using Arduino standard commands
-
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN               19               // Status LED
 #define AUX1_PIN               18               // ESP8266 GPIO0, SPI MISO/Fault

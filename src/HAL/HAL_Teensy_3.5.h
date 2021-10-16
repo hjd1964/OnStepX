@@ -7,6 +7,8 @@
 
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
+// turn on support for using DACs to output digital signals using Arduino standard commands
+#define HAL_DAC_AS_DIGITAL
 
 // 1/500 second sidereal timer
 #define HAL_FRACTIONAL_SEC 500.0
