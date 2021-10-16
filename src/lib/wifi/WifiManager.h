@@ -9,12 +9,10 @@
   #include <WiFi.h>
   #include <WiFiClient.h>
   #include <WiFiAP.h>
-  #include <WebServer.h>
 #elif defined(ESP8266)
   #include <ESP8266WiFi.h>
   #include <WiFiClient.h>
   #include <ESP8266WiFiAP.h>
-  #include <ESP8266WebServer.h>
 #else
   #error "Configuration (Config.h): No Wifi support is present for this device"
 #endif
