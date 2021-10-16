@@ -21,7 +21,7 @@ means "no data" and is ignored on both sides.  Mega2560 hardware runs at (fastes
 all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
 */
 
-#include "..\..\Common.h"
+#include "../../Common.h"
 
 #if defined(SERIAL_ST4_SLAVE) && SERIAL_ST4_SLAVE == ON
 
