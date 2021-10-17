@@ -49,6 +49,9 @@
 #ifndef SERIAL_IP_MODE
 #define SERIAL_IP_MODE                 OFF //         OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
 #endif
+#if SERIAL_IP_MODE != OFF && defined(ESP32)
+#define OPERATIONAL_MODE WIFI
+#endif
 
 #ifndef STANDARD_COMMAND_CHANNEL
 #define STANDARD_COMMAND_CHANNEL       ON //          ON, Wifi command channel for simultanious connections on port 9999.

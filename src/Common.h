@@ -6,7 +6,6 @@
 #define SERIAL_ST4_MASTER ON
 #define STANDARD_IPSERIAL_CHANNEL ON
 #define PERSISTENT_IPSERIAL_CHANNEL ON
-#define OPERATIONAL_MODE WIFI
 
 #include <Arduino.h>
 #include "Constants.h"
