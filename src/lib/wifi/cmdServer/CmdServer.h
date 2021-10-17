@@ -19,7 +19,8 @@
       WiFiServer *cmdSvr;
       WiFiClient cmdSvrClient;
 
-      long clientTimeoutMs;
+      unsigned long clientTimeoutMs;
+      unsigned long clientEndTimeMs = 0;
       bool persist;
       long port;
   };

@@ -115,10 +115,10 @@ void SerialWrapper::begin(long baud) {
     //if (isChannel(channel++)) SERIAL_BT.begin(SERIAL_BT_NAME); // started early in .ino file
   #endif
   #ifdef SERIAL_IP
-    if (isChannel(channel++)) SERIAL_IP.begin(9999);
+    if (isChannel(channel++)) SERIAL_IP.begin(9999, 2L*1000L);
   #endif
   #ifdef SERIAL_PIP
-    if (isChannel(channel++)) SERIAL_PIP.begin(9999);
+    if (isChannel(channel++)) SERIAL_PIP.begin(9998, 120L*1000L, true);
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) SERIAL_LOCAL.begin(baud);

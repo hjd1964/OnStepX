@@ -20,8 +20,7 @@
 
   class IPSerial : public Stream {
     public:
-      inline void begin() { begin(9999); }
-      void begin(long port);
+      void begin(long port, unsigned long clientTimeoutMs, bool persist = false);
 
       void restart();
 
@@ -51,9 +50,10 @@
       EthernetClient cmdSvrClient;
 
       int port = -1;
-      unsigned long timeout = 60000;
-      unsigned long clientTimeout = 0;
-      bool resetTimeout = false;
+      unsigned long clientTimeoutMs;
+      unsigned long clientEndTimeMs = 0;
+      bool active = false;
+      bool persist = false;
   };
 
   #if defined(STANDARD_COMMAND_CHANNEL) && STANDARD_COMMAND_CHANNEL == ON

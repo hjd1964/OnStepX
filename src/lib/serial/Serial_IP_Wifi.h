@@ -23,8 +23,7 @@
 
   class IPSerial : public Stream {
     public:
-      inline void begin() { begin(9999); }
-      void begin(long port);
+      void begin(long port, unsigned long clientTimeoutMs, bool persist = false);
       
       void end();
 
@@ -52,9 +51,10 @@
       WiFiClient cmdSvrClient;
 
       int port = -1;
-      unsigned long timeout = 60000;
-      unsigned long clientTimeout = 0;
-      bool resetTimeout = false;
+      unsigned long clientTimeoutMs;
+      unsigned long clientEndTimeMs = 0;
+      bool active = false;
+      bool persist = false;
 
       bool accessPointEnabled = SERIAL_IP_MODE == ACCESS_POINT;
       bool stationEnabled     = SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == STATION_DHCP;

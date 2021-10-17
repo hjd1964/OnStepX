@@ -46,6 +46,7 @@
 // default provision is for 8 tasks, up to 255 are allowed, to change use:
 // #define TASKS_MAX 200 (for example)
 #ifndef TASKS_MAX
+@#%#%@
   #define TASKS_MAX 8
 #endif
 

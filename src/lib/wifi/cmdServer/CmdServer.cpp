@@ -22,15 +22,14 @@
 
   void CmdServer::handleClient() {
     // disconnect client
-    static unsigned long clientTime = 0;
     if (cmdSvrClient && !cmdSvrClient.connected()) cmdSvrClient.stop();
-    if (cmdSvrClient && (long)(clientTime - millis()) < 0) cmdSvrClient.stop();
+    if (cmdSvrClient && (long)(clientEndTimeMs - millis()) < 0) cmdSvrClient.stop();
 
     // new client
     if (!cmdSvrClient && cmdSvr->hasClient()) {
       // find free/disconnected spot
       cmdSvrClient = cmdSvr->available();
-      clientTime = millis() + (unsigned long)clientTimeoutMs;
+      clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
     }
 
     // check clients for data, if found get the command, pass to OnStep and pickup the response, then return the response to client
@@ -39,7 +38,7 @@
       static int cmdBufferPos = 0;
 
       // still active? push back disconnect
-      if (persist) clientTime = millis() + (unsigned long)clientTimeoutMs;
+      if (persist) clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
 
       // get the data
       byte b = cmdSvrClient.read();

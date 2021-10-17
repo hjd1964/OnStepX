@@ -58,7 +58,7 @@
 #endif
 
 #ifndef PASSWORD_DEFAULT
-#define PASSWORD_DEFAULT ""               // not used, default pwd for Wifi settings
+#define PASSWORD_DEFAULT       "password" // not used, default pwd for Wifi settings
 #endif
 #ifndef AP_ENABLED
 #define AP_ENABLED                   true //        true, to enable the soft AP

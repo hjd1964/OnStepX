@@ -19,7 +19,8 @@
       EthernetServer *cmdSvr;
       EthernetClient cmdSvrClient;
 
-      long clientTimeoutMs;
+      unsigned long clientTimeoutMs;
+      unsigned long clientEndTimeMs = 0;
       bool persist;
   };
 

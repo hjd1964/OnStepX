@@ -5,7 +5,11 @@
 
 #if defined(ESP8266) || defined(ESP32)
 
-  #include "../tasks/OnTask.h"
+  // from the NV library
+  #if defined(ESP32)
+    extern void timerAlarmsDisable();
+    extern void timerAlarmsEnable();
+  #endif
 
   bool NonVolatileStorageESP::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
     if (size > 4096 || wait == false) return false;

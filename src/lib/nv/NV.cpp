@@ -45,11 +45,8 @@ bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
 
 // write the key value into addresses 0..3, blocking waits for all commits
 void NonVolatileStorage::writeKey(uint32_t uniqueKey) {
-  wait();
-  bool state = readAndWriteThrough;
-  readAndWriteThrough = true;
   write(0, uniqueKey);
-  readAndWriteThrough = state;
+  wait();
 }
 
 void NonVolatileStorage::poll(bool disableInterrupts) {

@@ -9,9 +9,8 @@
   bool port9999Assigned = false;
   bool port9998Assigned = false;
 
-  void IPSerial::begin(long port) {
-    if (port == 9999) { if (port9999Assigned) return; else port9999Assigned = true; } else
-    if (port == 9998) { if (port9998Assigned) return; else port9998Assigned = true; } else return;
+  void IPSerial::begin(long port, unsigned long clientTimeoutMs, bool persist) {
+    if (active) return;
 
     this->port = port;
 
@@ -21,11 +20,9 @@
     cmdSvr->begin();
     VF("MSG: Ethernet started IP commandServer on port "); VL(port);
 
-    // setup for persistent channel
-    if (port < 9999) {
-      timeout = 120000UL;
-      resetTimeout = true;
-    }
+    this->clientTimeoutMs = clientTimeoutMs;
+    this->persist = persist;
+    active = true;
 
     delay(1000);
   }
@@ -52,7 +49,7 @@
         #if DEBUG_CMDSERVER == ON
           VLF("MSG: available(), NEW cmdSvrClient.");
         #endif
-        clientTimeout = millis() + timeout;
+        clientEndTimeMs = millis() + clientTimeoutMs;
         cmdSvrClient.setTimeout(1000);
       }
     } else {
@@ -63,7 +60,7 @@
         cmdSvrClient.stop();
         return 0;
       }
-      if ((long)(clientTimeout - millis()) < 0) {
+      if ((long)(clientEndTimeMs - millis()) < 0) {
         #if DEBUG_CMDSERVER == ON
           VLF("MSG: available(), timed out STOP cmdSvrClient.");
         #endif
@@ -93,7 +90,7 @@
 
   int IPSerial::read(void) {
     if (!ethernetManager.active || !cmdSvrClient) return -1;
-    if (resetTimeout) clientTimeout = millis() + timeout;
+    if (persist) clientEndTimeMs = millis() + clientTimeoutMs;
     int c = cmdSvrClient.read();
     #if DEBUG_CMDSERVER == ON
       VF("MSG: read(), found: "); VL((char)c);
