@@ -10,12 +10,18 @@ Button::Button(int pin, int initState, int32_t trigger) {
   long activeState = (trigger & 0b0000000000000000000001);
   threshold        = (trigger & 0b0000000000011111111110) >> 1;
   hysteresis       = (trigger & 0b0111111111100000000000) >> 11;
-  isAnalog         = threshold != 0;
 
-  debounceMs = hysteresis;
+  isAnalog = threshold != 0;
+  if (isAnalog) debounceMs = 30; else debounceMs = hysteresis;
 
   if (activeState == LOW) { UP = HIGH; DOWN = LOW; } else
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
+
+  VF("MSG: Button, ");
+  V("PIN="); V(pin); V(", ");
+  V("ON="); V(activeState); V(", ");
+  V("THS="); V(threshold); V(", ");
+  V("HYS="); VL(hysteresis);
 
   pinModeEx(pin, initState);
 }
@@ -24,8 +30,15 @@ void Button::poll() {
   int lastState = state;
   if (isAnalog) {
     int analogValue = analogRead(pin);
-    if (analogValue >= threshold + hysteresis) state = HIGH; else
-    if (analogValue < threshold - hysteresis) state = LOW; else state = lastState;
+
+    if (DOWN == HIGH) {
+      if (analogValue >= threshold + hysteresis) state = HIGH; else state = LOW;
+    }
+
+    if (DOWN == LOW) {
+      if (analogValue < threshold - hysteresis) state = LOW; else state = HIGH;
+    }
+
   } else state = digitalReadEx(pin);
   if (lastState != state) {
     avgPulseDuration = ((avgPulseDuration*49.0) + (double)(millis() - stableStartMs))/50.0;
