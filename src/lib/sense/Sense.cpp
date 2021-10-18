@@ -24,6 +24,12 @@ SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
     }
   }
 
+  VF("MSG: Sense, ");
+  V("pin="); V(pin); V(", ");
+  V("active="); V(activeState ? "HIGH" : "LOW"); V(", ");
+  V("ths="); V(threshold); V(", ");
+  V("hys="); VL(hysteresis);
+
   pinModeEx(pin, initState);
 
   reset();
