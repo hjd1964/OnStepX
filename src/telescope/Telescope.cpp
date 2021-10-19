@@ -30,7 +30,7 @@ InitError initError;
 // help for analogWrite() range conversions
 const int AnalogRange = powf(2, HAL_ANALOG_WRITE_BITS) - 1.0F;
 
-#if LED_STATUS != OFF && STATUS_LED_PIN != OFF
+#if STATUS_LED != OFF && STATUS_LED_PIN != OFF
   void statusFlash() {
     static uint8_t cycle = 0;
     if (cycle++ > 16) cycle = 0;
@@ -108,7 +108,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   #endif
 
   // bring up status LED and flash error codes
-  #if LED_STATUS != OFF && STATUS_LED_PIN != OFF
+  #if STATUS_LED != OFF && STATUS_LED_PIN != OFF
     int pin = STATUS_LED_PIN;
     pinModeEx(pin, OUTPUT);
     VF("MSG: Telescope, start status LED task (rate 500ms priority 4)... ");

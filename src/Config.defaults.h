@@ -191,8 +191,8 @@
 #endif
 
 // user feedback
-#ifndef LED_STATUS
-#define LED_STATUS                    ON
+#ifndef STATUS_LED
+#define STATUS_LED                    ON
 #endif
 #ifndef STATUS_LED_ON_STATE
 #define STATUS_LED_ON_STATE           LOW

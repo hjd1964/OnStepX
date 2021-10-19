@@ -23,7 +23,7 @@
 #endif
 
 void Status::init() {
-  #if LED_STATUS == ON
+  #if STATUS_LED == ON
     // if anything else is using the status LED, disable it
     if ((STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) || 
         (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN)) tasks.remove(tasks.getHandleByName("StaLed"));

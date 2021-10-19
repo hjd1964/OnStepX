@@ -41,7 +41,7 @@
 #define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_VCC_PIN       8               // LED
+#define STATUS_LED_VCC_PIN       8               // LED
 #define STATUS_LED_PIN           9               // GND
 #define STATUS_MOUNT_LED_PIN     10              // PGND
 #define RETICLE_LED_PIN          44              // PGND
@@ -148,7 +148,7 @@
 #define SENSE_LIMIT_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define LED_STATUS_VCC_PIN       8               // LED Annode
+#define STATUS_LED_VCC_PIN       8               // LED Annode
 #define STATUS_LED_PIN           9               // Default LED Cathode (-)
 #define STATUS_MOUNT_LED_PIN     7               // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN   7               // Default LED Cathode (-)
