@@ -492,7 +492,7 @@ uint8_t Tasks::getNextHandle(uint8_t handle) {
     if (allocated[handle]) {
       return handle + 1;
     }
-  } while (handle < highest_task);
+  } while (++handle < highest_task);
   return false;
 }
 
