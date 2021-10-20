@@ -4,8 +4,12 @@
 
 #include "../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-    defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON)
+#ifndef SERIAL_IP_MODE
+#define SERIAL_IP_MODE OFF
+#endif
+
+#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON) && !defined(SERIAL_IP_CLIENT) && \
+    (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
 
   #include "../ethernet/EthernetManager.h"
 
@@ -20,7 +24,7 @@
 
   class IPSerial : public Stream {
     public:
-      void begin(long port, unsigned long clientTimeoutMs, bool persist = false);
+      void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
 
       void restart();
 
@@ -56,12 +60,12 @@
       bool persist = false;
   };
 
-  #if defined(STANDARD_COMMAND_CHANNEL) && STANDARD_COMMAND_CHANNEL == ON
+  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
     extern IPSerial ipSerial;
     #define SERIAL_IP ipSerial
   #endif
 
-  #if defined(PERSISTENT_COMMAND_CHANNEL) && PERSISTENT_COMMAND_CHANNEL == ON
+  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
     extern IPSerial pipSerial;
     #define SERIAL_PIP pipSerial
   #endif

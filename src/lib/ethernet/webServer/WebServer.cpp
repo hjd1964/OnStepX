@@ -4,8 +4,8 @@
 #include "WebServer.h"
 #include "../../tasks/OnTask.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-   (defined(WEB_SERVER) && WEB_SERVER == ON)
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && WEB_SERVER == ON
+
   // SD CARD support, simply enable and provide a webserver.on("filename.htm") to serve each file
   #ifndef SD_CARD
     #define SD_CARD OFF
@@ -19,7 +19,7 @@
 
   const char http_defaultHeader[] PROGMEM = "HTTP/1.1 200 OK\r\n" "Content-Type: text/html\r\n" "Connection: close\r\n" "\r\n";
 
-  void WebServer::init() {
+  void WebServer::begin() {
     #if defined(SDCARD_CS_PIN)
       #if SD_CARD == ON
         #if TEENSYDUINO
@@ -42,8 +42,6 @@
 
     webServer.begin();
     VLF("MSG: Ethernet started www Server on port 80");
-
-    handler_count = 0;
   }
 
   void WebServer::handleClient() {

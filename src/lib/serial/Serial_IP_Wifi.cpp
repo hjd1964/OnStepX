@@ -3,11 +3,15 @@
 
 #include "Serial_IP_Wifi.h"
 
-#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI && \
-    defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT)
+#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && !defined(SERIAL_IP_CLIENT) && \
+    OPERATIONAL_MODE == WIFI
 
   void IPSerial::begin(long port, unsigned long clientTimeoutMs, bool persist) {
     if (active) return;
+
+    // special case where the port is the most common baud rate
+    // so a standard call to begin(baud_rate) can still work
+    if ((port < 9000 || port >= 10000 || port == 9600) && clientTimeoutMs == 2000 && persist == false) port = 9999;
 
     this->port = port;
 
@@ -104,11 +108,11 @@
     return cmdSvrClient.write(data, count);
   }
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_COMMAND_CHANNEL == ON
+  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
     IPSerial ipSerial;
   #endif
 
-  #if defined(PERSISTENT_COMMAND_CHANNEL) && PERSISTENT_COMMAND_CHANNEL == ON
+  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
     IPSerial pipSerial;
   #endif
 

@@ -1,7 +1,7 @@
 // wifi manager, used by the webserver and wifi serial IP
 #include "WifiManager.h"
 
-#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI
+#if OPERATIONAL_MODE == WIFI
 
 void WifiManager::init() {
   if (!active) {

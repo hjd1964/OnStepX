@@ -1,9 +1,9 @@
 // ethernet IP command server
 #include "CmdServer.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-  ((defined(STANDARD_COMMAND_CHANNEL) && STANDARD_COMMAND_CHANNEL == ON) || \
-   (defined(PERSISTENT_COMMAND_CHANNEL) && PERSISTENT_COMMAND_CHANNEL == ON)) && !defined(SERIAL_IP_MODE)
+#if !defined(SERIAL_IP_MODE) && \
+    (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    (STANDARD_COMMAND_CHANNEL == ON || PERSISTENT_COMMAND_CHANNEL == ON)
 
   #include "../../tasks/OnTask.h"
   #include "../../../libApp/cmd/Cmd.h"

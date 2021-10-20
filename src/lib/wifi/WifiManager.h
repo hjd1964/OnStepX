@@ -3,7 +3,13 @@
 
 #include "../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI
+#ifndef OPERATIONAL_MODE
+#define OPERATIONAL_MODE OFF
+#endif
+
+#if OPERATIONAL_MODE == WIFI
+
+#include "WifiManager.defaults.h"
 
 #if defined(ESP32)
   #include <WiFi.h>
@@ -18,7 +24,7 @@
 #endif
 
 #pragma pack(1)
-#define WifiSettingsSize 252
+#define WifiSettingsSize 236
 typedef struct WifiSettings {
   char masterPassword[40];
 
@@ -28,6 +34,9 @@ typedef struct WifiSettings {
 
   char sta_ssid[40];
   char sta_pwd[40];
+
+  uint8_t target1_ip[4];
+  uint8_t target2_ip[4];
 
   uint8_t sta_ip[4];
   uint8_t sta_gw[4];
@@ -52,6 +61,8 @@ class WifiManager {
       PASSWORD_DEFAULT,
       AP_ENABLED, STA_ENABLED, STA_DHCP_ENABLED,
       STA_SSID, STA_PASSWORD,
+      TARGET_IP_ADDR1,
+      TARGET_IP_ADDR2,
       STA_IP_ADDR, STA_GW_ADDR, STA_SN_MASK,
       AP_SSID, AP_PASSWORD, AP_CHANNEL,
       AP_IP_ADDR, AP_GW_ADDR, AP_SN_MASK

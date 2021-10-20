@@ -1,5 +1,8 @@
 // -----------------------------------------------------------------------------------
-// Polling serial IP for ESP32
+// IP communication routines
+
+// original work by jesco-t
+
 #pragma once
 
 #include "../../Common.h"
@@ -8,7 +11,7 @@
 #define SERIAL_IP_MODE OFF
 #endif
 
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && !defined(SERIAL_IP_CLIENT) && \
+#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && defined(SERIAL_IP_CLIENT) && \
     OPERATIONAL_MODE == WIFI
 
   #include "../wifi/WifiManager.h"
@@ -25,40 +28,35 @@
     #error "Configuration (Config.h): No Wifi support is present for this device"
   #endif
 
+
   class IPSerial : public Stream {
     public:
       void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
-      
       void end();
+      void paused(bool state);
+      bool isConnected();
 
-      int read(void);
-
-      int available(void);
-
-      int peek(void);
-
-      void flush(void);
-
-      size_t write(uint8_t data);
-
-      size_t write(const uint8_t* data, size_t count);
+      virtual size_t write(uint8_t);
+      virtual size_t write(const uint8_t *, size_t);
+      virtual int available(void);
+      virtual int read(void);
+      virtual int peek(void);
+      virtual void flush(void);
 
       inline size_t write(unsigned long n) { return write((uint8_t)n); }
       inline size_t write(long n) { return write((uint8_t)n); }
       inline size_t write(unsigned int n) { return write((uint8_t)n); }
       inline size_t write(int n) { return write((uint8_t)n); }
-
+      virtual int availableForWrite() { return 1; }
       using Print::write;
 
     private:
-      WiFiServer *cmdSvr;
       WiFiClient cmdSvrClient;
-
-      int port = -1;
-      unsigned long clientTimeoutMs;
-      unsigned long clientEndTimeMs = 0;
+  
       bool active = false;
       bool persist = false;
+      int port = -1;
+      unsigned long clientTimeoutMs;
   };
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON

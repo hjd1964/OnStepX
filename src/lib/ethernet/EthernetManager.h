@@ -3,7 +3,13 @@
 
 #include "../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+#ifndef OPERATIONAL_MODE
+#define OPERATIONAL_MODE OFF
+#endif
+
+#if OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500
+
+#include "EthernetManager.defaults.h"
 
 #ifdef ESP8266
   #ifndef ETHERNET_W5500
@@ -15,11 +21,12 @@
 #endif
 
 #pragma pack(1)
-#define EthernetSettingsSize 40
+#define EthernetSettingsSize 95
 typedef struct EthernetSettings {
+  char masterPassword[40];
   unsigned char mac[6];
   bool dhcp_enabled;
-  IPAddress ip, dns, gw, sn;
+  IPAddress target1_ip, target2_ip, ip, dns, gw, sn;
 } EthernetSettings;
 #pragma pack()
 
@@ -29,7 +36,13 @@ class EthernetManager {
     void restart();
     void writeSettings();
 
-    EthernetSettings settings = {MAC, STA_DHCP_ENABLED, STA_IP_ADDR, STA_GW_ADDR, STA_GW_ADDR, STA_SN_MASK};
+    EthernetSettings settings = {
+      PASSWORD_DEFAULT,
+      MAC,
+      STA_DHCP_ENABLED,
+      TARGET_IP_ADDR1, TARGET_IP_ADDR2,
+      STA_IP_ADDR, STA_GW_ADDR, STA_GW_ADDR, STA_SN_MASK
+    };
 
     bool active = false;
   private:

@@ -4,8 +4,7 @@
 
 #include "../../../Common.h"
 
-#if defined(OPERATIONAL_MODE) && OPERATIONAL_MODE == WIFI && \
-   (defined(WEB_SERVER) && WEB_SERVER == ON)
+#if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
 
   #include "../WifiManager.h"
 

@@ -1,7 +1,7 @@
 // global ethernet variables
 #include "Ethernet.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+#if OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500
 
   // flag that ethernet initialization has been completed
   bool eth_active = false;

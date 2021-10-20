@@ -3,14 +3,18 @@
 
 #include "Serial_IP_Ethernet.h"
 
-#if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-    defined(SERIAL_IP_MODE) && (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON)
+#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON) && !defined(SERIAL_IP_CLIENT) && \
+    (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
 
   bool port9999Assigned = false;
   bool port9998Assigned = false;
 
   void IPSerial::begin(long port, unsigned long clientTimeoutMs, bool persist) {
     if (active) return;
+
+    // special case where the port is the most common baud rate
+    // so a standard call to begin(baud_rate) can still work
+    if ((port < 9000 || port >= 10000 || port == 9600) && clientTimeoutMs == 2000 && persist == false) port = 9999;
 
     this->port = port;
 
