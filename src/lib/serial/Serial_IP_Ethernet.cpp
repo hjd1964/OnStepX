@@ -111,4 +111,13 @@
     if (!ethernetManager.active || !cmdSvrClient) return 0;
     return cmdSvrClient.write(data, count);
   }
+
+  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
+    IPSerial SerialIP;
+  #endif
+
+  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+    IPSerial SerialPIP1;
+  #endif
+
 #endif

@@ -59,4 +59,15 @@
       bool active = false;
       bool persist = false;
   };
+
+  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
+    extern IPSerial ipSerial;
+    #define SERIAL_IP SerialIP
+  #endif
+
+  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+    extern IPSerial SerialPIP1;
+    #define SERIAL_PIP1 SerialPIP1
+  #endif
+
 #endif
