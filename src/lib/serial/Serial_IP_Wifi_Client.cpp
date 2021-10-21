@@ -13,7 +13,7 @@
 
     // special case where the port is the most common baud rate
     // so a standard call to begin(baud_rate) can still work
-    if ((port < 9000 || port >= 10000 || port == 9600) && clientTimeoutMs == 2000 && persist == false) port = 9999;
+    if ((port < 9000 || port >= 10000 || port == 9600) && clientTimeoutMs == 2000 && persist == false) port = 9998;
 
     this->port = port;
 
@@ -21,76 +21,78 @@
 
     this->clientTimeoutMs = clientTimeoutMs;
     this->persist = persist;
-    IPAddress onStep = IPAddress(wifiManager.settings.target1_ip);
+    onStep = IPAddress(wifiManager.settings.target1_ip);
 
-    VF("MSG: IPSerial, Target = "); VL(onStep.toString());
+    VF("MSG: WiFi waiting for connection");
+    while (WiFi.status() != WL_CONNECTED) { delay(500); V("."); }
+    VL("");
 
     delay(1000);
     if (cmdSvrClient.connect(onStep, port)) {
+      VF("MSG: WiFi started client to "); V(onStep.toString()); V(":"); VL(port);
       active = true;
-      VL("WRN: IPSerial, connection to target failed"); 
-    }
+    } else VL("WRN: WiFi connection to target failed"); 
   }
 
   void IPSerial::end() {
     cmdSvrClient.stop();
-    VL("MSG: IPSerial, connection closed.");
+    VL("MSG: IPSerial, connection closed");
     WiFi.disconnect();
-    VL("MSG: IPSerial, disconnected.");
+    VL("MSG: IPSerial, disconnected");
   }
 
-  void IPSerial::paused(bool state){
-    // dummy, not needed for WiFi implementation
-  }
-
-  bool IPSerial::isConnected(){
-    return WiFi.status() == WL_CONNECTED; 
+  bool IPSerial::isConnected() {
+    if (WiFi.status() == WL_CONNECTED) {
+      if (!cmdSvrClient.connected()) {
+        if (cmdSvrClient.connect(onStep, port)) {
+          VLF("MSG: WiFi restarted client");
+          return true;
+        } else {
+          VLF("WRN: WiFi connection to target failed");
+          return false;
+        }
+      } else return true;
+    } else return false;
   }
 
   size_t IPSerial::write(uint8_t data) {
-    if (cmdSvrClient.connected()) {
-      D("LX200 command: "); DL((const char)data);
-      cmdSvrClient.println((const char)data);
-    } 
+    if (!active || !isConnected()) return 0;
 
-    return 1; 
+    return cmdSvrClient.write(data);
   }
 
   size_t IPSerial::write(const uint8_t *data, size_t quantity) {
-    if (cmdSvrClient.connected()) {
-      D("LX200 command: "); DL((const char*)data);
-      cmdSvrClient.println((const char*)data);
-    } 
-    return 1;
+    if (!active || !isConnected()) return 0;
+
+    return cmdSvrClient.write(data, quantity);
   }
 
   int IPSerial::available(void) {
-    int a = cmdSvrClient.available();
-    return a;
+    if (!active || !isConnected()) return 0;
+
+    return cmdSvrClient.available();
   }
 
   int IPSerial::read(void) {
-    int c = cmdSvrClient.read();
-    //D("OnStep response: "); DL(c);
-    if (c == 0) c = -1;
-    return c;
+    if (!active || !isConnected()) return -1;
+
+    return cmdSvrClient.read();
   }
 
   int IPSerial::peek(void) {
-    // dummy, not needed for WiFi implementation
-    return 1;
+    if (!active || !isConnected()) return -1;
+
+    return cmdSvrClient.peek();
   }
 
   void IPSerial::flush(void) {
-    // dummy, not needed for WiFi implementation
+    if (!active || !isConnected()) return;
+
+    return cmdSvrClient.flush();
   }
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
     IPSerial ipSerial;
-  #endif
-
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
-    IPSerial pipSerial;
   #endif
 
 #endif

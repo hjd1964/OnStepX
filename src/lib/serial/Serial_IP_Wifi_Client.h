@@ -33,7 +33,6 @@
     public:
       void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
       void end();
-      void paused(bool state);
       bool isConnected();
 
       virtual size_t write(uint8_t);
@@ -52,7 +51,8 @@
 
     private:
       WiFiClient cmdSvrClient;
-  
+      IPAddress onStep;
+
       bool active = false;
       bool persist = false;
       int port = -1;
@@ -64,8 +64,4 @@
     #define SERIAL_IP ipSerial
   #endif
 
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
-    extern IPSerial pipSerial;
-    #define SERIAL_PIP pipSerial
-  #endif
 #endif
