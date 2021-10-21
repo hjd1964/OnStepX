@@ -109,11 +109,14 @@
   }
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    IPSerial ipSerial;
+    IPSerial SerialIP;
+    #define SERIAL_IP SerialIP
   #endif
 
   #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
-    IPSerial pipSerial;
+    IPSerial SerialPIP1;
+    IPSerial SerialPIP2;
+    IPSerial SerialPIP3;
   #endif
 
 #endif

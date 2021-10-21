@@ -60,8 +60,8 @@
   };
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    extern IPSerial ipSerial;
-    #define SERIAL_IP ipSerial
+    extern IPSerial SerialIP;
+    #define SERIAL_IP SerialIP
   #endif
 
 #endif

@@ -92,7 +92,7 @@
   }
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    IPSerial ipSerial;
+    IPSerial SerialIP;
   #endif
 
 #endif

@@ -34,17 +34,6 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL, optionally also early init of SERIAL_IP/PIP or SERIAL_BT
-#include "../lib/serial/Serial_IP_Wifi.h"
-#if defined(SERIAL_IP)
-  #define SERIAL_IP_BEGIN() SERIAL_IP.begin(9999, 2L*1000L);
-#else
-  #define SERIAL_IP_BEGIN()
-#endif
-#if defined(SERIAL_PIP)
-  #define SERIAL_PIP_BEGIN() SERIAL_PIP.begin(9998, 120L*1000L, true);
-#else
-  #define SERIAL_PIP_BEGIN()
-#endif
 
 #if SERIAL_BT_MODE == SLAVE
   #include <BluetoothSerial.h>
@@ -64,8 +53,6 @@
 #define HAL_INIT() { \
   analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
   nv.init(E2END + 1, false, 5000, false); \
-  SERIAL_IP_BEGIN(); \
-  SERIAL_PIP_BEGIN(); \
   SERIAL_BT_BEGIN(); \
 }
 

@@ -4,6 +4,16 @@
 
 #include "../../Common.h"
 
+#include "../serial/Serial_IP_Wifi.h"
+#include "../serial/Serial_IP_Ethernet.h"
+
+#ifdef MOUNT_PRESENT
+  #if ST4_INTERFACE == ON && ST4_HAND_CONTROL == ON
+    #include "../serial/Serial_ST4_Master.h"
+  #endif
+  #include "../serial/Serial_Local.h"
+#endif
+
 static uint8_t _wrapper_channels = 0;
 
 #define isChannel(x) (x == thisChannel)

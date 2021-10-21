@@ -62,12 +62,17 @@
   };
 
   #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    extern IPSerial ipSerial;
-    #define SERIAL_IP ipSerial
+    extern IPSerial SerialIP;
+    #define SERIAL_IP SerialIP
   #endif
 
   #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
-    extern IPSerial pipSerial;
-    #define SERIAL_PIP pipSerial
+    extern IPSerial SerialPIP1;
+    extern IPSerial SerialPIP2;
+    extern IPSerial SerialPIP3;
+    #define SERIAL_PIP1 SerialPIP1
+    #define SERIAL_PIP2 SerialPIP2
+    #define SERIAL_PIP3 SerialPIP3
   #endif
+
 #endif
