@@ -221,7 +221,7 @@
 #ifndef STATUS_BUZZER_DEFAULT
 #define STATUS_BUZZER_DEFAULT         OFF
 #endif
-#ifndef BUZZER_MEMORY
+#ifndef STATUS_BUZZER_MEMORY
 #define STATUS_BUZZER_MEMORY          OFF
 #endif
 
