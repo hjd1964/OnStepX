@@ -6,7 +6,8 @@
 
 #include "../EthernetManager.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && WEB_SERVER == ON
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    WEB_SERVER == ON
 
   // Turn ON to allow webserver debug messages
   #ifndef DEBUG_WEBSERVER

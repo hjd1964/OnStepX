@@ -6,7 +6,7 @@
 
 #if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
     COMMAND_SERVER != OFF
-d
+
   class CmdServer {
     public:
       CmdServer(uint32_t port, long clientTimeoutMs, bool persist = false);

@@ -4,7 +4,8 @@
 #include "WebServer.h"
 #include "../../tasks/OnTask.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && WEB_SERVER == ON
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    WEB_SERVER == ON
 
   // SD CARD support, simply enable and provide a webserver.on("filename.htm") to serve each file
   #ifndef SD_CARD
