@@ -10,7 +10,7 @@
 
 // optional web-server
 #ifndef WEB_SERVER
-#define WEB_SERVER ON                     // ON for website at port 80
+#define WEB_SERVER OFF                    // ON for website at port 80
 #endif
 
 // optional LX200 command server IP channels 9996 to 9999 (listens to clients) used by SWS
