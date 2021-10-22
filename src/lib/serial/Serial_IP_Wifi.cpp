@@ -3,8 +3,7 @@
 
 #include "Serial_IP_Wifi.h"
 
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && !defined(SERIAL_IP_CLIENT) && \
-    OPERATIONAL_MODE == WIFI
+#if OPERATIONAL_MODE == WIFI && SERIAL_SERVER != OFF
 
   void IPSerial::begin(long port, unsigned long clientTimeoutMs, bool persist) {
     if (active) return;
@@ -50,7 +49,6 @@
         #endif
         cmdSvrClient = cmdSvr->available();
         clientEndTimeMs = millis() + clientTimeoutMs;
-//        cmdSvrClient.setTimeout(1000);
       }
     } else {
       if (!cmdSvrClient.connected()) { 
@@ -108,12 +106,12 @@
     return cmdSvrClient.write(data, count);
   }
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == STANDARD || SERIAL_SERVER == BOTH
     IPSerial SerialIP;
-    #define SERIAL_IP SerialIP
+    #define SERIAL_SIP SerialIP
   #endif
 
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == PERSISTENT || SERIAL_SERVER == BOTH
     IPSerial SerialPIP1;
     IPSerial SerialPIP2;
     IPSerial SerialPIP3;

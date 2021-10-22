@@ -6,15 +6,9 @@
 #pragma once
 
 #include "../../Common.h"
+#include "../wifi/WifiManager.h"
 
-#ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE OFF
-#endif
-
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && defined(SERIAL_IP_CLIENT) && \
-    OPERATIONAL_MODE == WIFI
-
-  #include "../wifi/WifiManager.h"
+#if OPERATIONAL_MODE == WIFI && SERIAL_CLIENT == ON
 
   #if defined(ESP32)
     #include <WiFi.h>
@@ -29,7 +23,7 @@
   #endif
 
 
-  class IPSerial : public Stream {
+  class IPSerialClient : public Stream {
     public:
       void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
       void end();
@@ -59,9 +53,6 @@
       unsigned long clientTimeoutMs;
   };
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    extern IPSerial SerialIP;
-    #define SERIAL_IP SerialIP
-  #endif
-
+  extern IPSerialClient SerialIPClient;
+  #define SERIAL_IP SerialIPClient
 #endif

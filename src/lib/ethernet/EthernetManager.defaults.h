@@ -1,5 +1,38 @@
 #pragma once
 
+// -------------------------------------------------------------------------------------------------
+// general ip settings
+
+// first, you must have an Wifi or Ethernet device:  OFF or WIFI, ETHERNET_W5100, ETHERNET_W5500
+#ifndef OPERATIONAL_MODE
+#define OPERATIONAL_MODE OFF
+#endif
+
+// optional web-server
+#ifndef WEB_SERVER
+#define WEB_SERVER ON                     // ON for website at port 80
+#endif
+
+// optional LX200 command server IP channels 9996 to 9999 (listens to clients) used by SWS
+// OFF or STANDARD (port 9999), or PERSISTENT (ports 9996 to 9998), or BOTH
+#ifndef COMMAND_SERVER
+#define COMMAND_SERVER OFF
+#endif
+
+// optional Arduino Serial class work-alike IP channels 9996 to 9999 as a server (listens to clients)
+// OFF or STANDARD (port 9999), or PERSISTENT (ports 9996 to 9998), or BOTH
+#ifndef SERIAL_SERVER
+#define SERIAL_SERVER OFF              // SERIAL_SIP, SERIAL_PIP1, etc.
+#endif
+
+// optional Arduino Serial class work-alike IP channel to port 9998 as a client (connects to a server)
+#ifndef SERIAL_CLIENT
+#define SERIAL_CLIENT OFF              // ON for SERIAL_IP at port 9998
+#endif
+
+// -------------------------------------------------------------------------------------------------
+// ethernet manager settings
+
 #ifndef MAC
 #define MAC {0xDE,0xAD,0xBE,0xEF,0xFE,0xED} // a unique MAC address
 #endif

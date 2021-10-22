@@ -25,8 +25,7 @@
 void Status::init() {
   #if STATUS_LED == ON
     // if anything else is using the status LED, disable it
-    if ((STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) || 
-        (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN)) tasks.remove(tasks.getHandleByName("StaLed"));
+    if (STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
   #endif
 
   #if STATUS_BUZZER_MEMORY == ON

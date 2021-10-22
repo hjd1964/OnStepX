@@ -45,25 +45,31 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF
 #endif
 
-// ESP32 VIRTUAL SERIAL IP COMMAND CHANNEL
+// ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
 #ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE                 OFF //         OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
+#define SERIAL_IP_MODE                OFF // use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
 #endif
 
-#if SERIAL_IP_MODE != OFF && defined(ESP32)
+#if SERIAL_IP_MODE == ACCESS_POINT
 #define OPERATIONAL_MODE WIFI
+#define AP_ENABLED true
+#endif
+#if SERIAL_IP_MODE == STATION
+#define OPERATIONAL_MODE WIFI
+#define STA_ENABLED true
+#endif
+#if SERIAL_IP_MODE == BOTH
+#define OPERATIONAL_MODE WIFI
+#define AP_ENABLED true
+#define STA_ENABLED true
 #endif
 
-#ifndef STANDARD_COMMAND_CHANNEL
-#define STANDARD_COMMAND_CHANNEL       ON //          ON, Wifi command channel for simultanious connections on port 9999.
-#endif
-
-#ifndef PERSISTENT_COMMAND_CHANNEL
-#define PERSISTENT_COMMAND_CHANNEL     ON //          ON, Wifi command channel for a single connection on port 9998.
+#ifndef SERIAL_SERVER
+#define SERIAL_SERVER                BOTH // or STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
 #endif
 
 #ifndef AP_ENABLED
-#define AP_ENABLED                   true //        true, to enable the soft AP
+#define AP_ENABLED                   true // to enable the soft AP
 #endif
 
 #ifndef STA_IP_ADDR

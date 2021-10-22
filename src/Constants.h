@@ -181,7 +181,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583927925UL
+#define INIT_NV_KEY                 583927926UL
 
 #define NV_KEY                      0      // bytes: 4   , addr:   0..  3
 #define NV_SITE_NUMBER              4      // bytes: 1   , addr:   4..  4
@@ -191,15 +191,15 @@
 #define NV_MOUNT_SETTINGS_BASE      181    // bytes: 10  , addr: 181..190
 #define NV_MOUNT_TYPE_BASE          191    // bytes: 1   , addr: 191..191
 #define NV_MOUNT_GOTO_BASE          192    // bytes: 5   , addr: 192..196
-#define NV_MOUNT_GUIDE_BASE         197    // bytes: 2   , addr: 197..198
-#define NV_MOUNT_LIMITS_BASE        199    // bytes: 16  , addr: 199..214
-#define NV_MOUNT_PARK_BASE          215    // bytes: 15  , addr: 215..229
-#define NV_MOUNT_PEC_BASE           230    // bytes: 6   , addr: 230..235
+#define NV_MOUNT_GUIDE_BASE         197    // bytes: 3   , addr: 197..199
+#define NV_MOUNT_LIMITS_BASE        200    // bytes: 16  , addr: 200..215
+#define NV_MOUNT_PARK_BASE          216    // bytes: 15  , addr: 216..230
+#define NV_MOUNT_PEC_BASE           231    // bytes: 6   , addr: 231..236
 
-#define NV_ALIGN_MODEL_BASE         236    // bytes: 32  , addr: 236..267
-#define NV_AXIS_SETTINGS_REVERT     268    // bytes: 2   , addr: 268..269
-#define NV_AXIS_SETTINGS_BASE       270    // bytes: 25*9, addr: 270..494
-#define NV_FOCUSER_SETTINGS_BASE    495    // bytes: 18*9, addr: 495..656
-#define NV_ROTATOR_SETTINGS_BASE    657    // bytes: 7   , addr: 657..663
-#define NV_FEATURE_SETTINGS_BASE    664    // bytes: 3 *8, addr: 664..688
+#define NV_ALIGN_MODEL_BASE         237    // bytes: 32  , addr: 237..268
+#define NV_AXIS_SETTINGS_REVERT     269    // bytes: 2   , addr: 269..270
+#define NV_AXIS_SETTINGS_BASE       271    // bytes: 25*9, addr: 271..495
+#define NV_FOCUSER_SETTINGS_BASE    496    // bytes: 18*9, addr: 496..657
+#define NV_ROTATOR_SETTINGS_BASE    658    // bytes: 7   , addr: 658..664
+#define NV_FEATURE_SETTINGS_BASE    665    // bytes: 3 *8, addr: 665..689
 #define NV_PEC_BUFFER_BASE          700    // Bytes: ?   , addr: 700..700 + (PEC_BUFFER_SIZE_LIMIT - 1)

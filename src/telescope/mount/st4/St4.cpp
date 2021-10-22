@@ -85,10 +85,10 @@
           // Smart Hand Controller active
           char c = serialST4.poll();
           // process any single byte guide commands
-          if (c == ccMe) guide.startAxis1(GA_REVERSE, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMw) guide.startAxis1(GA_FORWARD, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMn) guide.startAxis2(GA_FORWARD, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMs) guide.startAxis2(GA_REVERSE, guide.settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMe) guide.startAxis1(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMw) guide.startAxis1(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMn) guide.startAxis2(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMs) guide.startAxis2(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
           if (c == ccQe || c == ccQw) guide.stopAxis1(GA_BREAK);
           if (c == ccQn || c == ccQs) guide.stopAxis2(GA_BREAK);
           return;
@@ -135,7 +135,7 @@
         //if (!cmdWaiting())
         {
           if (altModeA) {
-            int r = (int)guide.settings.rateSelect;
+            int r = (int)guide.settings.axis1RateSelect;
             if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
               #if SLEW_GOTO == ON
                 if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B+#"); else { if (r >= 7) r=8; else if (r >= 5) r=7; else if (r >= 2) r=5; else if (r < 2) r=2; }
@@ -161,8 +161,9 @@
               status.sound.click();
             }
             if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); status.sound.click(); }
-            guide.settings.rateSelect = (GuideRateSelect)r;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && guide.settings.rateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.rateSelect;
+            guide.settings.axis1RateSelect = (GuideRateSelect)r;
+            guide.settings.axis2RateSelect = (GuideRateSelect)r;
+            if (SEPARATE_PULSE_GUIDE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
           }
           if (altModeB) {
             #if ST4_HAND_CONTROL_FOCUSER == ON
@@ -224,7 +225,7 @@
             if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
           {
-            GuideRateSelect rateSelect = guide.settings.rateSelect;
+            GuideRateSelect rateSelect = guide.settings.axis1RateSelect;
             if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
@@ -245,7 +246,7 @@
             if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
           {
-            GuideRateSelect rateSelect = guide.settings.rateSelect;
+            GuideRateSelect rateSelect = guide.settings.axis2RateSelect;
             if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis2(st4GuideActionAxis2, rateSelect, GUIDE_TIME_LIMIT*1000);
           }

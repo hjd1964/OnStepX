@@ -59,7 +59,7 @@ SerialWrapper::SerialWrapper() {
     if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
     channel++;
   #endif
-  #ifdef SERIAL_IP
+  #ifdef SERIAL_SIP
     if (!hasChannel(channel)) { thisChannel = channel; setChannel(channel); return; }
     channel++;
   #endif
@@ -121,8 +121,8 @@ void SerialWrapper::begin(long baud) {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) SERIAL_PIP3.begin(9998, 120L*1000L, true);
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) SERIAL_IP.begin(9999, 2L*1000L);
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) SERIAL_SIP.begin(9999, 2L*1000L);
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) SERIAL_LOCAL.begin(baud);
@@ -160,8 +160,8 @@ void SerialWrapper::end() {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) SERIAL_PIP3.end();
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) SERIAL_IP.end();
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) SERIAL_SIP.end();
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) SERIAL_LOCAL.end();
@@ -198,8 +198,8 @@ size_t SerialWrapper::write(uint8_t data) {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) return SERIAL_PIP3.write(data);
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) return SERIAL_IP.write(data);
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) return SERIAL_SIP.write(data);
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) return SERIAL_LOCAL.write(data);
@@ -238,8 +238,8 @@ size_t SerialWrapper::write(const uint8_t *data, size_t quantity) {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) return SERIAL_PIP3.write(data, quantity);
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) return SERIAL_IP.write(data, quantity);
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) return SERIAL_SIP.write(data, quantity);
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) return SERIAL_LOCAL.write(data, quantity);
@@ -279,8 +279,8 @@ int SerialWrapper::available() {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) return SERIAL_PIP3.available();
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) return SERIAL_IP.available();
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) return SERIAL_SIP.available();
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) return SERIAL_LOCAL.available();
@@ -318,8 +318,8 @@ int SerialWrapper::read() {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) return SERIAL_PIP3.read();
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) return SERIAL_IP.read();
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) return SERIAL_SIP.read();
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) return SERIAL_LOCAL.read();
@@ -357,8 +357,8 @@ int SerialWrapper::peek() {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) return SERIAL_PIP3.peek();
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) return SERIAL_IP.peek();
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) return SERIAL_SIP.peek();
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) return SERIAL_LOCAL.peek();
@@ -396,8 +396,8 @@ void SerialWrapper::flush() {
   #ifdef SERIAL_PIP3
     if (isChannel(channel++)) SERIAL_PIP3.flush();
   #endif
-  #ifdef SERIAL_IP
-    if (isChannel(channel++)) SERIAL_IP.flush();
+  #ifdef SERIAL_SIP
+    if (isChannel(channel++)) SERIAL_SIP.flush();
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) SERIAL_LOCAL.flush();

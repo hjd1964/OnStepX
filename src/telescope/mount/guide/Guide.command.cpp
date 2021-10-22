@@ -32,19 +32,17 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       int16_t timeMs;
       if (convert.atoi2(&parameter[1], &timeMs)) {
         if (timeMs >= 0 && timeMs <= 16399) {
-          GuideRateSelect rateSelect = rateSelect;
-          if (SEPARATE_PULSE_GUIDE_RATE == ON) rateSelect = settings.pulseRateSelect;
           if (parameter[0] == 'w') {
-            *commandError = startAxis1(GA_FORWARD, rateSelect, timeMs);
+            *commandError = startAxis1(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
           if (parameter[0] == 'e') {
-            *commandError = startAxis1(GA_REVERSE, rateSelect, timeMs);
+            *commandError = startAxis1(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
           if (parameter[0] == 'n') {
-            *commandError = startAxis2(GA_FORWARD, rateSelect, timeMs);
+            *commandError = startAxis2(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
           } else
-          if (parameter[0] == 's') { 
-            *commandError = startAxis2(GA_REVERSE, rateSelect, timeMs);
+          if (parameter[0] == 's') {
+            *commandError = startAxis2(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
           } else *commandError = CE_CMD_UNKNOWN;
           if (command[1] == 'g') *numericReply = false;
         } else *commandError = CE_PARAM_RANGE;
@@ -54,31 +52,31 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
     // :Mw#       Move Telescope West at current guide rate
     //            Returns: Nothing
     if (command[1] == 'w' && parameter[0] == 0) {
-      *commandError = startAxis1(GA_FORWARD, settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = startAxis1(GA_FORWARD, settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Me#       Move Telescope East at current guide rate
     //            Returns: Nothing
     if (command[1] == 'e' && parameter[0] == 0) {
-      *commandError = startAxis1(GA_REVERSE, settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = startAxis1(GA_REVERSE, settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Mn#       Move Telescope North at current guide rate
     //            Returns: Nothing
     if (command[1] == 'n' && parameter[0] == 0) {
-      *commandError = startAxis2(GA_FORWARD, settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = startAxis2(GA_FORWARD, settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Ms#       Move Telescope South at current guide rate
     //            Returns: Nothing
     if (command[1] == 's' && parameter[0] == 0) {
-      *commandError = startAxis2(GA_REVERSE, settings.rateSelect, GUIDE_TIME_LIMIT*1000);
+      *commandError = startAxis2(GA_REVERSE, settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
       *numericReply = false;
     } else
     // :Mp#       Move Telescope for sPiral search at current guide rate
     //            Returns: Nothing
     if (command[1] == 'p' && parameter[0] == 0) {
-      *commandError = startSpiral(settings.rateSelect, GUIDE_SPIRAL_TIME_LIMIT*1000);
+      *commandError = startSpiral(settings.axis1RateSelect, GUIDE_SPIRAL_TIME_LIMIT*1000);
       *numericReply = false;
     } else return false;
   } else
@@ -124,12 +122,13 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       char* conv_end;
       float f = strtod(parameter, &conv_end);
       if (&parameter[0] != conv_end) {
-        if (f < 0.001/3600.0) f = 0.001/3600.0;
+        if (f < 0.0001F/3600.0F) f = 0.0001F/3600.0F;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
-        customRateAxis1 = f*240.0;
-        rateSelectAxis1 = GR_CUSTOM;
+        VF("MSG: set Axis1 custom guide rate to "); V(f); VLF("°/s");
+        settings.axis1RateSelect = GR_CUSTOM;
+        customRateAxis1 = f*240.0F;
       }
-      *numericReply=false; 
+      *numericReply = false;
     } else
 
     // :RE[n.n]#  Set Axis2 Guide rate to n.n degrees per second
@@ -138,10 +137,11 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       char* conv_end;
       float f = strtod(parameter, &conv_end);
       if (&parameter[0] != conv_end) {
-        if (f < 0.001/3600.0) f = 0.001/3600.0;
+        if (f < 0.0001F/3600.0F) f = 0.0001F/3600.0F;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
-        customRateAxis2 = f*240.0;
-        rateSelectAxis2 = GR_CUSTOM;
+        VF("MSG: set Axis2 custom guide rate to "); V(f); VLF("°/s");
+        settings.axis2RateSelect = GR_CUSTOM;
+        customRateAxis2 = f*240.0F;
       }
       *numericReply = false;
     } else
@@ -158,9 +158,10 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (command[1] == 'G') r = 2; else if (command[1] == 'C') r = 5; else
       if (command[1] == 'M') r = 6; else if (command[1] == 'F') r = 7; else
       if (command[1] == 'S') r = 8; else r = command[1] - '0';
-      settings.rateSelect = (GuideRateSelect)r;
-      if (SEPARATE_PULSE_GUIDE_RATE == ON && settings.rateSelect <= GR_1X) {
-        settings.pulseRateSelect = settings.rateSelect;
+      settings.axis1RateSelect = (GuideRateSelect)r;
+      settings.axis2RateSelect = (GuideRateSelect)r;
+      if (SEPARATE_PULSE_GUIDE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
+        settings.pulseRateSelect = (GuideRateSelect)r;
         nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
       }
       *numericReply = false; 

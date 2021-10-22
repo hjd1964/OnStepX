@@ -5,10 +5,9 @@
 
 #include "Serial_IP_Wifi_Client.h"
 
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && defined(SERIAL_IP_CLIENT) && \
-    OPERATIONAL_MODE == WIFI
+#if OPERATIONAL_MODE == WIFI && SERIAL_CLIENT == ON
 
-  void IPSerial::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
+  void IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
     if (active) return;
 
     // special case where the port is the most common baud rate
@@ -34,14 +33,14 @@
     } else VL("WRN: WiFi connection to target failed"); 
   }
 
-  void IPSerial::end() {
+  void IPSerialClient::end() {
     cmdSvrClient.stop();
     VL("MSG: IPSerial, connection closed");
     WiFi.disconnect();
     VL("MSG: IPSerial, disconnected");
   }
 
-  bool IPSerial::isConnected() {
+  bool IPSerialClient::isConnected() {
     if (WiFi.status() == WL_CONNECTED) {
       if (!cmdSvrClient.connected()) {
         if (cmdSvrClient.connect(onStep, port)) {
@@ -55,44 +54,41 @@
     } else return false;
   }
 
-  size_t IPSerial::write(uint8_t data) {
+  size_t IPSerialClient::write(uint8_t data) {
     if (!active || !isConnected()) return 0;
 
     return cmdSvrClient.write(data);
   }
 
-  size_t IPSerial::write(const uint8_t *data, size_t quantity) {
+  size_t IPSerialClient::write(const uint8_t *data, size_t quantity) {
     if (!active || !isConnected()) return 0;
 
     return cmdSvrClient.write(data, quantity);
   }
 
-  int IPSerial::available(void) {
+  int IPSerialClient::available(void) {
     if (!active || !isConnected()) return 0;
 
     return cmdSvrClient.available();
   }
 
-  int IPSerial::read(void) {
+  int IPSerialClient::read(void) {
     if (!active || !isConnected()) return -1;
 
     return cmdSvrClient.read();
   }
 
-  int IPSerial::peek(void) {
+  int IPSerialClient::peek(void) {
     if (!active || !isConnected()) return -1;
 
     return cmdSvrClient.peek();
   }
 
-  void IPSerial::flush(void) {
+  void IPSerialClient::flush(void) {
     if (!active || !isConnected()) return;
 
     return cmdSvrClient.flush();
   }
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    IPSerial SerialIP;
-  #endif
-
+  IPSerialClient SerialIPClient;
 #endif

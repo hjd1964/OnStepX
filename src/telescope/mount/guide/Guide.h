@@ -18,10 +18,11 @@ enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X,
 enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE, GA_SPIRAL, GA_HOME };
 
 #pragma pack(1)
-#define GuideSettingsSize 2
+#define GuideSettingsSize 3
 typedef struct GuideSettings {
   GuideRateSelect pulseRateSelect;
-  GuideRateSelect rateSelect;
+  GuideRateSelect axis1RateSelect;
+  GuideRateSelect axis2RateSelect;
 } GuideSettings;
 #pragma pack()
 
@@ -93,11 +94,10 @@ class Guide {
     // start axis2 movement
     void axis2AutoSlew(GuideAction guideAction);
 
-    GuideRateSelect rateSelectAxis1    = GR_20X;
-    GuideRateSelect rateSelectAxis2    = GR_20X;
+    GuideRateSelect spiralGuideRateSelect = GR_20X;
     
-    GuideAction     guideActionAxis1   = GA_NONE;
-    GuideAction     guideActionAxis2   = GA_NONE;
+    GuideAction   guideActionAxis1     = GA_NONE;
+    GuideAction   guideActionAxis2     = GA_NONE;
 
     float         customRateAxis1      = 0.0F;
     float         customRateAxis2      = 0.0F;

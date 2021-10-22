@@ -3,8 +3,8 @@
 
 #include "Serial_IP_Ethernet.h"
 
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON) && !defined(SERIAL_IP_CLIENT) && \
-    (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    SERIAL_SERVER != OFF
 
   bool port9999Assigned = false;
   bool port9998Assigned = false;
@@ -112,11 +112,11 @@
     return cmdSvrClient.write(data, count);
   }
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == STANDARD || SERIAL_SERVER == BOTH
     IPSerial SerialIP;
   #endif
 
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == PERSISTENT || SERIAL_SERVER == BOTH
     IPSerial SerialPIP1;
   #endif
 

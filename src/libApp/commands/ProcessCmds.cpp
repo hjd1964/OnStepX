@@ -88,7 +88,7 @@
   CommandProcessor processCommandsPIP3(9600,'3');
   void processCmdsPIP3() { ::yield(); processCommandsPIP3.poll(); }
 #endif
-#ifdef SERIAL_IP
+#ifdef SERIAL_SIP
   CommandProcessor processCommandsIP(9600,'I');
   void processCmdsIP() { ::yield(); processCommandsIP.poll(); }
 #endif
@@ -255,7 +255,7 @@ void commandChannelInit() {
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
-  #ifdef SERIAL_IP
+  #ifdef SERIAL_SIP
     VF("MSG: Setup, start command channel IP task (priority 5)... ");
     handle = tasks.add(0, 0, true, 5, processCmdsIP, "CmdI");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }

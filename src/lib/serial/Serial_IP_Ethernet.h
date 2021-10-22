@@ -3,15 +3,10 @@
 #pragma once
 
 #include "../../Common.h"
+#include "../ethernet/EthernetManager.h"
 
-#ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE OFF
-#endif
-
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ON) && !defined(SERIAL_IP_CLIENT) && \
-    (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
-
-  #include "../ethernet/EthernetManager.h"
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
+    SERIAL_SERVER != OFF
 
   #ifdef ESP8266
     #ifndef ETHERNET_W5500
@@ -60,12 +55,12 @@
       bool persist = false;
   };
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
-    extern IPSerial ipSerial;
-    #define SERIAL_IP SerialIP
+  #if SERIAL_SERVER == STANDARD || SERIAL_SERVER == BOTH
+    extern IPSerial SerialIP;
+    #define SERIAL_SIP SerialIP
   #endif
 
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == PERSISTENT || SERIAL_SERVER == BOTH
     extern IPSerial SerialPIP1;
     #define SERIAL_PIP1 SerialPIP1
   #endif

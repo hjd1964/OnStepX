@@ -31,8 +31,9 @@ void Guide::init() {
   // read the settings
   nv.readBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
 
-  // reset normal guide rate to 20X, value stored in NV isn't used
-  settings.rateSelect = GR_20X;
+  // reset default guide rate to 20X, value stored in NV isn't used
+  settings.axis1RateSelect = GR_20X;
+  settings.axis2RateSelect = GR_20X;
 
   // start guide monitor task
   VF("MSG: Mount, start guide monitor task (rate 10ms priority 3)... ");
@@ -143,9 +144,9 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
 
   if (rateSelect < GR_2X)       rateSelect = GR_2X;
   if (rateSelect > GR_HALF_MAX) rateSelect = GR_HALF_MAX;
-  this->settings.rateSelect = rateSelect;
+  spiralGuideRateSelect = rateSelect;
 
-  VF("MSG: guideSpiralStart(); using guide rates to "); V(rateSelectToRate(rateSelect)); VL("X");
+  VF("MSG: guideSpiralStart(); using guide rates to "); V(rateSelectToRate(spiralGuideRateSelect)); VL("X");
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
@@ -285,13 +286,13 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
 
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!validAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (settings.rateSelect < 3) {
+    if (settings.axis1RateSelect < 3) {
       if (limits.isError() || axis1.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
   if (axis == 2 || guideAction == GA_SPIRAL) {
     if (!validAxis2(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (settings.rateSelect < 3) {
+    if (settings.axis2RateSelect < 3) {
       if (limits.isError() || axis2.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
@@ -319,7 +320,7 @@ void Guide::spiralPoll() {
   float T = ((long)(millis() - spiralStartTime))/1000.0;
 
   // actual rate we'll be using (in sidereal X)
-  float rate = rateSelectToRate(settings.rateSelect);
+  float rate = rateSelectToRate(spiralGuideRateSelect);
   float maxRate = rateSelectToRate(GR_MAX);
   if (rate > maxRate/2.0) rate = maxRate/2.0;
 

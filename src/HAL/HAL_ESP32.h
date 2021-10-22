@@ -33,7 +33,7 @@
 #endif
 
 //--------------------------------------------------------------------------------------------------
-// General purpose initialize for HAL, optionally also early init of SERIAL_IP/PIP or SERIAL_BT
+// General purpose initialize for HAL, optionally also early init of SERIAL_SIP/PIP or SERIAL_BT
 
 #if SERIAL_BT_MODE == SLAVE
   #include <BluetoothSerial.h>

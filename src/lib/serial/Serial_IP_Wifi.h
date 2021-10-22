@@ -3,15 +3,9 @@
 #pragma once
 
 #include "../../Common.h"
+#include "../wifi/WifiManager.h"
 
-#ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE OFF
-#endif
-
-#if (SERIAL_IP_MODE == STATION || SERIAL_IP_MODE == ACCESS_POINT) && !defined(SERIAL_IP_CLIENT) && \
-    OPERATIONAL_MODE == WIFI
-
-  #include "../wifi/WifiManager.h"
+#if OPERATIONAL_MODE == WIFI && SERIAL_SERVER != OFF
 
   #if defined(ESP32)
     #include <WiFi.h>
@@ -61,12 +55,12 @@
       bool persist = false;
   };
 
-  #if defined(STANDARD_IPSERIAL_CHANNEL) && STANDARD_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == STANDARD || SERIAL_SERVER == BOTH
     extern IPSerial SerialIP;
-    #define SERIAL_IP SerialIP
+    #define SERIAL_SIP SerialIP
   #endif
 
-  #if defined(PERSISTENT_IPSERIAL_CHANNEL) && PERSISTENT_IPSERIAL_CHANNEL == ON
+  #if SERIAL_SERVER == PERSISTENT || SERIAL_SERVER == BOTH
     extern IPSerial SerialPIP1;
     extern IPSerial SerialPIP2;
     extern IPSerial SerialPIP3;

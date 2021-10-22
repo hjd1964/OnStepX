@@ -23,6 +23,8 @@
 #define ETHERNET_W5100              -16
 #define ETHERNET_W5500              -17
 #define SHARED                      -18
+#define STANDARD                    -19
+#define PERSISTENT                  -20
 #define INVALID                     -127
 
 // NV/EEPROM
