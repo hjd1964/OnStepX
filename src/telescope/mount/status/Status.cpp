@@ -28,9 +28,16 @@ void Status::init() {
     if (STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
   #endif
 
+  if (!nv.isKeyValid()) {
+    VLF("MSG: Mount, status writing defaults to NV");
+    nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)buzzer);
+  }
+
   #if STATUS_BUZZER_MEMORY == ON
-    sound.enabled = misc.buzzer;
+    buzzer = nv.read(NV_MOUNT_STATUS_BASE);
   #endif
+
+  sound.enabled = buzzer;
 
   #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
