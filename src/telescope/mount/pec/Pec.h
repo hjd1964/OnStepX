@@ -27,14 +27,15 @@ typedef struct PecSettings {
 
 class Pec {
   public:
-    void init();
-
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
-
-    void poll();
 
     // tracking rate (in x) due to PEC playing
     float rate = 0.0F;
+
+    #if AXIS1_PEC == ON
+      void init();
+      void poll();
+    #endif
 
   private:
     #if AXIS1_PEC == ON

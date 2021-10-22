@@ -124,6 +124,7 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *supressFram
     // :VS#       Get PEC number of steps per sidereal second of worm rotation
     //            Returns: n.n#
     if (command[1] == 'S' && parameter[0] == 0) {
+      stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
       sprintF(reply, "%0.6f", stepsPerSiderealSecond);
       *numericReply = false;
     } else
