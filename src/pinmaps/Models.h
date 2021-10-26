@@ -47,9 +47,9 @@
   #define PINMAP_STR "MaxESP v3"
   #include "Pins.MaxESP3.h"
 #endif
-#if PINMAP == UNO
-  #define PINMAP_STR "UNO W/CNC v3"
-  #include "Pins.UNO.h"
+#if PINMAP == GregsESP32
+  #define PINMAP_STR "GregsESP32"
+  #include "Pins.GregsESP32.h"
 #endif
 #if PINMAP == CNC3
   #define PINMAP_STR "CNC v3"
