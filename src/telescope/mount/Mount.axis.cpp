@@ -28,7 +28,7 @@
 
   const StepDirPins StepDirPinsAxis1 = {AXIS1_STEP_PIN, AXIS1_STEP_STATE, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE};
   StepDirMotor motor1(1, &StepDirPinsAxis1, &stepDirDriver1);
-  IRAM_ATTR void moveAxis1() { motor1.move(AXIS1_STEP_PIN, AXIS1_DIR_PIN); }
+  IRAM_ATTR void moveAxis1() { motor1.move(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFFAxis1() { motor1.moveFF(AXIS1_STEP_PIN); }
   IRAM_ATTR void moveFRAxis1() { motor1.moveFR(AXIS1_STEP_PIN); }
 #endif
@@ -60,7 +60,7 @@ void pollAxis1() { axis1.poll(); }
 
   const StepDirPins StepDirPinsAxis2 = {AXIS2_STEP_PIN, AXIS2_STEP_STATE, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE};
   StepDirMotor motor2(2, &StepDirPinsAxis2, &stepDirDriver2);
-  IRAM_ATTR void moveAxis2() { motor2.move(AXIS2_STEP_PIN, AXIS2_DIR_PIN); }
+  IRAM_ATTR void moveAxis2() { motor2.move(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFFAxis2() { motor2.moveFF(AXIS2_STEP_PIN); }
   IRAM_ATTR void moveFRAxis2() { motor2.moveFR(AXIS2_STEP_PIN); }
 #endif

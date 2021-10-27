@@ -68,7 +68,7 @@ class StepDirMotor : public Motor {
     void updateMotorDirection();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
-    void move(const int8_t stepPin, const int16_t dirPin);
+    void move(const int8_t stepPin);
 
     // fast forward axis movement, no backlash, no mode switching
     void moveFF(const int8_t stepPin);

@@ -239,7 +239,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
 }
 
 #if STEP_WAVE_FORM == SQUARE
-  IRAM_ATTR void StepDirMotor::move(const int8_t stepPin, const int16_t dirPin) {
+  IRAM_ATTR void StepDirMotor::move(const int8_t stepPin) {
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
       microstepModeControl = MMC_SLEWING_PAUSE;
       tasks.immediate(mtrHandle);
