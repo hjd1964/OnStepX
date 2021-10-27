@@ -2,7 +2,7 @@
 // Pin map for OnStep MaxSTM STM32F411CE/STM32F401CE PCB (or the Blackpill https://github.com/WeActTC/MiniF4-STM32F4x1)
 #pragma once
 
-// clue that the direction pins are shared so we can set direction early before each step
+// Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 
 // For an 8KB EEPROM on the MaxSTM3.6I

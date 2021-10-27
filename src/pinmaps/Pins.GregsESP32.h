@@ -16,6 +16,9 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
+// Hint that direction pins use a GPIO device
+#define GPIO_DIRECTION_PINS
+
 // The multi-purpose pins
 #define AUX1_PIN                GPIO_PIN(8)      // Dew heater 1
 #define AUX2_PIN                GPIO_PIN(9)      // Dew heater 2

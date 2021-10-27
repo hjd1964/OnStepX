@@ -2,7 +2,7 @@
 // Pin map for OnStep MaxPCB 3.6 Teensy4.1 PCB
 #pragma once
 
-// clue that the direction pins are shared so we can set direction early before each step
+// Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 
 #if defined(ARDUINO_TEENSY41)

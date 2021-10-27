@@ -16,7 +16,7 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
-// clue that the direction pins are shared so we can set direction early before each step
+// Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)

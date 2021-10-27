@@ -102,6 +102,9 @@ class Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     virtual void setSlewing(bool state);
 
+    // monitor and respond to motor state as required
+    virtual void poll();
+
     int driverType = OFF;
     volatile bool inBacklash = false;          // must be true if within the backlash travel
 

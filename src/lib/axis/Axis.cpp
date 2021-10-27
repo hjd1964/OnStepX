@@ -444,6 +444,9 @@ void Axis::poll() {
   Y;
 
   setFrequency(freq);
+
+  // keep associated motor updated
+  motor->poll();
 }
 
 // set minimum slew frequency in "measures" (radians, microns, etc.) per second

@@ -9,6 +9,10 @@
 #include "StepDirDrivers.h"
 #include "../Motor.h"
 
+#define DirSetRev 253
+#define DirSetFwd 254
+#define DirNone 255
+
 typedef struct StepDirPins {
   int16_t   step;
   uint8_t   stepState;
@@ -57,8 +61,14 @@ class StepDirMotor : public Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
 
+    // monitor and respond to motor state as required
+    void poll();
+
+    // change motor direction
+    void updateMotorDirection();
+
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
-    void move(const int8_t stepPin, const int8_t dirPin);
+    void move(const int8_t stepPin, const int16_t dirPin);
 
     // fast forward axis movement, no backlash, no mode switching
     void moveFF(const int8_t stepPin);
