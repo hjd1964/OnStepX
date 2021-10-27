@@ -16,9 +16,9 @@
 
 // polling frequency for monitoring axis motion (default 100X/second) 
 #ifndef FRACTIONAL_SEC
-  #define FRACTIONAL_SEC            100
+  #define FRACTIONAL_SEC            100.0F
 #endif
-#define FRACTIONAL_SEC_MS           (lround(1000.0F/FRACTIONAL_SEC))
+#define FRACTIONAL_SEC_US           (lround(1000000.0F/FRACTIONAL_SEC))
 
 #include "../../libApp/commands/ProcessCmds.h"
 #include "motor/Motor.h"
