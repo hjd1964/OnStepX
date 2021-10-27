@@ -7,8 +7,8 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-// 1/1000 second sidereal timer
-#define HAL_FRACTIONAL_SEC 1000.0
+// 1/5000 second sidereal timer
+#define HAL_FRACTIONAL_SEC 5000.0F
 
 // This platform has 15 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS

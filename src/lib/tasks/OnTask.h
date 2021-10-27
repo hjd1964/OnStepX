@@ -21,19 +21,12 @@
  *
  * DESCRIPTION:
  * 
-
- *
  * Software timer based processes must use "tasks.yield();" (or the "Y;" macro, which is the same exact thing)
  * during any processing that requires a significant amount of time. This allows for the processing of other tasks
  * while it is working.  What a "significant amount of time" is depends on the program's requirements.  It might
- * be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timers based 
+ * be measured in micro-seconds, or milli-seconds, or seconds.  Yield should not be used for hardware timer based 
  * processes
  *
- * Up to 64 mutexes (0 to 63) are supported with the following macros, any
- * code between these two statements will be limited to running on one process
- * at a time even if "tasks.yield();" is called within that code:
- * tasks_mutex_enter(mutex_number);
- * tasks_mutex_exit(mutex_number);
 */
 
 #pragma once

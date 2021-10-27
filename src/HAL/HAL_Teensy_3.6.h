@@ -10,8 +10,8 @@
 // turn on support for using DACs to output digital signals using Arduino standard commands
 #define HAL_DAC_AS_DIGITAL
 
-// 1/1000 second sidereal timer
-#define HAL_FRACTIONAL_SEC 1000.0
+// 1/2000 second sidereal timer
+#define HAL_FRACTIONAL_SEC 2000.0F
 
 // This platform has 16 bit PWM
 #ifndef HAL_ANALOG_WRITE_BITS
