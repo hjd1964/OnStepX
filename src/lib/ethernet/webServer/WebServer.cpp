@@ -274,11 +274,7 @@
 
       // open the sdcard file
       if (SDfound) {
-        #ifdef TEENSYDUINO
-          File dataFile = SD.open(fn.c_str());
-        #else
-          File dataFile = SD.open(fn, FILE_READ);
-        #endif
+        File dataFile = SD.open(fn.c_str(), O_READ);
         if (dataFile) {
           do {
             n = dataFile.available();
