@@ -72,10 +72,11 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
   return true;
 }
 
-// set driver reverse state
+// set driver default reverse state
 void StepDirMotor::setReverse(int8_t state) {
   if (state == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
-  digitalWriteF(Pins->dir, dirFwd);
+  digitalWriteEx(Pins->dir, dirFwd);
+  direction = dirFwd;
 }
 
 // set default driver microsteps and current
@@ -320,7 +321,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
     takeStep = !takeStep;
   }
 #else
-  IRAM_ATTR void StepDirMotor::move(const int8_t stepPin, const int8_t dirPin) {
+  IRAM_ATTR void StepDirMotor::move(const int8_t stepPin) {
     digitalWriteF(stepPin, stepClr);
 
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {

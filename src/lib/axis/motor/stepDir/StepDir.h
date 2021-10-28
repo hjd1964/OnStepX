@@ -31,7 +31,7 @@ class StepDirMotor : public Motor {
     // sets up the driver step/dir/enable pins
     bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
 
-    // set driver reverse state
+    // set driver default reverse state
     void setReverse(int8_t state);
 
     // set default driver microsteps and current
