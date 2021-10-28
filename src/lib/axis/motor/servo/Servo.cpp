@@ -10,12 +10,6 @@
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
-inline void pollServos() {
-  #ifdef AXIS1_SERVO
-    motor1.poll(); Y;
-  #endif
-}
-
 // constructor
 ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, PID *pid, ServoDriver *driver, ServoControl *control) {
   axisPrefix[10] = '0' + axisNumber;
@@ -34,15 +28,6 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
 
   // make sure there is something to do
   if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
-
-  if (servoMonitorHandle == 0) {
-    // start task to poll servos
-    VF("MSG: Motors, start servo monitor task (rate 5ms priority 1)... ");
-    char timerName[] = "Servos_";
-    timerName[6] = '0' + axisNumber;
-    servoMonitorHandle = tasks.add(5, 0, true, 1, pollServos, timerName);
-    if (servoMonitorHandle) { VLF("success"); } else { VLF("FAILED!"); return false; }
-  }
 
   // setup the PID
   V(axisPrefix); VF("setting PID range +/-"); VL(HAL_ANALOG_WRITE_RANGE);
