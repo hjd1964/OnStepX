@@ -85,9 +85,9 @@ class Rotator {
     uint8_t parkHandle = 0;
 };
 
-#ifdef AXIS3_DRIVER_SD
+#ifdef AXIS3_DRIVER_PRESENT
   extern StepDirMotor motor3;
-#elif defined(AXIS3_SERVO)
+#elif defined(AXIS3_SERVO_PRESENT)
   extern ServoMotor motor3;
 #endif
 extern IRAM_ATTR void moveAxis3();

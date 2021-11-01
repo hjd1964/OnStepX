@@ -8,24 +8,6 @@
   #define DRIVER_STEP_DEFAULTS
 #endif
 
-#if defined(AXIS1_DRIVER_SD) || defined(AXIS2_DRIVER_SD) || defined(AXIS3_DRIVER_SD) || \
-    defined(AXIS4_DRIVER_SD) || defined(AXIS5_DRIVER_SD) || defined(AXIS6_DRIVER_SD) || \
-    defined(AXIS7_DRIVER_SD) || defined(AXIS8_DRIVER_SD) || defined(AXIS9_DRIVER_SD)
-  #define SD_DRIVER_PRESENT
-#endif
-
-#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
-    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
-    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
-  #define TMC_DRIVER_PRESENT
-#endif
-
-#if defined(AXIS1_SERVO) || defined(AXIS2_SERVO) || defined(AXIS3_SERVO) || \
-    defined(AXIS4_SERVO) || defined(AXIS5_SERVO) || defined(AXIS6_SERVO) || \
-    defined(AXIS7_SERVO) || defined(AXIS8_SERVO) || defined(AXIS9_SERVO)
-  #define SERVO_DRIVER_PRESENT
-#endif
-
 // pinmap
 #ifndef PINMAP
 #define PINMAP                        OFF
@@ -120,6 +102,9 @@
 #ifndef AXIS1_POWER_DOWN
 #define AXIS1_POWER_DOWN              OFF                         // motor power off if at standstill > 30 sec
 #endif
+#ifndef AXIS1_ENABLE_STATE
+#define AXIS1_ENABLE_STATE            LOW  // default state of ENable pin for motor power on
+#endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF                         // wrap for unlimited range
 #endif
@@ -144,6 +129,75 @@
 #ifndef AXIS1_SENSE_LIMIT_INIT
 #define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
+#if AXIS1_DRIVER_MODEL >= DRIVER_FIRST && AXIS1_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS1_DRIVER_PRESENT
+  #if AXIS1_DRIVER_MODEL == TMC2130 || AXIS1_DRIVER_MODEL == TMC5160
+  #define AXIS1_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS1_STEP_STATE
+  #define AXIS1_STEP_STATE              HIGH // default signal transition state for a step
+  #endif
+  #ifndef AXIS1_DRIVER_MICROSTEPS
+  #define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
+  #endif
+  #ifndef AXIS1_DRIVER_MICROSTEPS_GOTO
+  #define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF  // microstep mode to use during slews
+  #endif
+  #ifndef AXIS1_DRIVER_DECAY
+  #define AXIS1_DRIVER_DECAY            OFF  // OFF for default, TMC STEALTHCHOP
+  #endif
+  #ifndef AXIS1_DRIVER_DECAY_GOTO
+  #define AXIS1_DRIVER_DECAY_GOTO       OFF  // OFF for default, TMC SPREADCYCLE
+  #endif
+  #ifndef AXIS1_DRIVER_IHOLD
+  #define AXIS1_DRIVER_IHOLD            HALF // in mA
+  #endif
+  #ifndef AXIS1_DRIVER_IRUN
+  #define AXIS1_DRIVER_IRUN             OFF  // in mA
+  #endif
+  #ifndef AXIS1_DRIVER_IGOTO
+  #define AXIS1_DRIVER_IGOTO            SAME // in mA
+  #endif
+  #ifndef AXIS1_DRIVER_STATUS
+  #define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
+  #endif
+  #ifndef AXIS1_PARAMETER1      
+  #define AXIS1_PARAMETER1              AXIS1_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS1_PARAMETER2 
+  #define AXIS1_PARAMETER2              AXIS1_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS1_SERVO_PRESENT
+  #ifndef AXIS1_SERVO_P
+  #define AXIS1_SERVO_P                 2.0    // P = proportional
+  #endif
+  #ifndef AXIS1_SERVO_I
+  #define AXIS1_SERVO_I                 5.0    // I = integral
+  #endif
+  #ifndef AXIS1_SERVO_D
+  #define AXIS1_SERVO_D                 1.0    // D = derivative
+  #endif
+  #ifndef AXIS1_SERVO_ENCODER
+  #define AXIS1_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS1_SERVO_ENCODER_TRIGGER
+  #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE // ignored for ENC_AB
+  #endif
+  #ifndef AXIS1_SERVO_PH1_STATE
+  #define AXIS1_SERVO_PH1_STATE         LOW    // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PD) pin
+  #endif
+  #ifndef AXIS1_SERVO_PH2_STATE
+  #define AXIS1_SERVO_PH2_STATE         LOW    // default state motor driver IN2 or DIR pin
+  #endif
+  #ifndef AXIS1_PARAMETER1      
+  #define AXIS1_PARAMETER1              1      // subdivisions always 1
+  #endif
+  #ifndef AXIS1_PARAMETER2 
+  #define AXIS1_PARAMETER2              0      // not used
+  #endif
+#endif
 
 #ifndef AXIS2_DRIVER_MODEL
 #define AXIS2_DRIVER_MODEL            OFF                         // specify a driver to enable
@@ -156,6 +210,9 @@
 #endif
 #ifndef AXIS2_POWER_DOWN
 #define AXIS2_POWER_DOWN              OFF
+#endif
+#ifndef AXIS2_ENABLE_STATE
+#define AXIS2_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS2_TANGENT_ARM
 #define AXIS2_TANGENT_ARM             OFF
@@ -180,6 +237,75 @@
 #endif
 #ifndef AXIS2_SENSE_LIMIT_INIT
 #define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
+#endif
+#if AXIS2_DRIVER_MODEL >= DRIVER_FIRST && AXIS2_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS2_DRIVER_PRESENT
+  #if AXIS2_DRIVER_MODEL == TMC2130 || AXIS2_DRIVER_MODEL == TMC5160
+  #define AXIS2_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS2_STEP_STATE
+  #define AXIS2_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS2_DRIVER_MICROSTEPS
+  #define AXIS2_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS2_DRIVER_MICROSTEPS_GOTO
+  #define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS2_DRIVER_DECAY
+  #define AXIS2_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS2_DRIVER_DECAY_GOTO
+  #define AXIS2_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS2_DRIVER_IHOLD
+  #define AXIS2_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS2_DRIVER_IRUN
+  #define AXIS2_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS2_DRIVER_IGOTO
+  #define AXIS2_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS2_DRIVER_STATUS
+  #define AXIS2_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS2_PARAMETER1      
+  #define AXIS2_PARAMETER1              AXIS2_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS2_PARAMETER2 
+  #define AXIS2_PARAMETER2              AXIS2_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS2_SERVO_PRESENT
+  #ifndef AXIS2_SERVO_P
+  #define AXIS2_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS2_SERVO_I
+  #define AXIS2_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS2_SERVO_D
+  #define AXIS2_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS2_SERVO_ENCODER
+  #define AXIS2_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS2_SERVO_ENCODER_TRIGGER
+  #define AXIS2_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS2_SERVO_PH1_STATE
+  #define AXIS2_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS2_SERVO_PH2_STATE
+  #define AXIS2_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS2_PARAMETER1      
+  #define AXIS2_PARAMETER1              1
+  #endif
+  #ifndef AXIS2_PARAMETER2 
+  #define AXIS2_PARAMETER2              0
+  #endif
 #endif
 
 // mount type
@@ -379,6 +505,9 @@
 #ifndef AXIS3_POWER_DOWN
 #define AXIS3_POWER_DOWN              OFF
 #endif
+#ifndef AXIS3_ENABLE_STATE
+#define AXIS3_ENABLE_STATE            LOW
+#endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
 #define AXIS3_SLEW_RATE_DESIRED       3.0                         // in degrees/sec
 #endif
@@ -412,6 +541,75 @@
 #ifndef AXIS3_SENSE_LIMIT_INIT
 #define AXIS3_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS3_DRIVER_MODEL >= DRIVER_FIRST && AXIS3_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS3_DRIVER_PRESENT
+  #if AXIS3_DRIVER_MODEL == TMC2130 || AXIS3_DRIVER_MODEL == TMC5160
+  #define AXIS3_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS3_STEP_STATE
+  #define AXIS3_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS3_DRIVER_MICROSTEPS
+  #define AXIS3_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS3_DRIVER_MICROSTEPS_GOTO
+  #define AXIS3_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS3_DRIVER_DECAY
+  #define AXIS3_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS3_DRIVER_DECAY_GOTO
+  #define AXIS3_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS3_DRIVER_IHOLD
+  #define AXIS3_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS3_DRIVER_IRUN
+  #define AXIS3_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS3_DRIVER_IGOTO
+  #define AXIS3_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS3_DRIVER_STATUS
+  #define AXIS3_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS3_PARAMETER1      
+  #define AXIS3_PARAMETER1              AXIS3_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS3_PARAMETER2 
+  #define AXIS3_PARAMETER2              AXIS3_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS3_SERVO_PRESENT
+  #ifndef AXIS3_SERVO_P
+  #define AXIS3_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS3_SERVO_I
+  #define AXIS3_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS3_SERVO_D
+  #define AXIS3_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS3_SERVO_ENCODER
+  #define AXIS3_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS3_SERVO_ENCODER_TRIGGER
+  #define AXIS3_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS3_SERVO_PH1_STATE
+  #define AXIS3_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS3_SERVO_PH2_STATE
+  #define AXIS3_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS3_PARAMETER1      
+  #define AXIS3_PARAMETER1              1
+  #endif
+  #ifndef AXIS3_PARAMETER2 
+  #define AXIS3_PARAMETER2              0
+  #endif
+#endif
 
 // -----------------------------------------------------------------------------------
 // focuser settings, FOCUSER1
@@ -426,6 +624,9 @@
 #endif
 #ifndef AXIS4_POWER_DOWN
 #define AXIS4_POWER_DOWN              OFF
+#endif
+#ifndef AXIS4_ENABLE_STATE
+#define AXIS4_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
 #define AXIS4_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -463,6 +664,75 @@
 #ifndef AXIS4_SENSE_LIMIT_INIT
 #define AXIS4_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS4_DRIVER_MODEL >= DRIVER_FIRST && AXIS4_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS4_DRIVER_PRESENT
+  #if AXIS4_DRIVER_MODEL == TMC2130 || AXIS4_DRIVER_MODEL == TMC5160
+  #define AXIS4_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS4_STEP_STATE
+  #define AXIS4_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS4_DRIVER_MICROSTEPS
+  #define AXIS4_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS4_DRIVER_MICROSTEPS_GOTO
+  #define AXIS4_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS4_DRIVER_DECAY
+  #define AXIS4_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS4_DRIVER_DECAY_GOTO
+  #define AXIS4_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS4_DRIVER_IHOLD
+  #define AXIS4_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS4_DRIVER_IRUN
+  #define AXIS4_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS4_DRIVER_IGOTO
+  #define AXIS4_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS4_DRIVER_STATUS
+  #define AXIS4_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS4_PARAMETER1      
+  #define AXIS4_PARAMETER1              AXIS4_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS4_PARAMETER2 
+  #define AXIS4_PARAMETER2              AXIS4_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS3_SERVO_PRESENT
+  #ifndef AXIS4_SERVO_P
+  #define AXIS4_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS4_SERVO_I
+  #define AXIS4_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS4_SERVO_D
+  #define AXIS4_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS4_SERVO_ENCODER
+  #define AXIS4_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS4_SERVO_ENCODER_TRIGGER
+  #define AXIS4_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS4_SERVO_PH1_STATE
+  #define AXIS4_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS4_SERVO_PH2_STATE
+  #define AXIS4_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS4_PARAMETER1      
+  #define AXIS4_PARAMETER1              1
+  #endif
+  #ifndef AXIS4_PARAMETER2 
+  #define AXIS4_PARAMETER2              0
+  #endif
+#endif
 
 // focuser settings, FOCUSER2
 #ifndef AXIS5_DRIVER_MODEL
@@ -476,6 +746,9 @@
 #endif
 #ifndef AXIS5_POWER_DOWN
 #define AXIS5_POWER_DOWN              OFF
+#endif
+#ifndef AXIS5_ENABLE_STATE
+#define AXIS5_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
 #define AXIS5_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -513,6 +786,75 @@
 #ifndef AXIS5_SENSE_LIMIT_INIT
 #define AXIS5_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS5_DRIVER_MODEL >= DRIVER_FIRST && AXIS5_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS5_DRIVER_PRESENT
+  #if AXIS5_DRIVER_MODEL == TMC2130 || AXIS5_DRIVER_MODEL == TMC5160
+  #define AXIS5_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS5_STEP_STATE
+  #define AXIS5_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS5_DRIVER_MICROSTEPS
+  #define AXIS5_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS5_DRIVER_MICROSTEPS_GOTO
+  #define AXIS5_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS5_DRIVER_DECAY
+  #define AXIS5_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS5_DRIVER_DECAY_GOTO
+  #define AXIS5_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS5_DRIVER_IHOLD
+  #define AXIS5_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS5_DRIVER_IRUN
+  #define AXIS5_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS5_DRIVER_IGOTO
+  #define AXIS5_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS5_DRIVER_STATUS
+  #define AXIS5_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS5_PARAMETER1      
+  #define AXIS5_PARAMETER1              AXIS5_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS5_PARAMETER2 
+  #define AXIS5_PARAMETER2              AXIS5_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS5_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS5_SERVO_PRESENT
+  #ifndef AXIS5_SERVO_P
+  #define AXIS5_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS5_SERVO_I
+  #define AXIS5_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS5_SERVO_D
+  #define AXIS5_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS5_SERVO_ENCODER
+  #define AXIS5_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS5_SERVO_ENCODER_TRIGGER
+  #define AXIS5_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS5_SERVO_PH1_STATE
+  #define AXIS5_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS5_SERVO_PH2_STATE
+  #define AXIS5_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS5_PARAMETER1      
+  #define AXIS5_PARAMETER1              1
+  #endif
+  #ifndef AXIS5_PARAMETER2 
+  #define AXIS5_PARAMETER2              0
+  #endif
+#endif
 
 // focuser settings, FOCUSER3
 #ifndef AXIS6_DRIVER_MODEL
@@ -526,6 +868,9 @@
 #endif
 #ifndef AXIS6_POWER_DOWN
 #define AXIS6_POWER_DOWN              OFF
+#endif
+#ifndef AXIS6_ENABLE_STATE
+#define AXIS6_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
 #define AXIS6_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -563,6 +908,75 @@
 #ifndef AXIS6_SENSE_LIMIT_INIT
 #define AXIS6_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS6_DRIVER_MODEL >= DRIVER_FIRST && AXIS6_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS6_DRIVER_PRESENT
+  #if AXIS6_DRIVER_MODEL == TMC2130 || AXIS6_DRIVER_MODEL == TMC5160
+  #define AXIS6_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS6_STEP_STATE
+  #define AXIS6_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS6_DRIVER_MICROSTEPS
+  #define AXIS6_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS6_DRIVER_MICROSTEPS_GOTO
+  #define AXIS6_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS6_DRIVER_DECAY
+  #define AXIS6_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS6_DRIVER_DECAY_GOTO
+  #define AXIS6_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS6_DRIVER_IHOLD
+  #define AXIS6_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS6_DRIVER_IRUN
+  #define AXIS6_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS6_DRIVER_IGOTO
+  #define AXIS6_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS6_DRIVER_STATUS
+  #define AXIS6_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS6_PARAMETER1      
+  #define AXIS6_PARAMETER1              AXIS6_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS6_PARAMETER2 
+  #define AXIS6_PARAMETER2              AXIS6_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS6_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS6_SERVO_PRESENT
+  #ifndef AXIS6_SERVO_P
+  #define AXIS6_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS6_SERVO_I
+  #define AXIS6_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS6_SERVO_D
+  #define AXIS6_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS6_SERVO_ENCODER
+  #define AXIS6_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS6_SERVO_ENCODER_TRIGGER
+  #define AXIS6_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS6_SERVO_PH1_STATE
+  #define AXIS6_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS6_SERVO_PH2_STATE
+  #define AXIS6_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS6_PARAMETER1      
+  #define AXIS6_PARAMETER1              1
+  #endif
+  #ifndef AXIS6_PARAMETER2 
+  #define AXIS6_PARAMETER2              0
+  #endif
+#endif
 
 // focuser settings, FOCUSER4
 #ifndef AXIS7_DRIVER_MODEL
@@ -576,6 +990,9 @@
 #endif
 #ifndef AXIS7_POWER_DOWN
 #define AXIS7_POWER_DOWN              OFF
+#endif
+#ifndef AXIS7_ENABLE_STATE
+#define AXIS7_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
 #define AXIS7_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -613,6 +1030,75 @@
 #ifndef AXIS7_SENSE_LIMIT_INIT
 #define AXIS7_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS7_DRIVER_MODEL >= DRIVER_FIRST && AXIS7_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS7_DRIVER_PRESENT
+  #if AXIS7_DRIVER_MODEL == TMC2130 || AXIS7_DRIVER_MODEL == TMC5160
+  #define AXIS7_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS7_STEP_STATE
+  #define AXIS7_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS7_DRIVER_MICROSTEPS
+  #define AXIS7_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS7_DRIVER_MICROSTEPS_GOTO
+  #define AXIS7_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS7_DRIVER_DECAY
+  #define AXIS7_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS7_DRIVER_DECAY_GOTO
+  #define AXIS7_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS7_DRIVER_IHOLD
+  #define AXIS7_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS7_DRIVER_IRUN
+  #define AXIS7_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS7_DRIVER_IGOTO
+  #define AXIS7_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS7_DRIVER_STATUS
+  #define AXIS7_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS7_DRIVER_PARAMETER1      
+  #define AXIS7_DRIVER_PARAMETER1       AXIS7_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS7_DRIVER_PARAMETER2 
+  #define AXIS7_DRIVER_PARAMETER2       AXIS7_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS7_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS7_SERVO_PRESENT
+  #ifndef AXIS7_SERVO_P
+  #define AXIS7_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS7_SERVO_I
+  #define AXIS7_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS7_SERVO_D
+  #define AXIS7_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS7_SERVO_ENCODER
+  #define AXIS7_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS7_SERVO_ENCODER_TRIGGER
+  #define AXIS7_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS7_SERVO_PH1_STATE
+  #define AXIS7_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS7_SERVO_PH2_STATE
+  #define AXIS7_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS7_PARAMETER1      
+  #define AXIS7_PARAMETER1              1
+  #endif
+  #ifndef AXIS7_PARAMETER2 
+  #define AXIS7_PARAMETER2              0
+  #endif
+#endif
 
 // focuser settings, FOCUSER5
 #ifndef AXIS8_DRIVER_MODEL
@@ -626,6 +1112,9 @@
 #endif
 #ifndef AXIS8_POWER_DOWN
 #define AXIS8_POWER_DOWN              OFF
+#endif
+#ifndef AXIS8_ENABLE_STATE
+#define AXIS8_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
 #define AXIS8_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -663,6 +1152,75 @@
 #ifndef AXIS8_SENSE_LIMIT_INIT
 #define AXIS8_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS8_DRIVER_MODEL >= DRIVER_FIRST && AXIS8_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS8_DRIVER_PRESENT
+  #if AXIS8_DRIVER_MODEL == TMC2130 || AXIS8_DRIVER_MODEL == TMC5160
+  #define AXIS8_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS8_STEP_STATE
+  #define AXIS8_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS8_DRIVER_MICROSTEPS
+  #define AXIS8_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS8_DRIVER_MICROSTEPS_GOTO
+  #define AXIS8_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS8_DRIVER_DECAY
+  #define AXIS8_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS8_DRIVER_DECAY_GOTO
+  #define AXIS8_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS8_DRIVER_IHOLD
+  #define AXIS8_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS8_DRIVER_IRUN
+  #define AXIS8_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS8_DRIVER_IGOTO
+  #define AXIS8_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS8_DRIVER_STATUS
+  #define AXIS8_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS8_PARAMETER1      
+  #define AXIS8_PARAMETER1              AXIS8_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS8_PARAMETER2 
+  #define AXIS8_PARAMETER2              AXIS8_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS8_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS8_SERVO_PRESENT
+  #ifndef AXIS8_SERVO_P
+  #define AXIS8_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS8_SERVO_I
+  #define AXIS8_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS8_SERVO_D
+  #define AXIS8_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS8_SERVO_ENCODER
+  #define AXIS8_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS8_SERVO_ENCODER_TRIGGER
+  #define AXIS8_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS8_SERVO_PH1_STATE
+  #define AXIS8_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS8_SERVO_PH2_STATE
+  #define AXIS8_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS8_PARAMETER1      
+  #define AXIS8_PARAMETER1              1
+  #endif
+  #ifndef AXIS8_PARAMETER2 
+  #define AXIS8_PARAMETER2              0
+  #endif
+#endif
 
 // focuser settings, FOCUSER6
 #ifndef AXIS9_DRIVER_MODEL
@@ -676,6 +1234,9 @@
 #endif
 #ifndef AXIS9_POWER_DOWN
 #define AXIS9_POWER_DOWN              OFF
+#endif
+#ifndef AXIS9_ENABLE_STATE
+#define AXIS9_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
 #define AXIS9_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -713,12 +1274,99 @@
 #ifndef AXIS9_SENSE_LIMIT_INIT
 #define AXIS9_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+#if AXIS9_DRIVER_MODEL >= DRIVER_FIRST && AXIS9_DRIVER_MODEL <= DRIVER_LAST
+  #define AXIS9_DRIVER_PRESENT
+  #if AXIS9_DRIVER_MODEL == TMC2130 || AXIS9_DRIVER_MODEL == TMC5160
+  #define AXIS9_DRIVER_TMC_SPI
+  #endif
+  #ifndef AXIS9_STEP_STATE
+  #define AXIS9_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS9_DRIVER_MICROSTEPS
+  #define AXIS9_DRIVER_MICROSTEPS       OFF
+  #endif
+  #ifndef AXIS9_DRIVER_MICROSTEPS_GOTO
+  #define AXIS9_DRIVER_MICROSTEPS_GOTO  OFF
+  #endif
+  #ifndef AXIS9_DRIVER_DECAY
+  #define AXIS9_DRIVER_DECAY            OFF
+  #endif
+  #ifndef AXIS9_DRIVER_DECAY_GOTO
+  #define AXIS9_DRIVER_DECAY_GOTO       OFF
+  #endif
+  #ifndef AXIS9_DRIVER_IHOLD
+  #define AXIS9_DRIVER_IHOLD            HALF
+  #endif
+  #ifndef AXIS9_DRIVER_IRUN
+  #define AXIS9_DRIVER_IRUN             OFF
+  #endif
+  #ifndef AXIS9_DRIVER_IGOTO
+  #define AXIS9_DRIVER_IGOTO            SAME
+  #endif
+  #ifndef AXIS9_DRIVER_STATUS
+  #define AXIS9_DRIVER_STATUS           OFF
+  #endif
+  #ifndef AXIS9_PARAMETER1      
+  #define AXIS9_PARAMETER1              AXIS9_DRIVER_MICROSTEPS
+  #endif
+  #ifndef AXIS9_PARAMETER2 
+  #define AXIS9_PARAMETER2              AXIS9_DRIVER_IRUN
+  #endif
+#endif
+#if AXIS9_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS9_SERVO_PRESENT
+  #ifndef AXIS9_SERVO_P
+  #define AXIS9_SERVO_P                 2.0
+  #endif
+  #ifndef AXIS9_SERVO_I
+  #define AXIS9_SERVO_I                 5.0
+  #endif
+  #ifndef AXIS9_SERVO_D
+  #define AXIS9_SERVO_D                 1.0
+  #endif
+  #ifndef AXIS9_SERVO_ENCODER
+  #define AXIS9_SERVO_ENCODER           ENC_AB
+  #endif
+  #ifndef AXIS9_SERVO_ENCODER_TRIGGER
+  #define AXIS9_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS9_SERVO_PH1_STATE
+  #define AXIS9_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS9_SERVO_PH2_STATE
+  #define AXIS9_SERVO_PH2_STATE         LOW
+  #endif
+  #ifndef AXIS9_PARAMETER1      
+  #define AXIS9_PARAMETER1              1
+  #endif
+  #ifndef AXIS9_PARAMETER2 
+  #define AXIS9_PARAMETER2              0
+  #endif
+#endif
 
 #ifndef FOCUSER_TEMPERATURE
 #define FOCUSER_TEMPERATURE           OFF // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
 #endif
 #ifndef FOCUSER_TEMPERATURE_PIN
 #define FOCUSER_TEMPERATURE_PIN       OFF // for thermistors, analog pin
+#endif
+
+#if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \
+    defined(AXIS4_DRIVER_PRESENT) || defined(AXIS5_DRIVER_PRESENT) || defined(AXIS6_DRIVER_PRESENT) || \
+    defined(AXIS7_DRIVER_PRESENT) || defined(AXIS8_DRIVER_PRESENT) || defined(AXIS9_DRIVER_PRESENT)
+  #define SD_DRIVER_PRESENT
+#endif
+
+#if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
+    defined(AXIS4_DRIVER_TMC_SPI) || defined(AXIS5_DRIVER_TMC_SPI) || defined(AXIS6_DRIVER_TMC_SPI) || \
+    defined(AXIS7_DRIVER_TMC_SPI) || defined(AXIS8_DRIVER_TMC_SPI) || defined(AXIS9_DRIVER_TMC_SPI)
+  #define TMC_DRIVER_PRESENT
+#endif
+
+#if defined(AXIS1_SERVO_PRESENT) || defined(AXIS2_SERVO_PRESENT) || defined(AXIS3_SERVO_PRESENT) || \
+    defined(AXIS4_SERVO_PRESENT) || defined(AXIS5_SERVO_PRESENT) || defined(AXIS6_SERVO_PRESENT) || \
+    defined(AXIS7_SERVO_PRESENT) || defined(AXIS8_SERVO_PRESENT) || defined(AXIS9_SERVO_PRESENT)
+  #define SERVO_DRIVER_PRESENT
 #endif
 
 // -----------------------------------------------------------------------------------

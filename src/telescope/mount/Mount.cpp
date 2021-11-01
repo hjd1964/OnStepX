@@ -42,7 +42,7 @@ void Mount::init() {
   // get the main axes ready
   delay(100);
   axis1.init(&motor1, pollAxis1);
-  #ifdef AXIS2_SERVO
+  #ifdef AXIS2_SERVO_PRESENT
     if (!motor1.init(moveAxis1)) { DLF("ERR: Axis1, no motor exiting!"); return; }
   #else
     if (!motor1.init(moveAxis1, moveFFAxis1, moveFRAxis1)) { DLF("ERR: Axis1, no motor exiting!"); return; }
@@ -53,7 +53,7 @@ void Mount::init() {
 
   delay(100);
   axis2.init(&motor2, pollAxis2);
-  #ifdef AXIS2_SERVO
+  #ifdef AXIS2_SERVO_PRESENT
     if (!motor2.init(moveAxis2)) { DLF("ERR: Axis2, no motor exiting!"); return; }
   #else
     if (!motor2.init(moveAxis2, moveFFAxis2, moveFRAxis2)) { DLF("ERR: Axis2, no motor exiting!"); return; }

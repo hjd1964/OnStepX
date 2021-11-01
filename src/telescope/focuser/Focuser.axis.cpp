@@ -6,7 +6,7 @@
 #ifdef FOCUSER_PRESENT
 
 #if AXIS4_DRIVER_MODEL != OFF
-  #ifdef AXIS4_SERVO
+  #ifdef AXIS4_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis4 = {AXIS4_SERVO_PH1_PIN, AXIS4_SERVO_PH1_STATE, AXIS4_SERVO_PH2_PIN, AXIS4_SERVO_PH2_STATE, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE, AXIS4_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_SERVO_P, AXIS4_SERVO_I, AXIS4_SERVO_D, AXIS4_DRIVER_STATUS};
     ServoDriver servoDriver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
@@ -22,7 +22,7 @@
     ServoMotor motor4(4, &encAxis4, &pidAxis4, &servoDriver4, &control4);
     void moveAxis4() { motor4.move(); }
   #endif
-  #ifdef AXIS4_DRIVER_SD
+  #ifdef AXIS4_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis4 = {AXIS4_M0_PIN, AXIS4_M1_PIN, AXIS4_M2_PIN, AXIS4_M3_PIN, AXIS4_DECAY_PIN, AXIS4_FAULT_PIN};
     const DriverSettings DriverSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_MICROSTEPS_GOTO, AXIS4_DRIVER_IHOLD, AXIS4_DRIVER_IRUN, AXIS4_DRIVER_IGOTO, AXIS4_DRIVER_DECAY, AXIS4_DRIVER_DECAY_GOTO, AXIS4_DRIVER_STATUS};
     StepDirDriver stepDirDriver4(4, &DriverPinsAxis4, &DriverSettingsAxis4);
@@ -38,7 +38,7 @@
 #endif
 
 #if AXIS5_DRIVER_MODEL != OFF
-  #ifdef AXIS5_SERVO
+  #ifdef AXIS5_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis5 = {AXIS5_SERVO_PH1_PIN, AXIS5_SERVO_PH1_STATE, AXIS5_SERVO_PH2_PIN, AXIS5_SERVO_PH2_STATE, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE, AXIS5_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_SERVO_P, AXIS5_SERVO_I, AXIS5_SERVO_D, AXIS5_DRIVER_STATUS};
     ServoDriver servoDriver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
@@ -54,7 +54,7 @@
     ServoMotor motor5(5, &encAxis5, &pidAxis5, &servoDriver5, &control5);
     void moveAxis5() { motor5.move(); }
   #endif
-  #ifdef AXIS5_DRIVER_SD
+  #ifdef AXIS5_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis5 = {AXIS5_M0_PIN, AXIS5_M1_PIN, AXIS5_M2_PIN, AXIS5_M3_PIN, AXIS5_DECAY_PIN, AXIS5_FAULT_PIN};
     const DriverSettings DriverSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_MICROSTEPS_GOTO, AXIS5_DRIVER_IHOLD, AXIS5_DRIVER_IRUN, AXIS5_DRIVER_IGOTO, AXIS5_DRIVER_DECAY, AXIS5_DRIVER_DECAY_GOTO, AXIS5_DRIVER_STATUS};
     StepDirDriver stepDirDriver5(5, &DriverPinsAxis5, &DriverSettingsAxis5);
@@ -70,7 +70,7 @@
 #endif
 
 #if AXIS6_DRIVER_MODEL != OFF
-  #ifdef AXIS6_SERVO
+  #ifdef AXIS6_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis6 = {AXIS6_SERVO_PH1_PIN, AXIS6_SERVO_PH1_STATE, AXIS6_SERVO_PH2_PIN, AXIS6_SERVO_PH2_STATE, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE, AXIS6_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_SERVO_P, AXIS6_SERVO_I, AXIS6_SERVO_D, AXIS6_DRIVER_STATUS};
     ServoDriver servoDriver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
@@ -86,7 +86,7 @@
     ServoMotor motor6(6, &encAxis6, &pidAxis6, &servoDriver6, &control6);
     void moveAxis6() { motor6.move(); }
   #endif
-  #ifdef AXIS6_DRIVER_SD
+  #ifdef AXIS6_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis6 = {AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS6_M2_PIN, AXIS6_M3_PIN, AXIS6_DECAY_PIN, AXIS6_FAULT_PIN};
     const DriverSettings DriverSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_MICROSTEPS_GOTO, AXIS6_DRIVER_IHOLD, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_IGOTO, AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO, AXIS6_DRIVER_STATUS};
     StepDirDriver stepDirDriver6(6, &DriverPinsAxis6, &DriverSettingsAxis6);
@@ -102,7 +102,7 @@
 #endif
 
 #if AXIS7_DRIVER_MODEL != OFF
-  #ifdef AXIS7_SERVO
+  #ifdef AXIS7_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis7 = {AXIS7_SERVO_PH1_PIN, AXIS7_SERVO_PH1_STATE, AXIS7_SERVO_PH2_PIN, AXIS7_SERVO_PH2_STATE, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE, AXIS7_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_SERVO_P, AXIS7_SERVO_I, AXIS7_SERVO_D, AXIS7_DRIVER_STATUS};
     ServoDriver servoDriver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
@@ -118,7 +118,7 @@
     ServoMotor motor7(7, &encAxis7, &pidAxis7, &servoDriver7, &control7);
     void moveAxis7() { motor7.move(); }
   #endif
-  #ifdef AXIS7_DRIVER_SD
+  #ifdef AXIS7_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis7 = {AXIS7_M0_PIN, AXIS7_M1_PIN, AXIS7_M2_PIN, AXIS7_M3_PIN, AXIS7_DECAY_PIN, AXIS7_FAULT_PIN};
     const DriverSettings DriverSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_MICROSTEPS_GOTO, AXIS7_DRIVER_IHOLD, AXIS7_DRIVER_IRUN, AXIS7_DRIVER_IGOTO, AXIS7_DRIVER_DECAY, AXIS7_DRIVER_DECAY_GOTO, AXIS7_DRIVER_STATUS};
     StepDirDriver stepDirDriver7(7, &DriverPinsAxis7, &DriverSettingsAxis7);
@@ -134,7 +134,7 @@
 #endif
 
 #if AXIS8_DRIVER_MODEL != OFF
-  #ifdef AXIS8_SERVO
+  #ifdef AXIS8_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis8 = {AXIS8_SERVO_PH1_PIN, AXIS8_SERVO_PH1_STATE, AXIS8_SERVO_PH2_PIN, AXIS8_SERVO_PH2_STATE, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE, AXIS8_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_SERVO_P, AXIS8_SERVO_I, AXIS8_SERVO_D, AXIS8_DRIVER_STATUS};
     ServoDriver servoDriver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
@@ -150,7 +150,7 @@
     ServoMotor motor8(8, &encAxis8, &pidAxis8, &servoDriver8, &control8);
     void moveAxis8() { motor8.move(); }
   #endif
-  #ifdef AXIS8_DRIVER_SD
+  #ifdef AXIS8_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis8 = {AXIS8_M0_PIN, AXIS8_M1_PIN, AXIS8_M2_PIN, AXIS8_M3_PIN, AXIS8_DECAY_PIN, AXIS8_FAULT_PIN};
     const DriverSettings DriverSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_MICROSTEPS_GOTO, AXIS8_DRIVER_IHOLD, AXIS8_DRIVER_IRUN, AXIS8_DRIVER_IGOTO, AXIS8_DRIVER_DECAY, AXIS8_DRIVER_DECAY_GOTO, AXIS8_DRIVER_STATUS};
     StepDirDriver stepDirDriver8(8, &DriverPinsAxis8, &DriverSettingsAxis8);
@@ -166,7 +166,7 @@
 #endif
 
 #if AXIS9_DRIVER_MODEL != OFF
-  #ifdef AXIS9_SERVO
+  #ifdef AXIS9_SERVO_PRESENT
     const ServoDriverPins ServoPinsAxis9 = {AXIS9_SERVO_PH1_PIN, AXIS9_SERVO_PH1_STATE, AXIS9_SERVO_PH2_PIN, AXIS9_SERVO_PH2_STATE, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE, AXIS9_FAULT_PIN};
     const ServoDriverSettings ServoSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_SERVO_P, AXIS9_SERVO_I, AXIS9_SERVO_D, AXIS9_DRIVER_STATUS};
     ServoDriver servoDriver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
@@ -182,7 +182,7 @@
     ServoMotor motor9(9, &encAxis9, &pidAxis9, &servoDriver9, &control9);
     void moveAxis9() { motor9.move(); }
   #endif
-  #ifdef AXIS9_DRIVER_SD
+  #ifdef AXIS9_DRIVER_PRESENT
     const DriverModePins DriverPinsAxis9 = {AXIS9_M0_PIN, AXIS9_M1_PIN, AXIS9_M2_PIN, AXIS9_M3_PIN, AXIS9_DECAY_PIN, AXIS9_FAULT_PIN};
     const DriverSettings DriverSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_MICROSTEPS_GOTO, AXIS9_DRIVER_IHOLD, AXIS9_DRIVER_IRUN, AXIS9_DRIVER_IGOTO, AXIS9_DRIVER_DECAY, AXIS9_DRIVER_DECAY_GOTO, AXIS9_DRIVER_STATUS};
     StepDirDriver stepDirDriver9(9, &DriverPinsAxis9, &DriverSettingsAxis9);

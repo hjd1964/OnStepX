@@ -5,7 +5,7 @@
 
 #ifdef MOUNT_PRESENT
 
-#ifdef AXIS1_SERVO
+#ifdef AXIS1_SERVO_PRESENT
   const ServoDriverPins ServoPinsAxis1 = {AXIS1_SERVO_PH1_PIN, AXIS1_SERVO_PH1_STATE, AXIS1_SERVO_PH2_PIN, AXIS1_SERVO_PH2_STATE, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE, AXIS1_FAULT_PIN};
   const ServoDriverSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_SERVO_P, AXIS1_SERVO_I, AXIS1_SERVO_D, AXIS1_DRIVER_STATUS};
   ServoDriver servoDriver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
@@ -21,7 +21,7 @@
   ServoMotor motor1(1, &encAxis1, &pidAxis1, &servoDriver1, &control1);
   IRAM_ATTR void moveAxis1() { motor1.move(); }
 #endif
-#ifdef AXIS1_DRIVER_SD
+#ifdef AXIS1_DRIVER_PRESENT
   const DriverModePins DriverPinsAxis1 = {AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_DECAY_PIN, AXIS1_FAULT_PIN};
   const DriverSettings DriverSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_MICROSTEPS_GOTO, AXIS1_DRIVER_IHOLD, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_IGOTO, AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO, AXIS1_DRIVER_STATUS};
   StepDirDriver stepDirDriver1(1, &DriverPinsAxis1, &DriverSettingsAxis1);
@@ -37,7 +37,7 @@ const AxisSettings SettingsAxis1 = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_
 Axis axis1(1, &PinsAxis1, &SettingsAxis1);
 void pollAxis1() { axis1.poll(); }
 
-#ifdef AXIS2_SERVO
+#ifdef AXIS2_SERVO_PRESENT
   const ServoDriverPins ServoPinsAxis2 = {AXIS2_SERVO_PH1_PIN, AXIS2_SERVO_PH1_STATE, AXIS2_SERVO_PH2_PIN, AXIS2_SERVO_PH2_STATE, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE, AXIS2_FAULT_PIN};
   const ServoDriverSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_SERVO_P, AXIS2_SERVO_I, AXIS2_SERVO_D, AXIS2_DRIVER_STATUS};
   ServoDriver servoDriver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
@@ -53,7 +53,7 @@ void pollAxis1() { axis1.poll(); }
   ServoMotor motor2(2, &encAxis2, &pidAxis2, &servoDriver2, &control2);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
 #endif
-#ifdef AXIS2_DRIVER_SD
+#ifdef AXIS2_DRIVER_PRESENT
   const DriverModePins DriverPinsAxis2 = {AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_M2_PIN, AXIS2_M3_PIN, AXIS2_DECAY_PIN, AXIS2_FAULT_PIN};
   const DriverSettings DriverSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_MICROSTEPS_GOTO, AXIS2_DRIVER_IHOLD, AXIS2_DRIVER_IRUN, AXIS2_DRIVER_IGOTO, AXIS2_DRIVER_DECAY, AXIS2_DRIVER_DECAY_GOTO, AXIS2_DRIVER_STATUS};
   StepDirDriver stepDirDriver2(2, &DriverPinsAxis2, &DriverSettingsAxis2);

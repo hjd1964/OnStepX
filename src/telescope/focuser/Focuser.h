@@ -150,9 +150,9 @@ class Focuser {
 };
 
 #if AXIS4_DRIVER_MODEL != OFF
-  #ifdef AXIS4_DRIVER_SD
+  #ifdef AXIS4_DRIVER_PRESENT
     extern StepDirMotor motor4;
-  #elif defined(AXIS4_SERVO)
+  #elif defined(AXIS4_SERVO_PRESENT)
     extern ServoMotor motor4;
   #endif
   extern IRAM_ATTR void moveAxis4();
@@ -161,9 +161,9 @@ class Focuser {
 #endif
 
 #if AXIS5_DRIVER_MODEL != OFF
-  #ifdef AXIS5_DRIVER_SD
+  #ifdef AXIS5_DRIVER_PRESENT
     extern StepDirMotor motor5;
-  #elif defined(AXIS5_SERVO)
+  #elif defined(AXIS5_SERVO_PRESENT)
     extern ServoMotor motor5;
   #endif
   extern IRAM_ATTR void moveAxis5();
@@ -172,9 +172,9 @@ class Focuser {
 #endif
 
 #if AXIS6_DRIVER_MODEL != OFF
-  #ifdef AXIS6_DRIVER_SD
+  #ifdef AXIS6_DRIVER_PRESENT
     extern StepDirMotor motor6;
-  #elif defined(AXIS6_SERVO)
+  #elif defined(AXIS6_SERVO_PRESENT)
     extern ServoMotor motor6;
   #endif
   extern IRAM_ATTR void moveAxis6();
@@ -183,9 +183,9 @@ class Focuser {
 #endif
 
 #if AXIS7_DRIVER_MODEL != OFF
-  #ifdef AXIS7_DRIVER_SD
+  #ifdef AXIS7_DRIVER_PRESENT
     extern StepDirMotor motor7;
-  #elif defined(AXIS7_SERVO)
+  #elif defined(AXIS7_SERVO_PRESENT)
     extern ServoMotor motor7;
   #endif
   extern IRAM_ATTR void moveAxis7();
@@ -194,9 +194,9 @@ class Focuser {
 #endif
 
 #if AXIS8_DRIVER_MODEL != OFF
-  #ifdef AXIS8_DRIVER_SD
+  #ifdef AXIS8_DRIVER_PRESENT
     extern StepDirMotor motor8;
-  #elif defined(AXIS8_SERVO)
+  #elif defined(AXIS8_SERVO_PRESENT)
     extern ServoMotor motor8;
   #endif
   extern IRAM_ATTR void moveAxis8();
@@ -205,9 +205,9 @@ class Focuser {
 #endif
 
 #if AXIS9_DRIVER_MODEL != OFF
-  #ifdef AXIS9_DRIVER_SD
+  #ifdef AXIS9_DRIVER_PRESENT
     extern StepDirMotor motor9;
-  #elif defined(AXIS9_SERVO)
+  #elif defined(AXIS9_SERVO_PRESENT)
     extern ServoMotor motor9;
   #endif
   extern IRAM_ATTR void moveAxis9();

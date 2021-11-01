@@ -111,9 +111,9 @@ class Mount {
     bool atHome = true;
 };
 
-#ifdef AXIS1_DRIVER_SD
+#ifdef AXIS1_DRIVER_PRESENT
   extern StepDirMotor motor1;
-#elif defined(AXIS1_SERVO)
+#elif defined(AXIS1_SERVO_PRESENT)
   extern ServoMotor motor1;
 #endif
 extern IRAM_ATTR void moveAxis1();
@@ -122,9 +122,9 @@ extern IRAM_ATTR void moveFRAxis1();
 extern IRAM_ATTR void pollAxis1();
 extern Axis axis1;
 
-#ifdef AXIS2_DRIVER_SD
+#ifdef AXIS2_DRIVER_PRESENT
   extern StepDirMotor motor2;
-#elif defined(AXIS2_SERVO)
+#elif defined(AXIS2_SERVO_PRESENT)
   extern ServoMotor motor2;
 #endif
 extern IRAM_ATTR void moveAxis2();

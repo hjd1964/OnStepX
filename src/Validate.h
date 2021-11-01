@@ -73,50 +73,47 @@
   #error "Configuration (Config.h): Setting AXIS1_DRIVER_STATUS unknown, use OFF or a valid driver status."
 #endif
 
-#if AXIS1_DRIVER_MICROSTEPS != OFF && (AXIS1_DRIVER_MICROSTEPS < 1 || AXIS1_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS1_DRIVER_MICROSTEPS != 1 && AXIS1_DRIVER_MICROSTEPS != 2 && AXIS1_DRIVER_MICROSTEPS != 4 && \
-      AXIS1_DRIVER_MICROSTEPS != 8 && AXIS1_DRIVER_MICROSTEPS != 16 && AXIS1_DRIVER_MICROSTEPS != 32 && \
-      AXIS1_DRIVER_MICROSTEPS != 64 && AXIS1_DRIVER_MICROSTEPS != 128 && AXIS1_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+#ifdef AXIS1_DRIVER_PRESENT
+  #if AXIS1_DRIVER_MICROSTEPS != OFF && (AXIS1_DRIVER_MICROSTEPS < 1 || AXIS1_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS1_DRIVER_MICROSTEPS != 1 && AXIS1_DRIVER_MICROSTEPS != 2 && AXIS1_DRIVER_MICROSTEPS != 4 && \
+        AXIS1_DRIVER_MICROSTEPS != 8 && AXIS1_DRIVER_MICROSTEPS != 16 && AXIS1_DRIVER_MICROSTEPS != 32 && \
+        AXIS1_DRIVER_MICROSTEPS != 64 && AXIS1_DRIVER_MICROSTEPS != 128 && AXIS1_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS1_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS1_DRIVER_MICROSTEPS_GOTO < 1 || AXIS1_DRIVER_MICROSTEPS_GOTO >= AXIS1_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO unknown, use a valid microstep setting (range 1 to < AXIS1_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS1_DRIVER_MICROSTEPS_GOTO != 1 && AXIS1_DRIVER_MICROSTEPS_GOTO != 2 && AXIS1_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS1_DRIVER_MICROSTEPS_GOTO != 8 && AXIS1_DRIVER_MICROSTEPS_GOTO != 16 && AXIS1_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS1_DRIVER_MICROSTEPS_GOTO != 64 && AXIS1_DRIVER_MICROSTEPS_GOTO != 128 && AXIS1_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS1_DRIVER_MICROSTEPS == OFF && AXIS1_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS1_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS1_DRIVER_DECAY != OFF && (AXIS1_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS1_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS1_DRIVER_DECAY_GOTO != OFF && (AXIS1_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS1_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS1_DRIVER_IRUN != OFF && (AXIS1_DRIVER_IRUN < 0 || AXIS1_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
+  #endif
+  #if AXIS1_DRIVER_IHOLD != HALF && (AXIS1_DRIVER_IHOLD < 0 || AXIS1_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
+  #endif
+  #if AXIS1_DRIVER_IGOTO != SAME && (AXIS1_DRIVER_IGOTO < 0 || AXIS1_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
-#if AXIS1_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS1_DRIVER_MICROSTEPS_GOTO < 1 || AXIS1_DRIVER_MICROSTEPS_GOTO >= AXIS1_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO unknown, use a valid microstep setting (range 1 to < AXIS1_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS1_DRIVER_MICROSTEPS_GOTO != 1 && AXIS1_DRIVER_MICROSTEPS_GOTO != 2 && AXIS1_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS1_DRIVER_MICROSTEPS_GOTO != 8 && AXIS1_DRIVER_MICROSTEPS_GOTO != 16 && AXIS1_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS1_DRIVER_MICROSTEPS_GOTO != 64 && AXIS1_DRIVER_MICROSTEPS_GOTO != 128 && AXIS1_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+#ifdef AXIS1_SERVO_PRESENT
+  #if AXIS1_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS1_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS1_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
-#endif
-
-#if AXIS1_DRIVER_MICROSTEPS == OFF && AXIS1_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS1_DRIVER_MICROSTEPS."
-#endif
-
-#if AXIS1_DRIVER_DECAY != OFF && (AXIS1_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS1_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS1_DRIVER_DECAY_GOTO != OFF && (AXIS1_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS1_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS1_DRIVER_IRUN != OFF && (AXIS1_DRIVER_IRUN < 0 || AXIS1_DRIVER_IRUN > 3000)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS1_DRIVER_IHOLD != HALF && (AXIS1_DRIVER_IHOLD < 0 || AXIS1_DRIVER_IHOLD > 3000)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS1_DRIVER_IGOTO != SAME && (AXIS1_DRIVER_IGOTO < 0 || AXIS1_DRIVER_IGOTO > 3000)
-  #error "Configuration (Config.h): Setting AXIS1_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS1_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS1_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS1_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
 #endif
 
 #if AXIS1_REVERSE != ON && AXIS1_REVERSE != OFF
@@ -162,50 +159,47 @@
   #error "Configuration (Config.h): Setting AXIS2_DRIVER_STATUS unknown, use OFF or a valid driver status."
 #endif
 
-#if AXIS2_DRIVER_MICROSTEPS != OFF && (AXIS2_DRIVER_MICROSTEPS < 1 || AXIS2_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS2_DRIVER_MICROSTEPS != 1 && AXIS2_DRIVER_MICROSTEPS != 2 && AXIS2_DRIVER_MICROSTEPS != 4 && \
-      AXIS2_DRIVER_MICROSTEPS != 8 && AXIS2_DRIVER_MICROSTEPS != 16 && AXIS2_DRIVER_MICROSTEPS != 32 && \
-      AXIS2_DRIVER_MICROSTEPS != 64 && AXIS2_DRIVER_MICROSTEPS != 128 && AXIS2_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+#ifdef AXIS2_DRIVER_PRESENT
+  #if AXIS2_DRIVER_MICROSTEPS != OFF && (AXIS2_DRIVER_MICROSTEPS < 1 || AXIS2_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS2_DRIVER_MICROSTEPS != 1 && AXIS2_DRIVER_MICROSTEPS != 2 && AXIS2_DRIVER_MICROSTEPS != 4 && \
+        AXIS2_DRIVER_MICROSTEPS != 8 && AXIS2_DRIVER_MICROSTEPS != 16 && AXIS2_DRIVER_MICROSTEPS != 32 && \
+        AXIS2_DRIVER_MICROSTEPS != 64 && AXIS2_DRIVER_MICROSTEPS != 128 && AXIS2_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS2_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS2_DRIVER_MICROSTEPS_GOTO < 1 || AXIS2_DRIVER_MICROSTEPS_GOTO >= AXIS2_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS2_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS2_DRIVER_MICROSTEPS_GOTO != 1 && AXIS2_DRIVER_MICROSTEPS_GOTO != 2 && AXIS2_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS2_DRIVER_MICROSTEPS_GOTO != 8 && AXIS2_DRIVER_MICROSTEPS_GOTO != 16 && AXIS2_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS2_DRIVER_MICROSTEPS_GOTO != 64 && AXIS2_DRIVER_MICROSTEPS_GOTO != 128 && AXIS2_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS2_DRIVER_MICROSTEPS == OFF && AXIS2_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS2_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS2_DRIVER_DECAY != OFF && (AXIS2_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS2_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS2_DRIVER_DECAY_GOTO != OFF && (AXIS2_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS2_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS2_DRIVER_IRUN != OFF && (AXIS2_DRIVER_IRUN < 0 || AXIS2_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
+  #endif
+  #if AXIS2_DRIVER_IHOLD != HALF && (AXIS2_DRIVER_IHOLD < 0 || AXIS2_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
+  #endif
+  #if AXIS2_DRIVER_IGOTO != SAME && (AXIS2_DRIVER_IGOTO < 0 || AXIS2_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
-#if AXIS2_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS2_DRIVER_MICROSTEPS_GOTO < 1 || AXIS2_DRIVER_MICROSTEPS_GOTO >= AXIS2_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS2_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS2_DRIVER_MICROSTEPS_GOTO != 1 && AXIS2_DRIVER_MICROSTEPS_GOTO != 2 && AXIS2_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS2_DRIVER_MICROSTEPS_GOTO != 8 && AXIS2_DRIVER_MICROSTEPS_GOTO != 16 && AXIS2_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS2_DRIVER_MICROSTEPS_GOTO != 64 && AXIS2_DRIVER_MICROSTEPS_GOTO != 128 && AXIS2_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+#ifdef AXIS2_SERVO_PRESENT
+  #if AXIS2_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS2_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS2_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
-#endif
-
-#if AXIS2_DRIVER_MICROSTEPS == OFF && AXIS2_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS2_DRIVER_MICROSTEPS."
-#endif
-
-#if AXIS2_DRIVER_DECAY != OFF && (AXIS2_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS2_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS2_DRIVER_DECAY_GOTO != OFF && (AXIS2_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS2_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS2_DRIVER_IRUN != OFF && (AXIS2_DRIVER_IRUN < 0 || AXIS2_DRIVER_IRUN > 3000)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS2_DRIVER_IHOLD != HALF && (AXIS2_DRIVER_IHOLD < 0 || AXIS2_DRIVER_IHOLD > 3000)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS2_DRIVER_IGOTO != SAME && (AXIS2_DRIVER_IGOTO < 0 || AXIS2_DRIVER_IGOTO > 3000)
-  #error "Configuration (Config.h): Setting AXIS2_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
-#endif
-
-#if AXIS2_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS2_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS2_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
 #endif
 
 #if AXIS2_REVERSE != ON && AXIS2_REVERSE != OFF
@@ -395,50 +389,47 @@
   #error "Configuration (Config.h): Setting AXIS3_DRIVER_STATUS unknown, use OFF or valid driver status."
 #endif
 
-#if AXIS3_DRIVER_MICROSTEPS != OFF && (AXIS3_DRIVER_MICROSTEPS < 1 || AXIS3_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS3_DRIVER_MICROSTEPS != 1 && AXIS3_DRIVER_MICROSTEPS != 2 && AXIS3_DRIVER_MICROSTEPS != 4 && \
-      AXIS3_DRIVER_MICROSTEPS != 8 && AXIS3_DRIVER_MICROSTEPS != 16 && AXIS3_DRIVER_MICROSTEPS != 32 && \
-      AXIS3_DRIVER_MICROSTEPS != 64 && AXIS3_DRIVER_MICROSTEPS != 128 && AXIS3_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+#ifdef AXIS3_DRIVER_PRESENT
+  #if AXIS3_DRIVER_MICROSTEPS != OFF && (AXIS3_DRIVER_MICROSTEPS < 1 || AXIS3_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS3_DRIVER_MICROSTEPS != 1 && AXIS3_DRIVER_MICROSTEPS != 2 && AXIS3_DRIVER_MICROSTEPS != 4 && \
+        AXIS3_DRIVER_MICROSTEPS != 8 && AXIS3_DRIVER_MICROSTEPS != 16 && AXIS3_DRIVER_MICROSTEPS != 32 && \
+        AXIS3_DRIVER_MICROSTEPS != 64 && AXIS3_DRIVER_MICROSTEPS != 128 && AXIS3_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS3_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS3_DRIVER_MICROSTEPS_GOTO < 1 || AXIS3_DRIVER_MICROSTEPS_GOTO >= AXIS3_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS3_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS3_DRIVER_MICROSTEPS_GOTO != 1 && AXIS3_DRIVER_MICROSTEPS_GOTO != 2 && AXIS3_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS3_DRIVER_MICROSTEPS_GOTO != 8 && AXIS3_DRIVER_MICROSTEPS_GOTO != 16 && AXIS3_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS3_DRIVER_MICROSTEPS_GOTO != 64 && AXIS3_DRIVER_MICROSTEPS_GOTO != 128 && AXIS3_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS3_DRIVER_MICROSTEPS == OFF && AXIS3_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS3_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS3_DRIVER_DECAY != OFF && (AXIS3_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS3_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS3_DRIVER_DECAY_GOTO != OFF && (AXIS3_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS3_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS3_DRIVER_IRUN != OFF && (AXIS3_DRIVER_IRUN < 0 || AXIS3_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS3_DRIVER_IHOLD != HALF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS3_DRIVER_IGOTO != SAME && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
-#if AXIS3_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS3_DRIVER_MICROSTEPS_GOTO < 1 || AXIS3_DRIVER_MICROSTEPS_GOTO >= AXIS3_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS3_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS3_DRIVER_MICROSTEPS_GOTO != 1 && AXIS3_DRIVER_MICROSTEPS_GOTO != 2 && AXIS3_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS3_DRIVER_MICROSTEPS_GOTO != 8 && AXIS3_DRIVER_MICROSTEPS_GOTO != 16 && AXIS3_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS3_DRIVER_MICROSTEPS_GOTO != 64 && AXIS3_DRIVER_MICROSTEPS_GOTO != 128 && AXIS3_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+#ifdef AXIS3_SERVO_PRESENT
+  #if AXIS3_SERVO_ENCODER != SAME && (AXIS3_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS3_SERVO_ENCODER > SERVO_ENCODER_LAST)
+    #error "Configuration (Config.h): Setting AXIS3_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
-#endif
-
-#if AXIS3_DRIVER_MICROSTEPS == OFF && AXIS3_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS3_DRIVER_MICROSTEPS."
-#endif
-
-#if AXIS3_DRIVER_DECAY != OFF && (AXIS3_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS3_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS3_DRIVER_DECAY_GOTO != OFF && (AXIS3_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS3_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS3_DRIVER_IRUN != OFF && (AXIS3_DRIVER_IRUN < 0 || AXIS3_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS3_DRIVER_IHOLD != HALF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS3_DRIVER_IGOTO != SAME && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS3_SERVO_ENCODER != SAME && (AXIS3_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS3_SERVO_ENCODER > SERVO_ENCODER_LAST)
-  #error "Configuration (Config.h): Setting AXIS3_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
 #endif
 
 #if AXIS3_REVERSE != ON && AXIS3_REVERSE != OFF
@@ -482,413 +473,490 @@
     (AXIS4_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS4_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS4_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
+
+#if AXIS4_DRIVER_STATUS != OFF && AXIS4_DRIVER_STATUS != ON && AXIS4_DRIVER_STATUS != HIGH && AXIS4_DRIVER_STATUS != LOW
+  #error "Configuration (Config.h): Setting AXIS4_DRIVER_STATUS unknown, use OFF or valid driver status."
+#endif
+
+#if AXIS4_REVERSE != ON && AXIS4_REVERSE != OFF
+  #error "Configuration (Config.h): Setting AXIS4_REVERSE unknown, use OFF or ON."
+#endif
+
+#if AXIS4_POWER_DOWN != ON && AXIS4_POWER_DOWN != OFF
+  #error "Configuration (Config.h): Setting AXIS4_POWER_DOWN unknown, use OFF or ON."
+#endif
+
+#if AXIS4_LIMIT_MIN < 0 || AXIS4_LIMIT_MIN > 500
+  #error "Configuration (Config.h): Setting AXIS4_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
+#endif
+
+#if AXIS4_LIMIT_MAX < AXIS4_LIMIT_MIN || AXIS4_LIMIT_MAX > 500
+  #error "Configuration (Config.h): Setting AXIS4_LIMIT_MAX unknown, use value in the range AXIS4_LIMIT_MIN to 500 (mm.)"
+#endif
+
+#if AXIS4_SENSE_HOME != OFF && AXIS4_SENSE_HOME < 0
+  #error "Configuration (Config.h): Setting AXIS4_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS4_SENSE_LIMIT_MIN != OFF && AXIS4_SENSE_LIMIT_MIN < 0
+  #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS4_SENSE_LIMIT_MAX != OFF && AXIS4_SENSE_LIMIT_MAX < 0
+  #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS4_DRIVER_PRESENT
+  #if AXIS4_DRIVER_MICROSTEPS != OFF && (AXIS4_DRIVER_MICROSTEPS < 1 || AXIS4_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS4_DRIVER_MICROSTEPS != 1 && AXIS4_DRIVER_MICROSTEPS != 2 && AXIS4_DRIVER_MICROSTEPS != 4 && \
+        AXIS4_DRIVER_MICROSTEPS != 8 && AXIS4_DRIVER_MICROSTEPS != 16 && AXIS4_DRIVER_MICROSTEPS != 32 && \
+        AXIS4_DRIVER_MICROSTEPS != 64 && AXIS4_DRIVER_MICROSTEPS != 128 && AXIS4_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS4_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS4_DRIVER_MICROSTEPS_GOTO < 1 || AXIS4_DRIVER_MICROSTEPS_GOTO >= AXIS4_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS4_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS4_DRIVER_MICROSTEPS_GOTO != 1 && AXIS4_DRIVER_MICROSTEPS_GOTO != 2 && AXIS4_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS4_DRIVER_MICROSTEPS_GOTO != 8 && AXIS4_DRIVER_MICROSTEPS_GOTO != 16 && AXIS4_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS4_DRIVER_MICROSTEPS_GOTO != 64 && AXIS4_DRIVER_MICROSTEPS_GOTO != 128 && AXIS4_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS4_DRIVER_MICROSTEPS == OFF && AXIS4_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS4_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS4_DRIVER_DECAY != OFF && (AXIS4_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS4_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS4_DRIVER_DECAY_GOTO != OFF && (AXIS4_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS4_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS4_DRIVER_IRUN != OFF && (AXIS4_DRIVER_IRUN < 0 || AXIS4_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS4_DRIVER_IHOLD != HALF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS4_DRIVER_IGOTO != SAME && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS4_SERVO_PRESENT
+  #if AXIS4_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS4_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS4_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+#endif
+
+// AXIS5 FOCUSER
 #if AXIS5_DRIVER_MODEL != OFF && \
     (AXIS5_DRIVER_MODEL < DRIVER_FIRST || AXIS5_DRIVER_MODEL > DRIVER_LAST) && \
     (AXIS5_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS5_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS5_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
+
+#if AXIS5_DRIVER_STATUS != OFF && AXIS5_DRIVER_STATUS != ON && AXIS5_DRIVER_STATUS != HIGH && AXIS5_DRIVER_STATUS != LOW
+  #error "Configuration (Config.h): Setting AXIS5_DRIVER_STATUS unknown, use OFF or valid driver status."
+#endif
+
+#if AXIS5_REVERSE != ON && AXIS5_REVERSE != OFF
+  #error "Configuration (Config.h): Setting AXIS5_REVERSE unknown, use OFF or ON."
+#endif
+
+#if AXIS5_POWER_DOWN != ON && AXIS5_POWER_DOWN != OFF
+  #error "Configuration (Config.h): Setting AXIS5_POWER_DOWN unknown, use OFF or ON."
+#endif
+
+#if AXIS5_LIMIT_MIN < 0 || AXIS5_LIMIT_MIN > 500
+  #error "Configuration (Config.h): Setting AXIS5_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
+#endif
+
+#if AXIS5_LIMIT_MAX < AXIS5_LIMIT_MIN || AXIS5_LIMIT_MAX > 500
+  #error "Configuration (Config.h): Setting AXIS5_LIMIT_MAX unknown, use value in the range AXIS5_LIMIT_MIN to 500 (mm.)"
+#endif
+
+#if AXIS5_SENSE_HOME != OFF && AXIS5_SENSE_HOME < 0
+  #error "Configuration (Config.h): Setting AXIS5_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS5_SENSE_LIMIT_MIN != OFF && AXIS5_SENSE_LIMIT_MIN < 0
+  #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS5_SENSE_LIMIT_MAX != OFF && AXIS5_SENSE_LIMIT_MAX < 0
+  #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS5_DRIVER_PRESENT
+  #if AXIS5_DRIVER_MICROSTEPS != OFF && (AXIS5_DRIVER_MICROSTEPS < 1 || AXIS5_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS5_DRIVER_MICROSTEPS != 1 && AXIS5_DRIVER_MICROSTEPS != 2 && AXIS5_DRIVER_MICROSTEPS != 4 && \
+        AXIS5_DRIVER_MICROSTEPS != 8 && AXIS5_DRIVER_MICROSTEPS != 16 && AXIS5_DRIVER_MICROSTEPS != 32 && \
+        AXIS5_DRIVER_MICROSTEPS != 64 && AXIS5_DRIVER_MICROSTEPS != 128 && AXIS5_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS5_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS5_DRIVER_MICROSTEPS_GOTO < 1 || AXIS5_DRIVER_MICROSTEPS_GOTO >= AXIS5_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS5_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS5_DRIVER_MICROSTEPS_GOTO != 1 && AXIS5_DRIVER_MICROSTEPS_GOTO != 2 && AXIS5_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS5_DRIVER_MICROSTEPS_GOTO != 8 && AXIS5_DRIVER_MICROSTEPS_GOTO != 16 && AXIS5_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS5_DRIVER_MICROSTEPS_GOTO != 64 && AXIS5_DRIVER_MICROSTEPS_GOTO != 128 && AXIS5_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS5_DRIVER_MICROSTEPS == OFF && AXIS5_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS5_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS5_DRIVER_DECAY != OFF && (AXIS5_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS5_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS5_DRIVER_DECAY_GOTO != OFF && (AXIS5_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS5_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS5_DRIVER_IRUN != OFF && (AXIS5_DRIVER_IRUN < 0 || AXIS5_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS5_DRIVER_IHOLD != HALF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS5_DRIVER_IGOTO != SAME && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS5_SERVO_PRESENT
+  #if AXIS5_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS5_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS5_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+#endif
+
+// AXIS6 FOCUSER
 #if AXIS6_DRIVER_MODEL != OFF && \
     (AXIS6_DRIVER_MODEL < DRIVER_FIRST || AXIS6_DRIVER_MODEL > DRIVER_LAST) && \
     (AXIS6_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS6_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS6_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
+
+#if AXIS6_DRIVER_STATUS != OFF && AXIS6_DRIVER_STATUS != ON && AXIS6_DRIVER_STATUS != HIGH && AXIS6_DRIVER_STATUS != LOW
+  #error "Configuration (Config.h): Setting AXIS6_DRIVER_STATUS unknown, use OFF or valid driver status."
+#endif
+
+#if AXIS6_REVERSE != ON && AXIS6_REVERSE != OFF
+  #error "Configuration (Config.h): Setting AXIS6_REVERSE unknown, use OFF or ON."
+#endif
+
+#if AXIS6_POWER_DOWN != ON && AXIS6_POWER_DOWN != OFF
+  #error "Configuration (Config.h): Setting AXIS6_POWER_DOWN unknown, use OFF or ON."
+#endif
+
+#if AXIS6_LIMIT_MIN < 0 || AXIS6_LIMIT_MIN > 500
+  #error "Configuration (Config.h): Setting AXIS6_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
+#endif
+
+#if AXIS6_LIMIT_MAX < AXIS6_LIMIT_MIN || AXIS6_LIMIT_MAX > 500
+  #error "Configuration (Config.h): Setting AXIS6_LIMIT_MAX unknown, use value in the range AXIS6_LIMIT_MIN to 500 (mm.)"
+#endif
+
+#if AXIS6_SENSE_HOME != OFF && AXIS6_SENSE_HOME < 0
+  #error "Configuration (Config.h): Setting AXIS6_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS6_SENSE_LIMIT_MIN != OFF && AXIS6_SENSE_LIMIT_MIN < 0
+  #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS6_SENSE_LIMIT_MAX != OFF && AXIS6_SENSE_LIMIT_MAX < 0
+  #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS6_DRIVER_PRESENT
+  #if AXIS6_DRIVER_MICROSTEPS != OFF && (AXIS6_DRIVER_MICROSTEPS < 1 || AXIS6_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS6_DRIVER_MICROSTEPS != 1 && AXIS6_DRIVER_MICROSTEPS != 2 && AXIS6_DRIVER_MICROSTEPS != 4 && \
+        AXIS6_DRIVER_MICROSTEPS != 8 && AXIS6_DRIVER_MICROSTEPS != 16 && AXIS6_DRIVER_MICROSTEPS != 32 && \
+        AXIS6_DRIVER_MICROSTEPS != 64 && AXIS6_DRIVER_MICROSTEPS != 128 && AXIS6_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS6_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS6_DRIVER_MICROSTEPS_GOTO < 1 || AXIS6_DRIVER_MICROSTEPS_GOTO >= AXIS6_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS6_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS6_DRIVER_MICROSTEPS_GOTO != 1 && AXIS6_DRIVER_MICROSTEPS_GOTO != 2 && AXIS6_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS6_DRIVER_MICROSTEPS_GOTO != 8 && AXIS6_DRIVER_MICROSTEPS_GOTO != 16 && AXIS6_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS6_DRIVER_MICROSTEPS_GOTO != 64 && AXIS6_DRIVER_MICROSTEPS_GOTO != 128 && AXIS6_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS6_DRIVER_MICROSTEPS == OFF && AXIS6_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS6_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS6_DRIVER_DECAY != OFF && (AXIS6_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS6_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS6_DRIVER_DECAY_GOTO != OFF && (AXIS6_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS6_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS6_DRIVER_IRUN != OFF && (AXIS6_DRIVER_IRUN < 0 || AXIS6_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS6_DRIVER_IHOLD != HALF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS6_DRIVER_IGOTO != SAME && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS6_SERVO_PRESENT
+  #if AXIS6_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS6_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS6_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+#endif
+
+// AXIS7 FOCUSER
 #if AXIS7_DRIVER_MODEL != OFF && \
     (AXIS7_DRIVER_MODEL < DRIVER_FIRST || AXIS7_DRIVER_MODEL > DRIVER_LAST) && \
     (AXIS7_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS7_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS7_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
+
+#if AXIS7_DRIVER_STATUS != OFF && AXIS7_DRIVER_STATUS != ON && AXIS7_DRIVER_STATUS != HIGH && AXIS7_DRIVER_STATUS != LOW
+  #error "Configuration (Config.h): Setting AXIS7_DRIVER_STATUS unknown, use OFF or valid driver status."
+#endif
+
+#if AXIS7_REVERSE != ON && AXIS7_REVERSE != OFF
+  #error "Configuration (Config.h): Setting AXIS7_REVERSE unknown, use OFF or ON."
+#endif
+
+#if AXIS7_POWER_DOWN != ON && AXIS7_POWER_DOWN != OFF
+  #error "Configuration (Config.h): Setting AXIS7_POWER_DOWN unknown, use OFF or ON."
+#endif
+
+#if AXIS7_LIMIT_MIN < 0 || AXIS7_LIMIT_MIN > 500
+  #error "Configuration (Config.h): Setting AXIS7_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
+#endif
+
+#if AXIS7_LIMIT_MAX < AXIS7_LIMIT_MIN || AXIS7_LIMIT_MAX > 500
+  #error "Configuration (Config.h): Setting AXIS7_LIMIT_MAX unknown, use value in the range AXIS7_LIMIT_MIN to 500 (mm.)"
+#endif
+
+#if AXIS7_SENSE_HOME != OFF && AXIS7_SENSE_HOME < 0
+  #error "Configuration (Config.h): Setting AXIS7_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS7_SENSE_LIMIT_MIN != OFF && AXIS7_SENSE_LIMIT_MIN < 0
+  #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS7_SENSE_LIMIT_MAX != OFF && AXIS7_SENSE_LIMIT_MAX < 0
+  #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS7_DRIVER_PRESENT
+  #if AXIS7_DRIVER_MICROSTEPS != OFF && (AXIS7_DRIVER_MICROSTEPS < 1 || AXIS7_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS7_DRIVER_MICROSTEPS != 1 && AXIS7_DRIVER_MICROSTEPS != 2 && AXIS7_DRIVER_MICROSTEPS != 4 && \
+        AXIS7_DRIVER_MICROSTEPS != 8 && AXIS7_DRIVER_MICROSTEPS != 16 && AXIS7_DRIVER_MICROSTEPS != 32 && \
+        AXIS7_DRIVER_MICROSTEPS != 64 && AXIS7_DRIVER_MICROSTEPS != 128 && AXIS7_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS7_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS7_DRIVER_MICROSTEPS_GOTO < 1 || AXIS7_DRIVER_MICROSTEPS_GOTO >= AXIS7_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS7_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS7_DRIVER_MICROSTEPS_GOTO != 1 && AXIS7_DRIVER_MICROSTEPS_GOTO != 2 && AXIS7_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS7_DRIVER_MICROSTEPS_GOTO != 8 && AXIS7_DRIVER_MICROSTEPS_GOTO != 16 && AXIS7_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS7_DRIVER_MICROSTEPS_GOTO != 64 && AXIS7_DRIVER_MICROSTEPS_GOTO != 128 && AXIS7_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS7_DRIVER_MICROSTEPS == OFF && AXIS7_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS7_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS7_DRIVER_DECAY != OFF && (AXIS7_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS7_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS7_DRIVER_DECAY_GOTO != OFF && (AXIS7_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS7_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS7_DRIVER_IRUN != OFF && (AXIS7_DRIVER_IRUN < 0 || AXIS7_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS7_DRIVER_IHOLD != HALF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS7_DRIVER_IGOTO != SAME && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS7_SERVO_PRESENT
+  #if AXIS7_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS7_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS7_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+#endif
+
+// AXIS8 FOCUSER
 #if AXIS8_DRIVER_MODEL != OFF && \
     (AXIS8_DRIVER_MODEL < DRIVER_FIRST || AXIS8_DRIVER_MODEL > DRIVER_LAST) && \
     (AXIS8_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS8_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS8_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
+
+#if AXIS8_DRIVER_STATUS != OFF && AXIS8_DRIVER_STATUS != ON && AXIS8_DRIVER_STATUS != HIGH && AXIS8_DRIVER_STATUS != LOW
+  #error "Configuration (Config.h): Setting AXIS8_DRIVER_STATUS unknown, use OFF or valid driver status."
+#endif
+
+#if AXIS8_REVERSE != ON && AXIS8_REVERSE != OFF
+  #error "Configuration (Config.h): Setting AXIS8_REVERSE unknown, use OFF or ON."
+#endif
+
+#if AXIS8_POWER_DOWN != ON && AXIS8_POWER_DOWN != OFF
+  #error "Configuration (Config.h): Setting AXIS8_POWER_DOWN unknown, use OFF or ON."
+#endif
+
+#if AXIS8_LIMIT_MIN < 0 || AXIS8_LIMIT_MIN > 500
+  #error "Configuration (Config.h): Setting AXIS8_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
+#endif
+
+#if AXIS8_LIMIT_MAX < AXIS8_LIMIT_MIN || AXIS8_LIMIT_MAX > 500
+  #error "Configuration (Config.h): Setting AXIS8_LIMIT_MAX unknown, use value in the range AXIS8_LIMIT_MIN to 500 (mm.)"
+#endif
+
+#if AXIS8_SENSE_HOME != OFF && AXIS8_SENSE_HOME < 0
+  #error "Configuration (Config.h): Setting AXIS8_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS8_SENSE_LIMIT_MIN != OFF && AXIS8_SENSE_LIMIT_MIN < 0
+  #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#if AXIS8_SENSE_LIMIT_MAX != OFF && AXIS8_SENSE_LIMIT_MAX < 0
+  #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS8_DRIVER_PRESENT
+  #if AXIS8_DRIVER_MICROSTEPS != OFF && (AXIS8_DRIVER_MICROSTEPS < 1 || AXIS8_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS8_DRIVER_MICROSTEPS != 1 && AXIS8_DRIVER_MICROSTEPS != 2 && AXIS8_DRIVER_MICROSTEPS != 4 && \
+        AXIS8_DRIVER_MICROSTEPS != 8 && AXIS8_DRIVER_MICROSTEPS != 16 && AXIS8_DRIVER_MICROSTEPS != 32 && \
+        AXIS8_DRIVER_MICROSTEPS != 64 && AXIS8_DRIVER_MICROSTEPS != 128 && AXIS8_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS8_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS8_DRIVER_MICROSTEPS_GOTO < 1 || AXIS8_DRIVER_MICROSTEPS_GOTO >= AXIS8_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS8_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS8_DRIVER_MICROSTEPS_GOTO != 1 && AXIS8_DRIVER_MICROSTEPS_GOTO != 2 && AXIS8_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS8_DRIVER_MICROSTEPS_GOTO != 8 && AXIS8_DRIVER_MICROSTEPS_GOTO != 16 && AXIS8_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS8_DRIVER_MICROSTEPS_GOTO != 64 && AXIS8_DRIVER_MICROSTEPS_GOTO != 128 && AXIS8_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS8_DRIVER_MICROSTEPS == OFF && AXIS8_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS8_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS8_DRIVER_DECAY != OFF && (AXIS8_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS8_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS8_DRIVER_DECAY_GOTO != OFF && (AXIS8_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS8_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS8_DRIVER_IRUN != OFF && (AXIS8_DRIVER_IRUN < 0 || AXIS8_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS8_DRIVER_IHOLD != HALF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS8_DRIVER_IGOTO != SAME && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS8_SERVO_PRESENT
+  #if AXIS8_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS8_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS8_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+#endif
+
+// AXIS9 FOCUSER
 #if AXIS9_DRIVER_MODEL != OFF && \
     (AXIS9_DRIVER_MODEL < DRIVER_FIRST || AXIS9_DRIVER_MODEL > DRIVER_LAST) && \
     (AXIS9_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS9_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS9_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
 
-#if AXIS4_DRIVER_STATUS != OFF && AXIS4_DRIVER_STATUS != ON && AXIS4_DRIVER_STATUS != HIGH && AXIS4_DRIVER_STATUS != LOW
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_STATUS unknown, use OFF or valid driver status."
-#endif
-#if AXIS5_DRIVER_STATUS != OFF && AXIS5_DRIVER_STATUS != ON && AXIS5_DRIVER_STATUS != HIGH && AXIS5_DRIVER_STATUS != LOW
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_STATUS unknown, use OFF or valid driver status."
-#endif
-#if AXIS6_DRIVER_STATUS != OFF && AXIS6_DRIVER_STATUS != ON && AXIS6_DRIVER_STATUS != HIGH && AXIS6_DRIVER_STATUS != LOW
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_STATUS unknown, use OFF or valid driver status."
-#endif
-#if AXIS7_DRIVER_STATUS != OFF && AXIS7_DRIVER_STATUS != ON && AXIS7_DRIVER_STATUS != HIGH && AXIS7_DRIVER_STATUS != LOW
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_STATUS unknown, use OFF or valid driver status."
-#endif
-#if AXIS8_DRIVER_STATUS != OFF && AXIS8_DRIVER_STATUS != ON && AXIS8_DRIVER_STATUS != HIGH && AXIS8_DRIVER_STATUS != LOW
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_STATUS unknown, use OFF or valid driver status."
-#endif
 #if AXIS9_DRIVER_STATUS != OFF && AXIS9_DRIVER_STATUS != ON && AXIS9_DRIVER_STATUS != HIGH && AXIS9_DRIVER_STATUS != LOW
   #error "Configuration (Config.h): Setting AXIS9_DRIVER_STATUS unknown, use OFF or valid driver status."
 #endif
 
-#if AXIS4_DRIVER_MICROSTEPS != OFF && (AXIS4_DRIVER_MICROSTEPS < 1 || AXIS4_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS4_DRIVER_MICROSTEPS != 1 && AXIS4_DRIVER_MICROSTEPS != 2 && AXIS4_DRIVER_MICROSTEPS != 4 && \
-      AXIS4_DRIVER_MICROSTEPS != 8 && AXIS4_DRIVER_MICROSTEPS != 16 && AXIS4_DRIVER_MICROSTEPS != 32 && \
-      AXIS4_DRIVER_MICROSTEPS != 64 && AXIS4_DRIVER_MICROSTEPS != 128 && AXIS4_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS5_DRIVER_MICROSTEPS != OFF && (AXIS5_DRIVER_MICROSTEPS < 1 || AXIS5_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS5_DRIVER_MICROSTEPS != 1 && AXIS5_DRIVER_MICROSTEPS != 2 && AXIS5_DRIVER_MICROSTEPS != 4 && \
-      AXIS5_DRIVER_MICROSTEPS != 8 && AXIS5_DRIVER_MICROSTEPS != 16 && AXIS5_DRIVER_MICROSTEPS != 32 && \
-      AXIS5_DRIVER_MICROSTEPS != 64 && AXIS5_DRIVER_MICROSTEPS != 128 && AXIS5_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS6_DRIVER_MICROSTEPS != OFF && (AXIS6_DRIVER_MICROSTEPS < 1 || AXIS6_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS6_DRIVER_MICROSTEPS != 1 && AXIS6_DRIVER_MICROSTEPS != 2 && AXIS6_DRIVER_MICROSTEPS != 4 && \
-      AXIS6_DRIVER_MICROSTEPS != 8 && AXIS6_DRIVER_MICROSTEPS != 16 && AXIS6_DRIVER_MICROSTEPS != 32 && \
-      AXIS6_DRIVER_MICROSTEPS != 64 && AXIS6_DRIVER_MICROSTEPS != 128 && AXIS6_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS7_DRIVER_MICROSTEPS != OFF && (AXIS7_DRIVER_MICROSTEPS < 1 || AXIS7_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS7_DRIVER_MICROSTEPS != 1 && AXIS7_DRIVER_MICROSTEPS != 2 && AXIS7_DRIVER_MICROSTEPS != 4 && \
-      AXIS7_DRIVER_MICROSTEPS != 8 && AXIS7_DRIVER_MICROSTEPS != 16 && AXIS7_DRIVER_MICROSTEPS != 32 && \
-      AXIS7_DRIVER_MICROSTEPS != 64 && AXIS7_DRIVER_MICROSTEPS != 128 && AXIS7_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS8_DRIVER_MICROSTEPS != OFF && (AXIS8_DRIVER_MICROSTEPS < 1 || AXIS8_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS8_DRIVER_MICROSTEPS != 1 && AXIS8_DRIVER_MICROSTEPS != 2 && AXIS8_DRIVER_MICROSTEPS != 4 && \
-      AXIS8_DRIVER_MICROSTEPS != 8 && AXIS8_DRIVER_MICROSTEPS != 16 && AXIS8_DRIVER_MICROSTEPS != 32 && \
-      AXIS8_DRIVER_MICROSTEPS != 64 && AXIS8_DRIVER_MICROSTEPS != 128 && AXIS8_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS9_DRIVER_MICROSTEPS != OFF && (AXIS9_DRIVER_MICROSTEPS < 1 || AXIS9_DRIVER_MICROSTEPS > 256)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
-  #if AXIS9_DRIVER_MICROSTEPS != 1 && AXIS9_DRIVER_MICROSTEPS != 2 && AXIS9_DRIVER_MICROSTEPS != 4 && \
-      AXIS9_DRIVER_MICROSTEPS != 8 && AXIS9_DRIVER_MICROSTEPS != 16 && AXIS9_DRIVER_MICROSTEPS != 32 && \
-      AXIS9_DRIVER_MICROSTEPS != 64 && AXIS9_DRIVER_MICROSTEPS != 128 && AXIS9_DRIVER_MICROSTEPS != 256
-    #warning "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
-  #endif
-#endif
-
-#if AXIS4_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS4_DRIVER_MICROSTEPS_GOTO < 1 || AXIS4_DRIVER_MICROSTEPS_GOTO >= AXIS4_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS4_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS4_DRIVER_MICROSTEPS_GOTO != 1 && AXIS4_DRIVER_MICROSTEPS_GOTO != 2 && AXIS4_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS4_DRIVER_MICROSTEPS_GOTO != 8 && AXIS4_DRIVER_MICROSTEPS_GOTO != 16 && AXIS4_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS4_DRIVER_MICROSTEPS_GOTO != 64 && AXIS4_DRIVER_MICROSTEPS_GOTO != 128 && AXIS4_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS5_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS5_DRIVER_MICROSTEPS_GOTO < 1 || AXIS5_DRIVER_MICROSTEPS_GOTO >= AXIS5_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS5_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS5_DRIVER_MICROSTEPS_GOTO != 1 && AXIS5_DRIVER_MICROSTEPS_GOTO != 2 && AXIS5_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS5_DRIVER_MICROSTEPS_GOTO != 8 && AXIS5_DRIVER_MICROSTEPS_GOTO != 16 && AXIS5_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS5_DRIVER_MICROSTEPS_GOTO != 64 && AXIS5_DRIVER_MICROSTEPS_GOTO != 128 && AXIS5_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS6_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS6_DRIVER_MICROSTEPS_GOTO < 1 || AXIS6_DRIVER_MICROSTEPS_GOTO >= AXIS6_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS6_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS6_DRIVER_MICROSTEPS_GOTO != 1 && AXIS6_DRIVER_MICROSTEPS_GOTO != 2 && AXIS6_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS6_DRIVER_MICROSTEPS_GOTO != 8 && AXIS6_DRIVER_MICROSTEPS_GOTO != 16 && AXIS6_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS6_DRIVER_MICROSTEPS_GOTO != 64 && AXIS6_DRIVER_MICROSTEPS_GOTO != 128 && AXIS6_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS7_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS7_DRIVER_MICROSTEPS_GOTO < 1 || AXIS7_DRIVER_MICROSTEPS_GOTO >= AXIS7_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS7_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS7_DRIVER_MICROSTEPS_GOTO != 1 && AXIS7_DRIVER_MICROSTEPS_GOTO != 2 && AXIS7_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS7_DRIVER_MICROSTEPS_GOTO != 8 && AXIS7_DRIVER_MICROSTEPS_GOTO != 16 && AXIS7_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS7_DRIVER_MICROSTEPS_GOTO != 64 && AXIS7_DRIVER_MICROSTEPS_GOTO != 128 && AXIS7_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS8_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS8_DRIVER_MICROSTEPS_GOTO < 1 || AXIS8_DRIVER_MICROSTEPS_GOTO >= AXIS8_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS8_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS8_DRIVER_MICROSTEPS_GOTO != 1 && AXIS8_DRIVER_MICROSTEPS_GOTO != 2 && AXIS8_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS8_DRIVER_MICROSTEPS_GOTO != 8 && AXIS8_DRIVER_MICROSTEPS_GOTO != 16 && AXIS8_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS8_DRIVER_MICROSTEPS_GOTO != 64 && AXIS8_DRIVER_MICROSTEPS_GOTO != 128 && AXIS8_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-#if AXIS9_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS9_DRIVER_MICROSTEPS_GOTO < 1 || AXIS9_DRIVER_MICROSTEPS_GOTO >= AXIS9_DRIVER_MICROSTEPS)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS9_DRIVER_MICROSTEPS and supported by your driver/design.)"
-  #if AXIS9_DRIVER_MICROSTEPS_GOTO != 1 && AXIS9_DRIVER_MICROSTEPS_GOTO != 2 && AXIS9_DRIVER_MICROSTEPS_GOTO != 4 && \
-      AXIS9_DRIVER_MICROSTEPS_GOTO != 8 && AXIS9_DRIVER_MICROSTEPS_GOTO != 16 && AXIS9_DRIVER_MICROSTEPS_GOTO != 32 && \
-      AXIS9_DRIVER_MICROSTEPS_GOTO != 64 && AXIS9_DRIVER_MICROSTEPS_GOTO != 128 && AXIS9_DRIVER_MICROSTEPS_GOTO != 256
-    #warning "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
-  #endif
-#endif
-
-#if AXIS4_DRIVER_MICROSTEPS == OFF && AXIS4_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS4_DRIVER_MICROSTEPS."
-#endif
-#if AXIS5_DRIVER_MICROSTEPS == OFF && AXIS5_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS5_DRIVER_MICROSTEPS."
-#endif
-#if AXIS6_DRIVER_MICROSTEPS == OFF && AXIS6_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS6_DRIVER_MICROSTEPS."
-#endif
-#if AXIS7_DRIVER_MICROSTEPS == OFF && AXIS7_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS7_DRIVER_MICROSTEPS."
-#endif
-#if AXIS8_DRIVER_MICROSTEPS == OFF && AXIS8_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS8_DRIVER_MICROSTEPS."
-#endif
-#if AXIS9_DRIVER_MICROSTEPS == OFF && AXIS9_DRIVER_MICROSTEPS_GOTO != OFF
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS9_DRIVER_MICROSTEPS."
-#endif
-
-#if AXIS4_DRIVER_DECAY != OFF && (AXIS4_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS4_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS5_DRIVER_DECAY != OFF && (AXIS5_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS5_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS6_DRIVER_DECAY != OFF && (AXIS6_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS6_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS7_DRIVER_DECAY != OFF && (AXIS7_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS7_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS8_DRIVER_DECAY != OFF && (AXIS8_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS8_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS9_DRIVER_DECAY != OFF && (AXIS9_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS9_DRIVER_DECAY > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS4_DRIVER_DECAY_GOTO != OFF && (AXIS4_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS4_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS5_DRIVER_DECAY_GOTO != OFF && (AXIS5_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS5_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS6_DRIVER_DECAY_GOTO != OFF && (AXIS6_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS6_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS7_DRIVER_DECAY_GOTO != OFF && (AXIS7_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS7_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS8_DRIVER_DECAY_GOTO != OFF && (AXIS8_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS8_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-#if AXIS9_DRIVER_DECAY_GOTO != OFF && (AXIS9_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS9_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
-#endif
-
-#if AXIS4_DRIVER_IRUN != OFF && (AXIS4_DRIVER_IRUN < 0 || AXIS4_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS5_DRIVER_IRUN != OFF && (AXIS5_DRIVER_IRUN < 0 || AXIS5_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS6_DRIVER_IRUN != OFF && (AXIS6_DRIVER_IRUN < 0 || AXIS6_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS7_DRIVER_IRUN != OFF && (AXIS7_DRIVER_IRUN < 0 || AXIS7_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS8_DRIVER_IRUN != OFF && (AXIS8_DRIVER_IRUN < 0 || AXIS8_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS9_DRIVER_IRUN != OFF && (AXIS9_DRIVER_IRUN < 0 || AXIS9_DRIVER_IRUN > 1000)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS4_DRIVER_IHOLD != HALF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS5_DRIVER_IHOLD != HALF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS6_DRIVER_IHOLD != HALF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS7_DRIVER_IHOLD != HALF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS8_DRIVER_IHOLD != HALF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS9_DRIVER_IHOLD != HALF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 1000)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS4_DRIVER_IGOTO != SAME && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS5_DRIVER_IGOTO != SAME && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS6_DRIVER_IGOTO != SAME && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS7_DRIVER_IGOTO != SAME && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS8_DRIVER_IGOTO != SAME && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-#if AXIS9_DRIVER_IGOTO != SAME && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 1000)
-  #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
-#endif
-
-#if AXIS4_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS4_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS4_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-#if AXIS5_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS5_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS5_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-#if AXIS6_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS6_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS6_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-#if AXIS7_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS7_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS7_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-#if AXIS8_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS8_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS8_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-#if AXIS9_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS9_SERVO_ENCODER > SERVO_ENCODER_LAST
-  #error "Configuration (Config.h): Setting AXIS9_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
-#endif
-
-#if AXIS4_REVERSE != ON && AXIS4_REVERSE != OFF
-  #error "Configuration (Config.h): Setting AXIS4_REVERSE unknown, use OFF or ON."
-#endif
-#if AXIS5_REVERSE != ON && AXIS5_REVERSE != OFF
-  #error "Configuration (Config.h): Setting AXIS5_REVERSE unknown, use OFF or ON."
-#endif
-#if AXIS6_REVERSE != ON && AXIS6_REVERSE != OFF
-  #error "Configuration (Config.h): Setting AXIS6_REVERSE unknown, use OFF or ON."
-#endif
-#if AXIS7_REVERSE != ON && AXIS7_REVERSE != OFF
-  #error "Configuration (Config.h): Setting AXIS7_REVERSE unknown, use OFF or ON."
-#endif
-#if AXIS8_REVERSE != ON && AXIS8_REVERSE != OFF
-  #error "Configuration (Config.h): Setting AXIS8_REVERSE unknown, use OFF or ON."
-#endif
 #if AXIS9_REVERSE != ON && AXIS9_REVERSE != OFF
   #error "Configuration (Config.h): Setting AXIS9_REVERSE unknown, use OFF or ON."
 #endif
 
-#if AXIS4_POWER_DOWN != ON && AXIS4_POWER_DOWN != OFF
-  #error "Configuration (Config.h): Setting AXIS4_POWER_DOWN unknown, use OFF or ON."
-#endif
-#if AXIS5_POWER_DOWN != ON && AXIS5_POWER_DOWN != OFF
-  #error "Configuration (Config.h): Setting AXIS5_POWER_DOWN unknown, use OFF or ON."
-#endif
-#if AXIS6_POWER_DOWN != ON && AXIS6_POWER_DOWN != OFF
-  #error "Configuration (Config.h): Setting AXIS6_POWER_DOWN unknown, use OFF or ON."
-#endif
-#if AXIS7_POWER_DOWN != ON && AXIS7_POWER_DOWN != OFF
-  #error "Configuration (Config.h): Setting AXIS7_POWER_DOWN unknown, use OFF or ON."
-#endif
-#if AXIS8_POWER_DOWN != ON && AXIS8_POWER_DOWN != OFF
-  #error "Configuration (Config.h): Setting AXIS8_POWER_DOWN unknown, use OFF or ON."
-#endif
 #if AXIS9_POWER_DOWN != ON && AXIS9_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS9_POWER_DOWN unknown, use OFF or ON."
 #endif
 
-#if AXIS4_LIMIT_MIN < 0 || AXIS4_LIMIT_MIN > 500
-  #error "Configuration (Config.h): Setting AXIS4_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
-#endif
-#if AXIS5_LIMIT_MIN < 0 || AXIS5_LIMIT_MIN > 500
-  #error "Configuration (Config.h): Setting AXIS5_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
-#endif
-#if AXIS6_LIMIT_MIN < 0 || AXIS6_LIMIT_MIN > 500
-  #error "Configuration (Config.h): Setting AXIS6_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
-#endif
-#if AXIS7_LIMIT_MIN < 0 || AXIS7_LIMIT_MIN > 500
-  #error "Configuration (Config.h): Setting AXIS7_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
-#endif
-#if AXIS8_LIMIT_MIN < 0 || AXIS8_LIMIT_MIN > 500
-  #error "Configuration (Config.h): Setting AXIS8_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
-#endif
 #if AXIS9_LIMIT_MIN < 0 || AXIS9_LIMIT_MIN > 500
   #error "Configuration (Config.h): Setting AXIS9_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
 #endif
 
-#if AXIS4_LIMIT_MAX < AXIS4_LIMIT_MIN || AXIS4_LIMIT_MAX > 500
-  #error "Configuration (Config.h): Setting AXIS4_LIMIT_MAX unknown, use value in the range AXIS4_LIMIT_MIN to 500 (mm.)"
-#endif
-#if AXIS5_LIMIT_MAX < AXIS5_LIMIT_MIN || AXIS5_LIMIT_MAX > 500
-  #error "Configuration (Config.h): Setting AXIS5_LIMIT_MAX unknown, use value in the range AXIS5_LIMIT_MIN to 500 (mm.)"
-#endif
-#if AXIS6_LIMIT_MAX < AXIS6_LIMIT_MIN || AXIS6_LIMIT_MAX > 500
-  #error "Configuration (Config.h): Setting AXIS6_LIMIT_MAX unknown, use value in the range AXIS6_LIMIT_MIN to 500 (mm.)"
-#endif
-#if AXIS7_LIMIT_MAX < AXIS7_LIMIT_MIN || AXIS7_LIMIT_MAX > 500
-  #error "Configuration (Config.h): Setting AXIS7_LIMIT_MAX unknown, use value in the range AXIS7_LIMIT_MIN to 500 (mm.)"
-#endif
-#if AXIS8_LIMIT_MAX < AXIS8_LIMIT_MIN || AXIS8_LIMIT_MAX > 500
-  #error "Configuration (Config.h): Setting AXIS8_LIMIT_MAX unknown, use value in the range AXIS8_LIMIT_MIN to 500 (mm.)"
-#endif
 #if AXIS9_LIMIT_MAX < AXIS9_LIMIT_MIN || AXIS9_LIMIT_MAX > 500
   #error "Configuration (Config.h): Setting AXIS9_LIMIT_MAX unknown, use value in the range AXIS9_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS4_SENSE_HOME != OFF && AXIS4_SENSE_HOME < 0
-  #error "Configuration (Config.h): Setting AXIS4_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS5_SENSE_HOME != OFF && AXIS5_SENSE_HOME < 0
-  #error "Configuration (Config.h): Setting AXIS5_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS6_SENSE_HOME != OFF && AXIS6_SENSE_HOME < 0
-  #error "Configuration (Config.h): Setting AXIS6_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS7_SENSE_HOME != OFF && AXIS7_SENSE_HOME < 0
-  #error "Configuration (Config.h): Setting AXIS7_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS8_SENSE_HOME != OFF && AXIS8_SENSE_HOME < 0
-  #error "Configuration (Config.h): Setting AXIS8_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
 #if AXIS9_SENSE_HOME != OFF && AXIS9_SENSE_HOME < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MIN != OFF && AXIS4_SENSE_LIMIT_MIN < 0
-  #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS5_SENSE_LIMIT_MIN != OFF && AXIS5_SENSE_LIMIT_MIN < 0
-  #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS6_SENSE_LIMIT_MIN != OFF && AXIS6_SENSE_LIMIT_MIN < 0
-  #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS7_SENSE_LIMIT_MIN != OFF && AXIS7_SENSE_LIMIT_MIN < 0
-  #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS8_SENSE_LIMIT_MIN != OFF && AXIS8_SENSE_LIMIT_MIN < 0
-  #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
 #if AXIS9_SENSE_LIMIT_MIN != OFF && AXIS9_SENSE_LIMIT_MIN < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MAX != OFF && AXIS4_SENSE_LIMIT_MAX < 0
-  #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS5_SENSE_LIMIT_MAX != OFF && AXIS5_SENSE_LIMIT_MAX < 0
-  #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS6_SENSE_LIMIT_MAX != OFF && AXIS6_SENSE_LIMIT_MAX < 0
-  #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS7_SENSE_LIMIT_MAX != OFF && AXIS7_SENSE_LIMIT_MAX < 0
-  #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-#if AXIS8_SENSE_LIMIT_MAX != OFF && AXIS8_SENSE_LIMIT_MAX < 0
-  #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
 #if AXIS9_SENSE_LIMIT_MAX != OFF && AXIS9_SENSE_LIMIT_MAX < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
+#endif
+
+#ifdef AXIS9_DRIVER_PRESENT
+  #if AXIS9_DRIVER_MICROSTEPS != OFF && (AXIS9_DRIVER_MICROSTEPS < 1 || AXIS9_DRIVER_MICROSTEPS > 256)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS unknown, use OFF or a valid microstep setting (range 1 to 256x and supported by your driver/design.)"
+    #if AXIS9_DRIVER_MICROSTEPS != 1 && AXIS9_DRIVER_MICROSTEPS != 2 && AXIS9_DRIVER_MICROSTEPS != 4 && \
+        AXIS9_DRIVER_MICROSTEPS != 8 && AXIS9_DRIVER_MICROSTEPS != 16 && AXIS9_DRIVER_MICROSTEPS != 32 && \
+        AXIS9_DRIVER_MICROSTEPS != 64 && AXIS9_DRIVER_MICROSTEPS != 128 && AXIS9_DRIVER_MICROSTEPS != 256
+      #warning "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS9_DRIVER_MICROSTEPS_GOTO != OFF && (AXIS9_DRIVER_MICROSTEPS_GOTO < 1 || AXIS9_DRIVER_MICROSTEPS_GOTO >= AXIS9_DRIVER_MICROSTEPS)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO unknown, use OFF or a valid microstep setting (range 1 to < AXIS9_DRIVER_MICROSTEPS and supported by your driver/design.)"
+    #if AXIS9_DRIVER_MICROSTEPS_GOTO != 1 && AXIS9_DRIVER_MICROSTEPS_GOTO != 2 && AXIS9_DRIVER_MICROSTEPS_GOTO != 4 && \
+        AXIS9_DRIVER_MICROSTEPS_GOTO != 8 && AXIS9_DRIVER_MICROSTEPS_GOTO != 16 && AXIS9_DRIVER_MICROSTEPS_GOTO != 32 && \
+        AXIS9_DRIVER_MICROSTEPS_GOTO != 64 && AXIS9_DRIVER_MICROSTEPS_GOTO != 128 && AXIS9_DRIVER_MICROSTEPS_GOTO != 256
+      #warning "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO has an unusual value (not a power of 2!)"
+    #endif
+  #endif
+  #if AXIS9_DRIVER_MICROSTEPS == OFF && AXIS9_DRIVER_MICROSTEPS_GOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_MICROSTEPS_GOTO can't be enabled without first enabling AXIS9_DRIVER_MICROSTEPS."
+  #endif
+  #if AXIS9_DRIVER_DECAY != OFF && (AXIS9_DRIVER_DECAY < DRIVER_DECAY_FIRST || AXIS9_DRIVER_DECAY > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_DECAY unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS9_DRIVER_DECAY_GOTO != OFF && (AXIS9_DRIVER_DECAY_GOTO < DRIVER_DECAY_FIRST || AXIS9_DRIVER_DECAY_GOTO > DRIVER_DECAY_LAST)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
+  #endif
+  #if AXIS9_DRIVER_IRUN != OFF && (AXIS9_DRIVER_IRUN < 0 || AXIS9_DRIVER_IRUN > 1000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS9_DRIVER_IHOLD != HALF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #endif
+  #if AXIS9_DRIVER_IGOTO != SAME && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #endif
+#endif
+
+#ifdef AXIS9_SERVO_PRESENT
+  #if AXIS9_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS9_SERVO_ENCODER > SERVO_ENCODER_LAST
+    #error "Configuration (Config.h): Setting AXIS9_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
 #endif
 
 // USER FEEDBACK
