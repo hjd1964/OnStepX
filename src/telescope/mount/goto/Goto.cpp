@@ -90,6 +90,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   if (taskHandle != 0) tasks.remove(taskHandle);
   taskHandle = tasks.add(0, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
+    VLF("MSG: Mount, create goto monitor task (idle, priority 3)... success");
 
     double a1, a2;
     transform.mountToInstrument(&destination, &a1, &a2);
@@ -109,7 +110,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
     if (e != CE_NONE) return e;
 
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
-    VF("MSG: Mount, start goto monitor task (rate "); V(FRACTIONAL_SEC_US); VLF("us priority 3)... success");
+    VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VLF("us");
 
     status.sound.alert();
 
