@@ -105,8 +105,11 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
     VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
     VF("MSG: Mount, starting goto at slew rate ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
 
-    axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
-    axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    if (e != CE_NONE) return e;
+    e = axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    if (e != CE_NONE) return e;
+
 
     status.sound.alert();
 

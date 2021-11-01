@@ -120,7 +120,7 @@ CommandError Park::request() {
       settings.state = state;
       nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
-      VF("ERR, Mount::parkGoto(); Failed to start goto (CE "); V(e); V(")");
+      VF("ERR, Mount::parkGoto(); Failed to start goto (CE "); V(e); VL(")");
       return e;
     }
   #endif

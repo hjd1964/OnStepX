@@ -76,8 +76,12 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
 // enables or disables the associated step/dir driver
 void Axis::enable(bool state) {
+  #if DEBUG == VERBOSE
+    if (enabled && state != true) { V(axisPrefix); VLF("disabled"); }
+    if (!enabled && state == true) { V(axisPrefix); VLF("enabled"); }
+  #endif
   enabled = state;
-  motor->power(state & !poweredDown);
+  motor->power(enabled & !poweredDown);
 }
 
 // time (in ms) before automatic power down at standstill, use 0 to disable
