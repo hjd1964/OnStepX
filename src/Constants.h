@@ -115,11 +115,6 @@
 #define ENC_PULSE_ONLY              4      // pulse only encoder
 #define SERVO_ENCODER_LAST          4
 
-// motor drivers
-#define DEFAULT_POWER_DOWN_TIME     30000  // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
-#define SERVO                       -1     // general purpose flag for a SERVO driver motor
-#define STEP_DIR                    -2     // general purpose flag for a STEP_DIR driver motor
-
 // TIME LOCATION SOURCE devices supported
 #define TLS_FIRST                   1
 #define DS3231                      1      // DS3231 RTC on I2C
