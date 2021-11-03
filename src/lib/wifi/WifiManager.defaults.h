@@ -33,12 +33,8 @@
 // -------------------------------------------------------------------------------------------------
 // wifi manager settings
 
-#ifndef TARGET_IP_ADDR1
-#define TARGET_IP_ADDR1     {192,168,0,1} // ..,168,0,1}, IP Address to connect to (OnStep for example)
-#endif
-
-#ifndef TARGET_IP_ADDR2
-#define TARGET_IP_ADDR2     {192,168,0,1} // ..,168,0,1}, IP Address to connect to
+#ifndef PROD_ABV
+#define PROD_ABV                "Unknown"
 #endif
 
 #ifndef PASSWORD_DEFAULT
@@ -47,10 +43,6 @@
 
 #ifndef AP_ENABLED
 #define AP_ENABLED                  false //      false, to disable the soft AP
-#endif
-
-#ifndef PROD_ABV
-#define PROD_ABV                "Unknown"
 #endif
 
 #ifndef AP_SSID
@@ -77,13 +69,21 @@
 #define AP_SN_MASK        {255,255,255,0} // ..55,255,0}, Wifi Access Point SUBNET Mask
 #endif
 
-#ifndef STA_ENABLED
-#define STA_ENABLED                false  //       false, normally not enabled
+// station mode
+
+#ifndef STA_AP_FALLBACK
+#define STA_AP_FALLBACK             false //       false, activate SoftAP if station fails to connect
 #endif
 
-#ifndef STA_DHCP_ENABLED
-#define STA_DHCP_ENABLED           false  //      false, true to use LAN DHCP addresses
+#ifndef STA_ALT_FALLBACK
+#define STA_ALT_FALLBACK            false //       false, activate Alternate if station fails to connect
 #endif
+
+#ifndef STA_ENABLED
+#define STA_ENABLED                 false //       false, normally not enabled
+#endif
+
+// primary station
 
 #ifndef STA_SSID
 #define STA_SSID                   "Home" //     "Home", Wifi Station SSID to connnect to
@@ -91,6 +91,14 @@
 
 #ifndef STA_PASSWORD
 #define STA_PASSWORD           "password" //  "password", Wifi Station mode password
+#endif
+
+#ifndef STA_DHCP_ENABLED
+#define STA_DHCP_ENABLED           false  //      false, true to use LAN DHCP addresses
+#endif
+
+#ifndef STA_TARGET_IP_ADDR 
+#define STA_TARGET_IP_ADDR  {192,168,0,1} // ..,168,0,1}, IP Address to connect to (OnStep for example)
 #endif
 
 #ifndef STA_IP_ADDR
@@ -103,4 +111,34 @@
 
 #ifndef STA_SN_MASK
 #define STA_SN_MASK       {255,255,255,0} // ..55,255,0}, Wifi Station SUBNET Mask
+#endif
+
+// alternate station
+
+#ifndef STA_SSID_ALT
+#define STA_SSID_ALT               "Home"
+#endif
+
+#ifndef STA_PASSWORD_ALT
+#define STA_PASSWORD_ALT       "password"
+#endif
+
+#ifndef STA_DHCP_ENABLED_ALT
+#define STA_DHCP_ENABLED_ALT       false
+#endif
+
+#ifndef STA_TARGET_IP_ADDR_ALT 
+#define STA_TARGET_IP_ADDR_ALT {192,168,0,1}
+#endif
+
+#ifndef STA_IP_ADDR_ALT
+#define STA_IP_ADDR_ALT     {192,168,0,2}
+#endif
+
+#ifndef STA_GW_ADDR_ALT
+#define STA_GW_ADDR_ALT     {192,168,0,1}
+#endif
+
+#ifndef STA_SN_MASK_ALT
+#define STA_SN_MASK_ALT   {255,255,255,0}
 #endif

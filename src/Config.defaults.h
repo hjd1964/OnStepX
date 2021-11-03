@@ -28,8 +28,13 @@
 #endif
 
 // ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
+
 #ifndef SERIAL_IP_MODE
 #define SERIAL_IP_MODE                OFF // use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
+#endif
+
+#ifndef STA_AP_FALLBACK
+#define STA_AP_FALLBACK              true // activate SoftAP if station fails to connect
 #endif
 
 #if SERIAL_IP_MODE == ACCESS_POINT

@@ -24,60 +24,74 @@
 #endif
 
 #pragma pack(1)
-#define WifiSettingsSize 236
+
+typedef struct AccessPointSettings {
+  char ssid[40];
+  char pwd[40];
+  unsigned char channel;
+  uint8_t ip[4];
+  uint8_t gw[4];
+  uint8_t sn[4];
+} AccessPointSettings;
+
+typedef struct StationSettings {
+  char ssid[40];
+  char pwd[40];
+  bool dhcpEnabled;
+  uint8_t target[4];
+  uint8_t ip[4];
+  uint8_t gw[4];
+  uint8_t sn[4];
+} StationSettings;
+
+#define WifiSettingsSize 331
 typedef struct WifiSettings {
   char masterPassword[40];
 
   bool accessPointEnabled;
+  AccessPointSettings ap;
+
   bool stationEnabled;
-  bool stationDhcpEnabled;
+  bool stationApFallback;
+  bool stationAltFallback;
+  StationSettings sta1;
+  StationSettings sta2;
 
-  char sta_ssid[40];
-  char sta_pwd[40];
-
-  uint8_t target1_ip[4];
-  uint8_t target2_ip[4];
-
-  uint8_t sta_ip[4];
-  uint8_t sta_gw[4];
-  uint8_t sta_sn[4];
-
-  char ap_ssid[40];
-  char ap_pwd[40];
-  unsigned char ap_ch;
-
-  uint8_t ap_ip[4];
-  uint8_t ap_gw[4];
-  uint8_t ap_sn[4];
 } WifiSettings;
 #pragma pack()
 
 class WifiManager {
   public:
-    void init();
+    bool init();
     void writeSettings();
+
+    StationSettings *sta;
 
     WifiSettings settings = {
       PASSWORD_DEFAULT,
-      AP_ENABLED, STA_ENABLED, STA_DHCP_ENABLED,
-      STA_SSID, STA_PASSWORD,
-      TARGET_IP_ADDR1,
-      TARGET_IP_ADDR2,
-      STA_IP_ADDR, STA_GW_ADDR, STA_SN_MASK,
-      AP_SSID, AP_PASSWORD, AP_CHANNEL,
-      AP_IP_ADDR, AP_GW_ADDR, AP_SN_MASK
+
+      AP_ENABLED,
+      {
+        AP_SSID, AP_PASSWORD, AP_CHANNEL,
+        AP_IP_ADDR, AP_GW_ADDR, AP_SN_MASK
+      },
+
+      STA_ENABLED,
+      STA_AP_FALLBACK,
+      STA_ALT_FALLBACK,
+      {
+        STA_SSID, STA_PASSWORD, STA_DHCP_ENABLED,
+        STA_TARGET_IP_ADDR, STA_IP_ADDR, STA_GW_ADDR, STA_SN_MASK
+      },
+
+      {
+        STA_SSID_ALT, STA_PASSWORD_ALT, STA_DHCP_ENABLED_ALT,
+        STA_TARGET_IP_ADDR_ALT, STA_IP_ADDR_ALT, STA_GW_ADDR_ALT, STA_SN_MASK_ALT
+      }
     };
 
   private:
     bool active = false;
-
-    IPAddress ap_ip;
-    IPAddress ap_gw;
-    IPAddress ap_sn;
-
-    IPAddress sta_ip;
-    IPAddress sta_gw;
-    IPAddress sta_sn;
 };
 
 extern WifiManager wifiManager;

@@ -25,14 +25,14 @@
 typedef struct EthernetSettings {
   char masterPassword[40];
   unsigned char mac[6];
-  bool dhcp_enabled;
-  IPAddress target1_ip, target2_ip, ip, dns, gw, sn;
+  bool dhcpEnabled;
+  IPAddress target, ip, dns, gw, sn;
 } EthernetSettings;
 #pragma pack()
 
 class EthernetManager {
   public:
-    void init();
+    bool init();
     void restart();
     void writeSettings();
 
@@ -40,7 +40,7 @@ class EthernetManager {
       PASSWORD_DEFAULT,
       MAC,
       STA_DHCP_ENABLED,
-      TARGET_IP_ADDR1, TARGET_IP_ADDR2,
+      STA_TARGET_IP_ADDR,
       STA_IP_ADDR, STA_GW_ADDR, STA_GW_ADDR, STA_SN_MASK
     };
 

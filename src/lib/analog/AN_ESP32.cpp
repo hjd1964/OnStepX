@@ -102,9 +102,15 @@
       ledcSetup(channel, __an_frequency, __an_resolution); // was 1000Hz at 10 bit
       ledcAttachPin(pin, channel);
       ledcWrite(channel, value);
-      // just disconnect and go digital if value is 0 or 1023
-      if (value == 0)    { noTone(pin); digitalWrite(pin, LOW); }
-      if (value == 1023) { noTone(pin); digitalWrite(pin, HIGH); }
+      // just disconnect and go digital if value is 0 or full range
+      if (value <= 0) {
+        noTone(pin);
+        digitalWrite(pin, LOW);
+      }
+      if (value >= round(pow(2, __an_resolution)) - 1) {
+        noTone(pin);
+        digitalWrite(pin, HIGH);
+      }
     } else { log_e("analogWrite, PWM channel in use or unavailable."); }
     portEXIT_CRITICAL(&__analogOutMux);
   }

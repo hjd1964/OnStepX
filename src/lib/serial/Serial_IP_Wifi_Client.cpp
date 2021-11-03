@@ -20,7 +20,7 @@
 
     this->clientTimeoutMs = clientTimeoutMs;
     this->persist = persist;
-    onStep = IPAddress(wifiManager.settings.target1_ip);
+    onStep = IPAddress(wifiManager.sta->target);
 
     VF("MSG: WiFi waiting for connection");
     while (WiFi.status() != WL_CONNECTED) { delay(500); V("."); }

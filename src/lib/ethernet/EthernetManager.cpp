@@ -3,7 +3,7 @@
 
 #if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
 
-void EthernetManager::init() {
+bool EthernetManager::init() {
   if (!active) {
     #ifdef NV_ETHERNET_SETTINGS_BASE
       if (EthernetSettingsSize < sizeof(EthernetSettings)) { nv.readOnly(true); DL("ERR: EthernetManager::init(); EthernetSettingsSize error NV subsystem writes disabled"); }
@@ -17,9 +17,10 @@ void EthernetManager::init() {
     #endif
 
     VF("MSG: Ethernet DHCP En = "); VL(settings.dhcp_enabled);
-    VF("MSG: Ethernet IP = "); V(settings.ip[0]); V("."); V(settings.ip[1]); V("."); V(settings.ip[2]); V("."); VL(settings.ip[3]);
-    VF("MSG: Ethernet GW = "); V(settings.gw[0]); V("."); V(settings.gw[1]); V("."); V(settings.gw[2]); V("."); VL(settings.gw[3]);
-    VF("MSG: Ethernet SN = "); V(settings.sn[0]); V("."); V(settings.sn[1]); V("."); V(settings.sn[2]); V("."); VL(settings.sn[3]);
+    VF("MSG: Ethernet IP      = "); V(settings.ip[0]); V("."); V(settings.ip[1]); V("."); V(settings.ip[2]); V("."); VL(settings.ip[3]);
+    VF("MSG: Ethernet GW      = "); V(settings.gw[0]); V("."); V(settings.gw[1]); V("."); V(settings.gw[2]); V("."); VL(settings.gw[3]);
+    VF("MSG: Ethernet SN      = "); V(settings.sn[0]); V("."); V(settings.sn[1]); V("."); V(settings.sn[2]); V("."); VL(settings.sn[3]);
+    VF("MSG: Ethernet TARGET  = "); V(settings.target[0]); V("."); V(settings.target[1]); V("."); V(settings.target[2]); V("."); VL(settings.target[3]);
 
     #if defined(ETHERNET_CS_PIN) && ETHERNET_CS_PIN != OFF
       VF("MSG: Ethernet device ETHERNET_CS_PIN ("); V(ETHERNET_CS_PIN); VL(")");
@@ -35,11 +36,16 @@ void EthernetManager::init() {
       delay(1000);
     }
 
-    Ethernet.begin(settings.mac, settings.ip, settings.dns, settings.gw, settings.sn);
+    if (settings.dhcpEnabled) {
+      active = Ethernet.begin(settings.mac);
+    } else {
+      Ethernet.begin(settings.mac, settings.ip, settings.dns, settings.gw, settings.sn);
+      active = true;
+    }
 
     VLF("MSG: Ethernet initialized");
-    active = true;
   }
+  return active;
 }
 
 void EthernetManager::restart() {
