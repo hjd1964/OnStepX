@@ -124,12 +124,15 @@ void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
   cacheClean = false;
 
   if (readAndWriteThrough) if (!readOnlyMode) writeToStorage(i, j);
+
   if (cacheSize == 0) {
     if (!readOnlyMode) {
       if (!readAndWriteThrough) {
         if (j != readFromStorage(i)) writeToStorage(i, j);
       } else writeToStorage(i, j);
     }
+
+    commitReadyTimeMs = millis() + waitMs;
     return;
   }
 
@@ -143,6 +146,7 @@ void NonVolatileStorage::writeToCache(uint16_t i, uint8_t j) {
     // mark read as clean (so we don't overwrite the cache)
     bitWrite(cacheStateRead[i/8], i%8, 0);
   }
+
   commitReadyTimeMs = millis() + waitMs;
 }
 
@@ -158,22 +162,20 @@ double   NonVolatileStorage::readD (uint16_t i) { double j;   readBytes(i, (uint
 void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { readBytes(i, j, -maxLen); }
 
 void NonVolatileStorage::readBytes(uint16_t i, void *j, int16_t count) {
-  if (abs(count) > 64) return;
   if (count < 0) {
     count = -count;
-    for (uint8_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
+    for (uint16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
   } else {
-    for (uint8_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); j = (uint8_t*)j + 1; }
+    for (uint16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); j = (uint8_t*)j + 1; }
   }
 }
 
 void NonVolatileStorage::updateBytes(uint16_t i, void *j, int16_t count) {
-  if (abs(count) > 64) return;
   if (count < 0) {
     count = -count;
-    for (uint8_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
+    for (uint16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
   } else {
-    for (uint8_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
+    for (uint16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
   }
 }
 
