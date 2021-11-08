@@ -25,9 +25,9 @@
 #define SERIAL_SERVER OFF                 // SERIAL_SIP, SERIAL_PIP1, etc.
 #endif
 
-// optional Arduino Serial class work-alike IP channel to port 9998 as a client (connects to a server)
+// optional Arduino Serial class work-alike IP channel (ports 9996 to 9998) as a client (connects to a server)
 #ifndef SERIAL_CLIENT
-#define SERIAL_CLIENT OFF                 // ON for SERIAL_IP at port 9998
+#define SERIAL_CLIENT OFF                 // ON to enable SERIAL_IP
 #endif
 
 // -------------------------------------------------------------------------------------------------
