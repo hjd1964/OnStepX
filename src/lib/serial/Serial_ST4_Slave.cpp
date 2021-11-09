@@ -35,6 +35,8 @@ all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
 #endif
 
 void Sst4::begin(long baudRate = 9600) {
+  if (isActive) return;
+
   xmit_head = 0; xmit_tail = 0; xmit_buffer[0] = 0;
   recv_head = 0; recv_tail = 0; recv_buffer[0] = 0;
   
@@ -56,6 +58,8 @@ void Sst4::begin(long baudRate = 9600) {
     timerAlarmWrite(Timer1, INTERVAL, true);
     timerAlarmEnable(Timer1);
   #endif
+
+  isActive = true;
 }
 
 void Sst4::end() {

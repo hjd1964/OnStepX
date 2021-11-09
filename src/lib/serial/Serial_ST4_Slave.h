@@ -68,6 +68,7 @@ class Sst4 : public Stream {
   private:
     uint8_t recv_head = 0;
     long time_out = 500;
+    bool isActive = false;
 };
 
 extern Sst4 SerialST4;

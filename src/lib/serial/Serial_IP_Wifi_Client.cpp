@@ -23,8 +23,13 @@
     onStep = IPAddress(wifiManager.sta->target);
 
     VF("MSG: WiFi waiting for connection");
-    while (WiFi.status() != WL_CONNECTED) { delay(500); V("."); }
+    for (int i = 0; i < 5; i++) { if (WiFi.status() != WL_CONNECTED) { delay(2000); V("."); } }
     VL("");
+
+    if (WiFi.status() != WL_CONNECTED) {
+      VL("WRN: WiFi connection to target failed");
+      return;
+    }
 
     delay(1000);
     if (cmdSvrClient.connect(onStep, port)) {
@@ -51,7 +56,7 @@
           return false;
         }
       } else return true;
-    } else return false;
+    } else { active = false; return false; }
   }
 
   size_t IPSerialClient::write(uint8_t data) {
