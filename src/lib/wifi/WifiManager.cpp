@@ -103,6 +103,7 @@ bool WifiManager::init() {
 
 void WifiManager::setStation(int number) {
   if (number >= 1 && number <= WifiStationCount) stationNumber = number;
+  sta = &settings.station[stationNumber - 1];
 }
 
 void WifiManager::disconnect() {

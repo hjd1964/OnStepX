@@ -79,6 +79,13 @@
 #define STA_ENABLED                 false //       false, normally not enabled
 #endif
 
+#ifndef STA_HOST_NAME
+#define STA_HOST_NAME               "Home" //     "Home", Wifi Host Name to connect to
+#endif
+#ifndef STA1_HOST_NAME
+#define STA1_HOST_NAME STA_HOST_NAME
+#endif
+
 #ifndef STA_SSID
 #define STA_SSID                    "Home" //     "Home", Wifi Station SSID to connnect to
 #endif
@@ -130,6 +137,10 @@
 
 // first alternate station
 
+#ifndef STA2_HOST_NAME
+#define STA2_HOST_NAME                  "" //         "", Wifi Host Name to connect to
+#endif
+
 #ifndef STA2_SSID
 #define STA2_SSID                       "" //         "", Wifi Station SSID to connnect to
 #endif
@@ -159,6 +170,10 @@
 #endif
 
 // second alternate station
+
+#ifndef STA3_HOST_NAME
+#define STA3_HOST_NAME                  "" //         "", Wifi Host Name to connect to
+#endif
 
 #ifndef STA3_SSID
 #define STA3_SSID                       "" //         "", Wifi Station SSID to connnect to
