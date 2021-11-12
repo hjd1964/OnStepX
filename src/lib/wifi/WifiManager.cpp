@@ -10,7 +10,7 @@ bool WifiManager::init() {
       if (WifiSettingsSize < sizeof(WifiSettings)) { nv.readOnly(true); DL("ERR: WifiManager::init(); WifiSettingsSize error NV subsystem writes disabled"); }
 
       if (!nv.isKeyValid()) {
-        VLF("MSG: WifiManager, writing defaults to NV");
+        VLF("MSG: WiFi, writing defaults to NV");
         nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
       }
 
@@ -21,69 +21,52 @@ bool WifiManager::init() {
     IPAddress ap_gw = IPAddress(settings.ap.gw);
     IPAddress ap_sn = IPAddress(settings.ap.sn);
 
-    VF("MSG: WiFi Master Pwd   = "); VL(settings.masterPassword);
+    VF("MSG: WiFi, Master Pwd  = "); VL(settings.masterPassword);
 
-    VF("MSG: WiFi AP Enable    = "); VL(settings.accessPointEnabled);
-    VF("MSG: WiFi AP SSID      = "); VL(settings.ap.ssid);
-    VF("MSG: WiFi AP PWD       = "); VL(settings.ap.pwd);
-    VF("MSG: WiFi AP CH        = "); VL(settings.ap.channel);
-    VF("MSG: WiFi AP IP        = "); VL(ap_ip.toString());
-    VF("MSG: WiFi AP GATEWAY   = "); VL(ap_gw.toString());
-    VF("MSG: WiFi AP SN        = "); VL(ap_sn.toString());
+    VF("MSG: WiFi, AP Enable   = "); VL(settings.accessPointEnabled);
+    VF("MSG: WiFi, AP Fallback = "); VL(settings.stationApFallback);
+    VF("MSG: WiFi, Sta Enable  = "); VL(settings.stationEnabled);
 
-    VF("MSG: WiFi Sta Enable   = "); VL(settings.stationEnabled);
-    VF("MSG: WiFi Sta Fback AP = "); VL(settings.stationApFallback);
-    VF("MSG: WiFi Sta Fback Alt= "); VL(settings.stationAltFallback);
+    if (settings.accessPointEnabled) {
+      VF("MSG: WiFi, AP SSID     = "); VL(settings.ap.ssid);
+      VF("MSG: WiFi, AP PWD      = "); VL(settings.ap.pwd);
+      VF("MSG: WiFi, AP CH       = "); VL(settings.ap.channel);
+      VF("MSG: WiFi, AP IP       = "); VL(ap_ip.toString());
+      VF("MSG: WiFi, AP GATEWAY  = "); VL(ap_gw.toString());
+      VF("MSG: WiFi, AP SN       = "); VL(ap_sn.toString());
+    }
 
-    sta = &settings.sta1;
+    sta = &settings.station[stationNumber - 1];
+
     IPAddress sta_ip = IPAddress(sta->ip);
     IPAddress sta_gw = IPAddress(sta->gw);
     IPAddress sta_sn = IPAddress(sta->sn);
     IPAddress target = IPAddress(sta->target);
 
-    VF("MSG: WiFi Sta1 DHCP En = "); VL(sta->dhcpEnabled);
-    VF("MSG: WiFi Sta1 SSID    = "); VL(sta->ssid);
-    VF("MSG: WiFi Sta1 PWD     = "); VL(sta->pwd);
-    VF("MSG: WiFi Sta1 IP      = "); VL(sta_ip.toString());
-    VF("MSG: WiFi Sta1 GATEWAY = "); VL(sta_gw.toString());
-    VF("MSG: WiFi Sta1 SN      = "); VL(sta_sn.toString());
-    VF("MSG: WiFi Sta1 TARGET  = "); VL(target.toString());
-
-    sta = &settings.sta2;
-    sta_ip = IPAddress(sta->ip);
-    sta_gw = IPAddress(sta->gw);
-    sta_sn = IPAddress(sta->sn);
-    target = IPAddress(sta->target);
-
-    VF("MSG: WiFi Sta2 DHCP En = "); VL(sta->dhcpEnabled);
-    VF("MSG: WiFi Sta2 SSID    = "); VL(sta->ssid);
-    VF("MSG: WiFi Sta2 PWD     = "); VL(sta->pwd);
-    VF("MSG: WiFi Sta2 IP      = "); VL(sta_ip.toString());
-    VF("MSG: WiFi Sta2 GATEWAY = "); VL(sta_gw.toString());
-    VF("MSG: WiFi Sta2 SN      = "); VL(sta_sn.toString());
-    VF("MSG: WiFi Sta2 TARGET  = "); VL(target.toString());
-
-    sta = &settings.sta1;
+    VF("MSG: WiFi, Station#    = "); VL(stationNumber);
+    VF("MSG: WiFi, Sta DHCP En = "); VL(sta->dhcpEnabled);
+    VF("MSG: WiFi, Sta SSID    = "); VL(sta->ssid);
+    VF("MSG: WiFi, Sta PWD     = "); VL(sta->pwd);
+    VF("MSG: WiFi, Sta IP      = "); VL(sta_ip.toString());
+    VF("MSG: WiFi, Sta GATEWAY = "); VL(sta_gw.toString());
+    VF("MSG: WiFi, Sta SN      = "); VL(sta_sn.toString());
+    VF("MSG: WiFi, Sta TARGET  = "); VL(target.toString());
 
   TryAgain:
-    sta_ip = IPAddress(sta->ip);
-    sta_gw = IPAddress(sta->gw);
-    sta_sn = IPAddress(sta->sn);
-
     if (settings.accessPointEnabled && !settings.stationEnabled) {
-      VLF("MSG: WiFi starting Soft AP");
+      VLF("MSG: WiFi, starting Soft AP");
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
       WiFi.mode(WIFI_AP);
     } else
     if (!settings.accessPointEnabled && settings.stationEnabled) {
-      VLF("MSG: WiFi starting Station");
+      VLF("MSG: WiFi, starting Station");
       WiFi.begin(sta->ssid, sta->pwd);
       WiFi.mode(WIFI_STA);
     } else
     if (settings.accessPointEnabled && settings.stationEnabled) {
-      VLF("MSG: WiFi starting Soft AP");
+      VLF("MSG: WiFi, starting Soft AP");
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
-      VLF("MSG: WiFi starting Station");
+      VLF("MSG: WiFi, starting Station");
       WiFi.begin(sta->ssid, sta->pwd);
       WiFi.mode(WIFI_AP_STA);
     }
@@ -97,35 +80,36 @@ bool WifiManager::init() {
     for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
 
     if (WiFi.status() != WL_CONNECTED) {
-      // if connection fails fall back to the alternate station
-      if (settings.stationEnabled && settings.stationAltFallback && sta != &settings.sta2) {
-        VLF("MSG: WiFi starting station failed");
-        WiFi.disconnect();
-        delay(3000);
-        VLF("MSG: WiFi switching to alternate station");
-        sta = &settings.sta2;
-        goto TryAgain;
-      }
-
       // if connection fails fall back to access-point mode
       if (settings.stationEnabled && settings.stationApFallback && !settings.accessPointEnabled) {
         VLF("MSG: WiFi starting station failed");
         WiFi.disconnect();
         delay(3000);
-        VLF("MSG: WiFi switching to SoftAP mode");
+        VLF("MSG: WiFi, switching to SoftAP mode");
         settings.stationEnabled = false;
         settings.accessPointEnabled = true;
         goto TryAgain;
       }
 
-      VLF("MSG: WiFi initialization failed");
+      VLF("MSG: WiFi, initialization failed");
     } else {
       active = true;
-      VLF("MSG: WiFi initialized");      
+      VLF("MSG: WiFi, initialized");      
     }
   }
 
   return active;
+}
+
+void WifiManager::setStation(int number) {
+  if (number >= 1 && number <= WifiStationCount) stationNumber = number;
+}
+
+void WifiManager::disconnect() {
+  WiFi.disconnect();
+  WiFi.softAPdisconnect(true);
+  active = false;
+  VLF("MSG: WiFi, disconnected");      
 }
 
 void WifiManager::writeSettings() {

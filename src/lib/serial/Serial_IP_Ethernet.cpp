@@ -22,7 +22,7 @@
 
     cmdSvr = new EthernetServer(port);
     cmdSvr->begin();
-    VF("MSG: Ethernet started IP commandServer on port "); VL(port);
+    VF("MSG: Ethernet, started IP commandServer on port "); VL(port);
 
     this->clientTimeoutMs = clientTimeoutMs;
     this->persist = persist;

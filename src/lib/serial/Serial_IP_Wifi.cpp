@@ -21,7 +21,7 @@
 
     cmdSvr->begin();
     cmdSvr->setNoDelay(true);
-    VF("MSG: WiFi started IP commandServer on port "); VL(port);
+    VF("MSG: WiFi, started IP commandServer on port "); VL(port);
 
     this->clientTimeoutMs = clientTimeoutMs;
     this->persist = persist;

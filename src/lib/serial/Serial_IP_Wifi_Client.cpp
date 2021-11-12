@@ -7,8 +7,8 @@
 
 #if OPERATIONAL_MODE == WIFI && SERIAL_CLIENT == ON
 
-  void IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
-    if (active) return;
+  bool IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
+    if (active) return true;
 
     // special case where the port is the most common baud rate
     // so a standard call to begin(baud_rate) can still work
@@ -22,37 +22,44 @@
     this->persist = persist;
     onStep = IPAddress(wifiManager.sta->target);
 
-    VF("MSG: WiFi waiting for connection");
+    VF("MSG: WiFi, waiting for connection");
     for (int i = 0; i < 5; i++) { if (WiFi.status() != WL_CONNECTED) { delay(2000); V("."); } }
     VL("");
 
     if (WiFi.status() != WL_CONNECTED) {
-      VL("WRN: WiFi connection to target failed");
-      return;
+      VL("WRN: WiFi, connection to target failed");
+      return false;
     }
 
     delay(1000);
     if (cmdSvrClient.connect(onStep, port)) {
-      VF("MSG: WiFi started client to "); V(onStep.toString()); V(":"); VL(port);
+      VF("MSG: WiFi, started client to "); V(onStep.toString()); V(":"); VL(port);
       active = true;
-    } else VL("WRN: WiFi connection to target failed"); 
+      return true;
+    } else {
+      VL("WRN: WiFi, connection to target failed");
+      return false;
+    }
   }
 
   void IPSerialClient::end() {
+    if (!active) return;
+    
     cmdSvrClient.stop();
     VL("MSG: IPSerial, connection closed");
     WiFi.disconnect();
     VL("MSG: IPSerial, disconnected");
+    active = false;
   }
 
   bool IPSerialClient::isConnected() {
     if (WiFi.status() == WL_CONNECTED) {
       if (!cmdSvrClient.connected()) {
         if (cmdSvrClient.connect(onStep, port)) {
-          VLF("MSG: WiFi restarted client");
+          VLF("MSG: WiFi, restarted client");
           return true;
         } else {
-          VLF("WRN: WiFi connection to target failed");
+          VLF("WRN: WiFi, connection to target failed");
           return false;
         }
       } else return true;

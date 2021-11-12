@@ -25,7 +25,7 @@
 
   class IPSerialClient : public Stream {
     public:
-      void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
+      bool begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
       void end();
       bool isConnected();
 

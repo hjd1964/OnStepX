@@ -44,7 +44,8 @@ typedef struct StationSettings {
   uint8_t sn[4];
 } StationSettings;
 
-#define WifiSettingsSize 331
+#define WifiStationCount 3
+#define WifiSettingsSize 427
 typedef struct WifiSettings {
   char masterPassword[40];
 
@@ -53,9 +54,7 @@ typedef struct WifiSettings {
 
   bool stationEnabled;
   bool stationApFallback;
-  bool stationAltFallback;
-  StationSettings sta1;
-  StationSettings sta2;
+  StationSettings station[WifiStationCount];
 
 } WifiSettings;
 #pragma pack()
@@ -63,6 +62,8 @@ typedef struct WifiSettings {
 class WifiManager {
   public:
     bool init();
+    void disconnect();
+    void setStation(int number);
     void writeSettings();
 
     StationSettings *sta;
@@ -78,20 +79,31 @@ class WifiManager {
 
       STA_ENABLED,
       STA_AP_FALLBACK,
-      STA_ALT_FALLBACK,
-      {
-        STA_SSID, STA_PASSWORD, STA_DHCP_ENABLED,
-        STA_TARGET_IP_ADDR, STA_IP_ADDR, STA_GW_ADDR, STA_SN_MASK
-      },
 
       {
-        STA_SSID_ALT, STA_PASSWORD_ALT, STA_DHCP_ENABLED_ALT,
-        STA_TARGET_IP_ADDR_ALT, STA_IP_ADDR_ALT, STA_GW_ADDR_ALT, STA_SN_MASK_ALT
+        {
+          STA1_SSID, STA1_PASSWORD, STA1_DHCP_ENABLED,
+          STA1_TARGET_IP_ADDR, STA1_IP_ADDR, STA1_GW_ADDR, STA1_SN_MASK
+        },
+
+        {
+          STA2_SSID, STA2_PASSWORD, STA2_DHCP_ENABLED,
+          STA2_TARGET_IP_ADDR, STA2_IP_ADDR, STA2_GW_ADDR, STA2_SN_MASK
+        },
+
+        {
+          STA3_SSID, STA3_PASSWORD, STA3_DHCP_ENABLED,
+          STA3_TARGET_IP_ADDR, STA3_IP_ADDR, STA3_GW_ADDR, STA3_SN_MASK
+        }
+
       }
     };
 
-  private:
     bool active = false;
+    int stationNumber = 1;
+
+  private:
+    
 };
 
 extern WifiManager wifiManager;
