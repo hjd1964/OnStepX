@@ -28,7 +28,6 @@
 #endif
 
 // ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
-
 #ifndef SERIAL_IP_MODE
 #define SERIAL_IP_MODE                OFF // use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
 #endif
@@ -55,17 +54,12 @@
 #define SERIAL_SERVER                BOTH // or STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
 #endif
 
-#ifndef AP_ENABLED
-#define AP_ENABLED                   true // to enable the soft AP
-#endif
-
-#ifndef STA_IP_ADDR
-#define STA_IP_ADDR        {192,168,1,55} // ..168,1,55}, default Wifi Station IP Address for OnStep.
-#endif
-
-#ifndef STA_GW_ADDR
-#define STA_GW_ADDR         {192,168,1,1} // ..,168,1,1}, default Wifi Station GATEWAY Address for OnStep.
-#endif
+#define STA_SSID                   "Home" //      "Home", Wifi Station SSID to connnect to
+#define STA_PASSWORD           "password" //  "password", Wifi Station mode password
+#define STA_DHCP_ENABLED           false  //       false, true to use LAN DHCP addresses
+#define STA_IP_ADDR         {192,168,0,2} //  ..168,0,2}, Wifi Station IP Address
+#define STA_GW_ADDR         {192,168,0,1} // ..,168,0,1}, Wifi Station GATEWAY Address
+#define STA_SN_MASK       {255,255,255,0} // ..55,255,0}, Wifi Station SUBNET Mask
 
 // sensors
 #ifndef WEATHER
