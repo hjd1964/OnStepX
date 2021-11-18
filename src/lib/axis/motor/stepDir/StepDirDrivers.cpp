@@ -34,16 +34,23 @@ StepDirDriver::StepDirDriver(uint8_t axisNumber, const DriverModePins *Pins, con
 }
 
 void StepDirDriver::init(int16_t microsteps, int16_t current) {
-  // update the current from initialization setting
   if (settings.currentRun != OFF) {
     if (settings.currentRun != current) {
+      // update the current from initialization setting
       settings.currentRun = current;
       settings.currentGoto = current;
       settings.currentHold = lround(current/2.0F);
     } else {
+      // automatically set goto and hold current if they are disabled
       if (settings.currentGoto == OFF) settings.currentGoto = settings.currentRun;
       if (settings.currentHold == OFF) settings.currentHold = lround(settings.currentRun/2.0F);
     }
+  } else {
+    // set current defaults for TMC drivers
+    settings.currentRun = 600;
+    if (settings.model == TMC2130) settings.currentRun = 2500;
+    settings.currentGoto = settings.currentRun;
+    settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
   // update the microsteps from the initialization setting
