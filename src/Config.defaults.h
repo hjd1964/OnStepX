@@ -29,11 +29,11 @@
 
 // ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
 #ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE                OFF // use ACCESS_POINT or STATION to enable the interface (ESP32 only.)
+#define SERIAL_IP_MODE                OFF                         // use ACCESS_POINT or STATION to enable the interface (ESP32 only)
 #endif
 
 #ifndef STA_AP_FALLBACK
-#define STA_AP_FALLBACK              true // activate SoftAP if station fails to connect
+#define STA_AP_FALLBACK              true                         // activate SoftAP if station fails to connect
 #endif
 
 #if SERIAL_IP_MODE == ACCESS_POINT
@@ -51,15 +51,15 @@
 #endif
 
 #ifndef SERIAL_SERVER
-#define SERIAL_SERVER                BOTH // or STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
+#define SERIAL_SERVER                BOTH                         // or STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
 #endif
 
-#define STA_SSID                   "Home" //      "Home", Wifi Station SSID to connnect to
-#define STA_PASSWORD           "password" //  "password", Wifi Station mode password
-#define STA_DHCP_ENABLED           false  //       false, true to use LAN DHCP addresses
-#define STA_IP_ADDR         {192,168,0,2} //  ..168,0,2}, Wifi Station IP Address
-#define STA_GW_ADDR         {192,168,0,1} // ..,168,0,1}, Wifi Station GATEWAY Address
-#define STA_SN_MASK       {255,255,255,0} // ..55,255,0}, Wifi Station SUBNET Mask
+#define STA_SSID                   "Home"                         //      "Home", Wifi Station SSID to connnect to
+#define STA_PASSWORD           "password"                         //  "password", Wifi Station mode password
+#define STA_DHCP_ENABLED           false                          //       false, true to use LAN DHCP addresses
+#define STA_IP_ADDR         {192,168,0,2}                         //  ..168,0,2}, Wifi Station IP Address
+#define STA_GW_ADDR         {192,168,0,1}                         // ..,168,0,1}, Wifi Station GATEWAY Address
+#define STA_SN_MASK       {255,255,255,0}                         // ..55,255,0}, Wifi Station SUBNET Mask
 
 // sensors
 #ifndef WEATHER
@@ -90,19 +90,19 @@
 
 // axes
 #ifndef AXIS1_DRIVER_MODEL
-#define AXIS1_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS1_DRIVER_MODEL            OFF                         // specify a driver model to enable
 #endif
 #ifndef AXIS1_STEPS_PER_DEGREE
-#define AXIS1_STEPS_PER_DEGREE        12800.0
+#define AXIS1_STEPS_PER_DEGREE        12800.0                     // (micro)steps per degree
 #endif
 #ifndef AXIS1_REVERSE
-#define AXIS1_REVERSE                 OFF
+#define AXIS1_REVERSE                 OFF                         // reverse rotation direction
 #endif
 #ifndef AXIS1_POWER_DOWN
 #define AXIS1_POWER_DOWN              OFF                         // motor power off if at standstill > 30 sec
 #endif
 #ifndef AXIS1_ENABLE_STATE
-#define AXIS1_ENABLE_STATE            LOW  // default state of ENable pin for motor power on
+#define AXIS1_ENABLE_STATE            LOW                         // default state of ENable pin for motor power on
 #endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF                         // wrap for unlimited range
@@ -114,7 +114,7 @@
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
 #ifndef AXIS1_SENSE_HOME
-#define AXIS1_SENSE_HOME              OFF                         // HIGH/LOW to activate home sensing and set direction
+#define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
 #endif
 #ifndef AXIS1_SENSE_HOME_INIT
 #define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
@@ -134,31 +134,31 @@
   #define AXIS1_DRIVER_TMC_SPI
   #endif
   #ifndef AXIS1_STEP_STATE
-  #define AXIS1_STEP_STATE              HIGH // default signal transition state for a step
+  #define AXIS1_STEP_STATE              HIGH                      // default signal transition state for a step
   #endif
   #ifndef AXIS1_DRIVER_MICROSTEPS
-  #define AXIS1_DRIVER_MICROSTEPS       OFF  // normal microstep mode 
+  #define AXIS1_DRIVER_MICROSTEPS       OFF                       // normal microstep mode 
   #endif
   #ifndef AXIS1_DRIVER_MICROSTEPS_GOTO
-  #define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF  // microstep mode to use during slews
+  #define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF                       // microstep mode to use during slews
   #endif
   #ifndef AXIS1_DRIVER_DECAY
-  #define AXIS1_DRIVER_DECAY            OFF  // OFF for default, TMC STEALTHCHOP
+  #define AXIS1_DRIVER_DECAY            OFF                       // OFF for default, TMC STEALTHCHOP
   #endif
   #ifndef AXIS1_DRIVER_DECAY_GOTO
-  #define AXIS1_DRIVER_DECAY_GOTO       OFF  // OFF for default, TMC SPREADCYCLE
+  #define AXIS1_DRIVER_DECAY_GOTO       OFF                       // OFF for default, TMC SPREADCYCLE
   #endif
   #ifndef AXIS1_DRIVER_IHOLD
-  #define AXIS1_DRIVER_IHOLD            HALF // in mA
+  #define AXIS1_DRIVER_IHOLD            HALF                      // in mA
   #endif
   #ifndef AXIS1_DRIVER_IRUN
-  #define AXIS1_DRIVER_IRUN             OFF  // in mA
+  #define AXIS1_DRIVER_IRUN             OFF                       // in mA
   #endif
   #ifndef AXIS1_DRIVER_IGOTO
-  #define AXIS1_DRIVER_IGOTO            SAME // in mA
+  #define AXIS1_DRIVER_IGOTO            SAME                      // in mA
   #endif
   #ifndef AXIS1_DRIVER_STATUS
-  #define AXIS1_DRIVER_STATUS           OFF  // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
+  #define AXIS1_DRIVER_STATUS           OFF                       // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
   #endif
   #ifndef AXIS1_PARAMETER1      
   #define AXIS1_PARAMETER1              AXIS1_DRIVER_MICROSTEPS
@@ -170,31 +170,31 @@
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS1_SERVO_PRESENT
   #ifndef AXIS1_SERVO_P
-  #define AXIS1_SERVO_P                 2.0    // P = proportional
+  #define AXIS1_SERVO_P                 2.0                       // P = proportional
   #endif
   #ifndef AXIS1_SERVO_I
-  #define AXIS1_SERVO_I                 5.0    // I = integral
+  #define AXIS1_SERVO_I                 5.0                       // I = integral
   #endif
   #ifndef AXIS1_SERVO_D
-  #define AXIS1_SERVO_D                 1.0    // D = derivative
+  #define AXIS1_SERVO_D                 1.0                       // D = derivative
   #endif
   #ifndef AXIS1_SERVO_ENCODER
-  #define AXIS1_SERVO_ENCODER           ENC_AB
+  #define AXIS1_SERVO_ENCODER           ENC_AB                    // type of encoder: ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY
   #endif
   #ifndef AXIS1_SERVO_ENCODER_TRIGGER
-  #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE // ignored for ENC_AB
+  #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE                    // ignored for ENC_AB
   #endif
   #ifndef AXIS1_SERVO_PH1_STATE
-  #define AXIS1_SERVO_PH1_STATE         LOW    // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PD) pin
+  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PD) pin
   #endif
   #ifndef AXIS1_SERVO_PH2_STATE
-  #define AXIS1_SERVO_PH2_STATE         LOW    // default state motor driver IN2 or DIR pin
+  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or DIR pin
   #endif
   #ifndef AXIS1_PARAMETER1      
-  #define AXIS1_PARAMETER1              1      // subdivisions always 1
+  #define AXIS1_PARAMETER1              1                         // subdivisions always 1
   #endif
   #ifndef AXIS1_PARAMETER2 
-  #define AXIS1_PARAMETER2              0      // not used
+  #define AXIS1_PARAMETER2              0                         // not used
   #endif
 #endif
 
@@ -202,19 +202,19 @@
 #define AXIS2_DRIVER_MODEL            OFF                         // specify a driver to enable
 #endif
 #ifndef AXIS2_STEPS_PER_DEGREE
-#define AXIS2_STEPS_PER_DEGREE        12800.0
+#define AXIS2_STEPS_PER_DEGREE        12800.0                     // (micro)steps per degree of movement
 #endif
 #ifndef AXIS2_REVERSE
-#define AXIS2_REVERSE                 OFF
+#define AXIS2_REVERSE                 OFF                         // reverse movement
 #endif
 #ifndef AXIS2_POWER_DOWN
-#define AXIS2_POWER_DOWN              OFF
+#define AXIS2_POWER_DOWN              OFF                         // power down at standstill
 #endif
 #ifndef AXIS2_ENABLE_STATE
-#define AXIS2_ENABLE_STATE            LOW
+#define AXIS2_ENABLE_STATE            LOW                         // stepper enable state
 #endif
 #ifndef AXIS2_TANGENT_ARM
-#define AXIS2_TANGENT_ARM             OFF
+#define AXIS2_TANGENT_ARM             OFF                         // ON to enable support for Dec tangent arm equatorial mounts
 #endif
 #ifndef AXIS2_LIMIT_MIN
 #define AXIS2_LIMIT_MIN               -90                         // in degrees
@@ -223,19 +223,19 @@
 #define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
 #ifndef AXIS2_SENSE_HOME
-#define AXIS2_SENSE_HOME              OFF
+#define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
 #endif
 #ifndef AXIS2_SENSE_HOME_INIT
-#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP
+#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MIN
-#define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE
+#define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE                 // HIGH/LOW to activate min limit
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MAX
-#define AXIS2_SENSE_LIMIT_MAX         LIMIT_SENSE
+#define AXIS2_SENSE_LIMIT_MAX         LIMIT_SENSE                 // HIGH/LOW to activate max limit
 #endif
 #ifndef AXIS2_SENSE_LIMIT_INIT
-#define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT
+#define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
 #if AXIS2_DRIVER_MODEL >= DRIVER_FIRST && AXIS2_DRIVER_MODEL <= DRIVER_LAST
   #define AXIS2_DRIVER_PRESENT
@@ -398,13 +398,13 @@
 
 // guiding
 #ifndef GUIDE_TIME_LIMIT
-#define GUIDE_TIME_LIMIT              0              // in seconds
+#define GUIDE_TIME_LIMIT              0                           // in seconds, 0 to disable
 #endif
 #ifndef GUIDE_HOME_TIME_LIMIT
-#define GUIDE_HOME_TIME_LIMIT         5*60           // in seconds
+#define GUIDE_HOME_TIME_LIMIT         5*60                        // in seconds, for home switches
 #endif
 #ifndef GUIDE_DISABLE_BACKLASH
-#define GUIDE_DISABLE_BACKLASH        OFF
+#define GUIDE_DISABLE_BACKLASH        OFF                         // ON disables backlash while pulse-guiding
 #endif
 
 // tracking
@@ -616,16 +616,16 @@
 #define AXIS4_DRIVER_MODEL            OFF                         // specify a driver to enable
 #endif
 #ifndef AXIS4_STEPS_PER_MICRON
-#define AXIS4_STEPS_PER_MICRON        0.5
+#define AXIS4_STEPS_PER_MICRON        0.5                         // (micro)steps per micron of movement
 #endif
 #ifndef AXIS4_REVERSE
-#define AXIS4_REVERSE                 OFF
+#define AXIS4_REVERSE                 OFF                         // reverse movement direction
 #endif
 #ifndef AXIS4_POWER_DOWN
-#define AXIS4_POWER_DOWN              OFF
+#define AXIS4_POWER_DOWN              OFF                         // automatic power down at standstill
 #endif
 #ifndef AXIS4_ENABLE_STATE
-#define AXIS4_ENABLE_STATE            LOW
+#define AXIS4_ENABLE_STATE            LOW                         // enable pin state when driver is active
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
 #define AXIS4_SLEW_RATE_MINIMUM       2                           // in microns/sec
@@ -702,8 +702,8 @@
   #define AXIS4_PARAMETER2              AXIS4_DRIVER_IRUN
   #endif
 #endif
-#if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
-  #define AXIS3_SERVO_PRESENT
+#if AXIS4_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+  #define AXIS4_SERVO_PRESENT
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
   #endif
@@ -735,7 +735,7 @@
 
 // focuser settings, FOCUSER2
 #ifndef AXIS5_DRIVER_MODEL
-#define AXIS5_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS5_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS5_STEPS_PER_MICRON
 #define AXIS5_STEPS_PER_MICRON        0.5
@@ -750,25 +750,25 @@
 #define AXIS5_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS5_SLEW_RATE_MINIMUM       2
 #endif
 #ifndef AXIS5_SLEW_RATE_DESIRED
-#define AXIS5_SLEW_RATE_DESIRED       500                         // in microns/sec
+#define AXIS5_SLEW_RATE_DESIRED       500
 #endif
 #ifndef AXIS5_ACCELERATION_TIME
-#define AXIS5_ACCELERATION_TIME       2                           // in seconds, to selected rate
+#define AXIS5_ACCELERATION_TIME       2
 #endif
 #ifndef AXIS5_RAPID_STOP_TIME
-#define AXIS5_RAPID_STOP_TIME         1                           // in seconds, to stop
+#define AXIS5_RAPID_STOP_TIME         1
 #endif
 #ifndef AXIS5_BACKLASH_RATE
-#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4)
 #endif
 #ifndef AXIS5_LIMIT_MIN
-#define AXIS5_LIMIT_MIN               0                           // in mm
+#define AXIS5_LIMIT_MIN               0
 #endif
 #ifndef AXIS5_LIMIT_MAX
-#define AXIS5_LIMIT_MAX               50                          // in mm
+#define AXIS5_LIMIT_MAX               50
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
@@ -857,7 +857,7 @@
 
 // focuser settings, FOCUSER3
 #ifndef AXIS6_DRIVER_MODEL
-#define AXIS6_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS6_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS6_STEPS_PER_MICRON
 #define AXIS6_STEPS_PER_MICRON        0.5
@@ -872,25 +872,25 @@
 #define AXIS6_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS6_SLEW_RATE_MINIMUM       2
 #endif
 #ifndef AXIS6_SLEW_RATE_DESIRED
-#define AXIS6_SLEW_RATE_DESIRED       500                         // in microns/sec
+#define AXIS6_SLEW_RATE_DESIRED       500
 #endif
 #ifndef AXIS6_ACCELERATION_TIME
-#define AXIS6_ACCELERATION_TIME       2                           // in seconds, to selected rate
+#define AXIS6_ACCELERATION_TIME       2
 #endif
 #ifndef AXIS6_RAPID_STOP_TIME
-#define AXIS6_RAPID_STOP_TIME         1                           // in seconds, to stop
+#define AXIS6_RAPID_STOP_TIME         1
 #endif
 #ifndef AXIS6_BACKLASH_RATE
-#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4)
 #endif
 #ifndef AXIS6_LIMIT_MIN
-#define AXIS6_LIMIT_MIN               0                           // in mm
+#define AXIS6_LIMIT_MIN               0
 #endif
 #ifndef AXIS6_LIMIT_MAX
-#define AXIS6_LIMIT_MAX               50                          // in mm
+#define AXIS6_LIMIT_MAX               50
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
@@ -979,7 +979,7 @@
 
 // focuser settings, FOCUSER4
 #ifndef AXIS7_DRIVER_MODEL
-#define AXIS7_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS7_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS7_STEPS_PER_MICRON
 #define AXIS7_STEPS_PER_MICRON        0.5
@@ -994,25 +994,25 @@
 #define AXIS7_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS7_SLEW_RATE_MINIMUM       2
 #endif
 #ifndef AXIS7_SLEW_RATE_DESIRED
-#define AXIS7_SLEW_RATE_DESIRED       500                         // in microns/sec
+#define AXIS7_SLEW_RATE_DESIRED       500
 #endif
 #ifndef AXIS7_ACCELERATION_TIME
-#define AXIS7_ACCELERATION_TIME       2                           // in seconds, to selected rate
+#define AXIS7_ACCELERATION_TIME       2
 #endif
 #ifndef AXIS7_RAPID_STOP_TIME
-#define AXIS7_RAPID_STOP_TIME         1                           // in seconds, to stop
+#define AXIS7_RAPID_STOP_TIME         1
 #endif
 #ifndef AXIS7_BACKLASH_RATE
-#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4)
 #endif
 #ifndef AXIS7_LIMIT_MIN
-#define AXIS7_LIMIT_MIN               0                           // in mm
+#define AXIS7_LIMIT_MIN               0
 #endif
 #ifndef AXIS7_LIMIT_MAX
-#define AXIS7_LIMIT_MAX               50                          // in mm
+#define AXIS7_LIMIT_MAX               50
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
@@ -1101,7 +1101,7 @@
 
 // focuser settings, FOCUSER5
 #ifndef AXIS8_DRIVER_MODEL
-#define AXIS8_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS8_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS8_STEPS_PER_MICRON
 #define AXIS8_STEPS_PER_MICRON        0.5
@@ -1116,25 +1116,25 @@
 #define AXIS8_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS8_SLEW_RATE_MINIMUM       2
 #endif
 #ifndef AXIS8_SLEW_RATE_DESIRED
-#define AXIS8_SLEW_RATE_DESIRED       500                         // in microns/sec
+#define AXIS8_SLEW_RATE_DESIRED       500
 #endif
 #ifndef AXIS8_ACCELERATION_TIME
-#define AXIS8_ACCELERATION_TIME       2                           // in seconds, to selected rate
+#define AXIS8_ACCELERATION_TIME       2
 #endif
 #ifndef AXIS8_RAPID_STOP_TIME
-#define AXIS8_RAPID_STOP_TIME         1                           // in seconds, to stop
+#define AXIS8_RAPID_STOP_TIME         1
 #endif
 #ifndef AXIS8_BACKLASH_RATE
-#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4)
 #endif
 #ifndef AXIS8_LIMIT_MIN
-#define AXIS8_LIMIT_MIN               0                           // in mm
+#define AXIS8_LIMIT_MIN               0
 #endif
 #ifndef AXIS8_LIMIT_MAX
-#define AXIS8_LIMIT_MAX               50                          // in mm
+#define AXIS8_LIMIT_MAX               50
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
@@ -1223,7 +1223,7 @@
 
 // focuser settings, FOCUSER6
 #ifndef AXIS9_DRIVER_MODEL
-#define AXIS9_DRIVER_MODEL            OFF                         // specify a driver to enable
+#define AXIS9_DRIVER_MODEL            OFF
 #endif
 #ifndef AXIS9_STEPS_PER_MICRON
 #define AXIS9_STEPS_PER_MICRON        0.5
@@ -1238,25 +1238,25 @@
 #define AXIS9_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS9_SLEW_RATE_MINIMUM       2
 #endif
 #ifndef AXIS9_SLEW_RATE_DESIRED
-#define AXIS9_SLEW_RATE_DESIRED       500                         // in microns/sec
+#define AXIS9_SLEW_RATE_DESIRED       500
 #endif
 #ifndef AXIS9_ACCELERATION_TIME
-#define AXIS9_ACCELERATION_TIME       2                           // in seconds, to selected rate
+#define AXIS9_ACCELERATION_TIME       2
 #endif
 #ifndef AXIS9_RAPID_STOP_TIME
-#define AXIS9_RAPID_STOP_TIME         1                           // in seconds, to stop
+#define AXIS9_RAPID_STOP_TIME         1
 #endif
 #ifndef AXIS9_BACKLASH_RATE
-#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4)
 #endif
 #ifndef AXIS9_LIMIT_MIN
-#define AXIS9_LIMIT_MIN               0                           // in mm
+#define AXIS9_LIMIT_MIN               0
 #endif
 #ifndef AXIS9_LIMIT_MAX
-#define AXIS9_LIMIT_MAX               50                          // in mm
+#define AXIS9_LIMIT_MAX               50
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
@@ -1344,10 +1344,10 @@
 #endif
 
 #ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE           OFF // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
+#define FOCUSER_TEMPERATURE           OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
 #endif
 #ifndef FOCUSER_TEMPERATURE_PIN
-#define FOCUSER_TEMPERATURE_PIN       OFF // for thermistors, analog pin
+#define FOCUSER_TEMPERATURE_PIN       OFF                         // for thermistors, analog pin
 #endif
 
 #if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \
@@ -1372,205 +1372,205 @@
 // auxiliary feature settings
 
 #ifndef FEATURE1_PURPOSE
-#define FEATURE1_PURPOSE              OFF
+#define FEATURE1_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE1_NAME
 #define FEATURE1_NAME                "FEATURE1"
 #endif
 #ifndef FEATURE1_TEMP
-#define FEATURE1_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#define FEATURE1_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE1_TEMP_PIN
-#define FEATURE1_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE1_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE1_PIN
-#define FEATURE1_PIN                  OFF   // OUTPUT control pin
+#define FEATURE1_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE1_DEFAULT_VALUE
-#define FEATURE1_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE1_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE1_ACTIVE_STATE
-#define FEATURE1_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE1_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE2_PURPOSE
-#define FEATURE2_PURPOSE              OFF
+#define FEATURE2_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE2_NAME
 #define FEATURE2_NAME                "FEATURE2"
 #endif
 #ifndef FEATURE2_TEMP
-#define FEATURE2_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#define FEATURE2_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE2_TEMP_PIN
-#define FEATURE2_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE2_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE2_PIN
-#define FEATURE2_PIN                  OFF   // OUTPUT control pin
+#define FEATURE2_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE2_DEFAULT_VALUE
-#define FEATURE2_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE2_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE2_ACTIVE_STATE
-#define FEATURE2_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE2_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE3_PURPOSE
-#define FEATURE3_PURPOSE              OFF
+#define FEATURE3_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE3_NAME
 #define FEATURE3_NAME                "FEATURE3"
 #endif
 #ifndef FEATURE3_TEMP
-#define FEATURE3_TEMP                 OFF   // temperature sensor, thermistor or DS1820
+#define FEATURE3_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE3_TEMP_PIN
-#define FEATURE3_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE3_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE3_PIN
-#define FEATURE3_PIN                  OFF   // OUTPUT control pin
+#define FEATURE3_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE3_DEFAULT_VALUE
-#define FEATURE3_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE3_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE3_ACTIVE_STATE
-#define FEATURE3_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE3_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE4_PURPOSE
-#define FEATURE4_PURPOSE              OFF
+#define FEATURE4_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE4_NAME
 #define FEATURE4_NAME                "FEATURE4"
 #endif
 #ifndef FEATURE4_TEMP
-#define FEATURE4_TEMP                 OFF
+#define FEATURE4_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE4_TEMP_PIN
-#define FEATURE4_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE4_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE4_PIN
-#define FEATURE4_PIN                  OFF   // OUTPUT control pin
+#define FEATURE4_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE4_DEFAULT_VALUE
-#define FEATURE4_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE4_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE4_ACTIVE_STATE
-#define FEATURE4_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE4_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE5_PURPOSE
-#define FEATURE5_PURPOSE              OFF
+#define FEATURE5_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE5_NAME
 #define FEATURE5_NAME                "FEATURE5"
 #endif
 #ifndef FEATURE5_TEMP
-#define FEATURE5_TEMP                 OFF
+#define FEATURE5_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE5_TEMP_PIN
-#define FEATURE5_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE5_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE5_PIN
-#define FEATURE5_PIN                  OFF   // OUTPUT control pin
+#define FEATURE5_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE5_DEFAULT_VALUE
-#define FEATURE5_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE5_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE5_ACTIVE_STATE
-#define FEATURE5_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE5_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE6_PURPOSE
-#define FEATURE6_PURPOSE              OFF
+#define FEATURE6_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE6_NAME
 #define FEATURE6_NAME                "FEATURE6"
 #endif
 #ifndef FEATURE6_TEMP
-#define FEATURE6_TEMP                 OFF
+#define FEATURE6_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE6_TEMP_PIN
-#define FEATURE6_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE6_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE6_PIN
-#define FEATURE6_PIN                  OFF   // OUTPUT control pin
+#define FEATURE6_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE6_DEFAULT_VALUE
-#define FEATURE6_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE6_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE6_ACTIVE_STATE
-#define FEATURE6_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE6_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE7_PURPOSE
-#define FEATURE7_PURPOSE              OFF
+#define FEATURE7_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE7_NAME
 #define FEATURE7_NAME                "FEATURE7"
 #endif
 #ifndef FEATURE7_TEMP
-#define FEATURE7_TEMP                 OFF
+#define FEATURE7_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE7_TEMP_PIN
-#define FEATURE7_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE7_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE7_PIN
-#define FEATURE7_PIN                  OFF   // OUTPUT control pin
+#define FEATURE7_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE7_DEFAULT_VALUE
-#define FEATURE7_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE7_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE7_ACTIVE_STATE
-#define FEATURE7_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE7_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 #ifndef FEATURE8_PURPOSE
-#define FEATURE8_PURPOSE              OFF
+#define FEATURE8_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE8_NAME
 #define FEATURE8_NAME                "FEATURE8"
 #endif
 #ifndef FEATURE8_TEMP
-#define FEATURE8_TEMP                 OFF
+#define FEATURE8_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
 #ifndef FEATURE8_TEMP_PIN
-#define FEATURE8_TEMP_PIN             OFF   // for thermistors, analog pin
+#define FEATURE8_TEMP_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE8_PIN
-#define FEATURE8_PIN                  OFF   // OUTPUT control pin
+#define FEATURE8_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE8_DEFAULT_VALUE
-#define FEATURE8_DEFAULT_VALUE        OFF   // OUTPUT control pin default state
+#define FEATURE8_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE8_ACTIVE_STATE
-#define FEATURE8_ACTIVE_STATE         HIGH  // OUTPUT control pin active state
+#define FEATURE8_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
 #endif
 
 // thermistor configuration settings to support two types
 
 #ifndef THERMISTOR1_TNOM
-#define THERMISTOR1_TNOM              25    // nominal temperature (Celsius)
+#define THERMISTOR1_TNOM              25                          // nominal temperature (Celsius)
 #endif
 #ifndef THERMISTOR1_RNOM
-#define THERMISTOR1_RNOM              10000 // nominal resistance (Ohms) at nominal temperature
+#define THERMISTOR1_RNOM              10000                       // nominal resistance (Ohms) at nominal temperature
 #endif
 #ifndef THERMISTOR1_BETA
-#define THERMISTOR1_BETA              3950  // beta coefficient
+#define THERMISTOR1_BETA              3950                        // beta coefficient
 #endif
 #ifndef THERMISTOR1_RSERIES
-#define THERMISTOR1_RSERIES           4700  // series resistor value (Ohms)
+#define THERMISTOR1_RSERIES           4700                        // series resistor value (Ohms)
 #endif
 
 #ifndef THERMISTOR2_TNOM
-#define THERMISTOR2_TNOM              25    // nominal temperature (Celsius)
+#define THERMISTOR2_TNOM              25                          // nominal temperature (Celsius)
 #endif
 #ifndef THERMISTOR2_RNOM
-#define THERMISTOR2_RNOM              10000 // nominal resistance (Ohms) at nominal temperature
+#define THERMISTOR2_RNOM              10000                       // nominal resistance (Ohms) at nominal temperature
 #endif
 #ifndef THERMISTOR2_BETA
-#define THERMISTOR2_BETA              3950  // beta coefficient
+#define THERMISTOR2_BETA              3950                        // beta coefficient
 #endif
 #ifndef THERMISTOR2_RSERIES
-#define THERMISTOR2_RSERIES           4700  // series resistor value (Ohms)
+#define THERMISTOR2_RSERIES           4700                        // series resistor value (Ohms)
 #endif
