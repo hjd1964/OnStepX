@@ -132,11 +132,11 @@ void Park::requestDone() {
   if (state != PS_PARK_FAILED) {
     #if DEBUG == VERBOSE
       long index = axis1.getInstrumentCoordinateSteps() - axis1.getMotorPositionSteps();
-      V("MSG: Mount, park axis1 motor target   "); VL(axis1.getTargetCoordinateSteps() - index);
-      V("MSG: Mount, park axis1 motor position "); VL(axis1.getMotorPositionSteps());
+      VF("MSG: Mount, park axis1 motor target   "); VL(axis1.getTargetCoordinateSteps() - index);
+      VF("MSG: Mount, park axis1 motor position "); VL(axis1.getMotorPositionSteps());
       index = axis2.getInstrumentCoordinateSteps() - axis2.getMotorPositionSteps();
-      V("MSG: Mount, park axis2 motor target   "); VL(axis2.getTargetCoordinateSteps() - index);
-      V("MSG: Mount, park axis2 motor position "); VL(axis2.getMotorPositionSteps());
+      VF("MSG: Mount, park axis2 motor target   "); VL(axis2.getTargetCoordinateSteps() - index);
+      VF("MSG: Mount, park axis2 motor position "); VL(axis2.getMotorPositionSteps());
     #endif
 
     // save the axis state
@@ -199,8 +199,8 @@ CommandError Park::restore(bool withTrackingOn) {
   axis1.setInstrumentCoordinatePark(a1);
   axis2.setInstrumentCoordinatePark(a2);
 
-  V("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
-  V("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
+  VF("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
+  VF("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
 
   // restore backlash settings
   axis1.setBacklash(mount.settings.backlash.axis1);

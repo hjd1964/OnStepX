@@ -29,8 +29,8 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
 
   #if DEBUG == VERBOSE
     V(axisPrefix); V("init step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
-    V(", dir="); if (Pins->dir == OFF) V("OFF"); else V(Pins->dir);
-    V(", en="); if (Pins->enable == OFF) VL("OFF"); else if (Pins->enable == SHARED) VL("SHARED"); else VL(Pins->enable);
+    V(", dir="); if (Pins->dir == OFF) VF("OFF"); else V(Pins->dir);
+    V(", en="); if (Pins->enable == OFF) VLF("OFF"); else if (Pins->enable == SHARED) VLF("SHARED"); else VL(Pins->enable);
   #endif
 
   // this driver requires available pins to function
@@ -83,7 +83,7 @@ void StepDirMotor::setReverse(int8_t state) {
 void StepDirMotor::setParam(int16_t microsteps, int16_t current) {
   driver->init(microsteps, current);
   homeSteps = driver->getMicrostepRatio();
-  V(axisPrefix); V("sequencer homes every "); V(homeSteps); VL(" step(s)");
+  V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
 }
 
 // sets motor power on/off (if possible)
@@ -183,7 +183,7 @@ void StepDirMotor::modeSwitch() {
       }
 
       if (enableMoveFast(true)) {
-        V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VL(" steps/sec.");
+        V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
       }
 
       microstepModeControl = MMC_SLEWING_READY;

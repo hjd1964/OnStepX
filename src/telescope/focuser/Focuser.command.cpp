@@ -31,7 +31,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
         CommandError e1 = park(index);
         if (e1 != CE_NONE) e = e1;
       }
-      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Focusers, park error "); VL(e); *commandError = e; }
+      if (e == CE_NONE) *commandError = CE_1; else { VF("MSG: Focusers, park error "); VL(e); *commandError = e; }
       return false;
     } else 
 
@@ -44,7 +44,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
         CommandError e1 = unpark(index);
         if (e1 != CE_NONE) e = e1;
       }
-      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Focusers, unpark error "); VL(e); *commandError = e; }
+      if (e == CE_NONE) *commandError = CE_1; else { VF("MSG: Focusers, unpark error "); VL(e); *commandError = e; }
       return false;
     } else return false;
   } else

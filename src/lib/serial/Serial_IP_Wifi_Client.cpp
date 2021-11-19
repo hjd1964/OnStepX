@@ -27,7 +27,7 @@
     VL("");
 
     if (WiFi.status() != WL_CONNECTED) {
-      VL("WRN: WiFi, connection to target failed");
+      VLF("WRN: WiFi, connection to target failed");
       return false;
     }
 
@@ -37,7 +37,7 @@
       active = true;
       return true;
     } else {
-      VL("WRN: WiFi, connection to target failed");
+      VLF("WRN: WiFi, connection to target failed");
       return false;
     }
   }
@@ -46,9 +46,9 @@
     if (!active) return;
     
     cmdSvrClient.stop();
-    VL("MSG: IPSerial, connection closed");
+    VLF("MSG: IPSerial, connection closed");
     WiFi.disconnect();
-    VL("MSG: IPSerial, disconnected");
+    VLF("MSG: IPSerial, disconnected");
     active = false;
   }
 

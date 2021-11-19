@@ -58,8 +58,8 @@ void StepDirDriver::init(int16_t microsteps, int16_t current) {
 
   #if DEBUG == VERBOSE
     VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
-    VF(" u-step mode "); if (settings.microsteps == OFF) { V("OFF"); } else { V(settings.microsteps); V("X"); }
-    VF(" (goto mode "); if (settings.microstepsGoto == SAME) { VL("SAME)"); } else { V(settings.microstepsGoto); VL("X)"); }
+    VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF"); } else { V(settings.microsteps); VF("X"); }
+    VF(" (goto mode "); if (settings.microstepsGoto == SAME) { VLF("SAME)"); } else { V(settings.microstepsGoto); VL("X)"); }
   #endif
 
   if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
@@ -74,15 +74,15 @@ void StepDirDriver::init(int16_t microsteps, int16_t current) {
       tmcDriver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3);
       VF("MSG: StepDvr"); V(axisNumber); VF(", TMC ");
       if (current == OFF) {
-        VL("current control OFF (set by Vref)");
+        VLF("current control OFF (set by Vref)");
       } else {
-        V("Ihold="); V(settings.currentHold); V("mA, ");
-        V("Irun="); V(settings.currentRun); V("mA, ");
-        V("Igoto="); V(settings.currentGoto); VL("mA");
+        VF("Ihold="); V(settings.currentHold); VF("mA, ");
+        VF("Irun="); V(settings.currentRun); VF("mA, ");
+        VF("Igoto="); V(settings.currentGoto); VL("mA");
       }
       if (settings.decay == STEALTHCHOP || settings.decayGoto == STEALTHCHOP) {
         tmcDriver.mode(true, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
-        VF("MSG: StepDvr"); V(axisNumber); VLF(", TMC standstill automatic current calibration");
+        VF("MSG: StepDvr"); V(axisNumber); VL(", TMC standstill automatic current calibration");
         delay(100);
       }
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);

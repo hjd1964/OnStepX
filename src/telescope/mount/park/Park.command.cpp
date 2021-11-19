@@ -15,7 +15,7 @@ bool Park::command(char *reply, char *command, char *parameter, bool *supressFra
     //                    1 on success
     if (command[1] == 'P' && parameter[0] == 0) {
       CommandError e = request();
-      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Mount, park error "); VL(e); *commandError = e; } 
+      if (e == CE_NONE) *commandError = CE_1; else { VF("MSG: Mount, park error "); VL(e); *commandError = e; } 
       return false;
     } else 
 
@@ -29,7 +29,7 @@ bool Park::command(char *reply, char *command, char *parameter, bool *supressFra
     //                    1 on success
     if (command[1] == 'R' && parameter[0] == 0) {
       CommandError e = restore(true);
-      if (e == CE_NONE) *commandError = CE_1; else { V("MSG: Mount, unpark error "); VL(e); *commandError = e; }
+      if (e == CE_NONE) *commandError = CE_1; else { VF("MSG: Mount, unpark error "); VL(e); *commandError = e; }
       return false;
     } else return false;
   } else return false;

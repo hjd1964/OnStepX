@@ -66,23 +66,23 @@ CommandError Limits::validateCoords(Coordinate *coords) {
     if (coords->h < -Deg180) coords->h += Deg360;
     if (flt(coords->h, axis1.settings.limits.min)) {
         VF("MSG: Mount, validate failed HA past min limit by ");
-        V(radToDeg(coords->h - axis1.settings.limits.min)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->h - axis1.settings.limits.min)*3600.0); VLF(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
     if (fgt(coords->h, axis1.settings.limits.max)) {
         VF("MSG: Mount, validate failed HA past max limit by ");
-        V(radToDeg(coords->h - axis1.settings.limits.max)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->h - axis1.settings.limits.max)*3600.0); VLF(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
     if (AXIS2_TANGENT_ARM == OFF) {
       if (flt(coords->d, axis2.settings.limits.min)) {
         VF("MSG: Mount, validate failed Dec past min limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VLF(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;
       }
       if (fgt(coords->d, axis2.settings.limits.max)) {
         VF("MSG: Mount, validate failed Dec past max limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VL(" arc-secs");
+        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VLF(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;}
     }
   }

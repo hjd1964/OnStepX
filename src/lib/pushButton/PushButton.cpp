@@ -29,10 +29,10 @@ Button::Button(int pin, int initState, int32_t trigger) {
   }
 
   VF("MSG: Button, ");
-  V("pin="); V(pin); V(", ");
-  V("active="); V(activeState ? "HIGH" : "LOW"); V(", ");
-  V("ths="); V(threshold); V(", ");
-  V("hys="); VL(hysteresis);
+  VF("pin="); V(pin); V(", ");
+  VF("active="); VF(activeState ? "HIGH" : "LOW"); V(", ");
+  VF("ths="); V(threshold); V(", ");
+  VF("hys="); VL(hysteresis);
 
   pinModeEx(pin, initState);
 }

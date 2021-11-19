@@ -116,7 +116,7 @@
       // digital or analog pec sense, with 60 second delay before redetect
       long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
       if (dist > stepsPerSiderealSecond*60.0 && wormIndexState != lastState && wormIndexState == true) {
-        VL("MSG: Mount, PEC index detected");
+        VLF("MSG: Mount, PEC index detected");
         wormSenseSteps = axis1Steps;
         wormSenseFirst = true;
         bufferStart = true;
@@ -137,7 +137,7 @@
     wormRotationSteps = ((wormRotationSteps % settings.wormRotationSteps) + settings.wormRotationSteps) % settings.wormRotationSteps;
     #if PEC_SENSE == OFF
       if (wormRotationSteps - lastWormRotationSteps < 0) {
-        VL("MSG: Mount, virtual index detected");
+        VLF("MSG: Mount, virtual index detected");
         bufferStart = true;
       } else bufferStart = false;
     #endif
@@ -151,7 +151,7 @@
     if (settings.state == PEC_READY_PLAY) {
       // makes sure the index is at the start of a second before resuming play
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
-        VL("MSG: Mount, started PEC playing");
+        VLF("MSG: Mount, started PEC playing");
         settings.state = PEC_PLAY;
         bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         wormRotationStartTimeFs = lastFs;
@@ -160,7 +160,7 @@
     // start recording PEC
     if (settings.state == PEC_READY_RECORD) {
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
-        V("MSG: Mount, started PEC recording at ");
+        VF("MSG: Mount, started PEC recording at ");
         settings.state = PEC_RECORD;
         bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         firstRecording = !settings.recorded;
@@ -173,7 +173,7 @@
     } else
     // and once the PEC data is all stored, indicate that it's valid and start using it
     if (settings.state == PEC_RECORD && (long)(lastFs - recordStopTimeFs) > 0) {
-      VL("MSG: Mount, PEC recording complete switched to playing");
+      VLF("MSG: Mount, PEC recording complete switched to playing");
       settings.state = PEC_PLAY;
       settings.recorded = true;
       cleanup();

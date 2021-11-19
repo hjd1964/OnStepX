@@ -28,7 +28,7 @@ void Rotator::init() {
   }
   readSettings();
 
-  VL("MSG: Rotator, init (Axis3)");
+  VLF("MSG: Rotator, init (Axis3)");
   axis3.init(&motor3, pollAxis3);
   if (!motor3.init(moveAxis3)) { DLF("ERR: Axis3, no motor exiting!"); return; }
   axis3.resetPositionSteps(0);
@@ -143,7 +143,7 @@ CommandError Rotator::unpark() {
   }
 
   axis3.enable(true);
-  V("MSG: Rotator, unpark position "); V(settings.position); VL("°");
+  VF("MSG: Rotator, unpark position "); V(settings.position); VL("°");
 
   // simple unpark if we didn't actually park
   if (settings.parkState == PS_UNPARKED) {

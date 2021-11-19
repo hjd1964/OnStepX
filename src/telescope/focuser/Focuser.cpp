@@ -287,8 +287,8 @@ CommandError Focuser::gotoTarget(int index, long target) {
   if (axes[index] == NULL) return CE_PARAM_RANGE;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
-  VF("MSG: Focuser"); V(index + 1); V(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VL("um)");
-  VF("MSG: Focuser"); V(index + 1); V(", starting goto at slew rate ("); V(configuration[index].slewRateDesired); VL("um/s)");
+  VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
+  VF("MSG: Focuser"); V(index + 1); VF(", starting goto at slew rate ("); V(configuration[index].slewRateDesired); VLF("um/s)");
 
   axes[index]->setFrequencyBase(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
@@ -336,7 +336,7 @@ CommandError Focuser::unpark(int index) {
   }
 
   axes[index]->enable(true);
-  V("MSG: Focuser"); V(index + 1); V(", unpark position "); V(settings[index].position); VL("um");
+  VF("MSG: Focuser"); V(index + 1); VF(", unpark position "); V(settings[index].position); VL("um");
 
   // simple unpark if we didn't actually park
   if (settings[index].parkState == PS_UNPARKED) {
@@ -420,8 +420,8 @@ void Focuser::monitor() {
               offset *= (float)axes[index]->getStepsPerMeasure();
               long steps = lroundf(offset/settings[index].tcf.deadband)*settings[index].tcf.deadband;
               if (tcfSteps[index] != steps) {
-                VF("MSG: Focuser"); V(index + 1); V(", TCF offset changed moving to target "); 
-                if (steps >= 0) { V("+ "); } else { V("- "); } V(fabs(steps/axes[index]->getStepsPerMeasure())); VL("um");
+                VF("MSG: Focuser"); V(index + 1); VF(", TCF offset changed moving to target "); 
+                if (steps >= 0) { V("+ "); } else { VF("- "); } V(fabs(steps/axes[index]->getStepsPerMeasure())); VLF("um");
                 tcfSteps[index] = steps;
                 axes[index]->setTargetCoordinateSteps(target[index] + tcfSteps[index]);
               }
@@ -439,7 +439,7 @@ void Focuser::monitor() {
             if (secs > writeTime[index]) {
               settings[index].position = targetMicrons;
               writeSettings(index);
-              VF("MSG: Focuser"); V(index + 1); V(", writing position ("); V(targetMicrons); VL("um) to NV"); 
+              VF("MSG: Focuser"); V(index + 1); VF(", writing position ("); V(targetMicrons); VLF("um) to NV"); 
             }
           }
         }

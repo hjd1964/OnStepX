@@ -101,7 +101,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }
-    VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
+    VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF("°, a2="); V(radToDeg(a2)); VL("°)");
     VF("MSG: Mount, starting goto at slew rate ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
 
     e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
@@ -110,7 +110,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
     if (e != CE_NONE) return e;
 
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
-    VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VLF("us");
+    VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VL("us");
 
     status.sound.alert();
 
@@ -197,44 +197,44 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (pierSideSelect == PSS_EAST || pierSideSelect == PSS_EAST_ONLY) {
     target.pierSide = PIER_SIDE_EAST;
     if (a1 < -limits.settings.pastMeridianE && a1e > axis1.settings.limits.max) {
-      V("MSG: Mount, set target EAST TO WEST: ");
+      VF("MSG: Mount, set target EAST TO WEST: ");
       target.pierSide = PIER_SIDE_WEST;
-    } else { V("MSG: Mount, set target EAST stays EAST: !("); }
+    } else { VF("MSG: Mount, set target EAST stays EAST: !("); }
     V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
   } else
   if (pierSideSelect == PSS_WEST || pierSideSelect == PSS_WEST_ONLY) {
     target.pierSide = PIER_SIDE_WEST;
-    VL("MSG: Mount, set target ");
+    VLF("MSG: Mount, set target ");
     if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
-      V("MSG: Mount, set target WEST TO EAST: (");
+      VF("MSG: Mount, set target WEST TO EAST: (");
       target.pierSide = PIER_SIDE_EAST;
-    } else { V("MSG: Mount, set target WEST stays WEST: !(");  }
+    } else { VF("MSG: Mount, set target WEST stays WEST: !(");  }
     V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); V(" && "); V(radToDeg(a1w)); V(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
   } else
   if (pierSideSelect == PSS_BEST || pierSideSelect == PSS_SAME_ONLY) {
     if (current.pierSide == PIER_SIDE_EAST) { 
       if (a1 < -limits.settings.pastMeridianE && a1e > axis1.settings.limits.max) {
-        V("MSG: Mount, set target BEST EAST TO WEST: (");
+        VF("MSG: Mount, set target BEST EAST TO WEST: (");
         target.pierSide = PIER_SIDE_WEST;
-      } else { V("MSG: Mount, set target BEST stays EAST: !("); }
+      } else { VF("MSG: Mount, set target BEST stays EAST: !("); }
       V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
     }
     if (current.pierSide == PIER_SIDE_WEST) {
         if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
-        V("MSG: Mount, set target BEST WEST TO EAST: (");
+        VF("MSG: Mount, set target BEST WEST TO EAST: (");
         target.pierSide = PIER_SIDE_EAST;
-      } else { V("MSG: Mount, set target BEST stays WEST: !("); }
+      } else { VF("MSG: Mount, set target BEST stays WEST: !("); }
       V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); D(" && "); V(radToDeg(a1w)); D(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
     }
   }
 
   if (target.pierSide == PIER_SIDE_EAST) {
     if (target.pierSide == current.pierSide) a1 = a1e;
-    D("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
+    DF("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
   } else
   if (target.pierSide == PIER_SIDE_WEST) {
     if (target.pierSide == current.pierSide) a1 = a1w;
-    D("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
+    DF("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
   }
 
   if (transform.mountType == ALTAZM) target.z = a1; else target.h = a1;
