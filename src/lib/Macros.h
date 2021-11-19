@@ -84,4 +84,6 @@
 #endif
 
 // supress compiler warnings for unused parameters
-#define UNUSED(x) (void)(x)
+#ifndef UNUSED
+  #define UNUSED(x) (void)(x)
+#endif
