@@ -70,7 +70,7 @@ class Guide {
     float rateAxis1 = 0.0F;
     float rateAxis2 = 0.0F;
 
-    GuideSettings settings = { GR_HALF, GR_20X };
+    GuideSettings settings = { GR_HALF, GR_20X, GR_20X };
 
   private:
     // keep guide rate <= half max
