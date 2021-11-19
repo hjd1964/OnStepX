@@ -239,13 +239,13 @@
     // give up recording if we stop tracking at the sidereal rate
     // don't zero the PEC offset, we don't want things moving and it really doesn't matter 
     if (settings.state == PEC_RECORD || settings.state == PEC_READY_RECORD) {
-      VL("MSG: Mount, PEC recording stopped");
+      VLF("MSG: Mount, PEC recording stopped");
       settings.state = PEC_NONE;
       rate = 0.0;
     } 
     // get ready to re-index when tracking comes back
     if (settings.state == PEC_PLAY) {
-      VL("MSG: Mount, PEC playing paused");
+      VLF("MSG: Mount, PEC playing paused");
       settings.state = PEC_READY_PLAY;
       rate = 0.0;
     } 
@@ -253,7 +253,7 @@
 
   // applies low pass filter to smooth noise in PEC data and linear regression
   void Pec::cleanup() {
-    VL("MSG: Mount, applying low pass filter to PEC data");
+    VLF("MSG: Mount, applying low pass filter to PEC data");
     int i,J1,J4,J9,J17;
     for (int scc = 3; scc < wormRotationSeconds + 3; scc++) {
       i = buffer[scc % wormRotationSeconds];
@@ -274,7 +274,7 @@
     }
 
     // linear regression
-    VL("MSG: Mount, applying linear regression to PEC data");
+    VLF("MSG: Mount, applying linear regression to PEC data");
     // the number of steps added should equal the number of steps subtracted (from the cycle)
     // first, determine how far we've moved ahead or backward in steps
     long stepsSum = 0; for (int scc = 0; scc < wormRotationSeconds; scc++) stepsSum += buffer[scc];
