@@ -85,10 +85,10 @@
           // Smart Hand Controller active
           char c = serialST4.poll();
           // process any single byte guide commands
-          if (c == ccMe) guide.startAxis1(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMw) guide.startAxis1(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMn) guide.startAxis2(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMs) guide.startAxis2(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? guide.settings.pulseRateSelect : guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMe) guide.startAxis1(GA_REVERSE, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMw) guide.startAxis1(GA_FORWARD, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMn) guide.startAxis2(GA_FORWARD, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
+          if (c == ccMs) guide.startAxis2(GA_REVERSE, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
           if (c == ccQe || c == ccQw) guide.stopAxis1(GA_BREAK);
           if (c == ccQn || c == ccQs) guide.stopAxis2(GA_BREAK);
           return;
