@@ -18,21 +18,9 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
   if (isAnalog) {
-  	if (threshold + hysteresis > 1023) {
-      hysteresis = 0;
-      VF("WRN: Button::Button(); Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range, hysteresis set to 0.");
-    }
-	  if (threshold - hysteresis < 0) {
-      hysteresis = 0;
-      VF("WRN: Button::Button(); Threshold - hysteresis for pin "); V(pin); VLF(" below Analog range, hysteresis set to 0.");
-    }
+  	if (threshold + hysteresis > 1023) hysteresis = 1023;
+	  if (threshold - hysteresis < 0) hysteresis = 0;
   }
-
-  VF("MSG: Button, ");
-  VF("pin="); V(pin); V(", ");
-  VF("active="); VF(activeState ? "HIGH" : "LOW"); V(", ");
-  VF("ths="); V(threshold); V(", ");
-  VF("hys="); VL(hysteresis);
 
   pinModeEx(pin, initState);
 }
