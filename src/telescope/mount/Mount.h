@@ -51,7 +51,7 @@ class Mount {
     // returns true if either of the mount motor drivers reported a fault
     inline bool isFault() { return axis1.fault() || axis2.fault(); }
 
-    // returns true if the mount is at the home (startup) position
+    // set flag for mount at the home (startup) position
     inline void setHome(bool state) { atHome = state; };
 
     // returns true if the mount is at the home (startup) position

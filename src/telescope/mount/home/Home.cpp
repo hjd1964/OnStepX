@@ -8,7 +8,6 @@
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
-#include "../park/Park.h"
 
 // init the home position (according to settings and mount type)
 void Home::init() {
@@ -50,6 +49,7 @@ CommandError Home::request() {
     VLF("MSG: Mount, moving to home");
 
     if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+      isRequestWithReset = false;
       guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
     } else {
       #if AXIS2_TANGENT_ARM == OFF
@@ -66,7 +66,7 @@ CommandError Home::request() {
         #endif
       }
 
-      VLF("Mount::returnHome(); target coordinates set");
+      VLF("Mount, home target coordinates set");
       #if AXIS2_TANGENT_ARM == OFF
         axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
       #endif
@@ -76,8 +76,17 @@ CommandError Home::request() {
   return CE_NONE;
 }
 
+// reset mount, moves to the home position first if home switches are present
+CommandError Home::requestWithReset() {
+  if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+    CommandError result = request();
+    isRequestWithReset = true;
+    return result;
+  } else return reset();
+}
+
 // reset mount at home
-CommandError Home::reset(bool resetPark) {
+CommandError Home::reset(bool fullReset) {
   #if SLEW_GOTO == ON
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
@@ -86,15 +95,11 @@ CommandError Home::reset(bool resetPark) {
     return CE_SLEW_IN_MOTION;
   }
 
-  #if SLEW_GOTO == ON
-    if (resetPark) park.reset();
-  #endif
-
   // stop tracking
   mount.tracking(false);
 
   // make sure the motors are powered off
-  mount.enable(false);
+  if (fullReset) mount.enable(false);
   
   // setup axis1 and axis2
   axis1.resetPosition(0.0L);
@@ -115,12 +120,13 @@ CommandError Home::reset(bool resetPark) {
   axis2.setFrequencySlew(degToRadF(0.1F));
 
   #if SLEW_GOTO == ON
-    goTo.alignReset();
+    if (fullReset) goTo.alignReset();
   #endif
 
   mount.setHome(true);
 
-  VLF("MSG: Mount, reset at home and in standby");
+  if (fullReset) { VLF("MSG: Mount, reset at home and in standby"); } else { VLF("MSG: Mount, reset at home"); }
+
   return CE_NONE;
 }
 

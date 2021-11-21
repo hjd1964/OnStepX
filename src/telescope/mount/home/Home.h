@@ -19,10 +19,15 @@ class Home {
     // move mount to the home position
     CommandError request();
 
+    // reset mount, moves to the home position first if home switches are present
+    CommandError requestWithReset();
+
     // reset mount at home
-    CommandError reset(bool resetPark = false);
+    CommandError reset(bool fullReset = true);
 
     Coordinate position;
+
+    bool isRequestWithReset = false;
 
   private:
 

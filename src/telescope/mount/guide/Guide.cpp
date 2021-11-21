@@ -181,13 +181,13 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
       axis1.setFrequencySlew(goTo.rate);
       guideActionAxis1 = GA_HOME;
       guideFinishTimeAxis1 = millis() + guideTimeLimit; 
-      axis1.autoSlewHome();
+      axis1.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
     #endif
 
     axis2.setFrequencySlew(goTo.rate);
     guideActionAxis2 = GA_HOME;
     guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-    axis2.autoSlewHome();
+    axis2.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
   #endif
   return CE_NONE;
 }
@@ -379,14 +379,11 @@ void Guide::poll() {
   // handle end of home guiding
   if (state == GU_HOME_GUIDE && !mount.isSlewing()) {
     #if AXIS2_TANGENT_ARM == OFF
-      VLF("MSG: guidePoll(); arrived at home");
+      VLF("MSG: Guide, arrival at home detected");
       state = GU_NONE;
       guideActionAxis1 = GA_NONE;
       guideActionAxis2 = GA_NONE;
-      home.reset();
-      mount.enable(true);
-    #else
-
+      home.reset(home.isRequestWithReset);
     #endif
   }
 

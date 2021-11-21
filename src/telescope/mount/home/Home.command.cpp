@@ -5,6 +5,8 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../park/Park.h"
+
 bool Home::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
   UNUSED(supressFrame);
@@ -20,7 +22,12 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
     //            Returns: Nothing
     if (command[1] == 'F' && parameter[0] == 0) {
-      *commandError = reset(true);
+      *commandError = requestWithReset();
+
+      #if SLEW_GOTO == ON
+        park.reset();
+      #endif
+
       *numericReply = false;
     } else return false; 
   } else return false;

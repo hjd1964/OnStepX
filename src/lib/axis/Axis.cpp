@@ -305,7 +305,7 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
 }
 
 // slew to home, with acceleration in "measures" per second per second
-CommandError Axis::autoSlewHome() {
+CommandError Axis::autoSlewHome(unsigned long timeout) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
@@ -317,19 +317,25 @@ CommandError Axis::autoSlewHome() {
       motor->setSlewing(true);
       V(axisPrefix); VF("autoSlewHome ");
       switch (homingStage) {
-        case HOME_FAST: VLF("fast started"); break;
-        case HOME_SLOW: VLF("slow started"); break;
-        case HOME_FINE: VLF("fine started"); break;
-        case HOME_NONE: VLF("?"); break;
+        case HOME_FAST: VF("fast "); break;
+        case HOME_SLOW: VF("slow "); break;
+        case HOME_FINE: VF("fine "); break;
+        default: break;
       }
     }
     if (sense.isOn(homeSenseHandle)) {
-      V(axisPrefix); VLF("move fwd");
+      VF("fwd@ ");
       autoRate = AR_RATE_BY_TIME_FORWARD;
     } else {
-      V(axisPrefix); VLF("move rev");
+      VF("rev@ ");
       autoRate = AR_RATE_BY_TIME_REVERSE;
     }
+    #if DEBUG == VERBOSE
+      if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
+      if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
+      if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("um/s/s"); }
+    #endif
+    homeTimeoutTime = millis() + timeout;
   }
   return CE_NONE;
 }
@@ -371,10 +377,14 @@ void Axis::poll() {
   errors.minLimitSensed = sense.isOn(minSenseHandle);
   errors.maxLimitSensed = sense.isOn(maxSenseHandle);
 
-  // stop homing as we pass by the switch
-  if (homingStage != HOME_NONE) {
+  // stop homing as we pass by the switch or times out
+  if (homingStage != HOME_NONE && (autoRate == AR_RATE_BY_TIME_FORWARD || autoRate == AR_RATE_BY_TIME_REVERSE)) {
     if (autoRate == AR_RATE_BY_TIME_FORWARD && !sense.isOn(homeSenseHandle)) autoSlewStop();
     if (autoRate == AR_RATE_BY_TIME_REVERSE && sense.isOn(homeSenseHandle)) autoSlewStop();
+    if ((long)(millis() - homeTimeoutTime) > 0) {
+      V(axisPrefix); VLF("autoSlewHome timed out");
+      autoSlewStop();
+    }
   }
   Y;
 
@@ -420,13 +430,18 @@ void Axis::poll() {
         autoRate = AR_NONE;
         freq = 0.0F;
         if (homingStage == HOME_FAST) homingStage = HOME_SLOW; else 
-        if (homingStage == HOME_SLOW) homingStage = HOME_FINE; else
+        if (homingStage == HOME_SLOW) {
+          if (!sense.isOn(homeSenseHandle)) homingStage = HOME_FINE; else {
+            slewFreq *= 6.0F;
+            V(axisPrefix); VLF("autoSlewHome approach correction");
+          }
+        } else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
         if (homingStage != HOME_NONE) {
-          float f = slewFreq/4.0F;
-          if (abs(f) < 0.0003F) { if (f < 0.0F) f = -0.0003F; else f = 0.0003F; }
-          setFrequencySlew(abs(f));
-          autoSlewHome();
+          float f = abs(slewFreq)/6.0F;
+          if (f < 0.0003F) f = 0.0003F;
+          setFrequencySlew(f);
+          autoSlewHome(30000);
         } else {
           V(axisPrefix); VLF("slew stopped");
         }

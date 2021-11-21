@@ -220,7 +220,7 @@ class Axis {
     CommandError autoSlew(Direction direction, float frequency = NAN);
 
     // slew to home, with acceleration in "measures" per second per second
-    CommandError autoSlewHome();
+    CommandError autoSlewHome(unsigned long timeout);
 
     // stops, with deacceleration by time
     void autoSlewStop();
@@ -320,6 +320,9 @@ class Axis {
     bool poweredDown = false;
     unsigned long powerDownTime = 0;
 
+    // timeout for home switch detection
+    unsigned long homeTimeoutTime = 0;
+
     // rates (in measures per second) to control motor movement
     float freq = 0.0F;
     float rampFreq = 0.0F;
@@ -328,12 +331,12 @@ class Axis {
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
 
-    AutoRate autoRate = AR_NONE;    // auto slew mode
-    float slewAccelerationDistance; // auto slew rate distance in measures to max rate
-    float slewMpspfs;               // auto slew rate in measures per second per frac-sec
-    float abortMpspfs;              // abort slew rate in measures per second per fracsec
-    float slewAccelTime = NAN;      // auto slew acceleration time in seconds
-    float abortAccelTime = NAN;     // abort slew acceleration time in seconds
+    AutoRate autoRate = AR_NONE;       // auto slew mode
+    float slewAccelerationDistance;    // auto slew rate distance in measures to max rate
+    float slewMpspfs;                  // auto slew rate in measures per second per frac-sec
+    float abortMpspfs;                 // abort slew rate in measures per second per fracsec
+    float slewAccelTime = NAN;         // auto slew acceleration time in seconds
+    float abortAccelTime = NAN;        // abort slew acceleration time in seconds
 
     HomingStage homingStage = HOME_NONE;
 
