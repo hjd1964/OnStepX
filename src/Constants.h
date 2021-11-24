@@ -148,8 +148,7 @@
 #define ANALOG_OUT                  2
 #define DEW_HEATER                  3      // control an dew heater
 #define INTERVALOMETER              4      // control an camera shutter
-#define SWITCH_UNPARKED             5
-#define AUX_FEATURE_PURPOSE_LAST    5
+#define AUX_FEATURE_PURPOSE_LAST    4
 
 // GPIO devices
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
