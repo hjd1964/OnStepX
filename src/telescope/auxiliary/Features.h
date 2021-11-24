@@ -6,8 +6,8 @@
 
 #ifdef FEATURES_PRESENT
 
-#include "../../commands/ProcessCmds.h"
-#include "../../lib/temperature/Temperature.h"
+#include "../../libApp/commands/ProcessCmds.h"
+#include "../../libApp/temperature/Temperature.h"
 #include "dewHeater/DewHeater.h"
 #include "intervalometer/Intervalometer.h"
 

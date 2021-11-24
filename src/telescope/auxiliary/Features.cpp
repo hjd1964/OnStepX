@@ -7,7 +7,7 @@
 
 #include "../../lib/tasks/OnTask.h"
 
-#include "../../lib/weather/Weather.h"
+#include "../../libApp/weather/Weather.h"
 #include "../../telescope/Telescope.h"
 
 void featuresPollWrapper() { features.poll(); }

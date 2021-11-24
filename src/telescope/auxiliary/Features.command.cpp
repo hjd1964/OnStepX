@@ -6,7 +6,7 @@
 #ifdef FEATURES_PRESENT
 
 #include "../../lib/convert/Convert.h"
-#include "../../lib/weather/Weather.h"
+#include "../../libApp/weather/Weather.h"
 #include "../../telescope/Telescope.h"
 
 // process auxiliary feature commands
