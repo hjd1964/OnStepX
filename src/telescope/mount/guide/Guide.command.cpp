@@ -31,7 +31,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'g' || command[1] == 'G') {
       int16_t timeMs;
       if (convert.atoi2(&parameter[1], &timeMs)) {
-        if (timeMs >= 0 && timeMs <= 16399) {
+        if (timeMs >= 0) {
           if (parameter[0] == 'w') {
             *commandError = startAxis1(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
