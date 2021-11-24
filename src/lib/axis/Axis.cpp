@@ -383,7 +383,7 @@ void Axis::poll() {
     if (autoRate == AR_RATE_BY_TIME_REVERSE && sense.isOn(homeSenseHandle)) autoSlewStop();
     if ((long)(millis() - homeTimeoutTime) > 0) {
       V(axisPrefix); VLF("autoSlewHome timed out");
-      autoSlewStop();
+      autoSlewAbort();
     }
   }
   Y;
