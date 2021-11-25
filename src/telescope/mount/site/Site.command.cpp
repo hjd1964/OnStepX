@@ -183,10 +183,10 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       int i;
       if (parameter[0] == '-' || parameter[0] == '+') i = 1; else i = 0;
       if (convert.dmsToDouble(&degs, (char *)&parameter[i], false)) {
-        if (parameter[0] == '-') location.longitude = -location.longitude;
         if (degs >= -180.0 && degs <= 360.0) {
           if (degs >= 180.0) degs -= 360.0;
           location.longitude = degToRad(degs);
+          if (parameter[0] == '-') location.longitude = -location.longitude;
           updateLocation();
           nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
         } else *commandError = CE_PARAM_RANGE;
