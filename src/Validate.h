@@ -62,6 +62,11 @@
 
 // MOUNT -----------------------------------------
 
+#if (AXIS1_DRIVER_MODEL != OFF && AXIS2_DRIVER_MODEL == OFF) || \
+    (AXIS1_DRIVER_MODEL == OFF && AXIS2_DRIVER_MODEL != OFF)
+  #error "Configuration (Config.h): Settings AXIS1_DRIVER_MODEL and AXIS2_DRIVER_MODEL must both be OFF or set to a valid DRIVER (from Constants.h)"
+#endif
+
 // AXIS1 RA/AZM
 #if AXIS1_DRIVER_MODEL != OFF && \
     (AXIS1_DRIVER_MODEL < DRIVER_FIRST || AXIS1_DRIVER_MODEL > DRIVER_LAST) && \
