@@ -46,12 +46,16 @@ class Park {
     // resets park state, clears any errors but does not erase the park position
     inline void reset() { state = PS_UNPARKED; nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings)); }
 
+    // check input pin to initiate park operation
+    void signal();
+
     ParkState state;
 
     ParkSettings settings = {{0, 0, PIER_SIDE_NONE}, false, PS_UNPARKED, 0};
 
   private:
-
+    uint8_t parkSenseHandle = 0;
+    uint8_t parkSignalHandle = 0;
 };
 
 extern Park park;

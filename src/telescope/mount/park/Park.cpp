@@ -5,12 +5,17 @@
 
 #if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
 
+#include "../../../lib/tasks/OnTask.h"
+
 #include "../../Telescope.h"
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
+#include "../../../lib/sense/Sense.h"
+
+void parkSignalWrapper() { park.signal(); }
 
 void Park::init() {
   // confirm the data structure size
@@ -25,6 +30,20 @@ void Park::init() {
   // read the settings
   nv.readBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
   state = settings.state;
+
+  // configure any associated sense/signal pins
+  #if PARK_SENSE != OFF && PARK_SENSE_PIN != OFF
+    VLF("MSG: Mount, park adding sense");
+    parkSenseHandle = sense.add(PARK_SENSE_PIN, PARK_SENSE_INIT, PARK_SENSE);
+  #endif
+
+  #if PARK_SIGNAL != OFF && PARK_SIGNAL_PIN != OFF
+    VLF("MSG: Mount, park adding signal");
+    parkSignalHandle = sense.add(PARK_SIGNAL_PIN, PARK_SIGNAL_INIT, PARK_SIGNAL);
+    
+    VF("MSG: Mount, start park signal monitor task (rate 1000ms priority 4)... ");
+    if (tasks.add(1000, 0, true, 4, parkSignalWrapper, "ParkSgl")) { VLF("success"); } else { VLF("FAILED!"); }
+  #endif
 }
 
 // sets the park position
@@ -129,6 +148,16 @@ CommandError Park::request() {
 
 // once parked save the park state
 void Park::requestDone() {
+
+  #if PARK_SENSE != OFF && PARK_SENSE_PIN != OFF
+    if (sense.isOn(parkSenseHandle)) {
+      VLF("MSG: Mount, park sense state indicates success.");
+    } else {
+      VLF("MSG: Mount, park sense state failed!");
+      state = PS_PARK_FAILED;
+    }
+  #endif
+
   if (state != PS_PARK_FAILED) {
     #if DEBUG == VERBOSE
       long index = axis1.getInstrumentCoordinateSteps() - axis1.getMotorPositionSteps();
@@ -216,6 +245,15 @@ CommandError Park::restore(bool withTrackingOn) {
 
   VLF("MSG: Mount, unparking done");
   return CE_NONE;
+}
+
+// check input pin to initiate a park operation, if allowed
+void Park::signal() {
+  #if PARK_SIGNAL != OFF && PARK_SIGNAL_PIN != OFF
+    if (sense.isOn(parkSignalHandle) && state == PS_UNPARKED && !mount.isSlewing() && !mount.isHome()) {
+      request();
+    }
+  #endif
 }
 
 Park park;

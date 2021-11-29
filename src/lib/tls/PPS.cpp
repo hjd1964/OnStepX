@@ -22,14 +22,14 @@ void ppsIsr() {
 }
 
 void Pps::init() {
-  #if SENSE_PPS_PIN != OFF
-    pinMode(SENSE_PPS_PIN, INPUT);
+  #if PPS_SENSE_PIN != OFF
+    pinMode(PPS_SENSE_PIN, INPUT);
     #if TIME_LOCATION_PPS_SENSE == HIGH
-      attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, RISING);
+      attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, RISING);
     #elif TIME_LOCATION_PPS_SENSE == LOW
-      attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, FALLING);
+      attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, FALLING);
     #elif TIME_LOCATION_PPS_SENSE == BOTH
-      attachInterrupt(digitalPinToInterrupt(SENSE_PPS_PIN), ppsIsr, CHANGE);
+      attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, CHANGE);
     #endif
   #endif
 }

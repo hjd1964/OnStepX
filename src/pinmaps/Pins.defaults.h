@@ -59,6 +59,18 @@
 #define ADDON_RESET_PIN             OFF
 #endif
 
+#ifndef PARK_SENSE_PIN
+#define PARK_SENSE_PIN              OFF
+#endif
+
+#ifndef PARK_SIGNAL_PIN
+#define PARK_SIGNAL_PIN             OFF
+#endif
+
+#ifndef PARK_STATUS_PIN
+#define PARK_STATUS_PIN             OFF
+#endif
+
 #ifndef PEC_SENSE_PIN
 #define PEC_SENSE_PIN               OFF
 #endif
@@ -67,8 +79,8 @@
 #define STATUS_LED_PIN              OFF
 #endif
 
-#ifndef STATUS_MOUNT_LED_PIN
-#define STATUS_MOUNT_LED_PIN        OFF
+#ifndef MOUNT_STATUS_LED_PIN
+#define MOUNT_STATUS_LED_PIN        OFF
 #endif
 
 #ifndef RETICLE_LED_PIN
@@ -79,12 +91,12 @@
 #define STATUS_BUZZER_PIN           OFF
 #endif
 
-#ifndef SENSE_PPS_PIN
-#define SENSE_PPS_PIN               OFF
+#ifndef PPS_SENSE_PIN
+#define PPS_SENSE_PIN               OFF
 #endif
 
-#ifndef SENSE_LIMIT_PIN
-#define SENSE_LIMIT_PIN             OFF
+#ifndef LIMIT_SENSE_PIN
+#define LIMIT_SENSE_PIN             OFF
 #endif
 
 #ifndef ST4_RA_W_PIN
@@ -143,10 +155,10 @@
 #define AXIS1_SENSE_HOME_PIN        OFF
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MIN_PIN
-#define AXIS1_SENSE_LIMIT_MIN_PIN SENSE_LIMIT_PIN
+#define AXIS1_SENSE_LIMIT_MIN_PIN LIMIT_SENSE_PIN
 #endif
 #ifndef AXIS1_SENSE_LIMIT_MAX_PIN
-#define AXIS1_SENSE_LIMIT_MAX_PIN SENSE_LIMIT_PIN
+#define AXIS1_SENSE_LIMIT_MAX_PIN LIMIT_SENSE_PIN
 #endif
 
 #ifndef AXIS2_ENABLE_PIN
@@ -192,10 +204,10 @@
 #define AXIS2_SENSE_HOME_PIN        OFF
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MIN_PIN
-#define AXIS2_SENSE_LIMIT_MIN_PIN SENSE_LIMIT_PIN
+#define AXIS2_SENSE_LIMIT_MIN_PIN LIMIT_SENSE_PIN
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MAX_PIN
-#define AXIS2_SENSE_LIMIT_MAX_PIN SENSE_LIMIT_PIN
+#define AXIS2_SENSE_LIMIT_MAX_PIN LIMIT_SENSE_PIN
 #endif
 
 #ifndef AXIS3_ENABLE_PIN

@@ -38,19 +38,19 @@
 #endif
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
-#define SENSE_LIMIT_PIN          3
+#define LIMIT_SENSE_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_VCC_PIN       8               // LED
 #define STATUS_LED_PIN           9               // GND
-#define STATUS_MOUNT_LED_PIN     10              // PGND
+#define MOUNT_STATUS_LED_PIN     10              // PGND
 #define RETICLE_LED_PIN          44              // PGND
 
 // For a piezo buzzer
 #define STATUS_BUZZER_PIN        42              // Tone
 
 // The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
+#define PPS_SENSE_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
 
 // Obsolete pins that would power Big Easy Drivers (A4988) back in the old days
 #define POWER_SUPPLY_PINS_OFF
@@ -145,12 +145,12 @@
 #endif
 
 // The limit switch sense is a 3.3V logic input which uses the internal pull up, shorted to ground it stops gotos/tracking
-#define SENSE_LIMIT_PIN          3
+#define LIMIT_SENSE_PIN          3
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_VCC_PIN       8               // LED Annode
 #define STATUS_LED_PIN           9               // Default LED Cathode (-)
-#define STATUS_MOUNT_LED_PIN     7               // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN     7               // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN   7               // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN   7               // Default LED Cathode (-)
 #define RETICLE_LED_PIN          9               // Default LED Cathode (-)
@@ -159,7 +159,7 @@
 #define STATUS_BUZZER_PIN        29              // Tone
 
 // The PPS pin is a logic level input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN            23              // PPS time source, GPS for example
+#define PPS_SENSE_PIN            23              // PPS time source, GPS for example
 
 // Obsolete pins that would power stepper drivers in the old days
 #define POWER_SUPPLY_PINS_OFF

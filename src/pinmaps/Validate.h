@@ -39,7 +39,7 @@
 // --------------------------------------------------------------------------------------
 // check AUX0 pin assignments
 #if AUX0_PIN != OFF
-  #if AUX0_PIN == STATUS_MOUNT_LED_PIN && STATUS_MOUNT_LED != OFF
+  #if AUX0_PIN == MOUNT_STATUS_LED_PIN && STATUS_MOUNT_LED != OFF
     #ifdef AUX0_PIN_IN_USE
       #error "Configuration (Config.h): STATUS_MOUNT_LED enabled but AUX0_PIN is already in use, choose one feature on AUX0_PIN"
     #endif
@@ -115,7 +115,7 @@
     #endif
     #define AUX3_PIN_IN_USE
   #endif
-  #if AUX3_PIN == SENSE_LIMIT_PIN && LIMIT_SENSE != OFF
+  #if AUX3_PIN == LIMIT_SENSE_PIN && LIMIT_SENSE != OFF
     #ifdef AUX3_PIN_IN_USE
       #error "Configuration (Config.h): LIMIT_SENSE enabled but AUX3_PIN is already in use, choose one feature on AUX3_PIN"
     #endif
@@ -156,13 +156,13 @@
 
 // check AUX7 pin assignments
 #if AUX7_PIN != OFF
-  #if AUX7_PIN == SENSE_LIMIT_PIN && LIMIT_SENSE != OFF
+  #if AUX7_PIN == LIMIT_SENSE_PIN && LIMIT_SENSE != OFF
     #ifdef AUX7_PIN_IN_USE
       #error "Configuration (Config.h): LIMIT_SENSE enabled but AUX7_PIN is already in use, choose one feature on AUX7_PIN"
     #endif
     #define AUX7_PIN_IN_USE
   #endif
-  #if AUX7_PIN == SENSE_PPS_PIN && TIME_LOCATION_PPS_SENSE != OFF
+  #if AUX7_PIN == PPS_SENSE_PIN && TIME_LOCATION_PPS_SENSE != OFF
     #ifdef AUX7_PIN_IN_USE
       #error "Configuration (Config.h): TIME_LOCATION_PPS_SENSE enabled but AUX7_PIN is already in use, choose one feature on AUX7_PIN"
     #endif
@@ -172,7 +172,7 @@
 
 // check AUX8 pin assignments
 #if AUX8_PIN != OFF
-  #if AUX8_PIN == STATUS_MOUNT_LED_PIN && STATUS_MOUNT_LED != OFF
+  #if AUX8_PIN == MOUNT_STATUS_LED_PIN && STATUS_MOUNT_LED != OFF
     #ifdef AUX8_PIN_IN_USE
       #error "Configuration (Config.h): STATUS_MOUNT_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
     #endif

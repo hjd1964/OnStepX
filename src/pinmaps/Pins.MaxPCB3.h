@@ -49,7 +49,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_PIN         AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_MOUNT_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define RETICLE_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
@@ -58,9 +58,9 @@
 #define STATUS_BUZZER_PIN      29               // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN          28               // PPS time source, GPS for example
+#define PPS_SENSE_PIN          28               // PPS time source, GPS for example
 
-#define SENSE_LIMIT_PIN        AUX7_PIN         // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
+#define LIMIT_SENSE_PIN        AUX7_PIN         // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       14

@@ -385,6 +385,25 @@
 #define ST4_HAND_CONTROL_FOCUSER      OFF
 #endif
 
+// park
+#ifndef PARK_SENSE
+#define PARK_SENSE                    OFF
+#endif
+#ifndef PARK_SENSE_INIT
+#define PARK_SENSE_INIT               INPUT_PULLUP
+#endif
+
+#ifndef PARK_SIGNAL
+#define PARK_SIGNAL                   OFF
+#endif
+#ifndef PARK_SIGNAL_INIT
+#define PARK_SIGNAL_INIT              INPUT_PULLUP
+#endif
+
+#ifndef PARK_STATUS
+#define PARK_STATUS                   OFF
+#endif
+
 // pec
 #ifndef PEC_SENSE
 #define PEC_SENSE                     OFF

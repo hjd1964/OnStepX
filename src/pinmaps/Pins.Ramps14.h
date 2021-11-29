@@ -82,11 +82,11 @@
 #endif
 
 // The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
-#define SENSE_LIMIT_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
+#define LIMIT_SENSE_PIN        3                // RAMPS X- (1=LMT, 2=GND, 3=+5)
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_PIN         AUX0_PIN         // Drain RAMPS SERVO1 (1=GND, 2=+5, 3=LED-)
-#define STATUS_MOUNT_LED_PIN   6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
+#define MOUNT_STATUS_LED_PIN   6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
 #define STATUS_ROTATOR_LED_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
 #define STATUS_FOCUSER_LED_PIN 6                // Drain RAMPS SERVO2 (1=GND, 2=+5, 3=LED-)
 #define RETICLE_LED_PIN        5                // Drain RAMPS SERVO3 (1=GND, 2=+5, 3=LED-)
@@ -95,7 +95,7 @@
 #define STATUS_BUZZER_PIN      4                // RAMPS SERVO4 (1=GND, 2=+5, 3=TONE+) (active HIGH)
 
 // The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN          2                // RAMPS X+, Interrupt 0 on Pin 2
+#define PPS_SENSE_PIN          2                // RAMPS X+, Interrupt 0 on Pin 2
 
 // Pins to Axis1 RA/Azm on RAMPS X
 #define AXIS1_ENABLE_PIN       38

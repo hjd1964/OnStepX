@@ -8,8 +8,8 @@
 #define PPS_SECS_TO_AVERAGE 40   // running average of 40 samples (1 per second)
 #define PPS_WINDOW_MICROS 20000  // +/- window in microseconds to meet synced criteria (2%)
 
-#if !defined(SENSE_PPS_PIN) || SENSE_PPS_PIN == OFF
-  #error "Configuration (Config.h): SENSE_PPS_PIN must be defined for TIME_LOCATION_PPS_SENSE ON"
+#if !defined(PPS_SENSE_PIN) || PPS_SENSE_PIN == OFF
+  #error "Configuration (Config.h): PPS_SENSE_PIN must be defined for TIME_LOCATION_PPS_SENSE ON"
 #endif
 
 class Pps {

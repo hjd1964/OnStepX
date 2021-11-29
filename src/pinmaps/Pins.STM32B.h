@@ -59,7 +59,7 @@
 // This is the built in LED for the Black Pill board. There is a pin
 // available from it too, in case you want to power another LED with a wire
 #define STATUS_LED_PIN         AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_MOUNT_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define RETICLE_LED_PIN        AUX3_PIN         // Default LED Cathode (-)
@@ -69,11 +69,11 @@
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and
 // adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN          PB5              // Pulse Per Second time source, e.g. GPS, RTC
+#define PPS_SENSE_PIN          PB5              // Pulse Per Second time source, e.g. GPS, RTC
 
 // The limit switch sense is a logic level input which uses the internal pull up,
 // shorted to ground it stops gotos/tracking
-#define SENSE_LIMIT_PIN        PA14
+#define LIMIT_SENSE_PIN        PA14
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       PA12

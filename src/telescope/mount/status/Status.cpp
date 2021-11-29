@@ -6,8 +6,9 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../lib/tasks/OnTask.h"
+#include "../park/Park.h"
 
-#if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
+#if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
   bool ledOn = false;
   bool ledOff = false;
   void flash() {
@@ -15,17 +16,19 @@
     if (ledOn) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
     if ((cycle++)%2 == 0) {
-      digitalWriteEx(STATUS_MOUNT_LED_PIN, !STATUS_MOUNT_LED_ON_STATE);
+      digitalWriteEx(MOUNT_STATUS_LED_PIN, !STATUS_MOUNT_LED_ON_STATE);
     } else {
-      digitalWriteEx(STATUS_MOUNT_LED_PIN, STATUS_MOUNT_LED_ON_STATE);
+      digitalWriteEx(MOUNT_STATUS_LED_PIN, STATUS_MOUNT_LED_ON_STATE);
     }
   }
 #endif
 
+void generalWrapper() { status.general(); }
+
 void Status::init() {
   #if STATUS_LED == ON
     // if anything else is using the status LED, disable it
-    if (STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
+    if (STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
   #endif
 
   if (!nv.isKeyValid()) {
@@ -39,24 +42,39 @@ void Status::init() {
 
   sound.enabled = buzzer;
 
-  #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
+  #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
-      pinModeEx(STATUS_MOUNT_LED_PIN, OUTPUT);
+      pinModeEx(MOUNT_STATUS_LED_PIN, OUTPUT);
       VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
     }
   #endif
+
+  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
+    pinModeEx(PARK_STATUS_PIN, OUTPUT);
+  #endif
+
+  VF("MSG: Mount, status start general status task (1s rate priority 4)... ");
+  statusTaskHandle = tasks.add(1000, 0, true, 4, generalWrapper, "genSta");
+  if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
 }
 
 // mount status LED flash rate (in ms)
 void Status::flashRate(int period) {
-  #if STATUS_MOUNT_LED != OFF && STATUS_MOUNT_LED_PIN != OFF
+  #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (period == 0) { period = 500; ledOff = true; } else ledOff = false;
     if (period == 1) { period = 500; ledOn = true; } else ledOn = false;
     tasks.setPeriod(statusTaskHandle, period/2UL);
   #else
     period = period;
+  #endif
+}
+
+// mount general status
+void Status::general() {
+  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
+    digitalWriteEx(PARK_STATUS_PIN, (park.state == PS_PARKED) ? PARK_STATUS : !PARK_STATUS)
   #endif
 }
 

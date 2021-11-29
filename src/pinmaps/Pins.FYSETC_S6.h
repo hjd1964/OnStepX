@@ -96,7 +96,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_PIN        PC6                // Drain (on EXP2) One could perhaps move these to the RGB leds, there's a header but no +5V present on it.
-#define STATUS_MOUNT_LED_PIN  PC7                // Drain (on EXP2 shared with Reticle/BME280_CS)
+#define MOUNT_STATUS_LED_PIN  PC7                // Drain (on EXP2 shared with Reticle/BME280_CS)
 #define STATUS_ROTATOR_LED_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
 #define STATUS_FOCUSER_LED_PIN PC7               // Drain (on EXP2 shared with Reticle/BME280_CS)
 #define RETICLE_LED_PIN       PC7                // Drain (on EXP2 shared with LED2/BME280_CS)
@@ -105,9 +105,9 @@
 #define STATUS_BUZZER_PIN     PC9                // Tone (on BEEP/EXP1)
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define SENSE_PPS_PIN         PB10               // PPS time source, GPS for example (on EXP2)
+#define PPS_SENSE_PIN         PB10               // PPS time source, GPS for example (on EXP2)
 
-#define SENSE_LIMIT_PIN       PA0                // Limit switch sense (on Z-)
+#define LIMIT_SENSE_PIN       PA0                // Limit switch sense (on Z-)
 
 // Soft SPI bus to stepper drivers
 #if PINMAP == FYSETC_S6_2

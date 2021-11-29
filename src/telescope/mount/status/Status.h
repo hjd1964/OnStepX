@@ -21,6 +21,8 @@ class Status {
     // mount status LED flash rate (in ms)
     void flashRate(int period);
 
+    void general();
+
     Sound sound;
 
   private:
