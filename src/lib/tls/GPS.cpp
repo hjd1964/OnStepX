@@ -28,7 +28,7 @@
 #endif
 
 #include "PPS.h"
-#include "../../tasks/OnTask.h"
+#include "../tasks/OnTask.h"
 
 #include <TinyGPS++.h> // http://arduiniana.org/libraries/tinygpsplus/
 TinyGPSPlus gps;
@@ -103,8 +103,8 @@ void TimeLocationSource::get(JulianDate &ut1) {
   ut1.hour = gps.time.hour() + gps.time.minute()/60.0 + (gps.time.second() + DUT1)/3600.0;
 
   // adjust date/time for DUT1 as needed
-  if (ut1.hour >= 24.0L) { ut1.hour -= 24.0L; ut1 += 1.0L; } else
-  if (ut1.hour < 0.0L) { ut1.hour += 24.0L; ut1 -= 1.0L; }
+  if (ut1.hour >= 24.0L) { ut1.hour -= 24.0L; ut1.day += 1.0L; } else
+  if (ut1.hour < 0.0L) { ut1.hour += 24.0L; ut1.day -= 1.0L; }
 }
 
 void TimeLocationSource::getSite(double &latitude, double &longitude, float &elevation) {
