@@ -85,10 +85,10 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (mount.settings.rc == RC_FULL_RA)         reply[0]|=0b11100000;           // OnTrack enabled Single axis
       if (mount.settings.rc == RC_FULL_BOTH)       reply[0]|=0b10100000;           // OnTrack enabled
       if (mount.settings.rc == RC_NONE) {
-        double r = siderealToHz(mount.trackingRate);
-        if (fequal(r, 57.900))                     reply[1]|=0b10000001; else      // Lunar rate selected
-        if (fequal(r, 60.000))                     reply[1]|=0b10000010; else      // Solar rate selected
-        if (fequal(r, 60.136))                     reply[1]|=0b10000011;           // King rate selected
+        float r = siderealToHz(mount.trackingRate);
+        if (fequal(r, 57.900F))                    reply[1]|=0b10000001; else      // Lunar rate selected
+        if (fequal(r, 60.000F))                    reply[1]|=0b10000010; else      // Solar rate selected
+        if (fequal(r, 60.136F))                    reply[1]|=0b10000011;           // King rate selected
       }
 
       if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // sync to encoders only
