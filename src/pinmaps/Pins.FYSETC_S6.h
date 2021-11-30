@@ -23,11 +23,7 @@
 #if SERIAL_GPS_BAUD != OFF
   #ifndef SERIAL_GPS
     #define SERIAL_GPS         SoftSerial
-  #endif
-  #ifndef SERIAL_GPS_RX
     #define SERIAL_GPS_RX      PA3
-  #endif
-  #ifndef SERIAL_GPS_TX
     #define SERIAL_GPS_TX      PA2
   #endif
 #endif
