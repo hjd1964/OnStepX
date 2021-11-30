@@ -146,7 +146,7 @@ void TimeLocationSource::poll() {
 bool TimeLocationSource::waitIsValid() {
   if (startTime == 0) startTime = millis();
   unsigned long t = millis() - startTime;
-  return (t/1000UL)/3600UL >= GPS_MIN_WAIT_MINUTES;
+  return (t/1000UL)/60UL >= GPS_MIN_WAIT_MINUTES;
 }
 
 bool TimeLocationSource::timeIsValid() {
