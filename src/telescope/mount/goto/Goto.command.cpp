@@ -105,7 +105,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
     // :GrH#      Returns: HH:MM:SS.SSSS# (high precision)
     if (command[1] == 'r' && (parameter[0] == 0 || parameter[1] == 0)) {
-      if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
+      if (parameter[0] == 'H' || parameter[0] == 'a') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       convert.doubleToHms(reply, radToHrs(gotoTarget.r), false, precisionMode);
       *numericReply = false;
     } else
@@ -115,7 +115,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     // :GdH#      High precision
     //            Returns: HH:MM:SS.SSS# (high precision)
     if (command[1] == 'd' && (parameter[0] == 0 || parameter[1] == 0)) {
-      if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
+      if (parameter[0] == 'H' || parameter[0] == 'e') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       convert.doubleToDms(reply, radToDeg(gotoTarget.d), false, true, precisionMode);
       *numericReply = false;
     } else
