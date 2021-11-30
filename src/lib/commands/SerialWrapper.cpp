@@ -17,6 +17,13 @@
   #define SERIAL_B_RXTX_SET
 #endif
 
+#if SERIAL_C == HardSerial
+  #undef SERIAL_C
+  HardwareSerial HWSerialC(SERIAL_C_RX, SERIAL_C_TX);
+  #define SERIAL_C HWSerialC
+  #define SERIAL_C_RXTX_SET
+#endif
+
 #ifdef SERIAL_BT
   BluetoothSerial bluetoothSerial;
 #endif

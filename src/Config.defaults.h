@@ -26,6 +26,9 @@
 #ifndef SERIAL_C_BAUD_DEFAULT
 #define SERIAL_C_BAUD_DEFAULT         OFF
 #endif
+#ifndef SERIAL_GPS_BAUD
+#define SERIAL_GPS_BAUD               OFF
+#endif
 
 // ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
 #ifndef SERIAL_IP_MODE

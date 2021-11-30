@@ -29,7 +29,7 @@
 #endif
 
 // Auto assign the Serial1 port pins for GPS
-#if defined(SERIAL_GPS_BAUD) && SERIAL_GPS_BAUD != OFF
+#if SERIAL_GPS_BAUD != OFF
   #ifndef SERIAL_GPS
     #define SERIAL_GPS         HardSerial
   #endif
