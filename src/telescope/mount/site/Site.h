@@ -10,6 +10,7 @@
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
 #include "../../../lib/tls/Tls.h"
+#include "../../../lib/tls/PPS.h"
 
 extern volatile unsigned long fracLAST;
 

@@ -100,6 +100,10 @@ void Site::init() {
   } else { VLF("FAILED!"); }
 
   setSiderealPeriod(SIDEREAL_PERIOD);
+
+  #if TIME_LOCATION_PPS_SENSE != OFF
+    pps.init();
+  #endif
 }
 
 // update/apply the site latitude and longitude, necessary for LAST calculations etc.

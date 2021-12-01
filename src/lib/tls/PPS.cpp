@@ -22,7 +22,7 @@ void ppsIsr() {
 }
 
 void Pps::init() {
-  #if PPS_SENSE_PIN != OFF
+    VF("MSG: PPS, attaching ISR to sense input");
     pinMode(PPS_SENSE_PIN, INPUT);
     #if TIME_LOCATION_PPS_SENSE == HIGH
       attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, RISING);
@@ -31,7 +31,6 @@ void Pps::init() {
     #elif TIME_LOCATION_PPS_SENSE == BOTH
       attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, CHANGE);
     #endif
-  #endif
 }
 
 Pps pps;
