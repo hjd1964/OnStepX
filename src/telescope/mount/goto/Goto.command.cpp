@@ -136,7 +136,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Returns: DDD*MM'SS.SSS# (high precision)
     if (command[1] == 'z' ) {
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
-      convert.doubleToDms(reply, radToDeg(gotoTarget.z), false, true, precisionMode);
+      convert.doubleToDms(reply, radToDeg(gotoTarget.z), true, false, precisionMode);
       *numericReply = false;
     } else
 
