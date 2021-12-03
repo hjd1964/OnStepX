@@ -19,6 +19,7 @@
 #define fequal(x,y)                 (fabs((x)-(y))<SmallestFloat)
 #define fgt(x,y)                    ((x)-(y)>SmallestFloat)
 #define flt(x,y)                    ((y)-(x)>SmallestFloat)
+#define NormalizeAzimuth(x)         (x<0.0L?x+360.0L:x)
 
 // strings
 #define STR_HELPER(x) #x

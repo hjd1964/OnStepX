@@ -113,7 +113,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     //            Returns: DDD*MM'SS.SSS# (high precision)
     if (command[1] == 'Z' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
-      convert.doubleToDms(reply, radToDeg(getPosition(CR_MOUNT_HOR).z), true, false, precisionMode);
+      convert.doubleToDms(reply, NormalizeAzimuth(radToDeg(getPosition(CR_MOUNT_HOR).z)), true, false, precisionMode);
       *numericReply = false;
     } else return false;
   } else
