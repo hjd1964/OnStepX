@@ -229,4 +229,6 @@
 #define FEATURE8_TEMP                 OFF //    OFF, THERMISTOR, DS1820, n. Where n is the ds18b20 s/n. For DEW_HEATER temp.  Adjust
 #define FEATURE8_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
+// ---------------------------------------------------------------------------------------------------------------------------------
 #define FileVersionConfig 5
+#include "Extended.config.h"
