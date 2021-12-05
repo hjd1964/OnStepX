@@ -68,7 +68,7 @@ typedef struct AxisErrors {
   uint8_t maxLimitSensed:1;
 } AxisErrors;
 
-enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE, AR_RATE_BY_TIME_END, AR_RATE_BY_TIME_ABORT};
+enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_TIME_ABORT, AR_RATE_BY_TIME_END, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE};
 enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
 
 class Axis {
@@ -255,6 +255,9 @@ class Axis {
     // checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
     bool motionError(Direction direction);
 
+    // checks for an sense error that would disallow motion in a given direction or DIR_BOTH for any motion
+    bool motionErrorSensed(Direction direction);
+
     // monitor movement
     void poll();
 
@@ -291,6 +294,8 @@ class Axis {
     bool validateAxisSettings(int axisNum, AxisSettings a);
     
     AxisErrors errors;
+    bool lastErrorResult = false;
+    bool commonMinMaxSense = false;
 
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
