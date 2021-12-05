@@ -94,7 +94,7 @@ class Motor {
     inline bool getSynchronized() { return synchronized; }
 
     // set synchronized state (automatic movement of target at setFrequencySteps() rate)
-    inline void setSynchronized(bool state) { synchronized = state; }
+    inline void setSynchronized(bool state) { synchronized = state; if (synchronized) targetSteps = motorSteps; }
 
     // get the current direction of motion
     Direction getDirection();
