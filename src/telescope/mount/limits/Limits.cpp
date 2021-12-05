@@ -243,8 +243,13 @@ void Limits::poll() {
     error.limit.axis2.max = true;
   } else error.limit.axis2.max = false;
 
+  error.limitSense.axis1.min = axis1.motionErrorSensed(DIR_REVERSE);
+  error.limitSense.axis1.max = axis1.motionErrorSensed(DIR_FORWARD);
+  error.limitSense.axis2.min = axis2.motionErrorSensed(DIR_REVERSE);
+  error.limitSense.axis2.max = axis2.motionErrorSensed(DIR_FORWARD);
+
   #if DEBUG == VERBOSE
-    const char* errPre = "MSG: Mount, error state changed: ";
+    const char* errPre = "MSG: Mount, error state: ";
     if (lastError.altitude.min != error.altitude.min ||
         lastError.altitude.max != error.altitude.max ||
         lastError.meridian.east != error.meridian.east ||
@@ -252,16 +257,24 @@ void Limits::poll() {
         lastError.limit.axis1.min != error.limit.axis1.min ||
         lastError.limit.axis1.max != error.limit.axis1.max ||
         lastError.limit.axis2.min != error.limit.axis2.min ||
-        lastError.limit.axis2.max != error.limit.axis2.max) {
+        lastError.limit.axis2.max != error.limit.axis2.max ||
+        lastError.limitSense.axis1.min != error.limitSense.axis1.min ||
+        lastError.limitSense.axis1.max != error.limitSense.axis1.max ||
+        lastError.limitSense.axis2.min != error.limitSense.axis2.min ||
+        lastError.limitSense.axis2.max != error.limitSense.axis2.max) {
       V(errPre);
-      V(error.altitude.min?    "Alt-! " :"Alt-. ");
-      V(error.altitude.max?    "Alt+! " :"Alt+. ");
-      V(error.meridian.east?   "ME! "  :"ME. ");
-      V(error.meridian.west?   "MW! "  :"MW. ");
-      V(error.limit.axis1.min? "Ax1-! ":"Ax1-. ");
-      V(error.limit.axis1.max? "Ax1+! ":"Ax1+. ");
-      V(error.limit.axis2.min? "Ax2-! ":"Ax2-. ");
-      VL(error.limit.axis2.max?"Ax2+!"  :"Ax2+.");
+      V(error.altitude.min?         "Alt-! " :"Alt-  ");
+      V(error.altitude.max?         "Alt+! " :"Alt+  ");
+      V(error.meridian.east?        "ME! "   :"ME  "  );
+      V(error.meridian.west?        "MW! "   :"MW  "  );
+      V(error.limit.axis1.min?      "A1L-! " :"A1L-  ");
+      V(error.limit.axis1.max?      "A1L+! " :"A1L+  ");
+      V(error.limit.axis2.min?      "A2L-! " :"A2L-  ");
+      V(error.limit.axis2.max?      "A2L+! " :"A2L+  ");
+      V(error.limitSense.axis1.min? "A1S-! " :"A1S-  ");
+      V(error.limitSense.axis1.max? "A1S+! " :"A1S+  ");
+      V(error.limitSense.axis2.min? "A2S-! " :"A2S-  ");
+      VL(error.limitSense.axis2.max?"A2S+!"  :"A2S+"  );
     }
   #endif
 
