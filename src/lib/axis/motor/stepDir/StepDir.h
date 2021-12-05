@@ -9,9 +9,9 @@
 #include "StepDirDrivers.h"
 #include "../Motor.h"
 
-#define DirSetRev 253
-#define DirSetFwd 254
-#define DirNone 255
+#define DirNone 253
+#define DirSetRev 254
+#define DirSetFwd 255
 
 typedef struct StepDirPins {
   int16_t   step;
