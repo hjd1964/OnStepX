@@ -19,7 +19,6 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
   UNUSED(supressFrame);
 
   if (command[0] == 'G') {
-
     // :GU#       Get telescope Status
     //            Returns: s#
     if (command[1] == 'U' && parameter[0] == 0)  {
