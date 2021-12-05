@@ -16,15 +16,16 @@ SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   if (isAnalog) {
   	if (threshold + hysteresis > 1023) {
       hysteresis = 0;
-      VF("WRN: Sense::Sense(); Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range, hysteresis set to 0.");
+      VL("");
+      VF("WRN: SenseInput::SenseInput(); Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range, hysteresis set to 0.");
     }
 	  if (threshold - hysteresis < 0) {
       hysteresis = 0;
-      VF("WRN: Sense::Sense(); Threshold - hysteresis for pin "); V(pin); VLF(" below Analog range, hysteresis set to 0.");
+      VL("");
+      VF("WRN: SenseInput::SenseInput(); Threshold - hysteresis for pin "); V(pin); VLF(" below Analog range, hysteresis set to 0.");
     }
   }
 
-  VF("MSG: Sense, ");
   VF("pin="); V(pin); V(", ");
   VF("active="); V(activeState ? "HIGH" : "LOW"); V(", ");
   VF("ths="); V(threshold); V(", ");
@@ -86,12 +87,13 @@ void SenseInput::reset() {
 
 uint8_t Sense::add(int pin, int initState, int32_t trigger, bool force) {
   if ((pin == OFF || trigger == OFF) && !force) return 0;
-  if (senseCount >= SENSE_MAX) { VF("WRN: Senses::add(); senseCount exceeded ignoring pin "); VL(pin); return 0; }
-  if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Senses::add(); trigger value invalid ignoring pin "); VL(pin); return 0; }
+  if (senseCount >= SENSE_MAX) { VF("WRN: Sense::add(); senseCount exceeded ignoring pin "); VL(pin); return 0; }
+  if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Sense::add(); trigger value invalid ignoring pin "); VL(pin); return 0; }
   if (initState != INPUT && initState != INPUT_PULLUP && initState != INPUT_PULLDOWN) {
-    VF("WRN: Senses::add(); initState value invalid ignoring pin "); VL(pin);
+    VF("WRN: Sense::add(); initState value invalid ignoring pin "); VL(pin);
     return 0;
   }
+  VF("MSG: Sense"); V(senseCount); V(", init ");
   senseInput[senseCount] = new SenseInput(pin, initState, trigger);
   senseCount++;
   return senseCount;
