@@ -120,12 +120,12 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       *numericReply = false;
     } else
 
-    // :Ga#       Get target Altitude
+    // :Gal#      Get target Altitude
     //            Returns: sDD*MM# or sDD*MM'SS# (based on precision setting)
     // :GaH#      High precision
     //            Returns: sDD*MM'SS.SSS# (high precision)
-    if (command[1] == 'a' && (parameter[0] == 0 || parameter[1] == 0)) {
-      if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
+    if (command[1] == 'a' && (parameter[0] == 'H' || parameter[0] == 'l') && parameter[1] == 0) {
+      if (parameter[0] == 'H') precisionMode = PM_HIGHEST;
       convert.doubleToHms(reply, radToDeg(gotoTarget.a), false, precisionMode);
       *numericReply = false;
     } else

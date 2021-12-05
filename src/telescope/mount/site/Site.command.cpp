@@ -30,7 +30,9 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
       if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
       GregorianDate date = calendars.julianDayToGregorian(julianDay);
-      date.year -= 2000; while (date.year >= 100) date.year -= 100;
+      date.year -= 2000;
+      while (date.year >= 100) date.year -= 100;
+      if (date.year < 0) date.year = 0;
       sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
       *numericReply = false;
     } else
