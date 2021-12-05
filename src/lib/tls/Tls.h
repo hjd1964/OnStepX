@@ -19,6 +19,8 @@
     #include "GPS.h"
   #elif TIME_LOCATION_SOURCE == NTP
     #include "NTP.h"
+  #elif TIME_LOCATION_SOURCE == TEENSY
+    #include "TEENSY.h" 
   #else
     #error "Configuration (Config.h): TIME_LOCATION_SOURCE must be either OFF, DS3231, DS3234, GPS, or NTP"
   #endif
