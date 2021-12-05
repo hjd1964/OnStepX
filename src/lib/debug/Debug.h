@@ -24,10 +24,12 @@
     #define DL(x)    SERIAL_DEBUG.println(x)
     #define DLF(x)   SERIAL_DEBUG.println(F(x))
   #endif
+  #define DL1(x) { static long t = 0; if (millis() > t + 1000L) { DL(x); t = millis(); } }
 #else
   #define D(x)
   #define DF(x)
   #define DL(x)
+  #define DL1(x)
   #define DLF(x)
 #endif
 
@@ -35,10 +37,12 @@
   #define V(x)       D(x)
   #define VF(x)      DF(x)
   #define VL(x)      DL(x)
+  #define VL1(x)     DL1(x)
   #define VLF(x)     DLF(x)
 #else
   #define V(x)
   #define VF(x)
   #define VL(x)
+  #define VL1(x)
   #define VLF(x)
 #endif
