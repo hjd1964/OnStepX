@@ -88,6 +88,16 @@
 #define SERIAL_DEBUG_BAUD             9600
 #endif
 
+// gpio device
+#ifndef GPIO_DEVICE
+#define GPIO_DEVICE                   OFF
+#endif
+
+#ifndef FileVersionConfig
+#warning "Configuration (Config.h): FileVersionConfig is undefined, assuming version 5."
+#define FileVersionConfig 5
+#endif
+
 // -----------------------------------------------------------------------------------
 // mount settings
 
@@ -218,6 +228,9 @@
 #endif
 #ifndef AXIS2_TANGENT_ARM
 #define AXIS2_TANGENT_ARM             OFF                         // ON to enable support for Dec tangent arm equatorial mounts
+#endif
+#ifndef AXIS2_TANGENT_ARM_CORRECTION
+#define AXIS2_TANGENT_ARM_CORRECTION  OFF                         // ON enables tangent arm geometry correction for Axis2
 #endif
 #ifndef AXIS2_LIMIT_MIN
 #define AXIS2_LIMIT_MIN               -90                         // in degrees
