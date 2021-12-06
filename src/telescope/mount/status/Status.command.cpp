@@ -41,6 +41,12 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (mount.settings.rc == RC_REFR_BOTH)  { reply[i++]='r'; }                  // [r]efr enabled
       if (mount.settings.rc == RC_FULL_RA)    { reply[i++]='t'; reply[i++]='s'; }  // on[t]rack enabled [s]ingle axis
       if (mount.settings.rc == RC_FULL_BOTH)  { reply[i++]='t'; }                  // on[t]rack enabled
+      if (mount.settings.rc == RC_NONE) {
+        float r = siderealToHz(mount.trackingRate);
+        if (fequal(r, 57.900F))                reply[i++]='('; else                // Lunar rate selected
+        if (fequal(r, 60.000F))                reply[i++]='O'; else                // SOlar rate selected
+        if (fequal(r, 60.136F))                reply[i++]='k';                     // King rate selected
+      }
 
       if (goTo.isHomePaused())                 reply[i++]='w';                     // [w]aiting at home 
       if (goTo.isHomePauseEnabled())           reply[i++]='u';                     // pa[u]se at home enabled?
