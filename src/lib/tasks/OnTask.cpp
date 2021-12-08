@@ -40,7 +40,7 @@
 #include "HAL_HWTIMERS.h"
 #include "OnTask.h"
 
-#define roundPeriod(x) ((unsigned long)((x)+0.5))
+#define roundPeriod(x) ((unsigned long)((x)+(double)0.5L))
 
 unsigned char _task_postpone = false;
 unsigned long _taskMasterFrequencyRatio = 16000000;
