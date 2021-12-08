@@ -322,6 +322,13 @@ void Task::setHardwareTimerPeriod() {
 }
 
 void tasksMonitor() {
+  static unsigned long _lastTaskMasterFrequencyRatio = 16000000UL;
+  if (_lastTaskMasterFrequencyRatio != _taskMasterFrequencyRatio) {
+    _lastTaskMasterFrequencyRatio = _taskMasterFrequencyRatio;
+    uint8_t handle = tasks.getFirstHandle();
+    for (int i = 0; i < TASKS_MAX; i++) {
+      if (handle == 0) break;
+      tasks.refreshPeriod(handle);
       handle = tasks.getNextHandle(handle);
     }
   }
