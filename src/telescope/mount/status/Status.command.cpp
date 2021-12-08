@@ -31,7 +31,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // park [F]ailed
       if (mount.isSyncToEncoders())            reply[i++]='e';                     // sync to [e]ncoders only
       if (mount.isHome())                      reply[i++]='H';                     // at [H]ome
-      #if TIME_LOCATION_PPS_SENSE == ON
+      #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
       if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G';                     // pulse [G]uide active
@@ -80,7 +80,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       memset(reply, (char)0b10000000, 9);
       if (!mount.isTracking())                     reply[0]|=0b10000001;           // Not tracking
       if (goTo.state == GS_NONE)                   reply[0]|=0b10000010;           // No goto
-      #if TIME_LOCATION_PPS_SENSE == ON
+      #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                            reply[0]|=0b10000100;           // PPS sync
       #endif
       if (guide.state == GU_PULSE_GUIDE)           reply[0]|=0b10001000;           // pulse guide active
