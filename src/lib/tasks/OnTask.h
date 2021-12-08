@@ -249,8 +249,6 @@ class Tasks {
 
     // set the period ratio to compensate for MCU clock inaccuracy
     // in sub-microseconds per second, this is safe to call from within an ISR
-    // software based timers are automatically updated on-the-fly
-    // hardware based timers need their period set to be updated
     // values above 16M cause the timers to compensate by running slower
     // values below 16M cause the timers to compensate by running faster
     IRAM_ATTR void setPeriodRatioSubMicros(unsigned long value);
