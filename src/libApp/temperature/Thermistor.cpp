@@ -5,7 +5,7 @@
 
 #ifdef THERMISTOR_DEVICES_PRESENT
 
-#include "../tasks/OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
 #include "../weather/Weather.h"
 

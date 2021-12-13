@@ -5,9 +5,9 @@
 
 #ifdef DS1820_DEVICES_PRESENT
 
-#include "../tasks/OnTask.h"
+#include "../../lib/tasks/OnTask.h"
 
-#include "../1wire/1Wire.h"
+#include "../../lib/1wire/1Wire.h"
 #include <DallasTemperature.h>        // my DallasTemperature library https://github.com/hjd1964/Arduino-Temperature-Control-Library
 DallasTemperature DS18X20(&oneWire);
 
@@ -35,7 +35,7 @@ bool Ds1820::init() {
 
   // only search out DS2413's or DS1820's IF none are explicitly specified
   bool search = deviceCount == 0;
-  #if DEBUG_MODE == VERBOSE
+  #if DEBUG == VERBOSE
     bool detected = false;
   #endif
 
@@ -52,7 +52,7 @@ bool Ds1820::init() {
           if (index <= 8) { for (int j = 0; j < 8; j++) { address[index][j] = addressfound[j]; deviceCount++; } }
           index++;
         }
-        #if DEBUG_MODE == VERBOSE
+        #if DEBUG == VERBOSE
           detected = true;
           if (addressfound[0] == 0x10) { VF("DS18S20: 0x"); } else { VF("DS18B20: 0x"); }
           for (int j = 0; j < 8; j++) { if (addressfound[j] < 16) { V("0"); } SERIAL_DEBUG.print(addressfound[j], HEX); }
@@ -66,7 +66,7 @@ bool Ds1820::init() {
     }
   }
 
-  #if DEBUG_MODE == VERBOSE
+  #if DEBUG == VERBOSE
     if (!detected) { VLF("No DS1820 devices found"); }
   #endif
 

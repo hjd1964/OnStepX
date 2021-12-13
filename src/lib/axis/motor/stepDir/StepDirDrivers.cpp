@@ -20,7 +20,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
  {  0,  0,  0,  0,  0,  0,  0,  0,  0}};  // GENERIC
 
-#if DEBUG_MODE != OFF
+#if DEBUG != OFF
   const char* DRIVER_NAME[DRIVER_MODEL_COUNT] = {
   "A4988", "DRV8825", "S109", "LV8729", "RAPS128", "TMC2100",
   "TMC2208", "TMC2209", "ST820", "TMC2130", "TMC5160", "GENERIC" };

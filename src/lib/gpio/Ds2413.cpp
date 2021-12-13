@@ -19,7 +19,7 @@ bool Ds2413::init() {
   // scan the 1-wire bus and record the devices found
   oneWire.reset_search();
 
-  #if DEBUG_MODE == VERBOSE
+  #if DEBUG == VERBOSE
     bool detected = false;
   #endif
 
@@ -33,7 +33,7 @@ bool Ds2413::init() {
       if (addressFound[0] == 0x3A) {
         if (index <= 1) { for (int j = 0; j < 8; j++) address[j] = addressFound[j]; deviceCount++; }
         index++;
-        #if DEBUG_MODE == VERBOSE
+        #if DEBUG == VERBOSE
           detected = true;
           VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (addressFound[j] < 16) { V("0"); } SERIAL_DEBUG.print(addressFound[j], HEX); }
           if (index <= 1) { VF(" auto-assigned to FEATURE"); V((index - 1)*2 + 1); V("_PIN"); } else { VF(" not assigned"); }
@@ -43,7 +43,7 @@ bool Ds2413::init() {
     }
   }
 
-  #if DEBUG_MODE == VERBOSE
+  #if DEBUG == VERBOSE
     if (!detected) { VLF("No DS2413 devices found"); }
   #endif
 

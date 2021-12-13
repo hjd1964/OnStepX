@@ -6,7 +6,7 @@
 #ifdef SERVO_DRIVER_PRESENT
 #include "../Motor.h"
 
-#if DEBUG_MODE != OFF
+#if DEBUG != OFF
   const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = { "SERVO_DIR_PHASE", "SERVO_IN_IN" };
 #endif
 
