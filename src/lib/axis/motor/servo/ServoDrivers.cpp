@@ -76,22 +76,22 @@ void ServoDriver::setMotorDirection(Direction dir) {
 void ServoDriver::update() {
   if (settings.model == SERVO_II) {
     if (motorDir == DIR_FORWARD) {
-      digitalWriteF(Pins->in1, Pins->inState1);
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, HAL_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
       if (Pins->inState2 == HIGH) motorPwr = HAL_ANALOG_WRITE_RANGE - motorPwr;
       analogWrite(Pins->in2, motorPwr);
     } else
     if (motorDir == DIR_REVERSE) {
       if (Pins->inState1 == HIGH) motorPwr = HAL_ANALOG_WRITE_RANGE - motorPwr;
       analogWrite(Pins->in1, motorPwr);
-      digitalWriteF(Pins->in2, Pins->inState2);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, HAL_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
     } else {
-      digitalWriteF(Pins->in1, Pins->inState1);
-      digitalWriteF(Pins->in2, Pins->inState2);
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, HAL_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, HAL_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
     }
   } else
   if (settings.model == SERVO_PD) {
     if (motorDir == DIR_FORWARD) {
-      digitalWriteF(Pins->in2, Pins->inState2);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, HAL_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
       if (Pins->inState1 == HIGH) motorPwr = HAL_ANALOG_WRITE_RANGE - motorPwr;
       analogWrite(Pins->in1, motorPwr);
     } else
