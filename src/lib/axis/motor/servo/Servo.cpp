@@ -5,7 +5,7 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
-//#define DEBUG_SERVO
+// #define DEBUG_SERVO 1
 
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
@@ -153,7 +153,7 @@ void ServoMotor::poll() {
   pid->Compute();
 
   #if DEBUG == VERBOSE && defined(DEBUG_SERVO)
-    if (axisNumber == 1) {
+    if (axisNumber == DEBUG_SERVO) {
       static uint16_t count = 0;
       count++;
       if (count%100 == 0) {
