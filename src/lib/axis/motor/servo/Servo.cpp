@@ -158,7 +158,7 @@ void ServoMotor::poll() {
       count++;
       if (count%100 == 0) {
         char s[80];
-        sprintf(s, "%sdelta = %6ld, power = %8.6f\r\n", axisPrefix, target - position, control->out); V(s);
+        sprintf(s, "%sdelta = %6ld, power = %6.3f%%\r\n", axisPrefix, target - position, (control->out/ANALOG_WRITE_PWM_RANGE)*100.0F); V(s);
       }
     }
   #endif
