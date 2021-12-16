@@ -44,8 +44,7 @@ class ServoDriver {
     // constructor
     ServoDriver(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings);
 
-    // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
-    // and sets up the pin modes
+    // decodes driver model and sets up the pin modes
     void init();
 
     // update status info. for driver
@@ -64,7 +63,7 @@ class ServoDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     inline int getSubdivisionsGoto() { return 1; }
 
-    // power level to the motor (-HAL_ANALOG_WRITE_RANGE to HAL_ANALOG_WRITE_RANGE, negative for reverse)
+    // power level to the motor (-ANALOG_WRITE_PWM_RANGE to ANALOG_WRITE_PWM_RANGE, negative for reverse)
     void setMotorPower(int power);
 
     // returns motor direction (DIR_FORMWARD or DIR_REVERSE)

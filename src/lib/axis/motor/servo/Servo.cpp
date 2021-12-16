@@ -30,12 +30,12 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
 
   // setup the PID
-  V(axisPrefix); VF("setting PID range +/-"); VL(HAL_ANALOG_WRITE_RANGE);
+  V(axisPrefix); VF("setting PID range +/-"); VL(ANALOG_WRITE_PWM_RANGE);
 
   control->in = 0;
   control->set = 0;
   pid->SetSampleTime(10);
-  pid->SetOutputLimits(-HAL_ANALOG_WRITE_RANGE, HAL_ANALOG_WRITE_RANGE);
+  pid->SetOutputLimits(-ANALOG_WRITE_PWM_RANGE, ANALOG_WRITE_PWM_RANGE);
   pid->SetMode(AUTOMATIC);
 
   // init driver advanced modes, etc.

@@ -49,7 +49,6 @@ class Telescope {
 };
 
 extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
-extern const int AnalogRange; // help for analogWrite() range conversions
-#define analog8BitToAnalogRange(v) roundf((v/255.0F)*AnalogRange)
+#define analog8BitToAnalogRange(v) roundf((v/255.0F)*(float)(ANALOG_WRITE_PWM_RANGE))
 
 extern Telescope telescope;

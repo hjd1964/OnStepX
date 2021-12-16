@@ -12,11 +12,11 @@
 #define HAL_NO_DOUBLE_PRECISION
 
 // This platform has 8 bit PWM
-#ifndef HAL_ANALOG_WRITE_BITS
-  #define HAL_ANALOG_WRITE_BITS 8
+#ifndef ANALOG_WRITE_PWM_BITS
+  #define ANALOG_WRITE_PWM_BITS 8
 #endif
-#ifndef HAL_ANALOG_WRITE_RANGE
-  #define HAL_ANALOG_WRITE_RANGE 255
+#ifndef ANALOG_WRITE_PWM_RANGE
+  #define ANALOG_WRITE_PWM_RANGE 255
 #endif
 
 // This is for ~16MHz AVR processors or similar.

@@ -10,12 +10,15 @@
 // 1/5000 second sidereal timer
 #define HAL_FRACTIONAL_SEC 5000.0F
 
-// This platform has 15 bit PWM
-#ifndef HAL_ANALOG_WRITE_BITS
-  #define HAL_ANALOG_WRITE_BITS 8
+// This platform has up to 15 bit PWM
+#ifndef ANALOG_WRITE_PWM_BITS
+  #define ANALOG_WRITE_PWM_BITS 13
 #endif
-#ifndef HAL_ANALOG_WRITE_RANGE
-  #define HAL_ANALOG_WRITE_RANGE 255
+#ifndef ANALOG_WRITE_PWM_RANGE
+  #define ANALOG_WRITE_PWM_RANGE 8191
+#endif
+#ifndef ANALOG_WRITE_PWM_FREQUENCY
+  #define ANALOG_WRITE_PWM_FREQUENCY 18310.55
 #endif
 
 #define HAL_FAST_PROCESSOR
@@ -41,7 +44,7 @@
 
 #define HAL_INIT() { \
   analogReadResolution(10); \
-  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   nv.init(E2END + 1, true, 0, false); \
 }
 

@@ -8,11 +8,11 @@
 #define HAL_FRACTIONAL_SEC 200.0F
 
 // This platform has 16 bit PWM
-#ifndef HAL_ANALOG_WRITE_BITS
-  #define HAL_ANALOG_WRITE_BITS 8
+#ifndef ANALOG_WRITE_PWM_BITS
+  #define ANALOG_WRITE_PWM_BITS 8
 #endif
-#ifndef HAL_ANALOG_WRITE_RANGE
-  #define HAL_ANALOG_WRITE_RANGE 255
+#ifndef ANALOG_WRITE_PWM_RANGE
+  #define ANALOG_WRITE_PWM_RANGE 255
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
@@ -51,7 +51,7 @@
 #endif
 
 #define HAL_INIT() { \
-  analogWriteResolution(HAL_ANALOG_WRITE_BITS); \
+  analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   nv.init(E2END + 1, false, 5000, false); \
   SERIAL_BT_BEGIN(); \
 }
