@@ -35,7 +35,7 @@ class StepDirMotor : public Motor {
     void setReverse(int8_t state);
 
     // set default driver microsteps and current
-    void setParam(int16_t microsteps, int16_t current);
+    void setParam(float microsteps, float currentRun, float currentGoto);
 
     // sets motor power on/off (if possible)
     void power(bool value);

@@ -23,9 +23,6 @@
 
 typedef struct ServoDriverSettings {
   int16_t model;
-  float p;
-  float i;
-  float d;
   int8_t  status;
 } ServoDriverSettings;
 

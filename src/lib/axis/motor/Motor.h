@@ -20,7 +20,7 @@ class Motor {
     virtual void setReverse(int8_t state);
 
     // set default driver parameters (microsteps and current for SD drivers)
-    virtual void setParam(int16_t param1, int16_t param2);
+    virtual void setParam(float param1, float param2, float param3);
 
     // sets motor power on/off (if possible)
     virtual void power(bool value);

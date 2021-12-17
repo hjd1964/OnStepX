@@ -49,7 +49,7 @@ class StepDirDriver {
 
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI)
     // and sets up the pin modes
-    void init(int16_t microsteps, int16_t current);
+    void init(int16_t microsteps, int16_t currentRun, int16_t currentGoto);
 
     // true if switching microstep modes is allowed
     bool modeSwitchAllowed();

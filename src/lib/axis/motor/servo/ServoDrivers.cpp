@@ -7,7 +7,7 @@
 #include "../Motor.h"
 
 #if DEBUG != OFF
-  const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = { "SERVO_DIR_PHASE", "SERVO_IN_IN" };
+  const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = { "SERVO_PD", "SERVO_II" };
 #endif
 
 ServoDriver::ServoDriver(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings) {
@@ -19,7 +19,6 @@ ServoDriver::ServoDriver(uint8_t axisNumber, const ServoDriverPins *Pins, const 
 void ServoDriver::init() {
   #if DEBUG == VERBOSE
     VF("MSG: Servo"); V(axisNumber); VF(", init model "); V(SERVO_DRIVER_NAME[settings.model - SERVO_DRIVER_FIRST]);
-    VF(" p="); V(settings.p); VF(", i="); V(settings.i); VF(", d="); VL(settings.d);
   #endif
 
   // init default driver control pins

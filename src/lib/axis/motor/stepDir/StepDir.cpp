@@ -80,8 +80,8 @@ void StepDirMotor::setReverse(int8_t state) {
 }
 
 // set default driver microsteps and current
-void StepDirMotor::setParam(int16_t microsteps, int16_t current) {
-  driver->init(microsteps, current);
+void StepDirMotor::setParam(float microsteps, float currentRun, float currentGoto) {
+  driver->init(round(microsteps), round(currentRun), round(currentGoto));
   homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
 }

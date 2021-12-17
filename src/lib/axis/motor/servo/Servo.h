@@ -30,8 +30,8 @@ class ServoMotor : public Motor {
     // set driver reverse state
     void setReverse(int8_t state);
 
-    // set default driver PID integral and porportional
-    void setParam(int16_t integral, int16_t porportional);
+    // set default driver PID parameters
+    void setParam(float porportional, float integral, float derivative);
 
     // sets motor power on/off (if possible)
     void power(bool value);

@@ -64,7 +64,7 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
   // setup motor
   motor->setReverse(settings.reverse);
-  motor->setParam(settings.param1, settings.param2);
+  motor->setParam(settings.param1, settings.param2, settings.param3);
   motor->setBacklashFrequencySteps(settings.backlashFreq*settings.stepsPerMeasure);
 
   // activate home and limit sense

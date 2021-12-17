@@ -6,6 +6,7 @@
 #ifdef AXIS_PRESENT
 
 #include "Axis.h"
+#include "../convert/Convert.h"
 
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
@@ -36,14 +37,17 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             thisAxis.limits.min = thisAxis.limits.min/1000.0F;
             thisAxis.limits.max = thisAxis.limits.max/1000.0F;
           }
-          sprintf(reply,"%ld.%03ld,%d,%d,%d,%d,%d",
-            (long)thisAxis.stepsPerMeasure,
-            (long)(thisAxis.stepsPerMeasure*1000)%1000,
-            (int)thisAxis.subdivisions,
-            (int)thisAxis.current,
+          char spm[40]; sprintF(spm, "%1.3f", thisAxis.stepsPerMeasure);
+          char prm1[40]; sprintF(prm1, "%1.3f", thisAxis.param1);
+          char prm2[40]; sprintF(prm2, "%1.3f", thisAxis.param2);
+          char prm3[40]; sprintF(prm3, "%1.3f", thisAxis.param3);
+          sprintf(reply,"%s,%d,%d,%d,%s,%s,%s,%c",
+            spm,
             (int)thisAxis.reverse,
             (int)round(thisAxis.limits.min),
-            (int)round(thisAxis.limits.max));
+            (int)round(thisAxis.limits.max),
+            prm1, prm2, prm3,
+            motor->driverType == SERVO?'V':'S');
           *numericReply = false;
         } else *commandError = CE_0;
       } else *commandError = CE_0;
@@ -111,6 +115,17 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
                 #endif
               } else *commandError = CE_PARAM_FORM;
             }
+            // validate settings for servo drivers
+            if (motor->driverType == SERVO) {
+              if (validateAxisSettings(axisNumber, thisAxis, true)) {
+                #ifdef SERVO_DRIVER_PRESENT
+                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+                  // make these take effect now
+                  motor->setParam(thisAxis.param1, thisAxis.param2, thisAxis.param3);
+                  *numericReply = false;
+                #endif
+              } else *commandError = CE_PARAM_FORM;
+            }
           } else *commandError = CE_PARAM_FORM;
         }
       } else *commandError = CE_0;
@@ -124,19 +139,23 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
 bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
   if (strcmp(s, "0") != 0) {
     char *ws = s;
-    char *conv_end;
-    double f = strtod(ws, &conv_end); if (&s[0] != conv_end) a.stepsPerMeasure = f; else return false;
+    char *conv_end; 
+    double f = strtod(ws, &conv_end);
+    if (&s[0] != conv_end) a.stepsPerMeasure = f; else return false;
     ws = strchr(ws, ','); if (ws != NULL) {
-      ws++; a.subdivisions = atol(ws);
+      ws++; a.reverse = atol(ws);
       ws = strchr(ws, ','); if (ws != NULL) {
-        ws++; a.current = atol(ws);
+        ws++; a.limits.min = atol(ws);
         ws = strchr(ws, ','); if (ws != NULL) {
-          ws++; a.reverse = atol(ws);
+          ws++; a.limits.max = atol(ws);
           ws = strchr(ws, ','); if (ws != NULL) {
-            ws++; a.limits.min = atol(ws);
+            ws++; a.param1 = atof(ws);
             ws = strchr(ws, ','); if (ws != NULL) {
-              ws++; a.limits.max = atol(ws);
-              return true;
+              ws++; a.param2 = atof(ws);
+              ws = strchr(ws, ','); if (ws != NULL) {
+                ws++; a.param3 = atof(ws);
+                return true;
+              }
             }
           }
         }
@@ -147,7 +166,7 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
 }
 
 // convert axis settings string into numeric form
-bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
+bool Axis::validateAxisSettings(int axisNum, AxisSettings a, bool isServo) {
   int index = axisNum - 1;
   if (index > 3) index = 3;
   int   MinLimitL[4]   = {    -360,      -90,    -360,     0};
@@ -174,14 +193,6 @@ bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad stepsPerMeasure="); DL(a.stepsPerMeasure);
     return false;
   }
-  if (a.subdivisions != OFF && (a.subdivisions < 1 || a.subdivisions > 256)) {
-    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad subdivisions="); DL(a.subdivisions);
-    return false;
-  }
-  if (a.current != OFF && (a.current < 0 || a.current > IrunLimitH[index])) {
-    DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad current="); DL(a.current);
-    return false;
-  }
   if (a.reverse != OFF && a.reverse != ON) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum+1); DF(" bad reverse="); DL(a.reverse);
     return false;
@@ -193,6 +204,20 @@ bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
   if (a.limits.max < MaxLimitL[index] || a.limits.max > MaxLimitH[index]) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad max="); DL(a.limits.max); 
     return false;
+  }
+  if (!isServo) {
+    if (round(a.subdivisions) != OFF && (round(a.subdivisions) < 1 || round(a.subdivisions) > 256)) {
+      DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad subdivisions="); DL(round(a.subdivisions));
+      return false;
+    }
+    if (round(a.currentRun) != OFF && (round(a.currentRun) < 0 || round(a.currentRun) > IrunLimitH[index])) {
+      DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad current run="); DL(round(a.currentRun));
+      return false;
+    }
+    if (round(a.currentGoto) != OFF && (round(a.currentGoto) < 0 || round(a.currentGoto) > IrunLimitH[index])) {
+      DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad current goto="); DL(round(a.currentGoto));
+      return false;
+    }
   }
   return true;
 }

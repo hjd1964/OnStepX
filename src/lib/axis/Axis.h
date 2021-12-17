@@ -34,15 +34,18 @@ typedef struct AxisLimits {
 // helpers for step/dir and servo parameters
 #define subdivisions param1
 #define integral param1
-#define current param2
+#define currentRun param2
 #define porportional param2
+#define currentGoto param3
+#define derivative param3
 
-#define AxisSettingsSize 25
+#define AxisSettingsSize 33
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
-  int16_t    param1;       // subdivision or integral
-  int16_t    param2;       // current or proportional
+  float      param1;       // stepper driver subdivision  or servo driver proportional
+  float      param2;       // stepper driver current run  or servo driver integral
+  float      param3;       // stepper driver current slew or servo driver derivative
   AxisLimits limits;
   float      backlashFreq;
 } AxisSettings;
@@ -291,7 +294,7 @@ class Axis {
 
     bool decodeAxisSettings(char *s, AxisSettings &a);
 
-    bool validateAxisSettings(int axisNum, AxisSettings a);
+    bool validateAxisSettings(int axisNum, AxisSettings a, bool isServo = false);
     
     AxisErrors errors;
     bool lastErrorResult = false;

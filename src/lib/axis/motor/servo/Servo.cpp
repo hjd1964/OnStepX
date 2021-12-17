@@ -5,8 +5,6 @@
 
 #ifdef SERVO_DRIVER_PRESENT
 
-// #define DEBUG_SERVO 1
-
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
@@ -27,10 +25,16 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   UNUSED(moveFR);
 
   // make sure there is something to do
-  if (_move == NULL) { V(axisPrefix); VF("nothing to do exiting!"); return false; }
+  if (_move == NULL) {
+    V(axisPrefix);
+    VF("nothing to do exiting!");
+    return false;
+  }
 
   // setup the PID
-  V(axisPrefix); VF("setting PID range +/-"); VL(ANALOG_WRITE_PWM_RANGE);
+  V(axisPrefix);
+  VF("setting PID range +/-");
+  VL(ANALOG_WRITE_PWM_RANGE);
 
   control->in = 0;
   control->set = 0;
@@ -38,22 +42,27 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   pid->SetOutputLimits(-ANALOG_WRITE_PWM_RANGE, ANALOG_WRITE_PWM_RANGE);
   pid->SetMode(AUTOMATIC);
 
-  // init driver advanced modes, etc.
-  driver->init();
-
   // now disable the driver
   power(false);
 
   // start the motor timer
-  V(axisPrefix); VF("start task to move motor... ");
+  V(axisPrefix);
+  VF("start task to move motor... ");
   char timerName[] = "Target_";
   timerName[6] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, _move, timerName);
   if (taskHandle) {
     V("success");
-    if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
+    if (axisNumber <= 2) {
+      if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) {
+        VF(" (no hardware timer!)");
+      }
+    }
     VL("");
-  } else { VLF("FAILED!"); return false; }
+  } else {
+    VLF("FAILED!");
+    return false;
+  }
 
   return true;
 }
@@ -63,11 +72,13 @@ void ServoMotor::setReverse(int8_t state) {
   if (state == ON) pid->SetControllerDirection(REVERSE);
 }
 
-// set default driver PID integral and porportional
-void ServoMotor::setParam(int16_t integral, int16_t porportional) {
-  // runtime settings for this are not used
-  UNUSED(integral);
-  UNUSED(porportional);
+// set default driver PID parameters
+void ServoMotor::setParam(float porportional, float integral, float derivative)
+{
+  pid->SetTunings(porportional, integral, derivative);
+  V(axisPrefix);
+  VF("setting PID parameters ");
+  VF(" P="); V(porportional); VF(", I="); V(integral); VF(", D="); VL(derivative);
 }
 
 // sets motor power on/off (if possible)
@@ -81,7 +92,7 @@ DriverStatus ServoMotor::getDriverStatus() {
   return driver->getStatus();
 }
 
-// resets motor and target angular position in steps, also zeros backlash and index 
+// resets motor and target angular position in steps, also zeros backlash and index
 void ServoMotor::resetPositionSteps(long value) {
   Motor::resetPositionSteps(value);
   enc->write(motorSteps);
@@ -94,17 +105,18 @@ void ServoMotor::setFrequencySteps(float frequency) {
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
 
   // if in backlash override the frequency
-  if (inBacklash) frequency = backlashFrequency;
+  if (inBacklash)
+    frequency = backlashFrequency;
 
   if (frequency != currentFrequency) {
     lastFrequency = frequency;
 
     // if slewing has a larger step size divide the frequency to account for it
-    if (lastFrequency <= backlashFrequency*2.0F) stepSize = 1; else { if (!inBacklash) stepSize = 64; }
+    if (lastFrequency <= backlashFrequency * 2.0F) stepSize = 1; else { if (!inBacklash) stepSize = 64; }
     frequency /= stepSize;
 
     // timer period in microseconds
-    float period = 1000000.0F/frequency;
+    float period = 1000000.0F / frequency;
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
@@ -132,8 +144,9 @@ void ServoMotor::setFrequencySteps(float frequency) {
 }
 
 float ServoMotor::getFrequencySteps() {
-  if (lastPeriod == 0) return 0;
-  return (16000000.0F/lastPeriod)*absStep;
+  if (lastPeriod == 0)
+    return 0;
+  return (16000000.0F / lastPeriod) * absStep;
 }
 
 // set slewing state (hint that we are about to slew or are done slewing)
@@ -152,24 +165,27 @@ void ServoMotor::poll() {
   control->in = position;
   pid->Compute();
 
-  #if DEBUG == VERBOSE && defined(DEBUG_SERVO)
-    if (axisNumber == DEBUG_SERVO) {
-      static uint16_t count = 0;
-      count++;
-      if (count%100 == 0) {
-        char s[80];
-        sprintf(s, "%sdelta = %6ld, power = %6.3f%%\r\n", axisPrefix, target - position, (control->out/ANALOG_WRITE_PWM_RANGE)*100.0F); V(s);
-      }
+#if DEBUG != OFF && defined(DEBUG_SERVO) && DEBUG_SERVO != OFF
+  if (axisNumber == DEBUG_SERVO) {
+    static uint16_t count = 0;
+    count++;
+    if (count % 100 == 0) {
+      char s[80];
+      sprintf(s, "%sdelta = %6ld, power = %6.3f%%\r\n", axisPrefix, target - position, (control->out / ANALOG_WRITE_PWM_RANGE) * 100.0F);
+      D(s);
     }
-  #endif
-  
+  }
+#endif
+
   driver->setMotorPower(round(control->out));
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
-IRAM_ATTR void ServoMotor::move() {
+IRAM_ATTR void ServoMotor::move()
+{
   if (synchronized && !inBacklash) targetSteps += step;
+
   if (motorSteps > targetSteps) {
     if (backlashSteps > 0) {
       backlashSteps -= absStep;
@@ -178,7 +194,8 @@ IRAM_ATTR void ServoMotor::move() {
       motorSteps -= absStep;
       inBacklash = false;
     }
-  } else 
+  } else
+
   if (motorSteps < targetSteps || inBacklash) {
     if (backlashSteps < backlashAmountSteps) {
       backlashSteps += absStep;
@@ -188,6 +205,7 @@ IRAM_ATTR void ServoMotor::move() {
       inBacklash = false;
     }
   }
+
 }
 
 #endif
