@@ -7,7 +7,7 @@
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST, PM_UNKNOWN};
 
 // sprintf like function for float type, limited to one parameter
-extern void sprintF(char *result, const char *source, float f);
+extern void sprintF(char *result, const char *source, double f);
 
 class Convert {
   public:
