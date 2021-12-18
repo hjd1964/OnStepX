@@ -230,11 +230,11 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   if (target.pierSide == PIER_SIDE_EAST) {
     if (target.pierSide == current.pierSide) a1 = a1e;
-    DF("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
+    VF("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
   } else
   if (target.pierSide == PIER_SIDE_WEST) {
     if (target.pierSide == current.pierSide) a1 = a1w;
-    DF("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
+    VF("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
   }
 
   if (transform.mountType == ALTAZM) target.z = a1; else target.h = a1;
