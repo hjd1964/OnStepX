@@ -174,7 +174,7 @@ void ServoMotor::poll() {
     count++;
     if (count % 100 == 0) {
       char s[80];
-      sprintf(s, "Servo%d_Delta %6ld, Servo%d_Power %6.3f%%\r\n", (int)axisNumber, target - position, (control->out / ANALOG_WRITE_PWM_RANGE) * 100.0F);
+      sprintf(s, "Servo%d_Delta %6ld, Servo%d_Power %6.3f%%\r\n", (int)axisNumber, target - position, (int)axisNumber, (control->out / ANALOG_WRITE_PWM_RANGE) * 100.0F);
       D(s);
     }
   }
