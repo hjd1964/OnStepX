@@ -31,6 +31,7 @@ void ServoDriver::init() {
 
   // set fastest PWM speed for Teensy processors
   #ifdef ANALOG_WRITE_PWM_FREQUENCY
+    VF("MSG: Servo"); V(axisNumber); VF(", setting control pins analog frequency "); VL(ANALOG_WRITE_PWM_FREQUENCY);
     analogWriteFrequency(Pins->in1, ANALOG_WRITE_PWM_FREQUENCY);
     analogWriteFrequency(Pins->in2, ANALOG_WRITE_PWM_FREQUENCY);
   #endif
