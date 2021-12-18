@@ -31,14 +31,14 @@ void Features::init() {
 
     if (device[i].purpose == DEW_HEATER) {
       device[i].dewHeater = new DewHeater;
-      device[i].dewHeater->init(NV_FEATURE_SETTINGS_BASE + i*3);
+      device[i].dewHeater->init(i);
       pinModeEx(device[i].pin, OUTPUT);
       device[i].dewHeater->enable(device[i].value);
     } else
 
     if (device[i].purpose == INTERVALOMETER) {
       device[i].intervalometer = new Intervalometer;
-      device[i].intervalometer->init(NV_FEATURE_SETTINGS_BASE + i*3);
+      device[i].intervalometer->init(i);
       pinModeEx(device[i].pin, OUTPUT);
       digitalWriteEx(device[i].pin, device[i].value == device[i].active?HIGH:LOW);
     }
