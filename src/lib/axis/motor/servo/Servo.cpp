@@ -42,6 +42,9 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   pid->SetOutputLimits(-ANALOG_WRITE_PWM_RANGE, ANALOG_WRITE_PWM_RANGE);
   pid->SetMode(AUTOMATIC);
 
+  // get the driver ready
+  driver->init();
+
   // now disable the driver
   power(false);
 
