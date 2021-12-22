@@ -5,7 +5,7 @@
 #include "../Common.h"
 #include "../libApp/commands/ProcessCmds.h"
 
-enum ParkState: uint8_t {PS_UNPARKED, PS_PARKED, PS_UNPARKING, PS_PARKING, PS_PARK_FAILED};
+enum ParkState: uint8_t {PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED, PS_UNPARKING};
 
 typedef struct InitError {
   uint8_t nv:1;       // NV data size/structure error (disables writes to NV)
