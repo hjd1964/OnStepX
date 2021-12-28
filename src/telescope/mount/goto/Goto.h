@@ -53,10 +53,10 @@ class Goto {
     CommandError requestSync(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
 
     // get target equatorial position (Native coordinate system)
-    Coordinate getTarget();
+    inline Coordinate getGotoTarget() { return gotoTarget; }
 
     // set target equatorial position (Native coordinate system)
-    void setTarget(Coordinate *coords);
+    inline void setGotoTarget(Coordinate *coords) { gotoTarget = *coords; }
 
     // set goto or sync target
     CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);

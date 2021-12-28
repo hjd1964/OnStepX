@@ -41,7 +41,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        goTo.setTarget(&target);
+        goTo.setGotoTarget(&target);
 
         char const *objType = ObjectStr[i];
         strcat(reply, ",");
@@ -55,7 +55,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        goTo.setTarget(&target);
+        goTo.setGotoTarget(&target);
         *commandError = goTo.request();
         *numericReply = false;
       } else 
@@ -66,7 +66,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        goTo.setTarget(&target);
+        goTo.setGotoTarget(&target);
 
         char const * objType = ObjectStr[i];
         char ws[20];
@@ -118,7 +118,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
           for (l = 0; l <= 15; l++) { if (strcmp(objType, ObjectStr[l]) == 0) i = l; }
         }
 
-        Coordinate target = goTo.getTarget();
+        Coordinate target = goTo.getGotoTarget();
         if (firstFreeRec()) writeVars(name, i, target.r, target.d); else *commandError = CE_LIBRARY_FULL;
       } else 
 

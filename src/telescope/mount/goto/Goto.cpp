@@ -145,16 +145,6 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
   return CE_NONE;
 }
 
-// get target equatorial position (Native coordinate system)
-Coordinate Goto::getTarget() {
-  return target;
-}
-
-// set target equatorial position (Native coordinate system)
-void Goto::setTarget(Coordinate *coords) {
-  target = *coords;
-}
-
 // converts from native to mount coordinates and checks for valid target
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool native) {
 
