@@ -222,6 +222,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         Location tempLocation;
         nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
         strcpy(tempLocation.name, parameter);
+        if (locationNumber == number) strcpy(location.name, parameter);
         nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
       } else *commandError = CE_PARAM_RANGE;
     } else
