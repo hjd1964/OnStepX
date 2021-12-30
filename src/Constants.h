@@ -103,7 +103,7 @@
 
 // SERVO DRIVER (usually for DC motors equipped with encoders)
 #define SERVO_DRIVER_FIRST          100
-#define SERVO_PD                    100    // SERVO, pwm and direction connections
+#define SERVO_PE                    100    // SERVO, direction (phase) and enable (pwm) connections
 #define SERVO_II                    101    // SERVO, dual pwm input connections
 #define SERVO_DRIVER_LAST           101
 
@@ -114,6 +114,11 @@
 #define ENC_PULSE_DIR               3      // pulse/direction encoder
 #define ENC_PULSE_ONLY              4      // pulse only encoder
 #define SERVO_ENCODER_LAST          4
+
+// servo feedback (must match Encoder library)
+#define SERVO_FEEDBACK_FIRST        1
+#define FB_PID                      1      // PID feedback
+#define SERVO_FEEDBACK_LAST         1
 
 // TIME LOCATION SOURCE devices supported
 #define TLS_FIRST                   1
