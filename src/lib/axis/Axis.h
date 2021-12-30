@@ -43,12 +43,7 @@ typedef struct AxisLimits {
 typedef struct AxisSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
-  float      param1;       // stepper driver subdivision  or servo driver proportional
-  float      param2;       // stepper driver current run  or servo driver integral
-  float      param3;       // stepper driver current slew or servo driver derivative
-  float      param4;       // servo driver proportional for goto
-  float      param5;       // servo driver integral for goto
-  float      param6;       // servo driver derivative for goto
+  float      param1, param2, param3, param4, param5, param6;
   AxisLimits limits;
   float      backlashFreq;
 } AxisSettings;

@@ -38,7 +38,7 @@ class StepDirMotor : public Motor {
     inline char getParamTypeCode() { return 'S'; }
 
     // set default driver microsteps and current
-    void setParam(float microsteps, float currentRun, float currentGoto, float param4, float param5, float param6);
+    void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
     bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
