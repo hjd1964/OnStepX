@@ -21,7 +21,7 @@ class Buffer {
     char (*reader)();
     char (*writer)(char c);
 
-    const static int bufferSize = 50;
+    const static int bufferSize = 80;
     char cmd[4] = "";
     char pb[bufferSize] = "";
     char cb[bufferSize] = "";

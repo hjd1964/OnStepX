@@ -111,7 +111,7 @@ void CommandProcessor::poll() {
   if (SerialPort.available()) buffer.add(SerialPort.read()); else return;
 
   if (buffer.ready()) {
-    char reply[50] = "";
+    char reply[80] = "";
     bool numericReply = true;
     bool supressFrame = false;
 
