@@ -176,6 +176,9 @@
   #define AXIS1_PARAMETER1              AXIS1_DRIVER_MICROSTEPS
   #define AXIS1_PARAMETER2              AXIS1_DRIVER_IRUN
   #define AXIS1_PARAMETER3              AXIS1_DRIVER_IGOTO
+  #define AXIS1_PARAMETER4              OFF
+  #define AXIS1_PARAMETER5              OFF
+  #define AXIS1_PARAMETER6              OFF
 #endif
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS1_SERVO_PRESENT
@@ -188,21 +191,36 @@
   #ifndef AXIS1_SERVO_D
   #define AXIS1_SERVO_D                 1.0                       // D = derivative
   #endif
+  #ifndef AXIS1_SERVO_P_GOTO
+  #define AXIS1_SERVO_P_GOTO            AXIS1_SERVO_P             // P = proportional
+  #endif
+  #ifndef AXIS1_SERVO_I_GOTO
+  #define AXIS1_SERVO_I_GOTO            AXIS1_SERVO_I             // I = integral
+  #endif
+  #ifndef AXIS1_SERVO_D_GOTO
+  #define AXIS1_SERVO_D_GOTO            AXIS1_SERVO_D             // D = derivative
+  #endif
   #ifndef AXIS1_SERVO_ENCODER
   #define AXIS1_SERVO_ENCODER           ENC_AB                    // type of encoder: ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY
   #endif
   #ifndef AXIS1_SERVO_ENCODER_TRIGGER
   #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE                    // ignored for ENC_AB
   #endif
+  #ifndef AXIS1_SERVO_FEEDBACK
+  #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
+  #endif
   #ifndef AXIS1_SERVO_PH1_STATE
-  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PD) pin
+  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_II) or PHASE (SERVO_PE) pin
   #endif
   #ifndef AXIS1_SERVO_PH2_STATE
-  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or DIR pin
+  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
   #endif
   #define AXIS1_PARAMETER1              AXIS1_SERVO_P
   #define AXIS1_PARAMETER2              AXIS1_SERVO_I
   #define AXIS1_PARAMETER3              AXIS1_SERVO_D
+  #define AXIS1_PARAMETER4              AXIS1_SERVO_P_GOTO
+  #define AXIS1_PARAMETER5              AXIS1_SERVO_I_GOTO
+  #define AXIS1_PARAMETER6              AXIS1_SERVO_D_GOTO
 #endif
 
 #ifndef AXIS2_DRIVER_MODEL
@@ -282,6 +300,9 @@
   #define AXIS2_PARAMETER1              AXIS2_DRIVER_MICROSTEPS
   #define AXIS2_PARAMETER2              AXIS2_DRIVER_IRUN
   #define AXIS2_PARAMETER3              AXIS2_DRIVER_IGOTO
+  #define AXIS2_PARAMETER4              OFF
+  #define AXIS2_PARAMETER5              OFF
+  #define AXIS2_PARAMETER6              OFF
 #endif
 #if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS2_SERVO_PRESENT
@@ -294,11 +315,23 @@
   #ifndef AXIS2_SERVO_D
   #define AXIS2_SERVO_D                 1.0
   #endif
+  #ifndef AXIS2_SERVO_P_GOTO
+  #define AXIS2_SERVO_P_GOTO            AXIS2_SERVO_P
+  #endif
+  #ifndef AXIS2_SERVO_I_GOTO
+  #define AXIS2_SERVO_I_GOTO            AXIS2_SERVO_I
+  #endif
+  #ifndef AXIS2_SERVO_D_GOTO
+  #define AXIS2_SERVO_D_GOTO            AXIS2_SERVO_D
+  #endif
   #ifndef AXIS2_SERVO_ENCODER
   #define AXIS2_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS2_SERVO_ENCODER_TRIGGER
   #define AXIS2_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS2_SERVO_FEEDBACK
+  #define AXIS2_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS2_SERVO_PH1_STATE
   #define AXIS2_SERVO_PH1_STATE         LOW
@@ -308,7 +341,10 @@
   #endif
   #define AXIS2_PARAMETER1              AXIS2_SERVO_P
   #define AXIS2_PARAMETER2              AXIS2_SERVO_I
-  #define AXIS3_PARAMETER3              AXIS2_SERVO_D
+  #define AXIS2_PARAMETER3              AXIS2_SERVO_D
+  #define AXIS2_PARAMETER4              AXIS2_SERVO_P_GOTO
+  #define AXIS2_PARAMETER5              AXIS2_SERVO_I_GOTO
+  #define AXIS2_PARAMETER6              AXIS2_SERVO_D_GOTO
 #endif
 
 // mount type
@@ -598,6 +634,9 @@
   #define AXIS3_PARAMETER1              AXIS3_DRIVER_MICROSTEPS
   #define AXIS3_PARAMETER2              AXIS3_DRIVER_IRUN
   #define AXIS3_PARAMETER3              AXIS3_DRIVER_IGOTO
+  #define AXIS3_PARAMETER4              OFF
+  #define AXIS3_PARAMETER5              OFF
+  #define AXIS3_PARAMETER6              OFF
 #endif
 #if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS3_SERVO_PRESENT
@@ -610,11 +649,23 @@
   #ifndef AXIS3_SERVO_D
   #define AXIS3_SERVO_D                 1.0
   #endif
+  #ifndef AXIS3_SERVO_P_GOTO
+  #define AXIS3_SERVO_P_GOTO            AXIS3_SERVO_P
+  #endif
+  #ifndef AXIS3_SERVO_I_GOTO
+  #define AXIS3_SERVO_I_GOTO            AXIS3_SERVO_I
+  #endif
+  #ifndef AXIS3_SERVO_D_GOTO
+  #define AXIS3_SERVO_D_GOTO            AXIS3_SERVO_D
+  #endif
   #ifndef AXIS3_SERVO_ENCODER
   #define AXIS3_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS3_SERVO_ENCODER_TRIGGER
   #define AXIS3_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS3_SERVO_FEEDBACK
+  #define AXIS3_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS3_SERVO_PH1_STATE
   #define AXIS3_SERVO_PH1_STATE         LOW
@@ -625,6 +676,9 @@
   #define AXIS3_PARAMETER1              AXIS3_SERVO_P
   #define AXIS3_PARAMETER2              AXIS3_SERVO_I
   #define AXIS3_PARAMETER3              AXIS3_SERVO_D
+  #define AXIS3_PARAMETER4              AXIS3_SERVO_P_GOTO
+  #define AXIS3_PARAMETER5              AXIS3_SERVO_I_GOTO
+  #define AXIS3_PARAMETER6              AXIS3_SERVO_D_GOTO
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -715,6 +769,9 @@
   #define AXIS4_PARAMETER1              AXIS4_DRIVER_MICROSTEPS
   #define AXIS4_PARAMETER2              AXIS4_DRIVER_IRUN
   #define AXIS4_PARAMETER3              AXIS4_DRIVER_IGOTO
+  #define AXIS4_PARAMETER4              OFF
+  #define AXIS4_PARAMETER5              OFF
+  #define AXIS4_PARAMETER6              OFF
 #endif
 #if AXIS4_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS4_SERVO_PRESENT
@@ -727,11 +784,23 @@
   #ifndef AXIS4_SERVO_D
   #define AXIS4_SERVO_D                 1.0
   #endif
+  #ifndef AXIS4_SERVO_P_GOTO
+  #define AXIS4_SERVO_P_GOTO            AXIS4_SERVO_P
+  #endif
+  #ifndef AXIS4_SERVO_I_GOTO
+  #define AXIS4_SERVO_I_GOTO            AXIS4_SERVO_I
+  #endif
+  #ifndef AXIS4_SERVO_D_GOTO
+  #define AXIS4_SERVO_D_GOTO            AXIS4_SERVO_D
+  #endif
   #ifndef AXIS4_SERVO_ENCODER
   #define AXIS4_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS4_SERVO_ENCODER_TRIGGER
   #define AXIS4_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS4_SERVO_FEEDBACK
+  #define AXIS4_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS4_SERVO_PH1_STATE
   #define AXIS4_SERVO_PH1_STATE         LOW
@@ -742,6 +811,9 @@
   #define AXIS4_PARAMETER1              AXIS4_SERVO_P
   #define AXIS4_PARAMETER2              AXIS4_SERVO_I
   #define AXIS4_PARAMETER2              AXIS4_SERVO_D
+  #define AXIS4_PARAMETER4              AXIS4_SERVO_P_GOTO
+  #define AXIS4_PARAMETER5              AXIS4_SERVO_I_GOTO
+  #define AXIS4_PARAMETER6              AXIS4_SERVO_D_GOTO
 #endif
 
 // focuser settings, FOCUSER2
@@ -831,6 +903,9 @@
   #define AXIS5_PARAMETER1              AXIS5_DRIVER_MICROSTEPS
   #define AXIS5_PARAMETER2              AXIS5_DRIVER_IRUN
   #define AXIS5_PARAMETER3              AXIS5_DRIVER_IGOTO
+  #define AXIS5_PARAMETER4              OFF
+  #define AXIS5_PARAMETER5              OFF
+  #define AXIS5_PARAMETER6              OFF
 #endif
 #if AXIS5_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS5_SERVO_PRESENT
@@ -843,11 +918,23 @@
   #ifndef AXIS5_SERVO_D
   #define AXIS5_SERVO_D                 1.0
   #endif
+  #ifndef AXIS5_SERVO_P_GOTO
+  #define AXIS5_SERVO_P_GOTO            AXIS5_SERVO_P
+  #endif
+  #ifndef AXIS5_SERVO_I_GOTO
+  #define AXIS5_SERVO_I_GOTO            AXIS5_SERVO_I
+  #endif
+  #ifndef AXIS5_SERVO_D_GOTO
+  #define AXIS5_SERVO_D_GOTO            AXIS5_SERVO_D
+  #endif
   #ifndef AXIS5_SERVO_ENCODER
   #define AXIS5_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS5_SERVO_ENCODER_TRIGGER
   #define AXIS5_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS5_SERVO_FEEDBACK
+  #define AXIS5_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS5_SERVO_PH1_STATE
   #define AXIS5_SERVO_PH1_STATE         LOW
@@ -858,6 +945,9 @@
   #define AXIS5_PARAMETER1              AXIS5_SERVO_P
   #define AXIS5_PARAMETER2              AXIS5_SERVO_I
   #define AXIS5_PARAMETER3              AXIS5_SERVO_D
+  #define AXIS5_PARAMETER4              AXIS5_SERVO_P_GOTO
+  #define AXIS5_PARAMETER5              AXIS5_SERVO_I_GOTO
+  #define AXIS5_PARAMETER6              AXIS5_SERVO_D_GOTO
 #endif
 
 // focuser settings, FOCUSER3
@@ -947,6 +1037,9 @@
   #define AXIS6_PARAMETER1              AXIS6_DRIVER_MICROSTEPS
   #define AXIS6_PARAMETER2              AXIS6_DRIVER_IRUN
   #define AXIS6_PARAMETER3              AXIS6_DRIVER_IGOTO
+  #define AXIS6_PARAMETER4              OFF
+  #define AXIS6_PARAMETER5              OFF
+  #define AXIS6_PARAMETER6              OFF
 #endif
 #if AXIS6_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS6_SERVO_PRESENT
@@ -959,11 +1052,23 @@
   #ifndef AXIS6_SERVO_D
   #define AXIS6_SERVO_D                 1.0
   #endif
+  #ifndef AXIS6_SERVO_P_GOTO
+  #define AXIS6_SERVO_P_GOTO            AXIS6_SERVO_P
+  #endif
+  #ifndef AXIS6_SERVO_I_GOTO
+  #define AXIS6_SERVO_I_GOTO            AXIS6_SERVO_I
+  #endif
+  #ifndef AXIS6_SERVO_D_GOTO
+  #define AXIS6_SERVO_D_GOTO            AXIS6_SERVO_D
+  #endif
   #ifndef AXIS6_SERVO_ENCODER
   #define AXIS6_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS6_SERVO_ENCODER_TRIGGER
   #define AXIS6_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS6_SERVO_FEEDBACK
+  #define AXIS6_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS6_SERVO_PH1_STATE
   #define AXIS6_SERVO_PH1_STATE         LOW
@@ -974,6 +1079,9 @@
   #define AXIS6_PARAMETER1              AXIS6_SERVO_P
   #define AXIS6_PARAMETER2              AXIS6_SERVO_I
   #define AXIS6_PARAMETER3              AXIS6_SERVO_D
+  #define AXIS6_PARAMETER4              AXIS6_SERVO_P_GOTO
+  #define AXIS6_PARAMETER5              AXIS6_SERVO_I_GOTO
+  #define AXIS6_PARAMETER6              AXIS6_SERVO_D_GOTO
 #endif
 
 // focuser settings, FOCUSER4
@@ -1060,9 +1168,12 @@
   #ifndef AXIS7_DRIVER_STATUS
   #define AXIS7_DRIVER_STATUS           OFF
   #endif
-  #define AXIS7_DRIVER_PARAMETER1       AXIS7_DRIVER_MICROSTEPS
-  #define AXIS7_DRIVER_PARAMETER2       AXIS7_DRIVER_IRUN
-  #define AXIS7_DRIVER_PARAMETER3       AXIS7_DRIVER_IGOTO
+  #define AXIS7_PARAMETER1              AXIS7_DRIVER_MICROSTEPS
+  #define AXIS7_PARAMETER2              AXIS7_DRIVER_IRUN
+  #define AXIS7_PARAMETER3              AXIS7_DRIVER_IGOTO
+  #define AXIS7_PARAMETER4              OFF
+  #define AXIS7_PARAMETER5              OFF
+  #define AXIS7_PARAMETER6              OFF
 #endif
 #if AXIS7_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS7_SERVO_PRESENT
@@ -1075,11 +1186,23 @@
   #ifndef AXIS7_SERVO_D
   #define AXIS7_SERVO_D                 1.0
   #endif
+  #ifndef AXIS7_SERVO_P_GOTO
+  #define AXIS7_SERVO_P_GOTO            AXIS7_SERVO_P
+  #endif
+  #ifndef AXIS7_SERVO_I_GOTO
+  #define AXIS7_SERVO_I_GOTO            AXIS7_SERVO_I
+  #endif
+  #ifndef AXIS7_SERVO_D_GOTO
+  #define AXIS7_SERVO_D_GOTO            AXIS7_SERVO_D
+  #endif
   #ifndef AXIS7_SERVO_ENCODER
   #define AXIS7_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS7_SERVO_ENCODER_TRIGGER
   #define AXIS7_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS7_SERVO_FEEDBACK
+  #define AXIS7_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS7_SERVO_PH1_STATE
   #define AXIS7_SERVO_PH1_STATE         LOW
@@ -1090,6 +1213,9 @@
   #define AXIS7_PARAMETER1              AXIS7_SERVO_P
   #define AXIS7_PARAMETER2              AXIS7_SERVO_I
   #define AXIS7_PARAMETER3              AXIS7_SERVO_D
+  #define AXIS7_PARAMETER4              AXIS7_SERVO_P_GOTO
+  #define AXIS7_PARAMETER5              AXIS7_SERVO_I_GOTO
+  #define AXIS7_PARAMETER6              AXIS7_SERVO_D_GOTO
 #endif
 
 // focuser settings, FOCUSER5
@@ -1179,6 +1305,9 @@
   #define AXIS8_PARAMETER1              AXIS8_DRIVER_MICROSTEPS
   #define AXIS8_PARAMETER2              AXIS8_DRIVER_IRUN
   #define AXIS8_PARAMETER3              AXIS8_DRIVER_IGOTO
+  #define AXIS8_PARAMETER4              OFF
+  #define AXIS8_PARAMETER5              OFF
+  #define AXIS8_PARAMETER6              OFF
 #endif
 #if AXIS8_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS8_SERVO_PRESENT
@@ -1191,11 +1320,23 @@
   #ifndef AXIS8_SERVO_D
   #define AXIS8_SERVO_D                 1.0
   #endif
+  #ifndef AXIS8_SERVO_P_GOTO
+  #define AXIS8_SERVO_P_GOTO            AXIS8_SERVO_P
+  #endif
+  #ifndef AXIS8_SERVO_I_GOTO
+  #define AXIS8_SERVO_I_GOTO            AXIS8_SERVO_I
+  #endif
+  #ifndef AXIS8_SERVO_D_GOTO
+  #define AXIS8_SERVO_D_GOTO            AXIS8_SERVO_D
+  #endif
   #ifndef AXIS8_SERVO_ENCODER
   #define AXIS8_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS8_SERVO_ENCODER_TRIGGER
   #define AXIS8_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS8_SERVO_FEEDBACK
+  #define AXIS8_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS8_SERVO_PH1_STATE
   #define AXIS8_SERVO_PH1_STATE         LOW
@@ -1206,6 +1347,9 @@
   #define AXIS8_PARAMETER1              AXIS8_SERVO_P
   #define AXIS8_PARAMETER2              AXIS8_SERVO_I
   #define AXIS8_PARAMETER3              AXIS8_SERVO_D
+  #define AXIS8_PARAMETER4              AXIS8_SERVO_P_GOTO
+  #define AXIS8_PARAMETER5              AXIS8_SERVO_I_GOTO
+  #define AXIS8_PARAMETER6              AXIS8_SERVO_D_GOTO
 #endif
 
 // focuser settings, FOCUSER6
@@ -1295,6 +1439,9 @@
   #define AXIS9_PARAMETER1              AXIS9_DRIVER_MICROSTEPS
   #define AXIS9_PARAMETER2              AXIS9_DRIVER_IRUN
   #define AXIS9_PARAMETER3              AXIS9_DRIVER_IGOTO
+  #define AXIS9_PARAMETER4              OFF
+  #define AXIS9_PARAMETER5              OFF
+  #define AXIS9_PARAMETER6              OFF
 #endif
 #if AXIS9_DRIVER_MODEL >= SERVO_DRIVER_FIRST
   #define AXIS9_SERVO_PRESENT
@@ -1307,11 +1454,23 @@
   #ifndef AXIS9_SERVO_D
   #define AXIS9_SERVO_D                 1.0
   #endif
+  #ifndef AXIS9_SERVO_P_GOTO
+  #define AXIS9_SERVO_P_GOTO            AXIS9_SERVO_P
+  #endif
+  #ifndef AXIS9_SERVO_I_GOTO
+  #define AXIS9_SERVO_I_GOTO            AXIS9_SERVO_I
+  #endif
+  #ifndef AXIS9_SERVO_D_GOTO
+  #define AXIS9_SERVO_D_GOTO            AXIS9_SERVO_D
+  #endif
   #ifndef AXIS9_SERVO_ENCODER
   #define AXIS9_SERVO_ENCODER           ENC_AB
   #endif
   #ifndef AXIS9_SERVO_ENCODER_TRIGGER
   #define AXIS9_SERVO_ENCODER_TRIGGER   CHANGE
+  #endif
+  #ifndef AXIS9_SERVO_FEEDBACK
+  #define AXIS9_SERVO_FEEDBACK          FB_PID
   #endif
   #ifndef AXIS9_SERVO_PH1_STATE
   #define AXIS9_SERVO_PH1_STATE         LOW
@@ -1322,6 +1481,9 @@
   #define AXIS9_PARAMETER1              AXIS9_SERVO_P
   #define AXIS9_PARAMETER2              AXIS9_SERVO_I
   #define AXIS9_PARAMETER3              AXIS9_SERVO_D
+  #define AXIS9_PARAMETER4              AXIS9_SERVO_P_GOTO
+  #define AXIS9_PARAMETER5              AXIS9_SERVO_I_GOTO
+  #define AXIS9_PARAMETER6              AXIS9_SERVO_D_GOTO
 #endif
 
 #ifndef FOCUSER_TEMPERATURE
@@ -1334,7 +1496,7 @@
 #if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \
     defined(AXIS4_DRIVER_PRESENT) || defined(AXIS5_DRIVER_PRESENT) || defined(AXIS6_DRIVER_PRESENT) || \
     defined(AXIS7_DRIVER_PRESENT) || defined(AXIS8_DRIVER_PRESENT) || defined(AXIS9_DRIVER_PRESENT)
-  #define SD_DRIVER_PRESENT
+  #define STEP_DIR_MOTOR_PRESENT
 #endif
 
 #if defined(AXIS1_DRIVER_TMC_SPI) || defined(AXIS2_DRIVER_TMC_SPI) || defined(AXIS3_DRIVER_TMC_SPI) || \
@@ -1346,7 +1508,11 @@
 #if defined(AXIS1_SERVO_PRESENT) || defined(AXIS2_SERVO_PRESENT) || defined(AXIS3_SERVO_PRESENT) || \
     defined(AXIS4_SERVO_PRESENT) || defined(AXIS5_SERVO_PRESENT) || defined(AXIS6_SERVO_PRESENT) || \
     defined(AXIS7_SERVO_PRESENT) || defined(AXIS8_SERVO_PRESENT) || defined(AXIS9_SERVO_PRESENT)
-  #define SERVO_DRIVER_PRESENT
+  #define SERVO_MOTOR_PRESENT
+#endif
+
+#if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT)
+  #define MOTOR_PRESENT
 #endif
 
 // -----------------------------------------------------------------------------------
