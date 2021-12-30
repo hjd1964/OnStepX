@@ -6,7 +6,7 @@
 #include "../tasks/OnTask.h"
 #include "../sense/Sense.h"
 
-#if defined(SERVO_DRIVER_PRESENT) || defined(SD_DRIVER_PRESENT)
+#ifdef MOTOR_PRESENT
 
 // constructor
 Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings) {
@@ -64,7 +64,7 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
   // setup motor
   motor->setReverse(settings.reverse);
-  motor->setParam(settings.param1, settings.param2, settings.param3);
+  motor->setParam(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
   motor->setBacklashFrequencySteps(settings.backlashFreq*settings.stepsPerMeasure);
 
   // activate home and limit sense

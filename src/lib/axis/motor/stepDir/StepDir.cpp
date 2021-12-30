@@ -3,7 +3,7 @@
 
 #include "StepDir.h"
 
-#ifdef SD_DRIVER_PRESENT
+#ifdef STEP_DIR_MOTOR_PRESENT
 
 #include "../../../tasks/OnTask.h"
 
@@ -80,10 +80,15 @@ void StepDirMotor::setReverse(int8_t state) {
 }
 
 // set default driver microsteps and current
-void StepDirMotor::setParam(float microsteps, float currentRun, float currentGoto) {
-  driver->init(round(microsteps), round(currentRun), round(currentGoto));
+void StepDirMotor::setParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  driver->setParam(param1, param2, param3, param4, param5, param6);
   homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
+}
+
+// validate driver parameters
+bool StepDirMotor::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  return driver->validateParam(param1, param2, param3, param4, param5, param6);
 }
 
 // sets motor power on/off (if possible)

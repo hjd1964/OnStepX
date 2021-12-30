@@ -3,26 +3,19 @@
 #pragma once
 #include "../../../../Common.h"
 
-#ifdef SERVO_DRIVER_PRESENT
+#ifdef SERVO_MOTOR_PRESENT
 
 #include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
                      // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
 
-#include <PID_v1.h>  // https://github.com/hjd1964/Arduino-PID-Library
-
 #include "ServoDrivers.h"
 
-typedef struct ServoControl {
-  double in;
-  double out;
-  double set;
-  volatile int8_t directionHint;
-} ServoSettings;
+#include "Pid/Pid.h"
 
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, Encoder *enc, PID *pid, ServoDriver *driver, ServoControl *control);
+    ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control);
 
     // sets up the servo motor
     bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
@@ -30,8 +23,11 @@ class ServoMotor : public Motor {
     // set driver reverse state
     void setReverse(int8_t state);
 
-    // set default driver PID parameters
-    void setParam(float porportional, float integral, float derivative);
+    // set driver parameters
+    void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // validate driver parameters
+    bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // sets motor power on/off (if possible)
     void power(bool value);
@@ -80,8 +76,10 @@ class ServoMotor : public Motor {
     void (*_move)() = NULL;
 
     Encoder *enc;
-    PID *pid = NULL;
+    Feedback *feedback;
     ServoControl *control;
+
+    bool isSlewing = false;
 };
 
 #endif

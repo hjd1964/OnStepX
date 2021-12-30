@@ -3,11 +3,12 @@
 
 #include "ServoDrivers.h"
 
-#ifdef SERVO_DRIVER_PRESENT
+#ifdef SERVO_MOTOR_PRESENT
+
 #include "../Motor.h"
 
 #if DEBUG != OFF
-  const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = { "SERVO_PD", "SERVO_II" };
+  const char* SERVO_DRIVER_NAME[DRIVER_SERVO_MODEL_COUNT] = { "SERVO_PE", "SERVO_II" };
 #endif
 
 ServoDriver::ServoDriver(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings) {
@@ -18,7 +19,7 @@ ServoDriver::ServoDriver(uint8_t axisNumber, const ServoDriverPins *Pins, const 
 
 void ServoDriver::init() {
   #if DEBUG == VERBOSE
-    VF("MSG: Servo"); V(axisNumber); VF(", init model "); V(SERVO_DRIVER_NAME[settings.model - SERVO_DRIVER_FIRST]);
+    VF("MSG: Servo"); V(axisNumber); VF(", init model "); VL(SERVO_DRIVER_NAME[settings.model - SERVO_DRIVER_FIRST]);
   #endif
 
   // init default driver control pins
@@ -95,19 +96,19 @@ void ServoDriver::update() {
       if (Pins->inState2 == HIGH) analogWrite(Pins->in2, ANALOG_WRITE_PWM_RANGE); else analogWrite(Pins->in2, 0);
     }
   } else
-  if (settings.model == SERVO_PD) {
+  if (settings.model == SERVO_PE) {
     if (motorDir == DIR_FORWARD) {
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, ANALOG_WRITE_PWM_RANGE); else analogWrite(Pins->in2, 0);
-      if (Pins->inState1 == HIGH) motorPwr = ANALOG_WRITE_PWM_RANGE - motorPwr;
-      analogWrite(Pins->in1, motorPwr);
+      digitalWriteF(Pins->in1, Pins->inState1);
+      if (Pins->inState2 == HIGH) motorPwr = ANALOG_WRITE_PWM_RANGE - motorPwr;
+      analogWrite(Pins->in2, motorPwr);
     } else
     if (motorDir == DIR_REVERSE) {
-      digitalWriteF(Pins->in2, !Pins->inState2);
-      if (Pins->inState1 == HIGH) motorPwr = ANALOG_WRITE_PWM_RANGE - motorPwr;
-      analogWrite(Pins->in1, motorPwr);
+      digitalWriteF(Pins->in1, !Pins->inState1);
+      if (Pins->inState2 == HIGH) motorPwr = ANALOG_WRITE_PWM_RANGE - motorPwr;
+      analogWrite(Pins->in2, motorPwr);
     } else {
       digitalWriteF(Pins->in1, Pins->inState1);
-      digitalWriteF(Pins->in2, Pins->inState2);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, ANALOG_WRITE_PWM_RANGE); else analogWrite(Pins->in2, 0);
     }
   }
 }

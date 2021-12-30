@@ -3,6 +3,8 @@
 
 #include "Motor.h"
 
+#ifdef MOTOR_PRESENT
+
 // resets motor and target angular position in steps, also zeros backlash and index 
 void Motor::resetPositionSteps(long value) {
   indexSteps    = 0;
@@ -166,3 +168,5 @@ void Motor::enableBacklash() {
   backlashStepsStore = 0;
   backlashAmountStepsStore = 0;
 }
+
+#endif

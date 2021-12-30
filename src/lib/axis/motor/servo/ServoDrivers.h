@@ -11,7 +11,7 @@
 // SERVO DRIVER (usually for DC motors equipped with encoders)
 #ifndef SERVO_DRIVER_FIRST
   #define SERVO_DRIVER_FIRST        100
-  #define SERVO_PD                  100    // SERVO, pwm and direction connections
+  #define SERVO_PE                  100    // SERVO, direction and pwm connections
   #define SERVO_II                  101    // SERVO, dual pwm input connections
   #define SERVO_DRIVER_LAST         101
 #endif
@@ -19,7 +19,7 @@
 #include "../Drivers.h"
 #include "../Motor.h"
 
-#ifdef SERVO_DRIVER_PRESENT
+#ifdef SERVO_MOTOR_PRESENT
 
 typedef struct ServoDriverSettings {
   int16_t model;

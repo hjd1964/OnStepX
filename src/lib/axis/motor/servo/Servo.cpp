@@ -3,20 +3,23 @@
 
 #include "Servo.h"
 
-#ifdef SERVO_DRIVER_PRESENT
+#ifdef SERVO_MOTOR_PRESENT
 
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, PID *pid, ServoDriver *driver, ServoControl *control) {
+ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control) {
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->enc = enc;
-  this->pid = pid;
+  this->feedback = feedback;
   this->control = control;
   this->driver = driver;
   driverType = SERVO;
+
+  // get the feedback control loop ready
+  feedback->init(axisNumber, control);
 }
 
 bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (*volatile moveFR)()) {
@@ -30,17 +33,6 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
     VF("nothing to do exiting!");
     return false;
   }
-
-  // setup the PID
-  V(axisPrefix);
-  VF("setting PID range +/-");
-  VL(ANALOG_WRITE_PWM_RANGE);
-
-  control->in = 0;
-  control->set = 0;
-  pid->SetSampleTime(10);
-  pid->SetOutputLimits(-ANALOG_WRITE_PWM_RANGE, ANALOG_WRITE_PWM_RANGE);
-  pid->SetMode(AUTOMATIC);
 
   // get the driver ready
   driver->init();
@@ -72,16 +64,18 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
 
 // set driver reverse state
 void ServoMotor::setReverse(int8_t state) {
-  if (state == ON) pid->SetControllerDirection(REVERSE);
+  feedback->setControlDirection(state);
 }
 
-// set default driver PID parameters
-void ServoMotor::setParam(float porportional, float integral, float derivative)
-{
-  pid->SetTunings(porportional, integral, derivative);
-  V(axisPrefix);
-  VF("setting PID parameters ");
-  VF(" P="); V(porportional); VF(", I="); V(integral); VF(", D="); VL(derivative);
+// set default driver parameters
+void ServoMotor::setParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  feedback->setParam(param1, param2, param3, param4, param5, param6);
+  setSlewing(isSlewing);
+}
+
+// validate driver parameters
+bool ServoMotor::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  return feedback->validateParam(param1, param2, param3, param4, param5, param6);
 }
 
 // sets motor power on/off (if possible)
@@ -154,7 +148,8 @@ float ServoMotor::getFrequencySteps() {
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void ServoMotor::setSlewing(bool state) {
-  UNUSED(state);
+  isSlewing = state;
+  feedback->selectAlternateParam(isSlewing);
 }
 
 // updates PID and sets servo motor power/direction
@@ -166,27 +161,26 @@ void ServoMotor::poll() {
 
   control->set = target;
   control->in = position;
-  pid->Compute();
+  feedback->poll();
 
-#if DEBUG != OFF && defined(DEBUG_SERVO) && DEBUG_SERVO != OFF
-  if (axisNumber == DEBUG_SERVO) {
-    static uint16_t count = 0;
-    count++;
-    if (count % 100 == 0) {
-      char s[80];
-      sprintf(s, "Servo%d_Delta %6ld, Servo%d_Power %6.3f%%\r\n", (int)axisNumber, target - position, (int)axisNumber, (control->out / ANALOG_WRITE_PWM_RANGE) * 100.0F);
-      D(s);
+  #if DEBUG != OFF && defined(DEBUG_SERVO) && DEBUG_SERVO != OFF
+    if (axisNumber == DEBUG_SERVO) {
+      static uint16_t count = 0;
+      count++;
+      if (count % 100 == 0) {
+        char s[80];
+        sprintf(s, "Servo%d_Delta %6ld, Servo%d_Power %6.3f%%\r\n", (int)axisNumber, target - position, (int)axisNumber, (control->out / ANALOG_WRITE_PWM_RANGE) * 100.0F);
+        D(s);
+      }
     }
-  }
-#endif
+  #endif
 
   driver->setMotorPower(round(control->out));
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
-IRAM_ATTR void ServoMotor::move()
-{
+IRAM_ATTR void ServoMotor::move() {
   if (synchronized && !inBacklash) targetSteps += step;
 
   if (motorSteps > targetSteps) {

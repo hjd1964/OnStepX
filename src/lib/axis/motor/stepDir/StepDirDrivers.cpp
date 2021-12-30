@@ -3,7 +3,7 @@
 
 #include "StepDirDrivers.h"
 
-#ifdef SD_DRIVER_PRESENT
+#ifdef STEP_DIR_MOTOR_PRESENT
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
@@ -33,7 +33,15 @@ StepDirDriver::StepDirDriver(uint8_t axisNumber, const DriverModePins *Pins, con
   settings = *Settings;
 }
 
-void StepDirDriver::init(int16_t microsteps, int16_t currentRun, int16_t currentGoto) {
+// decodes driver model/microstep mode into microstep codes (bit patterns or SPI) and sets up the pin modes
+void StepDirDriver::setParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  int16_t microsteps = round(param1);
+  int16_t currentRun = round(param2);
+  int16_t currentGoto = round(param3);
+  UNUSED(param4);
+  UNUSED(param5);
+  UNUSED(param6);
+
   if (settings.currentRun != OFF) {
     // disable any custom currentHold if a new currentRun is specified
     if (settings.currentRun != currentRun) settings.currentHold = OFF;
@@ -118,6 +126,37 @@ void StepDirDriver::init(int16_t microsteps, int16_t currentRun, int16_t current
   #else
     if (settings.status == HIGH) pinModeEx(Pins->fault, INPUT);
   #endif
+}
+
+// validate driver parameters
+bool StepDirDriver::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
+  int index = axisNumber - 1;
+  if (index > 3) index = 3;
+  int IrunLimitH[4] = {3000, 3000, 1000, 1000};
+  
+  long subdivisions = round(param1);
+  long currentRun = round(param2);
+  long currentGoto = round(param3);
+  UNUSED(param4);
+  UNUSED(param5);
+  UNUSED(param6);
+
+  if (subdivisions != OFF && (subdivisions < 1 || subdivisions > 256)) {
+    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad subdivisions="); DL(subdivisions);
+    return false;
+  }
+
+  if (currentRun != OFF && (currentRun < 0 || currentRun > IrunLimitH[index])) {
+    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+    return false;
+  }
+
+  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > IrunLimitH[index])) {
+    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+    return false;
+  }
+
+  return true;
 }
 
 bool StepDirDriver::modeSwitchAllowed() {
