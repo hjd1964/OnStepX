@@ -16,7 +16,9 @@
   #else
     Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN, AXIS3_SERVO_ENCODER, AXIS3_SERVO_ENCODER_TRIGGER, &control3.directionHint);
   #endif
-  PID pidAxis3(&control3.in, &control3.out, &control3.set, AXIS3_SERVO_P, AXIS3_SERVO_I, AXIS3_SERVO_D, DIRECT);
+  #if AXIS3_SERVO_FEEDBACK == FB_PID
+    Pid pidAxis3;
+  #endif
 
   ServoMotor motor3(3, &encAxis3, &pidAxis3, &servoDriver3, &control3);
   void moveAxis3() { motor3.move(); }

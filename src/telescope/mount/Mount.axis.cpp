@@ -16,7 +16,9 @@
   #else
     Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN, AXIS1_SERVO_ENCODER, AXIS1_SERVO_ENCODER_TRIGGER, &control1.directionHint);
   #endif
-  PID pidAxis1(&control1.in, &control1.out, &control1.set, AXIS1_SERVO_P, AXIS1_SERVO_I, AXIS1_SERVO_D, DIRECT);
+  #if AXIS1_SERVO_FEEDBACK == FB_PID
+    Pid pidAxis1;
+  #endif
 
   ServoMotor motor1(1, &encAxis1, &pidAxis1, &servoDriver1, &control1);
   IRAM_ATTR void moveAxis1() { motor1.move(); }
@@ -33,7 +35,7 @@
   IRAM_ATTR void moveFRAxis1() { motor1.moveFR(AXIS1_STEP_PIN); }
 #endif
 const AxisPins PinsAxis1 = {AXIS1_SENSE_LIMIT_MIN_PIN, AXIS1_SENSE_HOME_PIN, AXIS1_SENSE_LIMIT_MAX_PIN, { AXIS1_SENSE_HOME, AXIS1_SENSE_HOME_INIT, AXIS1_SENSE_LIMIT_MIN, AXIS1_SENSE_LIMIT_MAX, AXIS1_SENSE_LIMIT_INIT}};
-const AxisSettings SettingsAxis1 = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, AXIS1_PARAMETER1, AXIS1_PARAMETER2, AXIS1_PARAMETER3, { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX)}, siderealToRad(TRACK_BACKLASH_RATE)};
+const AxisSettings SettingsAxis1 = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, AXIS1_PARAMETER1, AXIS1_PARAMETER2, AXIS1_PARAMETER3, AXIS1_PARAMETER4, AXIS1_PARAMETER5, AXIS1_PARAMETER6, { degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX)}, siderealToRad(TRACK_BACKLASH_RATE)};
 Axis axis1(1, &PinsAxis1, &SettingsAxis1);
 void pollAxis1() { axis1.poll(); }
 
@@ -48,7 +50,9 @@ void pollAxis1() { axis1.poll(); }
   #else
     Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN, AXIS2_SERVO_ENCODER, AXIS2_SERVO_ENCODER_TRIGGER, &control2.directionHint);
   #endif
-  PID pidAxis2(&control2.in, &control2.out, &control2.set, AXIS2_SERVO_P, AXIS2_SERVO_I, AXIS2_SERVO_D, DIRECT);
+  #if AXIS2_SERVO_FEEDBACK == FB_PID
+    Pid pidAxis2;
+  #endif
 
   ServoMotor motor2(2, &encAxis2, &pidAxis2, &servoDriver2, &control2);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
@@ -65,7 +69,7 @@ void pollAxis1() { axis1.poll(); }
   IRAM_ATTR void moveFRAxis2() { motor2.moveFR(AXIS2_STEP_PIN); }
 #endif
 const AxisPins PinsAxis2 = {AXIS2_SENSE_LIMIT_MIN_PIN, AXIS2_SENSE_HOME_PIN, AXIS2_SENSE_LIMIT_MAX_PIN, {AXIS2_SENSE_HOME, AXIS2_SENSE_HOME_INIT, AXIS2_SENSE_LIMIT_MIN, AXIS2_SENSE_LIMIT_MAX, AXIS2_SENSE_LIMIT_INIT}};
-const AxisSettings SettingsAxis2 = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_REVERSE, AXIS2_PARAMETER1, AXIS2_PARAMETER2, AXIS2_PARAMETER3, {degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX)}, siderealToRad(TRACK_BACKLASH_RATE)};
+const AxisSettings SettingsAxis2 = {AXIS2_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS2_REVERSE, AXIS2_PARAMETER1, AXIS2_PARAMETER2, AXIS2_PARAMETER3, AXIS2_PARAMETER4, AXIS2_PARAMETER5, AXIS2_PARAMETER6, {degToRadF(AXIS2_LIMIT_MIN), degToRadF(AXIS2_LIMIT_MAX)}, siderealToRad(TRACK_BACKLASH_RATE)};
 Axis axis2(2, &PinsAxis2, &SettingsAxis2);
 void pollAxis2() { axis2.poll(); }
 

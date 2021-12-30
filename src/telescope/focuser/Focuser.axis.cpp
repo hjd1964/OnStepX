@@ -17,7 +17,9 @@
     #else
       Encoder encAxis4(AXIS4_SERVO_ENC1_PIN, AXIS4_SERVO_ENC2_PIN, AXIS4_SERVO_ENCODER, AXIS4_SERVO_ENCODER_TRIGGER, &control4.directionHint);
     #endif
-    PID pidAxis4(&control4.in, &control4.out, &control4.set, AXIS4_SERVO_P, AXIS4_SERVO_I, AXIS4_SERVO_D, DIRECT);
+    #if AXIS4_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis4;
+    #endif
 
     ServoMotor motor4(4, &encAxis4, &pidAxis4, &servoDriver4, &control4);
     void moveAxis4() { motor4.move(); }
@@ -49,7 +51,9 @@
     #else
       Encoder encAxis5(AXIS5_SERVO_ENC1_PIN, AXIS5_SERVO_ENC2_PIN, AXIS5_SERVO_ENCODER, AXIS5_SERVO_ENCODER_TRIGGER, &control5.directionHint);
     #endif
-    PID pidAxis5(&control5.in, &control5.out, &control5.set, AXIS5_SERVO_P, AXIS5_SERVO_I, AXIS5_SERVO_D, DIRECT);
+    #if AXIS5_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis5;
+    #endif
 
     ServoMotor motor5(5, &encAxis5, &pidAxis5, &servoDriver5, &control5);
     void moveAxis5() { motor5.move(); }
@@ -81,7 +85,9 @@
     #else
       Encoder encAxis6(AXIS6_SERVO_ENC1_PIN, AXIS6_SERVO_ENC2_PIN, AXIS6_SERVO_ENCODER, AXIS6_SERVO_ENCODER_TRIGGER, &control6.directionHint);
     #endif
-    PID pidAxis6(&control6.in, &control6.out, &control6.set, AXIS6_SERVO_P, AXIS6_SERVO_I, AXIS6_SERVO_D, DIRECT);
+    #if AXIS6_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis6;
+    #endif
 
     ServoMotor motor6(6, &encAxis6, &pidAxis6, &servoDriver6, &control6);
     void moveAxis6() { motor6.move(); }
@@ -113,7 +119,9 @@
     #else
       Encoder encAxis7(AXIS7_SERVO_ENC1_PIN, AXIS7_SERVO_ENC2_PIN, AXIS7_SERVO_ENCODER, AXIS7_SERVO_ENCODER_TRIGGER, &control7.directionHint);
     #endif
-    PID pidAxis7(&control7.in, &control7.out, &control7.set, AXIS7_SERVO_P, AXIS7_SERVO_I, AXIS7_SERVO_D, DIRECT);
+    #if AXIS7_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis7;
+    #endif
 
     ServoMotor motor7(7, &encAxis7, &pidAxis7, &servoDriver7, &control7);
     void moveAxis7() { motor7.move(); }
@@ -145,7 +153,9 @@
     #else
       Encoder encAxis8(AXIS8_SERVO_ENC1_PIN, AXIS8_SERVO_ENC2_PIN, AXIS8_SERVO_ENCODER, AXIS8_SERVO_ENCODER_TRIGGER, &control8.directionHint);
     #endif
-    PID pidAxis8(&control8.in, &control8.out, &control8.set, AXIS8_SERVO_P, AXIS8_SERVO_I, AXIS8_SERVO_D, DIRECT);
+    #if AXIS8_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis8;
+    #endif
 
     ServoMotor motor8(8, &encAxis8, &pidAxis8, &servoDriver8, &control8);
     void moveAxis8() { motor8.move(); }
@@ -177,7 +187,9 @@
     #else
       Encoder encAxis9(AXIS9_SERVO_ENC1_PIN, AXIS9_SERVO_ENC2_PIN, AXIS9_SERVO_ENCODER, AXIS9_SERVO_ENCODER_TRIGGER, &control9.directionHint);
     #endif
-    PID pidAxis9(&control9.in, &control9.out, &control9.set, AXIS9_SERVO_P, AXIS9_SERVO_I, AXIS9_SERVO_D, DIRECT);
+    #if AXIS9_SERVO_FEEDBACK == FB_PID
+      Pid pidAxis9;
+    #endif
 
     ServoMotor motor9(9, &encAxis9, &pidAxis9, &servoDriver9, &control9);
     void moveAxis9() { motor9.move(); }
