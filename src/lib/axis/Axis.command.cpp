@@ -50,7 +50,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             (int)round(thisAxis.limits.min),
             (int)round(thisAxis.limits.max),
             prm1, prm2, prm3, prm4, prm5, prm6,
-            motor->driverType == SERVO?'V':'S');
+            motor->getParamTypeCode());
           *numericReply = false;
         } else *commandError = CE_0;
       } else *commandError = CE_0;

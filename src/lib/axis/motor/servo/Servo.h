@@ -23,6 +23,9 @@ class ServoMotor : public Motor {
     // set driver reverse state
     void setReverse(int8_t state);
 
+    // get driver type code
+    inline char getParamTypeCode() { return feedback->getParamTypeCode(); }
+
     // set driver parameters
     void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
 

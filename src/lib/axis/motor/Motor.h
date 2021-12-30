@@ -21,6 +21,9 @@ class Motor {
     // set driver reverse state
     virtual void setReverse(int8_t state);
 
+    // get driver parameters type code
+    virtual char getParamTypeCode();
+
     // set driver parameters
     virtual void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
 

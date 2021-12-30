@@ -34,6 +34,9 @@ class StepDirMotor : public Motor {
     // set driver default reverse state
     void setReverse(int8_t state);
 
+    // get driver type code
+    inline char getParamTypeCode() { return 'S'; }
+
     // set default driver microsteps and current
     void setParam(float microsteps, float currentRun, float currentGoto, float param4, float param5, float param6);
 

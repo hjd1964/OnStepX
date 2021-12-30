@@ -5,6 +5,7 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
+// initialize feedback control and parameters
 void Feedback::init(uint8_t axisNumber, ServoControl *control) {
   this->axisNumber = axisNumber;
 
@@ -20,10 +21,12 @@ void Feedback::init(uint8_t axisNumber, ServoControl *control) {
   param6 = 0;
 }
 
+// validate driver parameters
 bool Feedback::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
   return true;
 }
 
+// set feedback parameters
 bool Feedback::setParam(float param1, float param2, float param3, float param4, float param5, float param6) {
   this->param1 = param1;
   this->param2 = param2;

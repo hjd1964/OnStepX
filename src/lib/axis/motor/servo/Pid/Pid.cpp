@@ -5,6 +5,7 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
+// initialize PID control and parameters
 void Pid::init(uint8_t axisNumber, ServoControl *control) {
   Feedback::init(axisNumber, control);
 
@@ -26,6 +27,7 @@ void Pid::init(uint8_t axisNumber, ServoControl *control) {
   pid->SetMode(AUTOMATIC);
 }
 
+// select PID param set for tracking or slewing
 void Pid::selectAlternateParam(bool alternate) {
   V(axisPrefix);
   if (!alternate) {
