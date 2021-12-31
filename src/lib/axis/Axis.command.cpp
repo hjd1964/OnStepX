@@ -38,18 +38,18 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             thisAxis.limits.max = thisAxis.limits.max/1000.0F;
           }
           char spm[40]; sprintF(spm, "%1.3f", thisAxis.stepsPerMeasure);
-          char prm1[40]; sprintF(prm1, "%1.1f", thisAxis.param1);
-          char prm2[40]; sprintF(prm2, "%1.1f", thisAxis.param2);
-          char prm3[40]; sprintF(prm3, "%1.1f", thisAxis.param3);
-          char prm4[40]; sprintF(prm4, "%1.1f", thisAxis.param4);
-          char prm5[40]; sprintF(prm5, "%1.1f", thisAxis.param5);
-          char prm6[40]; sprintF(prm6, "%1.1f", thisAxis.param6);
+          char ps1[40]; sprintF(ps1, "%1.1f", thisAxis.param1);
+          char ps2[40]; sprintF(ps2, "%1.1f", thisAxis.param2);
+          char ps3[40]; sprintF(ps3, "%1.1f", thisAxis.param3);
+          char ps4[40]; sprintF(ps4, "%1.1f", thisAxis.param4);
+          char ps5[40]; sprintF(ps5, "%1.1f", thisAxis.param5);
+          char ps6[40]; sprintF(ps6, "%1.1f", thisAxis.param6);
           sprintf(reply,"%s,%d,%d,%d,%s,%s,%s,%s,%s,%s,%c",
             spm,
             (int)thisAxis.reverse,
             (int)round(thisAxis.limits.min),
             (int)round(thisAxis.limits.max),
-            prm1, prm2, prm3, prm4, prm5, prm6,
+            ps1, ps2, ps3, ps4, ps5, ps6,
             motor->getParamTypeCode());
           *numericReply = false;
         } else *commandError = CE_0;
@@ -105,28 +105,24 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
               thisAxis.limits.min = thisAxis.limits.min*1000.0F;
               thisAxis.limits.max = thisAxis.limits.max*1000.0F;
             }
-            // validate settings for step/dir drivers
-            if (motor->driverType == STEP_DIR) {
-              if (validateAxisSettings(axisNumber, thisAxis)) {
-                #ifdef STEP_DIR_MOTOR_PRESENT
-                  int subdivGoto = ((StepDirMotor*)motor)->driver->getSubdivisionsGoto();
-                  if (axisNumber <= 2 && thisAxis.subdivisions < subdivGoto) thisAxis.subdivisions = subdivGoto;
-                  if (((StepDirMotor*)motor)->driver->subdivisionsToCode(thisAxis.subdivisions) != OFF) {
-                    nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
-                  } else *commandError = CE_PARAM_RANGE;
-                #endif
-              } else *commandError = CE_PARAM_FORM;
-            }
-            // validate settings for servo drivers
-            if (motor->driverType == SERVO) {
-              if (validateAxisSettings(axisNumber, thisAxis)) {
-                #ifdef SERVO_MOTOR_PRESENT
+            #ifdef STEP_DIR_MOTOR_PRESENT
+              // validate settings for step/dir drivers
+              if (motor->driverType == STEP_DIR) {
+                if (validateAxisSettings(axisNumber, thisAxis)) {
+                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+                } else *commandError = CE_PARAM_FORM;
+              }
+            #endif
+            #ifdef SERVO_MOTOR_PRESENT
+              // validate settings for servo drivers
+              if (motor->driverType == SERVO) {
+                if (validateAxisSettings(axisNumber, thisAxis)) {
                   nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
                   // make these take effect now
                   motor->setParam(thisAxis.param1, thisAxis.param2, thisAxis.param3, thisAxis.param4, thisAxis.param5, thisAxis.param6);
-                #endif
-              } else *commandError = CE_PARAM_FORM;
-            }
+                } else *commandError = CE_PARAM_FORM;
+              }
+            #endif
           } else *commandError = CE_PARAM_FORM;
         }
       } else *commandError = CE_0;

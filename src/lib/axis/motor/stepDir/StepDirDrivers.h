@@ -47,6 +47,9 @@ class StepDirDriver {
     // constructor
     StepDirDriver(uint8_t axisNumber, const DriverModePins *Pins, const DriverSettings *Settings);
 
+    // get driver type code
+    inline char getParamTypeCode() { if (isTmcSPI()) return 'T'; else return 'S'; }
+
     // decodes driver model/microstep mode into microstep codes (bit patterns or SPI) and sets up the pin modes
     void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
 
@@ -95,7 +98,7 @@ class StepDirDriver {
     // translate the human readable microsteps in the configuration to mode bit settings
     // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
     // this is a required method for the Axis class, even if it only ever returns 1
-    int subdivisionsToCode(uint8_t microsteps);
+    int subdivisionsToCode(long microsteps);
 
     #ifdef TMC_DRIVER_PRESENT
       TmcDriver tmcDriver;

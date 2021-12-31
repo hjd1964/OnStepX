@@ -33,11 +33,16 @@ typedef struct AxisLimits {
 
 // helpers for step/dir and servo parameters
 #define subdivisions param1
+#define subdivisionsGoto param2
+#define currentHold param3
+#define currentRun param4
+#define currentGoto param5
 #define integral param1
-#define currentRun param2
 #define porportional param2
-#define currentGoto param3
 #define derivative param3
+#define integralGoto param4
+#define porportionalGoto param5
+#define derivativeGoto param6
 
 #define AxisSettingsSize 45
 typedef struct AxisSettings {

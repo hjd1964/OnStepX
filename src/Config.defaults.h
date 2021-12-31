@@ -174,10 +174,10 @@
   #define AXIS1_DRIVER_STATUS           OFF                       // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
   #endif
   #define AXIS1_PARAMETER1              AXIS1_DRIVER_MICROSTEPS
-  #define AXIS1_PARAMETER2              AXIS1_DRIVER_IRUN
-  #define AXIS1_PARAMETER3              AXIS1_DRIVER_IGOTO
-  #define AXIS1_PARAMETER4              OFF
-  #define AXIS1_PARAMETER5              OFF
+  #define AXIS1_PARAMETER2              AXIS1_DRIVER_MICROSTEPS_GOTO
+  #define AXIS1_PARAMETER3              AXIS1_DRIVER_IHOLD
+  #define AXIS1_PARAMETER4              AXIS1_DRIVER_IRUN
+  #define AXIS1_PARAMETER5              AXIS1_DRIVER_IGOTO
   #define AXIS1_PARAMETER6              OFF
 #endif
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -298,10 +298,10 @@
   #define AXIS2_DRIVER_STATUS           OFF
   #endif
   #define AXIS2_PARAMETER1              AXIS2_DRIVER_MICROSTEPS
-  #define AXIS2_PARAMETER2              AXIS2_DRIVER_IRUN
-  #define AXIS2_PARAMETER3              AXIS2_DRIVER_IGOTO
-  #define AXIS2_PARAMETER4              OFF
-  #define AXIS2_PARAMETER5              OFF
+  #define AXIS2_PARAMETER2              AXIS2_DRIVER_MICROSTEPS_GOTO
+  #define AXIS2_PARAMETER3              AXIS2_DRIVER_IHOLD
+  #define AXIS2_PARAMETER4              AXIS2_DRIVER_IRUN
+  #define AXIS2_PARAMETER5              AXIS2_DRIVER_IGOTO
   #define AXIS2_PARAMETER6              OFF
 #endif
 #if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -632,10 +632,10 @@
   #define AXIS3_DRIVER_STATUS           OFF
   #endif
   #define AXIS3_PARAMETER1              AXIS3_DRIVER_MICROSTEPS
-  #define AXIS3_PARAMETER2              AXIS3_DRIVER_IRUN
-  #define AXIS3_PARAMETER3              AXIS3_DRIVER_IGOTO
-  #define AXIS3_PARAMETER4              OFF
-  #define AXIS3_PARAMETER5              OFF
+  #define AXIS3_PARAMETER2              AXIS3_DRIVER_MICROSTEPS_GOTO
+  #define AXIS3_PARAMETER3              AXIS3_DRIVER_IHOLD
+  #define AXIS3_PARAMETER4              AXIS3_DRIVER_IRUN
+  #define AXIS3_PARAMETER5              AXIS3_DRIVER_IGOTO
   #define AXIS3_PARAMETER6              OFF
 #endif
 #if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -767,10 +767,10 @@
   #define AXIS4_DRIVER_STATUS           OFF
   #endif
   #define AXIS4_PARAMETER1              AXIS4_DRIVER_MICROSTEPS
-  #define AXIS4_PARAMETER2              AXIS4_DRIVER_IRUN
-  #define AXIS4_PARAMETER3              AXIS4_DRIVER_IGOTO
-  #define AXIS4_PARAMETER4              OFF
-  #define AXIS4_PARAMETER5              OFF
+  #define AXIS4_PARAMETER2              AXIS4_DRIVER_MICROSTEPS_GOTO
+  #define AXIS4_PARAMETER3              AXIS4_DRIVER_IHOLD
+  #define AXIS4_PARAMETER4              AXIS4_DRIVER_IRUN
+  #define AXIS4_PARAMETER5              AXIS4_DRIVER_IGOTO
   #define AXIS4_PARAMETER6              OFF
 #endif
 #if AXIS4_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -901,10 +901,10 @@
   #define AXIS5_DRIVER_STATUS           OFF
   #endif
   #define AXIS5_PARAMETER1              AXIS5_DRIVER_MICROSTEPS
-  #define AXIS5_PARAMETER2              AXIS5_DRIVER_IRUN
-  #define AXIS5_PARAMETER3              AXIS5_DRIVER_IGOTO
-  #define AXIS5_PARAMETER4              OFF
-  #define AXIS5_PARAMETER5              OFF
+  #define AXIS5_PARAMETER2              AXIS5_DRIVER_MICROSTEPS_GOTO
+  #define AXIS5_PARAMETER3              AXIS5_DRIVER_IHOLD
+  #define AXIS5_PARAMETER4              AXIS5_DRIVER_IRUN
+  #define AXIS5_PARAMETER5              AXIS5_DRIVER_IGOTO
   #define AXIS5_PARAMETER6              OFF
 #endif
 #if AXIS5_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -1035,10 +1035,10 @@
   #define AXIS6_DRIVER_STATUS           OFF
   #endif
   #define AXIS6_PARAMETER1              AXIS6_DRIVER_MICROSTEPS
-  #define AXIS6_PARAMETER2              AXIS6_DRIVER_IRUN
-  #define AXIS6_PARAMETER3              AXIS6_DRIVER_IGOTO
-  #define AXIS6_PARAMETER4              OFF
-  #define AXIS6_PARAMETER5              OFF
+  #define AXIS6_PARAMETER2              AXIS6_DRIVER_MICROSTEPS_GOTO
+  #define AXIS6_PARAMETER3              AXIS6_DRIVER_IHOLD
+  #define AXIS6_PARAMETER4              AXIS6_DRIVER_IRUN
+  #define AXIS6_PARAMETER5              AXIS6_DRIVER_IGOTO
   #define AXIS6_PARAMETER6              OFF
 #endif
 #if AXIS6_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -1169,10 +1169,10 @@
   #define AXIS7_DRIVER_STATUS           OFF
   #endif
   #define AXIS7_PARAMETER1              AXIS7_DRIVER_MICROSTEPS
-  #define AXIS7_PARAMETER2              AXIS7_DRIVER_IRUN
-  #define AXIS7_PARAMETER3              AXIS7_DRIVER_IGOTO
-  #define AXIS7_PARAMETER4              OFF
-  #define AXIS7_PARAMETER5              OFF
+  #define AXIS7_PARAMETER2              AXIS7_DRIVER_MICROSTEPS_GOTO
+  #define AXIS7_PARAMETER3              AXIS7_DRIVER_IHOLD
+  #define AXIS7_PARAMETER4              AXIS7_DRIVER_IRUN
+  #define AXIS7_PARAMETER5              AXIS7_DRIVER_IGOTO
   #define AXIS7_PARAMETER6              OFF
 #endif
 #if AXIS7_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -1303,10 +1303,10 @@
   #define AXIS8_DRIVER_STATUS           OFF
   #endif
   #define AXIS8_PARAMETER1              AXIS8_DRIVER_MICROSTEPS
-  #define AXIS8_PARAMETER2              AXIS8_DRIVER_IRUN
-  #define AXIS8_PARAMETER3              AXIS8_DRIVER_IGOTO
-  #define AXIS8_PARAMETER4              OFF
-  #define AXIS8_PARAMETER5              OFF
+  #define AXIS8_PARAMETER2              AXIS8_DRIVER_MICROSTEPS_GOTO
+  #define AXIS8_PARAMETER3              AXIS8_DRIVER_IHOLD
+  #define AXIS8_PARAMETER4              AXIS8_DRIVER_IRUN
+  #define AXIS8_PARAMETER5              AXIS8_DRIVER_IGOTO
   #define AXIS8_PARAMETER6              OFF
 #endif
 #if AXIS8_DRIVER_MODEL >= SERVO_DRIVER_FIRST
@@ -1437,10 +1437,10 @@
   #define AXIS9_DRIVER_STATUS           OFF
   #endif
   #define AXIS9_PARAMETER1              AXIS9_DRIVER_MICROSTEPS
-  #define AXIS9_PARAMETER2              AXIS9_DRIVER_IRUN
-  #define AXIS9_PARAMETER3              AXIS9_DRIVER_IGOTO
-  #define AXIS9_PARAMETER4              OFF
-  #define AXIS9_PARAMETER5              OFF
+  #define AXIS9_PARAMETER2              AXIS9_DRIVER_MICROSTEPS_GOTO
+  #define AXIS9_PARAMETER3              AXIS9_DRIVER_IHOLD
+  #define AXIS9_PARAMETER4              AXIS9_DRIVER_IRUN
+  #define AXIS9_PARAMETER5              AXIS9_DRIVER_IGOTO
   #define AXIS9_PARAMETER6              OFF
 #endif
 #if AXIS9_DRIVER_MODEL >= SERVO_DRIVER_FIRST
