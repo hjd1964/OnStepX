@@ -19,10 +19,13 @@ class NonVolatileStorage {
     virtual bool init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire = NULL, uint8_t address = 0);
 
     // disables writing if true, defaults to false
-    void readOnly(bool state);
+    void protectData(bool state);
 
     // check to see if read only operation is set
     inline bool isReadOnly() { return readOnlyMode; }
+
+    // check to see if read only operation is set
+    inline bool protectingData() { return protectDataMode; }
 
     // wait for all commits to finish, blocking
     inline void wait() { while (!committed()) { poll(false); delay(10); } }
@@ -127,6 +130,7 @@ class NonVolatileStorage {
 
     bool readAndWriteThrough = false;
     bool readOnlyMode = false;
+    bool protectDataMode = false;
 
     uint16_t cacheIndex = -1;
     uint16_t cacheSize = 0;

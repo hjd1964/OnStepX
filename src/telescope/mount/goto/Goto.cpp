@@ -20,7 +20,7 @@ inline void gotoWrapper() { goTo.poll(); }
 
 void Goto::init() {
   // confirm the data structure size
-  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.readOnly(true); DLF("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); }
+  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.protectData(true); DLF("ERR: Goto::init(); GotoSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {

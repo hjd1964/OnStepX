@@ -41,7 +41,7 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
   // write axis settings to NV
   // NV_AXIS_SETTINGS_REVERT bit 0 = settings at compile (0) or run time (1), bits 1 to 9 = reset axis n on next boot
-  if (AxisSettingsSize < sizeof(AxisSettings)) { nv.readOnly(true); DL("ERR: Axis::init(); AxisSettingsSize error NV subsystem writes disabled"); }
+  if (AxisSettingsSize < sizeof(AxisSettings)) { nv.protectData(true); DL("ERR: Axis::init(); AxisSettingsSize error NV subsystem writes disabled"); }
   uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
   if (!(axesToRevert & 1)) bitSet(axesToRevert, axisNumber);
   if (bitRead(axesToRevert, axisNumber)) {
@@ -53,7 +53,7 @@ void Axis::init(Motor *motor, void (*callback)()) {
 
   // read axis settings from NV
   nv.readBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
-  if (!validateAxisSettings(axisNumber, settings)) nv.readOnly(true);
+  if (!validateAxisSettings(axisNumber, settings)) nv.protectData(true);
 
   #if DEBUG == VERBOSE
     V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);

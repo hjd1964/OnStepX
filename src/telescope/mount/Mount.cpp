@@ -24,7 +24,7 @@ inline void mountWrapper() { mount.poll(); }
 
 void Mount::init() {
   // confirm the data structure size
-  if (MountSettingsSize < sizeof(MountSettings)) { nv.readOnly(true); DL("ERR: Mount::init(); MountSettingsSize error NV subsystem writes disabled"); }
+  if (MountSettingsSize < sizeof(MountSettings)) { nv.protectData(true); DL("ERR: Mount::init(); MountSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
