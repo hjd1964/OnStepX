@@ -16,7 +16,7 @@ inline void limitsWrapper() { limits.poll(); }
 
 void Limits::init() {
   // confirm the data structure size
-  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.protectData(true); DL("ERR: Limits::init(); LimitSettingsSize error NV subsystem writes disabled"); }
+  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.initError = true; DL("ERR: Limits::init(); LimitSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {

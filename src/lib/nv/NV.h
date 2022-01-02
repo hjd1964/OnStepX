@@ -19,13 +19,10 @@ class NonVolatileStorage {
     virtual bool init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire = NULL, uint8_t address = 0);
 
     // protects already written data if true, defaults to false
-    void protectData(bool state);
+    void setReadOnly(bool state);
 
     // check to see if read only operation is set
     inline bool isReadOnly() { return readOnlyMode; }
-
-    // check to see if data is being protected
-    inline bool protectingData() { return protectDataMode; }
 
     // wait for all commits to finish, blocking
     inline void wait() { while (!committed()) { poll(false); delay(10); } }
@@ -118,6 +115,8 @@ class NonVolatileStorage {
     // NV size in bytes
     uint16_t size = 0;
 
+    bool initError = false;
+
   protected:
     // returns false if ready to read or write immediately
     virtual bool busy();
@@ -130,7 +129,6 @@ class NonVolatileStorage {
 
     bool readAndWriteThrough = false;
     bool readOnlyMode = false;
-    bool protectDataMode = false;
 
     uint16_t cacheIndex = -1;
     uint16_t cacheSize = 0;

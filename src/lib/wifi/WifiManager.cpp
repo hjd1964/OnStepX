@@ -7,7 +7,7 @@ bool WifiManager::init() {
   if (!active) {
 
     #ifdef NV_WIFI_SETTINGS_BASE
-      if (WifiSettingsSize < sizeof(WifiSettings)) { nv.protectData(true); DL("ERR: WifiManager::init(); WifiSettingsSize error NV subsystem writes disabled"); }
+      if (WifiSettingsSize < sizeof(WifiSettings)) { nv.initError = true; DL("ERR: WifiManager::init(); WifiSettingsSize error NV subsystem writes disabled"); }
 
       if (!nv.isKeyValid()) {
         VLF("MSG: WiFi, writing defaults to NV");

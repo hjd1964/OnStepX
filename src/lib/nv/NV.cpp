@@ -31,10 +31,8 @@ bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bo
   return true;
 }
 
-void NonVolatileStorage::protectData(bool state) {
-  protectDataMode = state;
+void NonVolatileStorage::setReadOnly(bool state) {
   readOnlyMode = state;
-  if (!isKeyValid()) readOnlyMode = false;
 }
 
 bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {

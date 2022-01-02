@@ -19,7 +19,7 @@ void parkSignalWrapper() { park.signal(); }
 
 void Park::init() {
   // confirm the data structure size
-  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.protectData(true); DL("ERR: Park::Init(); ParkSettingsSize error NV subsystem writes disabled"); }
+  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.initError = true; DL("ERR: Park::Init(); ParkSettingsSize error NV subsystem writes disabled"); }
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {

@@ -24,7 +24,7 @@
 
   void Pec::init() {
     // confirm the data structure size
-    if (PecSettingsSize < sizeof(PecSettings)) { nv.protectData(true); DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); }
+    if (PecSettingsSize < sizeof(PecSettings)) { nv.initError = true; DL("ERR: Pec::init(); PecSettingsSize error NV subsystem writes disabled"); }
 
     // write the default settings to NV
     if (!nv.isKeyValid()) {

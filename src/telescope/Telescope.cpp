@@ -98,7 +98,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV, failed to read back key!"); } else { VLF("MSG: NV, reset complete"); }
   }
 
-  if (nv.protectingData()) initError.nv = true;
+  initError.nv = nv.initError;
 
   #if RETICLE_LED != OFF && RETICLE_LED_PIN != OFF
     pinMode(RETICLE_LED_PIN, OUTPUT);
