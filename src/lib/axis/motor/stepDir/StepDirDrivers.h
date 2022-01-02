@@ -116,7 +116,6 @@ class StepDirDriver {
     int     axisNumber;
     DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
 
-    int     maxCurrent            = OFF;
     int     microstepRatio        = 1;
     int     microstepCode         = OFF;
     int     microstepCodeGoto     = OFF;

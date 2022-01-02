@@ -63,9 +63,6 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  if (settings.model == TMC2130) maxCurrent = 1500; else
-  if (settings.model == TMC5160) maxCurrent = 3000; else maxCurrent == OFF;
-
   #if DEBUG == VERBOSE
     VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
     VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF"); } else { V(settings.microsteps); VF("X"); }
@@ -134,7 +131,11 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
 bool StepDirDriver::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
   int index = axisNumber - 1;
   if (index > 3) index = 3;
-  
+
+  int maxCurrent;
+  if (settings.model == TMC2130) maxCurrent = 1500; else
+  if (settings.model == TMC5160) maxCurrent = 3000; else maxCurrent == OFF;
+
   long subdivisions = round(param1);
   long subdivisionsGoto = round(param2);
   long currentHold = round(param3);
