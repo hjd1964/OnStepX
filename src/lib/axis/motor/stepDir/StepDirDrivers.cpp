@@ -44,7 +44,7 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
 
   if (!isTmcSPI()) {
     if (settings.currentHold != OFF || settings.currentRun != OFF || settings.currentGoto != OFF) {
-      VF("WRN: StepDvr"); V(axisNumber); VF(", incorrect model for current control, disabling settings");
+      VF("WRN: StepDvr"); V(axisNumber); VLF(", incorrect model for current control, disabling current settings");
       settings.currentHold = OFF;
       settings.currentRun = OFF;
       settings.currentGoto = OFF;
@@ -62,6 +62,9 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
     settings.currentGoto = settings.currentRun;
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
+
+  if (settings.model == TMC2130) maxCurrent = 1500; else
+  if (settings.model == TMC5160) maxCurrent = 3000; else maxCurrent == OFF;
 
   #if DEBUG == VERBOSE
     VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
@@ -131,7 +134,6 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
 bool StepDirDriver::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
   int index = axisNumber - 1;
   if (index > 3) index = 3;
-  int IrunLimitH[4] = {3000, 3000, 1000, 1000};
   
   long subdivisions = round(param1);
   long subdivisionsGoto = round(param2);
@@ -139,14 +141,6 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
   long currentRun = round(param4);
   long currentGoto = round(param5);
   UNUSED(param6);
-
-  VL(param1);
-  VL(param2);
-  VL(param3);
-  VL(param4);
-  VL(param5);
-  VL(param6);
-  
 
   if (subdivisions == OFF) {
     DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" subdivisions must be set");
@@ -170,22 +164,22 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
 
   if (!isTmcSPI()) {
     if (currentHold != OFF || currentRun != OFF || currentGoto != OFF) {
-      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" current settings are not valid for this driver type!");
+      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" current settings are not valid for this driver type!");
       return false;
     }
   }
 
-  if (currentHold != OFF && (currentHold < 0 || currentHold > IrunLimitH[index])) {
+  if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
     DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
     return false;
   }
 
-  if (currentRun != OFF && (currentRun < 0 || currentRun > IrunLimitH[index])) {
+  if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
     DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
     return false;
   }
 
-  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > IrunLimitH[index])) {
+  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
     DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
     return false;
   }
