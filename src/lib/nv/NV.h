@@ -18,13 +18,13 @@ class NonVolatileStorage {
     // result:      true if the device was found, or false if not
     virtual bool init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire = NULL, uint8_t address = 0);
 
-    // disables writing if true, defaults to false
+    // protects already written data if true, defaults to false
     void protectData(bool state);
 
     // check to see if read only operation is set
     inline bool isReadOnly() { return readOnlyMode; }
 
-    // check to see if read only operation is set
+    // check to see if data is being protected
     inline bool protectingData() { return protectDataMode; }
 
     // wait for all commits to finish, blocking
