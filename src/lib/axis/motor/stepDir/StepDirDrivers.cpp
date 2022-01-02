@@ -63,11 +63,9 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  #if DEBUG == VERBOSE
-    VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
-    VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF"); } else { V(settings.microsteps); VF("X"); }
-    VF(" (goto mode "); if (settings.microstepsGoto == SAME) { VLF("SAME)"); } else { V(settings.microstepsGoto); VL("X)"); }
-  #endif
+  VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
+  VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF (assuming 1X)"); settings.microsteps = 1; } else { V(settings.microsteps); VF("X"); }
+  VF(" (goto mode "); if (settings.microstepsGoto == SAME) { VLF("SAME)"); } else { V(settings.microstepsGoto); VL("X)"); }
 
   if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
   microstepCode = subdivisionsToCode(settings.microsteps);
@@ -134,7 +132,7 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
 
   int maxCurrent;
   if (settings.model == TMC2130) maxCurrent = 1500; else
-  if (settings.model == TMC5160) maxCurrent = 3000; else maxCurrent == OFF;
+  if (settings.model == TMC5160) maxCurrent = 3000; else maxCurrent = OFF;
 
   long subdivisions = round(param1);
   long subdivisionsGoto = round(param2);
@@ -144,8 +142,8 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
   UNUSED(param6);
 
   if (subdivisions == OFF) {
-    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" subdivisions must be set");
-    return false;
+    VF("WRN, StepDirDrivers::validateParam(): Axis"); V(axisNumber); VLF(" subdivisions OFF (assuming 1X)");
+    subdivisions = 1;
   }
 
   if (subdivisions <= subdivisionsGoto) {
