@@ -6,7 +6,7 @@
 bool EthernetManager::init() {
   if (!active) {
     #ifdef NV_ETHERNET_SETTINGS_BASE
-      if (EthernetSettingsSize < sizeof(EthernetSettings)) { nv.initError = true; DL("ERR: EthernetManager::init(); EthernetSettingsSize error NV subsystem writes disabled"); }
+      if (EthernetSettingsSize < sizeof(EthernetSettings)) { nv.initError = true; DL("ERR: EthernetManager::init(); EthernetSettingsSize error"); }
 
       if (!nv.isKeyValid()) {
         VLF("MSG: Ethernet, writing defaults to NV");

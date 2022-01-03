@@ -91,7 +91,7 @@ void Focuser::init() {
   #endif
 
   // confirm the data structure size
-  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error NV subsystem writes disabled"); }
+  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); }
 
   // init settings stored in NV
   if (!nv.isKeyValid()) {

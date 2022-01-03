@@ -19,7 +19,7 @@ void Rotator::init() {
   delay(1000);
 
   // confirm the data structure size
-  if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(); RotatorSettingsSize error NV subsystem writes disabled"); }
+  if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(); RotatorSettingsSize error"); }
 
   // get settings stored in NV ready
   if (!nv.isKeyValid()) {

@@ -20,7 +20,7 @@ inline void guideWrapper() { guide.poll(); }
 
 void Guide::init() {
   // confirm the data structure size
-  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(); GuideSettingsSize error NV subsystem writes disabled"); }
+  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(); GuideSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.isKeyValid()) {
