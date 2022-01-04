@@ -161,26 +161,21 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
     return false;
   }
 
-  if (!isTmcSPI()) {
-    if (currentHold != OFF || currentRun != OFF || currentGoto != OFF) {
-      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" current settings are not valid for this driver type!");
+  if (isTmcSPI()) {
+    if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
+      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
       return false;
     }
-  }
 
-  if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
-    return false;
-  }
+    if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
+      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+      return false;
+    }
 
-  if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
-    return false;
-  }
-
-  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
-    return false;
+    if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
+      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+      return false;
+    }
   }
 
   return true;
