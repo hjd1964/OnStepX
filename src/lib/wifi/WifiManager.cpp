@@ -25,9 +25,8 @@ bool WifiManager::init() {
 
     VF("MSG: WiFi, AP Enable   = "); VL(settings.accessPointEnabled);
     VF("MSG: WiFi, AP Fallback = "); VL(settings.stationApFallback);
-    VF("MSG: WiFi, Sta Enable  = "); VL(settings.stationEnabled);
 
-    if (settings.accessPointEnabled) {
+    if (settings.accessPointEnabled || settings.stationApFallback) {
       VF("MSG: WiFi, AP SSID     = "); VL(settings.ap.ssid);
       VF("MSG: WiFi, AP PWD      = "); VL(settings.ap.pwd);
       VF("MSG: WiFi, AP CH       = "); VL(settings.ap.channel);
@@ -43,14 +42,18 @@ bool WifiManager::init() {
     IPAddress sta_sn = IPAddress(sta->sn);
     IPAddress target = IPAddress(sta->target);
 
-    VF("MSG: WiFi, Station#    = "); VL(stationNumber);
-    VF("MSG: WiFi, Sta DHCP En = "); VL(sta->dhcpEnabled);
-    VF("MSG: WiFi, Sta SSID    = "); VL(sta->ssid);
-    VF("MSG: WiFi, Sta PWD     = "); VL(sta->pwd);
-    VF("MSG: WiFi, Sta IP      = "); VL(sta_ip.toString());
-    VF("MSG: WiFi, Sta GATEWAY = "); VL(sta_gw.toString());
-    VF("MSG: WiFi, Sta SN      = "); VL(sta_sn.toString());
-    VF("MSG: WiFi, Sta TARGET  = "); VL(target.toString());
+    VF("MSG: WiFi, Sta Enable  = "); VL(settings.stationEnabled);
+
+    if (settings.stationEnabled) {
+      VF("MSG: WiFi, Station#    = "); VL(stationNumber);
+      VF("MSG: WiFi, Sta DHCP En = "); VL(sta->dhcpEnabled);
+      VF("MSG: WiFi, Sta SSID    = "); VL(sta->ssid);
+      VF("MSG: WiFi, Sta PWD     = "); VL(sta->pwd);
+      VF("MSG: WiFi, Sta IP      = "); VL(sta_ip.toString());
+      VF("MSG: WiFi, Sta GATEWAY = "); VL(sta_gw.toString());
+      VF("MSG: WiFi, Sta SN      = "); VL(sta_sn.toString());
+      VF("MSG: WiFi, Sta TARGET  = "); VL(target.toString());
+    }
 
   TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
