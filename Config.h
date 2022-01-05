@@ -25,7 +25,7 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define STATUS_LED                     ON //     ON, Steady illumination if no error, blinks w/error code otherwise.          Option
+#define STATUS_LED                    OFF //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
 
 // RETICLE CONTROL ------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#RETICLE
 #define RETICLE_LED                   OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
