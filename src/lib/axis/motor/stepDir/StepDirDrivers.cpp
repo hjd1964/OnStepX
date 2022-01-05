@@ -122,6 +122,8 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
   }
 
   // automatically set fault status for known drivers
+  status.active = settings.status != OFF;
+
   if (settings.status == ON) {
     switch (settings.model) {
       case DRV8825: settings.status = LOW; break;

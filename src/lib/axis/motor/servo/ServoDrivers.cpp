@@ -38,9 +38,9 @@ void ServoDriver::init() {
   #endif
 
   // automatically set fault status for known drivers
-  if (settings.status == ON) {
-    settings.status = LOW;
-  }
+  status.active = settings.status != OFF;
+
+  if (settings.status == ON) settings.status = LOW;
 
   // set fault pin mode
   if (settings.status == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);

@@ -114,7 +114,7 @@ class StepDirDriver {
     bool isDecayOnM2();
 
     int     axisNumber;
-    DriverStatus status = {{false, false}, {false, false}, false, false, false, false};
+    DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};
 
     int     microstepRatio        = 1;
     int     microstepCode         = OFF;

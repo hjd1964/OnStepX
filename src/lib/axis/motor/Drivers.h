@@ -6,6 +6,7 @@ typedef struct DriverOutputStatus {
 } DriverOutputStatus;
 
 typedef struct DriverStatus {
+  bool active;
   DriverOutputStatus outputA;
   DriverOutputStatus outputB;
   bool overTemperaturePreWarning;
