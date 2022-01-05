@@ -208,7 +208,7 @@ void StepDirDriver::modeMicrostepTracking() {
     noInterrupts();
     digitalWriteEx(Pins->m0, bitRead(microstepBitCode, 0));
     digitalWriteEx(Pins->m1, bitRead(microstepBitCode, 1));
-    digitalWriteEx(Pins->m2, bitRead(microstepBitCode, 2));
+    digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
     interrupts();
   }
 }
@@ -242,7 +242,7 @@ int StepDirDriver::modeMicrostepSlewing() {
       noInterrupts();
       digitalWriteEx(Pins->m0, bitRead(microstepBitCodeGoto, 0));
       digitalWriteEx(Pins->m1, bitRead(microstepBitCodeGoto, 1));
-      digitalWriteEx(Pins->m2, bitRead(microstepBitCodeGoto, 2));
+      digitalWriteEx(m2Pin, bitRead(microstepBitCodeGoto, 2));
       interrupts();
     }
   }
