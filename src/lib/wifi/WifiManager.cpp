@@ -77,11 +77,12 @@ bool WifiManager::init() {
     if (settings.accessPointEnabled) WiFi.softAPConfig(ap_ip, ap_gw, ap_sn);
 
     // wait for connection
-    for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
+    if (settings.stationEnabled) for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
 
-    if (WiFi.status() != WL_CONNECTED) {
+    if (settings.stationEnabled && WiFi.status() != WL_CONNECTED) {
+
       // if connection fails fall back to access-point mode
-      if (settings.stationEnabled && settings.stationApFallback && !settings.accessPointEnabled) {
+      if (settings.stationApFallback && !settings.accessPointEnabled) {
         VLF("MSG: WiFi starting station failed");
         WiFi.disconnect();
         delay(3000);
@@ -91,10 +92,15 @@ bool WifiManager::init() {
         goto TryAgain;
       }
 
-      VLF("MSG: WiFi, initialization failed");
+      if (!settings.accessPointEnabled) {
+        VLF("MSG: WiFi, initialization failed");
+      } else {
+        active = true;
+        VLF("MSG: WiFi, AP initialized station failed");
+      }
     } else {
       active = true;
-      VLF("MSG: WiFi, initialized");      
+      VLF("MSG: WiFi, initialized");
     }
   }
 
