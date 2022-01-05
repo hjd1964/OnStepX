@@ -28,7 +28,7 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
   if (mtrHandle == 0) { D(axisPrefix); DLF("no axis monitor, exiting!"); return false; }
 
   #if DEBUG == VERBOSE
-    V(axisPrefix); V("init step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
+    V(axisPrefix); V("pins step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
     V(", dir="); if (Pins->dir == OFF) VF("OFF"); else V(Pins->dir);
     V(", en="); if (Pins->enable == OFF) VLF("OFF"); else if (Pins->enable == SHARED) VLF("SHARED"); else VL(Pins->enable);
   #endif

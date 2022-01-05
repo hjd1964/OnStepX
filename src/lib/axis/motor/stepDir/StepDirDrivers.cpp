@@ -97,6 +97,20 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
     pinModeEx(decayPin, OUTPUT);
     digitalWriteEx(decayPin, getDecayPinState(settings.decay));
 
+    #if DEBUG == VERBOSE
+      VF("MSG: StepDvr"); V(axisNumber);
+      V(", pins m0="); if (Pins->m0 == OFF) V("OFF"); else V(Pins->m0);
+      V(", m1="); if (Pins->m1 == OFF) VF("OFF"); else V(Pins->m1);
+      V(", m2="); if (Pins->m2 == OFF) VF("OFF"); else V(Pins->m2);
+      if (!isTmcSPI()) {
+        V(", decay="); if (decayPin == OFF) VF("OFF"); else V(decayPin);
+        if (settings.status == ON) {
+          V(", fault="); if (Pins->fault == OFF) VF("OFF"); else V(Pins->fault);
+        }
+      }
+      VL("");
+    #endif
+
     microstepBitCode = microstepCode;
     microstepBitCodeGoto = microstepCodeGoto;
     pinModeEx(Pins->m0, OUTPUT);
