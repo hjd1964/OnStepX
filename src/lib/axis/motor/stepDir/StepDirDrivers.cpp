@@ -65,9 +65,9 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
 
   VF("MSG: StepDvr"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
   VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF (assuming 1X)"); settings.microsteps = 1; } else { V(settings.microsteps); VF("X"); }
-  VF(" (goto mode "); if (settings.microstepsGoto == SAME) { VLF("SAME)"); } else { V(settings.microstepsGoto); VL("X)"); }
+  VF(" (goto mode "); if (settings.microstepsGoto == OFF) { VLF("OFF)"); } else { V(settings.microstepsGoto); VL("X)"); }
 
-  if (settings.microstepsGoto == SAME) settings.microstepsGoto = settings.microsteps;
+  if (settings.microstepsGoto == OFF) settings.microstepsGoto = settings.microsteps;
   microstepCode = subdivisionsToCode(settings.microsteps);
   microstepCodeGoto = subdivisionsToCode(settings.microstepsGoto);
   microstepRatio = settings.microsteps/settings.microstepsGoto;

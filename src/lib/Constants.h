@@ -2,10 +2,8 @@
 #pragma once
 
 // misc.
-#define OFF                         -1
-#define SAME                        -1
-#define HALF                        -1
 #define AUTO                        -1
+#define OFF                         -1
 #define ON                          -2
 #define AUX                         -3
 #define SLAVE                       -4

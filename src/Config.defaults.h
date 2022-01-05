@@ -162,13 +162,13 @@
   #define AXIS1_DRIVER_DECAY_GOTO       OFF                       // OFF for default, TMC SPREADCYCLE
   #endif
   #ifndef AXIS1_DRIVER_IHOLD
-  #define AXIS1_DRIVER_IHOLD            HALF                      // in mA
+  #define AXIS1_DRIVER_IHOLD            OFF                       // in mA
   #endif
   #ifndef AXIS1_DRIVER_IRUN
   #define AXIS1_DRIVER_IRUN             OFF                       // in mA
   #endif
   #ifndef AXIS1_DRIVER_IGOTO
-  #define AXIS1_DRIVER_IGOTO            SAME                      // in mA
+  #define AXIS1_DRIVER_IGOTO            OFF                       // in mA
   #endif
   #ifndef AXIS1_DRIVER_STATUS
   #define AXIS1_DRIVER_STATUS           OFF                       // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
@@ -286,13 +286,13 @@
   #define AXIS2_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS2_DRIVER_IHOLD
-  #define AXIS2_DRIVER_IHOLD            HALF
+  #define AXIS2_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS2_DRIVER_IRUN
   #define AXIS2_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS2_DRIVER_IGOTO
-  #define AXIS2_DRIVER_IGOTO            SAME
+  #define AXIS2_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS2_DRIVER_STATUS
   #define AXIS2_DRIVER_STATUS           OFF
@@ -620,13 +620,13 @@
   #define AXIS3_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS3_DRIVER_IHOLD
-  #define AXIS3_DRIVER_IHOLD            HALF
+  #define AXIS3_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS3_DRIVER_IRUN
   #define AXIS3_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS3_DRIVER_IGOTO
-  #define AXIS3_DRIVER_IGOTO            SAME
+  #define AXIS3_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS3_DRIVER_STATUS
   #define AXIS3_DRIVER_STATUS           OFF
@@ -755,13 +755,13 @@
   #define AXIS4_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS4_DRIVER_IHOLD
-  #define AXIS4_DRIVER_IHOLD            HALF
+  #define AXIS4_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS4_DRIVER_IRUN
   #define AXIS4_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS4_DRIVER_IGOTO
-  #define AXIS4_DRIVER_IGOTO            SAME
+  #define AXIS4_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS4_DRIVER_STATUS
   #define AXIS4_DRIVER_STATUS           OFF
@@ -889,13 +889,13 @@
   #define AXIS5_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS5_DRIVER_IHOLD
-  #define AXIS5_DRIVER_IHOLD            HALF
+  #define AXIS5_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS5_DRIVER_IRUN
   #define AXIS5_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS5_DRIVER_IGOTO
-  #define AXIS5_DRIVER_IGOTO            SAME
+  #define AXIS5_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS5_DRIVER_STATUS
   #define AXIS5_DRIVER_STATUS           OFF
@@ -1023,13 +1023,13 @@
   #define AXIS6_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS6_DRIVER_IHOLD
-  #define AXIS6_DRIVER_IHOLD            HALF
+  #define AXIS6_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS6_DRIVER_IRUN
   #define AXIS6_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS6_DRIVER_IGOTO
-  #define AXIS6_DRIVER_IGOTO            SAME
+  #define AXIS6_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS6_DRIVER_STATUS
   #define AXIS6_DRIVER_STATUS           OFF
@@ -1157,13 +1157,13 @@
   #define AXIS7_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS7_DRIVER_IHOLD
-  #define AXIS7_DRIVER_IHOLD            HALF
+  #define AXIS7_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS7_DRIVER_IRUN
   #define AXIS7_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS7_DRIVER_IGOTO
-  #define AXIS7_DRIVER_IGOTO            SAME
+  #define AXIS7_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS7_DRIVER_STATUS
   #define AXIS7_DRIVER_STATUS           OFF
@@ -1291,13 +1291,13 @@
   #define AXIS8_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS8_DRIVER_IHOLD
-  #define AXIS8_DRIVER_IHOLD            HALF
+  #define AXIS8_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS8_DRIVER_IRUN
   #define AXIS8_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS8_DRIVER_IGOTO
-  #define AXIS8_DRIVER_IGOTO            SAME
+  #define AXIS8_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS8_DRIVER_STATUS
   #define AXIS8_DRIVER_STATUS           OFF
@@ -1425,13 +1425,13 @@
   #define AXIS9_DRIVER_DECAY_GOTO       OFF
   #endif
   #ifndef AXIS9_DRIVER_IHOLD
-  #define AXIS9_DRIVER_IHOLD            HALF
+  #define AXIS9_DRIVER_IHOLD            OFF
   #endif
   #ifndef AXIS9_DRIVER_IRUN
   #define AXIS9_DRIVER_IRUN             OFF
   #endif
   #ifndef AXIS9_DRIVER_IGOTO
-  #define AXIS9_DRIVER_IGOTO            SAME
+  #define AXIS9_DRIVER_IGOTO            OFF
   #endif
   #ifndef AXIS9_DRIVER_STATUS
   #define AXIS9_DRIVER_STATUS           OFF

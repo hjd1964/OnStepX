@@ -107,11 +107,11 @@
   #if AXIS1_DRIVER_IRUN != OFF && (AXIS1_DRIVER_IRUN < 0 || AXIS1_DRIVER_IRUN > 3000)
     #error "Configuration (Config.h): Setting AXIS1_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS1_DRIVER_IHOLD != HALF && (AXIS1_DRIVER_IHOLD < 0 || AXIS1_DRIVER_IHOLD > 3000)
-    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
+  #if AXIS1_DRIVER_IHOLD != OFF && (AXIS1_DRIVER_IHOLD < 0 || AXIS1_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS1_DRIVER_IGOTO != SAME && (AXIS1_DRIVER_IGOTO < 0 || AXIS1_DRIVER_IGOTO > 3000)
-    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
+  #if AXIS1_DRIVER_IGOTO != OFF && (AXIS1_DRIVER_IGOTO < 0 || AXIS1_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
@@ -193,11 +193,11 @@
   #if AXIS2_DRIVER_IRUN != OFF && (AXIS2_DRIVER_IRUN < 0 || AXIS2_DRIVER_IRUN > 3000)
     #error "Configuration (Config.h): Setting AXIS2_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS2_DRIVER_IHOLD != HALF && (AXIS2_DRIVER_IHOLD < 0 || AXIS2_DRIVER_IHOLD > 3000)
-    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IHOLD unknown, use HALF or a value 0 to 3000 (mA.)"
+  #if AXIS2_DRIVER_IHOLD != OFF && (AXIS2_DRIVER_IHOLD < 0 || AXIS2_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS2_DRIVER_IGOTO != SAME && (AXIS2_DRIVER_IGOTO < 0 || AXIS2_DRIVER_IGOTO > 3000)
-    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IGOTO unknown, use SAME or a value 0 to 3000 (mA.)"
+  #if AXIS2_DRIVER_IGOTO != OFF && (AXIS2_DRIVER_IGOTO < 0 || AXIS2_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
@@ -423,16 +423,16 @@
   #if AXIS3_DRIVER_IRUN != OFF && (AXIS3_DRIVER_IRUN < 0 || AXIS3_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS3_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS3_DRIVER_IHOLD != HALF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS3_DRIVER_IHOLD != OFF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS3_DRIVER_IGOTO != SAME && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS3_DRIVER_IGOTO != OFF && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
 #ifdef AXIS3_SERVO_PRESENT
-  #if AXIS3_SERVO_ENCODER != SAME && (AXIS3_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS3_SERVO_ENCODER > SERVO_ENCODER_LAST)
+  #if AXIS3_SERVO_ENCODER != OFF && (AXIS3_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS3_SERVO_ENCODER > SERVO_ENCODER_LAST)
     #error "Configuration (Config.h): Setting AXIS3_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
@@ -540,11 +540,11 @@
   #if AXIS4_DRIVER_IRUN != OFF && (AXIS4_DRIVER_IRUN < 0 || AXIS4_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS4_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS4_DRIVER_IHOLD != HALF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS4_DRIVER_IHOLD != OFF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS4_DRIVER_IGOTO != SAME && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS4_DRIVER_IGOTO != OFF && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
@@ -622,11 +622,11 @@
   #if AXIS5_DRIVER_IRUN != OFF && (AXIS5_DRIVER_IRUN < 0 || AXIS5_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS5_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS5_DRIVER_IHOLD != HALF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS5_DRIVER_IHOLD != OFF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS5_DRIVER_IGOTO != SAME && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS5_DRIVER_IGOTO != OFF && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
@@ -704,11 +704,11 @@
   #if AXIS6_DRIVER_IRUN != OFF && (AXIS6_DRIVER_IRUN < 0 || AXIS6_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS6_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS6_DRIVER_IHOLD != HALF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS6_DRIVER_IHOLD != OFF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS6_DRIVER_IGOTO != SAME && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS6_DRIVER_IGOTO != OFF && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
@@ -786,11 +786,11 @@
   #if AXIS7_DRIVER_IRUN != OFF && (AXIS7_DRIVER_IRUN < 0 || AXIS7_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS7_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS7_DRIVER_IHOLD != HALF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS7_DRIVER_IHOLD != OFF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS7_DRIVER_IGOTO != SAME && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS7_DRIVER_IGOTO != OFF && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
@@ -868,11 +868,11 @@
   #if AXIS8_DRIVER_IRUN != OFF && (AXIS8_DRIVER_IRUN < 0 || AXIS8_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS8_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS8_DRIVER_IHOLD != HALF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS8_DRIVER_IHOLD != OFF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS8_DRIVER_IGOTO != SAME && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS8_DRIVER_IGOTO != OFF && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
@@ -950,11 +950,11 @@
   #if AXIS9_DRIVER_IRUN != OFF && (AXIS9_DRIVER_IRUN < 0 || AXIS9_DRIVER_IRUN > 1000)
     #error "Configuration (Config.h): Setting AXIS9_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS9_DRIVER_IHOLD != HALF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use HALF or a value 0 to 1000 (mA.)"
+  #if AXIS9_DRIVER_IHOLD != OFF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 1000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
-  #if AXIS9_DRIVER_IGOTO != SAME && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use SAME or a value 0 to 1000 (mA.)"
+  #if AXIS9_DRIVER_IGOTO != OFF && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 1000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
   #endif
 #endif
 
