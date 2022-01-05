@@ -19,6 +19,17 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
   UNUSED(supressFrame);
 
   if (command[0] == 'G') {
+    // :Gm#       Gets the meridian pier-side
+    //            Returns: E#, W#, N# (none/parked)
+    if (command[1] == 'm' && parameter[0] == 0)  {
+      strcpy(reply, "?");
+      Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (current.pierSide == PIER_SIDE_NONE) reply[0]='N';
+      if (current.pierSide == PIER_SIDE_EAST) reply[0]='E';
+      if (current.pierSide == PIER_SIDE_WEST) reply[0]='W';
+      *numericReply = false;
+    } else
+
     // :GU#       Get telescope Status
     //            Returns: s#
     if (command[1] == 'U' && parameter[0] == 0)  {
