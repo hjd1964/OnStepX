@@ -310,8 +310,8 @@ DriverStatus StepDirDriver::getStatus() {
 
 int8_t StepDirDriver::getDecayPinState(int8_t decay) {
   uint8_t state = OFF;
-  if (decay == SPREADCYCLE) state = LOW;  else
-  if (decay == STEALTHCHOP) state = HIGH; else
+  if (decay == SPREADCYCLE) state = HIGH; else
+  if (decay == STEALTHCHOP) state = LOW;  else
   if (decay == MIXED)       state = LOW;  else
   if (decay == FAST)        state = HIGH;
   return state;
