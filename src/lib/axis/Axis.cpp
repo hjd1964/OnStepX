@@ -52,8 +52,13 @@ void Axis::init(Motor *motor, void (*callback)()) {
   nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
 
   // read axis settings from NV
+  AxisSettings backupSettings = settings;
   nv.readBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &settings, sizeof(AxisSettings));
-  if (!validateAxisSettings(axisNumber, settings)) nv.initError = true;
+  if (!validateAxisSettings(axisNumber, settings)) {
+    V(axisPrefix); VLF("NV settings validation failed using Config.h defaults");
+    settings = backupSettings;
+    nv.initError = true;
+  }
   
   #if DEBUG == VERBOSE
     V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
