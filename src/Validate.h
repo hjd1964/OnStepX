@@ -141,15 +141,15 @@
   #error "Configuration (Config.h): Setting AXIS1_LIMIT_MAX unknown, use value in the range 90 to 360."
 #endif
 
-#if AXIS1_SENSE_HOME != OFF && AXIS1_SENSE_HOME < 0
+#if (AXIS1_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS1_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS1_SENSE_LIMIT_MIN != OFF && AXIS1_SENSE_LIMIT_MIN < 0
+#if (AXIS1_SENSE_LIMIT_MIN) != OFF && (AXIS1_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS1_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS1_SENSE_LIMIT_MAX != OFF && AXIS1_SENSE_LIMIT_MAX < 0
+#if (AXIS1_SENSE_LIMIT_MAX) != OFF && (AXIS1_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS1_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -223,15 +223,15 @@
   #error "Configuration (Config.h): Setting AXIS2_LIMIT_MAX unknown, use value in the range 90 to 360."
 #endif
 
-#if AXIS2_SENSE_HOME != OFF && AXIS2_SENSE_HOME < 0
+#if (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS2_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS2_SENSE_LIMIT_MIN != OFF && AXIS2_SENSE_LIMIT_MIN < 0
+#if (AXIS2_SENSE_LIMIT_MIN) != OFF && (AXIS2_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS2_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS2_SENSE_LIMIT_MAX != OFF && AXIS2_SENSE_LIMIT_MAX < 0
+#if (AXIS2_SENSE_LIMIT_MAX) != OFF && (AXIS2_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS2_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -316,7 +316,7 @@
 #endif
 
 // SENSORS
-#if LIMIT_SENSE != OFF && LIMIT_SENSE < 0
+#if (LIMIT_SENSE) != OFF && (LIMIT_SENSE) < 0
   #error "Configuration (Config.h): Setting LIMIT_SENSE unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -325,7 +325,7 @@
   #error "Configuration (Config.h): Setting PEC_STEPS_PER_WORM_ROTATION unknown, use the value 0 to disable or 1 to 129600000 (steps.)"
 #endif
 
-#if PEC_SENSE != OFF && PEC_SENSE < 0
+#if (PEC_SENSE) != OFF && (PEC_SENSE) < 0
   #error "Configuration (Config.h): Setting PEC_SENSE unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -453,15 +453,15 @@
   #error "Configuration (Config.h): Setting AXIS3_LIMIT_MAX unknown, use value in the range 0 to 360."
 #endif
 
-#if AXIS3_SENSE_HOME != OFF && AXIS3_SENSE_HOME < 0
+#if (AXIS3_SENSE_HOME) != OFF && (AXIS3_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS3_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS3_SENSE_LIMIT_MIN != OFF && AXIS3_SENSE_LIMIT_MIN < 0
+#if (AXIS3_SENSE_LIMIT_MIN) != OFF && (AXIS3_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS3_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS3_SENSE_LIMIT_MAX != OFF && AXIS3_SENSE_LIMIT_MAX < 0
+#if (AXIS3_SENSE_LIMIT_MAX) != OFF && (AXIS3_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS3_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -499,7 +499,7 @@
   #error "Configuration (Config.h): Setting AXIS4_LIMIT_MAX unknown, use value in the range AXIS4_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS4_SENSE_HOME != OFF && AXIS4_SENSE_HOME < 0
+#if (AXIS4_SENSE_HOME) != OFF && (AXIS4_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS4_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -581,15 +581,15 @@
   #error "Configuration (Config.h): Setting AXIS5_LIMIT_MAX unknown, use value in the range AXIS5_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS5_SENSE_HOME != OFF && AXIS5_SENSE_HOME < 0
+#if (AXIS5_SENSE_HOME) != OFF && (AXIS5_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS5_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS5_SENSE_LIMIT_MIN != OFF && AXIS5_SENSE_LIMIT_MIN < 0
+#if (AXIS5_SENSE_LIMIT_MIN) != OFF && (AXIS5_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS5_SENSE_LIMIT_MAX != OFF && AXIS5_SENSE_LIMIT_MAX < 0
+#if (AXIS5_SENSE_LIMIT_MAX) != OFF && (AXIS5_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS5_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -663,15 +663,15 @@
   #error "Configuration (Config.h): Setting AXIS6_LIMIT_MAX unknown, use value in the range AXIS6_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS6_SENSE_HOME != OFF && AXIS6_SENSE_HOME < 0
+#if (AXIS6_SENSE_HOME) != OFF && (AXIS6_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS6_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS6_SENSE_LIMIT_MIN != OFF && AXIS6_SENSE_LIMIT_MIN < 0
+#if (AXIS6_SENSE_LIMIT_MIN) != OFF && (AXIS6_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS6_SENSE_LIMIT_MAX != OFF && AXIS6_SENSE_LIMIT_MAX < 0
+#if (AXIS6_SENSE_LIMIT_MAX) != OFF && (AXIS6_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS6_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -745,15 +745,15 @@
   #error "Configuration (Config.h): Setting AXIS7_LIMIT_MAX unknown, use value in the range AXIS7_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS7_SENSE_HOME != OFF && AXIS7_SENSE_HOME < 0
+#if (AXIS7_SENSE_HOME) != OFF && (AXIS7_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS7_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS7_SENSE_LIMIT_MIN != OFF && AXIS7_SENSE_LIMIT_MIN < 0
+#if (AXIS7_SENSE_LIMIT_MIN) != OFF && (AXIS7_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS7_SENSE_LIMIT_MAX != OFF && AXIS7_SENSE_LIMIT_MAX < 0
+#if (AXIS7_SENSE_LIMIT_MAX) != OFF && (AXIS7_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS7_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -827,15 +827,15 @@
   #error "Configuration (Config.h): Setting AXIS8_LIMIT_MAX unknown, use value in the range AXIS8_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS8_SENSE_HOME != OFF && AXIS8_SENSE_HOME < 0
+#if (AXIS8_SENSE_HOME) != OFF && (AXIS8_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS8_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS8_SENSE_LIMIT_MIN != OFF && AXIS8_SENSE_LIMIT_MIN < 0
+#if (AXIS8_SENSE_LIMIT_MIN) != OFF && (AXIS8_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS8_SENSE_LIMIT_MAX != OFF && AXIS8_SENSE_LIMIT_MAX < 0
+#if (AXIS8_SENSE_LIMIT_MAX) != OFF && (AXIS8_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS8_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
@@ -909,15 +909,15 @@
   #error "Configuration (Config.h): Setting AXIS9_LIMIT_MAX unknown, use value in the range AXIS9_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS9_SENSE_HOME != OFF && AXIS9_SENSE_HOME < 0
+#if (AXIS9_SENSE_HOME) != OFF && (AXIS9_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS9_SENSE_LIMIT_MIN != OFF && AXIS9_SENSE_LIMIT_MIN < 0
+#if (AXIS9_SENSE_LIMIT_MIN) != OFF && (AXIS9_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS9_SENSE_LIMIT_MAX != OFF && AXIS9_SENSE_LIMIT_MAX < 0
+#if (AXIS9_SENSE_LIMIT_MAX) != OFF && (AXIS9_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS9_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 

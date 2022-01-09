@@ -33,7 +33,7 @@ CommandError Home::request() {
       return CE_SLEW_IN_MOTION;
     }
 
-    if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+    if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
       CommandError e = reset();
       if (e != CE_NONE) return e;
     }
@@ -48,7 +48,7 @@ CommandError Home::request() {
 
     VLF("MSG: Mount, moving to home");
 
-    if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+    if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
       isRequestWithReset = false;
       guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
     } else {
@@ -78,7 +78,7 @@ CommandError Home::request() {
 
 // reset mount, moves to the home position first if home switches are present
 CommandError Home::requestWithReset() {
-  if (AXIS1_SENSE_HOME != OFF && AXIS2_SENSE_HOME != OFF) {
+  if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
     CommandError result = request();
     isRequestWithReset = true;
     return result;

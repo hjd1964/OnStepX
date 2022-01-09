@@ -109,7 +109,7 @@
 
 // check AUX3 pin assignments
 #if AUX3_PIN != OFF
-  #if AUX3_PIN == AXIS1_SENSE_HOME_PIN && AXIS1_SENSE_HOME != OFF
+  #if AUX3_PIN == AXIS1_SENSE_HOME_PIN && (AXIS1_SENSE_HOME) != OFF
     #ifdef AUX3_PIN_IN_USE
       #error "Configuration (Config.h): AXIS1_SENSE_HOME enabled but AUX3_PIN is already in use, choose one feature on AUX3_PIN"
     #endif
@@ -134,7 +134,7 @@
 
 // check AUX4 pin assignments
 #if AUX4_PIN != OFF
-  #if AUX4_PIN == AXIS2_SENSE_HOME_PIN && AXIS2_SENSE_HOME != OFF
+  #if AUX4_PIN == AXIS2_SENSE_HOME_PIN && (AXIS2_SENSE_HOME) != OFF
     #ifdef AUX4_PIN_IN_USE
       #error "Configuration (Config.h): AXIS2_SENSE_HOME enabled but AUX4_PIN is already in use, choose one feature on AUX4_PIN"
     #endif
