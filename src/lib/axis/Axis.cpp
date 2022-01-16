@@ -571,7 +571,7 @@ void Axis::setMotionLimitsCheck(bool state) {
 
 // checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
 bool Axis::motionError(Direction direction) {
-  if (motor->getDriverStatus().fault) return true;
+  if (fault()) return true;
 
   bool result = false;
 

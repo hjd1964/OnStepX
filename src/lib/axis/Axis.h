@@ -246,8 +246,8 @@ class Axis {
     // get synchronized state (automatic movement of target at setFrequencySteps() rate)
     inline bool getSynchronized() { return motor->getSynchronized(); }
 
-    // for TMC drivers, etc. report status
-    inline bool fault() { return false; };
+    // report fault status of motor driver, if available
+    inline bool fault() { return motor->getDriverStatus().fault; };
 
     // refresh driver status information maximum frequency is 20ms
     void updateDriverStatus();

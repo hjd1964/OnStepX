@@ -116,7 +116,7 @@ uint8_t Limits::errorCode() {
   ERR_ALT_MAX, ERR_WEATHER_INIT, ERR_SITE_INIT, ERR_NV_INIT};
 
   // priority highest to lowest
-  if (error.motorFault) return (uint8_t)ERR_MOTOR_FAULT;
+  if (axis1.fault() || axis2.fault()) return (uint8_t)ERR_MOTOR_FAULT;
   if (error.limitSense.axis1.min || error.limitSense.axis1.max ||
       error.limitSense.axis2.min || error.limitSense.axis2.max) return (uint8_t)ERR_LIMIT_SENSE;
   if (error.altitude.min) return (uint8_t)ERR_ALT_MIN;

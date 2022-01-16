@@ -42,7 +42,6 @@ typedef struct LimitsError {
   AxisError     limit;
   AxisError     limitSense;
   MerdianError  meridian;
-  bool          motorFault;
 } LimitsError;
 
 class Limits {
