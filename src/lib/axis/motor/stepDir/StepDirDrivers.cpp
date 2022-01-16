@@ -20,6 +20,22 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
  {  0,  0,  0,  0,  0,  0,  0,  0,  0}};  // GENERIC
 
+const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
+// minimum step pulse width, in ns
+{ 1000,  // A4988
+  2000,  // DRV8825
+  300,   // S109
+  500,   // LV8729
+  7000,  // RAPS128
+  103,   // TMC2100
+  103,   // TMC2208
+  103,   // TMC2209
+  20,    // ST820
+  103,   // TMC2130
+  103,   // TMC5160
+  OFF    // GENERIC
+};
+
 #if DEBUG != OFF
   const char* DRIVER_NAME[DRIVER_MODEL_COUNT] = {
   "A4988", "DRV8825", "S109", "LV8729", "RAPS128", "TMC2100",
@@ -41,6 +57,20 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
   settings.currentRun  = round(param4);
   settings.currentGoto = round(param5);
   UNUSED(param6);
+
+  #if STEP_WAVE_FORM == PULSE
+    // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
+    if (DriverPulseWidth[settings.model] == OFF) {
+      VF("WRN: StepDvr"); V(axisNumber); VF(", ");
+      V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
+    }
+    if (DriverPulseWidth[settings.model] > HAL_PULSE_WIDTH) {
+      DF("ERR: StepDvr"); D(axisNumber); DF(", "); 
+      D(DRIVER_NAME[settings.model]); DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
+      D(HAL_PULSE_WIDTH); DLF("ns");
+      nv.initError = true;
+    }
+  #endif
 
   if (!isTmcSPI()) {
     if (settings.currentHold != OFF || settings.currentRun != OFF || settings.currentGoto != OFF) {
