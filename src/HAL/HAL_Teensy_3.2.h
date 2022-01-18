@@ -22,25 +22,25 @@
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #if F_CPU >= 120000000
   #define HAL_MAXRATE_LOWER_LIMIT 10
-  #define HAL_PULSE_WIDTH 800
+  #define HAL_PULSE_WIDTH 400  // in ns, estimated
   #ifndef ANALOG_WRITE_PWM_FREQUENCY
     #define ANALOG_WRITE_PWM_FREQUENCY 14648.437
   #endif
 #elif F_CPU >= 96000000
   #define HAL_MAXRATE_LOWER_LIMIT 12
-  #define HAL_PULSE_WIDTH 900
+  #define HAL_PULSE_WIDTH 450  // in ns, estimated
   #ifndef ANALOG_WRITE_PWM_FREQUENCY
     #define ANALOG_WRITE_PWM_FREQUENCY 11718.75
   #endif
 #elif F_CPU >= 72000000
   #define HAL_MAXRATE_LOWER_LIMIT 14
-  #define HAL_PULSE_WIDTH 1000
+  #define HAL_PULSE_WIDTH 500  // in ns, estimated
   #ifndef ANALOG_WRITE_PWM_FREQUENCY
     #define ANALOG_WRITE_PWM_FREQUENCY 8789.062
   #endif
 #else
   #define HAL_MAXRATE_LOWER_LIMIT 28
-  #define HAL_PULSE_WIDTH 1500
+  #define HAL_PULSE_WIDTH 750  // in ns, estimated
 #endif
 
 // New symbol for the default I2C port -------------------------------------------------------------

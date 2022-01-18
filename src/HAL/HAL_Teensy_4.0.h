@@ -25,7 +25,7 @@
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 1.5
-#define HAL_PULSE_WIDTH 0  // effectively disable pulse mode since the pulse width is unknown at this time
+#define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>

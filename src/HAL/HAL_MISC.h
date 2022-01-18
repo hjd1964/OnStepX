@@ -19,7 +19,7 @@
   #define HAL_MAXRATE_LOWER_LIMIT 60
 #endif
 #ifndef HAL_PULSE_WIDTH
-  #define HAL_PULSE_WIDTH 10000
+  #define HAL_PULSE_WIDTH 10000  // in ns, estimated
 #endif
 
 // New symbol for the default I2C port -------------------------------------------------------------

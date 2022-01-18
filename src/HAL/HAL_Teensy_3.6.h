@@ -27,13 +27,13 @@
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #if F_CPU >= 240000000
   #define HAL_MAXRATE_LOWER_LIMIT 2
-  #define HAL_PULSE_WIDTH 260
+  #define HAL_PULSE_WIDTH 200  // in ns, estimated
 #elif F_CPU >= 180000000
   #define HAL_MAXRATE_LOWER_LIMIT 2.6
-  #define HAL_PULSE_WIDTH 400
+  #define HAL_PULSE_WIDTH 300  // in ns, estimated
 #else
   #define HAL_MAXRATE_LOWER_LIMIT 4.8
-  #define HAL_PULSE_WIDTH 500
+  #define HAL_PULSE_WIDTH 400  // in ns, estimated
 #endif
 #define HAL_FAST_PROCESSOR
 
