@@ -34,6 +34,7 @@ bool Feedback::setParam(float param1, float param2, float param3, float param4, 
   this->param4 = param4;
   this->param5 = param5;
   this->param6 = param6;
+  return true;
 }
 
 #endif
