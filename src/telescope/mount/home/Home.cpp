@@ -27,9 +27,9 @@ void Home::init() {
 // move mount to the home position
 CommandError Home::request() {
   #if SLEW_GOTO == ON
-    if (goTo.state != GS_NONE || guide.state != GU_NONE || mount.isSlewing()) return CE_SLEW_IN_MOTION;
+    if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
-      if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
+      if (guide.state == GU_HOME_GUIDE) guide.abortHome();
       return CE_SLEW_IN_MOTION;
     }
 
@@ -96,7 +96,7 @@ CommandError Home::reset(bool fullReset) {
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
   if (guide.state != GU_NONE) {
-    if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
+    if (guide.state == GU_HOME_GUIDE) guide.abortHome();
     return CE_SLEW_IN_MOTION;
   }
 

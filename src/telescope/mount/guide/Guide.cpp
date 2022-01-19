@@ -43,6 +43,7 @@ void Guide::init() {
 // start guide at a given direction and rate on Axis1
 CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
+  if (guide.state == GU_HOME_GUIDE) { abortHome(); return CE_NONE; }
 
   CommandError e = validate(1, guideAction);
   if (e != CE_NONE) return e;
@@ -91,6 +92,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
 // start guide at a given direction and rate on Axis2
 CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
+  if (guide.state == GU_HOME_GUIDE) { abortHome(); return CE_NONE; }
 
   CommandError e = validate(2, guideAction);
   if (e != CE_NONE) return e;
@@ -165,10 +167,8 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
 
 // stop spiral guide
 void Guide::stopSpiral() {
-  stopAxis1(GA_FORWARD);
-  stopAxis1(GA_REVERSE);
-  stopAxis2(GA_FORWARD);
-  stopAxis2(GA_REVERSE);
+  stopAxis1(GA_BREAK);
+  stopAxis2(GA_BREAK);
 }
 
 // start guide home (for use with home switches)
@@ -190,6 +190,14 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
     axis2.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
   #endif
   return CE_NONE;
+}
+
+// stop guide home (for use with home switches)
+void Guide::abortHome() {
+  VLF("MSG: Mount, aborting home guide");
+  state = GU_GUIDE;
+  stopAxis1(GA_BREAK, true);
+  stopAxis2(GA_BREAK, true);
 }
 
 // keep guide rate <= half max
