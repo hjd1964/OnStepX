@@ -37,6 +37,9 @@ class Park {
     // move the mount to the park position
     CommandError request();
 
+    // clear park state on abort
+    void requestAborted();
+
     // once parked save the park state
     void requestDone();
 
@@ -56,6 +59,7 @@ class Park {
   private:
     uint8_t parkSenseHandle = 0;
     uint8_t parkSignalHandle = 0;
+    bool wasTracking = false;
 };
 
 extern Park park;

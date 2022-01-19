@@ -40,6 +40,7 @@ CommandError Home::request() {
 
     #if AXIS2_TANGENT_ARM == OFF
       // stop tracking
+      wasTracking = mount.isTracking();
       mount.tracking(false);
     #endif
 
@@ -53,24 +54,16 @@ CommandError Home::request() {
       guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
     } else {
       #if AXIS2_TANGENT_ARM == OFF
-        axis1.setFrequencySlew(goTo.rate);
-        if (transform.mountType == ALTAZM) axis1.setTargetCoordinate(position.z); else axis1.setTargetCoordinate(position.h);
+        state = HS_HOMING;
+        if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+        return goTo.request(&position, PSS_EAST_ONLY, false);
+      #else
+        axis2.setFrequencySlew(goTo.rate);
+        if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(position.a); else {
+        axis2.setTargetCoordinate(axis2.getIndexPosition());
+        VLF("Mount, home target coordinates set");
+        axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
       #endif
-
-      axis2.setFrequencySlew(goTo.rate);
-      if (transform.mountType == ALTAZM) axis2.setTargetCoordinate(position.a); else {
-        #if AXIS2_TANGENT_ARM == OFF
-          axis2.setTargetCoordinate(position.d);
-        #else
-          axis2.setTargetCoordinate(axis2.getIndexPosition());
-        #endif
-      }
-
-      VLF("Mount, home target coordinates set");
-      #if AXIS2_TANGENT_ARM == OFF
-        axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-      #endif
-      axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
     }
   #endif
   return CE_NONE;
@@ -83,6 +76,18 @@ CommandError Home::requestWithReset() {
     isRequestWithReset = true;
     return result;
   } else return reset();
+}
+
+// clear home state on abort
+void Home::requestAborted() {
+  state = HS_NONE;
+  mount.tracking(wasTracking);
+}
+
+// once homed mark as done
+void Home::requestDone() {
+  state = HS_NONE;
+  reset(false);
 }
 
 // reset mount at home

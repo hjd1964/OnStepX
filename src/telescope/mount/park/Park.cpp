@@ -101,7 +101,7 @@ CommandError Park::request() {
     if (e != CE_NONE) return e;
     
     // stop tracking
-    bool wasTracking = mount.isTracking();
+    wasTracking = mount.isTracking();
     mount.tracking(false);
 
     #if AXIS1_PEC == ON
@@ -144,6 +144,14 @@ CommandError Park::request() {
     }
   #endif
   return CE_NONE;
+}
+
+// clear park state on abort
+void Park::requestAborted() {
+  state = PS_UNPARKED;
+  settings.state = state;
+  nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  mount.tracking(wasTracking);
 }
 
 // once parked save the park state

@@ -9,6 +9,8 @@
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 
+enum HomeState: uint8_t {HS_NONE, HS_HOMING};
+
 class Home {
   public:
     // init the home position (according to settings and mount type)
@@ -22,6 +24,12 @@ class Home {
     // reset mount, moves to the home position first if home switches are present
     CommandError requestWithReset();
 
+    // clear home state on abort
+    void requestAborted();
+
+    // once homed mark as done
+    void requestDone();
+
     // reset mount at home
     CommandError reset(bool fullReset = true);
 
@@ -29,7 +37,10 @@ class Home {
 
     bool isRequestWithReset = false;
 
+    HomeState state;
+
   private:
+    bool wasTracking = false;
 
 };
 

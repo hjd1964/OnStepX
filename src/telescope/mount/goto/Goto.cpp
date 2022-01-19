@@ -177,7 +177,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (a1 > limits.settings.pastMeridianW) a1w -= Deg360; // range 0 to -360 degrees, west of pier
 
   if (mount.isHome()) {
-    VL("MSG: Mount, set target from HOME");
+    VL("MSG: Mount, set target from home");
     if (transform.mountType == FORK) {
       if (preferredPierSide == PSS_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
     } else {
@@ -395,16 +395,10 @@ void Goto::poll() {
   } else
   if (stage == GG_DESTINATION || stage == GG_ABORT) {
     if (!mount.isSlewing()) {
-      VLF("MSG: Mount, goto destination reached (stopping)");
-      axis1.autoSlewRateByDistanceStop();
-      axis2.autoSlewRateByDistanceStop();
-
-      // check if parking and mark as finished
-      if (park.state == PS_PARKING && stage != GG_ABORT) park.requestDone();
+      VLF("MSG: Mount, goto destination reached");
 
       // flag the goto as finished
       state = GS_NONE;
-      stage = GG_NONE;
 
       // back to normal tracking
       mount.update();
@@ -413,6 +407,19 @@ void Goto::poll() {
       tasks.setDurationComplete(taskHandle);
       taskHandle = 0;
       VLF("MSG: Mount, goto monitor task terminated");
+
+      // check if parking and mark as finished or unparked as needed
+      if (park.state == PS_PARKING) {
+        if (stage == GG_ABORT) park.requestAborted(); else park.requestDone();
+      }
+
+      // check if homing
+      if (home.state == HS_HOMING) {
+        if (stage == GG_ABORT) home.requestAborted(); else home.requestDone();
+      }
+
+      // reset goto stage
+      stage = GG_NONE;
 
       status.sound.alert();
 
