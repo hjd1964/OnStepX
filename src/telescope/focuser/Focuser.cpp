@@ -288,7 +288,7 @@ CommandError Focuser::gotoTarget(int index, long target) {
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
-  VF("MSG: Focuser"); V(index + 1); VF(", starting goto at slew rate ("); V(configuration[index].slewRateDesired); VLF("um/s)");
+  VF("MSG: Focuser"); V(index + 1); VLF(", starting goto");
 
   axes[index]->setFrequencyBase(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);

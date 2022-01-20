@@ -102,7 +102,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
       axis2.setTargetCoordinate(a2);
     }
     VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF("°, a2="); V(radToDeg(a2)); VL("°)");
-    VF("MSG: Mount, starting goto at slew rate ("); V(radToDeg(radsPerSecondCurrent)); VL("°/s)");
+    VLF("MSG: Mount, starting goto");
 
     e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
     if (e != CE_NONE) return e;

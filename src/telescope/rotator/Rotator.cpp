@@ -99,7 +99,7 @@ CommandError Rotator::gotoTarget(float target) {
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target); VL("°)");
-  VF("MSG: Rotator, starting goto at slew rate ("); V(AXIS3_SLEW_RATE_DESIRED); VL("°/s)");
+  VLF("MSG: Rotator, starting goto");
 
   axis3.setFrequencyBase(0.0F);
   axis3.setTargetCoordinate(target);
