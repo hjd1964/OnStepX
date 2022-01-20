@@ -259,12 +259,22 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
 
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
+  V(axisPrefix);
+  VF("autoSlewRateByDistance start ");
+
   motor->markOriginCoordinateSteps();
   slewAccelerationDistance = distance;
   motor->setSynchronized(false);
   motor->setSlewing(true);
   autoRate = AR_RATE_BY_DISTANCE;
   rampFreq = 0.0F;
+
+  #if DEBUG == VERBOSE
+    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
+    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
+    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("um/s/s"); }
+  #endif
+
   return CE_NONE;
 }
 

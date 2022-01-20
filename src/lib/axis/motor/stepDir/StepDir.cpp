@@ -179,6 +179,7 @@ void StepDirMotor::modeSwitch() {
 
     if (microstepModeControl == MMC_TRACKING) {
       microstepModeControl = MMC_SLEWING_REQUEST;
+      switchStartTimeMs = millis();
     } else
     if (microstepModeControl == MMC_SLEWING_PAUSE) {
 
@@ -189,6 +190,7 @@ void StepDirMotor::modeSwitch() {
 
       if (enableMoveFast(true)) {
         V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
+        V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms");
       }
 
       microstepModeControl = MMC_SLEWING_READY;
