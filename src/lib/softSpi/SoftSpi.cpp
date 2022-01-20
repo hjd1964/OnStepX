@@ -22,43 +22,51 @@ bool SoftSpi::init(int16_t mosi, int16_t sck, int16_t cs, int16_t miso) {
 
 void SoftSpi::begin() {
   pinModeEx(cs, OUTPUT);
-  digitalWriteEx(cs, HIGH); delayMicroseconds(1);
+  digitalWriteEx(cs, HIGH);
+  delayMicroseconds(1);
   pinMode(sck, OUTPUT);
   digitalWriteF(sck, HIGH);
   pinMode(miso, INPUT);
-  pinMode(mosi, OUTPUT);   delayMicroseconds(1);
-  digitalWriteEx(cs, LOW); delayMicroseconds(1);
+  pinMode(mosi, OUTPUT);
+  delayMicroseconds(1);
+  digitalWriteEx(cs, LOW);
+  delayMicroseconds(1);
 }
 
 void SoftSpi::pause() {
-  digitalWriteEx(cs, HIGH); delayMicroseconds(1);
-  digitalWriteEx(cs, LOW);  delayMicroseconds(1);
+  digitalWriteEx(cs, HIGH);
+  delayMicroseconds(1);
+  digitalWriteEx(cs, LOW);
+  delayMicroseconds(1);
 }
 
 void SoftSpi::end() {
-  digitalWriteEx(cs, HIGH); delayMicroseconds(1);
+  digitalWriteEx(cs, HIGH);
+  delayMicroseconds(1);
 }
 
-uint8_t SoftSpi::transfer(uint8_t data_out)
-{
+uint8_t SoftSpi::transfer(uint8_t data_out) {
   uint8_t data_in = 0;
   for(int i = 7; i >= 0; i--) {
     digitalWriteF(sck, LOW);
-    digitalWriteF(mosi, bitRead(data_out,i)); delayMicroseconds(1);
+    digitalWriteF(mosi, bitRead(data_out, i));
+    delayMicroseconds(1);
     digitalWriteF(sck, HIGH);
-    bitWrite(data_in, i, digitalReadF(miso)); delayMicroseconds(1);
+    bitWrite(data_in, i, digitalReadF(miso));
+    delayMicroseconds(1);
   }
   return data_in;
 }
 
-uint32_t SoftSpi::transfer32(uint32_t data_out)
-{
+uint32_t SoftSpi::transfer32(uint32_t data_out) {
   uint32_t data_in = 0;
   for(int i = 31; i >= 0; i--) {
     digitalWriteF(sck, LOW);
-    digitalWriteF(mosi, bitRead(data_out,i)); delayMicroseconds(1);
+    digitalWriteF(mosi, bitRead(data_out, i));
+    delayMicroseconds(1);
     digitalWriteF(sck, HIGH);
-    bitWrite(data_in, i, digitalReadF(miso)); delayMicroseconds(1);
+    bitWrite(data_in, i, digitalReadF(miso));
+    delayMicroseconds(1);
   }
   return data_in;
 }
