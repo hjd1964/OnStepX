@@ -151,6 +151,11 @@ void Park::requestAborted() {
   state = PS_UNPARKED;
   settings.state = state;
   nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  
+  // restore backlash settings
+  axis1.setBacklash(mount.settings.backlash.axis1);
+  axis2.setBacklash(mount.settings.backlash.axis2);
+  
   mount.tracking(wasTracking);
 }
 
