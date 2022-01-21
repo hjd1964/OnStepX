@@ -148,7 +148,10 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     step = dir;
 
     if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
-    if (microstepModeControl == MMC_SLEWING_READY) microstepModeControl = MMC_SLEWING;
+    if (microstepModeControl == MMC_SLEWING_READY) {
+      V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms");
+      microstepModeControl = MMC_SLEWING;
+    }
 
   } else {
     noInterrupts();
@@ -190,7 +193,6 @@ void StepDirMotor::modeSwitch() {
 
       if (enableMoveFast(true)) {
         V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
-        V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms");
       }
 
       microstepModeControl = MMC_SLEWING_READY;
