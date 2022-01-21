@@ -65,7 +65,7 @@ extern Telescope telescope;
 #endif
 
 void systemServices() {
-  nv.poll();
+  if (!xBusy) nv.poll();
 }
 
 void sensesPoll() {
