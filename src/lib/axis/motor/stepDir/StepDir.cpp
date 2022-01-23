@@ -144,7 +144,10 @@ void StepDirMotor::setFrequencySteps(float frequency) {
 
     // change the motor rate/direction
     if (step != dir) step = 0;
-    tasks.setPeriodSubMicros(taskHandle, lastPeriod);
+    if (lastPeriodSet != lastPeriod) {
+      tasks.setPeriodSubMicros(taskHandle, lastPeriod);
+      lastPeriodSet = lastPeriod;
+    }
     step = dir;
 
     if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
