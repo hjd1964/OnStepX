@@ -36,13 +36,14 @@
 #define HAL_WIRE_CLOCK 100000
 
 // Non-volatile storage ----------------------------------------------------------------------------
-#ifdef NV_DEFAULT
+#if NV_DRIVER == NV_DEFAULT
   #include "../lib/nv/NV_EEPROM.h"
+  #define HAL_NV_INIT() nv.init(4096, false, 0, false);
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { nv.init(4096, false, 0, false); }
+#define HAL_INIT() { ; }
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)

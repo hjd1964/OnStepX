@@ -25,11 +25,12 @@
 #define HAL_WIRE_CLOCK 100000
 
 // Non-volatile storage ----------------------------------------------------------------------------
-#ifdef NV_DEFAULT
+#if NV_DRIVER == NV_DEFAULT
   #define E2END 4095
   #undef  NV_ENDURANCE
   #define NV_ENDURANCE NVE_LOW
   #include "../lib/nv/NV_ESP.h"
+  #define HAL_NV_INIT() nv.init(E2END + 1, false, 5000, false);
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -52,7 +53,6 @@
 
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
-  nv.init(E2END + 1, false, 5000, false); \
   SERIAL_BT_BEGIN(); \
 }
 

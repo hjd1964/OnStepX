@@ -536,11 +536,6 @@
 #define PEC_BUFFER_SIZE_LIMIT         720
 #endif
 
-// non-volatile storage
-#ifndef NV_DEFAULT
-#define NV_DEFAULT                    ON
-#endif
-
 // ESP32 virtual serial bluetooth command channel
 #ifndef SERIAL_BT_MODE
 #define SERIAL_BT_MODE                OFF

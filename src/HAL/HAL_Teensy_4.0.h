@@ -33,9 +33,10 @@
 #define HAL_WIRE_CLOCK 100000
 
 // Non-volatile storage ------------------------------------------------------------------------------
-#ifdef NV_DEFAULT
+#if NV_DRIVER == NV_DEFAULT
   #include "EEPROM.h"
   #include "../lib/nv/NV_EEPROM.h"
+  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false);
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -45,7 +46,6 @@
 #define HAL_INIT() { \
   analogReadResolution(10); \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
-  nv.init(E2END + 1, true, 0, false); \
 }
 
 #define HAL_RESET() { \

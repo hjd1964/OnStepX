@@ -34,17 +34,17 @@
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #undef E2END
-#ifdef NV_DEFAULT
+#if NV_DRIVER == NV_DEFAULT
   #define E2END 4095
-  #define NV_EEPROM_ADDRESS 0x57
+  #define NV_ADDRESS 0x57
   #include "../lib/nv/NV_24XX.h"
+  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_ADDRESS);
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
-  nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_EEPROM_ADDRESS); \
 }
 
 //--------------------------------------------------------------------------------------------------
