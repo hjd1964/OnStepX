@@ -544,6 +544,11 @@
 #define SERIAL_BT_NAME                "OnStep"
 #endif
 
+// use the HAL specified default NV driver
+#ifndef NV_DRIVER
+  #define NV_DRIVER                   NV_DEFAULT
+#endif
+
 // -----------------------------------------------------------------------------------
 // rotator settings, ROTATOR
 #ifndef AXIS3_DRIVER_MODEL
