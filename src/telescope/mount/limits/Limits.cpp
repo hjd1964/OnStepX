@@ -210,6 +210,16 @@ void Limits::poll() {
   if (flt(current.a1, axis1.settings.limits.min)) {
     stopAxis1(GA_REVERSE);
     error.limit.axis1.min = true;
+    // ---------------------------------------------------------
+    if (lastError.limit.axis1.min != error.limit.axis1.min) {
+      D("MSG: Limits, min error A1 = ")
+      D(radToDeg(current.a1));
+      D(" A2 = ");
+      D(radToDeg(current.a2));
+      D(" MIN = ");
+      DL(radToDeg(axis1.settings.limits.min));
+    }
+    // ---------------------------------------------------------
   } else error.limit.axis1.min = false;
 
   if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
@@ -230,6 +240,16 @@ void Limits::poll() {
     {
       stopAxis1(GA_FORWARD);
       error.limit.axis1.max = true;
+      // -------------------------------------------------------------
+      if (lastError.limit.axis1.min != error.limit.axis1.min) {
+        D("MSG: Limits, max error A1 = ")
+        D(radToDeg(current.a1));
+        D(" A2 = ");
+        D(radToDeg(current.a2));
+        D(" MAX = ");
+        DL(radToDeg(axis1.settings.limits.max));
+      }
+      // -------------------------------------------------------------
     }
   } else error.limit.axis1.max = false;
 
