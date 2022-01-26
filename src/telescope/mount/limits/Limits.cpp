@@ -212,7 +212,7 @@ void Limits::poll() {
     error.limit.axis1.min = true;
     // ---------------------------------------------------------
     if (lastError.limit.axis1.min != error.limit.axis1.min) {
-      D("MSG: Limits, min error A1 = ")
+      D("MSG: Limits, min error A1 = ");
       D(radToDeg(current.a1));
       D(" A2 = ");
       D(radToDeg(current.a2));
@@ -242,7 +242,7 @@ void Limits::poll() {
       error.limit.axis1.max = true;
       // -------------------------------------------------------------
       if (lastError.limit.axis1.max != error.limit.axis1.max) {
-        D("MSG: Limits, max error A1 = ")
+        D("MSG: Limits, max error A1 = ");
         D(radToDeg(current.a1));
         D(" A2 = ");
         D(radToDeg(current.a2));
