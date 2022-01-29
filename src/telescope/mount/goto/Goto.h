@@ -127,7 +127,7 @@ class Goto {
     float      radsPerSecondCurrent;
     const double radsPerFrac = (degToRad(15.0/3600.0)/FRACTIONAL_SEC)*SIDEREAL_RATIO;
 
-    GotoSettings settings = {false, false, 128.0F};
+    GotoSettings settings = {false, false, 1000001.0F};
 };
 
 extern Goto goTo;

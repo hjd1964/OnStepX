@@ -44,8 +44,9 @@ void Goto::init() {
     settings.usPerStepCurrent = usPerStepBase;
   #endif
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0F;
+  if (settings.usPerStepCurrent > 1000000.0F) settings.usPerStepCurrent = usPerStepBase;
   if (settings.usPerStepCurrent < usPerStepBase/2.0F) settings.usPerStepCurrent = usPerStepBase/2.0F;
-  if (settings.usPerStepCurrent > 1000000.0F) settings.usPerStepCurrent = 1000000.0F;
+  if (settings.usPerStepCurrent > usPerStepBase*2.0F) settings.usPerStepCurrent = usPerStepBase*2.0F;
   updateAccelerationRates();
 }
 
