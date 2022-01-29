@@ -120,6 +120,10 @@
 #endif
 
 // Non-volatile storage
+#ifndef NV_ENDURANCE
+  #define NV_ENDURANCE NVE_MID
+#endif
+
 #if NV_DRIVER == NV_2416
   #define E2END 2047
 #elif NV_DRIVER == NV_2432

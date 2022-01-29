@@ -100,9 +100,6 @@
 #define NVE_MID                     1   // mid (~ 100K writes)
 #define NVE_HIGH                    2   // high (~ 1M writes)
 #define NVE_VHIGH                   3   // very high (> 1M writes)
-#ifndef NV_ENDURANCE
-  #define NV_ENDURANCE NVE_MID
-#endif
 
 // angular
 #define RAD_DEG_RATIO               57.29577951308232L
