@@ -7,6 +7,8 @@
 
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../../Telescope.h"
+#include "../home/Home.h"
+#include "../Mount.h"
 
 bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
@@ -236,6 +238,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         location.latitude = degToRad(degs);
         updateLocation();
         nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+        if (mount.isHome()) home.init();
       } else *commandError = CE_PARAM_FORM;
     } else 
 
@@ -273,6 +276,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       nv.update(NV_SITE_NUMBER, number);
       readLocation(number);
       updateLocation();
+      if (mount.isHome()) home.init();
       *numericReply = false;
     } else
 

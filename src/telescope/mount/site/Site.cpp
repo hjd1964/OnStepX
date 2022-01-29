@@ -9,6 +9,8 @@
 
 #include "../../Telescope.h"
 #include "../park/Park.h"
+#include "../home/Home.h"
+#include "../Mount.h"
 
 // fractional second sidereal clock (fracsec or millisecond)
 volatile unsigned long fracLAST;
@@ -31,6 +33,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       site.location.elevation = degToRad(elevation);
       strcpy(site.location.name, "GPS");
       site.updateLocation();
+      if (mount.isHome()) home.init();
 
       VLF("MSG: Mount, setting date/time from GPS");
       JulianDate jd;
