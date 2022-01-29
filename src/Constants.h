@@ -180,7 +180,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928927UL
+#define INIT_NV_KEY                 583928928UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
@@ -199,7 +199,7 @@
 #define NV_ALIGN_MODEL_BASE         238    // bytes: 32  , 32
 #define NV_AXIS_SETTINGS_REVERT     270    // bytes: 2   , 2
 #define NV_AXIS_SETTINGS_BASE       272    // bytes: 45*9, 405
-#define NV_FOCUSER_SETTINGS_BASE    677    // bytes: 18*9, 162
-#define NV_ROTATOR_SETTINGS_BASE    839    // bytes: 7   , 7
-#define NV_FEATURE_SETTINGS_BASE    846    // bytes: 3 *8, 24
-#define NV_PEC_BUFFER_BASE          870    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+#define NV_FOCUSER_SETTINGS_BASE    677    // bytes: 18*6, 108
+#define NV_ROTATOR_SETTINGS_BASE    785    // bytes: 7   , 7
+#define NV_FEATURE_SETTINGS_BASE    792    // bytes: 3 *8, 24
+#define NV_PEC_BUFFER_BASE          816    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
