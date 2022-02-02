@@ -119,6 +119,8 @@ class Site {
 
     bool dateIsReady = false;
     bool timeIsReady = false;
+    bool writeDate = true;
+    bool writeTime = true;
 
     // sidereal period in sub-microsecond counts
     unsigned long siderealPeriod = 0;

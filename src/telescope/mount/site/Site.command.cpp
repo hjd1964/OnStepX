@@ -158,7 +158,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         if (hour <  0.0)  { hour += 24.0; ut1.day -= 1.0; }
         dateIsReady = true;
         setSiderealTime(ut1);
-        if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+        if (writeTime) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+        if (NV_ENDURANCE < NVE_MID) writeTime = false;
         updateTlsStatus();
         #if TIME_LOCATION_SOURCE != OFF
           tls.set(ut1);
@@ -206,7 +207,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         ut1.hour = hour + location.timezone;
         timeIsReady = true;
         setSiderealTime(ut1);
-        if (NV_ENDURANCE >= NVE_MID) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+        if (writeDate) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+        if (NV_ENDURANCE < NVE_MID) writeDate = false;
         updateTlsStatus();
         #if TIME_LOCATION_SOURCE != OFF
           tls.set(ut1);
