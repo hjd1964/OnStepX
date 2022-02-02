@@ -60,14 +60,18 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
 
   #if STEP_WAVE_FORM == PULSE
     // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
+    long pulseWidth = HAL_PULSE_WIDTH;
+    if (axisNumber > 2) pulseWidth = 2000;
+
     if (DriverPulseWidth[settings.model] == OFF) {
       VF("WRN: StepDvr"); V(axisNumber); VF(", ");
       V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
     }
-    if (DriverPulseWidth[settings.model] > HAL_PULSE_WIDTH) {
+
+    if (DriverPulseWidth[settings.model] > pulseWidth) {
       DF("ERR: StepDvr"); D(axisNumber); DF(", "); 
       D(DRIVER_NAME[settings.model]); DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
-      D(HAL_PULSE_WIDTH); DLF("ns");
+      D(pulseWidth); DLF("ns");
       nv.initError = true;
     }
   #endif

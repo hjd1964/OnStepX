@@ -375,7 +375,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
         motorSteps--;
         inBacklash = false;
       }
-      if (axisNumber > 2) delayMicroseconds(1);
+      if (axisNumber > 2) delayMicroseconds(2);
       digitalWriteF(stepPin, stepSet);
     } else
     if (direction == dirFwd) {
@@ -386,7 +386,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
         motorSteps++;
         inBacklash = false;
       }
-      if (axisNumber > 2) delayMicroseconds(1);
+      if (axisNumber > 2) delayMicroseconds(2);
       digitalWriteF(stepPin, stepSet);
     }
   }
