@@ -49,11 +49,14 @@ class Guide {
     // start spiral guide at the specified rate (spiral size is porportional to rate)
     CommandError startSpiral(GuideRateSelect rateSelect, unsigned long guideTimeLimit);
 
-    // stop spiral guide
-    void stopSpiral();
-
     // start guide home (for use with home switches)
     CommandError startHome(unsigned long guideTimeLimit);
+
+    // stop both axes of guide
+    void stop();
+
+    // abort both axes of guide
+    void abort();
 
     // returns true if any guide is happening on Axis1
     inline bool activeAxis1() { return guideActionAxis1 != GA_NONE; }

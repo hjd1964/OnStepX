@@ -75,7 +75,8 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
 // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
 // set abort true to rapidly stop (broken limit, etc)
 void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
-  if (guide.state == GU_HOME_GUIDE) abort = true;
+  if (guide.state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
+
   if (guideActionAxis1 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
     if (rateAxis1 == 0.0F) {
@@ -125,7 +126,8 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
 // set abort true to rapidly stop (broken limit, etc)
 void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
-  if (guide.state == GU_HOME_GUIDE) abort = true;
+  if (guide.state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
+
   if (guideActionAxis2 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
     if (rateAxis2 == 0.0F) {
@@ -142,7 +144,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
 
 // start spiral guide at the specified rate (spiral size is porportional to rate)
 CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
-  if (state == GU_SPIRAL_GUIDE) { stopSpiral(); return CE_NONE; }
+  if (state == GU_SPIRAL_GUIDE) { stop(); return CE_NONE; }
   if (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) return CE_SLEW_IN_MOTION;
   CommandError e = validate(0, GA_SPIRAL); if (e != CE_NONE) return e;
 
@@ -167,12 +169,6 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
   return CE_NONE;
 }
 
-// stop spiral guide
-void Guide::stopSpiral() {
-  stopAxis1(GA_BREAK);
-  stopAxis2(GA_BREAK);
-}
-
 // start guide home (for use with home switches)
 CommandError Guide::startHome(unsigned long guideTimeLimit) {
   #if SLEW_GOTO == ON
@@ -192,6 +188,22 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
     axis2.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
   #endif
   return CE_NONE;
+}
+
+// stop both axes of guide
+void Guide::stop() {
+  stopAxis1(GA_BREAK);
+  stopAxis2(GA_BREAK);
+}
+
+// abort both axes of guide
+void Guide::abort() {
+  if (guide.state == GU_HOME_GUIDE) {
+    VLF("MSG: Mount, aborting home guide");
+    state = GU_GUIDE;
+  }
+  stopAxis1(GA_BREAK, true);
+  stopAxis2(GA_BREAK, true);
 }
 
 // keep guide rate <= half max
@@ -356,6 +368,9 @@ void Guide::spiralPoll() {
 }
 
 void Guide::poll() {
+  // just return if no guide is active
+  if (state == GU_NONE) return;
+
   // check fast guide completion axis1
   if (guideActionAxis1 == GA_BREAK && rateAxis1 == 0.0F && !axis1.isSlewing()) {
     guideActionAxis1 = GA_NONE;
@@ -372,10 +387,10 @@ void Guide::poll() {
     if (guideActionAxis2 > GA_BREAK && (long)(millis() - guideFinishTimeAxis2) >= 0) stopAxis2(GA_BREAK);
   }
 
-  // do spiral guiding
+  // do spiral guiding, change rates and stop both axes at once
   if (state == GU_SPIRAL_GUIDE) {
     if (guideActionAxis1 > GA_BREAK && guideActionAxis2 > GA_BREAK) spiralPoll(); else
-    if (guideActionAxis1 != GA_BREAK || guideActionAxis2 != GA_BREAK) stopSpiral();
+    if (guideActionAxis1 > GA_BREAK || guideActionAxis2 > GA_BREAK) stop();
   }
 
   // handle end of home guiding
@@ -389,7 +404,7 @@ void Guide::poll() {
     #endif
   }
 
-  // watch for guides finished
+  // watch for finished guides
   if (guideActionAxis1 == GA_NONE && guideActionAxis2 == GA_NONE) state = GU_NONE;
 }
 
