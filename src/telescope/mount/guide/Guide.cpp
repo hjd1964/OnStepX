@@ -43,7 +43,7 @@ void Guide::init() {
 // start guide at a given direction and rate on Axis1
 CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
-  if (guide.state == GU_HOME_GUIDE) { abortHome(); return CE_NONE; }
+  if (guide.state == GU_HOME_GUIDE) return CE_NONE;
 
   CommandError e = validate(1, guideAction);
   if (e != CE_NONE) return e;
@@ -92,7 +92,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
 // start guide at a given direction and rate on Axis2
 CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
-  if (guide.state == GU_HOME_GUIDE) { abortHome(); return CE_NONE; }
+  if (guide.state == GU_HOME_GUIDE) return CE_NONE;
 
   CommandError e = validate(2, guideAction);
   if (e != CE_NONE) return e;

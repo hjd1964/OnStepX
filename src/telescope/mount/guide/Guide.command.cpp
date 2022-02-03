@@ -86,23 +86,27 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: Nothing
   if (command[0] == 'Q') {
     if (command[1] == 0) {
-        #if SLEW_GOTO == ON
-          goTo.stop();
-        #endif
-        stopAxis1(GA_BREAK);
-        stopAxis2(GA_BREAK);
-        *numericReply = false; 
+        if (guide.state == GU_HOME_GUIDE) {
+          abortHome();
+        } else {
+          #if SLEW_GOTO == ON
+            goTo.stop();
+          #endif
+          stopAxis1(GA_BREAK);
+          stopAxis2(GA_BREAK);
+        }
+        *numericReply = false;
     } else
     // :Qe# Qw#   Halt east/westward Slews
     //            Returns: Nothing
     if ((command[1] == 'e' || command[1] == 'w') && parameter[0] == 0) {
-      stopAxis1(GA_BREAK);
+      if (guide.state == GU_HOME_GUIDE) abortHome(); else stopAxis1(GA_BREAK);
       *numericReply = false;
     } else
     // :Qn# Qs#   Halt north/southward Slews
     //            Returns: Nothing
     if ((command[1] == 'n' || command[1] == 's') && parameter[0] == 0) {
-      stopAxis2(GA_BREAK);
+      if (guide.state == GU_HOME_GUIDE) abortHome(); else stopAxis2(GA_BREAK);
       *numericReply = false;
     } else return false;
   } else
