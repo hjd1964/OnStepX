@@ -89,20 +89,19 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
         #if SLEW_GOTO == ON
           goTo.stop();
         #endif
-        stopAxis1(GA_BREAK);
-        stopAxis2(GA_BREAK);
+        stop();
         *numericReply = false;
     } else
     // :Qe# Qw#   Halt east/westward Slews
     //            Returns: Nothing
     if ((command[1] == 'e' || command[1] == 'w') && parameter[0] == 0) {
-      stopAxis1(GA_BREAK);
+      stopAxis1();
       *numericReply = false;
     } else
     // :Qn# Qs#   Halt north/southward Slews
     //            Returns: Nothing
     if ((command[1] == 'n' || command[1] == 's') && parameter[0] == 0) {
-      stopAxis2(GA_BREAK);
+      stopAxis2();
       *numericReply = false;
     } else return false;
   } else

@@ -37,14 +37,14 @@ class Guide {
 
     // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     // set abort true to rapidly stop (broken limit, etc)
-    void stopAxis1(GuideAction stopDirection, bool abort = false);
+    void stopAxis1(GuideAction stopDirection = GA_BREAK, bool abort = false);
 
     // start guide at a given direction and rate on Axis2
     CommandError startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);
 
     // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     // set abort true to rapidly stop (broken limit, etc)
-    void stopAxis2(GuideAction stopDirection, bool abort = false);
+    void stopAxis2(GuideAction stopDirection = GA_BREAK, bool abort = false);
 
     // start spiral guide at the specified rate (spiral size is porportional to rate)
     CommandError startSpiral(GuideRateSelect rateSelect, unsigned long guideTimeLimit);

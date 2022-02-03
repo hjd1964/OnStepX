@@ -192,8 +192,8 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
 
 // stop both axes of guide
 void Guide::stop() {
-  stopAxis1(GA_BREAK);
-  stopAxis2(GA_BREAK);
+  stopAxis1();
+  stopAxis2();
 }
 
 // abort both axes of guide
@@ -376,7 +376,7 @@ void Guide::poll() {
     guideActionAxis1 = GA_NONE;
     mount.update();
   } else {
-    if (guideActionAxis1 > GA_BREAK && (long)(millis() - guideFinishTimeAxis1) >= 0) stopAxis1(GA_BREAK);
+    if (guideActionAxis1 > GA_BREAK && (long)(millis() - guideFinishTimeAxis1) >= 0) stopAxis1();
   }
 
   // check fast guide completion axis2
@@ -384,7 +384,7 @@ void Guide::poll() {
     guideActionAxis2 = GA_NONE;
     mount.update();
   } else {
-    if (guideActionAxis2 > GA_BREAK && (long)(millis() - guideFinishTimeAxis2) >= 0) stopAxis2(GA_BREAK);
+    if (guideActionAxis2 > GA_BREAK && (long)(millis() - guideFinishTimeAxis2) >= 0) stopAxis2();
   }
 
   // do spiral guiding, change rates and stop both axes at once

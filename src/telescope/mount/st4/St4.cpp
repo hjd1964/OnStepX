@@ -89,8 +89,8 @@
           if (c == ccMw) guide.startAxis1(GA_FORWARD, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
           if (c == ccMn) guide.startAxis2(GA_FORWARD, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
           if (c == ccMs) guide.startAxis2(GA_REVERSE, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccQe || c == ccQw) guide.stopAxis1(GA_BREAK);
-          if (c == ccQn || c == ccQs) guide.stopAxis2(GA_BREAK);
+          if (c == ccQe || c == ccQw) guide.stopAxis1();
+          if (c == ccQn || c == ccQs) guide.stopAxis2();
           return;
         }
       } else {
@@ -109,8 +109,8 @@
       const long Shed_ms = 4000;
 
       // stop any guide that might be triggered by combination button presses
-      if (st4Axis1Rev.isDown() && st4Axis1Fwd.isDown()) guide.stopAxis1(GA_BREAK);
-      if (st4Axis2Fwd.isDown() && st4Axis2Rev.isDown()) guide.stopAxis2(GA_BREAK);
+      if (st4Axis1Rev.isDown() && st4Axis1Fwd.isDown()) guide.stopAxis1();
+      if (st4Axis2Fwd.isDown() && st4Axis2Rev.isDown()) guide.stopAxis2();
   
       // see if a combination was down for long enough for an alternate mode
       static bool altModeA = false;
@@ -229,7 +229,7 @@
             if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
-        } else guide.stopAxis1(GA_BREAK);
+        } else guide.stopAxis1();
       }
 
       // guide N/S
@@ -250,7 +250,7 @@
             if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis2(st4GuideActionAxis2, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
-        } else guide.stopAxis2(GA_BREAK);
+        } else guide.stopAxis2();
       }
 
     }
