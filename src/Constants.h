@@ -76,50 +76,6 @@
 #define ASTROMETRIC_J2000           4
 #define MOUNT_COORDS_LAST           4
 
-// DRIVER (step/direction interface, usually for stepper motors)
-#define DRIVER_FIRST                0
-#define A4988                       0      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
-#define DRV8825                     1      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define S109                        2      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define LV8729                      3      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define RAPS128                     4      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define TMC2100                     5      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2208                     6      // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209                     7      // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define ST820                       8      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
-#define TMC2130                     9      // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC5160                     10     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define GENERIC                     11     // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
-#define DRIVER_LAST                 11
-
-// DRIVER DECAY MODE
-#define DRIVER_DECAY_MODE_FIRST     1
-#define MIXED                       2
-#define FAST                        3
-#define SLOW                        4
-#define SPREADCYCLE                 5
-#define STEALTHCHOP                 6
-#define DRIVER_DECAY_MODE_LAST      6
-
-// SERVO DRIVER (usually for DC motors equipped with encoders)
-#define SERVO_DRIVER_FIRST          100
-#define SERVO_PE                    100    // SERVO, direction (phase) and enable (pwm) connections
-#define SERVO_II                    101    // SERVO, dual pwm input connections
-#define SERVO_DRIVER_LAST           101
-
-// SERVO ENCODER (must match Encoder library)
-#define SERVO_ENCODER_FIRST         1
-#define ENC_AB                      1      // AB quadrature encoder
-#define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
-#define ENC_PULSE_DIR               3      // pulse/direction encoder
-#define ENC_PULSE_ONLY              4      // pulse only encoder
-#define SERVO_ENCODER_LAST          4
-
-// servo feedback (must match Encoder library)
-#define SERVO_FEEDBACK_FIRST        1
-#define FB_PID                      1      // PID feedback
-#define SERVO_FEEDBACK_LAST         1
-
 // TIME LOCATION SOURCE devices supported
 #define TLS_FIRST                   1
 #define DS3231                      1      // DS3231 RTC on I2C
