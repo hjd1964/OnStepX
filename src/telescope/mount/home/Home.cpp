@@ -29,7 +29,7 @@ CommandError Home::request() {
   #if SLEW_GOTO == ON
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
-      if (guide.state == GU_HOME_GUIDE) guide.abortHome();
+      if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
       return CE_SLEW_IN_MOTION;
     }
 
@@ -96,7 +96,7 @@ CommandError Home::reset(bool fullReset) {
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
   if (guide.state != GU_NONE) {
-    if (guide.state == GU_HOME_GUIDE) guide.abortHome();
+    if (guide.state == GU_HOME_GUIDE) { guide.stopAxis1(GA_BREAK); guide.stopAxis2(GA_BREAK); }
     return CE_SLEW_IN_MOTION;
   }
 

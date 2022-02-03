@@ -75,6 +75,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
 // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
 // set abort true to rapidly stop (broken limit, etc)
 void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
+  if (guide.state == GU_HOME_GUIDE) abort = true;
   if (guideActionAxis1 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
     if (rateAxis1 == 0.0F) {
@@ -124,6 +125,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
 // set abort true to rapidly stop (broken limit, etc)
 void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
+  if (guide.state == GU_HOME_GUIDE) abort = true;
   if (guideActionAxis2 > GA_BREAK) {
     if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
     if (rateAxis2 == 0.0F) {
@@ -190,14 +192,6 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
     axis2.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
   #endif
   return CE_NONE;
-}
-
-// stop guide home (for use with home switches)
-void Guide::abortHome() {
-  VLF("MSG: Mount, aborting home guide");
-  state = GU_GUIDE;
-  stopAxis1(GA_BREAK, true);
-  stopAxis2(GA_BREAK, true);
 }
 
 // keep guide rate <= half max

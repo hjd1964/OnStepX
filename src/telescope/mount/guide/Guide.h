@@ -55,9 +55,6 @@ class Guide {
     // start guide home (for use with home switches)
     CommandError startHome(unsigned long guideTimeLimit);
 
-    // stop guide home (for use with home switches)
-    void abortHome();
-
     // returns true if any guide is happening on Axis1
     inline bool activeAxis1() { return guideActionAxis1 != GA_NONE; }
 
