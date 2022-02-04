@@ -97,8 +97,7 @@ void Transform::mountToTopocentric(Coordinate *coord) {
 
 void Transform::mountToObservedPlace(Coordinate *coord) {
   #if ALIGN_MAX_NUM_STARS > 1
-    //align.mountToObservedPlace(coord);
-    (void)(*coord);
+    align.mountToObservedPlace(coord);
   #else
     (void)(*coord);
   #endif
@@ -125,8 +124,7 @@ void Transform::topocentricToMount(Coordinate *coord) {
 
 void Transform::observedPlaceToMount(Coordinate *coord) {
   #if ALIGN_MAX_NUM_STARS > 1  
-    //align.observedPlaceToMount(coord);
-    (void)(*coord);
+    align.observedPlaceToMount(coord);
   #else
     (void)(*coord);
   #endif

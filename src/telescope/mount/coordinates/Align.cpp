@@ -132,7 +132,7 @@ void GeoAlign::correct(float a1, float a2, float pierSide, float sf, float _deo,
   // becomes a (N) offset.  Unchanged with meridian flips.
   DO1 = _deo*sf;
   // works on HA.  meridian flips effect this in HA
-  DOh = DO1*(1.0/cosA2)*pierSide;
+  DOh = DO1*(1.0F/cosA2)*pierSide;
 
   // ------------------------------------------------------------
   // B. Misalignment, Declination axis relative to Polar axis
@@ -175,8 +175,7 @@ void GeoAlign::correct(float a1, float a2, float pierSide, float sf, float _deo,
   *a2r  = (+PZ*sinA1       + PA*cosA1             +  DFd + FFd + TFd);
 }
 
-void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9)
-{
+void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9) {
   long l,
 
   _deo_m,_deo_p,
@@ -277,19 +276,21 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
 void GeoAlign::autoModel(int n) {
   modelIsReady = false;
 
+  VLF("MSG: Align, calculate pointing model start");
+
   // how many stars?
   num = n;
 
-  best_dist = 3600.0*180.0;
-  best_deo  = 0.0;
-  best_pd   = 0.0;
-  best_pz   = 0.0;
-  best_pe   = 0.0;
-  best_tf   = 0.0;
-  best_ff   = 0.0;
-  best_df   = 0.0;
-  best_ode  = 0.0;
-  best_ohe  = 0.0;
+  best_dist = 3600.0F*180.0F;
+  best_deo  = 0.0F;
+  best_pd   = 0.0F;
+  best_pz   = 0.0F;
+  best_pe   = 0.0F;
+  best_tf   = 0.0F;
+  best_ff   = 0.0F;
+  best_df   = 0.0F;
+  best_ode  = 0.0F;
+  best_ohe  = 0.0F;
 
   // figure out the average Axis1 offset as a starting point
   ohe = 0;
@@ -340,26 +341,29 @@ void GeoAlign::autoModel(int n) {
   #endif
 
   // geometric corrections
-  model.doCor = best_deo/3600.0;
-  model.pdCor = best_pd/3600.0;
-  model.azmCor = best_pz/3600.0;
-  model.altCor = best_pe/3600.0;
+  model.doCor = arcsecToRad(best_deo);
+  model.pdCor = arcsecToRad(best_pd);
+  model.azmCor = arcsecToRad(best_pz);
+  model.altCor = arcsecToRad(best_pe);
 
-  model.tfCor = best_tf/3600.0;
-  if (mountType == FORK || mountType == ALTAZM) model.dfCor = best_ff/3600.0; else model.dfCor = best_df/3600.0;
+  model.tfCor = arcsecToRad(best_tf);
+  if (mountType == FORK || mountType == ALTAZM) model.dfCor = arcsecToRad(best_ff); else model.dfCor = arcsecToRad(best_df);
 
-  model.ax1Cor = best_ohw/3600.0;
-  model.ax2Cor = best_odw/3600.0;
+  model.ax1Cor = arcsecToRad(best_ohw);
+  model.ax2Cor = arcsecToRad(best_odw);
 
   // update status and exit
   modelIsReady = true;
   autoModelTask = 0;
+
+  VLF("MSG: Align, calculate pointing model done");
 }
 
 void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   if (!modelIsReady) return;
 
-  float p = 1.0; if (coord->pierSide == PIER_SIDE_WEST) p = -1.0;
+  float p = 1.0;
+  if (coord->pierSide == PIER_SIDE_WEST) p = -1.0;
   
   float ax1, ax2;
   if (mountType == ALTAZM) {
@@ -379,7 +383,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
 
   // breaks-down near the poles (limited to > 1' from pole)
   if (fabs(ax2) < degToRadF(89.98333333F)) {
-    for (int pass=0; pass < 3; pass++) {
+    for (int pass = 0; pass < 3; pass++) {
       float sinAx2 = sinf(a2);
       float cosAx2 = cosf(a2);
       float sinAx1 = sinf(a1);
@@ -399,7 +403,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   
       // Fork or Axis flex
       float DFd;
-      if (mountType == FORK || mountType == ALTAZM) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1+sinLat*(sinAx2/cosAx2));
+      if (mountType == FORK || mountType == ALTAZM) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1 + sinLat*(sinAx2/cosAx2));
   
       // Tube flex
       float TFh = model.tfCor*(cosLat*sinAx1*(1.0/cosAx2));
@@ -431,7 +435,8 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
 void GeoAlign::mountToObservedPlace(Coordinate *coord) {
   if (!modelIsReady) return;
 
-  float p = 1.0; if (coord->pierSide == PIER_SIDE_WEST) p = -1.0;
+  float p = 1.0F;
+  if (coord->pierSide == PIER_SIDE_WEST) p = -1.0F;
   
   float ax1, ax2;
   if (mountType == ALTAZM) {
@@ -469,7 +474,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
 
     // Fork or Axis flex
     float DFd;
-    if (mountType == FORK) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1 + sinLat*(sinAx2/cosAx2));
+    if (mountType == FORK || mountType == ALTAZM) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1 + sinLat*(sinAx2/cosAx2));
 
     // Tube flex
     float TFh = model.tfCor*(cosLat*sinAx1*(1.0/cosAx2));
@@ -484,8 +489,8 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     ax2 = ax2 - (a2 + DFd + TFd);
   }
 
-  while (ax1 >  Deg360) ax1 -= Deg360;
-  while (ax1 < -Deg360) ax1 += Deg360;
+  while (ax1 >  Deg180) ax1 -= Deg360;
+  while (ax1 < -Deg180) ax1 += Deg360;
 
   if (ax2 >  Deg90) ax2 =  Deg90;
   if (ax2 < -Deg90) ax2 = -Deg90;

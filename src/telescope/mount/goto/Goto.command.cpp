@@ -148,19 +148,19 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           static int star = 0;
           *numericReply = false;
           switch (parameter[1]) {
-            case '0': sprintf(reply,"%ld",(long)(transform.align.model.ax1Cor*3600.0F)); break; // ax1Cor
-            case '1': sprintf(reply,"%ld",(long)(transform.align.model.ax2Cor*3600.0F)); break; // ax2Cor
-            case '2': sprintf(reply,"%ld",(long)(transform.align.model.altCor*3600.0F)); break; // altCor
-            case '3': sprintf(reply,"%ld",(long)(transform.align.model.azmCor*3600.0F)); break; // azmCor
-            case '4': sprintf(reply,"%ld",(long)(transform.align.model.doCor*3600.0F));  break; // doCor
-            case '5': sprintf(reply,"%ld",(long)(transform.align.model.pdCor*3600.0F));  break; // pdCor
-            case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)         // ffCor
-              sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0F)); else sprintf(reply,"%ld",(long)(0));
+            case '0': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.ax1Cor))); break; // ax1Cor
+            case '1': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.ax2Cor))); break; // ax2Cor
+            case '2': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.altCor))); break; // altCor
+            case '3': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.azmCor))); break; // azmCor
+            case '4': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.doCor)));  break; // doCor
+            case '5': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.pdCor)));  break; // pdCor
+            case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)              // ffCor
+              sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.dfCor))); else sprintf(reply,"%ld",(long)(0));
             break;
-            case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)         // dfCor
-              sprintf(reply,"%ld",(long)(transform.align.model.dfCor*3600.0F)); else sprintf(reply,"%ld",(long)(0));
+            case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)              // dfCor
+              sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.dfCor))); else sprintf(reply,"%ld",(long)(0));
             break;
-            case '8': sprintf(reply,"%ld",(long)(transform.align.model.tfCor*3600.0F)); break;  // tfCor
+            case '8': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.tfCor))); break;  // tfCor
             // number of stars, reset to first star
             case '9': { int n = 0; if (alignState.currentStar > alignState.lastStar) n = alignState.lastStar; sprintf(reply,"%ld",(long)(n)); star = 0; } break;
             case 'A': { convert.doubleToHms(reply,radToHrs(transform.align.actual[star].ax1),true,PM_HIGH); } break;
@@ -358,19 +358,19 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           static int star;
           double d;
           switch (parameter[1]) {
-            case '0': transform.align.model.ax1Cor = atol(&parameter[3])/3600.0F; break; // ax1Cor
-            case '1': transform.align.model.ax2Cor = atol(&parameter[3])/3600.0F; break; // ax2Cor 
-            case '2': transform.align.model.altCor = atol(&parameter[3])/3600.0F; break; // altCor
-            case '3': transform.align.model.azmCor = atol(&parameter[3])/3600.0F; break; // azmCor
-            case '4': transform.align.model.doCor = atol(&parameter[3])/3600.0F; break;  // doCor
-            case '5': transform.align.model.pdCor = atol(&parameter[3])/3600.0F; break;  // pdCor
+            case '0': transform.align.model.ax1Cor = arcsecToRad(atol(&parameter[3])); break; // ax1Cor
+            case '1': transform.align.model.ax2Cor = arcsecToRad(atol(&parameter[3])); break; // ax2Cor 
+            case '2': transform.align.model.altCor = arcsecToRad(atol(&parameter[3])); break; // altCor
+            case '3': transform.align.model.azmCor = arcsecToRad(atol(&parameter[3])); break; // azmCor
+            case '4': transform.align.model.doCor = arcsecToRad(atol(&parameter[3])); break;  // doCor
+            case '5': transform.align.model.pdCor = arcsecToRad(atol(&parameter[3])); break;  // pdCor
             case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)
-              transform.align.model.dfCor = atol(&parameter[3])/3600.0F; break;          // fdCor or ffCor
+              transform.align.model.dfCor = arcsecToRad(atol(&parameter[3])); break;          // fdCor or ffCor
             break;
             case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)
-              transform.align.model.dfCor = atol(&parameter[3])/3600.0F; break;          // fdCor or ffCor
+              transform.align.model.dfCor = arcsecToRad(atol(&parameter[3])); break;          // fdCor or ffCor
             break;
-            case '8': transform.align.model.tfCor = atol(&parameter[3])/3600.0F; break;  // tfCor
+            case '8': transform.align.model.tfCor = arcsecToRad(atol(&parameter[3])); break;  // tfCor
             // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model
             case '9': {
                 int n = atol(&parameter[3]);
