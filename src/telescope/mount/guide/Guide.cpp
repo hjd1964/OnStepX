@@ -83,7 +83,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
       guideActionAxis1 = GA_BREAK;
       if (abort) axis1.autoSlewAbort(); else axis1.autoSlewStop();
     } else {
-      VLF("MSG: Guide, axis1 stopped");
+      VLF("MSG: Guide, Axis1 stopped");
       guideActionAxis1 = GA_NONE;
       rateAxis1 = 0.0F;
       mount.update();
@@ -96,7 +96,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
   if (guide.state == GU_HOME_GUIDE) return CE_NONE;
 
-  CommandError e = validate(2, guideAction);
+  CommandError e = validate(2, guideAction); // if successful always sets pierSide
   if (e != CE_NONE) return e;
 
   guideActionAxis2 = guideAction;
@@ -110,6 +110,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(30000);
     axis2.setPowerDownOverrideTime(30000);
+    if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_REVERSE; };
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
     V(rate); VL("X");
 
@@ -134,7 +135,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
       guideActionAxis2 = GA_BREAK;
       if (abort) axis2.autoSlewAbort(); else axis2.autoSlewStop();
     } else {
-      VLF("MSG: Guide, axis2 stopped");
+      VLF("MSG: Guide, Axis2 stopped");
       guideActionAxis2 = GA_NONE;
       rateAxis2 = 0.0F;
       mount.update();
@@ -258,6 +259,7 @@ bool Guide::validAxis1(GuideAction guideAction) {
 // valid guide for Axis2
 bool Guide::validAxis2(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT_ALT);
+  pierSide = location.pierSide;
 
   if (!limits.isEnabled()) return true;
 
@@ -266,14 +268,14 @@ bool Guide::validAxis2(GuideAction guideAction) {
   #endif
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
-    if (location.pierSide == PIER_SIDE_WEST) {
+    if (pierSide == PIER_SIDE_WEST) {
       if (location.a2 > axis2.settings.limits.max) return false;
     } else {
       if (location.a2 < axis2.settings.limits.min) return false;
     }
   }
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
-    if (location.pierSide == PIER_SIDE_WEST) {
+    if (pierSide == PIER_SIDE_WEST) {
       if (location.a2 < axis2.settings.limits.min) return false;
     } else {
       if (location.a2 > axis2.settings.limits.max) return false;
@@ -289,12 +291,9 @@ bool Guide::validAxis2(GuideAction guideAction) {
 CommandError Guide::validate(int axis, GuideAction guideAction) {
   if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (guideAction == GA_SPIRAL && mount.isSlewing()) return CE_SLEW_IN_MOTION;
   #if SLEW_GOTO == ON
     if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
-  #endif
-  if (guideAction == GA_SPIRAL && mount.isSlewing()) return CE_SLEW_IN_MOTION;
-
-  #if SLEW_GOTO == ON
     if (goTo.state != GS_NONE) { goTo.stop(); return CE_SLEW_IN_MOTION; }
   #endif
 
@@ -304,12 +303,14 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
       if (limits.isError() || axis1.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
+
   if (axis == 2 || guideAction == GA_SPIRAL) {
     if (!validAxis2(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     if (settings.axis2RateSelect < 3) {
       if (limits.isError() || axis2.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
+
   return CE_NONE;
 }
 

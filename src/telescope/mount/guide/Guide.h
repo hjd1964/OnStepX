@@ -99,14 +99,16 @@ class Guide {
 
     GuideRateSelect spiralGuideRateSelect = GR_20X;
     
-    GuideAction   guideActionAxis1     = GA_NONE;
-    GuideAction   guideActionAxis2     = GA_NONE;
+    GuideAction guideActionAxis1 = GA_NONE;
+    GuideAction guideActionAxis2 = GA_NONE;
 
-    float         customRateAxis1      = 0.0F;
-    float         customRateAxis2      = 0.0F;
+    PierSide pierSide = PIER_SIDE_NONE;
 
-    float         spiralScaleAxis1     = 0.0F;
-    unsigned long spiralStartTime      = 0;
+    float customRateAxis1 = 0.0F;
+    float customRateAxis2 = 0.0F;
+
+    float spiralScaleAxis1 = 0.0F;
+    unsigned long spiralStartTime = 0;
 
     unsigned long guideFinishTimeAxis1 = 0;
     unsigned long guideFinishTimeAxis2 = 0;
