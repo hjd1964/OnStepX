@@ -77,10 +77,18 @@ CommandError GeoAlign::addStar(int thisStar, int numberStars, Coordinate *actual
   if (autoModelTask != 0 || thisStar < 1 || thisStar > ALIGN_MAX_NUM_STARS || numberStars < 1 || numberStars > ALIGN_MAX_NUM_STARS) return CE_ALIGN_FAIL;
 
   int i = thisStar - 1;
+
+  this->mount[i].h = mount->h;
+  this->mount[i].d = mount->d;
+  this->actual[i].h = actual->h;
+  this->actual[i].d = actual->d;
+
   if (mountType == ALTAZM) {
+    transform.equToHor(mount);
     this->mount[i].ax1 = mount->z;
     this->mount[i].ax2 = mount->a;
 
+    transform.equToHor(actual);
     this->actual[i].ax1 = actual->z;
     this->actual[i].ax2 = actual->a;
   } else {
@@ -108,6 +116,8 @@ CommandError GeoAlign::addStar(int thisStar, int numberStars, Coordinate *actual
 }
 
 void GeoAlign::createModel(int numberStars) {
+  if (autoModelTask != 0) return;
+
   // start a task to solve for the model
   modelNumberStars = numberStars;
   autoModelTask = tasks.add(1, 0, false, 6, autoModelWrapper, "Align");
@@ -489,25 +499,20 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     ax2 = ax2 - (a2 + DFd + TFd);
   }
 
-  while (ax1 >  Deg180) ax1 -= Deg360;
-  while (ax1 < -Deg180) ax1 += Deg360;
-
   if (ax2 >  Deg90) ax2 =  Deg90;
   if (ax2 < -Deg90) ax2 = -Deg90;
 
   if (mountType == ALTAZM) {
+    while (ax1 >  Deg360) ax1 -= Deg360;
+    while (ax1 < -Deg360) ax1 += Deg360;
     coord->z = ax1;
     coord->a = ax2;
   } else {
+    while (ax1 >  Deg180) ax1 -= Deg360;
+    while (ax1 < -Deg180) ax1 += Deg360;
     coord->h = ax1;
     coord->d = ax2;
   }
-}
-
-float GeoAlign::backInRads2(float angle) {
-  while (angle >= Deg180) angle -= Deg360;
-  while (angle < -Deg180) angle += Deg360;
-  return angle;
 }
 
 #endif

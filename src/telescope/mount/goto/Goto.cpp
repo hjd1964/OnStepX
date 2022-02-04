@@ -271,9 +271,9 @@ CommandError Goto::alignAddStar() {
 
   // add an align star
   if (e == CE_NONE) {
-    Coordinate actual = mount.getMountPosition(CR_MOUNT);
-    #if ALIGN_MAX_NUM_STARS > 1  
-      e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &actual);
+    Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
+    #if ALIGN_MAX_NUM_STARS > 1
+      e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &mountPosition);
     #endif
     if (e == CE_NONE) alignState.currentStar++;
   }

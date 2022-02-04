@@ -163,10 +163,10 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
             case '8': sprintf(reply,"%ld",(long)(radToArcsec(transform.align.model.tfCor))); break;  // tfCor
             // number of stars, reset to first star
             case '9': { int n = 0; if (alignState.currentStar > alignState.lastStar) n = alignState.lastStar; sprintf(reply,"%ld",(long)(n)); star = 0; } break;
-            case 'A': { convert.doubleToHms(reply,radToHrs(transform.align.actual[star].ax1),true,PM_HIGH); } break;
-            case 'B': { convert.doubleToDms(reply,radToDeg(transform.align.actual[star].ax2),false,true,PM_HIGH); } break;
-            case 'C': { convert.doubleToHms(reply,radToHrs(transform.align.mount[star].ax1),true,PM_HIGH); } break;
-            case 'D': { convert.doubleToDms(reply,radToDeg(transform.align.mount[star].ax2),false,true,PM_HIGH); } break;
+            case 'A': { convert.doubleToHms(reply,radToHrs(transform.align.actual[star].h),true,PM_HIGH); } break;
+            case 'B': { convert.doubleToDms(reply,radToDeg(transform.align.actual[star].d),false,true,PM_HIGH); } break;
+            case 'C': { convert.doubleToHms(reply,radToHrs(transform.align.mount[star].h),true,PM_HIGH); } break;
+            case 'D': { convert.doubleToDms(reply,radToDeg(transform.align.mount[star].d),false,true,PM_HIGH); } break;
             // pier side (and increment n)
             case 'E': sprintf(reply,"%ld",(long)(transform.align.mount[star].side)); star++; break;
             default: *numericReply = true; *commandError = CE_CMD_UNKNOWN;
@@ -381,16 +381,37 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
                 } else star = 0;
               }
             break;
-            // Star #n HA
-            case 'A': if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax1 = hrsToRad(d); break;
-            // Star #n Dec
-            case 'B': if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].ax2 = degToRad(d); break;
-            // Mount #n HA
-            case 'C': if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax1 = hrsToRad(d); break;
-            // Star #n Dec
-            case 'D': if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].ax2 = degToRad(d); break;
+            // Actual HA (n)
+            case 'A': if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].h = hrsToRad(d); break;
+            // Actual Dec (n)
+            case 'B': if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.actual[star].d = degToRad(d); break;
+            // Mount HA (n)
+            case 'C': if (!convert.hmsToDouble(&d, &parameter[3], PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].h = hrsToRad(d); break;
+            // Mount Dec (n)
+            case 'D': if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].d = degToRad(d); break;
             // Mount PierSide (and increment n)
-            case 'E': transform.align.actual[star].side = transform.align.mount[star].side = atol(&parameter[3]); star++; break;
+            case 'E':
+              transform.align.actual[star].side = transform.align.mount[star].side = atol(&parameter[3]);
+              if (transform.mountType == ALTAZM) {
+                Coordinate temp;
+                temp.h = transform.align.actual[star].h;
+                temp.d = transform.align.actual[star].d;
+                transform.equToHor(&temp);
+                transform.align.actual[star].ax1 = temp.z;
+                transform.align.actual[star].ax2 = temp.a;
+                temp.h = transform.align.mount[star].h;
+                temp.d = transform.align.mount[star].d;
+                transform.equToHor(&temp);
+                transform.align.mount[star].ax1 = temp.z;
+                transform.align.mount[star].ax2 = temp.a;
+              } else {
+                transform.align.actual[star].ax1 = transform.align.actual[star].h;
+                transform.align.actual[star].ax2 = transform.align.actual[star].d;
+                transform.align.mount[star].ax1 = transform.align.mount[star].h;
+                transform.align.mount[star].ax2 = transform.align.mount[star].d;
+              }
+              star++;
+            break;
             default: *commandError = CE_CMD_UNKNOWN;
           }
         } else
