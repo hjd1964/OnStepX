@@ -362,8 +362,8 @@ void GeoAlign::autoModel(int n) {
 void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   if (!modelIsReady) return;
 
-  float p = 1.0;
-  if (coord->pierSide == PIER_SIDE_WEST) p = -1.0;
+  float p = 1.0F;
+  if (coord->pierSide == PIER_SIDE_WEST) p = -1.0F;
   
   float ax1, ax2;
   if (mountType == ALTAZM) {
@@ -395,7 +395,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
       // horizon and the effect on Alt is 0. At the Nadir it
       // becomes an (up) offset.  Unchanged with meridian flips.
       // expressed as a correction to the Zenith axis misalignment
-      float DOh = model.doCor*(1.0/cosAx2)*p;
+      float DOh = model.doCor*(1.0F/cosAx2)*p;
   
       // ------------------------------------------------------------
       // misalignment due to Alt axis being perp. to Azm axis
@@ -406,7 +406,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
       if (mountType == FORK || mountType == ALTAZM) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1 + sinLat*(sinAx2/cosAx2));
   
       // Tube flex
-      float TFh = model.tfCor*(cosLat*sinAx1*(1.0/cosAx2));
+      float TFh = model.tfCor*(cosLat*sinAx1*(1.0F/cosAx2));
       float TFd = model.tfCor*(cosLat*cosAx1 - sinLat*cosAx2);
   
       // polar misalignment
@@ -466,7 +466,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     // horizon and the effect on Alt is 0. At the Nadir it
     // becomes a (N) offset.  Unchanged with meridian flips.
     // expressed as a correction to the Azm axis misalignment
-    float DOh = model.doCor*(1.0/cosAx2)*p;
+    float DOh = model.doCor*(1.0F/cosAx2)*p;
 
     // as the above offset becomes zero near the horizon, the affect
     // works on Azm instead.  meridian flips affect this in Azm
@@ -477,7 +477,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     if (mountType == FORK || mountType == ALTAZM) DFd = model.dfCor*cosAx1; else DFd = -model.dfCor*(cosLat*cosAx1 + sinLat*(sinAx2/cosAx2));
 
     // Tube flex
-    float TFh = model.tfCor*(cosLat*sinAx1*(1.0/cosAx2));
+    float TFh = model.tfCor*(cosLat*sinAx1*(1.0F/cosAx2));
     float TFd = model.tfCor*(cosLat*cosAx1 - sinLat*cosAx2);
    
     // ------------------------------------------------------------
