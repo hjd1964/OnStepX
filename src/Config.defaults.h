@@ -53,44 +53,44 @@
 #endif
 
 #ifndef AP_SSID
-#define AP_SSID                 "OnStepX"                         // Wifi Access Point SSID
+#define AP_SSID                       "OnStepX"                   // Wifi Access Point SSID
 #endif
 #ifndef AP_PASSWORD
-#define AP_PASSWORD            "password"                         // Wifi Access Point password
+#define AP_PASSWORD                   "password"                  // Wifi Access Point password
 #endif
 #ifndef AP_CHANNEL
-#define AP_CHANNEL                      7                         // Wifi Access Point channel
+#define AP_CHANNEL                    7                           // Wifi Access Point channel
 #endif
 #ifndef AP_IP_ADDR
-#define AP_IP_ADDR          {192,168,0,1}                         // Wifi Access Point IP Address
+#define AP_IP_ADDR                    {192,168,0,1}               // Wifi Access Point IP Address
 #endif
 #ifndef AP_GW_ADDR
-#define AP_GW_ADDR          {192,168,0,1}                         // Wifi Access Point GATEWAY Address
+#define AP_GW_ADDR                    {192,168,0,1}               // Wifi Access Point GATEWAY Address
 #endif
 #ifndef AP_SN_MASK
-#define AP_SN_MASK        {255,255,255,0}                         // Wifi Access Point SUBNET Mask
+#define AP_SN_MASK                    {255,255,255,0}             // Wifi Access Point SUBNET Mask
 #endif
 
 #ifndef STA_AP_FALLBACK
-#define STA_AP_FALLBACK              true                         // activate SoftAP if station fails to connect
+#define STA_AP_FALLBACK               true                        // activate SoftAP if station fails to connect
 #endif
 #ifndef STA_SSID
-#define STA_SSID                   "Home"                         // Station SSID to connnect to
+#define STA_SSID                      "Home"                      // Station SSID to connnect to
 #endif
 #ifndef STA_PASSWORD
-#define STA_PASSWORD           "password"                         // Wifi Station mode password
+#define STA_PASSWORD                  "password"                  // Wifi Station mode password
 #endif
 #ifndef STA_DHCP_ENABLED
-#define STA_DHCP_ENABLED           false                          // true to use LAN DHCP addresses
+#define STA_DHCP_ENABLED              false                       // true to use LAN DHCP addresses
 #endif
 #ifndef STA_IP_ADDR
-#define STA_IP_ADDR         {192,168,0,2}                         // Wifi Station IP Address
+#define STA_IP_ADDR                   {192,168,0,2}               // Wifi Station IP Address
 #endif
 #ifndef STA_GW_ADDR
-#define STA_GW_ADDR         {192,168,0,1}                         // Wifi Station GATEWAY Address
+#define STA_GW_ADDR                   {192,168,0,1}               // Wifi Station GATEWAY Address
 #endif
 #ifndef STA_SN_MASK
-#define STA_SN_MASK       {255,255,255,0}                         // Wifi Station SUBNET Mask
+#define STA_SN_MASK                   {255,255,255,0}             // Wifi Station SUBNET Mask
 #endif
 
 // sensors
