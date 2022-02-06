@@ -5,7 +5,6 @@
 
 #ifdef AXIS_PRESENT
 
-#include "Axis.h"
 #include "../convert/Convert.h"
 
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
