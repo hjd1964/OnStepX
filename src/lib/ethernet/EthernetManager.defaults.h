@@ -10,7 +10,7 @@
 
 // optional web-server
 #ifndef WEB_SERVER
-#define WEB_SERVER OFF                 // ON for website at port 80
+#define WEB_SERVER OFF                       // ON for website at port 80
 #endif
 
 // optional LX200 command server IP channels 9996 to 9999 (listens to clients) used by SWS
@@ -22,41 +22,41 @@
 // optional Arduino Serial class work-alike IP channels 9996 to 9999 as a server (listens to clients)
 // OFF or STANDARD (port 9999), or PERSISTENT (ports 9996 to 9998), or BOTH
 #ifndef SERIAL_SERVER
-#define SERIAL_SERVER OFF              // SERIAL_SIP, SERIAL_PIP1, etc.
+#define SERIAL_SERVER OFF                    // SERIAL_SIP, SERIAL_PIP1, etc.
 #endif
 
 // optional Arduino Serial class work-alike IP channel to port 9998 as a client (connects to a server)
 #ifndef SERIAL_CLIENT
-#define SERIAL_CLIENT OFF              // ON for SERIAL_IP at port 9998
+#define SERIAL_CLIENT OFF                    // ON for SERIAL_IP at port 9998
 #endif
 
 // -------------------------------------------------------------------------------------------------
 // ethernet manager settings
 
 #ifndef MAC
-#define MAC {0xDE,0xAD,0xBE,0xEF,0xFE,0xED} // a unique MAC address
+#define MAC {0xDE,0xAD,0xBE,0xEF,0xFE,0xED}  // unique MAC address
 #endif
 
 #ifndef PASSWORD_DEFAULT
-#define PASSWORD_DEFAULT       "password" // "password", default pwd for ethernet settings
+#define PASSWORD_DEFAULT       "password"    // default password for settings
 #endif
 
 #ifndef STA_TARGET_IP_ADDR
-#define STA_TARGET_IP_ADDR  {192,168,0,1} // ..,168,0,1}, IP Address to connect to (OnStep for example)
+#define STA_TARGET_IP_ADDR  {192,168,0,1}    // IP Address to connect to (OnStep for example)
 #endif
 
 #ifndef DHCP_ENABLED
-#define DHCP_ENABLED                 true //       true, true to use LAN DHCP addresses
+#define DHCP_ENABLED                 true    // true to use LAN DHCP addresses
 #endif
 
 #ifndef STA_IP_ADDR
-#define STA_IP_ADDR         {192,168,0,2} //  ..168,0,2}, Wifi Station IP Address.
+#define STA_IP_ADDR         {192,168,0,2}    // IP Address
 #endif
 
 #ifndef STA_GW_ADDR
-#define STA_GW_ADDR         {192,168,0,1} // ..,168,0,1}, Wifi Station GATEWAY Address.
+#define STA_GW_ADDR         {192,168,0,1}    // GATEWAY Address
 #endif
 
 #ifndef STA_SN_MASK
-#define STA_SN_MASK       {255,255,255,0} // ..55,255,0}, Wifi Station SUBNET Mask.
+#define STA_SN_MASK       {255,255,255,0}    // SUBNET Mask
 #endif
