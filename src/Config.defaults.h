@@ -30,7 +30,7 @@
 #define SERIAL_GPS_BAUD               OFF
 #endif
 
-// ESP32 VIRTUAL SERIAL IP COMMAND CHANNELS
+// ESP32 virtual serial IP command channels
 #ifndef SERIAL_IP_MODE
 #define SERIAL_IP_MODE                OFF                         // use ACCESS_POINT or STATION to enable the interface (ESP32 only)
 #endif
