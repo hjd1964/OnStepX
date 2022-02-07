@@ -55,7 +55,7 @@ void Transform::init() {
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   Coordinate result = *coord;
-
+  
   #if MOUNT_COORDS == OBSERVED_PLACE
     mountToObservedPlace(&result);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT

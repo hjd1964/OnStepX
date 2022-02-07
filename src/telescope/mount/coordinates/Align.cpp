@@ -451,7 +451,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
 
   float p = 1.0F;
   if (coord->pierSide == PIER_SIDE_WEST) p = -1.0F;
-  
+
   float ax1, ax2;
   if (mountType == ALTAZM) {
     ax1 = coord->z;
