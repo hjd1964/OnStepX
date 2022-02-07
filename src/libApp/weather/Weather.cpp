@@ -46,7 +46,7 @@ bool Weather::init() {
     #if WEATHER == BME280 || WEATHER == BME280_0x76
       if (bmx.begin(BME_ADDRESS, &HAL_Wire)) { weatherSensor = WS_BME280; success = true; } else { DF("WRN: Weather.init(), BME280 (I2C 0x"); SERIAL_DEBUG.print(BME_ADDRESS, HEX); DLF(") not found"); }
     #elif WEATHER == BMP280 || WEATHER == BMP280_0x76
-      if (bmx.begin(BMP_ADDRESS)) { weatherSensor = WS_BMP280; success = true; } else { DF("WRN: Weather.init(), BMP280 (I2C 0x"); SERIAL_DEBUG.print(BME_ADDRESS, HEX); DLF(") not found"); }
+      if (bmx.begin(BMP_ADDRESS)) { weatherSensor = WS_BMP280; success = true; } else { DF("WRN: Weather.init(), BMP280 (I2C 0x"); SERIAL_DEBUG.print(BMP_ADDRESS, HEX); DLF(") not found"); }
     #elif WEATHER == BME280_SPI
       if (bmx.begin()) { weatherSensor = WS_BME280; success = true; } else { DLF("WRN: Weather.init(), BME280 (SPI) not found"); }
     #elif WEATHER == BMP280_SPI
@@ -82,10 +82,10 @@ void Weather::poll() {
       tasks.yield(1000);
       pressure = bmx.readPressure()/100.0;
       tasks.yield(1000);
-      if (weatherSensor == WS_BME280) {
+      #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI
         humidity = bmx.readHumidity();
         tasks.yield(1000);
-      }
+      #endif
 
       // apply a 10 sample rolling average to the ambient temperature
       static uint8_t nanCount = 0;
@@ -148,7 +148,7 @@ float Weather::getHumidity() {
 
 // set relative humidity in %
 bool Weather::setHumidity(float h) {
-  if (weatherSensor == WS_NONE) { 
+  if (weatherSensor == WS_NONE || weatherSensor == WS_BMP280) { 
     if (h >= 0.0 && h < 100.0) humidity = h; else return false;
   }
   return true;
