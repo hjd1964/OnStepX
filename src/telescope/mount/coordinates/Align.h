@@ -68,7 +68,7 @@ class GeoAlign
 {
   public:
     // prepare goto assist for operation, also clears the alignment model;
-    void init(uint8_t mountType, float latitude);
+    void init(int8_t mountType, float latitude);
 
     // reads the last saved alignment model from NV
     void modelRead();
@@ -105,8 +105,8 @@ class GeoAlign
     void doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9);
 
     bool modelIsReady;
-    uint8_t mountType;
-    float lat, cosLat, sinLat;
+    int8_t mountType;
+    float cosLat, sinLat;
 
     long num, l;
     long Ff, Df;

@@ -133,7 +133,6 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
   
   double a1, a2;
   transform.mountToInstrument(&target, &a1, &a2);
-
   axis1.setInstrumentCoordinate(a1);
   axis2.setInstrumentCoordinate(a2);
 
@@ -155,7 +154,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   target = *coords;
   if (native) transform.nativeToMount(&target);
-  transform.equToHor(&target);
+  if (transform.mountType != ALTAZM) transform.equToHor(&target);
 
   e = limits.validateCoords(&target);
   if (e != CE_NONE) return e;
@@ -264,7 +263,7 @@ CommandError Goto::alignAddStar() {
   // first star, get ready for a new pointing model, init/sync then call gta.addStar 
   if (alignState.currentStar == 1) {
     #if ALIGN_MAX_NUM_STARS > 1  
-      transform.align.init(site.location.latitude, transform.mountType);
+      transform.align.init(transform.mountType, site.location.latitude);
     #endif
     e = requestSync(&target, preferredPierSide);
   }

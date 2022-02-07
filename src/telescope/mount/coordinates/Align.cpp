@@ -23,19 +23,19 @@
 uint8_t modelNumberStars = 0;
 void autoModelWrapper() { transform.align.autoModel(modelNumberStars); }
 
-void GeoAlign::init(uint8_t mountType, float latitude) {
+void GeoAlign::init(int8_t mountType, float latitude) {
   modelClear();
 
-  lat = latitude;
   this->mountType = mountType;
   if (mountType == ALTAZM) {
     cosLat = cosf(Deg90);
     sinLat = sinf(Deg90);
   } else {
-    cosLat = cosf(lat);
-    sinLat = sinf(lat);
+    cosLat = cosf(latitude);
+    sinLat = sinf(latitude);
   }
 }
+
 
 void GeoAlign::modelRead() {
   // get misc settings from NV
@@ -57,6 +57,7 @@ void GeoAlign::modelWrite() {
 }
 
 void GeoAlign::modelClear() {
+  modelNumberStars = 0;
   model.ax1Cor = 0;  // align internal index for Axis1
   model.ax2Cor = 0;  // align internal index for Axis2
   model.altCor = 0;  // polar error relative to NCP/SCP/Zenith, - is below & + above
@@ -311,13 +312,16 @@ void GeoAlign::autoModel(int n) {
     if (diff < -Deg180) diff = diff + Deg360;
     ohe = ohe + diff;
   }
-  ohe = ohe/num; best_ohe = round(radToArcsec(ohe)); best_ohw = best_ohe;
+  ohe = ohe/num;
+  best_ohe = round(radToArcsec(ohe));
+  best_ohw = best_ohe;
 
   // fork flex or dec axis flex, as appropriate
-  if (mountType == ALTAZM) { Ff=0; Df=0; } else if (mountType == FORK) { Ff=1; Df=0; } else { Ff=0; Df=1; }
+  if (mountType == ALTAZM) { Ff = 0; Df = 0; } else if (mountType == FORK) { Ff = 1; Df = 0; } else { Ff = 0; Df = 1; }
 
   // only search for cone error if > 2 stars
-  int Do = 0; if (num > 2) Do = 1;
+  int Do = 0;
+  if (num > 2) Do = 1;
 
   // search, this can handle about 9 degrees of polar misalignment, and 4 degrees of cone error
   //              DoPdPzPeTfFf Df OdOh

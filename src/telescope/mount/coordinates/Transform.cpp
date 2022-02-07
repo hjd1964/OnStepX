@@ -46,15 +46,16 @@ void Transform::init() {
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  if (transform.mountType == ALTAZM) meridianFlips = false; else meridianFlips = true;
+  if (mountType == ALTAZM) meridianFlips = false; else meridianFlips = true;
 
   #if ALIGN_MAX_NUM_STARS > 1
-    align.init(site.location.latitude, mountType);
+    align.init(mountType, site.location.latitude);
   #endif
 }
 
 Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords) {
   Coordinate result = *coord;
+
   #if MOUNT_COORDS == OBSERVED_PLACE
     mountToObservedPlace(&result);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
@@ -62,21 +63,22 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
   #else
     #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
+
   if (mountType == ALTAZM) {
-    horToEqu(coord);
-    hourAngleToRightAscension(&result);
+    horToEqu(&result);
   } else {
-    hourAngleToRightAscension(&result);
     if (returnHorizonCoords) equToHor(&result);
   }
+
+  hourAngleToRightAscension(&result);
   return result;
 }
 
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
-//  VF("target1    = "); print(coord);
   rightAscensionToHourAngle(coord);
-//  VF("target2    = "); print(coord);
+
   if (mountType == ALTAZM) equToHor(coord);
+
   #if MOUNT_COORDS == OBSERVED_PLACE
     observedPlaceToMount(coord);
   #elif MOUNT_COORDS == TOPOCENTRIC || MOUNT_COORDS == TOPO_STRICT
@@ -84,7 +86,7 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   #else
     #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
-//  VF("target3    = "); print(coord);
+
   if (a1 != NULL && a2 != NULL) {
     if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
   }
@@ -129,10 +131,13 @@ void Transform::observedPlaceToMount(Coordinate *coord) {
     (void)(*coord);
   #endif
 
-  double a1, a2;
-  if (mountType == ALTAZM) { a1 = coord->z; a2 = coord->a; } else { a1 = coord->h; a2 = coord->d; }
-  coord->a1 = a1;
-  coord->a2 = a2;
+  if (mountType == ALTAZM) {
+    coord->a1 = coord->z;
+    coord->a2 = coord->a;
+  } else {
+    coord->a1 = coord->h;
+    coord->a2 = coord->d;
+  }
 }
 
 void Transform::topocentricToObservedPlace(Coordinate *coord) {
@@ -156,7 +161,6 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
     a2 = atan(a2);
   #endif
 
-  mount.a2 = a2;
   if (a2 < -Deg90 || a2 > Deg90) {
     mount.pierSide = PIER_SIDE_WEST;
     a1 -= Deg180;
@@ -165,7 +169,13 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
 
   if (a2 > Deg180) a2 -= Deg360; else if (a2 <= -Deg180) a2 += Deg360;
 
-  if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else { mount.h = a1; mount.d = a2; }
+  if (mountType == ALTAZM) {
+    mount.z = a1;
+    mount.a = a2;
+  } else {
+    mount.h = a1;
+    mount.d = a2;
+  }
 
   mount.a1 = a1;
   mount.a2 = a2;
