@@ -154,7 +154,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   target = *coords;
   if (native) transform.nativeToMount(&target);
-  if (transform.mountType != ALTAZM) transform.equToHor(&target);
+  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
 
   e = limits.validateCoords(&target);
   if (e != CE_NONE) return e;
@@ -426,7 +426,6 @@ void Goto::poll() {
       return;
     }
 
-  skip:
     // keep updating the axis targets to match the mount target
     if (mount.isTracking()) {
       double a1, a2;
@@ -436,6 +435,8 @@ void Goto::poll() {
       axis2.setTargetCoordinate(a2);
     }
   }
+
+  skip:
 
   // keep updating mount target
   if (mount.isTracking()) target.h += radsPerFrac;
