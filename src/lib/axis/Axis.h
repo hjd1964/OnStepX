@@ -217,9 +217,6 @@ class Axis {
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlewRateByDistance(float distance, float frequency = NAN);
 
-    // stops, with deacceleration by distance
-    bool autoSlewRateByDistanceStop();
-
     // auto slew with acceleration in "measures" per second per second
     // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second

@@ -278,15 +278,6 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
   return CE_NONE;
 }
 
-// stops, with deacceleration by distance
-bool Axis::autoSlewRateByDistanceStop() {
-  if (autoRate != AR_RATE_BY_DISTANCE) return false;
-  autoRate = AR_NONE;
-  motor->setSlewing(false);
-  motor->setSynchronized(true);
-  return true;
-}
-
 // auto slew with acceleration in "measures" per second per second
 // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
 // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
