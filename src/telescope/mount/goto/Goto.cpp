@@ -433,6 +433,13 @@ void Goto::poll() {
     target.h += radsPerFrac;
     nearTarget.h += radsPerFrac;
 
+    if (stage == GG_NEAR_DESTINATION) {
+      double a1, a2;
+      transform.mountToInstrument(&nearTarget, &a1, &a2);
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
+    } else
+
     if (stage == GG_DESTINATION) {
       if (transform.mountType == ALTAZM) transform.equToHor(&target);
       double a1, a2;
@@ -440,15 +447,7 @@ void Goto::poll() {
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }
-
-    if (stage == GG_NEAR_DESTINATION) {
-      double a1, a2;
-      transform.mountToInstrument(&nearTarget, &a1, &a2);
-      axis1.setTargetCoordinate(a1);
-      axis2.setTargetCoordinate(a2);
-    }
   }
-
 }
 
 CommandError Goto::startAutoSlew() {
