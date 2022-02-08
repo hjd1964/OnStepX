@@ -70,7 +70,7 @@ class Limits {
 
     void poll();
 
-    LimitSettings settings = { { degToRadF(-10.0F), degToRadF(85.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
+    LimitSettings settings = { { degToRadF(-10.0F), degToRadF(80.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
 
   private:
     void stop(GuideAction stopDirection);

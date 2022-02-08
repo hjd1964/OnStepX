@@ -100,6 +100,9 @@ CommandError Home::reset(bool fullReset) {
     return CE_SLEW_IN_MOTION;
   }
 
+  // refresh the home position
+  init();
+
   // stop tracking
   mount.tracking(false);
 

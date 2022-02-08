@@ -522,6 +522,9 @@
 #ifndef SLEW_RAPID_STOP_DIST
 #define SLEW_RAPID_STOP_DIST          2.0
 #endif
+#ifndef SLEW_DESTINATION_DIST
+#define SLEW_DESTINATION_DIST         0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
+#endif
 
 // pier side
 #ifndef MFLIP_SKIP_HOME

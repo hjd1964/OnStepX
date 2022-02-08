@@ -11,7 +11,7 @@
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t        {GG_NONE, GG_WAYPOINT, GG_DESTINATION, GG_READY_ABORT, GG_ABORT};
+enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
@@ -110,9 +110,11 @@ class Goto {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
+    CommandError startAutoSlew();
+
     PierSideSelect preferredPierSide = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
     Coordinate gotoTarget;
-    Coordinate start, destination, target;
+    Coordinate start, destination, target, nearTarget;
     GotoStage  stage                = GG_NONE;
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;

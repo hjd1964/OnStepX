@@ -75,14 +75,32 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   mount.syncToEncoders(false);
   if (mount.isHome()) mount.tracking(true);
 
-  Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
-  start = current;
-  destination = target;
+  nearTarget = target;
+  if (transform.mountType != ALTAZM && fabs(target.d) < Deg90 - degToRad(SLEW_DESTINATION_DIST)) {
+    nearTarget.h = target.h - degToRad(SLEW_DESTINATION_DIST);
+    if (target.pierSide == PIER_SIDE_EAST)
+      nearTarget.d = target.d - degToRad(SLEW_DESTINATION_DIST);
+    else
+      nearTarget.d = target.d + degToRad(SLEW_DESTINATION_DIST);
+  }
 
-  // prepare for goto, check for any waypoints and set them if found
+  Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
+
+  // prepare for goto
   state = GS_GOTO;
-  stage = GG_DESTINATION;
-  if (MFLIP_SKIP_HOME == OFF && transform.mountType != ALTAZM && start.pierSide != destination.pierSide) {
+  start = current;
+
+  // decide if going to target or nearby
+  if (transform.mountType == ALTAZM || SLEW_DESTINATION_DIST == 0.0) {
+    stage = GG_DESTINATION;
+    destination = target;
+  } else {
+    stage = GG_NEAR_DESTINATION;
+    destination = nearTarget;
+  }
+
+  // add waypoint if needed
+  if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
     VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
     waypoint(&current);
   }
@@ -92,22 +110,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   taskHandle = tasks.add(0, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
     VLF("MSG: Mount, create goto monitor task (idle, priority 3)... success");
-
-    double a1, a2;
-    transform.mountToInstrument(&destination, &a1, &a2);
-    if (park.state == PS_PARKING && stage == GG_DESTINATION) {
-      axis1.setTargetCoordinatePark(a1);
-      axis2.setTargetCoordinatePark(a2);
-    } else {
-      axis1.setTargetCoordinate(a1);
-      axis2.setTargetCoordinate(a2);
-    }
-    VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF("°, a2="); V(radToDeg(a2)); VL("°)");
     VLF("MSG: Mount, starting goto");
 
-    e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
-    if (e != CE_NONE) return e;
-    e = axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+    e = startAutoSlew();
     if (e != CE_NONE) return e;
 
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
@@ -238,7 +243,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
 // stop any presently active goto
 void Goto::stop() {
-  if (state == GS_GOTO && (stage == GG_DESTINATION || stage == GG_WAYPOINT)) stage = GG_READY_ABORT;
+  if (state == GS_GOTO && stage > GG_READY_ABORT) stage = GG_READY_ABORT;
 }
 
 // general status checks ahead of sync or goto
@@ -286,7 +291,7 @@ void Goto::waypoint(Coordinate *current) {
   //                W   .   E
   // meridian flip, only happens for equatorial mounts
 
-  stage = GG_WAYPOINT;
+  stage = GG_WAYPOINT_HOME;
 
   // default goes straight to the home position
   destination = home.position;
@@ -294,8 +299,12 @@ void Goto::waypoint(Coordinate *current) {
   // if the home position is at 0 hours, we're done
   if (home.position.h == 0.0) return;
 
+  double d60 = degToRad(120);
+  double d45 = degToRad(135);
+  if (current->pierSide == PIER_SIDE_EAST) { d60 = Deg180 - d60; d45 = Deg180 - d45; }
+
   // decide if we should first move to 60 deg. HA (4 hours) to get away from the horizon limits
-  if (current->a < Deg10 && fabs(start.h) > Deg90) destination.h = Deg60;
+  if (current->a < Deg10 && fabs(start.h) > Deg90) { destination.h = d60; stage = GG_WAYPOINT_AVOID; return; }
 
   // decide if we should first move to 45 deg. HA (3 hours) to get away from the horizon limits
   // if at a low latitude and in the opposite sky, |HA| = 6 is very low on the horizon and we need
@@ -303,9 +312,9 @@ void Goto::waypoint(Coordinate *current) {
   // near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation
   if (current->a < Deg20 && site.locationEx.latitude.absval < Deg45) {
     if (site.location.latitude >= 0) {
-      if (current->d <= Deg90 - site.location.latitude) destination.h = Deg45;
+      if (current->d <= Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; }
     } else {
-      if (current->d >= -Deg90 - site.location.latitude) destination.h = Deg45;
+      if (current->d >= -Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; }
     }
   }
 }
@@ -350,57 +359,47 @@ float Goto::usPerStepLowerLimit() {
 void Goto::poll() {
   if (stage == GG_READY_ABORT) {
     VLF("MSG: Mount, goto abort requested");
-
+    stage = GG_ABORT;
     meridianFlipHome.paused = false;
     meridianFlipHome.resume = false;
     axis1.autoSlewAbort();
     axis2.autoSlewAbort();
+  }
 
-    stage = GG_ABORT;
-  } else
-  if (stage == GG_WAYPOINT) {
-    if (!mount.isSlewing()) {
-      if (destination.h == home.position.h && destination.d == home.position.d && destination.pierSide == home.position.pierSide) {
+  if (!mount.isSlewing()) {
+    if (stage == GG_WAYPOINT_AVOID) {
+      VLF("MSG: Mount, goto waypoint reached");
+      stage = GG_WAYPOINT_HOME;
+      destination = home.position;
+      startAutoSlew();
+    } else
 
-        if (settings.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
+    if (stage == GG_WAYPOINT_HOME) {
+      if (settings.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
+      meridianFlipHome.paused = false;
+      meridianFlipHome.resume = false;
 
-        meridianFlipHome.paused = false;
-        meridianFlipHome.resume = false;
-        VLF("MSG: Mount, goto home reached");
+      VLF("MSG: Mount, goto home reached");
+      if (SLEW_DESTINATION_DIST == 0.0) {
         stage = GG_DESTINATION;
         destination = target;
       } else {
-        VLF("MSG: Mount, goto waypoint reached");
-        destination = home.position;
+        stage = GG_NEAR_DESTINATION;
+        destination = nearTarget;
       }
+      startAutoSlew();
+    } else
 
-      axis1.autoSlewStop();
-      axis2.autoSlewStop();
-      VLF("MSG: Mount, goto stopped");
+    if (stage == GG_NEAR_DESTINATION) {
+      VLF("MSG: Mount, goto near destination reached");
+      stage = GG_DESTINATION;
+      destination = target;
+      startAutoSlew();
+    } else
 
-      double a1, a2;
-      transform.mountToInstrument(&destination, &a1, &a2);
-      if (park.state == PS_PARKING && stage == GG_DESTINATION) {
-        axis1.setTargetCoordinatePark(a1);
-        axis2.setTargetCoordinatePark(a2);
-      } else {
-        axis1.setTargetCoordinate(a1);
-        axis2.setTargetCoordinate(a2);
-      }
-      VF("MSG: Mount, goto next target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
-
-      axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-      axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
-    }
-  } else
-  if (stage == GG_DESTINATION || stage == GG_ABORT) {
-    if (!mount.isSlewing()) {
+    if (stage == GG_DESTINATION || stage == GG_ABORT) {
       VLF("MSG: Mount, goto destination reached");
-
-      // flag the goto as finished
       state = GS_NONE;
-
-      // back to normal tracking
       mount.update();
 
       // kill this monitor
@@ -425,21 +424,49 @@ void Goto::poll() {
 
       return;
     }
+  }
 
-    // keep updating the axis targets to match the mount target
-    if (mount.isTracking()) {
-      double a1, a2;
+  skip:
+
+  // keep updating the axis targets to match the mount target
+  if (mount.isTracking()) {
+    target.h += radsPerFrac;
+    nearTarget.h += radsPerFrac;
+
+    if (stage == GG_DESTINATION) {
       if (transform.mountType == ALTAZM) transform.equToHor(&target);
+      double a1, a2;
       transform.mountToInstrument(&target, &a1, &a2);
+      axis1.setTargetCoordinate(a1);
+      axis2.setTargetCoordinate(a2);
+    }
+
+    if (stage == GG_NEAR_DESTINATION) {
+      double a1, a2;
+      transform.mountToInstrument(&nearTarget, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }
   }
 
-  skip:
+}
 
-  // keep updating mount target
-  if (mount.isTracking()) target.h += radsPerFrac;
+CommandError Goto::startAutoSlew() {
+  CommandError e;
+  double a1, a2;
+  transform.mountToInstrument(&destination, &a1, &a2);
+  if (stage == GG_DESTINATION && park.state == PS_PARKING) {
+    axis1.setTargetCoordinatePark(a1);
+    axis2.setTargetCoordinatePark(a2);
+  } else {
+    axis1.setTargetCoordinate(a1);
+    axis2.setTargetCoordinate(a2);
+  }
+  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
+
+  e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+  if (e == CE_NONE) e = axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
+  return e;
 }
 
 Goto goTo;
