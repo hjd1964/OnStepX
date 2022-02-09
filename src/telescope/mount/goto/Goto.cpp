@@ -75,29 +75,21 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   mount.syncToEncoders(false);
   if (mount.isHome()) mount.tracking(true);
 
-  nearTarget = target;
+  // allow slewing near target for Eq modes if not too close to the poles
+  slewDestinationDistHA = 0.0;
+  slewDestinationDistDec = 0.0;
   if (transform.mountType != ALTAZM && fabs(target.d) < Deg90 - degToRad(SLEW_DESTINATION_DIST)) {
-    nearTarget.h = target.h - degToRad(SLEW_DESTINATION_DIST);
-    if (target.pierSide == PIER_SIDE_EAST)
-      nearTarget.d = target.d - degToRad(SLEW_DESTINATION_DIST);
-    else
-      nearTarget.d = target.d + degToRad(SLEW_DESTINATION_DIST);
+    slewDestinationDistHA = degToRad(SLEW_DESTINATION_DIST);
+    slewDestinationDistDec = degToRad(SLEW_DESTINATION_DIST);
+    if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
   }
-
-  Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
 
   // prepare for goto
+  Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
   state = GS_GOTO;
+  stage = GG_NEAR_DESTINATION;
   start = current;
-
-  // decide if going to target or nearby
-  if (transform.mountType == ALTAZM || SLEW_DESTINATION_DIST == 0.0) {
-    stage = GG_DESTINATION;
-    destination = target;
-  } else {
-    stage = GG_NEAR_DESTINATION;
-    destination = nearTarget;
-  }
+  destination = target;
 
   // add waypoint if needed
   if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
@@ -380,21 +372,20 @@ void Goto::poll() {
       meridianFlipHome.resume = false;
 
       VLF("MSG: Mount, goto home reached");
-      if (SLEW_DESTINATION_DIST == 0.0) {
-        stage = GG_DESTINATION;
-        destination = target;
-      } else {
-        stage = GG_NEAR_DESTINATION;
-        destination = nearTarget;
-      }
+      stage = GG_NEAR_DESTINATION;
+      destination = target;
       startAutoSlew();
     } else
 
     if (stage == GG_NEAR_DESTINATION) {
-      VLF("MSG: Mount, goto near destination reached");
+      if (slewDestinationDistHA != 0.0) {
+        VLF("MSG: Mount, goto near destination reached");
+        destination = target;
+        slewDestinationDistHA = 0.0;
+        slewDestinationDistDec = 0.0;
+        startAutoSlew();
+      }
       stage = GG_DESTINATION;
-      destination = target;
-      startAutoSlew();
     } else
 
     if (stage == GG_DESTINATION || stage == GG_ABORT) {
@@ -431,29 +422,32 @@ void Goto::poll() {
   // keep updating the axis targets to match the mount target
   if (mount.isTracking()) {
     target.h += radsPerFrac;
-    nearTarget.h += radsPerFrac;
 
-    if (stage == GG_NEAR_DESTINATION) {
+    if (stage == GG_DESTINATION || stage == GG_NEAR_DESTINATION) {
+      Coordinate nearTarget = target;
+      nearTarget.h -= slewDestinationDistHA;
+      nearTarget.d -= slewDestinationDistDec;
+      if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
       double a1, a2;
       transform.mountToInstrument(&nearTarget, &a1, &a2);
-      axis1.setTargetCoordinate(a1);
-      axis2.setTargetCoordinate(a2);
-    } else
-
-    if (stage == GG_DESTINATION) {
-      if (transform.mountType == ALTAZM) transform.equToHor(&target);
-      double a1, a2;
-      transform.mountToInstrument(&target, &a1, &a2);
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }
   }
 }
 
+// start slews with approach correction and parking support
 CommandError Goto::startAutoSlew() {
   CommandError e;
+
+  if (stage == GG_NEAR_DESTINATION) {
+    destination.h -= slewDestinationDistHA;
+    destination.d -= slewDestinationDistDec;
+  }
+
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
+
   if (stage == GG_DESTINATION && park.state == PS_PARKING) {
     axis1.setTargetCoordinatePark(a1);
     axis2.setTargetCoordinatePark(a2);
@@ -461,6 +455,7 @@ CommandError Goto::startAutoSlew() {
     axis1.setTargetCoordinate(a1);
     axis2.setTargetCoordinate(a2);
   }
+
   VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
 
   e = axis1.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);

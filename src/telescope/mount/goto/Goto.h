@@ -110,11 +110,12 @@ class Goto {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
+    // start slews with approach correction and parking support
     CommandError startAutoSlew();
 
     PierSideSelect preferredPierSide = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
     Coordinate gotoTarget;
-    Coordinate start, destination, target, nearTarget;
+    Coordinate start, destination, target;
     GotoStage  stage                = GG_NONE;
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;
@@ -128,6 +129,9 @@ class Goto {
     float      usPerStepBase        = 128.0F;
     float      radsPerSecondCurrent;
     const double radsPerFrac = (degToRad(15.0/3600.0)/FRACTIONAL_SEC)*SIDEREAL_RATIO;
+
+    double slewDestinationDistHA = 0.0;
+    double slewDestinationDistDec = 0.0;
 
     GotoSettings settings = {false, false, 1000001.0F};
 };
