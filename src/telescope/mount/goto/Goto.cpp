@@ -378,6 +378,7 @@ void Goto::poll() {
     } else
 
     if (stage == GG_NEAR_DESTINATION) {
+      stage = GG_DESTINATION;
       if (slewDestinationDistHA != 0.0) {
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
@@ -385,7 +386,6 @@ void Goto::poll() {
         slewDestinationDistDec = 0.0;
         startAutoSlew();
       }
-      stage = GG_DESTINATION;
     } else
 
     if (stage == GG_DESTINATION || stage == GG_ABORT) {
