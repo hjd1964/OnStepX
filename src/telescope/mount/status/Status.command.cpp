@@ -48,10 +48,10 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G';                     // pulse [G]uide active
       if (guide.state != GU_NONE)              reply[i++]='g';                     // [g]uide active
 
-      if (mount.settings.rc == RC_REFR_RA)    { reply[i++]='r'; reply[i++]='s'; }  // [r]efr enabled [s]ingle axis
-      if (mount.settings.rc == RC_REFR_BOTH)  { reply[i++]='r'; }                  // [r]efr enabled
-      if (mount.settings.rc == RC_FULL_RA)    { reply[i++]='t'; reply[i++]='s'; }  // on[t]rack enabled [s]ingle axis
-      if (mount.settings.rc == RC_FULL_BOTH)  { reply[i++]='t'; }                  // on[t]rack enabled
+      if (mount.settings.rc == RC_REFRACTION) { reply[i++]='r'; reply[i++]='s'; }  // [r]efr enabled [s]ingle axis
+      if (mount.settings.rc == RC_REFRACTION_DUAL) { reply[i++]='r'; }             // [r]efr enabled
+      if (mount.settings.rc == RC_MODEL)      { reply[i++]='t'; reply[i++]='s'; }  // on[t]rack enabled [s]ingle axis
+      if (mount.settings.rc == RC_MODEL_DUAL) { reply[i++]='t'; }                  // on[t]rack enabled
       if (mount.settings.rc == RC_NONE) {
         float r = siderealToHz(mount.trackingRate);
         if (fequal(r, 57.900F))                reply[i++]='('; else                // Lunar rate selected
@@ -96,10 +96,10 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #endif
       if (guide.state == GU_PULSE_GUIDE)           reply[0]|=0b10001000;           // pulse guide active
 
-      if (mount.settings.rc == RC_REFR_RA)         reply[0]|=0b11010000;           // Refr enabled Single axis
-      if (mount.settings.rc == RC_REFR_BOTH)       reply[0]|=0b10010000;           // Refr enabled
-      if (mount.settings.rc == RC_FULL_RA)         reply[0]|=0b11100000;           // OnTrack enabled Single axis
-      if (mount.settings.rc == RC_FULL_BOTH)       reply[0]|=0b10100000;           // OnTrack enabled
+      if (mount.settings.rc == RC_REFRACTION)      reply[0]|=0b11010000;           // Refr enabled Single axis
+      if (mount.settings.rc == RC_REFRACTION_DUAL) reply[0]|=0b10010000;           // Refr enabled
+      if (mount.settings.rc == RC_MODEL)           reply[0]|=0b11100000;           // OnTrack enabled Single axis
+      if (mount.settings.rc == RC_MODEL_DUAL)      reply[0]|=0b10100000;           // OnTrack enabled
       if (mount.settings.rc == RC_NONE) {
         float r = siderealToHz(mount.trackingRate);
         if (fequal(r, 57.900F))                    reply[1]|=0b10000001; else      // Lunar rate selected

@@ -39,6 +39,13 @@ void Mount::init() {
   site.init();
   transform.init();
 
+  // setup compensated tracking as configured
+  if (TRACK_COMPENSATION_MEMORY == OFF) settings.rc = RC_DEFAULT;
+  if (transform.mountType == ALTAZM) {
+    if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
+    if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL;
+  }
+
   // get the main axes ready
   delay(100);
   axis1.init(&motor1, pollAxis1);
@@ -168,7 +175,7 @@ void Mount::enable(bool state) {
 
 // allow syncing to the encoders instead of from them
 void Mount::syncToEncoders(bool state) {
-  settings.syncToEncoders = state;
+  syncToEncodersEnabled = state;
 }
 
 // updates the tracking rates, etc. as appropriate for the mount state
@@ -224,7 +231,7 @@ void Mount::poll() {
     #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
   #endif
 
-  if (trackingState != TS_SIDEREAL) {
+  if (trackingState == TS_NONE) {
     trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
     update();
@@ -262,12 +269,12 @@ void Mount::poll() {
   }
 
   // apply (optional) pointing model and refraction
-  if (settings.rc == RC_FULL_RA || settings.rc == RC_FULL_BOTH) {
+  if (settings.rc == RC_MODEL || settings.rc == RC_MODEL_DUAL) {
     transform.topocentricToObservedPlace(&ahead); Y;
     transform.topocentricToObservedPlace(&behind); Y;
     transform.observedPlaceToMount(&ahead); Y;
     transform.observedPlaceToMount(&behind); Y;
-  } else if (settings.rc == RC_REFR_RA || settings.rc == RC_REFR_BOTH) {
+  } else if (settings.rc == RC_REFRACTION || settings.rc == RC_REFRACTION_DUAL) {
     transform.topocentricToObservedPlace(&ahead); Y;
     transform.topocentricToObservedPlace(&behind); Y;
   }
@@ -294,7 +301,7 @@ void Mount::poll() {
     trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
 
   // calculate the Axis2 Dec/Alt tracking rate (if dual axis or ALTAZM mode)
-  if (settings.rc == RC_REFR_BOTH || settings.rc == RC_FULL_BOTH || transform.mountType == ALTAZM) {
+  if (settings.rc == RC_REFRACTION_DUAL || settings.rc == RC_MODEL_DUAL || transform.mountType == ALTAZM) {
     float rate2;
     rate2 = (aheadAxis2 - behindAxis2)/DiffRange2;
     if (current.pierSide == PIER_SIDE_WEST) rate2 = -rate2;

@@ -10,25 +10,31 @@
 #include "../../libApp/commands/ProcessCmds.h"
 #include "coordinates/Transform.h"
 
-enum RateCompensation: uint8_t {RC_NONE, RC_REFR_RA, RC_REFR_BOTH, RC_FULL_RA, RC_FULL_BOTH};
-#if TRACK_REFRACTION_RATE_DEFAULT == ON
-  #define RC_DEFAULT RC_REFR_RA
-#else
+enum RateCompensation: uint8_t {RC_NONE, RC_REFRACTION, RC_REFRACTION_DUAL, RC_MODEL, RC_MODEL_DUAL};
+
+#if TRACK_COMPENSATION == OFF
   #define RC_DEFAULT RC_NONE
+#elif TRACK_COMPENSATION == REFRACTION
+  #define RC_DEFAULT RC_REFRACTION
+#elif TRACK_COMPENSATION == REFRACTION_DUAL
+  #define RC_DEFAULT RC_REFRACTION_DUAL
+#elif TRACK_COMPENSATION == MODEL
+  #define RC_DEFAULT RC_FULL
+#elif TRACK_COMPENSATION == MODEL_DUAL
+  #define RC_DEFAULT RC_MODEL_DUAL
 #endif
 
 enum TrackingState: uint8_t    {TS_NONE, TS_SIDEREAL};
 enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
 
 #pragma pack(1)
-#define MountSettingsSize 10
+#define MountSettingsSize 9
 typedef struct Backlash {
   float axis1;
   float axis2;
 } Backlash;
 typedef struct MountSettings {
   RateCompensation rc;
-  bool syncToEncoders;
   Backlash backlash;
 } MountSettings;
 #pragma pack()
@@ -77,7 +83,7 @@ class Mount {
     void syncToEncoders(bool state);
 
     // returns true if syncing only from OnStep to the Encoders
-    inline bool isSyncToEncoders() { return settings.syncToEncoders; }
+    inline bool isSyncToEncoders() { return syncToEncodersEnabled; }
 
     // updates the tracking rates, etc. as appropriate for the mount state
     // called once a second by poll() but available here for immediate action
@@ -86,7 +92,7 @@ class Mount {
     void poll();
 
     float trackingRate = 1.0F;
-    MountSettings settings = {RC_DEFAULT, false, { 0, 0 }};
+    MountSettings settings = {RC_DEFAULT, { 0, 0 }};
 
   private:
     // alternate tracking rate calculation method
@@ -107,6 +113,8 @@ class Mount {
     TrackingState trackingState = TS_NONE;
     float trackingRateAxis1     = 0.0F;
     float trackingRateAxis2     = 0.0F;
+
+    bool syncToEncodersEnabled = false;
 
     bool atHome = true;
 };

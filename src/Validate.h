@@ -347,8 +347,12 @@
   #error "Configuration (Config.h): Setting TRACK_AUTOSTART unknown, use OFF or ON."
 #endif
 
-#if TRACK_REFRACTION_RATE_DEFAULT != ON && TRACK_REFRACTION_RATE_DEFAULT != OFF
-  #error "Configuration (Config.h): Setting TRACK_REFRACTION_RATE_DEFAULT unknown, use OFF or ON."
+#if TRACK_COMPENSATION != OFF && (TRACK_COMPENSATION < COMPENSATED_TRACKING_FIRST || TRACK_COMPENSATION > COMPENSATED_TRACKING_LAST)
+  #error "Configuration (Config.h): Setting TRACK_COMPENSATION unknown, use OFF or REFRACTION or REFRACTION_DUAL or MODEL or MODEL_DUAL."
+#endif
+
+#if TRACK_COMPENSATION_MEMORY != ON && TRACK_COMPENSATION_MEMORY != OFF
+  #error "Configuration (Config.h): Setting TRACK_COMPENSATION_MEMORY unknown, use OFF or ON."
 #endif
 
 #if TRACK_BACKLASH_RATE < 2 && TRACK_BACKLASH_RATE > 100

@@ -91,6 +91,14 @@
 #define BEST                        3      // same as PSS_BEST
 #define PIER_SIDE_LAST              3
 
+// COMPENSATED TRACKING
+#define COMPENSATED_TRACKING_FIRST  1
+#define REFRACTION                  1      // refraction compensated tracking RA only
+#define REFRACTION_DUAL             2      // refraction compensated tracking both axes
+#define MODEL                       3      // pointing model compensated tracking RA only
+#define MODEL_DUAL                  4      // pointing model compensated tracking both axes
+#define COMPENSATED_TRACKING_LAST   4
+
 // TEMPERATURE sensing devices
 #define TEMPERATURE_FIRST           1
 #define DS1820     0x2800000000000000      // DS18B20 1-wire temperature sensors for focusing and dew heaters
@@ -136,26 +144,26 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928928UL
+#define INIT_NV_KEY                 583928927UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
 #define NV_SITE_BASE                5      // bytes: 40*4, 160
 #define NV_SITE_JD_BASE             165    // bytes: 16  , 16
 
-#define NV_MOUNT_SETTINGS_BASE      181    // bytes: 10  , 10
-#define NV_MOUNT_TYPE_BASE          191    // bytes: 1   , 1
-#define NV_MOUNT_GOTO_BASE          192    // bytes: 5   , 5
-#define NV_MOUNT_GUIDE_BASE         197    // bytes: 3   , 3
-#define NV_MOUNT_LIMITS_BASE        200    // bytes: 16  , 16
-#define NV_MOUNT_PARK_BASE          216    // bytes: 15  , 15
-#define NV_MOUNT_PEC_BASE           231    // bytes: 6   , 6
-#define NV_MOUNT_STATUS_BASE        237    // bytes: 1   , 1
+#define NV_MOUNT_SETTINGS_BASE      181    // bytes: 9   , 9
+#define NV_MOUNT_TYPE_BASE          190    // bytes: 1   , 1
+#define NV_MOUNT_GOTO_BASE          191    // bytes: 5   , 5
+#define NV_MOUNT_GUIDE_BASE         196    // bytes: 3   , 3
+#define NV_MOUNT_LIMITS_BASE        199    // bytes: 16  , 16
+#define NV_MOUNT_PARK_BASE          215    // bytes: 15  , 15
+#define NV_MOUNT_PEC_BASE           230    // bytes: 6   , 6
+#define NV_MOUNT_STATUS_BASE        236    // bytes: 1   , 1
 
-#define NV_ALIGN_MODEL_BASE         238    // bytes: 32  , 32
-#define NV_AXIS_SETTINGS_REVERT     270    // bytes: 2   , 2
-#define NV_AXIS_SETTINGS_BASE       272    // bytes: 45*9, 405
-#define NV_FOCUSER_SETTINGS_BASE    677    // bytes: 18*6, 108
-#define NV_ROTATOR_SETTINGS_BASE    785    // bytes: 7   , 7
-#define NV_FEATURE_SETTINGS_BASE    792    // bytes: 3 *8, 24
-#define NV_PEC_BUFFER_BASE          816    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+#define NV_ALIGN_MODEL_BASE         237    // bytes: 32  , 32
+#define NV_AXIS_SETTINGS_REVERT     269    // bytes: 2   , 2
+#define NV_AXIS_SETTINGS_BASE       271    // bytes: 45*9, 405
+#define NV_FOCUSER_SETTINGS_BASE    676    // bytes: 18*6, 108
+#define NV_ROTATOR_SETTINGS_BASE    784    // bytes: 7   , 7
+#define NV_FEATURE_SETTINGS_BASE    791    // bytes: 3 *8, 24
+#define NV_PEC_BUFFER_BASE          815    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)

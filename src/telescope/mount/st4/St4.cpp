@@ -154,7 +154,7 @@
             }
             if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
               #if SLEW_GOTO == ON
-                if (goTo.isAlignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
+                if (goTo.alignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
               #else
                 SERIAL_LOCAL.transmit(":CS#");
               #endif

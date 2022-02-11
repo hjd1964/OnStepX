@@ -221,21 +221,21 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Return: 0 on failure
   //                    1 on success
   if (command[0] == 'T' && parameter[0] == 0) {
-    if (command[1] == 'o') { settings.rc = RC_FULL_RA; } else
-    if (command[1] == 'r') { settings.rc = RC_REFR_RA; } else
-    if (command[1] == 'n') { settings.rc = RC_NONE;    } else
+    if (command[1] == 'o') { settings.rc = RC_MODEL; } else
+    if (command[1] == 'r') { settings.rc = RC_REFRACTION; } else
+    if (command[1] == 'n') { settings.rc = RC_NONE; } else
     if (command[1] == '1') {
-      if (settings.rc == RC_REFR_BOTH) settings.rc = RC_REFR_RA; else
-      if (settings.rc == RC_FULL_BOTH) settings.rc = RC_FULL_RA;
+      if (settings.rc == RC_REFRACTION_DUAL) settings.rc = RC_REFRACTION; else
+      if (settings.rc == RC_MODEL_DUAL) settings.rc = RC_MODEL;
     } else
     if (command[1] == '2') {
-      if (settings.rc == RC_REFR_RA) settings.rc = RC_REFR_BOTH; else
-      if (settings.rc == RC_FULL_RA) settings.rc = RC_FULL_BOTH;
+      if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL; else
+      if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
     } else
-    if (command[1] == 'S') { settings.rc = RC_NONE; trackingRate = hzToSidereal(60.0F);     } else
+    if (command[1] == 'S') { settings.rc = RC_NONE; trackingRate = hzToSidereal(60.0F); } else
     if (command[1] == 'K') { settings.rc = RC_NONE; trackingRate = hzToSidereal(60.136F); } else
-    if (command[1] == 'L') { settings.rc = RC_NONE; trackingRate = hzToSidereal(57.9F);   } else
-    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);              } else
+    if (command[1] == 'L') { settings.rc = RC_NONE; trackingRate = hzToSidereal(57.9F); } else
+    if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); } else
     if (command[1] == '+') { site.setSiderealPeriod(site.getSiderealPeriod() - hzToSubMicros(0.02F)); } else
     if (command[1] == '-') { site.setSiderealPeriod(site.getSiderealPeriod() + hzToSubMicros(0.02F)); } else
     if (command[1] == 'R') { site.setSiderealPeriod(SIDEREAL_PERIOD); } else
@@ -255,13 +255,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     } else *commandError = CE_CMD_UNKNOWN;
 
     if (transform.mountType == ALTAZM) {
-      if (settings.rc == RC_FULL_RA) settings.rc = RC_FULL_BOTH;
-      if (settings.rc == RC_REFR_RA) settings.rc = RC_REFR_BOTH;
+      if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
+      if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL;
     }
 
     if (*commandError == CE_NONE) {
       switch (command[1]) { case 'S': case 'K': case 'L': case 'Q': case '+': case '-': case 'R': *numericReply = false; }
       switch (command[1]) { case 'o': case 'r': case 'n': trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); }
+      nv.updateBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
       update();
     }
   } else
