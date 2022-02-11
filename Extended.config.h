@@ -98,7 +98,10 @@
 
 // ALIGN ---------------------------------------------------------------------------------------------------------------------------
 #define ALIGN_MAX_STARS              AUTO //   AUTO, Uses HAL specified default (either 6 or 9 stars.)                        Infreq
-                                          //              Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
+                                          //         Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
+#define SLEW_DESTINATION_DIST        0.25 //   0.25, Distance in deg's for goto target unidirectional approach, 0.0 disables  Option
+#define SLEW_DESTINATION_ALIGN_OFFSET  ON //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
+                                          //         from the correct direction when centering
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define STATUS_BUZZER_DEFAULT         OFF //    OFF, ON default starts w/buzzer enabled.                                      Option

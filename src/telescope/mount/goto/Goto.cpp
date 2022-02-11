@@ -382,8 +382,10 @@ void Goto::poll() {
       if (slewDestinationDistHA != 0.0) {
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
-        slewDestinationDistHA = 0.0;
-        slewDestinationDistDec = 0.0;
+        if (!alignActive() || SLEW_DESTINATION_ALIGN_OFFSET == OFF) {
+          slewDestinationDistHA = 0.0;
+          slewDestinationDistDec = 0.0;
+        }
         startAutoSlew();
       }
     } else

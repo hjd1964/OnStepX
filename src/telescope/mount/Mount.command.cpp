@@ -173,14 +173,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
               #if SLEW_GOTO == ON
                 CommandError e = goTo.validate();
                 if (e != CE_NONE) { *commandError = e; return true; }
-                if (goTo.isAligning()) { *commandError = CE_0; return true; }
+                if (goTo.alignActive()) { *commandError = CE_0; return true; }
               #endif
-              if (isnan(encoderAxis1) || isnan(encoderAxis2) || settings.syncToEncoders) { *commandError = CE_0; return true; }
+              if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
               axis1.setInstrumentCoordinate(encoderAxis1);
               axis2.setInstrumentCoordinate(encoderAxis2);
             }
           break;
-          case '3': settings.syncToEncoders = false; break;
+          case '3': syncToEncodersEnabled = false; break;
           default: *commandError = CE_CMD_UNKNOWN;
         }
       } else

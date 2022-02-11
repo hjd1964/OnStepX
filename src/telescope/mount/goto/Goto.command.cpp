@@ -65,7 +65,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Return: 0 on failure
     //                    1 on success
     if (command[1] == '+' && parameter[0] == 0) {
-      if (alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar) {
+      if (alignActive()) {
         CommandError e = alignAddStar();
         if (e != CE_NONE) {
           alignState.lastStar = 0;
@@ -84,7 +84,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
   //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
   if (command[0] == 'C' && (command[1] == 'S' || command[1] == 'M') && parameter[0] == 0) {
     CommandError e;
-    if (alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar) {
+    if (alignActive()) {
       e = alignAddStar();
       if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
     } else {

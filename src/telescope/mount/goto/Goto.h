@@ -74,10 +74,10 @@ class Goto {
     inline void alignReset() { alignState.currentStar = 0; alignState.lastStar = 0; }
 
     // check if an align is in progress
-    inline bool isAligning() { return alignState.lastStar > 0 && alignState.currentStar < alignState.lastStar; }
+    inline bool alignActive() { return alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar; }
 
     // check if an align is done
-    inline bool isAlignDone() { return alignState.lastStar > 0 && alignState.currentStar > alignState.lastStar; }
+    inline bool alignDone() { return alignState.lastStar > 0 && alignState.currentStar > alignState.lastStar; }
 
     // returns true if the pause at home feature is enabled
     inline bool isHomePauseEnabled() { return settings.meridianFlipPause; }
