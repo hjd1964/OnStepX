@@ -113,8 +113,8 @@
 
 // GUIDING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#GUIDING
 #define GUIDE_TIME_LIMIT                0 //      0, No guide time limit. Or n. Where n=1..120 second time limit guard.       Adjust
-#define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X                          Option
-#define SEPARATE_PULSE_GUIDE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding                    Infreq
+#define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X.                         Option
+#define SEPARATE_PULSE_GUIDE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding.                   Infreq
 
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
 #define PEC_BUFFER_SIZE_LIMIT         720 //    720, Seconds of PEC buffer allowed.                                           Adjust
@@ -123,7 +123,7 @@
 #define SLEW_GOTO                      ON //     ON, Use OFF to disable mount Goto features.                                  Infreq
 #define SLEW_DESTINATION_DIST        0.25 //   0.25, Distance in deg's for goto target unidirectional approach, 0.0 disables  Option
 #define SLEW_DESTINATION_ALIGN_OFFSET  ON //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
-                                          //         from the correct direction when centering
+                                          //         from the correct direction when centering.
 
 // TRACKING BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#TRACKING
 #define TRACK_AUTOSTART               OFF //    OFF, ON Start with tracking enabled.                                          Option
