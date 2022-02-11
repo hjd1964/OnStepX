@@ -499,8 +499,11 @@
 #ifndef TRACK_AUTOSTART
 #define TRACK_AUTOSTART               OFF
 #endif
+#ifndef TRACK_COMPENSATION_DEFAULT
+#define TRACK_COMPENSATION_DEFAULT    OFF
+#endif
 #ifndef TRACK_COMPENSATION_MEMORY
-#define TRACK_COMPENSATION_MEMORY     OFF                         // remembers refraction/pointing model compensated tracking settings
+#define TRACK_COMPENSATION_MEMORY     OFF
 #endif
 #ifndef TRACK_BACKLASH_RATE
 #define TRACK_BACKLASH_RATE           25
