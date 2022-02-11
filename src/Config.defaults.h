@@ -492,7 +492,7 @@
 #define GUIDE_HOME_TIME_LIMIT         5*60                        // in seconds, for home switches
 #endif
 #ifndef GUIDE_DISABLE_BACKLASH
-#define GUIDE_DISABLE_BACKLASH        OFF                         // ON disables backlash while pulse-guiding
+#define GUIDE_DISABLE_BACKLASH        OFF                         // disables backlash while pulse-guiding
 #endif
 
 // tracking
