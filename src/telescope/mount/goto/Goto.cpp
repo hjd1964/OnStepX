@@ -78,9 +78,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   // allow slewing near target for Eq modes if not too close to the poles
   slewDestinationDistHA = 0.0;
   slewDestinationDistDec = 0.0;
-  if (transform.mountType != ALTAZM && fabs(target.d) < Deg90 - degToRad(SLEW_DESTINATION_DIST)) {
-    slewDestinationDistHA = degToRad(SLEW_DESTINATION_DIST);
-    slewDestinationDistDec = degToRad(SLEW_DESTINATION_DIST);
+  if (transform.mountType != ALTAZM && fabs(target.d) < Deg90 - degToRad(SLEW_GOTO_OFFSET)) {
+    slewDestinationDistHA = degToRad(SLEW_GOTO_OFFSET);
+    slewDestinationDistDec = degToRad(SLEW_GOTO_OFFSET);
     if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
   }
 
@@ -382,7 +382,7 @@ void Goto::poll() {
       if (slewDestinationDistHA != 0.0) {
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
-        if (!alignActive() || SLEW_DESTINATION_ALIGN_OFFSET == OFF) {
+        if (!alignActive() || SLEW_GOTO_OFFSET_ALIGN == OFF) {
           slewDestinationDistHA = 0.0;
           slewDestinationDistDec = 0.0;
         }

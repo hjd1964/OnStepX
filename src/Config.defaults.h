@@ -522,11 +522,11 @@
 #ifndef SLEW_RAPID_STOP_DIST
 #define SLEW_RAPID_STOP_DIST          2.0
 #endif
-#ifndef SLEW_DESTINATION_DIST
-#define SLEW_DESTINATION_DIST         0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
+#ifndef SLEW_GOTO_OFFSET
+#define SLEW_GOTO_OFFSET             0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
 #endif
-#ifndef SLEW_DESTINATION_ALIGN_OFFSET
-#define SLEW_DESTINATION_ALIGN_OFFSET ON                          // skip final phase of goto for align stars so user tends to
+#ifndef SLEW_GOTO_OFFSET_ALIGN
+#define SLEW_GOTO_OFFSET_ALIGN        OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
 
 // pier side
