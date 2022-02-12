@@ -349,9 +349,7 @@ float Goto::usPerStepLowerLimit() {
 
 // monitor goto
 void Goto::poll() {
-  if (axis1.isAborting() || axis2.isAborting()) {
-    if (stage > GG_READY_ABORT) stage = GG_READY_ABORT;
-  }
+  if (stage > GG_READY_ABORT && (axis1.isAborting() || axis2.isAborting())) stage = GG_READY_ABORT;
 
   if (stage == GG_READY_ABORT) {
     VLF("MSG: Mount, goto abort requested");
