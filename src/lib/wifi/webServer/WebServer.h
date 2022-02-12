@@ -24,6 +24,6 @@
   // macros to help with sending webpage data, chunked
   #define sendHtmlStart() www.setContentLength(CONTENT_LENGTH_UNKNOWN); www.sendHeader("Cache-Control","no-cache"); www.send(200, "text/html", String());
   #define sendHtml(x) www.sendContent(x); x = "";
-  #define sendHtmlDone(x) www.sendContent("");
+  #define sendHtmlDone() www.sendContent("");
 
 #endif

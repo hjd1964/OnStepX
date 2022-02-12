@@ -29,7 +29,7 @@
   // macros to help with sending webpage data
   #define sendHtmlStart()
   #define sendHtml(x) www.sendContent(x); x = "";
-  #define sendHtmlDone(x) www.sendContent("");
+  #define sendHtmlDone() www.sendContent("");
   // misc.
   #define WEB_SOCKET_TIMEOUT    10000
   #define HANDLER_COUNT_MAX     24
