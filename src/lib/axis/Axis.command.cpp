@@ -3,7 +3,7 @@
 
 #include "Axis.h"
 
-#ifdef AXIS_PRESENT
+#ifdef MOTOR_PRESENT
 
 #include "../convert/Convert.h"
 

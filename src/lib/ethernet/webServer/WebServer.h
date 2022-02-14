@@ -28,6 +28,7 @@
 
   // macros to help with sending webpage data
   #define sendHtmlStart()
+  #define sendHtmlC(x) www.sendContent(x);
   #define sendHtml(x) www.sendContent(x); x = "";
   #define sendHtmlDone() www.sendContent("");
   // misc.
