@@ -4,6 +4,7 @@
 // digital mode reads have basic hf EMI/RFI noise filtering
 
 #include "Sense.h"
+#include "..\tasks\OnTask.h"
 
 SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   this->pin = pin;
@@ -110,7 +111,7 @@ int Sense::changed(uint8_t handle) {
 }
 
 void Sense::poll() {
-  for (int i = 0; i < senseCount; i++) senseInput[i]->poll();
+  for (int i = 0; i < senseCount; i++) { senseInput[i]->poll(); Y; }
 }
 
 Sense sense;
