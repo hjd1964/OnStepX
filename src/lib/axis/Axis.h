@@ -231,9 +231,6 @@ class Axis {
     // emergency stops, with deacceleration by time
     void autoSlewAbort();
 
-    // checks for emergency stop
-    inline bool isAborting() { return autoRate <= AR_RATE_BY_TIME_ABORT; };
-
     // checks if slew is active on this axis
     bool isSlewing();
 
