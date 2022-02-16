@@ -99,6 +99,7 @@
 // ALIGN ---------------------------------------------------------------------------------------------------------------------------
 #define ALIGN_MAX_STARS              AUTO //   AUTO, Uses HAL specified default (either 6 or 9 stars.)                        Infreq
                                           //         Or use n. Where n=1 (for Sync only) or 3 to 9 (for Goto Assist.)
+#define ALIGN_AUTO_HOME               OFF //    OFF, ON uses home switches to find home before starting the align.            Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define STATUS_BUZZER_DEFAULT         OFF //    OFF, ON default starts w/buzzer enabled.                                      Option

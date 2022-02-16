@@ -566,7 +566,11 @@
 
 // mount align
 #ifndef ALIGN_MAX_STARS
-#define ALIGN_MAX_STARS               AUTO
+#define ALIGN_MAX_STARS               AUTO                        // max num align stars, AUTO for HAL specified default
+#endif
+
+#ifndef ALIGN_AUTO_HOME
+#define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
 #endif
 
 // mount pec

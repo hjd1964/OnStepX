@@ -22,7 +22,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Point to the celestial pole.  GEM w/counterweights pointing downwards (CWD position).  Equatorial fork mounts at HA = 0.
     //            Returns: Nothing
     if (command[1] == 'F' && parameter[0] == 0) {
-      *commandError = requestWithReset();
+      *commandError = reset(true);
 
       #if SLEW_GOTO == ON
         park.reset();
