@@ -526,7 +526,7 @@
 #define SLEW_RAPID_STOP_DIST          2.0
 #endif
 #ifndef SLEW_GOTO_OFFSET
-#define SLEW_GOTO_OFFSET             0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
+#define SLEW_GOTO_OFFSET              0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
 #endif
 #ifndef SLEW_GOTO_OFFSET_ALIGN
 #define SLEW_GOTO_OFFSET_ALIGN        OFF                         // skip final phase of goto for align stars so user tends to
