@@ -38,6 +38,8 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       VLF("MSG: Mount, setting date/time from GPS");
       JulianDate jd;
       tls.get(jd);
+      dateIsReady = true;
+      timeIsReady = true;
       site.setDateTime(jd);
       #if SLEW_GOTO == ON
         if (park.state == PS_PARKED) park.restore(false);
@@ -60,7 +62,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 void Site::init() {
   // get location
   VLF("MSG: Mount, site get Latitude/Longitude from NV");
-  readLocation(number);
+  readLocation(locationNumber);
   updateLocation();
 
   // get date/time from the RTC/GPS or NV
@@ -121,8 +123,12 @@ void Site::updateLocation() {
   setSiderealTime(ut1);
 }
 
-// update the initError status and restore the park position if necessary
-void Site::updateTlsStatus() {
+// update the TLS 
+void Site::updateTLS() {
+  #if TIME_LOCATION_SOURCE != OFF
+    tls.set(ut1);
+  #endif
+
   if (initError.tls && dateIsReady && timeIsReady) {
     initError.tls = false;
     #if SLEW_GOTO == ON
@@ -131,12 +137,24 @@ void Site::updateTlsStatus() {
   }
 }
 
-// sets the Julian Date/time (UT1,) and updates sidereal time
+// gets the UT1 Julian date/time
+JulianDate Site::getDateTime() {
+  JulianDate now = ut1;
+
+  now.hour = getTime();
+  while (now.hour >= 24.0) { now.hour -= 24.0; now.day += 1.0; }
+  while (now.hour <  0.0)  { now.hour += 24.0; now.day -= 1.0; }
+
+  return now;
+}
+
+// sets the UT1 Julian date/time and updates sidereal time
 void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
-  dateIsReady = true;
-  timeIsReady = true;
   setSiderealTime(julianDate);
+
+  if (writeTime) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
+  if (NV_ENDURANCE < NVE_MID) writeTime = false;
 }
 
 // gets the time in sidereal hours
@@ -145,7 +163,7 @@ double Site::getSiderealTime() {
   noInterrupts();
   fs = fracLAST;
   interrupts();
-  return backInHours(fsToHours(fs));
+  return rangeHours(fsToHours(fs));
 }
 
 // sets the UT time (in hours) that have passed in this Julian Day
@@ -169,7 +187,7 @@ void Site::setSiderealPeriod(unsigned long period) {
   tasks.setPeriodSubMicros(handle, lround(siderealPeriod/FRACTIONAL_SEC));
 }
 
-// gets the time in hours that have passed in this Julian Day
+// gets the time in hours that have passed since Julian Day was set (UT1)
 double Site::getTime() {
   unsigned long cs;
   noInterrupts();
@@ -193,7 +211,7 @@ double Site::julianDateToLAST(JulianDate julianDate) {
   // DL("ST 1"); delay(100);
   double gast = julianDateToGAST(julianDate);
   // DL("ST 2"); delay(100);
-  return backInHours(gast - radToHrs(location.longitude));
+  return rangeHours(gast - radToHrs(location.longitude));
 }
 
 // convert julian date/time to greenwich apparent sidereal time
@@ -201,7 +219,6 @@ double Site::julianDateToGAST(JulianDate julianDate) {
   GregorianDate date;
 
   date = calendars.julianDayToGregorian(julianDate);
-  date.hour = 0; date.minute = 0; date.second = 0; date.fracsec = 0;
   JulianDate julianDay0 = calendars.gregorianToJulianDay(date);
   double D= (julianDate.day - 2451545.0) + julianDate.hour/24.0;
   double D0=(julianDay0.day - 2451545.0);
@@ -218,7 +235,7 @@ double Site::julianDateToGAST(JulianDate julianDate) {
   double eqeq = W*cos(degToRad(E));
   double gast = gmst + eqeq;
 
-  return backInHours(gast);
+  return rangeHours(gast);
 }
 
 // reads the julian date information from NV
@@ -232,12 +249,12 @@ void Site::readJD() {
   }
   nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
   if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
-  if (ut1.hour < 0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
+  if (ut1.hour < 0.0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
 }
 
 // reads the location information from NV
 // locationNumber can be 0..3
-void Site::readLocation(uint8_t locationNumber) {
+void Site::readLocation(uint8_t number) {
   if (LocationSize < sizeof(Location)) { nv.initError = true; DL("ERR: Site::readLocation(); LocationSize error"); }
   if (!nv.isKeyValid()) {
     VLF("MSG: Mount, site writing default sites 0-3 to NV");
@@ -247,8 +264,8 @@ void Site::readLocation(uint8_t locationNumber) {
     strcpy(location.name, "");
     for (uint8_t l = 0; l < 4; l++) nv.updateBytes(NV_SITE_BASE + l*LocationSize, &location, LocationSize);
   }
-  number = locationNumber;
-  nv.readBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+  locationNumber = number;
+  nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
   if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV latitude"); }
   if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV longitude"); }
   if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; initError.value = true; DLF("ERR: Site::readSite,  bad NV timeZone"); }
@@ -260,41 +277,62 @@ bool Site::setElevation(float e) {
  return true;
 }
 
-// adjust time (hours) into the 0 to 24 range
-double Site::backInHours(double time) {
+// convert UT1 to local standard date/time
+JulianDate Site::UT1ToLocal(JulianDate ut1) {
+  ut1.hour -= location.timezone;
+  while (ut1.hour >= 24.0) { ut1.hour -= 24.0; ut1.day += 1.0; }
+  while (ut1.hour < 0.0) { ut1.hour += 24.0; ut1.day -= 1.0; }
+  return ut1;
+}
+
+// convert local standard to UT1 date/time
+JulianDate Site::localToUT1(JulianDate local) {
+  local.hour += location.timezone;
+  while (local.hour >= 24.0) { local.hour -= 24.0; local.day += 1.0; }
+  while (local.hour < 0.0) { local.hour += 24.0; local.day -= 1.0; }
+  return local;
+}
+
+// adjust into the 0 to 24 range
+double Site::rangeHours(double time) {
   while (time >= 24.0) time -= 24.0;
   while (time < 0.0)   time += 24.0;
   return time;
 }
 
-// adjust time (hours) into the -12 to 12 range
-double Site::backInHourAngle(double time) {
-  while (time >= 12.0) time -= 24.0;
-  while (time < -12.0) time += 24.0;
+// adjust into the 0 to 12 range
+double Site::rangeAmPm(double time) {
+  while (time >= 12.0) time -= 12.0;
+  while (time < 0.0) time += 12.0;
   return time;
 }
 
-// convert string in format MM/DD/YY to Date
-GregorianDate Site::strToDate(char *ymd) {
-  GregorianDate date;
-  date.valid = false;
-  char m[3], d[3], y[3];
+// convert string in format MM/DD/YY or MM/DD/YYYY to Date (changes only date)
+bool Site::strToDate(char *ymd, GregorianDate *date) {
+  GregorianDate temp;
+  char m[3], d[3], y[5];
 
-  if (strlen(ymd) !=  8) return date;
+  if (strlen(ymd) != 8 && strlen(ymd) != 10) return false;
+
   m[0] = *ymd++; m[1] = *ymd++; m[2] = 0;
-  if (!convert.atoi2(m, &date.month, false)) return date;
-  if (*ymd++ != '/') return date;
-  d[0] = *ymd++; d[1] = *ymd++; d[2]=0;
-  if (!convert.atoi2(d, &date.day, false)) return date;
-  if (*ymd++ != '/') return date;
-  y[0] = *ymd++; y[1] = *ymd++; y[2]=0;
-  if (!convert.atoi2(y, &date.year, false)) return date;
+  if (!convert.atoi2(m, &temp.month, false)) return false;
+  if (*ymd++ != '/') return false;
 
-  if (date.month < 1 || date.month > 12 || date.day < 1 || date.day > 31 || date.year < 0 || date.year > 99) return date;
-  if (date.year > 20) date.year += 2000; else date.year += 2100;
+  d[0] = *ymd++; d[1] = *ymd++; d[2] = 0;
+  if (!convert.atoi2(d, &temp.day, false)) return false;
+  if (*ymd++ != '/') return false;
 
-  date.valid = true;
-  return date;
+  y[0] = *ymd++; y[1] = *ymd++; y[2] = 0;
+  if (strlen(ymd) == 10) { y[2] = *ymd++; y[3] = *ymd++;  y[4] = 0; }
+  if (!convert.atoi2(y, &temp.year, false)) return false;
+  if (temp.year < 100) { if (temp.year > 20) temp.year += 2000; else temp.year += 2100; }
+
+  if (temp.month < 1 || temp.month > 12 || temp.day < 1 || temp.day > 31 || temp.year < 2000 || temp.year > 2300) return false;
+
+  date->year = temp.year;
+  date->month = temp.month;
+  date->day = temp.day;
+  return true;
 }
 
 Site site;

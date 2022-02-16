@@ -18,8 +18,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     // :Ga#       Get standard time in 12 hour format
     //            Returns: HH:MM:SS#
     if (command[1] == 'a' && parameter[0] == 0) {
-      double time = backInHours(getTime() - location.timezone);
-      if (time > 12.0) time -= 12.0;
+      double time = rangeAmPm(getTime() - location.timezone);
       convert.doubleToHms(reply, time, false, PM_HIGH);
       *numericReply = false;
     } else
@@ -27,15 +26,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     // :GC#       Get standard calendar date
     //            Returns: MM/DD/YY#
     if (command[1] == 'C' && parameter[0] == 0) {
-      JulianDate julianDay = ut1;
-      double hour = getTime() - location.timezone;
-      while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
-      if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
-      GregorianDate date = calendars.julianDayToGregorian(julianDay);
-      date.year -= 2000;
-      while (date.year >= 100) date.year -= 100;
-      if (date.year < 0) date.year = 0;
-      sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
+      GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
+      sprintf(reply,"%02d/%02d/%02d", (int)local.month, (int)local.day, (int)local.year % 100);
       *numericReply = false;
     } else
 
@@ -69,7 +61,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     // :GLH#      Returns: HH:MM:SS.SSSS# (high precision)
     if (command[1] == 'L' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
-      convert.doubleToHms(reply, backInHours(getTime() - location.timezone), false, precisionMode);
+      convert.doubleToHms(reply, rangeHours(getTime() - location.timezone), false, precisionMode);
       *numericReply = false;
     } else
 
@@ -118,7 +110,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       // :GX80#     Get the UT1 Time as sexagesimal value in 24 hour format
       //            Returns: HH:MM:SS.ss#
       if (parameter[1] == '0') {
-        convert.doubleToHms(reply, backInHours(getTime()), false, PM_HIGH);
+        convert.doubleToHms(reply, rangeHours(getTime()), false, PM_HIGH);
         *numericReply = false;
       } else
 
@@ -130,8 +122,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
         if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
         GregorianDate date = calendars.julianDayToGregorian(julianDay);
-        date.year -= 2000; if (date.year >= 100) date.year -= 100;
-        sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year);
+        sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year % 100);
         *numericReply = false;
       } else
 
@@ -145,25 +136,15 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
   } else
 
   if (command[0] == 'S') {
-    // :SC[MM/DD/YY]#
-    //            Change standard date to MM/DD/YY
+    // :SC[MM/DD/YY]# or :SC[MM/DD/YYYY]#
+    //            Change local standard date
     //            Return: 0 on failure, 1 on success
     if (command[1] == 'C') {
-      GregorianDate date = strToDate(parameter);
-      if (date.valid) {
-        ut1 = calendars.gregorianToJulianDay(date);
-        ut1.hour = backInHours(getTime());
-        double hour = ut1.hour - location.timezone;
-        if (hour >= 24.0) { hour -= 24.0; ut1.day += 1.0; } else
-        if (hour <  0.0)  { hour += 24.0; ut1.day -= 1.0; }
+      GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
+      if (strToDate(parameter, &local)) {
         dateIsReady = true;
-        setSiderealTime(ut1);
-        if (writeTime) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-        if (NV_ENDURANCE < NVE_MID) writeTime = false;
-        updateTlsStatus();
-        #if TIME_LOCATION_SOURCE != OFF
-          tls.set(ut1);
-        #endif
+        setDateTime(localToUT1(calendars.gregorianToJulian(local)));        
+        updateTLS();
       } else *commandError = CE_PARAM_FORM;
     } else
 
@@ -175,7 +156,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (convert.tzToDouble(&hour, parameter)) {
         if (hour >= -13.75 || hour <= 12.0) {
           location.timezone = hour;
-          nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+          nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
         } else *commandError = CE_PARAM_RANGE;
       } else *commandError = CE_PARAM_FORM;
     } else
@@ -193,7 +174,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
           location.longitude = degToRad(degs);
           if (parameter[0] == '-') location.longitude = -location.longitude;
           updateLocation();
-          nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+          nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
         } else *commandError = CE_PARAM_RANGE;
       } else *commandError = CE_PARAM_FORM;
     } else
@@ -202,17 +183,11 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Set the local Time
     //            Return: 0 failure, 1 success
     if (command[1] == 'L') {
-      double hour;
-      if (convert.hmsToDouble(&hour, parameter, PM_HIGH) || convert.hmsToDouble(&hour, parameter, PM_HIGHEST)) {
-        ut1.hour = hour + location.timezone;
+      GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
+      if (convert.hmsToDouble(&local.hour, parameter, PM_HIGH) || convert.hmsToDouble(&local.hour, parameter, PM_HIGHEST)) {
         timeIsReady = true;
-        setSiderealTime(ut1);
-        if (writeDate) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-        if (NV_ENDURANCE < NVE_MID) writeDate = false;
-        updateTlsStatus();
-        #if TIME_LOCATION_SOURCE != OFF
-          tls.set(ut1);
-        #endif
+        setDateTime(localToUT1(calendars.gregorianToJulian(local)));        
+        updateTLS();
       } else *commandError = CE_PARAM_FORM;
     } else
 
@@ -226,8 +201,8 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
         Location tempLocation;
         nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
         strcpy(tempLocation.name, parameter);
-        if (locationNumber == number) strcpy(location.name, parameter);
         nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+        if (locationNumber == locationNumber) strcpy(location.name, parameter);
       } else *commandError = CE_PARAM_RANGE;
     } else
 
@@ -239,7 +214,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       if (convert.dmsToDouble(&degs, parameter, true)) {
         location.latitude = degToRad(degs);
         updateLocation();
-        nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+        nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
         if (mount.isHome()) home.init();
       } else *commandError = CE_PARAM_FORM;
     } else 
@@ -266,7 +241,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       float f = strtod(&parameter[0], &conv_end);
       if (&parameter[0] == conv_end) f = NAN;
       if (!setElevation(f)) *commandError = CE_PARAM_RANGE;
-      nv.updateBytes(NV_SITE_BASE + number*LocationSize, &location, LocationSize);
+      nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
     } else return false;
   } else
 
@@ -274,9 +249,9 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     // :W[n]#     Sets current site to n, where n = 0..3
     //            Returns: Nothing
     if ((command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
-      number = command[1] - '0';
-      nv.update(NV_SITE_NUMBER, number);
-      readLocation(number);
+      locationNumber = command[1] - '0';
+      nv.update(NV_SITE_NUMBER, locationNumber);
+      readLocation(locationNumber);
       updateLocation();
       if (mount.isHome()) home.init();
       *numericReply = false;

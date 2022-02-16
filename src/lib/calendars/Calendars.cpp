@@ -5,7 +5,29 @@
 
 #ifdef CALENDARS_PRESENT
 
-// convert from Gregorian date to Julian Day (does not handle hours)
+// convert from Gregorian to Julian date/time
+JulianDate Calendars::gregorianToJulian(GregorianDate date) {
+  JulianDate jd = gregorianToJulianDay(date);
+  jd.hour = date.hour;
+
+  while (jd.hour >= 24.0) { jd.hour -= 24.0; jd.day += 1.0; }
+  while (jd.hour < 0.0) { jd.hour += 24.0; jd.day -= 1.0; }
+
+  return jd;
+}
+
+// convert from Julian to Gregorian date/time
+GregorianDate Calendars::julianToGregorian(JulianDate julianDate) {
+  while (julianDate.hour >= 24.0) { julianDate.hour -= 24.0; julianDate.day += 1.0; }
+  while (julianDate.hour < 0.0) { julianDate.hour += 24.0; julianDate.day -= 1.0; }
+
+  GregorianDate date = julianDayToGregorian(julianDate);
+  date.hour = julianDate.hour;
+
+  return date;
+}
+
+// convert from Gregorian to Julian date (does not handle hours)
 JulianDate Calendars::gregorianToJulianDay(GregorianDate date) {
   JulianDate julianDay;
   
@@ -19,7 +41,7 @@ JulianDate Calendars::gregorianToJulianDay(GregorianDate date) {
   return julianDay;
 }
 
-// convert from Julian Day to Gregorian date (does not handle hours)
+// convert from Julian to Gregorian date (does not handle hours)
 GregorianDate Calendars::julianDayToGregorian(JulianDate julianDate) {
   double A, B, C, D, D1, E, F, G, I;
   GregorianDate date;
@@ -41,6 +63,7 @@ GregorianDate Calendars::julianDayToGregorian(JulianDate julianDate) {
   date.day = floor(D1);
   if (G < 13.5)         date.month = floor(G - 1.0);    else date.month = floor(G - 13.0);
   if (date.month > 2.5) date.year  = floor(D - 4716.0); else date.year  = floor(D - 4715.0);
+  date.hour = 0.0;
 
   return date;
 }

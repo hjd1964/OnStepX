@@ -47,9 +47,12 @@ class Site {
     void updateLocation();
 
     // update the initError status and restore the park position if necessary
-    void updateTlsStatus();
+    void updateTLS();
 
-    // sets the Julian Date/time (UT1,) and updates sidereal time
+    // gets the UT1 Julian date/time
+    JulianDate getDateTime();
+
+    // sets the UT1 Julian date/time and updates sidereal time
     void setDateTime(JulianDate julianDate);
 
     // gets the time in sidereal hours
@@ -81,7 +84,7 @@ class Site {
     unsigned long updateTimeoutTime = 0;
 
   private:
-    // gets the time in hours that have passed in this Julian Day
+    // gets the time in hours that have passed since Julian Day was set (UT1)
     double getTime();
 
     // sets the time in sidereal hours
@@ -98,19 +101,25 @@ class Site {
 
     // reads the location information from NV
     // locationNumber can be 0..3
-    void readLocation(uint8_t locationNumber);
+    void readLocation(uint8_t number);
 
     // sets the site altitude in meters
     bool setElevation(float e);
 
-    // adjust time (hours) into the 0 to 24 range
-    double backInHours(double time);
+    // convert UT1 to local standard date/time
+    JulianDate UT1ToLocal(JulianDate ut1);
 
-    // adjust time (hours) into the -12 to 12 range
-    double backInHourAngle(double time);
+    // convert local standard to UT1 date/time
+    JulianDate localToUT1(JulianDate local);
 
-    // convert string in format MM/DD/YY to julian date
-    GregorianDate strToDate(char *ymd);
+    // adjust into the 0 to 24 range
+    double rangeHours(double time);
+
+    // adjust into the 0 to 12 range
+    double rangeAmPm(double time);
+
+    // convert string in format MM/DD/YY or MM/DD/YYYY to Date (changes only date)
+    bool strToDate(char *ymd, GregorianDate *date);
 
     // the current UT1 date and time
     JulianDate ut1;
@@ -129,7 +138,7 @@ class Site {
     uint8_t handle = 0;
 
     // site number 0..3
-    uint8_t number = 0;
+    uint8_t locationNumber = 0;
 };
 
 extern Site site;
