@@ -78,7 +78,10 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   // allow slewing near target for Eq modes if not too close to the poles
   slewDestinationDistHA = 0.0;
   slewDestinationDistDec = 0.0;
-  if (transform.mountType != ALTAZM && fabs(target.d) < Deg90 - degToRad(SLEW_GOTO_OFFSET)) {
+  if (transform.mountType != ALTAZM && 
+      park.state != PS_PARKING &&
+      home.state != HS_HOMING &&
+      fabs(target.d) < Deg90 - degToRad(SLEW_GOTO_OFFSET)) {
     slewDestinationDistHA = degToRad(SLEW_GOTO_OFFSET);
     slewDestinationDistDec = degToRad(SLEW_GOTO_OFFSET);
     if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
@@ -349,8 +352,6 @@ float Goto::usPerStepLowerLimit() {
 
 // monitor goto
 void Goto::poll() {
-  if (stage > GG_READY_ABORT && (axis1.isAborting() || axis2.isAborting())) stage = GG_READY_ABORT;
-
   if (stage == GG_READY_ABORT) {
     VLF("MSG: Mount, goto abort requested");
     stage = GG_ABORT;

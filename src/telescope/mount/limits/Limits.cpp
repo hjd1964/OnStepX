@@ -136,12 +136,12 @@ uint8_t Limits::errorCode() {
   return ERR_NONE;
 }
 
-void Limits::stop(GuideAction stopDirection) {
+void Limits::stop() {
   #if SLEW_GOTO == ON
     goTo.stop();
   #endif
-  guide.stopAxis1(stopDirection, true);
-  guide.stopAxis2(stopDirection, true);
+  guide.stopAxis1(GA_BREAK, true);
+  guide.stopAxis2(GA_BREAK, true);
   mount.tracking(false);
 }
 
@@ -170,9 +170,11 @@ void Limits::poll() {
 
   Coordinate current = mount.getMountPosition(CR_MOUNT_ALT);
 
+  // overhead and horizon limits
   if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
   if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
+  // meridian limits
   if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
     if (current.h < -settings.pastMeridianE) {
       stopAxis1(GA_REVERSE);
@@ -207,6 +209,7 @@ void Limits::poll() {
     current.a2 = axis2.getMotorPosition();
   #endif
 
+  // min and max limits
   if (flt(current.a1, axis1.settings.limits.min)) {
     stopAxis1(GA_REVERSE);
     error.limit.axis1.min = true;
@@ -263,10 +266,18 @@ void Limits::poll() {
     error.limit.axis2.max = true;
   } else error.limit.axis2.max = false;
 
+  // min and max limit switches
   error.limitSense.axis1.min = axis1.motionErrorSensed(DIR_REVERSE);
+  if (error.limitSense.axis1.min) stopAxis1(GA_REVERSE);
+
   error.limitSense.axis1.max = axis1.motionErrorSensed(DIR_FORWARD);
+  if (error.limitSense.axis1.max) stopAxis1(GA_FORWARD);
+
   error.limitSense.axis2.min = axis2.motionErrorSensed(DIR_REVERSE);
+  if (error.limitSense.axis2.min) stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+
   error.limitSense.axis2.max = axis2.motionErrorSensed(DIR_FORWARD);
+  if (error.limitSense.axis2.max) stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
 
   #if DEBUG == VERBOSE
     const char* errPre = "MSG: Mount, error state: ";
@@ -298,12 +309,13 @@ void Limits::poll() {
     }
   #endif
 
+  // respond to overhead and horizon limits
   if (transform.mountType == ALTAZM) {
     if (error.altitude.min) stopAxis2(GA_REVERSE);
     if (error.altitude.max) stopAxis2(GA_FORWARD);
   } else {
-    if (!lastError.altitude.min && error.altitude.min) stop(GA_BREAK);
-    if (!lastError.altitude.max && error.altitude.max) stop(GA_BREAK);
+    if (!lastError.altitude.min && error.altitude.min) stop();
+    if (!lastError.altitude.max && error.altitude.max) stop();
   }
 }
 

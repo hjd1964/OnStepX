@@ -73,9 +73,9 @@ class Limits {
     LimitSettings settings = { { degToRadF(-10.0F), degToRadF(80.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
 
   private:
-    void stop(GuideAction stopDirection);
-    void stopAxis1(GuideAction stopDirection);
-    void stopAxis2(GuideAction stopDirection);
+    void stop();
+    void stopAxis1(GuideAction stopDirection = GA_BREAK);
+    void stopAxis2(GuideAction stopDirection = GA_BREAK);
 
     bool limitsEnabled = false;
     LimitsError error;
