@@ -55,7 +55,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       #if ALIGN_AUTO_HOME == ON
         home.requestWithReset();
       #else
-        home.request();
+        home.reset();
       #endif
       mount.tracking(true);
 

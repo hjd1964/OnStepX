@@ -445,7 +445,7 @@ void Goto::poll() {
 CommandError Goto::startAutoSlew() {
   CommandError e;
 
-  if (stage == GG_NEAR_DESTINATION) {
+  if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
     destination.h -= slewDestinationDistHA;
     destination.d -= slewDestinationDistDec;
   }
