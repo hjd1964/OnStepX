@@ -428,13 +428,15 @@ void Goto::poll() {
   if (mount.isTracking()) {
     target.h += radsPerFrac;
 
-    if (stage == GG_DESTINATION || stage == GG_NEAR_DESTINATION) {
+    if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
       Coordinate nearTarget = target;
       nearTarget.h -= slewDestinationDistHA;
       nearTarget.d -= slewDestinationDistDec;
+
       if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
       double a1, a2;
       transform.mountToInstrument(&nearTarget, &a1, &a2);
+
       axis1.setTargetCoordinate(a1);
       axis2.setTargetCoordinate(a2);
     }

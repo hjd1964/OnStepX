@@ -205,8 +205,8 @@ void Mount::update() {
       axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
-    f1 = abs(f1);
-    f2 = abs(f2);
+    f1 = fabs(f1);
+    f2 = fabs(f2);
     if (f2 > f1) f1 = f2;
     if (f1 < 0.20F) statusFlashMs = SF_STOPPED; else
     if (f1 > 3.0F) statusFlashMs = SF_SLEWING; else statusFlashMs = 500.0F/f1;

@@ -214,7 +214,7 @@ float Focuser::getTcfCoef(int index) {
 // set TCF coefficient, in microns per deg. C
 bool Focuser::setTcfCoef(int index, float value) {
   if (index < 0 || index >= FOCUSER_MAX) return false;
-  if (abs(value) >= 1000.0F) return false;
+  if (fabs(value) >= 1000.0F) return false;
   settings[index].tcf.coef = value;
   writeSettings(index);
   return true;
@@ -244,7 +244,7 @@ float Focuser::getTcfT0(int index) {
 // set TCF T0, in deg. C
 bool Focuser::setTcfT0(int index, float value) {
   if (index < 0 || index >= FOCUSER_MAX) return false;
-  if (abs(value) > 60.0F) return false;
+  if (fabs(value) > 60.0F) return false;
   settings[index].tcf.t0 = value;
   writeSettings(index);
   return true;

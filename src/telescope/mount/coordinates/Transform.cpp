@@ -223,8 +223,8 @@ void Transform::equToHor(Coordinate *coord) {
   double t1     = sin(coord->h);
   double t2     = cosHA*site.locationEx.latitude.sine - tan(coord->d)*site.locationEx.latitude.cosine;
   // handle degenerate coordinates near the poles
-  if (abs(coord->d - Deg90) < TenthArcSec) coord->z = 0.0; else
-  if (abs(coord->d + Deg90) < TenthArcSec) coord->z = Deg180; else {
+  if (fabs(coord->d - Deg90) < TenthArcSec) coord->z = 0.0; else
+  if (fabs(coord->d + Deg90) < TenthArcSec) coord->z = Deg180; else {
     coord->z = atan2(t1, t2);
     coord->z += Deg180;
   }

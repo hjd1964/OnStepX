@@ -103,8 +103,9 @@ CommandError Home::reset(bool fullReset) {
   // refresh the home position
   init();
 
-  // stop tracking
+  // stop tracking and set default rate
   mount.tracking(false);
+  mount.trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
 
   // make sure the motors are powered off
   if (fullReset) mount.enable(false);
