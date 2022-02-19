@@ -20,8 +20,8 @@
     #define PROFILER_VT100 ON
     
     char scale_unit(double *d) {
-      if (abs(lround(*d)) > 999) { *d /= 1000.0; return 'm'; } else
-        if (abs(lround(*d)) > 999) { *d /= 1000.0; return ' '; } else return 'u';
+      if (labs(lround(*d)) > 999) { *d /= 1000.0; return 'm'; } else
+        if (labs(lround(*d)) > 999) { *d /= 1000.0; return ' '; } else return 'u';
     }
     
     void profiler() {

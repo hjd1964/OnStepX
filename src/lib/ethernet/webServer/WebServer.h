@@ -26,21 +26,32 @@
     #define WLF(x)
   #endif
 
-  // macros to help with sending webpage data
-  #define sendHtmlStart()
-  #define sendHtmlC(x) www.sendContent(x);
-  #define sendHtml(x) www.sendContent(x); x = "";
-  #define sendHtmlDone() www.sendContent("");
   // misc.
   #define WEB_SOCKET_TIMEOUT    10000
   #define HANDLER_COUNT_MAX     24
   #define PARAMETER_COUNT_MAX   8
+
+  const char http_defaultHeader[] PROGMEM =
+  "HTTP/1.1 200 OK\r\n" "Content-Type: text/html\r\n" "Connection: close\r\n" "\r\n";
+
+  const char http_textHeader[] PROGMEM =
+  "HTTP/1.1 200 OK\r\n" "Content-Type: text/plain\r\n" "Connection: close\r\n" "\r\n";
 
   const char http_js304Header[] PROGMEM =
   "HTTP/1.1 304 OK\r\n" "Content-Type: application/javascript\r\n" "Etag: \"3457807a63ac7bdabf8999b98245d0fe\"\r\n" "Last-Modified: Mon, 13 Apr 2015 15:35:56 GMT\r\n" "Connection: close\r\n" "\r\n";
 
   const char http_jsHeader[] PROGMEM =
   "HTTP/1.1 200 OK\r\n" "Content-Type: application/javascript\r\n" "Etag: \"3457807a63ac7bdabf8999b98245d0fe\"\r\n" "Last-Modified: Mon, 13 Apr 2015 15:35:56 GMT\r\n" "Connection: close\r\n" "\r\n";
+
+  // macros to help with sending webpage data
+  #define sendHtmlStart() setResponseHeader(http_defaultHeader);
+  #define sendHtmlC(x) www.sendContent(x);
+  #define sendHtml(x) www.sendContent(x); x = "";
+  #define sendHtmlDone() www.sendContent("");
+
+  #define sendTextStart() setResponseHeader(http_textHeader);
+  #define sendText(x) www.sendContent(x); x = "";
+  #define sendTextDone() www.sendContent("");
 
   typedef void (* webFunction) ();
   

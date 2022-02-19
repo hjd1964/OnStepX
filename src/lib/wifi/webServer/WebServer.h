@@ -27,4 +27,8 @@
   #define sendHtml(x) www.sendContent(x); x = "";
   #define sendHtmlDone() www.sendContent("");
 
+  #define sendTextStart() www.setContentLength(CONTENT_LENGTH_UNKNOWN); www.sendHeader("Cache-Control","no-cache"); www.send(200, "text/plain", String());
+  #define sendText(x) www.sendContent(x); x = "";
+  #define sendTextDone() www.sendContent("");
+
 #endif

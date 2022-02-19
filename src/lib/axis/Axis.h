@@ -130,7 +130,7 @@ class Axis {
     // coordinate wrap, in "measures" (radians, microns, etc.)
     // wrap occurs when the coordinate exceeds the min or max limits
     // default 0.0 (disabled)
-    inline void coordinateWrap(double value) { wrapAmount = value; wrapEnabled = abs(value) > 0.0F; }
+    inline void coordinateWrap(double value) { wrapAmount = value; wrapEnabled = fabs(value) > 0.0F; }
 
     // set instrument coordinate, in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);

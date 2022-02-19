@@ -18,8 +18,6 @@
 
   EthernetServer webServer(80);
 
-  const char http_defaultHeader[] PROGMEM = "HTTP/1.1 200 OK\r\n" "Content-Type: text/html\r\n" "Connection: close\r\n" "\r\n";
-
   void WebServer::begin() {
     #if defined(SDCARD_CS_PIN)
       #if SD_CARD == ON
@@ -37,9 +35,6 @@
     #endif
 
     ethernetManager.init();
-
-    // start the Ethernet connection and the server:
-    setResponseHeader(http_defaultHeader);
 
     webServer.begin();
     VLF("MSG: Ethernet started www Server on port 80");

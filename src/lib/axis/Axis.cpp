@@ -134,8 +134,8 @@ double Axis::getIndexPosition() {
 }
 
 double distance(double c1, double c2) {
-  double d1 = abs(c1 - c2);
-  double d2 = abs(c2 - c1);
+  double d1 = fabs(c1 - c2);
+  double d2 = fabs(c2 - c1);
   if (d1 <= d2) return d1; else return d2;
 }
 
@@ -438,7 +438,7 @@ void Axis::poll() {
       if (commonMinMaxSensed) { autoSlewAbort(); return; }
 
       if (freq > slewMpspfs) freq -= slewMpspfs; else if (freq < -slewMpspfs) freq += slewMpspfs; else freq = 0.0F;
-      if (abs(freq) <= slewMpspfs) {
+      if (fabs(freq) <= slewMpspfs) {
         motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
@@ -451,7 +451,7 @@ void Axis::poll() {
         } else
         if (homingStage == HOME_FINE) homingStage = HOME_NONE;
         if (homingStage != HOME_NONE) {
-          float f = abs(slewFreq)/6.0F;
+          float f = fabs(slewFreq)/6.0F;
           if (f < 0.0003F) f = 0.0003F;
           setFrequencySlew(f);
           autoSlewHome(30000);
