@@ -280,6 +280,13 @@ CommandError Goto::alignAddStar() {
   return e;
 }
 
+// reset the alignment model
+void Goto::alignReset() {
+  alignState.currentStar = 0;
+  alignState.lastStar = 0;
+  transform.align.modelClear();
+}
+
 // set any additional destinations required for a goto
 void Goto::waypoint(Coordinate *current) {
   // HA goes from +90...0..-90

@@ -71,7 +71,7 @@ class Goto {
     CommandError alignAddStar();
 
     // reset the alignment model
-    inline void alignReset() { alignState.currentStar = 0; alignState.lastStar = 0; }
+    void alignReset();
 
     // check if an align is in progress
     inline bool alignActive() { return alignState.lastStar > 0 && alignState.currentStar <= alignState.lastStar; }
