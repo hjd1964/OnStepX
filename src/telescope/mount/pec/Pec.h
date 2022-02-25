@@ -35,6 +35,8 @@ class Pec {
     #if AXIS1_PEC == ON
       void init();
       void poll();
+
+      PecSettings settings = { false, PEC_NONE, PEC_STEPS_PER_WORM_ROTATION };
     #endif
 
   private:
@@ -53,8 +55,6 @@ class Pec {
     #if AXIS1_PEC == ON
       uint8_t  monitorHandle            = 0;
       uint8_t  senseHandle              = 0;
-
-      PecSettings settings = { false, PEC_NONE, PEC_STEPS_PER_WORM_ROTATION };
 
       bool     wormIndexState           = false;
       bool     wormIndexSenseThisSecond = false;
