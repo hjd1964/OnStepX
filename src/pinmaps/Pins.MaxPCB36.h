@@ -12,10 +12,10 @@
 // Serial2: RX4 Pin 7, TX4 Pin 8
 
 #if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B              Serial1
+  #define SERIAL_B              Serial2
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
-  #define SERIAL_C              Serial2
+  #define SERIAL_C              Serial1
 #endif
 #if defined(USB_DUAL_SERIAL) || defined(USB_TRIPLE_SERIAL)
   #define SERIAL_D              SerialUSB1
