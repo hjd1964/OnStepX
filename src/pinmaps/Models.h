@@ -6,10 +6,6 @@
   #define PINMAP_STR "Classic"
   #include "Pins.Classic.h"
 #endif
-#if PINMAP == ClassicShield
-  #define PINMAP_STR "Classic (Steve's Shield)"
-  #include "Pins.Classic.h"
-#endif
 #if PINMAP == MiniPCB
   #define PINMAP_STR "MiniPCB v1"
   #include "Pins.MiniPCB.h"
@@ -54,22 +50,6 @@
 #if PINMAP == CNC3
   #define PINMAP_STR "CNC v3"
   #include "Pins.CNC3.h"
-#endif
-#if PINMAP == Ramps14
-  #define PINMAP_STR "RAMPS v1.4"
-  #include "Pins.Ramps14.h"
-#endif
-#if PINMAP == MksGenL1
-  #define PINMAP_STR "MKS Gen-L v1"
-  #include "Pins.Ramps14.h"
-#endif
-#if PINMAP == MksGenL2
-  #define PINMAP_STR "MKS Gen-L v2"
-  #include "Pins.Ramps14.h"
-#endif
-#if PINMAP == MksGenL21
-  #define PINMAP_STR "MKS Gen-L v2.1"
-  #include "Pins.Ramps14.h"
 #endif
 #if PINMAP == STM32Blue
   #define PINMAP_STR "STM32 Bluepill"
