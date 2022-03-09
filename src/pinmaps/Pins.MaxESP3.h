@@ -58,8 +58,8 @@
 #define AXIS1_ENABLE_PIN        12
 #define AXIS1_M0_PIN            13               // SPI MOSI
 #define AXIS1_M1_PIN            14               // SPI SCK
-#define AXIS1_M2_PIN            23               // SPI CS
-#define AXIS1_M3_PIN            AUX2_PIN         // SPI MISO
+#define AXIS1_M2_PIN            23               // SPI CS (UART TX)
+#define AXIS1_M3_PIN            AUX2_PIN         // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           0
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
@@ -69,8 +69,8 @@
 #define AXIS2_ENABLE_PIN        SHARED
 #define AXIS2_M0_PIN            13               // SPI MOSI
 #define AXIS2_M1_PIN            14               // SPI SCK
-#define AXIS2_M2_PIN            5                // SPI CS
-#define AXIS2_M3_PIN            AUX2_PIN         // SPI MISO
+#define AXIS2_M2_PIN            5                // SPI CS (UART TX)
+#define AXIS2_M3_PIN            AUX2_PIN         // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
@@ -80,8 +80,8 @@
 #define AXIS3_ENABLE_PIN        OFF              // No enable pin control (always enabled)
 #define AXIS3_M0_PIN            OFF              // SPI MOSI
 #define AXIS3_M1_PIN            OFF              // SPI SCK
-#define AXIS3_M2_PIN            OFF              // SPI CS
-#define AXIS3_M3_PIN            OFF              // SPI MISO
+#define AXIS3_M2_PIN            OFF              // SPI CS (UART TX)
+#define AXIS3_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          2
 #define AXIS3_DIR_PIN           15
 
@@ -89,8 +89,8 @@
 #define AXIS4_ENABLE_PIN        AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation
 #define AXIS4_M0_PIN            OFF              // SPI MOSI
 #define AXIS4_M1_PIN            OFF              // SPI SCK
-#define AXIS4_M2_PIN            OFF              // SPI CS
-#define AXIS4_M3_PIN            OFF              // SPI MISO
+#define AXIS4_M2_PIN            OFF              // SPI CS (UART TX)
+#define AXIS4_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          19
 #define AXIS4_DIR_PIN           15
 
@@ -98,8 +98,8 @@
 #define AXIS5_ENABLE_PIN        OFF              // No enable pin control (always enabled)
 #define AXIS5_M0_PIN            OFF              // SPI MOSI
 #define AXIS5_M1_PIN            OFF              // SPI SCK
-#define AXIS5_M2_PIN            OFF              // SPI CS
-#define AXIS5_M3_PIN            OFF              // SPI MISO
+#define AXIS5_M2_PIN            OFF              // SPI CS (UART TX)
+#define AXIS5_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN          2
 #define AXIS5_DIR_PIN           15
 

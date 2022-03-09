@@ -70,8 +70,8 @@
 #define AXIS1_ENABLE_PIN       33
 #define AXIS1_M0_PIN           34               // SPI MOSI
 #define AXIS1_M1_PIN           35               // SPI SCK
-#define AXIS1_M2_PIN           36               // SPI CS
-#define AXIS1_M3_PIN           37               // SPI MISO
+#define AXIS1_M2_PIN           36               // SPI CS (UART TX)
+#define AXIS1_M3_PIN           37               // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN         38
 #define AXIS1_DIR_PIN          39
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
@@ -81,8 +81,8 @@
 #define AXIS2_ENABLE_PIN       40
 #define AXIS2_M0_PIN           41               // SPI MOSI
 #define AXIS2_M1_PIN           13               // SPI SCK
-#define AXIS2_M2_PIN           14               // SPI CS
-#define AXIS2_M3_PIN           37               // SPI MISO
+#define AXIS2_M2_PIN           14               // SPI CS (UART TX)
+#define AXIS2_M3_PIN           37               // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN         15
 #define AXIS2_DIR_PIN          16
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
@@ -92,8 +92,8 @@
 #define AXIS3_ENABLE_PIN       11
 #define AXIS3_M0_PIN           12               // SPI MOSI
 #define AXIS3_M1_PIN           24               // SPI SCK
-#define AXIS3_M2_PIN           25               // SPI CS
-#define AXIS3_M3_PIN           37               // SPI MISO
+#define AXIS3_M2_PIN           25               // SPI CS (UART TX)
+#define AXIS3_M3_PIN           37               // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN         26
 #define AXIS3_DIR_PIN          27
 #define AXIS3_DECAY_PIN        AXIS3_M2_PIN
@@ -102,8 +102,8 @@
 #define AXIS4_ENABLE_PIN       28
 #define AXIS4_M0_PIN           29               // SPI MOSI
 #define AXIS4_M1_PIN           30               // SPI SCK
-#define AXIS4_M2_PIN           31               // SPI CS
-#define AXIS4_M3_PIN           37               // SPI MISO
+#define AXIS4_M2_PIN           31               // SPI CS (UART TX)
+#define AXIS4_M3_PIN           37               // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN         32
 #define AXIS4_DIR_PIN          27
 #define AXIS4_DECAY_PIN        AXIS4_M2_PIN
@@ -112,8 +112,8 @@
 #define AXIS5_ENABLE_PIN       11
 #define AXIS5_M0_PIN           12               // SPI MOSI
 #define AXIS5_M1_PIN           24               // SPI SCK
-#define AXIS5_M2_PIN           25               // SPI CS
-#define AXIS5_M3_PIN           37               // SPI MISO
+#define AXIS5_M2_PIN           25               // SPI CS (UART TX)
+#define AXIS5_M3_PIN           37               // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN         26
 #define AXIS5_DIR_PIN          27
 #define AXIS5_DECAY_PIN        AXIS5_M2_PIN

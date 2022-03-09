@@ -21,11 +21,15 @@
   #define ANALOG_WRITE_PWM_FREQUENCY 18310.55
 #endif
 
-#define HAL_FAST_PROCESSOR
-
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 1.5
 #define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
+#define HAL_FAST_PROCESSOR
+
+// TMC2209 setup -----------------------------------------------------------------------------------
+#define TMC2209_SOFTWARE_SERIAL
+#define TMC_UART_SERIAL_NO_RX
+#define TMC_UART_SERIAL_BAUD 230400
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>

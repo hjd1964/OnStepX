@@ -12,13 +12,6 @@
 
 #define InsteinESP1                 4      // ESP32 Instein PINMAP (latest variant September/2020)
 
-#define Ramps14                     10     // Ramps v1.4 3D printer shields/boards for Mega2560, a 5-axis design
-#define Ramps15                     10     // Ramps v1.5 3D printer shields/boards for Mega2560, a 5-axis design
-#define MksGenL                     11     // Ramps clone, all-in-one
-#define MksGenL1                    11     // Ramps clone, all-in-one
-#define MksGenL2                    12     // as above, SPI bus to all stepper drivers
-#define MksGenL21                   13     // as above, SPI bus to all stepper drivers, the best Mega2560 based board
-
 #define FYSETC_S6                   15     // FYSETC S6 Version 1.2, 3D printer board, a 6-axis design
 #define FYSETC_S6_1                 15     // FYSETC S6 Version 1.2
 #define FYSETC_S6_2                 16     // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design

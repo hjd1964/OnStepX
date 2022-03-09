@@ -1,131 +1,8 @@
 // -------------------------------------------------------------------------------------------------
-// Pin map for legacy OnStep Classic (Mega2560 or Teensy3.x)
+// Pin map for legacy OnStep Classic (Teensy3.x)
 #pragma once
 
-#if defined(__AVR_ATmega2560__)
-
-#if PINMAP == ClassicInstein
-  #warning "This an an experimental PINMAP, use at your own risk!!!"
-#endif
-
-// Serial ports (see Pins.defaults.h for SERIAL_A)
-// Serial0: RX Pin 0, TX Pin 1 (to USB serial adapter)
-// Serial1: RX1 Pin 19, TX1 Pin 17
-// Serial2: RX2 Pin 17, TX2 Pin 16
-
-#if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B               Serial1
-#endif
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
-#endif
-
-// Misc. pins
-#if defined(ST4_ALTERNATE_PINS_ON) || (PINMAP == ClassicShield)
-  #ifndef DS3234_CS_PIN
-    #define DS3234_CS_PIN        53              // Default CS Pin for DS3234 on SPI
-  #endif
-  #ifndef BMx280_CS_PIN
-    #define BMx280_CS_PIN        48              // Default CS Pin for BME280 or BMP280 on SPI
-  #endif
-#endif
-
-// The PEC index sense resets the PEC index then waits for 60 seconds before allowing another reset
-#ifdef PEC_SENSE_ANALOG
-  #define PEC_SENSE_PIN          1               // PEC Sense, analog
-#else
-  #define PEC_SENSE_PIN          2               // PEC Sense, digital
-#endif
-
-// The limit switch sense is a 5V logic input which uses the internal (or external 2k) pull up, shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN          3
-
-// The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED_VCC_PIN       8               // LED
-#define STATUS_LED_PIN           9               // GND
-#define MOUNT_STATUS_LED_PIN     10              // PGND
-#define RETICLE_LED_PIN          44              // PGND
-
-// For a piezo buzzer
-#define STATUS_BUZZER_PIN        42              // Tone
-
-// The PPS pin is a 5V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN            21              // Interrupt 2 on Pin 21 (alternate Int3 on Pin20)
-
-// Obsolete pins that would power Big Easy Drivers (A4988) back in the old days
-#define POWER_SUPPLY_PINS_OFF
-#define Axis15vPin               12              // 5V
-#define Axis25vPin               5               // 5V
-#define Axis2GndPin              7               // GND
-
-// Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN         25
-#define AXIS1_M0_PIN             22              // SPI MOSI
-#define AXIS1_M1_PIN             23              // SPI CLK
-#define AXIS1_M2_PIN             24              // SPI CS
-#define AXIS1_M3_PIN             26              // SPI MISO
-#define AXIS1_STEP_PIN           13              // (PB7)
-#define AXIS1_DIR_PIN            11              // (PB5)
-#define AXIS1_DECAY_PIN          32
-#define AXIS1_FAULT_PIN          26
-
-// Axis2 Dec/Alt step/dir driver
-#define AXIS2_ENABLE_PIN         30
-#define AXIS2_M0_PIN             27              // SPI MOSI
-#define AXIS2_M1_PIN             28              // SPI CLK
-#define AXIS2_M2_PIN             29              // SPI CS
-#define AXIS2_M3_PIN             31              // SPI MISO
-#define AXIS2_STEP_PIN           6               // (PH3)
-#define AXIS2_DIR_PIN            4               // (PG5)
-#define AXIS2_DECAY_PIN          33
-#define AXIS2_FAULT_PIN          31
-
-// Pins to rotator stepper driver
-#define AXIS3_ENABLE_PIN         OFF
-#define AXIS3_M0_PIN             OFF             // SPI MOSI
-#define AXIS3_M1_PIN             OFF             // SPI SCK
-#define AXIS3_M2_PIN             OFF             // SPI CS
-#define AXIS3_M3_PIN             OFF             // SPI MISO
-#define AXIS3_STEP_PIN           A9
-#define AXIS3_DIR_PIN            A8
-
-// Pins to focuser1 stepper driver
-#define AXIS4_ENABLE_PIN         OFF
-#define AXIS4_M0_PIN             OFF             // SPI MOSI
-#define AXIS4_M1_PIN             OFF             // SPI SCK
-#define AXIS4_M2_PIN             OFF             // SPI CS
-#define AXIS4_M3_PIN             OFF             // SPI MISO
-#define AXIS4_STEP_PIN           A11
-#define AXIS4_DIR_PIN            A10
-
-// Pins to focuser2 stepper driver
-#define AXIS5_ENABLE_PIN         OFF
-#define AXIS5_M0_PIN             OFF             // SPI MOSI
-#define AXIS5_M1_PIN             OFF             // SPI SCK
-#define AXIS5_M2_PIN             OFF             // SPI CS
-#define AXIS5_M3_PIN             OFF             // SPI MISO
-#define AXIS5_STEP_PIN           A13
-#define AXIS5_DIR_PIN            A12
-
-// ST4 interface
-#if defined(ST4_ALTERNATE_PINS_ON) || (PINMAP == ClassicShield)
-  #define ST4_RA_W_PIN           47              // ST4 RA- West
-  #define ST4_DEC_S_PIN          43              // ST4 DE- South
-  #define ST4_DEC_N_PIN          45              // ST4 DE+ North
-  #define ST4_RA_E_PIN           49              // ST4 RA+ East
-#elif PINMAP == ClassicInstein
-  #define ST4_RA_W_PIN           49              // Socket RJ12 Pin 3 RA- West
-  #define ST4_DEC_S_PIN          43              // Socket RJ12 Pin 4 DE- South
-  #define ST4_DEC_N_PIN          47              // Socket RJ12 Pin 5 DE+ North
-  #define ST4_RA_E_PIN           45              // Socket RJ12 Pin 6 RA+ East
-#else
-  #define ST4_RA_W_PIN           47              // ST4 RA- West
-  #define ST4_DEC_S_PIN          49              // ST4 DE- South
-  #define ST4_DEC_N_PIN          51              // ST4 DE+ North
-  #define ST4_RA_E_PIN           53              // ST4 RA+ East
-#endif
-
-#elif defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+#if defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial1: RX1 Pin 0, TX1 Pin 1
@@ -171,8 +48,8 @@
 #define AXIS1_ENABLE_PIN         16
 #define AXIS1_M0_PIN             13              // SPI MOSI
 #define AXIS1_M1_PIN             14              // SPI CLK
-#define AXIS1_M2_PIN             15              // SPI CS
-#define AXIS1_M3_PIN             17              // SPI MISO
+#define AXIS1_M2_PIN             15              // SPI CS (UART TX)
+#define AXIS1_M3_PIN             17              // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN           12
 #define AXIS1_DIR_PIN            10
 #define AXIS1_FAULT_PIN          17
@@ -181,8 +58,8 @@
 #define AXIS2_ENABLE_PIN         21
 #define AXIS2_M0_PIN             18              // SPI MOSI
 #define AXIS2_M1_PIN             19              // SPI CLK
-#define AXIS2_M2_PIN             20              // SPI CS
-#define AXIS2_M3_PIN             22              // SPI MISO
+#define AXIS2_M2_PIN             20              // SPI CS (UART TX)
+#define AXIS2_M3_PIN             22              // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN           6
 #define AXIS2_DIR_PIN            4
 #define AXIS2_FAULT_PIN          22

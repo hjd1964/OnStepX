@@ -80,46 +80,22 @@
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       OFF
 #define AXIS1_M0_PIN           PA7              // SPI MOSI
-#define AXIS1_M0_PINPORT       GPIOA
-#define AXIS1_M0_PINBIT        GPIO_PIN_7
 #define AXIS1_M1_PIN           PA5              // SPI SCK
-#define AXIS1_M1_PINPORT       GPIOA
-#define AXIS1_M1_PINBIT        GPIO_PIN_5
-#define AXIS1_M2_PIN           PA1              // SPI CS
-#define AXIS1_M2_PINPORT       GPIOA
-#define AXIS1_M2_PINBIT        GPIO_PIN_1
-#define AXIS1_M3_PIN           PA6              // SPI MISO
-#define AXIS1_M3_PINPORT       GPIOA
-#define AXIS1_M3_PINBIT        GPIO_PIN_6
+#define AXIS1_M2_PIN           PA1              // SPI CS (UART TX)
+#define AXIS1_M3_PIN           PA6              // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN         PB10
-#define Axis1_StpPORT          GPIOB
-#define Axis1_StpBIT           GPIO_PIN_10
 #define AXIS1_DIR_PIN          PB2
-#define Axis1_DirPORT          GPIOB
-#define Axis1_DirBIT           GPIO_PIN_2
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
 #define AXIS1_SENSE_HOME_PIN   AUX3_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       OFF
 #define AXIS2_M0_PIN           PA7              // SPI MOSI
-#define AXIS2_M0_PINPORT       GPIOA
-#define AXIS2_M0_PINBIT        GPIO_PIN_7
 #define AXIS2_M1_PIN           PA5              // SPI SCK
-#define AXIS2_M1_PINPORT       GPIOA
-#define AXIS2_M1_PINBIT        GPIO_PIN_5
-#define AXIS2_M2_PIN           PA0              // SPI CS
-#define AXIS2_M2_PINPORT       GPIOA
-#define AXIS2_M2_PINBIT        GPIO_PIN_0
-#define AXIS2_M3_PIN           PA6              // SPI MISO
-#define AXIS2_M3_PINPORT       GPIOA
-#define AXIS2_M3_PINBIT        GPIO_PIN_6
+#define AXIS2_M2_PIN           PA0              // SPI CS (UART TX)
+#define AXIS2_M3_PIN           PA6              // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN         PA4
-#define Axis2_StpPORT          GPIOA
-#define Axis2_StpBIT           GPIO_PIN_4
 #define AXIS2_DIR_PIN          PB0
-#define Axis2_DirPORT          GPIOB
-#define Axis2_DirBIT           GPIO_PIN_0
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
 #define AXIS2_SENSE_HOME_PIN   AUX4_PIN
 
@@ -127,8 +103,8 @@
 #define AXIS3_ENABLE_PIN       OFF
 #define AXIS3_M0_PIN           PA7              // SPI MOSI
 #define AXIS3_M1_PIN           PA5              // SPI SCK
-#define AXIS3_M2_PIN           PC15             // SPI CS
-#define AXIS3_M3_PIN           PA6              // SPI MISO
+#define AXIS3_M2_PIN           PC15             // SPI CS (UART TX)
+#define AXIS3_M3_PIN           PA6              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN         PB8
 #define AXIS3_DIR_PIN          PC13
 
@@ -136,8 +112,8 @@
 #define AXIS4_ENABLE_PIN       OFF
 #define AXIS4_M0_PIN           PA7              // SPI MOSI
 #define AXIS4_M1_PIN           PA5              // SPI SCK
-#define AXIS4_M2_PIN           PC14             // SPI CS
-#define AXIS4_M3_PIN           PA6              // SPI MISO
+#define AXIS4_M2_PIN           PC14             // SPI CS (UART TX)
+#define AXIS4_M3_PIN           PA6              // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN         PB9
 #define AXIS4_DIR_PIN          PC13
 
@@ -145,8 +121,8 @@
 #define AXIS5_ENABLE_PIN       OFF
 #define AXIS5_M0_PIN           PA7              // SPI MOSI
 #define AXIS5_M1_PIN           PA5              // SPI SCK
-#define AXIS5_M2_PIN           PC15             // SPI CS
-#define AXIS5_M3_PIN           PA6              // SPI MISO
+#define AXIS5_M2_PIN           PC15             // SPI CS (UART TX)
+#define AXIS5_M3_PIN           PA6              // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN         PB8
 #define AXIS5_DIR_PIN          PC13
 

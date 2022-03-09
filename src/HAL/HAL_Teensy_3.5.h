@@ -1,4 +1,4 @@
-// Platform setup ------------------------------------------------------------------------------------
+// Platform setup ----------------------------------------------------------------------------------
 // Teensy3.5
 #pragma once
 
@@ -29,12 +29,17 @@
 #define HAL_PULSE_WIDTH 400  // in ns, measured 1/18/22
 #define HAL_FAST_PROCESSOR
 
+// TMC2209 setup -----------------------------------------------------------------------------------
+#define TMC2209_SOFTWARE_SERIAL
+#define TMC_UART_SERIAL_NO_RX
+#define TMC_UART_SERIAL_BAUD 230400
+
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire1
 #define HAL_WIRE_CLOCK 100000
 
-// Non-volatile storage ------------------------------------------------------------------------------
+// Non-volatile storage ----------------------------------------------------------------------------
 #if NV_DRIVER == NV_DEFAULT
   #include "EEPROM.h"
   #include "../lib/nv/NV_EEPROM.h"

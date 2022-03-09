@@ -7,6 +7,11 @@
   #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 5 for this OnStep."
 #endif
 
+// GENERAL ---------------------------------------
+#if defined(TMC_UART_DRIVER_PRESENT) && !defined(TMC_UART_SERIAL_BAUD)
+  #error "Configuration (Config.h): This platform doesn't support TMC UART mode drivers"
+#endif
+
 // TELESCOPE -------------------------------------
 #if PINMAP != OFF && (PINMAP < PINMAP_FIRST || PINMAP > PINMAP_LAST)
   #error "Configuration (Config.h): PINMAP must be set to a valid board (from Constants.h) or OFF (for user pin defs in Config.h)"

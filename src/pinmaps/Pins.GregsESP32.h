@@ -55,8 +55,8 @@
 #define AXIS1_ENABLE_PIN        GPIO_PIN(11)
 #define AXIS1_M0_PIN            23               // SPI MOSI
 #define AXIS1_M1_PIN            18               // SPI SCK
-#define AXIS1_M2_PIN            0                // SPI CS
-#define AXIS1_M3_PIN            19               // SPI MISO
+#define AXIS1_M2_PIN            0                // SPI CS (UART TX)
+#define AXIS1_M3_PIN            19               // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          26
 #define AXIS1_DIR_PIN           GPIO_PIN(12)
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
@@ -68,8 +68,8 @@
 #define AXIS2_ENABLE_PIN        SHARED
 #define AXIS2_M0_PIN            23               // SPI MOSI
 #define AXIS2_M1_PIN            18               // SPI SCK
-#define AXIS2_M2_PIN            2                // SPI CS
-#define AXIS2_M3_PIN            19               // SPI MISO
+#define AXIS2_M2_PIN            2                // SPI CS (UART TX)
+#define AXIS2_M3_PIN            19               // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN          25
 #define AXIS2_DIR_PIN           GPIO_PIN(13)
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
@@ -81,8 +81,8 @@
 #define AXIS3_ENABLE_PIN        SHARED           // No enable pin control (always enabled)
 #define AXIS3_M0_PIN            23               // SPI MOSI
 #define AXIS3_M1_PIN            18               // SPI SCK
-#define AXIS3_M2_PIN            4                // SPI CS
-#define AXIS3_M3_PIN            19               // SPI MISO
+#define AXIS3_M2_PIN            4                // SPI CS (UART TX)
+#define AXIS3_M3_PIN            19               // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          15
 #define AXIS3_DIR_PIN           GPIO_PIN(14)
 #define AXIS3_SENSE_LIMIT_MIN_PIN GPIO_PIN(6)
@@ -92,8 +92,8 @@
 #define AXIS4_ENABLE_PIN        SHARED           // Enable pin on AUX2_PIN but can be turned OFF during validation
 #define AXIS4_M0_PIN            23               // SPI MOSI
 #define AXIS4_M1_PIN            18               // SPI SCK
-#define AXIS4_M2_PIN            14               // SPI CS
-#define AXIS4_M3_PIN            19               // SPI MISO
+#define AXIS4_M2_PIN            14               // SPI CS (UART TX)
+#define AXIS4_M3_PIN            19               // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          5
 #define AXIS4_DIR_PIN           GPIO_PIN(15)
 #define AXIS4_SENSE_LIMIT_MIN_PIN GPIO_PIN(7)
@@ -103,8 +103,8 @@
 #define AXIS5_ENABLE_PIN        SHARED           // No enable pin control (always enabled)
 #define AXIS5_M0_PIN            23               // SPI MOSI
 #define AXIS5_M1_PIN            18               // SPI SCK
-#define AXIS5_M2_PIN            4                // SPI CS
-#define AXIS5_M3_PIN            19               // SPI MISO
+#define AXIS5_M2_PIN            4                // SPI CS (UART TX)
+#define AXIS5_M3_PIN            19               // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN          15
 #define AXIS5_DIR_PIN           15
 #define AXIS5_SENSE_LIMIT_MIN_PIN GPIO_PIN(6)

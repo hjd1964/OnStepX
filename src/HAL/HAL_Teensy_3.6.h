@@ -37,6 +37,11 @@
 #endif
 #define HAL_FAST_PROCESSOR
 
+// TMC2209 setup -----------------------------------------------------------------------------------
+#define TMC2209_SOFTWARE_SERIAL
+#define TMC_UART_SERIAL_NO_RX
+#define TMC_UART_SERIAL_BAUD 230400
+
 // New symbols for the Serial ports so they can be remapped if necessary -----------------------------
 
 // SerialA is manidatory

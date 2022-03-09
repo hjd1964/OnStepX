@@ -5,21 +5,28 @@
 #include <Arduino.h>
 #include "../../../../Common.h"
 
-#ifdef TMC_DRIVER_PRESENT
+#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_DRIVER_PRESENT)
 
-#include "../../../softSpi/SoftSpi.h"
+#ifdef TMC_UART_DRIVER_PRESENT
+  #include <SoftwareSerial.h>
+  #include <TMC2209.h> // https://github.com/hjd1964/TMC2209
+#endif
+
+#ifdef TMC_DRIVER_PRESENT
+  #include "../../../softSpi/SoftSpi.h"
+#endif
 
 class TmcDriver {
   public:
-    // setup SoftSpi and driver model/Rsense
-    void init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso);
+    // setup SoftSpi or UART and driver model/Rsense
+    bool init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber = 0);
 
     // TMC setup most common settings
     // 256x interpolation:   intpol
     // decay mode:           decay_mode (STEALTHCHOP or SPREADCYCLE)
-    // microstepping mode:   micro_step_mode (0=256x, 1=128x, 2=64x, 3=32x, 4=16x, 5=8x, 6=4x, 7=2x, 8=1x)
+    // microstepping mode:   micro_step_code (0=256x, 1=128x, 2=64x, 3=32x, 4=16x, 5=8x, 6=4x, 7=2x, 8=1x)
     // irun, ihold, rsense:  current in mA and sense resistor value
-    bool mode(bool intpol, int decay_mode, byte micro_step_mode, int irun, int ihold);
+    bool mode(bool intpol, int decay_mode, byte micro_step_code, int irun, int ihold);
 
     // Check for TMC error from DRVSTATUS register
     bool error();
@@ -37,7 +44,7 @@ class TmcDriver {
     inline int  get_DRVSTATUS_result()           { return ds_result;     }
 
     // Chopper configuration
-    bool refresh_CHOPCONF(byte micro_step_mode);
+    bool refresh_CHOPCONF(byte micro_step_code);
     uint32_t read_CHOPCONF();
     inline bool set_CHOPCONF_toff(int v)         { if (v >= 2 && v <= 15)      { cc_toff         = v; return true; } return false; }
     inline bool set_CHOPCONF_hstart(int v)       { if (v >= 0 && v <= 7)       { cc_hstart       = v; return true; } return false; }
@@ -66,10 +73,10 @@ class TmcDriver {
     inline bool set_PWMCONF_PWM_AMPL(int v)      { if (v >= 0 && v <= 255)     { pc_pwm_ampl     = v; return true; } return false; }
     inline bool set_PWMCONF_pwm_sym(int v)       { if (v >= 0 && v <= 1)       { pc_pwm_sym      = v; return true; } return false; }
     // TMC5160/5161 specific
-    inline bool set_PWMCONF_PWM_OFS(int v)       { if (v >= 0 && v <= 255)     { pc_PWM_OFS      = v; return true; } return false; }
+    inline bool set_PWMCONF_PWM_OFS(int v)       { if (v >= 0 && v <= 255)     { pc_pwm_ofs      = v; return true; } return false; }
     inline bool set_PWMCONF_pwm_autograd(int v)  { if (v >= 0 && v <= 1)       { pc_pwm_autograd = v; return true; } return false; }
     inline bool set_PWMCONF_PWM_REG(int v)       { if (v >= 0 && v <= 15)      { pc_pwm_reg      = v; return true; } return false; }
-    inline bool set_PWMCONF_PWM_LIM(int v)       { if (v >= 0 && v <= 15)      { pc_PWM_LIM      = v; return true; } return false; }
+    inline bool set_PWMCONF_PWM_LIM(int v)       { if (v >= 0 && v <= 15)      { pc_pwm_lim      = v; return true; } return false; }
 
     // Coolstep and stallguard configurarion
     bool refresh_COOLCONF();
@@ -82,8 +89,10 @@ class TmcDriver {
     inline bool set_COOLCONF_sfilt(int v)        { if (v >= 0 && v <= 1)       { cl_sfilt = v; return true; } return false; }
 
   private:
-    uint8_t write(byte Address, uint32_t data_out);
-    uint8_t read(byte Address, uint32_t* data_out);
+    #ifdef TMC_DRIVER_PRESENT
+      uint8_t write(byte Address, uint32_t data_out);
+      uint8_t read(byte Address, uint32_t* data_out);
+    #endif
 
     // the write flag and various TMC SPI registers
     static const uint8_t WRITE          = 0x80;
@@ -98,6 +107,11 @@ class TmcDriver {
     static const uint8_t REG_DCCTRL     = 0x6E;
     static const uint8_t REG_DRVSTATUS  = 0x6F;
     static const uint8_t REG_PWMCONF    = 0x70;
+
+    // keep track of what commands need to be sent
+    int last_microStepCode = -1;
+    int last_irun = -1;
+    int last_ihold = -1;
 
     // keep track of what registers need to be updated
     uint32_t last_GCONF       = 0;
@@ -138,11 +152,11 @@ class TmcDriver {
     // TMC2130 specific
     uint32_t pc_pwm_ampl      = 0x80; // default=128, range 0 to 255 (PWM amplitude or switch back amplitude if pwm_auto=1)
     uint32_t pc_pwm_sym       = 0x00; // default=0,   range 0 to 1   (PWM symmetric 0: value may change during cycle, 1: enforce; 0: disable autograd on TMC5160/5161)
-    // TMC5160 specific
-    uint32_t pc_PWM_OFS       = 0x1e; // default=30,  range 0 to 255 (PWM user defined amplitude offset related to full motor current)
+    // TMC2209/TMC5160 specific
+    uint32_t pc_pwm_ofs       = 0x1e; // default=30,  range 0 to 255 (PWM user defined amplitude offset related to full motor current)
     uint32_t pc_pwm_autograd  = 0x00; // default=0,   range 0 to 1   (PWM automatic grad control 0: off, 1: on)
     uint32_t pc_pwm_reg       = 0x04; // default=4,   range 0 to 15  (PWM maximum amplitude change per half-wave when using pwm autoscale)
-    uint32_t pc_PWM_LIM       = 0x0c; // default=12,  range 0 to 15  (PWM limit for PWM_SCALE_AUTO when switching back from spreadCycle to stealthChop)
+    uint32_t pc_pwm_lim       = 0x0c; // default=12,  range 0 to 15  (PWM limit for PWM_SCALE_AUTO when switching back from spreadCycle to stealthChop)
 
     // DRVSTATUS settings
     bool     ds_stst          = false;
@@ -170,7 +184,14 @@ class TmcDriver {
     int   model;
     float rsense              = 0.11 + 0.02; // default for TMC2130
 
-    SoftSpi softSpi;
+    #ifdef TMC_DRIVER_PRESENT
+      SoftSpi softSpi;
+    #endif
+
+    #ifdef TMC_UART_DRIVER_PRESENT
+      const int MicroStepCodeToMode[9] = {256, 128, 64, 32, 16, 8, 4, 2, 1};
+      TMC2209 *tmcUartDriver;
+    #endif
 };
 
 #endif

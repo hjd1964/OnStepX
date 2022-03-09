@@ -19,7 +19,12 @@
 #define HAL_MAXRATE_LOWER_LIMIT 16
 #define HAL_PULSE_WIDTH 200  // in ns, measured 1/18/22
 
-// New symbol for the default I2C port ---------------------------------------------------------------
+// TMC2209 setup -----------------------------------------------------------------------------------
+#define TMC2209_SOFTWARE_SERIAL
+#define TMC_UART_SERIAL_BAUD 115200
+#define TMC_UART_SERIAL_NO_RX
+
+// New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000

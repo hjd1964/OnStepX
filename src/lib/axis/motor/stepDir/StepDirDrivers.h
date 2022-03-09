@@ -8,7 +8,7 @@
 #ifdef STEP_DIR_MOTOR_PRESENT
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 12
+#define DRIVER_MODEL_COUNT 14
 
 #include "../Drivers.h"
 #include "TmcDrivers.h"
@@ -86,6 +86,9 @@ class StepDirDriver {
     // checks for TMC SPI driver
     bool isTmcSPI();
 
+    // checks for TMC UART driver
+    bool isTmcUART();
+
     // get the microsteps
     // this is a required method for the Axis class, even if it only ever returns 1
     inline int getSubdivisions() { return settings.microsteps; }
@@ -100,7 +103,7 @@ class StepDirDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     int subdivisionsToCode(long microsteps);
 
-    #ifdef TMC_DRIVER_PRESENT
+    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       TmcDriver tmcDriver;
     #endif
 
