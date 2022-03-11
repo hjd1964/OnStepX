@@ -246,6 +246,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   }
   if (native) transform.nativeToMount(&target);
   if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
+  transform.hourAngleToRightAscension(&target);
 
   return CE_NONE;
 }
@@ -447,8 +448,7 @@ void Goto::poll() {
 
   // keep updating the axis targets to match the mount target
   if (mount.isTracking()) {
-    target.h += radsPerFrac;
-
+    transform.rightAscensionToHourAngle(&target);
     if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
       Coordinate nearTarget = target;
       nearTarget.h -= slewDestinationDistHA;

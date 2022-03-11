@@ -227,6 +227,8 @@ double Axis::getOriginOrTargetDistance() {
 void Axis::setSlewAccelerationRate(float mpsps) {
   if (autoRate == AR_NONE) {
     slewMpspfs = mpsps/FRACTIONAL_SEC;
+    // cap the acceleration rate so we can stay within the backlash frequency
+    if (slewMpspfs > settings.backlashFreq/2.0F) slewMpspfs = settings.backlashFreq/2.0F;
     slewAccelTime = NAN;
   }
 }

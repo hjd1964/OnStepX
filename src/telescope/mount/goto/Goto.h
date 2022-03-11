@@ -128,7 +128,6 @@ class Goto {
     float      usPerStepDefault     = 64.0F;
     float      usPerStepBase        = 128.0F;
     float      radsPerSecondCurrent;
-    const double radsPerFrac = (degToRad(15.0/3600.0)/FRACTIONAL_SEC)*SIDEREAL_RATIO;
 
     double slewDestinationDistHA = 0.0;
     double slewDestinationDistDec = 0.0;
