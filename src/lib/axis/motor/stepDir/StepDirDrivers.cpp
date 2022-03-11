@@ -128,7 +128,7 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
     #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       if (settings.decay == OFF) settings.decay = STEALTHCHOP;
       if (settings.decayGoto == OFF) settings.decayGoto = SPREADCYCLE;
-      tmcDriver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3);
+      tmcDriver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3, axisNumber);
       VF("MSG: StepDvr"); V(axisNumber); VF(", TMC ");
       if (settings.currentRun == OFF) {
         VLF("current control OFF (set by Vref)");

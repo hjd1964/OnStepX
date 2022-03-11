@@ -8,12 +8,6 @@
 bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber) {
   active = false;
 
-  this->model = model;
-  if (model == TMC5160) rsense = 0.075; else
-  if (model == TMC2130) rsense = 0.11 + 0.02; else
-  if (model == TMC2209U) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
-  VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
-
   #ifdef TMC_UART_DRIVER_PRESENT
     if (model == TMC2209U) {
       // pull MS1 and MS2 low for device address 0
@@ -22,30 +16,30 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
       pinModeEx(sck, OUTPUT);
       digitalWrite(sck, LOW);
 
-      int tx = cs;
-      int rx = miso;
-      int deviceAddress = 0;
-      #ifdef TMC_UART_USE_DEVICE_ADDRESS
-        deviceAddress = axisNumber;
-        #ifdef TMC_UART_USE_DEVICE_ADDRESS_REMAP
-          if (deviceAddress = 5) deviceAddress = 3;
-        #endif
-      #endif
-
       tmcUartDriver = new TMC2209();
       if (tmcUartDriver == NULL) return false; 
+      int deviceAddress = 0;
+      int rx = miso;
+      int tx = cs;
 
       delay(1);
-      #ifdef TMC_UART_SERIAL_PORT
-        tmcUartDriver->setup(TMC_UART_SERIAL_PORT, TMC_UART_SERIAL_BAUD, deviceAddress, rx, tx);
-      #else
-        #ifdef TMC_UART_SERIAL_NO_RX
+      #if SERIAL_TMC == SoftSerial
+        #warning "Correct 1"
+        #ifdef SERIAL_TMC_NO_RX
           rx = OFF;
         #endif
-        tmcUartDriver->setup(TMC_UART_SERIAL_BAUD, deviceAddress, rx, tx);
+        tmcUartDriver->setup(SERIAL_TMC_BAUD, deviceAddress, rx, tx);
+      #else
+        deviceAddress = axisNumber;
+        rx = SERIAL_TMC_RX;
+        tx = SERIAL_TMC_TX;
+        #ifdef SERIAL_TMC_AXIS5_REMAP
+          if (deviceAddress = 5) deviceAddress = 3;
+        #endif
+        tmcUartDriver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, deviceAddress, rx, tx);
       #endif
 
-      VF("MSG: TmcDriver, UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(TMC_UART_SERIAL_BAUD); VLF("bps");
+      VF("MSG: TmcDriver, UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
 
       if (rx != OFF) {
         if (tmcUartDriver->isSetupAndCommunicating()) VLF("MSG: TmcDriver, UART driver found"); else VLF("WRN: TmcDriver, UART driver detection failed");
@@ -63,6 +57,12 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
   #endif
 
   #ifdef TMC_DRIVER_PRESENT
+    this->model = model;
+    if (model == TMC5160) rsense = 0.075; else
+    if (model == TMC2130) rsense = 0.11 + 0.02; else
+    if (model == TMC2209U) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
+    VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
+
     if (model == TMC2130 || model == TMC5160) {
       active = softSpi.init(mosi, sck, cs, miso);
       return true;

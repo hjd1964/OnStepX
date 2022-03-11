@@ -8,7 +8,10 @@
 #if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_DRIVER_PRESENT)
 
 #ifdef TMC_UART_DRIVER_PRESENT
-  #include <SoftwareSerial.h>
+  #if SERIAL_TMC == SoftSerial
+    #define TMC2209_SOFTWARE_SERIAL
+    #include <SoftwareSerial.h>
+  #endif
   #include <TMC2209.h> // https://github.com/hjd1964/TMC2209
 #endif
 

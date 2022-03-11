@@ -16,6 +16,11 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
+// Use the following settings for any TMC2209 that may be present
+#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+#define SERIAL_TMC_BAUD         115200           // Baud rate
+#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+
 // Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 

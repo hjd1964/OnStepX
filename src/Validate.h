@@ -8,7 +8,7 @@
 #endif
 
 // GENERAL ---------------------------------------
-#if defined(TMC_UART_DRIVER_PRESENT) && !defined(TMC_UART_SERIAL_BAUD)
+#if defined(TMC_UART_DRIVER_PRESENT) && (!defined(SERIAL_TMC) || !defined(SERIAL_TMC_BAUD))
   #error "Configuration (Config.h): This platform doesn't support TMC UART mode drivers"
 #endif
 
