@@ -286,6 +286,11 @@ CommandError Goto::alignAddStar() {
   // add an align star
   if (e == CE_NONE) {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
+
+    // update the targets HA and Horizon coords as necessary
+    transform.rightAscensionToHourAngle(&target);
+    if (transform.mountType == ALTAZM) transform.equToHor(&target);
+
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &mountPosition);
     #endif
