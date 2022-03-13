@@ -118,6 +118,9 @@ class StepDirDriver {
 
     int     axisNumber;
     DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};
+    #if DEBUG != OFF
+      DriverStatus lastStatus = {false, {false, false}, {false, false}, false, false, false, false};
+    #endif
 
     int     microstepRatio        = 1;
     int     microstepCode         = OFF;
@@ -127,6 +130,8 @@ class StepDirDriver {
     int16_t m2Pin                 = OFF;
     int16_t decayPin              = OFF;
     const DriverModePins *Pins;
+
+    unsigned long timeLastStatusUpdate = 0;
 };
 
 #endif

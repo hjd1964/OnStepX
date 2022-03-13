@@ -16,10 +16,19 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
+#ifdef TMC2209_USE_HARDWARE_SERIAL
 // Use the following settings for any TMC2209 that may be present
-#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
-#define SERIAL_TMC_BAUD         115200           // Baud rate
-#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+  #define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
+  #define SERIAL_TMC_BAUD         230400           // Baud rate
+  #define SERIAL_TMC_TX           23               // Transmit data
+  #define SERIAL_TMC_RX           4                // Recieving data
+  #define SERIAL_TMC_HARDCODED                     // Use hard-coded MS1/MS2 addresses for all drivers, sets M0/M1 to high
+#else
+  // Use the following settings for any TMC2209 that may be present
+  #define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+  #define SERIAL_TMC_BAUD         115200           // Baud rate
+  #define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+#endif
 
 // Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
@@ -91,7 +100,11 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#define AXIS4_ENABLE_PIN        AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation
+#ifdef TMC2209_USE_HARDWARE_SERIAL
+  #define AXIS4_ENABLE_PIN      OFF
+#else
+  #define AXIS4_ENABLE_PIN      AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation
+#endif
 #define AXIS4_M0_PIN            OFF              // SPI MOSI
 #define AXIS4_M1_PIN            OFF              // SPI SCK
 #define AXIS4_M2_PIN            OFF              // SPI CS (UART TX)

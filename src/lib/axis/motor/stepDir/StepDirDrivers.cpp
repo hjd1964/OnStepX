@@ -143,9 +143,6 @@ void StepDirDriver::setParam(float param1, float param2, float param3, float par
         delay(100);
       }
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
-      if (settings.model == TMC2209U && settings.status == ON) {
-        DF("WRN, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" polling driver status not recommended for TMC2209U");
-      }
     #endif
   } else
   {
@@ -251,12 +248,6 @@ bool StepDirDriver::validateParam(float param1, float param2, float param3, floa
     }
   }
 
-  if (isTmcUART()) {
-    if (subdivisionsGoto != OFF) {
-      DF("ERR, StepDirDrivers::validateParam(): Axis"); D(axisNumber); DLF(" microstep mode switching not recommended for TMC UART driver");
-    }
-  }
-
   return true;
 }
 
@@ -331,36 +322,58 @@ void StepDirDriver::modeDecaySlewing() {
 }
 
 void StepDirDriver::updateStatus() {
-  #ifdef TMC_DRIVER_PRESENT
+  #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
     if (settings.status == ON) {
-      if (tmcDriver.refresh_DRVSTATUS()) {
-        status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
-        status.outputA.openLoad      = tmcDriver.get_DRVSTATUS_olA();
-        status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
-        status.outputB.openLoad      = tmcDriver.get_DRVSTATUS_olB();
-        status.overTemperaturePreWarning = tmcDriver.get_DRVSTATUS_otpw();
-        status.overTemperature       = tmcDriver.get_DRVSTATUS_ot();
-        status.standstill            = tmcDriver.get_DRVSTATUS_stst();
+      if ((long)(millis() - timeLastStatusUpdate) > 200) {
+        if (tmcDriver.refresh_DRVSTATUS()) {
+          status.outputA.shortToGround = tmcDriver.get_DRVSTATUS_s2gA();
+          status.outputA.openLoad      = tmcDriver.get_DRVSTATUS_olA();
+          status.outputB.shortToGround = tmcDriver.get_DRVSTATUS_s2gB();
+          status.outputB.openLoad      = tmcDriver.get_DRVSTATUS_olB();
+          status.overTemperaturePreWarning = tmcDriver.get_DRVSTATUS_otpw();
+          status.overTemperature       = tmcDriver.get_DRVSTATUS_ot();
+          status.standstill            = tmcDriver.get_DRVSTATUS_stst();
 
-        // open load indication is not reliable in standstill
-        if (
-          status.outputA.shortToGround ||
-          (status.outputA.openLoad && !status.standstill) ||
-          status.outputB.shortToGround ||
-          (status.outputB.openLoad && !status.standstill) ||
-          status.overTemperaturePreWarning ||
-          status.overTemperature
-        ) status.fault = true; else status.fault = false;
+          // open load indication is not reliable in standstill
+          if (
+            status.outputA.shortToGround ||
+            status.outputB.shortToGround ||
+            status.overTemperaturePreWarning ||
+            status.overTemperature
+          ) status.fault = true; else status.fault = false;
+        } else {
+          status.outputA.shortToGround = true;
+          status.outputA.openLoad      = true;
+          status.outputB.shortToGround = true;
+          status.outputB.openLoad      = true;
+          status.overTemperaturePreWarning = true;
+          status.overTemperature       = true;
+          status.standstill            = true;
+          status.fault                 = true;
+        }
 
-      } else {
-        status.outputA.shortToGround = true;
-        status.outputA.openLoad      = true;
-        status.outputB.shortToGround = true;
-        status.outputB.openLoad      = true;
-        status.overTemperaturePreWarning = true;
-        status.overTemperature       = true;
-        status.standstill            = true;
-        status.fault                 = true;
+        #if DEBUG != OFF
+          if ((status.outputA.shortToGround != lastStatus.outputA.shortToGround) ||
+              (status.outputA.openLoad      != lastStatus.outputA.openLoad) ||
+              (status.outputB.shortToGround != lastStatus.outputB.shortToGround) ||
+              (status.outputB.openLoad      != lastStatus.outputB.openLoad) ||
+              (status.overTemperaturePreWarning != lastStatus.overTemperaturePreWarning) ||
+              (status.overTemperature       != lastStatus.overTemperature) ||
+              (status.standstill            != lastStatus.standstill) ||
+              (status.fault                 != lastStatus.fault)) {
+            VF("MSG: StepDvr"); V(axisNumber); VF(", status change ");
+            VF("SGA"); if (status.outputA.shortToGround) VF("! "); else VF(". "); 
+            VF("OLA"); if (status.outputA.openLoad) VF("! "); else VF(". "); 
+            VF("SGB"); if (status.outputB.shortToGround) VF("! "); else VF(". "); 
+            VF("OLB"); if (status.outputB.openLoad) VF("! "); else VF(". "); 
+            VF("OTP"); if (status.overTemperaturePreWarning) VF("! "); else VF(". "); 
+            VF("OTE"); if (status.overTemperature) VF("! "); else VF(". "); 
+            VF("SST"); if (status.standstill) VF("! "); else VF(". "); 
+            VF("FLT"); if (status.fault) VLF("!"); else VLF("."); 
+          }
+          lastStatus = status;
+        #endif
+        timeLastStatusUpdate = millis();
       }
     } else
   #endif

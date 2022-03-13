@@ -246,9 +246,6 @@ class Axis {
     // report fault status of motor driver, if available
     inline bool fault() { return motor->getDriverStatus().fault; };
 
-    // refresh driver status information maximum frequency is 20ms
-    void updateDriverStatus();
-
     // get associated motor driver status
     DriverStatus getStatus();
 

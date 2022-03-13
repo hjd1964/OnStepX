@@ -94,7 +94,7 @@ bool StepDirMotor::validateParam(float param1, float param2, float param3, float
 // sets motor power on/off (if possible)
 void StepDirMotor::power(bool state) {
   if (Pins->enable != OFF && Pins->enable != SHARED) {
-    digitalWriteEx(Pins->enable, state?Pins->enabledState:!Pins->enabledState);
+    digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
     driver->power(state);
   }
