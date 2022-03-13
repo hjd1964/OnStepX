@@ -417,7 +417,7 @@ void Goto::poll() {
           slewDestinationDistDec = 0.0;
         }
         startAutoSlew();
-      }
+      } else VLF("MSG: Mount, goto near destination skipped");
     } else
 
     if (stage == GG_DESTINATION || stage == GG_ABORT) {
