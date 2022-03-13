@@ -23,10 +23,19 @@
   #define SERIAL_E_BAUD_DEFAULT 9600
 #endif
 
-// Use the following settings for any TMC2209 that may be present
-#define SERIAL_TMC              SoftSerial     // Use software serial with RX on M2 and TX on M3 of axis
-#define SERIAL_TMC_BAUD         230400         // Baud rate
-#define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
+#ifdef TMC2209_USE_HARDWARE_SERIAL
+  // Use the following settings for any TMC2209 that may be present
+  #define SERIAL_TMC           Serial4          // Use a single hardware serial port to up to four drivers
+  #define SERIAL_TMC_BAUD      460800           // Baud rate
+  #define SERIAL_TMC_TX        OFF              // Transmit data
+  #define SERIAL_TMC_RX        OFF              // Recieving data
+  #define SERIAL_TMC_HARDCODED                  // Use hard-coded MS1/MS2 addresses for all drivers, sets M0/M1 to high
+#else
+  // Use the following settings for any TMC2209 that may be present
+  #define SERIAL_TMC           SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+  #define SERIAL_TMC_BAUD      230400           // Baud rate
+  #define SERIAL_TMC_NO_RX                      // Recieving data doesn't work with software serial
+#endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN               19               // Status LED
