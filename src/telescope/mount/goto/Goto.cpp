@@ -191,7 +191,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
         VF("MSG: Mount, set target EAST TO WEST: ");
         target.pierSide = PIER_SIDE_WEST;
       } else { VF("MSG: Mount, set target EAST stays EAST: !("); }
-      V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
+      V(radToDeg(a1)); V(" < "); V(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
     } else
     if (pierSideSelect == PSS_WEST || pierSideSelect == PSS_WEST_ONLY) {
       target.pierSide = PIER_SIDE_WEST;
@@ -208,14 +208,14 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
           VF("MSG: Mount, set target BEST EAST TO WEST: (");
           target.pierSide = PIER_SIDE_WEST;
         } else { VF("MSG: Mount, set target BEST stays EAST: !("); }
-        V(radToDeg(a1)); V(" < "); D(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
+        V(radToDeg(a1)); V(" < "); V(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
       }
       if (current.pierSide == PIER_SIDE_WEST) {
           if (a1 > limits.settings.pastMeridianW && a1w < axis1.settings.limits.min) {
           VF("MSG: Mount, set target BEST WEST TO EAST: (");
           target.pierSide = PIER_SIDE_EAST;
         } else { VF("MSG: Mount, set target BEST stays WEST: !("); }
-        V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); D(" && "); V(radToDeg(a1w)); D(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
+        V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); V(" && "); V(radToDeg(a1w)); V(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
       }
     }
 
