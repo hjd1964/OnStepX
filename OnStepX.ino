@@ -60,10 +60,6 @@ extern Telescope telescope;
   extern void profiler();
 #endif
 
-#if DEBUG == CONSOLE
-  extern void debugConsole();
-#endif
-
 void systemServices() {
   if (!xBusy) nv.poll();
 }
@@ -105,9 +101,6 @@ void setup() {
   // start task manager debug events
   #if DEBUG == PROFILER
     tasks.add(142, 0, true, 7, profiler, "Profilr");
-  #endif
-  #if DEBUG == CONSOLE
-    tasks.add(1000, 0, true, 7, debugConsole);
   #endif
 }
 
