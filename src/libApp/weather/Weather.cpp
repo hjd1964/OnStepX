@@ -66,7 +66,7 @@ bool Weather::init() {
 
     if (success) {
       VF("MSG: Weather, start weather monitor task (rate 5000ms priority 7)... ");
-      if (tasks.add(5000, 0, true, 7, weatherPollWrapper, "WeaPoll")) { VLF("success"); } else { VLF("FAILED!"); }
+      if (tasks.add(1000, 0, true, 7, weatherPollWrapper, "WeaPoll")) { VLF("success"); } else { VLF("FAILED!"); }
     }
   #else
     success = true;
@@ -78,14 +78,17 @@ bool Weather::init() {
 void Weather::poll() {
   #if WEATHER != OFF
     if (success && !xBusy) {
-      temperature = bmx.readTemperature();
-      tasks.yield(1000);
-      pressure = bmx.readPressure()/100.0;
-      tasks.yield(1000);
-      #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI
-        humidity = bmx.readHumidity();
-        tasks.yield(1000);
-      #endif
+      static int phase = -1;
+      switch (phase++) {
+        case 0: temperature = bmx.readTemperature(); return; break;
+        case 1: pressure = bmx.readPressure()/100.0; return; break;
+        case 2: 
+          #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI
+            humidity = bmx.readHumidity();
+          #endif
+          phase = 0;
+        break;
+      }
 
       // apply a 10 sample rolling average to the ambient temperature
       static uint8_t nanCount = 0;
