@@ -8,7 +8,7 @@
   #define TASKS_PROFILER_ENABLE
 #endif
 
-#if defined(DEBUG) && DEBUG != OFF
+#if defined(DEBUG) && DEBUG != OFF && DEBUG != PROFILER
   #if defined(REMOTE) && DEBUG == REMOTE
     // echo strings to OnStep debug interface (supports embedded spaces and cr/lf)
     extern void debugPrint(const char* s);
