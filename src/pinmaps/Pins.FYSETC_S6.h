@@ -28,6 +28,11 @@
   #endif
 #endif
 
+// Use the following settings for any TMC2209 that may be present
+#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+#define SERIAL_TMC_BAUD         115200           // Baud rate
+#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define Temp0Pin              PC0                // Temp0   (on TE0, THERMO0)
 #define Temp1Pin              PC1                // Temp1   (on TE1, THERMO1)
