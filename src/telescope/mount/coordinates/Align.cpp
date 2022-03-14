@@ -368,9 +368,10 @@ void GeoAlign::autoModel(int n) {
 
   // update status and exit
   modelIsReady = true;
-  autoModelTask = 0;
 
   VLF("MSG: Align, calculate pointing model done");
+  tasks.setDurationComplete(autoModelTask);
+  autoModelTask = 0;
 }
 
 void GeoAlign::observedPlaceToMount(Coordinate *coord) {
