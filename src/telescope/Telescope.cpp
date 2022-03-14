@@ -93,8 +93,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   // init is done, write the NV key if necessary
   if (!nv.isKeyValid()) {
+    VLF("MSG: NV, waiting for commit");
+    nv.wait();
     nv.writeKey((uint32_t)INIT_NV_KEY);
-    delay(1000);
+    nv.wait();
     if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV, failed to read back key!"); } else { VLF("MSG: NV, reset complete"); }
   }
 
