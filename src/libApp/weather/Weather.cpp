@@ -78,11 +78,11 @@ bool Weather::init() {
 void Weather::poll() {
   #if WEATHER != OFF
     if (success && !xBusy) {
-      static int phase = -1;
-      switch (phase++) {
-        case 0: temperature = bmx.readTemperature(); return; break;
-        case 1: pressure = bmx.readPressure()/100.0; return; break;
-        case 2: 
+      static int phase = 0;
+      switch (++phase) {
+        case 1: temperature = bmx.readTemperature(); return; break;
+        case 2: pressure = bmx.readPressure()/100.0; return; break;
+        case 3: 
           #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI
             humidity = bmx.readHumidity();
           #endif
