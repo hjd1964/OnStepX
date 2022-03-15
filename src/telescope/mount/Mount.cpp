@@ -160,7 +160,7 @@ void Mount::enable(bool state) {
   static bool firstEnable = true;
 
   if (state == true) {
-    if (firstEnable) status.init();
+    if (firstEnable) status.ready();
     firstEnable = false;
   } else
 

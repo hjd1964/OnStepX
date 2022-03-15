@@ -144,11 +144,10 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
   //                Return: see below
   if (command[0] == 'S' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '7'  && parameter[2] == ','  && parameter[4] == 0) {
     if (parameter[3] == '0' || parameter[3] == '1') {
-      buzzer = parameter[3] - '0';
+      sound.enabled = parameter[3] - '0';
       #if STATUS_BUZZER_MEMORY == ON
-        nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)buzzer);
+        nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
       #endif
-      sound.enabled = buzzer;
     } else *commandError = CE_PARAM_RANGE;
   } else return false;
 

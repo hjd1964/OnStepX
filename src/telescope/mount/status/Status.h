@@ -14,7 +14,11 @@
 
 class Status {
   public:
+    // get mount status ready
     void init();
+
+    // late init once tracking is enabled
+    void ready();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
@@ -27,7 +31,6 @@ class Status {
 
   private:
     uint8_t statusTaskHandle = 0;
-    bool buzzer = STATUS_BUZZER_DEFAULT == ON;
 };
 
 extern Status status;

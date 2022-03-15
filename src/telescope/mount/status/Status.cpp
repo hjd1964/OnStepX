@@ -25,22 +25,28 @@
 
 void generalWrapper() { status.general(); }
 
+// get mount status ready
 void Status::init() {
+  if (!nv.isKeyValid()) {
+    VLF("MSG: Mount, status writing defaults to NV");
+    nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
+  }
+
+  #if STATUS_BUZZER_MEMORY == ON
+    sound.enabled = nv.read(NV_MOUNT_STATUS_BASE);
+  #endif
+
+  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
+    pinModeEx(PARK_STATUS_PIN, OUTPUT);
+  #endif
+}
+
+// late init once tracking is enabled
+void Status::ready() {
   #if STATUS_LED == ON
     // if anything else is using the status LED, disable it
     if (STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
   #endif
-
-  if (!nv.isKeyValid()) {
-    VLF("MSG: Mount, status writing defaults to NV");
-    nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)buzzer);
-  }
-
-  #if STATUS_BUZZER_MEMORY == ON
-    buzzer = nv.read(NV_MOUNT_STATUS_BASE);
-  #endif
-
-  sound.enabled = buzzer;
 
   #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
@@ -49,10 +55,6 @@ void Status::init() {
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
     }
-  #endif
-
-  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
-    pinModeEx(PARK_STATUS_PIN, OUTPUT);
   #endif
 
   VF("MSG: Mount, status start general status task (1s rate priority 4)... ");

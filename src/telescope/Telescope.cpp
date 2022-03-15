@@ -74,6 +74,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   #ifdef MOUNT_PRESENT
     mount.init();
+    status.init();
   #endif
 
   #ifdef ROTATOR_PRESENT
