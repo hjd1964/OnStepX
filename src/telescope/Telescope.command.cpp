@@ -97,6 +97,8 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     //            Returns: Nothing
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
       #ifdef HAL_RESET
+        nv.wait();
+        tasks.yield(1000);
         HAL_RESET();
       #endif
       *numericReply = false;

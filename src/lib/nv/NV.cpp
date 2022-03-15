@@ -2,6 +2,7 @@
 // non-volatile storage base class
 
 #include "NV.h"
+#include "../debug/Debug.h"
 
 bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // set nv size
@@ -35,6 +36,30 @@ void NonVolatileStorage::setReadOnly(bool state) {
   readOnlyMode = state;
 }
 
+// wait for all commits to finish, blocking
+void NonVolatileStorage::wait() {
+  committed();
+  uint32_t startTime = millis();
+
+  VF("MSG: NV, waiting for commit");
+  long passes = 0;
+  while (!committed()) {
+    poll(false);
+    delay(1);
+
+    passes++;
+    if (passes % 4000 == 0) V(".");
+
+    if ((long)(millis() - startTime) > 180000) {
+      VF(" timed out with "); V(cacheSizeDirtyCount); VLF(" remaining");
+      initError = true;
+      return;
+    }
+  }
+  VL(".");
+}
+
+// returns true if NV holds the correct key value in addresses 0..4
 bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
   bool state = readAndWriteThrough;
   readAndWriteThrough = true;
@@ -43,9 +68,55 @@ bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
   return keyMatches;
 };
 
-// write the key value into addresses 0..3, blocking waits for all commits
+// write the key value into addresses 0..3
 void NonVolatileStorage::writeKey(uint32_t uniqueKey) {
+  VLF("MSG: NV, writing key");
+  bool readOnlyState = readOnlyMode;
+  readOnlyMode = false;
+  bool readAndWriteState = readAndWriteThrough;
+  readAndWriteThrough = true;
   write(0, uniqueKey);
+  readOnlyMode = readOnlyState;
+  readAndWriteThrough = readAndWriteState;
+}
+
+// write pattern to all nv memory
+void NonVolatileStorage::wipe(uint8_t j) {
+  VF("MSG: NV, wipe with value 0x");
+  char s[8];
+  sprintf(s, "%02X", j);
+  V(s);
+  for (uint16_t i = 0; i < size; i++) write(i, (char)j);
+  VL("");
+}
+
+// verify and wipe nv
+bool NonVolatileStorage::verify() {
+  initError = false;
+
+  long errors = 0;
+  VLF("MSG: NV, verify phase 1");
+  wipe(0xff);
+  wait();
+  ignoreCache(true);
+  for (uint16_t i = 0; i < nv.size - 1; i++) { if (nv.read(i) != 0xff) errors++; }
+  ignoreCache(false);
+
+  VLF("MSG: NV, verify phase 2");
+  wipe(0x00);
+  wait();
+  ignoreCache(true);
+  for (uint16_t i = 0; i < nv.size - 1; i++) { if (nv.read(i) != 0x00) errors++; }
+  ignoreCache(false);
+
+  if (errors == 0) {
+    VLF("MSG: NV, verify success");
+  } else {
+    DF("ERR: NV, verify found "); D(errors); DLF(" errors");
+    initError = true;
+  }
+
+  return initError;
 }
 
 void NonVolatileStorage::poll(bool disableInterrupts) {
@@ -64,7 +135,7 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
       cacheCleanThisPass = true;
     }
 
-    if (!delayedCommitEnabled || (long)(millis() - commitReadyTimeMs) >= 0)  
+    if (!delayedCommitEnabled || (long)(millis() - commitReadyTimeMs) >= 0)
       dirtyW = bitRead(cacheStateWrite[cacheIndex/8], cacheIndex%8); else cacheCleanThisPass = false;
     dirtyR = bitRead(cacheStateRead[cacheIndex/8], cacheIndex%8);
     if (dirtyW || dirtyR) { cacheCleanThisPass = false; break; }
@@ -80,19 +151,32 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
     }
   }
 
+  /*
+  int32_t dirtyWriteCount = 0;
+  static int32_t lastDirtyWriteCount = 0;
+  for (uint16_t i = 0; i < cacheSize; i++) { if (bitRead(cacheStateWrite[i/8], i%8)) dirtyWriteCount++; }
+  if (lastDirtyWriteCount != dirtyWriteCount) { V("MSG: NV cache "); V(dirtyWriteCount); VL(" bytes to be written"); }
+
+  int32_t dirtyReadCount = 0;
+  static int32_t lastDirtyReadCount = 0;
+  for (uint16_t i = 0; i < cacheSize; i++) { if (bitRead(cacheStateRead[i/8], i%8)) dirtyReadCount++; }
+  if (lastDirtyReadCount != dirtyReadCount) { V("MSG: NV cache "); V(dirtyReadCount); VL(" bytes to be read"); }
+  */
+
   // stop compiler warnings
   (void)(disableInterrupts);
 }
 
 bool NonVolatileStorage::committed() {
-  uint8_t dirty = 0;
+  cacheSizeDirtyCount = 0;
 
-  for (uint16_t j = 0; j < cacheSize; j++) {
-    dirty = bitRead(cacheStateWrite[j/8], j%8);
-    if (dirty) break;
+  for (uint16_t i = 0; i < cacheSize; i++) {
+    if (bitRead(cacheStateWrite[i/8], i%8)) {
+      cacheSizeDirtyCount++;
+    }
   }
 
-  return !dirty;
+  return !cacheSizeDirtyCount;
 }
 
 bool valid() {

@@ -25,7 +25,7 @@ class NonVolatileStorage {
     inline bool isReadOnly() { return readOnlyMode; }
 
     // wait for all commits to finish, blocking
-    inline void wait() { while (!committed()) { poll(false); delay(10); } }
+    void wait();
 
     // returns true if NV holds the correct key value in addresses 0..4
     bool isKeyValid(uint32_t uniqueKey);
@@ -33,11 +33,14 @@ class NonVolatileStorage {
     // returns true if the NV key was checked and correct
     inline bool isKeyValid() { return keyMatches; }
 
-    // write the key value into addresses 0..3, blocking waits for all commits
+    // write the key value into addresses 0..3
     void writeKey(uint32_t uniqueKey);
 
-    // clear the nv memory
-    inline void wipe() { for (int i = 0; i < (int)size; i++) write(i, (char)0); }
+    // write pattern to all nv memory
+    void wipe(uint8_t j = 0);
+
+    // verify and wipe nv
+    bool verify();
 
     // call frequently to perform any operations that need to happen in the background
     virtual void poll(bool disableInterrupts = true);
@@ -136,6 +139,7 @@ class NonVolatileStorage {
     uint16_t cacheStateSize = 0;
     uint8_t* cacheStateRead;
     uint8_t* cacheStateWrite;
+    uint16_t cacheSizeDirtyCount = 0;
 
     uint32_t waitMs = 0;
 
