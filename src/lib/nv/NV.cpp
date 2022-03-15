@@ -144,15 +144,15 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
   if (dirtyW) {
     uint16_t p = pageWriteSize;
 
+    // if not a page boundary use a page size of 1
+    if ((cacheIndex % p) != 0) p = 1; else
+
     for (int k = 0; k < p; k++) {
       // if a page write would exceed the NV size use a page size of 1
       if (cacheIndex + k >= cacheSize) { p = 1; break; }
       // check that the read cache for these locations is clean otherwise use a page size of 1
       if (bitRead(cacheStateRead[(cacheIndex + k)/8], (cacheIndex + k)%8)) { p = 1; break; }
     }
-
-    // if not a page boundary use a page size of 1
-    if (cacheIndex % p != 0) p = 1;
 
     // write the page and update the cache write state
     writePageToStorage(cacheIndex, &cache[cacheIndex], p);
