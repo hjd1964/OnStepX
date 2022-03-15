@@ -14,7 +14,7 @@ bool NonVolatileStorage24XX::init(uint16_t size, bool cacheEnable, uint16_t wait
   NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
   // device page size must be >= 4 and a multipule of 4
-  pageWriteSize = 4;
+  if (cacheEnable) pageWriteSize = 4;
 
   this->wire = wire;
   eepromAddress = address;
