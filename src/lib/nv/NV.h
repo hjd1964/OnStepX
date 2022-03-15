@@ -132,8 +132,9 @@ class NonVolatileStorage {
 
     // write value j of count bytes to position starting at i in storage
     // these writes must be aligned with the page size!
-    virtual void writePageToStorage(uint16_t i, uint8_t *j, uint8_t count) {}
+    virtual void writePageToStorage(uint16_t i, uint8_t *j, uint8_t count) { writeToStorage(i, *j); (void)(count); }
 
+    // default page write size is 1
     int pageWriteSize = 1;
 
     bool readAndWriteThrough = false;
