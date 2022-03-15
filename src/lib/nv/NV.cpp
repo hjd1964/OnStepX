@@ -142,8 +142,17 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
   }
 
   if (dirtyW) {
-    if (!readOnlyMode) writeToStorage(cacheIndex, cache[cacheIndex]);
-    bitWrite(cacheStateWrite[cacheIndex/8], cacheIndex%8, 0);
+    uint16_t i = cacheIndex;
+    if ((pageWriteSize > 1) && (i % pageWriteSize == 0) && (cacheIndex + pageWriteSize < cacheSize)) {
+      writePageToStorage(cacheIndex, &cache[cacheIndex], pageWriteSize);
+      for (int k = 0; k < pageWriteSize; k++) {
+        bitWrite(cacheStateWrite[(cacheIndex + k)/8], (cacheIndex + k)%8, 0);
+      }
+    } else {
+      if (!readOnlyMode) writeToStorage(cacheIndex, cache[cacheIndex]);
+      bitWrite(cacheStateWrite[cacheIndex/8], cacheIndex%8, 0);
+    }
+
   } else {
     if (dirtyR) {
       cache[cacheIndex] = readFromStorage(cacheIndex);

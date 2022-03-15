@@ -13,6 +13,9 @@ bool NonVolatileStorage24XX::init(uint16_t size, bool cacheEnable, uint16_t wait
   // setup size, cache, etc.
   NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
+  // device page size must be >= 4 and a multipule of 4
+  pageWriteSize = 4;
+
   this->wire = wire;
   eepromAddress = address;
   wire->begin();
@@ -46,6 +49,19 @@ void NonVolatileStorage24XX::writeToStorage(uint16_t i,  uint8_t j) {
   wire->write(MSB(i));
   wire->write(LSB(i));
   wire->write(j);
+  wire->endTransmission();
+  nextOpMs = millis() + EEPROM_WRITE_WAIT;
+}
+
+// write value j of count bytes to position starting at i in storage
+// these writes must be aligned with the page size!
+void NonVolatileStorage24XX::writePageToStorage(uint16_t i, uint8_t *j, uint8_t count) {
+  while (busy()) {}
+
+  wire->beginTransmission(eepromAddress);
+  wire->write(MSB(i));
+  wire->write(LSB(i));
+  for (int k = 0; k < count; k++) { wire->write(*j); j++; }
   wire->endTransmission();
   nextOpMs = millis() + EEPROM_WRITE_WAIT;
 }

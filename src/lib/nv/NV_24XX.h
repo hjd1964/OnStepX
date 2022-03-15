@@ -28,6 +28,10 @@ class NonVolatileStorage24XX : public NonVolatileStorage {
     // write value j to position i in storage 
     void writeToStorage(uint16_t i, uint8_t j);
 
+    // write value j of count bytes to position starting at i in storage
+    // these writes must be aligned with the page size!
+    void writePageToStorage(uint16_t i, uint8_t *j, uint8_t count);
+ 
     TwoWire* wire;
     uint8_t eepromAddress = 0;
     uint32_t nextOpMs = 0;
