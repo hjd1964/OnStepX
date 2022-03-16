@@ -100,9 +100,9 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   initError.nv = nv.initError;
 
-  #if RETICLE_LED != OFF && RETICLE_LED_PIN != OFF
+  #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
     pinMode(RETICLE_LED_PIN, OUTPUT);
-    analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(RETICLE_LED));
+    analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(RETICLE_LED_DEFAULT));
   #endif
 
   // bring up status LED and flash error codes

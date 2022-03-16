@@ -66,9 +66,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   // :B-#       Decrease Reticule Brightness
   //            Returns: Nothing
   if (command[0] == 'B' && (command[1] == '+' || command[1] == '-') && parameter[0] == 0)  {
-    #if RETICLE_LED >= 0 && RETICLE_LED_PIN != OFF
+    #if RETICLE_LED_DEFAULT >= 0 && RETICLE_LED_PIN != OFF
       int scale;
-      static int reticuleBrightness = RETICLE_LED;
+      static int reticuleBrightness = RETICLE_LED_DEFAULT;
       if (reticuleBrightness > 255-8) scale = 1; else
       if (reticuleBrightness > 255-32) scale = 4; else
       if (reticuleBrightness > 255-64) scale = 12; else

@@ -25,6 +25,7 @@ typedef struct MeridianFlipHome {
 typedef struct GotoSettings {
   bool meridianFlipAuto  :1;
   bool meridianFlipPause :1;
+  PierSideSelect preferredPierSide :4;
   float usPerStepCurrent;
 } GotoSettings;
 #pragma pack()
@@ -113,7 +114,6 @@ class Goto {
     // start slews with approach correction and parking support
     CommandError startAutoSlew();
 
-    PierSideSelect preferredPierSide = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
     Coordinate gotoTarget;
     Coordinate start, destination, target;
     GotoStage  stage                = GG_NONE;
@@ -132,7 +132,7 @@ class Goto {
     double slewDestinationDistHA = 0.0;
     double slewDestinationDistDec = 0.0;
 
-    GotoSettings settings = {false, false, 1000001.0F};
+    GotoSettings settings = {MFLIP_AUTOMATIC_DEFAULT == ON, MFLIP_PAUSE_HOME_DEFAULT == ON, (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT, 1000001.0F};
 };
 
 extern Goto goTo;

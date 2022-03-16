@@ -92,7 +92,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       e = alignAddStar();
       if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
     } else {
-      PierSideSelect pps = preferredPierSide;
+      PierSideSelect pps = settings.preferredPierSide;
       if (!mount.isHome() && PIER_SIDE_SYNC_CHANGE_SIDES == OFF) pps = PSS_SAME_ONLY;
       e = requestSync(&gotoTarget, pps);
     }
@@ -192,7 +192,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
               sprintf(reply, "%d%s", (int)current.pierSide, (!transform.meridianFlips)?" N":"");
           break;
           case '5': sprintf(reply, "%d", (int)settings.meridianFlipAuto); break;   // autoMeridianFlip
-          case '6': reply[0] = "EWB"[preferredPierSide - 1]; reply[1] = 0; break;  // preferred pier side
+          case '6': reply[0] = "EWB"[settings.preferredPierSide - 1]; reply[1] = 0; break;  // preferred pier side
           case '7': sprintF(reply, "%0.1f", (1000000.0F/settings.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break;
           // rotator availablity 2 = rotate/derotate, 1 = rotate, 0 = off
           case '8':
@@ -213,7 +213,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     if (command[1] == 'A' && parameter[0] == 0) {
       transform.horToEqu(&gotoTarget);
       transform.hourAngleToRightAscension(&gotoTarget);
-      CommandError e = request(&gotoTarget, preferredPierSide);
+      CommandError e = request(&gotoTarget, settings.preferredPierSide);
       strcpy(reply,"0");
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) reply[0] = '0';
@@ -228,7 +228,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //              1=destination is West of the pier
     //              2=an error occured
     if (command[1] == 'D' && parameter[0] == 0) {
-      CommandError e = setTarget(&gotoTarget, preferredPierSide);
+      CommandError e = setTarget(&gotoTarget, settings.preferredPierSide);
       strcpy(reply, "2");
       if (e == CE_NONE && target.pierSide == PIER_SIDE_EAST) reply[0] = '0';
       if (e == CE_NONE && target.pierSide == PIER_SIDE_WEST) reply[0] = '1';
@@ -304,7 +304,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //              8=already in motion
     //              9=unspecified error
     if (command[1] == 'S' && parameter[0] == 0) {
-      CommandError e = request(&gotoTarget, preferredPierSide);
+      CommandError e = request(&gotoTarget, settings.preferredPierSide);
       strcpy(reply,"0");
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) reply[0] = '0';
@@ -468,11 +468,14 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           // preferred pier side
           case '6':
             switch (parameter[3]) {
-              case 'E': preferredPierSide = PSS_EAST; break;
-              case 'W': preferredPierSide = PSS_WEST; break;
-              case 'B': preferredPierSide = PSS_BEST; break;
+              case 'E': settings.preferredPierSide = PSS_EAST; break;
+              case 'W': settings.preferredPierSide = PSS_WEST; break;
+              case 'B': settings.preferredPierSide = PSS_BEST; break;
               default: *commandError = CE_PARAM_RANGE;
             }
+            #if PIER_SIDE_PREFERRED_MEMORY == ON
+              nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
+            #endif
           break;
           // pause at home on meridian flip
           case '8':

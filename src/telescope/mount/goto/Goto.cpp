@@ -33,10 +33,14 @@ void Goto::init() {
 
   // force defaults if needed
   #if MFLIP_PAUSE_HOME_MEMORY != ON
-    settings.meridianFlipPause = false;
+    settings.meridianFlipPause = (MFLIP_PAUSE_HOME_DEFAULT == ON);
   #endif
 
-  if (MFLIP_AUTOMATIC_MEMORY != ON || !transform.meridianFlips) settings.meridianFlipAuto = false;
+  if (MFLIP_AUTOMATIC_MEMORY != ON || !transform.meridianFlips) settings.meridianFlipAuto = (MFLIP_AUTOMATIC_DEFAULT == ON);
+
+  #if PIER_SIDE_PREFERRED_MEMORY != ON
+    settings.preferredPierSide = (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT;
+  #endif
 
   // calculate base and current maximum step rates
   usPerStepBase = 1000000.0/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*SLEW_RATE_BASE_DESIRED);
@@ -52,7 +56,7 @@ void Goto::init() {
 
 // goto to equatorial target position (Native coordinate system) using the defaut preferredPierSide
 CommandError Goto::request() {
-  return request(&target, preferredPierSide);
+  return request(&target, settings.preferredPierSide);
 }
 
 // goto equatorial position (Native or Mount coordinate system)
@@ -122,7 +126,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
 
 // sync to equatorial target position (Native coordinate system) using the default preferredPierSide
 CommandError Goto::requestSync() {
-  return requestSync(&target, preferredPierSide);
+  return requestSync(&target, settings.preferredPierSide);
 }
 
 // sync to equatorial position (Native or Mount coordinate system)
@@ -180,7 +184,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
     if (mount.isHome()) {
       VL("MSG: Mount, set target from home");
       if (transform.mountType == FORK) {
-        if (preferredPierSide == PSS_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
+        if (settings.preferredPierSide == PSS_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
       } else {
         if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
       }
@@ -280,7 +284,7 @@ CommandError Goto::alignAddStar() {
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.init(transform.mountType, site.location.latitude);
     #endif
-    e = requestSync(&target, preferredPierSide);
+    e = requestSync(&target, settings.preferredPierSide);
   }
 
   // add an align star

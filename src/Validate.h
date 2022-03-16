@@ -369,8 +369,16 @@
   #error "Configuration (Config.h): Setting MFLIP_SKIP_HOME unknown, use OFF or ON."
 #endif
 
+#if MFLIP_PAUSE_HOME_DEFAULT != ON && MFLIP_PAUSE_HOME_DEFAULT != OFF
+  #error "Configuration (Config.h): Setting MFLIP_PAUSE_HOME_DEFAULT unknown, use OFF or ON."
+#endif
+
 #if MFLIP_PAUSE_HOME_MEMORY != ON && MFLIP_PAUSE_HOME_MEMORY != OFF
   #error "Configuration (Config.h): Setting MFLIP_PAUSE_HOME_MEMORY unknown, use OFF or ON."
+#endif
+
+#if MFLIP_AUTOMATIC_DEFAULT != ON && MFLIP_AUTOMATIC_DEFAULT != OFF
+  #error "Configuration (Config.h): Setting MFLIP_AUTOMATIC_DEFAULT unknown, use OFF or ON."
 #endif
 
 #if MFLIP_AUTOMATIC_MEMORY != ON && MFLIP_AUTOMATIC_MEMORY != OFF
@@ -381,8 +389,12 @@
   #error "Configuration (Config.h): Setting PIER_SIDE_SYNC_CHANGE_SIDES unknown, use OFF or ON."
 #endif
 
-#if PIER_SIDE_PREFERRED_DEFAULT < PIER_SIDE_FIRST && PIER_SIDE_SYNC_CHANGE_SIDES > PIER_SIDE_LAST
-  #error "Configuration (Config.h): Setting PIER_SIDE_SYNC_CHANGE_SIDES unknown, use EAST or WEST or BEST."
+#if PIER_SIDE_PREFERRED_DEFAULT < PIER_SIDE_FIRST && PIER_SIDE_PREFERRED_DEFAULT > PIER_SIDE_LAST
+  #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_DEFAULT unknown, use EAST or WEST or BEST."
+#endif
+
+#if PIER_SIDE_PREFERRED_MEMORY != OFF && PIER_SIDE_PREFERRED_MEMORY != ON
+  #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_MEMORY unknown, use ON or OFF."
 #endif
 
 // PARKING BEHAVIOUR
