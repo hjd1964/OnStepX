@@ -121,12 +121,12 @@
     #endif
     #define AUX3_PIN_IN_USE
   #endif
-  #if AUX3_PIN == RETICLE_LED_PIN && RETICLE_LED != OFF
+  #if AUX3_PIN == RETICLE_LED_PIN && RETICLE_LED_DEFAULT != OFF
     #if AUX3_PIN == STATUS_LED_PIN && STATUS_LED != OFF
-      #error "Configuration (Config.h): RETICLE_LED and STATUS_LED can't both be enabled on the same AUX3_PIN"
+      #error "Configuration (Config.h): RETICLE_LED_DEFAULT and STATUS_LED can't both be enabled on the same AUX3_PIN"
     #endif
     #ifdef AUX3_PIN_IN_USE
-      #error "Configuration (Config.h): RETICLE_LED enabled but AUX3_PIN is already in use, choose one feature on AUX3_PIN"
+      #error "Configuration (Config.h): RETICLE_LED_DEFAULT enabled but AUX3_PIN is already in use, choose one feature on AUX3_PIN"
     #endif
     #define AUX3_PIN_IN_USE
   #endif
@@ -140,9 +140,9 @@
     #endif
     #define AUX4_PIN_IN_USE
   #endif
-  #if AUX4_PIN == RETICLE_LED_PIN && RETICLE_LED != OFF
+  #if AUX4_PIN == RETICLE_LED_PIN && RETICLE_LED_DEFAULT != OFF
     #ifdef AUX4_PIN_IN_USE
-      #error "Configuration (Config.h): RETICLE_LED enabled but AUX4_PIN is already in use, choose one feature on AUX4_PIN"
+      #error "Configuration (Config.h): RETICLE_LED_DEFAULT enabled but AUX4_PIN is already in use, choose one feature on AUX4_PIN"
     #endif
     #define AUX4_PIN_IN_USE
   #endif
@@ -190,12 +190,12 @@
     #endif
     #define AUX8_PIN_IN_USE
   #endif
-  #if AUX8_PIN == RETICLE_LED_PIN && RETICLE_LED != OFF
+  #if AUX8_PIN == RETICLE_LED_PIN && RETICLE_LED_DEFAULT != OFF
     #if AUX8_PIN == STATUS_LED_PIN && STATUS_LED != OFF
-      #error "Configuration (Config.h): RETICLE_LED and STATUS_LED can't both be enabled on the same AUX8_PIN"
+      #error "Configuration (Config.h): RETICLE_LED_DEFAULT and STATUS_LED can't both be enabled on the same AUX8_PIN"
     #endif
     #ifdef AUX8_PIN_IN_USE
-      #error "Configuration (Config.h): RETICLE_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
+      #error "Configuration (Config.h): RETICLE_LED_DEFAULT enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
     #endif
     #define AUX8_PIN_IN_USE
   #endif

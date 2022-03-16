@@ -49,8 +49,8 @@
   #error "Configuration (Config.h): Setting STATUS_LED unknown, use OFF or ON."
 #endif
 
-#if RETICLE_LED != OFF && (RETICLE_LED < 0 || RETICLE_LED > 255)
-  #error "Configuration (Config.h): Setting RETICLE_LED unknown, use OFF or 0 to 255."
+#if RETICLE_LED_DEFAULT != OFF && (RETICLE_LED_DEFAULT < 0 || RETICLE_LED_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting RETICLE_LED_DEFAULT unknown, use OFF or 0 to 255."
 #endif
 
 #if WEATHER != OFF && (WEATHER < WEATHER_FIRST || WEATHER > WEATHER_LAST)

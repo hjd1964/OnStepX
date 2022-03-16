@@ -420,8 +420,8 @@
 #endif
 
 // reticle
-#ifndef RETICLE_LED
-#define RETICLE_LED                   OFF
+#ifndef RETICLE_LED_DEFAULT
+#define RETICLE_LED_DEFAULT                   OFF
 #endif
 
 // time and location
