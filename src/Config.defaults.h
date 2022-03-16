@@ -528,19 +528,19 @@
 
 // slewing
 #ifndef SLEW_GOTO
-#define SLEW_GOTO                     ON
+#define SLEW_GOTO                     ON                          // OFF disables goto functionality
 #endif
 #ifndef SLEW_RATE_BASE_DESIRED
-#define SLEW_RATE_BASE_DESIRED        1.0
+#define SLEW_RATE_BASE_DESIRED        1.0                         // *desired* maximum slew rate, actual slew rate depends on many factors
 #endif
 #ifndef SLEW_RATE_MEMORY
-#define SLEW_RATE_MEMORY              OFF
+#define SLEW_RATE_MEMORY              OFF                         // ON to retain runtime slew rate settings across power cycles
 #endif
 #ifndef SLEW_ACCELERATION_DIST
-#define SLEW_ACCELERATION_DIST        5.0
+#define SLEW_ACCELERATION_DIST        5.0                         // distance in degrees to complete acceleration/deceleration
 #endif
 #ifndef SLEW_RAPID_STOP_DIST
-#define SLEW_RAPID_STOP_DIST          2.0
+#define SLEW_RAPID_STOP_DIST          2.0                         // distance in degrees for emergency stop
 #endif
 #ifndef SLEW_GOTO_OFFSET
 #define SLEW_GOTO_OFFSET              0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
@@ -610,16 +610,16 @@
 #define AXIS3_DRIVER_MODEL            OFF                         // specify a driver to enable
 #endif
 #ifndef AXIS3_STEPS_PER_DEGREE
-#define AXIS3_STEPS_PER_DEGREE        64.0
+#define AXIS3_STEPS_PER_DEGREE        64.0                        // (micro)steps per degree of movement
 #endif
 #ifndef AXIS3_REVERSE
-#define AXIS3_REVERSE                 OFF
+#define AXIS3_REVERSE                 OFF                         // reverse movement
 #endif
 #ifndef AXIS3_POWER_DOWN
-#define AXIS3_POWER_DOWN              OFF
+#define AXIS3_POWER_DOWN              OFF                         // power down at standstill
 #endif
 #ifndef AXIS3_ENABLE_STATE
-#define AXIS3_ENABLE_STATE            LOW
+#define AXIS3_ENABLE_STATE            LOW                         // stepper enable state
 #endif
 #ifndef AXIS3_SLEW_RATE_DESIRED
 #define AXIS3_SLEW_RATE_DESIRED       3.0                         // in degrees/sec
