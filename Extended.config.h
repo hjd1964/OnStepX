@@ -115,7 +115,7 @@
 // GUIDING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#GUIDING
 #define GUIDE_TIME_LIMIT                0 //      0, No guide time limit. Or n. Where n=1..120 second time limit guard.       Adjust
 #define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X.                         Option
-#define SEPARATE_PULSE_GUIDE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding.                   Infreq
+#define GUIDE_SEPARATE_PULSE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding.                   Infreq
 
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
 #define PEC_BUFFER_SIZE_LIMIT         720 //    720, Seconds of PEC buffer allowed.                                           Adjust
@@ -148,7 +148,7 @@
 #define PIER_SIDE_PREFERRED_MEMORY    OFF //    OFF, ON Remember preferred pier side setting across power cycles.             Option
 
 // PARKING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PARKING
-#define STRICT_PARKING                OFF //    OFF, ON Un-parking is only allowed if successfully parked.                    Option
+#define PARK_STRICT                   OFF //    OFF, ON Un-parking is only allowed if successfully parked.                    Option
 
 // =================================================================================================================================
 // ROTATOR =========================================================================================================================

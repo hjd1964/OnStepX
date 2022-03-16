@@ -163,7 +163,7 @@
             if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); status.sound.click(); }
             guide.settings.axis1RateSelect = (GuideRateSelect)r;
             guide.settings.axis2RateSelect = (GuideRateSelect)r;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
+            if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
           }
           if (altModeB) {
             #if ST4_HAND_CONTROL_FOCUSER == ON
@@ -226,7 +226,7 @@
           #endif
           {
             GuideRateSelect rateSelect = guide.settings.axis1RateSelect;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
+            if (GUIDE_SEPARATE_PULSE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
         } else guide.stopAxis1();
@@ -247,7 +247,7 @@
           #endif
           {
             GuideRateSelect rateSelect = guide.settings.axis2RateSelect;
-            if (SEPARATE_PULSE_GUIDE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
+            if (GUIDE_SEPARATE_PULSE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
             guide.startAxis2(st4GuideActionAxis2, rateSelect, GUIDE_TIME_LIMIT*1000);
           }
         } else guide.stopAxis2();

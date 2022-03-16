@@ -33,16 +33,16 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (convert.atoi2(&parameter[1], &timeMs)) {
         if (timeMs >= 0) {
           if (parameter[0] == 'w') {
-            *commandError = startAxis1(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
+            *commandError = startAxis1(GA_FORWARD, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
           if (parameter[0] == 'e') {
-            *commandError = startAxis1(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
+            *commandError = startAxis1(GA_REVERSE, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
           if (parameter[0] == 'n') {
-            *commandError = startAxis2(GA_FORWARD, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
+            *commandError = startAxis2(GA_FORWARD, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
           } else
           if (parameter[0] == 's') {
-            *commandError = startAxis2(GA_REVERSE, (SEPARATE_PULSE_GUIDE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
+            *commandError = startAxis2(GA_REVERSE, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
           } else *commandError = CE_CMD_UNKNOWN;
           if (command[1] == 'g') *numericReply = false;
         } else *commandError = CE_PARAM_RANGE;
@@ -159,7 +159,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (command[1] == 'S') r = 8; else r = command[1] - '0';
       settings.axis1RateSelect = (GuideRateSelect)r;
       settings.axis2RateSelect = (GuideRateSelect)r;
-      if (SEPARATE_PULSE_GUIDE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
+      if (GUIDE_SEPARATE_PULSE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
         settings.pulseRateSelect = (GuideRateSelect)r;
         nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
       }

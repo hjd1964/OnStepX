@@ -201,7 +201,7 @@ void Park::requestDone() {
 CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
   if (state != PS_PARKED) {
-    #if STRICT_PARKING == ON
+    #if PARK_STRICT == ON
       VLF("MSG: Unpark ignored, not parked");
       return CE_NOT_PARKED;
     #endif

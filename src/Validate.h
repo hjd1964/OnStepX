@@ -320,8 +320,8 @@
   #error "Configuration (Config.h): Setting GUIDE_DISABLE_BACKLASH unknown, use OFF or ON."
 #endif
 
-#if SEPARATE_PULSE_GUIDE_RATE != ON && SEPARATE_PULSE_GUIDE_RATE != OFF
-  #error "Configuration (Config.h): Setting SEPARATE_PULSE_GUIDE_RATE unknown, use OFF or ON."
+#if GUIDE_SEPARATE_PULSE_RATE != ON && GUIDE_SEPARATE_PULSE_RATE != OFF
+  #error "Configuration (Config.h): Setting GUIDE_SEPARATE_PULSE_RATE unknown, use OFF or ON."
 #endif
 
 // SENSORS
@@ -402,8 +402,8 @@
 #endif
 
 // PARKING BEHAVIOUR
-#if STRICT_PARKING != ON && STRICT_PARKING != OFF
-  #error "Configuration (Config.h): Setting STRICT_PARKING unknown, use OFF or ON."
+#if PARK_STRICT != ON && PARK_STRICT != OFF
+  #error "Configuration (Config.h): Setting PARK_STRICT unknown, use OFF or ON."
 #endif
 
 // ROTATOR ---------------------------------------

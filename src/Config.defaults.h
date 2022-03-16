@@ -490,6 +490,10 @@
 #define PARK_STATUS                   OFF
 #endif
 
+#ifndef PARK_STRICT
+#define PARK_STRICT                   OFF
+#endif
+
 // pec
 #ifndef PEC_SENSE
 #define PEC_SENSE                     OFF
@@ -575,19 +579,14 @@
 #define PIER_SIDE_PREFERRED_MEMORY    OFF
 #endif
 
-// parking
-#ifndef STRICT_PARKING
-#define STRICT_PARKING                OFF
-#endif
-
 // mount coordinates
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC
 #endif
 
 // mount guiding
-#ifndef SEPARATE_PULSE_GUIDE_RATE
-#define SEPARATE_PULSE_GUIDE_RATE     ON
+#ifndef GUIDE_SEPARATE_PULSE_RATE
+#define GUIDE_SEPARATE_PULSE_RATE     ON
 #endif
 
 // mount align
