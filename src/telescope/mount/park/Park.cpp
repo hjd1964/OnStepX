@@ -25,6 +25,9 @@ void Park::init() {
   if (!nv.isKeyValid()) {
     VLF("MSG: Mount, park writing defaults to NV");
     nv.writeBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+    // set the initial park position at home
+    state = settings.state;
+    set();
   }
 
   // read the settings
