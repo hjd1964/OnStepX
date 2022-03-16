@@ -215,28 +215,28 @@
 
 // FEATURES ----------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-ConfigurationMaster#AUXILIARY
 
-#define FEATURE1_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE1_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE1_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE2_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE2_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE2_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE3_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE3_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE3_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE4_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE4_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE4_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE5_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE5_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE5_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE6_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE6_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE6_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE7_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE7_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE7_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
-#define FEATURE8_DEFAULT_VALUE        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
+#define FEATURE8_VALUE_DEFAULT        OFF //    OFF, ON, n. Where n=0..255 for ANALOG_OUT purpose.                            Adjust
 #define FEATURE8_ACTIVE_STATE        HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V or 5V.)               Adjust
 
 // ---------------------------------------------------------------------------------------------------------------------------------

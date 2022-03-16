@@ -1103,29 +1103,29 @@
   #error "Configuration (Config.h): Setting FEATURE8_PIN unknown, use OFF or a valid microcontroller pin designation."
 #endif
 
-#if FEATURE1_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE1_DEFAULT_VALUE < 0 || FEATURE1_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE1_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE1_VALUE_DEFAULT != OFF && FEATURE1_VALUE_DEFAULT != ON && (FEATURE1_VALUE_DEFAULT < 0 || FEATURE1_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE1_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE2_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE2_DEFAULT_VALUE < 0 || FEATURE2_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE2_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE2_VALUE_DEFAULT != OFF && FEATURE2_VALUE_DEFAULT != ON && (FEATURE2_VALUE_DEFAULT < 0 || FEATURE2_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE2_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE3_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE3_DEFAULT_VALUE < 0 || FEATURE3_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE3_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE3_VALUE_DEFAULT != OFF && FEATURE3_VALUE_DEFAULT != ON && (FEATURE3_VALUE_DEFAULT < 0 || FEATURE3_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE3_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE4_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE4_DEFAULT_VALUE < 0 || FEATURE4_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE4_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE4_VALUE_DEFAULT != OFF && FEATURE4_VALUE_DEFAULT != ON && (FEATURE4_VALUE_DEFAULT < 0 || FEATURE4_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE4_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE5_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE5_DEFAULT_VALUE < 0 || FEATURE5_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE5_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE5_VALUE_DEFAULT != OFF && FEATURE5_VALUE_DEFAULT != ON && (FEATURE5_VALUE_DEFAULT < 0 || FEATURE5_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE5_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE6_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE6_DEFAULT_VALUE < 0 || FEATURE6_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE6_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE6_VALUE_DEFAULT != OFF && FEATURE6_VALUE_DEFAULT != ON && (FEATURE6_VALUE_DEFAULT < 0 || FEATURE6_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE6_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE7_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE7_DEFAULT_VALUE < 0 || FEATURE7_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE7_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE7_VALUE_DEFAULT != OFF && FEATURE7_VALUE_DEFAULT != ON && (FEATURE7_VALUE_DEFAULT < 0 || FEATURE7_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE7_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
-#if FEATURE8_DEFAULT_VALUE != OFF && FEATURE1_DEFAULT_VALUE != ON && (FEATURE8_DEFAULT_VALUE < 0 || FEATURE8_DEFAULT_VALUE > 255)
-  #error "Configuration (Config.h): Setting FEATURE8_DEFAULT_VALUE unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
+#if FEATURE8_VALUE_DEFAULT != OFF && FEATURE8_VALUE_DEFAULT != ON && (FEATURE8_VALUE_DEFAULT < 0 || FEATURE8_VALUE_DEFAULT > 255)
+  #error "Configuration (Config.h): Setting FEATURE8_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
 
 #if FEATURE1_ACTIVE_STATE != HIGH && FEATURE1_ACTIVE_STATE != LOW

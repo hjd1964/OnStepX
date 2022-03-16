@@ -1590,8 +1590,8 @@
 #ifndef FEATURE1_PIN
 #define FEATURE1_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE1_DEFAULT_VALUE
-#define FEATURE1_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE1_VALUE_DEFAULT
+#define FEATURE1_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE1_ACTIVE_STATE
 #define FEATURE1_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1612,8 +1612,8 @@
 #ifndef FEATURE2_PIN
 #define FEATURE2_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE2_DEFAULT_VALUE
-#define FEATURE2_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE2_VALUE_DEFAULT
+#define FEATURE2_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE2_ACTIVE_STATE
 #define FEATURE2_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1634,8 +1634,8 @@
 #ifndef FEATURE3_PIN
 #define FEATURE3_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE3_DEFAULT_VALUE
-#define FEATURE3_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE3_VALUE_DEFAULT
+#define FEATURE3_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE3_ACTIVE_STATE
 #define FEATURE3_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1656,8 +1656,8 @@
 #ifndef FEATURE4_PIN
 #define FEATURE4_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE4_DEFAULT_VALUE
-#define FEATURE4_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE4_VALUE_DEFAULT
+#define FEATURE4_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE4_ACTIVE_STATE
 #define FEATURE4_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1678,8 +1678,8 @@
 #ifndef FEATURE5_PIN
 #define FEATURE5_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE5_DEFAULT_VALUE
-#define FEATURE5_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE5_VALUE_DEFAULT
+#define FEATURE5_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE5_ACTIVE_STATE
 #define FEATURE5_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1700,8 +1700,8 @@
 #ifndef FEATURE6_PIN
 #define FEATURE6_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE6_DEFAULT_VALUE
-#define FEATURE6_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE6_VALUE_DEFAULT
+#define FEATURE6_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE6_ACTIVE_STATE
 #define FEATURE6_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1722,8 +1722,8 @@
 #ifndef FEATURE7_PIN
 #define FEATURE7_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE7_DEFAULT_VALUE
-#define FEATURE7_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE7_VALUE_DEFAULT
+#define FEATURE7_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE7_ACTIVE_STATE
 #define FEATURE7_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
@@ -1744,8 +1744,8 @@
 #ifndef FEATURE8_PIN
 #define FEATURE8_PIN                  OFF                         // OUTPUT control pin
 #endif
-#ifndef FEATURE8_DEFAULT_VALUE
-#define FEATURE8_DEFAULT_VALUE        OFF                         // OUTPUT control pin default state
+#ifndef FEATURE8_VALUE_DEFAULT
+#define FEATURE8_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
 #endif
 #ifndef FEATURE8_ACTIVE_STATE
 #define FEATURE8_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
