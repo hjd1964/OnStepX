@@ -100,9 +100,19 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   initError.nv = nv.initError;
 
+  // write the default settings to NV
+  if (!nv.isKeyValid()) {
+    VLF("MSG: Telescope, writing defaults to NV");
+    nv.write(NV_RETICLE_SETTINGS_BASE, reticleBrightness);
+  }
+
   #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
+    #if RETICLE_LED_MEMORY == ON
+      reticleBrightness = nv.readI(NV_RETICLE_SETTINGS_BASE);
+    #endif
+
     pinMode(RETICLE_LED_PIN, OUTPUT);
-    analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(RETICLE_LED_DEFAULT));
+    analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticleBrightness));
   #endif
 
   // bring up status LED and flash error codes

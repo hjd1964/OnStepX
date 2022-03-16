@@ -46,6 +46,7 @@ class Telescope {
 
   private:
     Firmware firmware;
+    int16_t reticleBrightness = RETICLE_LED_DEFAULT;
 };
 
 extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)

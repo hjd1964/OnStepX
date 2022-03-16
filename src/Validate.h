@@ -53,6 +53,10 @@
   #error "Configuration (Config.h): Setting RETICLE_LED_DEFAULT unknown, use OFF or 0 to 255."
 #endif
 
+#if RETICLE_LED_MEMORY != OFF && RETICLE_LED_MEMORY != ON
+  #error "Configuration (Config.h): Setting RETICLE_LED_MEMORY unknown, use OFF or ON."
+#endif
+
 #if WEATHER != OFF && (WEATHER < WEATHER_FIRST || WEATHER > WEATHER_LAST)
   #error "Configuration (Config.h): Setting WEATHER unknown, use OFF or valid WEATHER SENSOR (from Constants.h)"
 #endif

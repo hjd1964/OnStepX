@@ -68,7 +68,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   if (command[0] == 'B' && (command[1] == '+' || command[1] == '-') && parameter[0] == 0)  {
     #if RETICLE_LED_DEFAULT >= 0 && RETICLE_LED_PIN != OFF
       int scale;
-      static int reticuleBrightness = RETICLE_LED_DEFAULT;
       if (reticuleBrightness > 255-8) scale = 1; else
       if (reticuleBrightness > 255-32) scale = 4; else
       if (reticuleBrightness > 255-64) scale = 12; else
@@ -76,6 +75,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (command[1] == '-') reticuleBrightness += scale;  if (reticuleBrightness > 255) reticuleBrightness = 255;
       if (command[1] == '+') reticuleBrightness -= scale;  if (reticuleBrightness < 0)   reticuleBrightness = 0;
       analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticuleBrightness));
+      #if RETICLE_LED_MEMORY == ON
+        nv.write(NV_RETICLE_SETTINGS_BASE, reticleBrightness);
+      #endif
     #endif
     *numericReply = false;
   } else 
