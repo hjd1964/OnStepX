@@ -23,10 +23,10 @@ void Library::init() {
 
   if (recMax == 0) { VLF("WRN: Library::Library(); recMax == 0, no library space available"); return; }
 
-  // write the default limits to NV
+  // write default library structure to NV
   if (!nv.isKeyValid()) {
     VLF("MSG: Mount, library clearing NV storage area");
-    for (uint16_t i = NV_LIBRARY_DATA_BASE; i <= nv.size; i++) nv.write(i, (uint8_t)0);
+    clearAll();
   }
 
    VF("MSG: Mount, library allocated "); V(recMax); VLF(" catalog records");
@@ -268,7 +268,7 @@ void Library::clearLib() {
   }
 }
 
-// clears all libraries    
+// clear library (clear all catalogs)
 void Library::clearAll() {
   for (long l = 0; l < recMax; l++) clearRec(l);
 }
