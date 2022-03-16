@@ -1128,8 +1128,8 @@
   #error "Configuration (Config.h): Setting FEATURE8_VALUE_DEFAULT unknown, use OFF, ON or a value from 0 to 255 (for ANALOG_OUT.)"
 #endif
 
-#if FEATURE1_ACTIVE_STATE != HIGH && FEATURE1_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE1_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE1_ON_STATE != HIGH && FEATURE1_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE1_ON_STATE unknown, use HIGH or LOW."
 #endif
 #if FEATURE2_ON_STATE != HIGH && FEATURE2_ON_STATE != LOW
   #error "Configuration (Config.h): Setting FEATURE2_ON_STATE unknown, use HIGH or LOW."
