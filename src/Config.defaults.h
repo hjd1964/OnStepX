@@ -394,6 +394,9 @@
 #ifndef MOUNT_TYPE
 #define MOUNT_TYPE                    GEM
 #endif
+#ifndef MOUNT_COORDS
+#define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
+#endif
 
 // user feedback
 #ifndef STATUS_LED
@@ -495,14 +498,17 @@
 #endif
 
 // pec
+#ifndef PEC_STEPS_PER_WORM_ROTATION
+#define PEC_STEPS_PER_WORM_ROTATION   0
+#endif
+#ifndef PEC_BUFFER_SIZE_LIMIT
+#define PEC_BUFFER_SIZE_LIMIT         720                         // fixed PEC buffer maximum size
+#endif
 #ifndef PEC_SENSE
 #define PEC_SENSE                     OFF
 #endif
 #ifndef PEC_SENSE_INIT
 #define PEC_SENSE_INIT                INPUT_PULLUP
-#endif
-#ifndef PEC_STEPS_PER_WORM_ROTATION
-#define PEC_STEPS_PER_WORM_ROTATION   0
 #endif
 
 // guiding
@@ -514,6 +520,9 @@
 #endif
 #ifndef GUIDE_DISABLE_BACKLASH
 #define GUIDE_DISABLE_BACKLASH        OFF                         // disables backlash while pulse-guiding
+#endif
+#ifndef GUIDE_SEPARATE_PULSE_RATE
+#define GUIDE_SEPARATE_PULSE_RATE     ON
 #endif
 
 // tracking
@@ -579,28 +588,13 @@
 #define PIER_SIDE_PREFERRED_MEMORY    OFF
 #endif
 
-// mount coordinates
-#ifndef MOUNT_COORDS
-#define MOUNT_COORDS                  TOPOCENTRIC
-#endif
-
-// mount guiding
-#ifndef GUIDE_SEPARATE_PULSE_RATE
-#define GUIDE_SEPARATE_PULSE_RATE     ON
-#endif
-
-// mount align
+// align
 #ifndef ALIGN_MAX_STARS
 #define ALIGN_MAX_STARS               AUTO                        // max num align stars, AUTO for HAL specified default
 #endif
 
 #ifndef ALIGN_AUTO_HOME
 #define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
-#endif
-
-// mount pec
-#ifndef PEC_BUFFER_SIZE_LIMIT
-#define PEC_BUFFER_SIZE_LIMIT         720                         // fixed PEC buffer maximum size
 #endif
 
 // -----------------------------------------------------------------------------------
