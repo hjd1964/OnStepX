@@ -109,6 +109,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
     #if RETICLE_LED_MEMORY == ON
       reticleBrightness = nv.readI(NV_RETICLE_SETTINGS_BASE);
+      if (reticleBrightness < 0) reticleBrightness = RETICLE_LED_DEFAULT;
     #endif
 
     pinMode(RETICLE_LED_PIN, OUTPUT);
