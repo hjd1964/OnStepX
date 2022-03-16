@@ -421,7 +421,10 @@
 
 // reticle
 #ifndef RETICLE_LED_DEFAULT
-#define RETICLE_LED_DEFAULT                   OFF
+#define RETICLE_LED_DEFAULT           OFF
+#endif
+#ifndef RETICLE_LED_MEMORY
+#define RETICLE_LED_MEMORY            OFF
 #endif
 
 // time and location
