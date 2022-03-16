@@ -76,7 +76,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (command[1] == '+') reticuleBrightness -= scale;  if (reticuleBrightness < 0)   reticuleBrightness = 0;
       analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticuleBrightness));
       #if RETICLE_LED_MEMORY == ON
-        nv.write(NV_RETICLE_SETTINGS_BASE, reticleBrightness);
+        nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
       #endif
     #endif
     *numericReply = false;

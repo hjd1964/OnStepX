@@ -159,5 +159,5 @@
 #define NV_FOCUSER_SETTINGS_BASE    676    // bytes: 18*6, 108
 #define NV_ROTATOR_SETTINGS_BASE    784    // bytes: 7   , 7
 #define NV_FEATURE_SETTINGS_BASE    791    // bytes: 3 *8, 24
-#define NV_RETICLE_SETTINGS_BASE    815    // bytes: 2   , 2
+#define NV_TELESCOPE_SETTINGS_BASE  815    // bytes: 2   , 2
 #define NV_PEC_BUFFER_BASE          817    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)

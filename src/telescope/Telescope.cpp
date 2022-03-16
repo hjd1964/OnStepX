@@ -103,12 +103,12 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   // write the default settings to NV
   if (!nv.isKeyValid()) {
     VLF("MSG: Telescope, writing defaults to NV");
-    nv.write(NV_RETICLE_SETTINGS_BASE, reticleBrightness);
+    nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
   }
 
   #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
     #if RETICLE_LED_MEMORY == ON
-      reticleBrightness = nv.readI(NV_RETICLE_SETTINGS_BASE);
+      reticleBrightness = nv.readI(NV_TELESCOPE_SETTINGS_BASE);
       if (reticleBrightness < 0) reticleBrightness = RETICLE_LED_DEFAULT;
     #endif
 

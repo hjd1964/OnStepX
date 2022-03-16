@@ -562,7 +562,7 @@
 #define SLEW_GOTO_OFFSET_ALIGN        OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
 
-// pier side
+// meridian flip, pier side
 #ifndef MFLIP_SKIP_HOME
 #define MFLIP_SKIP_HOME               OFF
 #endif
