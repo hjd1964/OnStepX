@@ -13,6 +13,25 @@
 #define PINMAP                        OFF
 #endif
 
+// use the HAL specified default NV driver
+#ifndef NV_DRIVER
+  #define NV_DRIVER                   NV_DEFAULT
+#endif
+
+// debug
+#ifndef DEBUG
+#define DEBUG                         OFF
+#endif
+#ifndef DEBUG_ECHO_COMMANDS
+#define DEBUG_ECHO_COMMANDS           OFF
+#endif
+#ifndef SERIAL_DEBUG
+#define SERIAL_DEBUG                  Serial
+#endif
+#ifndef SERIAL_DEBUG_BAUD
+#define SERIAL_DEBUG_BAUD             9600
+#endif
+
 // serial ports
 #ifndef SERIAL_A_BAUD_DEFAULT
 #define SERIAL_A_BAUD_DEFAULT         9600
@@ -30,14 +49,23 @@
 #define SERIAL_GPS_BAUD               OFF
 #endif
 
+// ESP32 virtual serial bluetooth command channel
+#ifndef SERIAL_BT_MODE
+#define SERIAL_BT_MODE                OFF                         // use STATION to enable the interface (ESP32 only)
+#endif
+#ifndef SERIAL_BT_NAME
+#define SERIAL_BT_NAME                "OnStep"                    // Bluetooth name of command channel
+#endif
+
 // ESP32 virtual serial IP command channels
 #ifndef SERIAL_IP_MODE
 #define SERIAL_IP_MODE                OFF                         // use ACCESS_POINT or STATION to enable the interface (ESP32 only)
 #endif
 #ifndef SERIAL_SERVER
-#define SERIAL_SERVER                BOTH                         // STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
+#define SERIAL_SERVER                 BOTH                        // STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
 #endif
 
+// translate Config.h IP settings into low level library settings
 #if SERIAL_IP_MODE == ACCESS_POINT
 #define OPERATIONAL_MODE WIFI
 #define AP_ENABLED true
@@ -101,20 +129,6 @@
 // step signal
 #ifndef STEP_WAVE_FORM
 #define STEP_WAVE_FORM                PULSE
-#endif
-
-// debug
-#ifndef DEBUG
-#define DEBUG                         OFF
-#endif
-#ifndef DEBUG_ECHO_COMMANDS
-#define DEBUG_ECHO_COMMANDS           OFF
-#endif
-#ifndef SERIAL_DEBUG
-#define SERIAL_DEBUG                  Serial
-#endif
-#ifndef SERIAL_DEBUG_BAUD
-#define SERIAL_DEBUG_BAUD             9600
 #endif
 
 // gpio device
@@ -383,7 +397,7 @@
 
 // user feedback
 #ifndef STATUS_LED
-#define STATUS_LED                    ON
+#define STATUS_LED                    OFF
 #endif
 #ifndef STATUS_LED_ON_STATE
 #define STATUS_LED_ON_STATE           LOW
@@ -587,20 +601,7 @@
 
 // mount pec
 #ifndef PEC_BUFFER_SIZE_LIMIT
-#define PEC_BUFFER_SIZE_LIMIT         720
-#endif
-
-// ESP32 virtual serial bluetooth command channel
-#ifndef SERIAL_BT_MODE
-#define SERIAL_BT_MODE                OFF
-#endif
-#ifndef SERIAL_BT_NAME
-#define SERIAL_BT_NAME                "OnStep"
-#endif
-
-// use the HAL specified default NV driver
-#ifndef NV_DRIVER
-  #define NV_DRIVER                   NV_DEFAULT
+#define PEC_BUFFER_SIZE_LIMIT         720                         // fixed PEC buffer maximum size
 #endif
 
 // -----------------------------------------------------------------------------------
@@ -1582,7 +1583,7 @@
 #define FEATURE1_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
 #endif
 #ifndef FEATURE1_NAME
-#define FEATURE1_NAME                "FEATURE1"
+#define FEATURE1_NAME                "FEATURE1"                   // user friendly name of feature, up to 10 chars
 #endif
 #ifndef FEATURE1_TEMP
 #define FEATURE1_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
@@ -1594,164 +1595,164 @@
 #define FEATURE1_PIN                  OFF                         // OUTPUT control pin
 #endif
 #ifndef FEATURE1_VALUE_DEFAULT
-#define FEATURE1_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE1_VALUE_DEFAULT        OFF                         // OUTPUT control pin default value/state ON, OFF, 0..255
 #endif
-#ifndef FEATURE1_ACTIVE_STATE
-#define FEATURE1_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE1_ON_STATE
+#define FEATURE1_ON_STATE             HIGH                        // OUTPUT control pin ON (active) state
 #endif
 
 #ifndef FEATURE2_PURPOSE
-#define FEATURE2_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE2_PURPOSE              OFF
 #endif
 #ifndef FEATURE2_NAME
 #define FEATURE2_NAME                "FEATURE2"
 #endif
 #ifndef FEATURE2_TEMP
-#define FEATURE2_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE2_TEMP                 OFF
 #endif
 #ifndef FEATURE2_TEMP_PIN
-#define FEATURE2_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE2_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE2_PIN
-#define FEATURE2_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE2_PIN                  OFF
 #endif
 #ifndef FEATURE2_VALUE_DEFAULT
-#define FEATURE2_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE2_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE2_ACTIVE_STATE
-#define FEATURE2_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE2_ON_STATE
+#define FEATURE2_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE3_PURPOSE
-#define FEATURE3_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE3_PURPOSE              OFF
 #endif
 #ifndef FEATURE3_NAME
 #define FEATURE3_NAME                "FEATURE3"
 #endif
 #ifndef FEATURE3_TEMP
-#define FEATURE3_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE3_TEMP                 OFF
 #endif
 #ifndef FEATURE3_TEMP_PIN
-#define FEATURE3_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE3_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE3_PIN
-#define FEATURE3_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE3_PIN                  OFF
 #endif
 #ifndef FEATURE3_VALUE_DEFAULT
-#define FEATURE3_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE3_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE3_ACTIVE_STATE
-#define FEATURE3_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE3_ON_STATE
+#define FEATURE3_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE4_PURPOSE
-#define FEATURE4_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE4_PURPOSE              OFF
 #endif
 #ifndef FEATURE4_NAME
 #define FEATURE4_NAME                "FEATURE4"
 #endif
 #ifndef FEATURE4_TEMP
-#define FEATURE4_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE4_TEMP                 OFF
 #endif
 #ifndef FEATURE4_TEMP_PIN
-#define FEATURE4_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE4_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE4_PIN
-#define FEATURE4_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE4_PIN                  OFF
 #endif
 #ifndef FEATURE4_VALUE_DEFAULT
-#define FEATURE4_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE4_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE4_ACTIVE_STATE
-#define FEATURE4_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE4_ON_STATE
+#define FEATURE4_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE5_PURPOSE
-#define FEATURE5_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE5_PURPOSE              OFF
 #endif
 #ifndef FEATURE5_NAME
 #define FEATURE5_NAME                "FEATURE5"
 #endif
 #ifndef FEATURE5_TEMP
-#define FEATURE5_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE5_TEMP                 OFF
 #endif
 #ifndef FEATURE5_TEMP_PIN
-#define FEATURE5_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE5_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE5_PIN
-#define FEATURE5_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE5_PIN                  OFF
 #endif
 #ifndef FEATURE5_VALUE_DEFAULT
-#define FEATURE5_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE5_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE5_ACTIVE_STATE
-#define FEATURE5_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE5_ON_STATE
+#define FEATURE5_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE6_PURPOSE
-#define FEATURE6_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE6_PURPOSE              OFF
 #endif
 #ifndef FEATURE6_NAME
 #define FEATURE6_NAME                "FEATURE6"
 #endif
 #ifndef FEATURE6_TEMP
-#define FEATURE6_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE6_TEMP                 OFF
 #endif
 #ifndef FEATURE6_TEMP_PIN
-#define FEATURE6_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE6_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE6_PIN
-#define FEATURE6_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE6_PIN                  OFF
 #endif
 #ifndef FEATURE6_VALUE_DEFAULT
-#define FEATURE6_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE6_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE6_ACTIVE_STATE
-#define FEATURE6_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE6_ON_STATE
+#define FEATURE6_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE7_PURPOSE
-#define FEATURE7_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE7_PURPOSE              OFF
 #endif
 #ifndef FEATURE7_NAME
 #define FEATURE7_NAME                "FEATURE7"
 #endif
 #ifndef FEATURE7_TEMP
-#define FEATURE7_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE7_TEMP                 OFF
 #endif
 #ifndef FEATURE7_TEMP_PIN
-#define FEATURE7_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE7_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE7_PIN
-#define FEATURE7_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE7_PIN                  OFF
 #endif
 #ifndef FEATURE7_VALUE_DEFAULT
-#define FEATURE7_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE7_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE7_ACTIVE_STATE
-#define FEATURE7_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE7_ON_STATE
+#define FEATURE7_ON_STATE             HIGH
 #endif
 
 #ifndef FEATURE8_PURPOSE
-#define FEATURE8_PURPOSE              OFF                         // OFF or SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER
+#define FEATURE8_PURPOSE              OFF
 #endif
 #ifndef FEATURE8_NAME
 #define FEATURE8_NAME                "FEATURE8"
 #endif
 #ifndef FEATURE8_TEMP
-#define FEATURE8_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
+#define FEATURE8_TEMP                 OFF
 #endif
 #ifndef FEATURE8_TEMP_PIN
-#define FEATURE8_TEMP_PIN             OFF                         // for thermistors, analog pin
+#define FEATURE8_TEMP_PIN             OFF
 #endif
 #ifndef FEATURE8_PIN
-#define FEATURE8_PIN                  OFF                         // OUTPUT control pin
+#define FEATURE8_PIN                  OFF
 #endif
 #ifndef FEATURE8_VALUE_DEFAULT
-#define FEATURE8_VALUE_DEFAULT        OFF                         // OUTPUT control pin default state
+#define FEATURE8_VALUE_DEFAULT        OFF
 #endif
-#ifndef FEATURE8_ACTIVE_STATE
-#define FEATURE8_ACTIVE_STATE         HIGH                        // OUTPUT control pin active state
+#ifndef FEATURE8_ON_STATE
+#define FEATURE8_ON_STATE             HIGH
 #endif
 
 // thermistor configuration settings to support two types

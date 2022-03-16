@@ -1131,24 +1131,24 @@
 #if FEATURE1_ACTIVE_STATE != HIGH && FEATURE1_ACTIVE_STATE != LOW
   #error "Configuration (Config.h): Setting FEATURE1_ACTIVE_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE2_ACTIVE_STATE != HIGH && FEATURE2_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE2_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE2_ON_STATE != HIGH && FEATURE2_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE2_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE3_ACTIVE_STATE != HIGH && FEATURE3_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE3_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE3_ON_STATE != HIGH && FEATURE3_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE3_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE4_ACTIVE_STATE != HIGH && FEATURE4_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE4_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE4_ON_STATE != HIGH && FEATURE4_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE4_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE5_ACTIVE_STATE != HIGH && FEATURE5_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE5_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE5_ON_STATE != HIGH && FEATURE5_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE5_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE6_ACTIVE_STATE != HIGH && FEATURE6_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE6_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE6_ON_STATE != HIGH && FEATURE6_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE6_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE7_ACTIVE_STATE != HIGH && FEATURE7_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE7_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE7_ON_STATE != HIGH && FEATURE7_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE7_ON_STATE unknown, use HIGH or LOW."
 #endif
-#if FEATURE8_ACTIVE_STATE != HIGH && FEATURE8_ACTIVE_STATE != LOW
-  #error "Configuration (Config.h): Setting FEATURE8_ACTIVE_STATE unknown, use HIGH or LOW."
+#if FEATURE8_ON_STATE != HIGH && FEATURE8_ON_STATE != LOW
+  #error "Configuration (Config.h): Setting FEATURE8_ON_STATE unknown, use HIGH or LOW."
 #endif
