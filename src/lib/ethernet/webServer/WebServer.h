@@ -44,12 +44,12 @@
   "HTTP/1.1 200 OK\r\n" "Content-Type: application/javascript\r\n" "Etag: \"3457807a63ac7bdabf8999b98245d0fe\"\r\n" "Last-Modified: Mon, 13 Apr 2015 15:35:56 GMT\r\n" "Connection: close\r\n" "\r\n";
 
   // macros to help with sending webpage data
-  #define sendHtmlStart() setResponseHeader(http_defaultHeader);
+  #define sendHtmlStart() www.setResponseHeader(http_defaultHeader);
   #define sendHtmlC(x) www.sendContent(x);
   #define sendHtml(x) www.sendContent(x); x = "";
   #define sendHtmlDone() www.sendContent("");
 
-  #define sendTextStart() setResponseHeader(http_textHeader);
+  #define sendTextStart() www.setResponseHeader(http_textHeader);
   #define sendText(x) www.sendContent(x); x = "";
   #define sendTextDone() www.sendContent("");
 
