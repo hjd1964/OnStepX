@@ -2,10 +2,9 @@
 // controller settings
 #pragma once
 
-#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == \
-    AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == \
-    AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
-  #define DRIVER_STEP_DEFAULTS
+// use the HAL specified default NV driver
+#ifndef NV_DRIVER
+#define NV_DRIVER                     NV_DEFAULT
 #endif
 
 // pinmap
@@ -13,9 +12,10 @@
 #define PINMAP                        OFF
 #endif
 
-// use the HAL specified default NV driver
-#ifndef NV_DRIVER
-  #define NV_DRIVER                   NV_DEFAULT
+#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == \
+    AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == \
+    AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
+  #define DRIVER_STEP_DEFAULTS
 #endif
 
 // debug

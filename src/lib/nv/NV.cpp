@@ -99,14 +99,14 @@ bool NonVolatileStorage::verify() {
   wipe(0xff);
   wait();
   ignoreCache(true);
-  for (uint16_t i = 0; i < nv.size - 1; i++) { if (nv.read(i) != 0xff) errors++; }
+  for (uint16_t i = 0; i < size - 1; i++) { if (read(i) != 0xff) errors++; }
   ignoreCache(false);
 
   VLF("MSG: NV, verify phase 2");
   wipe(0x00);
   wait();
   ignoreCache(true);
-  for (uint16_t i = 0; i < nv.size - 1; i++) { if (nv.read(i) != 0x00) errors++; }
+  for (uint16_t i = 0; i < size - 1; i++) { if (read(i) != 0x00) errors++; }
   ignoreCache(false);
 
   if (errors == 0) {
