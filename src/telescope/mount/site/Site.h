@@ -83,6 +83,9 @@ class Site {
     // for internal use, when to timeout date/time updates
     unsigned long updateTimeoutTime = 0;
 
+    bool dateIsReady = false;
+    bool timeIsReady = false;
+
   private:
     // gets the time in hours that have passed since Julian Day was set (UT1)
     double getTime();
@@ -126,8 +129,6 @@ class Site {
     double fracHOUR = 0;
     unsigned long fracSTART = 0;
 
-    bool dateIsReady = false;
-    bool timeIsReady = false;
     bool writeDate = true;
     bool writeTime = true;
 

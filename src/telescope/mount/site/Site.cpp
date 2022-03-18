@@ -38,8 +38,8 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       VLF("MSG: Mount, setting date/time from GPS");
       JulianDate jd;
       tls.get(jd);
-      dateIsReady = true;
-      timeIsReady = true;
+      site.dateIsReady = true;
+      site.timeIsReady = true;
       site.setDateTime(jd);
       #if SLEW_GOTO == ON
         if (park.state == PS_PARKED) park.restore(false);
