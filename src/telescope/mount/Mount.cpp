@@ -27,7 +27,7 @@ void Mount::init() {
   if (MountSettingsSize < sizeof(MountSettings)) { nv.initError = true; DL("ERR: Mount::init(); MountSettingsSize error"); }
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, writing defaults to NV");
     nv.writeBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
   }

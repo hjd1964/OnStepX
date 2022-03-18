@@ -9,7 +9,7 @@ bool WifiManager::init() {
     #ifdef NV_WIFI_SETTINGS_BASE
       if (WifiSettingsSize < sizeof(WifiSettings)) { nv.initError = true; DL("ERR: WifiManager::init(); WifiSettingsSize error"); }
 
-      if (!nv.isKeyValid()) {
+      if (!nv.hasValidKey()) {
         VLF("MSG: WiFi, writing defaults to NV");
         nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
       }

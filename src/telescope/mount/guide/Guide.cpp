@@ -23,7 +23,7 @@ void Guide::init() {
   if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(); GuideSettingsSize error"); }
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, guide writing defaults to NV");
     nv.writeBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
   }

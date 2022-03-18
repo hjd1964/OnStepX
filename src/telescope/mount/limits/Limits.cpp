@@ -19,7 +19,7 @@ void Limits::init() {
   if (LimitSettingsSize < sizeof(LimitSettings)) { nv.initError = true; DL("ERR: Limits::init(); LimitSettingsSize error"); }
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, limits writing defaults to NV");
     nv.writeBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
   }

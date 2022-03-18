@@ -28,10 +28,11 @@ class NonVolatileStorage {
     void wait();
 
     // returns true if NV holds the correct key value in addresses 0..4
+    // except returns false if #define NV_WIPE ON exists
     bool isKeyValid(uint32_t uniqueKey);
 
     // returns true if the NV key was checked and correct
-    inline bool isKeyValid() { return keyMatches; }
+    inline bool hasValidKey() { return keyMatches; }
 
     // write the key value into addresses 0..3
     void writeKey(uint32_t uniqueKey);

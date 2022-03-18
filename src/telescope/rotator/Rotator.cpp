@@ -22,7 +22,7 @@ void Rotator::init() {
   if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(); RotatorSettingsSize error"); }
 
   // get settings stored in NV ready
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Rotator, writing defaults to NV");
     writeSettings();
   }

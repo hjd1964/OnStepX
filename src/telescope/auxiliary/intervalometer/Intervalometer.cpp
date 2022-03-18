@@ -9,7 +9,7 @@ void Intervalometer::init(int index) {
   this->index = index;
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VF("MSG: Intervalometer/Feature"); V(index + 1); VLF(", writing defaults to NV");
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3, timeToByte(expTime));
     nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, timeToByte(expDelay));

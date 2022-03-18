@@ -90,7 +90,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   #endif
 
   // init is done, write the NV key if necessary
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     if (!nv.initError) {
       nv.writeKey((uint32_t)INIT_NV_KEY);
       nv.wait();
@@ -101,7 +101,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   initError.nv = nv.initError;
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Telescope, writing defaults to NV");
     nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
   }

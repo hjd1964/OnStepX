@@ -27,7 +27,7 @@ void generalWrapper() { status.general(); }
 
 // get mount status ready
 void Status::init() {
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, status writing defaults to NV");
     nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
   }

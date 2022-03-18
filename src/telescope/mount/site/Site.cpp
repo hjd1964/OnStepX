@@ -241,7 +241,7 @@ double Site::julianDateToGAST(JulianDate julianDate) {
 // reads the julian date information from NV
 void Site::readJD() {
   if (JulianDateSize < sizeof(ut1)) { nv.initError = true; DL("ERR: Site::readJD(); JulianDateSize error"); }
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, site writing default date/time to NV");
     ut1.day = 2451544.5;
     ut1.hour = 0.0;
@@ -256,7 +256,7 @@ void Site::readJD() {
 // locationNumber can be 0..3
 void Site::readLocation(uint8_t number) {
   if (LocationSize < sizeof(Location)) { nv.initError = true; DL("ERR: Site::readLocation(); LocationSize error"); }
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, site writing default sites 0-3 to NV");
     location.latitude = 0.0;
     location.longitude = 0.0;

@@ -22,7 +22,7 @@ void Park::init() {
   if (ParkSettingsSize < sizeof(ParkSettings)) { nv.initError = true; DL("ERR: Park::Init(); ParkSettingsSize error"); }
 
   // write the default settings to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, park writing defaults to NV");
     nv.writeBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
     // set the initial park position at home

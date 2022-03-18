@@ -24,7 +24,7 @@ void Library::init() {
   if (recMax == 0) { VLF("WRN: Library::Library(); recMax == 0, no library space available"); return; }
 
   // write default library structure to NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     VLF("MSG: Mount, library clearing NV storage area");
     clearAll();
   }

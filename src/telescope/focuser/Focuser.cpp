@@ -94,7 +94,7 @@ void Focuser::init() {
   if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); }
 
   // init settings stored in NV
-  if (!nv.isKeyValid()) {
+  if (!nv.hasValidKey()) {
     for (int index = 0; index < FOCUSER_MAX; index++) {
       VF("MSG: Focuser"); V(index + 1); VLF(", writing defaults to NV");
       settings[index].tcf.enabled = false;

@@ -4,6 +4,10 @@
 #include "NV.h"
 #include "../debug/Debug.h"
 
+#ifndef NV_WIPE
+  #define NV_WIPE OFF
+#endif
+
 bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
   // set nv size
   this->size = size;
@@ -60,11 +64,14 @@ void NonVolatileStorage::wait() {
 }
 
 // returns true if NV holds the correct key value in addresses 0..4
+// except returns false if #define NV_WIPE ON exists
 bool NonVolatileStorage::isKeyValid(uint32_t uniqueKey) {
-  bool state = readAndWriteThrough;
-  readAndWriteThrough = true;
-  keyMatches = readUL(0) == uniqueKey;
-  readAndWriteThrough = state;
+  if (NV_WIPE == OFF) {
+    bool state = readAndWriteThrough;
+    readAndWriteThrough = true;
+    keyMatches = readUL(0) == uniqueKey;
+    readAndWriteThrough = state;
+  } else keyMatches = false;
   return keyMatches;
 };
 

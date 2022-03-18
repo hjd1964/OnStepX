@@ -8,7 +8,7 @@ bool EthernetManager::init() {
     #ifdef NV_ETHERNET_SETTINGS_BASE
       if (EthernetSettingsSize < sizeof(EthernetSettings)) { nv.initError = true; DL("ERR: EthernetManager::init(); EthernetSettingsSize error"); }
 
-      if (!nv.isKeyValid()) {
+      if (!nv.hasValidKey()) {
         VLF("MSG: Ethernet, writing defaults to NV");
         nv.writeBytes(NV_ETHERNET_SETTINGS_BASE, &settings, sizeof(EthernetSettings));
       }
