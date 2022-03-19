@@ -35,23 +35,33 @@
 #define ADDON_RESET_PIN           AUX2_PIN       // ESP8266 RST
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
-#define PEC_SENSE_PIN             36             // [input only 36] (also analog A0)
+#ifndef PEC_SENSE_PIN
+  #define PEC_SENSE_PIN           36             // [input only 36] (also analog A0)
+#endif
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED_PIN            AUX8_PIN       // Default LED Cathode (-)
-#define MOUNT_STATUS_LED_PIN      AUX8_PIN       // Default LED Cathode (-)
-#define STATUS_ROTATOR_LED_PIN    AUX8_PIN       // Default LED Cathode (-)
-#define STATUS_FOCUSER_LED_PIN    AUX8_PIN       // Default LED Cathode (-)
-#define RETICLE_LED_PIN           AUX8_PIN       // Default LED Cathode (-)
+#ifndef STATUS_LED_PIN
+  #define STATUS_LED_PIN          AUX8_PIN       // Default LED Cathode (-)
+#endif
+#define MOUNT_STATUS_LED_PIN      STATUS_LED_PIN  // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN    STATUS_LED_PIN // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN    STATUS_LED_PIN // Default LED Cathode (-)
+#define RETICLE_LED_PIN           STATUS_LED_PIN // Default LED Cathode (-)
 
 // For a piezo buzzer
-#define STATUS_BUZZER_PIN         2
+#ifndef STATUS_BUZZER_PIN
+  #define STATUS_BUZZER_PIN       2
+#endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#define PPS_SENSE_PIN             AUX7_PIN       // PPS time source, GPS for example
+#ifndef PPS_SENSE_PIN
+  #define PPS_SENSE_PIN           AUX7_PIN       // PPS time source, GPS for example
+#endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN           AUX7_PIN
+#ifndef LIMIT_SENSE_PIN
+  #define LIMIT_SENSE_PIN         AUX7_PIN
+#endif
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN          12             // [must be low at boot 12]
@@ -62,7 +72,9 @@
 #define AXIS1_STEP_PIN            26
 #define AXIS1_DIR_PIN             16
 #define AXIS1_DECAY_PIN           AXIS1_M2_PIN
-#define AXIS1_SENSE_HOME_PIN      AUX3_PIN
+#ifndef AXIS1_SENSE_HOME_PIN
+  #define AXIS1_SENSE_HOME_PIN    AUX3_PIN
+#endif
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN          SHARED
@@ -73,7 +85,9 @@
 #define AXIS2_STEP_PIN            25
 #define AXIS2_DIR_PIN             27
 #define AXIS2_DECAY_PIN           AXIS2_M2_PIN
-#define AXIS2_SENSE_HOME_PIN      AUX4_PIN
+#ifndef AXIS2_SENSE_HOME_PIN
+  #define AXIS2_SENSE_HOME_PIN    AUX4_PIN
+#endif
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN          SHARED

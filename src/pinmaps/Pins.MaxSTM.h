@@ -60,27 +60,35 @@
 #define ADDON_RESET_PIN        OFF              // ESP8266 RST
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
-#define PEC_SENSE_PIN          PB1              // PEC Sense, analog or digital
+#ifndef PEC_SENSE_PIN
+  #define PEC_SENSE_PIN        PB1              // PEC Sense, analog or digital
+#endif
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_PIN         AUX0_PIN         // Default LED Cathode (-)
 #define MOUNT_STATUS_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN AUX0_PIN         // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN AUX0_PIN         // Default LED Cathode (-)
-#define RETICLE_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
+#ifndef RETICLE_LED_PIN
+  #define RETICLE_LED_PIN      AUX8_PIN         // Default LED Cathode (-)
+#endif
 
 // For a piezo buzzer
 #define STATUS_BUZZER_PIN      PA14             // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
-#ifdef MAXSTM_AUX0_PPS
-  #define PPS_SENSE_PIN        AUX0_PIN         // PPS time source, GPS for example (MaxSTM version 3.6)
-#else
-  #define PPS_SENSE_PIN        AUX2_PIN         // PPS time source, GPS for example (MaxSTM version 3.61 and later)
+#ifndef PPS_SENSE_PIN
+  #ifdef MAXSTM_AUX0_PPS
+    #define PPS_SENSE_PIN      AUX0_PIN         // PPS time source, GPS for example (MaxSTM version 3.6)
+  #else
+    #define PPS_SENSE_PIN      AUX2_PIN         // PPS time source, GPS for example (MaxSTM version 3.61 and later)
+  #endif
 #endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#define LIMIT_SENSE_PIN        AUX7_PIN
+#ifndef LIMIT_SENSE_PIN
+  #define LIMIT_SENSE_PIN      AUX7_PIN
+#endif
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN       OFF
@@ -91,7 +99,9 @@
 #define AXIS1_STEP_PIN         PB10
 #define AXIS1_DIR_PIN          PB2
 #define AXIS1_DECAY_PIN        AXIS1_M2_PIN
-#define AXIS1_SENSE_HOME_PIN   AUX3_PIN
+#ifndef AXIS1_SENSE_HOME_PIN
+  #define AXIS1_SENSE_HOME_PIN AUX3_PIN
+#endif
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       OFF
@@ -102,7 +112,9 @@
 #define AXIS2_STEP_PIN         PA4
 #define AXIS2_DIR_PIN          PB0
 #define AXIS2_DECAY_PIN        AXIS2_M2_PIN
-#define AXIS2_SENSE_HOME_PIN   AUX4_PIN
+#ifndef AXIS2_SENSE_HOME_PIN
+  #define AXIS2_SENSE_HOME_PIN AUX4_PIN
+#endif
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       OFF

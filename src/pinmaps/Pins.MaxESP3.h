@@ -61,7 +61,9 @@
 #define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
-#define RETICLE_LED_PIN         STATUS_LED_PIN   // Default LED Cathode (-)
+#ifndef RETICLE_LED_PIN 
+  #define RETICLE_LED_PIN       STATUS_LED_PIN   // Default LED Cathode (-)
+#endif
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
