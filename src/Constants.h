@@ -5,11 +5,7 @@
 // Configuration options ----------------------------------------------------------------------------------------------------
 
 // PINMAPS
-#define PINMAP_FIRST                1
-#define Classic                     1      // original pin-map
-#define ClassicShield               2      // " for Steve's shield where ST4 port is on the Mega2560's "alternate pins"
-#define ClassicInstein              3      // "  w/Instein ST4 port... this isn't tested, I have no idea if it's safe to use!
-
+#define PINMAP_FIRST                4
 #define InsteinESP1                 4      // ESP32 Instein PINMAP (latest variant September/2020)
 
 #define FYSETC_S6                   15     // FYSETC S6 Version 1.2, 3D printer board, a 6-axis design
@@ -27,7 +23,6 @@
 #define MaxSTM3                     43     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
 #define MaxSTM3I                    44     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
-#define MaxESP2                     50     // similar to MaxPCB2 except 3 axes and uses cheaper/more available ESP32 MCU
 #define MaxESP3                     51     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
 #define GregsESP32                  52
 #define CNC3                        53     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)

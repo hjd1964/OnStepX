@@ -2,10 +2,6 @@
 // Loads pinmap model for current configuration
 #pragma once
 
-#if PINMAP == Classic
-  #define PINMAP_STR "Classic"
-  #include "Pins.Classic.h"
-#endif
 #if PINMAP == MiniPCB
   #define PINMAP_STR "MiniPCB v1"
   #include "Pins.MiniPCB.h"
@@ -34,10 +30,6 @@
     #define PINMAP_STR "MaxPCB v3"
     #include "Pins.MaxPCB3.h"
   #endif
-#endif
-#if PINMAP == MaxESP2
-  #define PINMAP_STR "MaxESP v2"
-  #include "Pins.MaxESP2.h"
 #endif
 #if PINMAP == MaxESP3
   #define PINMAP_STR "MaxESP v3"
