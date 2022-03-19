@@ -43,14 +43,14 @@
 #ifndef STATUS_LED_PIN
   #define STATUS_LED_PIN          AUX8_PIN       // Default LED Cathode (-)
 #endif
-#define MOUNT_STATUS_LED_PIN      STATUS_LED_PIN  // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN      STATUS_LED_PIN // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN    STATUS_LED_PIN // Default LED Cathode (-)
 #define STATUS_FOCUSER_LED_PIN    STATUS_LED_PIN // Default LED Cathode (-)
 #define RETICLE_LED_PIN           STATUS_LED_PIN // Default LED Cathode (-)
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-  #define STATUS_BUZZER_PIN       2
+  #define STATUS_BUZZER_PIN       2              // [must be low at boot 2]
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
@@ -80,7 +80,7 @@
 #define AXIS2_ENABLE_PIN          SHARED
 #define AXIS2_M0_PIN              32             // SPI MOSI
 #define AXIS2_M1_PIN              33             // SPI SCK
-#define AXIS2_M2_PIN              0              // SPI CS (UART TX)
+#define AXIS2_M2_PIN              0              // [must be high at boot 0] SPI CS (UART TX)
 #define AXIS2_M3_PIN              AUX2_PIN       // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN            25
 #define AXIS2_DIR_PIN             27
@@ -117,10 +117,10 @@
 #define AXIS5_DIR_PIN             14
 
 // ST4 interface
-#define ST4_RA_W_PIN              34             // ST4 RA- West [input only 34]
+#define ST4_RA_W_PIN              34             // [input only 34] ST4 RA- West
 #define ST4_DEC_S_PIN             18             // ST4 DE- South
 #define ST4_DEC_N_PIN             4              // ST4 DE+ North
-#define ST4_RA_E_PIN              35             // ST4 RA+ East [input only 35]
+#define ST4_RA_E_PIN              35             // [input only 35] ST4 RA+ East
 
 #else
 #error "Wrong processor for this configuration!"

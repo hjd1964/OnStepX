@@ -18,16 +18,16 @@
 
 #ifdef TMC2209_USE_HARDWARE_SERIAL
   // Use the following settings for any TMC2209 that may be present
-  #define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
-  #define SERIAL_TMC_BAUD         460800           // Baud rate
-  #define SERIAL_TMC_TX           23               // Transmit data
-  #define SERIAL_TMC_RX           39               // Recieving data
-  #define SERIAL_TMC_HARDCODED                     // Use hard-coded MS1/MS2 addresses for all drivers, sets M0/M1 to high
+  #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
+  #define SERIAL_TMC_BAUD       460800           // Baud rate
+  #define SERIAL_TMC_TX         23               // Transmit data
+  #define SERIAL_TMC_RX         39               // Recieving data
+  #define SERIAL_TMC_HARDCODED                   // Use hard-coded MS1/MS2 addresses for all drivers, sets M0/M1 to high
 #else
   // Use the following settings for any TMC2209 that may be present
-  #define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
-  #define SERIAL_TMC_BAUD         115200           // Baud rate
-  #define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+  #define SERIAL_TMC            SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+  #define SERIAL_TMC_BAUD       115200           // Baud rate
+  #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
 #endif
 
 // Hint that the direction pins are shared
@@ -51,7 +51,7 @@
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
 #ifndef PEC_SENSE_PIN
-  #define PEC_SENSE_PIN         36               // PEC Sense, analog (A0) or digital (GPIO36)
+  #define PEC_SENSE_PIN         36               // [input only 36] PEC Sense, analog (A0) or digital (GPIO36)
 #endif
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
@@ -76,20 +76,20 @@
 #endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
-#ifdef LIMIT_SENSE_PIN
+#ifndef LIMIT_SENSE_PIN
   #define LIMIT_SENSE_PIN       AUX7_PIN
 #endif
 
 // Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN        12
+#define AXIS1_ENABLE_PIN        12               // [must be low at boot 12]
 #define AXIS1_M0_PIN            13               // SPI MOSI
 #define AXIS1_M1_PIN            14               // SPI SCK
 #define AXIS1_M2_PIN            23               // SPI CS (UART TX)
 #define AXIS1_M3_PIN            AUX2_PIN         // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          18
-#define AXIS1_DIR_PIN           0
+#define AXIS1_DIR_PIN           0                // [must be high at boot 0]
 #define AXIS1_DECAY_PIN         AXIS1_M2_PIN
-#ifdef AXIS1_SENSE_HOME_PIN
+#ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
 
@@ -102,7 +102,7 @@
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
 #define AXIS2_DECAY_PIN         AXIS2_M2_PIN
-#ifdef AXIS2_SENSE_HOME_PIN
+#ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
 
@@ -112,11 +112,11 @@
 #define AXIS3_M1_PIN            OFF              // SPI SCK
 #define AXIS3_M2_PIN            OFF              // SPI CS (UART TX)
 #define AXIS3_M3_PIN            OFF              // SPI MISO (UART RX)
-#define AXIS3_STEP_PIN          2
+#define AXIS3_STEP_PIN          2                // [must be low at boot 2]
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#ifdef TMC2209_USE_HARDWARE_SERIAL
+#ifndef TMC2209_USE_HARDWARE_SERIAL
   #define AXIS4_ENABLE_PIN      OFF
 #else
   #define AXIS4_ENABLE_PIN      AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation
@@ -138,10 +138,10 @@
 #define AXIS5_DIR_PIN           15
 
 // ST4 interface
-#define ST4_RA_W_PIN            34               // ST4 RA- West
+#define ST4_RA_W_PIN            34               // [input only 34] ST4 RA- West
 #define ST4_DEC_S_PIN           32               // ST4 DE- South
 #define ST4_DEC_N_PIN           33               // ST4 DE+ North
-#define ST4_RA_E_PIN            35               // ST4 RA+ East
+#define ST4_RA_E_PIN            35               // [input only 35] ST4 RA+ East
 
 #else
 #error "Wrong processor for this configuration!"
