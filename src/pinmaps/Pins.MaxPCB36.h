@@ -27,113 +27,113 @@
 #endif
 
 // Use the following settings for any TMC UART driver (TMC2209) that may be present
-#define SERIAL_TMC              SoftSerial  // Use software serial with RX on M2 and TX on M3 of axis
-#define SERIAL_TMC_BAUD         230400      // Baud rate
-#define SERIAL_TMC_NO_RX                    // Recieving data doesn't work with software serial
+#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+#define SERIAL_TMC_BAUD         230400           // Baud rate
+#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX0_PIN               23               // Status LED
-#define AUX2_PIN               20               // PPS
-#define AUX3_PIN               21               // Home SW
-#define AUX4_PIN               22               // 1-Wire, Home SW
-#define AUX5_PIN               1                // TX1 
-#define AUX6_PIN               0                // RX1
-#define AUX7_PIN               9                // Limit SW
-#define AUX8_PIN               10               // Status2 LED, Reticle LED
+#define AUX0_PIN                23               // Status LED
+#define AUX2_PIN                20               // PPS
+#define AUX3_PIN                21               // Home SW
+#define AUX4_PIN                22               // 1-Wire, Home SW
+#define AUX5_PIN                1                // TX1 
+#define AUX6_PIN                0                // RX1
+#define AUX7_PIN                9                // Limit SW
+#define AUX8_PIN                10               // Status2 LED, Reticle LED
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN         AUX4_PIN         // Default Pin for OneWire bus (note: this pin has a 0.1uF capacitor that must be removed for OneWire to function)
+  #define ONE_WIRE_PIN          AUX4_PIN         // Default Pin for OneWire bus (note: this pin has a 0.1uF capacitor that must be removed for OneWire to function)
 #endif
-#define ADDON_GPIO0_PIN        OFF              // ESP8266 GPIO0 (shared with AXIS2_DIR_PIN)
-#define ADDON_RESET_PIN        OFF              // ESP8266 RST
+#define ADDON_GPIO0_PIN         OFF              // ESP8266 GPIO0 (shared with AXIS2_DIR_PIN)
+#define ADDON_RESET_PIN         OFF              // ESP8266 RST
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
-#define PEC_SENSE_PIN          2                // PEC Sense, analog or digital
+#define PEC_SENSE_PIN           2                // PEC Sense, analog or digital
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
-#define STATUS_LED_PIN         AUX0_PIN         // Default LED Cathode (-)
-#define MOUNT_STATUS_LED_PIN   AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_ROTATOR_LED_PIN AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_FOCUSER_LED_PIN AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_LED_PIN          AUX0_PIN         // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN    AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
-  #define RETICLE_LED_PIN      AUX8_PIN         // Default LED Cathode (-)
+  #define RETICLE_LED_PIN       AUX8_PIN         // Default LED Cathode (-)
 #endif
 
 // For a piezo buzzer
-#define STATUS_BUZZER_PIN      17               // Tone
+#define STATUS_BUZZER_PIN       17               // Tone
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #ifndef PPS_SENSE_PIN
-  #define PPS_SENSE_PIN        AUX2_PIN         // PPS time source, GPS for example (MaxSTM version 3.61 and later)
+  #define PPS_SENSE_PIN         AUX2_PIN         // PPS time source, GPS for example (MaxSTM version 3.61 and later)
 #endif
 
 // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
 #ifndef LIMIT_SENSE_PIN
-  #define LIMIT_SENSE_PIN      AUX7_PIN
+  #define LIMIT_SENSE_PIN       AUX7_PIN
 #endif
 
 // Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN       33
-#define AXIS1_M0_PIN           34               // SPI MOSI
-#define AXIS1_M1_PIN           35               // SPI SCK
-#define AXIS1_M2_PIN           36               // SPI CS (UART TX)
-#define AXIS1_M3_PIN           37               // SPI MISO (UART RX)
-#define AXIS1_STEP_PIN         38
-#define AXIS1_DIR_PIN          39
-#define AXIS1_DECAY_PIN        AXIS1_M2_PIN
+#define AXIS1_ENABLE_PIN        33
+#define AXIS1_M0_PIN            34               // SPI MOSI
+#define AXIS1_M1_PIN            35               // SPI SCK
+#define AXIS1_M2_PIN            36               // SPI CS (UART TX)
+#define AXIS1_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS1_STEP_PIN          38
+#define AXIS1_DIR_PIN           39
+#define AXIS1_DECAY_PIN         AXIS1_M2_PIN
 #ifndef AXIS1_SENSE_HOME_PIN
-  #define AXIS1_SENSE_HOME_PIN AUX3_PIN
+  #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
 
 // Axis2 Dec/Alt step/dir driver
-#define AXIS2_ENABLE_PIN       40
-#define AXIS2_M0_PIN           41               // SPI MOSI
-#define AXIS2_M1_PIN           13               // SPI SCK
-#define AXIS2_M2_PIN           14               // SPI CS (UART TX)
-#define AXIS2_M3_PIN           37               // SPI MISO (UART RX)
-#define AXIS2_STEP_PIN         15
-#define AXIS2_DIR_PIN          16
-#define AXIS2_DECAY_PIN        AXIS2_M2_PIN
+#define AXIS2_ENABLE_PIN        40
+#define AXIS2_M0_PIN            41               // SPI MOSI
+#define AXIS2_M1_PIN            13               // SPI SCK
+#define AXIS2_M2_PIN            14               // SPI CS (UART TX)
+#define AXIS2_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS2_STEP_PIN          15
+#define AXIS2_DIR_PIN           16
+#define AXIS2_DECAY_PIN         AXIS2_M2_PIN
 #ifndef AXIS2_SENSE_HOME_PIN
-  #define AXIS2_SENSE_HOME_PIN AUX4_PIN
+  #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
 
 // For rotator stepper driver
-#define AXIS3_ENABLE_PIN       11
-#define AXIS3_M0_PIN           12               // SPI MOSI
-#define AXIS3_M1_PIN           24               // SPI SCK
-#define AXIS3_M2_PIN           25               // SPI CS (UART TX)
-#define AXIS3_M3_PIN           37               // SPI MISO (UART RX)
-#define AXIS3_STEP_PIN         26
-#define AXIS3_DIR_PIN          27
-#define AXIS3_DECAY_PIN        AXIS3_M2_PIN
+#define AXIS3_ENABLE_PIN        11
+#define AXIS3_M0_PIN            12               // SPI MOSI
+#define AXIS3_M1_PIN            24               // SPI SCK
+#define AXIS3_M2_PIN            25               // SPI CS (UART TX)
+#define AXIS3_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS3_STEP_PIN          26
+#define AXIS3_DIR_PIN           27
+#define AXIS3_DECAY_PIN         AXIS3_M2_PIN
 
 // For focuser1 stepper driver
-#define AXIS4_ENABLE_PIN       28
-#define AXIS4_M0_PIN           29               // SPI MOSI
-#define AXIS4_M1_PIN           30               // SPI SCK
-#define AXIS4_M2_PIN           31               // SPI CS (UART TX)
-#define AXIS4_M3_PIN           37               // SPI MISO (UART RX)
-#define AXIS4_STEP_PIN         32
-#define AXIS4_DIR_PIN          27
-#define AXIS4_DECAY_PIN        AXIS4_M2_PIN
+#define AXIS4_ENABLE_PIN        28
+#define AXIS4_M0_PIN            29               // SPI MOSI
+#define AXIS4_M1_PIN            30               // SPI SCK
+#define AXIS4_M2_PIN            31               // SPI CS (UART TX)
+#define AXIS4_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS4_STEP_PIN          32
+#define AXIS4_DIR_PIN           27
+#define AXIS4_DECAY_PIN         AXIS4_M2_PIN
 
 // For focuser2 stepper driver
-#define AXIS5_ENABLE_PIN       11
-#define AXIS5_M0_PIN           12               // SPI MOSI
-#define AXIS5_M1_PIN           24               // SPI SCK
-#define AXIS5_M2_PIN           25               // SPI CS (UART TX)
-#define AXIS5_M3_PIN           37               // SPI MISO (UART RX)
-#define AXIS5_STEP_PIN         26
-#define AXIS5_DIR_PIN          27
-#define AXIS5_DECAY_PIN        AXIS5_M2_PIN
+#define AXIS5_ENABLE_PIN        11
+#define AXIS5_M0_PIN            12               // SPI MOSI
+#define AXIS5_M1_PIN            24               // SPI SCK
+#define AXIS5_M2_PIN            25               // SPI CS (UART TX)
+#define AXIS5_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS5_STEP_PIN          26
+#define AXIS5_DIR_PIN           27
+#define AXIS5_DECAY_PIN         AXIS5_M2_PIN
 
 // ST4 interface
-#define ST4_RA_W_PIN           3                // ST4 RA- West
-#define ST4_DEC_S_PIN          4                // ST4 DE- South
-#define ST4_DEC_N_PIN          5                // ST4 DE+ North
-#define ST4_RA_E_PIN           6                // ST4 RA+ East
+#define ST4_RA_W_PIN            3                // ST4 RA- West
+#define ST4_DEC_S_PIN           4                // ST4 DE- South
+#define ST4_DEC_N_PIN           5                // ST4 DE+ North
+#define ST4_RA_E_PIN            6                // ST4 RA+ East
 
 #else
 #error "Wrong processor for this configuration!"
