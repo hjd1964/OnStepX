@@ -5,31 +5,29 @@
 // Configuration options ----------------------------------------------------------------------------------------------------
 
 // PINMAPS
-#define PINMAP_FIRST                4
-#define InsteinESP1                 4      // ESP32 Instein PINMAP (latest variant September/2020)
+#define PINMAP_FIRST                1
 
-#define FYSETC_S6                   15     // FYSETC S6 Version 1.2, 3D printer board, a 6-axis design
-#define FYSETC_S6_1                 15     // FYSETC S6 Version 1.2
-#define FYSETC_S6_2                 16     // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design
+#define FYSETC_S6                   1      // FYSETC S6 Version 1.2, 3D printer board, a 6-axis design
+#define FYSETC_S6_1                 2      // FYSETC S6 Version 1.2
+#define FYSETC_S6_2                 3      // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design
 
-#define MiniPCB                     20     // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
-#define MiniPCB13                   21     // improved version 1.3 adds better support for ESP-01 flashing and optional I2C
+#define MiniPCB                     4      // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
+#define MiniPCB13                   5      // improved version 1.3 adds better support for ESP-01 flashing and optional I2C
 
-#define MiniPCB2                    30     // 2-axis design for small alum. case, Teensy3.2
+#define MiniPCB2                    6      // 2-axis design for small alum. case, Teensy3.2
 
-#define MaxPCB                      40     // first generation custom 4-axis board, Teensy3.5/Teensy3.6
-#define MaxPCB2                     41     // improved second generation for alum. case, Teensy3.5/Teensy3.6
-#define MaxPCB3                     42     // improved third generation for alum. case, Teensy4.1
-#define MaxSTM3                     43     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
-#define MaxSTM3I                    44     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
+#define MaxPCB                      7      // first generation custom 4-axis board, Teensy3.5/Teensy3.6
+#define MaxPCB2                     8      // improved second generation for alum. case, Teensy3.5/Teensy3.6
+#define MaxPCB3                     9      // improved third generation for alum. case, Teensy4.1
+#define MaxSTM3                     10     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
+#define MaxSTM3I                    11     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
-#define MaxESP3                     51     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
-#define GregsESP32                  52
-#define CNC3                        53     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MaxESP3                     12     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
+#define CNC3                        13     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
 
-#define STM32Blue                   60     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define STM32Blue                   14     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 60
+#define PINMAP_LAST                 14
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1

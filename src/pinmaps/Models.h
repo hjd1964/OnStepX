@@ -35,10 +35,6 @@
   #define PINMAP_STR "MaxESP v3"
   #include "Pins.MaxESP3.h"
 #endif
-#if PINMAP == GregsESP32
-  #define PINMAP_STR "GregsESP32"
-  #include "Pins.GregsESP32.h"
-#endif
 #if PINMAP == CNC3
   #define PINMAP_STR "CNC v3"
   #include "Pins.CNC3.h"
@@ -58,14 +54,6 @@
 #if PINMAP == MaxSTM3 || PINMAP == MaxSTM3I
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
-#endif
-#if PINMAP == ClassicInstein
-  #define PINMAP_STR "Classic (Instein)"
-  #include "Pins.Classic.h"
-#endif
-#if PINMAP == InsteinESP1
-  #define PINMAP_STR "Instein (ESP32)"
-  #include "Pins.InsteinESP1.h"
 #endif
 
 // all unassigned pins OFF
