@@ -11,10 +11,12 @@
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial0: RX Pin GPIO3, TX Pin GPIO1 (to USB serial adapter)
 // Serial1: RX1 Pin GPIO10, TX1 Pin GPIO9 (on SPI Flash pins, must be moved to be used)
-// Serial2: RX2 Pin GPIO16, TX2 Pin GPIO17
+// Serial2: RX2 Pin GPIO13, TX2 Pin GPIO5
 
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              Serial2
+  #define SERIAL_B_RX           13
+  #define SERIAL_B_TX           5
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
