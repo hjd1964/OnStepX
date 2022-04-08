@@ -180,13 +180,13 @@ CommandError Guide::startHome(unsigned long guideTimeLimit) {
       axis1.setFrequencySlew(goTo.rate);
       guideActionAxis1 = GA_HOME;
       guideFinishTimeAxis1 = millis() + guideTimeLimit; 
-      axis1.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
+      axis1.autoSlewHome((PI/goTo.rate)*1000.0F);
     #endif
 
     axis2.setFrequencySlew(goTo.rate);
     guideActionAxis2 = GA_HOME;
     guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-    axis2.autoSlewHome((HALF_PI/goTo.rate)*1000.0F);
+    axis2.autoSlewHome((PI/goTo.rate)*1000.0F);
   #endif
   return CE_NONE;
 }
