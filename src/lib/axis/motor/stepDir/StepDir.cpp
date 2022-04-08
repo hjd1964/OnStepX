@@ -7,20 +7,23 @@
 
 #include "../../../tasks/OnTask.h"
 
-StepDirMotor::StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver) {
+StepDirMotor::StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver, bool useFastHardwareTimers) {
   axisPrefix[10] = '0' + axisNumber;
   driverType = STEP_DIR;
   this->axisNumber = axisNumber;
   this->Pins = Pins;
   this->driver = driver;
+  this->useFastHardwareTimers = useFastHardwareTimers;
 }
 
 bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (*volatile moveFR)()) {
   this->_move = move;
-  this->_moveFF = moveFF;
-  this->_moveFR = moveFR;
   if (_move == NULL) { D(axisPrefix); DLF("nothing to do exiting!"); return false; }
 
+  this->_moveFF = moveFF;
+  this->_moveFR = moveFR;
+  if (_moveFF == NULL || _moveFR == NULL) useFastCalls = false; else useFastCalls = true;
+ 
   // get the axis monitor handle, by name
   char taskName[] = "Ax_Mtr";
   taskName[2] = axisNumber + '0';
@@ -65,7 +68,7 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
   taskHandle = tasks.add(0, 0, true, 0, _move, timerName);
   if (taskHandle) {
     V("success");
-    if (axisNumber <= 2) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
+    if (axisNumber <= 2 && useFastHardwareTimers) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
     VL("");
   } else { VLF("FAILED!"); return false; }
 
@@ -152,7 +155,9 @@ void StepDirMotor::setFrequencySteps(float frequency) {
 
     if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
     if (microstepModeControl == MMC_SLEWING_READY) {
-      V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms");
+      #if DEBUG == VERBOSE
+        if (useFastCalls) { V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms"); }
+      #endif
       microstepModeControl = MMC_SLEWING;
     }
 
@@ -219,7 +224,7 @@ void StepDirMotor::setSlewing(bool state) {
 
 // swaps in/out fast unidirectional ISR for slewing 
 bool StepDirMotor::enableMoveFast(const bool fast) {
-  if (axisNumber <= 2) {
+  if (useFastCalls) {
     if (fast) {
       if (direction == dirRev) tasks.setCallback(taskHandle, _moveFR); else tasks.setCallback(taskHandle, _moveFF);
     } else tasks.setCallback(taskHandle, _move);

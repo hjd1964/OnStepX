@@ -176,28 +176,32 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
 bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
   if (!motor->validateParam(a.param1, a.param2, a.param3, a.param4, a.param5, a.param6)) return false;
 
-  int index = axisNum - 1;
-  if (index > 3) index = 3;
-  int   MinLimitL[4]   = {    -360,      -90,    -360,     0};
-  int   MinLimitH[4]   = {     -90,        0,       0,   500};
-  int   MaxLimitL[4]   = {      90,        0,       0,     0};
-  int   MaxLimitH[4]   = {     360,       90,     360,   500};
-  float StepsLimitL[4] = {   150.0,    150.0,     5.0, 0.005};
-  float StepsLimitH[4] = {360000.0, 360000.0, 36000.0, 100.0};
+  int minLimitL, minLimitH, maxLimitL, maxLimitH;
+  float stepsLimitL, stepsLimitH;
 
-  if (axisNum <= 2) {
-    // convert axis1 & 2 into degrees
+  if (unitsStr[0] == 'u') {
+    minLimitL = 0;
+    minLimitH = 500000;
+    maxLimitL = 0;
+    maxLimitH = 500000;
+    stepsLimitL = 0.001;
+    stepsLimitH = 1000.0;
+  } else {
+    minLimitL = -360;
+    minLimitH = 360;
+    maxLimitL = -360;
+    maxLimitH = 360;
+    stepsLimitL = 1.0;
+    stepsLimitH = 360000.0;
+  }
+
+  if (unitsRadians) {
     a.stepsPerMeasure /= RAD_DEG_RATIO;
     a.limits.min = radToDegF(a.limits.min);
     a.limits.max = radToDegF(a.limits.max);
-  } else
-  if (axisNum > 3) {
-    // convert axis > 3 min/max into mm
-    a.limits.min = a.limits.min/1000.0F;
-    a.limits.max = a.limits.max/1000.0F;
   }
 
-  if (a.stepsPerMeasure < StepsLimitL[index] || a.stepsPerMeasure > StepsLimitH[index]) {
+  if (a.stepsPerMeasure < stepsLimitL || a.stepsPerMeasure > stepsLimitH) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad stepsPerMeasure="); DL(a.stepsPerMeasure);
     return false;
   }
@@ -207,12 +211,12 @@ bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
     return false;
   }
 
-  if (a.limits.min < MinLimitL[index] || a.limits.min > MinLimitH[index]) {
+  if (a.limits.min < minLimitL || a.limits.min > minLimitH) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad min="); DL(a.limits.min);
     return false;
   }
 
-  if (a.limits.max < MaxLimitL[index] || a.limits.max > MaxLimitH[index]) {
+  if (a.limits.max < maxLimitL || a.limits.max > maxLimitH) {
     DF("ERR, Axis::validateAxisSettings(): Axis"); D(axisNum); DF(" bad max="); DL(a.limits.max); 
     return false;
   }

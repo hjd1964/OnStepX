@@ -35,7 +35,7 @@ bool Ds2413::init() {
         index++;
         #if DEBUG == VERBOSE
           detected = true;
-          VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (addressFound[j] < 16) { V("0"); } SERIAL_DEBUG.print(addressFound[j], HEX); }
+          VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (addressFound[j] < 16) { V("0"); } if (DEBUG != OFF) SERIAL_DEBUG.print(addressFound[j], HEX); }
           if (index <= 1) { VF(" auto-assigned to FEATURE"); V((index - 1)*2 + 1); V("_PIN"); } else { VF(" not assigned"); }
           VL("");
         #endif

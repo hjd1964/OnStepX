@@ -9,13 +9,14 @@
 #include "../Motor.h"
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control) {
+ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control, bool useFastHardwareTimers) {
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->enc = enc;
   this->feedback = feedback;
   this->control = control;
   this->driver = driver;
+  this->useFastHardwareTimers = useFastHardwareTimers;
   driverType = SERVO;
 
   // get the feedback control loop ready
@@ -48,7 +49,7 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   taskHandle = tasks.add(0, 0, true, 0, _move, timerName);
   if (taskHandle) {
     V("success");
-    if (axisNumber <= 2) {
+    if (axisNumber <= 2 && useFastHardwareTimers) {
       if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) {
         VF(" (no hardware timer!)");
       }

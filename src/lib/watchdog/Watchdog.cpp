@@ -17,8 +17,8 @@ void Watchdog::enable(int seconds) {
     uint8_t handle = tasks.add(100, 0, true, 0, watchdogWrapper, "wdog");
     if (handle) {
       VLF("success");
-      if (tasks.requestHardwareTimer(handle, 2)) { VF(" (no hardware timer!)"); }
-    } else { VLF("FAILED!"); }
+      tasks.requestHardwareTimer(handle, 3);
+    }
   }
   enabled = true;
 }

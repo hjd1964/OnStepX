@@ -9,12 +9,19 @@
 #ifdef MOTOR_PRESENT
 
 // constructor
-Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings) {
+Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
 
   this->pins = pins;
   this->settings = *settings;
+
+  switch (axisMeasure) {
+    case AXIS_MEASURE_UNKNOWN: strcpy(unitsStr, "?");  unitsRadians = false; break;
+    case AXIS_MEASURE_MICRONS: strcpy(unitsStr, "um"); unitsRadians = false; break;
+    case AXIS_MEASURE_DEGREES: strcpy(unitsStr, "°");  unitsRadians = false; break;
+    case AXIS_MEASURE_RADIANS: strcpy(unitsStr, "°");  unitsRadians = true;  break;
+  } 
 }
 
 // sets up the driver step/dir/enable pins and any associated driver mode control
@@ -64,7 +71,8 @@ void Axis::init(Motor *motor, void (*callback)()) {
     V(axisPrefix); VF("stepsPerMeasure="); V(settings.stepsPerMeasure);
     V(", reverse="); if (settings.reverse == OFF) VLF("OFF"); else if (settings.reverse == ON) VLF("ON"); else VLF("?");
     V(axisPrefix); VF("backlash takeup frequency set to ");
-    if (axisNumber <= 3) { V(radToDegF(settings.backlashFreq)); VLF(" deg/sec."); } else { V(settings.backlashFreq); VLF(" microns/sec."); }
+    if (unitsRadians) V(radToDegF(settings.backlashFreq)); else V(settings.backlashFreq);
+    V(unitsStr); VLF("/s");
   #endif
 
   // setup motor
@@ -272,9 +280,10 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
   rampFreq = 0.0F;
 
   #if DEBUG == VERBOSE
-    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("um/s/s"); }
+    if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
+    V(unitsStr); VF("/s, accel ");
+    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+    V(unitsStr); VLF("/s/s");
   #endif
 
   return CE_NONE;
@@ -305,9 +314,10 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
     VF("rev@ ");
   }
   #if DEBUG == VERBOSE
-    if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-    if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-    if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("um/s/s"); }
+    if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
+    V(unitsStr); VF("/s, accel ");
+    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+    V(unitsStr); VLF("/s/s");
   #endif
 
   return CE_NONE;
@@ -340,10 +350,12 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
       autoRate = AR_RATE_BY_TIME_REVERSE;
     }
     #if DEBUG == VERBOSE
-      if (axisNumber <= 2) { V(radToDeg(slewFreq)); V("°/s, accel "); SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-      if (axisNumber == 3) { V(slewFreq); V("°/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("°/s/s"); }
-      if (axisNumber > 3) { V(slewFreq); V("um/s, accel "); SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3); VLF("um/s/s"); }
+      if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
+      V(unitsStr); VF("/s, accel ");
+      if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+      V(unitsStr); VF("/s/s, timeout ");
     #endif
+    VL(timeout);
     homeTimeoutTime = millis() + timeout;
   }
   return CE_NONE;

@@ -15,7 +15,7 @@
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control);
+    ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
@@ -81,6 +81,8 @@ class ServoMotor : public Motor {
     Encoder *enc;
     Feedback *feedback;
     ServoControl *control;
+
+    bool useFastHardwareTimers = true;
 
     bool isSlewing = false;
 };

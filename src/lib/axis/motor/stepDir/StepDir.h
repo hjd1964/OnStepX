@@ -26,7 +26,7 @@ enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUE
 class StepDirMotor : public Motor {
   public:
     // constructor
-    StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver);
+    StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver, bool useFastHardwareTimers = true);
 
     // sets up the driver step/dir/enable pins
     bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
@@ -113,6 +113,9 @@ class StepDirMotor : public Motor {
     unsigned long switchStartTimeMs;    // log time to switch microstep mode and do ISR swap
 
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
+
+    bool useFastHardwareTimers = true;
+    bool useFastCalls = false;
 
     void (*_move)() = NULL;
     void (*_moveFF)() = NULL;

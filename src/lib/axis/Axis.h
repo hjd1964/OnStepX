@@ -76,11 +76,12 @@ typedef struct AxisErrors {
 
 enum AutoRate: uint8_t {AR_NONE, AR_RATE_BY_TIME_ABORT, AR_RATE_BY_TIME_END, AR_RATE_BY_DISTANCE, AR_RATE_BY_TIME_FORWARD, AR_RATE_BY_TIME_REVERSE};
 enum HomingStage: uint8_t {HOME_NONE, HOME_FINE, HOME_SLOW, HOME_FAST};
+enum AxisMeasure: uint8_t {AXIS_MEASURE_UNKNOWN, AXIS_MEASURE_MICRONS, AXIS_MEASURE_DEGREES, AXIS_MEASURE_RADIANS};
 
 class Axis {
   public:
     // constructor
-    Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings);
+    Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure);
 
     // process axis commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -299,6 +300,8 @@ class Axis {
 
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
+    char unitsStr[3] = "?";
+    bool unitsRadians = false;
 
     bool enabled = false;        // enable/disable logical state (disabled is powered down)
     bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
