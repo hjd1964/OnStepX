@@ -62,6 +62,7 @@ typedef struct AxisSettings {
 typedef struct AxisSense {
   int32_t    homeTrigger;
   int8_t     homeInit;
+  float      homeDistLimit;
   int32_t    minTrigger;
   int32_t    maxTrigger;
   int8_t     minMaxInit;
@@ -228,8 +229,11 @@ class Axis {
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlew(Direction direction, float frequency = NAN);
 
-    // slew to home, with acceleration in "measures" per second per second
-    CommandError autoSlewHome(unsigned long timeout);
+     // slew to home using home sensor, with acceleration in "measures" per second per second
+    CommandError autoSlewHome(unsigned long timeout = 0);
+
+    // check if a home sensor is available
+    inline bool hasHomeSense() { return pins->axisSense.homeTrigger != OFF; }
 
     // stops, with deacceleration by time
     void autoSlewStop();

@@ -177,7 +177,11 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rC#       Move rotator to half-travel target position
     //            Returns: Nothing
     if (command[1] == 'C') {
-      *commandError = gotoTarget(round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0));
+      if (AXIS3_SENSE_HOME != OFF) {
+        axis3.autoSlewHome();
+      } else {
+        *commandError = gotoTarget(round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0));
+      }
       *numericReply = false;
     } else
 

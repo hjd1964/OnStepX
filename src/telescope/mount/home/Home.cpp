@@ -49,9 +49,10 @@ CommandError Home::request() {
 
     VLF("MSG: Mount, moving to home");
 
-    if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
+    if (((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) ||
+         (AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF)) {
       isRequestWithReset = false;
-      guide.startHome(GUIDE_HOME_TIME_LIMIT*1000UL);
+      guide.startHome();
     } else {
       #if AXIS2_TANGENT_ARM == OFF
         state = HS_HOMING;

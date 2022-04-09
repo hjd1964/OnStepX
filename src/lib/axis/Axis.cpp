@@ -323,7 +323,7 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
   return CE_NONE;
 }
 
-// slew to home, with acceleration in "measures" per second per second
+// slew to home using home sensor, with acceleration in "measures" per second per second
 CommandError Axis::autoSlewHome(unsigned long timeout) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
@@ -349,6 +349,10 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
       VF("rev@ ");
       autoRate = AR_RATE_BY_TIME_REVERSE;
     }
+
+    // automatically set timeout if not specified
+    if (timeout == 0) timeout = (pins->axisSense.homeDistLimit/slewFreq)*1.2F*1000.0F;
+
     #if DEBUG == VERBOSE
       if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
       V(unitsStr); VF("/s, accel ");

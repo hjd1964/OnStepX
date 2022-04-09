@@ -175,6 +175,9 @@
 #ifndef AXIS1_SENSE_HOME_INIT
 #define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 #endif
+#ifndef AXIS1_SENSE_HOME_DIST_LIMIT
+#define AXIS1_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees
+#endif
 #ifndef AXIS1_SENSE_LIMIT_MIN
 #define AXIS1_SENSE_LIMIT_MIN         LIMIT_SENSE                 // HIGH/LOW to activate min limit
 #endif
@@ -298,6 +301,9 @@
 #endif
 #ifndef AXIS2_SENSE_HOME_INIT
 #define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+#endif
+#ifndef AXIS2_SENSE_HOME_DIST_LIMIT
+#define AXIS2_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees
 #endif
 #ifndef AXIS2_SENSE_LIMIT_MIN
 #define AXIS2_SENSE_LIMIT_MIN         LIMIT_SENSE                 // HIGH/LOW to activate min limit
@@ -515,9 +521,6 @@
 #ifndef GUIDE_TIME_LIMIT
 #define GUIDE_TIME_LIMIT              0                           // in seconds, 0 to disable
 #endif
-#ifndef GUIDE_HOME_TIME_LIMIT
-#define GUIDE_HOME_TIME_LIMIT         5*60                        // in seconds, for home switches
-#endif
 #ifndef GUIDE_DISABLE_BACKLASH
 #define GUIDE_DISABLE_BACKLASH        OFF                         // disables backlash while pulse-guiding
 #endif
@@ -637,6 +640,9 @@
 #endif
 #ifndef AXIS3_SENSE_HOME_INIT
 #define AXIS3_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
+#ifndef AXIS3_SENSE_HOME_DIST_LIMIT
+#define AXIS3_SENSE_HOME_DIST_LIMIT   180.0                       // max home sense distance in degrees
 #endif
 #ifndef AXIS3_SENSE_LIMIT_MIN
 #define AXIS3_SENSE_LIMIT_MIN         OFF
@@ -773,6 +779,9 @@
 #ifndef AXIS4_SENSE_HOME_INIT
 #define AXIS4_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
+#ifndef AXIS4_SENSE_HOME_DIST_LIMIT
+#define AXIS4_SENSE_HOME_DIST_LIMIT   50                          // max home sense distance in mm
+#endif
 #ifndef AXIS4_SENSE_LIMIT_MIN
 #define AXIS4_SENSE_LIMIT_MIN         OFF
 #endif
@@ -906,6 +915,9 @@
 #endif
 #ifndef AXIS5_SENSE_HOME_INIT
 #define AXIS5_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
+#ifndef AXIS5_SENSE_HOME_DIST_LIMIT
+#define AXIS5_SENSE_HOME_DIST_LIMIT   50
 #endif
 #ifndef AXIS5_SENSE_LIMIT_MIN
 #define AXIS5_SENSE_LIMIT_MIN         OFF
@@ -1041,6 +1053,9 @@
 #ifndef AXIS6_SENSE_HOME_INIT
 #define AXIS6_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
+#ifndef AXIS6_SENSE_HOME_DIST_LIMIT
+#define AXIS6_SENSE_HOME_DIST_LIMIT   50
+#endif
 #ifndef AXIS6_SENSE_LIMIT_MIN
 #define AXIS6_SENSE_LIMIT_MIN         OFF
 #endif
@@ -1174,6 +1189,9 @@
 #endif
 #ifndef AXIS7_SENSE_HOME_INIT
 #define AXIS7_SENSE_HOME_INIT         INPUT_PULLUP
+#endif
+#ifndef AXIS7_SENSE_HOME_DIST_LIMIT
+#define AXIS7_SENSE_HOME_DIST_LIMIT   50
 #endif
 #ifndef AXIS7_SENSE_LIMIT_MIN
 #define AXIS7_SENSE_LIMIT_MIN         OFF
@@ -1309,6 +1327,9 @@
 #ifndef AXIS8_SENSE_HOME_INIT
 #define AXIS8_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
+#ifndef AXIS8_SENSE_HOME_DIST_LIMIT
+#define AXIS8_SENSE_HOME_DIST_LIMIT   50
+#endif
 #ifndef AXIS8_SENSE_LIMIT_MIN
 #define AXIS8_SENSE_LIMIT_MIN         OFF
 #endif
@@ -1443,6 +1464,9 @@
 #ifndef AXIS9_SENSE_HOME_INIT
 #define AXIS9_SENSE_HOME_INIT         INPUT_PULLUP
 #endif
+#ifndef AXIS9_SENSE_HOME_DIST_LIMIT
+#define AXIS9_SENSE_HOME_DIST_LIMIT   50
+#endif
 #ifndef AXIS9_SENSE_LIMIT_MIN
 #define AXIS9_SENSE_LIMIT_MIN         OFF
 #endif
@@ -1535,10 +1559,10 @@
 #endif
 
 #ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE           OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
+#define FOCUSER_TEMPERATURE             OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
 #endif
 #ifndef FOCUSER_TEMPERATURE_PIN
-#define FOCUSER_TEMPERATURE_PIN       OFF                         // for thermistors, analog pin
+#define FOCUSER_TEMPERATURE_PIN         OFF                         // for thermistors, analog pin
 #endif
 
 #if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \

@@ -307,9 +307,13 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :Fh#       Move focuser target position to half-travel
     //            Returns: Nothing
     if (command[1] == 'h') {
-      long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-      *commandError = gotoTarget(index, t);
-      *numericReply = false;
+      if (axes[index]->hasHomeSense()) {
+        axes[index]->autoSlewHome();
+      } else {
+        long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
+        *commandError = gotoTarget(index, t);
+        *numericReply = false;
+      }
     } else *commandError = CE_CMD_UNKNOWN;
 
   } else return false;

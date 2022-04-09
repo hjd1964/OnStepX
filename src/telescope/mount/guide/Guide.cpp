@@ -171,22 +171,20 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
 }
 
 // start guide home (for use with home switches)
-CommandError Guide::startHome(unsigned long guideTimeLimit) {
+CommandError Guide::startHome() {
   #if SLEW_GOTO == ON
     // use guiding and switches to find home
     guide.state = GU_HOME_GUIDE;
 
     #if AXIS2_TANGENT_ARM == OFF
-      axis1.setFrequencySlew(goTo.rate);
       guideActionAxis1 = GA_HOME;
-      guideFinishTimeAxis1 = millis() + guideTimeLimit; 
-      axis1.autoSlewHome((PI/goTo.rate)*1000.0F);
+      axis1.setFrequencySlew(goTo.rate);
+      axis1.autoSlewHome();
     #endif
 
-    axis2.setFrequencySlew(goTo.rate);
     guideActionAxis2 = GA_HOME;
-    guideFinishTimeAxis2 = millis() + guideTimeLimit; 
-    axis2.autoSlewHome((PI/goTo.rate)*1000.0F);
+    axis2.setFrequencySlew(goTo.rate);
+    axis2.autoSlewHome();
   #endif
   return CE_NONE;
 }
