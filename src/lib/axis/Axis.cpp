@@ -480,7 +480,7 @@ void Axis::poll() {
           float f = fabs(slewFreq)/6.0F;
           if (f < 0.0003F) f = 0.0003F;
           setFrequencySlew(f);
-          autoSlewHome(30000);
+          autoSlewHome(SLEW_HOME_REFINE_TIME_LIMIT * 1000);
         } else {
           V(axisPrefix); VLF("slew stopped");
         }

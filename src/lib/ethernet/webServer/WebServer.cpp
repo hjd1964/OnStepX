@@ -45,7 +45,7 @@
 
       webServer = new EthernetServer(port);
       webServer->begin();
-      Ethernet.setRetransmissionCount(4);
+      Ethernet.setRetransmissionCount(8);
       Ethernet.setRetransmissionTimeout(25);
       VF("MSG: Ethernet started web server on port "); VL(port);
     }
@@ -55,7 +55,8 @@
     client = webServer->available();
 
     if (client) {
-      WL("MSG: Webserver new client");
+      WLF("--------------------------------------------------");
+      WF("MSG: Webserver new client, socket "); WL(client.getSocketNumber());
 
       parameter_count = 0;
       String line = "";
@@ -128,7 +129,6 @@
       if (handler_number >= 0) {
         if (handlers[handler_number] != NULL) {
           WF("MSG: Webserver running handler# "); WL(handler_number);
-         // client.print(responseHeader);
           (*handlers[handler_number])();
           handlerFound = true;
         } else {
@@ -164,7 +164,7 @@
           #endif
         }
       }
-      
+
       // handle page not found
       if (!handlerFound && notFoundHandler != NULL) {
         WLF("MSG: Webserver didn't find handler");
@@ -307,7 +307,7 @@
   }
 
   void WebServer::on(String fn, webFunction handler) {
-    handler_count++; if (handler_count > HANDLER_COUNT_MAX) { handler_count = HANDLER_COUNT_MAX; return; }
+    handler_count++; if (handler_count > WEB_HANDLER_COUNT_MAX) { handler_count = WEB_HANDLER_COUNT_MAX; return; }
     handlers[handler_count - 1] = handler;
     handlers_fn[handler_count - 1] = fn;
   }
@@ -376,7 +376,7 @@
 
   #if SD_CARD == ON
     void WebServer::on(String fn) {
-      handler_count++; if (handler_count > HANDLER_COUNT_MAX) { handler_count = HANDLER_COUNT_MAX; return; }
+      handler_count++; if (handler_count > WEB_HANDLER_COUNT_MAX) { handler_count = WEB_HANDLER_COUNT_MAX; return; }
       handlers[handler_count - 1] = NULL;
       handlers_fn[handler_count - 1] = fn;
     }

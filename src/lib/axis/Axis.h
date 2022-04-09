@@ -20,6 +20,11 @@
 #endif
 #define FRACTIONAL_SEC_US           (lround(1000000.0F/FRACTIONAL_SEC))
 
+// time limit in seconds for slew home refine phases
+#ifndef SLEW_HOME_REFINE_TIME_LIMIT
+#define SLEW_HOME_REFINE_TIME_LIMIT 30
+#endif
+
 #include "../../libApp/commands/ProcessCmds.h"
 #include "motor/Motor.h"
 #include "motor/stepDir/StepDir.h"
