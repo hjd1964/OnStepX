@@ -31,7 +31,7 @@
   #define WEB_SOCKET_TIMEOUT     250
   #endif
   #ifndef WEB_HANDLER_COUNT_MAX
-  #define WEB_HANDLER_COUNT_MAX  16
+  #define WEB_HANDLER_COUNT_MAX  24
   #endif
   #define PARAMETER_COUNT_MAX    8
   #define CONTENT_LENGTH_UNKNOWN -1
