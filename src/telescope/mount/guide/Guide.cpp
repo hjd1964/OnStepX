@@ -177,11 +177,13 @@ CommandError Guide::startHome() {
     guide.state = GU_HOME_GUIDE;
 
     #if AXIS2_TANGENT_ARM == OFF
+      guideFinishTimeAxis1 = millis() + (unsigned long)(GUIDE_HOME_TIME_LIMIT * 1000.0);
       guideActionAxis1 = GA_HOME;
       axis1.setFrequencySlew(goTo.rate);
       axis1.autoSlewHome();
     #endif
 
+    guideFinishTimeAxis2 = millis() + (unsigned long)(GUIDE_HOME_TIME_LIMIT * 1000.0);
     guideActionAxis2 = GA_HOME;
     axis2.setFrequencySlew(goTo.rate);
     axis2.autoSlewHome();

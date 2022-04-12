@@ -11,6 +11,9 @@
 #include "../../../lib/axis/Axis.h"
 #include "../coordinates/Transform.h"
 
+// default time limit for guiding home is 10 minutes
+#define GUIDE_HOME_TIME_LIMIT 600.0
+
 // default time for spiral guides is 103.4 seconds
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
 enum GuideState: uint8_t       {GU_NONE, GU_PULSE_GUIDE, GU_GUIDE, GU_SPIRAL_GUIDE, GU_HOME_GUIDE};
