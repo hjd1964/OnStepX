@@ -465,6 +465,10 @@
 #ifndef LIMIT_SENSE_INIT
 #define LIMIT_SENSE_INIT              INPUT_PULLUP
 #endif
+// ON blocks all motion when min/max are on the same pin, applies to all axes (mount/rotator/focusers)
+#ifndef LIMIT_SENSE_STRICT
+#define LIMIT_SENSE_STRICT            OFF
+#endif
 
 // st4
 #ifndef ST4_INTERFACE

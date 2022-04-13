@@ -85,7 +85,9 @@ void Axis::init(Motor *motor, void (*callback)()) {
   homeSenseHandle = sense.add(pins->home, pins->axisSense.homeInit, pins->axisSense.homeTrigger);
   minSenseHandle = sense.add(pins->min, pins->axisSense.minMaxInit, pins->axisSense.minTrigger);
   maxSenseHandle = sense.add(pins->max, pins->axisSense.minMaxInit, pins->axisSense.maxTrigger);
-  commonMinMaxSense = pins->min != OFF && pins->min == pins->max;
+  #if LIMIT_SENSE_STRICT != ON
+    commonMinMaxSense = pins->min != OFF && pins->min == pins->max;
+  #endif
 }
 
 // enables or disables the associated step/dir driver
