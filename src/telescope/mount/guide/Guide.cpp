@@ -78,7 +78,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
   if (guide.state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
 
   if (guideActionAxis1 > GA_BREAK) {
-    if (stopDirection != GA_BREAK && stopDirection != guideActionAxis1) return;
+    if (stopDirection != GA_BREAK && guideActionAxis1 != stopDirection && guideActionAxis1 != GA_HOME) return;
     if (rateAxis1 == 0.0F) {
       guideActionAxis1 = GA_BREAK;
       if (abort) axis1.autoSlewAbort(); else axis1.autoSlewStop();
@@ -130,7 +130,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
   if (guide.state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
 
   if (guideActionAxis2 > GA_BREAK) {
-    if (stopDirection != GA_BREAK && stopDirection != guideActionAxis2) return;
+    if (stopDirection != GA_BREAK && guideActionAxis2 != stopDirection && guideActionAxis2 != GA_HOME) return;
     if (rateAxis2 == 0.0F) {
       guideActionAxis2 = GA_BREAK;
       if (abort) axis2.autoSlewAbort(); else axis2.autoSlewStop();
