@@ -161,8 +161,6 @@ void Limits::stopAxis2(GuideAction stopDirection) {
 }
 
 void Limits::poll() {
-  if (!limitsEnabled) return;
-
   static int autoFlipDelayCycles = 0;
   if (autoFlipDelayCycles > 0) autoFlipDelayCycles--;
 
@@ -170,101 +168,112 @@ void Limits::poll() {
 
   Coordinate current = mount.getMountPosition(CR_MOUNT_ALT);
 
-  // overhead and horizon limits
-  if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
-  if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
+  if (limitsEnabled) {
+    // overhead and horizon limits
+    if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
+    if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
-  // meridian limits
-  if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
-    if (current.h < -settings.pastMeridianE) {
-      stopAxis1(GA_REVERSE);
-      error.meridian.east = true;
+    // meridian limits
+    if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
+      if (current.h < -settings.pastMeridianE) {
+        stopAxis1(GA_REVERSE);
+        error.meridian.east = true;
+      } else error.meridian.east = false;
     } else error.meridian.east = false;
-  } else error.meridian.east = false;
 
-  if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
-    if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
+    if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
+      if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
+        #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
+          if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
+            // disable this limit for a second to allow goto to exit the out of limits region
+            autoFlipDelayCycles = 10;
+            VLF("MSG: Mount, start automatic meridian flip");
+            Coordinate target = mount.getMountPosition();
+            CommandError e = goTo.request(&target, PSS_EAST_ONLY, false);
+            if (e != CE_NONE) {
+              stopAxis1(GA_FORWARD);
+              error.meridian.west = true;
+              VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+            }
+          } else
+        #endif
+        {
+          stopAxis1(GA_FORWARD);
+          error.meridian.west = true;
+        }
+      } else error.meridian.west = false;
+    } else error.meridian.west = false;
+
+    #if AXIS2_TANGENT_ARM == ON
+      current.a2 = axis2.getMotorPosition();
+    #endif
+
+    // min and max limits
+    if (flt(current.a1, axis1.settings.limits.min)) {
+      stopAxis1(GA_REVERSE);
+      error.limit.axis1.min = true;
+      // ---------------------------------------------------------
+      if (lastError.limit.axis1.min != error.limit.axis1.min) {
+        D("MSG: Limits, min error A1 = ");
+        D(radToDeg(current.a1));
+        D(" A2 = ");
+        D(radToDeg(current.a2));
+        D(" MIN = ");
+        DL(radToDeg(axis1.settings.limits.min));
+      }
+      // ---------------------------------------------------------
+    } else error.limit.axis1.min = false;
+
+    if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
       #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
-        if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
+        if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           // disable this limit for a second to allow goto to exit the out of limits region
           autoFlipDelayCycles = 10;
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
-          CommandError e = goTo.request(&target, PSS_EAST_ONLY, false);
+          CommandError e = goTo.request(&target, PSS_WEST_ONLY, false);
           if (e != CE_NONE) {
             stopAxis1(GA_FORWARD);
-            error.meridian.west = true;
+            error.limit.axis1.max = true;
             VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
           }
         } else
       #endif
       {
         stopAxis1(GA_FORWARD);
-        error.meridian.west = true;
-      }
-    } else error.meridian.west = false;
-  } else error.meridian.west = false;
-
-  #if AXIS2_TANGENT_ARM == ON
-    current.a2 = axis2.getMotorPosition();
-  #endif
-
-  // min and max limits
-  if (flt(current.a1, axis1.settings.limits.min)) {
-    stopAxis1(GA_REVERSE);
-    error.limit.axis1.min = true;
-    // ---------------------------------------------------------
-    if (lastError.limit.axis1.min != error.limit.axis1.min) {
-      D("MSG: Limits, min error A1 = ");
-      D(radToDeg(current.a1));
-      D(" A2 = ");
-      D(radToDeg(current.a2));
-      D(" MIN = ");
-      DL(radToDeg(axis1.settings.limits.min));
-    }
-    // ---------------------------------------------------------
-  } else error.limit.axis1.min = false;
-
-  if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
-    #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
-      if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
-        // disable this limit for a second to allow goto to exit the out of limits region
-        autoFlipDelayCycles = 10;
-        VLF("MSG: Mount, start automatic meridian flip");
-        Coordinate target = mount.getMountPosition();
-        CommandError e = goTo.request(&target, PSS_WEST_ONLY, false);
-        if (e != CE_NONE) {
-          stopAxis1(GA_FORWARD);
-          error.limit.axis1.max = true;
-          VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+        error.limit.axis1.max = true;
+        // -------------------------------------------------------------
+        if (lastError.limit.axis1.max != error.limit.axis1.max) {
+          D("MSG: Limits, max error A1 = ");
+          D(radToDeg(current.a1));
+          D(" A2 = ");
+          D(radToDeg(current.a2));
+          D(" MAX = ");
+          DL(radToDeg(axis1.settings.limits.max));
         }
-      } else
-    #endif
-    {
-      stopAxis1(GA_FORWARD);
-      error.limit.axis1.max = true;
-      // -------------------------------------------------------------
-      if (lastError.limit.axis1.max != error.limit.axis1.max) {
-        D("MSG: Limits, max error A1 = ");
-        D(radToDeg(current.a1));
-        D(" A2 = ");
-        D(radToDeg(current.a2));
-        D(" MAX = ");
-        DL(radToDeg(axis1.settings.limits.max));
+        // -------------------------------------------------------------
       }
-      // -------------------------------------------------------------
-    }
-  } else error.limit.axis1.max = false;
+    } else error.limit.axis1.max = false;
 
-  if (flt(current.a2, axis2.settings.limits.min)) {
-    stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
-    error.limit.axis2.min = true;
-  } else error.limit.axis2.min = false;
+    if (flt(current.a2, axis2.settings.limits.min)) {
+      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+      error.limit.axis2.min = true;
+    } else error.limit.axis2.min = false;
 
-  if (fgt(current.a2, axis2.settings.limits.max)) {
-    stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
-    error.limit.axis2.max = true;
-  } else error.limit.axis2.max = false;
+    if (fgt(current.a2, axis2.settings.limits.max)) {
+      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
+      error.limit.axis2.max = true;
+    } else error.limit.axis2.max = false;
+  } else {
+    error.altitude.min = false;
+    error.altitude.max = false;
+    error.limit.axis1.min = false;
+    error.limit.axis1.max = false;
+    error.limit.axis2.min = false;
+    error.limit.axis2.max = false;
+    error.meridian.east = false;
+    error.meridian.west = false;
+  }
 
   // min and max limit switches
   error.limitSense.axis1.min = axis1.motionErrorSensed(DIR_REVERSE);
