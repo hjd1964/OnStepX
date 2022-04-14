@@ -421,14 +421,14 @@ void Axis::poll() {
 
     if (autoRate != AR_RATE_BY_TIME_ABORT) {
       if (motionError(motor->getDirection())) {
-        V(axisPrefix); VLF("motionError slew aborting");
+        V(axisPrefix); VLF("motionError");
         autoSlewAbort();
         return;
       }
     }
     if (autoRate == AR_RATE_BY_DISTANCE) {
       if (commonMinMaxSensed) {
-        V(axisPrefix); VLF("commonMinMaxSensed slew aborting");
+        V(axisPrefix); VLF("commonMinMaxSensed");
         autoSlewAbort();
         return;
       }
@@ -464,7 +464,7 @@ void Axis::poll() {
     } else
     if (autoRate == AR_RATE_BY_TIME_END) {
       if (commonMinMaxSensed) {
-        V(axisPrefix); VLF("commonMinMaxSensed slew aborting");
+        V(axisPrefix); VLF("commonMinMaxSensed");
         autoSlewAbort();
         return;
       }
