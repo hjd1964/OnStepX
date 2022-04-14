@@ -8,8 +8,13 @@
 
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 
-#include <Ethernet.h>
-EthernetUDP Udp;
+#if OPERATIONAL_MODE == WIFI
+  #include <WiFiUdp.h>
+  WiFiUDP Udp;
+#else
+  #include <Ethernet.h>
+  EthernetUDP Udp;
+#endif
 
 #include "../tasks/OnTask.h"
 

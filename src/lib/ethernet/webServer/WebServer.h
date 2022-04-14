@@ -37,44 +37,36 @@
   #define CONTENT_LENGTH_UNKNOWN -1
   #define CONTENT_LENGTH_NOT_SET -2
 
-  const char http_defaultHeader[] PROGMEM =
-  "HTTP/1.1 200 OK\r\n" "Content-Type: text/html\r\n" "Connection: close\r\n" "\r\n";
-
-  const char http_textHeader[] PROGMEM =
-  "HTTP/1.1 200 OK\r\n" "Content-Type: text/plain\r\n" "Connection: close\r\n" "\r\n";
-
-  const char http_jsonHeader[] PROGMEM =
-  "HTTP/1.1 200 OK\r\n" "Content-Type: application/json\r\n" "Connection: close\r\n" "\r\n";
-
-  const char http_js304Header[] PROGMEM =
-  "HTTP/1.1 304 OK\r\n" "Content-Type: application/javascript\r\n" "Etag: \"3457807a63ac7bdabf8999b98245d0fe\"\r\n" "Last-Modified: Mon, 13 Apr 2015 15:35:56 GMT\r\n" "Connection: close\r\n" "\r\n";
-
-  const char http_jsHeader[] PROGMEM =
-  "HTTP/1.1 200 OK\r\n" "Content-Type: application/javascript\r\n" "Etag: \"3457807a63ac7bdabf8999b98245d0fe\"\r\n" "Last-Modified: Mon, 13 Apr 2015 15:35:56 GMT\r\n" "Connection: close\r\n" "\r\n";
-
-  // macros to help with sending webpage data
-//  #define sendHtmlStart() setResponseHeader(http_defaultHeader);
-//  #define sendTextStart() setResponseHeader(http_textHeader);
-//  #define sendJsonStart() setResponseHeader(http_jsonHeader);
   #define sendContentAndClear(x) sendContent(x); x = "";
 
   typedef void (* webFunction) ();
   
   class WebServer {
     public:
-      void begin(long port = 80, long timeToClose = 100, bool autoReset = false);
+      void begin(long port = 80, long timeToClose = 50, bool autoReset = false);
 
       void handleClient();
 
       void on(String fn, webFunction handler);
-      #if SD_CARD == ON
-        void on(String fn);
-      #endif
       void onNotFound(webFunction handler);
 
+      // get argument value by identifier
       String arg(String id);
-      String argLowerCase(String id);
-  
+      // get argument value by index
+      String arg(int i);
+      // get argument name by index
+      String argName(int i);
+      // get arguments count
+      int args();                     
+      // check if argument exists
+      bool hasArg(String id);
+
+      // return uniform resource identifier
+      String uri() { return requestedHandler; }
+
+      // return modified since state
+      bool modifiedSince() { return modifiedSinceFound; }
+
       void setContentLength(long length);
       void setResponseHeader(const char *str);
       void sendHeader(const char* key, const char* val, bool first = false);
@@ -82,9 +74,7 @@
       void sendContent(String s);
       void sendContent(const char * s);
 
-      bool SDfound = false;
-
-      EthernetServer *webServer;
+      EthernetServer *webServer = NULL;
       EthernetClient client;
     private:
       int  getHandler(String* line);
@@ -92,20 +82,15 @@
       void processPut(String* line);
       void processPost(String* line);
  
-      #if SD_CARD == ON
-        void sdPage(String fn, EthernetClient* client);
-      #endif
-  
       char responseHeader[200] = "";
-      #if SD_CARD == ON
-        bool modifiedSinceFound = false;
-      #endif
+      bool modifiedSinceFound = false;
   
       webFunction notFoundHandler = NULL;
       webFunction handlers[WEB_HANDLER_COUNT_MAX];
       String handlers_fn[WEB_HANDLER_COUNT_MAX];
       int handler_count = 0;
       
+      String requestedHandler;
       String parameters[PARAMETER_COUNT_MAX];
       String values[PARAMETER_COUNT_MAX];
       int parameter_count;

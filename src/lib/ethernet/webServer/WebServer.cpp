@@ -4,39 +4,10 @@
 #include "WebServer.h"
 #include "../../tasks/OnTask.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-    WEB_SERVER == ON
-
-  // SD CARD support, simply enable and provide a webserver.on("filename.htm") to serve each file
-  #ifndef SD_CARD
-    #define SD_CARD OFF
-  #endif
-
-  #if SD_CARD == ON
-    #include <SD.h>
-  #endif
+#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && WEB_SERVER == ON
 
   void WebServer::begin(long port, long timeToClose, bool autoReset) {
     if (webServer == NULL) {
-      #if defined(SDCARD_CS_PIN)
-        static bool SDinit = false;
-        if (!SDinit) {
-          #if SD_CARD == ON
-            #if TEENSYDUINO
-              SDfound = SD.begin(BUILTIN_SDCARD);
-            #else
-              SDfound = SD.begin(SDCARD_CS_PIN);
-            #endif
-          #else
-            if (SDCARD_CS_PIN != OFF) {
-              pinMode(SDCARD_CS_PIN, OUTPUT);
-              digitalWrite(SDCARD_CS_PIN, HIGH);
-            }
-          #endif
-          SDinit = true;
-        }
-      #endif
-
       ethernetManager.init();
 
       this->port = port;
@@ -47,7 +18,7 @@
       webServer->begin();
       Ethernet.setRetransmissionCount(8);
       Ethernet.setRetransmissionTimeout(25);
-      VF("MSG: Ethernet started web server on port "); VL(port);
+      VF("MSG: Ethernet, started web server on port "); VL(port);
     }
   }
 
@@ -83,9 +54,7 @@
 
           // scan the header
           if (currentSection == 1) {
-            #if SD_CARD == ON
-              if (!modifiedSinceFound && line.indexOf("If-Modified-Since:") >= 0) modifiedSinceFound = true;
-            #endif
+            if (!modifiedSinceFound && line.indexOf("If-Modified-Since:") >= 0) modifiedSinceFound = true;
             if (!isGet && !isPost && !isPut) {
               int index = line.indexOf("GET ");
               if (index >= 0) {
@@ -131,37 +100,6 @@
           WF("MSG: Webserver running handler# "); WL(handler_number);
           (*handlers[handler_number])();
           handlerFound = true;
-        } else {
-          #if SD_CARD == ON
-            char temp[512];
-            if (handlers_fn[handler_number].endsWith(".js")) {
-              if (modifiedSinceFound) {
-                WLF("MSG: Webserver sending js304Header");
-                strcpy_P(temp, http_js304Header);
-              } else {
-                WLF("MSG: Webserver sending jsHeader");
-                strcpy_P(temp, http_jsHeader);
-              }
-            } else
-            if (handlers_fn[handler_number].endsWith(".txt")) {
-              WLF("MSG: Webserver sending textHeader");
-              strcpy_P(temp, http_textHeader);
-            } else
-            if (handlers_fn[handler_number].endsWith(".htm") || handlers_fn[handler_number].endsWith(".html")) {
-              WLF("MSG: Webserver sending htmlHeader");
-              strcpy_P(temp, http_defaultHeader);
-            } else {
-              WLF("MSG: Webserver assuming html, sending htmlHeader");
-              strcpy_P(temp, http_defaultHeader);
-            }
-            client.print(temp);
-
-            if (!modifiedSinceFound) {
-              WLF("MSG: Webserver sending SD file");
-              sdPage(handlers_fn[handler_number], &client);
-            }
-            handlerFound = true;
-          #endif
         }
       }
 
@@ -183,9 +121,7 @@
       // reset the webserver if requested
       if (autoReset) webServer->begin();
 
-      #if SD_CARD == ON
-        modifiedSinceFound = false;
-      #endif
+      modifiedSinceFound = false;
   
       WL("MSG: Webserver client disconnected");
     }
@@ -200,10 +136,9 @@
     // isolate the content
     *line = line->substring(0, url_end);
     int url_start = 0;
-    if (line->startsWith('/')) *line = line->substring(1);
     int url_end2 = line->lastIndexOf('?');
     if (url_end2 > 0) url_end = url_end2;
-    String requestedHandler = line->substring(url_start, url_end);
+    requestedHandler = line->substring(url_start, url_end);
     *line = line->substring(url_end);
     requestedHandler.trim();
     if (requestedHandler.length() == 0) requestedHandler = "/";
@@ -237,7 +172,8 @@
       if (thisArg != "") {
         if (++parameter_count > PARAMETER_COUNT_MAX) parameter_count = PARAMETER_COUNT_MAX;
         parameters[parameter_count - 1] = thisArg;
-        values[parameter_count - 1] = thisVal.trim();
+        thisVal.trim();
+        values[parameter_count - 1] = thisVal;
       }
       if ((int)line->length() > j1) *line = line->substring(j1); else *line = "";
 
@@ -263,12 +199,13 @@
       int j1 = line->indexOf('&');
       if (j1 == -1) j1 = line->length() + 1;
       String thisArg = line->substring(0, j);
-      if (thisArg.startsWith('?')) thisArg = thisArg.substring(1);
+      if (thisArg.startsWith("?")) thisArg = thisArg.substring(1);
       String thisVal = line->substring(j + 1, j1);
       if (thisArg != "") {
         if (++parameter_count > PARAMETER_COUNT_MAX) parameter_count = PARAMETER_COUNT_MAX;
         parameters[parameter_count - 1] = thisArg;
-        values[parameter_count - 1] = thisVal.trim();
+        thisVal.trim();
+        values[parameter_count - 1] = thisVal;
       }
       if ((int)line->length() > j1) *line = line->substring(j1); else *line = "";
 
@@ -316,18 +253,39 @@
     notFoundHandler = handler;
   }
   
+  // get argument value by identifier
   String WebServer::arg(String id) {
     for (int i = 0; i < parameter_count; i++) {
       if (id == parameters[i]) return values[i];
     }
     return EmptyStr;
   }
+
+  // get argument value by index
+  String WebServer::arg(int i) {
+    if (i >= 0 && i < parameter_count) {
+      return values[i];
+    } else return "";
+  }
   
-  String WebServer::argLowerCase(String id) {
+  // get argument identifier by index
+  String WebServer::argName(int i) {
+    if (i >= 0 && i < parameter_count) {
+      return parameters[i];
+    } else return EmptyStr;
+  }
+  
+  // get arguments count
+  int WebServer::args() {
+    return parameter_count;
+  }
+  
+  // check if argument exists
+  bool WebServer::hasArg(String id) {
     for (int i = 0; i < parameter_count; i++) {
-      if (id == parameters[i].toLowerCase()) return values[i];
+      if (id == parameters[i]) return true;
     }
-    return EmptyStr;
+    return false;
   }
   
   void WebServer::setContentLength(long length) {
@@ -373,36 +331,6 @@
   void WebServer::sendContent(const char * s) {
     client.print(s);
   }
-
-  #if SD_CARD == ON
-    void WebServer::on(String fn) {
-      handler_count++; if (handler_count > WEB_HANDLER_COUNT_MAX) { handler_count = WEB_HANDLER_COUNT_MAX; return; }
-      handlers[handler_count - 1] = NULL;
-      handlers_fn[handler_count - 1] = fn;
-    }
-    
-    void WebServer::sdPage(String fn, EthernetClient *client) {
-      char temp[512] = "";
-      int n;
-
-      // open the sdcard file
-      if (SDfound) {
-        File dataFile = SD.open(fn.c_str(), O_READ);
-        if (dataFile) {
-          do {
-            n = dataFile.available();
-            if (n > 256) n = 256;
-            if (n > 0) {
-              dataFile.read(temp, n);
-              client->write(temp, n);
-            }
-            Y;
-          } while (n > 0);
-          dataFile.close();
-        }
-      }
-    }
-  #endif
 
   WebServer www;
 
