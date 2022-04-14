@@ -277,16 +277,26 @@ void Limits::poll() {
 
   // min and max limit switches
   error.limitSense.axis1.min = axis1.motionErrorSensed(DIR_REVERSE);
-  if (error.limitSense.axis1.min) stopAxis1(GA_REVERSE);
+  if (error.limitSense.axis1.min) {
+    if (!axis1.commonMinMaxSense || lastError.limitSense.axis1.min != error.limitSense.axis1.min) stopAxis1(GA_REVERSE);
+  }
 
   error.limitSense.axis1.max = axis1.motionErrorSensed(DIR_FORWARD);
-  if (error.limitSense.axis1.max) stopAxis1(GA_FORWARD);
+  if (error.limitSense.axis1.max) {
+    if (!axis1.commonMinMaxSense || lastError.limitSense.axis1.max != error.limitSense.axis1.max) stopAxis1(GA_FORWARD);
+  }
 
   error.limitSense.axis2.min = axis2.motionErrorSensed(DIR_REVERSE);
-  if (error.limitSense.axis2.min) stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+  if (error.limitSense.axis2.min) {
+    if (!axis2.commonMinMaxSense || lastError.limitSense.axis2.min != error.limitSense.axis2.min)
+      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+  }
 
   error.limitSense.axis2.max = axis2.motionErrorSensed(DIR_FORWARD);
-  if (error.limitSense.axis2.max) stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
+  if (error.limitSense.axis2.max) {
+    if (!axis2.commonMinMaxSense || lastError.limitSense.axis2.max != error.limitSense.axis2.max)
+      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
+  }
 
   #if DEBUG == VERBOSE
     const char* errPre = "MSG: Mount, error state: ";

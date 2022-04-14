@@ -281,6 +281,8 @@ class Axis {
 
     AxisSettings settings;
 
+    bool commonMinMaxSense = false;
+
   private:
     // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
     void setFrequency(float frequency);
@@ -310,7 +312,6 @@ class Axis {
     
     AxisErrors errors;
     bool lastErrorResult = false;
-    bool commonMinMaxSense = false;
 
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
