@@ -105,7 +105,7 @@
       bool autoReset = false;
       long timeToClose = 100;
 
-      int lastMethod = HTTP_UNKNOWN
+      int lastMethod = HTTP_UNKNOWN;
 
       long length;
       String header;

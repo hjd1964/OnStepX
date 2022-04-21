@@ -154,7 +154,7 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
     // if not a page boundary use a page size of 1
     if ((cacheIndex % p) != 0) p = 1; else
 
-    for (int k = 0; k < p; k++) {
+    for (uint16_t k = 0; k < p; k++) {
       // if a page write would exceed the NV size use a page size of 1
       if (cacheIndex + k >= cacheSize) { p = 1; break; }
       // check that the read cache for these locations is clean otherwise use a page size of 1
@@ -163,7 +163,7 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
 
     // write the page and update the cache write state
     writePageToStorage(cacheIndex, &cache[cacheIndex], p);
-    for (int k = 0; k < p; k++) {
+    for (uint16_t k = 0; k < p; k++) {
       bitWrite(cacheStateWrite[(cacheIndex + k)/8], (cacheIndex + k)%8, 0);
     }
   } else {
@@ -269,18 +269,18 @@ void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { read
 void NonVolatileStorage::readBytes(uint16_t i, void *j, int16_t count) {
   if (count < 0) {
     count = -count;
-    for (uint16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
+    for (int16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
   } else {
-    for (uint16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); j = (uint8_t*)j + 1; }
+    for (int16_t k = 0; k < count; k++) { *(uint8_t*)j = read(i++); j = (uint8_t*)j + 1; }
   }
 }
 
 void NonVolatileStorage::updateBytes(uint16_t i, void *j, int16_t count) {
   if (count < 0) {
     count = -count;
-    for (uint16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
+    for (int16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); if (*(uint8_t*)j == 0) return; else j = (uint8_t*)j + 1; }
   } else {
-    for (uint16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
+    for (int16_t k = 0; k < count; k++) { update(i++, *(uint8_t*)j); j = (uint8_t*)j + 1; }
   }
 }
 
