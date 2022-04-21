@@ -186,7 +186,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
       if (convert.hmsToDouble(&local.hour, parameter, PM_HIGH) || convert.hmsToDouble(&local.hour, parameter, PM_HIGHEST)) {
         timeIsReady = true;
-        setDateTime(localToUT1(calendars.gregorianToJulian(local)));        
+        setDateTime(localToUT1(calendars.gregorianToJulian(local)));
         updateTLS();
       } else *commandError = CE_PARAM_FORM;
     } else
