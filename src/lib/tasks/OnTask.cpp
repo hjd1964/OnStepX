@@ -114,7 +114,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
     break;
     case 4:
       HAL_HWTIMER4_FUN = callback;
-      if (HAL_HWTIMER4_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER4_INIT() failed"); return false; }
+      if (!HAL_HWTIMER4_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER4_INIT() failed"); return false; }
     break;
   }
   hardwareTimer = num;

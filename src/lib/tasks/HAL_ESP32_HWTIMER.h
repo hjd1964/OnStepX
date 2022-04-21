@@ -50,7 +50,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
     // timer#, divider, count up
-    itimer1 = timerBegin(1, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
+    itimer1 = timerBegin(0, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer1, &HAL_HWTIMER1_WRAPPER, true);
     timerAlarmWrite(itimer1, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer1);
@@ -64,10 +64,10 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   #define HAL_HWTIMER1_SET_PERIOD() timerAlarmWrite(itimer1, _nextPeriod1, true)
   IRAM_ATTR void HAL_HWTIMER1_WRAPPER() {
-    portENTER_CRITICAL_ISR( &timerMux );
+    portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER1_PROFILER_PREFIX;
     static uint16_t count = 0;
-    if (_nextRep1 > 1) { count++; if (count%_nextRep1 != 0) goto done; }
+    if (_nextRep1 > 1) { count++; if (count % _nextRep1 != 0) goto done; }
     if (_nextRep1) HAL_HWTIMER1_FUN();
     HAL_HWTIMER1_SET_PERIOD();
     done: {}
@@ -84,7 +84,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
     // timer#, divider, count up
-    itimer2 = timerBegin(2, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
+    itimer2 = timerBegin(1, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer2, &HAL_HWTIMER2_WRAPPER, true);
     timerAlarmWrite(itimer2, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer2);
@@ -98,10 +98,10 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   
   #define HAL_HWTIMER2_SET_PERIOD() timerAlarmWrite(itimer2, _nextPeriod2, true)
   IRAM_ATTR void HAL_HWTIMER2_WRAPPER() {
-    portENTER_CRITICAL_ISR( &timerMux );
+    portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER2_PROFILER_PREFIX;
     static uint16_t count = 0;
-    if (_nextRep2 > 1) { count++; if (count%_nextRep2 != 0) goto done; }
+    if (_nextRep2 > 1) { count++; if (count % _nextRep2 != 0) goto done; }
     if (_nextRep2) HAL_HWTIMER2_FUN();
     HAL_HWTIMER2_SET_PERIOD();
     done: {}
@@ -118,7 +118,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
     // timer#, divider, count up
-    itimer3 = timerBegin(3, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
+    itimer3 = timerBegin(2, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer3, &HAL_HWTIMER3_WRAPPER, true);
     timerAlarmWrite(itimer3, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer3);
@@ -132,10 +132,10 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   
   #define HAL_HWTIMER3_SET_PERIOD() timerAlarmWrite(itimer3, _nextPeriod3, true)
   IRAM_ATTR void HAL_HWTIMER3_WRAPPER() {
-    portENTER_CRITICAL_ISR( &timerMux );
+    portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER3_PROFILER_PREFIX;
     static uint16_t count = 0;
-    if (_nextRep3 > 1) { count++; if (count%_nextRep3 != 0) goto done; }
+    if (_nextRep3 > 1) { count++; if (count % _nextRep3 != 0) goto done; }
     if (_nextRep3) HAL_HWTIMER3_FUN();
     HAL_HWTIMER3_SET_PERIOD();
     done: {}
@@ -152,7 +152,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
     // timer#, divider, count up
-    itimer4 = timerBegin(0, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
+    itimer4 = timerBegin(3, 5, true); // ESP32 timer frequency is 80MHz, 80/5 = 16MHz
     timerAttachInterrupt(itimer4, &HAL_HWTIMER4_WRAPPER, true);
     timerAlarmWrite(itimer4, 1000*16, true); // startup one millisecond
     timerAlarmEnable(itimer4);
@@ -166,10 +166,10 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   #define HAL_HWTIMER4_SET_PERIOD() timerAlarmWrite(itimer4, _nextPeriod4, true)
   IRAM_ATTR void HAL_HWTIMER4_WRAPPER() {
-    portENTER_CRITICAL_ISR( &timerMux );
+    portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER4_PROFILER_PREFIX;
     static uint16_t count = 0;
-    if (_nextRep4 > 1) { count++; if (count%_nextRep4 != 0) goto done; }
+    if (_nextRep4 > 1) { count++; if (count % _nextRep4 != 0) goto done; }
     if (_nextRep4) HAL_HWTIMER4_FUN();
     HAL_HWTIMER4_SET_PERIOD();
     done: {}

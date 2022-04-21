@@ -36,6 +36,10 @@
   #define PARAMETER_COUNT_MAX    8
   #define CONTENT_LENGTH_UNKNOWN -1
   #define CONTENT_LENGTH_NOT_SET -2
+  #define HTTP_UNKNOWN           0
+  #define HTTP_GET               1
+  #define HTTP_PUT               2
+  #define HTTP_POST              3
 
   #define sendContentAndClear(x) sendContent(x); x = "";
 
@@ -60,6 +64,9 @@
       int args();                     
       // check if argument exists
       bool hasArg(String id);
+
+      // check http last method used, returns HTTP_UNKNOWN, HTTP_GET, HTTP_PUT, or HTTP_POST
+      inline int method() { return lastMethod; }
 
       // return uniform resource identifier
       String uri() { return requestedHandler; }
@@ -97,6 +104,8 @@
       int port = -1;
       bool autoReset = false;
       long timeToClose = 100;
+
+      int lastMethod = HTTP_UNKNOWN
 
       long length;
       String header;

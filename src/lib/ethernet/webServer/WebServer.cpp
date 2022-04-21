@@ -33,9 +33,7 @@
       String line = "";
       int currentSection = 1;
       int handler_number = -1;
-      bool isGet = false;
-      bool isPost = false;
-      bool isPut = false;
+      lastMethod = HTTP_UNKNOWN;
 
       unsigned long to = millis() + WEB_SOCKET_TIMEOUT;
       while (client.connected() && (long)(millis() - to) < 0 && currentSection <= 2) {
@@ -55,10 +53,10 @@
           // scan the header
           if (currentSection == 1) {
             if (!modifiedSinceFound && line.indexOf("If-Modified-Since:") >= 0) modifiedSinceFound = true;
-            if (!isGet && !isPost && !isPut) {
+            if (lastMethod == HTTP_UNKNOWN) {
               int index = line.indexOf("GET ");
               if (index >= 0) {
-                isGet = true;
+                lastMethod = HTTP_GET;
                 line = line.substring(index + 4);
                 handler_number = getHandler(&line);
                 if (handler_number >= 0) processGet(&line);
@@ -66,13 +64,13 @@
               } else {
                 index = line.indexOf("POST ");
                 if (index >= 0) {
-                  isPost = true;
+                  lastMethod = HTTP_POST;
                   line = line.substring(index + 5);
                   handler_number = getHandler(&line);
                 } else {
                   index = line.indexOf("PUT ");
                   if (index >= 0) {
-                    isPut = true;
+                    lastMethod = HTTP_PUT;
                     line = line.substring(index + 4);
                     handler_number = getHandler(&line);
                     if (handler_number >= 0) processPut(&line);
@@ -84,8 +82,8 @@
 
           // scan the request
           if (currentSection == 2 && handler_number >= 0) {
-            if (isPut) processPut(&line); else
-            if (isPost) processPost(&line);
+            if (lastMethod == HTTP_PUT) processPut(&line); else
+            if (lastMethod == HTTP_POST) processPost(&line);
           }
 
           line = "";
