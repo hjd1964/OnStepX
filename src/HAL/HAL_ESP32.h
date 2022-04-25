@@ -23,6 +23,9 @@
 #include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
+#if defined(SDA_PIN) && defined(SCL_PIN)
+HAL_Wire.begin(SDA_PIN, SCL_PIN)
+#endif
 
 // Non-volatile storage ----------------------------------------------------------------------------
 #if NV_DRIVER == NV_DEFAULT

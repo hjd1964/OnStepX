@@ -3,3 +3,6 @@
 *.json
 *.json
 *.json
+__vm/*
+*.vcxproj*
+Debug/*

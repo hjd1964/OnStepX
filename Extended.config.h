@@ -18,7 +18,7 @@
 // DEBUG ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#DEBUG
 // Enable additional debugging and/or status messages on the specified SERIAL_DEBUG port
 // Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
-#define DEBUG                         OFF //    OFF, Use ON for background error messages only, use VERBOSE for all           Infreq
+#define DEBUG                         VERBOSE //    OFF, Use ON for background error messages only, use VERBOSE for all           Infreq
                                           //         error and status messages, use CONSOLE for VT100 debug console,
                                           //         or use PROFILER for VT100 task profiler.
 #define DEBUG_ECHO_COMMANDS           OFF //    OFF, Use ON to log command/responses to the debug serial port.                Option
@@ -30,7 +30,7 @@
 #define SERIAL_D_BAUD_DEFAULT         OFF //    OFF, n. Also see (src/pinmaps/) for more PINMAP serial port information.      Option
 
 // ESP32 VIRTUAL SERIAL BLUETOOTH AND IP COMMAND CHANNELS --------------------------------------------------------------------------
-#define SERIAL_BT_MODE                OFF //    OFF, Use SLAVE to enable the interface (ESP32 only.)                          Option
+#define SERIAL_BT_MODE                SLAVE //    OFF, Use SLAVE to enable the interface (ESP32 only.)                          Option
 #define SERIAL_BT_NAME           "OnStep" //         "OnStep", Bluetooth device name.                                         Adjust
 #define SERIAL_IP_MODE                OFF //    OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)        Option
 
@@ -55,8 +55,8 @@
 
 #define AXIS1_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
 
-#define AXIS1_LIMIT_MIN              -180 //   -180, n. Where n= -90..-360 (degrees.) Minimum "Hour Angle" or Azimuth.        Adjust
-#define AXIS1_LIMIT_MAX               180 //    180, n. Where n=  90.. 360 (degrees.) Maximum "Hour Angle" or Azimuth.        Adjust
+#define AXIS1_LIMIT_MIN              -360 //   -180, n. Where n= -90..-360 (degrees.) Minimum "Hour Angle" or Azimuth.        Adjust
+#define AXIS1_LIMIT_MAX               360 //    180, n. Where n=  90.. 360 (degrees.) Maximum "Hour Angle" or Azimuth.        Adjust
 
 #define AXIS1_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from front. Option
 #define AXIS1_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
@@ -134,7 +134,7 @@
 #define TRACK_COMPENSATION_MEMORY     OFF //    OFF, ON Remembers refraction/pointing model compensated tracking settings.    Option
 
 // SLEWING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SLEWING
-#define SLEW_RATE_MEMORY              OFF //    OFF, ON Remembers rates set across power cycles.                              Option
+#define SLEW_RATE_MEMORY              ON //    OFF, ON Remembers rates set across power cycles.                              Option
 
 // PIER SIDE BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SYNCING
 #define MFLIP_SKIP_HOME               OFF //    OFF, ON Goto directly to the destination without visiting home position.      Option
@@ -193,13 +193,13 @@
 #define AXIS4_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops.                                Option
 
 #define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
-#define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+#define AXIS4_LIMIT_MAX                13 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
 
 #define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 #define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
-#define AXIS4_SLEW_RATE_MINIMUM         2 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
+#define AXIS4_SLEW_RATE_MINIMUM         500 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
 
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
