@@ -110,7 +110,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(30000);
     axis2.setPowerDownOverrideTime(30000);
-    if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_REVERSE; };
+    if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
     V(rate); VL("X");
 
