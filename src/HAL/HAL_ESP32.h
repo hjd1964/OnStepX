@@ -23,8 +23,11 @@
 #include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
-#if defined(SDA_PIN) && defined(SCL_PIN)
-HAL_Wire.begin(SDA_PIN, SCL_PIN)
+#if !defined(SDA_PIN)
+#define SDA_PIN 21
+#endif
+#if !defined(SCL_PIN)
+#define SCL_PIN 22
 #endif
 
 // Non-volatile storage ----------------------------------------------------------------------------
@@ -56,6 +59,7 @@ HAL_Wire.begin(SDA_PIN, SCL_PIN)
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   SERIAL_BT_BEGIN(); \
+HAL_Wire.begin(SDA_PIN,SCL_PIN,HAL_WIRE_CLOCK); \
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -35,12 +35,12 @@
 #define SHARED_DIRECTION_PINS
 
 //Alternative SDA/SCL, if needed
-//#define SDA_PIN              32
-//#define SCL_PIN              25
+#define SDA_PIN              32
+#define SCL_PIN              25
 
 //Serial B
-//#define SERIAL_B_RX          39
-//#define SERIAL_B_TX          18
+#define SERIAL_B_RX          39
+#define SERIAL_B_TX          18
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                4                // ESP8266 RST control, or MISO for Axis1&2, or Axis4 EN support
@@ -67,7 +67,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
-#define STATUS_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
+#define STATUS_LED_PIN        513         // Default LED Cathode (-)
 #endif
 #define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
@@ -78,7 +78,7 @@
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-#define STATUS_BUZZER_PIN     AUX8_PIN         // Tone
+#define STATUS_BUZZER_PIN     514         // Tone
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency

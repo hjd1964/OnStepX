@@ -188,10 +188,10 @@
 // FEATURES ----------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-ConfigurationMaster#AUXILIARY
 // Note: Temporarily set DEBUG mode to VERBOSE and use "FEATURE1_TEMP DS1820" to list the DS18B20 device serial numbers.
 
-#define FEATURE1_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
+#define FEATURE1_PURPOSE              SWITCH //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE1_NAME          "FEATURE1" // "FE..", Name of feature being controlled.                                        Adjust
 #define FEATURE1_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
-#define FEATURE1_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE1_PIN                  512 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
 #define FEATURE2_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE2_NAME          "FEATURE2" // "FE..", Name of feature being controlled.                                        Adjust
