@@ -21,7 +21,8 @@ class TimeLocationSource {
 
     // set the RTC's time
     void set(JulianDate ut1);
-    
+    void set(int year, int month, int day, int hour, int minute, int second);
+
     // get the RTC's time
     void get(JulianDate &ut1);
 

@@ -52,7 +52,7 @@ void NonVolatileStorage::wait() {
     delay(1);
 
     passes++;
-    if (passes % 4000 == 0) V(".");
+    if (passes % 4000 == 0) { V("."); }
 
     if ((long)(millis() - startTime) > 180000) {
       VF(" timed out with "); V(cacheSizeDirtyCount); VLF(" remaining");
