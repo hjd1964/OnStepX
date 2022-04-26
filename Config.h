@@ -25,7 +25,7 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define STATUS_LED                    ON //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
+#define STATUS_LED                    OFF //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
 
 // RETICLE CONTROL ------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#RETICLE
 #define RETICLE_LED_DEFAULT           OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
@@ -193,15 +193,15 @@
 #define FEATURE1_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
 #define FEATURE1_PIN                  512 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
-#define FEATURE2_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
-#define FEATURE2_NAME          "FEATURE2" // "FE..", Name of feature being controlled.                                        Adjust
+#define FEATURE2_PURPOSE              SWITCH //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
+#define FEATURE2_NAME          "FAN" // "FE..", Name of feature being controlled.                                        Adjust
 #define FEATURE2_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
-#define FEATURE2_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE2_PIN                  516 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
-#define FEATURE3_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
+#define FEATURE3_PURPOSE              SWITCH //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE3_NAME          "FEATURE3" // "FE..", Name of feature being controlled.                                        Adjust
 #define FEATURE3_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
-#define FEATURE3_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE3_PIN                  517 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
 #define FEATURE4_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE4_NAME          "FEATURE4" // "FE..", Name of feature being controlled.                                        Adjust

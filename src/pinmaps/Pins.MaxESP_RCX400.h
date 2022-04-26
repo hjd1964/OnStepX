@@ -67,7 +67,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
-#define STATUS_LED_PIN        513         // Default LED Cathode (-)
+#define STATUS_LED_PIN        520         // Default LED Cathode (-)
 #endif
 #define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
