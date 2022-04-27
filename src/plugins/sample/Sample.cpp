@@ -5,7 +5,7 @@
 #include "../../lib/serial/Serial_Local.h"
 #include "../../lib/tasks/OnTask.h"
 
-void sampleWrapper() { sample.poll(); }
+void sampleWrapper() { sample.loop(); }
 
 void Sample::init() {
   VLF("MSG: Plugins, starting: sample");
@@ -15,7 +15,7 @@ void Sample::init() {
   tasks.add(500, 0, true, 7, sampleWrapper);
 }
 
-void Sample::poll() {
+void Sample::loop() {
   SERIAL_LOCAL.transmit(":GR#");
   // let OnStepX run for 0.1 second to process the command
   tasks.yield(100);

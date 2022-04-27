@@ -6,7 +6,7 @@ public:
   // the initialization method must be present and named: void init();
   void init();
 
-  void poll();
+  void loop();
 
 private:
 
