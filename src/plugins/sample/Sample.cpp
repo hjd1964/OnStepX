@@ -11,7 +11,7 @@ void Sample::init() {
   VLF("MSG: Plugins, starting: sample");
 
   // start a task that runs twice a second, run at priority level 7 so
-  // we can block fairly aggressively without significant impact on operation
+  // we can block using tasks.yield(); fairly aggressively without significant impact on operation
   tasks.add(500, 0, true, 7, sampleWrapper);
 }
 
