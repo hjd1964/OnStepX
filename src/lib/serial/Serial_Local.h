@@ -12,8 +12,11 @@ class SerialLocal : public Stream {
     void begin(long baud);
     void end();
 
+    // sends a command for processing
     void transmit(const char *data);
-    char *recv();
+
+    // receive has the last commands response, if one exists
+    char *receive();
 
     int read(void);
 
@@ -29,12 +32,13 @@ class SerialLocal : public Stream {
     inline void flush(void) { }
 
     inline size_t write(uint8_t data) {
-      if (xmit_tail == xmit_index) return 0; 
       xmit_buffer[xmit_tail] = data;
-      xmit_tail++; xmit_tail &= 0b111111;
+      xmit_tail++;
+      xmit_tail &= 0b111111;
       xmit_buffer[xmit_tail] = 0;
       return 1;
     }
+
     size_t write(const uint8_t* data, size_t count) {
       for (int i = 0; i < (int)count; i++) { if (!write(data[i])) return i; }
       return count;
