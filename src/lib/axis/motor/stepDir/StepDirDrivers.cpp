@@ -18,8 +18,8 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2130S
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
  {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208S
- {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S
- {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U
+ {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2206S
+ {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U/TMC2206U
  {  8,  7,  6,  5,  4,  3,  2,  1,  0}    // TMC5160
 };
 
