@@ -35,7 +35,7 @@ class ServoMotor : public Motor {
     // sets motor power on/off (if possible)
     void power(bool value);
 
-    // get the associated stepper driver status
+    // get the associated driver status
     DriverStatus getDriverStatus();
 
     // resets motor and target angular position in steps, also zeros backlash and index 

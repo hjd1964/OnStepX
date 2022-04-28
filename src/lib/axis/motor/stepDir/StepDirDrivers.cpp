@@ -352,7 +352,7 @@ void StepDirDriver::updateStatus() {
           status.fault                 = true;
         }
 
-        #if DEBUG != OFF
+        #if DEBUG == VERBOSE
           if ((status.outputA.shortToGround != lastStatus.outputA.shortToGround) ||
               (status.outputA.openLoad      != lastStatus.outputA.openLoad) ||
               (status.outputB.shortToGround != lastStatus.outputB.shortToGround) ||
