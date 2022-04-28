@@ -197,6 +197,9 @@ class Axis {
     // get frequency in steps per second
     float getFrequencySteps() { return motor->getFrequencySteps(); }
 
+    // get direction
+    Direction getDirection() { return motor->getDirection(); }
+
     // gets backlash frequency in "measures" (degrees, microns, etc.) per second
     float getBacklashFrequency();
 
