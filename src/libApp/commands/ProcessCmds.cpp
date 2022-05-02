@@ -221,7 +221,7 @@ void commandChannelInit() {
   #endif
   #ifdef SERIAL_D
     VF("MSG: Setup, start command channel D task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsD, "PrcCmdD")) { VLF("success"); } else { VLF("FAILED!"); }
+    handle = tasks.add(0, 0, true, 5, processCmdsD, "PrcCmdD");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
