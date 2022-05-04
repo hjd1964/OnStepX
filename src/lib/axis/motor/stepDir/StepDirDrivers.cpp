@@ -18,8 +18,8 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2130S
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
  {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208S
- {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2206S
- {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U/TMC2206U
+ {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2226S
+ {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U/TMC2226U
  {  8,  7,  6,  5,  4,  3,  2,  1,  0}    // TMC5160
 };
 
@@ -36,8 +36,8 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2130S
   103,   // TMC2130
   103,   // TMC2208S
-  103,   // TMC2209S
-  103,   // TMC2209U
+  103,   // TMC2209S/TMC2209S
+  103,   // TMC2209U/TCM2206U
   103    // TMC5160
 };
 
@@ -51,11 +51,11 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
     "S109",
     "ST820",
     "TMC2100",
-    "TMC2130 Stand-alone",
+    "TMC2130 legacy",
     "TMC2130 SPI",
-    "TMC2208 Stand-alone",
-    "TMC2209 Stand-alone",
-    "TMC2209 UART",
+    "TMC2208 legacy",
+    "TMC2209 legacy",
+    "TMC2209/TMC2226 UART",
     "TMC5160 SPI"
   };
 #endif
@@ -125,7 +125,7 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
   microstepRatio = settings.microsteps/settings.microstepsGoto;
 
   if (isTmcSPI() || isTmcUART()) {
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       if (settings.decay == OFF) settings.decay = STEALTHCHOP;
       if (settings.decayGoto == OFF) settings.decayGoto = SPREADCYCLE;
       tmcDriver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3, axisNumber);
@@ -257,7 +257,7 @@ bool StepDirDriver::modeSwitchAllowed() {
 
 void StepDirDriver::modeMicrostepTracking() {
   if (isTmcSPI() || isTmcUART()) {
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       tmcDriver.refresh_CHOPCONF(microstepCode);
     #endif
   } else {
@@ -271,7 +271,7 @@ void StepDirDriver::modeMicrostepTracking() {
 
 void StepDirDriver::modeDecayTracking() {
   if (isTmcSPI() || isTmcUART()) {
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       tmcDriver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
     #endif
   } else {
@@ -291,7 +291,7 @@ int StepDirDriver::getMicrostepRatio() {
 int StepDirDriver::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
     if (isTmcSPI() || isTmcUART()) {
-      #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+      #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
         tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
       #endif
     } else {
@@ -307,7 +307,7 @@ int StepDirDriver::modeMicrostepSlewing() {
 
 void StepDirDriver::modeDecaySlewing() {
   if (isTmcSPI() || isTmcUART()) {
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       int IGOTO = settings.currentGoto;
       if (IGOTO == OFF) IGOTO = settings.currentRun;
       tmcDriver.mode(true, settings.decayGoto, microstepCode, IGOTO, settings.currentHold);
@@ -322,7 +322,7 @@ void StepDirDriver::modeDecaySlewing() {
 }
 
 void StepDirDriver::updateStatus() {
-  #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+  #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
     if (settings.status == ON) {
       if ((long)(millis() - timeLastStatusUpdate) > 200) {
         if (tmcDriver.refresh_DRVSTATUS()) {
@@ -397,7 +397,7 @@ int8_t StepDirDriver::getDecayPinState(int8_t decay) {
 
 // secondary way to power down not using the enable pin
 void StepDirDriver::power(bool state) {
-  #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+  #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
     int I_run = 0, I_hold = 0;
     if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
     tmcDriver.mode(true, settings.decay, microstepCode, I_run, I_hold);
@@ -408,7 +408,7 @@ void StepDirDriver::power(bool state) {
 
 // checks for TMC SPI driver
 bool StepDirDriver::isTmcSPI() {
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (settings.model == TMC2130 || settings.model == TMC5160) return true; else return false;
   #else
     return false;

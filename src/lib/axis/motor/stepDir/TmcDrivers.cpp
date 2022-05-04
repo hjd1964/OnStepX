@@ -3,7 +3,7 @@
 
 #include "TmcDrivers.h"
 
-#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_DRIVER_PRESENT)
+#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_SPI_DRIVER_PRESENT)
 
 bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber) {
   active = false;
@@ -62,7 +62,7 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC5160) rsense = 0.075; else
     if (model == TMC2130) rsense = 0.11 + 0.02; else
     if (model == TMC2209U) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
@@ -98,7 +98,7 @@ bool TmcDriver::mode(bool intpol, int decay_mode, byte micro_step_code, int irun
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
       uint32_t data_out = 0;
@@ -210,7 +210,7 @@ bool TmcDriver::error() {
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
 
@@ -240,7 +240,7 @@ bool TmcDriver::refresh_CHOPCONF(byte micro_step_code) {
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
 
@@ -267,7 +267,7 @@ uint32_t TmcDriver::read_CHOPCONF() {
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
 
@@ -312,7 +312,7 @@ int TmcDriver::refresh_DRVSTATUS() {
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
 
@@ -362,7 +362,7 @@ bool TmcDriver::refresh_COOLCONF() {
     } else
   #endif
 
-  #ifdef TMC_DRIVER_PRESENT
+  #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC2130 || model == TMC5160) {
       softSpi.begin();
       
@@ -377,7 +377,7 @@ bool TmcDriver::refresh_COOLCONF() {
   return false;
 }
 
-#ifdef TMC_DRIVER_PRESENT
+#ifdef TMC_SPI_DRIVER_PRESENT
   uint8_t TmcDriver::write(byte Address, uint32_t data_out) {
     Address = Address | 0x80;
     uint8_t status_byte = softSpi.transfer(Address);

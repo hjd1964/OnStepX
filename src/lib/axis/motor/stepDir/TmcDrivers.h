@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include "../../../../Common.h"
 
-#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_DRIVER_PRESENT)
+#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_SPI_DRIVER_PRESENT)
 
 #ifdef TMC_UART_DRIVER_PRESENT
   #if SERIAL_TMC == SoftSerial
@@ -15,7 +15,7 @@
   #include <TMC2209.h> // https://github.com/hjd1964/TMC2209
 #endif
 
-#ifdef TMC_DRIVER_PRESENT
+#ifdef TMC_SPI_DRIVER_PRESENT
   #include "../../../softSpi/SoftSpi.h"
 #endif
 
@@ -92,7 +92,7 @@ class TmcDriver {
     inline bool set_COOLCONF_sfilt(int v)        { if (v >= 0 && v <= 1)       { cl_sfilt = v; return true; } return false; }
 
   private:
-    #ifdef TMC_DRIVER_PRESENT
+    #ifdef TMC_SPI_DRIVER_PRESENT
       uint8_t write(byte Address, uint32_t data_out);
       uint8_t read(byte Address, uint32_t* data_out);
     #endif
@@ -187,7 +187,7 @@ class TmcDriver {
     int   model;
     float rsense              = 0.11 + 0.02; // default for TMC2130
 
-    #ifdef TMC_DRIVER_PRESENT
+    #ifdef TMC_SPI_DRIVER_PRESENT
       SoftSpi softSpi;
     #endif
 

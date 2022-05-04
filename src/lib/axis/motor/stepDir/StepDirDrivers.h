@@ -107,7 +107,7 @@ class StepDirDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     int subdivisionsToCode(long microsteps);
 
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       TmcDriver tmcDriver;
     #endif
 
