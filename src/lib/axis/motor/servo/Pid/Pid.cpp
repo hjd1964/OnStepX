@@ -37,12 +37,12 @@ void Pid::selectAlternateParam(bool alternate) {
     p = param1;
     i = param2;
     d = param3;
-    VF("setting normal parameters ");
+    VF("setting normal parameters");
   } else {
     p = param4;
     i = param5;
     d = param6;
-    VF("setting alternate parameters ");
+    VF("setting alternate parameters");
   }
   VF(" P="); V(p); VF(", I="); V(i); VF(", D="); VL(d);
   pid->SetTunings(p, i, d);
