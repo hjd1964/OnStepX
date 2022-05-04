@@ -36,8 +36,10 @@ void Guide::init() {
   settings.axis2RateSelect = GR_20X;
 
   // start guide monitor task
-  VF("MSG: Mount, start guide monitor task (rate 10ms priority 3)... ");
-  if (tasks.add(10, 0, true, 3, guideWrapper, "MntGuid")) { VLF("success"); } else { VLF("FAILED!"); }
+  VF("MSG: Mount, start guide monitor task (rate "); V(FRACTIONAL_SEC_US/2); VF("us priority 3)... ");
+  int taskHandle = tasks.add(0, 0, true, 3, guideWrapper, "MtGuide");
+  tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US/2);
+  if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
 }
 
 // start guide at a given direction and rate on Axis1
