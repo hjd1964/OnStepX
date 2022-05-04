@@ -18,7 +18,7 @@
 // DEBUG ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#DEBUG
 // Enable additional debugging and/or status messages on the specified SERIAL_DEBUG port
 // Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
-#define DEBUG                         OFF //    OFF, Use ON for background error messages only, use VERBOSE for all           Infreq
+#define DEBUG                     VERBOSE //    OFF, Use ON for background error messages only, use VERBOSE for all           Infreq
                                           //         error and status messages, use CONSOLE for VT100 debug console,
                                           //         or use PROFILER for VT100 task profiler.
 #define DEBUG_SERVO                   OFF //    OFF, n. Where n=1 to 9 as the designated axis for logging servo activity.     Option
@@ -49,15 +49,15 @@
 #define AXIS1_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
 // for SERVO_II and SERVO_SD driver models, PID and encoder settings:
+#define AXIS1_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
 #define AXIS1_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS1_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS1_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
-#define AXIS1_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
+#define AXIS1_SERVO_P_GOTO            2.0 //    2.0, Proportional; as above except active only while slewing.                 Adjust 
+#define AXIS1_SERVO_I_GOTO            5.0 //    5.0, Integral; as above except active only while slewing.                     Adjust
+#define AXIS1_SERVO_D_GOTO            1.0 //    1.0, Derivative; ; as above except active only while slewing.                 Adjust
 
 #define AXIS1_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
-
-#define AXIS1_LIMIT_MIN              -180 //   -180, n. Where n= -90..-360 (degrees.) Minimum "Hour Angle" or Azimuth.        Adjust
-#define AXIS1_LIMIT_MAX               180 //    180, n. Where n=  90.. 360 (degrees.) Maximum "Hour Angle" or Azimuth.        Adjust
 
 #define AXIS1_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from front. Option
 #define AXIS1_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
@@ -75,15 +75,15 @@
 #define AXIS2_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
 // for SERVO_II and SERVO_SD driver models, PID and encoder settings:
+#define AXIS2_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
 #define AXIS2_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS2_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS2_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
-#define AXIS2_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
+#define AXIS2_SERVO_P_GOTO            2.0 //    2.0, Proportional; as above except active only while slewing.                 Adjust 
+#define AXIS2_SERVO_I_GOTO            5.0 //    5.0, Integral; as above except active only while slewing.                     Adjust
+#define AXIS2_SERVO_D_GOTO            1.0 //    1.0, Derivative; ; as above except active only while slewing.                 Adjust
 
 #define AXIS2_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops or 10min after last<=1x guide.  Option
-
-#define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed declination.                Infreq
-#define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed declination.                 Infreq
 
 #define AXIS2_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS2_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
@@ -160,15 +160,15 @@
 #define AXIS3_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
 // for SERVO_II and SERVO_SD driver models, PID and encoder settings:
+#define AXIS3_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
 #define AXIS3_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS3_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS3_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
-#define AXIS3_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
+#define AXIS3_SERVO_P_GOTO            2.0 //    2.0, Proportional; as above except active only while slewing.                 Adjust 
+#define AXIS3_SERVO_I_GOTO            5.0 //    5.0, Integral; as above except active only while slewing.                     Adjust
+#define AXIS3_SERVO_D_GOTO            1.0 //    1.0, Derivative; ; as above except active only while slewing.                 Adjust
 
 #define AXIS3_POWER_DOWN              OFF //    OFF, ON Powers off the motor at stand-still.                                  Option
-
-#define AXIS3_LIMIT_MIN              -180 //   -180, n. Where n=-360..0 (degrees.) Minimum allowed rotator angle.             Infreq
-#define AXIS3_LIMIT_MAX               180 //    180, n. Where n=0..360 (degrees.) Maximum allowed rotator angle.              Infreq
 
 #define AXIS3_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS3_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
@@ -186,15 +186,15 @@
 #define AXIS4_DRIVER_DECAY_GOTO       OFF //    OFF, Decay mode goto default override. TMC default is SPREADCYCLE.            Infreq
 
 // for SERVO_II and SERVO_SD driver models, PID and encoder settings:
+#define AXIS4_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
 #define AXIS4_SERVO_P                 2.0 //    2.0, Proportional; scale of immediate response to position error.             Adjust 
 #define AXIS4_SERVO_I                 5.0 //    5.0, Integral; rate of increasing response to position error over time.       Adjust
 #define AXIS4_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
-#define AXIS4_SERVO_ENCODER        ENC_AB // ..._AB, Encoder type, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY.         Adjust
+#define AXIS4_SERVO_P_GOTO            2.0 //    2.0, Proportional; as above except active only while slewing.                 Adjust 
+#define AXIS4_SERVO_I_GOTO            5.0 //    5.0, Integral; as above except active only while slewing.                     Adjust
+#define AXIS4_SERVO_D_GOTO            1.0 //    1.0, Derivative; ; as above except active only while slewing.                 Adjust
 
 #define AXIS4_POWER_DOWN              OFF //    OFF, ON Powers off 30sec after movement stops.                                Option
-
-#define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
-#define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
 
 #define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
