@@ -85,6 +85,10 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
+#define AXIS1_SERVO_ENC1_PIN    AXIS1_M0_PIN
+#define AXIS1_SERVO_ENC2_PIN    AXIS1_M1_PIN
+#define AXIS1_SERVO_PH1_PIN     AXIS1_STEP_PIN
+#define AXIS1_SERVO_PH2_PIN     AXIS1_DIR_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        40
@@ -98,6 +102,10 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
+#define AXIS2_SERVO_ENC1_PIN    AXIS2_M0_PIN
+#define AXIS2_SERVO_ENC2_PIN    AXIS2_M1_PIN
+#define AXIS2_SERVO_PH1_PIN     AXIS2_STEP_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_DIR_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        11
@@ -108,6 +116,10 @@
 #define AXIS3_STEP_PIN          26
 #define AXIS3_DIR_PIN           27
 #define AXIS3_DECAY_PIN         AXIS3_M2_PIN
+#define AXIS3_SERVO_ENC1_PIN    AXIS3_M0_PIN
+#define AXIS3_SERVO_ENC2_PIN    AXIS3_M1_PIN
+#define AXIS3_SERVO_PH1_PIN     AXIS3_STEP_PIN
+#define AXIS3_SERVO_PH2_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #define AXIS4_ENABLE_PIN        28
@@ -118,6 +130,10 @@
 #define AXIS4_STEP_PIN          32
 #define AXIS4_DIR_PIN           27
 #define AXIS4_DECAY_PIN         AXIS4_M2_PIN
+#define AXIS4_SERVO_ENC1_PIN    AXIS4_M0_PIN
+#define AXIS4_SERVO_ENC2_PIN    AXIS4_M1_PIN
+#define AXIS4_SERVO_PH1_PIN     AXIS4_STEP_PIN
+#define AXIS4_SERVO_PH2_PIN     AXIS4_DIR_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        11
@@ -128,6 +144,10 @@
 #define AXIS5_STEP_PIN          26
 #define AXIS5_DIR_PIN           27
 #define AXIS5_DECAY_PIN         AXIS5_M2_PIN
+#define AXIS5_SERVO_ENC1_PIN    AXIS4_M0_PIN
+#define AXIS5_SERVO_ENC2_PIN    AXIS4_M1_PIN
+#define AXIS5_SERVO_PH1_PIN     AXIS4_STEP_PIN
+#define AXIS5_SERVO_PH2_PIN     AXIS4_DIR_PIN
 
 // ST4 interface
 #define ST4_RA_W_PIN            3                // ST4 RA- West
