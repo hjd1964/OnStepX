@@ -124,10 +124,6 @@ class Mount {
 #elif defined(AXIS1_SERVO_PRESENT)
   extern ServoMotor motor1;
 #endif
-extern IRAM_ATTR void moveAxis1();
-extern IRAM_ATTR void moveFFAxis1();
-extern IRAM_ATTR void moveFRAxis1();
-extern IRAM_ATTR void pollAxis1();
 extern Axis axis1;
 
 #ifdef AXIS2_DRIVER_PRESENT
@@ -135,10 +131,6 @@ extern Axis axis1;
 #elif defined(AXIS2_SERVO_PRESENT)
   extern ServoMotor motor2;
 #endif
-extern IRAM_ATTR void moveAxis2();
-extern IRAM_ATTR void moveFFAxis2();
-extern IRAM_ATTR void moveFRAxis2();
-extern IRAM_ATTR void pollAxis2();
 extern Axis axis2;
 
 extern Mount mount;

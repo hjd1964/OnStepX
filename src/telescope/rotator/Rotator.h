@@ -90,8 +90,6 @@ class Rotator {
 #elif defined(AXIS3_SERVO_PRESENT)
   extern ServoMotor motor3;
 #endif
-extern IRAM_ATTR void moveAxis3();
-extern IRAM_ATTR void pollAxis3();
 extern Axis axis3;
 
 extern Rotator rotator;

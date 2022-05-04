@@ -13,35 +13,27 @@
 #define DirSetRev 254
 #define DirSetFwd 255
 
-typedef struct StepDirPins {
-  int16_t   step;
-  uint8_t   stepState;
-  int16_t   dir;
-  int16_t   enable;
-  uint8_t   enabledState;
-} StepDirPins;
-
 enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUEST, MMC_SLEWING_PAUSE, MMC_SLEWING_READY, MMC_TRACKING_READY};
 
 class StepDirMotor : public Motor {
   public:
     // constructor
-    StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *driver, bool useFastHardwareTimers = true);
+    StepDirMotor(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, bool useFastHardwareTimers = true);
 
     // sets up the driver step/dir/enable pins
-    bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
+    bool init();
 
     // set driver default reverse state
     void setReverse(int8_t state);
 
     // get driver type code
-    inline char getParamTypeCode() { return driver->getParamTypeCode(); }
+    inline char getParameterTypeCode() { return driver->getParameterTypeCode(); }
 
-    // set default driver microsteps and current
-    void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
+    void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
-    bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // sets motor power on/off (if possible)
     void power(bool value);
@@ -82,14 +74,14 @@ class StepDirMotor : public Motor {
     // fast reverse axis movement, no backlash, no mode switching
     void moveFR(const int8_t stepPin);
 
-    // a stepper motor driver, should not be used outside of the StepDir class
+    // a stepper motor driver, should not be used above the StepDir class
     StepDirDriver *driver;
 
-  private:
-    const StepDirPins *Pins;
+    // the stepper motor driver pins, should not be used above the StepDir class
+    const StepDirDriverPins *Pins;
 
+  private:
     uint8_t taskHandle = 0;
-    volatile uint8_t mtrHandle = 0;
 
     #ifdef DRIVER_STEP_DEFAULTS
       #define stepClr LOW               // pin state to reset driver before taking a step
@@ -117,9 +109,9 @@ class StepDirMotor : public Motor {
     bool useFastHardwareTimers = true;
     bool useFastCalls = false;
 
-    void (*_move)() = NULL;
-    void (*_moveFF)() = NULL;
-    void (*_moveFR)() = NULL;
+    void (*callback)() = NULL;
+    void (*callbackFF)() = NULL;
+    void (*callbackFR)() = NULL;
 };
 
 #endif

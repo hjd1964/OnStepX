@@ -35,12 +35,6 @@
 #include "motor/stepDir/StepDir.h"
 #include "motor/servo/Servo.h"
 
-#pragma pack(1)
-typedef struct AxisLimits {
-  float min;
-  float max;
-} AxisLimits;
-
 // helpers for step/dir and servo parameters
 #define subdivisions param1
 #define subdivisionsGoto param2
@@ -54,14 +48,26 @@ typedef struct AxisLimits {
 #define porportionalGoto param5
 #define derivativeGoto param6
 
-#define AxisSettingsSize 45
+#pragma pack(1)
+typedef struct AxisLimits {
+  float min;
+  float max;
+} AxisLimits;
+
 typedef struct AxisSettings {
+  double     stepsPerMeasure;
+  int8_t     reverse;
+  AxisLimits limits;
+  float      backlashFreq;
+} AxisSettings;
+
+#define AxisStoredSettingsSize 41
+typedef struct AxisStoredSettings {
   double     stepsPerMeasure;
   int8_t     reverse;
   float      param1, param2, param3, param4, param5, param6;
   AxisLimits limits;
-  float      backlashFreq;
-} AxisSettings;
+} AxisStoredSettings;
 #pragma pack()
 
 typedef struct AxisSense {
@@ -98,7 +104,7 @@ class Axis {
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // sets up the driver step/dir/enable pins and any associated driver mode control
-    void init(Motor *motor, void (*callback)());
+    bool init(Motor *motor);
 
     // enables or disables the associated step/dir driver
     void enable(bool value);
@@ -282,7 +288,7 @@ class Axis {
     // associated motor
     Motor *motor;
 
-    AxisSettings settings;
+    AxisStoredSettings settings;
 
     bool commonMinMaxSense = false;
 
@@ -309,9 +315,9 @@ class Axis {
     // nearest the instrument coordinate
     double unwrapNearest(double value);
 
-    bool decodeAxisSettings(char *s, AxisSettings &a);
+    bool decodeAxisSettings(char *s, AxisStoredSettings &a);
 
-    bool validateAxisSettings(int axisNum, AxisSettings a);
+    bool validateAxisSettings(int axisNum, AxisStoredSettings a);
     
     AxisErrors errors;
     bool lastErrorResult = false;
@@ -356,6 +362,7 @@ class Axis {
     float minFreq = 0.0F;
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
+    float backlashFreq = 0.0F;
 
     AutoRate autoRate = AR_NONE;       // auto slew mode
     float slewAccelerationDistance;    // auto slew rate distance in measures to max rate

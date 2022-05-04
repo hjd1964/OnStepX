@@ -10,11 +10,13 @@
 
 class Pid : public Feedback {
   public:
+    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto);
+
     // initialize PID control and parameters
     void init(uint8_t axisNumber, ServoControl *control);
 
     // get driver type code so clients understand the use of the six parameters
-    char getParamTypeCode() { return 'P'; }
+    char getParameterTypeCode() { return 'P'; }
 
     // select PID param set for tracking or slewing
     void selectAlternateParam(bool alternate);

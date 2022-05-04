@@ -155,8 +155,6 @@ class Focuser {
   #elif defined(AXIS4_SERVO_PRESENT)
     extern ServoMotor motor4;
   #endif
-  extern IRAM_ATTR void moveAxis4();
-  extern IRAM_ATTR void pollAxis4();
   extern Axis axis4;
 #endif
 
@@ -166,8 +164,6 @@ class Focuser {
   #elif defined(AXIS5_SERVO_PRESENT)
     extern ServoMotor motor5;
   #endif
-  extern IRAM_ATTR void moveAxis5();
-  extern IRAM_ATTR void pollAxis5();
   extern Axis axis5;
 #endif
 
@@ -177,8 +173,6 @@ class Focuser {
   #elif defined(AXIS6_SERVO_PRESENT)
     extern ServoMotor motor6;
   #endif
-  extern IRAM_ATTR void moveAxis6();
-  extern IRAM_ATTR void pollAxis6();
   extern Axis axis6;
 #endif
 
@@ -188,8 +182,6 @@ class Focuser {
   #elif defined(AXIS7_SERVO_PRESENT)
     extern ServoMotor motor7;
   #endif
-  extern IRAM_ATTR void moveAxis7();
-  extern IRAM_ATTR void pollAxis7();
   extern Axis axis7;
 #endif
 
@@ -199,8 +191,6 @@ class Focuser {
   #elif defined(AXIS8_SERVO_PRESENT)
     extern ServoMotor motor8;
   #endif
-  extern IRAM_ATTR void moveAxis8();
-  extern IRAM_ATTR void pollAxis8();
   extern Axis axis8;
 #endif
 
@@ -210,8 +200,6 @@ class Focuser {
   #elif defined(AXIS9_SERVO_PRESENT)
     extern ServoMotor motor9;
   #endif
-  extern IRAM_ATTR void moveAxis9();
-  extern IRAM_ATTR void pollAxis9();
   extern Axis axis9;
 #endif
 

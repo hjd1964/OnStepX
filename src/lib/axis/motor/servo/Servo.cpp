@@ -8,37 +8,55 @@
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
+ServoMotor *servoMotorInstance[9];
+IRAM_ATTR void moveServoMotorAxis1() { servoMotorInstance[0]->move(); }
+IRAM_ATTR void moveServoMotorAxis2() { servoMotorInstance[1]->move(); }
+IRAM_ATTR void moveServoMotorAxis3() { servoMotorInstance[2]->move(); }
+IRAM_ATTR void moveServoMotorAxis4() { servoMotorInstance[3]->move(); }
+IRAM_ATTR void moveServoMotorAxis5() { servoMotorInstance[4]->move(); }
+IRAM_ATTR void moveServoMotorAxis6() { servoMotorInstance[5]->move(); }
+IRAM_ATTR void moveServoMotorAxis7() { servoMotorInstance[6]->move(); }
+IRAM_ATTR void moveServoMotorAxis8() { servoMotorInstance[7]->move(); }
+IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
+
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control, bool useFastHardwareTimers) {
+ServoMotor::ServoMotor(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings, Encoder *enc, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers) {
+  if (axisNumber < 1 || axisNumber > 9) return;
+
+  strcpy(axisPrefix, "MSG: Servo_, ");
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->enc = enc;
   this->feedback = feedback;
   this->control = control;
-  this->driver = driver;
   this->useFastHardwareTimers = useFastHardwareTimers;
   driverType = SERVO;
+
+  this->driver = new ServoDriver(axisNumber, Pins, Settings);
+  feedback->getDefaultParameters(&default_param1, &default_param2, &default_param3, &default_param4, &default_param5, &default_param6);
+
+  // attach the function pointers to the callbacks
+  servoMotorInstance[axisNumber - 1] = this;
+  switch (axisNumber) {
+    case 1: callback = moveServoMotorAxis1; break;
+    case 2: callback = moveServoMotorAxis2; break;
+    case 3: callback = moveServoMotorAxis3; break;
+    case 4: callback = moveServoMotorAxis4; break;
+    case 5: callback = moveServoMotorAxis5; break;
+    case 6: callback = moveServoMotorAxis6; break;
+    case 7: callback = moveServoMotorAxis7; break;
+    case 8: callback = moveServoMotorAxis8; break;
+    case 9: callback = moveServoMotorAxis9; break;
+  }
 
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
 }
 
-bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (*volatile moveFR)()) {
-  this->_move = move;
-  UNUSED(moveFF);
-  UNUSED(moveFR);
+bool ServoMotor::init() {
+  if (axisNumber < 1 || axisNumber > 9) return false;
 
-  // make sure there is something to do
-  if (_move == NULL) {
-    V(axisPrefix);
-    VF("nothing to do exiting!");
-    return false;
-  }
-
-  // get the driver ready
   driver->init();
-
-  // now disable the driver
   power(false);
 
   // start the motor timer
@@ -46,7 +64,7 @@ bool ServoMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void (
   VF("start task to move motor... ");
   char timerName[] = "Target_";
   timerName[6] = '0' + axisNumber;
-  taskHandle = tasks.add(0, 0, true, 0, _move, timerName);
+  taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     V("success");
     if (axisNumber <= 2 && useFastHardwareTimers) {
@@ -68,15 +86,15 @@ void ServoMotor::setReverse(int8_t state) {
   feedback->setControlDirection(state);
 }
 
-// set default driver parameters
-void ServoMotor::setParam(float param1, float param2, float param3, float param4, float param5, float param6) {
-  feedback->setParam(param1, param2, param3, param4, param5, param6);
+// set driver parameters
+void ServoMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+  feedback->setParameters(param1, param2, param3, param4, param5, param6);
   setSlewing(isSlewing);
 }
 
 // validate driver parameters
-bool ServoMotor::validateParam(float param1, float param2, float param3, float param4, float param5, float param6) {
-  return feedback->validateParam(param1, param2, param3, param4, param5, param6);
+bool ServoMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+  return feedback->validateParameters(param1, param2, param3, param4, param5, param6);
 }
 
 // sets motor power on/off (if possible)

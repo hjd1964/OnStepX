@@ -29,8 +29,7 @@ void Rotator::init() {
   readSettings();
 
   VLF("MSG: Rotator, init (Axis3)");
-  axis3.init(&motor3, pollAxis3);
-  if (!motor3.init(moveAxis3)) { DLF("ERR: Axis3, no motor exiting!"); return; }
+  if (!axis3.init(&motor3, pollAxis3)) { DLF("ERR: Axis3, no motion controller exiting!"); return; }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_DESIRED);

@@ -46,48 +46,43 @@ void focWrapper() { focuser.monitor(); }
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 void Focuser::init() {
+
   // get the motion controllers ready
   #if AXIS4_DRIVER_MODEL != OFF
-    axis4.init(&motor4, pollAxis4);
-    if (motor4.init(moveAxis4)) {
+    if (!axis4.init(&motor4)) { DLF("ERR: Axis4, no motion controller skipping!"); } else {
       VLF("MSG: Focuser1, init (Axis4)");
       axes[0] = &axis4;
-    } else { DLF("ERR: Axis4, no motor!"); }
+    }
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    axis5.init(&motor5, pollAxis5);
-    if (motor5.init(moveAxis5)) {
+    if (!axis5.init(&motor5)) { DLF("ERR: Axis5, no motion controller skipping!"); } else {
       VLF("MSG: Focuser2, init (Axis5)");
       axes[1] = &axis5;
-    } else { DLF("ERR: Axis5, no motor!"); }
+    }
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    axis6.init(&motor6, pollAxis6);
-    if (motor6.init(moveAxis6)) {
+    if (!axis6.init(&motor6)) { DLF("ERR: Axis6, no motion controller skipping!"); } else {
       VLF("MSG: Focuser3, init (Axis6)");
       axes[2] = &axis6;
-    } else { DLF("ERR: Axis6, no motor!"); }
+    }
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    axis7.init(&motor7, pollAxis7);
-    if (motor7.init(moveAxis7)) {
+    if (!axis7.init(&motor7)) { DLF("ERR: Axis7, no motion controller skipping!"); } else {
       VLF("MSG: Focuser4, init (Axis7)");
       axes[3] = &axis7;
-    } else { DLF("ERR: Axis7, no motor!"); }
+    }
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    axis8.init(&motor8, pollAxis8);
-    if (motor8.init(moveAxis8)) {
+    if (!axis8.init(&motor8)) { DLF("ERR: Axis8, no motion controller skipping!"); } else {
       VLF("MSG: Focuser5, init (Axis8)");
       axes[4] = &axis8;
-    } else { DLF("ERR: Axis8, no motor!"); }
+    }
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    axis9.init(&motor9, pollAxis9);
-    if (motor9.init(moveAxis9)) {
+    if (!axis9.init(&motor9)) { DLF("ERR: Axis9, no motion controller skipping!"); } else {
       VLF("MSG: Focuser6, init (Axis9)");
       axes[5] = &axis9;
-    } else { DLF("ERR: Axis9, no motor!"); }
+    }
   #endif
 
   // confirm the data structure size
