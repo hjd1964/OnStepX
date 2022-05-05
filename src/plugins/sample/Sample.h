@@ -1,5 +1,5 @@
 // Sample plugin
-#pragma onced
+#pragma once
 
 class Sample {
 public:

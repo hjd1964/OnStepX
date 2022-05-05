@@ -60,21 +60,21 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (features.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
-  //  B - Reticule/Accessory Control
-  // :B+#       Increase reticule Brightness
+  //  B - Reticle/Accessory Control
+  // :B+#       Increase reticle Brightness
   //            Returns: Nothing
-  // :B-#       Decrease Reticule Brightness
+  // :B-#       Decrease Reticle Brightness
   //            Returns: Nothing
   if (command[0] == 'B' && (command[1] == '+' || command[1] == '-') && parameter[0] == 0)  {
     #if RETICLE_LED_DEFAULT >= 0 && RETICLE_LED_PIN != OFF
       int scale;
-      if (reticuleBrightness > 255-8) scale = 1; else
-      if (reticuleBrightness > 255-32) scale = 4; else
-      if (reticuleBrightness > 255-64) scale = 12; else
-      if (reticuleBrightness > 255-128) scale = 32; else scale = 64;
-      if (command[1] == '-') reticuleBrightness += scale;  if (reticuleBrightness > 255) reticuleBrightness = 255;
-      if (command[1] == '+') reticuleBrightness -= scale;  if (reticuleBrightness < 0)   reticuleBrightness = 0;
-      analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticuleBrightness));
+      if (reticleBrightness > 255-8) scale = 1; else
+      if (reticleBrightness > 255-32) scale = 4; else
+      if (reticleBrightness > 255-64) scale = 12; else
+      if (reticleBrightness > 255-128) scale = 32; else scale = 64;
+      if (command[1] == '-') reticleBrightness += scale;  if (reticleBrightness > 255) reticleBrightness = 255;
+      if (command[1] == '+') reticleBrightness -= scale;  if (reticleBrightness < 0)   reticleBrightness = 0;
+      analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticleBrightness));
       #if RETICLE_LED_MEMORY == ON
         nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
       #endif
