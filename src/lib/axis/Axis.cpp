@@ -114,8 +114,8 @@ bool Axis::init(Motor *motor) {
   #endif
 
   // setup motor
-  motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
   if (!motor->init()) { DLF("ERR: Axis::init(); no motor exiting!"); return false; }
+  motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
   motor->setReverse(settings.reverse);
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
 
