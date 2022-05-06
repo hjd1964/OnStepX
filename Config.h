@@ -20,9 +20,9 @@
                                           //         MaxSTM3, FYSETC_S6_2, etc.  Other boards and more info. in ~/src/Constants.h
 
 // SERIAL PORT COMMAND CHANNELS ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SERIAL
-#define SERIAL_B_BAUD_DEFAULT        9600 //   9600, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
+#define SERIAL_B_BAUD_DEFAULT        9600 //   9600, n. See (src/pinmaps/) for your MCU Serial port # etc.                    Option
 #define SERIAL_B_ESP_FLASHING         OFF //    OFF, ON Upload ESP8266 WiFi firmware through SERIAL_B with :ESPFLASH# cmd.    Option
-#define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
+#define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. See (src/pinmaps/) for your MCU Serial port # etc.                    Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define STATUS_LED                    OFF //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
