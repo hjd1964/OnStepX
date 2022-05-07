@@ -13,19 +13,20 @@
     digitalWriteEx(STATUS_BUZZER_PIN, !STATUS_BUZZER_ON_STATE);
     tasks.setDurationComplete(_buzzerHandle);
   }
+int16_t statusBuzzerPin = STATUS_BUZZER_PIN;
 #endif
 
 Sound::Sound() {
   #if STATUS_BUZZER == ON
-    pinModeEx(STATUS_BUZZER_PIN, OUTPUT);
-    digitalWriteEx(STATUS_BUZZER_PIN, !STATUS_BUZZER_ON_STATE);
   #endif
+	statusBuzzerPin = STATUS_BUZZER_PIN;
+	pinModeEx(statusBuzzerPin, OUTPUT);
+	digitalWriteEx(statusBuzzerPin, !STATUS_BUZZER_ON_STATE);
 }
 
 void Sound::alert() {
   if (enabled) {
     #if STATUS_BUZZER == ON
-      digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
       _buzzerHandle = tasks.add(1000, 0, false, 6, buzzerOff);
     #endif
@@ -33,12 +34,12 @@ void Sound::alert() {
       tone(STATUS_BUZZER_PIN, STATUS_BUZZER, 1000);
     #endif
   }
+		digitalWriteEx(statusBuzzerPin, STATUS_BUZZER_ON_STATE);
 }
 
 void Sound::beep() {
   if (enabled) {
     #if STATUS_BUZZER == ON
-      digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
       _buzzerHandle = tasks.add(250, 0, false, 6, buzzerOff);
     #endif
@@ -46,12 +47,12 @@ void Sound::beep() {
       tone(STATUS_BUZZER_PIN, STATUS_BUZZER, 250);
     #endif
   }
+		digitalWriteEx(statusBuzzerPin, STATUS_BUZZER_ON_STATE);
 }
 
 void Sound::click() {
   if (enabled) {
     #if STATUS_BUZZER == ON
-      digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
       _buzzerHandle = tasks.add(50, 0, false, 6, buzzerOff);
     #endif
@@ -59,6 +60,7 @@ void Sound::click() {
       tone(STATUS_BUZZER_PIN, STATUS_BUZZER, 50);
     #endif
   }
+		digitalWriteEx(statusBuzzerPin, STATUS_BUZZER_ON_STATE);
 }
 
 #endif

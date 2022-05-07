@@ -12,15 +12,17 @@
   bool ledOn = false;
   bool ledOff = false;
   void flash() {
-    if (ledOff) { digitalWriteEx(STATUS_LED_PIN, !STATUS_LED_ON_STATE); return; }
-    if (ledOn) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
     if ((cycle++)%2 == 0) {
-      digitalWriteEx(MOUNT_STATUS_LED_PIN, !STATUS_MOUNT_LED_ON_STATE);
     } else {
-      digitalWriteEx(MOUNT_STATUS_LED_PIN, STATUS_MOUNT_LED_ON_STATE);
     }
   }
+int16_t statusLedPin = STATUS_LED_PIN;
+int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
+	if (ledOff) { digitalWriteEx(statusLedPin, !STATUS_LED_ON_STATE); return; }
+	if (ledOn) { digitalWriteEx(statusLedPin, STATUS_LED_ON_STATE); return; }
+		digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
+		digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
 #endif
 
 void generalWrapper() { status.general(); }
@@ -37,8 +39,13 @@ void Status::init() {
   #endif
 
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
-    pinModeEx(PARK_STATUS_PIN, OUTPUT);
   #endif
+	pinModeEx(PARK_STATUS_PIN, OUTPUT);
+
+#if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
+	statusLedPin = STATUS_LED_PIN;
+	mountStatusLedPin = MOUNT_STATUS_LED_PIN;
+#endif
 }
 
 // late init once tracking is enabled
@@ -50,7 +57,6 @@ void Status::ready() {
 
   #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
-      pinModeEx(MOUNT_STATUS_LED_PIN, OUTPUT);
       VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
@@ -60,6 +66,7 @@ void Status::ready() {
   VF("MSG: Mount, status start general status task (1s rate priority 4)... ");
   statusTaskHandle = tasks.add(1000, 0, true, 4, generalWrapper, "genSta");
   if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
+		pinModeEx(mountStatusLedPin, OUTPUT);
 }
 
 // mount status LED flash rate (in ms)
