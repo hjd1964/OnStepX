@@ -94,8 +94,8 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       //            Returns: Value
       if (parameter[0] == 'F')  {
         switch (parameter[1]) {
-          case '3': sprintF(reply, "%0.6f", axis1.getFrequencySteps()); *numericReply = false; break;
-          case '4': sprintF(reply, "%0.6f", axis2.getFrequencySteps()); *numericReply = false; break;
+          case '3': sprintF(reply, "%0.6f", (axis1.getDirection() == DIR_FORWARD) ? axis1.getFrequencySteps() : -axis1.getFrequencySteps()); *numericReply = false; break;
+          case '4': sprintF(reply, "%0.6f", (axis2.getDirection() == DIR_FORWARD) ? axis2.getFrequencySteps() : -axis2.getFrequencySteps()); *numericReply = false; break;
           case 'A': sprintf(reply, "%d%%", 50); *numericReply = false; break; // workload
           case 'G': // index position for Axis2
             sprintF(reply, "%0.6f", radToDeg(transform.instrumentToMount(0.0, axis2.getIndexPosition()).a2));

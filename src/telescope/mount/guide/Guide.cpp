@@ -36,8 +36,10 @@ void Guide::init() {
   settings.axis2RateSelect = GR_20X;
 
   // start guide monitor task
-  VF("MSG: Mount, start guide monitor task (rate 10ms priority 3)... ");
-  if (tasks.add(10, 0, true, 3, guideWrapper, "MntGuid")) { VLF("success"); } else { VLF("FAILED!"); }
+  VF("MSG: Mount, start guide monitor task (rate "); V(FRACTIONAL_SEC_US/2); VF("us priority 3)... ");
+  int taskHandle = tasks.add(0, 0, true, 3, guideWrapper, "MtGuide");
+  tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US/2);
+  if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
 }
 
 // start guide at a given direction and rate on Axis1
@@ -110,7 +112,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(30000);
     axis2.setPowerDownOverrideTime(30000);
-    if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_REVERSE; };
+    if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
     V(rate); VL("X");
 

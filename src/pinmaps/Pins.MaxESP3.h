@@ -16,7 +16,7 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
-#ifdef TMC2209_USE_HARDWARE_SERIAL
+#if DRIVER_UART_HARDWARE_SERIAL == ON
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD       460800           // Baud rate
@@ -116,7 +116,7 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#ifndef TMC2209_USE_HARDWARE_SERIAL
+#if DRIVER_UART_HARDWARE_SERIAL == OFF
   #define AXIS4_ENABLE_PIN      OFF
 #else
   #define AXIS4_ENABLE_PIN      AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation

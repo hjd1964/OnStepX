@@ -312,7 +312,7 @@ class Tasks {
     #endif
     uint8_t count            = 0;
     uint8_t num_tasks        = 0; // the total number of tasks
-    uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255}; // the task# were are servicing at this priority level
+    uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255}; // the task# we are servicing at this priority level
     bool    allocated[TASKS_MAX];
     Task    *task[TASKS_MAX];
 };

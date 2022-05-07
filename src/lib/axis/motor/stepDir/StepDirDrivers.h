@@ -13,9 +13,27 @@
 #include "../Drivers.h"
 #include "TmcDrivers.h"
 
+#define mosi_pin m0
+#define sck_pin  m1
+#define cs_pin   m2
+#define miso_pin m3
+
 #pragma pack(1)
-#define StepDriverSettingsSize 15
-typedef struct DriverSettings {
+typedef struct StepDirDriverPins {
+  int16_t step;
+  uint8_t stepState;
+  int16_t dir;
+  int16_t enable;
+  uint8_t enabledState;
+  int16_t m0;
+  int16_t m1;
+  int16_t m2;
+  int16_t m3;
+  int16_t decay;
+  int16_t fault;
+} StepDirDriverPins;
+
+typedef struct StepDirDriverSettings {
   int16_t model;
   int16_t microsteps;
   int16_t microstepsGoto;
@@ -25,36 +43,22 @@ typedef struct DriverSettings {
   int8_t  decay;
   int8_t  decayGoto;
   int8_t  status;
-} DriverSettings;
+} StepDirDriverSettings;
 #pragma pack()
-
-typedef struct DriverModePins {
-  int16_t m0;
-  int16_t m1;
-  int16_t m2;
-  int16_t m3;
-  int16_t decay;
-  int16_t fault;
-} DriverPins;
-
-#define mosi_pin m0
-#define sck_pin  m1
-#define cs_pin   m2
-#define miso_pin m3
 
 class StepDirDriver {
   public:
     // constructor
-    StepDirDriver(uint8_t axisNumber, const DriverModePins *Pins, const DriverSettings *Settings);
+    StepDirDriver(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings);
 
     // get driver type code
-    inline char getParamTypeCode() { if (isTmcSPI()) return 'T'; else return 'S'; }
+    inline char getParameterTypeCode() { if (isTmcSPI()) return 'T'; else return 'S'; }
 
-    // decodes driver model/microstep mode into microstep codes (bit patterns or SPI) and sets up the pin modes
-    void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
+    void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
-    bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // true if switching microstep modes is allowed
     bool modeSwitchAllowed();
@@ -103,11 +107,11 @@ class StepDirDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     int subdivisionsToCode(long microsteps);
 
-    #if defined(TMC_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       TmcDriver tmcDriver;
     #endif
 
-    DriverSettings settings;
+    StepDirDriverSettings settings;
 
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
@@ -116,20 +120,21 @@ class StepDirDriver {
     // checkes if decay control is on the M2 pin
     bool isDecayOnM2();
 
-    int     axisNumber;
+    uint8_t axisNumber;
     DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};
     #if DEBUG != OFF
       DriverStatus lastStatus = {false, {false, false}, {false, false}, false, false, false, false};
     #endif
 
-    int     microstepRatio        = 1;
-    int     microstepCode         = OFF;
-    int     microstepCodeGoto     = OFF;
+    const int16_t* microsteps;
+    int16_t microstepRatio        = 1;
+    int16_t microstepCode         = OFF;
+    int16_t microstepCodeGoto     = OFF;
     uint8_t microstepBitCode      = 0;
     uint8_t microstepBitCodeGoto  = 0;
     int16_t m2Pin                 = OFF;
     int16_t decayPin              = OFF;
-    const DriverModePins *Pins;
+    const StepDirDriverPins *Pins;
 
     unsigned long timeLastStatusUpdate = 0;
 };

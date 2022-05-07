@@ -24,18 +24,18 @@ void TimeLocationSource::set(JulianDate ut1) {
   double m = (f1 - h)*60.0;
   double s = (m - floor(m))*60.0;
 
-  setTime(h, floor(m), floor(s), greg.day, greg.month, greg.year);   // set current system time
+  set(h, floor(m), floor(s), greg.day, greg.month, greg.year);
+}
 
-  unsigned long TeensyTime;
-  TeensyTime = now();                         // get time in epoch
-  Teensy3Clock.set(TeensyTime);               // set Teensy time
+void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+  setTime(hour, minute, second, day, month, year);
+  unsigned long TeensyTime = now();              // get time in epoch
+  Teensy3Clock.set(TeensyTime);                  // set Teensy time
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {
-  unsigned long TeensyTime;
-
-  TeensyTime = Teensy3Clock.get();            // get time from Teensy RTC
-  setTime(TeensyTime);                        // set system time
+  unsigned long TeensyTime = Teensy3Clock.get(); // get time from Teensy RTC
+  setTime(TeensyTime);                           // set system time
 
   if (year() >= 0 && year() <= 3000 && month() >= 1 && month() <= 12 && day() >= 1 && day() <= 31 &&
       hour() <= 23 && minute() <= 59 && second() <= 59) {

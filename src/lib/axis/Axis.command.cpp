@@ -23,8 +23,8 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
       if (axesToRevert & 1) {
         // check that this axis is not set to revert
         if (!(axesToRevert & (1 << axisNumber))) {
-          AxisSettings thisAxis;
-          nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+          AxisStoredSettings thisAxis;
+          nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisStoredSettingsSize, &thisAxis, sizeof(AxisStoredSettings));
           if (axisNumber <= 2) {
             // convert axis1, 2, and 3 into degrees
             thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
@@ -49,7 +49,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             (int)round(thisAxis.limits.min),
             (int)round(thisAxis.limits.max),
             ps1, ps2, ps3, ps4, ps5, ps6,
-            motor->getParamTypeCode());
+            motor->getParameterTypeCode());
           *numericReply = false;
         } else *commandError = CE_0;
       } else *commandError = CE_0;
@@ -93,7 +93,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
           nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
         } else {
           // :SXA[n],[sssss...]#
-          AxisSettings thisAxis = settings;
+          AxisStoredSettings thisAxis = settings;
           if (decodeAxisSettings(&parameter[3], thisAxis)) {
             if (axisNumber <= 2) {
               // convert axis1, 2 into radians
@@ -110,7 +110,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
               // validate settings for step/dir drivers
               if (motor->driverType == STEP_DIR) {
                 if (validateAxisSettings(axisNumber, thisAxis)) {
-                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize, &thisAxis, sizeof(AxisStoredSettings));
                 } else *commandError = CE_PARAM_FORM;
               }
             #endif
@@ -118,9 +118,9 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
               // validate settings for servo drivers
               if (motor->driverType == SERVO) {
                 if (validateAxisSettings(axisNumber, thisAxis)) {
-                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisSettingsSize, &thisAxis, sizeof(AxisSettings));
+                  nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize, &thisAxis, sizeof(AxisSettings));
                   // make these take effect now
-                  motor->setParam(thisAxis.param1, thisAxis.param2, thisAxis.param3, thisAxis.param4, thisAxis.param5, thisAxis.param6);
+                  motor->setParameters(thisAxis.param1, thisAxis.param2, thisAxis.param3, thisAxis.param4, thisAxis.param5, thisAxis.param6);
                 } else *commandError = CE_PARAM_FORM;
               }
             #endif
@@ -134,7 +134,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
 }
 
 // convert axis settings string into numeric form
-bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
+bool Axis::decodeAxisSettings(char *s, AxisStoredSettings &a) {
   if (strcmp(s, "0") != 0) {
     char *ws = s;
     char *conv_end; 
@@ -173,8 +173,8 @@ bool Axis::decodeAxisSettings(char *s, AxisSettings &a) {
 }
 
 // convert axis settings string into numeric form
-bool Axis::validateAxisSettings(int axisNum, AxisSettings a) {
-  if (!motor->validateParam(a.param1, a.param2, a.param3, a.param4, a.param5, a.param6)) return false;
+bool Axis::validateAxisSettings(int axisNum, AxisStoredSettings a) {
+  if (!motor->validateParameters(a.param1, a.param2, a.param3, a.param4, a.param5, a.param6)) return false;
 
   int minLimitL, minLimitH, maxLimitL, maxLimitH;
   float stepsLimitL, stepsLimitH;

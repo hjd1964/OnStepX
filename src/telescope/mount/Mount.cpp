@@ -35,6 +35,19 @@ void Mount::init() {
   // read the settings
   nv.readBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
 
+  // get the main axes ready
+  delay(100);
+  if (!axis1.init(&motor1)) {  DLF("ERR: Axis1, no motion controller exiting!"); return;  }
+  axis1.setBacklash(settings.backlash.axis1);
+  axis1.setMotionLimitsCheck(false);
+  if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
+
+  delay(100);
+  if (!axis2.init(&motor2)) {  DLF("ERR: Axis2, no motion controller exiting!"); return;  }
+  axis2.setBacklash(settings.backlash.axis2);
+  axis2.setMotionLimitsCheck(false);
+  if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
+
   // initialize the critical subsystems
   site.init();
   transform.init();
@@ -45,29 +58,6 @@ void Mount::init() {
     if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
     if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL;
   }
-
-  // get the main axes ready
-  delay(100);
-  axis1.init(&motor1, pollAxis1);
-  #ifdef AXIS1_SERVO_PRESENT
-    if (!motor1.init(moveAxis1)) { DLF("ERR: Axis1, no motor exiting!"); return; }
-  #else
-    if (!motor1.init(moveAxis1, moveFFAxis1, moveFRAxis1)) { DLF("ERR: Axis1, no motor exiting!"); return; }
-  #endif
-  axis1.setBacklash(settings.backlash.axis1);
-  axis1.setMotionLimitsCheck(false);
-  if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
-
-  delay(100);
-  axis2.init(&motor2, pollAxis2);
-  #ifdef AXIS2_SERVO_PRESENT
-    if (!motor2.init(moveAxis2)) { DLF("ERR: Axis2, no motor exiting!"); return; }
-  #else
-    if (!motor2.init(moveAxis2, moveFFAxis2, moveFRAxis2)) { DLF("ERR: Axis2, no motor exiting!"); return; }
-  #endif
-  axis2.setBacklash(settings.backlash.axis2);
-  axis2.setMotionLimitsCheck(false);
-  if (AXIS2_POWER_DOWN == ON) axis1.setPowerDownTime(DEFAULT_POWER_DOWN_TIME);
 
   // initialize the other subsystems
   home.init();

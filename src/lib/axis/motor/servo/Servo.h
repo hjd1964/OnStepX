@@ -15,27 +15,27 @@
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, Encoder *enc, Feedback *feedback, ServoDriver *driver, ServoControl *control, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings, Encoder *enc, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
-    bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
+    bool init();
 
     // set driver reverse state
     void setReverse(int8_t state);
 
     // get driver type code
-    inline char getParamTypeCode() { return feedback->getParamTypeCode(); }
+    inline char getParameterTypeCode() { return feedback->getParameterTypeCode(); }
 
     // set driver parameters
-    void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
-    bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // sets motor power on/off (if possible)
     void power(bool value);
 
-    // get the associated stepper driver status
+    // get the associated driver status
     DriverStatus getDriverStatus();
 
     // resets motor and target angular position in steps, also zeros backlash and index 
@@ -76,7 +76,7 @@ class ServoMotor : public Motor {
 
     volatile int  absStep = 1;          // absolute step size (unsigned)
 
-    void (*_move)() = NULL;
+    void (*callback)() = NULL;
 
     Encoder *enc;
     Feedback *feedback;

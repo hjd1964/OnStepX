@@ -5,6 +5,26 @@
 
 #ifdef MOTOR_PRESENT
 
+// get driver default parameters
+void Motor::getDefaultParameters(float *param1, float *param2, float *param3, float *param4, float *param5, float *param6){
+  *param1 = default_param1;
+  *param2 = default_param2;
+  *param3 = default_param3;
+  *param4 = default_param4;
+  *param5 = default_param5;
+  *param6 = default_param6;
+}
+
+// set driver default parameters
+void Motor::setDefaultParameters(float param1, float param2, float param3, float param4, float param5, float param6){
+  default_param1 = param1;
+  default_param2 = param2;
+  default_param3 = param3;
+  default_param4 = param4;
+  default_param5 = param5;
+  default_param6 = param6;
+}
+
 // resets motor and target angular position in steps, also zeros backlash and index 
 void Motor::resetPositionSteps(long value) {
   indexSteps    = 0;

@@ -27,7 +27,7 @@ bool TimeLocationSource::init() {
 
     #ifdef TLS_TIMELIB
       RtcDateTime now = rtcDS3234.GetDateTime();
-      setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
+      setTime(now.Hour(), now.Minute(), now.Second(), now.Day(), now.Month(), now.Year());
     #endif
 
     ready = true;
@@ -48,10 +48,17 @@ void TimeLocationSource::set(JulianDate ut1) {
   double m = (f1 - h)*60.0;
   double s = (m - floor(m))*60.0;
 
+  set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
+}
+
+void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+  #ifdef TLS_TIMELIB
+    setTime(hour, minute, second, day, month, year);
+  #endif
   #ifdef SSPI_SHARED
     SPI.begin();
   #endif
-  RtcDateTime updateTime = RtcDateTime(greg.year, greg.month, greg.day, h, floor(m), floor(s));
+  RtcDateTime updateTime = RtcDateTime(year, month, day, hour, minute, second);
   rtcDS3234.SetDateTime(updateTime);
   #ifdef SSPI_SHARED
     SPI.end();

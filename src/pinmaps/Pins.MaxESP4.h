@@ -18,7 +18,7 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
-#ifdef TMC2209_USE_HARDWARE_SERIAL
+#if DRIVER_UART_HARDWARE_SERIAL == ON
   #error "Configuration (Config.h): TMC2209 hardware serial isn't supported, disable this option."
 #else
   // Use the following settings for any TMC2209 that may be present

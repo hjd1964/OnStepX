@@ -16,19 +16,25 @@ enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 class Motor {
   public:
     // sets up the motor identification
-    virtual bool init(void (*volatile move)(), void (*volatile moveFF)() = NULL, void (*volatile moveFR)() = NULL);
+    virtual bool init();
 
     // set driver reverse state
     virtual void setReverse(int8_t state);
 
     // get driver parameters type code
-    virtual char getParamTypeCode();
+    virtual char getParameterTypeCode();
+
+    // get driver default parameters
+    void getDefaultParameters(float *param1, float *param2, float *param3, float *param4, float *param5, float *param6);
+
+    // get driver default parameters
+    void setDefaultParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // set driver parameters
-    virtual void setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    virtual void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
-    virtual bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // sets motor power on/off (if possible)
     virtual void power(bool value);
@@ -116,6 +122,8 @@ class Motor {
     int driverType = OFF;
     volatile bool inBacklash = false;          // must be true if within the backlash travel
 
+    volatile uint8_t monitorHandle = 0;        // handle to the axis task monitor
+
   protected:
     // disable backlash compensation, to work properly there must be an enable call to match
     void disableBacklash();
@@ -124,7 +132,7 @@ class Motor {
     void enableBacklash();
 
     volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
-    char axisPrefix[14] = "MSG: Motor_, ";     // prefix for debug messages
+    char axisPrefix[16];                       // prefix for debug messages
 
     bool enabled = false;                      // enable/disable logical state (disabled is powered down)
     bool synchronized = true;                  // locks movement of axis target with timer rate
@@ -145,6 +153,8 @@ class Motor {
     volatile long motorSteps = 0;              // where the motor is not counting backlash
     volatile long indexSteps = 0;              // for absolute motor position to axis position
     volatile int  step = 1;                    // step size, and for direction control
+
+    float default_param1 = 0, default_param2 = 0, default_param3 = 0, default_param4 = 0, default_param5 = 0, default_param6 = 0;
 
     bool poweredDown = false;
 

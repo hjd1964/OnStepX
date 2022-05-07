@@ -18,13 +18,19 @@ class Feedback {
     virtual void init(uint8_t axisNumber, ServoControl *control);
 
     // get driver type code
-    virtual char getParamTypeCode();
+    virtual char getParameterTypeCode();
 
-    // validate driver parameters
-    virtual bool validateParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    // get default feedback parameters
+    virtual void getDefaultParameters(float *param1, float *param2, float *param3, float *param4, float *param5, float *param6);
+
+    // set default feedback parameters
+    virtual void setDefaultParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // set feedback parameters
-    virtual bool setParam(float param1, float param2, float param3, float param4, float param5, float param6);
+    virtual void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // validate driver parameters
+    virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // select feedback PID param set
     virtual void selectAlternateParam(bool alternate);
@@ -35,9 +41,10 @@ class Feedback {
     virtual void poll();
 
   protected:
-    float param1, param2, param3, param4, param5, param6;
+    float default_param1 = 0, default_param2 = 0, default_param3 = 0, default_param4 = 0, default_param5 = 0, default_param6 = 0;
+    float param1 = 0, param2 = 0, param3 = 0, param4 = 0, param5 = 0, param6 = 0;
     ServoControl *control;
-    uint8_t axisNumber = 0; // axis number for this feedback (1 to 9 in OnStepX)
+    uint8_t axisNumber = 0;
 };
 
 #endif

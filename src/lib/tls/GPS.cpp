@@ -92,6 +92,14 @@ void TimeLocationSource::set(JulianDate ut1) {
   ut1 = ut1;
 }
 
+void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+  #ifdef TLS_TIMELIB
+    setTime(hour, minute, second, day, month, year);
+  #else
+    (void)year; (void)month; (void)day; (void)hour; (void)minute; (void)second;
+  #endif
+}
+
 void TimeLocationSource::get(JulianDate &ut1) {
   if (!ready) return;
   if (!timeIsValid()) return;

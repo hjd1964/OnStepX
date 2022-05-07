@@ -30,7 +30,7 @@ class PollingSerial : public Stream {
     inline void flush(void) { while (poll()) {}; }
 
     inline size_t write(uint8_t data) {
-      if (xmit_tail == xmit_index) return 0; 
+      //if (xmit_tail == xmit_index) return 0; 
       xmit_buffer[xmit_tail] = data;
       xmit_tail++; xmit_tail &= 0b111111;
       xmit_buffer[xmit_tail] = 0;

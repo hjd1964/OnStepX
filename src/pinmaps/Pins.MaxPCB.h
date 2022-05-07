@@ -23,7 +23,7 @@
   #define SERIAL_E_BAUD_DEFAULT 9600
 #endif
 
-#ifdef TMC2209_USE_HARDWARE_SERIAL
+#if DRIVER_UART_HARDWARE_SERIAL == ON
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC           Serial4          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD      460800           // Baud rate
@@ -97,6 +97,10 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN AUX3_PIN
 #endif
+#define AXIS1_SERVO_ENC1_PIN   AXIS1_M0_PIN
+#define AXIS1_SERVO_ENC2_PIN   AXIS1_M1_PIN
+#define AXIS1_SERVO_PH1_PIN    AXIS1_STEP_PIN
+#define AXIS1_SERVO_PH2_PIN    AXIS1_DIR_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN       9
@@ -111,6 +115,10 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN AUX4_PIN
 #endif
+#define AXIS2_SERVO_ENC1_PIN   AXIS2_M0_PIN
+#define AXIS2_SERVO_ENC2_PIN   AXIS2_M1_PIN
+#define AXIS2_SERVO_PH1_PIN    AXIS2_STEP_PIN
+#define AXIS2_SERVO_PH2_PIN    AXIS2_DIR_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN       AUX5_PIN

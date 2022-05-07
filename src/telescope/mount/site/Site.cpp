@@ -89,7 +89,7 @@ void Site::init() {
       readJD();
     }
   #else
-    VLF("MSG: Site, get Date/Time from NV");
+    VLF("MSG: Mount, site get Date/Time from NV");
     readJD();
   #endif
 
