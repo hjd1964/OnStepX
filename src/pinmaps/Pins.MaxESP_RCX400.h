@@ -98,7 +98,7 @@
 #define AXIS1_M2_PIN            OFF              // SPI CS (UART TX)
 #define AXIS1_M3_PIN            OFF         // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          23
-#define AXIS1_DIR_PIN           2                // [must be high at boot 0]
+#define AXIS1_DIR_PIN           2               // [must be high at boot 0]
 #define AXIS1_DECAY_PIN         OFF
 #ifndef AXIS1_SENSE_HOME_PIN
 #define AXIS1_SENSE_HOME_PIN  OFF
