@@ -25,7 +25,7 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF //    OFF, n. See (src/HAL/) for your MCU Serial port # etc.                        Option
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define STATUS_LED                    OFF //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
+#define STATUS_LED                    ON //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
 
 // RETICLE CONTROL ------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#RETICLE
 #define RETICLE_LED_DEFAULT           OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
@@ -53,9 +53,9 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
-#define AXIS1_DRIVER_MODEL            GENERIC //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
-#define AXIS1_DRIVER_MICROSTEPS       1 //    OFF, n. Microstep mode when tracking.                                        <-Often
-#define AXIS1_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos. OFF uses _DRIVER_MICROSTEPS.        Option
+#define AXIS1_DRIVER_MODEL            GENERIC2_STEPDIR_SERVO //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
+#define AXIS1_DRIVER_MICROSTEPS       256 //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS1_DRIVER_MICROSTEPS_GOTO  1 //    OFF, n. Microstep mode used during gotos. OFF uses _DRIVER_MICROSTEPS.        Option
 #define AXIS1_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
 // for TMC2130, TMC5160, and TMC2209U STEP/DIR driver models:
@@ -63,14 +63,14 @@
 #define AXIS1_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS1_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
 
-#define AXIS1_STEPS_PER_DEGREE      49777.77778 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS1_STEPS_PER_DEGREE      194.44444444 //  12800, n. Number of steps per degree:                                          <-Req'd
 #define AXIS1_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
-#define AXIS2_DRIVER_MODEL            GENERIC //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
-#define AXIS2_DRIVER_MICROSTEPS       1 //    OFF, n. Microstep mode when tracking.                                        <-Often
-#define AXIS2_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during gotos. OFF uses _DRIVER_MICROSTEPS.        Option
+#define AXIS2_DRIVER_MODEL            GENERIC2_STEPDIR_SERVO //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
+#define AXIS2_DRIVER_MICROSTEPS       256 //    OFF, n. Microstep mode when tracking.                                        <-Often
+#define AXIS2_DRIVER_MICROSTEPS_GOTO  1 //    OFF, n. Microstep mode used during gotos. OFF uses _DRIVER_MICROSTEPS.        Option
 #define AXIS2_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  Polling for driver status info/fault detection.       Option
 
 // for TMC2130, TMC5160, and TMC2209U STEP/DIR driver models:
@@ -78,11 +78,11 @@
 #define AXIS2_DRIVER_IRUN             OFF //    OFF, n, (mA.) Current during tracking, appropriate for stepper/driver/etc.    Option
 #define AXIS2_DRIVER_IGOTO            OFF //    OFF, n, (mA.) Current during slews. OFF uses IRUN.                            Option
 
-#define AXIS2_STEPS_PER_DEGREE      49777.77778 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
+#define AXIS2_STEPS_PER_DEGREE      194.44444444 //  12800, n. Number of steps per degree:                                          <-Req'd
 #define AXIS2_REVERSE                 ON //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 
-#define AXIS2_HOME_DEFAULT             20
+#define AXIS2_HOME_DEFAULT             30
 
 // MOUNT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_TYPE                    ALTAZM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
@@ -96,8 +96,8 @@
                                           //         Better tracking accuracy especially for Mega2560's w/ceramic resonator.
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define STATUS_MOUNT_LED              OFF //    OFF, ON Flashes proportional to rate of movement or solid on for slews.       Option
-#define STATUS_BUZZER                 OFF //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
+#define STATUS_MOUNT_LED              ON //    OFF, ON Flashes proportional to rate of movement or solid on for slews.       Option
+#define STATUS_BUZZER                 ON //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
 
 // ST4 INTERFACE ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#ST4
 // *** It is up to you to verify the interface meets the electrical specifications of any connected device, use at your own risk ***
@@ -113,8 +113,8 @@
 #define PARK_STATUS                   OFF //    OFF, signals with a HIGH or LOW state when successfully parked.               Option 
 
 // PEC ---------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PEC
-#define PEC_STEPS_PER_WORM_ROTATION     51200 //      0, n. Steps per worm rotation (0 disables else 720 sec buffer allocated.)  <-Req'd
                                           //         n = (AXIS1_STEPS_PER_DEGREE*360)/reduction_final_stage
+#define PEC_STEPS_PER_WORM_ROTATION     200 //      0, n. Steps per worm rotation (0 disables else 720 sec buffer allocated.)  <-Req'd
 
 #define PEC_SENSE                     OFF //    OFF, HIGH. Senses the PEC signal rising edge or use LOW for falling edge.     Option
                                           //         Ignored in ALTAZM mode.
@@ -166,7 +166,7 @@
 // enabled changes to these settings below may be ignored as runtime settings from NV (EEPROM) are used instead.
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
-#define AXIS4_DRIVER_MODEL            GENERIC //    OFF, Enter motor driver model (above) to activate the focuser.                Option
+#define AXIS4_DRIVER_MODEL            GENERIC2_STEPDIR_SERVO //    OFF, Enter motor driver model (above) to activate the focuser.                Option
 #define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 #define AXIS4_DRIVER_STATUS           OFF //    OFF, ON, HIGH, or LOW.  For driver status info/fault detection.               Option
 
@@ -198,10 +198,10 @@
 #define FEATURE2_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
 #define FEATURE2_PIN                  516 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
-#define FEATURE3_PURPOSE              SWITCH //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
+#define FEATURE3_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE3_NAME          "FEATURE3" // "FE..", Name of feature being controlled.                                        Adjust
 #define FEATURE3_TEMP                 OFF //    OFF, THERMISTOR or n. Where n is the ds18b20 s/n. For DEW_HEATER temperature. Adjust
-#define FEATURE3_PIN                  517 //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
+#define FEATURE3_PIN                  OFF //    OFF, AUX for auxiliary pin, n. Where n is the pin#.                           Adjust
 
 #define FEATURE4_PURPOSE              OFF //    OFF, SWITCH, ANALOG_OUT, DEW_HEATER, INTERVALOMETER.                          Option
 #define FEATURE4_NAME          "FEATURE4" // "FE..", Name of feature being controlled.                                        Adjust

@@ -68,6 +68,9 @@
 
 #define AXIS1_WRAP                    OFF //    OFF, ON Allows unlimited RA/Azm range and ignores min/max/meridian limits.    Option
 
+#define AXIS1_ENABLE_STATE            HIGH                         // default state of ENable pin for motor power on
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 
 #define AXIS2_DRIVER_DECAY            OFF //    OFF, Tracking decay mode default override. TMC default is STEALTHCHOP.        Infreq
@@ -91,6 +94,8 @@
 #define AXIS2_TANGENT_ARM             OFF //    OFF, ON +limit range above. Set cntr w/[Reset Home] Return cntr w/[Find Home] Infreq
 #define AXIS2_TANGENT_ARM_CORRECTION  OFF //    OFF, ON enables tangent arm geometry correction for Axis2.                    Infreq
 
+#define AXIS2_ENABLE_STATE            HIGH                         // default state of ENable pin for motor power on
+#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 // MOUNT COORDINATES ------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_COORDS          TOPOCENTRIC // ...RIC, Applies refraction to coordinates to/from OnStep, except exactly         Infreq
                                           //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
@@ -201,11 +206,13 @@
 
 #define AXIS4_SLEW_RATE_MINIMUM         500 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
 
+#define AXIS4_ENABLE_STATE            HIGH                         // default state of ENable pin for motor power on
+
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
 
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
-#define STATUS_FOCUSER_LED            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
+#define STATUS_FOCUSER_LED            ON //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
 
 // SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
 #define FOCUSER_TEMPERATURE           OFF //    OFF, THERMISTOR, DS1820, n. Where n is the DS1820 s/n for focuser temp.       Adjust
