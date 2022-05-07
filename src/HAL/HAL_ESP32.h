@@ -48,6 +48,7 @@
 
 #if SERIAL_BT_MODE != OFF && SERIAL_IP_MODE != OFF
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
+#endif
 
 #if (defined(SDA_PIN) && defined(SCL_PIN))
 #define beginWire() HAL_Wire.begin(SDA_PIN, SCL_PIN, HAL_WIRE_CLOCK);
