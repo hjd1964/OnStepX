@@ -67,18 +67,18 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
-#define STATUS_LED_PIN        520         // Default LED Cathode (-)
+#define STATUS_LED_PIN        527         // Default LED Cathode (-)
 #endif
-#define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
-#define STATUS_ROTATOR_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
-#define STATUS_FOCUSER_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
+#define MOUNT_STATUS_LED_PIN    528   // Default LED Cathode (-)
+#define STATUS_ROTATOR_LED_PIN  OFF   // Default LED Cathode (-)
+#define STATUS_FOCUSER_LED_PIN  525   // Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
-#define RETICLE_LED_PIN       STATUS_LED_PIN   // Default LED Cathode (-)
+#define RETICLE_LED_PIN       OFF   // Default LED Cathode (-)
 #endif
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-#define STATUS_BUZZER_PIN     514         // Tone
+#define STATUS_BUZZER_PIN     526         // Tone
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
@@ -92,7 +92,7 @@
 #endif
 
 // Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN        12               // [must be low at boot 12]
+#define AXIS1_ENABLE_PIN        521               // [must be low at boot 12]
 #define AXIS1_M0_PIN            16               // SPI MOSI
 #define AXIS1_M1_PIN            OFF               // SPI SCK
 #define AXIS1_M2_PIN            OFF              // SPI CS (UART TX)
@@ -106,12 +106,12 @@
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        SHARED
-#define AXIS2_M0_PIN            26               // SPI MOSI
+#define AXIS2_M0_PIN            523               // SPI MOSI
 #define AXIS2_M1_PIN            OFF               // SPI SCK
 #define AXIS2_M2_PIN            OFF                // SPI CS (UART TX)
 #define AXIS2_M3_PIN            OFF         // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN          21
-#define AXIS2_DIR_PIN           17
+#define AXIS2_DIR_PIN           522
 #define AXIS2_DECAY_PIN         OFF
 #ifndef AXIS2_SENSE_HOME_PIN
 #define AXIS2_SENSE_HOME_PIN  OFF
