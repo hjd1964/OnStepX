@@ -43,7 +43,7 @@ bool StepDirMotor::init(void (*volatile move)(), void (*volatile moveFF)(), void
   }
 
   // init default driver direction pin for output
-  pinMode(Pins->dir, OUTPUT);
+  pinModeEx(Pins->dir, OUTPUT);
 
   // init default driver step state (clear)
   #ifndef DRIVER_STEP_DEFAULTS
