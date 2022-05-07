@@ -23,12 +23,6 @@
 #include <Wire.h>
 #define HAL_Wire Wire
 #define HAL_WIRE_CLOCK 100000
-#if !defined(SDA_PIN)
-#define SDA_PIN 21
-#endif
-#if !defined(SCL_PIN)
-#define SCL_PIN 22
-#endif
 
 // Non-volatile storage ----------------------------------------------------------------------------
 #if NV_DRIVER == NV_DEFAULT
@@ -54,12 +48,21 @@
 
 #if SERIAL_BT_MODE != OFF && SERIAL_IP_MODE != OFF
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
+
+#if (defined(SDA_PIN) && defined(SCL_PIN))
+#define beginWire() HAL_Wire.begin(SDA_PIN, SCL_PIN, HAL_WIRE_CLOCK);
+#elif defined(SDA_PIN)
+#define beginWire() HAL_Wire.begin(SDA_PIN, 22, HAL_WIRE_CLOCK);
+#elif defined(SCL_PIN)
+#define beginWire() HAL_Wire.begin(21, SCL_PIN, HAL_WIRE_CLOCK);
+#else
+#define beginWire() HAL_Wire.begin(21, 22, HAL_WIRE_CLOCK);
 #endif
 
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   SERIAL_BT_BEGIN(); \
-HAL_Wire.begin(SDA_PIN,SCL_PIN,HAL_WIRE_CLOCK); \
+  beginWire(); \
 }
 
 //--------------------------------------------------------------------------------------------------
