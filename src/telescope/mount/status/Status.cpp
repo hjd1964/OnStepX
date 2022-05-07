@@ -11,18 +11,20 @@
 #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
   bool ledOn = false;
   bool ledOff = false;
+  int16_t statusLedPin = STATUS_LED_PIN;
+  int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
+
   void flash() {
-    static uint8_t cycle = 0;
-    if ((cycle++)%2 == 0) {
-    } else {
-    }
+      if (ledOff) { digitalWriteEx(statusLedPin, !STATUS_LED_ON_STATE); return; }
+      if (ledOn) { digitalWriteEx(statusLedPin, STATUS_LED_ON_STATE); return; }
+      static uint8_t cycle = 0;
+      if ((cycle++) % 2 == 0) {
+          digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
+      }
+      else {
+          digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
+      }
   }
-int16_t statusLedPin = STATUS_LED_PIN;
-int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
-	if (ledOff) { digitalWriteEx(statusLedPin, !STATUS_LED_ON_STATE); return; }
-	if (ledOn) { digitalWriteEx(statusLedPin, STATUS_LED_ON_STATE); return; }
-		digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
-		digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
 #endif
 
 void generalWrapper() { status.general(); }
