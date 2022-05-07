@@ -36,8 +36,8 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2130S
   103,   // TMC2130
   103,   // TMC2208S
-  103,   // TMC2209S/TMC2209S
-  103,   // TMC2209U/TCM2206U
+  103,   // TMC2209S/TMC2226S
+  103,   // TMC2209U/TCM2226U
   103    // TMC5160
 };
 

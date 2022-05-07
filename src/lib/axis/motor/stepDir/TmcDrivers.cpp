@@ -34,7 +34,7 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
         #ifdef SERIAL_TMC_NO_RX
           rx = OFF;
         #endif
-        VF("MSG: TmcDriver, UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("MSG: TmcDriver, software serial UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
         tmcUartDriver->setup(SERIAL_TMC_BAUD, deviceAddress, rx, tx);
       #else
         deviceAddress = axisNumber - 1;
@@ -43,7 +43,7 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
         #ifdef SERIAL_TMC_AXIS5_REMAP
           if (deviceAddress = 4) deviceAddress = 2;
         #endif
-        VF("MSG: TmcDriver, UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("MSG: TmcDriver, hardware serial UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
         tmcUartDriver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, deviceAddress, rx, tx);
       #endif
 
@@ -64,8 +64,7 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
 
   #ifdef TMC_SPI_DRIVER_PRESENT
     if (model == TMC5160) rsense = 0.075; else
-    if (model == TMC2130) rsense = 0.11 + 0.02; else
-    if (model == TMC2209U) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
+    if (model == TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
     VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
 
     if (model == TMC2130 || model == TMC5160) {
