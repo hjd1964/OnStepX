@@ -85,6 +85,9 @@
 
 #define AXIS1_WRAP                    OFF //    OFF, ON Allows unlimited RA/Azm range and ignores min/max/meridian limits.    Option
 
+#define AXIS1_ENABLE_STATE            HIGH                         // default state of ENable pin for motor power on
+#define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 #define AXIS2_DRIVER_MODEL            GENERIC2_STEPDIR_SERVO //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
 
@@ -119,6 +122,9 @@
 
 #define AXIS2_TANGENT_ARM             OFF //    OFF, ON +limit range above. Set cntr w/[Reset Home] Return cntr w/[Find Home] Infreq
 #define AXIS2_TANGENT_ARM_CORRECTION  OFF //    OFF, ON enables tangent arm geometry correction for Axis2.                    Infreq
+
+#define AXIS2_ENABLE_STATE            HIGH                         // default state of ENable pin for motor power on
+#define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 
 // MOUNT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
 #define MOUNT_TYPE                    ALTAZM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
@@ -181,7 +187,7 @@
 // SLEWING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SLEWING
 #define SLEW_RATE_BASE_DESIRED        1.0 //    1.0, n. Desired slew rate in deg/sec. Adjustable at run-time from            <-Req'd
                                           //         1/2 to 2x this rate, and as performace considerations require.
-#define SLEW_RATE_MEMORY              OFF //    OFF, ON Remembers rates set across power cycles.                              Option
+#define SLEW_RATE_MEMORY              ON //    OFF, ON Remembers rates set across power cycles.                              Option
 #define SLEW_ACCELERATION_DIST        5.0 //    5.0, n, (degrees.) Approx. distance for acceleration (and deceleration.)      Adjust
 #define SLEW_RAPID_STOP_DIST          2.0 //    2.0, n, (degrees.) Approx. distance required to stop when a slew              Adjust
                                           //         is aborted or a limit is exceeded.
@@ -264,7 +270,7 @@
 #define AXIS4_STEPS_PER_MICRON        0.2 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
 #define AXIS4_LIMIT_MIN                 0 //      0, n. Where n=0..500 (millimeters.) Minimum allowed position.               Adjust
-#define AXIS4_LIMIT_MAX                50 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
+#define AXIS4_LIMIT_MAX                13 //     50, n. Where n=0..500 (millimeters.) Maximum allowed position.               Adjust
 
 #define AXIS4_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                         Option
 #define AXIS4_DRIVER_MICROSTEPS_GOTO  OFF //    OFF, n. Microstep mode used during slews. OFF uses _DRIVER_MICROSTEPS.        Option
