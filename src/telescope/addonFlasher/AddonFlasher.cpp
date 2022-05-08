@@ -14,12 +14,13 @@
   #endif
 
   void AddonFlasher::init() {
-    VF("MSG: AddonFlasher, init gpio0="); V(ADDON_GPIO0_PIN); VF(", reset="); VL(ADDON_RESET_PIN);
     addonGPIOPin = ADDON_GPIO0_PIN;
     addonResetPin = ADDON_RESET_PIN;
     VF("MSG: AddonFlasher, init gpio0="); V(addonGPIOPin); VF(", reset="); VL(addonResetPin);
     pinModeEx(addonGPIOPin, OUTPUT);
     pinModeEx(addonResetPin, OUTPUT);
+
+
     run();
 
     #if ADDON_TRIGR_PIN != OFF
@@ -69,7 +70,7 @@
     VLF("MSG: AddonFlasher, setting addon run mode");
 
     // enter run mode
-    digitalWriteEx(ADDON_GPIO0_PIN, HIGH);
+    digitalWriteEx(addonGPIOPin, HIGH);
     reset();
 
     if (setSerial) {
@@ -105,16 +106,16 @@
     tasks.yield(1000);
 
     // enter program mode
-    digitalWriteEx(ADDON_GPIO0_PIN, LOW);
+    digitalWriteEx(addonGPIOPin, LOW);
     reset();
   }
 
   void AddonFlasher::reset() {
     // reset LOW (active) HIGH (inactive)
     tasks.yield(20);
-    digitalWriteEx(ADDON_RESET_PIN, LOW);
+    digitalWriteEx(addonResetPin, LOW);
     tasks.yield(20);
-    digitalWriteEx(ADDON_RESET_PIN, HIGH);
+    digitalWriteEx(addonResetPin, HIGH);
     tasks.yield(20);
   }
 

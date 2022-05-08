@@ -9,19 +9,18 @@
 #include "../park/Park.h"
 
 #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
-bool ledOn = false;
-bool ledOff = false;
-int16_t statusLedPin = STATUS_LED_PIN;
-int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
-void flash() {
+  bool ledOn = false;
+  bool ledOff = false;
+  int16_t statusLedPin = STATUS_LED_PIN;
+  int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
+  void flash() {
     if (ledOff) { digitalWriteEx(statusLedPin, !STATUS_LED_ON_STATE); return; }
     if (ledOn) { digitalWriteEx(statusLedPin, STATUS_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
-    if ((cycle++) % 2 == 0) {
-        digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
-    }
-    else {
-        digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
+    if ((cycle++)%2 == 0) {
+      digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
+    } else {
+      digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
     }
 }
 #endif
@@ -39,11 +38,11 @@ void Status::init() {
     sound.enabled = nv.read(NV_MOUNT_STATUS_BASE);
 #endif
 
-#if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
+  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
     mountStatusLedPin = MOUNT_STATUS_LED_PIN;
     parkStatusPin = PARK_STATUS_PIN;
     pinModeEx(parkStatusPin, OUTPUT);
-#endif
+  #endif
 }
 
 // late init once tracking is enabled
@@ -55,11 +54,10 @@ void Status::ready() {
 
 #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
-        pinModeEx(mountStatusLedPin, OUTPUT);
-        VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
-        statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
-        if (statusTaskHandle) { VLF("success"); }
-        else { VLF("FAILED!"); }
+      pinModeEx(mountStatusLedPin, OUTPUT);
+      VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
+      statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
+      if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
     }
 #endif
 
@@ -84,9 +82,9 @@ void Status::flashRate(int period) {
 
 // mount general status
 void Status::general() {
-#if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
+  #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
     digitalWriteEx(parkStatusPin, (park.state == PS_PARKED) ? PARK_STATUS : !PARK_STATUS)
-#endif
+  #endif
 }
 
 Status status;
