@@ -43,7 +43,7 @@
 #define TMC2226S                    11     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
 #define TMC2226U                    12     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
 #define TMC5160                     13     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define GENERIC2_STEPDIR_SERVO		14     // generic driver for servo motors using external step/dir control. for 1x,2x,4x,8x,16x,32x,64x,128x,256x (single pin mode switching)
+#define GENERIC2_STEPDIR_SERVO      14     // generic driver for servo motors using external step/dir control. for 1x,2x,4x,8x,16x,32x,64x,128x,256x (single pin mode switching)
 #define DRIVER_LAST                 14
 
 // driver (step/dir) decay mode
