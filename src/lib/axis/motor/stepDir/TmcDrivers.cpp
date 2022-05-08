@@ -13,15 +13,6 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
     if (model == TMC2209U) {
       pinModeEx(mosi, OUTPUT);
       pinModeEx(sck, OUTPUT);
-      #ifdef SERIAL_TMC_HARDCODED
-        // let user hard code the device addresses 0,1,2,3
-        digitalWrite(mosi, HIGH);
-        digitalWrite(sck, HIGH);
-      #else
-        // pull MS1 and MS2 low for device address 0
-        digitalWrite(mosi, LOW);
-        digitalWrite(sck, LOW);
-      #endif
 
       tmcUartDriver = new TMC2209();
       if (tmcUartDriver == NULL) return false; 
@@ -31,12 +22,20 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
 
       delay(1);
       #if SERIAL_TMC == SoftSerial
+        // pull MS1 and MS2 low for device address 0
+        digitalWriteEx(mosi, LOW);
+        digitalWriteEx(sck, LOW);
+
         #ifdef SERIAL_TMC_NO_RX
           rx = OFF;
         #endif
         VF("MSG: TmcDriver, software serial UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
         tmcUartDriver->setup(SERIAL_TMC_BAUD, deviceAddress, rx, tx);
       #else
+        // help user hard code the device addresses 0,1,2,3
+        digitalWriteEx(mosi, HIGH);
+        digitalWriteEx(sck, HIGH);
+
         deviceAddress = axisNumber - 1;
         rx = SERIAL_TMC_RX;
         tx = SERIAL_TMC_TX;

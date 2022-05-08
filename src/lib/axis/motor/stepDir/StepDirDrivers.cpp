@@ -9,7 +9,8 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
 {{  0,  1,  2,  3,  7,OFF,OFF,OFF,OFF},   // A4988
  {  0,  1,  2,  3,  4,  5,OFF,OFF,OFF},   // DRV8825
- {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC
+ {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC - NO MODE SWITCHING
+ {  0,  1,  1,  1,  1,  1,  1,  1,  1},   // GENERIC2 - M0 MODE SWITCHING
  {  0,  1,  2,  3,  4,  5,  6,  7,OFF},   // LV8729
  {  4,  2,  6,  5,  3,  7,OFF,OFF,OFF},   // S109
  {  0,  1,  2,  3,  4,  5,OFF,  6,  7},   // ST820
@@ -21,7 +22,6 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2226S
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U/TMC2226U
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
- {  0,  1,  1,  1,  1,  1,  1,  1,  1},   // GENERIC2 - STEPDIR_SERVO
 };
 
 const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
@@ -29,6 +29,7 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
 { 1000,  // A4988
   2000,  // DRV8825
   OFF,   // GENERIC
+  OFF,   // GENERIC2
   500,   // LV8729
   7000,  // RAPS128
   300,   // S109
@@ -40,14 +41,14 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2209S/TMC2226S
   103,   // TMC2209U/TCM2226U
   103,   // TMC5160
-  1000,  // GENERIC2 - STEPDIR_SERVO. Enough for 500 KHz stepping
 };
 
 #if DEBUG != OFF
   const char* DRIVER_NAME[DRIVER_MODEL_COUNT] =
   { "A4988",
     "DRV8825",
-    "GENERIC",
+    "GENERIC - NO MODE SWITCHING",
+    "GENERIC2 - M0 MODE SWITCHING",
     "LV8729",
     "RAPS128",
     "S109",
@@ -58,8 +59,7 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
     "TMC2208 legacy",
     "TMC2209 legacy",
     "TMC2209/TMC2226 UART",
-    "TMC5160 SPI",
-    "GENERIC2-STEPDIR_SERVO"
+    "TMC5160 SPI"
   };
 #endif
 
