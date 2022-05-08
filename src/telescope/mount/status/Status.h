@@ -13,14 +13,14 @@
 #define SF_SLEWING 1
 
 class Status {
-  public:
+public:
     // get mount status ready
     void init();
 
     // late init once tracking is enabled
     void ready();
 
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char* reply, char* command, char* parameter, bool* supressFrame, bool* numericReply, CommandError* commandError);
 
     // mount status LED flash rate (in ms)
     void flashRate(int period);
@@ -29,8 +29,10 @@ class Status {
 
     Sound sound;
 
-  private:
+private:
     uint8_t statusTaskHandle = 0;
+    uint16_t mountStatusLedPin = 0;
+    uint16_t parkStatusPin = 0;
 };
 
 extern Status status;

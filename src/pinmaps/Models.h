@@ -43,6 +43,10 @@
   #define PINMAP_STR "MaxESP v4"
   #include "Pins.MaxESP4.h"
 #endif
+#if PINMAP == MaxESP_RCX400
+#define PINMAP_STR "MaxESP RCX 400 version"
+#include "Pins.MaxESP_RCX400.h"
+#endif
 #if PINMAP == STM32Blue
   #define PINMAP_STR "STM32 Bluepill"
   #include "Pins.STM32B.h"

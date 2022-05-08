@@ -20,7 +20,8 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
  {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208S
  {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2226S
  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209U/TMC2226U
- {  8,  7,  6,  5,  4,  3,  2,  1,  0}    // TMC5160
+ {  8,  7,  6,  5,  4,  3,  2,  1,  0},    // TMC5160
+ {  0,  1,  1,  1,  1,  1,  1,  1,  1},   // GENERIC2 - STEPDIR_SERVO
 };
 
 const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
@@ -38,7 +39,8 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2208S
   103,   // TMC2209S/TMC2226S
   103,   // TMC2209U/TCM2226U
-  103    // TMC5160
+  103,    // TMC5160
+  1000,   // GENERIC2 - STEPDIR_SERVO. Enough for 500 KHz stepping
 };
 
 #if DEBUG != OFF
@@ -56,7 +58,8 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
     "TMC2208 legacy",
     "TMC2209 legacy",
     "TMC2209/TMC2226 UART",
-    "TMC5160 SPI"
+    "TMC5160 SPI",
+    "GENERIC2-STEPDIR_SERVO"
   };
 #endif
 
