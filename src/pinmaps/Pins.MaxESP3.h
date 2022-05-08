@@ -30,6 +30,10 @@
   #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
 #endif
 
+//SDA/SCL pins. 21/22 are the default values
+#define SDA_PIN              21
+#define SCL_PIN              22
+
 // Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 
