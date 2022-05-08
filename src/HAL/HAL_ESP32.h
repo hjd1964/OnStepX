@@ -50,9 +50,20 @@
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
+#if (defined(SDA_PIN) && defined(SCL_PIN))
+  #define beginWire() HAL_Wire.begin(SDA_PIN, SCL_PIN, HAL_WIRE_CLOCK);
+#elif defined(SDA_PIN)
+  #define beginWire() HAL_Wire.begin(SDA_PIN, 22, HAL_WIRE_CLOCK);
+#elif defined(SCL_PIN)
+  #define beginWire() HAL_Wire.begin(21, SCL_PIN, HAL_WIRE_CLOCK);
+#else
+  #define beginWire() HAL_Wire.begin(21, 22, HAL_WIRE_CLOCK);
+#endif
+
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   SERIAL_BT_BEGIN(); \
+  beginWire(); \
 }
 
 //--------------------------------------------------------------------------------------------------
