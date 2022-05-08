@@ -31,6 +31,8 @@ class Status {
 
   private:
     uint8_t statusTaskHandle = 0;
+    uint16_t mountStatusLedPin = 0;
+    uint16_t parkStatusPin = 0;
 };
 
 extern Status status;

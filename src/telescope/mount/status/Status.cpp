@@ -11,14 +11,16 @@
 #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
   bool ledOn = false;
   bool ledOff = false;
+  int16_t statusLedPin = STATUS_LED_PIN;
+  int16_t mountStatusLedPin = MOUNT_STATUS_LED_PIN;
   void flash() {
-    if (ledOff) { digitalWriteEx(STATUS_LED_PIN, !STATUS_LED_ON_STATE); return; }
-    if (ledOn) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
+    if (ledOff) { digitalWriteEx(statusLedPin, !STATUS_LED_ON_STATE); return; }
+    if (ledOn) { digitalWriteEx(statusLedPin, STATUS_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
     if ((cycle++)%2 == 0) {
-      digitalWriteEx(MOUNT_STATUS_LED_PIN, !STATUS_MOUNT_LED_ON_STATE);
+      digitalWriteEx(mountStatusLedPin, !STATUS_MOUNT_LED_ON_STATE);
     } else {
-      digitalWriteEx(MOUNT_STATUS_LED_PIN, STATUS_MOUNT_LED_ON_STATE);
+      digitalWriteEx(mountStatusLedPin, STATUS_MOUNT_LED_ON_STATE);
     }
   }
 #endif
@@ -37,7 +39,9 @@ void Status::init() {
   #endif
 
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
-    pinModeEx(PARK_STATUS_PIN, OUTPUT);
+    mountStatusLedPin = MOUNT_STATUS_LED_PIN;
+    parkStatusPin = PARK_STATUS_PIN;
+    pinModeEx(parkStatusPin, OUTPUT);
   #endif
 }
 
@@ -50,7 +54,7 @@ void Status::ready() {
 
   #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
     if (!tasks.getHandleByName("mntLed")) {
-      pinModeEx(MOUNT_STATUS_LED_PIN, OUTPUT);
+      pinModeEx(mountStatusLedPin, OUTPUT);
       VF("MSG: Mount, status start LED task (variable rate priority 4)... ");
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
@@ -76,7 +80,7 @@ void Status::flashRate(int period) {
 // mount general status
 void Status::general() {
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
-    digitalWriteEx(PARK_STATUS_PIN, (park.state == PS_PARKED) ? PARK_STATUS : !PARK_STATUS)
+    digitalWriteEx(parkStatusPin, (park.state == PS_PARKED) ? PARK_STATUS : !PARK_STATUS)
   #endif
 }
 

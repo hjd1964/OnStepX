@@ -15,6 +15,7 @@ class Sound {
 
     bool enabled = STATUS_BUZZER_DEFAULT == ON; 
   private:
+    int16_t statusBuzzerPin = 0;
 };
 
 #endif
