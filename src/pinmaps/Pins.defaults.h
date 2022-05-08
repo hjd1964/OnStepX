@@ -21,6 +21,14 @@
 #define SERIAL_TMC_AXIS5_REMAP                   // Identify Focuser2 (Axis5) as Axis3
 */
 
+#ifndef SDA_PIN
+#define SDA_PIN                    21
+#endif
+
+#ifndef SCL_PIN
+#define SCL_PIN                    22
+#endif
+
 #ifndef AUX0_PIN
 #define AUX0_PIN                    OFF
 #endif

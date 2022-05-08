@@ -53,6 +53,7 @@
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   SERIAL_BT_BEGIN(); \
+  HAL_Wire.begin(SDA_PIN, SCL_PIN, HAL_WIRE_CLOCK); \
 }
 
 //--------------------------------------------------------------------------------------------------
