@@ -15,9 +15,11 @@
 
   void AddonFlasher::init() {
     VF("MSG: AddonFlasher, init gpio0="); V(ADDON_GPIO0_PIN); VF(", reset="); VL(ADDON_RESET_PIN);
-    pinModeEx(ADDON_GPIO0_PIN, OUTPUT);
-    pinModeEx(ADDON_RESET_PIN, OUTPUT);
-
+    addonGPIOPin = ADDON_GPIO0_PIN;
+    addonResetPin = ADDON_RESET_PIN;
+    VF("MSG: AddonFlasher, init gpio0="); V(addonGPIOPin); VF(", reset="); VL(addonResetPin);
+    pinModeEx(addonGPIOPin, OUTPUT);
+    pinModeEx(addonResetPin, OUTPUT);
     run();
 
     #if ADDON_TRIGR_PIN != OFF

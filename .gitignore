@@ -1,8 +1,8 @@
 
 .vscode/settings.json
 *.json
-*.json
-*.json
 __vm/*
 *.vcxproj*
+.vs/*
 Debug/*
+*.sln

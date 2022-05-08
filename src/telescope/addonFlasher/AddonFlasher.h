@@ -23,6 +23,8 @@
       // monitors for flash button press
       void poll();
     private:
+      uint16_t addonGPIOPin = 0;
+      uint16_t addonResetPin = 0;
   };
 
   extern AddonFlasher addonFlasher;
