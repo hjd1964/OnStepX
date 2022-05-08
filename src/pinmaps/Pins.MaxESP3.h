@@ -22,7 +22,6 @@
   #define SERIAL_TMC_BAUD       460800           // Baud rate
   #define SERIAL_TMC_TX         23               // Transmit data
   #define SERIAL_TMC_RX         39               // Recieving data
-  #define SERIAL_TMC_HARDCODED                   // Use hard-coded MS1/MS2 addresses for all drivers, sets M0/M1 to high
 #else
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC            SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
