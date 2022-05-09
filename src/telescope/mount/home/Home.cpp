@@ -14,12 +14,12 @@ void Home::init() {
   #ifndef AXIS1_HOME_DEFAULT
     if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0; position.z = 0; }
   #else
-    if (transform.mountType == ALTAZM) position.z = AXIS1_HOME_DEFAULT; else position.h = AXIS1_HOME_DEFAULT;
+    if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
   #endif
   #ifndef AXIS2_HOME_DEFAULT
     if (transform.mountType == ALTAZM) position.a = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;
   #else
-    if (transform.mountType == ALTAZM) position.a = AXIS2_HOME_DEFAULT; else position.d = AXIS2_HOME_DEFAULT;
+    if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
   position.pierSide = PIER_SIDE_NONE;
 }
