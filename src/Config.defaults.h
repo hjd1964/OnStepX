@@ -200,6 +200,9 @@
   #ifndef AXIS1_STEP_STATE
   #define AXIS1_STEP_STATE              HIGH                      // default signal transition state for a step
   #endif
+  #ifndef AXIS1_M2_ON_STATE
+  #define AXIS1_M2_ON_STATE             HIGH                      // default ON state for M2
+  #endif
   #ifndef AXIS1_DRIVER_MICROSTEPS
   #define AXIS1_DRIVER_MICROSTEPS       OFF                       // normal microstep mode 
   #endif
@@ -314,6 +317,9 @@
   #endif
   #ifndef AXIS2_STEP_STATE
   #define AXIS2_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS2_M2_ON_STATE
+  #define AXIS2_M2_ON_STATE             HIGH
   #endif
   #ifndef AXIS2_DRIVER_MICROSTEPS
   #define AXIS2_DRIVER_MICROSTEPS       OFF
@@ -646,6 +652,9 @@
   #ifndef AXIS3_STEP_STATE
   #define AXIS3_STEP_STATE              HIGH
   #endif
+  #ifndef AXIS3_M2_ON_STATE
+  #define AXIS3_M2_ON_STATE             HIGH
+  #endif
   #ifndef AXIS3_DRIVER_MICROSTEPS
   #define AXIS3_DRIVER_MICROSTEPS       OFF
   #endif
@@ -772,6 +781,9 @@
   #ifndef AXIS4_STEP_STATE
   #define AXIS4_STEP_STATE              HIGH
   #endif
+  #ifndef AXIS4_M2_ON_STATE
+  #define AXIS4_M2_ON_STATE             HIGH
+  #endif
   #ifndef AXIS4_DRIVER_MICROSTEPS
   #define AXIS4_DRIVER_MICROSTEPS       OFF
   #endif
@@ -896,6 +908,9 @@
   #endif
   #ifndef AXIS5_STEP_STATE
   #define AXIS5_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS5_M2_ON_STATE
+  #define AXIS5_M2_ON_STATE             HIGH
   #endif
   #ifndef AXIS5_DRIVER_MICROSTEPS
   #define AXIS5_DRIVER_MICROSTEPS       OFF
@@ -1022,6 +1037,9 @@
   #ifndef AXIS6_STEP_STATE
   #define AXIS6_STEP_STATE              HIGH
   #endif
+  #ifndef AXIS6_M2_ON_STATE
+  #define AXIS6_M2_ON_STATE             HIGH
+  #endif
   #ifndef AXIS6_DRIVER_MICROSTEPS
   #define AXIS6_DRIVER_MICROSTEPS       OFF
   #endif
@@ -1146,6 +1164,9 @@
   #endif
   #ifndef AXIS7_STEP_STATE
   #define AXIS7_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS7_M2_ON_STATE
+  #define AXIS7_M2_ON_STATE             HIGH
   #endif
   #ifndef AXIS7_DRIVER_MICROSTEPS
   #define AXIS7_DRIVER_MICROSTEPS       OFF
@@ -1272,6 +1293,9 @@
   #ifndef AXIS8_STEP_STATE
   #define AXIS8_STEP_STATE              HIGH
   #endif
+  #ifndef AXIS8_M2_ON_STATE
+  #define AXIS8_M2_ON_STATE             HIGH
+  #endif
   #ifndef AXIS8_DRIVER_MICROSTEPS
   #define AXIS8_DRIVER_MICROSTEPS       OFF
   #endif
@@ -1396,6 +1420,9 @@
   #endif
   #ifndef AXIS9_STEP_STATE
   #define AXIS9_STEP_STATE              HIGH
+  #endif
+  #ifndef AXIS9_M2_ON_STATE
+  #define AXIS9_M2_ON_STATE             HIGH
   #endif
   #ifndef AXIS9_DRIVER_MICROSTEPS
   #define AXIS9_DRIVER_MICROSTEPS       OFF

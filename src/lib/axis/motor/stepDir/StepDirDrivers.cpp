@@ -164,6 +164,12 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
       VL("");
     #endif
 
+    // toggle the M2 pin states if needed, this allows extra flexibility for stand alone stepper drivers
+    if (Pins->m2State == LOW) {
+      if (bitRead(microstepCode, 2)) bitClear(microstepCode, 2); else bitSet(microstepCode, 2);
+      if (bitRead(microstepCodeGoto, 2)) bitClear(microstepCodeGoto, 2); else bitSet(microstepCodeGoto, 2);
+    }
+
     microstepBitCode = microstepCode;
     microstepBitCodeGoto = microstepCodeGoto;
     pinModeEx(Pins->m0, OUTPUT);

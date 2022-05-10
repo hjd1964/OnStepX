@@ -28,6 +28,7 @@ typedef struct StepDirDriverPins {
   int16_t m0;
   int16_t m1;
   int16_t m2;
+  uint8_t m2State;
   int16_t m3;
   int16_t decay;
   int16_t fault;
