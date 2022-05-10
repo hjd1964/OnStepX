@@ -10,7 +10,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 {{  0,  1,  2,  3,  7,OFF,OFF,OFF,OFF},   // A4988
  {  0,  1,  2,  3,  4,  5,OFF,OFF,OFF},   // DRV8825
  {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC - NO MODE SWITCHING
- {  0,  1,  1,  1,  1,  1,  1,  1,  1},   // GENERIC2 - M0 MODE SWITCHING
+ {  0,  4,  4,  4,  4,  4,  4,  4,  4},   // GENERIC2 - M2 MODE SWITCHING
  {  0,  1,  2,  3,  4,  5,  6,  7,OFF},   // LV8729
  {  4,  2,  6,  5,  3,  7,OFF,OFF,OFF},   // S109
  {  0,  1,  2,  3,  4,  5,OFF,  6,  7},   // ST820
@@ -48,7 +48,7 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   { "A4988",
     "DRV8825",
     "GENERIC - NO MODE SWITCHING",
-    "GENERIC2 - M0 MODE SWITCHING",
+    "GENERIC2 - M2 MODE SWITCHING",
     "LV8729",
     "RAPS128",
     "S109",
