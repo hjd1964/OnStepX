@@ -224,12 +224,12 @@
   #error "Configuration (Config.h): Setting AXIS2_POWER_DOWN unknown, use OFF or ON."
 #endif
 
-#if AXIS2_LIMIT_MIN < -360 || AXIS2_LIMIT_MIN > -90
-  #error "Configuration (Config.h): Setting AXIS2_LIMIT_MIN unknown, use value in the range -90 to -360."
+#if AXIS2_LIMIT_MIN < -90 || AXIS2_LIMIT_MIN > 0
+  #error "Configuration (Config.h): Setting AXIS2_LIMIT_MIN unknown, use value in the range -90 to 0."
 #endif
 
-#if AXIS2_LIMIT_MAX < 90 || AXIS2_LIMIT_MAX > 360
-  #error "Configuration (Config.h): Setting AXIS2_LIMIT_MAX unknown, use value in the range 90 to 360."
+#if AXIS2_LIMIT_MAX < 0 || AXIS2_LIMIT_MAX > 90
+  #error "Configuration (Config.h): Setting AXIS2_LIMIT_MAX unknown, use value in the range 0 to 90."
 #endif
 
 #if (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) < 0
