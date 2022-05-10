@@ -29,22 +29,21 @@
 #define DRIVER_FIRST                0
 #define A4988                       0      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
 #define DRV8825                     1      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define GENERIC                     2      // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (no mode switching)
-#define GENERIC2                    3      // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (using just M0 pin)
-#define LV8729                      4      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define RAPS128                     5      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
-#define S109                        6      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
-#define ST820                       7      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
-#define TMC2100                     8      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2130S                    9      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2130                     10     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC2208S                    11     // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209S                    12     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define TMC2209U                    13     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
-#define TMC2226S                    12     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define TMC2226U                    13     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
-#define TMC5160                     14     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define DRIVER_LAST                 14
+#define GENERIC                     2      // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (using just the M2 pin)
+#define LV8729                      3      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define RAPS128                     4      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,64x,128x
+#define S109                        5      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
+#define ST820                       6      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
+#define TMC2100                     7      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
+#define TMC2130S                    8      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
+#define TMC2130                     9      // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC2208S                    10     // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
+#define TMC2209S                    11     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define TMC2209U                    12     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
+#define TMC2226S                    11     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define TMC2226U                    12     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
+#define TMC5160                     13     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define DRIVER_LAST                 13
 
 // driver (step/dir) decay mode
 #define DRIVER_DECAY_MODE_FIRST     1

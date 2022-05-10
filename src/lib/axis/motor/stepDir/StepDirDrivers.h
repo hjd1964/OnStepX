@@ -8,7 +8,7 @@
 #ifdef STEP_DIR_MOTOR_PRESENT
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 15
+#define DRIVER_MODEL_COUNT 14
 
 #include "../Drivers.h"
 #include "TmcDrivers.h"

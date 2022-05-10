@@ -9,8 +9,7 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
 {{  0,  1,  2,  3,  7,OFF,OFF,OFF,OFF},   // A4988
  {  0,  1,  2,  3,  4,  5,OFF,OFF,OFF},   // DRV8825
- {  0,  0,  0,  0,  0,  0,  0,  0,  0},   // GENERIC - NO MODE SWITCHING
- {  0,  4,  4,  4,  4,  4,  4,  4,  4},   // GENERIC2 - M2 MODE SWITCHING
+ {  0,  4,  4,  4,  4,  4,  4,  4,  4},   // GENERIC
  {  0,  1,  2,  3,  4,  5,  6,  7,OFF},   // LV8729
  {  4,  2,  6,  5,  3,  7,OFF,OFF,OFF},   // S109
  {  0,  1,  2,  3,  4,  5,OFF,  6,  7},   // ST820
@@ -29,7 +28,6 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
 { 1000,  // A4988
   2000,  // DRV8825
   OFF,   // GENERIC
-  OFF,   // GENERIC2
   500,   // LV8729
   7000,  // RAPS128
   300,   // S109
@@ -47,8 +45,7 @@ const static int32_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   const char* DRIVER_NAME[DRIVER_MODEL_COUNT] =
   { "A4988",
     "DRV8825",
-    "GENERIC - NO MODE SWITCHING",
-    "GENERIC2 - M2 MODE SWITCHING",
+    "GENERIC",
     "LV8729",
     "RAPS128",
     "S109",
