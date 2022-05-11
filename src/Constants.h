@@ -113,7 +113,8 @@
 #define DS2413                      1      // DS2413 2-channel GPIO for dew heaters etc. pin# 1000 and 1001
 #define MCP23008                    2      // MCP23008 8-channel GPIO for dew heaters etc. pin# 1000 to 1007
 #define MCP23017                    3      // MCP23017 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
-#define GPIO_LAST                   3
+#define X9555                       4      // TCA/PCA9555 16-channel GPIO for dew heaters etc. pin# 1000 to 1015
+#define GPIO_LAST                   4
 
 // --------------------------------------------------------------------------------------------------------------------------
 

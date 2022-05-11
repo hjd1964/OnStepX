@@ -26,7 +26,7 @@ bool Mcp23017::init() {
 
 // set GPIO pin (0 to 15) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void Mcp23017::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 16) {
+  if (found && pin >= 0 && pin <= 15) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
