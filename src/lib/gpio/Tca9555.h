@@ -14,11 +14,9 @@ class Tca9555 {
     void pinMode(int pin, int mode);
 
     // one sixteen channel TCA9555 GPIO is supported, this gets the last set value
-    // index 0 to 15 are auxiliary features #1, #2, etc.
     int digitalRead(int pin);
 
     // one sixteen channel TCA9555 GPIO is supported, this sets each output on or off
-    // index 0 to 15 are auxiliary features #1, #2, etc.
     void digitalWrite(int pin, bool value);
 
   private:

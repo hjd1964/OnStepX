@@ -14,11 +14,9 @@ class Mcp23008 {
     void pinMode(int pin, int mode);
 
     // one eight channel MCP23008 GPIO is supported, this gets the last set value
-    // index 0 to 7 are auxiliary features #1, #2, etc.
-    int digitalRead(int pin);
+      int digitalRead(int pin);
 
     // one eight channel MCP23008 GPIO is supported, this sets each output on or off
-    // index 0 to 7 are auxiliary features #1, #2, etc.
     void digitalWrite(int pin, bool value);
 
   private:

@@ -36,7 +36,6 @@ void Mcp23017::pinMode(int pin, int mode) {
 }
 
 // one sixteen channel MCP23017 GPIO is supported, this gets the last set value
-// index 0 to 15 are auxiliary features #1, #2, etc.
 int Mcp23017::digitalRead(int pin) {
   if (found && pin >= 0 && pin <= 15) {
     if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
@@ -46,7 +45,6 @@ int Mcp23017::digitalRead(int pin) {
 }
 
 // one sixteen channel MCP23017 GPIO is supported, this sets each output on or off
-// index 0 to 15 are auxiliary features #1, #2, etc.
 void Mcp23017::digitalWrite(int pin, bool value) {
   if (found && pin >= 0 && pin <= 15) {
     state[pin] = value;

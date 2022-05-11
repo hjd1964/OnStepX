@@ -36,7 +36,6 @@ void Tca9555::pinMode(int pin, int mode) {
 }
 
 // one sixteen channel Tca9555 GPIO is supported, this gets the last set value
-// index 0 to 15 are auxiliary features #1, #2, etc.
 int Tca9555::digitalRead(int pin) {
   if (found && pin >= 0 && pin <= 15) {
     if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
@@ -46,7 +45,6 @@ int Tca9555::digitalRead(int pin) {
 }
 
 // one sixteen channel Tca9555 GPIO is supported, this sets each output on or off
-// index 0 to 15 are auxiliary features #1, #2, etc.
 void Tca9555::digitalWrite(int pin, bool value) {
   if (found && pin >= 0 && pin <= 15) {
     state[pin] = value;
