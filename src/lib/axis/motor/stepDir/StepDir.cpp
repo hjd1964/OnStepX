@@ -7,36 +7,37 @@
 
 #include "../../../tasks/OnTask.h"
 
+StepDirMotor *stepDirMotorInstance[9];
+
 // if the AXISn_STEP_PIN isn't present, use the passed step pin instead (slower)
 #ifndef AXIS1_STEP_PIN
-  #define AXIS1_STEP_PIN stepDirMotorWrapper[0]->Pins->step
+  #define AXIS1_STEP_PIN stepDirMotorInstance[0]->Pins->step
 #endif
 #ifndef AXIS2_STEP_PIN
-  #define AXIS2_STEP_PIN stepDirMotorWrapper[1]->Pins->step
+  #define AXIS2_STEP_PIN stepDirMotorInstance[1]->Pins->step
 #endif
 #ifndef AXIS3_STEP_PIN
-  #define AXIS3_STEP_PIN stepDirMotorWrapper[2]->Pins->step
+  #define AXIS3_STEP_PIN stepDirMotorInstance[2]->Pins->step
 #endif
 #ifndef AXIS4_STEP_PIN
-  #define AXIS4_STEP_PIN stepDirMotorWrapper[3]->Pins->step
+  #define AXIS4_STEP_PIN stepDirMotorInstance[3]->Pins->step
 #endif
 #ifndef AXIS5_STEP_PIN
-  #define AXIS5_STEP_PIN stepDirMotorWrapper[4]->Pins->step
+  #define AXIS5_STEP_PIN stepDirMotorInstance[4]->Pins->step
 #endif
 #ifndef AXIS6_STEP_PIN
-  #define AXIS6_STEP_PIN stepDirMotorWrapper[5]->Pins->step
+  #define AXIS6_STEP_PIN stepDirMotorInstance[5]->Pins->step
 #endif
 #ifndef AXIS7_STEP_PIN
-  #define AXIS7_STEP_PIN stepDirMotorWrapper[6]->Pins->step
+  #define AXIS7_STEP_PIN stepDirMotorInstance[6]->Pins->step
 #endif
 #ifndef AXIS8_STEP_PIN
-  #define AXIS8_STEP_PIN stepDirMotorWrapper[7]->Pins->step
+  #define AXIS8_STEP_PIN stepDirMotorInstance[7]->Pins->step
 #endif
 #ifndef AXIS9_STEP_PIN
-  #define AXIS9_STEP_PIN stepDirMotorWrapper[8]->Pins->step
+  #define AXIS9_STEP_PIN stepDirMotorInstance[8]->Pins->step
 #endif
 
-StepDirMotor *stepDirMotorInstance[9];
 IRAM_ATTR void moveStepDirMotorAxis1() { stepDirMotorInstance[0]->move(AXIS1_STEP_PIN); }
 IRAM_ATTR void moveStepDirMotorAxis2() { stepDirMotorInstance[1]->move(AXIS2_STEP_PIN); }
 IRAM_ATTR void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
