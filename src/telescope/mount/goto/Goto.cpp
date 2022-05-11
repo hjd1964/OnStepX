@@ -169,11 +169,12 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   // west side of pier - we're in the eastern sky and the HA's are negative
 
   Coordinate current = mount.getMountPosition(CR_MOUNT);
-  target.pierSide = current.pierSide;
-  if (transform.meridianFlips) {
-    e = limits.validateCoords(&target);
-    if (e != CE_NONE) return e;
 
+  target.pierSide = current.pierSide;
+  e = limits.validateCoords(&target);
+  if (e != CE_NONE) return e;
+
+  if (transform.meridianFlips) {
     double a1;
     if (transform.mountType == ALTAZM) a1 = target.z; else a1 = target.h;
 
