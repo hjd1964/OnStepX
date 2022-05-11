@@ -32,8 +32,8 @@
 #define SERIAL_IP_MODE                OFF //    OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)        Option
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413 for 2-ch 1-wire GPIO, MCP23008 for 8-ch I2C GPIO, or MCP23017     Option
-                                          //         for a 16-ch I2C GPIO. The device can be used for most OnStep features.
+#define GPIO_DEVICE                   OFF //    OFF, DS2413 for 2-ch 1-wire GPIO, MCP23008 for 8-ch I2C GPIO, MCP23017 or     Option
+                                          //         X9555 for a 16-ch I2C GPIO. Works with most OnStep features.
                                           //         Channels are assigned to pin#'s starting at 512 (for channel 0, etc.)
 
 // UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
