@@ -18,6 +18,9 @@
 #include "Tca9555.h"
 #if GPIO_DEVICE != X9555
 
+#include "Pcf8575.h"
+#if GPIO_DEVICE != X8575
+
 class Gpio {
   public:
     bool init();
@@ -33,6 +36,7 @@ class Gpio {
 
 extern Gpio gpio;
 
+#endif
 #endif
 #endif
 #endif
