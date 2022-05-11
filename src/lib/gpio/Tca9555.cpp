@@ -7,7 +7,8 @@
 
 #include "../tasks/OnTask.h"
 
-#include <TCA9555.h>
+#include <TCA9555.h> // https://www.arduino.cc/reference/en/libraries/tca9555/
+
 TCA9555 tca(0x27, &HAL_Wire); // might need to change this I2C Address?
 
 // check for TCA9555 device on the I2C bus
