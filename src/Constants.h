@@ -100,11 +100,12 @@
 // AUXILIARY FEATURE purpose
 #define AUX_FEATURE_PURPOSE_FIRST   1
 #define SWITCH                      1      // control an simple on/off switch
-#define ANALOG_OUTPUT               2      // control an analog (pwm) output, depends on MCU support
-#define ANALOG_OUT                  2
-#define DEW_HEATER                  3      // control an dew heater
-#define INTERVALOMETER              4      // control an camera shutter
-#define AUX_FEATURE_PURPOSE_LAST    4
+#define MOMENTARY_SWITCH            2      // control an simple momentary on/off switch
+#define ANALOG_OUTPUT               3      // control an analog (pwm) output, depends on MCU support
+#define ANALOG_OUT                  3      // as above
+#define DEW_HEATER                  4      // control an dew heater
+#define INTERVALOMETER              5      // control an camera shutter
+#define AUX_FEATURE_PURPOSE_LAST    5
 
 // GPIO devices
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin

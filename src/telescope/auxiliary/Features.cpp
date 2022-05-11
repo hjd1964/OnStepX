@@ -19,9 +19,10 @@ void Features::init() {
     if (device[i].value == ON) device[i].value = 1; else
       if (device[i].value < 0 || device[i].value > 255) device[i].value = 0;
 
-    if (device[i].purpose == SWITCH) {
+    if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH) {
       pinModeEx(device[i].pin, OUTPUT);
       digitalWriteEx(device[i].pin, device[i].value == device[i].active);
+      if (device[i].purpose == MOMENTARY_SWITCH && device[i].value) momentarySwitchTime[i] = 50;
     } else
 
     if (device[i].purpose == ANALOG_OUTPUT) {
@@ -40,7 +41,7 @@ void Features::init() {
       device[i].intervalometer = new Intervalometer;
       device[i].intervalometer->init(i);
       pinModeEx(device[i].pin, OUTPUT);
-      digitalWriteEx(device[i].pin, device[i].value == device[i].active?HIGH:LOW);
+      digitalWriteEx(device[i].pin, device[i].value == device[i].active);
     }
   }
 
@@ -52,6 +53,16 @@ void Features::init() {
 
 void Features::poll() {
   for (int i = 0; i < 8; i++) {
+    if (device[i].purpose == MOMENTARY_SWITCH) {
+      if (momentarySwitchTime[i] > 0) {
+        momentarySwitchTime[i]--;
+        if (momentarySwitchTime[i] == 0) {
+          device[i].value = 0;
+          digitalWriteEx(device[i].pin, device[i].value == device[i].active);
+        }
+      }
+    } else
+
     if (device[i].purpose == DEW_HEATER) {
       device[i].dewHeater->poll(temperature.getChannel(i + 1) - weather.getDewPoint());
       digitalWriteEx(device[i].pin, device[i].dewHeater->isOn() == device[i].active);
