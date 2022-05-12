@@ -6,10 +6,15 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23017
 
+#include "../commands/CommandErrors.h"
+
 class Mcp23017 {
   public:
     // scan for MCP23017 device on the 1-wire bus
     bool init();
+
+    // process any gpio commands
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     void pinMode(int pin, int mode);
 
@@ -17,7 +22,7 @@ class Mcp23017 {
     int digitalRead(int pin);
 
     // one sixteen channel MCP23017 GPIO is supported, this sets each output on or off
-      void digitalWrite(int pin, bool value);
+    void digitalWrite(int pin, bool value);
 
   private:
     bool found = false;

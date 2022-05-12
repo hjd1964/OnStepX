@@ -1,16 +1,16 @@
 // -----------------------------------------------------------------------------------
-// I2C TCA9555 GPIO support
+// Smart Web Server GPIO support (optional when SWS Encoders are not used)
 #pragma once
 
 #include "../../Common.h"
 
-#if defined(GPIO_DEVICE) && GPIO_DEVICE == X9555
+#if defined(GPIO_DEVICE) && GPIO_DEVICE == SWS
 
 #include "../commands/CommandErrors.h"
 
-class Tca9555 {
+class SwsGpio {
   public:
-    // scan for TCA9555 device on the 1-wire bus
+    // scan for SWS device on the 1-wire bus
     bool init();
 
     // process any gpio commands
@@ -26,11 +26,16 @@ class Tca9555 {
 
   private:
     bool found = false;
+    bool swsPolling = true;
 
-    int mode[16] = { INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT };
-    bool state[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+    bool virtualRead[4] = { false, false, false, false };
+    bool virtualWrite[4] = { false, false, false, false };
+    char virtualMode[4] = { 'X', 'X', 'X', 'X' };
+
+    int mode[4] = { OFF, OFF, OFF, OFF };
+    bool state[4] = { false, false, false, false };
 };
 
-extern Tca9555 gpio;
+extern SwsGpio gpio;
 
 #endif

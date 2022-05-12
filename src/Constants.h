@@ -115,7 +115,8 @@
 #define MCP23017                    3      // MCP23017 16-channel GPIO
 #define X9555                       4      // TCA/PCA9555 16-channel GPIO
 #define X8575                       5      // PCF8575 16-channel GPIO
-#define GPIO_LAST                   5
+#define SWS                         6      // Smart Web Server 4-channel GPIO (on Encoder pins, if otherwise unused)
+#define GPIO_LAST                   6
 
 // --------------------------------------------------------------------------------------------------------------------------
 

@@ -23,6 +23,17 @@ bool Mcp23008::init() {
   return found;
 }
 
+// no command processing
+bool Mcp23008::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(command);
+  UNUSED(parameter);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
+  UNUSED(commandError);
+  return false;
+}
+
 // set GPIO pin (0 to 7) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void Mcp23008::pinMode(int pin, int mode) {
   if (found && pin >= 0 && pin <= 7) {

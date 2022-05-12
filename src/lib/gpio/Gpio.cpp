@@ -9,6 +9,16 @@ bool Gpio::init() {
   return true;
 }
 
+bool Gpio::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(command);
+  UNUSED(parameter);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
+  UNUSED(commandError);
+  return false;
+}
+
 void Gpio::pinMode(int pin, int mode) {
   pin = pin;
   mode = mode;

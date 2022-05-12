@@ -24,6 +24,17 @@ bool Mcp23017::init() {
   return found;
 }
 
+// no command processing
+bool Mcp23017::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(command);
+  UNUSED(parameter);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
+  UNUSED(commandError);
+  return false;
+}
+
 // set GPIO pin (0 to 15) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void Mcp23017::pinMode(int pin, int mode) {
   if (found && pin >= 0 && pin <= 15) {

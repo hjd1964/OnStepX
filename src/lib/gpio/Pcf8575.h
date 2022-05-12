@@ -6,10 +6,15 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X8575
 
+#include "../commands/CommandErrors.h"
+
 class Pcf8575 {
   public:
     // scan for PCF8575 device on the 1-wire bus
     bool init();
+
+    // process any gpio commands
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     void pinMode(int pin, int mode);
 

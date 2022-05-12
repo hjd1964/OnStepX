@@ -34,6 +34,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   #ifdef MOUNT_PRESENT
     if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (guide.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (gpio.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     #if SLEW_GOTO == ON
       if (status.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
       if (goTo.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;

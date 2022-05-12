@@ -6,15 +6,20 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23008
 
+#include "../commands/CommandErrors.h"
+
 class Mcp23008 {
   public:
     // scan for MCP23008 device on the 1-wire bus
     bool init();
 
+    // process any gpio commands
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+
     void pinMode(int pin, int mode);
 
     // one eight channel MCP23008 GPIO is supported, this gets the last set value
-      int digitalRead(int pin);
+    int digitalRead(int pin);
 
     // one eight channel MCP23008 GPIO is supported, this sets each output on or off
     void digitalWrite(int pin, bool value);

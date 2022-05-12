@@ -23,6 +23,17 @@ bool Pcf8575::init() {
   return found;
 }
 
+// no command processing
+bool Pcf8575::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(command);
+  UNUSED(parameter);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
+  UNUSED(commandError);
+  return false;
+}
+
 // set GPIO pin (0 to 15) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void Pcf8575::pinMode(int pin, int mode) {
   if (found && pin >= 0 && pin <= 15) {

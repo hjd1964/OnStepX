@@ -59,6 +59,17 @@ bool Ds2413::init() {
   return found;
 }
 
+// no command processing
+bool Ds2413::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(reply);
+  UNUSED(command);
+  UNUSED(parameter);
+  UNUSED(supressFrame);
+  UNUSED(numericReply);
+  UNUSED(commandError);
+  return false;
+}
+
 // set GPIO pin (0 or 1) mode for INPUT or OUTPUT (both pins must be in the same mode)
 void Ds2413::pinMode(int pin, int mode) {
   if (found && pin >= 0 && pin <= 1) {

@@ -6,10 +6,15 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413
 
+#include "../commands/CommandErrors.h"
+
 class Ds2413 {
   public:
     // scan for DS2413 devices on the 1-wire bus
     bool init();
+
+    // process any gpio commands
+    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // set GPIO pin (0 or 1) mode for INPUT or OUTPUT (both pins must be in the same mode)
     void pinMode(int pin, int mode);

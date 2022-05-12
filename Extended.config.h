@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------------------------
- * Extended configuration for OnStepX INFREQUENTLY USED controller options
+ * Extended configuration for OnStepX INFREQUENTLY USED options
  *
  *          For more information on setting OnStep up see http://www.stellarjourney.com/index.php?r=site/equipment_onstep 
  *                      and join the OnStep Groups.io at https://groups.io/g/onstep
@@ -32,9 +32,11 @@
 #define SERIAL_IP_MODE                OFF //    OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)        Option
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413 for 2-ch 1-wire GPIO, MCP23008 for 8-ch I2C GPIO, MCP23017 or     Option
-                                          //         X9555 for a 16-ch I2C GPIO. Works with most OnStep features.
-                                          //         Channels are assigned to pin#'s starting at 512 (for channel 0, etc.)
+#define GPIO_DEVICE                   OFF //    OFF, DS2413   for 2-ch 1-wire GPIO.                                           Option
+                                          //         SWS      for 4-ch Serial GPIO (on SWS encoder pins if otherwise unused.)
+                                          //         MCP23008 for 8-ch I2C GPIO.
+                                          //         MCP23017, X9555, or X8575 for 16-ch I2C GPIO.
+                                          //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
 
 // UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
 #define DRIVER_UART_HARDWARE_SERIAL   OFF //    OFF, Uses SoftwareSerial (transmit only) or ON for hardware serial.           Option
