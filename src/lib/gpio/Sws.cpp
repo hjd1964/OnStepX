@@ -13,9 +13,7 @@ bool SwsGpio::init() {
   static bool initialized = false;
   if (initialized) return found;
 
-  if (swsPolling) {
-    found = true;
-  } else { found = false; DLF("WRN: Gpio.init(), SwsGpio ready"); }
+  found = true;
 
   return found;
 }
@@ -40,7 +38,7 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
             reply[i] = newMode;
             virtualMode[i] = newMode;
           } else {
-            if (virtualMode[i] == 'O') reply[i] = virtualWrite[i]; else reply[i] = 'X';
+            if (virtualMode[i] == 'O') { reply[i] = (virtualWrite[i]) ? '1' : '0'; } else reply[i] = 'X';
           }
 
           reply[i + 1] = 0;

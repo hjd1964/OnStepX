@@ -26,7 +26,6 @@ class SwsGpio {
 
   private:
     bool found = false;
-    bool swsPolling = true;
 
     bool virtualRead[8] = {false, false, false, false, false, false, false, false};
     bool virtualWrite[8] = {false, false, false, false, false, false, false, false};
