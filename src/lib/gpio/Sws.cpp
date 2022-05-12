@@ -36,7 +36,7 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
           if (mode[i] == INPUT_PULLUP) newMode = 'U'; else
           if (mode[i] == OUTPUT) newMode = 'O';
 
-          if (virtualMode[i] != mode[i]) {
+          if (virtualMode[i] != newMode) {
             reply[i] = newMode;
             virtualMode[i] = newMode;
           } else {
