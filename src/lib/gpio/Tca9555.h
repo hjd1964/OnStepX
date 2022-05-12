@@ -10,7 +10,7 @@
 
 class Tca9555 {
   public:
-    // scan for TCA9555 device on the 1-wire bus
+    // scan for TCA9555 device
     bool init();
 
     // process any gpio commands

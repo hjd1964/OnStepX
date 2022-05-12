@@ -10,7 +10,7 @@
 
 class Mcp23017 {
   public:
-    // scan for MCP23017 device on the 1-wire bus
+    // scan for MCP23017 device
     bool init();
 
     // process any gpio commands

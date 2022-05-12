@@ -10,7 +10,7 @@
 
 class Pcf8575 {
   public:
-    // scan for PCF8575 device on the 1-wire bus
+    // scan for PCF8575 device
     bool init();
 
     // process any gpio commands

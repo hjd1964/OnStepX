@@ -30,7 +30,7 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
       // :GXGO#     Get Gpio Output mode or State
       //            Returns: Value
       if (parameter[0] == 'G' && parameter[1] == 'O') {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 8; i++) {
           char newMode = 'X';
           if (mode[i] == INPUT) newMode = 'I'; else
           if (mode[i] == INPUT_PULLUP) newMode = 'U'; else
@@ -57,7 +57,7 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
       // :SXG[n],[v]#   Set Gpio input [n]umber to [v]alue
       //              Return: 0 on failure
       //                      1 on success
-      if (parameter[0] == 'G' && parameter[1] >= '0' && parameter[1] <= '3') {
+      if (parameter[0] == 'G' && parameter[1] >= '0' && parameter[1] <= '7') {
         int i = parameter[1] - '0';
         int v = atol(&parameter[3]);
         if (v == 0 || v == 1) {
@@ -70,9 +70,9 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
   return true;
 }
 
-// set GPIO pin (0 to 3) mode for INPUT, INPUT_PULLUP, or OUTPUT
+// set GPIO pin (0 to 7) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void SwsGpio::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 3) {
+  if (found && pin >= 0 && pin <= 7) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
@@ -83,7 +83,7 @@ void SwsGpio::pinMode(int pin, int mode) {
 
 // one four channel SWS GPIO is supported, this gets the last set value
 int SwsGpio::digitalRead(int pin) {
-  if (found && pin >= 0 && pin <= 3) {
+  if (found && pin >= 0 && pin <= 7) {
     if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
       return virtualRead[pin];
     } else return state[pin]; 
@@ -92,7 +92,7 @@ int SwsGpio::digitalRead(int pin) {
 
 // one four channel SWS GPIO is supported, this sets each output on or off
 void SwsGpio::digitalWrite(int pin, bool value) {
-  if (found && pin >= 0 && pin <= 3) {
+  if (found && pin >= 0 && pin <= 7) {
     state[pin] = value;
     virtualWrite[pin] = value;
   } else return;

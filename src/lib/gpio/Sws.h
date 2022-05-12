@@ -10,7 +10,7 @@
 
 class SwsGpio {
   public:
-    // scan for SWS device on the 1-wire bus
+    // scan for SWS device
     bool init();
 
     // process any gpio commands
@@ -18,22 +18,22 @@ class SwsGpio {
 
     void pinMode(int pin, int mode);
 
-    // one sixteen channel TCA9555 GPIO is supported, this gets the last set value
+    // one eight channel SWS GPIO is supported, this gets the last set value
     int digitalRead(int pin);
 
-    // one sixteen channel TCA9555 GPIO is supported, this sets each output on or off
+    // one eight channel SWS GPIO is supported, this sets each output on or off
     void digitalWrite(int pin, bool value);
 
   private:
     bool found = false;
     bool swsPolling = true;
 
-    bool virtualRead[4] = { false, false, false, false };
-    bool virtualWrite[4] = { false, false, false, false };
-    char virtualMode[4] = { 'X', 'X', 'X', 'X' };
+    bool virtualRead[8] = {false, false, false, false, false, false, false, false};
+    bool virtualWrite[8] = {false, false, false, false, false, false, false, false};
+    char virtualMode[8] = {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' };
 
-    int mode[4] = { OFF, OFF, OFF, OFF };
-    bool state[4] = { false, false, false, false };
+    int mode[8] = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
+    bool state[8] = {false, false, false, false, false, false, false, false};
 };
 
 extern SwsGpio gpio;
