@@ -32,10 +32,10 @@
 #define SERIAL_IP_MODE                OFF //    OFF, Use ACCESS_POINT or STATION to enable the interface (ESP32 only.)        Option
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413   for 2-ch 1-wire GPIO.                                           Option
-                                          //         SWS      for 4-ch Serial GPIO (on SWS encoder pins if otherwise unused.)
-                                          //         MCP23008 for 8-ch I2C GPIO.
-                                          //         MCP23017, X9555, or X8575 for 16-ch I2C GPIO.
+#define GPIO_DEVICE                   OFF //    OFF, DS2413: for 2-ch 1-wire gpio.                                            Option
+                                          //         SWS: for 8-ch Serial gpio (normally 4 unused encoder pins.)
+                                          //         MCP23008: for 8-ch I2C gpio.
+                                          //         MCP23017, X9555, or X8575: for 16-ch I2C gpio.
                                           //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
 
 // UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
