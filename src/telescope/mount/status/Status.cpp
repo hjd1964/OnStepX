@@ -12,8 +12,8 @@
   bool ledOn = false;
   bool ledOff = false;
   void flash() {
-    if (ledOff) { digitalWriteEx(STATUS_LED_PIN, !STATUS_LED_ON_STATE); return; }
-    if (ledOn) { digitalWriteEx(STATUS_LED_PIN, STATUS_LED_ON_STATE); return; }
+    if (ledOff) { digitalWriteEx(MOUNT_STATUS_LED_PIN, !STATUS_MOUNT_LED_ON_STATE); return; }
+    if (ledOn) { digitalWriteEx(MOUNT_STATUS_LED_PIN, STATUS_MOUNT_LED_ON_STATE); return; }
     static uint8_t cycle = 0;
     if ((cycle++)%2 == 0) {
       digitalWriteEx(MOUNT_STATUS_LED_PIN, !STATUS_MOUNT_LED_ON_STATE);
@@ -58,8 +58,7 @@ void Status::ready() {
   #endif
 
   VF("MSG: Mount, status start general status task (1s rate priority 4)... ");
-  statusTaskHandle = tasks.add(1000, 0, true, 4, generalWrapper, "genSta");
-  if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
+  if (tasks.add(1000, 0, true, 4, generalWrapper, "genSta")) { VLF("success"); } else { VLF("FAILED!"); }
 }
 
 // mount status LED flash rate (in ms)
