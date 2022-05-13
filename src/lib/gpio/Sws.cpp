@@ -24,6 +24,12 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
 
   if (command[0] == 'G') {
     if (command[1] == 'X' && parameter[2] == 0)  {
+      // :GXGA#     Get Gpio presence
+      //            Returns: 8# on success or 0 (error) if not present
+      if (parameter[0] == 'G' && parameter[1] == 'A') {
+        strcpy(reply, "8");
+        *numericReply = false;
+      } else
 
       // :GXGO#     Get Gpio Output mode or State
       //            Returns: Value
