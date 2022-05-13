@@ -97,6 +97,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   stage = GG_NEAR_DESTINATION;
   start = current;
   destination = target;
+  nearDestinationRefineStages = 1;
 
   // add waypoint if needed
   if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
@@ -413,8 +414,11 @@ void Goto::poll() {
     } else
 
     if (stage == GG_NEAR_DESTINATION) {
-      stage = GG_DESTINATION;
-      if (slewDestinationDistHA != 0.0) {
+      if (slewDestinationDistHA != 0.0 || transform.mountType == ALTAZM) {
+
+        if (transform.mountType != ALTAZM || !nearDestinationRefineStages) stage = GG_DESTINATION;
+        nearDestinationRefineStages--;
+
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
         if (!alignActive() || SLEW_GOTO_OFFSET_ALIGN == OFF) {
@@ -422,7 +426,10 @@ void Goto::poll() {
           slewDestinationDistDec = 0.0;
         }
         startAutoSlew();
-      } else VLF("MSG: Mount, goto near destination skipped");
+      } else {
+        stage = GG_DESTINATION;
+        VLF("MSG: Mount, goto near destination skipped");
+      }
     } else
 
     if (stage == GG_DESTINATION || stage == GG_ABORT) {

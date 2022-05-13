@@ -120,6 +120,7 @@ class Goto {
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;
+    int        nearDestinationRefineStages;
 
     MeridianFlipHome meridianFlipHome = {false, false};
 
