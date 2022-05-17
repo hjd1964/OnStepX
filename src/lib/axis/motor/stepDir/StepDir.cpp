@@ -108,7 +108,7 @@ bool StepDirMotor::init() {
     stepSet = Pins->stepState;
     stepClr = !stepSet;
   #endif
-  pinMode(Pins->step, OUTPUT);
+  pinModeEx(Pins->step, OUTPUT);
   digitalWriteF(Pins->step, stepClr);
 
   // init default driver enable pin

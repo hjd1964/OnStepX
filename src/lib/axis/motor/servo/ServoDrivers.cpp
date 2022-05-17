@@ -37,9 +37,9 @@ void ServoDriver::init() {
   // init default driver control pins
   pinModeEx(Pins->enable, OUTPUT);
   digitalWriteEx(Pins->enable, !Pins->enabledState);
-  pinMode(Pins->in1, OUTPUT);
+  pinModeEx(Pins->in1, OUTPUT);
   digitalWriteF(Pins->in1, Pins->inState1); // either in1 or direction, state should default to inactive
-  pinMode(Pins->in2, OUTPUT);
+  pinModeEx(Pins->in2, OUTPUT);
   digitalWriteF(Pins->in2, Pins->inState2); // either in2 or phase (PWM,) state should default to inactive
 
   // set fastest PWM speed for Teensy processors
