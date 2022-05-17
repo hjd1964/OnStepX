@@ -16,10 +16,10 @@ bool Mcp23008::init() {
   static bool initialized = false;
   if (initialized) return found;
 
-  if (mcp.begin_I2C(0x20, &HAL_Wire)) {
+  if (mcp.begin_I2C(GPIO_MCP23008_I2C_ADDRESS, &HAL_Wire)) {
     found = true;
     for (int i = 0; i < 8; i++) { mcp.pinMode(i, INPUT); }
-  } else { found = false; DLF("WRN: Gpio.init(), Mcp23008 (I2C 0x20) not found"); }
+  } else { found = false; DF("WRN: Gpio.init(), MCP23008 (I2C "); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_MCP23008_I2C_ADDRESS, HEX); DLF(") not found"); }
   return found;
 }
 

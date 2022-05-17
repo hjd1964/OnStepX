@@ -107,7 +107,7 @@
 #define INTERVALOMETER              5      // control an camera shutter
 #define AUX_FEATURE_PURPOSE_LAST    5
 
-// GPIO devices (pin# 512 up to 527)
+// GPIO devices (pin# 512 up to 543)
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
 #define GPIO_FIRST                  1
 #define DS2413                      1      // DS2413 2-channel GPIO
@@ -115,8 +115,9 @@
 #define MCP23017                    3      // MCP23017 16-channel GPIO
 #define X9555                       4      // TCA/PCA9555 16-channel GPIO
 #define X8575                       5      // PCF8575 16-channel GPIO
-#define SWS                         6      // Smart Web Server 4-channel GPIO (on Encoder pins, if otherwise unused)
-#define GPIO_LAST                   6
+#define SWS                         6      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
+#define SSR75HC595                  7      // 75HC595 8,16,24,32-channel GPIO (serial shift register, output only)
+#define GPIO_LAST                   7
 
 // --------------------------------------------------------------------------------------------------------------------------
 

@@ -9,7 +9,7 @@
 
 #include <TCA9555.h> // https://www.arduino.cc/reference/en/libraries/tca9555/
 
-TCA9555 tca(0x27, &HAL_Wire); // might need to change this I2C Address?
+TCA9555 tca(GPIO_TCA9555_I2C_ADDRESS, &HAL_Wire); // might need to change this I2C Address?
 
 // check for TCA9555 device on the I2C bus
 bool Tca9555::init() {
@@ -19,7 +19,7 @@ bool Tca9555::init() {
   if (tca.begin()) {
     found = true;
     for (int i = 0; i < 16; i++) { tca.pinMode(i, INPUT); }
-  } else { found = false; DLF("WRN: Gpio.init(), Tca9555 (I2C 0x27) not found"); }
+  } else { found = false; DLF("WRN: Gpio.init(), TCA9555 (I2C "); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_TCA9555_I2C_ADDRESS, HEX); DLF(") not found"); }
 
   return found;
 }

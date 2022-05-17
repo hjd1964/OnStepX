@@ -50,3 +50,6 @@
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define HAL_TEMP() ( NAN )
+
+// a really short fixed delay (none needed)
+#define HAL_DELAY_25NS()

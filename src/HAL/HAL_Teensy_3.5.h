@@ -57,3 +57,6 @@
 // Internal MCU temperature (in degrees C)
 #define _Tpin 70
 #define HAL_TEMP() ( (-((analogRead(_Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
+
+// a really short fixed delay (none needed)
+#define HAL_DELAY_25NS()

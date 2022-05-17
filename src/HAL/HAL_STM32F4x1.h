@@ -69,3 +69,6 @@
 
 // Allow MCU reset -----------------------------------------------------------------------------------
 #define HAL_RESET() NVIC_SystemReset()
+
+// a really short fixed delay (none needed)
+#define HAL_DELAY_25NS()

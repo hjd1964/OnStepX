@@ -93,3 +93,6 @@
 //--------------------------------------------------------------------------------------------------
 // for using the DAC as a digital output on Teensy3.6 A21=66 A22=67
 //#define digitalWrite(x,y) { if (x==66 || x==67) { if ((y)==LOW) analogWrite(x,0); else analogWrite(x,255); } else digitalWrite(x,y); }
+
+// a really short fixed delay
+#define HAL_DELAY_25NS() delayNanoseconds(10)

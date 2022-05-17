@@ -68,3 +68,6 @@
 
 // Allow MCU reset -----------------------------------------------------------------------------------
 #define HAL_RESET() ESP.restart()
+
+// a really short fixed delay (none needed)
+#define HAL_DELAY_25NS()

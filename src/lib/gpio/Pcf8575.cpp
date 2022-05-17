@@ -9,7 +9,7 @@
 
 #include <PCF8575.h> // https://www.arduino.cc/reference/en/libraries/pcf8575/
 
-PCF8575 pcf(0x38, &HAL_Wire); // might need to change this I2C Address?
+PCF8575 pcf(GPIO_PCF8575_I2C_ADDRESS, &HAL_Wire); // might need to change this I2C Address?
 
 // check for PCF8575 device on the I2C bus
 bool Pcf8575::init() {
@@ -18,7 +18,7 @@ bool Pcf8575::init() {
 
   if (pcf.begin()) {
     found = true;
-  } else { found = false; DLF("WRN: Gpio.init(), Pcf8575 (I2C 0x38) not found"); }
+  } else { found = false; DLF("WRN: Gpio.init(), PCF8575 (I2C "); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_PCF8575_I2C_ADDRESS, HEX); DLF(") not found"); }
 
   return found;
 }

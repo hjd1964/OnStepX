@@ -8,6 +8,10 @@
 
 #include "../commands/CommandErrors.h"
 
+#ifndef GPIO_MCP23017_I2C_ADDRESS
+#define GPIO_MCP23017_I2C_ADDRESS 0x20
+#endif
+
 class Mcp23017 {
   public:
     // scan for MCP23017 device

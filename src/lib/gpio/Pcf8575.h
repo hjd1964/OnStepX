@@ -8,6 +8,10 @@
 
 #include "../commands/CommandErrors.h"
 
+#ifndef GPIO_PCF8575_I2C_ADDRESS
+#define GPIO_PCF8575_I2C_ADDRESS 0x38
+#endif
+
 class Pcf8575 {
   public:
     // scan for PCF8575 device
