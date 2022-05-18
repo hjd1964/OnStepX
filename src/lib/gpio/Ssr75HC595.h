@@ -8,22 +8,6 @@
 
 #include "../commands/CommandErrors.h"
 
-#ifndef GPIO_SSR75HC595_LATCH_PIN
-#define GPIO_SSR75HC595_LATCH_PIN OFF
-#endif
-#ifndef GPIO_SSR75HC595_CLOCK_PIN
-#define GPIO_SSR75HC595_CLOCK_PIN OFF
-#endif
-#ifndef GPIO_SSR75HC595_DATA_PIN
-#define GPIO_SSR75HC595_DATA_PIN OFF
-#endif
-#ifndef GPIO_SSR75HC595_COUNT
-#define GPIO_SSR75HC595_COUNT 8 // probably 16 (two 8 pin devices) for a gain of 13 pins is the best balance
-#endif
-#if GPIO_SSR75HC595_COUNT != 8 && GPIO_SSR75HC595_COUNT != 16 && GPIO_SSR75HC595_COUNT != 24 && GPIO_SSR75HC595_COUNT != 32
-  #error "GPIO device SSR75HC595 supports GPIO_SSR75HC595_COUNT of 8, 16, 24, or 32 only."
-#endif
-
 class Ssr75HC595 {
   public:
     // init for SSR75HC595 device
@@ -45,8 +29,8 @@ class Ssr75HC595 {
     uint32_t register_value = 0;
     bool found = false;
 
-    int mode[GPIO_SSR75HC595_COUNT];
-    bool state[GPIO_SSR75HC595_COUNT];
+    int mode[32];
+    bool state[32];
 };
 
 extern Ssr75HC595 gpio;

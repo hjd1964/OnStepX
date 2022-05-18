@@ -66,13 +66,13 @@ class StepDirMotor : public Motor {
     void updateMotorDirection();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
-    void move(const int8_t stepPin);
+    void move(const int16_t stepPin);
 
     // fast forward axis movement, no backlash, no mode switching
-    void moveFF(const int8_t stepPin);
+    void moveFF(const int16_t stepPin);
 
     // fast reverse axis movement, no backlash, no mode switching
-    void moveFR(const int8_t stepPin);
+    void moveFR(const int16_t stepPin);
 
     // a stepper motor driver, should not be used above the StepDir class
     StepDirDriver *driver;

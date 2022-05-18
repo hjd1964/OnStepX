@@ -22,6 +22,24 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
+// GPIO SSR75HC595 pins (if used, code below only works for pins 0 to 31)
+#define GPIO_SSR75HC595_LATCH_PIN OFF
+#define GPIO_SSR75HC595_CLOCK_PIN OFF
+#define GPIO_SSR75HC595_DATA_PIN  OFF
+#define GPIO_SSR75HC595_COUNT     8              // 8, 16, 24, or 32 (for 1, 2, 3, or 4 75HC595's)
+#if GPIO_SSR75HC595_LATCH_PIN != OFF
+  #define GPIO_SSR75HC595_LATCH_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_LATCH_PIN); }
+  #define GPIO_SSR75HC595_LATCH_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_LATCH_PIN); }
+#endif
+#if GPIO_SSR75HC595_CLOCK_PIN != OFF
+  #define GPIO_SSR75HC595_CLOCK_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_CLOCK_PIN); }
+  #define GPIO_SSR75HC595_CLOCK_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_CLOCK_PIN); }
+#endif
+#if GPIO_SSR75HC595_DATA_PIN != OFF
+  #define GPIO_SSR75HC595_DATA_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_DATA_PIN); }
+  #define GPIO_SSR75HC595_DATA_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_DATA_PIN); }
+#endif
+
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                18               // ESP8266 RST control, or SPI MISO Axis1&2
 #define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA {assuming default SCL/SDA pins are present}
