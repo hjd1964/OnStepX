@@ -50,6 +50,14 @@
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
+#ifndef SDA_PIN
+  #define SDA_PIN 21
+#endif
+
+#ifndef SCL_PIN
+  #define SCL_PIN 22
+#endif
+
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
   SERIAL_BT_BEGIN(); \
