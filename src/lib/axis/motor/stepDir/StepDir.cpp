@@ -315,7 +315,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
 }
 
 #if STEP_WAVE_FORM == SQUARE
-  IRAM_ATTR void StepDirMotor::move(const int8_t stepPin) {
+  IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
     if (direction > DirNone) return;
 
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
@@ -372,7 +372,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
     takeStep = !takeStep;
   }
 
-  IRAM_ATTR void StepDirMotor::moveFF(const int8_t stepPin) {
+  IRAM_ATTR void StepDirMotor::moveFF(const int16_t stepPin) {
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
     if (takeStep) {
@@ -385,7 +385,7 @@ IRAM_ATTR void StepDirMotor::updateMotorDirection() {
     takeStep = !takeStep;
   }
 
-  IRAM_ATTR void StepDirMotor::moveFR(const int8_t stepPin) {
+  IRAM_ATTR void StepDirMotor::moveFR(const int16_t stepPin) {
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
     if (takeStep) {
