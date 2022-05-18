@@ -5,6 +5,10 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X8575
 
+#ifndef GPIO_PCF8575_I2C_ADDRESS
+  #define GPIO_PCF8575_I2C_ADDRESS 0x38
+#endif
+
 #include "../tasks/OnTask.h"
 
 #include <PCF8575.h> // https://www.arduino.cc/reference/en/libraries/pcf8575/

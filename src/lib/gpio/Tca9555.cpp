@@ -5,6 +5,10 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X9555
 
+#ifndef GPIO_TCA9555_I2C_ADDRESS
+  #define GPIO_TCA9555_I2C_ADDRESS 0x27
+#endif
+
 #include "../tasks/OnTask.h"
 
 #include <TCA9555.h> // https://www.arduino.cc/reference/en/libraries/tca9555/

@@ -5,6 +5,10 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23008
 
+#ifndef GPIO_MCP23008_I2C_ADDRESS
+  #define GPIO_MCP23008_I2C_ADDRESS 0x20
+#endif
+
 #include "../tasks/OnTask.h"
 
 // needs: https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library and https://github.com/adafruit/Adafruit_BusIO

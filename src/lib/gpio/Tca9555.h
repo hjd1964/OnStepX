@@ -8,10 +8,6 @@
 
 #include "../commands/CommandErrors.h"
 
-#ifndef GPIO_TCA9555_I2C_ADDRESS
-#define GPIO_TCA9555_I2C_ADDRESS 0x27
-#endif
-
 class Tca9555 {
   public:
     // scan for TCA9555 device
