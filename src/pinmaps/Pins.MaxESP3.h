@@ -29,10 +29,6 @@
   #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
 #endif
 
-// SDA/SCL pins. 21/22 are the default values
-#define SDA_PIN                 21
-#define SCL_PIN                 22
-
 // GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
 #define GPIO_SSR74HC595_LATCH_PIN OFF
 #define GPIO_SSR74HC595_CLOCK_PIN OFF
