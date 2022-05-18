@@ -15,9 +15,6 @@
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              Serial2
 #endif
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
-#endif
 
 #if DRIVER_UART_HARDWARE_SERIAL == ON
   // Use the following settings for any TMC2209 that may be present

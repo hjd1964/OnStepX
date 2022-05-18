@@ -21,9 +21,6 @@
   #define SERIAL_B_RX           13
   #define SERIAL_B_TX           5
 #endif
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
-#endif
 
 // GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
 #define GPIO_SSR74HC595_LATCH_PIN OFF

@@ -4,6 +4,26 @@
 
 // --------------------------------------------------------------------------------------
 
+#if !defined(SERIAL_A) && SERIAL_A_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SERIAL_A isn't defined, SERIAL_A_BAUD_DEFAULT should be OFF."
+#endif
+
+#if !defined(SERIAL_B) && SERIAL_B_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SERIAL_B isn't defined, SERIAL_B_BAUD_DEFAULT should be OFF."
+#endif
+
+#if !defined(SERIAL_C) && SERIAL_C_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SERIAL_C isn't defined, SERIAL_C_BAUD_DEFAULT should be OFF."
+#endif
+
+#if !defined(SERIAL_D) && SERIAL_D_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SERIAL_D isn't defined, SERIAL_D_BAUD_DEFAULT should be OFF."
+#endif
+
+#if !defined(SERIAL_E) && SERIAL_E_BAUD_DEFAULT != OFF
+  #error "Configuration (Config.h): SERIAL_E isn't defined, SERIAL_E_BAUD_DEFAULT should be OFF."
+#endif
+
 // can we flash an ESP8266?
 #if SERIAL_B_ESP_FLASHING == ON  && (!defined(ADDON_GPIO0_PIN) || !defined(ADDON_RESET_PIN))
   #error "Configuration (Config.h): SERIAL_B_ESP_FLASHING not supported for this PINMAP"

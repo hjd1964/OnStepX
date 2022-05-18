@@ -26,9 +26,6 @@
   #define SERIAL_B_RX           PB11
   #define SERIAL_B_TX           PB10
 #endif
-#if SERIAL_C_BAUD_DEFAULT != OFF
-  #error "Configuration (Config.h): SerialC isn't supported, disable this option."
-#endif
 
 // Use the following settings for any TMC UART driver (TMC2209) that may be present
 #define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
