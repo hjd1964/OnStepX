@@ -36,7 +36,7 @@
                                           //         SWS: for 8-ch Serial gpio (normally 4 unused encoder pins.)
                                           //         MCP23008: for 8-ch I2C gpio.
                                           //         MCP23017, X9555, or X8575: for 16-ch I2C gpio.
-                                          //         SSR75HC595: for up to 32-ch I2C gpio (serial shift register, output only.)
+                                          //         SSR75HC595: for up to 32-ch gpio (serial shift register, output only.)
                                           //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
 
 // UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
