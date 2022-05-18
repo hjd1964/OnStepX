@@ -11,6 +11,9 @@
 // Serial1: RX1 Pin 0, TX1 Pin 1
 // Serial2: RX4 Pin 7, TX4 Pin 8
 
+#if SERIAL_A_BAUD_DEFAULT != OFF
+  #define SERIAL_A              Serial
+#endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              Serial2
 #endif

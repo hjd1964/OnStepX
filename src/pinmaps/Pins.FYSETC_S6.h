@@ -12,6 +12,9 @@
 // Serial2 RX2 Pin PA3, TX2 Pin PA2
 // Serial3 RX3 Pin PC11, TX3 Pin PC10
 
+#if SERIAL_A_BAUD_DEFAULT != OFF
+  #define SERIAL_A              Serial
+#endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              Serial1
 #endif

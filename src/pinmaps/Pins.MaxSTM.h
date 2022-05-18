@@ -17,6 +17,9 @@
 // Serial2 RX2 Pin PA3 , TX2 Pin PA2
 // Serial6 RX6 Pin PA12, TX6 Pin PA11 (used for USB virtual serial)
 
+#if SERIAL_A_BAUD_DEFAULT != OFF
+  #define SERIAL_A              Serial
+#endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              HardSerial
   #define SERIAL_B_RX           PA3

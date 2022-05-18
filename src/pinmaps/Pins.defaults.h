@@ -2,11 +2,6 @@
 // Null pin map, assigns OFF to all values not already assigned
 #pragma once
 
-// SerialA is manidatory
-#ifndef SERIAL_A
-#define SERIAL_A                    Serial
-#endif
-
 /*
 // Example for a board using SoftwareSerial ports to any number of drivers
 #define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis

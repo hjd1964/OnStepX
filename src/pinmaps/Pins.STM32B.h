@@ -18,7 +18,9 @@
 // Serial2 RX2 Pin PA3 , TX2 Pin PA2 (pins are used for other purposes)
 // Serial3 RX3 Pin PB11, TX3 Pin PB10
 
-#define SERIAL_A                Serial1
+#if SERIAL_A_BAUD_DEFAULT != OFF
+  #define SERIAL_A              Serial1
+#endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              HardSerial
   #define SERIAL_B_RX           PB11
