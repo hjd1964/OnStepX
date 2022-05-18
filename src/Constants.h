@@ -116,7 +116,7 @@
 #define X9555                       4      // TCA/PCA9555 16-channel GPIO
 #define X8575                       5      // PCF8575 16-channel GPIO
 #define SWS                         6      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
-#define SSR75HC595                  7      // 75HC595 8,16,24,32-channel GPIO (serial shift register, output only)
+#define SSR74HC595                  7      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
 #define GPIO_LAST                   7
 
 // --------------------------------------------------------------------------------------------------------------------------

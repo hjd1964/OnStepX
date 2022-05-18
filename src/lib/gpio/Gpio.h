@@ -30,8 +30,8 @@
   #include "Sws.h"
 #endif
 
-#if GPIO_DEVICE == SSR75HC595
-  #include "Ssr75HC595.h"
+#if GPIO_DEVICE == SSR74HC595
+  #include "Ssr74HC595.h"
 #endif
 
 #if GPIO_DEVICE == OFF

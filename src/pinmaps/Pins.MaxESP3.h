@@ -33,22 +33,22 @@
 #define SDA_PIN                 21
 #define SCL_PIN                 22
 
-// GPIO SSR75HC595 pins (if used, code below only works for pins 0 to 31)
-#define GPIO_SSR75HC595_LATCH_PIN OFF
-#define GPIO_SSR75HC595_CLOCK_PIN OFF
-#define GPIO_SSR75HC595_DATA_PIN  OFF
-#define GPIO_SSR75HC595_COUNT     8              // 8, 16, 24, or 32 (for 1, 2, 3, or 4 75HC595's)
-#if GPIO_SSR75HC595_LATCH_PIN != OFF
-  #define GPIO_SSR75HC595_LATCH_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_LATCH_PIN); }
-  #define GPIO_SSR75HC595_LATCH_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_LATCH_PIN); }
+// GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
+#define GPIO_SSR74HC595_LATCH_PIN OFF
+#define GPIO_SSR74HC595_CLOCK_PIN OFF
+#define GPIO_SSR74HC595_DATA_PIN  OFF
+#define GPIO_SSR74HC595_COUNT     8              // 8, 16, 24, or 32 (for 1, 2, 3, or 4 74HC595's)
+#if GPIO_SSR74HC595_LATCH_PIN != OFF
+  #define GPIO_SSR74HC595_LATCH_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_LATCH_PIN); }
+  #define GPIO_SSR74HC595_LATCH_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_LATCH_PIN); }
 #endif
-#if GPIO_SSR75HC595_CLOCK_PIN != OFF
-  #define GPIO_SSR75HC595_CLOCK_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_CLOCK_PIN); }
-  #define GPIO_SSR75HC595_CLOCK_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_CLOCK_PIN); }
+#if GPIO_SSR74HC595_CLOCK_PIN != OFF
+  #define GPIO_SSR74HC595_CLOCK_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_CLOCK_PIN); }
+  #define GPIO_SSR74HC595_CLOCK_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_CLOCK_PIN); }
 #endif
-#if GPIO_SSR75HC595_DATA_PIN != OFF
-  #define GPIO_SSR75HC595_DATA_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR75HC595_DATA_PIN); }
-  #define GPIO_SSR75HC595_DATA_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR75HC595_DATA_PIN); }
+#if GPIO_SSR74HC595_DATA_PIN != OFF
+  #define GPIO_SSR74HC595_DATA_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
+  #define GPIO_SSR74HC595_DATA_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
 #endif
 
 // Hint that the direction pins are shared
