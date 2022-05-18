@@ -16,8 +16,6 @@
   #define SERIAL_A              Serial
 #endif
 
-#define FYSETC_E4_DRIVER_UART_MODE E4_USE_I2C    // E4_USE_I2C or E4_USE_SERIAL
-
 #define DRIVER_UART_HARDWARE_SERIAL ON
 
 // Use the following settings TMC2209
@@ -32,8 +30,8 @@
   #define SERIAL_TMC_TX         22               // Transmit data
   #define SERIAL_TMC_RX         21               // Recieving data
   // SDA/SCL pins are disabled
-  #define SDA_PIN               OFF
-  #define SCL_PIN               OFF
+  #define HAL_SDA_PIN           OFF
+  #define HAL_SCL_PIN           OFF
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
