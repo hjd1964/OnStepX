@@ -39,7 +39,6 @@
   #endif
   #define FAN0_PIN              13               // FAN_E0 (Dew heater, etc.)
 #elif DRIVER_UART_HARDWARE_SERIAL == ALT
-  // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins (remove jumpers for E4 fimware update)
   #define SERIAL_TMC_INVERT     ON               // Invert data
   #define SERIAL_TMC_TX         13               // Transmit data
   #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
