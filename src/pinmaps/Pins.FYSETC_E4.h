@@ -26,6 +26,8 @@
     #define SERIAL_TMC_TX       1                // Transmit data
     #define SERIAL_TMC_RX       3                // Recieving data
     #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 3 here
+    #define HAL_SDA_PIN         21
+    #define HAL_SCL_PIN         22
   #else
     // if SERIAL_A is ON map the hardware serial UART to the I2C pins, and disable I2C
     #define SERIAL_TMC_TX       22               // Transmit data
@@ -43,6 +45,8 @@
   #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
   #define FAN0_PIN              OFF              // FAN_E0 (Dew heater, etc.)
   #define SPARE_RX_PIN          OFF              // Not supported in this case
+  #define HAL_SDA_PIN           21
+  #define HAL_SCL_PIN           22
 #else
   #error "Configuration (Config.h): For FYSETC_E4, set DRIVER_UART_HARDWARE_SERIAL to ON (Serial pins or I2C pins) or ALTERNATE (FAN_E0.)"
 #endif

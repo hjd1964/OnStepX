@@ -18,6 +18,10 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
+// Specify the I2C pins
+#define HAL_SDA_PIN             21
+#define HAL_SCL_PIN             22
+
 // Hint that the direction pins are shared
 #define SHARED_DIRECTION_PINS
 
