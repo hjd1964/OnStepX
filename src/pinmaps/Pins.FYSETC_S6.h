@@ -60,27 +60,27 @@
 #endif
 
 // Fans (From Marlin) we use for Auxiliary Features (switches etc.)  Probably with a little crafty wiring these can be 3V3 or 5V.
-#define Fan0Pin                 PB0              // Fan0    (on FAN0)
-#define Fan1Pin                 PB1              // Fan1    (on FAN1)
-#define Fan2Pin                 PB2              // Fan2    (on FAN2)
+#define FAN0_PIN                 PB0             // Fan0    (on FAN0)
+#define FAN1_PIN                 PB1             // Fan1    (on FAN1)
+#define FAN2_PIN                 PB2             // Fan2    (on FAN2)
 
 // Heaters (From Marlin) we use for Auxiliary Features (switches, dew heaters, etc.)
-#define Heater0Pin              PB3              // Heater0 (on E0-OUT, E0-Heater)
-#define Heater1Pin              PB4              // Heater1 (on E1-OUT, E1-Heater)
-#define Heater2Pin              PB15             // Heater2 (on E2-OUT, E2-Heater)
-#define Heater3Pin              PC8              // Heater3 (on BED-OUT, Heated-Bed)
+#define HEATER0_PIN              PB3             // Heater0 (on E0-OUT, E0-Heater)
+#define HEATER1_PIN              PB4             // Heater1 (on E1-OUT, E1-Heater)
+#define HEATER2_PIN              PB15            // Heater2 (on E2-OUT, E2-Heater)
+#define HEATER3_PIN              PC8             // Heater3 (on BED-OUT, Heated-Bed)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 // I defined 7 Aux pins so they match up with the first 7 Auxiliary Feature slots avaliable in OnStep
 // Aux1-3 can be used for pretty much anything
 // Aux4-7 are more for dew-heaters
-#define AUX1_PIN                Fan0Pin
-#define AUX2_PIN                Fan1Pin
-#define AUX3_PIN                Fan2Pin
-#define AUX4_PIN                Heater0Pin
-#define AUX5_PIN                Heater1Pin
-#define AUX6_PIN                Heater2Pin
-#define AUX7_PIN                Heater3Pin
+#define AUX1_PIN                FAN0_PIN
+#define AUX2_PIN                FAN1_PIN
+#define AUX3_PIN                FAN2_PIN
+#define AUX4_PIN                HEATER0_PIN
+#define AUX5_PIN                HEATER1_PIN
+#define AUX6_PIN                HEATER2_PIN
+#define AUX7_PIN                HEATER3_PIN
 
 // Misc. pins
 #ifndef DS3234_CS_PIN
