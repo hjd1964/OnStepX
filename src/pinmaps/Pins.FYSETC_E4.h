@@ -21,7 +21,7 @@
 #define SERIAL_TMC_BAUD         460800           // Baud rate
 
 #if DRIVER_UART_HARDWARE_SERIAL == ON
-  #if SERIAL_A_BAUD_DEFAULT != OFF
+  #if SERIAL_A_BAUD_DEFAULT == OFF
     // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins (remove jumpers for E4 fimware update)
     #define SERIAL_TMC_TX       1                // Transmit data
     #define SERIAL_TMC_RX       3                // Recieving data
