@@ -43,7 +43,11 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
           if (deviceAddress = 4) deviceAddress = 2;
         #endif
         VF("MSG: TmcDriver, hardware serial UART driver pins rx="); V(rx); VF(", tx="); V(tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
-        tmcUartDriver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, deviceAddress, rx, tx);
+        #if SERIAL_TMC_INVERT == ON
+          tmcUartDriver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, deviceAddress, rx, tx, true);
+        #else
+          tmcUartDriver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, deviceAddress, rx, tx);
+        #endif
       #endif
 
       if (rx != OFF) {

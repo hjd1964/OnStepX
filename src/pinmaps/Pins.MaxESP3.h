@@ -22,11 +22,13 @@
   #define SERIAL_TMC_BAUD       460800           // Baud rate
   #define SERIAL_TMC_TX         23               // Transmit data
   #define SERIAL_TMC_RX         39               // Recieving data
-#else
+#elif DRIVER_UART_HARDWARE_SERIAL == OFF
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC            SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
   #define SERIAL_TMC_BAUD       115200           // Baud rate
   #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
+#else
+  #error "Configuration (Config.h): For MaxESP3, set DRIVER_UART_HARDWARE_SERIAL to ON (pins TX23,RX39) or OFF (uses CS.)"
 #endif
 
 // GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)

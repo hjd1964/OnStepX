@@ -19,17 +19,32 @@
 // Use the following settings TMC2209
 #define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
 #define SERIAL_TMC_BAUD         460800           // Baud rate
-#if SERIAL_A_BAUD_DEFAULT != OFF
+
+#if DRIVER_UART_HARDWARE_SERIAL == ON
+  #if SERIAL_A_BAUD_DEFAULT != OFF
+    // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins (remove jumpers for E4 fimware update)
+    #define SERIAL_TMC_TX       1                // Transmit data
+    #define SERIAL_TMC_RX       3                // Recieving data
+    #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 3 here
+  #else
+    // if SERIAL_A is ON map the hardware serial UART to the I2C pins, and disable I2C
+    #define SERIAL_TMC_TX       22               // Transmit data
+    #define SERIAL_TMC_RX       21               // Recieving data
+    // SDA/SCL pins are disabled
+    #define HAL_SDA_PIN         OFF
+    #define HAL_SCL_PIN         OFF
+    #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 21 here
+  #endif
+  #define FAN0_PIN              13               // FAN_E0 (Dew heater, etc.)
+#elif DRIVER_UART_HARDWARE_SERIAL == ALT
   // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins (remove jumpers for E4 fimware update)
-  #define SERIAL_TMC_TX         1                // Transmit data
-  #define SERIAL_TMC_RX         3                // Recieving data
+  #define SERIAL_TMC_INVERT     ON               // Invert data
+  #define SERIAL_TMC_TX         13               // Transmit data
+  #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
+  #define FAN0_PIN              OFF              // FAN_E0 (Dew heater, etc.)
+  #define SPARE_RX_PIN          OFF              // Not supported in this case
 #else
-  // if SERIAL_A is ON map the hardware serial UART to the I2C pins, and disable I2C
-  #define SERIAL_TMC_TX         22               // Transmit data
-  #define SERIAL_TMC_RX         21               // Recieving data
-  // SDA/SCL pins are disabled
-  #define HAL_SDA_PIN           OFF
-  #define HAL_SCL_PIN           OFF
+  #error "Configuration (Config.h): For FYSETC_E4, set DRIVER_UART_HARDWARE_SERIAL to ON (Serial pins or I2C pins) or ALTERNATE (FAN_E0.)"
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
@@ -38,8 +53,8 @@
 #define AUX4_PIN                35               // [input only 35] Home SW for Axis2 (Y_MIN)
 #define AUX5_PIN                2                // [must be low at boot 2] HEAT_E0 (Dew heater, etc.)
 #define AUX6_PIN                4                // HEAT_BED (Dew heater, etc.)
-#define AUX7_PIN                13               // FAN_E0 (Dew heater, etc.)
-#define AUX8_PIN                SERIAL_TMC_RX    // Future possibility for 1-Wire option, or buzzer, etc.
+#define AUX7_PIN                FAN0_PIN         // FAN_E0 (Dew heater, etc.)
+#define AUX8_PIN                SPARE_RX_PIN     // Option for 1-Wire or status LED, buzzer, etc.
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
@@ -53,7 +68,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
-  #define STATUS_LED_PIN        OFF              // Default LED Cathode (-)
+  #define STATUS_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
 #endif
 #define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
 #define STATUS_ROTATOR_LED_PIN  STATUS_LED_PIN   // Default LED Cathode (-)
