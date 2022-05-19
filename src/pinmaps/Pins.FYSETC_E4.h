@@ -5,7 +5,7 @@
 
 #pragma once
 
-#if defined(ESP32) || true
+#if defined(ESP32)
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial0: RX Pin GPIO3, TX Pin GPIO1 (to USB serial adapter)
@@ -15,8 +15,6 @@
 #if SERIAL_A_BAUD_DEFAULT != OFF
   #define SERIAL_A              Serial
 #endif
-
-#define DRIVER_UART_HARDWARE_SERIAL ON
 
 // Use the following settings TMC2209
 #define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
