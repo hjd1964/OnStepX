@@ -2,6 +2,13 @@
 // Null pin map, assigns OFF to all values not already assigned
 #pragma once
 
+// usually the default serial port
+#if SERIAL_A_BAUD_DEFAULT != OFF
+#ifndef SERIAL_A
+#define SERIAL_A                    Serial
+#endif
+#endif
+
 /*
 // map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
 #define TMC_UART_DRIVER_ADDRESS_REMAP(x) (x)
