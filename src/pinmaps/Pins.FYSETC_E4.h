@@ -57,10 +57,10 @@
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX3_PIN                34               // [input only 34] Home SW for Axis1 (X_MIN)
 #define AUX4_PIN                35               // [input only 35] Home SW for Axis2 (Y_MIN)
-#define AUX5_PIN                2                // [must be low at boot 2] HEAT_E0 (Dew heater, etc.)
-#define AUX6_PIN                4                // HEAT_BED (Dew heater, etc.)
-#define AUX7_PIN                13               // FAN_E0 (Dew heater, etc.)
-#define AUX8_PIN                SPARE_RX_PIN     // Option for 1-Wire or status LED, buzzer, etc.
+#define AUX5_PIN                2                // [must be low at boot 2] Dew heater, etc. (HEAT_E0)
+#define AUX6_PIN                4                // Dew heater, etc. (HEAT_BED)
+#define AUX7_PIN                SPARE_RX_PIN     // Option for 1-Wire, etc.
+#define AUX8_PIN                13               // Status LED or Buzzer, Dew heater, etc. (FAN_E0)
 
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define TEMP0_PIN               36               // [input only 36] PEC (TE)
@@ -81,7 +81,7 @@
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN          AUX8_PIN         // Default Pin for OneWire bus
+  #define ONE_WIRE_PIN          AUX7_PIN         // Default Pin for OneWire bus
 #endif
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
