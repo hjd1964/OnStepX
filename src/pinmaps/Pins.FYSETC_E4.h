@@ -22,7 +22,7 @@
 
 // map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
 //                                  X is 1, Y is 3, Z is 0, and E0 is 2
-#define TMC_UART_DRIVER_ADDRESS_MAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
+#define TMC_UART_DRIVER_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
 
 #if DRIVER_UART_HARDWARE_SERIAL == ON
   #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
