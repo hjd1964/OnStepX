@@ -54,7 +54,7 @@
 #define AXIS1_SERVO_D                 1.0 //    1.0, Derivative; overshoot supression.                                        Adjust
 #define AXIS1_SERVO_P_GOTO            2.0 //    2.0, Proportional; as above except active only while slewing.                 Adjust 
 #define AXIS1_SERVO_I_GOTO            5.0 //    5.0, Integral; as above except active only while slewing.                     Adjust
-#define AXIS1_SERVO_D_GOTO            1.0 //    1.0, Derivative; ; as above except active only while slewing.                 Adjust
+#define AXIS1_SERVO_D_GOTO            1.0 //    1.0, Derivative; as above except active only while slewing.                   Adjust
 
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 
