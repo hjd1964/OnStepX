@@ -9,7 +9,7 @@
 
 // GENERAL ---------------------------------------
 #if defined(TMC_UART_DRIVER_PRESENT) && (!defined(SERIAL_TMC) || !defined(SERIAL_TMC_BAUD))
-  #error "Configuration (Config.h): This platform doesn't support TMC UART mode drivers"
+  #error "Configuration (Config.h): This PINMAP doesn't support TMC UART mode drivers"
 #endif
 
 // TELESCOPE -------------------------------------
