@@ -7,7 +7,7 @@
 #define TMC_UART_DRIVER_ADDRESS_REMAP(x) (x)
 
 // map the driver addresses so axis5 becomes axis3 in hardware serial mode
-#define TMC_UART_DRIVER_ADDRESS_AXIS5_REMAP
+#define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5
 
 // Example for a board using SoftwareSerial ports to any number of drivers
 #define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis

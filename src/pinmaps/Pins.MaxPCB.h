@@ -27,7 +27,7 @@
 #endif
 
 // map the driver addresses so axis5 becomes axis3 in hardware serial mode
-#define TMC_UART_DRIVER_ADDRESS_AXIS5_REMAP
+#define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5
 
 #if DRIVER_UART_HARDWARE_SERIAL == ON
   // Use the following settings for any TMC2209 that may be present

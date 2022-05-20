@@ -25,7 +25,7 @@
 #define TMC_UART_DRIVER_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
 
 // map the driver addresses so axis5 becomes axis3 in hardware serial mode
-#define TMC_UART_DRIVER_ADDRESS_AXIS5_REMAP
+#define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5
 
 #if DRIVER_UART_HARDWARE_SERIAL == ON
   #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
