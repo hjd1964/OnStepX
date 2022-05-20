@@ -37,26 +37,26 @@
 #define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
 
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
-#define Temp0Pin                PC0              // Temp0   (on TE0, THERMO0)
-#define Temp1Pin                PC1              // Temp1   (on TE1, THERMO1)
-#define Temp2Pin                PC2              // Temp2   (on TE2, THERMO2)
-#define Temp3Pin                PC3              // Temp3   (on TB , THERMO3)
+#define TEMP0_PIN               PC0              // Temp0   (on TE0, THERMO0)
+#define TEMP1_PIN               PC1              // Temp1   (on TE1, THERMO1)
+#define TEMP2_PIN               PC2              // Temp2   (on TE2, THERMO2)
+#define TEMP3_PIN               PC3              // Temp3   (on TB , THERMO3)
 
 #if FOCUSER_TEMPERATURE_PIN == OFF
   #undef FOCUSER_TEMPERATURE_PIN
-  #define FOCUSER_TEMPERATURE_PIN Temp0Pin
+  #define FOCUSER_TEMPERATURE_PIN TEMP0_PIN
 #endif
 #if FEATURE1_TEMP_PIN == OFF
   #undef FEATURE1_TEMP_PIN
-  #define FEATURE1_TEMP_PIN     Temp1Pin
+  #define FEATURE1_TEMP_PIN     TEMP1_PIN
 #endif
 #if FEATURE2_TEMP_PIN == OFF
   #undef FEATURE2_TEMP_PIN
-  #define FEATURE2_TEMP_PIN     Temp2Pin
+  #define FEATURE2_TEMP_PIN     TEMP2_PIN
 #endif
 #if FEATURE3_TEMP_PIN == OFF
   #undef FEATURE3_TEMP_PIN
-  #define FEATURE3_TEMP_PIN     Temp3Pin
+  #define FEATURE3_TEMP_PIN     TEMP3_PIN
 #endif
 
 // Fans (From Marlin) we use for Auxiliary Features (switches etc.)  Probably with a little crafty wiring these can be 3V3 or 5V.

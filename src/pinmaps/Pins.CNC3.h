@@ -22,6 +22,10 @@
   #define SERIAL_B_TX           5
 #endif
 
+// Specify the ESP32 I2C pins
+#define HAL_SDA_PIN             21
+#define HAL_SCL_PIN             22
+
 // GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
 #define GPIO_SSR74HC595_LATCH_PIN OFF
 #define GPIO_SSR74HC595_CLOCK_PIN OFF

@@ -20,18 +20,18 @@
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD       460800           // Baud rate
-  #define SERIAL_TMC_TX         23               // Transmit data
   #define SERIAL_TMC_RX         39               // Recieving data
+  #define SERIAL_TMC_TX         23               // Transmit data
 #elif DRIVER_UART_HARDWARE_SERIAL == OFF
   // Use the following settings for any TMC2209 that may be present
-  #define SERIAL_TMC            SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
+  #define SERIAL_TMC            SoftSerial       // Use software serial with TX on M3 (CS) of each axis
   #define SERIAL_TMC_BAUD       115200           // Baud rate
   #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
 #else
   #error "Configuration (Config.h): For MaxESP3, set DRIVER_UART_HARDWARE_SERIAL to ON (pins TX23,RX39) or OFF (uses CS.)"
 #endif
 
-// Specify the I2C pins
+// Specify the ESP32 I2C pins
 #define HAL_SDA_PIN             21
 #define HAL_SCL_PIN             22
 

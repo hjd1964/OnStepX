@@ -18,7 +18,7 @@
   #error "Configuration (Config.h): SerialC isn't supported, disable this option."
 #endif
 
-// Specify the I2C pins
+// Specify the ESP32 I2C pins
 #define HAL_SDA_PIN             21
 #define HAL_SCL_PIN             22
 
