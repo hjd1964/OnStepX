@@ -26,6 +26,9 @@
   #define SERIAL_E_BAUD_DEFAULT 9600
 #endif
 
+// map the driver addresses so axis5 becomes axis3 in hardware serial mode
+#define TMC_UART_DRIVER_ADDRESS_AXIS5_REMAP
+
 #if DRIVER_UART_HARDWARE_SERIAL == ON
   // Use the following settings for any TMC2209 that may be present
   #define SERIAL_TMC           Serial4          // Use a single hardware serial port to up to four drivers
