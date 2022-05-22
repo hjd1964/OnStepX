@@ -29,7 +29,7 @@
   #define ODRIVE_UPDATE_MS 100 // for a 10Hz update rate
 #endif
 
-#include <ODriveArduino.h>
+#include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino
 
 typedef struct ODriveDriverSettings {
   int16_t model;
