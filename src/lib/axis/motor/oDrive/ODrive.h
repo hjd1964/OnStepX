@@ -35,6 +35,13 @@
   #define ODRIVE_SLEW_DIRECT OFF
 #endif
 
+// odrive sync limit (for absolute encoders) OFF or specify the sync limit in arc-seconds
+// this should, I hope, allow you to limit just how far from the encoders you can sync. (+/-) to fine-tune the origin
+// with absolute encoders this protects you from
+#ifndef ODRIVE_SYNC_LIMIT
+  #define ODRIVE_SYNC_LIMIT OFF
+#endif
+
 #include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino
 
 typedef struct ODriveDriverSettings {
@@ -64,6 +71,9 @@ class ODriveMotor : public Motor {
 
     // sets motor power on/off (if possible)
     void power(bool value);
+
+    // set instrument coordinate, in steps
+    void setInstrumentCoordinateSteps(long value);
 
     // get the associated driver status
     DriverStatus getDriverStatus();

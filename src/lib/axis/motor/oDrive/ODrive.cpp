@@ -113,6 +113,17 @@ void ODriveMotor::power(bool state) {
   if (state) { VLF("Active"); } else { VLF("Idle"); }
 }
 
+void ODriveMotor::setInstrumentCoordinateSteps(long value) {
+  #if ODRIVE_SYNC_LIMIT != OFF
+    noInterrupts();
+    long index = value - motorSteps;
+    interrupts();
+    float indexDeg = index/stepsPerMeasure;
+    if (indexDeg >= -degToRadF(ODRIVE_SYNC_LIMIT/3600.0F) && indexDeg <= degToRadF(ODRIVE_SYNC_LIMIT/3600.0F))
+  #endif
+  Motor::setInstrumentCoordinateSteps(value);
+}
+
 // get the associated stepper drivers status
 DriverStatus ODriveMotor::getDriverStatus() {
   return status;
@@ -120,6 +131,8 @@ DriverStatus ODriveMotor::getDriverStatus() {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ODriveMotor::resetPositionSteps(long value) {
+  UNUSED(value);
+
   // this is where the initial odrive position in "steps" is brought into agreement with the motor position in steps
   // not sure on this... but code below ignores (value,) gets the odrive position convert to steps and resets the motor
   // there (as the odrive encoders are absolute.)
