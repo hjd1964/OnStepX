@@ -5,10 +5,9 @@
 #include <Arduino.h>
 #include "../../../../Common.h"
 
-// the various microsteps for different driver models, with the bit modes for each
+// SERVO DRIVER (usually for DC motors equipped with encoders)
 #define DRIVER_SERVO_MODEL_COUNT 2
 
-// SERVO DRIVER (usually for DC motors equipped with encoders)
 #ifndef SERVO_DRIVER_FIRST
   #define SERVO_DRIVER_FIRST        100
   #define SERVO_PE                  100    // SERVO, direction and pwm connections
