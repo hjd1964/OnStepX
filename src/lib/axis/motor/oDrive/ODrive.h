@@ -25,8 +25,14 @@
   #define ODRIVE_RST_PIN 3
 #endif
 
+// odrive update rate default 10Hz
 #ifndef ODRIVE_UPDATE_MS
-  #define ODRIVE_UPDATE_MS 100 // for a 10Hz update rate
+  #define ODRIVE_UPDATE_MS 100
+#endif
+
+// odrive direct slewing ON or OFF (ODrive handles acceleration)
+#ifndef ODRIVE_SLEW_DIRECT
+  #define ODRIVE_SLEW_DIRECT OFF
 #endif
 
 #include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino

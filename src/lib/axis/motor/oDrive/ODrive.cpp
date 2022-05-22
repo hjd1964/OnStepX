@@ -192,7 +192,11 @@ void ODriveMotor::poll() {
   lastSetPositionTime = millis();
 
   noInterrupts();
-  long target = motorSteps + backlashSteps;
+  #if ODRIVE_SLEW_DIRECT == ON
+    long target = targetSteps + backlashSteps;
+  #else
+    long target = motorSteps + backlashSteps;
+  #endif
   interrupts();
 
   _oDriveDriver->SetPosition(axisNumber - 1, target/(TWO_PI*stepsPerMeasure));
