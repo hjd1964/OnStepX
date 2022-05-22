@@ -66,8 +66,8 @@
 #else
   #if defined(HAL_DAC_AS_DIGITAL)
     // DAC but no external GPIO
-    #define pinModeEx(pin,mode)       { if (pin > 0x100) pinMode(pin-0x100,mode); else if (pin >= 0) pinMode(CLEAN_PIN(pin),mode); }
-    #define digitalWriteEx(pin,value) { if (pin > 0x100) analogWrite(pin-0x100,value); else if (pin >= 0) { digitalWriteF(CLEAN_PIN(pin),value); } }
+    #define pinModeEx(pin,mode)       { if (pin > 0x100) pinMode(CLEAN_PIN(pin-0x100),mode); else if (pin >= 0) pinMode(CLEAN_PIN(pin),mode); }
+    #define digitalWriteEx(pin,value) { if (pin > 0x100) analogWrite(CLEAN_PIN(pin-0x100),value); else if (pin >= 0) { digitalWriteF(CLEAN_PIN(pin),value); } }
   #else
     // neither DAC as digital or external GPIO
     #define pinModeEx(pin,mode)       { if (pin >= 0) pinMode(pin,mode); }
