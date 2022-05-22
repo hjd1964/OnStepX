@@ -61,6 +61,11 @@
 #define SERVO_II                    101    // SERVO, dual pwm input connections
 #define SERVO_DRIVER_LAST           101
 
+// odrive driver
+#define ODRIVE_DRIVER_FIRST         200
+#define ODRIVE                      200    // First generation ODrive (axis 1 and 2 only)
+#define ODRIVE_DRIVER_LAST          200
+
 // servo encoder (must match Encoder library)
 #define SERVO_ENCODER_FIRST         1
 #define ENC_AB                      1      // AB quadrature encoder
@@ -76,8 +81,9 @@
 
 // driver (step/dir) and servo, misc.
 #define DEFAULT_POWER_DOWN_TIME     30000  // default standstill time (in ms) to power down an axis (see AXISn_DRIVER_POWER_DOWN)
-#define SERVO                       -1     // general purpose flag for a SERVO driver motor
-#define STEP_DIR                    -2     // general purpose flag for a STEP_DIR driver motor
+#define ODRIVER                     -10    // general purpose flag for a ODRIVE driver motor
+#define SERVO                       -11    // general purpose flag for a SERVO driver motor
+#define STEP_DIR                    -12    // general purpose flag for a STEP_DIR driver motor
 
 // NV/EEPROM
 #define NV_KEY_VALUE                111111111UL

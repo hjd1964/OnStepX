@@ -228,7 +228,7 @@
   #define AXIS1_DRIVER_STATUS           OFF                       // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
   #endif
 #endif
-#if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+#if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS1_SERVO_PRESENT
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
@@ -262,6 +262,18 @@
   #endif
   #ifndef AXIS1_SERVO_PH2_STATE
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
+  #endif
+#endif
+#if AXIS1_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
+  #define AXIS1_ODRIVE_PRESENT
+  #ifndef AXIS1_ODRIVE_P
+  #define AXIS1_ODRIVE_P                 2.0                       // P = proportional
+  #endif
+  #ifndef AXIS1_ODRIVE_I
+  #define AXIS1_ODRIVE_I                 5.0                       // I = integral
+  #endif
+  #ifndef AXIS1_ODRIVE_D
+  #define AXIS1_ODRIVE_D                 1.0                       // D = derivative
   #endif
 #endif
 
@@ -346,7 +358,7 @@
   #define AXIS2_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+#if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS2_SERVO_PRESENT
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
@@ -380,6 +392,18 @@
   #endif
   #ifndef AXIS2_SERVO_PH2_STATE
   #define AXIS2_SERVO_PH2_STATE         LOW
+  #endif
+#endif
+#if AXIS2_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
+  #define AXIS2_ODRIVE_PRESENT
+  #ifndef AXIS2_ODRIVE_P
+  #define AXIS2_ODRIVE_P                 2.0                       // P = proportional
+  #endif
+  #ifndef AXIS2_ODRIVE_I
+  #define AXIS2_ODRIVE_I                 5.0                       // I = integral
+  #endif
+  #ifndef AXIS2_ODRIVE_D
+  #define AXIS2_ODRIVE_D                 1.0                       // D = derivative
   #endif
 #endif
 
@@ -1515,6 +1539,10 @@
     defined(AXIS4_SERVO_PRESENT) || defined(AXIS5_SERVO_PRESENT) || defined(AXIS6_SERVO_PRESENT) || \
     defined(AXIS7_SERVO_PRESENT) || defined(AXIS8_SERVO_PRESENT) || defined(AXIS9_SERVO_PRESENT)
   #define SERVO_MOTOR_PRESENT
+#endif
+
+#if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)
+  #define ODRIVE_MOTOR_PRESENT
 #endif
 
 #if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT)
