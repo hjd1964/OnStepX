@@ -5,6 +5,10 @@
 
 #ifdef MOUNT_PRESENT
 
+#ifdef AXIS1_ODRIVE_PRESENT
+  const ODriveDriverSettings ODriveSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS};
+  ODriveMotor motor1(1, &ODriveSettingsAxis1);
+#endif
 #ifdef AXIS1_SERVO_PRESENT
   ServoControl servoControlAxis1;
 
@@ -32,6 +36,10 @@ const AxisPins PinsAxis1 = {AXIS1_SENSE_LIMIT_MIN_PIN, AXIS1_SENSE_HOME_PIN, AXI
 const AxisSettings SettingsAxis1 = {AXIS1_STEPS_PER_DEGREE*RAD_DEG_RATIO, AXIS1_REVERSE, {degToRadF(AXIS1_LIMIT_MIN), degToRadF(AXIS1_LIMIT_MAX)}, siderealToRad(TRACK_BACKLASH_RATE)};
 Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
 
+#ifdef AXIS2_ODRIVE_PRESENT
+  const ODriveDriverSettings ODriveSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS};
+  StepDirMotor motor2(2, &Serial3, &ODriveSettingsAxis2);
+#endif
 #ifdef AXIS2_SERVO_PRESENT
   ServoControl servoControlAxis2;
 
