@@ -32,16 +32,16 @@ typedef struct MinMaxError {
   uint8_t max;
 } MinMaxError;
 
-typedef struct AxisError {
+typedef struct AxisMinMaxError {
   MinMaxError axis1;
   MinMaxError axis2;
-} AxisError;
+} AxisMinMaxError;
 
 typedef struct LimitsError {
-  MinMaxError   altitude;
-  AxisError     limit;
-  AxisError     limitSense;
-  MerdianError  meridian;
+  MinMaxError     altitude;
+  AxisMinMaxError limit;
+  AxisMinMaxError limitSense;
+  MerdianError    meridian;
 } LimitsError;
 
 class Limits {
