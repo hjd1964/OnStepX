@@ -124,7 +124,7 @@ void ODriveMotor::resetPositionSteps(long value) {
   // not sure on this... but code below ignores (value,) gets the odrive position convert to steps and resets the motor
   // there (as the odrive encoders are absolute.)
 
-  long oPosition = _oDriveDriver->GetPosition(axisNumber - 1) * TWO_PI * stepsPerMeasure; // axis1/2 are in steps per radian
+  long oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
   Motor::resetPositionSteps(oPosition);
 
   // but what if the odrive encoders are incremental?  how to tell the odrive what its angular position is?
@@ -188,11 +188,14 @@ void ODriveMotor::setSlewing(bool state) {
 
 // updates PID and sets odrive position
 void ODriveMotor::poll() {
+  if ((long)(millis() - lastSetPositionTime) < ODRIVE_UPDATE_MS) return;
+  lastSetPositionTime = millis();
+
   noInterrupts();
   long target = motorSteps + backlashSteps;
   interrupts();
 
-  _oDriveDriver->SetPosition(axisNumber - 1, target/(TWO_PI * stepsPerMeasure));
+  _oDriveDriver->SetPosition(axisNumber - 1, target/(TWO_PI*stepsPerMeasure));
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate

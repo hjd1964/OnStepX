@@ -25,6 +25,10 @@
   #define ODRIVE_RST_PIN 3
 #endif
 
+#ifndef ODRIVE_UPDATE_MS
+  #define ODRIVE_UPDATE_MS 100 // for a 10Hz update rate
+#endif
+
 #include <ODriveArduino.h>
 
 typedef struct ODriveDriverSettings {
@@ -80,6 +84,7 @@ class ODriveMotor : public Motor {
     void move();
 
   private:
+    unsigned long lastSetPositionTime = 0;
     uint8_t oDriveMonitorHandle = 0;
     uint8_t taskHandle = 0;
 
@@ -91,7 +96,7 @@ class ODriveMotor : public Motor {
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
 
-    volatile int  absStep = 1;          // absolute step size (unsigned)
+    volatile int absStep = 1;           // absolute step size (unsigned)
 
     void (*callback)() = NULL;
 
