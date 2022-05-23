@@ -102,7 +102,7 @@ void ServoMotor::power(bool state) {
   driver->power(state);
 }
 
-// get the associated stepper drivers status
+// get the associated driver status
 DriverStatus ServoMotor::getDriverStatus() {
   driver->updateStatus();
   return driver->getStatus();

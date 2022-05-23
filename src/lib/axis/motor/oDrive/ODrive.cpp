@@ -128,7 +128,7 @@ void ODriveMotor::setInstrumentCoordinateSteps(long value) {
   Motor::setInstrumentCoordinateSteps(value);
 }
 
-// get the associated stepper drivers status
+// get the associated driver status
 DriverStatus ODriveMotor::getDriverStatus() {
   return status;
 }

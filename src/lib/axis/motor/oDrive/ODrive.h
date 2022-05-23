@@ -3,9 +3,7 @@
 #pragma once
 #include "../../../../Common.h"
 
-// SERVO DRIVER (usually for DC motors equipped with encoders)
-#define ODRIVE_MODEL_COUNT 1
-
+// ODRIVE DRIVER MODEL
 #ifndef ODRIVE_DRIVER_FIRST
   #define ODRIVE_DRIVER_FIRST       200
   #define ODRIVE                    200
