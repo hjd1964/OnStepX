@@ -37,9 +37,16 @@
 
 // odrive sync limit (for absolute encoders) OFF or specify the sync limit in arc-seconds
 // this should, I hope, allow you to limit just how far from the encoders you can sync. (+/-) to fine-tune the origin
-// with absolute encoders this protects you from
+// with absolute encoders this protects you from exceeding the software min/max limits by > the amount specified
 #ifndef ODRIVE_SYNC_LIMIT
   #define ODRIVE_SYNC_LIMIT OFF
+#endif
+
+// odrive swap axes
+// when OFF OnStep Axis1 is motor_number 0 and Axis2 is motor_number 1
+// when ON OnStep Axis1 is motor_number 1 and Axis2 is motor_number 0
+#ifndef ODRIVE_SWAP_AXES
+  #define ODRIVE_SWAP_AXES OFF
 #endif
 
 #include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino

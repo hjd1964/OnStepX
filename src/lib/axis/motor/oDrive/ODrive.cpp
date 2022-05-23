@@ -19,16 +19,20 @@ ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Setting
   if (axisNumber < 1 || axisNumber > 2) return;
 
   strcpy(axisPrefix, "MSG: ODrive_, ");
-  axisPrefix[11] = '0' + axisNumber;
-  this->axisNumber = axisNumber;
+  #if ODRIVE_SWAP_AXES == ON
+    this->axisNumber = 3 - axisNumber;
+  #else
+    this->axisNumber = axisNumber;
+  #endif
+  axisPrefix[11] = '0' + this->axisNumber;
   this->useFastHardwareTimers = useFastHardwareTimers;
   driverType = ODRIVER;
 
   _oDriveDriver = new ODriveArduino(ODRIVE_SERIAL);
 
   // attach the function pointers to the callbacks
-  odriveMotorInstance[axisNumber - 1] = this;
-  switch (axisNumber) {
+  odriveMotorInstance[this->axisNumber - 1] = this;
+  switch (this->axisNumber) {
     case 1: callback = moveServoMotorAxis1; break;
     case 2: callback = moveServoMotorAxis2; break;
   }
@@ -189,8 +193,7 @@ void ODriveMotor::setFrequencySteps(float frequency) {
 }
 
 float ODriveMotor::getFrequencySteps() {
-  if (lastPeriod == 0)
-    return 0;
+  if (lastPeriod == 0) return 0;
   return (16000000.0F / lastPeriod) * absStep;
 }
 
