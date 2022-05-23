@@ -77,7 +77,10 @@ bool ODriveMotor::init() {
 
 // set driver reverse state
 void ODriveMotor::setReverse(int8_t state) {
-  UNUSED(state);  // not sure how one would do this, not required strictly speaking though
+  if (state == true) {
+    VF("WRN: ODrive"); V(axisNumber); VF(", ");
+    VLF("axis reversal must be accomplished with hardware or ODrive setup!");
+  }
 }
 
 // set driver parameters
