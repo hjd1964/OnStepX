@@ -19,6 +19,9 @@
 #ifndef ODRIVE_SERIAL
   #define ODRIVE_SERIAL Serial3
 #endif
+#ifndef ODRIVE_SERIAL_BAUD
+  #define ODRIVE_SERIAL_BAUD 19200
+#endif
 #ifndef ODRIVE_RST_PIN
   #define ODRIVE_RST_PIN 3
 #endif
