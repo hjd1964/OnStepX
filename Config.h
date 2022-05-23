@@ -151,9 +151,8 @@
 #define ST4_HAND_CONTROL_FOCUSER       ON //     ON, ON alternate to above: Focuser move [E]f1 [W]f2 [N]-     [S]+            Option
 
 // GUIDING BEHAVIOUR ---------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#GUIDING
-#define GUIDE_TIME_LIMIT               10 //     10, Ten seconds. Or n. Where n=1..120 second time limit guard.               Adjust
+#define GUIDE_TIME_LIMIT               10 //     10, n. Time limit n=0..120 seconds. Use 0 to disable.                        Adjust
 #define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X.                         Option
-#define GUIDE_SEPARATE_PULSE_RATE      ON //     ON, Uses a separate rate (stored in NV) for pulse guiding.                   Infreq
 
 // SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
 #define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option

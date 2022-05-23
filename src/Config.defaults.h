@@ -540,7 +540,7 @@
 #define GUIDE_DISABLE_BACKLASH        OFF                         // disables backlash while pulse-guiding
 #endif
 #ifndef GUIDE_SEPARATE_PULSE_RATE
-#define GUIDE_SEPARATE_PULSE_RATE     ON
+#define GUIDE_SEPARATE_PULSE_RATE     ON                          // normally always enabled
 #endif
 
 // tracking
