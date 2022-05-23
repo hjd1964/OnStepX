@@ -18,13 +18,15 @@ ODriveArduino *_oDriveDriver;
 ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Settings, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 2) return;
 
-  strcpy(axisPrefix, "MSG: ODrive_, ");
   #if ODRIVE_SWAP_AXES == ON
     this->axisNumber = 3 - axisNumber;
   #else
     this->axisNumber = axisNumber;
   #endif
+
+  strcpy(axisPrefix, "MSG: ODrive_, ");
   axisPrefix[11] = '0' + this->axisNumber;
+
   this->useFastHardwareTimers = useFastHardwareTimers;
   driverType = ODRIVER;
 
