@@ -8,8 +8,8 @@
 #include "../../../tasks/OnTask.h"
 
 ODriveMotor *odriveMotorInstance[2];
-IRAM_ATTR void moveServoMotorAxis1() { odriveMotorInstance[0]->move(); }
-IRAM_ATTR void moveServoMotorAxis2() { odriveMotorInstance[1]->move(); }
+IRAM_ATTR void moveODriveMotorAxis1() { odriveMotorInstance[0]->move(); }
+IRAM_ATTR void moveODriveMotorAxis2() { odriveMotorInstance[1]->move(); }
 
 // ODrive servo motor driver
 ODriveArduino *_oDriveDriver;
@@ -33,8 +33,8 @@ ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Setting
   // attach the function pointers to the callbacks
   odriveMotorInstance[this->axisNumber - 1] = this;
   switch (this->axisNumber) {
-    case 1: callback = moveServoMotorAxis1; break;
-    case 2: callback = moveServoMotorAxis2; break;
+    case 1: callback = moveODriveMotorAxis1; break;
+    case 2: callback = moveODriveMotorAxis2; break;
   }
 }
 
