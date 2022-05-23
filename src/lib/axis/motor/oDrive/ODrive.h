@@ -13,6 +13,7 @@
 #ifdef ODRIVE_MOTOR_PRESENT
 
 #include "../Motor.h"
+#include "../../../convert/Convert.h"
 
 // the following would be in the pinmap normally and should trigger #error on compile here when not present
 // for now, they fit your hardware as best as I can tell...
@@ -108,6 +109,15 @@ class ODriveMotor : public Motor {
     void move();
 
   private:
+
+    // special command to send high resolution position to odrive
+    void setPosition(int motor_number, float position) {
+      char command[32];
+      sprintF(command, "p n %1.8f 0.0 0.0", position);
+      command[2] = '0' + motor_number;
+      ODRIVE_SERIAL.println(command);
+    }
+
     unsigned long lastSetPositionTime = 0;
     uint8_t oDriveMonitorHandle = 0;
     uint8_t taskHandle = 0;

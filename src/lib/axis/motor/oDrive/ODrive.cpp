@@ -220,7 +220,7 @@ void ODriveMotor::poll() {
   #endif
   interrupts();
 
-  _oDriveDriver->SetPosition(axisNumber - 1, target/(TWO_PI*stepsPerMeasure));
+  setPosition(axisNumber -1, target/(TWO_PI*stepsPerMeasure));
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
