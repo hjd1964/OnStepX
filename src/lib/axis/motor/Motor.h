@@ -55,7 +55,7 @@ class Motor {
     long getInstrumentCoordinateSteps();
 
     // set instrument coordinate, in steps
-    void setInstrumentCoordinateSteps(long value);
+    virtual void setInstrumentCoordinateSteps(long value);
 
     // set instrument park coordinate, in steps
     // should only be called when the axis is not moving
