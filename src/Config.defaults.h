@@ -1545,7 +1545,7 @@
   #define ODRIVE_MOTOR_PRESENT
 #endif
 
-#if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT)
+#if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT) || defined(ODRIVE_MOTOR_PRESENT)
   #define MOTOR_PRESENT
 #endif
 
