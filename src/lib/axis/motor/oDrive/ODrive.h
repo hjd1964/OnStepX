@@ -34,7 +34,12 @@
 
 // odrive direct slewing ON or OFF (ODrive handles acceleration)
 #ifndef ODRIVE_SLEW_DIRECT
-  #define ODRIVE_SLEW_DIRECT OFF
+  #define ODRIVE_SLEW_DIRECT ON
+#endif
+
+// odrive direct slewing ON or OFF (ODrive handles acceleration)
+#ifndef ODRIVE_ABSOLUTE_ENCODERS
+  #define ODRIVE_ABSOLUTE_ENCODERS ON
 #endif
 
 // odrive sync limit (for absolute encoders) OFF or specify the sync limit in arc-seconds

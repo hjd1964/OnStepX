@@ -140,16 +140,25 @@ DriverStatus ODriveMotor::getDriverStatus() {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ODriveMotor::resetPositionSteps(long value) {
-  UNUSED(value);
-
   // this is where the initial odrive position in "steps" is brought into agreement with the motor position in steps
   // not sure on this... but code below ignores (value,) gets the odrive position convert to steps and resets the motor
   // there (as the odrive encoders are absolute.)
 
   long oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
-  Motor::resetPositionSteps(oPosition);
 
-  // but what if the odrive encoders are incremental?  how to tell the odrive what its angular position is?
+  noInterrupts();
+  motorSteps    = oPosition;
+  targetSteps   = motorSteps;
+  #if ODRIVE_ABSOLUTE_ENCODERS == OFF
+    // but what if the odrive encoders are incremental?  how to tell the odrive what its angular position is?
+    // here thinking we'll ignore it... sync OnStepX there and let the offset handle it
+    indexSteps  = value - motorSteps;
+  #else
+    UNUSED(value);
+    indexSteps = 0;
+  #endif
+  backlashSteps = 0;
+  interrupts();
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
