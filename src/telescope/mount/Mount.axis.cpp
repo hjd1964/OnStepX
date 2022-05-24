@@ -38,7 +38,7 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
 
 #ifdef AXIS2_ODRIVE_PRESENT
   const ODriveDriverSettings ODriveSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS};
-  StepDirMotor motor2(2, &Serial3, &ODriveSettingsAxis2);
+  ODriveMotor motor2(2, &ODriveSettingsAxis2);
 #endif
 #ifdef AXIS2_SERVO_PRESENT
   ServoControl servoControlAxis2;
