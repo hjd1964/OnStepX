@@ -115,7 +115,7 @@ void ODriveMotor::power(bool state) {
   }
   if(!_oDriveDriver->run_state(axisNumber - 1, requestedState, false, timeout)) {
     VF("WRN: ODrive"); V(axisNumber); VF(", ");
-    VLF("closed loop - command timeout!");
+    VLF("closed loop control - command timeout!");
     return;
   }
   V(axisPrefix); VLF("closed loop control - ");
@@ -123,7 +123,7 @@ void ODriveMotor::power(bool state) {
 }
 
 void ODriveMotor::setInstrumentCoordinateSteps(long value) {
-  #if ODRIVE_SYNC_LIMIT != OFF
+  #if ODRIVE_ABSOLUTE == ON && ODRIVE_SYNC_LIMIT != OFF
     noInterrupts();
     long index = value - motorSteps;
     interrupts();
@@ -144,12 +144,15 @@ void ODriveMotor::resetPositionSteps(long value) {
   // not sure on this... but code below ignores (value,) gets the odrive position convert to steps and resets the motor
   // there (as the odrive encoders are absolute.)
 
-  long oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
+  long oPosition;
+  // if (axisNumber - 1 == 0) oPosition = o_position0;
+  // if (axisNumber - 1 == 1) oPosition = o_position1;
+  oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
 
   noInterrupts();
   motorSteps    = oPosition;
   targetSteps   = motorSteps;
-  #if ODRIVE_ABSOLUTE_ENCODERS == OFF
+  #if ODRIVE_ABSOLUTE == OFF
     // but what if the odrive encoders are incremental?  how to tell the odrive what its angular position is?
     // here thinking we'll ignore it... sync OnStepX there and let the offset handle it
     indexSteps  = value - motorSteps;
