@@ -225,9 +225,10 @@
             if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
           {
+            bool pulseGuide = GUIDE_SEPARATE_PULSE_RATE == ON && ST4_HAND_CONTROL != ON;
             GuideRateSelect rateSelect = guide.settings.axis1RateSelect;
-            if (GUIDE_SEPARATE_PULSE_RATE == ON && ST4_HAND_CONTROL != ON) rateSelect = guide.settings.pulseRateSelect;
-            guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000);
+            if (pulseGuide) rateSelect = guide.settings.pulseRateSelect;
+            guide.startAxis1(st4GuideActionAxis1, rateSelect, GUIDE_TIME_LIMIT*1000, pulseGuide);
           }
         } else guide.stopAxis1();
       }
