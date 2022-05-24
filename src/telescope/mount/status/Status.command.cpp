@@ -46,7 +46,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
-      if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G';                     // pulse [G]uide active
+      if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G'; else                // pulse [G]uide active
       if (guide.state != GU_NONE)              reply[i++]='g';                     // [g]uide active
 
       if (mount.settings.rc == RC_REFRACTION) { reply[i++]='r'; reply[i++]='s'; }  // [r]efr enabled [s]ingle axis
@@ -110,6 +110,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       }
 
       if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // sync to encoders only
+      if (guide.state == GU_PULSE_GUIDE)           reply[1]|=0b10010000; else      // pulse guide active
       if (guide.state != GU_NONE)                  reply[1]|=0b10001000;           // guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
