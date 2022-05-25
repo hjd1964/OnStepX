@@ -150,7 +150,7 @@ void Limits::stopAxis1(GuideAction stopDirection) {
     goTo.stop();
   #endif
   guide.stopAxis1(stopDirection, true);
-  if (stopDirection == GA_FORWARD) mount.tracking(false);
+  if (stopDirection == GA_FORWARD || transform.mountType == ALTAZM) mount.tracking(false);
 }
 
 void Limits::stopAxis2(GuideAction stopDirection) {
@@ -158,6 +158,7 @@ void Limits::stopAxis2(GuideAction stopDirection) {
     goTo.stop();
   #endif
   guide.stopAxis2(stopDirection, true);
+  if (transform.mountType == ALTAZM) mount.tracking(false);
 }
 
 void Limits::poll() {
