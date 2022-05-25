@@ -466,7 +466,6 @@ void Axis::poll() {
         autoSlewAbort();
         return;
       }
-
       if (motor->getTargetDistanceSteps() == 0) {
         motor->setSlewing(false);
         autoRate = AR_NONE;
@@ -474,6 +473,7 @@ void Axis::poll() {
         motor->setSynchronized(true);
         V(axisPrefix); VLF("slew stopped");
       } else {
+/*
         if (fabs(freq) > backlashFreq) {
           if (motor->getTargetDistanceSteps() < 0) rampFreq -= getRampDirection()*slewMpspfs; else rampFreq += getRampDirection()*slewMpspfs;
           freq = rampFreq;
@@ -486,6 +486,12 @@ void Axis::poll() {
           if (motor->getTargetDistanceSteps() < 0) freq = -freq;
           rampFreq = freq;
         }
+*/
+        freq = sqrtf(2.0F*(slewMpspfs*FRACTIONAL_SEC)*getOriginOrTargetDistance());
+        if (freq < backlashFreq/2.0F) freq = backlashFreq/2.0F;
+        if (freq > slewFreq) freq = slewFreq;
+        if (motor->getTargetDistanceSteps() < 0) freq = -freq;
+        rampFreq = freq;
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {
