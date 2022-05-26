@@ -169,6 +169,18 @@ DriverStatus StepDirMotor::getDriverStatus() {
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void StepDirMotor::setFrequencySteps(float frequency) {
+
+  // chart acceleration
+  #if DEBUG != OFF && defined(DEBUG_STEPDIR_ACCEL) && DEBUG_STEPDIR_ACCEL != OFF
+    if (axisNumber == DEBUG_STEPDIR) {
+      static unsigned long t = 0;
+      if ((long)(millis() - t) > 100) {
+        DL(frequency);
+        t = millis();
+      }
+    }
+  #endif
+
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
