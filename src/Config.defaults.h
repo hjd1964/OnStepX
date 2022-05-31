@@ -445,6 +445,12 @@
 #ifndef AXIS2_TANGENT_ARM_CORRECTION
 #define AXIS2_TANGENT_ARM_CORRECTION  OFF
 #endif
+#ifndef TANGENT_ARM_INSTRUMENT_TO_MOUNT
+#define TANGENT_ARM_INSTRUMENT_TO_MOUNT(a) (atan(a))              // returns angle in radians
+#endif
+#ifndef TANGENT_ARM_MOUNT_TO_INSTRUMENT
+#define TANGENT_ARM_MOUNT_TO_INSTRUMENT(a) (tan(a))               // angle (a) in radians
+#endif
 
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system

@@ -158,7 +158,7 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   Coordinate mount;
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
-    a2 = atan(a2);
+    a2 = TANGENT_ARM_INSTRUMENT_TO_MOUNT(a2)
   #endif
 
   if (a2 < -Deg90 || a2 > Deg90) {
@@ -195,7 +195,7 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
-    *a2 = tan(*a2);
+    *a2 = TANGENT_ARM_MOUNT_TO_INSTRUMENT(*a2)
   #endif
 }
 
