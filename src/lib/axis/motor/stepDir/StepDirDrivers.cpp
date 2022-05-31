@@ -76,24 +76,6 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
   settings.currentGoto = round(param5);
   UNUSED(param6);
 
-  #if STEP_WAVE_FORM == PULSE
-    // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
-    long pulseWidth = HAL_PULSE_WIDTH;
-    if (axisNumber > 2) pulseWidth = 2000;
-
-    if (DriverPulseWidth[settings.model] == OFF) {
-      VF("WRN: StepDir"); V(axisNumber); VF(", ");
-      V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
-    }
-
-    if (DriverPulseWidth[settings.model] > pulseWidth) {
-      DF("ERR: StepDir"); D(axisNumber); DF(", "); 
-      D(DRIVER_NAME[settings.model]); DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
-      D(pulseWidth); DLF("ns");
-      nv.initError = true;
-    }
-  #endif
-
   if (!isTmcSPI() && !isTmcUART()) {
     if (settings.currentHold != OFF || settings.currentRun != OFF || settings.currentGoto != OFF) {
       VF("WRN: StepDir"); V(axisNumber); VLF(", incorrect model for current control, disabling current settings");
@@ -204,6 +186,24 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
 bool StepDirDriver::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   int index = axisNumber - 1;
   if (index > 3) index = 3;
+
+  #if STEP_WAVE_FORM == PULSE
+    // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
+    long pulseWidth = HAL_PULSE_WIDTH;
+    if (axisNumber > 2) pulseWidth = 2000;
+
+    if (DriverPulseWidth[settings.model] == OFF) {
+      VF("WRN, StepDirDrivers::validateParameters(): Axis"); V(axisNumber); VF(", ");
+      V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
+    }
+
+    if (DriverPulseWidth[settings.model] > pulseWidth) {
+      DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(", "); 
+      D(DRIVER_NAME[settings.model]); DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
+      D(pulseWidth); DLF("ns");
+      return false;
+    }
+  #endif
 
   int maxCurrent;
   if (settings.model == TMC2130) maxCurrent = 1500; else
