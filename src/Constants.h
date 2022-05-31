@@ -55,7 +55,12 @@
 #define GEM                         1      // German Equatorial Mount, meridian flips enabled
 #define FORK                        2      // Fork Mount, meridian flips disabled
 #define ALTAZM                      3      // Altitude Azimuth Mounts, Dobsonians, etc.
-#define MOUNT_TYPE_LAST             3
+#define GEM_TA                      4      // GEM, w/tangent arm Declination
+#define GEM_TAC                     5      // GEM, w/tangent arm Declination and geometry correction
+#define FORK_TA                     6      // FORK, w/tangent arm Declination
+#define FORK_TAC                    7      // FORK, w/tangent arm Declination and geometry correction
+#define ALTAZM_UNL                  8      // ALTAZM, w/unlimited Azmiuth motion
+#define MOUNT_TYPE_LAST             8
 
 // MOUNT COORDS
 #define MOUNT_COORDS_FIRST          1

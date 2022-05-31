@@ -85,8 +85,6 @@
                                           //         |THLD(n) Where n=1..1023 (ADU) for Analog threshold.
                                           //         |HYST(n) Where n=0..1023 (ADU) for +/- Hystersis range.
 
-#define AXIS1_WRAP                    OFF //    OFF, ON Allows unlimited RA/Azm range and ignores min/max/meridian limits.    Option
-
 // AXIS2 DEC/ALT ------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS2
 #define AXIS2_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
 
@@ -118,12 +116,17 @@
 #define AXIS2_SENSE_LIMIT_MIN LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
 #define AXIS2_SENSE_LIMIT_MAX LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
 
-#define AXIS2_TANGENT_ARM             OFF //    OFF, ON +limit range above. Set cntr w/[Reset Home] Return cntr w/[Find Home] Infreq
-#define AXIS2_TANGENT_ARM_CORRECTION  OFF //    OFF, ON enables tangent arm geometry correction for Axis2.                    Infreq
-
 // MOUNT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
-#define MOUNT_TYPE                    GEM //    GEM, GEM for German Equatorial, FORK for Equatorial Fork, or ALTAZM          <-Req'd
-                                          //         Dobsonian etc. mounts. GEM Eq mounts perform meridian flips.
+
+#define MOUNT_TYPE                    GEM //    GEM, GEM         German Equatorial Mount, etc. that need meridian flips.     <-Req'd
+                                          //         GEM_TA      GEM w/tangent arm Declination
+                                          //         GEM_TAC     GEM w/tangent arm Declination and geometry correction
+                                          //         FORK        Fork Mount
+                                          //         FORK_TA     FORK w/tangent arm Declination
+                                          //         FORK_TAC    FORK w/tangent arm Declination and geometry correction
+                                          //         ALTAZM      Altitude/Azimuth Mount, Dobsonians, etc.
+                                          //         ALTAZM_UNL  ALTAZM w/unlimited Azimuth motion
+
 #define MOUNT_COORDS          TOPOCENTRIC // ...RIC, Applies refraction to coordinates to/from OnStep, except exactly         Infreq
                                           //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
                                           //              Use OBSERVED_PLACE for no refraction.

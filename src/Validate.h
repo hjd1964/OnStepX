@@ -153,10 +153,6 @@
   #error "Configuration (Config.h): Setting AXIS1_POWER_DOWN unknown, use OFF or ON."
 #endif
 
-#if AXIS1_WRAP != ON && AXIS1_WRAP != OFF
-  #error "Configuration (Config.h): Setting AXIS1_WRAP unknown, use OFF or ON."
-#endif
-
 #if AXIS1_LIMIT_MIN < -360 || AXIS1_LIMIT_MIN > -90
   #error "Configuration (Config.h): Setting AXIS1_LIMIT_MIN unknown, use value in the range -90 to -360."
 #endif
@@ -268,12 +264,8 @@
   #error "Configuration (Config.h): Setting AXIS2_TANGENT_ARM_CORRECTION unknown, use OFF or ON."
 #endif
 
-#if AXIS2_TANGENT_ARM != OFF && MOUNT_TYPE == ALTAZM
-  #error "Configuration (Config.h): Setting AXIS2_TANGENT_ARM is not supported for default MOUNT_TYPE ALTAZM"
-#endif
-
 // MOUNT TYPE
-#if MOUNT_TYPE < MOUNT_TYPE_FIRST && MOUNT_TYPE > MOUNT_TYPE_LAST
+#if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
   #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
 #endif
 

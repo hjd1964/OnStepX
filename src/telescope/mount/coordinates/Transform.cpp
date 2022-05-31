@@ -27,16 +27,16 @@ void Transform::init() {
 
   // write axis settings to NV
   if (!nv.hasValidKey() || revert) {
-    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
+    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_SUBTYPE);
   }
   mountType = nv.readUC(NV_MOUNT_TYPE_BASE);
   if (mountType == 0) {
-    mountType = MOUNT_TYPE;
-    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_TYPE);
+    mountType = MOUNT_SUBTYPE;
+    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_SUBTYPE);
     VLF("MSG: Transform, revert mount type to default");
   } else
   if (mountType < GEM || mountType > ALTAZM) {
-    mountType = MOUNT_TYPE;
+    mountType = MOUNT_SUBTYPE;
     initError.value = true;
     VLF("WRN: Transform, unknown mount type reverting to default");
   }
@@ -195,7 +195,7 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
-    a2 = tan(a2);
+    *a2 = tan(*a2);
   #endif
 }
 

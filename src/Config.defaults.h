@@ -165,9 +165,6 @@
 #ifndef AXIS1_ENABLE_STATE
 #define AXIS1_ENABLE_STATE            LOW                         // default state of ENable pin for motor power on
 #endif
-#ifndef AXIS1_WRAP
-#define AXIS1_WRAP                    OFF                         // wrap for unlimited range
-#endif
 #ifndef AXIS1_LIMIT_MIN
 #define AXIS1_LIMIT_MIN               -180                        // in degrees
 #endif
@@ -292,12 +289,6 @@
 #ifndef AXIS2_ENABLE_STATE
 #define AXIS2_ENABLE_STATE            LOW                         // stepper enable state
 #endif
-#ifndef AXIS2_TANGENT_ARM
-#define AXIS2_TANGENT_ARM             OFF                         // ON to enable support for Dec tangent arm equatorial mounts
-#endif
-#ifndef AXIS2_TANGENT_ARM_CORRECTION
-#define AXIS2_TANGENT_ARM_CORRECTION  OFF                         // ON enables tangent arm geometry correction for Axis2
-#endif
 #ifndef AXIS2_LIMIT_MIN
 #define AXIS2_LIMIT_MIN               -90                         // in degrees
 #endif
@@ -407,10 +398,54 @@
   #endif
 #endif
 
-// mount type
+// decode internal mount type, tangent arm, azm wrap
 #ifndef MOUNT_TYPE
 #define MOUNT_TYPE                    GEM
 #endif
+#if MOUNT_TYPE == GEM
+#define MOUNT_SUBTYPE                 GEM
+#endif
+#if MOUNT_TYPE == GEM_TA
+#define MOUNT_SUBTYPE                 GEM
+#define AXIS2_TANGENT_ARM             ON
+#endif
+#if MOUNT_TYPE == GEM_TAC
+#define MOUNT_SUBTYPE                 GEM
+#define AXIS2_TANGENT_ARM             ON
+#define AXIS2_TANGENT_ARM_CORRECTION  ON
+#endif
+#if MOUNT_TYPE == FORK
+#define MOUNT_SUBTYPE                 FORK
+#endif
+#if MOUNT_TYPE == FORK_TA
+#define MOUNT_SUBTYPE                 FORK
+#define AXIS2_TANGENT_ARM             ON
+#endif
+#if MOUNT_TYPE == FORK_TAC
+#define MOUNT_SUBTYPE                 FORK
+#define AXIS2_TANGENT_ARM             ON
+#define AXIS2_TANGENT_ARM_CORRECTION  ON
+#endif
+#if MOUNT_TYPE == ALTAZM
+#define MOUNT_SUBTYPE                 ALTAZM
+#endif
+#if MOUNT_TYPE == ALTAZM_UNL
+#define MOUNT_SUBTYPE                 ALTAZM
+#define AXIS1_WRAP                    ON
+#endif
+#ifndef MOUNT_SUBTYPE
+#define MOUNT_SUBTYPE                 OFF
+#endif
+#ifndef AXIS1_WRAP
+#define AXIS1_WRAP                    OFF
+#endif
+#ifndef AXIS2_TANGENT_ARM
+#define AXIS2_TANGENT_ARM             OFF
+#endif
+#ifndef AXIS2_TANGENT_ARM_CORRECTION
+#define AXIS2_TANGENT_ARM_CORRECTION  OFF
+#endif
+
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
 #endif
