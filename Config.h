@@ -291,14 +291,14 @@
 
 #define AXIS4_SLEW_RATE_MINIMUM         2 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
 
+// AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
+// Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
+
 // FOCUSER USER FEEDBACK ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define STATUS_FOCUSER_LED            OFF //    OFF, ON Flashes proportional to the rate of movement (2Hz = 500um/s.)         Option
 
 // FOCUSER SENSORS ------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
 #define FOCUSER_TEMPERATURE           OFF //    OFF, THERMISTOR, DS1820, n. Where n is the DS1820 s/n for focuser temp.       Adjust
-
-// AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
-// Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
 
 // =================================================================================================================================
 // AUXILIARY FEATURES ==============================================================================================================
