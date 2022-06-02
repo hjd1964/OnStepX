@@ -498,11 +498,6 @@
   #error "Configuration (Config.h): Setting AXIS3_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-// USER FEEDBACK
-#if STATUS_ROTATOR_LED != ON && STATUS_ROTATOR_LED != OFF
-  #error "Configuration (Config.h): Setting STATUS_ROTATOR_LED unknown, use OFF or ON."
-#endif
-
 // FOCUSER ---------------------------------------
 
 // AXIS4 FOCUSER
@@ -995,11 +990,6 @@
   #if AXIS9_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS9_SERVO_ENCODER > SERVO_ENCODER_LAST
     #error "Configuration (Config.h): Setting AXIS9_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
-#endif
-
-// USER FEEDBACK
-#if STATUS_FOCUSER_LED != ON && STATUS_FOCUSER_LED != OFF
-  #error "Configuration (Config.h): Setting STATUS_FOCUSER_LED unknown, use OFF or ON."
 #endif
 
 // FOCUSER TEMPERATURE

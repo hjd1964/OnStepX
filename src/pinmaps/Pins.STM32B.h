@@ -64,8 +64,6 @@
 // available from it too, in case you want to power another LED with a wire
 #define STATUS_LED_PIN          AUX0_PIN         // Default LED Cathode (-)
 #define MOUNT_STATUS_LED_PIN    AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_ROTATOR_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
-#define STATUS_FOCUSER_LED_PIN  AUX0_PIN         // Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       AUX3_PIN         // Default LED Cathode (-)
 #endif

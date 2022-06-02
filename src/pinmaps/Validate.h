@@ -65,18 +65,6 @@
     #endif
     #define AUX0_PIN_IN_USE
   #endif
-  #if AUX0_PIN == STATUS_ROTATOR_LED_PIN && STATUS_ROTATOR_LED != OFF
-    #ifdef AUX0_PIN_IN_USE
-      #error "Configuration (Config.h): STATUS_ROTATOR_LED enabled but AUX0_PIN is already in use, choose one feature on AUX0_PIN"
-    #endif
-    #define AUX0_PIN_IN_USE
-  #endif
-  #if AUX0_PIN == STATUS_ROTATOR_LED_PIN && STATUS_FOCUSER_LED != OFF
-    #ifdef AUX0_PIN_IN_USE
-      #error "Configuration (Config.h): STATUS_FOCUSER_LED enabled but AUX0_PIN is already in use, choose one feature on AUX0_PIN"
-    #endif
-    #define AUX0_PIN_IN_USE
-  #endif
 #endif
 
 // check AUX1 pin assignments
@@ -195,18 +183,6 @@
   #if AUX8_PIN == MOUNT_STATUS_LED_PIN && STATUS_MOUNT_LED != OFF
     #ifdef AUX8_PIN_IN_USE
       #error "Configuration (Config.h): STATUS_MOUNT_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
-    #endif
-    #define AUX8_PIN_IN_USE
-  #endif
-  #if AUX8_PIN == STATUS_ROTATOR_LED_PIN && STATUS_ROTATOR_LED != OFF
-    #ifdef AUX0_PIN_IN_USE
-      #error "Configuration (Config.h): STATUS_ROTATOR_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
-    #endif
-    #define AUX0_PIN_IN_USE
-  #endif
-  #if AUX8_PIN == STATUS_ROTATOR_LED_PIN && STATUS_FOCUSER_LED != OFF
-    #ifdef AUX8_PIN_IN_USE
-      #error "Configuration (Config.h): STATUS_FOCUSER_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
     #endif
     #define AUX8_PIN_IN_USE
   #endif

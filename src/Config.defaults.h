@@ -469,18 +469,6 @@
 #ifndef STATUS_MOUNT_LED_ON_STATE
 #define STATUS_MOUNT_LED_ON_STATE     LOW
 #endif
-#ifndef STATUS_ROTATOR_LED
-#define STATUS_ROTATOR_LED            OFF
-#endif
-#ifndef STATUS_ROTATOR_LED_ON_STATE
-#define STATUS_ROTATOR_LED_ON_STATE   LOW
-#endif
-#ifndef STATUS_FOCUSER_LED
-#define STATUS_FOCUSER_LED            OFF
-#endif
-#ifndef STATUS_FOCUSER_LED_ON_STATE
-#define STATUS_FOCUSER_LED_ON_STATE   LOW
-#endif
 #ifndef STATUS_BUZZER
 #define STATUS_BUZZER                 OFF
 #endif
