@@ -1590,8 +1590,8 @@
 #ifndef FEATURE1_TEMP
 #define FEATURE1_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
-#ifndef FEATURE1_TEMP_PIN
-#define FEATURE1_TEMP_PIN             OFF                         // for thermistors, analog pin
+#ifndef FEATURE1_TEMPERATURE_PIN
+#define FEATURE1_TEMPERATURE_PIN             OFF                         // for thermistors, analog pin
 #endif
 #ifndef FEATURE1_PIN
 #define FEATURE1_PIN                  OFF                         // OUTPUT control pin
@@ -1612,8 +1612,8 @@
 #ifndef FEATURE2_TEMP
 #define FEATURE2_TEMP                 OFF
 #endif
-#ifndef FEATURE2_TEMP_PIN
-#define FEATURE2_TEMP_PIN             OFF
+#ifndef FEATURE2_TEMPERATURE_PIN
+#define FEATURE2_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE2_PIN
 #define FEATURE2_PIN                  OFF
@@ -1634,8 +1634,8 @@
 #ifndef FEATURE3_TEMP
 #define FEATURE3_TEMP                 OFF
 #endif
-#ifndef FEATURE3_TEMP_PIN
-#define FEATURE3_TEMP_PIN             OFF
+#ifndef FEATURE3_TEMPERATURE_PIN
+#define FEATURE3_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE3_PIN
 #define FEATURE3_PIN                  OFF
@@ -1656,8 +1656,8 @@
 #ifndef FEATURE4_TEMP
 #define FEATURE4_TEMP                 OFF
 #endif
-#ifndef FEATURE4_TEMP_PIN
-#define FEATURE4_TEMP_PIN             OFF
+#ifndef FEATURE4_TEMPERATURE_PIN
+#define FEATURE4_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE4_PIN
 #define FEATURE4_PIN                  OFF
@@ -1678,8 +1678,8 @@
 #ifndef FEATURE5_TEMP
 #define FEATURE5_TEMP                 OFF
 #endif
-#ifndef FEATURE5_TEMP_PIN
-#define FEATURE5_TEMP_PIN             OFF
+#ifndef FEATURE5_TEMPERATURE_PIN
+#define FEATURE5_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE5_PIN
 #define FEATURE5_PIN                  OFF
@@ -1700,8 +1700,8 @@
 #ifndef FEATURE6_TEMP
 #define FEATURE6_TEMP                 OFF
 #endif
-#ifndef FEATURE6_TEMP_PIN
-#define FEATURE6_TEMP_PIN             OFF
+#ifndef FEATURE6_TEMPERATURE_PIN
+#define FEATURE6_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE6_PIN
 #define FEATURE6_PIN                  OFF
@@ -1722,8 +1722,8 @@
 #ifndef FEATURE7_TEMP
 #define FEATURE7_TEMP                 OFF
 #endif
-#ifndef FEATURE7_TEMP_PIN
-#define FEATURE7_TEMP_PIN             OFF
+#ifndef FEATURE7_TEMPERATURE_PIN
+#define FEATURE7_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE7_PIN
 #define FEATURE7_PIN                  OFF
@@ -1744,8 +1744,8 @@
 #ifndef FEATURE8_TEMP
 #define FEATURE8_TEMP                 OFF
 #endif
-#ifndef FEATURE8_TEMP_PIN
-#define FEATURE8_TEMP_PIN             OFF
+#ifndef FEATURE8_TEMPERATURE_PIN
+#define FEATURE8_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE8_PIN
 #define FEATURE8_PIN                  OFF
