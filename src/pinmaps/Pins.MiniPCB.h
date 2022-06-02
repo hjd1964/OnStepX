@@ -91,8 +91,8 @@
 #endif
 #define AXIS1_SERVO_ENC1_PIN    AXIS1_M0_PIN
 #define AXIS1_SERVO_ENC2_PIN    AXIS1_M1_PIN
-#define AXIS1_SERVO_PH1_PIN     AXIS1_STEP_PIN
-#define AXIS1_SERVO_PH2_PIN     AXIS1_DIR_PIN
+#define AXIS1_SERVO_PH1_PIN     AXIS1_DIR_PIN
+#define AXIS1_SERVO_PH2_PIN     AXIS1_STEP_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        9
@@ -113,8 +113,8 @@
 #endif
 #define AXIS2_SERVO_ENC1_PIN    AXIS2_M0_PIN
 #define AXIS2_SERVO_ENC2_PIN    AXIS2_M1_PIN
-#define AXIS2_SERVO_PH1_PIN     AXIS2_STEP_PIN
-#define AXIS2_SERVO_PH2_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        OFF
