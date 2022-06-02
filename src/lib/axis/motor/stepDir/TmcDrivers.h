@@ -23,6 +23,14 @@
   #include "../../../softSpi/SoftSpi.h"
 #endif
 
+#ifndef TMC5160_DRIVER_RSENSE
+  #define TMC5160_DRIVER_RSENSE (0.075)
+#endif
+
+#ifndef TMC2130_DRIVER_RSENSE
+  #define TMC2130_DRIVER_RSENSE (0.11 + 0.02)
+#endif
+
 class TmcDriver {
   public:
     // setup SoftSpi or UART and driver model/Rsense

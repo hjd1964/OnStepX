@@ -72,8 +72,8 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
   #endif
 
   #ifdef TMC_SPI_DRIVER_PRESENT
-    if (model == TMC5160) rsense = 0.075; else
-    if (model == TMC2130) rsense = 0.11 + 0.02; else rsense = 0.11 + 0.02;
+    if (model == TMC5160) rsense = TMC5160_DRIVER_RSENSE; else
+    if (model == TMC2130) rsense = TMC2130_DRIVER_RSENSE; else rsense = TMC2130_DRIVER_RSENSE;
     VF("MSG: TmcDriver, init RSENSE="); VL(rsense);
 
     if (model == TMC2130 || model == TMC5160) {
