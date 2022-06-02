@@ -187,9 +187,9 @@
 #define SLEW_ACCELERATION_DIST        5.0 //    5.0, n, (degrees.) Approx. distance for acceleration (and deceleration.)      Adjust
 #define SLEW_RAPID_STOP_DIST          2.0 //    2.0, n, (degrees.) Approx. distance required to stop when a slew              Adjust
                                           //         is aborted or a limit is exceeded.
-#define SLEW_GOTO_OFFSET_ALIGN        OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
 #define GOTO_FEATURE                   ON //     ON, Use OFF to disable mount Goto features.                                  Infreq
 #define GOTO_OFFSET                  0.25 //   0.25, Offset in deg's for goto target unidirectional approach, 0.0 disables    Option
+#define GOTO_OFFSET_ALIGN             OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
                                           //         from the correct direction when centering.
 
 // PIER SIDE BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SYNCING

@@ -605,8 +605,8 @@
 #ifndef GOTO_OFFSET
 #define GOTO_OFFSET                   0.25                        // distance in degrees for goto target unidirectional approach, 0.0 disables
 #endif
-#ifndef SLEW_GOTO_OFFSET_ALIGN
-#define SLEW_GOTO_OFFSET_ALIGN        OFF                         // skip final phase of goto for align stars so user tends to
+#ifndef GOTO_OFFSET_ALIGN
+#define GOTO_OFFSET_ALIGN             OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
 
 // meridian flip, pier side

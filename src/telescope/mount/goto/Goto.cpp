@@ -421,7 +421,7 @@ void Goto::poll() {
 
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
-        if (!alignActive() || SLEW_GOTO_OFFSET_ALIGN == OFF) {
+        if (!alignActive() || GOTO_OFFSET_ALIGN == OFF) {
           slewDestinationDistHA = 0.0;
           slewDestinationDistDec = 0.0;
         }
