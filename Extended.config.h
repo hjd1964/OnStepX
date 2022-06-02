@@ -40,6 +40,6 @@
                                           //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
 
 // UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
-#define DRIVER_UART_HARDWARE_SERIAL    ON //    OFF, Uses SoftwareSerial or ON for hardware serial.                           Option
+#define DRIVER_UART_HARDWARE_SERIAL   OFF //    OFF, Uses SoftwareSerial or ON for hardware serial.                           Option
 
 // ---------------------------------------------------------------------------------------------------------------------------------
