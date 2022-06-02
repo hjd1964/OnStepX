@@ -34,7 +34,7 @@
 
 // odrive direct slewing ON or OFF (ODrive handles acceleration)
 #ifndef ODRIVE_SLEW_DIRECT
-  #define ODRIVE_SLEW_DIRECT ON
+  #define ODRIVE_SLEW_DIRECT OFF
 #endif
 
 // odrive if using absolute encoders set to ON
