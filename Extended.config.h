@@ -15,7 +15,7 @@
 // =================================================================================================================================
 // CONTROLLER ======================================================================================================================
 
-// DEBUG ------------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#DEBUG
+// DEBUG ---------------------------------------------------------------------------------------------------------------------------
 // Enable additional debugging and/or status messages on the specified SERIAL_DEBUG port
 // Note that the SERIAL_DEBUG port cannot be used for normal communication with OnStep
 #define DEBUG                         OFF //    OFF, Use ON for background error messages only, use VERBOSE for all           Infreq
