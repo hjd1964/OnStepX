@@ -16,7 +16,7 @@
 // CONTROLLER ======================================================================================================================
 
 // PINMAP ---------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PINMAP
-#define PINMAP                        OFF //    OFF, Choose from: MksGenL2, MiniPCB2, MaxPCB2, MaxESP3, CNC3, STM32Blue,     <-Req'd
+#define PINMAP                        OFF //    OFF, Choose from: MiniPCB, MiniPCB2, MaxPCB2, MaxESP3, CNC3, STM32Blue,      <-Req'd
                                           //         MaxSTM3, FYSETC_S6_2, etc.  Other boards and more info. in ~/src/Constants.h
 
 // SERIAL PORT COMMAND CHANNELS ------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#SERIAL
@@ -30,11 +30,11 @@
 // USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
 #define STATUS_LED                    OFF //    OFF, Steady illumination if no error, blinks w/error code otherwise.          Option
 
-// RETICLE CONTROL ------------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#RETICLE
+// RETICLE CONTROL ---------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#RETICLE_CONTROL
 #define RETICLE_LED_DEFAULT           OFF //    OFF, n. Where n=0..255 (0..100%) activates feature sets default brightness.   Option
 #define RETICLE_LED_MEMORY            OFF //    OFF, ON Remember reticle brightness across power cycles.                      Option
 
-// WEATHER SENSOR ------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
+// WEATHER SENSOR ------------------------------------------ see https://onstep.groups.io/g/main/wiki/6-Configuration#WEATHER_SENSOR
 #define WEATHER                       OFF //    OFF, BME280 (I2C 0x77,) BME280_0x76, BME280_SPI (see pinmap for CS.)          Option
                                           //         BMP280 (I2C 0x77,) BMP280_0x76, BMP280_SPI (see pinmap for CS.)
                                           //         BME280 or BMP280 for temperature, pressure.  BME280 for humidity also.
@@ -48,7 +48,7 @@
 
 // Driver models (Step/Dir and Servo) many have specific requirements so be sure to follow the link below to help learn about these.
 // Typically: A4988, DRV8825, LV8729, S109, TMC2130, TMC5160, TMC2209S, TMC2209U, TMC2226S, TMC2226U
-// Others: SERVO_II and SERVO_PD have settings in Extended.config.h
+// Others: SERVO_II and SERVO_PE have settings in Extended.config.h
 
 // AXIS1 RA/AZM -------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration---Rotator-and-Focusers#AXIS1
 #define AXIS1_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
@@ -137,7 +137,7 @@
                                           //         falling edge, or use BOTH for rising and falling edges.
                                           //         Better tracking accuracy especially for Mega2560's w/ceramic resonator.
 
-// USER FEEDBACK -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#USER_FEEDBACK
+// STATUS ---------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#STATUS
 #define STATUS_MOUNT_LED              OFF //    OFF, ON Flashes proportional to rate of movement or solid on for slews.       Option
 #define STATUS_BUZZER                 OFF //    OFF, ON, n. Where n=100..6000 (Hz freq.) for speaker. ON for piezo buzzer.    Option
 #define STATUS_BUZZER_DEFAULT         OFF //    OFF, ON default starts w/buzzer enabled.                                      Option
@@ -156,7 +156,7 @@
 #define GUIDE_TIME_LIMIT               10 //     10, n. Time limit n=0..120 seconds. Use 0 to disable.                        Adjust
 #define GUIDE_DISABLE_BACKLASH        OFF //    OFF, Disable backlash takeup during guiding at <= 1X.                         Option
 
-// SENSORS -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SENSORS
+// LIMITS ---------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#LIMITS
 #define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 // PARK -------------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PARK
@@ -192,7 +192,7 @@
 #define GOTO_OFFSET_ALIGN             OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
                                           //         from the correct direction when centering.
 
-// PIER SIDE BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SYNCING
+// PIER SIDE BEHAVIOUR ------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#PIERSIDE
 #define MFLIP_SKIP_HOME               OFF //    OFF, ON Goto directly to the destination without visiting home position.      Option
 #define MFLIP_AUTOMATIC_DEFAULT       OFF //    OFF, ON Start with automatic meridian flips enabled.                          Option
 #define MFLIP_AUTOMATIC_MEMORY        OFF //    OFF, ON Remember automatic meridian flip setting across power cycles.         Option
@@ -252,11 +252,12 @@
 
 // Driver models (Step/Dir and Servo) many have specific requirements so be sure to follow the link below to help learn about these.
 // Typically: A4988, DRV8825, LV8729, S109, TMC2130, TMC5160, TMC2209S, TMC2209U, TMC2226S, TMC2226U
-// Others: SERVO_II and SERVO_PD have settings in Extended.config.h
+// Others: SERVO_II and SERVO_PE have settings in Extended.config.h
 
 // AXIS4 FOCUSER 1 -------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#AXIS4
 #define AXIS4_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) to activate the focuser.                Option
 #define AXIS4_SLEW_RATE_DESIRED       500 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
+#define AXIS4_SLEW_RATE_MINIMUM         2 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
 
 // If runtime axis settings are enabled changes in the section below may be ignored unless you reset to defaults:
 // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
@@ -284,8 +285,6 @@
 #define AXIS4_SENSE_HOME              OFF //    OFF, HIGH or LOW enables & state clockwise home position, as seen from above. Option
 #define AXIS4_SENSE_LIMIT_MIN         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
 #define AXIS4_SENSE_LIMIT_MAX         OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
-
-#define AXIS4_SLEW_RATE_MINIMUM         2 //      2, n. Where n=1..10 (um/s.) Minimum microns/second.                         Adjust
 
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 // Up to 6 focusers can be present (AXIS4 to AXIS9) simply copy the above text for focuser 1 and rename to AXIS5_ for focuser 2, etc
