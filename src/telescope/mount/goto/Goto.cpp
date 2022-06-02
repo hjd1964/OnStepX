@@ -85,9 +85,9 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   if (transform.mountType != ALTAZM && 
       park.state != PS_PARKING &&
       home.state != HS_HOMING &&
-      fabs(target.d) < Deg90 - degToRad(SLEW_GOTO_OFFSET)) {
-    slewDestinationDistHA = degToRad(SLEW_GOTO_OFFSET);
-    slewDestinationDistDec = degToRad(SLEW_GOTO_OFFSET);
+      fabs(target.d) < Deg90 - degToRad(GOTO_OFFSET)) {
+    slewDestinationDistHA = degToRad(GOTO_OFFSET);
+    slewDestinationDistDec = degToRad(GOTO_OFFSET);
     if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
   }
 
