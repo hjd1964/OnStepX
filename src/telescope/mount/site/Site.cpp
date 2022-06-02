@@ -41,7 +41,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       site.dateIsReady = true;
       site.timeIsReady = true;
       site.setDateTime(jd);
-      #if SLEW_GOTO == ON
+      #if GOTO_FEATURE == ON
         if (park.state == PS_PARKED) park.restore(false);
       #endif
 
@@ -131,7 +131,7 @@ void Site::updateTLS() {
 
   if (initError.tls && dateIsReady && timeIsReady) {
     initError.tls = false;
-    #if SLEW_GOTO == ON
+    #if GOTO_FEATURE == ON
       if (park.state == PS_PARKED) park.restore(false);
     #endif
   }

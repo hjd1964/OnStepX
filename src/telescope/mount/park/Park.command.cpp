@@ -3,7 +3,7 @@
 
 #include "Park.h"
 
-#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
+#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
 
 bool Park::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);

@@ -86,7 +86,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: Nothing
   if (command[0] == 'Q') {
     if (command[1] == 0) {
-        #if SLEW_GOTO == ON
+        #if GOTO_FEATURE == ON
           goTo.stop();
         #endif
         stop();
@@ -109,7 +109,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   // R - Guide Rate Commands
   if (command[0] == 'R') {
 
-    #if SLEW_GOTO == ON
+    #if GOTO_FEATURE == ON
       float maxDegsPerSec = radToDegF(goTo.rate);
     #else
       float maxDegsPerSec = 0.2F;

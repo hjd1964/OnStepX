@@ -3,7 +3,7 @@
 
 #include "Goto.h"
 
-#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
+#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
 
 #include "../../../lib/tasks/OnTask.h"
 

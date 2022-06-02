@@ -587,8 +587,8 @@
 #endif
 
 // slewing
-#ifndef SLEW_GOTO
-#define SLEW_GOTO                     ON                          // OFF disables goto functionality
+#ifndef GOTO_FEATURE
+#define GOTO_FEATURE                  ON                          // OFF disables goto functionality
 #endif
 #ifndef SLEW_RATE_BASE_DESIRED
 #define SLEW_RATE_BASE_DESIRED        1.0                         // *desired* maximum slew rate, actual slew rate depends on many factors

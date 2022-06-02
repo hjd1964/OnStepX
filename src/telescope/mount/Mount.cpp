@@ -78,7 +78,7 @@ void Mount::init() {
     limits.settings.pastMeridianW = Deg360;
   }
 
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     goTo.init();
     library.init();
     park.init();
@@ -106,7 +106,7 @@ void Mount::init() {
     }
   #else
     tracking(false);
-    #if SLEW_GOTO == ON
+    #if GOTO_FEATURE == ON
       if (park.state == PS_PARKED) park.restore(false);
     #endif
   #endif
@@ -174,7 +174,7 @@ void Mount::update() {
   static int lastStatusFlashMs = 0;
   int statusFlashMs = 0;
 
-#if SLEW_GOTO == ON
+#if GOTO_FEATURE == ON
   if (goTo.state == GS_NONE && guide.state < GU_GUIDE) {
 #else
   if (guide.state < GU_GUIDE) {

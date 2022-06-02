@@ -351,8 +351,8 @@
 #endif
 
 // SLEWING BEHAVIOUR
-#if SLEW_GOTO != ON && SLEW_GOTO != OFF
-  #error "Configuration (Config.h): Setting SLEW_GOTO unknown, use OFF or ON."
+#if GOTO_FEATURE != ON && GOTO_FEATURE != OFF
+  #error "Configuration (Config.h): Setting GOTO_FEATURE unknown, use OFF or ON."
 #endif
 
 #if SLEW_RATE_MEMORY != ON && SLEW_RATE_MEMORY != OFF

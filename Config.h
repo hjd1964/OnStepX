@@ -117,7 +117,6 @@
 #define AXIS2_SENSE_LIMIT_MAX LIMIT_SENSE // ...NSE, HIGH or LOW state on limit sense switch stops movement.                  Option
 
 // MOUNT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#MOUNT_TYPE
-
 #define MOUNT_TYPE                    GEM //    GEM, GEM         German Equatorial Mount, etc. that need meridian flips.     <-Req'd
                                           //         GEM_TA      GEM w/tangent arm Declination
                                           //         GEM_TAC     GEM w/tangent arm Declination and geometry correction
@@ -188,9 +187,9 @@
 #define SLEW_ACCELERATION_DIST        5.0 //    5.0, n, (degrees.) Approx. distance for acceleration (and deceleration.)      Adjust
 #define SLEW_RAPID_STOP_DIST          2.0 //    2.0, n, (degrees.) Approx. distance required to stop when a slew              Adjust
                                           //         is aborted or a limit is exceeded.
-#define SLEW_GOTO                      ON //     ON, Use OFF to disable mount Goto features.                                  Infreq
 #define SLEW_GOTO_OFFSET             0.25 //   0.25, Offset in deg's for goto target unidirectional approach, 0.0 disables    Option
 #define SLEW_GOTO_OFFSET_ALIGN        OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
+#define GOTO_FEATURE                   ON //     ON, Use OFF to disable mount Goto features.                                  Infreq
                                           //         from the correct direction when centering.
 
 // PIER SIDE BEHAVIOUR -------------------------------------------- see https://onstep.groups.io/g/main/wiki/6-Configuration#SYNCING

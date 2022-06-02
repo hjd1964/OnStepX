@@ -24,7 +24,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     if (command[1] == 'F' && parameter[0] == 0) {
       *commandError = reset(true);
 
-      #if SLEW_GOTO == ON
+      #if GOTO_FEATURE == ON
         park.reset();
       #endif
 

@@ -4,7 +4,7 @@
 
 #include "../../../Common.h"
 
-#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
+#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
 
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"

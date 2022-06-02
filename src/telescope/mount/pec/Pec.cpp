@@ -77,7 +77,7 @@
           if (!settings.recorded) settings.state = PEC_NONE;
 
           #if PEC_SENSE == OFF
-            #if SLEW_GOTO == ON
+            #if GOTO_FEATURE == ON
               park.settings.wormSensePositionSteps = 0;
             #endif
             settings.state = PEC_NONE;
@@ -98,7 +98,7 @@
 
   void Pec::poll() {
     // PEC is only active when we're tracking at the sidereal rate with a guide rate that makes sense
-    #if SLEW_GOTO == ON
+    #if GOTO_FEATURE == ON
       if (park.state > PS_UNPARKED) { disable(); return; }
     #endif
     if (!mount.isTracking() || guide.state > GU_PULSE_GUIDE) { disable(); return; }

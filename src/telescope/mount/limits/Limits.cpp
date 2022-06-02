@@ -137,7 +137,7 @@ uint8_t Limits::errorCode() {
 }
 
 void Limits::stop() {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     goTo.stop();
   #endif
   guide.stopAxis1(GA_BREAK, true);
@@ -146,7 +146,7 @@ void Limits::stop() {
 }
 
 void Limits::stopAxis1(GuideAction stopDirection) {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     goTo.stop();
   #endif
   guide.stopAxis1(stopDirection, true);
@@ -154,7 +154,7 @@ void Limits::stopAxis1(GuideAction stopDirection) {
 }
 
 void Limits::stopAxis2(GuideAction stopDirection) {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     goTo.stop();
   #endif
   guide.stopAxis2(stopDirection, true);
@@ -184,7 +184,7 @@ void Limits::poll() {
 
     if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
       if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
-        #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
+        #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
             // disable this limit for a second to allow goto to exit the out of limits region
             autoFlipDelayCycles = 10;
@@ -226,7 +226,7 @@ void Limits::poll() {
     } else error.limit.axis1.min = false;
 
     if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
-      #if SLEW_GOTO == ON && AXIS2_TANGENT_ARM == OFF
+      #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
         if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           // disable this limit for a second to allow goto to exit the out of limits region
           autoFlipDelayCycles = 10;

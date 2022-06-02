@@ -116,7 +116,7 @@
       static bool altModeA = false;
       static bool altModeB = false;
 
-      #if SLEW_GOTO == ON
+      #if GOTO_FEATURE == ON
         const long AltMode_ms = 2000;
         if (goTo.state != GS_NONE && !goTo.isHomePaused()) {
           if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
@@ -137,7 +137,7 @@
           if (altModeA) {
             int r = (int)guide.settings.axis1RateSelect;
             if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
-              #if SLEW_GOTO == ON
+              #if GOTO_FEATURE == ON
                 if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B+#"); else { if (r >= 7) r=8; else if (r >= 5) r=7; else if (r >= 2) r=5; else if (r < 2) r=2; }
               #else
                 SERIAL_LOCAL.transmit(":B+#");
@@ -145,7 +145,7 @@
               status.sound.click();
             }
             if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
-              #if SLEW_GOTO == ON
+              #if GOTO_FEATURE == ON
                 if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B-#"); else { if (r <= 5) r=2; else if (r <= 7) r=5; else if (r <= 8) r=7; else if (r > 8) r=8; }
               #else
                 SERIAL_LOCAL.transmit(":B-#");
@@ -153,7 +153,7 @@
               status.sound.click();
             }
             if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
-              #if SLEW_GOTO == ON
+              #if GOTO_FEATURE == ON
                 if (goTo.alignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
               #else
                 SERIAL_LOCAL.transmit(":CS#");
@@ -220,7 +220,7 @@
       if (st4GuideActionAxis1 != lastSt4GuideActionAxis1) {
         lastSt4GuideActionAxis1 = st4GuideActionAxis1;
         if (st4GuideActionAxis1 != GA_BREAK) {
-          #if ST4_HAND_CONTROL == ON && SLEW_GOTO == ON
+          #if ST4_HAND_CONTROL == ON && GOTO_FEATURE == ON
             if (goTo.isHomePaused()) goTo.homeContinue(); else
             if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif
@@ -242,7 +242,7 @@
       if (st4GuideActionAxis2 != lastSt4GuideActionAxis2) {
         lastSt4GuideActionAxis2 = st4GuideActionAxis2;
         if (st4GuideActionAxis2 != GA_BREAK) {
-          #if ST4_HAND_CONTROL == ON && SLEW_GOTO == ON
+          #if ST4_HAND_CONTROL == ON && GOTO_FEATURE == ON
             if (goTo.isHomePaused()) goTo.homeContinue(); else
             if (goTo.state == GS_GOTO) goTo.stop(); else
           #endif

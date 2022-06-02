@@ -174,7 +174,7 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
 
 // start guide home (for use with home switches)
 CommandError Guide::startHome() {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     // use guiding and switches to find home
     guide.state = GU_HOME_GUIDE;
 
@@ -211,7 +211,7 @@ void Guide::abort() {
 
 // keep guide rate <= half max
 float Guide::limitGuideRate(float rate) {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     float rateLimit = radToDegF(goTo.rate)*120.0F;
     if (rate > rateLimit) rate = rateLimit;
   #endif
@@ -229,7 +229,7 @@ float Guide::rateSelectToRate(GuideRateSelect rateSelect, uint8_t axis) {
     case GR_8X: return limitGuideRate(8.0F);
     case GR_20X: return limitGuideRate(20.0F);
     case GR_48X: return limitGuideRate(48.0F);
-    #if SLEW_GOTO == ON
+    #if GOTO_FEATURE == ON
       case GR_HALF_MAX: return radToDegF(goTo.rate)*120.0F;
       case GR_MAX: return radToDegF(goTo.rate)*240.0F;
     #endif
@@ -294,7 +294,7 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
   if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (guideAction == GA_SPIRAL && mount.isSlewing()) return CE_SLEW_IN_MOTION;
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
     if (goTo.state != GS_NONE) { goTo.stop(); return CE_SLEW_IN_MOTION; }
   #endif

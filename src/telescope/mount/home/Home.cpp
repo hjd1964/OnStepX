@@ -26,7 +26,7 @@ void Home::init() {
 
 // move mount to the home position
 CommandError Home::request() {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
       if (guide.state == GU_HOME_GUIDE) guide.stop();
@@ -92,7 +92,7 @@ void Home::requestDone() {
 
 // reset mount at home
 CommandError Home::reset(bool fullReset) {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
   #endif
   if (guide.state != GU_NONE) {
@@ -128,7 +128,7 @@ CommandError Home::reset(bool fullReset) {
   axis1.setFrequencySlew(degToRadF(0.1F));
   axis2.setFrequencySlew(degToRadF(0.1F));
 
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     if (fullReset) goTo.alignReset();
   #endif
 

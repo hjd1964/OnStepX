@@ -3,7 +3,7 @@
 
 #include "Park.h"
 
-#if defined(MOUNT_PRESENT) && SLEW_GOTO == ON
+#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
 
 #include "../../../lib/tasks/OnTask.h"
 
@@ -90,7 +90,7 @@ CommandError Park::set() {
 
 // move the mount to the park position
 CommandError Park::request() {
-  #if SLEW_GOTO == ON
+  #if GOTO_FEATURE == ON
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
