@@ -125,13 +125,13 @@ void Focuser::init() {
         if (settings[index].position < axes[index]->settings.limits.min) {
           settings[index].position = axes[index]->settings.limits.min;
           initError.value = true;
-          DLF("ERR, Focuser.init(): bad NV park pos < _LIMIT_MIN (set to _LIMIT_MIN)");
+          DLF("ERR: Focuser.init(), bad NV park pos < _LIMIT_MIN (set to _LIMIT_MIN)");
         }
 
         if (settings[index].position > axes[index]->settings.limits.max) {
           settings[index].position = axes[index]->settings.limits.max;
           initError.value = true;
-          DLF("ERR, Focuser.init(): bad NV park pos > _LIMIT_MAX steps (set to _LIMIT_MAX)");
+          DLF("ERR: Focuser.init(), bad NV park pos > _LIMIT_MAX steps (set to _LIMIT_MAX)");
         }
 
         axes[index]->resetPositionSteps(0);
@@ -360,12 +360,12 @@ CommandError Focuser::unpark(int index) {
 
 void Focuser::readSettings(int index) {
   nv.readBytes(NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize, &settings[index], sizeof(FocuserSettings));
-  if (fabs(settings[index].tcf.coef) > 999.0F) { settings[index].tcf.coef = 0.0F;  initError.value = true; DLF("ERR, Focuser.init(): bad NV |tcf.coef| > 999.0 um/deg. C (set to 0.0)"); }
-  if (settings[index].tcf.deadband < 1 )       { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR, Focuser.init(): bad NV tcf.deadband < 1 steps (set to 1)"); }
-  if (settings[index].tcf.deadband > 10000 )   { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR, Focuser.init(): bad NV tcf.deadband > 10000 steps (set to 1)"); }
-  if (fabs(settings[index].tcf.t0) > 60.0F)    { settings[index].tcf.t0 = 10.0F;   initError.value = true; DLF("ERR, Focuser.init(): bad NV |tcf.t0| > 60.0 deg. C (set to 10.0)"); }
-  if (settings[index].backlash < 0)            { settings[index].backlash = 0;     initError.value = true; DLF("ERR, Focuser.init(): bad NV backlash < 0 steps (set to 0)"); }
-  if (settings[index].backlash > 10000)        { settings[index].backlash = 0;     initError.value = true; DLF("ERR, Focuser.init(): bad NV backlash > 10000 steps (set to 0)"); }
+  if (fabs(settings[index].tcf.coef) > 999.0F) { settings[index].tcf.coef = 0.0F;  initError.value = true; DLF("ERR: Focuser.init(), bad NV |tcf.coef| > 999.0 um/deg. C (set to 0.0)"); }
+  if (settings[index].tcf.deadband < 1 )       { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR: Focuser.init(), bad NV tcf.deadband < 1 steps (set to 1)"); }
+  if (settings[index].tcf.deadband > 10000 )   { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR: Focuser.init(), bad NV tcf.deadband > 10000 steps (set to 1)"); }
+  if (fabs(settings[index].tcf.t0) > 60.0F)    { settings[index].tcf.t0 = 10.0F;   initError.value = true; DLF("ERR: Focuser.init(), bad NV |tcf.t0| > 60.0 deg. C (set to 10.0)"); }
+  if (settings[index].backlash < 0)            { settings[index].backlash = 0;     initError.value = true; DLF("ERR: Focuser.init(), bad NV backlash < 0 steps (set to 0)"); }
+  if (settings[index].backlash > 10000)        { settings[index].backlash = 0;     initError.value = true; DLF("ERR: Focuser.init(), bad NV backlash > 10000 steps (set to 0)"); }
 }
 
 void Focuser::writeSettings(int index) {

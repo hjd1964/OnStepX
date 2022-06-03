@@ -65,7 +65,7 @@ bool Ssr74HC595::init() {
     state[i] = false;
   }
 
-  VLF("MSG: GPIO SSR74HC595 Initialized");
+  VLF("MSG: GPIO, SSR74HC595 Initialized");
 
   found = true;
   return found;

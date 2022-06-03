@@ -19,7 +19,7 @@ void Rotator::init() {
   delay(1000);
 
   // confirm the data structure size
-  if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(); RotatorSettingsSize error"); }
+  if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(), RotatorSettingsSize error"); }
 
   // get settings stored in NV ready
   if (!nv.hasValidKey()) {
@@ -170,11 +170,11 @@ CommandError Rotator::unpark() {
 void Rotator::readSettings() {
   nv.readBytes(NV_ROTATOR_SETTINGS_BASE + RotatorSettingsSize, &settings, sizeof(RotatorSettings));
 
-  if (settings.backlash < 0)     { settings.backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash < 0 steps (set to 0)"); }
-  if (settings.backlash > 10000) { settings.backlash = 0; initError.value = true; DLF("ERR, Rotator.init(): bad NV backlash > 10000 steps (set to 0)"); }
+  if (settings.backlash < 0)     { settings.backlash = 0; initError.value = true; DLF("ERR: Rotator.init(), bad NV backlash < 0 steps (set to 0)"); }
+  if (settings.backlash > 10000) { settings.backlash = 0; initError.value = true; DLF("ERR: Rotator.init(), bad NV backlash > 10000 steps (set to 0)"); }
 
-  if (settings.position < AXIS3_LIMIT_MIN) { settings.position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos < AXIS3_LIMIT_MIN (set to 0.0)"); }
-  if (settings.position > AXIS3_LIMIT_MAX) { settings.position = 0.0F; initError.value = true; DLF("ERR, Rotator.init(): bad NV park pos > AXIS3_LIMIT_MAX (set to 0.0)"); }
+  if (settings.position < AXIS3_LIMIT_MIN) { settings.position = 0.0F; initError.value = true; DLF("ERR: Rotator.init(), bad NV park pos < AXIS3_LIMIT_MIN (set to 0.0)"); }
+  if (settings.position > AXIS3_LIMIT_MAX) { settings.position = 0.0F; initError.value = true; DLF("ERR: Rotator.init(), bad NV park pos > AXIS3_LIMIT_MAX (set to 0.0)"); }
 }
 
 void Rotator::writeSettings() {

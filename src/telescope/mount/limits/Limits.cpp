@@ -16,7 +16,7 @@ inline void limitsWrapper() { limits.poll(); }
 
 void Limits::init() {
   // confirm the data structure size
-  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.initError = true; DL("ERR: Limits::init(); LimitSettingsSize error"); }
+  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.initError = true; DL("ERR: Limits::init(), LimitSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.hasValidKey()) {
@@ -194,7 +194,7 @@ void Limits::poll() {
             if (e != CE_NONE) {
               stopAxis1(GA_FORWARD);
               error.meridian.west = true;
-              VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+              DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
             }
           } else
         #endif
@@ -215,7 +215,7 @@ void Limits::poll() {
       error.limit.axis1.min = true;
       // ---------------------------------------------------------
       if (lastError.limit.axis1.min != error.limit.axis1.min) {
-        D("MSG: Limits, min error A1 = ");
+        D("WRN: Limits, min error A1 = ");
         D(radToDeg(current.a1));
         D(" A2 = ");
         D(radToDeg(current.a2));
@@ -236,7 +236,7 @@ void Limits::poll() {
           if (e != CE_NONE) {
             stopAxis1(GA_FORWARD);
             error.limit.axis1.max = true;
-            VF("MSG: Limits::limitPoll() goto for automatic meridian flip failed ("); V(e); VL(")");
+            DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
           }
         } else
       #endif

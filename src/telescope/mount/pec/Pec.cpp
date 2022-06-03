@@ -24,7 +24,7 @@
 
   void Pec::init() {
     // confirm the data structure size
-    if (PecSettingsSize < sizeof(PecSettings)) { nv.initError = true; DL("ERR: Pec::init(); PecSettingsSize error"); }
+    if (PecSettingsSize < sizeof(PecSettings)) { nv.initError = true; DL("ERR: Pec::init(), PecSettingsSize error"); }
 
     // write the default settings to NV
     if (!nv.hasValidKey()) {
@@ -46,18 +46,18 @@
       if (bufferSize < 61) {
         bufferSize = 0;
         initError.value = true;
-        DLF("ERR: Pec::init(); invalid bufferSize, PEC disabled");
+        DLF("ERR: Pec::init(), invalid bufferSize - PEC disabled");
       } else
       if (bufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
         bufferSize = 0;
         initError.value = true;
-        DLF("ERR: Pec::init(); bufferSize exceeds available NV, PEC disabled");
+        DLF("ERR: Pec::init(), bufferSize exceeds available NV - PEC disabled");
       } else {
         buffer = (int8_t*)malloc(bufferSize * sizeof(*buffer));
         if (buffer == NULL) {
           bufferSize = 0;
           initError.value = true;
-          VLF("WRN: Pec::init(), bufferSize exceeds available RAM, PEC disabled");
+          VLF("WRN: Pec::init(), bufferSize exceeds available RAM - PEC disabled");
         } else {
           VF("MSG: Mount, PEC allocated buffer "); V(bufferSize * (long)sizeof(*buffer)); VLF(" bytes");
 
@@ -71,7 +71,7 @@
           if (settings.state > PEC_RECORD) {
             settings.state = PEC_NONE;
             initError.value = true;
-            DLF("ERR: Pec::init(); bad NV settings.state");
+            DLF("ERR: Pec::init(), bad NV settings.state");
           }
 
           if (!settings.recorded) settings.state = PEC_NONE;

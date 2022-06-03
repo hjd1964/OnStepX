@@ -16,7 +16,7 @@
   #ifdef TASKS_PROFILER_ENABLE
     #include "../tasks/OnTask.h"
 
-    #warning "MSG: Warning the OnTask PROFILER is for debugging only, there is siginficant overhead associated with enabling this feature."
+    #warning "Warning: the OnTask PROFILER is for debugging only, there is siginficant overhead associated with enabling this feature."
     #define PROFILER_VT100 ON
     
     char scale_unit(double *d) {

@@ -20,7 +20,7 @@ inline void gotoWrapper() { goTo.poll(); }
 
 void Goto::init() {
   // confirm the data structure size
-  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.initError = true; DLF("ERR: Goto::init(); GotoSettingsSize error"); }
+  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.initError = true; DLF("ERR: Goto::init(), GotoSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.hasValidKey()) {
@@ -377,7 +377,7 @@ float Goto::usPerStepLowerLimit() {
   r_us = (r_us_axis1 + r_us_axis2)/2.0F;
  
   // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
-  if (r_us < 0.25F) { r_us = 0.25F; DLF("WRN, Mount::usPerStepLowerLimit(): r_us exceeds design limit"); }
+  if (r_us < 0.25F) { r_us = 0.25F; DLF("WRN: Mount::usPerStepLowerLimit(), r_us exceeds design limit"); }
 
   // return rate in us units
   return r_us;

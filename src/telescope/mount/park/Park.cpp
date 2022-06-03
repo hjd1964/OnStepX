@@ -19,7 +19,7 @@ void parkSignalWrapper() { park.signal(); }
 
 void Park::init() {
   // confirm the data structure size
-  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.initError = true; DL("ERR: Park::Init(); ParkSettingsSize error"); }
+  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.initError = true; DL("ERR: Park::Init(), ParkSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.hasValidKey()) {
@@ -142,7 +142,7 @@ CommandError Park::request() {
       settings.state = state;
       nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
-      VF("ERR, Mount::parkGoto(); Failed to start goto (CE "); V(e); VL(")");
+      VF(": Mount::parkGoto(), Failed to start goto (CE "); V(e); VL(")");
       return e;
     }
   #endif
@@ -169,7 +169,7 @@ void Park::requestDone() {
     if (sense.isOn(parkSenseHandle)) {
       VLF("MSG: Mount, park sense state indicates success.");
     } else {
-      VLF("MSG: Mount, park sense state failed!");
+      DLF("WRN: Mount, park sense state failed!");
       state = PS_PARK_FAILED;
     }
   #endif
@@ -194,7 +194,7 @@ void Park::requestDone() {
     #endif
 
     VLF("MSG: Mount, parking done");
-  } else { DLF("ERR, Mount::parkFinish(); Parking failed"); }
+  } else { DLF("ERR: Mount::parkFinish(), Parking failed"); }
 
   axis1.enable(false);
   axis2.enable(false);

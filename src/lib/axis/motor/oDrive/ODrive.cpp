@@ -48,7 +48,7 @@ bool ODriveMotor::init() {
     digitalWriteEx(ODRIVE_RST_PIN, HIGH); // bring ODrive out of Reset
     delay(1000);                          // allow time for ODrive to boot
     ODRIVE_SERIAL.begin(ODRIVE_SERIAL_BAUD);
-    VLF("MSG: ODrive channel Init");
+    VLF("MSG: ODrive, channel init");
   }
 
   power(false);

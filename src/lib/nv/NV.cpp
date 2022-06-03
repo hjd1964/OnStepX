@@ -177,12 +177,12 @@ void NonVolatileStorage::poll(bool disableInterrupts) {
   int32_t dirtyWriteCount = 0;
   static int32_t lastDirtyWriteCount = 0;
   for (uint16_t i = 0; i < cacheSize; i++) { if (bitRead(cacheStateWrite[i/8], i%8)) dirtyWriteCount++; }
-  if (lastDirtyWriteCount != dirtyWriteCount) { V("MSG: NV cache "); V(dirtyWriteCount); VL(" bytes to be written"); }
+  if (lastDirtyWriteCount != dirtyWriteCount) { V("MSG: NV, cache "); V(dirtyWriteCount); VL(" bytes to be written"); }
 
   int32_t dirtyReadCount = 0;
   static int32_t lastDirtyReadCount = 0;
   for (uint16_t i = 0; i < cacheSize; i++) { if (bitRead(cacheStateRead[i/8], i%8)) dirtyReadCount++; }
-  if (lastDirtyReadCount != dirtyReadCount) { V("MSG: NV cache "); V(dirtyReadCount); VL(" bytes to be read"); }
+  if (lastDirtyReadCount != dirtyReadCount) { V("MSG: NV, cache "); V(dirtyReadCount); VL(" bytes to be read"); }
   */
 
   // stop compiler warnings

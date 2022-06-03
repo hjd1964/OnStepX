@@ -27,7 +27,7 @@
 
     if (client) {
       WLF("--------------------------------------------------");
-      WF("MSG: Webserver new client, socket "); WL(client.getSocketNumber());
+      WF("MSG: Webserver, new client socket "); WL(client.getSocketNumber());
 
       parameter_count = 0;
       String line = "";
@@ -95,7 +95,7 @@
       bool handlerFound = false;
       if (handler_number >= 0) {
         if (handlers[handler_number] != NULL) {
-          WF("MSG: Webserver running handler# "); WL(handler_number);
+          WF("MSG: Webserver, running handler# "); WL(handler_number);
           (*handlers[handler_number])();
           handlerFound = true;
         }
@@ -103,7 +103,7 @@
 
       // handle page not found
       if (!handlerFound && notFoundHandler != NULL) {
-        WLF("MSG: Webserver didn't find handler");
+        WLF("MSG: Webserver, didn't find handler");
         (*notFoundHandler)();
       }
 
@@ -121,7 +121,7 @@
 
       modifiedSinceFound = false;
   
-      WL("MSG: Webserver client disconnected");
+      WL("MSG: Webserver, client disconnected");
     }
   }
 
@@ -129,7 +129,7 @@
     int url_end = line->indexOf("HTTP/");
     if (url_end <= 0) return -1;
 
-    WF("MSG: Webserver checking handler for ");
+    WF("MSG: Webserver, checking handler for ");
 
     // isolate the content
     *line = line->substring(0, url_end);
@@ -144,7 +144,7 @@
 
     for (int i = 0; i < handler_count; i++) {
       if (requestedHandler.equals(handlers_fn[i])) {
-        WF("MSG: Webserver found handler# "); WL(i);
+        WF("MSG: Webserver, found handler# "); WL(i);
         return i;
       }
     }
@@ -152,9 +152,9 @@
   }
 
   void WebServer::processGet(String* line) {
-    WLF("MSG: Webserver checking header GET parameters");
+    WLF("MSG: Webserver, checking header GET parameters");
 
-    if (line->equals(EmptyStr)) { WLF("MSG: Webserver GET empty"); return; }
+    if (line->equals(EmptyStr)) { WLF("MSG: Webserver, GET empty"); return; }
 
     // isolate any parameters, get their values
     // look for form "?a=1&" or "&a=1"
@@ -175,17 +175,17 @@
       }
       if ((int)line->length() > j1) *line = line->substring(j1); else *line = "";
 
-      WF("MSG: Webserver found "); W(thisArg); W(" = "); WL(thisVal);
+      WF("MSG: Webserver, found "); W(thisArg); W(" = "); WL(thisVal);
     }
   }
 
   void WebServer::processPut(String* line) {
-    WLF("MSG: Webserver checking header PUT parameters");
+    WLF("MSG: Webserver, checking header PUT parameters");
 
     // make all tokens start with '&'
     *line = "&" + *line;
 
-    if (line->equals("&")) { WLF("MSG: Webserver PUT empty"); return; }
+    if (line->equals("&")) { WLF("MSG: Webserver, PUT empty"); return; }
 
     // isolate any parameters, get their values
     // look for form "&a=1"
@@ -212,12 +212,12 @@
   }
 
   void WebServer::processPost(String* line) {
-    WLF("MSG: Webserver checking header POST parameters");
+    WLF("MSG: Webserver, checking header POST parameters");
 
     // make all tokens start with '&'
     *line = "&" + *line;
 
-    if (line->equals(EmptyStr)) { WLF("MSG: Webserver POST empty"); return; }
+    if (line->equals(EmptyStr)) { WLF("MSG: Webserver, POST empty"); return; }
 
     // isolate any parameters, get their values
     // look for form "&a=1"
@@ -237,7 +237,7 @@
       }
       if ((int)line->length() > j1) *line = line->substring(j1); else *line = "";
 
-      WF("MSG: Webserver found "); W(thisArg); W(" = "); WL(thisVal);
+      WF("MSG: Webserver, found "); W(thisArg); W(" = "); WL(thisVal);
     }
   }
 

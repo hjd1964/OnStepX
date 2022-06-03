@@ -78,7 +78,7 @@
             digitalWriteF(ST4_DEC_S_PIN, HIGH); // idle
             shcActive = true;
             serialST4.begin();
-            VLF("MSG: SerialST4 mode activated");
+            VLF("MSG: SerialST4, activated");
           }
           return;
         } else {
@@ -100,7 +100,7 @@
           pinMode(ST4_DEC_N_PIN, ST4_INTERFACE_INIT);
           shcActive = false;
           serialST4.end();
-          VLF("MSG: SerialST4 mode deactivated");
+          VLF("MSG: SerialST4, deactivated");
           return;
         }
       }

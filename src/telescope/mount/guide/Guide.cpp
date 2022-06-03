@@ -20,7 +20,7 @@ inline void guideWrapper() { guide.poll(); }
 
 void Guide::init() {
   // confirm the data structure size
-  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(); GuideSettingsSize error"); }
+  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(), GuideSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.hasValidKey()) {
@@ -155,7 +155,7 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
   if (rateSelect > GR_HALF_MAX) rateSelect = GR_HALF_MAX;
   spiralGuideRateSelect = rateSelect;
 
-  VF("MSG: guideSpiralStart(); using guide rates to "); V(rateSelectToRate(spiralGuideRateSelect)); VL("X");
+  VF("MSG: guideSpiralStart(), using guide rates to "); V(rateSelectToRate(spiralGuideRateSelect)); VL("X");
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;

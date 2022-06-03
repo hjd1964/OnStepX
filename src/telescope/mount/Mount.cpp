@@ -24,7 +24,7 @@ inline void mountWrapper() { mount.poll(); }
 
 void Mount::init() {
   // confirm the data structure size
-  if (MountSettingsSize < sizeof(MountSettings)) { nv.initError = true; DL("ERR: Mount::init(); MountSettingsSize error"); }
+  if (MountSettingsSize < sizeof(MountSettings)) { nv.initError = true; DL("ERR: Mount::init(), MountSettingsSize error"); }
 
   // write the default settings to NV
   if (!nv.hasValidKey()) {

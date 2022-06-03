@@ -78,7 +78,7 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
 
   if (!isTmcSPI() && !isTmcUART()) {
     if (settings.currentHold != OFF || settings.currentRun != OFF || settings.currentGoto != OFF) {
-      VF("WRN: StepDir"); V(axisNumber); VLF(", incorrect model for current control, disabling current settings");
+      VF("WRN: StepDir"); V(axisNumber); VLF(", incorrect model for current control - disabling current settings");
       settings.currentHold = OFF;
       settings.currentRun = OFF;
       settings.currentGoto = OFF;
@@ -193,12 +193,12 @@ bool StepDirDriver::validateParameters(float param1, float param2, float param3,
     if (axisNumber > 2) pulseWidth = 2000;
 
     if (DriverPulseWidth[settings.model] == OFF) {
-      VF("WRN, StepDirDrivers::validateParameters(): Axis"); V(axisNumber); VF(", ");
+      VF("WRN: StepDirDrivers::validateParameters(), Axis"); V(axisNumber); VF(" ");
       V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
     }
 
     if (DriverPulseWidth[settings.model] > pulseWidth) {
-      DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(", "); 
+      DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" "); 
       D(DRIVER_NAME[settings.model]); DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
       D(pulseWidth); DLF("ns");
       return false;
@@ -218,38 +218,38 @@ bool StepDirDriver::validateParameters(float param1, float param2, float param3,
   UNUSED(param6);
 
   if (subdivisions == OFF) {
-    VF("WRN, StepDirDrivers::validateParameters(): Axis"); V(axisNumber); VLF(" subdivisions OFF (assuming 1X)");
+    VF("WRN: StepDirDrivers::validateParameters(), Axis"); V(axisNumber); VLF(" subdivisions OFF (assuming 1X)");
     subdivisions = 1;
   }
 
   if (subdivisions <= subdivisionsGoto) {
-    DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DLF(" subdivisions must be > subdivisionsGoto");
+    DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DLF(" subdivisions must be > subdivisionsGoto");
     return false;
   }
 
   if (subdivisions != OFF && (subdivisionsToCode(subdivisions) == OFF)) {
-    DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(" bad subdivisions="); DL(subdivisions);
+    DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" bad subdivisions="); DL(subdivisions);
     return false;
   }
 
   if (subdivisionsGoto != OFF && (subdivisionsToCode(subdivisionsGoto) == OFF)) {
-    DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(" bad subdivisionsGoto="); DL(subdivisionsGoto);
+    DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" bad subdivisionsGoto="); DL(subdivisionsGoto);
     return false;
   }
 
   if (isTmcSPI() || isTmcUART()) {
     if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-      DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
+      DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
       return false;
     }
 
     if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-      DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+      DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
       return false;
     }
 
     if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-      DF("ERR, StepDirDrivers::validateParameters(): Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+      DF("ERR: StepDirDrivers::validateParameters(), Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
       return false;
     }
   }

@@ -39,20 +39,20 @@ void GeoAlign::init(int8_t mountType, float latitude) {
 
 void GeoAlign::modelRead() {
   // get misc settings from NV
-  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::readModel(); AlignModelSize error"); }
+  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::readModel(), AlignModelSize error"); }
   nv.readBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
-  if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR, GeoAlign::readModel(): bad NV ax1Cor"); }
-  if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR, GeoAlign::readModel(): bad NV ax2Cor"); }
-  if (model.dfCor  <    -256 || model.dfCor  >    256) { model.dfCor  = 0; DLF("ERR, GeoAlign::readModel(): bad NV dfCor");  }
-  if (model.tfCor  <    -128 || model.tfCor  >    128) { model.tfCor  = 0; DLF("ERR, GeoAlign::readModel(): bad NV tfCor");  }
-  if (model.doCor  <   -8192 || model.doCor  >   8192) { model.doCor  = 0; DLF("ERR, GeoAlign::readModel(): bad NV doCor");  }
-  if (model.pdCor  <    -256 || model.pdCor  >    256) { model.pdCor  = 0; DLF("ERR, GeoAlign::readModel(): bad NV pdCor");  }
-  if (model.altCor <  -16384 || model.altCor >  16384) { model.altCor = 0; DLF("ERR, GeoAlign::readModel(): bad NV altCor"); }
-  if (model.azmCor <  -16384 || model.azmCor >  16384) { model.azmCor = 0; DLF("ERR, GeoAlign::readModel(): bad NV azmCor"); }
+  if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
+  if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
+  if (model.dfCor  <    -256 || model.dfCor  >    256) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
+  if (model.tfCor  <    -128 || model.tfCor  >    128) { model.tfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV tfCor");  }
+  if (model.doCor  <   -8192 || model.doCor  >   8192) { model.doCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV doCor");  }
+  if (model.pdCor  <    -256 || model.pdCor  >    256) { model.pdCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV pdCor");  }
+  if (model.altCor <  -16384 || model.altCor >  16384) { model.altCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV altCor"); }
+  if (model.azmCor <  -16384 || model.azmCor >  16384) { model.azmCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV azmCor"); }
 }
 
 void GeoAlign::modelWrite() {
-  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::writeModel(); AlignModelSize error"); }
+  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::writeModel(), AlignModelSize error"); }
   nv.updateBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
 }
 
