@@ -368,16 +368,13 @@ float Goto::usPerStepLowerLimit() {
   #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
     r_us /= 1.6F;
   #endif
-  
+
   // average required goto us rates for each axis with any micro-step mode switching applied
   float r_us_axis1 = r_us/axis1.getStepsPerStepSlewing();
   float r_us_axis2 = r_us/axis2.getStepsPerStepSlewing();
-  
+
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
   r_us = (r_us_axis1 + r_us_axis2)/2.0F;
- 
-  // the timer granulaity can start to make for some very abrupt rate changes below 0.25us
-  if (r_us < 0.25F) { r_us = 0.25F; DLF("WRN: Mount::usPerStepLowerLimit(), r_us exceeds design limit"); }
 
   // return rate in us units
   return r_us;
