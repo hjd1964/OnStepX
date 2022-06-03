@@ -248,14 +248,14 @@ void Site::readJD() {
     nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
   }
   nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (day)"); }
-  if (ut1.hour < 0.0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(); bad NV julian date (hour)"); }
+  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(), bad NV julian date (day)"); }
+  if (ut1.hour < 0.0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(), bad NV julian date (hour)"); }
 }
 
 // reads the location information from NV
 // locationNumber can be 0..3
 void Site::readLocation(uint8_t number) {
-  if (LocationSize < sizeof(Location)) { nv.initError = true; DL("ERR: Site::readLocation(); LocationSize error"); }
+  if (LocationSize < sizeof(Location)) { nv.initError = true; DL("ERR: Site::readLocation(), LocationSize error"); }
   if (!nv.hasValidKey()) {
     VLF("MSG: Mount, site writing default sites 0-3 to NV");
     location.latitude = 0.0;
