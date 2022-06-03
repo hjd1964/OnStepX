@@ -24,6 +24,7 @@ bool Mcp23017::init() {
     found = true;
     for (int i = 0; i < 16; i++) { mcp.pinMode(i, INPUT); }
   } else { found = false; DLF("WRN: Gpio.init(), MCP23017 (I2C "); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_MCP23017_I2C_ADDRESS, HEX); DLF(") not found"); }
+  HAL_Wire.setClock(HAL_WIRE_CLOCK);
 
   return found;
 }
