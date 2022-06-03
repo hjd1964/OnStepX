@@ -78,7 +78,7 @@ void setup() {
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
 
-  VLF("MSG: Setup, HAL I2C Wire Clock "); V(HAL_WIRE_CLOCK/1000.0); VL("KHz (I2C devices may or may not be present)");
+  VF("MSG: Setup, HAL I2C Wire Clock "); V(HAL_WIRE_CLOCK/1000.0); VLF("KHz (I2C devices may or may not be present)");
 
   nv.initError = !HAL_NV_INIT();
   delay(2000);
