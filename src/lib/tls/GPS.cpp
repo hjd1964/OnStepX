@@ -71,19 +71,25 @@ bool TimeLocationSource::init() {
     SERIAL_GPS.begin(SERIAL_GPS_BAUD);
   #endif
 
-  VF("MSG: TLS, start GPS monitor task (rate 10ms priority 7)... ");
-  if (tasks.add(1, 0, true, 7, gpsPoll, "gpsPoll")) {
-    VLF("success");
-    active = true;
+  // check to see if the GPS is present
+  tasks.yield(500);
+  if (!SERIAL_GPS.available()) {
+    VF("WRN: TLS, GPS serial RX interface is quiet!");
+    return false;
   } else {
-    VLF("FAILED!");
-    active = false;
+    unsigned long timeout = millis() + 1000UL;
+    while (SERIAL_GPS.available() > 0) {
+      if (gps.encode(SERIAL_GPS.read())) break;
+      if ((long)(millis() - timeout) > 0) {
+        VF("WRN: TLS, GPS serial RX interface no NMEA sentences detected!");
+        return false;
+      }
+      Y;
+    }
   }
 
-  // flag that start time is unknown
-  startTime = 0;
-
-  ready = false;
+  VF("MSG: TLS, GPS start monitor task (rate 10ms priority 7)... ");
+  if (tasks.add(1, 0, true, 7, gpsPoll, "gpsPoll")) { VLF("success"); active = true; } else { VLF("FAILED!"); }
 
   return active;
 }
