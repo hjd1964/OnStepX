@@ -44,7 +44,7 @@
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        07     // minor version 00 to 99
-#define FirmwareVersionPatch        "g"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "h"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       5      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -77,10 +77,7 @@ void setup() {
   // start low level hardware
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
-
-  VF("MSG: Setup, HAL I2C Wire Clock "); V(HAL_WIRE_CLOCK/1000.0); VLF("KHz (I2C devices may or may not be present)");
-
-  nv.initError = !HAL_NV_INIT();
+  HAL_NV_INIT();
   delay(2000);
 
   // start system service task
