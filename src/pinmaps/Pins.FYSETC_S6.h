@@ -201,6 +201,15 @@
 #define AXIS5_STEP_PIN          PE6
 #define AXIS5_DIR_PIN           PC13
 
+// For focuser3 stepper driver
+#define AXIS6_ENABLE_PIN        PE3
+#define AXIS6_M0_PIN            SS_MOSI          // SPI MOSI
+#define AXIS6_M1_PIN            SS_SCK           // SPI SCK
+#define AXIS6_M2_PIN            PC15             // SPI CS (UART TX)
+#define AXIS6_M3_PIN            SS_MISO          // SPI MISO (UART RX)
+#define AXIS6_STEP_PIN          PE2
+#define AXIS6_DIR_PIN           PE4
+
 // ST4 interface
 #define ST4_RA_W_PIN            PA8              // ST4 RA- West  (on EXP1)
 #define ST4_DEC_S_PIN           PD2              // ST4 DE- South (on EXP1)
