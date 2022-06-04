@@ -39,7 +39,4 @@
                                           //         SSR74HC595: for up to 32-ch gpio (serial shift register, output only.)
                                           //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
 
-// UART STEP/DIR DRIVER SUPPORT ----------------------------------------------------------------------------------------------------
-#define DRIVER_UART_HARDWARE_SERIAL   OFF //    OFF, Uses SoftwareSerial or ON for hardware serial.                           Option
-
 // ---------------------------------------------------------------------------------------------------------------------------------

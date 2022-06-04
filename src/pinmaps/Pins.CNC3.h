@@ -26,6 +26,33 @@
 #define HAL_SDA_PIN             21
 #define HAL_SCL_PIN             22
 
+// Use the following settings for any TMC UART driver (TMC2209U) that may be present
+#define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5      // Map driver axis5 to axis3 in hardware serial mode
+
+#ifndef DRIVER_UART_HARDWARE_SERIAL
+  #define DRIVER_UART_HARDWARE_SERIAL OFF        // Default is software serial for this board
+#endif
+
+#if DRIVER_UART_HARDWARE_SERIAL == ON
+  #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
+  #define SERIAL_TMC_BAUD       460800           // Baud rate
+  #define SERIAL_TMC_RX         39               // Recieving data
+  #define SERIAL_TMC_TX         15               // Transmit data
+#elif DRIVER_UART_HARDWARE_SERIAL == OFF
+  #define SERIAL_TMC            SoftSerial       // Use software serial with TX on M3 (CS) of each axis
+  #define SERIAL_TMC_BAUD       115200           // Baud rate
+  #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
+#else
+  #error "Configuration (Config.h): For CNC3, set DRIVER_UART_HARDWARE_SERIAL to ON (pins TX15,RX39) or OFF (uses CS.)"
+#endif
+
+// The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
+#define AUX2_PIN                18               // ESP8266 RST control, or SPI MISO Axis1&2
+#define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA {assuming default SCL/SDA pins are present}
+#define AUX4_PIN                22               // Home SW for Axis2, or I2C SCL
+#define AUX7_PIN                39               // Limit SW, PPS, etc.
+#define AUX8_PIN                23               // 1-Wire, Status LED1, Status LED2, Reticle LED, etc.
+
 // GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
 #define GPIO_SSR74HC595_LATCH_PIN OFF
 #define GPIO_SSR74HC595_CLOCK_PIN OFF
@@ -43,13 +70,6 @@
   #define GPIO_SSR74HC595_DATA_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
   #define GPIO_SSR74HC595_DATA_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
 #endif
-
-// The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX2_PIN                18               // ESP8266 RST control, or SPI MISO Axis1&2
-#define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA {assuming default SCL/SDA pins are present}
-#define AUX4_PIN                22               // Home SW for Axis2, or I2C SCL
-#define AUX7_PIN                39               // Limit SW, PPS, etc.
-#define AUX8_PIN                23               // 1-Wire, Status LED1, Status LED2, Reticle LED, etc.
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
