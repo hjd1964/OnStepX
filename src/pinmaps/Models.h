@@ -39,10 +39,6 @@
   #define PINMAP_STR "CNC v3"
   #include "Pins.CNC3.h"
 #endif
-#if PINMAP == MaxESP4
-  #define PINMAP_STR "MaxESP v4"
-  #include "Pins.MaxESP4.h"
-#endif
 #if PINMAP == STM32Blue
   #define PINMAP_STR "STM32 Bluepill"
   #include "Pins.STM32B.h"
