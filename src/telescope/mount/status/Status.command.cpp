@@ -110,8 +110,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       }
 
       if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // sync to encoders only
-      if (guide.state == GU_PULSE_GUIDE)           reply[1]|=0b10010000; else      // pulse guide active
-      if (guide.state != GU_NONE)                  reply[1]|=0b10001000;           // guide active
+      if (guide.state != GU_NONE && guide.state != GU_PULSE_GUIDE)
+                                                   reply[1]|=0b10001000;           // guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
       if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home enabled?
