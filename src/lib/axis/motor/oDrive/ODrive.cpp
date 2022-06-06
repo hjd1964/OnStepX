@@ -108,7 +108,7 @@ bool ODriveMotor::validateParameters(float param1, float param2, float param3, f
 // sets motor power on/off (if possible)
 void ODriveMotor::power(bool state) {
   int requestedState = AXIS_STATE_IDLE;
-  int timeout = 0.01;
+  float timeout = 0.01;
   if (state) {
     requestedState = AXIS_STATE_CLOSED_LOOP_CONTROL;
     timeout = 0.5;
