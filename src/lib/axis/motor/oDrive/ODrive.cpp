@@ -118,7 +118,7 @@ void ODriveMotor::power(bool state) {
     VLF("closed loop control - command timeout!");
     return;
   }
-  V(axisPrefix); VLF("closed loop control - ");
+  V(axisPrefix); VF("closed loop control - ");
   if (state) { VLF("Active"); } else { VLF("Idle"); }
 }
 
