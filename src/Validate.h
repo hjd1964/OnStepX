@@ -453,14 +453,17 @@
   #if AXIS3_DRIVER_DECAY_GOTO != OFF && (AXIS3_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS3_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS3_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS3_DRIVER_IRUN != OFF && (AXIS3_DRIVER_IRUN < 0 || AXIS3_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS3_DRIVER_IRUN != OFF && (AXIS3_DRIVER_IRUN < 0 || AXIS3_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS3_DRIVER_IHOLD != OFF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS3_DRIVER_IHOLD != OFF && (AXIS3_DRIVER_IHOLD < 0 || AXIS3_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS3_DRIVER_IGOTO != OFF && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS3_DRIVER_IGOTO != OFF && (AXIS3_DRIVER_IGOTO < 0 || AXIS3_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
+  #endif
+  #if (AXIS3_DRIVER_IRUN > 1000 || AXIS3_DRIVER_IHOLD > 1000 || AXIS3_DRIVER_IGOTO > 1000)
+    #warning "Configuration (Config.h): Setting AXIS3_DRIVER_IHOLD or _IRUN or _IGOTO > 1000 (mA) this Axis on many boards is not designed to operate at high current"
   #endif
 #endif
 
@@ -565,14 +568,17 @@
   #if AXIS4_DRIVER_DECAY_GOTO != OFF && (AXIS4_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS4_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS4_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS4_DRIVER_IRUN != OFF && (AXIS4_DRIVER_IRUN < 0 || AXIS4_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS4_DRIVER_IRUN != OFF && (AXIS4_DRIVER_IRUN < 0 || AXIS4_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS4_DRIVER_IHOLD != OFF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS4_DRIVER_IHOLD != OFF && (AXIS4_DRIVER_IHOLD < 0 || AXIS4_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS4_DRIVER_IGOTO != OFF && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS4_DRIVER_IGOTO != OFF && (AXIS4_DRIVER_IGOTO < 0 || AXIS4_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
+  #endif
+  #if (AXIS4_DRIVER_IRUN > 1000 || AXIS4_DRIVER_IHOLD > 1000 || AXIS4_DRIVER_IGOTO > 1000)
+    #warning "Configuration (Config.h): Setting AXIS4_DRIVER_IHOLD or _IRUN or _IGOTO > 1000 (mA) this Axis on many boards is not designed to operate at high current"
   #endif
 #endif
 
@@ -647,14 +653,17 @@
   #if AXIS5_DRIVER_DECAY_GOTO != OFF && (AXIS5_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS5_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS5_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS5_DRIVER_IRUN != OFF && (AXIS5_DRIVER_IRUN < 0 || AXIS5_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS5_DRIVER_IRUN != OFF && (AXIS5_DRIVER_IRUN < 0 || AXIS5_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS5_DRIVER_IHOLD != OFF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS5_DRIVER_IHOLD != OFF && (AXIS5_DRIVER_IHOLD < 0 || AXIS5_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS5_DRIVER_IGOTO != OFF && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS5_DRIVER_IGOTO != OFF && (AXIS5_DRIVER_IGOTO < 0 || AXIS5_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
+  #endif
+  #if (AXIS5_DRIVER_IRUN > 1000 || AXIS5_DRIVER_IHOLD > 1000 || AXIS5_DRIVER_IGOTO > 1000)
+    #warning "Configuration (Config.h): Setting AXIS5_DRIVER_IHOLD or _IRUN or _IGOTO > 1000 (mA) this Axis on many boards is not designed to operate at high current"
   #endif
 #endif
 
@@ -729,14 +738,14 @@
   #if AXIS6_DRIVER_DECAY_GOTO != OFF && (AXIS6_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS6_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS6_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS6_DRIVER_IRUN != OFF && (AXIS6_DRIVER_IRUN < 0 || AXIS6_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS6_DRIVER_IRUN != OFF && (AXIS6_DRIVER_IRUN < 0 || AXIS6_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS6_DRIVER_IHOLD != OFF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS6_DRIVER_IHOLD != OFF && (AXIS6_DRIVER_IHOLD < 0 || AXIS6_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS6_DRIVER_IGOTO != OFF && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS6_DRIVER_IGOTO != OFF && (AXIS6_DRIVER_IGOTO < 0 || AXIS6_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
@@ -811,14 +820,14 @@
   #if AXIS7_DRIVER_DECAY_GOTO != OFF && (AXIS7_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS7_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS7_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS7_DRIVER_IRUN != OFF && (AXIS7_DRIVER_IRUN < 0 || AXIS7_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS7_DRIVER_IRUN != OFF && (AXIS7_DRIVER_IRUN < 0 || AXIS7_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS7_DRIVER_IHOLD != OFF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS7_DRIVER_IHOLD != OFF && (AXIS7_DRIVER_IHOLD < 0 || AXIS7_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS7_DRIVER_IGOTO != OFF && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS7_DRIVER_IGOTO != OFF && (AXIS7_DRIVER_IGOTO < 0 || AXIS7_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
@@ -893,14 +902,14 @@
   #if AXIS8_DRIVER_DECAY_GOTO != OFF && (AXIS8_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS8_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS8_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS8_DRIVER_IRUN != OFF && (AXIS8_DRIVER_IRUN < 0 || AXIS8_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS8_DRIVER_IRUN != OFF && (AXIS8_DRIVER_IRUN < 0 || AXIS8_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS8_DRIVER_IHOLD != OFF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS8_DRIVER_IHOLD != OFF && (AXIS8_DRIVER_IHOLD < 0 || AXIS8_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS8_DRIVER_IGOTO != OFF && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS8_DRIVER_IGOTO != OFF && (AXIS8_DRIVER_IGOTO < 0 || AXIS8_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
@@ -975,14 +984,14 @@
   #if AXIS9_DRIVER_DECAY_GOTO != OFF && (AXIS9_DRIVER_DECAY_GOTO < DRIVER_DECAY_MODE_FIRST || AXIS9_DRIVER_DECAY_GOTO > DRIVER_DECAY_MODE_LAST)
     #error "Configuration (Config.h): Setting AXIS9_DRIVER_DECAY_GOTO unknown, use a valid DRIVER DECAY MODE (from Constants.h)"
   #endif
-  #if AXIS9_DRIVER_IRUN != OFF && (AXIS9_DRIVER_IRUN < 0 || AXIS9_DRIVER_IRUN > 1000)
-    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IRUN unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS9_DRIVER_IRUN != OFF && (AXIS9_DRIVER_IRUN < 0 || AXIS9_DRIVER_IRUN > 3000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IRUN unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS9_DRIVER_IHOLD != OFF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 1000)
-    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS9_DRIVER_IHOLD != OFF && (AXIS9_DRIVER_IHOLD < 0 || AXIS9_DRIVER_IHOLD > 3000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IHOLD unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
-  #if AXIS9_DRIVER_IGOTO != OFF && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 1000)
-    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use OFF or a value 0 to 1000 (mA.)"
+  #if AXIS9_DRIVER_IGOTO != OFF && (AXIS9_DRIVER_IGOTO < 0 || AXIS9_DRIVER_IGOTO > 3000)
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO unknown, use OFF or a value 0 to 3000 (mA.)"
   #endif
 #endif
 
