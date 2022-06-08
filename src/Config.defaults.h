@@ -136,11 +136,6 @@
 #define GPIO_DEVICE                   OFF
 #endif
 
-// hardware serial option for TMC2209 and TMC2226 drivers
-#ifndef DRIVER_UART_HARDWARE_SERIAL
-#define DRIVER_UART_HARDWARE_SERIAL OFF
-#endif
-
 #ifndef FileVersionConfig
 #warning "Configuration (Config.h): FileVersionConfig is undefined, assuming version 5."
 #define FileVersionConfig 5
