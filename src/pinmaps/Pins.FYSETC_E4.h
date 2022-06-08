@@ -24,9 +24,7 @@
 #define TMC_UART_DRIVER_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
 
 #ifndef DRIVER_UART_HARDWARE_SERIAL
-  #define DRIVER_UART_HARDWARE_SERIAL ON        // Default is hardware serial for this board
-#elif DRIVER_UART_HARDWARE_SERIAL != ON
-  #error "Configuration (Config.h): DRIVER_UART_HARDWARE_SERIAL must be ON for this board"
+  #define DRIVER_UART_HARDWARE_SERIAL ON         // Default is hardware serial for this board
 #endif
 
 #define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
