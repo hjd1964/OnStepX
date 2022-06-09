@@ -121,7 +121,7 @@ void Motor::setBacklashSteps(long value) {
   interrupts();
 }
 
-// mark origin coordinate for autoSlewRateByDistance as current location
+// mark origin coordinate for autoGoto as current location
 void Motor::markOriginCoordinateSteps() {
   noInterrupts();
   originSteps = motorSteps;

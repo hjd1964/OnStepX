@@ -234,12 +234,12 @@ class Axis {
     // set acceleration for emergency stop movement in seconds (for autoSlewStop)
     void setSlewAccelerationTimeAbort(float seconds);
 
-    // slew with rate by distance
+    // auto goto to destination target coordinate
     // \param distance: acceleration distance in measures (to frequency)
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
-    CommandError autoSlewRateByDistance(float distance, float frequency = NAN);
+    CommandError autoGoto(float distance, float frequency = NAN);
 
-    // auto slew with acceleration in "measures" per second per second
+    // auto slew
     // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlew(Direction direction, float frequency = NAN);

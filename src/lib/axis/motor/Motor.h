@@ -145,7 +145,7 @@ class Motor {
     volatile uint16_t backlashAmountSteps = 0; // the amount of backlash travel
     uint16_t backlashAmountStepsStore;         // temporary storage for the amount of backlash travel
 
-    long originSteps = 0;                      // start position for an autoSlewRateByDistance()
+    long originSteps = 0;                      // start position for an autoGoto()
     volatile long targetSteps = 0;             // where we want the motor
     volatile long motorSteps = 0;              // where the motor is not counting backlash
     volatile long indexSteps = 0;              // for absolute motor position to axis position

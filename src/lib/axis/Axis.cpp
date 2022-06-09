@@ -295,10 +295,10 @@ void Axis::setSlewAccelerationTimeAbort(float seconds) {
   if (autoRate == AR_NONE) abortAccelTime = seconds;
 }
 
-// slew with rate by distance
+// auto goto to destination target coordinate
 // \param distance: acceleration distance in measures (to frequency)
 // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
-CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
+CommandError Axis::autoGoto(float distance, float frequency) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
@@ -306,7 +306,7 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
   V(axisPrefix);
-  VF("autoSlewRateByDistance start ");
+  VF("autoGoto start ");
 
   motor->markOriginCoordinateSteps();
   slewAccelerationDistance = distance;
@@ -325,7 +325,7 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
   return CE_NONE;
 }
 
-// auto slew with acceleration in "measures" per second per second
+// auto slew
 // \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
 // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
 CommandError Axis::autoSlew(Direction direction, float frequency) {

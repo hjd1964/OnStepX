@@ -62,7 +62,7 @@ CommandError Home::request() {
         axis2.setFrequencySlew(goTo.rate);
         axis2.setTargetCoordinate(axis2.getIndexPosition());
         VLF("Mount, axis2 home target coordinates set");
-        axis2.autoSlewRateByDistance(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+        axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));
       #endif
     }
   #endif
