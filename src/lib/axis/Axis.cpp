@@ -268,9 +268,9 @@ double Axis::getOriginOrTargetDistance() {
 // set acceleration rate in "measures" per second per second (for autoSlew)
 void Axis::setSlewAccelerationRate(float mpsps) {
   if (autoRate == AR_NONE) {
-    slewMpspfs = mpsps/FRACTIONAL_SEC;
-    // cap the acceleration rate so we can stay within the backlash frequency
-    if (slewMpspfs > backlashFreq/2.0F) slewMpspfs = backlashFreq/2.0F;
+    // cap the acceleration rate so we can stay within the backlash frequency for 2 seconds
+    if (mpsps > backlashFreq/2.0F) mpsps = backlashFreq/2.0F;
+    slewAccelRateFs = mpsps/FRACTIONAL_SEC;
     slewAccelTime = NAN;
   }
 }
@@ -283,7 +283,9 @@ void Axis::setSlewAccelerationTime(float seconds) {
 // set acceleration for emergency stop movement in "measures" per second per second
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
   if (autoRate == AR_NONE) {
-    abortMpspfs = mpsps/FRACTIONAL_SEC;
+    // cap the acceleration rate so we can stay within the backlash frequency for 2 seconds
+    if (mpsps > backlashFreq/2.0F) mpsps = backlashFreq/2.0F;
+    abortAccelRateFs = mpsps/FRACTIONAL_SEC;
     abortAccelTime = NAN;
   }
 }
@@ -316,7 +318,7 @@ CommandError Axis::autoSlewRateByDistance(float distance, float frequency) {
   #if DEBUG == VERBOSE
     if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
     V(unitsStr); VF("/s, accel ");
-    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewAccelRateFs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewAccelRateFs*FRACTIONAL_SEC, 3);
     V(unitsStr); VLF("/s/s");
   #endif
 
@@ -350,7 +352,7 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
   #if DEBUG == VERBOSE
     if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
     V(unitsStr); VF("/s, accel ");
-    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+    if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewAccelRateFs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewAccelRateFs*FRACTIONAL_SEC, 3);
     V(unitsStr); VLF("/s/s");
   #endif
 
@@ -390,7 +392,7 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
     #if DEBUG == VERBOSE
       if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
       V(unitsStr); VF("/s, accel ");
-      if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewMpspfs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewMpspfs*FRACTIONAL_SEC, 3);
+      if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewAccelRateFs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewAccelRateFs*FRACTIONAL_SEC, 3);
       V(unitsStr); VF("/s/s, timeout ");
     #endif
     VL(timeout);
@@ -473,7 +475,7 @@ void Axis::poll() {
       } else {
 /*
         if (fabs(freq) > backlashFreq) {
-          if (motor->getTargetDistanceSteps() < 0) rampFreq -= getRampDirection()*slewMpspfs; else rampFreq += getRampDirection()*slewMpspfs;
+          if (motor->getTargetDistanceSteps() < 0) rampFreq -= getRampDirection()*slewAccelRateFs; else rampFreq += getRampDirection()*slewAccelRateFs;
           freq = rampFreq;
           if (freq < -slewFreq) freq = -slewFreq;
           if (freq > slewFreq) freq = slewFreq;
@@ -485,7 +487,7 @@ void Axis::poll() {
           rampFreq = freq;
         }
 */
-        freq = sqrtf(2.0F*(slewMpspfs*FRACTIONAL_SEC)*getOriginOrTargetDistance());
+        freq = sqrtf(2.0F*(slewAccelRateFs*FRACTIONAL_SEC)*getOriginOrTargetDistance());
         if (freq < backlashFreq/2.0F) freq = backlashFreq/2.0F;
         if (freq > slewFreq) freq = slewFreq;
         if (motor->getTargetDistanceSteps() < 0) freq = -freq;
@@ -493,11 +495,11 @@ void Axis::poll() {
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {
-      freq += slewMpspfs;
+      freq += slewAccelRateFs;
       if (freq > slewFreq) freq = slewFreq;
     } else
     if (autoRate == AR_RATE_BY_TIME_REVERSE) {
-      freq -= slewMpspfs;
+      freq -= slewAccelRateFs;
       if (freq < -slewFreq) freq = -slewFreq;
     } else
     if (autoRate == AR_RATE_BY_TIME_END) {
@@ -507,8 +509,8 @@ void Axis::poll() {
         return;
       }
 
-      if (freq > slewMpspfs) freq -= slewMpspfs; else if (freq < -slewMpspfs) freq += slewMpspfs; else freq = 0.0F;
-      if (fabs(freq) <= slewMpspfs) {
+      if (freq > slewAccelRateFs) freq -= slewAccelRateFs; else if (freq < -slewAccelRateFs) freq += slewAccelRateFs; else freq = 0.0F;
+      if (fabs(freq) <= slewAccelRateFs) {
         motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
@@ -531,8 +533,8 @@ void Axis::poll() {
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_ABORT) {
-      if (freq > abortMpspfs) freq -= abortMpspfs; else if (freq < -abortMpspfs) freq += abortMpspfs; else freq = 0.0F;
-      if (fabs(freq) <= abortMpspfs) {
+      if (freq > abortAccelRateFs) freq -= abortAccelRateFs; else if (freq < -abortAccelRateFs) freq += abortAccelRateFs; else freq = 0.0F;
+      if (fabs(freq) <= abortAccelRateFs) {
         motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
@@ -573,8 +575,8 @@ void Axis::setFrequencySlew(float frequency) {
   slewFreq = frequency;
 
   // adjust acceleration rates if they depend on slewFreq
-  if (!isnan(slewAccelTime)) slewMpspfs = (slewFreq/slewAccelTime)/FRACTIONAL_SEC;
-  if (!isnan(abortAccelTime)) abortMpspfs = (slewFreq/abortAccelTime)/FRACTIONAL_SEC;
+  if (!isnan(slewAccelTime)) slewAccelRateFs = (slewFreq/slewAccelTime)/FRACTIONAL_SEC;
+  if (!isnan(abortAccelTime)) abortAccelRateFs = (slewFreq/abortAccelTime)/FRACTIONAL_SEC;
 }
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
