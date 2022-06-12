@@ -26,7 +26,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
           AxisStoredSettings thisAxis;
           nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisStoredSettingsSize, &thisAxis, sizeof(AxisStoredSettings));
           if (axisNumber <= 2) {
-            // convert axis1, 2, and 3 into degrees
+            // convert axis1 and axis2 into degrees
             thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
             thisAxis.limits.min = radToDegF(thisAxis.limits.min);
             thisAxis.limits.max = radToDegF(thisAxis.limits.max);

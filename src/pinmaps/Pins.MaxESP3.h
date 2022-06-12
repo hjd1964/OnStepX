@@ -82,7 +82,7 @@
   #define PEC_SENSE_PIN         36               // [input only 36] PEC Sense, analog (A0) or digital (GPIO36)
 #endif
 
-// The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
+// The status LED is a two wire jumper with a 2k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
   #define STATUS_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
 #endif
