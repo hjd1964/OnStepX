@@ -44,8 +44,9 @@ void Status::init() {
 // late init once tracking is enabled
 void Status::ready() {
   #if STATUS_LED == ON
-    // if anything else is using the status LED, disable it
+    // if Mount buzzer or status LED are using the Telescope status LED pin, disable it and use here now
     if (STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
+    if (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
   #endif
 
   #if STATUS_MOUNT_LED != OFF && MOUNT_STATUS_LED_PIN != OFF
@@ -55,6 +56,11 @@ void Status::ready() {
       statusTaskHandle = tasks.add(0, 0, true, 4, flash, "mntLed");
       if (statusTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
     }
+  #endif
+
+  #if STATUS_BUZZER != OFF
+    VLF("MSG: Mount, status start buzzer");
+    sound.init();
   #endif
 
   VF("MSG: Mount, status start general status task (1s rate priority 4)... ");

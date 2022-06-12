@@ -7,6 +7,14 @@
 
 #include "../tasks/OnTask.h"
 
+void Sound::init() {
+  #if STATUS_BUZZER == ON
+    pinModeEx(STATUS_BUZZER_PIN, OUTPUT);
+    digitalWriteEx(STATUS_BUZZER_PIN, !STATUS_BUZZER_ON_STATE);
+  #endif
+  ready = true;
+}
+
 #if STATUS_BUZZER == ON
   uint8_t _buzzerHandle = 0;
   void buzzerOff() {
@@ -15,15 +23,8 @@
   }
 #endif
 
-Sound::Sound() {
-  #if STATUS_BUZZER == ON
-    pinModeEx(STATUS_BUZZER_PIN, OUTPUT);
-    digitalWriteEx(STATUS_BUZZER_PIN, !STATUS_BUZZER_ON_STATE);
-  #endif
-}
-
 void Sound::alert() {
-  if (enabled) {
+  if (ready && enabled) {
     #if STATUS_BUZZER == ON
       digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
@@ -36,7 +37,7 @@ void Sound::alert() {
 }
 
 void Sound::beep() {
-  if (enabled) {
+  if (ready && enabled) {
     #if STATUS_BUZZER == ON
       digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
@@ -49,7 +50,7 @@ void Sound::beep() {
 }
 
 void Sound::click() {
-  if (enabled) {
+  if (ready && enabled) {
     #if STATUS_BUZZER == ON
       digitalWriteEx(STATUS_BUZZER_PIN, STATUS_BUZZER_ON_STATE);
       if (_buzzerHandle) tasks.remove(_buzzerHandle);
