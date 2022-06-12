@@ -53,7 +53,7 @@ class StepDirDriver {
     StepDirDriver(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings);
 
     // get driver type code
-    inline char getParameterTypeCode() { if (isTmcSPI()) return 'T'; else return 'S'; }
+    inline char getParameterTypeCode() { if (isTmcSPI() || isTmcUART()) return 'T'; else return 'S'; }
 
     // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
     void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
