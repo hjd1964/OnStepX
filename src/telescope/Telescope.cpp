@@ -36,9 +36,10 @@ InitError initError;
     uint8_t flashes = 0;
     if (initError.nv)      flashes = 1; else
     if (initError.value)   flashes = 2; else
-    if (initError.driver)  flashes = 3; else
-    if (initError.tls)     flashes = 4; else
-    if (initError.weather) flashes = 5;
+    if (initError.gpio)    flashes = 3; else
+    if (initError.driver)  flashes = 4; else
+    if (initError.tls)     flashes = 5; else
+    if (initError.weather) flashes = 6;
 
     int pin = STATUS_LED_PIN;
  
@@ -64,7 +65,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
   } else { VLF("MSG: NV, correct key found"); }
 
-  gpio.init();
+  if (!gpio.init()) initError.gpio = true;
 
   #if SERIAL_B_ESP_FLASHING == ON
     addonFlasher.init();
