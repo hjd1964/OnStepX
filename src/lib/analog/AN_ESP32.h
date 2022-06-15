@@ -4,7 +4,7 @@
 
 #include "Arduino.h"
 
-#ifdef ESP32
+#if defined(ESP32) && !(defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3))
     // starts tone on the specified pin of frequency (Hz) for the duration (in ms)
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin

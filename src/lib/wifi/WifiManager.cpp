@@ -59,11 +59,17 @@ bool WifiManager::init() {
     if (settings.accessPointEnabled && !settings.stationEnabled) {
       VLF("MSG: WiFi, starting Soft AP");
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
+      #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3)
+        WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      #endif
       WiFi.mode(WIFI_AP);
     } else
     if (!settings.accessPointEnabled && settings.stationEnabled) {
       VLF("MSG: WiFi, starting Station");
       WiFi.begin(sta->ssid, sta->pwd);
+      #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3)
+        WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      #endif
       WiFi.mode(WIFI_STA);
     } else
     if (settings.accessPointEnabled && settings.stationEnabled) {
@@ -71,6 +77,9 @@ bool WifiManager::init() {
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
       VLF("MSG: WiFi, starting Station");
       WiFi.begin(sta->ssid, sta->pwd);
+      #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3)
+        WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      #endif
       WiFi.mode(WIFI_AP_STA);
     }
 
