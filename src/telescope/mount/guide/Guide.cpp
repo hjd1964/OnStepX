@@ -51,7 +51,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   if (e != CE_NONE) return e;
 
   guideActionAxis1 = guideAction;
-  float rate = rateSelectToRate(rateSelect);
+  float rate = rateSelectToRate(rateSelect, 1);
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
@@ -102,7 +102,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
   if (e != CE_NONE) return e;
 
   guideActionAxis2 = guideAction;
-  float rate = rateSelectToRate(rateSelect);
+  float rate = rateSelectToRate(rateSelect, 2);
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
