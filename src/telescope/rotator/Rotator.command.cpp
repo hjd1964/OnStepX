@@ -70,7 +70,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
 
     // :rD#       Get rotator degrees per step
     //            Returns: n.n#
-    if (command[1] == 'u') {
+    if (command[1] == 'D') {
       sprintF(reply, "%7.5f", 1.0/axis3.getStepsPerMeasure());
       *numericReply = false;
     } else
