@@ -319,7 +319,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
-    if (direction > DirNone) return;
+    #ifdef GPIO_DIRECTION_PINS
+      if (direction > DirNone) return;
+    #endif
 
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
       microstepModeControl = MMC_SLEWING_PAUSE;
@@ -417,7 +419,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
   IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
     digitalWriteF(stepPin, stepClr);
 
-    if (direction > DirNone) return;
+    #ifdef GPIO_DIRECTION_PINS
+      if (direction > DirNone) return;
+    #endif
 
     if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
       microstepModeControl = MMC_SLEWING_PAUSE;
