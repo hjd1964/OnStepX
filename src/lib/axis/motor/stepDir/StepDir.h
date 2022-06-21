@@ -6,6 +6,10 @@
 
 #ifdef STEP_DIR_MOTOR_PRESENT
 
+#if defined(GPIO_DIRECTION_PINS) && defined(SHARED_DIRECTION_PINS)
+  #error "Configuration (Config.h): Having both GPIO_DIRECTION_PINS and SHARED_DIRECTION_PINS is not allowed"
+#endif
+
 #include "StepDirDrivers.h"
 #include "../Motor.h"
 
@@ -93,6 +97,7 @@ class StepDirMotor : public Motor {
     volatile uint8_t dirFwd = LOW;      // pin state for forward direction
     volatile uint8_t dirRev = HIGH;     // pin state for reverse direction
     volatile uint8_t direction = LOW;   // current direction in use
+    volatile uint32_t pulseWidth = 2;   // step/dir driver pulse width
 
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile int  slewStep = 1;         // step size during slews (for micro-step mode switching)

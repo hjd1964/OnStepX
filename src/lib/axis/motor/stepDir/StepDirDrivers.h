@@ -94,6 +94,9 @@ class StepDirDriver {
     // checks for TMC UART driver
     bool isTmcUART();
 
+    // get the pulse width in microseconds, if unknown (-1) uses 2 microseconds
+    long getPulseWidth();
+
     // get the microsteps
     // this is a required method for the Axis class, even if it only ever returns 1
     inline int getSubdivisions() { return settings.microsteps; }
