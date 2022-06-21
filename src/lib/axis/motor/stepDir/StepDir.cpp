@@ -350,7 +350,7 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
         #ifdef SHARED_DIRECTION_PINS
           if (axisNumber > 2) {
             digitalWriteF(Pins->dir, direction);
-            delayMicroseconds(pulseWidth);
+            delayNanoseconds(pulseWidth);
           }
         #endif
 
@@ -471,7 +471,7 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
       #ifdef SHARED_DIRECTION_PINS
         if (axisNumber > 2) {
-          delayMicroseconds(pulseWidth);
+          delayNanoseconds(pulseWidth);
           direction = DirNone;
         }
       #endif
@@ -489,7 +489,7 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
       #ifdef SHARED_DIRECTION_PINS
         if (axisNumber > 2) {
-          delayMicroseconds(pulseWidth);
+          delayNanoseconds(pulseWidth);
           direction = DirNone;
         }
       #endif

@@ -94,7 +94,7 @@ class StepDirDriver {
     // checks for TMC UART driver
     bool isTmcUART();
 
-    // get the pulse width in microseconds, if unknown (-1) uses 2 microseconds
+    // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
     long getPulseWidth();
 
     // get the microsteps

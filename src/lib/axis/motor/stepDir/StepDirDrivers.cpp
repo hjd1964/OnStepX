@@ -430,11 +430,11 @@ bool StepDirDriver::isTmcUART() {
   #endif
 }
 
-// get the pulse width in microseconds, if unknown (-1) uses 2 microseconds
+// get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
 long StepDirDriver::getPulseWidth() {
-  float ns = DriverPulseWidth[settings.model];
-  if (ns < 0) ns = 2000.0F;
-  return ceilf(ns/1000.0F);
+  long ns = DriverPulseWidth[settings.model];
+  if (ns < 0) ns = 2000;
+  return ns;
 }
 
 bool StepDirDriver::isDecayOnM2() {
