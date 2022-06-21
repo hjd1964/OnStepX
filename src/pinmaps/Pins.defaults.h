@@ -9,6 +9,14 @@
 #endif
 #endif
 
+// Specify the default I2C pins (if they can be set via the HAL)
+#ifndef I2C_SDA_PIN
+#define I2C_SDA_PIN                 OFF
+#endif
+#ifndef I2C_SCL_PIN
+#define I2C_SCL_PIN                 OFF
+#endif
+
 /*
 // map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
 #define TMC_UART_DRIVER_ADDRESS_REMAP(x) (x)

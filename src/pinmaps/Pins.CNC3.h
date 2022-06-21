@@ -23,8 +23,8 @@
 #endif
 
 // Specify the ESP32 I2C pins
-#define HAL_SDA_PIN             21
-#define HAL_SCL_PIN             22
+#define I2C_SDA_PIN             21
+#define I2C_SCL_PIN             22
 
 // Use the following settings for any TMC UART driver (TMC2209U) that may be present
 #define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5      // Map driver axis5 to axis3 in hardware serial mode

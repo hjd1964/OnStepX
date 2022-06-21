@@ -33,8 +33,8 @@
   #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
   #define SERIAL_TMC_TX         15               // Transmit data (Z-MIN)
   #define SPARE_RX_PIN          OFF              // Not supported in this case
-  #define HAL_SDA_PIN           21
-  #define HAL_SCL_PIN           22
+  #define I2C_SDA_PIN           21
+  #define I2C_SCL_PIN           22
 #elif DRIVER_UART_HARDWARE_SERIAL == ALT
   #if SERIAL_A_BAUD_DEFAULT == OFF
     // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins
@@ -42,15 +42,15 @@
     #define SERIAL_TMC_RX       3                // Recieving data
     #define SERIAL_TMC_TX       1                // Transmit data
     #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 3 here
-    #define HAL_SDA_PIN         21
-    #define HAL_SCL_PIN         22
+    #define I2C_SDA_PIN         21
+    #define I2C_SCL_PIN         22
   #else
     // if SERIAL_A is ON map the hardware serial UART to the I2C pins, and disable I2C
     #define SERIAL_TMC_RX       21               // Recieving data
     #define SERIAL_TMC_TX       22               // Transmit data
     // SDA/SCL pins are disabled
-    #define HAL_SDA_PIN         OFF
-    #define HAL_SCL_PIN         OFF
+    #define I2C_SDA_PIN         OFF
+    #define I2C_SCL_PIN         OFF
     #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 21 here
   #endif
 #else
