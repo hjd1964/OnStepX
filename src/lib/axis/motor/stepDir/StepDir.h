@@ -63,11 +63,13 @@ class StepDirMotor : public Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
 
-    // monitor and respond to motor state as required
-    void poll();
+    #if defined(GPIO_DIRECTION_PINS)
+      // monitor and respond to motor state as required
+      void poll() { updateMotorDirection(); }
 
-    // change motor direction
-    void updateMotorDirection();
+      // change motor direction on request by polling
+      void updateMotorDirection();
+    #endif
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move(const int16_t stepPin);

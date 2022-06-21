@@ -303,23 +303,19 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
   } else return false;
 }
 
-// monitor and respond to motor state as required
-void StepDirMotor::poll() {
-  #if defined(GPIO_DIRECTION_PINS) || defined(SHARED_DIRECTION_PINS)
-    updateMotorDirection();
-  #endif
-}
-
-IRAM_ATTR void StepDirMotor::updateMotorDirection() {
-  if (direction == DirSetRev) {
-    digitalWriteEx(Pins->dir, dirRev);
-    direction = dirRev;
-  } else
-  if (direction == DirSetFwd) {
-    digitalWriteEx(Pins->dir, dirFwd);
-    direction = dirFwd;
+#if defined(GPIO_DIRECTION_PINS)
+  // change motor direction on request by polling
+  IRAM_ATTR void StepDirMotor::updateMotorDirection() {
+    if (direction == DirSetRev) {
+      digitalWriteEx(Pins->dir, dirRev);
+      direction = dirRev;
+    } else
+    if (direction == DirSetFwd) {
+      digitalWriteEx(Pins->dir, dirFwd);
+      direction = dirFwd;
+    }
   }
-}
+#endif
 
 #if STEP_WAVE_FORM == SQUARE
   IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
