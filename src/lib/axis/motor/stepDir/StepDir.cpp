@@ -134,7 +134,7 @@ bool StepDirMotor::init() {
   return true;
 }
 
-// sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
+// set driver default reverse state
 void StepDirMotor::setReverse(int8_t state) {
   if (state == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   digitalWriteEx(Pins->dir, dirFwd);
