@@ -261,6 +261,7 @@ void StepDirMotor::modeSwitch() {
   if (lastFrequency <= backlashFrequency*2.0F) {
 
     if (microstepModeControl >= MMC_SLEWING) {
+      microstepModeControl = MMC_TRACKING_READY;
 
       if (enableMoveFast(false)) {
         V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
@@ -271,7 +272,6 @@ void StepDirMotor::modeSwitch() {
         driver->modeMicrostepTracking();
       }
 
-      microstepModeControl = MMC_TRACKING_READY;
     }
   } else {
 
