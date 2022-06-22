@@ -210,7 +210,7 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     lastFrequency = frequency;
 
     // if slewing has a larger step size divide the frequency to account for it
-    if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) frequency /= slewStep;
+    if (microstepModeControl == MMC_SLEWING || microstepModeControl == MMC_SLEWING_READY) frequency /= stepSize;
 
     // frequency in steps per second to period in microsecond counts per step
     // also runs the timer twice as fast if using a square wave
@@ -283,7 +283,7 @@ void StepDirMotor::modeSwitch() {
 
       if (driver->modeSwitchAllowed()) {
         V(axisPrefix); VLF("mode switch slewing set");
-        slewStep = driver->modeMicrostepSlewing();
+        stepSize = driver->modeMicrostepSlewing();
       }
 
       if (enableMoveFast(true)) {
@@ -407,9 +407,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
     if (takeStep) {
-      if (synchronized) targetSteps += slewStep;
+      if (synchronized) targetSteps += stepSize;
       if (motorSteps < targetSteps) {
-        motorSteps += slewStep;
+        motorSteps += stepSize;
         digitalWriteF(stepPin, stepSet);
       }
     } else digitalWriteF(stepPin, stepClr);
@@ -420,9 +420,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
     if (takeStep) {
-      if (synchronized) targetSteps -= slewStep;
+      if (synchronized) targetSteps -= stepSize;
       if (motorSteps > targetSteps) {
-        motorSteps -= slewStep;
+        motorSteps -= stepSize;
         digitalWriteF(stepPin, stepSet);
       }
     } else digitalWriteF(stepPin, stepClr);
@@ -521,9 +521,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
-    if (synchronized) targetSteps += slewStep;
+    if (synchronized) targetSteps += stepSize;
     if (motorSteps < targetSteps) {
-      motorSteps += slewStep;
+      motorSteps += stepSize;
       digitalWriteF(stepPin, stepSet);
     }
   }
@@ -533,9 +533,9 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
     if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
-    if (synchronized) targetSteps -= slewStep;
+    if (synchronized) targetSteps -= stepSize;
     if (motorSteps > targetSteps) {
-      motorSteps -= slewStep;
+      motorSteps -= stepSize;
       digitalWriteF(stepPin, stepSet);
     }
   }
