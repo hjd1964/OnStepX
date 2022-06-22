@@ -25,15 +25,15 @@
 #define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5
 
 // Example for a board using SoftwareSerial ports to any number of drivers
-#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
-#define SERIAL_TMC_BAUD         115200           // Baud rate
-#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
+#define SERIAL_TMC                  SoftSerial     // Use software serial with RX on M2 and TX on M3 of axis
+#define SERIAL_TMC_BAUD             115200         // Baud rate
+#define SERIAL_TMC_NO_RX                           // Recieving data doesn't work with software serial
 
 // Example for a board using one HardwareSerial port to all four drivers
-#define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
-#define SERIAL_TMC_BAUD         500000           // Baud rate
-#define SERIAL_TMC_TX           11               // Transmit data
-#define SERIAL_TMC_RX           12               // Recieving data
+#define SERIAL_TMC                  Serial1        // Use a single hardware serial port to up to four drivers
+#define SERIAL_TMC_BAUD             500000         // Baud rate
+#define SERIAL_TMC_TX               11             // Transmit data
+#define SERIAL_TMC_RX               12             // Recieving data
 */
 
 // GPIO SSR74HC595 pins (if used, only pins 0 to 31 are supported on the ESP32)
