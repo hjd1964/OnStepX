@@ -42,7 +42,7 @@
 #include "../tasks/OnTask.h"
 
 // designed for a 20MHz max bit rate
-IRAM_ATTR void shiftOut20MHz(uint8_t dataPin, uint8_t clockPin, uint32_t val) {
+IRAM_ATTR void shiftOut20MHz(uint32_t val) {
   if ((val & 0b10000000) == 0) { GPIO_SSR74HC595_DATA_LOW(); } else { GPIO_SSR74HC595_DATA_HIGH(); }
   GPIO_SSR74HC595_CLOCK_HIGH();
   GPIO_SSR74HC595_CLOCK_LOW();
@@ -125,10 +125,10 @@ void Ssr74HC595::digitalWrite(int pin, bool value) {
     if (mode[pin] == OUTPUT) {
       if (value) bitSet(register_value, pin); else bitClear(register_value, pin);
       GPIO_SSR74HC595_LATCH_LOW();
-      if (GPIO_SSR74HC595_COUNT >= 32) shiftOut20MHz(GPIO_SSR74HC595_DATA_PIN, GPIO_SSR74HC595_CLOCK_PIN, (register_value>>24) & 0xff);
-      if (GPIO_SSR74HC595_COUNT >= 24) shiftOut20MHz(GPIO_SSR74HC595_DATA_PIN, GPIO_SSR74HC595_CLOCK_PIN, (register_value>>16) & 0xff);
-      if (GPIO_SSR74HC595_COUNT >= 16) shiftOut20MHz(GPIO_SSR74HC595_DATA_PIN, GPIO_SSR74HC595_CLOCK_PIN, (register_value>>8) & 0xff);
-      shiftOut20MHz(GPIO_SSR74HC595_DATA_PIN, GPIO_SSR74HC595_CLOCK_PIN, (register_value) & 0xff);
+      if (GPIO_SSR74HC595_COUNT >= 32) shiftOut20MHz((register_value>>24) & 0xff);
+      if (GPIO_SSR74HC595_COUNT >= 24) shiftOut20MHz((register_value>>16) & 0xff);
+      if (GPIO_SSR74HC595_COUNT >= 16) shiftOut20MHz((register_value>>8) & 0xff);
+      shiftOut20MHz((register_value) & 0xff);
       GPIO_SSR74HC595_LATCH_HIGH();
     }
     sei();
