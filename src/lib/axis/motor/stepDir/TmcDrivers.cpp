@@ -39,11 +39,11 @@ bool TmcDriver::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t m
         rx = SERIAL_TMC_RX;
         tx = SERIAL_TMC_TX;
 
-        #ifdef TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5
+        #ifdef DRIVER_UART_ADDRESS_REMAP_AXIS5
           if (deviceAddress == 4) deviceAddress = 2;
         #endif
-        #ifdef TMC_UART_DRIVER_ADDRESS_REMAP
-          deviceAddress = TMC_UART_DRIVER_ADDRESS_REMAP(axisNumber - 1);
+        #ifdef DRIVER_UART_ADDRESS_REMAP
+          deviceAddress = DRIVER_UART_ADDRESS_REMAP(axisNumber - 1);
         #else
           deviceAddress = axisNumber - 1;
         #endif

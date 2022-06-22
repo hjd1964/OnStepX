@@ -17,11 +17,11 @@
 #endif
 
 // Use the following settings for any TMC UART driver (TMC2209U) that may be present
-#define TMC_UART_DRIVER_ADDRESS_REMAP_AXIS5      // Map driver axis5 to axis3 in hardware serial mode
+#define DRIVER_UART_ADDRESS_REMAP_AXIS5          // Map driver axis5 to axis3 in hardware serial mode
 
 // map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
 //                                  X is 1, Y is 3, Z is 0, and E0 is 2
-#define TMC_UART_DRIVER_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
+#define DRIVER_UART_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
 
 #ifndef DRIVER_UART_HARDWARE_SERIAL
   #define DRIVER_UART_HARDWARE_SERIAL ON         // Default is hardware serial for this board
