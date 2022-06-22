@@ -50,11 +50,6 @@
 #define AUX7_PIN                39               // Limit SW, PPS, etc.
 #define AUX8_PIN                25               // 1-Wire, Status LED, Status2 LED, Reticle LED, Tone, etc.
 
-// GPIO SSR74HC595 pins (if used, code below only works for pins 0 to 31)
-#define GPIO_SSR74HC595_LATCH_PIN OFF
-#define GPIO_SSR74HC595_CLOCK_PIN OFF
-#define GPIO_SSR74HC595_DATA_PIN  OFF
-#define GPIO_SSR74HC595_COUNT     8              // 8, 16, 24, or 32 (for 1, 2, 3, or 4 74HC595's)
 // Misc. pins
 #ifndef ONE_WIRE_PIN
   #define ONE_WIRE_PIN          AUX8_PIN         // Default Pin for OneWire bus

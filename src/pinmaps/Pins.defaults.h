@@ -36,6 +36,20 @@
 #define SERIAL_TMC_RX           12               // Recieving data
 */
 
+// GPIO SSR74HC595 pins (if used, only pins 0 to 31 are supported on the ESP32)
+#ifndef GPIO_SSR74HC595_LATCH_PIN
+#define GPIO_SSR74HC595_LATCH_PIN   OFF
+#endif
+#ifndef GPIO_SSR74HC595_CLOCK_PIN
+#define GPIO_SSR74HC595_CLOCK_PIN   OFF
+#endif
+#ifndef GPIO_SSR74HC595_DATA_PIN
+#define GPIO_SSR74HC595_DATA_PIN    OFF
+#endif
+#ifndef GPIO_SSR74HC595_COUNT
+#define GPIO_SSR74HC595_COUNT       8              // 8, 16, 24, or 32 (for 1, 2, 3, or 4 74HC595's)
+#endif
+
 #ifndef AUX0_PIN
 #define AUX0_PIN                    OFF
 #endif
