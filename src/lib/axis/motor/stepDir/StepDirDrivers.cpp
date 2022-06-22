@@ -128,6 +128,8 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
     #endif
   } else
   {
+    m0Pin = Pins->m0;
+    m1Pin = Pins->m1;
     if (isDecayOnM2()) { decayPin = Pins->m2; m2Pin = OFF; } else { decayPin = Pins->decay; m2Pin = Pins->m2; }
     pinModeEx(decayPin, OUTPUT);
     digitalWriteEx(decayPin, getDecayPinState(settings.decay));
@@ -153,13 +155,21 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
     }
 
     microstepBitCode = microstepCode;
+    microstepBitCodeM0 = bitRead(microstepBitCode, 0);
+    microstepBitCodeM1 = bitRead(microstepBitCode, 1);
+    microstepBitCodeM2 = bitRead(microstepBitCode, 2);
+
     microstepBitCodeGoto = microstepCodeGoto;
-    pinModeEx(Pins->m0, OUTPUT);
-    digitalWriteEx(Pins->m0, bitRead(microstepBitCode, 0));
-    pinModeEx(Pins->m1, OUTPUT);
-    digitalWriteEx(Pins->m1, bitRead(microstepBitCode, 1));
+    microstepBitCodeGotoM0 = bitRead(microstepBitCodeGoto, 0);
+    microstepBitCodeGotoM1 = bitRead(microstepBitCodeGoto, 1);
+    microstepBitCodeGotoM2 = bitRead(microstepBitCodeGoto, 2);
+
+    pinModeEx(m0Pin, OUTPUT);
+    digitalWriteEx(m0Pin, microstepBitCodeM0);
+    pinModeEx(m1Pin, OUTPUT);
+    digitalWriteEx(m1Pin, microstepBitCodeM1);
     pinModeEx(m2Pin, OUTPUT);
-    digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
+    digitalWriteEx(m2Pin, microstepBitCodeM2);
   }
 
   // automatically set fault status for known drivers
@@ -180,6 +190,18 @@ void StepDirDriver::setParameters(float param1, float param2, float param3, floa
   #else
     if (settings.status == HIGH) pinModeEx(Pins->fault, INPUT);
   #endif
+
+
+  // set mode switching support flags
+  // use low speed mode switch for TMC drivers or high speed otherwise
+  if (isTmcSPI() || isTmcUART()) {
+    modeSwitchAllowed = microstepRatio != 1;
+    modeSwitchFastAllowed = false;
+  } else {
+    modeSwitchAllowed = false;
+    modeSwitchFastAllowed = microstepRatio != 1;
+  }
+
 }
 
 // validate driver parameters
@@ -257,8 +279,10 @@ bool StepDirDriver::validateParameters(float param1, float param2, float param3,
   return true;
 }
 
-bool StepDirDriver::modeSwitchAllowed() {
-  return microstepRatio != 1;  
+IRAM_ATTR void StepDirDriver::modeMicrostepTrackingFast() {
+  digitalWriteF(m0Pin, microstepBitCodeM0);
+  digitalWriteF(m1Pin, microstepBitCodeM1);
+  digitalWriteF(m2Pin, microstepBitCodeM2);
 }
 
 void StepDirDriver::modeMicrostepTracking() {
@@ -267,11 +291,7 @@ void StepDirDriver::modeMicrostepTracking() {
       tmcDriver.refresh_CHOPCONF(microstepCode);
     #endif
   } else {
-    noInterrupts();
-    digitalWriteEx(Pins->m0, bitRead(microstepBitCode, 0));
-    digitalWriteEx(Pins->m1, bitRead(microstepBitCode, 1));
-    digitalWriteEx(m2Pin, bitRead(microstepBitCode, 2));
-    interrupts();
+    modeMicrostepTrackingFast();
   }
 }
 
@@ -283,14 +303,19 @@ void StepDirDriver::modeDecayTracking() {
   } else {
     if (settings.decay == OFF) return;
     int8_t state = getDecayPinState(settings.decay);
-    noInterrupts();
     digitalWriteEx(decayPin, state);
-    interrupts();
   }
 }
 
 // get microstep ratio for slewing
 int StepDirDriver::getMicrostepRatio() {
+  return microstepRatio;
+}
+
+IRAM_ATTR int StepDirDriver::modeMicrostepSlewingFast() {
+  digitalWriteF(m0Pin, microstepBitCodeGotoM0);
+  digitalWriteF(m1Pin, microstepBitCodeGotoM1);
+  digitalWriteF(m2Pin, microstepBitCodeGotoM2);
   return microstepRatio;
 }
 
@@ -300,15 +325,11 @@ int StepDirDriver::modeMicrostepSlewing() {
       #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
         tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
       #endif
+      return microstepRatio;
     } else {
-      noInterrupts();
-      digitalWriteEx(Pins->m0, bitRead(microstepBitCodeGoto, 0));
-      digitalWriteEx(Pins->m1, bitRead(microstepBitCodeGoto, 1));
-      digitalWriteEx(m2Pin, bitRead(microstepBitCodeGoto, 2));
-      interrupts();
+      return modeMicrostepSlewingFast();
     }
   }
-  return microstepRatio;
 }
 
 void StepDirDriver::modeDecaySlewing() {
@@ -321,9 +342,7 @@ void StepDirDriver::modeDecaySlewing() {
   } else {
     if (settings.decayGoto == OFF) return;
     int8_t state = getDecayPinState(settings.decayGoto);
-    noInterrupts();
     if (state != OFF) digitalWriteEx(decayPin, state);
-    interrupts();
   }
 }
 

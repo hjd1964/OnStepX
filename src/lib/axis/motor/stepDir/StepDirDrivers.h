@@ -61,8 +61,8 @@ class StepDirDriver {
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // true if switching microstep modes is allowed
-    bool modeSwitchAllowed();
+    // set microstep mode for tracking, high speed for traditional drivers only
+    void modeMicrostepTrackingFast();
 
     // set microstep mode for tracking
     void modeMicrostepTracking();
@@ -72,6 +72,9 @@ class StepDirDriver {
 
     // get microstep ratio for slewing
     int getMicrostepRatio();
+
+    // set microstep mode for slewing, high speed for traditional drivers only
+    int modeMicrostepSlewingFast();
 
     // set microstep mode for slewing
     int modeMicrostepSlewing();
@@ -111,6 +114,12 @@ class StepDirDriver {
     // this is a required method for the Axis class, even if it only ever returns 1
     int subdivisionsToCode(long microsteps);
 
+    // true if switching microstep modes at low speed is allowed
+    bool modeSwitchAllowed = false;
+
+    // true if switching microstep modes at high speed is allowed
+    bool modeSwitchFastAllowed = false;
+
     #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
       TmcDriver tmcDriver;
     #endif
@@ -131,13 +140,21 @@ class StepDirDriver {
     #endif
 
     const int16_t* microsteps;
-    int16_t microstepRatio        = 1;
-    int16_t microstepCode         = OFF;
-    int16_t microstepCodeGoto     = OFF;
-    uint8_t microstepBitCode      = 0;
-    uint8_t microstepBitCodeGoto  = 0;
-    int16_t m2Pin                 = OFF;
-    int16_t decayPin              = OFF;
+    int16_t microstepRatio         = 1;
+    int16_t microstepCode          = OFF;
+    int16_t microstepCodeGoto      = OFF;
+    uint8_t microstepBitCode       = 0;
+    uint8_t microstepBitCodeM0     = 0;
+    uint8_t microstepBitCodeM1     = 0;
+    uint8_t microstepBitCodeM2     = 0;
+    uint8_t microstepBitCodeGoto   = 0;
+    uint8_t microstepBitCodeGotoM0 = 0;
+    uint8_t microstepBitCodeGotoM1 = 0;
+    uint8_t microstepBitCodeGotoM2 = 0;
+    int16_t m0Pin                  = OFF;
+    int16_t m1Pin                  = OFF;
+    int16_t m2Pin                  = OFF;
+    int16_t decayPin               = OFF;
     const StepDirDriverPins *Pins;
 
     unsigned long timeLastStatusUpdate = 0;
