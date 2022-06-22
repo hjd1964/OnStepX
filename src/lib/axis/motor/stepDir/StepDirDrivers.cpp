@@ -325,11 +325,11 @@ int StepDirDriver::modeMicrostepSlewing() {
       #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
         tmcDriver.refresh_CHOPCONF(microstepCodeGoto);
       #endif
-      return microstepRatio;
     } else {
       return modeMicrostepSlewingFast();
     }
   }
+  return microstepRatio;
 }
 
 void StepDirDriver::modeDecaySlewing() {
