@@ -267,7 +267,7 @@ void StepDirMotor::modeSwitch() {
         V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
       }
 
-      if (driver->modeSwitchAllowed()) {
+      if (driver->modeSwitchAllowed || driver->modeSwitchFastAllowed) {
         V(axisPrefix); VLF("mode switch tracking set");
         driver->modeMicrostepTracking();
       }
@@ -281,7 +281,7 @@ void StepDirMotor::modeSwitch() {
     } else
     if (microstepModeControl == MMC_SLEWING_PAUSE) {
 
-      if (driver->modeSwitchAllowed()) {
+      if (driver->modeSwitchAllowed || driver->modeSwitchFastAllowed) {
         V(axisPrefix); VLF("mode switch slewing set");
         stepSize = driver->modeMicrostepSlewing();
       }
