@@ -2,15 +2,12 @@
 // Pin map for OnStep MaxSTM STM32F411CE/STM32F401CE PCB (or the Blackpill https://github.com/WeActTC/MiniF4-STM32F4x1)
 #pragma once
 
-// Hint that the direction pins are shared
-#define SHARED_DIRECTION_PINS
+#if defined(STM32F411xE) || defined(STM32F401xC)
 
 // For an 8KB EEPROM on the MaxSTM3.6I
 #if PINMAP == MaxSTM3I
   #define NV_M24C32
 #endif
-
-#if defined(STM32F411xE) || defined(STM32F401xC)
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial1 RX1 Pin PA10, TX1 Pin PA9
@@ -132,6 +129,7 @@
 #define AXIS3_M2_PIN            PC15             // SPI CS (UART TX)
 #define AXIS3_M3_PIN            PA6              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          PB8
+#define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           PC13
 
 // For focuser1 stepper driver

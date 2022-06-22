@@ -40,9 +40,6 @@
 #define I2C_SDA_PIN             21
 #define I2C_SCL_PIN             22
 
-// Hint that the direction pins are shared
-#define SHARED_DIRECTION_PINS
-
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                4                // ESP8266 RST control, or MISO for Axis1&2, or Axis4 EN support
 #define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA
@@ -121,6 +118,7 @@
 #define AXIS3_M2_PIN            OFF              // SPI CS (UART TX)
 #define AXIS3_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          2                // [must be low at boot 2]
+#define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver

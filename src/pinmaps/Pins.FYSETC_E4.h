@@ -1,8 +1,5 @@
 // -------------------------------------------------------------------------------------------------
 // Pinmap for FYSETC E4 Version 1.0 (ESP32)
-
-// ********* EXPERIMENTAL, THIS PINMAP MAY BE CHANGED OR REMOVED AT ANY TIME **********
-
 #pragma once
 
 #if defined(ESP32)

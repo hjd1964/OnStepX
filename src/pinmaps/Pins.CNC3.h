@@ -22,10 +22,6 @@
   #define SERIAL_B_TX           5
 #endif
 
-// Specify the ESP32 I2C pins
-#define I2C_SDA_PIN             21
-#define I2C_SCL_PIN             22
-
 // Use the following settings for any TMC UART driver (TMC2209U) that may be present
 #define DRIVER_UART_ADDRESS_REMAP_AXIS5          // Map driver axis5 to axis3 in hardware serial mode
 
@@ -45,6 +41,10 @@
 #else
   #error "Configuration (Config.h): For CNC3, set DRIVER_UART_HARDWARE_SERIAL to ON (pins TX15,RX39) or OFF (uses CS.)"
 #endif
+
+// Specify the ESP32 I2C pins
+#define I2C_SDA_PIN             21
+#define I2C_SCL_PIN             22
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                18               // ESP8266 RST control, or SPI MISO Axis1&2

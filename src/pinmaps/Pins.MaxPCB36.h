@@ -2,9 +2,6 @@
 // Pin map for OnStep MaxPCB 3.6 Teensy4.1 PCB
 #pragma once
 
-// Hint that the direction pins are shared
-#define SHARED_DIRECTION_PINS
-
 #if defined(ARDUINO_TEENSY41)
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
@@ -123,6 +120,7 @@
 #define AXIS3_M2_PIN            25               // SPI CS (UART TX)
 #define AXIS3_M3_PIN            37               // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          26
+#define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           27
 #define AXIS3_DECAY_PIN         AXIS3_M2_PIN
 #define AXIS3_SERVO_ENC1_PIN    AXIS3_M0_PIN
