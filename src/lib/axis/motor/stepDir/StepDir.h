@@ -114,7 +114,6 @@ class StepDirMotor : public Motor {
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
     bool useFastHardwareTimers = true;
-    bool useFastCalls = false;
 
     void (*callback)() = NULL;
     void (*callbackFF)() = NULL;
