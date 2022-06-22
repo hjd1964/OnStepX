@@ -21,6 +21,24 @@
   #error "GPIO device SSR74HC595 supports GPIO_SSR74HC595_COUNT of 8, 16, 24, or 32 only."
 #endif
 
+#ifdef ESP32
+  // ESP32 GPIO SSR74HC595 macros (if used, code below only works for pins 0 to 31)
+  #define GPIO_SSR74HC595_LATCH_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_LATCH_PIN); }
+  #define GPIO_SSR74HC595_LATCH_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_LATCH_PIN); }
+  #define GPIO_SSR74HC595_CLOCK_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_CLOCK_PIN); }
+  #define GPIO_SSR74HC595_CLOCK_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_CLOCK_PIN); }
+  #define GPIO_SSR74HC595_DATA_LOW() { GPIO.out_w1tc = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
+  #define GPIO_SSR74HC595_DATA_HIGH() { GPIO.out_w1ts = ((uint32_t)1 << GPIO_SSR74HC595_DATA_PIN); }
+#else
+  // generic GPIO SSR74HC595 macros
+  #define GPIO_SSR74HC595_LATCH_LOW() digitalWrite(GPIO_SSR74HC595_LATCH_PIN, LOW)
+  #define GPIO_SSR74HC595_LATCH_HIGH() digitalWrite(GPIO_SSR74HC595_LATCH_PIN, HIGH)
+  #define GPIO_SSR74HC595_CLOCK_LOW() digitalWrite(GPIO_SSR74HC595_CLOCK_PIN, LOW)
+  #define GPIO_SSR74HC595_CLOCK_HIGH() digitalWrite(GPIO_SSR74HC595_CLOCK_PIN, HIGH)
+  #define GPIO_SSR74HC595_DATA_LOW() digitalWrite(GPIO_SSR74HC595_DATA_PIN, LOW)
+  #define GPIO_SSR74HC595_DATA_HIGH() digitalWrite(GPIO_SSR74HC595_DATA_PIN, HIGH)
+#endif
+
 #include "../tasks/OnTask.h"
 
 // designed for a 20MHz max bit rate
