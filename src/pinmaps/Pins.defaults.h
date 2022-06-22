@@ -35,6 +35,7 @@
 #ifndef I2C_SDA_PIN
 #define I2C_SDA_PIN                 OFF
 #endif
+
 #ifndef I2C_SCL_PIN
 #define I2C_SCL_PIN                 OFF
 #endif
