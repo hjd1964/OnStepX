@@ -63,5 +63,8 @@
 // Internal MCU temperature (in degrees C)
 #define HAL_TEMP() ( NAN )
 
+//---------------------------------------------------------------------------------------------------
+// Misc. includes to support this processor's operation
+
 // a really short fixed delay
 #define HAL_DELAY_25NS() delayNanoseconds(20)

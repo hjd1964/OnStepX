@@ -69,7 +69,10 @@
 // Internal MCU temperature (in degrees C)
 #define HAL_TEMP() ( NAN )
 
-// Allow MCU reset -----------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+// Misc. includes to support this processor's operation
+
+// MCU reset
 #define HAL_RESET() NVIC_SystemReset()
 
 // a really short fixed delay (none needed)

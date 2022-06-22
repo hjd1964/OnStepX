@@ -92,9 +92,8 @@
 #define _Tpin 70
 #define HAL_TEMP() ( (-((analogRead(_Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
 
-//--------------------------------------------------------------------------------------------------
-// for using the DAC as a digital output on Teensy3.6 A21=66 A22=67
-//#define digitalWrite(x,y) { if (x==66 || x==67) { if ((y)==LOW) analogWrite(x,0); else analogWrite(x,255); } else digitalWrite(x,y); }
+//---------------------------------------------------------------------------------------------------
+// Misc. includes to support this processor's operation
 
 // a really short fixed delay
 #define HAL_DELAY_25NS() delayNanoseconds(10)
