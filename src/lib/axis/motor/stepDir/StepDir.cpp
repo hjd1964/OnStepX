@@ -9,48 +9,68 @@
 
 StepDirMotor *stepDirMotorInstance[9];
 
-// if the AXISn_STEP_PIN isn't present, use the passed step pin instead (slower)
 #ifndef AXIS1_STEP_PIN
   #define AXIS1_STEP_PIN stepDirMotorInstance[0]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis1() { stepDirMotorInstance[0]->move(AXIS1_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis1() { stepDirMotorInstance[0]->moveFF(AXIS1_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis1() { stepDirMotorInstance[0]->moveFR(AXIS1_STEP_PIN); }
+
 #ifndef AXIS2_STEP_PIN
   #define AXIS2_STEP_PIN stepDirMotorInstance[1]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis2() { stepDirMotorInstance[1]->move(AXIS2_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis2() { stepDirMotorInstance[1]->moveFF(AXIS2_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis2() { stepDirMotorInstance[1]->moveFR(AXIS2_STEP_PIN); }
+
 #ifndef AXIS3_STEP_PIN
   #define AXIS3_STEP_PIN stepDirMotorInstance[2]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis3() { stepDirMotorInstance[2]->moveFF(AXIS3_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis3() { stepDirMotorInstance[2]->moveFR(AXIS3_STEP_PIN); }
+
 #ifndef AXIS4_STEP_PIN
   #define AXIS4_STEP_PIN stepDirMotorInstance[3]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis4() { stepDirMotorInstance[3]->move(AXIS4_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis4() { stepDirMotorInstance[3]->moveFF(AXIS4_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis4() { stepDirMotorInstance[3]->moveFR(AXIS4_STEP_PIN); }
+
 #ifndef AXIS5_STEP_PIN
   #define AXIS5_STEP_PIN stepDirMotorInstance[4]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis5() { stepDirMotorInstance[4]->move(AXIS5_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis5() { stepDirMotorInstance[4]->moveFF(AXIS5_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis5() { stepDirMotorInstance[4]->moveFR(AXIS5_STEP_PIN); }
+
 #ifndef AXIS6_STEP_PIN
   #define AXIS6_STEP_PIN stepDirMotorInstance[5]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis6() { stepDirMotorInstance[5]->move(AXIS6_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis6() { stepDirMotorInstance[5]->moveFF(AXIS6_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis6() { stepDirMotorInstance[5]->moveFR(AXIS6_STEP_PIN); }
+
 #ifndef AXIS7_STEP_PIN
   #define AXIS7_STEP_PIN stepDirMotorInstance[6]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis7() { stepDirMotorInstance[6]->move(AXIS7_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis7() { stepDirMotorInstance[6]->moveFF(AXIS7_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis7() { stepDirMotorInstance[6]->moveFR(AXIS7_STEP_PIN); }
+
 #ifndef AXIS8_STEP_PIN
   #define AXIS8_STEP_PIN stepDirMotorInstance[7]->Pins->step
 #endif
+IRAM_ATTR void moveStepDirMotorAxis8() { stepDirMotorInstance[7]->move(AXIS8_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis8() { stepDirMotorInstance[7]->moveFF(AXIS8_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis8() { stepDirMotorInstance[7]->moveFR(AXIS8_STEP_PIN); }
+
 #ifndef AXIS9_STEP_PIN
   #define AXIS9_STEP_PIN stepDirMotorInstance[8]->Pins->step
 #endif
-
-IRAM_ATTR void moveStepDirMotorAxis1() { stepDirMotorInstance[0]->move(AXIS1_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis2() { stepDirMotorInstance[1]->move(AXIS2_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis4() { stepDirMotorInstance[3]->move(AXIS4_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis5() { stepDirMotorInstance[4]->move(AXIS5_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis6() { stepDirMotorInstance[5]->move(AXIS6_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis7() { stepDirMotorInstance[6]->move(AXIS7_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorAxis8() { stepDirMotorInstance[7]->move(AXIS8_STEP_PIN); }
 IRAM_ATTR void moveStepDirMotorAxis9() { stepDirMotorInstance[8]->move(AXIS9_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis1() { stepDirMotorInstance[0]->moveFF(AXIS1_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis2() { stepDirMotorInstance[1]->moveFF(AXIS2_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis1() { stepDirMotorInstance[0]->moveFR(AXIS1_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis2() { stepDirMotorInstance[1]->moveFR(AXIS2_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis9() { stepDirMotorInstance[8]->moveFF(AXIS9_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis9() { stepDirMotorInstance[8]->moveFR(AXIS9_STEP_PIN); }
 
 StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
@@ -69,25 +89,21 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pi
 
   // attach the function pointers to the callbacks
   stepDirMotorInstance[axisNumber - 1] = this;
-  callbackFF = NULL;
-  callbackFR = NULL;
   switch (axisNumber) {
     case 1: callback = moveStepDirMotorAxis1; callbackFF = moveStepDirMotorFFAxis1; callbackFR = moveStepDirMotorFRAxis1; break;
     case 2: callback = moveStepDirMotorAxis2; callbackFF = moveStepDirMotorFFAxis2; callbackFR = moveStepDirMotorFRAxis2; break;
-    case 3: callback = moveStepDirMotorAxis3; break;
-    case 4: callback = moveStepDirMotorAxis4; break;
-    case 5: callback = moveStepDirMotorAxis5; break;
-    case 6: callback = moveStepDirMotorAxis6; break;
-    case 7: callback = moveStepDirMotorAxis7; break;
-    case 8: callback = moveStepDirMotorAxis8; break;
-    case 9: callback = moveStepDirMotorAxis9; break;
+    case 3: callback = moveStepDirMotorAxis3; callbackFF = moveStepDirMotorFFAxis3; callbackFR = moveStepDirMotorFRAxis3; break;
+    case 4: callback = moveStepDirMotorAxis4; callbackFF = moveStepDirMotorFFAxis4; callbackFR = moveStepDirMotorFRAxis4; break;
+    case 5: callback = moveStepDirMotorAxis5; callbackFF = moveStepDirMotorFFAxis5; callbackFR = moveStepDirMotorFRAxis5; break;
+    case 6: callback = moveStepDirMotorAxis6; callbackFF = moveStepDirMotorFFAxis6; callbackFR = moveStepDirMotorFRAxis6; break;
+    case 7: callback = moveStepDirMotorAxis7; callbackFF = moveStepDirMotorFFAxis7; callbackFR = moveStepDirMotorFRAxis7; break;
+    case 8: callback = moveStepDirMotorAxis8; callbackFF = moveStepDirMotorFFAxis8; callbackFR = moveStepDirMotorFRAxis8; break;
+    case 9: callback = moveStepDirMotorAxis9; callbackFF = moveStepDirMotorFFAxis9; callbackFR = moveStepDirMotorFRAxis9; break;
   }
 }
 
 bool StepDirMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
-
-  if (callbackFF == NULL || callbackFR == NULL) useFastCalls = false; else useFastCalls = true;
  
   #if DEBUG == VERBOSE
     V(axisPrefix); V("pins step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
@@ -227,7 +243,7 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     if (microstepModeControl == MMC_TRACKING_READY) microstepModeControl = MMC_TRACKING;
     if (microstepModeControl == MMC_SLEWING_READY) {
       #if DEBUG == VERBOSE
-        if (useFastCalls) { V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms"); }
+        V(axisPrefix); VF("high speed swap in took "); V(millis() - switchStartTimeMs); VLF(" ms");
       #endif
       microstepModeControl = MMC_SLEWING;
     }
@@ -295,12 +311,10 @@ void StepDirMotor::setSlewing(bool state) {
 
 // swaps in/out fast unidirectional ISR for slewing 
 bool StepDirMotor::enableMoveFast(const bool fast) {
-  if (useFastCalls) {
-    if (fast) {
-      if (direction == dirRev) tasks.setCallback(taskHandle, callbackFR); else tasks.setCallback(taskHandle, callbackFF);
-    } else tasks.setCallback(taskHandle, callback);
-    return true;
-  } else return false;
+  if (fast) {
+    if (direction == dirRev) tasks.setCallback(taskHandle, callbackFR); else tasks.setCallback(taskHandle, callbackFF);
+  } else tasks.setCallback(taskHandle, callback);
+  return true;
 }
 
 #if defined(GPIO_DIRECTION_PINS)
