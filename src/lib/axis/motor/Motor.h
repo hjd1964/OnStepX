@@ -95,11 +95,11 @@ class Motor {
     // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
     virtual void setFrequencySteps(float frequency);
 
+    // set backlash frequency in steps per second
+    virtual void setBacklashFrequencySteps(float frequency);
+
     // get tracking mode steps per slewing mode step
     virtual int getStepsPerStepSlewing();
-
-    // set backlash frequency in steps per second
-    void setBacklashFrequencySteps(float frequency);
 
     // get synchronized state (automatic movement of target at setFrequencySteps() rate)
     inline bool getSynchronized() { return synchronized; }
