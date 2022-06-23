@@ -259,7 +259,6 @@ void StepDirMotor::setFrequencySteps(float frequency) {
 void StepDirMotor::modeSwitch() {
   Y;
   if (lastFrequency <= backlashFrequency*2.0F) {
-
     if (microstepModeControl >= MMC_SLEWING) {
       microstepModeControl = MMC_TRACKING_READY;
 
@@ -271,10 +270,8 @@ void StepDirMotor::modeSwitch() {
         V(axisPrefix); VLF("mode switch tracking set");
         driver->modeMicrostepTracking();
       }
-
     }
   } else {
-
     if (microstepModeControl == MMC_TRACKING) {
       microstepModeControl = MMC_SLEWING_REQUEST;
       switchStartTimeMs = millis();
