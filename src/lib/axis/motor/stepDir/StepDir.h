@@ -90,26 +90,27 @@ class StepDirMotor : public Motor {
     uint8_t taskHandle = 0;
 
     #ifdef DRIVER_STEP_DEFAULTS
-      #define stepClr LOW               // pin state to reset driver before taking a step
-      #define stepSet HIGH              // pin state to take a step
+      #define stepClr LOW                // pin state to reset driver before taking a step
+      #define stepSet HIGH               // pin state to take a step
     #else
-      volatile uint8_t stepClr = LOW;   // pin state to reset driver before taking a step
-      volatile uint8_t stepSet = HIGH;  // pin state to take a step
+      volatile uint8_t stepClr = LOW;    // pin state to reset driver before taking a step
+      volatile uint8_t stepSet = HIGH;   // pin state to take a step
     #endif
-    volatile uint8_t dirFwd = LOW;      // pin state for forward direction
-    volatile uint8_t dirRev = HIGH;     // pin state for reverse direction
-    volatile uint8_t direction = LOW;   // current direction in use
-    volatile uint32_t pulseWidth =2000; // step/dir driver pulse width in nanoseconds
+    volatile uint8_t dirFwd = LOW;       // pin state for forward direction
+    volatile uint8_t dirRev = HIGH;      // pin state for reverse direction
+    volatile uint8_t direction = LOW;    // current direction in use
+    volatile uint32_t pulseWidth = 2000; // step/dir driver pulse width in nanoseconds
 
-    volatile int16_t homeSteps = 1;     // step count for microstep sequence between home positions (driver indexer)
-    volatile int16_t stepSize = 1;      // step size during slews (for micro-step mode switching)
-    volatile bool takeStep = false;     // should we take a step
+    volatile int16_t homeSteps = 1;      // step count for microstep sequence between home positions (driver indexer)
+    volatile int16_t stepSize = 1;       // step size during slews (for micro-step mode switching)
+    volatile bool takeStep = false;      // should we take a step
 
-    float currentFrequency = 0.0F;      // last frequency set 
-    float lastFrequency = 0.0F;         // last frequency requested
-    unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
-    unsigned long lastPeriodSet = 0;    // last timer period actually set (in sub-micros)
-    unsigned long switchStartTimeMs;    // log time to switch microstep mode and do ISR swap
+    float currentFrequency = 0.0F;       // last frequency set 
+    float lastFrequency = 0.0F;          // last frequency requested
+    volatile int16_t lastStepSize = 1;   // last step size (for timer frequency change)
+    unsigned long lastPeriod = 0;        // last timer period (in sub-micros)
+    unsigned long lastPeriodSet = 0;     // last timer period actually set (in sub-micros)
+    unsigned long switchStartTimeMs;     // log time to switch microstep mode and do ISR swap
 
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
