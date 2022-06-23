@@ -107,7 +107,6 @@ class StepDirMotor : public Motor {
 
     float currentFrequency = 0.0F;       // last frequency set 
     float lastFrequency = 0.0F;          // last frequency requested
-    volatile int16_t lastStepSize = 1;   // last step size (for timer frequency change)
     unsigned long lastPeriod = 0;        // last timer period (in sub-micros)
     unsigned long lastPeriodSet = 0;     // last timer period actually set (in sub-micros)
     unsigned long switchStartTimeMs;     // log time to switch microstep mode and do ISR swap
