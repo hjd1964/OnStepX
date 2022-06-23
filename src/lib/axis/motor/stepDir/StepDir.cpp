@@ -26,51 +26,51 @@ IRAM_ATTR void moveStepDirMotorFRAxis2() { stepDirMotorInstance[1]->moveFR(AXIS2
 #ifndef AXIS3_STEP_PIN
   #define AXIS3_STEP_PIN stepDirMotorInstance[2]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis3() { stepDirMotorInstance[2]->moveFF(AXIS3_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis3() { stepDirMotorInstance[2]->moveFR(AXIS3_STEP_PIN); }
+void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
+void moveStepDirMotorFFAxis3() { stepDirMotorInstance[2]->moveFF(AXIS3_STEP_PIN); }
+void moveStepDirMotorFRAxis3() { stepDirMotorInstance[2]->moveFR(AXIS3_STEP_PIN); }
 
 #ifndef AXIS4_STEP_PIN
   #define AXIS4_STEP_PIN stepDirMotorInstance[3]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis4() { stepDirMotorInstance[3]->move(AXIS4_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis4() { stepDirMotorInstance[3]->moveFF(AXIS4_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis4() { stepDirMotorInstance[3]->moveFR(AXIS4_STEP_PIN); }
+void moveStepDirMotorAxis4() { stepDirMotorInstance[3]->move(AXIS4_STEP_PIN); }
+void moveStepDirMotorFFAxis4() { stepDirMotorInstance[3]->moveFF(AXIS4_STEP_PIN); }
+void moveStepDirMotorFRAxis4() { stepDirMotorInstance[3]->moveFR(AXIS4_STEP_PIN); }
 
 #ifndef AXIS5_STEP_PIN
   #define AXIS5_STEP_PIN stepDirMotorInstance[4]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis5() { stepDirMotorInstance[4]->move(AXIS5_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis5() { stepDirMotorInstance[4]->moveFF(AXIS5_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis5() { stepDirMotorInstance[4]->moveFR(AXIS5_STEP_PIN); }
+void moveStepDirMotorAxis5() { stepDirMotorInstance[4]->move(AXIS5_STEP_PIN); }
+void moveStepDirMotorFFAxis5() { stepDirMotorInstance[4]->moveFF(AXIS5_STEP_PIN); }
+void moveStepDirMotorFRAxis5() { stepDirMotorInstance[4]->moveFR(AXIS5_STEP_PIN); }
 
 #ifndef AXIS6_STEP_PIN
   #define AXIS6_STEP_PIN stepDirMotorInstance[5]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis6() { stepDirMotorInstance[5]->move(AXIS6_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis6() { stepDirMotorInstance[5]->moveFF(AXIS6_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis6() { stepDirMotorInstance[5]->moveFR(AXIS6_STEP_PIN); }
+void moveStepDirMotorAxis6() { stepDirMotorInstance[5]->move(AXIS6_STEP_PIN); }
+void moveStepDirMotorFFAxis6() { stepDirMotorInstance[5]->moveFF(AXIS6_STEP_PIN); }
+void moveStepDirMotorFRAxis6() { stepDirMotorInstance[5]->moveFR(AXIS6_STEP_PIN); }
 
 #ifndef AXIS7_STEP_PIN
   #define AXIS7_STEP_PIN stepDirMotorInstance[6]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis7() { stepDirMotorInstance[6]->move(AXIS7_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis7() { stepDirMotorInstance[6]->moveFF(AXIS7_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis7() { stepDirMotorInstance[6]->moveFR(AXIS7_STEP_PIN); }
+void moveStepDirMotorAxis7() { stepDirMotorInstance[6]->move(AXIS7_STEP_PIN); }
+void moveStepDirMotorFFAxis7() { stepDirMotorInstance[6]->moveFF(AXIS7_STEP_PIN); }
+void moveStepDirMotorFRAxis7() { stepDirMotorInstance[6]->moveFR(AXIS7_STEP_PIN); }
 
 #ifndef AXIS8_STEP_PIN
   #define AXIS8_STEP_PIN stepDirMotorInstance[7]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis8() { stepDirMotorInstance[7]->move(AXIS8_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis8() { stepDirMotorInstance[7]->moveFF(AXIS8_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis8() { stepDirMotorInstance[7]->moveFR(AXIS8_STEP_PIN); }
+void moveStepDirMotorAxis8() { stepDirMotorInstance[7]->move(AXIS8_STEP_PIN); }
+void moveStepDirMotorFFAxis8() { stepDirMotorInstance[7]->moveFF(AXIS8_STEP_PIN); }
+void moveStepDirMotorFRAxis8() { stepDirMotorInstance[7]->moveFR(AXIS8_STEP_PIN); }
 
 #ifndef AXIS9_STEP_PIN
   #define AXIS9_STEP_PIN stepDirMotorInstance[8]->Pins->step
 #endif
-IRAM_ATTR void moveStepDirMotorAxis9() { stepDirMotorInstance[8]->move(AXIS9_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFFAxis9() { stepDirMotorInstance[8]->moveFF(AXIS9_STEP_PIN); }
-IRAM_ATTR void moveStepDirMotorFRAxis9() { stepDirMotorInstance[8]->moveFR(AXIS9_STEP_PIN); }
+void moveStepDirMotorAxis9() { stepDirMotorInstance[8]->move(AXIS9_STEP_PIN); }
+void moveStepDirMotorFFAxis9() { stepDirMotorInstance[8]->moveFF(AXIS9_STEP_PIN); }
+void moveStepDirMotorFRAxis9() { stepDirMotorInstance[8]->moveFR(AXIS9_STEP_PIN); }
 
 StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
