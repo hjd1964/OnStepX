@@ -325,10 +325,9 @@ int TmcDriver::refresh_DRVSTATUS() {
       softSpi.begin();
 
       // get global status register, look for driver error bit
-      uint32_t sgResult=0;
       uint32_t data_out=0;
       uint8_t  result = read(REG_DRVSTATUS, &data_out);
-      
+
       softSpi.pause();
       
       // first write returns nothing, second the status data
@@ -354,7 +353,7 @@ int TmcDriver::refresh_DRVSTATUS() {
       }
 
       softSpi.end();
-      return sgResult;
+      return data_out != 0;
     } else
   #endif
 
