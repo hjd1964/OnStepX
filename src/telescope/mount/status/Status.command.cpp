@@ -37,22 +37,22 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       int i = 0;
       if (!mount.isTracking())                 reply[i++]='n';                     // [n]ot tracking
       if (goTo.state == GS_NONE)               reply[i++]='N';                     // [N]o goto
-      if (park.state == PS_UNPARKED)           reply[i++]='p'; else                // not [p]arked
-      if (park.state == PS_PARKING)            reply[i++]='I'; else                // parking [I]n-progress
+      if (park.state == PS_UNPARKED)           reply[i++]='p'; else                // Not [p]arked
+      if (park.state == PS_PARKING)            reply[i++]='I'; else                // Parking [I]n-progress
       if (park.state == PS_PARKED)             reply[i++]='P'; else                // [P]arked
-      if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // park [F]ailed
-      if (mount.isSyncToEncoders())            reply[i++]='e';                     // sync to [e]ncoders only
-      if (mount.isHome())                      reply[i++]='H';                     // at [H]ome
+      if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // Park [F]ailed
+      if (mount.isSyncToEncoders())            reply[i++]='e';                     // Sync to [e]ncoders only
+      if (mount.isHome())                      reply[i++]='H';                     // At [H]ome
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
-      if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G'; else                // pulse [G]uide active
+      if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G'; else                // Pulse [G]uide active
       if (guide.state != GU_NONE)              reply[i++]='g';                     // [g]uide active
 
       if (mount.settings.rc == RC_REFRACTION) { reply[i++]='r'; reply[i++]='s'; }  // [r]efr enabled [s]ingle axis
       if (mount.settings.rc == RC_REFRACTION_DUAL) { reply[i++]='r'; }             // [r]efr enabled
-      if (mount.settings.rc == RC_MODEL)      { reply[i++]='t'; reply[i++]='s'; }  // on[t]rack enabled [s]ingle axis
-      if (mount.settings.rc == RC_MODEL_DUAL) { reply[i++]='t'; }                  // on[t]rack enabled
+      if (mount.settings.rc == RC_MODEL)      { reply[i++]='t'; reply[i++]='s'; }  // On[t]rack enabled [s]ingle axis
+      if (mount.settings.rc == RC_MODEL_DUAL) { reply[i++]='t'; }                  // On[t]rack enabled
       if (mount.settings.rc == RC_NONE) {
         float r = siderealToHz(mount.trackingRate);
         if (fequal(r, 57.900F))                reply[i++]='('; else                // Lunar rate selected
@@ -61,8 +61,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       }
 
       if (goTo.isHomePaused())                 reply[i++]='w';                     // [w]aiting at home 
-      if (goTo.isHomePauseEnabled())           reply[i++]='u';                     // pa[u]se at home enabled?
-      if (sound.enabled)                       reply[i++]='z';                     // bu[z]zer enabled?
+      if (goTo.isHomePauseEnabled())           reply[i++]='u';                     // Pa[u]se at home enabled?
+      if (sound.enabled)                       reply[i++]='z';                     // Bu[z]zer enabled?
       if (goTo.isAutoFlipEnabled())            reply[i++]='a';                     // [a]uto meridian flip
       #if AXIS1_PEC == ON
         if (pec.settings.recorded)             reply[i++]='R';                     // PEC data has been [R]ecorded
@@ -74,14 +74,14 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
-      if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // pier side n[o]ne
-      if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // pier side eas[T]
-      if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // pier side [W]est
+      if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // Pier side n[o]ne
+      if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // Pier side eas[T]
+      if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // Pier side [W]est
 
-      reply[i++]='0' + guide.settings.pulseRateSelect;                             // provide pulse-guide rate
-      reply[i++]='0' + guide.settings.axis1RateSelect;                             // provide guide rate
+      reply[i++]='0' + guide.settings.pulseRateSelect;                             // Provide pulse-guide rate
+      reply[i++]='0' + guide.settings.axis1RateSelect;                             // Provide guide rate
 
-      reply[i++]='0' + limits.errorCode();                                          // provide general error code
+      reply[i++]='0' + limits.errorCode();                                         // Provide general error code
       reply[i++]=0;
 
       *numericReply = false;
@@ -96,7 +96,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                            reply[0]|=0b10000100;           // PPS sync
       #endif
-      if (guide.state == GU_PULSE_GUIDE)           reply[0]|=0b10001000;           // pulse guide active
+      if (guide.state == GU_PULSE_GUIDE)           reply[0]|=0b10001000;           // Pulse guide active
 
       if (mount.settings.rc == RC_REFRACTION)      reply[0]|=0b11010000;           // Refr enabled Single axis
       if (mount.settings.rc == RC_REFRACTION_DUAL) reply[0]|=0b10010000;           // Refr enabled
@@ -109,9 +109,9 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
         if (fequal(r, 60.136F))                    reply[1]|=0b10000011;           // King rate selected
       }
 
-      if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // sync to encoders only
+      if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.state != GU_NONE && guide.state != GU_PULSE_GUIDE)
-                                                   reply[1]|=0b10001000;           // guide active
+                                                   reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
       if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home enabled?
