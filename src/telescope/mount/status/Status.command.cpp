@@ -43,6 +43,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // Park [F]ailed
       if (mount.isSyncToEncoders())            reply[i++]='e';                     // Sync to [e]ncoders only
       if (mount.isHome())                      reply[i++]='H';                     // At [H]ome
+      if (home.state == HS_HOMING)             reply[i++]='h';                     // Slewing [h]ome
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
@@ -113,6 +114,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (guide.state != GU_NONE && guide.state != GU_PULSE_GUIDE)
                                                    reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
+      if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing [h]ome
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
       if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home enabled?
       if (sound.enabled)                           reply[2]|=0b10001000;           // Buzzer enabled?
