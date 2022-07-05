@@ -196,7 +196,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     if (command[1] == '+') {
       #ifdef MOUNT_PRESENT
         if (transform.mountType == ALTAZM) {
-          if (settings.parkState < PS_PARKED) derotatorEnabled = true; else *commandError = CE_PARKED;
+          if (settings.parkState == PS_UNPARKED) derotatorEnabled = true; else *commandError = CE_PARKED;
         }
       #endif
       *numericReply = false;
