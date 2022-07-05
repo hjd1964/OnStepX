@@ -48,9 +48,15 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
   if (command[0] == 'r') {
 
     // :rT#       Get rotator sTatus
-    //            Returns: M# (for moving) or S# (for stopped)
+    //            Returns: s#
+    // note: for now returns only M# when moving for compatability with the ASCOM driver
+    // future changes might
     if (command[1] == 'T') {
-      if (axis3.isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axis3.isSlewing()) strcat(reply, "M"); else { // [M]oving
+        strcat(reply, "S");                             // [S]topped)
+        if (derotatorEnabled) strcat(reply, "D");       // [D]e-Rotate enabled
+        if (derotatorReverse) strcat(reply, "R");       // De-Rotate [R]everse
+      }
       *numericReply = false;
     } else
 
