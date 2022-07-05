@@ -16,7 +16,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
     //   L - Object Library Commands
     if (command[0] == 'L') {
 
-      // :LB#       Find previous object and set it as the current target object
+      // :LB#       Find previous catalog object subject to the current constraints
       //            Returns: Nothing
       if (command[1] == 'B' && parameter[0] == 0) { 
         prevRec();
@@ -41,7 +41,6 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
-        goTo.setGotoTarget(&target);
 
         char const *objType = ObjectStr[i];
         strcat(reply, ",");
@@ -49,14 +48,13 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         *numericReply = false;
       } else 
 
-      // :LIG#      Get catalog object information and goto
+      // :LIG#      Get catalog object information and goto target
       //            Returns: Nothing
       if (command[1] == 'I' && parameter[0] == 'G' && parameter[1] == 0) {
         int i;
         Coordinate target;
         readVars(reply, &i, &target.r, &target.d);
         goTo.setGotoTarget(&target);
-        *commandError = goTo.request();
         *numericReply = false;
       } else 
 
@@ -122,7 +120,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *supress
         if (firstFreeRec()) writeVars(name, i, target.r, target.d); else *commandError = CE_LIBRARY_FULL;
       } else 
 
-      // :LN#       Find next deep sky target object subject to the current constraints.
+      // :LN#       Find next catalog object subject to the current constraints
       //            Returns: Nothing
       if (command[1] == 'N' && parameter[0] == 0) { 
         nextRec();
