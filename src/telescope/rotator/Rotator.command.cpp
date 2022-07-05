@@ -138,10 +138,10 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :rR[sDDD*MM, etc.]#
-    //            Set rotator target angle Relative (in degrees)
+    // :rr[sDDD*MM, etc.]#
+    //            Set rotator target angle relative (in degrees)
     //            Returns: Nothing
-    if (command[1] == 'R') {
+    if (command[1] == 'r') {
       double r, t;
       convert.dmsToDouble(&r, parameter, true);
       t = axis3.getTargetCoordinate();
