@@ -12,7 +12,7 @@
   #include <WiFiUdp.h>
   WiFiUDP Udp;
 #else
-  #include <Ethernet.h>
+  #include <EthernetUdp.h>
   EthernetUDP Udp;
 #endif
 
