@@ -59,6 +59,33 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
   }
 #endif
 
+#if TIME_LOCATION_SOURCE == NTP
+  void ntpCheck() {
+    if (tls.isReady()) {
+      VLF("MSG: Mount, setting date/time from NTP");
+      JulianDate jd;
+      tls.get(jd);
+      site.dateIsReady = true;
+      site.timeIsReady = true;
+      site.setDateTime(jd);
+      #if GOTO_FEATURE == ON
+        if (park.state == PS_PARKED) park.restore(false);
+      #endif
+
+      VLF("MSG: Mount, stopping NTP monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("ntpChk"));
+    } else
+
+    if ((long)(millis() - site.updateTimeoutTime) > 0) {
+      VLF("MSG: Mount, NTP timed out stopping monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("ntpChk"));
+      VLF("WRN: TLS, NTP timed out stopping monitor task");
+      tasks.setDurationComplete(tasks.getHandleByName("ntp"));
+      initError.tls = true; 
+    }
+  }
+#endif
+
 void Site::init() {
   // get location
   VLF("MSG: Mount, site get Latitude/Longitude from NV");
@@ -81,6 +108,11 @@ void Site::init() {
           updateTimeoutTime = millis() + GPS_TIMEOUT_MINUTES*60000UL;
           VF("MSG: Transform, start GPS check task (rate 5000ms priority 7)... ");
           if (tasks.add(5000, 0, true, 7, gpsCheck, "gpsChk")) { VLF("success"); } else { VLF("FAILED!"); }
+        #endif
+        #if TIME_LOCATION_SOURCE == NTP
+          updateTimeoutTime = millis() + NTP_TIMEOUT_SECONDS*1000UL;
+          VF("MSG: Transform, start NTP check task (rate 5000ms priority 7)... ");
+          if (tasks.add(5000, 0, true, 7, ntpCheck, "ntpChk")) { VLF("success"); } else { VLF("FAILED!"); }
         #endif
       }
     } else {

@@ -69,7 +69,7 @@ void TimeLocationSource::get(JulianDate &ut1) {
       hour() <= 23 && minute() <= 59 && second() <= 59) {
     GregorianDate greg; greg.year = year(); greg.month = month(); greg.day = day();
     ut1 = calendars.gregorianToJulianDay(greg);
-    ut1.hour = hour() + minute()/60.0 + second()/3600.0;
+    ut1.hour = hour() + minute()/60.0 + (second() + DUT1)/3600.0;
   }
 }
 
