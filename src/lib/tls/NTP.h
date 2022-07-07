@@ -10,7 +10,7 @@
 #if OPERATIONAL_MODE == WIFI
   #include <WiFiUdp.h>
 #else
-  #include <Ethernet.h>
+  #include <EthernetUdp.h>
 #endif
 #include "../calendars/Calendars.h"
 
