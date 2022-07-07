@@ -6,6 +6,9 @@
 
 enum PrecisionMode {PM_LOWEST, PM_LOW, PM_HIGH, PM_HIGHEST, PM_UNKNOWN};
 
+// extended strncpy() that forces a maximum length
+void strncpyex(char *result, const char *source, size_t length);
+
 // sprintf like function for float type, limited to one parameter
 extern void sprintF(char *result, const char *source, double f);
 

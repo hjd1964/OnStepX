@@ -4,6 +4,11 @@
 #include "../../Common.h"
 #include "Convert.h"
 
+void strncpyex(char *result, const char *source, size_t length) {
+  strncpy(result, source, length);
+  result[length - 1] = 0;
+}
+
 void sprintF(char *result, const char *source, double f) {
   bool ok = false;
   uint8_t mas = 0, frac = 0, len = 0;
