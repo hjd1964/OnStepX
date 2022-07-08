@@ -118,7 +118,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
     VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VL("us");
 
-    status.sound.alert();
+    mountStatus.sound.alert();
 
   } else { DLF("WRN: Mount, start goto monitor task... FAILED!"); }
 
@@ -452,7 +452,7 @@ void Goto::poll() {
       // reset goto stage
       stage = GG_NONE;
 
-      status.sound.alert();
+      mountStatus.sound.alert();
 
       return;
     }

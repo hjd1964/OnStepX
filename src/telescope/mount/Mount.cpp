@@ -150,7 +150,7 @@ void Mount::enable(bool state) {
   static bool firstEnable = true;
 
   if (state == true) {
-    if (firstEnable) status.ready();
+    if (firstEnable) mountStatus.ready();
     firstEnable = false;
   } else
 
@@ -206,7 +206,7 @@ void Mount::update() {
   }
   if (statusFlashMs != lastStatusFlashMs) {
     lastStatusFlashMs = statusFlashMs;
-    status.flashRate(statusFlashMs);
+    mountStatus.flashRate(statusFlashMs);
     xBusy = statusFlashMs == SF_SLEWING;
   }
 }

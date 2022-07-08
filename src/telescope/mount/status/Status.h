@@ -33,6 +33,6 @@ class Status {
     uint8_t statusTaskHandle = 0;
 };
 
-extern Status status;
+extern Status mountStatus;
 
 #endif

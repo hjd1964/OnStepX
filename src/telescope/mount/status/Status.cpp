@@ -23,7 +23,7 @@
   }
 #endif
 
-void generalWrapper() { status.general(); }
+void generalWrapper() { mountStatus.general(); }
 
 // get mount status ready
 void Status::init() {
@@ -85,6 +85,6 @@ void Status::general() {
   #endif
 }
 
-Status status;
+Status mountStatus;
 
 #endif
