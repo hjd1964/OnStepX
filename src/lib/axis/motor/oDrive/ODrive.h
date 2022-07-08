@@ -127,7 +127,7 @@ class ODriveMotor : public Motor {
       char command[32];
       sprintF(command, "p n %1.8f\n", position);
       command[2] = '0' + motor_number;
-      ODRIVE_SERIAL.println(command);
+      ODRIVE_SERIAL.print(command);
     }
 
     unsigned long lastSetPositionTime = 0;
