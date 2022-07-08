@@ -22,6 +22,18 @@ class SerialLocal : public Stream {
 
     int read(void);
 
+    inline int receiveAvailable() {
+      int i = 0;
+      int x = xmit_index;
+      while (xmit_buffer[xmit_index] != 0) {
+        i++;
+        xmit_index++;
+        xmit_index &= 0b111111;
+      }
+      xmit_index = x;
+      return i;
+    }
+
     inline int available(void) { 
       uint8_t p = recv_head;
       uint8_t c = 0;
