@@ -12,6 +12,8 @@ class SerialLocal : public Stream {
     void begin(long baud);
     void end();
 
+    void setTimeout(long timeMs) { UNUSED(timeMs); }
+
     // sends a command for processing
     void transmit(const char *data);
 
