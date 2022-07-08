@@ -58,6 +58,9 @@
 
 #include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino
 
+// ODrive servo motor serial driver
+extern ODriveArduino *_oDriveDriver;
+
 typedef struct ODriveDriverSettings {
   int16_t model;
   int8_t  status;
@@ -122,7 +125,7 @@ class ODriveMotor : public Motor {
 //    if (motor_number == 0) o_position0 = position;
 //    if (motor_number == 1) o_position1 = position;
       char command[32];
-      sprintF(command, "p n %1.8f 0.0 0.0", position);
+      sprintF(command, "p n %1.8f\n", position);
       command[2] = '0' + motor_number;
       ODRIVE_SERIAL.println(command);
     }
