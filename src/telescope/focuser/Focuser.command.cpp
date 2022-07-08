@@ -246,7 +246,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] >= '1' && command[1] <= '4') {
       int p[] = {1, 10, 250, 5000};
-      moveRate[index] = p[command[1] - '1'];
+      if (strlen(parameter) == 0) moveRate[index] = p[command[1] - '1']; else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
 
@@ -274,7 +274,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FR[sn]#   Move focuser target position relative (in microns or steps)
     //            Returns: Nothing
     if (toupper(command[1]) == 'R') {
-      *commandError = gotoTarget(index, target[index] + atol(parameter)*UnitsToSteps);
+      if (strlen(parameter) > 0) *commandError = gotoTarget(index, target[index] + atol(parameter)*UnitsToSteps); else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
 
@@ -282,7 +282,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'S') {
-      *commandError = gotoTarget(index, atol(parameter)*UnitsToSteps);
+      if (strlen(parameter) > 0) *commandError = gotoTarget(index, atol(parameter)*UnitsToSteps); else *commandError = CE_PARAM_FORM; 
     } else
 
     // :FZ#       Set focuser position as zero
