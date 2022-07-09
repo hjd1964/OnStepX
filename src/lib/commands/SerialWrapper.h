@@ -11,8 +11,8 @@
   #if ST4_INTERFACE == ON && ST4_HAND_CONTROL == ON
     #include "../serial/Serial_ST4_Master.h"
   #endif
-  #include "../serial/Serial_Local.h"
 #endif
+#include "../serial/Serial_Local.h"
 
 static uint8_t _wrapper_channels = 0;
 
