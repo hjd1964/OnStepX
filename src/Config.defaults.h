@@ -51,7 +51,7 @@
 
 // ESP32 virtual serial bluetooth command channel
 #ifndef SERIAL_BT_MODE
-#define SERIAL_BT_MODE                OFF                         // use STATION to enable the interface (ESP32 only)
+#define SERIAL_BT_MODE                OFF                         // use SLAVE to enable the interface (ESP32 only)
 #endif
 #ifndef SERIAL_BT_NAME
 #define SERIAL_BT_NAME                "OnStep"                    // Bluetooth name of command channel
@@ -59,22 +59,24 @@
 
 // ESP32 virtual serial IP command channels
 #ifndef SERIAL_IP_MODE
-#define SERIAL_IP_MODE                OFF                         // use ACCESS_POINT or STATION to enable the interface (ESP32 only)
+#define SERIAL_IP_MODE                OFF                         // use settings shown below to enable the interface
 #endif
 #ifndef SERIAL_SERVER
 #define SERIAL_SERVER                 BOTH                        // STANDARD (port 9999) or PERSISTENT (ports 9996 to 9998)
 #endif
 
 // translate Config.h IP settings into low level library settings
-#if SERIAL_IP_MODE == ACCESS_POINT
+#if SERIAL_IP_MODE == ETHERNET_W5500
+#define OPERATIONAL_MODE ETHERNET_W5500
+#elif SERIAL_IP_MODE == ETHERNET_W5100
+#define OPERATIONAL_MODE ETHERNET_W5100
+#elif SERIAL_IP_MODE == WIFI_AP
 #define OPERATIONAL_MODE WIFI
 #define AP_ENABLED true
-#endif
-#if SERIAL_IP_MODE == STATION
+#elif SERIAL_IP_MODE == WIFI_STATION
 #define OPERATIONAL_MODE WIFI
 #define STA_ENABLED true
-#endif
-#if SERIAL_IP_MODE == BOTH
+#elif SERIAL_IP_MODE == BOTH
 #define OPERATIONAL_MODE WIFI
 #define AP_ENABLED true
 #define STA_ENABLED true
@@ -109,16 +111,16 @@
 #define STA_PASSWORD                  "password"                  // Wifi Station mode password
 #endif
 #ifndef STA_DHCP_ENABLED
-#define STA_DHCP_ENABLED              false                       // true to use LAN DHCP addresses
+#define STA_DHCP_ENABLED              false                       // Wifi Station/Ethernet DHCP enabled
 #endif
 #ifndef STA_IP_ADDR
-#define STA_IP_ADDR                   {192,168,0,2}               // Wifi Station IP Address
+#define STA_IP_ADDR                   {192,168,0,2}               // Wifi Station/Ethernet IP Address
 #endif
 #ifndef STA_GW_ADDR
-#define STA_GW_ADDR                   {192,168,0,1}               // Wifi Station GATEWAY Address
+#define STA_GW_ADDR                   {192,168,0,1}               // Wifi Station/Ethernet GATEWAY Address
 #endif
 #ifndef STA_SN_MASK
-#define STA_SN_MASK                   {255,255,255,0}             // Wifi Station SUBNET Mask
+#define STA_SN_MASK                   {255,255,255,0}             // Wifi Station/Ethernet SUBNET Mask.
 #endif
 
 // sensors

@@ -8,22 +8,21 @@
 #define ALT                         -3
 #define AUX                         -4
 #define SLAVE                       -5
-#define ACCESS_POINT                -6
-#define STATION                     -7
-#define STATION_DHCP                -8
-#define BOTH                        -9
-#define SoftSerial                  -10
-#define HardSerial                  -11
-#define CONSOLE                     -12
-#define PROFILER                    -13
-#define VERBOSE                     -14
-#define REMOTE                      -15
-#define WIFI                        -16
-#define ETHERNET_W5100              -17
-#define ETHERNET_W5500              -18
-#define SHARED                      -19
-#define STANDARD                    -20
-#define PERSISTENT                  -21
+#define BOTH                        -6
+#define SoftSerial                  -7
+#define HardSerial                  -8
+#define CONSOLE                     -9
+#define PROFILER                    -10
+#define VERBOSE                     -11
+#define REMOTE                      -12
+#define ETHERNET_W5100              -13
+#define ETHERNET_W5500              -14
+#define WIFI                        -15
+#define WIFI_AP                     -16    // shorthand for easy WIFI mode settings
+#define WIFI_STATION                -17    // shorthand for easy WIFI mode settings
+#define SHARED                      -18
+#define STANDARD                    -19
+#define PERSISTENT                  -20
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
