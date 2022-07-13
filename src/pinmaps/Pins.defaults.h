@@ -3,7 +3,7 @@
 #pragma once
 
 // --------------------------------------------------------------------------------------------------------
-// Serial and I2C interface pins
+// Serial, SPI, and I2C interface pins
 
 // usually the default serial port
 #if SERIAL_A_BAUD_DEFAULT != OFF
@@ -30,6 +30,11 @@
 #define SERIAL_TMC_TX               11             // Transmit data
 #define SERIAL_TMC_RX               12             // Recieving data
 */
+
+// pin# for controlling the reset of W5500 so it comes up properly
+#ifndef ETHERNET_RESET_PIN
+#define ETHERNET_RESET_PIN          OFF
+#endif
 
 // Specify the default I2C pins (if they can be set via the HAL)
 #ifndef I2C_SDA_PIN
