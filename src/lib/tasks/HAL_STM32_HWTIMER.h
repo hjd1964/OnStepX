@@ -37,28 +37,29 @@
 #define TIMER_CHANNEL      1         // always use timer channel 1
 #define F_COMP             4000000   // timer clocks at 4MHz
 
+// search "TIMER_TONE" in github.com/stm32duino/Arduino_Core_STM32/blob/main/variants to find the timer use
 #if defined(STM32F401xC) || defined(STM32F411xE)
-  #define STM32_TIMER1       TIM4    // for STM32F401 and STM32F411
+  #define STM32_TIMER1       TIM11   // for STM32F401 and STM32F411 (tone uses timer10, servo uses timer11)
   #define STM32_TIMER2       TIM9
-  #define STM32_TIMER3       TIM11
-  #define STM32_TIMER4       TIMX
+  #define STM32_TIMER3       TIM4    // same use as prior to this point (but different order)
+  #define STM32_TIMER4       TIM5
 #elif defined(STM32F446xx)
-  #define STM32_TIMER1       TIM1    // for STM32F446
-  #define STM32_TIMER2       TIM10
-  #define STM32_TIMER3       TIM11
-  #define STM32_TIMER4       TIMX
+  #define STM32_TIMER1       TIM14   // for STM32F446 (tone uses timer6, servo uses timer2, serial uses timer7)
+  #define STM32_TIMER2       TIM13
+  #define STM32_TIMER3       TIM12   // new timers was TIM1, TIM10, TIM11
+  #define STM32_TIMER4       TIM11
 #elif defined(STM32F303xC)
-  #define STM32_TIMER1       TIM15   // for STM32F303
+  #define STM32_TIMER1       TIM17   // for STM32F303 (tone uses timer6, servo uses timer2)
   #define STM32_TIMER2       TIM16
-  #define STM32_TIMER3       TIM17
-  #define STM32_TIMER4       TIMX
+  #define STM32_TIMER3       TIM15   // same use as prior to this point (but different order)
+  #define STM32_TIMER4       TIM7
 #elif defined(STM32F103xB)
-  #define STM32_TIMER1       TIM1    // for STM32F103
-  #define STM32_TIMER2       TIM2
-  #define STM32_TIMER3       TIM4
-  #define STM32_TIMER4       TIMX
+  #define STM32_TIMER1       TIM4    // for STM32F103 (tone uses timer3, servo uses timer2)
+  #define STM32_TIMER2       TIM2    // don't use the tone() function
+  #define STM32_TIMER3       TIM1    // same use as prior to this point (but different order)
+  #define STM32_TIMER4       TIM3
 #endif
- 
+
 #ifdef TASKS_HWTIMER1_ENABLE
   HardwareTimer *hwtimer1 = new HardwareTimer(STM32_TIMER1);
 
