@@ -387,14 +387,14 @@ void StepDirDriver::updateStatus() {
               (status.standstill            != lastStatus.standstill) ||
               (status.fault                 != lastStatus.fault)) {
             VF("MSG: StepDir"); V(axisNumber); VF(", status change ");
-            VF("SGA"); if (status.outputA.shortToGround) VF("! "); else VF(". "); 
-            VF("OLA"); if (status.outputA.openLoad) VF("! "); else VF(". "); 
-            VF("SGB"); if (status.outputB.shortToGround) VF("! "); else VF(". "); 
-            VF("OLB"); if (status.outputB.openLoad) VF("! "); else VF(". "); 
-            VF("OTP"); if (status.overTemperaturePreWarning) VF("! "); else VF(". "); 
-            VF("OTE"); if (status.overTemperature) VF("! "); else VF(". "); 
-            VF("SST"); if (status.standstill) VF("! "); else VF(". "); 
-            VF("FLT"); if (status.fault) VLF("!"); else VLF("."); 
+            VF("SGA"); if (status.outputA.shortToGround) VF("◄ "); else VF(". "); 
+            VF("OLA"); if (status.outputA.openLoad) VF("◄ "); else VF(". "); 
+            VF("SGB"); if (status.outputB.shortToGround) VF("◄ "); else VF(". "); 
+            VF("OLB"); if (status.outputB.openLoad) VF("◄ "); else VF(". "); 
+            VF("OTP"); if (status.overTemperaturePreWarning) VF("◄ "); else VF(". "); 
+            VF("OTE"); if (status.overTemperature) VF("◄ "); else VF(". "); 
+            VF("SST"); if (status.standstill) VF("◄ "); else VF(". "); 
+            VF("FLT"); if (status.fault) VLF("◄"); else VLF("."); 
           }
           lastStatus = status;
         #endif
