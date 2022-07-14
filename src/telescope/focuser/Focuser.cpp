@@ -473,7 +473,6 @@ void Focuser::monitor() {
     bool out = sense.isOn(outButtonHandle);
 
     if (in && out) { in = false; out = false; }
-    if (!in && !out) return;
 
     // press state changed?
     if (sense.changed(inButtonHandle)) {
