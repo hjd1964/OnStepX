@@ -18,7 +18,7 @@
 #define ETHERNET_W5100              -13
 #define ETHERNET_W5500              -14
 #define WIFI                        -15
-#define WIFI_AP                     -16    // shorthand for easy WIFI mode settings
+#define WIFI_ACCESS_POINT           -16    // shorthand for easy WIFI mode settings
 #define WIFI_STATION                -17    // shorthand for easy WIFI mode settings
 #define SHARED                      -18
 #define STANDARD                    -19
