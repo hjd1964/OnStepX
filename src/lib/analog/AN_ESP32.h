@@ -3,8 +3,9 @@
 #pragma once
 
 #include "Arduino.h"
+#include "../../Common.h"
 
-#if defined(ESP32) && !(defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32C3))
+#if defined(ESP32) && !defined(ESP32_HAS_ANALOG)
     // starts tone on the specified pin of frequency (Hz) for the duration (in ms)
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin

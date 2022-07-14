@@ -52,11 +52,24 @@
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
-#define HAL_INIT() { \
-  analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
-  SERIAL_BT_BEGIN(); \
-  if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, HAL_WIRE_CLOCK); \
-}
+#ifdef ESP32_HAS_ANALOG
+  #define HAL_INIT() { \
+    SERIAL_BT_BEGIN(); \
+    if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
+      HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
+      HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+    } \
+  }
+#else
+  #define HAL_INIT() { \
+    analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+    SERIAL_BT_BEGIN(); \
+    if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
+      HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
+      HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+    } \
+  }
+#endif
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
