@@ -72,7 +72,12 @@ class Focuser {
 
     // poll focusers to handle parking and TCF
     void monitor();
-  
+
+    // poll focuser buttons to start/stop movement
+    #if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
+      void buttons();
+    #endif
+
   private:
 
     // get focuser temperature in deg. C
@@ -147,6 +152,11 @@ class Focuser {
 
     // the default focuser is the first found
     int active = -1;
+
+    #if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
+      uint8_t inButtonHandle = 0;
+      uint8_t outButtonHandle = 0;
+    #endif
 };
 
 #if AXIS4_DRIVER_MODEL != OFF

@@ -9,6 +9,7 @@
 #include "../../libApp/weather/Weather.h"
 #include "../../libApp/temperature/Temperature.h"
 #include "../Telescope.h"
+#include "../../lib/sense/Sense.h"
 
 typedef struct FocuserConfiguration {
   bool present;
@@ -41,6 +42,10 @@ const FocuserConfiguration configuration[] = {
 };
 
 void focWrapper() { focuser.monitor(); }
+
+#if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
+void focButtonsWrapper() { focuser.buttons(); }
+#endif
 
 // setup arrays for easy access to focuser axes
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
@@ -151,6 +156,24 @@ void Focuser::init() {
   // start task for temperature compensated focusing
   VF("MSG: Focusers, starting TCF task (rate 1s priority 6)... ");
   if (tasks.add(1000, 0, true, 6, focWrapper, "FocPoll")) { VLF("success"); } else { VLF("FAILED!"); }
+
+  // start task for monitor for focuser buttons
+  #if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
+    if (FOCUSER_BUTTON_FOCUSER_INDEX - 1 < 0 ||
+        FOCUSER_BUTTON_FOCUSER_INDEX - 1 >= FOCUSER_MAX ||
+        axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1] == NULL) {
+      VLF("WRN: Focusers, starting button monitor failed invalid FOCUSER_BUTTON_FOCUSER_INDEX");
+      return;
+    }
+
+    VF("MSG: Focusers, starting button monitor task (rate 10ms priority 6)... ");
+    if (tasks.add(10, 0, true, 6, focButtonsWrapper, "FocBtns")) {
+      VLF("success");
+      VLF("Focusers, adding any in and out button senses");
+      inButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_IN_PIN, FOCUSER_BUTTON_SENSE_ON_STATE, FOCUSER_BUTTON_SENSE_IN);
+      outButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_OUT_PIN, FOCUSER_BUTTON_SENSE_ON_STATE, FOCUSER_BUTTON_SENSE_OUT);
+    } else { VLF("FAILED!"); }
+  #endif
 }
 
 // get focuser temperature in deg. C
@@ -442,6 +465,31 @@ void Focuser::monitor() {
     }
   }
 }
+
+// poll focuser buttons to start/stop movement
+#if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
+  void Focuser::buttons() {
+    bool in = sense.isOn(inButtonHandle);
+    bool out = sense.isOn(outButtonHandle);
+
+    if (in && out) { in = false; out = false; }
+    if (!in && !out) return;
+
+    // press state changed?
+    if (sense.changed(inButtonHandle)) {
+      if (in) {
+        if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
+        slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_FORWARD);
+      } else axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
+    } else
+    if (sense.changed(outButtonHandle)) {
+      if (out) {
+        if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
+        slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_REVERSE);
+      } else axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
+    }
+  }
+#endif
 
 Focuser focuser;
 

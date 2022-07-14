@@ -768,6 +768,28 @@
 #endif
 
 // -----------------------------------------------------------------------------------
+// focuser settings, all
+
+#ifndef FOCUSER_TEMPERATURE
+#define FOCUSER_TEMPERATURE           OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
+#endif
+#ifndef FOCUSER_BUTTON_SENSE_OUT
+#define FOCUSER_BUTTON_SENSE_OUT      OFF                         // moves focuser out
+#endif
+#ifndef FOCUSER_BUTTON_SENSE_IN
+#define FOCUSER_BUTTON_SENSE_IN       OFF                         // moves focuser in
+#endif
+#ifndef FOCUSER_BUTTON_SENSE_ON_STATE
+#define FOCUSER_BUTTON_SENSE_ON_STATE LOW
+#endif
+#ifndef FOCUSER_BUTTON_FOCUSER_INDEX
+#define FOCUSER_BUTTON_FOCUSER_INDEX  1                           // which focuser to associate pushbutton control with (1 to 6)
+#endif
+#ifndef FOCUSER_BUTTON_MOVE_RATE
+#define FOCUSER_BUTTON_MOVE_RATE      0                           // focuser button move rate, 0 uses last set or specify fixed rate in um/sec
+#endif
+
+// -----------------------------------------------------------------------------------
 // focuser settings, FOCUSER1
 #ifndef AXIS4_DRIVER_MODEL
 #define AXIS4_DRIVER_MODEL            OFF                         // specify a driver to enable
@@ -1536,9 +1558,6 @@
   #endif
 #endif
 
-#ifndef FOCUSER_TEMPERATURE
-#define FOCUSER_TEMPERATURE             OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
-#endif
 #if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \
     defined(AXIS4_DRIVER_PRESENT) || defined(AXIS5_DRIVER_PRESENT) || defined(AXIS6_DRIVER_PRESENT) || \
     defined(AXIS7_DRIVER_PRESENT) || defined(AXIS8_DRIVER_PRESENT) || defined(AXIS9_DRIVER_PRESENT)
