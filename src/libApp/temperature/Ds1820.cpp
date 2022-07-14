@@ -55,7 +55,10 @@ bool Ds1820::init() {
         #if DEBUG == VERBOSE
           detected = true;
           if (addressfound[0] == 0x10) { VF("DS18S20: 0x"); } else { VF("DS18B20: 0x"); }
-          for (int j = 0; j < 8; j++) { if (addressfound[j] < 16) { V("0"); } SERIAL_DEBUG.print(addressfound[j], HEX); }
+          for (int j = 0; j < 8; j++) {
+            if (addressfound[j] < 16) { V("0"); }
+            if (DEBUG != OFF) SERIAL_DEBUG.print(addressfound[j], HEX);
+          }
           if (search) {
             if (index == 1) { VF(" auto-assigned to FOCUSER_TEMPERATURE"); } else
             if (index <= 9) { VF(" auto-assigned to FEATURE"); V(index - 1); V("_TEMP"); } else { VF(" not assigned"); }
