@@ -3,6 +3,7 @@
 
 // provides four 16 bit timers (Timer1, Timer3, Timer4, Timer5) with 16 bit software pre-scalers, running at 2MHz
 // each timer configured as ~0 to 0.032 seconds (granularity of timer is 0.5uS) /8  pre-scaler
+// note that timer use my collide with PWM or tone() depending on which pin is being controlled
 
 #define TIMER_RATE_MHZ          2L    // Mega2560 motor timers run at 2 MHz
 #define TIMER_RATE_16MHZ_TICKS  8L    // 16L/TIMER_RATE_MHZ, 8x slower than the default 16MHz "sub-micros"

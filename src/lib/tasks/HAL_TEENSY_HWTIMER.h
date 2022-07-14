@@ -3,6 +3,8 @@
 
 // provides four 32 bit pit timers with 16 bit software pre-scalers
 // each timer configured as ~0 to x seconds (granularity of timer is 0.062uS)
+// timer use doesn't collide with PWM or tone() on these platforms
+
 #define F_BUS2 16000000L                              // Pretend the timers are running at 0.062us/tick
 #define TIMER_RATE_MHZ (F_BUS2/1000000.0)             // Teensy PIT timers run at F_BUS Hz but we use the interval timer library
 #define TIMER_RATE_16MHZ_TICKS (16.0/TIMER_RATE_MHZ)  // 16.0/TIMER_RATE_MHZ for the default 16MHz "sub micros"

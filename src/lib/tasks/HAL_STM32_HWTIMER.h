@@ -3,6 +3,8 @@
 
 // provides four 16 bit timers with 16 bit software pre-scalers, running at 4MHz
 // each timer configured as ~0 to 0.032 seconds (granularity of timer is 0.062uS)
+// note that timer use may collide with PWM depending on which pin is being controlled
+// I tried to stay away from tone() and use the most basic timers first where possible
 
 #define TIMER_RATE_MHZ          4L    // STM32 motor timers run at 4 MHz
 #define TIMER_RATE_16MHZ_TICKS  4L    // 16L/TIMER_RATE_MHZ, 4x slower than the default 16MHz "sub micros"

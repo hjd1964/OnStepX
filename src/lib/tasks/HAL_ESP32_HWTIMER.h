@@ -6,6 +6,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 // provides two 32 bit interval timers with 16 bit software pre-scalers, running at 16MHz
 // each timer configured as ~0 to x seconds (granularity of timer is 0.062uS)
+// timer use doesn't collide with PWM or tone() on these platforms
 
 // notes for future improvements:
 // the ESP32 timers flexible enough that we can get rid of the software pre-scalers
