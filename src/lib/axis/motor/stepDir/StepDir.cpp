@@ -7,6 +7,8 @@
 
 #include "../../../tasks/OnTask.h"
 
+extern int _hardwareTimersAllocated;
+
 StepDirMotor *stepDirMotorInstance[9];
 
 #ifndef AXIS1_STEP_PIN
@@ -80,6 +82,9 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pi
   driverType = STEP_DIR;
   this->axisNumber = axisNumber;
   this->Pins = Pins;
+  #ifdef SHARED_DIRECTION_PINS
+    if (axisNumber > 2) useFastHardwareTimers = false;
+  #endif
   this->useFastHardwareTimers = useFastHardwareTimers;
 
   driver = new StepDirDriver(axisNumber, Pins, Settings);
@@ -143,7 +148,14 @@ bool StepDirMotor::init() {
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     V("success");
-    if (axisNumber <= 2 && useFastHardwareTimers) { if (!tasks.requestHardwareTimer(taskHandle, axisNumber, 0)) { VF(" (no hardware timer!)"); } }
+    if (useFastHardwareTimers && _hardwareTimersAllocated < TASKS_HWTIMER_MAX) {
+      if (tasks.requestHardwareTimer(taskHandle, _hardwareTimersAllocated + 1, 0)) {
+        _hardwareTimersAllocated++;
+        VF(" (hardware timer)");
+      } else {
+        VF(" (no hardware timer!)");
+      }
+    }
     VL("");
   } else { VLF("FAILED!"); return false; }
 

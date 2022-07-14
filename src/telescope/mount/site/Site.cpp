@@ -133,7 +133,7 @@ void Site::init() {
   handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (handle) {
     VLF("success"); 
-    if (!tasks.requestHardwareTimer(handle, 3, 1)) { DLF("WRN: Site::init(), didn't get h/w timer for Clock (using s/w timer)"); }
+    if (!tasks.requestHardwareTimer(handle, 1, 1)) { DLF("WRN: Site::init(), didn't get h/w timer for Clock (using s/w timer)"); }
   } else { VLF("FAILED!"); }
 
   setSiderealPeriod(SIDEREAL_PERIOD);

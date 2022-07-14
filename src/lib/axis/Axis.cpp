@@ -8,6 +8,10 @@
 
 #ifdef MOTOR_PRESENT
 
+// there are four hardware timers possible in OnTask #1,2,3,4
+// this keeps track of which have been allocated in the Axis class and decendants
+int _hardwareTimersAllocated = AXIS_HARDWARE_TIMER_BASE - 1;
+
 Axis *axisWrapper[9];
 IRAM_ATTR void axisWrapper1() { axisWrapper[0]->poll(); }
 IRAM_ATTR void axisWrapper2() { axisWrapper[1]->poll(); }

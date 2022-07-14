@@ -6,6 +6,11 @@
 
 #ifdef MOTOR_PRESENT
 
+// default start of axis class hardware timers
+#ifndef AXIS_HARDWARE_TIMER_BASE
+#define AXIS_HARDWARE_TIMER_BASE    1
+#endif
+
 // default location of settings in NV
 #ifndef NV_AXIS_SETTINGS_REVERT
 #define NV_AXIS_SETTINGS_REVERT     100    // bytes: 2   , addr:  100.. 101
