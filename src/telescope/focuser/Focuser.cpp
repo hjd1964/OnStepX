@@ -469,23 +469,19 @@ void Focuser::monitor() {
 // poll focuser buttons to start/stop movement
 #if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
   void Focuser::buttons() {
-    bool in = sense.isOn(inButtonHandle);
-    bool out = sense.isOn(outButtonHandle);
-
-    if (in && out) { in = false; out = false; }
-
-    // press state changed?
-    if (sense.changed(inButtonHandle)) {
+    if (sense.changed(inButtonHandle) || sense.changed(outButtonHandle)) {
+      bool in = sense.isOn(inButtonHandle);
+      bool out = sense.isOn(outButtonHandle);
+      if (in && out) { in = false; out = false; }
       if (in) {
         if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
         slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_FORWARD);
-      } else axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
-    } else
-    if (sense.changed(outButtonHandle)) {
+      } else
       if (out) {
         if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
         slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_REVERSE);
-      } else axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
+      } else
+        axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
     }
   }
 #endif
