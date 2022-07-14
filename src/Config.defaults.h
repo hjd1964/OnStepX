@@ -1539,10 +1539,6 @@
 #ifndef FOCUSER_TEMPERATURE
 #define FOCUSER_TEMPERATURE             OFF                         // activate and set focuser sensor type DS18B20, THERMISTOR, etc.
 #endif
-#ifndef FOCUSER_TEMPERATURE_PIN
-#define FOCUSER_TEMPERATURE_PIN         OFF                         // for thermistors, analog pin
-#endif
-
 #if defined(AXIS1_DRIVER_PRESENT) || defined(AXIS2_DRIVER_PRESENT) || defined(AXIS3_DRIVER_PRESENT) || \
     defined(AXIS4_DRIVER_PRESENT) || defined(AXIS5_DRIVER_PRESENT) || defined(AXIS6_DRIVER_PRESENT) || \
     defined(AXIS7_DRIVER_PRESENT) || defined(AXIS8_DRIVER_PRESENT) || defined(AXIS9_DRIVER_PRESENT)
@@ -1587,9 +1583,6 @@
 #ifndef FEATURE1_TEMP
 #define FEATURE1_TEMP                 OFF                         // temperature sensor, thermistor or DS1820
 #endif
-#ifndef FEATURE1_TEMPERATURE_PIN
-#define FEATURE1_TEMPERATURE_PIN             OFF                         // for thermistors, analog pin
-#endif
 #ifndef FEATURE1_PIN
 #define FEATURE1_PIN                  OFF                         // OUTPUT control pin
 #endif
@@ -1608,9 +1601,6 @@
 #endif
 #ifndef FEATURE2_TEMP
 #define FEATURE2_TEMP                 OFF
-#endif
-#ifndef FEATURE2_TEMPERATURE_PIN
-#define FEATURE2_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE2_PIN
 #define FEATURE2_PIN                  OFF
@@ -1631,9 +1621,6 @@
 #ifndef FEATURE3_TEMP
 #define FEATURE3_TEMP                 OFF
 #endif
-#ifndef FEATURE3_TEMPERATURE_PIN
-#define FEATURE3_TEMPERATURE_PIN             OFF
-#endif
 #ifndef FEATURE3_PIN
 #define FEATURE3_PIN                  OFF
 #endif
@@ -1652,9 +1639,6 @@
 #endif
 #ifndef FEATURE4_TEMP
 #define FEATURE4_TEMP                 OFF
-#endif
-#ifndef FEATURE4_TEMPERATURE_PIN
-#define FEATURE4_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE4_PIN
 #define FEATURE4_PIN                  OFF
@@ -1675,9 +1659,6 @@
 #ifndef FEATURE5_TEMP
 #define FEATURE5_TEMP                 OFF
 #endif
-#ifndef FEATURE5_TEMPERATURE_PIN
-#define FEATURE5_TEMPERATURE_PIN             OFF
-#endif
 #ifndef FEATURE5_PIN
 #define FEATURE5_PIN                  OFF
 #endif
@@ -1696,9 +1677,6 @@
 #endif
 #ifndef FEATURE6_TEMP
 #define FEATURE6_TEMP                 OFF
-#endif
-#ifndef FEATURE6_TEMPERATURE_PIN
-#define FEATURE6_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE6_PIN
 #define FEATURE6_PIN                  OFF
@@ -1719,9 +1697,6 @@
 #ifndef FEATURE7_TEMP
 #define FEATURE7_TEMP                 OFF
 #endif
-#ifndef FEATURE7_TEMPERATURE_PIN
-#define FEATURE7_TEMPERATURE_PIN             OFF
-#endif
 #ifndef FEATURE7_PIN
 #define FEATURE7_PIN                  OFF
 #endif
@@ -1740,9 +1715,6 @@
 #endif
 #ifndef FEATURE8_TEMP
 #define FEATURE8_TEMP                 OFF
-#endif
-#ifndef FEATURE8_TEMPERATURE_PIN
-#define FEATURE8_TEMPERATURE_PIN             OFF
 #endif
 #ifndef FEATURE8_PIN
 #define FEATURE8_PIN                  OFF
