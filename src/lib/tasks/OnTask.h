@@ -36,6 +36,25 @@
   #define IRAM_ATTR
 #endif
 
+// this design supports up to four hardware timers, though not all may be present
+#ifdef TASKS_HWTIMER4_ENABLE
+  #define TASKS_HWTIMER_MAX 4
+#else
+  #ifdef TASKS_HWTIMER3_ENABLE
+    #define TASKS_HWTIMER_MAX 3
+  #else
+    #ifdef TASKS_HWTIMER2_ENABLE
+      #define TASKS_HWTIMER_MAX 2
+    #else
+      #ifdef TASKS_HWTIMER1_ENABLE
+        #define TASKS_HWTIMER_MAX 1
+      #else
+        #define TASKS_HWTIMER_MAX 0
+      #endif
+    #endif
+  #endif
+#endif
+
 // default provision is for 8 tasks, up to 255 are allowed, to change use:
 // #define TASKS_MAX 200 (for example)
 #ifndef TASKS_MAX
