@@ -43,7 +43,7 @@
 // Firmware version ----------------------------------------------------------------------------------------------------------------
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
-#define FirmwareVersionMinor        08     // minor version 00 to 99
+#define FirmwareVersionMinor        8      // minor version 00 to 99
 #define FirmwareVersionPatch        "a"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       5      // internal, for tracking configuration file changes
 
