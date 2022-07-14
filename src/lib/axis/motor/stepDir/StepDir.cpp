@@ -340,214 +340,141 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
   }
 #endif
 
-#if STEP_WAVE_FORM == SQUARE
-  IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
-    #ifdef GPIO_DIRECTION_PINS
-      if (direction > DirNone) return;
-    #endif
+IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
+  #if STEP_WAVE_FORM == PULSE
+    digitalWriteF(stepPin, stepClr);
+  #endif
 
-    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
-      microstepModeControl = MMC_SLEWING_PAUSE;
-      tasks.immediate(monitorHandle);
-    }
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
+  #ifdef GPIO_DIRECTION_PINS
+    if (direction > DirNone) return;
+  #endif
 
-    if (takeStep) {
-      if (direction == dirRev) {
-        if (backlashSteps > 0) {
-          backlashSteps--;
-          inBacklash = backlashSteps > 0;
-        } else {
-          motorSteps--;
-          inBacklash = false;
-        }
-        digitalWriteF(stepPin, stepSet);
-      } else
-      if (direction == dirFwd) {
-        if (backlashSteps < backlashAmountSteps) {
-          backlashSteps++;
-          inBacklash = backlashSteps < backlashAmountSteps;
-        } else {
-          motorSteps++;
-          inBacklash = false;
-        }
-
-        #ifdef SHARED_DIRECTION_PINS
-          if (axisNumber > 2) {
-            digitalWriteF(Pins->dir, direction);
-            delayNanoseconds(pulseWidth);
-          }
-        #endif
-
-        digitalWriteF(stepPin, stepSet);
-      }
-    } else {
-      if (synchronized && !inBacklash) targetSteps += step;
-      if (motorSteps > targetSteps) {
-        if (direction != dirRev) {
-          #ifdef GPIO_DIRECTION_PINS
-            direction = DirSetRev;
-          #else
-            direction = dirRev;
-            digitalWriteF(Pins->dir, dirRev);
-          #endif
-        }
-      } else
-      if (motorSteps < targetSteps) {
-        if (direction != dirFwd) {
-          #ifdef GPIO_DIRECTION_PINS
-            direction = DirSetFwd;
-          #else
-            direction = dirFwd;
-            digitalWriteF(Pins->dir, dirFwd);
-          #endif
-        }
-      } else {
-        if (!inBacklash) direction = DirNone;
-      }
-
-      digitalWriteF(stepPin, stepClr);
-    }
-
-    takeStep = !takeStep;
+  if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
+    microstepModeControl = MMC_SLEWING_PAUSE;
+    tasks.immediate(monitorHandle);
   }
+  if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
 
-  IRAM_ATTR void StepDirMotor::moveFF(const int16_t stepPin) {
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
-
+  #if STEP_WAVE_FORM == SQUARE
     if (takeStep) {
-      if (synchronized) targetSteps += stepSize;
-      if (motorSteps < targetSteps) {
-        motorSteps += stepSize;
-        digitalWriteF(stepPin, stepSet);
-      }
+  #endif
+
+  long lastTargetSteps = targetSteps;
+  if (synchronized && !inBacklash) targetSteps += step;
+
+  if (motorSteps > targetSteps) {
+    if (direction != dirRev) {
+      targetSteps = lastTargetSteps;
+      #ifdef GPIO_DIRECTION_PINS
+        direction = DirSetRev;
+      #else
+        direction = dirRev;
+        digitalWriteF(Pins->dir, dirRev);
+      #endif
+      return;
+    }
+
+    if (backlashSteps > 0) {
+      backlashSteps--;
+      inBacklash = backlashSteps > 0;
+    } else {
+      motorSteps--;
+      inBacklash = false;
+    }
+
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { digitalWriteF(Pins->dir, direction); delayNanoseconds(pulseWidth); }
+    #endif
+    digitalWriteF(stepPin, stepSet);
+  } else
+
+  if (motorSteps < targetSteps) {
+    if (direction != dirFwd) {
+      targetSteps = lastTargetSteps;
+      #ifdef GPIO_DIRECTION_PINS
+        direction = DirSetFwd;
+      #else
+        direction = dirFwd;
+        digitalWriteF(Pins->dir, dirFwd);
+      #endif
+      return;
+    }
+
+    if (backlashSteps < backlashAmountSteps) {
+      backlashSteps++;
+      inBacklash = backlashSteps < backlashAmountSteps;
+    } else {
+      motorSteps++;
+      inBacklash = false;
+    }
+
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { digitalWriteF(Pins->dir, direction); delayNanoseconds(pulseWidth); }
+    #endif
+    digitalWriteF(stepPin, stepSet);
+
+  } else if (!inBacklash) direction = DirNone;
+
+  #if STEP_WAVE_FORM == SQUARE
     } else digitalWriteF(stepPin, stepClr);
     takeStep = !takeStep;
+  #endif
+}
+
+IRAM_ATTR void StepDirMotor::moveFF(const int16_t stepPin) {
+  #if STEP_WAVE_FORM == PULSE
+    digitalWriteF(stepPin, stepClr);
+  #endif
+
+  if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
+
+  #if STEP_WAVE_FORM == SQUARE
+    if (takeStep) {
+  #endif
+
+  if (synchronized) targetSteps += stepSize;
+
+  if (motorSteps < targetSteps) {
+    motorSteps += stepSize;
+
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { digitalWriteF(Pins->dir, direction); delayNanoseconds(pulseWidth); }
+    #endif
+    digitalWriteF(stepPin, stepSet);
   }
 
-  IRAM_ATTR void StepDirMotor::moveFR(const int16_t stepPin) {
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
-
-    if (takeStep) {
-      if (synchronized) targetSteps -= stepSize;
-      if (motorSteps > targetSteps) {
-        motorSteps -= stepSize;
-        digitalWriteF(stepPin, stepSet);
-      }
+  #if STEP_WAVE_FORM == SQUARE
     } else digitalWriteF(stepPin, stepClr);
     takeStep = !takeStep;
-  }
-#else
+  #endif
+}
 
-  IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
+IRAM_ATTR void StepDirMotor::moveFR(const int16_t stepPin) {
+  #if STEP_WAVE_FORM == PULSE
     digitalWriteF(stepPin, stepClr);
+  #endif
 
-    #ifdef GPIO_DIRECTION_PINS
-      if (direction > DirNone) return;
+  if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
+
+  #if STEP_WAVE_FORM == SQUARE
+    if (takeStep) {
+  #endif
+
+  if (synchronized) targetSteps -= stepSize;
+
+  if (motorSteps > targetSteps) {
+    motorSteps -= stepSize;
+
+    #ifdef SHARED_DIRECTION_PINS
+      if (axisNumber > 2) { digitalWriteF(Pins->dir, direction); delayNanoseconds(pulseWidth); }
     #endif
-
-    if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
-      microstepModeControl = MMC_SLEWING_PAUSE;
-      tasks.immediate(monitorHandle);
-    }
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
-
-    if (synchronized && !inBacklash) targetSteps += step;
-
-    if (motorSteps > targetSteps) {
-      if (direction != dirRev) {
-        #ifdef GPIO_DIRECTION_PINS
-          direction = DirSetRev;
-        #else
-          direction = dirRev;
-          digitalWriteF(Pins->dir, dirRev);
-          #ifdef SHARED_DIRECTION_PINS
-            if (axisNumber < 3) return;
-          #else
-            return;
-          #endif
-        #endif
-      }
-    } else
-    if (motorSteps < targetSteps) {
-      if (direction != dirFwd) {
-        #ifdef GPIO_DIRECTION_PINS
-          direction = DirSetFwd;
-        #else
-          direction = dirFwd;
-          digitalWriteF(Pins->dir, dirFwd);
-          #ifdef SHARED_DIRECTION_PINS
-            if (axisNumber < 3) return;
-          #else
-            return;
-          #endif
-        #endif
-      }
-    } else {
-      if (!inBacklash) direction = DirNone;
-    }
-
-    if (direction == dirRev) {
-      if (backlashSteps > 0) {
-        backlashSteps--;
-        inBacklash = backlashSteps > 0;
-      } else {
-        motorSteps--;
-        inBacklash = false;
-      }
-
-      #ifdef SHARED_DIRECTION_PINS
-        if (axisNumber > 2) {
-          delayNanoseconds(pulseWidth);
-          direction = DirNone;
-        }
-      #endif
-
-      digitalWriteF(stepPin, stepSet);
-    } else
-    if (direction == dirFwd) {
-      if (backlashSteps < backlashAmountSteps) {
-        backlashSteps++;
-        inBacklash = backlashSteps < backlashAmountSteps;
-      } else {
-        motorSteps++;
-        inBacklash = false;
-      }
-
-      #ifdef SHARED_DIRECTION_PINS
-        if (axisNumber > 2) {
-          delayNanoseconds(pulseWidth);
-          direction = DirNone;
-        }
-      #endif
-
-      digitalWriteF(stepPin, stepSet);
-    }
+    digitalWriteF(stepPin, stepSet);
   }
 
-  IRAM_ATTR void StepDirMotor::moveFF(const int16_t stepPin) {
-    digitalWriteF(stepPin, stepClr);
-
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
-
-    if (synchronized) targetSteps += stepSize;
-    if (motorSteps < targetSteps) {
-      motorSteps += stepSize;
-      digitalWriteF(stepPin, stepSet);
-    }
-  }
-
-  IRAM_ATTR void StepDirMotor::moveFR(const int16_t stepPin) {
-    digitalWriteF(stepPin, stepClr);
-
-    if (microstepModeControl >= MMC_SLEWING_PAUSE) return;
-
-    if (synchronized) targetSteps -= stepSize;
-    if (motorSteps > targetSteps) {
-      motorSteps -= stepSize;
-      digitalWriteF(stepPin, stepSet);
-    }
-  }
-#endif
+  #if STEP_WAVE_FORM == SQUARE
+    } else digitalWriteF(stepPin, stepClr);
+    takeStep = !takeStep;
+  #endif
+}
 
 #endif
