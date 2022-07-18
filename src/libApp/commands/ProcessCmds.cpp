@@ -144,7 +144,7 @@ void CommandProcessor::poll() {
       #endif
     }
     #if DEBUG_ECHO_COMMANDS != OFF
-      DL("");
+      if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) { DL(""); }
     #endif
 
     buffer.flush();
