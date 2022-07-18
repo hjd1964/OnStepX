@@ -79,6 +79,10 @@
 #define STA_ENABLED                 false // normally not enabled
 #endif
 
+#ifndef STA_AUTO_RECONNECT
+#define STA_AUTO_RECONNECT          false // normally not enabled
+#endif
+
 #ifndef STA_HOST_NAME
 #define STA_HOST_NAME               "Home" // Wifi Host Name to connect to
 #endif

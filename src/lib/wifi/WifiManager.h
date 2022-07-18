@@ -64,6 +64,9 @@ class WifiManager {
   public:
     bool init();
     void disconnect();
+    #if STA_AUTO_RECONNECT == true
+      void reconnectStation();
+    #endif
     void setStation(int number);
     void writeSettings();
 
