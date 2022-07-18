@@ -132,16 +132,18 @@ void CommandProcessor::poll() {
     }
 
     // debug, log errors and/or commands
-    #if DEBUG_ECHO_COMMANDS == ON
-      DF("MSG: cmd"); D(channel); D(" = "); D(buffer.getCmd()); D(buffer.getParameter()); DF(", reply = "); D(reply);
+    #if DEBUG_ECHO_COMMANDS != OFF
+      if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) {
+        DF("MSG: cmd"); D(channel); D(" = "); D(buffer.getCmd()); D(buffer.getParameter()); DF(", reply = "); D(reply);
+      }
     #endif
     if (commandError != CE_NULL) {
       lastCommandError = commandError;
-      #if DEBUG_ECHO_COMMANDS == ON
+      #if DEBUG_ECHO_COMMANDS != OFF
         if (commandError > CE_0) { DF(", Error "); D(commandErrorStr[commandError]); }
       #endif
     }
-    #if DEBUG_ECHO_COMMANDS == ON
+    #if DEBUG_ECHO_COMMANDS != OFF
       DL("");
     #endif
 
