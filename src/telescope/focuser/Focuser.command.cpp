@@ -80,7 +80,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
 
     // check that the requested focuser is active
     int i = command[1] - '1';
-    if (i >= 0 && i < FOCUSER_MAX && parameter[0] != 0) {
+    if (i >= 0 && i < 6 && parameter[0] != 0) {
       // if not active return false so other focuser devices may process the command
       if (axes[i] == NULL) return false;
       index = i;
