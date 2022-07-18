@@ -195,6 +195,15 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
     return commandError;
   } else
 
+  // :GE#       Get last command error numeric code
+  //            Returns: CC#
+  if (command[0] == 'G' && command[1] == 'E' && parameter[0] == 0) {
+    sprintf(reply, "%02d", lastCommandError);
+    commandError = CE_NULL;
+    *numericReply = false;
+    return lastCommandError;
+  } else
+
   return CE_CMD_UNKNOWN;
 }
 
