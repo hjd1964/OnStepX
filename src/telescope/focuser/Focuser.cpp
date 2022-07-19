@@ -170,8 +170,8 @@ void Focuser::init() {
     if (tasks.add(10, 0, true, 6, focButtonsWrapper, "FocBtns")) {
       VLF("success");
       VLF("Focusers, adding any in and out button senses");
-      inButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_IN_PIN, FOCUSER_BUTTON_SENSE_ON_STATE, FOCUSER_BUTTON_SENSE_IN);
-      outButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_OUT_PIN, FOCUSER_BUTTON_SENSE_ON_STATE, FOCUSER_BUTTON_SENSE_OUT);
+      inButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_IN_PIN, FOCUSER_BUTTON_SENSE_INIT, FOCUSER_BUTTON_SENSE_IN);
+      outButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_OUT_PIN, FOCUSER_BUTTON_SENSE_INIT, FOCUSER_BUTTON_SENSE_OUT);
     } else { VLF("FAILED!"); }
   #endif
 }

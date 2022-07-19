@@ -782,8 +782,8 @@
 #ifndef FOCUSER_BUTTON_SENSE_IN
 #define FOCUSER_BUTTON_SENSE_IN       OFF                         // moves focuser in
 #endif
-#ifndef FOCUSER_BUTTON_SENSE_ON_STATE
-#define FOCUSER_BUTTON_SENSE_ON_STATE LOW
+#ifndef FOCUSER_BUTTON_SENSE_INIT
+#define FOCUSER_BUTTON_SENSE_INIT     INPUT_PULLUP                // pin mode for focuser buttons
 #endif
 #ifndef FOCUSER_BUTTON_FOCUSER_INDEX
 #define FOCUSER_BUTTON_FOCUSER_INDEX  1                           // which focuser to associate pushbutton control with (1 to 6)
