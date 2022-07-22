@@ -362,7 +362,7 @@ IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
   long lastTargetSteps = targetSteps;
   if (synchronized && !inBacklash) targetSteps += step;
 
-  if (motorSteps > targetSteps) {
+  if (motorSteps > targetSteps || (inBacklash && direction == dirRev)) {
     if (direction != dirRev) {
       targetSteps = lastTargetSteps;
       #ifdef GPIO_DIRECTION_PINS
@@ -388,7 +388,7 @@ IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
     digitalWriteF(stepPin, stepSet);
   } else
 
-  if (motorSteps < targetSteps) {
+  if (motorSteps < targetSteps || (inBacklash && direction == dirFwd)) {
     if (direction != dirFwd) {
       targetSteps = lastTargetSteps;
       #ifdef GPIO_DIRECTION_PINS
