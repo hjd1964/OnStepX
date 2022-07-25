@@ -45,8 +45,8 @@ typedef struct Coordinate {
 // ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
 
 typedef struct AlignCoordinate {
-  float ax1;
-  float ax2;
+  float ax1, ma1;
+  float ax2, ma2;
   float cosA1, sinA1, cosA2, tanA2;
   float h;
   float d;

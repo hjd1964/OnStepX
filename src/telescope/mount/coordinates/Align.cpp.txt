@@ -233,6 +233,8 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
         ma2 = ma2 + ode;
       }
  
+      mount[l].ma1 = ma1;
+      mount[l].ma2 = ma2;
       mount[l].sinA1 = sinf(ma1);
       mount[l].cosA1 = cosf(ma1);
       mount[l].cosA2 = cosf(ma2);
@@ -252,10 +254,10 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
         float ma1r, ma2r;
         correct(mount[l], sf1, _deo, _pd, _pz, _pe, _df, _ff, _tf, &ma1r, &ma2r);
 
-        delta[l].ax1 = actual[l].ax1 - (ma1 - ma1r);
+        delta[l].ax1 = actual[l].ax1 - (mount[l].ma1 - ma1r);
         if (delta[l].ax1 >  Deg180) delta[l].ax1 = delta[l].ax1 - Deg360; else
         if (delta[l].ax1 < -Deg180) delta[l].ax1 = delta[l].ax1 + Deg360;
-        delta[l].ax2 = actual[l].ax2 - (ma2 - ma2r);
+        delta[l].ax2 = actual[l].ax2 - (mount[l].ma2 - ma2r);
         delta[l].side = mount[l].side;
       }
 
