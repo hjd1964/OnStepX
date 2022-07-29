@@ -5,7 +5,8 @@
 #include "Arduino.h"
 #include "../../Common.h"
 
-#if defined(ESP32) && !defined(ESP32_HAS_ANALOG)
+#if defined(ESP32)
+  #if ESP_ARDUINO_VERSION < ESP_ARDUINO_VERSION_VAL(2, 0, 3)
     // starts tone on the specified pin of frequency (Hz) for the duration (in ms)
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin
@@ -17,4 +18,5 @@
     extern void analogWriteResolution(int value);
     // analog pwm frequency (500 to 10000Hz)
     extern void analogWriteFrequency(int value);
+  #endif
 #endif

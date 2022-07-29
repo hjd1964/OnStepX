@@ -7,7 +7,7 @@
 // 1/200 second sidereal timer
 #define HAL_FRACTIONAL_SEC 200.0F
 
-// This platform has 16 bit PWM
+// This platform has 8 bit PWM
 #ifndef ANALOG_WRITE_PWM_BITS
   #define ANALOG_WRITE_PWM_BITS 8
 #endif
@@ -52,8 +52,9 @@
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
-#ifdef ESP32_HAS_ANALOG
+#if ESP_ARDUINO_VERSION < ESP_ARDUINO_VERSION_VAL(2, 0, 3)
   #define HAL_INIT() { \
+    analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
     SERIAL_BT_BEGIN(); \
     if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
       HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
@@ -62,7 +63,6 @@
   }
 #else
   #define HAL_INIT() { \
-    analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
     SERIAL_BT_BEGIN(); \
     if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
       HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
