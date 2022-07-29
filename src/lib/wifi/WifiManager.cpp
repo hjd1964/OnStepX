@@ -95,7 +95,7 @@ bool WifiManager::init() {
     if (settings.accessPointEnabled) WiFi.softAPConfig(ap_ip, ap_gw, ap_sn);
 
     // wait for connection
-    if (settings.stationEnabled) for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
+    if (settings.stationEnabled) { for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break; }
 
     if (settings.stationEnabled && WiFi.status() != WL_CONNECTED) {
 
