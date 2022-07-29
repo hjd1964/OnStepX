@@ -3,7 +3,7 @@
 
 #include "NV_EEPROM.h"
 
-#if !defined(ARDUINO_ARCH_SAMD)
+#if !defined(ARDUINO_ARDUINO_NANO33BLE) && !defined(ARDUINO_ARCH_SAMD) && !defined(ARDUINO_ARCH_MBED_RP2040) && !defined(ARDUINO_ARCH_RP2040)
 
   #include "EEPROM.h"
   
