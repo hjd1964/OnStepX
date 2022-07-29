@@ -9,36 +9,42 @@ void strncpyex(char *result, const char *source, size_t length) {
   result[length - 1] = 0;
 }
 
-void sprintF(char *result, const char *source, double f) {
-  bool ok = false;
-  uint8_t mas = 0, frac = 0, len = 0;
-  char* a;
-  do {
-    a = (char*)strchr(source, '%');
-    if (a == NULL) return;
-    // "%f" form
-    if (a[1] == 'f') { len = 2; ok = true; break; }
-    // "%.2f" form
-    if (a[1] == '.' && a[2] >= '0' && a[2] <= '9' && a[3] == 'f') { frac = a[2] - '0'; len = 4; ok = true; break; }
-    // "%1.2f" form
-    if (a[1] >= '0' && a[1] <= '9' && a[2] == '.' && a[3] >= '0' && a[3] <= '9' && a[4] == 'f') {
-      mas = a[1] - '0';
-      frac = a[3] - '0';
-      len = 5;
-      ok = true;
-      break;
-    }
-  } while (!ok);
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_MBED_RP2040) || defined(ARDUINO_ARCH_RP2040)
+  void sprintF(char *result, const char *source, double f) {
+    sprintf(result, source, f);
+  }
+#else
+  void sprintF(char *result, const char *source, double f) {
+    bool ok = false;
+    uint8_t mas = 0, frac = 0, len = 0;
+    char* a;
+    do {
+      a = (char*)strchr(source, '%');
+      if (a == NULL) return;
+      // "%f" form
+      if (a[1] == 'f') { len = 2; ok = true; break; }
+      // "%.2f" form
+      if (a[1] == '.' && a[2] >= '0' && a[2] <= '9' && a[3] == 'f') { frac = a[2] - '0'; len = 4; ok = true; break; }
+      // "%1.2f" form
+      if (a[1] >= '0' && a[1] <= '9' && a[2] == '.' && a[3] >= '0' && a[3] <= '9' && a[4] == 'f') {
+        mas = a[1] - '0';
+        frac = a[3] - '0';
+        len = 5;
+        ok = true;
+        break;
+      }
+    } while (!ok);
 
-  char s[20];
-  dtostrf(f, mas, frac, s);
+    char s[20];
+    dtostrf(f, mas, frac, s);
 
-  uint8_t j = 0;
-  for (uint8_t i = 0; i < a - source; i++) result[j++] = source[i];
-  for (uint8_t i = 0; i < strlen(s); i++) result[j++] = s[i];
-  for (uint8_t i = len; i < strlen(a); i++) result[j++] = a[i];
-  result[j++] = 0;
-}
+    uint8_t j = 0;
+    for (uint8_t i = 0; i < a - source; i++) result[j++] = source[i];
+    for (uint8_t i = 0; i < strlen(s); i++) result[j++] = s[i];
+    for (uint8_t i = len; i < strlen(a); i++) result[j++] = a[i];
+    result[j++] = 0;
+  }
+#endif
 
 bool Convert::tzToDouble(double *value, char *hm) {
   int16_t sign = 1;
