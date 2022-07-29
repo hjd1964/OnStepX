@@ -39,7 +39,7 @@
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP ( NAN )
+#define HAL_TEMP() ( NAN )
 
 // stand-in for delayNanoseconds()
 #define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))
