@@ -286,7 +286,7 @@ CommandError Goto::alignAddStar() {
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.init(transform.mountType, site.location.latitude);
     #endif
-    e = requestSync(&target, settings.preferredPierSide);
+    e = requestSync(&gotoTarget, settings.preferredPierSide);
   }
 
   // add an align star
@@ -294,8 +294,8 @@ CommandError Goto::alignAddStar() {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
 
     // update the targets HA and Horizon coords as necessary
-    transform.rightAscensionToHourAngle(&target);
-    if (transform.mountType == ALTAZM) transform.equToHor(&target);
+    transform.rightAscensionToHourAngle(&gotoTarget);
+    if (transform.mountType == ALTAZM) transform.equToHor(&gotoTarget);
 
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &mountPosition);
