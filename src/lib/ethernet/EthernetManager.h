@@ -20,15 +20,13 @@
   #include <Ethernet.h>
 #endif
 
-#pragma pack(1)
-#define EthernetSettingsSize 95
+#define EthernetSettingsSize 128
 typedef struct EthernetSettings {
   char masterPassword[40];
   unsigned char mac[6];
   bool dhcpEnabled;
   IPAddress target, ip, dns, gw, sn;
 } EthernetSettings;
-#pragma pack()
 
 class EthernetManager {
   public:

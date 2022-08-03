@@ -23,8 +23,6 @@
   #error "Configuration (Config.h): No Wifi support is present for this device"
 #endif
 
-#pragma pack(1)
-
 typedef struct AccessPointSettings {
   char ssid[32];
   char pwd[32];
@@ -58,7 +56,6 @@ typedef struct WifiSettings {
   StationSettings station[WifiStationCount];
 
 } WifiSettings;
-#pragma pack()
 
 class WifiManager {
   public:
