@@ -423,6 +423,8 @@ int8_t StepDirDriver::getDecayPinState(int8_t decay) {
 // secondary way to power down not using the enable pin
 void StepDirDriver::power(bool state) {
   #if defined(TMC_SPI_DRIVER_PRESENT) || defined(TMC_UART_DRIVER_PRESENT)
+    VF("MSG: Axis"); V(axisNumber);
+    VF(", driver powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI or UART");
     int I_run = 0, I_hold = 0;
     if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
     tmcDriver.mode(true, settings.decay, microstepCode, I_run, I_hold);

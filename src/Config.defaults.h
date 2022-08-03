@@ -160,7 +160,10 @@
 #define AXIS1_REVERSE                 OFF                         // reverse rotation direction
 #endif
 #ifndef AXIS1_POWER_DOWN
-#define AXIS1_POWER_DOWN              OFF                         // motor power off if at standstill > 30 sec
+#define AXIS1_POWER_DOWN              OFF                         // power down if at standstill
+#endif
+#ifndef AXIS1_POWER_DOWN_TIME
+#define AXIS1_POWER_DOWN_TIME         30000                       // power down time in milliseconds
 #endif
 #ifndef AXIS1_ENABLE_STATE
 #define AXIS1_ENABLE_STATE            LOW                         // default state of ENable pin for motor power on
@@ -285,6 +288,9 @@
 #endif
 #ifndef AXIS2_POWER_DOWN
 #define AXIS2_POWER_DOWN              OFF                         // power down at standstill
+#endif
+#ifndef AXIS2_POWER_DOWN_TIME
+#define AXIS2_POWER_DOWN_TIME         30000                       // power off time in milliseconds
 #endif
 #ifndef AXIS2_ENABLE_STATE
 #define AXIS2_ENABLE_STATE            LOW                         // stepper enable state
@@ -658,6 +664,9 @@
 #ifndef AXIS3_POWER_DOWN
 #define AXIS3_POWER_DOWN              OFF                         // power down at standstill
 #endif
+#ifndef AXIS3_POWER_DOWN_TIME
+#define AXIS3_POWER_DOWN_TIME         30000                       // power down time in milliseconds
+#endif
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW                         // stepper enable state
 #endif
@@ -804,7 +813,10 @@
 #define AXIS4_REVERSE                 OFF                         // reverse movement direction
 #endif
 #ifndef AXIS4_POWER_DOWN
-#define AXIS4_POWER_DOWN              OFF                         // automatic power down at standstill
+#define AXIS4_POWER_DOWN              OFF                         // power down at standstill
+#endif
+#ifndef AXIS4_POWER_DOWN_TIME
+#define AXIS4_POWER_DOWN_TIME         30000                       // power down time in milliseconds
 #endif
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS4_ENABLE_STATE            LOW                         // enable pin state when driver is active
@@ -934,6 +946,9 @@
 #ifndef AXIS5_POWER_DOWN
 #define AXIS5_POWER_DOWN              OFF
 #endif
+#ifndef AXIS5_POWER_DOWN_TIME
+#define AXIS5_POWER_DOWN_TIME         30000
+#endif
 #ifndef AXIS5_ENABLE_STATE
 #define AXIS5_ENABLE_STATE            LOW
 #endif
@@ -1061,6 +1076,9 @@
 #endif
 #ifndef AXIS6_POWER_DOWN
 #define AXIS6_POWER_DOWN              OFF
+#endif
+#ifndef AXIS6_POWER_DOWN_TIME
+#define AXIS6_POWER_DOWN_TIME         30000
 #endif
 #ifndef AXIS6_ENABLE_STATE
 #define AXIS6_ENABLE_STATE            LOW
@@ -1190,6 +1208,9 @@
 #ifndef AXIS7_POWER_DOWN
 #define AXIS7_POWER_DOWN              OFF
 #endif
+#ifndef AXIS7_POWER_DOWN_TIME
+#define AXIS7_POWER_DOWN_TIME         30000
+#endif
 #ifndef AXIS7_ENABLE_STATE
 #define AXIS7_ENABLE_STATE            LOW
 #endif
@@ -1318,6 +1339,9 @@
 #ifndef AXIS8_POWER_DOWN
 #define AXIS8_POWER_DOWN              OFF
 #endif
+#ifndef AXIS8_POWER_DOWN_TIME
+#define AXIS8_POWER_DOWN_TIME         30000
+#endif
 #ifndef AXIS8_ENABLE_STATE
 #define AXIS8_ENABLE_STATE            LOW
 #endif
@@ -1445,6 +1469,9 @@
 #endif
 #ifndef AXIS9_POWER_DOWN
 #define AXIS9_POWER_DOWN              OFF
+#endif
+#ifndef AXIS9_POWER_DOWN_TIME
+#define AXIS9_POWER_DOWN_TIME         30000
 #endif
 #ifndef AXIS9_ENABLE_STATE
 #define AXIS9_ENABLE_STATE            LOW

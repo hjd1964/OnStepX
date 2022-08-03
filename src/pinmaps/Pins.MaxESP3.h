@@ -122,10 +122,10 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#if DRIVER_UART_HARDWARE_SERIAL == OFF
+#if DRIVER_UART_HARDWARE_SERIAL == ON
   #define AXIS4_ENABLE_PIN      OFF
 #else
-  #define AXIS4_ENABLE_PIN      AUX2_PIN         // Enable pin on AUX2_PIN but can be turned OFF during validation
+  #define AXIS4_ENABLE_PIN      AUX2_PIN
 #endif
 #define AXIS4_M0_PIN            OFF              // SPI MOSI
 #define AXIS4_M1_PIN            OFF              // SPI SCK

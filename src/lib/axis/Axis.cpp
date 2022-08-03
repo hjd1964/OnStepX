@@ -590,7 +590,6 @@ void Axis::setFrequency(float frequency) {
         if ((long)(millis() - powerDownTime) > 0) {
           poweredDown = true;
           motor->power(false);
-          V(axisPrefix); VLF("driver powered down");
         }
       }
     }
@@ -598,7 +597,6 @@ void Axis::setFrequency(float frequency) {
     if (poweredDown) {
       poweredDown = false;
       motor->power(true);
-      V(axisPrefix); VLF("driver powered up");
     }
     powerDownTime = millis() + powerDownDelay;
   }
