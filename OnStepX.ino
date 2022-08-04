@@ -77,7 +77,7 @@ void setup() {
   #endif
 
   // start low level hardware
-  VLF("MSG: Setup, HAL initalize");
+  VLF("MSG: Setup, HAL initialize");
   HAL_INIT();
   HAL_NV_INIT();
   delay(2000);
