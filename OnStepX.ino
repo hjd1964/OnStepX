@@ -44,7 +44,7 @@
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        8      // minor version 00 to 99
-#define FirmwareVersionPatch        "d"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "e"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       5      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -77,7 +77,7 @@ void setup() {
   #endif
 
   // start low level hardware
-  VLF("MSG: Setup, HAL initialize");
+  VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
   HAL_NV_INIT();
   delay(2000);
