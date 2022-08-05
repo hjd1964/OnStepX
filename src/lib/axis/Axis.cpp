@@ -441,6 +441,14 @@ void Axis::poll() {
   errors.maxLimitSensed = sense.isOn(maxSenseHandle);
   bool commonMinMaxSensed = commonMinMaxSense && (errors.minLimitSensed || errors.maxLimitSensed);
 
+  // let the user know if the home sense changes state
+  #if DEBUG == VERBOSE
+    if (sense.changed(homeSenseHandle)) {
+      V(axisPrefix); VF("home sense state changed ");
+      if (sense.isOn(homeSenseHandle)) { VLF("ON"); } else { VLF("OFF"); }
+    }
+  #endif
+
   // stop homing as we pass by the switch or times out
   if (homingStage != HOME_NONE && (autoRate == AR_RATE_BY_TIME_FORWARD || autoRate == AR_RATE_BY_TIME_REVERSE)) {
     if (autoRate == AR_RATE_BY_TIME_FORWARD && !sense.isOn(homeSenseHandle)) autoSlewStop();
