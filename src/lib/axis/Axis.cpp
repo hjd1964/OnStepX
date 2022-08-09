@@ -436,18 +436,26 @@ void Axis::poll() {
   // make sure we're ready
   if (axisNumber == 0) return;
 
-  // check physical limit switches
-  errors.minLimitSensed = sense.isOn(minSenseHandle);
-  errors.maxLimitSensed = sense.isOn(maxSenseHandle);
-  bool commonMinMaxSensed = commonMinMaxSense && (errors.minLimitSensed || errors.maxLimitSensed);
-
-  // let the user know if the home sense changes state
+  // let the user know if the associated senses change state
   #if DEBUG == VERBOSE
     if (sense.changed(homeSenseHandle)) {
       V(axisPrefix); VF("home sense state changed ");
       if (sense.isOn(homeSenseHandle)) { VLF("ON"); } else { VLF("OFF"); }
     }
+    if (sense.changed(minSenseHandle)) {
+      V(axisPrefix); VF("min sense state changed ");
+      if (sense.isOn(minSenseHandle)) { VLF("ON"); } else { VLF("OFF"); }
+    }
+    if (sense.changed(maxSenseHandle)) {
+      V(axisPrefix); VF("max sense state changed ");
+      if (sense.isOn(maxSenseHandle)) { VLF("ON"); } else { VLF("OFF"); }
+    }
   #endif
+
+  // check physical limit switches
+  errors.minLimitSensed = sense.isOn(minSenseHandle);
+  errors.maxLimitSensed = sense.isOn(maxSenseHandle);
+  bool commonMinMaxSensed = commonMinMaxSense && (errors.minLimitSensed || errors.maxLimitSensed);
 
   // stop homing as we pass by the switch or times out
   if (homingStage != HOME_NONE && (autoRate == AR_RATE_BY_TIME_FORWARD || autoRate == AR_RATE_BY_TIME_REVERSE)) {
