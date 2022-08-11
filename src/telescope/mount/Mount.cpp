@@ -37,13 +37,13 @@ void Mount::init() {
 
   // get the main axes ready
   delay(100);
-  if (!axis1.init(&motor1)) { initError.driver = true; DLF("ERR: Axis1, no motion controller exiting!"); return;  }
+  if (!axis1.init(&motor1)) { initError.driver = true; DLF("ERR: Axis1, no motion controller!"); }
   axis1.setBacklash(settings.backlash.axis1);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(AXIS1_POWER_DOWN_TIME);
 
   delay(100);
-  if (!axis2.init(&motor2)) { initError.driver = true; DLF("ERR: Axis2, no motion controller exiting!"); return;  }
+  if (!axis2.init(&motor2)) { initError.driver = true; DLF("ERR: Axis2, no motion controller!"); }
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis2.setPowerDownTime(AXIS2_POWER_DOWN_TIME);

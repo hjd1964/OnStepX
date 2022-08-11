@@ -60,16 +60,6 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
 bool Axis::init(Motor *motor) {
   this->motor = motor;
 
-  // start monitor
-  V(axisPrefix); VF("start monitor task (rate "); V(FRACTIONAL_SEC_US); VF("us priority 1)... ");
-  uint8_t taskHandle = 0;
-  char taskName[] = "Ax_Mtr";
-  taskName[2] = axisNumber + '0';
-  taskHandle = tasks.add(0, 0, true, 1, callback, taskName);
-  tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
-  if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
-  motor->monitorHandle = taskHandle;
-
   // check for reverting axis settings in NV
   if (!nv.hasValidKey()) {
     V(axisPrefix); VLF("writing defaults to NV");
@@ -122,6 +112,16 @@ bool Axis::init(Motor *motor) {
   motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
   motor->setReverse(settings.reverse);
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
+
+  // start monitor
+  V(axisPrefix); VF("start monitor task (rate "); V(FRACTIONAL_SEC_US); VF("us priority 1)... ");
+  uint8_t taskHandle = 0;
+  char taskName[] = "Ax_Mtr";
+  taskName[2] = axisNumber + '0';
+  taskHandle = tasks.add(0, 0, true, 1, callback, taskName);
+  tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
+  if (taskHandle) { VLF("success"); } else { VLF("FAILED!"); }
+  motor->monitorHandle = taskHandle;
 
   return true;
 }
