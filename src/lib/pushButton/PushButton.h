@@ -4,6 +4,9 @@
 
 #include <Arduino.h>
 
+// threshold in milliseconds (for tone detection, 40ms/7 = +/-17.5%)
+#define TONE_FREQ_THRESHOLD 7.0
+
 class Button {
   public:
     // create object

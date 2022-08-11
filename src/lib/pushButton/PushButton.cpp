@@ -99,7 +99,7 @@ long Button::timeUp() {
 }
 
 bool Button::hasTone() {
-  if (fabs(avgPulseDuration - 40.0) < 7.0) return true; else return false;
+  if (fabs(avgPulseDuration - 40.0) < TONE_FREQ_THRESHOLD) return true; else return false;
 }
 
 double Button::toneFreq() {
