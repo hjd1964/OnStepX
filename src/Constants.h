@@ -26,10 +26,11 @@
 
 #define MaxESP3                     13     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
 #define CNC3                        14     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MicroScope                  15     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
-#define STM32Blue                   15     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define STM32Blue                   16     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 15
+#define PINMAP_LAST                 17
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1

@@ -39,6 +39,10 @@
   #define PINMAP_STR "CNC v3"
   #include "Pins.CNC3.h"
 #endif
+#if PINMAP == MicroScope // Experimental and may be removed at any point!  USE AY YOUR OWN RISK!!!
+  #define PINMAP_STR "MicroScope v0.2"
+  #include "Pins.MicroScope.h"
+#endif
 #if PINMAP == STM32Blue
   #define PINMAP_STR "STM32 Bluepill"
   #include "Pins.STM32B.h"
