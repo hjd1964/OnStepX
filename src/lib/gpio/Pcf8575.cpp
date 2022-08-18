@@ -22,7 +22,7 @@ bool Pcf8575::init() {
 
   if (pcf.begin()) {
     found = true;
-  } else { found = false; DLF("WRN: Gpio.init(), PCF8575 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_PCF8575_I2C_ADDRESS, HEX); DLF(") not found"); }
+  } else { found = false; DF("WRN: Gpio.init(), PCF8575 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_PCF8575_I2C_ADDRESS, HEX); DLF(") not found"); }
   HAL_Wire.setClock(HAL_WIRE_CLOCK);
 
   return found;
