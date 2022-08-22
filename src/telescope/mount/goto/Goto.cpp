@@ -310,7 +310,9 @@ CommandError Goto::alignAddStar() {
 void Goto::alignReset() {
   alignState.currentStar = 0;
   alignState.lastStar = 0;
-  transform.align.modelClear();
+  #if ALIGN_MAX_NUM_STARS > 1
+    transform.align.modelClear();
+  #endif
 }
 
 // set any additional destinations required for a goto
