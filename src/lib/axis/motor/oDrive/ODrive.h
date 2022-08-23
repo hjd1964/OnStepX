@@ -18,7 +18,7 @@
 // the following would be in the pinmap normally and should trigger #error on compile here when not present
 // for now, they fit your hardware as best as I can tell...
 #ifndef ODRIVE_SERIAL
-  #define ODRIVE_SERIAL      Serial3
+  #define ODRIVE_SERIAL      Serial3 
 #endif
 #ifndef ODRIVE_SERIAL_BAUD
   #define ODRIVE_SERIAL_BAUD 19200
@@ -29,7 +29,7 @@
 
 // odrive update rate default 10Hz
 #ifndef ODRIVE_UPDATE_MS
-  #define ODRIVE_UPDATE_MS   100
+  #define ODRIVE_UPDATE_MS   3000
 #endif
 
 // odrive direct slewing ON or OFF (ODrive handles acceleration)
@@ -49,17 +49,16 @@
   #define ODRIVE_SYNC_LIMIT  OFF
 #endif
 
-// odrive swap axes
-// when OFF OnStep Axis1 is motor_number 0 and Axis2 is motor_number 1
-// when ON OnStep Axis1 is motor_number 1 and Axis2 is motor_number 0
-#ifndef ODRIVE_SWAP_AXES
-  #define ODRIVE_SWAP_AXES   OFF
+#if ODRIVE_COMM_MODE == OD_UART
+  #include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino 
+  // ODrive servo motor serial driver
+  extern ODriveArduino *_oDriveDriver;
+#elif ODRIVE_COMM_MODE == OD_CAN
+  #include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4.git
+  // changes were required to this CAN library so it is local now
+  #include "src/plugins/DDScope/ODriveTeensyCAN/ODriveTeensyCAN.h" //https://github.com/Malaphor/ODriveTeensyCAN.git
+  extern ODriveTeensyCAN *_oDriveDriver;
 #endif
-
-#include <ODriveArduino.h> // https://github.com/odriverobotics/ODrive/tree/master/Arduino/ODriveArduino
-
-// ODrive servo motor serial driver
-extern ODriveArduino *_oDriveDriver;
 
 typedef struct ODriveDriverSettings {
   int16_t model;
@@ -117,9 +116,11 @@ class ODriveMotor : public Motor {
     void move();
 
   private:
+
 //  float o_position0 = 0;
 //  float o_position1 = 0;
 
+    #if ODRIVE_COMM_MODE == OD_UART
     // special command to send high resolution position to odrive
     void setPosition(int motor_number, float position) {
 //    if (motor_number == 0) o_position0 = position;
@@ -129,6 +130,7 @@ class ODriveMotor : public Motor {
       command[2] = '0' + motor_number;
       ODRIVE_SERIAL.print(command);
     }
+    #endif
 
     unsigned long lastSetPositionTime = 0;
     uint8_t oDriveMonitorHandle = 0;
