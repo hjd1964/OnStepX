@@ -1614,6 +1614,33 @@
 
 #if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)
   #define ODRIVE_MOTOR_PRESENT
+
+  #ifndef ODRIVE_COMM_MODE
+  #define ODRIVE_COMM_MODE              OD_CAN                    // Use OD_UART or OD_CAN...I2C may be added later
+  #endif
+  #ifndef ODRIVE_SERIAL
+  #define ODRIVE_SERIAL                 Serial3                   // Teensy HW Serial3 (if used,) for example
+  #endif
+  #ifndef ODRIVE_SERIAL_BAUD
+  #define ODRIVE_SERIAL_BAUD            115200                    // 115200 baud default
+  #endif
+  #ifndef ODRIVE_UPDATE_MS
+  #define ODRIVE_UPDATE_MS              100                       // 10 HZ update rate
+  #endif
+  #ifndef ODRIVE_SWAP_AXES
+  #define ODRIVE_SWAP_AXES              ON                        // ODrive axis 0 = OnStep Axis2 = DEC or ALT
+  #endif                                                          // ODrive axis 1 = OnStep Axis1 = RA or AZM
+  #ifndef ODRIVE_SLEW_DIRECT
+  #define ODRIVE_SLEW_DIRECT            OFF                       // ON=using ODrive trapezoidal move profile. OFF=using OnStep move profile
+  #endif
+  #ifndef ODRIVE_ABSOLUTE
+  #define ODRIVE_ABSOLUTE               ON                        // using absolute encoders
+  #endif
+  #ifndef ODRIVE_SYNC_LIMIT
+  #define ODRIVE_SYNC_LIMIT             80                        // in arc seconds..one encoder tick
+  #endif                                                          // encoder resolution=2^14=16380; 16380/360=45.5 ticks/deg 
+                                                                  // 45.5/60=0.7583 ticks/min; 0.7583/60 = .00126 ticks/sec
+                                                                  // or 1/0.7583 = 1.32 arc-min/tick;  1.32*60 sec = 79.2 arc sec per encoder tick
 #endif
 
 #if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT) || defined(ODRIVE_MOTOR_PRESENT)
