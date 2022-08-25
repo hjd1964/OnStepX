@@ -61,6 +61,27 @@
   #define STM32_TIMER3       TIM1    // same use as prior to this point (but different order)
   #define STM32_TIMER4       TIM3
 #endif
+#if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
+bool HAL_HWTIMER_INIT(uint8_t priority, HardwareTimer * hwtimer, void (*wrapper)()) {
+    hwtimer->pause();
+    hwtimer->setMode(TIMER_CHANNEL, TIMER_OUTPUT_COMPARE);
+    hwtimer->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
+    hwtimer->attachInterrupt(TIMER_CHANNEL, wrapper);
+  
+    // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
+    uint32_t prescaleFactor = hwtimer->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
+    hwtimer->setPrescaleFactor(prescaleFactor);
+    hwtimer->setOverflow(4000);          // startup one millisecond
+  
+    // the sub-priority is which interrupt to handle first if both fire at the
+    // same time, which isn't supported in this HAL so all are set to 0
+    // setInterruptPriority(priority, sub-priority)
+    hwtimer->setInterruptPriority(priority, 0);
+    hwtimer->resume();                   // start the timer counting
+    hwtimer->refresh();                  // refresh the timer's count, prescale, and overflow
+    return true;
+  }
+#endif
 
 #ifdef TASKS_HWTIMER1_ENABLE
   HardwareTimer *hwtimer1 = new HardwareTimer(STM32_TIMER1);
@@ -69,23 +90,7 @@
   void HAL_HWTIMER1_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER1_INIT(uint8_t priority) {
-    hwtimer1->pause();
-    hwtimer1->setMode(TIMER_CHANNEL, TIMER_OUTPUT_COMPARE);
-    hwtimer1->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
-    hwtimer1->attachInterrupt(TIMER_CHANNEL, HAL_HWTIMER1_WRAPPER);
-  
-    // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
-    uint32_t prescaleFactor = hwtimer1->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
-    hwtimer1->setPrescaleFactor(prescaleFactor);
-    hwtimer1->setOverflow(4000);          // startup one millisecond
-  
-    // the sub-priority is which interrupt to handle first if both fire at the
-    // same time, which isn't supported in this HAL so all are set to 0
-    // setInterruptPriority(priority, sub-priority)
-    hwtimer1->setInterruptPriority(priority, 0);
-    hwtimer1->resume();                   // start the timer counting
-    hwtimer1->refresh();                  // refresh the timer's count, prescale, and overflow
-    return true;
+    return HAL_HWTIMER_INIT(priority, hwtimer1, HAL_HWTIMER1_WRAPPER);
   }
 
   void HAL_HWTIMER1_DONE() {
@@ -112,23 +117,7 @@
   void HAL_HWTIMER2_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
-    hwtimer2->pause();
-    hwtimer2->setMode(TIMER_CHANNEL, TIMER_OUTPUT_COMPARE);
-    hwtimer2->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
-    hwtimer2->attachInterrupt(TIMER_CHANNEL, HAL_HWTIMER2_WRAPPER);
-  
-    // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
-    uint32_t prescaleFactor = hwtimer2->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
-    hwtimer2->setPrescaleFactor(prescaleFactor);
-    hwtimer2->setOverflow(4000);          // startup one millisecond
-  
-    // the sub-priority is which interrupt to handle first if both fire at the
-    // same time, which isn't supported in this HAL so all are set to 0
-    // setInterruptPriority(priority, sub-priority)
-    hwtimer2->setInterruptPriority(priority, 0);
-    hwtimer2->resume();                   // start the timer counting
-    hwtimer2->refresh();                  // refresh the timer's count, prescale, and overflow
-    return true;
+    return HAL_HWTIMER_INIT(priority, hwtimer2, HAL_HWTIMER2_WRAPPER);
   }
 
   void HAL_HWTIMER2_DONE() {
@@ -155,23 +144,7 @@
   void HAL_HWTIMER3_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
-    hwtimer3->pause();
-    hwtimer3->setMode(TIMER_CHANNEL, TIMER_OUTPUT_COMPARE);
-    hwtimer3->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
-    hwtimer3->attachInterrupt(TIMER_CHANNEL, HAL_HWTIMER3_WRAPPER);
-  
-    // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
-    uint32_t prescaleFactor = hwtimer3->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
-    hwtimer3->setPrescaleFactor(prescaleFactor);
-    hwtimer3->setOverflow(4000);          // startup one millisecond
-  
-    // the sub-priority is which interrupt to handle first if both fire at the
-    // same time, which isn't supported in this HAL so all are set to 0
-    // setInterruptPriority(priority, sub-priority)
-    hwtimer3->setInterruptPriority(priority, 0);
-    hwtimer3->resume();                   // start the timer counting
-    hwtimer3->refresh();                  // refresh the timer's count, prescale, and overflow
-    return true;
+    return HAL_HWTIMER_INIT(priority, hwtimer3, HAL_HWTIMER3_WRAPPER);
   }
 
   void HAL_HWTIMER3_DONE() {
@@ -198,23 +171,7 @@
   void HAL_HWTIMER4_WRAPPER();       // forward definition of the timer ISR
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
-    hwtimer4->pause();
-    hwtimer4->setMode(TIMER_CHANNEL, TIMER_OUTPUT_COMPARE);
-    hwtimer4->setCaptureCompare(TIMER_CHANNEL, 1); // Interrupt 1 count after each update
-    hwtimer4->attachInterrupt(TIMER_CHANNEL, HAL_HWTIMER4_WRAPPER);
-  
-    // period 0.25... us per count (72/18 = 4MHz) 16.384 ms max
-    uint32_t prescaleFactor = hwtimer4->getTimerClkFreq()/F_COMP; // for example, 72000000/4000000 = 18
-    hwtimer4->setPrescaleFactor(prescaleFactor);
-    hwtimer4->setOverflow(4000);          // startup one millisecond
-  
-    // the sub-priority is which interrupt to handle first if both fire at the
-    // same time, which isn't supported in this HAL so all are set to 0
-    // setInterruptPriority(priority, sub-priority)
-    hwtimer4->setInterruptPriority(priority, 0);
-    hwtimer4->resume();                   // start the timer counting
-    hwtimer4->refresh();                  // refresh the timer's count, prescale, and overflow
-    return true;
+    return HAL_HWTIMER_INIT(priority, hwtimer4, HAL_HWTIMER4_WRAPPER);
   }
 
   void HAL_HWTIMER4_DONE() {
