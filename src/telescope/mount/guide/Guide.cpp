@@ -58,6 +58,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
   if (rate <= 2) {
+    backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(300000UL);
     axis2.setPowerDownOverrideTime(300000UL);
@@ -67,6 +68,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     mount.update();
   } else {
     state = GU_GUIDE;
+    backlashEnableControl(true);
     axis1.setFrequencySlew(degToRadF(rate/240.0F));
     axis1AutoSlew(guideAction);
   }
@@ -110,6 +112,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 
   if (rate <= 2) {
     state = GU_PULSE_GUIDE;
+    backlashEnableControl(false);
     axis1.setPowerDownOverrideTime(300000UL);
     axis2.setPowerDownOverrideTime(300000UL);
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
@@ -119,6 +122,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     mount.update();
   } else {
     state = GU_GUIDE;
+    backlashEnableControl(true);
     axis2.setFrequencySlew(degToRadF(rate/240.0F));
     axis2AutoSlew(guideAction);
   }
@@ -151,6 +155,8 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
   if (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) return CE_SLEW_IN_MOTION;
   CommandError e = validate(0, GA_SPIRAL); if (e != CE_NONE) return e;
 
+  backlashEnableControl(true);
+
   if (rateSelect < GR_2X)       rateSelect = GR_2X;
   if (rateSelect > GR_HALF_MAX) rateSelect = GR_HALF_MAX;
   spiralGuideRateSelect = rateSelect;
@@ -175,6 +181,8 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
 // start guide home (for use with home switches)
 CommandError Guide::startHome() {
   #if GOTO_FEATURE == ON
+    backlashEnableControl(true);
+
     // use guiding and switches to find home
     guide.state = GU_HOME_GUIDE;
 
@@ -409,6 +417,14 @@ void Guide::poll() {
 
   // watch for finished guides
   if (guideActionAxis1 == GA_NONE && guideActionAxis2 == GA_NONE) state = GU_NONE;
+}
+
+// enables or disables backlash for the GUIDE_DISABLE_BACKLASH option
+void Guide::backlashEnableControl(bool enabled) {
+  #if GUIDE_DISABLE_BACKLASH == ON
+    axis1.setBacklash(state ? settings.backlash.axis1 : 0.0F);
+    axis2.setBacklash(state ? settings.backlash.axis2 : 0.0F);
+  #endif
 }
 
 Guide guide;

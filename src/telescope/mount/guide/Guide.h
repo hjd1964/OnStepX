@@ -71,6 +71,9 @@ class Guide {
 
     void spiralPoll();
 
+    // enables or disables backlash for the GUIDE_DISABLE_BACKLASH option
+    void backlashEnableControl(bool enable);
+
     GuideState state = GU_NONE;
 
     float rateAxis1 = 0.0F;

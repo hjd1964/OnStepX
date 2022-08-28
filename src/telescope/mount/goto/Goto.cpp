@@ -78,6 +78,7 @@ CommandError Goto::request(Coordinate *coords, PierSideSelect pierSideSelect, bo
   limits.enabled(true);
   mount.syncToEncoders(false);
   if (mount.isHome()) mount.tracking(true);
+  guide.backlashEnableControl(true);
 
   // allow slewing near target for Eq modes if not too close to the poles
   slewDestinationDistHA = 0.0;
