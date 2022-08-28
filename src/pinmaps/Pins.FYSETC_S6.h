@@ -31,17 +31,6 @@
   #endif
 #endif
 
-// Use the following settings for any TMC UART driver (TMC2209U) that may be present
-#ifndef DRIVER_UART_HARDWARE_SERIAL
-  #define DRIVER_UART_HARDWARE_SERIAL OFF        // Default is software serial for this board
-#elif DRIVER_UART_HARDWARE_SERIAL != OFF
-  #error "Configuration (Config.h): DRIVER_UART_HARDWARE_SERIAL must be OFF for this board"
-#endif
-
-#define SERIAL_TMC              SoftSerial       // Use software serial with RX on M2 and TX on M3 of axis
-#define SERIAL_TMC_BAUD         115200           // Baud rate
-#define SERIAL_TMC_NO_RX                         // Recieving data doesn't work with software serial
-
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define TEMP0_PIN               PC0              // Temp0   (on TE0, THERMO0)
 #define TEMP1_PIN               PC1              // Temp1   (on TE1, THERMO1)

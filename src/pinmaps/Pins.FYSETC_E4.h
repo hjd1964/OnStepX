@@ -13,26 +13,14 @@
   #define SERIAL_A              Serial
 #endif
 
-// Use the following settings for any TMC UART driver (TMC2209U) that may be present
-#define DRIVER_UART_ADDRESS_REMAP_AXIS5          // Map driver axis5 to axis3 in hardware serial mode
+#define I2C_SDA_PIN             21
+#define I2C_SCL_PIN             22
 
-// map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
-//                                  X is 1, Y is 3, Z is 0, and E0 is 2
-#define DRIVER_UART_ADDRESS_REMAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : 2)))
-
-#ifndef DRIVER_UART_HARDWARE_SERIAL
-  #define DRIVER_UART_HARDWARE_SERIAL ON         // Default is hardware serial for this board
-#endif
-
-#define SERIAL_TMC              Serial1          // Use a single hardware serial port to up to four drivers
-#define SERIAL_TMC_BAUD         460800           // Baud rate
-#if DRIVER_UART_HARDWARE_SERIAL == ON
-  #define SERIAL_TMC_RX         0                // Recieving data (GPIO0 unused except for flashing)
-  #define SERIAL_TMC_TX         15               // Transmit data (Z-MIN)
-  #define SPARE_RX_PIN          OFF              // Not supported in this case
-  #define I2C_SDA_PIN           21
-  #define I2C_SCL_PIN           22
-#elif DRIVER_UART_HARDWARE_SERIAL == ALT
+// Use the following settings for the 4x TMC UART drivers
+#ifdef STEP_DIR_TMC_UART_PRESENT
+  #define SERIAL_TMC_HARDWARE_UART
+  #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
+  #define SERIAL_TMC_BAUD       460800           // Baud rate
   #if SERIAL_A_BAUD_DEFAULT == OFF
     // if SERIAL_A is OFF map the hardware serial UART to the Serial0 pins
     // you will need to remove jumpers to allow USB to work for an E4 fimware update
@@ -42,16 +30,13 @@
     #define I2C_SDA_PIN         21
     #define I2C_SCL_PIN         22
   #else
-    // if SERIAL_A is ON map the hardware serial UART to the I2C pins, and disable I2C
-    #define SERIAL_TMC_RX       21               // Recieving data
-    #define SERIAL_TMC_TX       22               // Transmit data
-    // SDA/SCL pins are disabled
-    #define I2C_SDA_PIN         OFF
-    #define I2C_SCL_PIN         OFF
-    #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 21 here
+    #define SERIAL_TMC_RX       0                // Recieving data (GPIO0 unused except for flashing)
+    #define SERIAL_TMC_TX       15               // Transmit data (Z-MIN)
+    #define SPARE_RX_PIN        OFF              // Not supported in this case
   #endif
-#else
-  #error "Configuration (Config.h): For FYSETC_E4, set DRIVER_UART_HARDWARE_SERIAL to ON (recommended, Z-MIN TX only) or ALT (Serial pins or I2C pins.)"
+  // map the driver addresses so axis Axis1(0) is X, Axis2(1) is Y, Axis3(2) is Z, Axis4(3) is E0...
+  //                                  Axis1(0) is 1, Axis2(1) is 3, Axis3(2) is 0, Axis4(3) is 2, Axis5(4) is 0
+  #define SERIAL_TMC_ADDRESS_MAP(x) (((x)==0)?1 : (((x)==1)?3 : (((x)==2)?0 : ((x)==3)?2 : 0)))
 #endif
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)

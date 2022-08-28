@@ -110,6 +110,7 @@ bool Axis::init(Motor *motor) {
   // special ODrive case, a way to pass the stepsPerMeasure to it
   if (motor->getParameterTypeCode() == 'O') settings.param6 = settings.stepsPerMeasure;
   motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
+  motor->enable(false);
   motor->setReverse(settings.reverse);
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
 
@@ -133,7 +134,7 @@ void Axis::enable(bool state) {
     if (!enabled && state == true) { V(axisPrefix); VLF("enabled"); }
   #endif
   enabled = state;
-  motor->power(enabled & !poweredDown);
+  motor->enable(enabled & !poweredDown);
 }
 
 // time (in ms) before automatic power down at standstill, use 0 to disable
@@ -604,14 +605,14 @@ void Axis::setFrequency(float frequency) {
         powerDownOverride = false;
         if ((long)(millis() - powerDownTime) > 0) {
           poweredDown = true;
-          motor->power(false);
+          motor->enable(false);
         }
       }
     }
   } else {
     if (poweredDown) {
       poweredDown = false;
-      motor->power(true);
+      motor->enable(true);
     }
     powerDownTime = millis() + powerDownDelay;
   }

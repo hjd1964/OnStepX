@@ -12,24 +12,24 @@
 #endif
 #endif
 
-/*
-// map the driver addresses so axis X is 0, Y is 1, Z is 2, and E0 is 3 instead of the actual...
-#define DRIVER_UART_ADDRESS_REMAP(x) (x)
-
-// map the driver addresses so axis5 becomes axis3 in hardware serial mode
-#define DRIVER_UART_ADDRESS_REMAP_AXIS5
-
-// Example for a board using SoftwareSerial ports to any number of drivers
-#define SERIAL_TMC                  SoftSerial     // Use software serial with RX on M2 and TX on M3 of axis
+// default settings for any TMC UART drivers that may be present
+#if defined(STEP_DIR_TMC_UART_PRESENT)
+#ifndef SERIAL_TMC
+#define SERIAL_TMC                  SoftSerial     // Use software serial with TX on M3 (CS) of each axis
+#endif
+#ifndef SERIAL_TMC_RX_DISABLE
+#define SERIAL_TMC_RX_DISABLE       true           // Recieving data often doesn't work with software serial
+#endif
+#ifndef SERIAL_TMC_BAUD
 #define SERIAL_TMC_BAUD             115200         // Baud rate
-#define SERIAL_TMC_NO_RX                           // Recieving data doesn't work with software serial
-
-// Example for a board using one HardwareSerial port to all four drivers
-#define SERIAL_TMC                  Serial1        // Use a single hardware serial port to up to four drivers
-#define SERIAL_TMC_BAUD             500000         // Baud rate
-#define SERIAL_TMC_TX               11             // Transmit data
-#define SERIAL_TMC_RX               12             // Recieving data
-*/
+#endif
+#ifndef SERIAL_TMC_ADDRESS_MAP
+#define SERIAL_TMC_ADDRESS_MAP(x)   (0)            // driver addresses are 0 for all axes
+#endif
+#ifndef SERIAL_TMC_INVERT
+#define SERIAL_TMC_INVERT           OFF            // invert the serial interface signal logic
+#endif
+#endif
 
 // pin# for controlling the reset of W5500 so it comes up properly
 #ifndef ETHERNET_RESET_PIN

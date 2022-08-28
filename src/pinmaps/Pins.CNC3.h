@@ -22,26 +22,6 @@
   #define SERIAL_B_TX           5
 #endif
 
-// Use the following settings for any TMC UART driver (TMC2209U) that may be present
-#define DRIVER_UART_ADDRESS_REMAP_AXIS5          // Map driver axis5 to axis3 in hardware serial mode
-
-#ifndef DRIVER_UART_HARDWARE_SERIAL
-  #define DRIVER_UART_HARDWARE_SERIAL OFF        // Default is software serial for this board
-#endif
-
-#if DRIVER_UART_HARDWARE_SERIAL == ON
-  #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
-  #define SERIAL_TMC_BAUD       460800           // Baud rate
-  #define SERIAL_TMC_RX         39               // Recieving data
-  #define SERIAL_TMC_TX         15               // Transmit data
-#elif DRIVER_UART_HARDWARE_SERIAL == OFF
-  #define SERIAL_TMC            SoftSerial       // Use software serial with TX on M3 (CS) of each axis
-  #define SERIAL_TMC_BAUD       115200           // Baud rate
-  #define SERIAL_TMC_NO_RX                       // Recieving data doesn't work with software serial
-#else
-  #error "Configuration (Config.h): For CNC3, set DRIVER_UART_HARDWARE_SERIAL to ON (pins TX15,RX39) or OFF (uses CS.)"
-#endif
-
 // Specify the ESP32 I2C pins
 #define I2C_SDA_PIN             21
 #define I2C_SCL_PIN             22

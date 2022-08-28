@@ -1,27 +1,13 @@
 // -----------------------------------------------------------------------------------
-// axis step/dir TMC SPI motor driver
+// Step/Dir TMC SPI motor driver
 #pragma once
 
 #include <Arduino.h>
-#include "../../../../Common.h"
+#include "../../../../../Common.h"
 
-#if defined(TMC_UART_DRIVER_PRESENT) || defined(TMC_SPI_DRIVER_PRESENT)
+#if !defined(DRIVER_TMC_STEPPER) && defined(STEP_DIR_TMC_SPI_PRESENT)
 
-#ifdef TMC_UART_DRIVER_PRESENT
-  #ifndef SERIAL_TMC_INVERT
-    #define SERIAL_TMC_INVERT OFF
-  #endif
-  #if SERIAL_TMC == SoftSerial
-    #define TMC2209_SOFTWARE_SERIAL
-    #include <SoftwareSerial.h>
-  #endif
-  #define TMC2209_DEBUG false
-  #include <TMC2209.h> // https://github.com/hjd1964/TMC2209
-#endif
-
-#ifdef TMC_SPI_DRIVER_PRESENT
-  #include "../../../softSpi/SoftSpi.h"
-#endif
+#include "../../../../softSpi/SoftSpi.h"
 
 #ifndef TMC5160_DRIVER_RSENSE
   #define TMC5160_DRIVER_RSENSE (0.075)
@@ -31,7 +17,7 @@
   #define TMC2130_DRIVER_RSENSE (0.11 + 0.02)
 #endif
 
-class TmcDriver {
+class TmcSPI {
   public:
     // setup SoftSpi or UART and driver model/Rsense
     bool init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber = 0);
@@ -104,10 +90,8 @@ class TmcDriver {
     inline bool set_COOLCONF_sfilt(int v)        { if (v >= 0 && v <= 1)       { cl_sfilt = v; return true; } return false; }
 
   private:
-    #ifdef TMC_SPI_DRIVER_PRESENT
-      uint8_t write(byte Address, uint32_t data_out);
-      uint8_t read(byte Address, uint32_t* data_out);
-    #endif
+    uint8_t write(byte Address, uint32_t data_out);
+    uint8_t read(byte Address, uint32_t* data_out);
 
     // the write flag and various TMC SPI registers
     static const uint8_t WRITE          = 0x80;
@@ -199,14 +183,7 @@ class TmcDriver {
     int   model;
     float rsense              = 0.11 + 0.02; // default for TMC2130
 
-    #ifdef TMC_SPI_DRIVER_PRESENT
-      SoftSpi softSpi;
-    #endif
-
-    #ifdef TMC_UART_DRIVER_PRESENT
-      const int MicroStepCodeToMode[9] = {256, 128, 64, 32, 16, 8, 4, 2, 1};
-      TMC2209 *tmcUartDriver;
-    #endif
+    SoftSpi softSpi;
 };
 
 #endif

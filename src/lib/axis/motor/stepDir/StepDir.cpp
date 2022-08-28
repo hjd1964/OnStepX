@@ -74,7 +74,7 @@ void moveStepDirMotorAxis9() { stepDirMotorInstance[8]->move(AXIS9_STEP_PIN); }
 void moveStepDirMotorFFAxis9() { stepDirMotorInstance[8]->moveFF(AXIS9_STEP_PIN); }
 void moveStepDirMotorFRAxis9() { stepDirMotorInstance[8]->moveFR(AXIS9_STEP_PIN); }
 
-StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, bool useFastHardwareTimers) {
+StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *Driver, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   strcpy(axisPrefix, "MSG: StepDir_, ");
@@ -87,10 +87,9 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirDriverPins *Pi
   #endif
   this->useFastHardwareTimers = useFastHardwareTimers;
 
-  driver = new StepDirDriver(axisNumber, Pins, Settings);
+  driver = Driver;
   pulseWidth = driver->getPulseWidth();
-
-  setDefaultParameters(Settings->microsteps, Settings->microstepsGoto, Settings->currentHold, Settings->currentRun, Settings->currentGoto, 0);
+  setDefaultParameters(driver->settings.microsteps, driver->settings.microstepsSlewing, driver->settings.currentHold, driver->settings.currentRun, driver->settings.currentGoto, 0);
 
   // attach the function pointers to the callbacks
   stepDirMotorInstance[axisNumber - 1] = this;
@@ -138,9 +137,6 @@ bool StepDirMotor::init() {
   // driver enabled for possible TMC current calibration
   digitalWriteEx(Pins->enable, Pins->enabledState)
 
-  // now disable the driver
-  power(false);
-
   // start the motor timer
   V(axisPrefix); VF("start task to move motor... ");
   char timerName[] = "Motor_";
@@ -171,7 +167,7 @@ void StepDirMotor::setReverse(int8_t state) {
 
 // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
 void StepDirMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  driver->setParameters(param1, param2, param3, param4, param5, param6);
+  driver->init(param1, param2, param3, param4, param5, param6);
   homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
 }
@@ -181,13 +177,13 @@ bool StepDirMotor::validateParameters(float param1, float param2, float param3, 
   return driver->validateParameters(param1, param2, param3, param4, param5, param6);
 }
 
-// sets motor power on/off (if possible)
-void StepDirMotor::power(bool state) {
+// sets motor enable on/off (if possible)
+void StepDirMotor::enable(bool state) {
   if (Pins->enable != OFF && Pins->enable != SHARED) {
     V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); } VF(" using pin "); VL(Pins->enable);
     digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
-    driver->power(state);
+    driver->enable(state);
   }
 }
 

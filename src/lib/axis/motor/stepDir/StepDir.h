@@ -10,8 +10,20 @@
   #error "Configuration (Config.h): Having both GPIO_DIRECTION_PINS and SHARED_DIRECTION_PINS is not allowed"
 #endif
 
-#include "StepDirDrivers.h"
+#include "generic/Generic.h"
+#include "tmcLegacy/LegacySPI.h"
+#include "tmcLegacy/LegacyUART.h"
+#include "tmcStepper/StepperSPI.h"
+#include "tmcStepper/StepperUART.h"
 #include "../Motor.h"
+
+typedef struct StepDirPins {
+  int16_t step;
+  uint8_t stepState;
+  int16_t dir;
+  int16_t enable;
+  uint8_t enabledState;
+} StepDirPins;
 
 #define DirNone 253
 #define DirSetRev 254
@@ -22,7 +34,7 @@ enum MicrostepModeControl: uint8_t {MMC_TRACKING, MMC_SLEWING, MMC_SLEWING_REQUE
 class StepDirMotor : public Motor {
   public:
     // constructor
-    StepDirMotor(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, bool useFastHardwareTimers = true);
+    StepDirMotor(uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *Driver, bool useFastHardwareTimers = true);
 
     // sets up the driver step/dir/enable pins
     bool init();
@@ -39,8 +51,8 @@ class StepDirMotor : public Motor {
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // sets motor power on/off (if possible)
-    void power(bool value);
+    // sets motor enable on/off (if possible)
+    void enable(bool value);
 
     // get the associated stepper driver status
     DriverStatus getDriverStatus();
@@ -84,7 +96,7 @@ class StepDirMotor : public Motor {
     StepDirDriver *driver;
 
     // the stepper motor driver pins, should not be used above the StepDir class
-    const StepDirDriverPins *Pins;
+    const StepDirPins *Pins;
 
   private:
     uint8_t taskHandle = 0;

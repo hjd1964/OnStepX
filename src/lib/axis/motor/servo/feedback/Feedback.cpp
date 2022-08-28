@@ -6,7 +6,7 @@
 #ifdef SERVO_MOTOR_PRESENT
 
 // initialize feedback control and parameters
-void Feedback::init(uint8_t axisNumber, ServoControl *control) {
+void Feedback::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
   this->axisNumber = axisNumber;
 
   this->control = control;

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis servo motor
+// axis odrive servo motor
 #pragma once
 #include "../../../../Common.h"
 
@@ -85,8 +85,8 @@ class ODriveMotor : public Motor {
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // sets motor power on/off (if possible)
-    void power(bool value);
+    // sets motor enable on/off (if possible)
+    void enable(bool value);
 
     // set instrument coordinate, in steps
     void setInstrumentCoordinateSteps(long value);

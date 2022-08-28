@@ -27,7 +27,7 @@
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
-#define DRIVER_FIRST                0
+#define STEP_DIR_DRIVER_FIRST       0
 #define A4988                       0      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
 #define DRV8825                     1      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
 #define GENERIC                     2      // generic s/d driver allows     for 1x,2x,4x,8x,16x,32x,64x,128x,256x (using just the M2 pin)
@@ -37,14 +37,18 @@
 #define ST820                       6      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x,128x,256x
 #define TMC2100                     7      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
 #define TMC2130S                    8      // allows M0,M1    bit patterens for 1x,2x,4x,16x   (spreadCycle only, no 256x intpol)
-#define TMC2130                     9      // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define TMC2208S                    10     // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
-#define TMC2209S                    11     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define TMC2209U                    12     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
-#define TMC2226S                    11     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
-#define TMC2226U                    12     // uses TMC protocol UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc. no mode switching)
-#define TMC5160                     13     // uses TMC protocol SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
-#define DRIVER_LAST                 13
+#define TMC2208S                    9      // allows M0,M1    bit patterens for 2x,4x,8x,16x   (stealthChop default, uses 256x intpol)
+#define TMC2209S                    10     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define TMC2226S                    10     // allows M0,M1    bit patterens for 8x,16x,32x,64x (M2 sets spreadCycle/stealthChop, uses 256x intpol)
+#define TMC_DRIVER_FIRST            11
+#define TMC2130                     11     // uses TMC software SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC5160                     12     // uses TMC software SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC5161                     13     // uses TMC software SPI comms   for 1x,2x...,256x  (SPI sets spreadCycle/stealthChop etc.)
+#define TMC_UART_DRIVER_FIRST       14
+#define TMC2208                     14     // uses TMC software UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc, dedicated RX/TX UART to each driver using index 0)
+#define TMC2209                     15     // uses TMC software UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc, dedicated RX/TX UART to each driver using index 0)
+#define TMC2226                     15     // uses TMC software UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc, dedicated RX/TX UART to each driver using index 0)
+#define STEP_DIR_DRIVER_LAST        15
 
 // driver (step/dir) decay mode
 #define DRIVER_DECAY_MODE_FIRST     1
@@ -57,9 +61,10 @@
 
 // servo driver (usually for DC motors equipped with encoders)
 #define SERVO_DRIVER_FIRST          100
-#define SERVO_PE                    100    // SERVO, direction (phase) and enable (pwm) connections
-#define SERVO_II                    101    // SERVO, dual pwm input connections
-#define SERVO_DRIVER_LAST           101
+#define SERVO_PE                    100    // SERVO, direction (phase) and pwm (enable) connections
+#define SERVO_EE                    101    // SERVO, dual pwm input (enable/enable) connections
+#define SERVO_TMC2209               102    // TMC2209 stepper driver using VACTUAL velocity control
+#define SERVO_DRIVER_LAST           102
 
 // odrive driver
 #define ODRIVE_DRIVER_FIRST         200

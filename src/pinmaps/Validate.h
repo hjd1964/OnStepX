@@ -29,6 +29,11 @@
   #error "Configuration (Config.h): SERIAL_B_ESP_FLASHING not supported for this PINMAP"
 #endif
 
+// make sure a serial interface is available for any TMC UART driver
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC)
+  #error "Configuration (Config.h): SERIAL_TMC is required for TMC UART drivers"
+#endif
+
 // powering down Dec supported only if EN is available and not shared with Axis1
 #if AXIS2_POWER_DOWN == ON && (AXIS2_EN_PIN == OFF || AXIS2_EN_PIN == SHARED)
   #error "Configuration (Config.h): AXIS2_POWER_DOWN not supported on this PINMAP"

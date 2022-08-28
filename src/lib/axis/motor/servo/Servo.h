@@ -8,34 +8,35 @@
 #include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
                      // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
 
-#include "ServoDrivers.h"
+#include "dc/Dc.h"
+#include "tmc2209/tmc2209.h"
 
-#include "Pid/Pid.h"
+#include "feedback/pid/Pid.h"
 
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, const ServoDriverPins *Pins, const ServoDriverSettings *Settings, Encoder *enc, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *enc, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
 
-    // set driver reverse state
+    // set motor reverse state
     void setReverse(int8_t state);
 
     // get driver type code
     inline char getParameterTypeCode() { return feedback->getParameterTypeCode(); }
 
-    // set driver parameters
+    // set motor parameters
     void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // validate driver parameters
+    // validate motor parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // sets motor power on/off (if possible)
-    void power(bool value);
+    // sets motor enable on/off (if possible)
+    void enable(bool value);
 
-    // get the associated driver status
+    // get the associated motor driver status
     DriverStatus getDriverStatus();
 
     // resets motor and target angular position in steps, also zeros backlash and index 

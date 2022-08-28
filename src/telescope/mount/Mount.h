@@ -119,7 +119,7 @@ class Mount {
     bool atHome = true;
 };
 
-#ifdef AXIS1_DRIVER_PRESENT
+#ifdef AXIS1_STEP_DIR_PRESENT
   extern StepDirMotor motor1;
 #elif defined(AXIS1_SERVO_PRESENT)
   extern ServoMotor motor1;
@@ -128,7 +128,7 @@ class Mount {
 #endif
 extern Axis axis1;
 
-#ifdef AXIS2_DRIVER_PRESENT
+#ifdef AXIS2_STEP_DIR_PRESENT
   extern StepDirMotor motor2;
 #elif defined(AXIS2_SERVO_PRESENT)
   extern ServoMotor motor2;

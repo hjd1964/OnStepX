@@ -8,6 +8,7 @@
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
+#include "../../../lib/tasks/OnTask.h"
 
 // init the home position (according to settings and mount type)
 void Home::init() {
@@ -107,12 +108,11 @@ CommandError Home::reset(bool fullReset) {
   mount.tracking(false);
   mount.trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
 
-  // make sure the motors are powered off
-  if (fullReset) mount.enable(false);
-  
+  tasks.yieldMicros(10000);
+
   // setup axis1 and axis2
-  axis1.resetPosition(0.0L);
-  axis2.resetPosition(0.0L);
+  if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
+  if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
   if (transform.mountType == ALTAZM) {
     axis1.setInstrumentCoordinate(position.z);
@@ -127,6 +127,9 @@ CommandError Home::reset(bool fullReset) {
 
   axis1.setFrequencySlew(degToRadF(0.1F));
   axis2.setFrequencySlew(degToRadF(0.1F));
+
+  // make sure the motors are powered off
+  if (fullReset) mount.enable(false);
 
   #if GOTO_FEATURE == ON
     if (fullReset) goTo.alignReset();
