@@ -29,7 +29,7 @@
     ServoDc driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
   #elif defined(AXIS1_SERVO_TMC2209)
     const ServoTmcPins ServoPinsAxis1 = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE, AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_FAULT_PIN};
-    const ServoTmcSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_IRUN, 25600 * 4};
+    const ServoTmcSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_VELOCITY};
     ServoTmc2209 driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
   #endif
 
@@ -79,7 +79,7 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
     ServoDc driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
   #elif defined(AXIS2_SERVO_TMC2209)
     const ServoTmcPins ServoPinsAxis2 = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE, AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_FAULT_PIN};
-    const ServoTmcSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_IRUN, 100};
+    const ServoTmcSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_IRUN, AXIS2_DRIVER_VELOCITY};
     ServoTmc2209 driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
   #endif
 

@@ -243,6 +243,9 @@
     #define AXIS1_SERVO_DC
   #endif
 
+  #ifndef AXIS1_DRIVER_VELOCITY
+  #define AXIS1_DRIVER_VELOCITY         12800                     // maximum velocity in steps/second, for SERVO_TMC2209 only
+  #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
   #endif
@@ -383,6 +386,9 @@
     #define AXIS2_SERVO_DC
   #endif
 
+  #ifndef AXIS2_DRIVER_VELOCITY
+  #define AXIS2_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
   #endif
@@ -783,6 +789,9 @@
     #define AXIS3_SERVO_DC
   #endif
 
+  #ifndef AXIS3_DRIVER_VELOCITY
+  #define AXIS3_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS3_SERVO_P
   #define AXIS3_SERVO_P                 2.0
   #endif
@@ -950,6 +959,9 @@
     #define AXIS4_SERVO_DC
   #endif
 
+  #ifndef AXIS4_DRIVER_VELOCITY
+  #define AXIS4_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
   #endif
@@ -1092,6 +1104,9 @@
     #define AXIS5_SERVO_DC
   #endif
 
+  #ifndef AXIS5_DRIVER_VELOCITY
+  #define AXIS5_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS5_SERVO_P
   #define AXIS5_SERVO_P                 2.0
   #endif
@@ -1234,6 +1249,9 @@
     #define AXIS6_SERVO_DC
   #endif
 
+  #ifndef AXIS6_DRIVER_VELOCITY
+  #define AXIS6_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS6_SERVO_P
   #define AXIS6_SERVO_P                 2.0
   #endif
@@ -1376,6 +1394,9 @@
     #define AXIS7_SERVO_DC
   #endif
 
+  #ifndef AXIS7_DRIVER_VELOCITY
+  #define AXIS7_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS7_SERVO_P
   #define AXIS7_SERVO_P                 2.0
   #endif
@@ -1518,6 +1539,9 @@
     #define AXIS8_SERVO_DC
   #endif
 
+  #ifndef AXIS8_DRIVER_VELOCITY
+  #define AXIS8_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS8_SERVO_P
   #define AXIS8_SERVO_P                 2.0
   #endif
@@ -1660,6 +1684,9 @@
     #define AXIS9_SERVO_DC
   #endif
 
+  #ifndef AXIS9_DRIVER_VELOCITY
+  #define AXIS9_DRIVER_VELOCITY         12800
+  #endif
   #ifndef AXIS9_SERVO_P
   #define AXIS9_SERVO_P                 2.0
   #endif

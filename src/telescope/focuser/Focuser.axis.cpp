@@ -25,7 +25,7 @@
       ServoDc driver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
     #elif defined(AXIS4_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis4 = {AXIS4_STEP_PIN, AXIS4_DIR_PIN, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE, AXIS4_M0_PIN, AXIS4_M1_PIN, AXIS4_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, AXIS4_DRIVER_VELOCITY};
       ServoTmc2209 driver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
     #endif
 
@@ -72,7 +72,7 @@
       ServoDc driver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
     #elif defined(AXIS5_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis5 = {AXIS5_STEP_PIN, AXIS5_DIR_PIN, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE, AXIS5_M0_PIN, AXIS5_M1_PIN, AXIS5_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, AXIS5_DRIVER_VELOCITY};
       ServoTmc2209 driver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
     #endif
 
@@ -119,7 +119,7 @@
       ServoDc driver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
     #elif defined(AXIS6_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis6 = {AXIS6_STEP_PIN, AXIS6_DIR_PIN, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE, AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS6_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_VELOCITY};
       ServoTmc2209 driver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
     #endif
 
@@ -166,7 +166,7 @@
       ServoDc driver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
     #elif defined(AXIS7_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis7 = {AXIS7_STEP_PIN, AXIS7_DIR_PIN, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE, AXIS7_M0_PIN, AXIS7_M1_PIN, AXIS7_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, AXIS7_DRIVER_VELOCITY};
       ServoTmc2209 driver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
     #endif
 
@@ -213,7 +213,7 @@
       ServoDc driver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
     #elif defined(AXIS8_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis8 = {AXIS8_STEP_PIN, AXIS8_DIR_PIN, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE, AXIS8_M0_PIN, AXIS8_M1_PIN, AXIS8_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, AXIS8_DRIVER_VELOCITY};
       ServoTmc2209 driver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
     #endif
 
@@ -260,7 +260,7 @@
       ServoDc driver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
     #elif defined(AXIS9_SERVO_TMC2209)
       const ServoTmcPins ServoPinsAxis9 = {AXIS9_STEP_PIN, AXIS9_DIR_PIN, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE, AXIS9_M0_PIN, AXIS9_M1_PIN, AXIS9_FAULT_PIN};
-      const ServoTmcSettings ServoSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, 100};
+      const ServoTmcSettings ServoSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, AXIS9_DRIVER_VELOCITY};
       ServoTmc2209 driver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
     #endif
 
