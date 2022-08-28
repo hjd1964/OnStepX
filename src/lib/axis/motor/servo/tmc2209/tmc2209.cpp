@@ -99,7 +99,7 @@ void ServoTmc2209::setMotorPower(float power) {
   if (!enabled) motorPwr = 0.0F; else motorPwr = power;
   if (motorPwr > motorPwrMax) motorPwr = motorPwrMax; else
   if (motorPwr < -motorPwrMax) motorPwr = -motorPwrMax;
-  driver->VACTUAL(round((motorPwr/0.715F)*2.0F));
+  driver->VACTUAL(round((motorPwr/0.715F)*4.0F));
 }
 
 // update status info. for driver
