@@ -8,7 +8,7 @@
 
 #ifdef MOTOR_PRESENT
 
-// there are four hardware timers possible in OnTask #1,2,3,4
+// there are four hardware timers possible in OnTask #1-4
 // this keeps track of which have been allocated in the Axis class and decendants
 int _hardwareTimersAllocated = AXIS_HARDWARE_TIMER_BASE - 1;
 
@@ -338,18 +338,17 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
 
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
-  V(axisPrefix);
   if (autoRate == AR_NONE) {
     motor->setSynchronized(true);
     motor->setSlewing(true);
-    VF("autoSlew start ");
+    V(axisPrefix); VF("autoSlew start ");
   } else { VF("autoSlew resum "); }
   if (direction == DIR_FORWARD) {
     autoRate = AR_RATE_BY_TIME_FORWARD;
-    VF("fwd@ ");
+    V(axisPrefix); VF("fwd@ ");
   } else {
     autoRate = AR_RATE_BY_TIME_REVERSE;
-    VF("rev@ ");
+    V(axisPrefix); VF("rev@ ");
   }
   #if DEBUG == VERBOSE
     if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
