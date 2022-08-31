@@ -137,7 +137,6 @@
 #define TASKS_HWTIMER1_ENABLE
 #define TASKS_HWTIMER2_ENABLE
 #define TASKS_HWTIMER3_ENABLE
-#define TASKS_HWTIMER4_ENABLE
 
 // default start of axis class hardware timers
 #define AXIS_HARDWARE_TIMER_BASE    2      // in the OnStepX timer#1 is the sidereal clock
