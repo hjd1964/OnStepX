@@ -5,7 +5,7 @@
 #define HAL_FAST_PROCESSOR
 
 // 1/200 second sidereal timer
-#define HAL_FRACTIONAL_SEC 200.0F
+#define HAL_FRACTIONAL_SEC 100.0F
 
 // This platform has 8 bit PWM
 #ifndef ANALOG_WRITE_PWM_BITS
