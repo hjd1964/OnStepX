@@ -37,12 +37,12 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
             thisAxis.limits.max = thisAxis.limits.max/1000.0F;
           }
           char spm[40]; sprintF(spm, "%1.3f", thisAxis.stepsPerMeasure);
-          char ps1[40]; sprintF(ps1, "%1.1f", thisAxis.param1);
-          char ps2[40]; sprintF(ps2, "%1.1f", thisAxis.param2);
-          char ps3[40]; sprintF(ps3, "%1.1f", thisAxis.param3);
-          char ps4[40]; sprintF(ps4, "%1.1f", thisAxis.param4);
-          char ps5[40]; sprintF(ps5, "%1.1f", thisAxis.param5);
-          char ps6[40]; sprintF(ps6, "%1.1f", thisAxis.param6);
+          char ps1[40]; sprintF(ps1, "%1.3f", thisAxis.param1);
+          char ps2[40]; sprintF(ps2, "%1.3f", thisAxis.param2);
+          char ps3[40]; sprintF(ps3, "%1.3f", thisAxis.param3);
+          char ps4[40]; sprintF(ps4, "%1.3f", thisAxis.param4);
+          char ps5[40]; sprintF(ps5, "%1.3f", thisAxis.param5);
+          char ps6[40]; sprintF(ps6, "%1.3f", thisAxis.param6);
           sprintf(reply,"%s,%d,%d,%d,%s,%s,%s,%s,%s,%s,%c",
             spm,
             (int)thisAxis.reverse,
