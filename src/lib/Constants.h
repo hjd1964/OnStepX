@@ -77,7 +77,8 @@
 #define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
 #define ENC_PULSE_DIR               3      // pulse/direction encoder
 #define ENC_PULSE_ONLY              4      // pulse only encoder
-#define SERVO_ENCODER_LAST          4
+#define ENC_SERIAL                  5
+#define SERVO_ENCODER_LAST          5
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1
