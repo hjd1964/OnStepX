@@ -26,7 +26,7 @@ char *SerialLocal::receive() {
   xmit_result[i] = 0;
   while (xmit_buffer[xmit_index] != 0) {
     xmit_result[i++] = xmit_buffer[xmit_index++];
-    xmit_index &= 0b111111;
+    xmit_index &= 0b1111111;
   }
   xmit_result[i] = 0; 
   return xmit_result;

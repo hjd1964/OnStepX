@@ -28,7 +28,7 @@ class SerialLocal : public Stream {
       while (xmit_buffer[xmit_index] != 0) {
         i++;
         xmit_index++;
-        xmit_index &= 0b111111;
+        xmit_index &= 0b1111111;
       }
       xmit_index = x;
       return i;
@@ -48,7 +48,7 @@ class SerialLocal : public Stream {
     inline size_t write(uint8_t data) {
       xmit_buffer[xmit_tail] = data;
       xmit_tail++;
-      xmit_tail &= 0b111111;
+      xmit_tail &= 0b1111111;
       xmit_buffer[xmit_tail] = 0;
       return 1;
     }
@@ -69,8 +69,8 @@ class SerialLocal : public Stream {
     uint8_t recv_tail = 0;
 
   protected:
-    char xmit_buffer[64] = "";
-    char xmit_result[64] = "";
+    char xmit_buffer[128] = "";
+    char xmit_result[128] = "";
     uint8_t xmit_index = 0;
     uint8_t xmit_tail = 0;
 };
