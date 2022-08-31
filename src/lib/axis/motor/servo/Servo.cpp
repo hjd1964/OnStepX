@@ -93,7 +93,6 @@ void ServoMotor::setReverse(int8_t state) {
 // set driver parameters
 void ServoMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   feedback->setParameters(param1, param2, param3, param4, param5, param6);
-  //trackingParameters = false;
 }
 
 // validate driver parameters
@@ -138,11 +137,11 @@ long ServoMotor::getTargetDistanceSteps() {
   long distance = targetSteps - position;
   interrupts();
 
-  if (distance < 20) {
-    noInterrupts();
-    distance = targetSteps - motorSteps;
-    interrupts();
-  }
+//  if (distance < 20) {
+//    noInterrupts();
+//    distance = targetSteps - motorSteps;
+//    interrupts();
+//  }
 
   return distance;
 }
