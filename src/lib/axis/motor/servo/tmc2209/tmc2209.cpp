@@ -136,7 +136,7 @@ void ServoTmc2209::setMotorVelocity(float velocity) {
 
   if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F*4.0F));
+  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F*8.0F));
 }
 
 // update status info. for driver
