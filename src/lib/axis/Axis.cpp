@@ -484,27 +484,13 @@ void Axis::poll() {
         autoSlewAbort();
         return;
       }
-      if (motor->getTargetDistanceSteps() == 0) {
+      if (atTarget()) {
         motor->setSlewing(false);
         autoRate = AR_NONE;
         freq = 0.0F;
         motor->setSynchronized(true);
         V(axisPrefix); VLF("slew stopped");
       } else {
-/*
-        if (fabs(freq) > backlashFreq) {
-          if (motor->getTargetDistanceSteps() < 0) rampFreq -= getRampDirection()*slewAccelRateFs; else rampFreq += getRampDirection()*slewAccelRateFs;
-          freq = rampFreq;
-          if (freq < -slewFreq) freq = -slewFreq;
-          if (freq > slewFreq) freq = slewFreq;
-        } else {
-          freq = (getOriginOrTargetDistance()/slewAccelerationDistance)*slewFreq;
-          if (freq < backlashFreq/2.0F) freq = backlashFreq/2.0F;
-          if (freq > backlashFreq*1.05F) freq = backlashFreq*1.05F;
-          if (motor->getTargetDistanceSteps() < 0) freq = -freq;
-          rampFreq = freq;
-        }
-*/
         freq = sqrtf(2.0F*(slewAccelRateFs*FRACTIONAL_SEC)*getOriginOrTargetDistance());
         if (freq < backlashFreq/2.0F) freq = backlashFreq/2.0F;
         if (freq > slewFreq) freq = slewFreq;
