@@ -117,7 +117,7 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#if DRIVER_UART_HARDWARE_SERIAL == ON
+#ifdef SERIAL_TMC_HARDWARE_UART
   #define AXIS4_ENABLE_PIN      OFF
 #else
   #define AXIS4_ENABLE_PIN      AUX2_PIN
