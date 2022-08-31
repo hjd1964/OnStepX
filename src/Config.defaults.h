@@ -243,8 +243,11 @@
     #define AXIS1_SERVO_DC
   #endif
 
-  #ifndef AXIS1_DRIVER_VELOCITY
-  #define AXIS1_DRIVER_VELOCITY         12800                     // maximum velocity in steps/second, for SERVO_TMC2209 only
+  #ifndef AXIS1_SERVO_MAX_VELOCITY
+  #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
+  #endif
+  #ifndef AXIS1_SERVO_ACCELERATION
+  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
@@ -386,8 +389,11 @@
     #define AXIS2_SERVO_DC
   #endif
 
-  #ifndef AXIS2_DRIVER_VELOCITY
-  #define AXIS2_DRIVER_VELOCITY         12800
+  #ifndef AXIS2_SERVO_MAX_VELOCITY
+  #define AXIS2_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS2_SERVO_ACCELERATION
+  #define AXIS2_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
@@ -789,8 +795,11 @@
     #define AXIS3_SERVO_DC
   #endif
 
-  #ifndef AXIS3_DRIVER_VELOCITY
-  #define AXIS3_DRIVER_VELOCITY         12800
+  #ifndef AXIS3_SERVO_MAX_VELOCITY
+  #define AXIS3_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS3_SERVO_ACCELERATION
+  #define AXIS3_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS3_SERVO_P
   #define AXIS3_SERVO_P                 2.0
@@ -959,8 +968,11 @@
     #define AXIS4_SERVO_DC
   #endif
 
-  #ifndef AXIS4_DRIVER_VELOCITY
-  #define AXIS4_DRIVER_VELOCITY         12800
+  #ifndef AXIS4_SERVO_MAX_VELOCITY
+  #define AXIS4_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS4_SERVO_ACCELERATION
+  #define AXIS4_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
@@ -1104,8 +1116,11 @@
     #define AXIS5_SERVO_DC
   #endif
 
-  #ifndef AXIS5_DRIVER_VELOCITY
-  #define AXIS5_DRIVER_VELOCITY         12800
+  #ifndef AXIS5_SERVO_MAX_VELOCITY
+  #define AXIS5_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS5_SERVO_ACCELERATION
+  #define AXIS5_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS5_SERVO_P
   #define AXIS5_SERVO_P                 2.0
@@ -1249,8 +1264,11 @@
     #define AXIS6_SERVO_DC
   #endif
 
-  #ifndef AXIS6_DRIVER_VELOCITY
-  #define AXIS6_DRIVER_VELOCITY         12800
+  #ifndef AXIS6_SERVO_MAX_VELOCITY
+  #define AXIS6_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS6_SERVO_ACCELERATION
+  #define AXIS6_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS6_SERVO_P
   #define AXIS6_SERVO_P                 2.0
@@ -1394,8 +1412,11 @@
     #define AXIS7_SERVO_DC
   #endif
 
-  #ifndef AXIS7_DRIVER_VELOCITY
-  #define AXIS7_DRIVER_VELOCITY         12800
+  #ifndef AXIS7_SERVO_MAX_VELOCITY
+  #define AXIS7_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS7_SERVO_ACCELERATION
+  #define AXIS7_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS7_SERVO_P
   #define AXIS7_SERVO_P                 2.0
@@ -1539,8 +1560,11 @@
     #define AXIS8_SERVO_DC
   #endif
 
-  #ifndef AXIS8_DRIVER_VELOCITY
-  #define AXIS8_DRIVER_VELOCITY         12800
+  #ifndef AXIS8_SERVO_MAX_VELOCITY
+  #define AXIS8_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS8_SERVO_ACCELERATION
+  #define AXIS8_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS8_SERVO_P
   #define AXIS8_SERVO_P                 2.0
@@ -1684,8 +1708,11 @@
     #define AXIS9_SERVO_DC
   #endif
 
-  #ifndef AXIS9_DRIVER_VELOCITY
-  #define AXIS9_DRIVER_VELOCITY         12800
+  #ifndef AXIS9_SERVO_MAX_VELOCITY
+  #define AXIS9_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS9_SERVO_ACCELERATION
+  #define AXIS9_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS9_SERVO_P
   #define AXIS9_SERVO_P                 2.0

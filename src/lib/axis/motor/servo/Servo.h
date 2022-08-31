@@ -5,8 +5,12 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
-                     // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
+#ifdef SERIAL_ENCODER
+  #include "serialEncoder/SerialEncoder.h"
+#else
+  #include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
+                      // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
+#endif
 
 #include "dc/Dc.h"
 #include "tmc2209/tmc2209.h"
@@ -16,7 +20,7 @@
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *enc, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
@@ -41,6 +45,15 @@ class ServoMotor : public Motor {
 
     // resets motor and target angular position in steps, also zeros backlash and index 
     void resetPositionSteps(long value);
+
+    // get instrument coordinate, in steps
+    long getInstrumentCoordinateSteps();
+
+    // set instrument coordinate, in steps
+    void setInstrumentCoordinateSteps(long value);
+
+    // distance to target in steps (+/-)
+    long getTargetDistanceSteps();
 
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return 64; }
@@ -74,18 +87,23 @@ class ServoMotor : public Motor {
     float currentFrequency = 0.0F;      // last frequency set 
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
+    float currentVelocity = 0.0F;       // last velocity set 
+    float acceleration = ANALOG_WRITE_PWM_RANGE/5.0F;
+    float accelerationFs = (ANALOG_WRITE_PWM_RANGE/5.0F)/FRACTIONAL_SEC;
+
+    int32_t lastPosition = 0;           // the last encoder position for stall check
+    unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
 
     volatile int  absStep = 1;          // absolute step size (unsigned)
 
     void (*callback)() = NULL;
 
-    Encoder *enc;
+    Encoder *encoder;
     Feedback *feedback;
     ServoControl *control;
 
     bool useFastHardwareTimers = true;
-
-    bool isSlewing = false;
+    bool slewing = false;
 };
 
 #endif

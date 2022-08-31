@@ -22,7 +22,9 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   this->Settings = TmcSettings;
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
-  motorPwrMax = TmcSettings->velocityMax;
+  velocityMax = TmcSettings->velocityMax;
+  acceleration = TmcSettings->acceleration;
+  accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
 void ServoTmc2209::init() {
@@ -40,6 +42,10 @@ void ServoTmc2209::init() {
   // set S/D motion pins to known, fixed state
   digitalWriteEx(Pins->step, LOW);
   digitalWriteEx(Pins->dir, LOW);
+
+  // show velocity control settings
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // initialize the serial port
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
@@ -70,7 +76,8 @@ void ServoTmc2209::init() {
 
   driver = new TMC2209Stepper(&SERIAL_TMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   driver->begin();
-  driver->intpol(false);
+  driver->intpol(true);
+  driver->en_spreadCycle(true);
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
@@ -94,12 +101,42 @@ void ServoTmc2209::init() {
   #endif
 }
 
-// power level to the motor (in microsteps/s)
-void ServoTmc2209::setMotorPower(float power) {
-  if (!enabled) motorPwr = 0.0F; else motorPwr = power;
-  if (motorPwr > motorPwrMax) motorPwr = motorPwrMax; else
-  if (motorPwr < -motorPwrMax) motorPwr = -motorPwrMax;
-  driver->VACTUAL(round((motorPwr/0.715F)*4.0F));
+// secondary way to power down not using the enable pin
+void ServoTmc2209::enable(bool state) {
+  enabled = state;
+  if (enablePin == SHARED) {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
+    int I_run = 0;
+    if (state) { I_run = Settings->current; }
+    driver->rms_current(I_run*0.707F);
+  } else {
+    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
+  }
+
+  currentVelocity = 0.0F;
+
+  ServoDriver::updateStatus();
+}
+
+// set motor velocity (in microsteps/s)
+void ServoTmc2209::setMotorVelocity(float velocity) {
+  if (!enabled) velocity = 0.0F;
+  if (velocity > velocityMax) velocity = velocityMax; else
+  if (velocity < -velocityMax) velocity = -velocityMax;
+
+  if (velocity > currentVelocity) {
+    currentVelocity += accelerationFs;
+    if (currentVelocity > velocity) currentVelocity = velocity;
+  } else
+  if (velocity < currentVelocity) {
+    currentVelocity -= accelerationFs;
+    if (currentVelocity < velocity) currentVelocity = velocity;
+  }
+
+  if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
+
+  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F*4.0F));
 }
 
 // update status info. for driver
@@ -130,22 +167,6 @@ void ServoTmc2209::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
-}
-
-// secondary way to power down not using the enable pin
-void ServoTmc2209::enable(bool state) {
-  enabled = state;
-  if (enablePin == SHARED) {
-    VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
-    int I_run = 0;
-    if (state) { I_run = Settings->current; }
-    driver->rms_current(I_run*0.707F);
-  } else {
-    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
-  }
-
-  ServoDriver::updateStatus();
 }
 
 #endif

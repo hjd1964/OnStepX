@@ -36,7 +36,10 @@ class Feedback {
     virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // select feedback PID param set
-    virtual void selectAlternateParam(bool alternate);
+    virtual void selectAlternateParameters(bool alternate);
+
+    // variable feedback PID params
+    virtual void variableParameters(float percent);
 
     // set feedback control direction
     virtual void setControlDirection(int8_t state);

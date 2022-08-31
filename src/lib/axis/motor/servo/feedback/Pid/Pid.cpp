@@ -37,10 +37,11 @@ void Pid::reset() {
   control->set = 0;
   control->out = 0;
   pid->SetMode(AUTOMATIC);
+  selectAlternateParameters(false);
 }
 
 // select PID param set for tracking or slewing
-void Pid::selectAlternateParam(bool alternate) {
+void Pid::selectAlternateParameters(bool alternate) {
   V(axisPrefix);
   if (!alternate) {
     p = param1;
@@ -59,6 +60,18 @@ void Pid::selectAlternateParam(bool alternate) {
 
 void Pid::setControlDirection(int8_t state) {
   if (state == ON) pid->SetControllerDirection(REVERSE); else pid->SetControllerDirection(DIRECT);
+}
+
+// manage feedback, variable PID params
+void Pid::variableParameters(float percent) {
+  if (percent < 0.0F) percent = 0.0F;
+  if (percent > 100.0F) percent = 100.0F;
+
+  p = param1 + (param4 - param1)*percent/100.0F;
+  i = param2 + (param5 - param2)*percent/100.0F;
+  d = param3 + (param6 - param3)*percent/100.0F;
+
+  pid->SetTunings(p, i, d);
 }
 
 #endif

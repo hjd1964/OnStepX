@@ -16,10 +16,17 @@ ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSetti
   this->Settings = Settings;
   model = Settings->model;
   statusMode = Settings->status;
+  velocityMax = (Settings->velocityMax/100.0F)*ANALOG_WRITE_PWM_RANGE;
+  acceleration = (Settings->acceleration/100.0F)*velocityMax;
+  accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
 void ServoDc::init() {
   ServoDriver::init();
+
+  // show velocity control settings
+  VF("MSG: ServoDriver"); V(axisNumber);
+  VF(", Vmax = "); V(Settings->velocityMax); VF("% power, Acceleration = "); V(Settings->acceleration); VLF("%/s/s");
 
   #if DEBUG == VERBOSE
     VF("MSG: ServoDriver"); V(axisNumber);
@@ -56,50 +63,55 @@ void ServoDc::init() {
   #endif
 }
 
-// power level to the motor
-void ServoDc::setMotorPower(float power) {
-  if (!enabled) motorPwr = 0.0F; else motorPwr = fabs(power);
-  if (motorPwr > motorPwrMax) motorPwr = motorPwrMax;
-  if (power >= 0) setMotorDirection(DIR_FORWARD); else setMotorDirection(DIR_REVERSE);
-  pwmUpdate();
+// set motor velocity by adjusting power (0 to ANALOG_WRITE_PWM_RANGE for 0 to 100% power)
+void ServoDc::setMotorVelocity(float velocity) {
+  if (!enabled) velocity = 0.0F;
+  if (velocity > velocityMax) velocity = velocityMax; else
+  if (velocity < -velocityMax) velocity = -velocityMax;
+
+  if (velocity > currentVelocity) {
+    currentVelocity += accelerationFs;
+    if (currentVelocity > velocity) currentVelocity = velocity;
+  } else
+  if (velocity < currentVelocity) {
+    currentVelocity -= accelerationFs;
+    if (currentVelocity < velocity) currentVelocity = velocity;
+  }
+  if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
+
+  pwmUpdate(fabs(currentVelocity));
  }
 
-// motor direction (DIR_FORMWARD or DIR_REVERSE)
-void ServoDc::setMotorDirection(Direction dir) {
-  motorDir = dir;
-  pwmUpdate();
-}
-
 // motor control update
-void ServoDc::pwmUpdate() {
+void ServoDc::pwmUpdate(float power) {
   if (model == SERVO_EE) {
-    if (motorDir == DIR_FORWARD) {
-      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, motorPwrMax); else analogWrite(Pins->in1, 0);
-      if (Pins->inState2 == HIGH) motorPwr = motorPwrMax - motorPwr;
-      analogWrite(Pins->in2, motorPwr);
+    if (motorDirection == DIR_FORWARD) {
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      analogWrite(Pins->in2, round(power));
     } else
-    if (motorDir == DIR_REVERSE) {
-      if (Pins->inState1 == HIGH) motorPwr = motorPwrMax - motorPwr;
-      analogWrite(Pins->in1, motorPwr);
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, motorPwrMax); else analogWrite(Pins->in2, 0);
+    if (motorDirection == DIR_REVERSE) {
+      if (Pins->inState1 == HIGH) power = velocityMax - power;
+      analogWrite(Pins->in1, round(power));
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
     } else {
-      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, motorPwrMax); else analogWrite(Pins->in1, 0);
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, motorPwrMax); else analogWrite(Pins->in2, 0);
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
     }
   } else
   if (model == SERVO_PE) {
-    if (motorDir == DIR_FORWARD) {
+    if (motorDirection == DIR_FORWARD) {
       digitalWriteF(Pins->in1, Pins->inState1);
-      if (Pins->inState2 == HIGH) motorPwr = motorPwrMax - motorPwr;
-      analogWrite(Pins->in2, motorPwr);
+      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      analogWrite(Pins->in2, round(power));
     } else
-    if (motorDir == DIR_REVERSE) {
+    if (motorDirection == DIR_REVERSE) {
       digitalWriteF(Pins->in1, !Pins->inState1);
-      if (Pins->inState2 == HIGH) motorPwr = motorPwrMax - motorPwr;
-      analogWrite(Pins->in2, motorPwr);
+      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      analogWrite(Pins->in2, round(power));
     } else {
       digitalWriteF(Pins->in1, Pins->inState1);
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, motorPwrMax); else analogWrite(Pins->in2, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
     }
   }
 }

@@ -22,6 +22,8 @@ typedef struct ServoDcPins {
 typedef struct ServoDcSettings {
   int16_t model;
   int8_t  status;
+  int32_t velocityMax;  // in % of max power
+  int32_t acceleration; // in %/second/second
 } ServoDcSettings;
 
 class ServoDc : public ServoDriver {
@@ -32,8 +34,8 @@ class ServoDc : public ServoDriver {
     // decodes driver model and sets up the pin modes
     void init();
 
-    // power level to the motor
-    void setMotorPower(float power);
+    // set motor velocity by adjusting power (0 to ANALOG_WRITE_PWM_RANGE for 0 to 100% power)
+    void setMotorVelocity(float power);
 
     // update status info. for driver
     void updateStatus();
@@ -41,13 +43,13 @@ class ServoDc : public ServoDriver {
     const ServoDcSettings *Settings;
 
   private:
-    // sets motor direction (DIR_FORMWARD or DIR_REVERSE)
-    void setMotorDirection(Direction dir);
-
     // motor control update
-    void pwmUpdate();
+    void pwmUpdate(float power);
 
     const ServoDcPins *Pins;
+
+    float acceleration;
+    float accelerationFs;
 };
 
 #endif

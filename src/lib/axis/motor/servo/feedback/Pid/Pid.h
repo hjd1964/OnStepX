@@ -22,7 +22,10 @@ class Pid : public Feedback {
     char getParameterTypeCode() { return 'P'; }
 
     // select PID param set for tracking or slewing
-    void selectAlternateParam(bool alternate);
+    void selectAlternateParameters(bool alternate);
+
+    // variable feedback, variable PID params
+    void variableParameters(float percent);
 
     // set feedback control direction
     void setControlDirection(int8_t state);

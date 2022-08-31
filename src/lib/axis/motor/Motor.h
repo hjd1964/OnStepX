@@ -52,7 +52,7 @@ class Motor {
     inline long getIndexPositionSteps() { return indexSteps; }
 
     // get instrument coordinate, in steps
-    long getInstrumentCoordinateSteps();
+    virtual long getInstrumentCoordinateSteps();
 
     // set instrument coordinate, in steps
     virtual void setInstrumentCoordinateSteps(long value);
@@ -81,7 +81,7 @@ class Motor {
     void markOriginCoordinateSteps();
 
     // distance to target in steps (+/-)
-    long getTargetDistanceSteps();
+    virtual long getTargetDistanceSteps();
 
     // distance to origin or target, whichever is closer, in steps
     long getOriginOrTargetDistanceSteps();

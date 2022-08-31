@@ -39,9 +39,10 @@ typedef struct ServoTmcPins {
 typedef struct ServoTmcSettings {
   int16_t model;
   int8_t  status;
+  int32_t velocityMax;  // maximum velocity in steps/second
+  int32_t acceleration; // acceleration steps/second/second
   int16_t microsteps;
   int16_t current;
-  int32_t velocityMax;  // maximum velocity in steps/second
 } ServoTmcSettings;
 
 class ServoTmc2209 : public ServoDriver {
@@ -56,7 +57,7 @@ class ServoTmc2209 : public ServoDriver {
     void enable(bool state);
 
     // power level to the motor
-    void setMotorPower(float power);
+    void setMotorVelocity(float power);
 
     // update status info. for driver
     void updateStatus();
@@ -71,7 +72,9 @@ class ServoTmc2209 : public ServoDriver {
     TMC2209Stepper *driver;
 
     bool powered = false;
-
+    float currentVelocity = 0.0F;
+    float acceleration;
+    float accelerationFs;
     const ServoTmcPins *Pins;
 };
 

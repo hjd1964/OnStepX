@@ -19,15 +19,15 @@ class ServoDriver {
     // this is a required method for the Axis class, even if it does nothing
     virtual void enable(bool state);
 
-    // get the control range to the motor (-motorPwrMax to motorPwrMax) defaults to ANALOG_WRITE_PWM_RANGE
+    // get the control range to the motor (-velocityMax to velocityMax) defaults to ANALOG_WRITE_PWM_RANGE
     // must be ready at object creation!
-    virtual float getMotorControlRange() { return motorPwrMax; }
+    virtual float getMotorControlRange() { return velocityMax; }
 
-    // power level to the motor
-    virtual void setMotorPower(float power);
+    // set motor velocity
+    virtual void setMotorVelocity(float velocity);
 
     // returns motor direction (DIR_FORMWARD or DIR_REVERSE)
-    Direction getMotorDirection() { return motorDir; };
+    Direction getMotorDirection() { return motorDirection; };
 
     // update status info. for driver
     // this is a required method for the Axis class
@@ -48,9 +48,8 @@ class ServoDriver {
     int16_t model = OFF;
     int16_t statusMode = OFF;
 
-    float motorPwr = 0.0F;
-    float motorPwrMax = ANALOG_WRITE_PWM_RANGE;
-    Direction motorDir = DIR_FORWARD;
+    float velocityMax = ANALOG_WRITE_PWM_RANGE;
+    Direction motorDirection = DIR_FORWARD;
 
     int16_t enablePin = OFF;
     uint8_t enabledState = LOW;
