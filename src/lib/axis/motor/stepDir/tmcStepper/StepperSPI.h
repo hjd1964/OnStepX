@@ -38,9 +38,6 @@ class StepDirTmcSPI : public StepDirDriver {
     // set decay mode for slewing
     void modeDecaySlewing();
 
-    // set the decay mode STEALTH_CHOP or SPREAD_CYCLE
-    void setDecayMode(int decayMode);
-
     // update status info. for driver
     void updateStatus();
 
@@ -52,6 +49,12 @@ class StepDirTmcSPI : public StepDirDriver {
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
+
+    // set the decay mode STEALTH_CHOP or SPREAD_CYCLE
+    void setDecayMode(int decayMode);
+
+    // set the peak current
+    void current(int mA);
 };
 
 #endif
