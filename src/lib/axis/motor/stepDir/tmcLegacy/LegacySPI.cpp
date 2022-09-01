@@ -117,7 +117,7 @@ void StepDirTmcSPI::modeMicrostepTracking() {
 
 int StepDirTmcSPI::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
-    driver.refresh_CHOPCONF(microstepCodeGoto);
+    driver.refresh_CHOPCONF(microstepCodeSlewing);
   }
   return microstepRatio;
 }

@@ -47,9 +47,6 @@ class StepDirTmcSPI : public StepDirDriver {
   private:
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
-
-    int16_t microstepCode          = OFF;
-    int16_t microstepCodeGoto      = OFF;
 };
 
 #endif
