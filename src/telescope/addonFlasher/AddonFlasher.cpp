@@ -1,4 +1,4 @@
-// Flashes an esp8266 based SWS on the SERIAL_B interface by passing data to/from SERIAL_A
+// Flashes an esp8266 based SWS on the SERIAL_PASSTHROUGH interface by passing data to/from SERIAL_A
 
 #include "AddonFlasher.h"
 #include "../../lib/tasks/OnTask.h"
@@ -7,7 +7,7 @@
 // ADDON_RESET_PIN  HIGH for run and LOW for reset
 // ADDON_GPIO0_PIN  HIGH for run and LOW for firmware upload
 
-#if SERIAL_B_ESP_FLASHING == ON
+#if defined(SERIAL_PASSTHROUGH)
 
   #if ADDON_TRIGR_PIN != OFF
     void addonFlasherWrapper() { addonFlasher.poll(); }
@@ -37,8 +37,8 @@
     unsigned long lastRead = millis() + 85000;
     while (true) {
       // read from port 1, send to port 0:
-      if (SERIAL_B.available()) {
-        int inByte = SERIAL_B.read();
+      if (SERIAL_PASSTHROUGH.available()) {
+        int inByte = SERIAL_PASSTHROUGH.read();
         delayMicroseconds(5);
         SERIAL_A.write(inByte);
         delayMicroseconds(5);
@@ -48,11 +48,11 @@
       if (SERIAL_A.available()) {
         int inByte = SERIAL_A.read();
         delayMicroseconds(5);
-        SERIAL_B.write(inByte);
+        SERIAL_PASSTHROUGH.write(inByte);
         delayMicroseconds(5);
         if (millis() > lastRead) lastRead = millis();
       }
-      tasks.yield();
+      //tasks.yield();
 
       // wait 5 seconds w/no traffic before resuming normal operation
       if (timeout && (long)(millis() - lastRead) > 5000) break;
@@ -71,10 +71,10 @@
     reset();
 
     if (setSerial) {
-      #if defined(SERIAL_B_RX) && defined(SERIAL_B_TX) && !defined(SERIAL_B_RXTX_SET)
-        SERIAL_B.begin(SERIAL_B_BAUD_DEFAULT, SERIAL_8N1, SERIAL_B_RX, SERIAL_B_TX);
+      #if defined(SERIAL_PASSTHROUGH_RX) && defined(SERIAL_PASSTHROUGH_TX) && !defined(SERIAL_PASSTHROUGH_RXTX_SET)
+        SERIAL_PASSTHROUGH.begin(SERIAL_PASSTHROUGH_BAUD_DEFAULT, SERIAL_8N1, SERIAL_PASSTHROUGH_RX, SERIAL_PASSTHROUGH_TX);
       #else
-        SERIAL_B.begin(SERIAL_B_BAUD_DEFAULT);
+        SERIAL_PASSTHROUGH.begin(SERIAL_PASSTHROUGH_BAUD_DEFAULT);
       #endif
 
       #if defined(SERIAL_A_RX) && defined(SERIAL_A_TX) && !defined(SERIAL_A_RXTX_SET)
@@ -95,10 +95,10 @@
       SERIAL_A.begin(115200);
     #endif
 
-    #if defined(SERIAL_B_RX) && defined(SERIAL_B_TX) && !defined(SERIAL_B_RXTX_SET)
-      SERIAL_B.begin(115200, SERIAL_8N1, SERIAL_B_RX, SERIAL_B_TX);
+    #if defined(SERIAL_PASSTHROUGH_RX) && defined(SERIAL_PASSTHROUGH_TX) && !defined(SERIAL_PASSTHROUGH_RXTX_SET)
+      SERIAL_PASSTHROUGH.begin(115200, SERIAL_8N1, SERIAL_PASSTHROUGH_RX, SERIAL_PASSTHROUGH_TX);
     #else
-      SERIAL_B.begin(115200);
+      SERIAL_PASSTHROUGH.begin(115200);
     #endif
     tasks.yield(1000);
 

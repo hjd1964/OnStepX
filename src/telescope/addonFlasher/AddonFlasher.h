@@ -2,7 +2,7 @@
 #pragma once
 #include "../../Common.h"
 
-#if SERIAL_B_ESP_FLASHING == ON
+#if defined(SERIAL_PASSTHROUGH)
   class AddonFlasher {
     public:
       // startup the addon flasher, monitors the ADDON_TRIGR_PIN if present

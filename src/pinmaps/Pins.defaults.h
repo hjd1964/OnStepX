@@ -12,6 +12,15 @@
 #endif
 #endif
 
+// automatic setup of serial passthrough
+#if SERIAL_B_ESP_FLASHING == ON
+  #define SERIAL_PASSTHROUGH SERIAL_B
+  #define SERIAL_PASSTHROUGH_BAUD_DEFAULT SERIAL_B_BAUD_DEFAULT
+  #define SERIAL_PASSTHROUGH_RX SERIAL_B_RX
+  #define SERIAL_PASSTHROUGH_TX SERIAL_B_TX
+  #define SERIAL_PASSTHROUGH_RXTX_SET SERIAL_B_RXTX_SET
+#endif
+
 // default settings for any TMC UART drivers that may be present
 #if defined(STEP_DIR_TMC_UART_PRESENT)
 #ifndef SERIAL_TMC
