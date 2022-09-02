@@ -238,7 +238,7 @@ void ServoMotor::poll() {
     if (axisNumber == DEBUG_SERVO) {
       static uint16_t count = 0;
       count++;
-      if (count % 100 == 0) {
+      if (count % 25 == 0) {
         char s[80];
         sprintf(s, "Servo%d: Delta %6ld, Power %6.3f%%\r\n", (int)axisNumber, (target - position), velocityPercent);
         D(s);
