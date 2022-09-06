@@ -43,7 +43,7 @@ void Guide::init() {
 }
 
 // start guide at a given direction and rate on Axis1
-CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
+CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE || guideActionAxis1 == guideAction) return CE_NONE;
   if (guide.state == GU_HOME_GUIDE) return CE_NONE;
 
@@ -57,7 +57,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
-  if (rate <= 2) {
+  if (rate <= 2 && pulseGuide) {
     backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
     axis1.setPowerDownOverrideTime(300000UL);
@@ -96,7 +96,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
 }
 
 // start guide at a given direction and rate on Axis2
-CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
+CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE || guideActionAxis2 == guideAction) return CE_NONE;
   if (guide.state == GU_HOME_GUIDE) return CE_NONE;
 
@@ -110,7 +110,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis2 = millis() + guideTimeLimit;
 
-  if (rate <= 2) {
+  if (rate <= 2 && pulseGuide) {
     state = GU_PULSE_GUIDE;
     backlashEnableControl(false);
     axis1.setPowerDownOverrideTime(300000UL);

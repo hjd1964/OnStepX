@@ -47,8 +47,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
-      if (guide.state == GU_PULSE_GUIDE)       reply[i++]='G'; else                // Pulse [G]uide active
-      if (guide.state != GU_NONE)              reply[i++]='g';                     // [g]uide active
+      if (guide.activePulseGuide())            reply[i++]='G';                     // Pulse [G]uide active
+      if (guide.active())                      reply[i++]='g';                     // [g]uide active
 
       if (mount.settings.rc == RC_REFRACTION) { reply[i++]='r'; reply[i++]='s'; }  // [r]efr enabled [s]ingle axis
       if (mount.settings.rc == RC_REFRACTION_DUAL) { reply[i++]='r'; }             // [r]efr enabled
@@ -97,7 +97,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #if TIME_LOCATION_PPS_SENSE != OFF
         if (pps.synced)                            reply[0]|=0b10000100;           // PPS sync
       #endif
-      if (guide.state == GU_PULSE_GUIDE)           reply[0]|=0b10001000;           // Pulse guide active
+      if (guide.activePulseGuide())                reply[0]|=0b10001000;           // Pulse guide active
 
       if (mount.settings.rc == RC_REFRACTION)      reply[0]|=0b11010000;           // Refr enabled Single axis
       if (mount.settings.rc == RC_REFRACTION_DUAL) reply[0]|=0b10010000;           // Refr enabled
@@ -111,8 +111,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       }
 
       if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // Sync to encoders only
-      if (guide.state != GU_NONE && guide.state != GU_PULSE_GUIDE)
-                                                   reply[1]|=0b10001000;           // Guide active
+      if (guide.active())                          reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing [h]ome
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
