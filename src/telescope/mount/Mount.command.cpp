@@ -251,8 +251,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     } else
     if (command[1] == 'd') {
       #if GOTO_FEATURE == ON
-        if (goTo.state == GS_NONE && guide.state == GU_NONE) tracking(false); else *commandError = CE_SLEW_IN_MOTION;
-      #else
         tracking(false);
       #endif
     } else *commandError = CE_CMD_UNKNOWN;
