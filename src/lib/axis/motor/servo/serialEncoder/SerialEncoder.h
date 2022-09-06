@@ -5,6 +5,10 @@
 
 #ifdef SERIAL_ENCODER
 
+#ifndef SERIAL_ENCODER_BAUD_DEFAULT
+#define SERIAL_ENCODER_BAUD_DEFAULT 480600
+#endif
+
 class Encoder {
   public:
     Encoder(int16_t channel = 1);

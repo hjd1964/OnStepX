@@ -24,7 +24,13 @@
 
   int32_t Encoder::raw() {
     if (!initialized) {
-      SERIAL_ENCODER.begin(460800);
+
+      #if defined(SERIAL_ENCODER_RX) && defined(SERIAL_ENCODER_TX) && !defined(SERIAL_ENCODER_RXTX_SET)
+        SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD_DEFAULT, SERIAL_8N1, SERIAL_ENCODER_RX, SERIAL_ENCODER_TX);
+      #else
+        SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD_DEFAULT);
+      #endif
+
       delay(100);
       initialized = true;
     }
