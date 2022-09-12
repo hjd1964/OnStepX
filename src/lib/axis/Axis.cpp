@@ -257,7 +257,7 @@ double Axis::getTargetCoordinate() {
 
 // check if we're at the target coordinate during an auto slew
 bool Axis::atTarget() {
-  return labs(motor->getTargetDistanceSteps()) < 2;
+  return labs(motor->getTargetDistanceSteps()) == 0;
 }
 
 // distance to target in "measures" (degrees, microns, etc.)
