@@ -268,7 +268,7 @@
   #define AXIS1_SERVO_D_GOTO            AXIS1_SERVO_D             // D = derivative
   #endif
   #ifndef AXIS1_SERVO_ENCODER
-  #define AXIS1_SERVO_ENCODER           ENC_AB                    // type of encoder: ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY
+  #define AXIS1_SERVO_ENCODER           ENC_AB                    // type of encoder: ENC_SERIAL, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY
   #endif
   #ifndef AXIS1_SERVO_ENCODER_TRIGGER
   #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE                    // ignored for ENC_AB
