@@ -23,8 +23,8 @@ void ServoDriver::init() {
   #if DEBUG == VERBOSE
     VF("MSG: ServoDriver"); V(axisNumber); VF(", init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
     VF("MSG: ServoDriver"); V(axisNumber); VF(", en=");
-    if (enablePin == OFF) VLF("OFF"); else
-    if (enablePin == SHARED) VLF("SHARED"); else VL(enablePin);
+    if (enablePin == OFF) { VLF("OFF"); } else
+    if (enablePin == SHARED) { VLF("SHARED"); } else { VL(enablePin); }
   #endif
 
   // init default driver control pins
