@@ -79,6 +79,15 @@ void ServoTmc2209::init() {
   driver->intpol(true);
   driver->en_spreadCycle(true);
 
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
+  if (Settings->microsteps == OFF) {
+    VLF("OFF (assuming 1X)");
+    driver->microsteps(1);
+  } else {
+    V(Settings->microsteps); VLF("X");
+    driver->microsteps(Settings->microsteps);
+  }
+
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
     VLF("current control OFF (set by Vref)");
@@ -136,7 +145,7 @@ void ServoTmc2209::setMotorVelocity(float velocity) {
 
   if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F*8.0F));
+  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F));
 }
 
 // update status info. for driver
