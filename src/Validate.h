@@ -140,8 +140,8 @@
 #endif
 
 #ifdef AXIS1_SERVO_PRESENT
-  #if AXIS1_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS1_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS1_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS1_ENCODER < ENC_FIRST || AXIS1_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS1_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -223,8 +223,8 @@
 #endif
 
 #ifdef AXIS2_SERVO_PRESENT
-  #if AXIS2_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS2_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS2_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS2_ENCODER < ENC_FIRST || AXIS2_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS2_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -468,8 +468,8 @@
 #endif
 
 #ifdef AXIS3_SERVO_PRESENT
-  #if AXIS3_SERVO_ENCODER != OFF && (AXIS3_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS3_SERVO_ENCODER > SERVO_ENCODER_LAST)
-    #error "Configuration (Config.h): Setting AXIS3_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS3_ENCODER != OFF && (AXIS3_ENCODER < ENC_FIRST || AXIS3_ENCODER > ENC_LAST)
+    #error "Configuration (Config.h): Setting AXIS3_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -583,8 +583,8 @@
 #endif
 
 #ifdef AXIS4_SERVO_PRESENT
-  #if AXIS4_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS4_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS4_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS4_ENCODER < ENC_FIRST || AXIS4_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS4_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -668,8 +668,8 @@
 #endif
 
 #ifdef AXIS5_SERVO_PRESENT
-  #if AXIS5_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS5_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS5_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS5_ENCODER < ENC_FIRST || AXIS5_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS5_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -750,8 +750,8 @@
 #endif
 
 #ifdef AXIS6_SERVO_PRESENT
-  #if AXIS6_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS6_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS6_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS6_ENCODER < ENC_FIRST || AXIS6_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS6_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -832,8 +832,8 @@
 #endif
 
 #ifdef AXIS7_SERVO_PRESENT
-  #if AXIS7_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS7_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS7_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS7_ENCODER < ENC_FIRST || AXIS7_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS7_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -914,8 +914,8 @@
 #endif
 
 #ifdef AXIS8_SERVO_PRESENT
-  #if AXIS8_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS8_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS8_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS8_ENCODER < ENC_FIRST || AXIS8_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS8_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 
@@ -996,8 +996,8 @@
 #endif
 
 #ifdef AXIS9_SERVO_PRESENT
-  #if AXIS9_SERVO_ENCODER < SERVO_ENCODER_FIRST || AXIS9_SERVO_ENCODER > SERVO_ENCODER_LAST
-    #error "Configuration (Config.h): Setting AXIS9_SERVO_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #if AXIS9_ENCODER < ENC_FIRST || AXIS9_ENCODER > ENC_LAST
+    #error "Configuration (Config.h): Setting AXIS9_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
 #endif
 

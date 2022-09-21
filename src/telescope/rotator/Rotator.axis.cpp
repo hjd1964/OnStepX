@@ -8,10 +8,18 @@
 #ifdef AXIS3_SERVO_PRESENT
   ServoControl servoControlAxis3;
 
-  #if AXIS3_SERVO_ENCODER == ENC_AB
-    Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN);
-  #else
-    Encoder encAxis3(AXIS3_SERVO_ENC1_PIN, AXIS3_SERVO_ENC2_PIN, AXIS3_SERVO_ENCODER, AXIS3_SERVO_ENCODER_TRIGGER, &servoControlAxis3.directionHint);
+  #if AXIS3_ENCODER == AB
+    Quadrature encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
+  #elif AXIS1_ENCODER == CW_CCW
+    CwCcw encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
+  #elif AXIS3_ENCODER == PULSE_DIR
+    PulseDir encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
+  #elif AXIS3_ENCODER == PULSE_ONLY
+    PulseOnly encAxis3(AXIS3_ENCODER_A_PIN, &servoControlAxis3.directionHint, 3);
+  #elif AXIS3_ENCODER == AS37_H39B_B
+    As37h39bb encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
+  #elif AXIS3_ENCODER == SERIAL_BRIDGE
+    SerialBridge encAxis3(3);
   #endif
 
   #if AXIS3_SERVO_FEEDBACK == FB_PID
@@ -28,7 +36,7 @@
     ServoTmc2209 driver3(3, &ServoPinsAxis3, &ServoSettingsAxis3);
   #endif
 
-  ServoMotor motor3(3, ((ServoDriver*)&driver3), &encAxis3, &pidAxis3, &servoControlAxis3);
+  ServoMotor motor3(3, ((ServoDriver*)&driver3), &encAxis3, &pidAxis3, &servoControlAxis3, AXIS3_SERVO_SYNC_THRESHOLD);
 #endif
 
 #ifdef AXIS3_STEP_DIR_PRESENT

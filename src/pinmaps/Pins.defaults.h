@@ -209,11 +209,11 @@
 #ifndef AXIS1_SERVO_PH2_PIN
 #define AXIS1_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS1_SERVO_ENC1_PIN
-#define AXIS1_SERVO_ENC1_PIN        OFF
+#ifndef AXIS1_ENCODER_A_PIN
+#define AXIS1_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS1_SERVO_ENC2_PIN
-#define AXIS1_SERVO_ENC2_PIN        OFF
+#ifndef AXIS1_ENCODER_B_PIN
+#define AXIS1_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS1_FAULT_PIN
 #define AXIS1_FAULT_PIN             OFF
@@ -258,11 +258,11 @@
 #ifndef AXIS2_SERVO_PH2_PIN
 #define AXIS2_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS2_SERVO_ENC1_PIN
-#define AXIS2_SERVO_ENC1_PIN        OFF
+#ifndef AXIS2_ENCODER_A_PIN
+#define AXIS2_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS2_SERVO_ENC2_PIN
-#define AXIS2_SERVO_ENC2_PIN        OFF
+#ifndef AXIS2_ENCODER_B_PIN
+#define AXIS2_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS2_FAULT_PIN
 #define AXIS2_FAULT_PIN             OFF
@@ -307,11 +307,11 @@
 #ifndef AXIS3_SERVO_PH2_PIN
 #define AXIS3_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS3_SERVO_ENC1_PIN
-#define AXIS3_SERVO_ENC1_PIN        OFF
+#ifndef AXIS3_ENCODER_A_PIN
+#define AXIS3_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS3_SERVO_ENC2_PIN
-#define AXIS3_SERVO_ENC2_PIN        OFF
+#ifndef AXIS3_ENCODER_B_PIN
+#define AXIS3_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS3_FAULT_PIN
 #define AXIS3_FAULT_PIN             OFF
@@ -356,11 +356,11 @@
 #ifndef AXIS4_SERVO_PH2_PIN
 #define AXIS4_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS4_SERVO_ENC1_PIN
-#define AXIS4_SERVO_ENC1_PIN        OFF
+#ifndef AXIS4_ENCODER_A_PIN
+#define AXIS4_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS4_SERVO_ENC2_PIN
-#define AXIS4_SERVO_ENC2_PIN        OFF
+#ifndef AXIS4_ENCODER_B_PIN
+#define AXIS4_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS4_FAULT_PIN
 #define AXIS4_FAULT_PIN             OFF
@@ -405,11 +405,11 @@
 #ifndef AXIS5_SERVO_PH2_PIN
 #define AXIS5_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS5_SERVO_ENC1_PIN
-#define AXIS5_SERVO_ENC1_PIN        OFF
+#ifndef AXIS5_ENCODER_A_PIN
+#define AXIS5_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS5_SERVO_ENC2_PIN
-#define AXIS5_SERVO_ENC2_PIN        OFF
+#ifndef AXIS5_ENCODER_B_PIN
+#define AXIS5_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS5_FAULT_PIN
 #define AXIS5_FAULT_PIN             OFF
@@ -454,11 +454,11 @@
 #ifndef AXIS6_SERVO_PH2_PIN
 #define AXIS6_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS6_SERVO_ENC1_PIN
-#define AXIS6_SERVO_ENC1_PIN        OFF
+#ifndef AXIS6_ENCODER_A_PIN
+#define AXIS6_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS6_SERVO_ENC2_PIN
-#define AXIS6_SERVO_ENC2_PIN        OFF
+#ifndef AXIS6_ENCODER_B_PIN
+#define AXIS6_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS6_FAULT_PIN
 #define AXIS6_FAULT_PIN             OFF
@@ -503,11 +503,11 @@
 #ifndef AXIS7_SERVO_PH2_PIN
 #define AXIS7_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS7_SERVO_ENC1_PIN
-#define AXIS7_SERVO_ENC1_PIN        OFF
+#ifndef AXIS7_ENCODER_A_PIN
+#define AXIS7_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS7_SERVO_ENC2_PIN
-#define AXIS7_SERVO_ENC2_PIN        OFF
+#ifndef AXIS7_ENCODER_B_PIN
+#define AXIS7_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS7_FAULT_PIN
 #define AXIS7_FAULT_PIN             OFF
@@ -552,11 +552,11 @@
 #ifndef AXIS8_SERVO_PH2_PIN
 #define AXIS8_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS8_SERVO_ENC1_PIN
-#define AXIS8_SERVO_ENC1_PIN        OFF
+#ifndef AXIS8_ENCODER_A_PIN
+#define AXIS8_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS8_SERVO_ENC2_PIN
-#define AXIS8_SERVO_ENC2_PIN        OFF
+#ifndef AXIS8_ENCODER_B_PIN
+#define AXIS8_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS8_FAULT_PIN
 #define AXIS8_FAULT_PIN             OFF
@@ -601,11 +601,11 @@
 #ifndef AXIS9_SERVO_PH2_PIN
 #define AXIS9_SERVO_PH2_PIN         OFF
 #endif
-#ifndef AXIS9_SERVO_ENC1_PIN
-#define AXIS9_SERVO_ENC1_PIN        OFF
+#ifndef AXIS9_ENCODER_A_PIN
+#define AXIS9_ENCODER_A_PIN         OFF
 #endif
-#ifndef AXIS9_SERVO_ENC2_PIN
-#define AXIS9_SERVO_ENC2_PIN        OFF
+#ifndef AXIS9_ENCODER_B_PIN
+#define AXIS9_ENCODER_B_PIN         OFF
 #endif
 #ifndef AXIS9_FAULT_PIN
 #define AXIS9_FAULT_PIN             OFF

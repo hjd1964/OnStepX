@@ -5,12 +5,12 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#ifdef SERIAL_ENCODER
-  #include "serialEncoder/SerialEncoder.h"
-#else
-  #include <Encoder.h> // https://github.com/hjd1964/Encoder (for AB, CW/CCW, PULSE/DIR, PULSE ONLY)
-                      // or use https://github.com/PaulStoffregen/Encoder for AB encoders only
-#endif
+#include "../../../encoder/as37h39bb/As37h39bb.h"
+#include "../../../encoder/cwCcw/CwCcw.h"
+#include "../../../encoder/pulseDir/PulseDir.h"
+#include "../../../encoder/pulseOnly/PulseOnly.h"
+#include "../../../encoder/quadrature/Quadrature.h"
+#include "../../../encoder/serialBridge/SerialBridge.h"
 
 #include "dc/Dc.h"
 #include "tmc2209/tmc2209.h"
@@ -20,7 +20,7 @@
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, int16_t syncThreshold, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
@@ -90,6 +90,7 @@ class ServoMotor : public Motor {
     float currentVelocity = 0.0F;       // last velocity set 
     float acceleration = ANALOG_WRITE_PWM_RANGE/5.0F;
     float accelerationFs = (ANALOG_WRITE_PWM_RANGE/5.0F)/FRACTIONAL_SEC;
+    int16_t syncThreshold = OFF;        // sync threshold in counts or OFF (for absolute encoders) 
 
     int32_t lastPosition = 0;           // the last encoder position for stall check
     unsigned long lastCheckTime = 0;    // time since the last encoder position was checked

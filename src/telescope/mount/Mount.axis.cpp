@@ -13,12 +13,18 @@
 #ifdef AXIS1_SERVO_PRESENT
   ServoControl servoControlAxis1;
 
-  #if AXIS1_SERVO_ENCODER == ENC_AB
-    Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN);
-  #elif AXIS1_SERVO_ENCODER == ENC_SERIAL
-    Encoder encAxis1(1);
-  #else
-    Encoder encAxis1(AXIS1_SERVO_ENC1_PIN, AXIS1_SERVO_ENC2_PIN, AXIS1_SERVO_ENCODER, AXIS1_SERVO_ENCODER_TRIGGER, &servoControlAxis1.directionHint);
+  #if AXIS1_ENCODER == AB
+    Quadrature encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+  #elif AXIS1_ENCODER == CW_CCW
+    CwCcw encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+  #elif AXIS1_ENCODER == PULSE_DIR
+    PulseDir encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+  #elif AXIS1_ENCODER == PULSE_ONLY
+    PulseOnly encAxis1(AXIS1_ENCODER_A_PIN, &servoControlAxis1.directionHint, 1);
+  #elif AXIS1_ENCODER == AS37_H39B_B
+    As37h39bb encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+  #elif AXIS1_ENCODER == SERIAL_BRIDGE
+    SerialBridge encAxis1(1);
   #endif
 
   #if AXIS1_SERVO_FEEDBACK == FB_PID
@@ -35,7 +41,7 @@
     ServoTmc2209 driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
   #endif
 
-  ServoMotor motor1(1, ((ServoDriver*)&driver1), &encAxis1, &pidAxis1, &servoControlAxis1);
+  ServoMotor motor1(1, ((ServoDriver*)&driver1), &encAxis1, &pidAxis1, &servoControlAxis1, AXIS1_SERVO_SYNC_THRESHOLD);
 #endif
 
 #ifdef AXIS1_STEP_DIR_PRESENT
@@ -65,12 +71,18 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
 #ifdef AXIS2_SERVO_PRESENT
   ServoControl servoControlAxis2;
 
-  #if AXIS2_SERVO_ENCODER == ENC_AB
-    Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN);
-  #elif AXIS2_SERVO_ENCODER == ENC_SERIAL
-    SEncoder encAxis2(2);
-  #else
-    Encoder encAxis2(AXIS2_SERVO_ENC1_PIN, AXIS2_SERVO_ENC2_PIN, AXIS2_SERVO_ENCODER, AXIS2_SERVO_ENCODER_TRIGGER, &servoControlAxis2.directionHint);
+  #if AXIS2_ENCODER == AB
+    Quadrature encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
+  #elif AXIS2_ENCODER == CW_CCW
+    CwCcw encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
+  #elif AXIS2_ENCODER == PULSE_DIR
+    PulseDir encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
+  #elif AXIS2_ENCODER == PULSE_ONLY
+    PulseOnly encAxis2(AXIS2_ENCODER_A_PIN, &servoControlAxis2.directionHint, 2);
+  #elif AXIS2_ENCODER == AS37_H39B_B
+    As37h39bb encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
+  #elif AXIS2_ENCODER == SERIAL_BRIDGE
+    SerialBridge encAxis2(2);
   #endif
 
   #if AXIS2_SERVO_FEEDBACK == FB_PID
@@ -87,7 +99,7 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
     ServoTmc2209 driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
   #endif
 
-  ServoMotor motor2(2, ((ServoDriver*)&driver2), &encAxis2, &pidAxis2, &servoControlAxis2);
+  ServoMotor motor2(2, ((ServoDriver*)&driver2), &encAxis2, &pidAxis2, &servoControlAxis2, AXIS2_SERVO_SYNC_THRESHOLD);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
 #endif
 

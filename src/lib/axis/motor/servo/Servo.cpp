@@ -22,7 +22,7 @@ IRAM_ATTR void moveServoMotorAxis8() { servoMotorInstance[7]->move(); }
 IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, bool useFastHardwareTimers) {
+ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, int16_t syncThreshold, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   strcpy(axisPrefix, "MSG: Servo_, ");
@@ -31,6 +31,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   this->encoder = encoder;
   this->feedback = feedback;
   this->control = control;
+  this->syncThreshold = syncThreshold;
   this->useFastHardwareTimers = useFastHardwareTimers;
   driverType = SERVO;
   this->driver = Driver;
@@ -115,8 +116,15 @@ DriverStatus ServoMotor::getDriverStatus() {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ServoMotor::resetPositionSteps(long value) {
-  Motor::resetPositionSteps(value);
-  encoder->write(value);
+  if (syncThreshold == OFF) {
+    Motor::resetPositionSteps(value);
+    encoder->write(value);
+  } else {
+    // disregard any home position, the absolute encoders are the final authority
+    Motor::resetPositionSteps(encoder->read());
+    D(axisPrefix);
+    DL("absolute encoder ignored reset position");
+  }
 }
 
 // get instrument coordinate, in steps
@@ -126,7 +134,15 @@ long ServoMotor::getInstrumentCoordinateSteps() {
 
 // set instrument coordinate, in steps
 void ServoMotor::setInstrumentCoordinateSteps(long value) {
-  Motor::setInstrumentCoordinateSteps(value);
+  noInterrupts();
+  long i = value - motorSteps;
+  interrupts();
+  if (syncThreshold == OFF || syncThreshold >= i) {
+    indexSteps = i;
+  } else {
+    D(axisPrefix);
+    DL("absolute encoder ignored sync exceeds threshold");
+  }
 }
 
 // distance to target in steps (+/-)
@@ -136,12 +152,6 @@ long ServoMotor::getTargetDistanceSteps() {
   noInterrupts();
   long distance = targetSteps - position;
   interrupts();
-
-//  if (distance < 20) {
-//    noInterrupts();
-//    distance = targetSteps - motorSteps;
-//    interrupts();
-//  }
 
   return distance;
 }
@@ -223,7 +233,7 @@ void ServoMotor::poll() {
   if (millis() - lastCheckTime > 1000) {
     if (labs(position - lastPosition) < 10 && abs(velocityPercent) >= 70) {
       D(axisPrefix);
-      DL("stall detected!");
+      D("stall detected!");
       D(" control->in = "); D(control->in);
       D(", control->set = "); D(control->set);
       D(", control->out = "); D(control->out);
@@ -240,7 +250,7 @@ void ServoMotor::poll() {
       count++;
       if (count % 25 == 0) {
         char s[80];
-        sprintf(s, "Servo%d: Delta %6ld, Power %6.3f%%\r\n", (int)axisNumber, (target - position), velocityPercent);
+        sprintf(s, "Servo%d_Delta: %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (target - position), (int)axisNumber, velocityPercent * 10.0F);
         D(s);
       }
     }

@@ -72,13 +72,14 @@
 #define ODRIVE_DRIVER_LAST          200
 
 // servo encoder (must match Encoder library)
-#define SERVO_ENCODER_FIRST         1
-#define ENC_AB                      1      // AB quadrature encoder
-#define ENC_CW_CCW                  2      // clockwise/counter-clockwise encoder
-#define ENC_PULSE_DIR               3      // pulse/direction encoder
-#define ENC_PULSE_ONLY              4      // pulse only encoder
-#define ENC_SERIAL                  5
-#define SERVO_ENCODER_LAST          5
+#define ENC_FIRST                   1
+#define AB                          1      // AB quadrature encoder
+#define CW_CCW                      2      // clockwise/counter-clockwise encoder
+#define PULSE_DIR                   3      // pulse/direction encoder
+#define PULSE_ONLY                  4      // pulse only encoder
+#define AS37_H39B_B                 5      // Broadcom AS37-H39B-B BISS-C interface encoder
+#define SERIAL_BRIDGE               6      // serial bridge to encoders
+#define ENC_LAST                    6
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1

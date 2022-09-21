@@ -249,6 +249,9 @@
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
+  #ifndef AXIS1_SERVO_SYNC_THRESHOLD
+  #define AXIS1_SERVO_SYNC_THRESHOLD    OFF                       // sync threshold in counts or OFF (for absolute encoders)
+  #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
   #endif
@@ -267,11 +270,8 @@
   #ifndef AXIS1_SERVO_D_GOTO
   #define AXIS1_SERVO_D_GOTO            AXIS1_SERVO_D             // D = derivative
   #endif
-  #ifndef AXIS1_SERVO_ENCODER
-  #define AXIS1_SERVO_ENCODER           ENC_AB                    // type of encoder: ENC_SERIAL, ENC_AB, ENC_CW_CCW, ENC_PULSE_DIR, ENC_PULSE_ONLY
-  #endif
-  #ifndef AXIS1_SERVO_ENCODER_TRIGGER
-  #define AXIS1_SERVO_ENCODER_TRIGGER   CHANGE                    // ignored for ENC_AB
+  #ifndef AXIS1_ENCODER
+  #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
   #endif
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
@@ -395,6 +395,9 @@
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS2_SERVO_SYNC_THRESHOLD
+  #define AXIS2_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
   #endif
@@ -413,11 +416,8 @@
   #ifndef AXIS2_SERVO_D_GOTO
   #define AXIS2_SERVO_D_GOTO            AXIS2_SERVO_D
   #endif
-  #ifndef AXIS2_SERVO_ENCODER
-  #define AXIS2_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS2_SERVO_ENCODER_TRIGGER
-  #define AXIS2_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS2_ENCODER
+  #define AXIS2_ENCODER                 AB
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          FB_PID
@@ -801,6 +801,9 @@
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS3_SERVO_SYNC_THRESHOLD
+  #define AXIS3_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS3_SERVO_P
   #define AXIS3_SERVO_P                 2.0
   #endif
@@ -819,11 +822,8 @@
   #ifndef AXIS3_SERVO_D_GOTO
   #define AXIS3_SERVO_D_GOTO            AXIS3_SERVO_D
   #endif
-  #ifndef AXIS3_SERVO_ENCODER
-  #define AXIS3_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS3_SERVO_ENCODER_TRIGGER
-  #define AXIS3_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS3_ENCODER
+  #define AXIS3_ENCODER                 AB
   #endif
   #ifndef AXIS3_SERVO_FEEDBACK
   #define AXIS3_SERVO_FEEDBACK          FB_PID
@@ -974,6 +974,9 @@
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS4_SERVO_SYNC_THRESHOLD
+  #define AXIS4_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
   #endif
@@ -992,11 +995,8 @@
   #ifndef AXIS4_SERVO_D_GOTO
   #define AXIS4_SERVO_D_GOTO            AXIS4_SERVO_D
   #endif
-  #ifndef AXIS4_SERVO_ENCODER
-  #define AXIS4_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS4_SERVO_ENCODER_TRIGGER
-  #define AXIS4_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS4_ENCODER
+  #define AXIS4_ENCODER                 AB
   #endif
   #ifndef AXIS4_SERVO_FEEDBACK
   #define AXIS4_SERVO_FEEDBACK          FB_PID
@@ -1122,6 +1122,9 @@
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS5_SERVO_SYNC_THRESHOLD
+  #define AXIS5_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS5_SERVO_P
   #define AXIS5_SERVO_P                 2.0
   #endif
@@ -1140,11 +1143,8 @@
   #ifndef AXIS5_SERVO_D_GOTO
   #define AXIS5_SERVO_D_GOTO            AXIS5_SERVO_D
   #endif
-  #ifndef AXIS5_SERVO_ENCODER
-  #define AXIS5_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS5_SERVO_ENCODER_TRIGGER
-  #define AXIS5_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS5_ENCODER
+  #define AXIS5_ENCODER                 AB
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          FB_PID
@@ -1270,6 +1270,9 @@
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS6_SERVO_SYNC_THRESHOLD
+  #define AXIS6_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS6_SERVO_P
   #define AXIS6_SERVO_P                 2.0
   #endif
@@ -1288,11 +1291,8 @@
   #ifndef AXIS6_SERVO_D_GOTO
   #define AXIS6_SERVO_D_GOTO            AXIS6_SERVO_D
   #endif
-  #ifndef AXIS6_SERVO_ENCODER
-  #define AXIS6_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS6_SERVO_ENCODER_TRIGGER
-  #define AXIS6_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS6_ENCODER
+  #define AXIS6_ENCODER                 AB
   #endif
   #ifndef AXIS6_SERVO_FEEDBACK
   #define AXIS6_SERVO_FEEDBACK          FB_PID
@@ -1418,6 +1418,9 @@
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS7_SERVO_SYNC_THRESHOLD
+  #define AXIS7_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS7_SERVO_P
   #define AXIS7_SERVO_P                 2.0
   #endif
@@ -1436,11 +1439,8 @@
   #ifndef AXIS7_SERVO_D_GOTO
   #define AXIS7_SERVO_D_GOTO            AXIS7_SERVO_D
   #endif
-  #ifndef AXIS7_SERVO_ENCODER
-  #define AXIS7_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS7_SERVO_ENCODER_TRIGGER
-  #define AXIS7_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS7_ENCODER
+  #define AXIS7_ENCODER                 AB
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          FB_PID
@@ -1566,6 +1566,9 @@
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS8_SERVO_SYNC_THRESHOLD
+  #define AXIS8_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS8_SERVO_P
   #define AXIS8_SERVO_P                 2.0
   #endif
@@ -1584,11 +1587,8 @@
   #ifndef AXIS8_SERVO_D_GOTO
   #define AXIS8_SERVO_D_GOTO            AXIS8_SERVO_D
   #endif
-  #ifndef AXIS8_SERVO_ENCODER
-  #define AXIS8_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS8_SERVO_ENCODER_TRIGGER
-  #define AXIS8_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS8_ENCODER
+  #define AXIS8_ENCODER                 AB
   #endif
   #ifndef AXIS8_SERVO_FEEDBACK
   #define AXIS8_SERVO_FEEDBACK          FB_PID
@@ -1714,6 +1714,9 @@
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
   #endif
+  #ifndef AXIS9_SERVO_SYNC_THRESHOLD
+  #define AXIS9_SERVO_SYNC_THRESHOLD    OFF
+  #endif
   #ifndef AXIS9_SERVO_P
   #define AXIS9_SERVO_P                 2.0
   #endif
@@ -1732,11 +1735,8 @@
   #ifndef AXIS9_SERVO_D_GOTO
   #define AXIS9_SERVO_D_GOTO            AXIS9_SERVO_D
   #endif
-  #ifndef AXIS9_SERVO_ENCODER
-  #define AXIS9_SERVO_ENCODER           ENC_AB
-  #endif
-  #ifndef AXIS9_SERVO_ENCODER_TRIGGER
-  #define AXIS9_SERVO_ENCODER_TRIGGER   CHANGE
+  #ifndef AXIS9_ENCODER
+  #define AXIS9_ENCODER                 AB
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          FB_PID

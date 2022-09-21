@@ -22,8 +22,8 @@ typedef struct ServoDcPins {
 typedef struct ServoDcSettings {
   int16_t model;
   int8_t  status;
-  int32_t velocityMax;  // in % of max power
-  int32_t acceleration; // in %/second/second
+  int32_t velocityMax;   // in % of max power
+  int32_t acceleration;  // in %/second/second
 } ServoDcSettings;
 
 class ServoDc : public ServoDriver {
