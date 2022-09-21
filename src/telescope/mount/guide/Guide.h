@@ -36,14 +36,14 @@ class Guide {
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     // start guide at a given direction and rate on Axis1
-    CommandError startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide = false);
+    CommandError startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);
 
     // stop guide on Axis1, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     // set abort true to rapidly stop (broken limit, etc)
     void stopAxis1(GuideAction stopDirection = GA_BREAK, bool abort = false);
 
     // start guide at a given direction and rate on Axis2
-    CommandError startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide = false);
+    CommandError startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);
 
     // stop guide on Axis2, use GA_BREAK to stop in either direction or specifiy the direction to be stopped GA_FORWARD or GA_REVERSE
     // set abort true to rapidly stop (broken limit, etc)
