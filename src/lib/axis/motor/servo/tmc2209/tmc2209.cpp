@@ -11,6 +11,15 @@
 #define rx m2
 #define tx m3
 
+// provide for using hardware serial
+#if SERIAL_TMC == HardSerial
+  #include <HardwareSerial.h>
+  #undef SERIAL_TMC
+  HardwareSerial HWSerialTMC(SERIAL_TMC_RX, SERIAL_TMC_TX);
+  #define SERIAL_TMC HWSerialTMC
+  #define SERIAL_TMC_RXTX_SET
+#endif
+
 ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 

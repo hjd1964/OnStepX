@@ -39,8 +39,8 @@ typedef struct ServoTmcPins {
 typedef struct ServoTmcSettings {
   int16_t model;
   int8_t  status;
-  int32_t velocityMax;  // maximum velocity in steps/second
-  int32_t acceleration; // acceleration steps/second/second
+  int32_t velocityMax;   // maximum velocity in steps/second
+  int32_t acceleration;  // acceleration steps/second/second
   int16_t microsteps;
   int16_t current;
 } ServoTmcSettings;
