@@ -136,7 +136,7 @@ class Site {
     unsigned long siderealPeriod = 0;
 
     // handle to sidereal timer LAST task
-    uint8_t handle = 0;
+    uint8_t taskHandle = 0;
 
     // site number 0..3
     uint8_t locationNumber = 0;

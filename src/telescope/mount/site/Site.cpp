@@ -130,10 +130,10 @@ void Site::init() {
   VF("MSG: Mount, site start sidereal timer task (rate 10ms priority 0)... ");
   delay(1000);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  handle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
-  if (handle) {
+  taskHandle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
+  if (taskHandle) {
     VLF("success"); 
-    if (!tasks.requestHardwareTimer(handle, 1)) { DLF("WRN: Site::init(), didn't get h/w timer for Clock (using s/w timer)"); }
+    if (!tasks.requestHardwareTimer(taskHandle, 1)) { DLF("WRN: Site::init(), didn't get h/w timer for Clock (using s/w timer)"); }
   } else { VLF("FAILED!"); }
 
   setSiderealPeriod(SIDEREAL_PERIOD);
@@ -216,7 +216,7 @@ unsigned long Site::getSiderealPeriod() {
 // sets sidereal period, in sub-micro counts per second
 void Site::setSiderealPeriod(unsigned long period) {
   siderealPeriod = period;
-  tasks.setPeriodSubMicros(handle, lround(siderealPeriod/FRACTIONAL_SEC));
+  tasks.setPeriodSubMicros(taskHandle, lround(siderealPeriod/FRACTIONAL_SEC));
 }
 
 // gets the time in hours that have passed since Julian Day was set (UT1)

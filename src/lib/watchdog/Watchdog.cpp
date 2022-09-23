@@ -14,11 +14,12 @@ void Watchdog::enable(int seconds) {
 
     // poll at 100ms
     VF("MSG: Watchdog, start monitor task (100ms rate priority 0)... ");
-    uint8_t handle = tasks.add(100, 0, true, 0, watchdogWrapper, "wdog");
-    if (handle) {
-      VLF("success");
-      if (!tasks.requestHardwareTimer(handle, 0)) { DLF("WRN: Watchdog::enable(), didn't get h/w timer (using s/w timer)"); }
-    }
+    uint8_t taskHandle = tasks.add(100, 0, true, 0, watchdogWrapper, "wdog");
+
+    if (taskHandle) {
+      VLF("success"); 
+      if (!tasks.requestHardwareTimer(taskHandle, 0)) { DLF("WRN: Watchdog::enable(), didn't get h/w timer (using s/w timer!!!)"); }
+    } else { VLF("FAILED!"); return false; }
   }
   enabled = true;
 }

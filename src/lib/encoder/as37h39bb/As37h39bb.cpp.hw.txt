@@ -64,9 +64,13 @@ void As37h39bb::init() {
   if (!initialized) return;
 
   // create timer for a 125kHz run rate; hopefully a hardware timer
-  uint8_t handle = tasks.add(0, 0, true, 0, as37h39b_isr, "As37h39");
-  tasks.requestHardwareTimer(handle, 3);
-  tasks.setPeriodMicros(handle, lround(500.0/CLOCK_RATE_KHZ));
+  VF("MSG: As37h39bb, start task to query encoder... ");
+  uint8_t taskHandle = tasks.add(0, 0, true, 0, as37h39b_isr, "As37h39");
+  if (taskHandle) {
+    V("success");
+    if (!tasks.requestHardwareTimer(taskHandle, 3)) { VLF(" (no hardware timer!)"); } else { VLF(""); }
+    tasks.setPeriodMicros(taskHandle, lround(500.0/CLOCK_RATE_KHZ));
+  } else { VLF("FAILED!"); initialized = false; }
 }
 
 // read encoder count
