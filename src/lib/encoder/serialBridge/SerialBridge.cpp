@@ -48,10 +48,8 @@ int32_t SerialBridge::raw() {
     #endif
     delay(100);
     _serial_bridge_initialized = true;
-    VL("MSG: SerialBridge, started");
   }
 
-//  VF("MSG: SerialBridge, send '"); V(channel); VL("'");
   SERIAL_ENCODER.print(channel);
   
   char c;
@@ -67,7 +65,6 @@ int32_t SerialBridge::raw() {
   } while (c != 13 && (millis() - start) < 4 && index < 16);
 
   if (strlen(result) > 0) {
-//    VF("MSG: SerialBridge, recv '"); V(result); VL("'");
     return atoi(result);
   } else {
     VLF("WRN: SerialBridge, timed out!");

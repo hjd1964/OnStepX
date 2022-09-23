@@ -1,4 +1,4 @@
-// Broadcom AS37-H39B-B BISS-C encoders
+// Broadcom AS37-H39B-B BISS-C encoders (hardware timer based version)
 
 #include "As37h39bb.h"
 
@@ -6,18 +6,67 @@
     AXIS4_ENCODER == AS37_H39B_B || AXIS5_ENCODER == AS37_H39B_B || AXIS6_ENCODER == AS37_H39B_B || \
     AXIS7_ENCODER == AS37_H39B_B || AXIS8_ENCODER == AS37_H39B_B || AXIS9_ENCODER == AS37_H39B_B
 
+#include "../../tasks/OnTask.h"
+
+volatile bool as37h39b_pause = false;
+volatile uint8_t as37h39b_sequence = 0;
+volatile uint8_t as37h39b_data[54];
+
+void as37h39b_isr() {
+  static bool toggle = false;
+
+  toggle != toggle;
+  if (toggle) {
+    #if AXIS1_ENCODER == AS37_H39B_B
+      digitalWriteF(AXIS1_ENCODER_A_PIN, HIGH);
+    #endif
+    #if AXIS2_ENCODER == AS37_H39B_B
+      digitalWriteF(AXIS2_ENCODER_A_PIN, HIGH);
+    #endif
+  } else {
+    as37h39b_sequence++;
+    if (as37h39b_sequence > 127) {
+      if (as37h39b_pause) as37h39b_sequence = 127; else as37h39b_sequence = 0;
+    }
+    if (as37h39b_sequence > 53) return;
+
+    #if AXIS1_ENCODER == AS37_H39B_B
+      as37h39b_data[as37h39b_sequence] = digitalReadF(AXIS1_ENCODER_B_PIN);
+    #endif
+    #if AXIS2_ENCODER == AS37_H39B_B
+      as37h39b_data[as37h39b_sequence] |= digitalReadF(AXIS2_ENCODER_B_PIN) << 1;
+    #endif
+
+    #if AXIS1_ENCODER == AS37_H39B_B
+      digitalWriteF(AXIS1_ENCODER_A_PIN, LOW);
+    #endif
+    #if AXIS2_ENCODER == AS37_H39B_B
+      digitalWriteF(AXIS2_ENCODER_A_PIN, LOW);
+    #endif
+  }
+}
+
 // designed according protocol description found in as38-H39e-b-an100.pdf
 
 As37h39bb::As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis) {
-  if (axis < 1 || axis > 9) return;
+  if (axis < 1 || axis > 2) return;
   initialized = true;
 
   clkPin = maPin;
   this->sloPin = sloPin;
-  this->axis = axis;
+  this->axis = axis - 1;
   pinMode(clkPin, OUTPUT);
-  digitalWriteF(clkPin, LOW);
+  digitalWrite(clkPin, LOW);
   pinMode(sloPin, INPUT_PULLUP);
+}
+
+void As37h39bb::init() {
+  if (!initialized) return;
+
+  // create timer for a 125kHz run rate; hopefully a hardware timer
+  uint8_t handle = tasks.add(0, 0, true, 0, as37h39b_isr, "As37h39");
+  tasks.requestHardwareTimer(handle, 3);
+  tasks.setPeriodMicros(handle, lround(500.0/CLOCK_RATE_KHZ));
 }
 
 // read encoder count
@@ -75,37 +124,31 @@ bool As37h39bb::readEnc(uint32_t &position) {
   encWrn = 0;
   encCrc = 0;
 
-  // rate in microseconds, ie 2+2 = 4 = 250KHz
-  int rate = lround(500.0/CLOCK_RATE_KHZ);
+  // grab the data
+  as37h39b_pause = true;
+  do {} while (as37h39b_sequence < 53);
+  uint8_t data[54];
+  for (int i = 0; i < 54; i++) data[i] = as37h39b_data[i];
+  as37h39b_pause = false;
+
+  int j = 0;
 
   // sync phase
   for (int i = 0; i < 20; i++) {
-    digitalWriteF(clkPin, LOW);
-    if (digitalReadF(sloPin) == LOW) foundAck = true;
-    delayMicroseconds(rate);
-    digitalWriteF(clkPin, HIGH);
-    delayMicroseconds(rate);
+    if (bitRead(data[j++], axis) == LOW) foundAck = true;
     if (foundAck) break;
   }
 
   // if we have an Ack
   if (foundAck) {
     for (int i = 0; i < 20; i++) {
-      digitalWriteF(clkPin, LOW);
-      if (digitalReadF(sloPin) == HIGH) foundStart = true;
-      delayMicroseconds(rate);
-      digitalWriteF(clkPin, HIGH);
-      delayMicroseconds(rate);
+      if (bitRead(data[j++], axis) == HIGH) foundStart = true;
       if (foundStart) break;
     }
 
     // if we have an Start
     if (foundStart) {
-      digitalWriteF(clkPin, LOW);
-      if (digitalReadF(sloPin) == LOW) foundCds = true;
-      delayMicroseconds(rate);
-      digitalWriteF(clkPin, HIGH);
-      delayMicroseconds(rate);
+      if (bitRead(data[j++], axis) == LOW) foundCds = true;
     }
 
     // if we have an Cds, read the data
@@ -113,51 +156,26 @@ bool As37h39bb::readEnc(uint32_t &position) {
 
       // the first 16 bits are the multi-turn count
       for (int i = 0; i < 16; i++) {
-        digitalWriteF(clkPin, LOW);
-        if (digitalReadF(sloPin) == HIGH) bitSet(encTurns, 15 - i);
-        delayMicroseconds(rate);
-        digitalWriteF(clkPin, HIGH);
-        delayMicroseconds(rate);
+        if (bitRead(data[j++], axis) == HIGH) bitSet(encTurns, 15 - i);
       }
       
       // the next 23 bits are the encoder absolute count
       for (int i = 0; i < 23; i++) {
-        digitalWriteF(clkPin, LOW);
-        if (digitalReadF(sloPin) == HIGH) bitSet(position, 22 - i);
-        delayMicroseconds(rate);
-        digitalWriteF(clkPin, HIGH);
-        delayMicroseconds(rate);
+        if (bitRead(data[j++], axis) == HIGH) bitSet(position, 22 - i);
       }
 
       // the Err bit
-      digitalWriteF(clkPin, LOW);
-      if (digitalReadF(sloPin) == HIGH) encErr = 1;
-      delayMicroseconds(rate);
-      digitalWriteF(clkPin, HIGH);
-      delayMicroseconds(rate);
+      if (bitRead(data[j++], axis) == HIGH) encErr = 1;
 
       // the Wrn bit
-      digitalWriteF(clkPin, LOW);
-      if (digitalReadF(sloPin) == HIGH) encWrn = 1;
-      delayMicroseconds(rate);
-      digitalWriteF(clkPin, HIGH);
-      delayMicroseconds(rate);
+      if (bitRead(data[j++], axis) == HIGH) encWrn = 1;
 
       // the last 6 bits are the CRC
       for (int i = 0; i < 6; i++) {
-        digitalWriteF(clkPin, LOW);
-        if (digitalReadF(sloPin) == HIGH) bitSet(encCrc, 5 - i);
-        delayMicroseconds(rate);
-        digitalWriteF(clkPin, HIGH);
-        delayMicroseconds(rate);
+        if (bitRead(data[j++], axis) == HIGH) bitSet(encCrc, 5 - i);
       }
     }
   }
-
-  // send a CDM (invert)
-  digitalWriteF(clkPin, LOW);
-  delayMicroseconds(rate * 10);
-  digitalWriteF(clkPin, HIGH);
 
   // trap errors
   int16_t errors = 0;

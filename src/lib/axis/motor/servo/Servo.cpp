@@ -34,6 +34,8 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   driverType = SERVO;
   this->driver = Driver;
 
+  encoder->init();
+
   feedback->getDefaultParameters(&default_param1, &default_param2, &default_param3, &default_param4, &default_param5, &default_param6);
 
   // attach the function pointers to the callbacks

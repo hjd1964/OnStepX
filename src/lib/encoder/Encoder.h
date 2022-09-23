@@ -33,6 +33,9 @@
 
 class Encoder {
   public:
+    // get device ready for use
+    virtual void init();
+
     // get current count
     virtual int32_t read();
 
