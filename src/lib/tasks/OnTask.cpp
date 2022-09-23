@@ -23,12 +23,6 @@
 // this line allows configuration of OnTask from the a given project, if this library is used stand-alone remove it
 #include "../../Common.h"
 
-// To enable the option to use a given hardware timer (1..4), if available, uncomment that line:
-//#define TASKS_HWTIMER1_ENABLE
-//#define TASKS_HWTIMER2_ENABLE
-//#define TASKS_HWTIMER3_ENABLE
-//#define TASKS_HWTIMER4_ENABLE
-
 // Enabling the profiler inserts time logging code into the process calls.  This provides the average
 // and largest start time delta and run time for each process.  To enable the profiler uncomment:
 //#define TASKS_PROFILER_ENABLE
@@ -36,9 +30,10 @@
 // Normally tasks are skipped if they become too late, to instead delay them for later processing uncomment:
 //#define TASKS_QUEUE_MISSED
 
+#include "OnTask.h"
+
 #include "HAL_PROFILER.h"
 #include "HAL_HWTIMERS.h"
-#include "OnTask.h"
 
 #define roundPeriod(x) ((unsigned long)((x)+(double)0.5L))
 
@@ -61,7 +56,7 @@ Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, vo
 }
 
 Task::~Task() {
-  switch (hardwareTimer) {
+  switch (hardware_timer) {
     case 1: HAL_HWTIMER1_DONE(); break;
     case 2: HAL_HWTIMER2_DONE(); break;
     case 3: HAL_HWTIMER3_DONE(); break;
@@ -99,25 +94,27 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   interrupts();
   HAL_HWTIMER_PREPARE_PERIOD(num, hardware_timer_period);
 
+  bool success = true;
   switch (num) {
     case 1:
       HAL_HWTIMER1_FUN = callback;
-      if (!HAL_HWTIMER1_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER1_INIT() failed"); return false; }
+      if (!HAL_HWTIMER1_INIT(hwPriority)) { success = false; HAL_HWTIMER1_FUN = NULL; }
     break;
     case 2:
       HAL_HWTIMER2_FUN = callback;
-      if (!HAL_HWTIMER2_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER2_INIT() failed"); return false; }
+      if (!HAL_HWTIMER2_INIT(hwPriority)) { success = false; HAL_HWTIMER2_FUN = NULL; }
     break;
     case 3:
       HAL_HWTIMER3_FUN = callback;
-      if (!HAL_HWTIMER3_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER3_INIT() failed"); return false; }
+      if (!HAL_HWTIMER3_INIT(hwPriority)) { success = false; HAL_HWTIMER3_FUN = NULL; }
     break;
     case 4:
       HAL_HWTIMER4_FUN = callback;
-      if (!HAL_HWTIMER4_INIT(hwPriority)) { DLF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER4_INIT() failed"); return false; }
+      if (!HAL_HWTIMER4_INIT(hwPriority)) { success = false; HAL_HWTIMER4_FUN = NULL; }
     break;
   }
-  hardwareTimer = num;
+  if (!success) { DF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER"); D(num); DLF("_INIT() failed"); return false; }
+  hardware_timer = num;
   period = hardware_timer_period;
   period_units = PU_SUB_MICROS;
   return true;
@@ -126,7 +123,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
 void Task::setCallback(void (*volatile callback)()) {
   this->callback = callback;
   noInterrupts();
-  switch (hardwareTimer) {
+  switch (hardware_timer) {
     case 1:
       HAL_HWTIMER1_FUN = callback;
     break;
@@ -148,7 +145,7 @@ void Task::setTimingMode(TimingMode mode) {
 }
 
 bool Task::poll() {
-  if (hardwareTimer || running) return false;
+  if (hardware_timer || running) return false;
 
   if (period != 0) {
     unsigned long t, time_to_next_task;
@@ -200,11 +197,11 @@ bool Task::poll() {
 }
 
 void Task::refreshPeriod() {
-  if (hardwareTimer) setHardwareTimerPeriod();
+  if (hardware_timer) setHardwareTimerPeriod();
 }
 
 void Task::setPeriod(unsigned long period, PeriodUnits units) {
-  if (hardwareTimer) {
+  if (hardware_timer) {
     next_period = period;
     next_period_units = units;
     setHardwareTimerPeriod();
@@ -260,12 +257,12 @@ void Task::setDurationComplete() {
 }
 
 void Task::setRepeat(bool repeat) {
-  if (hardwareTimer) return;
+  if (hardware_timer) return;
   this->repeat = repeat;
 }
 
 void Task::setPriority(bool priority) {
-  if (hardwareTimer) return;
+  if (hardware_timer) return;
   this->priority = priority;
 }
 
@@ -327,7 +324,7 @@ void Task::setHardwareTimerPeriod() {
     noInterrupts();
     period = temp;
     interrupts();
-    HAL_HWTIMER_PREPARE_PERIOD(hardwareTimer, period);
+    HAL_HWTIMER_PREPARE_PERIOD(hardware_timer, period);
   }
 }
 
@@ -389,14 +386,20 @@ uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t prio
   return handle;
 }
 
-bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t num) {
-  return requestHardwareTimer(handle, num, 128);
+bool Tasks::requestHardwareTimer(uint8_t handle) {
+  return requestHardwareTimer(handle, 128);
 }
 
-bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority) {
-  if (handle != 0 && allocated[handle - 1]) {
-    return task[handle - 1]->requestHardwareTimer(num, hwPriority);
-  } else return false;
+bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t hwPriority) {
+  if (handle != 0 && allocated[handle - 1] && TASKS_HWTIMERS > 0) {
+    for (int num = 0; num < TASKS_HWTIMERS; num++) {
+      if (!hardware_timer_allocated[num]) {
+        hardware_timer_allocated[num] = task[handle - 1]->requestHardwareTimer(num + 1, hwPriority);
+        return hardware_timer_allocated[num];
+      }
+    }
+  }
+  return false;
 }
 
 bool Tasks::setCallback(uint8_t handle, void (*volatile callback)()) {

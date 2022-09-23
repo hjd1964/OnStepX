@@ -36,23 +36,24 @@
   #define IRAM_ATTR
 #endif
 
-// this design supports up to four hardware timers, though not all may be present
-#ifdef TASKS_HWTIMER4_ENABLE
-  #define TASKS_HWTIMER_MAX 4
-#else
-  #ifdef TASKS_HWTIMER3_ENABLE
-    #define TASKS_HWTIMER_MAX 3
-  #else
-    #ifdef TASKS_HWTIMER2_ENABLE
-      #define TASKS_HWTIMER_MAX 2
-    #else
-      #ifdef TASKS_HWTIMER1_ENABLE
-        #define TASKS_HWTIMER_MAX 1
-      #else
-        #define TASKS_HWTIMER_MAX 0
-      #endif
-    #endif
-  #endif
+// To enable the option to use a given hardware timer (1..4), if available, uncomment that line:
+#ifndef TASKS_HWTIMERS
+  #define TASKS_HWTIMERS -1
+#endif
+#if TASKS_HWTIMERS < -1 || TASKS_HWTIMERS > 4
+    #error "OnTask: TASKS_HWTIMERS must be OFF, or 1 to 4."
+#endif
+#if TASKS_HWTIMERS >= 1
+  #define TASKS_HWTIMER1_ENABLE
+#endif
+#if TASKS_HWTIMERS >= 2
+  #define TASKS_HWTIMER2_ENABLE
+#endif
+#if TASKS_HWTIMERS >= 3
+  #define TASKS_HWTIMER3_ENABLE
+#endif
+#if TASKS_HWTIMERS == 4
+  #define TASKS_HWTIMER4_ENABLE
 #endif
 
 // default provision is for 8 tasks, up to 255 are allowed, to change use:
@@ -105,6 +106,7 @@ class Task {
     ~Task();
 
     bool requestHardwareTimer(uint8_t num, uint8_t hwPriority);
+    uint8_t hardware_timer = 0;
 
     void setCallback(void (*volatile callback)());
 
@@ -158,7 +160,6 @@ class Task {
     unsigned long          start_time        = 0;
     unsigned long          last_task_time    = 0;
     unsigned long          next_task_time    = 0;
-    uint8_t                hardwareTimer     = 0;
     TimingMode             timingMode        = TM_BALANCED;
     void (*volatile callback)() = NULL;
 
@@ -204,14 +205,13 @@ class Tasks {
     // \return          handle to the task on success, or 0 on failure
     uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]);
 
-    // allocates a hardware timer, if available, for this task. Note: for the 
-    // associated task: *repeat* must be true, *priority* must be 0 (all are higher than s/w task priority 0.)
+    // allocates a hardware timer, if available, for this task. Note: for the associated task: *repeat* must be true,
+    // *priority* must be 0 (all are higher than s/w task priority 0.)
     // \param handle        task handle
-    // \param num           the hardware timer number, there are up to four (1 to 4) depending on the platform
     // \param hwPriority    optional hardware interrupt priority, default is 128 if not specified
     // \return              true if successful, or false (in which case the standard polling timer will still be available)
-    bool requestHardwareTimer(uint8_t handle, uint8_t num, uint8_t hwPriority);
-    bool requestHardwareTimer(uint8_t handle, uint8_t num);
+    bool requestHardwareTimer(uint8_t handle, uint8_t hwPriority);
+    bool requestHardwareTimer(uint8_t handle);
 
     // change task callback
     // \param handle        task handle
@@ -333,6 +333,7 @@ class Tasks {
     uint8_t num_tasks        = 0; // the total number of tasks
     uint8_t number[8]        = {255, 255, 255, 255, 255, 255, 255, 255}; // the task# we are servicing at this priority level
     bool    allocated[TASKS_MAX];
+    bool    hardware_timer_allocated[4] = {false, false, false, false};
     Task    *task[TASKS_MAX];
 };
 

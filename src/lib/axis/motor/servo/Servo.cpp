@@ -8,8 +8,6 @@
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
-extern int _hardwareTimersAllocated;
-
 ServoMotor *servoMotorInstance[9];
 IRAM_ATTR void moveServoMotorAxis1() { servoMotorInstance[0]->move(); }
 IRAM_ATTR void moveServoMotorAxis2() { servoMotorInstance[1]->move(); }
@@ -70,12 +68,8 @@ bool ServoMotor::init() {
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     V("success");
-    if (useFastHardwareTimers && _hardwareTimersAllocated < TASKS_HWTIMER_MAX) {
-      if (tasks.requestHardwareTimer(taskHandle, _hardwareTimersAllocated + 1, 0)) {
-        _hardwareTimersAllocated++;
-      } else {
-        VF(" (no hardware timer!)");
-      }
+    if (useFastHardwareTimers) {
+      if (!tasks.requestHardwareTimer(taskHandle, 0)) { VF(" (no hardware timer!)"); }
     }
     VL("");
   } else {

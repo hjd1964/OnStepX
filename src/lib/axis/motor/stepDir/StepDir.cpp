@@ -7,8 +7,6 @@
 
 #include "../../../tasks/OnTask.h"
 
-extern int _hardwareTimersAllocated;
-
 StepDirMotor *stepDirMotorInstance[9];
 
 #ifndef AXIS1_STEP_PIN
@@ -144,13 +142,8 @@ bool StepDirMotor::init() {
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     V("success");
-    if (useFastHardwareTimers && _hardwareTimersAllocated < TASKS_HWTIMER_MAX) {
-      if (tasks.requestHardwareTimer(taskHandle, _hardwareTimersAllocated + 1, 0)) {
-        _hardwareTimersAllocated++;
-        VF(" (hardware timer)");
-      } else {
-        VF(" (no hardware timer!)");
-      }
+    if (useFastHardwareTimers) {
+      if (!tasks.requestHardwareTimer(taskHandle, 0)) { VF(" (no hardware timer!)"); }
     }
     VL("");
   } else { VLF("FAILED!"); return false; }
