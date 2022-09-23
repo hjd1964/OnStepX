@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------------
-// axis servo DC motor driver
+// axis servo TMC2209 stepper motor driver
 
-#include "tmc2209.h"
+#include "Tmc2209.h"
 
 #ifdef SERVO_TMC2209_PRESENT
 
@@ -164,7 +164,7 @@ void ServoTmc2209::updateStatus() {
 
       uint32_t status_word;
       TMC2208_n::DRV_STATUS_t status_result;
-      status_result.sr = ((TMC2209Stepper*)driver)->DRV_STATUS();
+      status_result.sr = driver->DRV_STATUS();
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;

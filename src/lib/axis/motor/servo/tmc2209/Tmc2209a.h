@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis servo DC motor driver
+// axis servo TMC2209 stepper motor driver
 #pragma once
 
 #include <Arduino.h>

@@ -13,7 +13,7 @@
 #include "../../../encoder/serialBridge/SerialBridge.h"
 
 #include "dc/Dc.h"
-#include "tmc2209/tmc2209.h"
+#include "tmc2209/Tmc2209.h"
 
 #include "feedback/pid/Pid.h"
 
