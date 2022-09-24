@@ -243,7 +243,7 @@ void ServoMotor::poll() {
       count++;
       if (count % 25 == 0) {
         char s[80];
-        sprintf(s, "Servo%d: Delta %6ld, Power %6.3f%%\r\n", (int)axisNumber, (target - position), velocityPercent);
+        sprintf(s, "Servo%d_Delta: %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (target - position), (int)axisNumber, velocityPercent * 10.0F);
         D(s);
       }
     }
