@@ -39,7 +39,7 @@
 #define SERIAL_IP_MODE                OFF //    OFF, WIFI_ACCESS_POINT or WIFI_STATION enables interface (ESP32 only.)       Option
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413: for 2-ch 1-wire gpio.                                            Option
+#define GPIO_DEVICE                   OFF //    OFF, DS2413: for 2ch or 4ch using 1-wire gpio's (one or two devices.)         Option
                                           //         SWS: for 8-ch Serial gpio (normally 4 unused encoder pins.)
                                           //         MCP23008: for 8-ch I2C gpio.
                                           //         MCP23017, X9555, or X8575: for 16-ch I2C gpio.
