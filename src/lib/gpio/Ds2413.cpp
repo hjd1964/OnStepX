@@ -6,8 +6,11 @@
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == DS2413
 
 #include "../1wire/1Wire.h"
+
 #include <DallasGPIO.h>               // my DallasGPIO library https://github.com/hjd1964/Arduino-DS2413GPIO-Control-Library
 DallasGPIO DS2413GPIO(&oneWire);
+
+#include "../tasks/OnTask.h"
 
 void ds2413Wrapper() { gpio.poll(); }
 
@@ -26,19 +29,27 @@ bool Ds2413::init() {
   VLF("*********************************************");
   VLF("MSG: Dallas/Maxim 1-wire DS2413 device s/n's:");
 
-  int index = 0;
   uint8_t addressFound[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   while (oneWire.search(addressFound)) {
     if (oneWire.crc8(addressFound, 7) == addressFound[7]) {
       if (addressFound[0] == 0x3A) {
-        if (index <= 1) { for (int j = 0; j < 8; j++) address[j] = addressFound[j]; deviceCount++; }
-        index++;
         #if DEBUG == VERBOSE
-          detected = true;
-          VF("DS2413:  0x"); for (int j = 0; j < 8; j++) { if (addressFound[j] < 16) { V("0"); } if (DEBUG != OFF) SERIAL_DEBUG.print(addressFound[j], HEX); }
-          if (index <= 1) { VF(" auto-assigned to FEATURE"); V((index - 1)*2 + 1); V("_PIN"); } else { VF(" not assigned"); }
-          VL("");
+          VF("DS2413: 0x");
+          for (int i = 0; i < 8; i++) {
+            if (addressFound[i] < 16) { V("0"); }
+            if (DEBUG != OFF) SERIAL_DEBUG.print(addressFound[i], HEX);
+          }
+          if (deviceCount < DS2413_MAX_DEVICES) {
+            VF(" allocated to GPIO("); V(deviceCount*2); VF(") and GPIO("); V(deviceCount*2 + 1); VLF(")");
+          } else { VLF(" not assigned"); }
         #endif
+
+        if (deviceCount < DS2413_MAX_DEVICES) {
+          for (int i = 0; i < 8; i++) address[deviceCount][i] = addressFound[i];
+          deviceCount++;
+        }
+
+        detected = true;
       }
     }
   }
@@ -51,9 +62,11 @@ bool Ds2413::init() {
 
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: GPIO, start DS2413 monitor task (rate 20ms priority 7)... ");
-    if (tasks.add(20, 0, true, 6, ds2413Wrapper, "ds2413")) { VLF("success"); } else { VLF("FAILED!"); }
+    VF("MSG: GPIO, start DS2413 monitor task (rate 100ms priority 7)... ");
+    if (tasks.add(100, 0, true, 7, ds2413Wrapper, "ds2413")) { VLF("success"); } else { VLF("FAILED!"); }
   } else found = false;
+
+  lastValidPin = deviceCount*2 - 1;
 
   initialized = true;
   return found;
@@ -70,54 +83,60 @@ bool Ds2413::command(char *reply, char *command, char *parameter, bool *supressF
   return false;
 }
 
-// set GPIO pin (0 or 1) mode for INPUT or OUTPUT (both pins must be in the same mode)
+// set GPIO pin mode for INPUT or OUTPUT (both pins of any device must be in the same mode)
 void Ds2413::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 1) {
+  if (found && pin >= 0 && pin <= lastValidPin) {
     if (mode == INPUT_PULLUP) mode = INPUT;
-    this->mode = mode;
+    this->mode[pin/2] = mode;
   }
 }
 
-// get GPIO pin (0 or 1) state
+// get GPIO pin state
 int Ds2413::digitalRead(int pin) {
-  if (found && (long)(millis() - goodUntil) < 0 && pin >= 0 && pin <= 1) {
+  if (found && (long)(millis() - goodUntil[pin/2]) < 0 && pin >= 0 && pin <= lastValidPin) {
     return state[pin];
   } else return -1;
 }
 
-// set GPIO pin (0 or 1) state
+// set GPIO pin state
 void Ds2413::digitalWrite(int pin, int value) {
-  if (found && pin >= 0 && pin <= 1) state[pin] = value;
+  if (found && pin >= 0 && pin <= lastValidPin) state[pin] = value;
 }
 
-// update the DS2413, designed for a 20ms polling interval
+// update the DS2413, designed for a 100ms polling interval
 void Ds2413::poll() {
   if (found) {
-    // loop to set the GPIO
+    // loop to get/set the GPIO
     // tasks.yield() during the 1-wire command sequence is ok since:
     //   1. only higher priority level tasks are allowed to run during a yield 
     //   2. all 1-wire task polling is run at the lowest priority level
-    if (mode == INPUT) {
-      for (int i = 0; i < 20; i++) {
-        if (DS2413GPIO.getStateByAddress(address, &state[1], &state[0], true)) break; else tasks.yield(20);
-      }
-    } else
-    if (mode == OUTPUT) {
-      if (lastState[0] != state[0] || lastState[1] != state[1]) {
-        for (int i = 0; i < 20; i++) {
-          if (DS2413GPIO.setStateByAddress(address, state[1], state[0], true)) break; else tasks.yield(20);
+    for (int index = 0; index < deviceCount; index++) {
+      if (mode[index] == INPUT) {
+        for (int i = 0; i < 22; i++) {
+          if (DS2413GPIO.getStateByAddress(address[0 + index], &state[1 + index*2], &state[0 + index*2], true)) break; else tasks.yield(2);
+        }
+      } else
+      if (mode[index] == OUTPUT) {
+        if (lastState[0 + index*2] != state[0 + index*2] || lastState[1 + index*2] != state[1 + index*2]) {
+          for (int i = 0; i < 22; i++) {
+            if (DS2413GPIO.setStateByAddress(address[0 + index], state[1 + index*2], state[0 + index*2], true)) break; else tasks.yield(2);
+          }
         }
       }
+      lastState[0 + index*2] = state[0 + index*2];
+      lastState[1 + index*2] = state[1 + index*2];
 
       if (DS2413GPIO.success()) {
-        goodUntil = millis() + 5000;
+        goodUntil[index] = millis() + 5000;
       } else {
-        state[0] = state[1] = INVALID;
-        DLF("ERR: DS2413 GPIO comms failure");
+        state[0 + index*2] = state[1 + index*2] = INVALID;
+        DF("ERR: DS2413 0x");
+        for (int i = 0; i < 8; i++) {
+          if (address[0 + index][i] < 16) { V("0"); }
+          if (DEBUG != OFF) SERIAL_DEBUG.print(address[0 + index][i], HEX);
+        }
+        DLF(" GPIO comms failure");
       }
-
-      lastState[0] = state[0];
-      lastState[1] = state[1];
     }
   }
 }

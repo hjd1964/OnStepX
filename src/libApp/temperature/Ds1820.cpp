@@ -33,7 +33,7 @@ bool Ds1820::init() {
   // scan the 1-wire bus and record the devices found
   oneWire.reset_search();
 
-  // only search out DS2413's or DS1820's IF none are explicitly specified
+  // only search out DS1820's IF none are explicitly specified
   bool search = deviceCount == 0;
   #if DEBUG == VERBOSE
     bool detected = false;
@@ -48,23 +48,24 @@ bool Ds1820::init() {
     if (oneWire.crc8(addressfound, 7) == addressfound[7]) {
       if (addressfound[0] == 0x10 || addressfound[0] == 0x28) {
         if (search) {
-          if (index <= 8) { if (device[index] != DS1820) index++; }
+          if (index <= 8) { while (device[index] != DS1820 && index <= 8) index++; }
           if (index <= 8) { for (int j = 0; j < 8; j++) { address[index][j] = addressfound[j]; deviceCount++; } }
           index++;
         }
+
         #if DEBUG == VERBOSE
-          detected = true;
           if (addressfound[0] == 0x10) { VF("DS18S20: 0x"); } else { VF("DS18B20: 0x"); }
-          for (int j = 0; j < 8; j++) {
-            if (addressfound[j] < 16) { V("0"); }
-            if (DEBUG != OFF) SERIAL_DEBUG.print(addressfound[j], HEX);
+          for (int i = 0; i < 8; i++) {
+            if (addressfound[i] < 16) { V("0"); }
+            if (DEBUG != OFF) SERIAL_DEBUG.print(addressfound[i], HEX);
           }
           if (search) {
-            if (index == 1) { VF(" auto-assigned to FOCUSER_TEMPERATURE"); } else
-            if (index <= 9) { VF(" auto-assigned to FEATURE"); V(index - 1); V("_TEMP"); } else { VF(" not assigned"); }
-          } else { VF(" auto-assign disabled"); }
-          VL("");
+            if (index == 1) { VLF(" auto-assigned to FOCUSER_TEMPERATURE"); } else
+            if (index <= 9) { VF(" auto-assigned to FEATURE"); V(index - 1); VLF("_TEMP"); } else { VLF(" not assigned"); }
+          } else { VLF(" auto-assign disabled"); }
         #endif
+
+        detected = true;
       }
     }
   }
@@ -78,44 +79,48 @@ bool Ds1820::init() {
   DS18X20.setWaitForConversion(false);
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 6)... ");
-    if (tasks.add(100, 0, true, 6, ds1820Wrapper, "ds1820")) { VLF("success"); } else { VLF("FAILED!"); }
+    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 7)... ");
+    if (tasks.add(100, 0, true, 7, ds1820Wrapper, "ds1820")) { VLF("success"); } else { VLF("FAILED!"); }
   } else found = false;
 
+  initialized = true;
   return found;
 }
 
 // read devices, designed for a 0.1s polling interval
 void Ds1820::poll() {
-  static int index = 0;
+  static int index = -1;
   static unsigned long requestTime = 0;
 
   if (found) {
-    if (index == 0) { DS18X20.requestTemperatures(true); requestTime = millis(); }
+    if (index < 0) { requestTime = millis(); if (DS18X20.requestTemperatures(true)) index++; }
     if ((long)(millis() - requestTime) < 200) return;
 
-    // loop to read the temperature
-    // tasks.yield() during the 1-wire command sequence is ok since:
-    //   1. only higher priority level tasks are allowed to run during a yield 
-    //   2. all 1-wire task polling is run at the lowest priority level
-    float rawTemperature = NAN;
-    for (int i = 0; i < 20; i++) {
-      rawTemperature = DS18X20.getTempC(address[index], true);
-      if (polling(rawTemperature)) tasks.yield(100); else break;
-    }
+    if (device[index] != (uint64_t)OFF) {
+      // loop to read the temperature
+      // tasks.yield() during the 1-wire command sequence is ok since:
+      //   1. only higher priority level tasks are allowed to run during a yield 
+      //   2. all 1-wire task polling is run at the lowest priority level
+      float rawTemperature = NAN;
+      for (int i = 0; i < 22; i++) {
+        rawTemperature = DS18X20.getTempC(address[index], true);
+        if (polling(rawTemperature)) tasks.yield(2); else break;
+      }
+  //D(index); D("="); DL(rawTemperature);
 
-    float temperature = validated(rawTemperature);
-    if (!isnan(temperature)) {
-      if (isnan(averageTemperature[index])) averageTemperature[index] = temperature;
-      averageTemperature[index] = (averageTemperature[index]*9.0F + temperature)/10.0F;
-      goodUntil[index] = millis() + 30000;
-    } else {
-      // we must get a reading at least once every 30 seconds otherwise flag the failure with a NAN
-      if ((long)(millis() - goodUntil[index]) > 0) averageTemperature[index] = NAN;
+      float temperature = validated(rawTemperature);
+      if (!isnan(temperature)) {
+        if (isnan(averageTemperature[index])) averageTemperature[index] = temperature;
+        averageTemperature[index] = (averageTemperature[index]*9.0F + temperature)/10.0F;
+        goodUntil[index] = millis() + 30000;
+      } else {
+        // we must get a reading at least once every 30 seconds otherwise flag the failure with a NAN
+        if ((long)(millis() - goodUntil[index]) > 0) averageTemperature[index] = NAN;
+      }
     }
   }
   index++;
-  if (index > 8) index = 0;
+  if (index > 8) index = -1;
 }
 
 // nine temperature sensors are supported, this gets the averaged temperature
@@ -132,12 +137,12 @@ float Ds1820::getChannel(int index) {
 
 // checks for polling status code from DS1820 library
 bool Ds1820::polling(float f) {
-  return (fabs(f - DEVICE_POLLING_C) < 0.001);
+  return (fabs(f - DEVICE_POLLING_C) < 0.001F);
 }
 
 // checks for validated status code from DS1820 library
 float Ds1820::validated(float f) {
-  if (fabs(f - DEVICE_DISCONNECTED_C) < 0.001) return NAN;
+  if (fabs(f - DEVICE_DISCONNECTED_C) < 0.001F) return NAN;
   if (f < -100 || f > 70) return NAN;
   return f;
 }

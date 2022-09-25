@@ -72,7 +72,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   #endif
 
   weather.init();
-
+  temperature.init();
+  
   #ifdef MOUNT_PRESENT
     mount.init();
     mountStatus.init();
