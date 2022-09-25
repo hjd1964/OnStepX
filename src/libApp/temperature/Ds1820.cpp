@@ -106,7 +106,6 @@ void Ds1820::poll() {
         rawTemperature = DS18X20.getTempC(address[index], true);
         if (polling(rawTemperature)) tasks.yield(2); else break;
       }
-  //D(index); D("="); DL(rawTemperature);
 
       float temperature = validated(rawTemperature);
       if (!isnan(temperature)) {
