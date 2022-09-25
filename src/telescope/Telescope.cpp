@@ -6,8 +6,10 @@
 
 #include "../lib/convert/Convert.h"
 #include "../libApp/commands/ProcessCmds.h"
-#include "Telescope.h"
 #include "../libApp/weather/Weather.h"
+#include "../libApp/temperature/Temperature.h"
+
+#include "Telescope.h"
 
 #include "addonFlasher/AddonFlasher.h"
 #include "mount/Mount.h"
