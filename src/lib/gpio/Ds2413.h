@@ -27,7 +27,7 @@ class Ds2413 {
     // set GPIO pin state
     void digitalWrite(int pin, int value);
 
-    // update the DS2413, designed for a 20ms polling interval
+    // update the DS2413
     void poll();
 
   private:

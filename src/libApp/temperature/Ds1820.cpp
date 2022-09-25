@@ -79,15 +79,15 @@ bool Ds1820::init() {
   DS18X20.setWaitForConversion(false);
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: Temperature, start DS1820 monitor task (rate 100ms priority 7)... ");
-    if (tasks.add(100, 0, true, 7, ds1820Wrapper, "ds1820")) { VLF("success"); } else { VLF("FAILED!"); }
+    VF("MSG: Temperature, start DS1820 monitor task (rate 250ms priority 7)... ");
+    if (tasks.add(250, 0, true, 7, ds1820Wrapper, "ds1820")) { VLF("success"); } else { VLF("FAILED!"); }
   } else found = false;
 
   initialized = true;
   return found;
 }
 
-// read devices, designed for a 0.1s polling interval
+// read devices
 void Ds1820::poll() {
   static int index = -1;
   static unsigned long requestTime = 0;

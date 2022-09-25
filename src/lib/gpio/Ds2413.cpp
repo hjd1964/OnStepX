@@ -103,7 +103,7 @@ void Ds2413::digitalWrite(int pin, int value) {
   if (found && pin >= 0 && pin <= lastValidPin) state[pin] = value;
 }
 
-// update the DS2413, designed for a 100ms polling interval
+// update the DS2413
 void Ds2413::poll() {
   if (found) {
     // loop to get/set the GPIO

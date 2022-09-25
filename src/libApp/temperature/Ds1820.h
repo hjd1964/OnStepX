@@ -11,7 +11,7 @@ class Ds1820 {
     // scan for DS18B20 devices on the 1-wire bus and prepare for operation
     bool init();
 
-    // read devices, designed for a 0.1s polling interval
+    // read devices
     void poll();
 
     // nine temperature sensors are supported, this gets the averaged
