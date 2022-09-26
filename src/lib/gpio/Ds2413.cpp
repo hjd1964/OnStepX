@@ -113,13 +113,13 @@ void Ds2413::poll() {
     for (int index = 0; index < deviceCount; index++) {
       if (mode[index] == INPUT) {
         for (int i = 0; i < 22; i++) {
-          if (DS2413GPIO.getStateByAddress(address[0 + index], &state[1 + index*2], &state[0 + index*2], true)) break; else tasks.yield(2);
+          if (DS2413GPIO.getStateByAddress(address[0 + index], &state[0 + index*2], &state[1 + index*2], true)) break; else tasks.yield(2);
         }
       } else
       if (mode[index] == OUTPUT) {
         if (lastState[0 + index*2] != state[0 + index*2] || lastState[1 + index*2] != state[1 + index*2]) {
           for (int i = 0; i < 22; i++) {
-            if (DS2413GPIO.setStateByAddress(address[0 + index], state[1 + index*2], state[0 + index*2], true)) break; else tasks.yield(2);
+            if (DS2413GPIO.setStateByAddress(address[0 + index], state[0 + index*2], state[1 + index*2], true)) break; else tasks.yield(2);
           }
         }
       }
