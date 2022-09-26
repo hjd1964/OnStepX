@@ -159,6 +159,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (command[1] == 'S') r = 8; else r = command[1] - '0';
       settings.axis1RateSelect = (GuideRateSelect)r;
       settings.axis2RateSelect = (GuideRateSelect)r;
+      VF("MSG: Guide rate "); V(r); VLF(" selected");
       if (GUIDE_SEPARATE_PULSE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
         settings.pulseRateSelect = (GuideRateSelect)r;
         nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
