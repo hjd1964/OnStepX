@@ -340,13 +340,15 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
     motor->setSlewing(true);
     V(axisPrefix); VF("autoSlew start ");
   } else { VF("autoSlew resum "); }
+
   if (direction == DIR_FORWARD) {
     autoRate = AR_RATE_BY_TIME_FORWARD;
-    V(axisPrefix); VF("fwd@ ");
+    VF("fwd@ ");
   } else {
     autoRate = AR_RATE_BY_TIME_REVERSE;
-    V(axisPrefix); VF("rev@ ");
+    VF("rev@ ");
   }
+
   #if DEBUG == VERBOSE
     if (unitsRadians) {
       if (radToDeg(slewFreq) >= 0.01F ) {
@@ -355,6 +357,7 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
         V(radToDeg(slewFreq)*3600.0F); V(" arc-sec");
       } 
     } else { V(slewFreq); V(unitsStr); }
+
     VF("/s, accel ");
     if (unitsRadians) SERIAL_DEBUG.print(radToDeg(slewAccelRateFs)*FRACTIONAL_SEC, 3); else SERIAL_DEBUG.print(slewAccelRateFs*FRACTIONAL_SEC, 3);
     V(unitsStr); VLF("/s/s");
