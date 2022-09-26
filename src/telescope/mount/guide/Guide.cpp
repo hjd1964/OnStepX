@@ -57,14 +57,15 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
+  if (rate <= 2) {
+    axis1.setPowerDownOverrideTime(300000UL);
+    axis2.setPowerDownOverrideTime(300000UL);
+  }
   if (rate <= 2 && rateSelect != GR_CUSTOM) {
     backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
-    axis1.setPowerDownOverrideTime(300000UL);
-    axis2.setPowerDownOverrideTime(300000UL);
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
     V(rate); VL("X");
-
     mount.update();
   } else {
     state = GU_GUIDE;
@@ -110,15 +111,16 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
   guideFinishTimeAxis2 = millis() + guideTimeLimit;
 
+  if (rate <= 2) {
+    axis1.setPowerDownOverrideTime(300000UL);
+    axis2.setPowerDownOverrideTime(300000UL);
+  }
   if (rate <= 2 && rateSelect != GR_CUSTOM) {
     state = GU_PULSE_GUIDE;
     backlashEnableControl(false);
-    axis1.setPowerDownOverrideTime(300000UL);
-    axis2.setPowerDownOverrideTime(300000UL);
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
     V(rate); VL("X");
-
     mount.update();
   } else {
     state = GU_GUIDE;
