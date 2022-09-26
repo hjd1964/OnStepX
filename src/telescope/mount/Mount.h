@@ -92,6 +92,9 @@ class Mount {
     void poll();
 
     float trackingRate = 1.0F;
+    float trackingRateAxis1 = 0.0F;
+    float trackingRateAxis2 = 0.0F;
+
     MountSettings settings = {RC_DEFAULT, { 0, 0 }};
 
   private:
@@ -111,8 +114,6 @@ class Mount {
     Coordinate current;
 
     TrackingState trackingState = TS_NONE;
-    float trackingRateAxis1     = 0.0F;
-    float trackingRateAxis2     = 0.0F;
 
     bool syncToEncodersEnabled = false;
 
