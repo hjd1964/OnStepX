@@ -117,6 +117,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
 
     // :RA[n.n]#  Set Axis1 Guide rate to n.n degrees per second
     //            Returns: Nothing
+    //            Note: Tracking, if active, is suspended in this mode of operation
     if (command[1] == 'A') {
       char* conv_end;
       float f = strtod(parameter, &conv_end);
@@ -132,6 +133,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
 
     // :RE[n.n]#  Set Axis2 Guide rate to n.n degrees per second
     //            Returns: Nothing
+    //            Note: Tracking, if active, is suspended in this mode of operation
     if (command[1] == 'E') {
       char* conv_end;
       float f = strtod(parameter, &conv_end);
@@ -152,6 +154,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
     // :RS#       Set guide rate: Slew           ?X (1/2 of current goto rate)
     // :Rn#       Set guide rate to n, where n = 0..9
     //            Returns: Nothing
+    //            Note: Tracking, if active, is integrated in this mode of operation
     if (strchr("GCMFS0123456789", command[1]) && parameter[0] == 0) {
       int r;
       if (command[1] == 'G') r = 2; else if (command[1] == 'C') r = 5; else
