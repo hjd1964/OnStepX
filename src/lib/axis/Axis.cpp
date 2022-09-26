@@ -140,7 +140,14 @@ void Axis::setPowerDownTime(int value) {
 
 // time (in ms) to disable automatic power down at standstill, use 0 to disable
 void Axis::setPowerDownOverrideTime(int value) {
-  if (value == 0) powerDownOverride = false; else { powerDownOverride = true; powerDownOverrideEnds = millis() + value; }
+  if (value == 0) powerDownOverride = false; else {
+    if (poweredDown) {
+      poweredDown = false;
+      motor->enable(true);
+    }
+    powerDownOverride = true;
+    powerDownOverrideEnds = millis() + value;
+  }
 }
 
 // set backlash amount in "measures" (radians, microns, etc.)
