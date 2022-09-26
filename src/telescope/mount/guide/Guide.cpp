@@ -70,7 +70,9 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
   } else {
     state = GU_GUIDE;
     backlashEnableControl(true);
-    if (guideAction == GA_REVERSE) rate -= mount.trackingRateAxis1; else rate += mount.trackingRateAxis1; 
+    if (rateSelect != GR_CUSTOM) {
+      if (guideAction == GA_REVERSE) rate -= mount.trackingRateAxis1; else rate += mount.trackingRateAxis1;
+    }
     axis1.setFrequencySlew(degToRadF(rate/240.0F));
     axis1AutoSlew(guideAction);
   }
@@ -126,7 +128,9 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
   } else {
     state = GU_GUIDE;
     backlashEnableControl(true);
-    if (guideAction == GA_REVERSE) rate -= mount.trackingRateAxis2; else rate += mount.trackingRateAxis2; 
+    if (rateSelect != GR_CUSTOM) {
+      if (guideAction == GA_REVERSE) rate -= mount.trackingRateAxis2; else rate += mount.trackingRateAxis2;
+    }
     axis2.setFrequencySlew(degToRadF(rate/240.0F));
     axis2AutoSlew(guideAction);
   }
