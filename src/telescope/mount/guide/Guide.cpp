@@ -364,6 +364,10 @@ void Guide::spiralPoll() {
   customRateAxis1 = rate*cos(angle);
   customRateAxis2 = rate*sin(angle);
 
+  // add the current tracking rates
+  customRateAxis1 += mount.trackingRateAxis1;
+  customRateAxis2 += mount.trackingRateAxis2;
+
   // set any new directions
   guideActionAxis1 = GA_FORWARD;
   guideActionAxis2 = GA_FORWARD;
