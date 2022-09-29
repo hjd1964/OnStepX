@@ -12,7 +12,9 @@
   // similar broadcom devices have range of 10MHz to 80 KHz
   // the fastest supported rate for this library depends on the MCU performance
   // slower rates don't disrupt timing much and still take lots of samples
-  #define CLOCK_RATE_KHZ 125
+  #ifndef AS37_CLOCK_RATE_KHZ
+  #define AS37_CLOCK_RATE_KHZ 125
+  #endif
 
   class As37h39bb : public Encoder {
     public:

@@ -69,7 +69,7 @@ void As37h39bb::init() {
   if (taskHandle) {
     V("success");
     if (!tasks.requestHardwareTimer(taskHandle, 3)) { VLF(" (no hardware timer!)"); } else { VLF(""); }
-    tasks.setPeriodMicros(taskHandle, lround(500.0/CLOCK_RATE_KHZ));
+    tasks.setPeriodMicros(taskHandle, lround(500.0/AS37_CLOCK_RATE_KHZ));
   } else { VLF("FAILED!"); initialized = false; }
 }
 
@@ -194,8 +194,11 @@ bool As37h39bb::readEnc(uint32_t &position) {
     return false;
   }
 
-  // combine absolute and 9 low order bits of multi-turn count for a 32 bit count
-  position = position | ((encTurns & 0b0111111111) << 23);
+  #ifndef AS37_SINGLE_TURN
+    // combine absolute and 9 low order bits of multi-turn count for a 32 bit count
+    position = position | ((encTurns & 0b0111111111) << 23);
+  #endif
+
   return true;
 }
 

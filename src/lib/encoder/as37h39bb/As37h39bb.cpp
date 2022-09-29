@@ -76,7 +76,7 @@ bool As37h39bb::readEnc(uint32_t &position) {
   encCrc = 0;
 
   // rate in microseconds, ie 2+2 = 4 = 250KHz
-  int rate = lround(500.0/CLOCK_RATE_KHZ);
+  int rate = lround(500.0/AS37_CLOCK_RATE_KHZ);
 
   // sync phase
   for (int i = 0; i < 20; i++) {
@@ -172,8 +172,11 @@ bool As37h39bb::readEnc(uint32_t &position) {
     return false;
   }
 
-  // combine absolute and 9 low order bits of multi-turn count for a 32 bit count
-  position = position | ((encTurns & 0b0111111111) << 23);
+  #ifndef AS37_SINGLE_TURN
+    // combine absolute and 9 low order bits of multi-turn count for a 32 bit count
+    position = position | ((encTurns & 0b0111111111) << 23);
+  #endif
+
   return true;
 }
 
