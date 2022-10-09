@@ -109,6 +109,8 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 
   guideActionAxis2 = guideAction;
   float rate = rateSelectToRate(rateSelect, 2);
+  float fastestRate = rateSelectToRate(GR_MAX, 2)*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F);
+  if (rate > fastestRate) rate = fastestRate;
 
   // unlimited 0 means the maximum period, about 49 days
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF;
@@ -203,7 +205,7 @@ CommandError Guide::startHome() {
 
     guideFinishTimeAxis2 = millis() + (unsigned long)(GUIDE_HOME_TIME_LIMIT * 1000.0);
     guideActionAxis2 = GA_HOME;
-    axis2.setFrequencySlew(goTo.rate);
+    axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
     axis2.autoSlewHome();
   #endif
   return CE_NONE;
@@ -356,7 +358,9 @@ void Guide::spiralPoll() {
   float rate = rateSelectToRate(spiralGuideRateSelect);
   float maxRate = rateSelectToRate(GR_MAX);
   if (rate > maxRate/2.0) rate = maxRate/2.0;
-
+  float fastestRate = rateSelectToRate(GR_MAX, 2)*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F);
+  if (rate > fastestRate) rate = fastestRate;
+  
   // apparaent FOV (in arc-seconds) = rate*15.0*2.0;
   // current radius assuming movement at 2 seconds per fov
   double radius = pow(T/6.28318, 1.0/1.74);

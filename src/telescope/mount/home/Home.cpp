@@ -60,7 +60,7 @@ CommandError Home::request() {
         if (transform.mountType == ALTAZM) transform.horToEqu(&position);
         return goTo.request(&position, PSS_EAST_ONLY, false);
       #else
-        axis2.setFrequencySlew(goTo.rate);
+        axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
         axis2.setTargetCoordinate(axis2.getIndexPosition());
         VLF("Mount, axis2 home target coordinates set");
         axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));

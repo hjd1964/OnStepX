@@ -640,6 +640,9 @@
 #ifndef SLEW_RATE_MEMORY
 #define SLEW_RATE_MEMORY              OFF                         // ON to retain runtime slew rate settings across power cycles
 #endif
+#ifndef AXIS2_SLEW_RATE_PERCENT
+#define AXIS2_SLEW_RATE_PERCENT       100.0F                      // allows max slew rate slow down of Axis2 relative to Axis1
+#endif
 #ifndef SLEW_ACCELERATION_DIST
 #define SLEW_ACCELERATION_DIST        5.0                         // distance in degrees to complete acceleration/deceleration
 #endif
