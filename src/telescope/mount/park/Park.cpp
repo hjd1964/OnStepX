@@ -129,6 +129,7 @@ CommandError Park::request() {
     parkTarget.h = settings.position.h;
     parkTarget.d = settings.position.d;
     parkTarget.pierSide = settings.position.pierSide;
+    if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
 
     // goto the park (mount) target coordinate
     VLF("MSG: Mount, parking");
