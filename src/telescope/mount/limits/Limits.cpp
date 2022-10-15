@@ -38,19 +38,19 @@ void Limits::init() {
 void Limits::constrainMeridianLimits() {
   if (settings.pastMeridianE > Deg360) {
     settings.pastMeridianE = Deg360;
-    DLF("WRN: Limits::init(), pastMeridianE > 360° setting to 360°");
+    DLF("WRN: Limits::init(), pastMeridianE > 360 deg setting to 360 deg");
   }
   if (settings.pastMeridianE < -Deg360) {
     settings.pastMeridianE = -Deg360;
-    DLF("WRN: Limits::init(), pastMeridianE < -360° setting to -360°");
+    DLF("WRN: Limits::init(), pastMeridianE < -360 deg setting to -360 deg");
   }
   if (settings.pastMeridianW > Deg360) {
     settings.pastMeridianW = Deg360;
-    DLF("WRN: Limits::init(), pastMeridianW > 360° setting to 360°");
+    DLF("WRN: Limits::init(), pastMeridianW > 360 deg setting to 360 deg");
   }
   if (settings.pastMeridianW < -Deg360) {
     settings.pastMeridianW = -Deg360;
-    DLF("WRN: Limits::init(), pastMeridianW < -360° setting to -360°");
+    DLF("WRN: Limits::init(), pastMeridianW < -360 deg setting to -360 deg");
   }
 }
 
@@ -314,18 +314,18 @@ void Limits::poll() {
         lastError.limitSense.axis2.min != error.limitSense.axis2.min ||
         lastError.limitSense.axis2.max != error.limitSense.axis2.max) {
       V(errPre);
-      V(error.altitude.min?         "Alt-◄ " :"Alt-  ");
-      V(error.altitude.max?         "Alt+◄ " :"Alt+  ");
-      V(error.meridian.east?        "ME◄ "   :"ME  "  );
-      V(error.meridian.west?        "MW◄ "   :"MW  "  );
-      V(error.limit.axis1.min?      "A1L-◄ " :"A1L-  ");
-      V(error.limit.axis1.max?      "A1L+◄ " :"A1L+  ");
-      V(error.limit.axis2.min?      "A2L-◄ " :"A2L-  ");
-      V(error.limit.axis2.max?      "A2L+◄ " :"A2L+  ");
-      V(error.limitSense.axis1.min? "A1S-◄ " :"A1S-  ");
-      V(error.limitSense.axis1.max? "A1S+◄ " :"A1S+  ");
-      V(error.limitSense.axis2.min? "A2S-◄ " :"A2S-  ");
-      VL(error.limitSense.axis2.max?"A2S+◄"  :"A2S+"  );
+      V(error.altitude.min?         "Alt-< " :"Alt-  ");
+      V(error.altitude.max?         "Alt+< " :"Alt+  ");
+      V(error.meridian.east?        "ME< "   :"ME  "  );
+      V(error.meridian.west?        "MW< "   :"MW  "  );
+      V(error.limit.axis1.min?      "A1L-< " :"A1L-  ");
+      V(error.limit.axis1.max?      "A1L+< " :"A1L+  ");
+      V(error.limit.axis2.min?      "A2L-< " :"A2L-  ");
+      V(error.limit.axis2.max?      "A2L+< " :"A2L+  ");
+      V(error.limitSense.axis1.min? "A1S-< " :"A1S-  ");
+      V(error.limitSense.axis1.max? "A1S+< " :"A1S+  ");
+      V(error.limitSense.axis2.min? "A2S-< " :"A2S-  ");
+      VL(error.limitSense.axis2.max?"A2S+<"  :"A2S+"  );
     }
   #endif
 

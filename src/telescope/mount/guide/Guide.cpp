@@ -385,7 +385,7 @@ void Guide::spiralPoll() {
   axis2AutoSlew(guideActionAxis2);
 
   // adjust Axis1 rate due to spherical coordinates and limit it to rates we can reach.  worst case the
-  // shape of the spiral will degrade to an 2:1 aspect oval at half max rate (fastest allowed) and |Axis2| = 75°
+  // shape of the spiral will degrade to an 2:1 aspect oval at half max rate (fastest allowed) and |Axis2| = 75 deg
   customRateAxis1 /= spiralScaleAxis1;
   if (customRateAxis1 > maxRate) customRateAxis1 = maxRate;
 

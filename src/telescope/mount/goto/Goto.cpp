@@ -501,7 +501,7 @@ CommandError Goto::startAutoSlew() {
     axis2.setTargetCoordinate(a2);
   }
 
-  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("°, a2="); V(radToDeg(a2)); VL("°)");
+  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("deg, a2="); V(radToDeg(a2)); DL(" deg)");
 
   e = axis1.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
   if (e == CE_NONE) e = axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));

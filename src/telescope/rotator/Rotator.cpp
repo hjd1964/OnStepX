@@ -97,7 +97,7 @@ CommandError Rotator::slew(Direction dir) {
 CommandError Rotator::gotoTarget(float target) {
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
-  VF("MSG: Rotator, goto target coordinate set ("); V(target); VL("°)");
+  VF("MSG: Rotator, goto target coordinate set ("); V(target); VL(" deg)");
   VLF("MSG: Rotator, starting goto");
 
   axis3.setFrequencyBase(0.0F);
@@ -142,7 +142,7 @@ CommandError Rotator::unpark() {
   }
 
   axis3.enable(true);
-  VF("MSG: Rotator, unpark position "); V(settings.position); VL("°");
+  VF("MSG: Rotator, unpark position "); V(settings.position); VL(" deg");
 
   // simple unpark if we didn't actually park
   if (settings.parkState == PS_UNPARKED) {
@@ -227,7 +227,7 @@ void Rotator::monitor() {
         if (secs > writeTime) {
           settings.position = axis3.getInstrumentCoordinate();
           writeSettings();
-          VF("MSG: Rotator, writing position ("); V(settings.position); VL("°) to NV"); 
+          VF("MSG: Rotator, writing position ("); V(settings.position); VL(" deg) to NV"); 
         }
       }
     }
