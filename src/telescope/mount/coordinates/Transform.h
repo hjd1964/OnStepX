@@ -53,10 +53,10 @@ class Transform {
     void observedPlaceToTopocentric(Coordinate *coord);
 
     // converts from Hour Angle (h) to Right Ascension (r) coordinates
-    void hourAngleToRightAscension(Coordinate *coord);
+    void hourAngleToRightAscension(Coordinate *coord, bool native);
     // converts from Right Ascension (r) to Hour Angle (h) coordinates
     // set RA to NAN to use the Hour Angle coordinate as (h)
-    void rightAscensionToHourAngle(Coordinate *coord);
+    void rightAscensionToHourAngle(Coordinate *coord, bool native);
 
     // converts from Equatorial (h,d) to Horizon (a,z) coordinates
     void equToHor(Coordinate *coord);

@@ -70,12 +70,12 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
     if (returnHorizonCoords) equToHor(&result);
   }
 
-  hourAngleToRightAscension(&result);
+  hourAngleToRightAscension(&result, true);
   return result;
 }
 
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
-  rightAscensionToHourAngle(coord);
+  rightAscensionToHourAngle(coord, true);
 
   if (mountType == ALTAZM) equToHor(coord);
 
@@ -199,21 +199,21 @@ void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   #endif
 }
 
-void Transform::hourAngleToRightAscension(Coordinate *coord) {
+void Transform::hourAngleToRightAscension(Coordinate *coord, bool native) {
   noInterrupts();
   unsigned long fs = fracLAST;
   interrupts();
   coord->r = fsToRad(fs) - coord->h;
-  coord->r = backInRads(coord->r);
+  if (native) coord->r = backInRads(coord->r);
 }
 
-void Transform::rightAscensionToHourAngle(Coordinate *coord) {
+void Transform::rightAscensionToHourAngle(Coordinate *coord, bool native) {
   if (isnan(coord->r)) return; // NAN flags mount coordinates
   noInterrupts();
   unsigned long fs = fracLAST;
   interrupts();
   coord->h = fsToRad(fs) - coord->r;
-  coord->h = backInRads2(coord->h);
+  if (native) coord->h = backInRads2(coord->h);
 }
 
 void Transform::equToHor(Coordinate *coord) {

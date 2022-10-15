@@ -212,7 +212,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Returns: 0..9, see :MS#
     if (command[1] == 'A' && parameter[0] == 0) {
       transform.horToEqu(&gotoTarget);
-      transform.hourAngleToRightAscension(&gotoTarget);
+      transform.hourAngleToRightAscension(&gotoTarget, true);
       CommandError e = request(&gotoTarget, settings.preferredPierSide);
       strcpy(reply,"0");
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
