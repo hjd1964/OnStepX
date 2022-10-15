@@ -1,7 +1,7 @@
 // general purpose encoder class
 #pragma once
 
-#include "../../common.h"
+#include "../../Common.h"
 
 #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER OFF
