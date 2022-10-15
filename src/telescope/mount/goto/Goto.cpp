@@ -464,19 +464,24 @@ void Goto::poll() {
   skip:
 
   // keep updating the axis targets to match the mount target
+  // but allow timeout to stop tracking to guarantee synchronization
+  if (!axis1.nearTarget() || !axis2.nearTarget()) nearTargetTimeout = millis();
+
   if (mount.isTracking()) {
     transform.rightAscensionToHourAngle(&target);
     if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
-      Coordinate nearTarget = target;
-      nearTarget.h -= slewDestinationDistHA;
-      nearTarget.d -= slewDestinationDistDec;
+      if (millis() - nearTargetTimeout < 4000) {
+        Coordinate nearTarget = target;
+        nearTarget.h -= slewDestinationDistHA;
+        nearTarget.d -= slewDestinationDistDec;
 
-      if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
-      double a1, a2;
-      transform.mountToInstrument(&nearTarget, &a1, &a2);
+        if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
+        double a1, a2;
+        transform.mountToInstrument(&nearTarget, &a1, &a2);
 
-      axis1.setTargetCoordinate(a1);
-      axis2.setTargetCoordinate(a2);
+        axis1.setTargetCoordinate(a1);
+        axis2.setTargetCoordinate(a2);
+      }
     }
   }
 }
@@ -505,6 +510,9 @@ CommandError Goto::startAutoSlew() {
 
   e = axis1.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent);
   if (e == CE_NONE) e = axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)), radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
+
+  nearTargetTimeout = millis();
+
   return e;
 }
 

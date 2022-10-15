@@ -258,9 +258,14 @@ double Axis::getTargetCoordinate() {
   return wrap(motor->getTargetCoordinateSteps()/settings.stepsPerMeasure);
 }
 
-// check if we're at the target coordinate during an auto slew
+// returns true if at target
 bool Axis::atTarget() {
   return labs(motor->getTargetDistanceSteps()) == 0;
+}
+
+// returns true if within one second of the target at the backlash takeup rate
+bool Axis::nearTarget() {
+  return labs(motor->getTargetDistanceSteps()) < backlashFreq*settings.stepsPerMeasure;
 }
 
 // distance to target in "measures" (degrees, microns, etc.)

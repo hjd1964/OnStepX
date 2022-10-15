@@ -194,6 +194,9 @@ class Axis {
     // returns true if at target
     bool atTarget();
 
+    // returns true if within one second of the target at the backlash takeup rate
+    bool nearTarget();
+
     // set backlash amount in "measures" (radians, microns, etc.)
     void setBacklash(float value);
 

@@ -121,6 +121,7 @@ class Goto {
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;
     int        nearDestinationRefineStages;
+    unsigned long nearTargetTimeout = 0;
 
     MeridianFlipHome meridianFlipHome = {false, false};
 
