@@ -42,9 +42,9 @@ void SerialBridge::write(int32_t count) {
 int32_t SerialBridge::raw() {
   if (!_serial_bridge_initialized) {
     #if defined(SERIAL_ENCODER_RX) && defined(SERIAL_ENCODER_TX) && !defined(SERIAL_ENCODER_RXTX_SET)
-      SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD_DEFAULT, SERIAL_8N1, SERIAL_ENCODER_RX, SERIAL_ENCODER_TX);
+      SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD, SERIAL_8N1, SERIAL_ENCODER_RX, SERIAL_ENCODER_TX);
     #else
-      SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD_DEFAULT);
+      SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD);
     #endif
     delay(100);
     _serial_bridge_initialized = true;
