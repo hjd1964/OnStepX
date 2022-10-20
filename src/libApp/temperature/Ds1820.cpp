@@ -63,9 +63,8 @@ bool Ds1820::init() {
             if (index == 1) { VLF(" auto-assigned to FOCUSER_TEMPERATURE"); } else
             if (index <= 9) { VF(" auto-assigned to FEATURE"); V(index - 1); VLF("_TEMP"); } else { VLF(" not assigned"); }
           } else { VLF(" auto-assign disabled"); }
+          detected = true;
         #endif
-
-        detected = true;
       }
     }
   }
