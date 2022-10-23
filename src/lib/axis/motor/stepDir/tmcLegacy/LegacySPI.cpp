@@ -175,7 +175,7 @@ void StepDirTmcSPI::enable(bool state) {
   VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI or UART");
   int I_run = 0, I_hold = 0;
   if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
-  driver.mode(true, settings.decay, microstepCode, I_run, I_hold);
+  driver.mode(settings.intpol, settings.decay, microstepCode, I_run, I_hold);
 }
 
 #endif
