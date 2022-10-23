@@ -12,12 +12,6 @@
 #define PINMAP                        OFF
 #endif
 
-#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == \
-    AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == \
-    AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
-  #define DRIVER_STEP_DEFAULTS
-#endif
-
 // debug
 #ifndef DEBUG
 #define DEBUG                         OFF
@@ -134,6 +128,12 @@
 // step signal
 #ifndef STEP_WAVE_FORM
 #define STEP_WAVE_FORM                PULSE
+#endif
+
+#if AXIS1_STEP_STATE == AXIS2_STEP_STATE == AXIS3_STEP_STATE == \
+    AXIS4_STEP_STATE == AXIS5_STEP_STATE == AXIS6_STEP_STATE == \
+    AXIS7_STEP_STATE == AXIS8_STEP_STATE == AXIS9_STEP_STATE == HIGH
+  #define DRIVER_STEP_DEFAULTS
 #endif
 
 // gpio device
