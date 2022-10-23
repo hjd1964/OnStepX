@@ -69,6 +69,9 @@
   #define LIMIT_SENSE_PIN       AUX7_PIN         // The limit switch sense is a logic level input normally pull high (2k resistor,) shorted to ground it stops gotos/tracking
 #endif
 
+// hint that the driver mode pins are dedicated (not shared SPI bus except possibly MISO)
+#define DEDICATED_MODE_PINS
+
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN        14
 #define AXIS1_M0_PIN            15               // SPI MOSI

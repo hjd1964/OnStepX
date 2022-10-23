@@ -62,9 +62,17 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   // initialize the serial port
   VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
   #if defined(SERIAL_TMC_HARDWARE_UART)
-    // help user hard code the device addresses 0,1,2,3
-    digitalWriteEx(Pins->m0, HIGH);
-    digitalWriteEx(Pins->m1, HIGH);
+    #if defined(DEDICATED_MODE_PINS)
+      // program the device address 0,1,2,3 since M0 and M1 are all unique
+      int deviceAddress = SERIAL_TMC_ADDRESS_MAP(axisNumber - 1);
+      digitalWriteEx(Pins->m0, bitRead(deviceAddress, 0));
+      digitalWriteEx(Pins->m1, bitRead(deviceAddress, 1));
+    #else
+      // help user hard code the device address 0,1,2,3 by cutting pins
+      digitalWriteEx(Pins->m0, HIGH);
+      digitalWriteEx(Pins->m1, HIGH);
+    #endif
+
     #define SerialTMC SERIAL_TMC
     static bool initialized = false;
     if (!initialized) {
