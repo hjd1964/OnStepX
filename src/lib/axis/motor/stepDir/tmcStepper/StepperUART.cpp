@@ -91,13 +91,13 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     driver = new TMC2208Stepper(&SerialTMC, 0.11F);
     ((TMC2208Stepper*)driver)->begin();
     ((TMC2208Stepper*)driver)->pwm_autoscale(true);
-    ((TMC2208Stepper*)driver)->intpol(true);
+    ((TMC2208Stepper*)driver)->intpol(settings.intpol);
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
     driver = new TMC2209Stepper(&SerialTMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
     ((TMC2209Stepper*)driver)->begin();
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
-    ((TMC2209Stepper*)driver)->intpol(true);
+    ((TMC2209Stepper*)driver)->intpol(settings.intpol);
   }
 
   // calibrate stealthChop

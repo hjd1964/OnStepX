@@ -94,6 +94,9 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   driver->setPwmOffset(pc_pwm_ofs);
   driver->setPwmGradient(pc_pwm_grad);
   if (pc_pwm_auto) driver->enableAutomaticCurrentScaling();
+  if (!settings.intpol) {
+    VF("WRN: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver interpolation control not supported");
+  }
 
   // calibrate stealthChop
   modeMicrostepTracking();

@@ -53,11 +53,11 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
 
   // calibrate stealthChop
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    driver.mode(true, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
+    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     delay(100);
   }
-  driver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+  driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -123,13 +123,13 @@ int StepDirTmcSPI::modeMicrostepSlewing() {
 }
 
 void StepDirTmcSPI::modeDecayTracking() {
-  driver.mode(true, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+  driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
 }
 
 void StepDirTmcSPI::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver.mode(true, settings.decaySlewing, microstepCode, IGOTO, settings.currentHold);
+  driver.mode(settings.intpol, settings.decaySlewing, microstepCode, IGOTO, settings.currentHold);
 }
 
 void StepDirTmcSPI::updateStatus() {

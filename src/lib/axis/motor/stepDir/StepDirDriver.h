@@ -27,6 +27,7 @@ typedef struct StepDirDriverSettings {
   int16_t currentHold;
   int16_t currentRun;
   int16_t currentGoto;
+  int8_t  intpol;
   int8_t  decay;
   int8_t  decaySlewing;
   int8_t  status;

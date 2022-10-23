@@ -52,19 +52,19 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC2130Stepper*)driver)->begin();
     ((TMC2130Stepper*)driver)->pwm_autoscale(true);
-    ((TMC2130Stepper*)driver)->intpol(true);
+    ((TMC2130Stepper*)driver)->intpol(settings.intpol);
   } else
   if (settings.model == TMC5160) {
     driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5160Stepper*)driver)->begin();
     ((TMC5160Stepper*)driver)->pwm_autoscale(true);
-    ((TMC5161Stepper*)driver)->intpol(true);
+    ((TMC5161Stepper*)driver)->intpol(settings.intpol);
   } else
   if (settings.model == TMC5161) {
     driver = new TMC5161Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5161Stepper*)driver)->begin();
     ((TMC5161Stepper*)driver)->pwm_autoscale(true);
-    ((TMC5161Stepper*)driver)->intpol(true);
+    ((TMC5161Stepper*)driver)->intpol(settings.intpol);
   }
   
   // calibrate stealthChop

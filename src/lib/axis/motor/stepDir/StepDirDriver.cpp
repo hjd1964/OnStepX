@@ -87,6 +87,7 @@ void StepDirDriver::init(float param1, float param2, float param3, float param4,
   settings.currentGoto = round(param5);
   UNUSED(param6);
 
+  if (settings.intpol == ON) settings.intpol = true; else settings.intpol = false;
   VF("MSG: StepDirDriver"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
   VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF (assuming 1X)"); settings.microsteps = 1; } else { V(settings.microsteps); VF("X"); }
   VF(" (goto mode "); if (settings.microstepsSlewing == OFF) { VLF("OFF)"); } else { V(settings.microstepsSlewing); VL("X)"); }
