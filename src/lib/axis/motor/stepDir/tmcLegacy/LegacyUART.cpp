@@ -34,9 +34,6 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  if (settings.decay == OFF) settings.decay = STEALTHCHOP;
-  if (settings.decaySlewing == OFF) settings.decaySlewing = SPREADCYCLE;
-
   VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
   if (settings.currentRun == OFF) {
     VLF("current control OFF (set by Vref)");
