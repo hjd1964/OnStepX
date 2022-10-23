@@ -72,6 +72,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     #else
       driver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), SERIAL_TMC_RX, SERIAL_TMC_TX);
     #endif
+    rxPin = SERIAL_TMC_RX;
   #else
     // pull MS1 and MS2 low for device address 0
     digitalWriteEx(Pins->m0, LOW);
