@@ -146,8 +146,8 @@
 #define STATUS_LED_PIN              OFF
 #endif
 
-#ifndef MOUNT_STATUS_LED_PIN
-#define MOUNT_STATUS_LED_PIN        OFF
+#ifndef MOUNT_LED_PIN
+#define MOUNT_LED_PIN               OFF
 #endif
 
 #ifndef RETICLE_LED_PIN

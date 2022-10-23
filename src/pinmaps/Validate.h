@@ -64,7 +64,7 @@
 // --------------------------------------------------------------------------------------
 // check AUX0 pin assignments
 #if AUX0_PIN != OFF
-  #if AUX0_PIN == MOUNT_STATUS_LED_PIN && STATUS_MOUNT_LED != OFF
+  #if AUX0_PIN == MOUNT_LED_PIN && STATUS_MOUNT_LED != OFF
     #ifdef AUX0_PIN_IN_USE
       #error "Configuration (Config.h): STATUS_MOUNT_LED enabled but AUX0_PIN is already in use, choose one feature on AUX0_PIN"
     #endif
@@ -185,7 +185,7 @@
 
 // check AUX8 pin assignments
 #if AUX8_PIN != OFF
-  #if AUX8_PIN == MOUNT_STATUS_LED_PIN && STATUS_MOUNT_LED != OFF
+  #if AUX8_PIN == MOUNT_LED_PIN && STATUS_MOUNT_LED != OFF
     #ifdef AUX8_PIN_IN_USE
       #error "Configuration (Config.h): STATUS_MOUNT_LED enabled but AUX8_PIN is already in use, choose one feature on AUX8_PIN"
     #endif

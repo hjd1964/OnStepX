@@ -75,7 +75,7 @@
 #ifndef STATUS_LED_PIN
   #define STATUS_LED_PIN        AUX8_PIN         // Default LED Cathode (-)
 #endif
-#define MOUNT_STATUS_LED_PIN    STATUS_LED_PIN   // Default LED Cathode (-)
+#define MOUNT_LED_PIN           STATUS_LED_PIN   // Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       STATUS_LED_PIN   // Default LED Cathode (-)
 #endif

@@ -58,7 +58,7 @@
 // This is the built in LED for the Black Pill board. There is a pin
 // available from it too, in case you want to power another LED with a wire
 #define STATUS_LED_PIN          AUX0_PIN         // Default LED Cathode (-)
-#define MOUNT_STATUS_LED_PIN    AUX0_PIN         // Default LED Cathode (-)
+#define MOUNT_LED_PIN           AUX0_PIN         // Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       AUX3_PIN         // Default LED Cathode (-)
 #endif

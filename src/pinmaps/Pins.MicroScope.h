@@ -41,7 +41,7 @@
 #ifndef STATUS_LED_PIN
   #define STATUS_LED_PIN        25               // 25 Default LED Cathode (-)
 #endif
-#define MOUNT_STATUS_LED_PIN    25               // 25 Default LED Cathode (-)
+#define MOUNT_LED_PIN           25               // 25 Default LED Cathode (-)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       25               // 25 Default LED Cathode (-)
 #endif

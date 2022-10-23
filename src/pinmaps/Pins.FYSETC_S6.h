@@ -91,7 +91,7 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #define STATUS_LED_PIN          PC6              // Drain (on EXP2) One could perhaps move these to the RGB leds, there's a header but no +5V present on it.
-#define MOUNT_STATUS_LED_PIN    PC6              // Drain (on EXP2 shared with Reticle/BME280_CS)
+#define MOUNT_LED_PIN           PC6              // Drain (on EXP2 shared with Reticle/BME280_CS)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       PC7              // Drain (on EXP2 shared with LED2/BME280_CS)
 #endif

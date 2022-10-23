@@ -516,8 +516,8 @@
 #ifndef STATUS_MOUNT_LED
 #define STATUS_MOUNT_LED              OFF
 #endif
-#ifndef STATUS_MOUNT_LED_ON_STATE
-#define STATUS_MOUNT_LED_ON_STATE     LOW
+#ifndef MOUNT_LED_ON_STATE
+#define MOUNT_LED_ON_STATE     LOW
 #endif
 #ifndef STATUS_BUZZER
 #define STATUS_BUZZER                 OFF
