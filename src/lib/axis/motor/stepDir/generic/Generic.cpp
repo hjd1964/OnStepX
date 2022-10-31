@@ -125,7 +125,7 @@ int8_t StepDirGeneric::getDecayPinState(int8_t decay) {
 }
 
 bool StepDirGeneric::isDecayOnM2() {
-  if (settings.model == TMC2209S) return true; else return false;
+  if (settings.model == TMC2209S || settings.model == TMC2225S) return true; else return false;
 }
 
 #endif

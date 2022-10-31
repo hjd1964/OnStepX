@@ -6,7 +6,7 @@
 #ifdef STEP_DIR_MOTOR_PRESENT
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 16
+#define DRIVER_MODEL_COUNT 17
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
@@ -21,13 +21,14 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
   {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2100
   {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2130S
   {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208S
+  {OFF,OFF,  0,  1,  2,  3,OFF,OFF,OFF},   // TMC2225S
   {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2226S
 
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5161
 
-  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2208
+  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2208/TMC2225
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209/TMC2226
 };
 
@@ -44,13 +45,14 @@ const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2100
   103,   // TMC2130S
   103,   // TMC2208S
+  103,   // TMC2225S
   103,   // TMC2209S/TMC2226S
 
   103,   // TMC2130
   103,   // TMC5160
   103,   // TMC5161
 
-  103,   // TMC2208
+  103,   // TMC2208/TMC2225
   103,   // TMC2209/TMC2226
 };
 
@@ -67,13 +69,14 @@ const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
     "TMC2100",
     "TMC2130",
     "TMC2208",
+    "TMC2225",
     "TMC2209/TMC2226",
 
     "TMC2130 (SPI)",
     "TMC5160 (SPI)",
     "TMC5161 (SPI)",
 
-    "TMC2208 (UART)",
+    "TMC2208/TMC2225 (UART)",
     "TMC2209/TMC2226 (UART)",
   };
 #endif
