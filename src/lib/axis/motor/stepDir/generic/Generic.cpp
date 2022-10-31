@@ -100,7 +100,7 @@ IRAM_ATTR int StepDirGeneric::modeMicrostepSlewing() {
 void StepDirGeneric::modeDecayTracking() {
   if (settings.decay == OFF) return;
   int8_t state = getDecayPinState(settings.decay);
-  digitalWriteEx(decayPin, state);
+  if (state != OFF) digitalWriteEx(decayPin, state);
 }
 
 void StepDirGeneric::modeDecaySlewing() {
