@@ -74,7 +74,6 @@
 #define AXIS1_M3_PIN            37               // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          38
 #define AXIS1_DIR_PIN           39
-#define AXIS1_DECAY_PIN         AXIS1_M2_PIN
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
@@ -91,7 +90,6 @@
 #define AXIS2_M3_PIN            37               // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN          15
 #define AXIS2_DIR_PIN           16
-#define AXIS2_DECAY_PIN         AXIS2_M2_PIN
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
@@ -109,7 +107,6 @@
 #define AXIS3_STEP_PIN          26
 #define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           27
-#define AXIS3_DECAY_PIN         AXIS3_M2_PIN
 #define AXIS3_ENCODER_A_PIN     AXIS3_M0_PIN
 #define AXIS3_ENCODER_B_PIN     AXIS3_M1_PIN
 #define AXIS3_SERVO_PH1_PIN     AXIS3_DIR_PIN
@@ -123,7 +120,6 @@
 #define AXIS4_M3_PIN            37               // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          32
 #define AXIS4_DIR_PIN           27
-#define AXIS4_DECAY_PIN         AXIS4_M2_PIN
 #define AXIS4_ENCODER_A_PIN     AXIS4_M0_PIN
 #define AXIS4_ENCODER_B_PIN     AXIS4_M1_PIN
 #define AXIS4_SERVO_PH1_PIN     AXIS4_DIR_PIN
@@ -137,7 +133,6 @@
 #define AXIS5_M3_PIN            37               // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN          26
 #define AXIS5_DIR_PIN           27
-#define AXIS5_DECAY_PIN         AXIS5_M2_PIN
 #define AXIS5_ENCODER_A_PIN     AXIS4_M0_PIN
 #define AXIS5_ENCODER_B_PIN     AXIS4_M1_PIN
 #define AXIS5_SERVO_PH1_PIN     AXIS4_DIR_PIN

@@ -86,7 +86,6 @@
 #endif
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           0                // [must be high at boot 0]
-#define AXIS1_DECAY_PIN         AXIS1_M2_PIN
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
@@ -101,7 +100,6 @@
 #endif
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
-#define AXIS2_DECAY_PIN         AXIS2_M2_PIN
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif

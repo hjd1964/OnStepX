@@ -82,7 +82,6 @@
 #define AXIS1_M3_PIN           AUX1_PIN          // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN         20
 #define AXIS1_DIR_PIN          21
-#define AXIS1_DECAY_PIN        AXIS1_M2_PIN
 #define AXIS1_FAULT_PIN        AXIS1_M3_PIN
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN AUX3_PIN
@@ -100,7 +99,6 @@
 #define AXIS2_M3_PIN           AUX2_PIN          // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN         3
 #define AXIS2_DIR_PIN          2
-#define AXIS2_DECAY_PIN        AXIS2_M2_PIN
 #define AXIS2_FAULT_PIN        AXIS2_M3_PIN
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN AUX4_PIN
