@@ -21,16 +21,17 @@
 #define MaxPCB                      8      // first generation custom 4-axis board, Teensy3.5/Teensy3.6
 #define MaxPCB2                     9      // improved second generation for alum. case, Teensy3.5/Teensy3.6
 #define MaxPCB3                     10     // improved third generation for alum. case, Teensy4.1
-#define MaxSTM3                     11     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
-#define MaxSTM3I                    12     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
+#define MaxPCB4                     11     // for Teensy4.1 w/TMC2209 support
+#define MaxSTM3                     12     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
+#define MaxSTM3I                    13     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
-#define MaxESP3                     13     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
-#define CNC3                        14     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
-#define MicroScope                  15     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
+#define MaxESP3                     14     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
+#define CNC3                        16     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MicroScope                  17     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
-#define STM32Blue                   16     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 17
+#define PINMAP_LAST                 18
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1

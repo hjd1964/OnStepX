@@ -31,6 +31,10 @@
     #include "Pins.MaxPCB3.h"
   #endif
 #endif
+#if PINMAP == MaxPCB4
+  #define PINMAP_STR "MaxPCB v4"
+  #include "Pins.MaxPCB4.h"
+#endif
 #if PINMAP == MaxESP3
   #define PINMAP_STR "MaxESP v3"
   #include "Pins.MaxESP3.h"
