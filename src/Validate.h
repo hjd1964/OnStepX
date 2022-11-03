@@ -1089,10 +1089,10 @@
   #error "Configuration (Config.h): Setting FEATURE1_PIN unknown, use OFF or a valid microcontroller pin designation."
 #endif
 #if FEATURE2_PIN != OFF && FEATURE2_PIN < 0
-  #error "Configuration (Config.h): Setting FEATURE3_PIN unknown, use OFF or a valid microcontroller pin designation."
+  #error "Configuration (Config.h): Setting FEATURE2_PIN unknown, use OFF or a valid microcontroller pin designation."
 #endif
 #if FEATURE3_PIN != OFF && FEATURE3_PIN < 0
-  #error "Configuration (Config.h): Setting FEATURE4_PIN unknown, use OFF or a valid microcontroller pin designation."
+  #error "Configuration (Config.h): Setting FEATURE3_PIN unknown, use OFF or a valid microcontroller pin designation."
 #endif
 #if FEATURE4_PIN != OFF && FEATURE4_PIN < 0
   #error "Configuration (Config.h): Setting FEATURE4_PIN unknown, use OFF or a valid microcontroller pin designation."
