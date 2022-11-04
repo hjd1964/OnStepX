@@ -26,6 +26,7 @@
 #define MaxSTM3I                    13     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
 #define MaxESP3                     14     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
+#define MaxESP4                     15     // for ESP32S w/TMC2209 support
 #define CNC3                        16     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
 #define MicroScope                  17     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
