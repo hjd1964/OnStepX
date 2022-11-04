@@ -54,6 +54,13 @@ class StepDirMotor : public Motor {
     // sets motor enable on/off (if possible)
     void enable(bool value);
 
+    // calibrate stealthChop then return to tracking mode
+    void calibrate() {
+      digitalWriteEx(Pins->enable, Pins->enabledState);
+      driver->calibrate();
+      digitalWriteEx(Pins->enable, !Pins->enabledState);
+    }
+
     // get the associated stepper driver status
     DriverStatus getDriverStatus();
 

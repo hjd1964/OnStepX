@@ -63,16 +63,8 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC5161Stepper*)driver)->pwm_autoscale(true);
     ((TMC5161Stepper*)driver)->intpol(settings.intpol);
   }
-  
-  // calibrate stealthChop
   modeMicrostepTracking();
-  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    driver->hold_multiplier(1.0F);
-    current(settings.currentRun);
-    setDecayMode(STEALTHCHOP);
-    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    delay(200);
-  }
+  
   driver->hold_multiplier(settings.currentHold/settings.currentRun);
   current(settings.currentRun);
   setDecayMode(settings.decay);
@@ -184,12 +176,33 @@ void StepDirTmcSPI::updateStatus() {
 }
 
 // secondary way to power down not using the enable pin
-void StepDirTmcSPI::enable(bool state) {
+bool StepDirTmcSPI::enable(bool state) {
   VF("MSG: StepDirDriver"); V(axisNumber);
   VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI or UART");
   int I_run = 0, I_hold = 0;
-  if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
-  current(I_run);
+  if (state) {
+    I_run = settings.currentRun;
+    I_hold = settings.currentHold;
+    current(I_run);
+  } else {
+    driver->ihold(0);
+    driver->irun(0);
+  }
+  return true;
+}
+
+// calibrate the motor driver if required
+void StepDirTmcSPI::calibrate() {
+  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
+    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    driver->hold_multiplier(1.0F);
+    current(settings.currentRun);
+    setDecayMode(STEALTHCHOP);
+    delay(100);
+    driver->hold_multiplier(settings.currentHold/settings.currentRun);
+    current(settings.currentRun);
+    setDecayMode(settings.decay);
+  }
 }
 
 // set the decay mode STEALTHCHOP or SPREADCYCLE
@@ -201,9 +214,10 @@ void StepDirTmcSPI::setDecayMode(int decayMode) {
 
 // set the peak current
 void StepDirTmcSPI::current(int mA) {
-  if (settings.model == TMC2130) { ((TMC2130Stepper*)driver)->rms_current(mA*0.707F); } else
-  if (settings.model == TMC5160) { ((TMC5160Stepper*)driver)->rms_current(mA*0.707F); } else
-  if (settings.model == TMC5161) { ((TMC5161Stepper*)driver)->rms_current(mA*0.707F); }
+  driver->rms_current(mA*0.707F);
+  //if (settings.model == TMC2130) { ((TMC2130Stepper*)driver)->rms_current(mA*0.707F); } else
+  //if (settings.model == TMC5160) { ((TMC5160Stepper*)driver)->rms_current(mA*0.707F); } else
+  //if (settings.model == TMC5161) { ((TMC5161Stepper*)driver)->rms_current(mA*0.707F); }
 }
 
 #endif

@@ -120,6 +120,9 @@ bool ODriveMotor::validateParameters(float param1, float param2, float param3, f
 
 // sets motor enable on/off (if possible)
 void ODriveMotor::enable(bool state) {
+  V(axisPrefix); VF("driver powered ");
+  if (state) { VLF("up"); } else { VLF("down"); } 
+  
   int requestedState = AXIS_STATE_IDLE;
   if (state) requestedState = AXIS_STATE_CLOSED_LOOP_CONTROL;
   

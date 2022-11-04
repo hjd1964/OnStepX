@@ -106,7 +106,6 @@ bool Axis::init(Motor *motor) {
   // special ODrive case, a way to pass the stepsPerMeasure to it
   if (motor->getParameterTypeCode() == 'O') settings.param6 = settings.stepsPerMeasure;
   motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
-  motor->enable(false);
   motor->setReverse(settings.reverse);
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
 
@@ -125,10 +124,6 @@ bool Axis::init(Motor *motor) {
 
 // enables or disables the associated step/dir driver
 void Axis::enable(bool state) {
-  #if DEBUG == VERBOSE
-    if (enabled && state != true) { V(axisPrefix); VLF("disabled"); }
-    if (!enabled && state == true) { V(axisPrefix); VLF("enabled"); }
-  #endif
   enabled = state;
   motor->enable(enabled & !poweredDown);
 }

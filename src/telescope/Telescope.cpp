@@ -75,7 +75,12 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   weather.init();
   temperature.init();
-  
+
+  #ifdef SHARED_ENABLE_PIN
+    pinModeEx(SHARED_ENABLE_PIN, OUTPUT);
+    digitalWriteEx(SHARED_ENABLE_PIN, HIGH);
+  #endif
+
   #ifdef MOUNT_PRESENT
     mount.init();
     mountStatus.init();
@@ -87,6 +92,22 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   #ifdef FOCUSER_PRESENT
     focuser.init();
+  #endif
+
+  #ifdef SHARED_ENABLE_PIN
+    digitalWriteEx(SHARED_ENABLE_PIN, LOW);
+  #endif
+
+  #ifdef MOUNT_PRESENT
+    mount.begin();
+  #endif
+
+  #ifdef ROTATOR_PRESENT
+    rotator.begin();
+  #endif
+
+  #ifdef FOCUSER_PRESENT
+    focuser.begin();
   #endif
 
   #ifdef FEATURES_PRESENT

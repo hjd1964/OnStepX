@@ -40,7 +40,10 @@ class StepDirTmcSPI : public StepDirDriver {
     void updateStatus();
 
     // secondary way to power down not using the enable pin
-    void enable(bool state);
+    bool enable(bool state);
+
+    // calibrate the motor driver if required
+    void calibrate();
 
     TmcSPI driver;
 

@@ -95,8 +95,10 @@
   #define LIMIT_SENSE_PIN       39               // [input only 39] (TB)
 #endif
 
+#define SHARED_ENABLE_PIN       25               // Hint that the enable pins are shared
+
 // Axis1 RA/Azm step/dir driver (X-AXIS)
-#define AXIS1_ENABLE_PIN        25               // 
+#define AXIS1_ENABLE_PIN        SHARED
 #define AXIS1_M0_PIN            OFF              // SPI MOSI
 #define AXIS1_M1_PIN            OFF              // SPI SCK
 #define AXIS1_M2_PIN            OFF              // SPI CS (UART TX)

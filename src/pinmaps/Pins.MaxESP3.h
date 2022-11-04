@@ -76,8 +76,11 @@
   #define LIMIT_SENSE_PIN       AUX7_PIN
 #endif
 
+#define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
+#define SHARED_ENABLE_PIN       12               // Hint that the enable pins are shared
+
 // Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN        12               // [must be low at boot 12]
+#define AXIS1_ENABLE_PIN        SHARED           // [must be low at boot 12]
 #define AXIS1_M0_PIN            13               // SPI MOSI
 #define AXIS1_M1_PIN            14               // SPI SCK
 #define AXIS1_M2_PIN            23               // SPI CS (UART TX)
@@ -111,7 +114,6 @@
 #define AXIS3_M2_PIN            OFF              // SPI CS (UART TX)
 #define AXIS3_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          2                // [must be low at boot 2]
-#define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver

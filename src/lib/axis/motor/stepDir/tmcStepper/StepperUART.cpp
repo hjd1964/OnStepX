@@ -57,7 +57,6 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   pinModeEx(Pins->m1, OUTPUT);
 
   // initialize the serial port
-  VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
   #if defined(SERIAL_TMC_HARDWARE_UART)
     #if defined(DEDICATED_MODE_PINS)
       // program the device address 0,1,2,3 since M0 and M1 are all unique
@@ -73,6 +72,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     #define SerialTMC SERIAL_TMC
     static bool initialized = false;
     if (!initialized) {
+      VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
         VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
@@ -104,19 +104,9 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
   }
-
-  // calibrate stealthChop
-  modeMicrostepTracking();
-  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    driver->rms_current(settings.currentRun*0.707F);
-    driver->hold_multiplier(1.0F);
-    setDecayMode(STEALTHCHOP);
-    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    delay(100);
-  }
-  driver->rms_current(settings.currentRun*0.707F);
   driver->hold_multiplier(settings.currentHold/settings.currentRun);
-  setDecayMode(settings.decay);
+  modeMicrostepTracking();
+  modeDecayTracking();
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -240,12 +230,30 @@ void StepDirTmcUART::updateStatus() {
 }
 
 // secondary way to power down not using the enable pin
-void StepDirTmcUART::enable(bool state) {
-  VF("MSG: StepDirDriver"); V(axisNumber);
-  VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI or UART");
+bool StepDirTmcUART::enable(bool state) {
   int I_run = 0, I_hold = 0;
-  if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
-  driver->rms_current(I_run*0.707F);
+  if (state) {
+    I_run = settings.currentRun;
+    I_hold = settings.currentHold;
+    driver->rms_current(I_run*0.707F);
+  } else {
+    driver->ihold(0);
+    driver->irun(0);
+  }
+  return true;
+}
+
+// calibrate the motor driver if required
+void StepDirTmcUART::calibrate() {
+  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
+    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    driver->hold_multiplier(1.0F);
+    driver->rms_current(settings.currentRun*0.707F);
+    setDecayMode(STEALTHCHOP);
+    delay(100);
+    driver->hold_multiplier(settings.currentHold/settings.currentRun);
+    modeDecayTracking();
+  }
 }
 
 #endif

@@ -66,7 +66,10 @@ class StepDirDriver {
     inline DriverStatus getStatus() { return status; }
 
     // secondary way to power down not using the enable pin
-    virtual void enable(bool state) { UNUSED(state); }
+    virtual bool enable(bool state) { UNUSED(state); return false; }
+
+    // calibrate the motor driver if required
+    virtual void calibrate() {}
 
     // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
     long getPulseWidth();

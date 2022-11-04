@@ -102,18 +102,10 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   if (!settings.intpol) {
     VF("WRN: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver interpolation control not supported");
   }
-
-  // calibrate stealthChop
   modeMicrostepTracking();
-  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    driver->setRunCurrent(settings.currentRun/25); // current in %
-    driver->setHoldCurrent(settings.currentRun/25); // current in %
-    driver->enableStealthChop();
-    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    delay(100);
-  }
+
   driver->setRunCurrent(settings.currentRun/25); // current in %
-  driver->setHoldCurrent(settings.currentRun/25); // current in %
+  driver->setHoldCurrent(settings.currentHold/25); // current in %
   if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
 
   // automatically set fault status for known drivers
@@ -220,13 +212,26 @@ void StepDirTmcUART::updateStatus() {
 }
 
 // secondary way to power down not using the enable pin
-void StepDirTmcUART::enable(bool state) {
-  VF("MSG: StepDirDriver"); V(axisNumber);
-  VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI or UART");
+bool StepDirTmcUART::enable(bool state) {
   int I_run = 0, I_hold = 0;
   if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
   driver->setRunCurrent(I_run/25); // current in %
   driver->setHoldCurrent(I_hold/25); // current in %
+  return true;
+}
+
+// calibrate the motor driver if required
+void StepDirTmcUART::calibrate() {
+  if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
+    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    driver->setRunCurrent(settings.currentRun/25); // current in %
+    driver->setHoldCurrent(settings.currentRun/25); // current in %
+    driver->enableStealthChop();
+    delay(100);
+    driver->setRunCurrent(settings.currentRun/25); // current in %
+    driver->setHoldCurrent(settings.currentHold/25); // current in %
+    if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  }
 }
 
 #endif

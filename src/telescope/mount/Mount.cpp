@@ -47,6 +47,11 @@ void Mount::init() {
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis2.setPowerDownTime(AXIS2_POWER_DOWN_TIME);
+}
+
+void Mount::begin() {
+  axis1.calibrate();
+  axis2.calibrate();
 
   // initialize the critical subsystems
   site.init();

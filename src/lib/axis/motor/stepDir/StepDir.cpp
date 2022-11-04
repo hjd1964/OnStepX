@@ -132,8 +132,7 @@ bool StepDirMotor::init() {
 
   // init default driver enable pin
   pinModeEx(Pins->enable, OUTPUT);
-  // driver enabled for possible TMC current calibration
-  digitalWriteEx(Pins->enable, Pins->enabledState)
+  digitalWriteEx(Pins->enable, !Pins->enabledState)
 
   // start the motor timer
   V(axisPrefix); VF("start task to move motor... ");
@@ -172,11 +171,14 @@ bool StepDirMotor::validateParameters(float param1, float param2, float param3, 
 
 // sets motor enable on/off (if possible)
 void StepDirMotor::enable(bool state) {
+  V(axisPrefix); VF("driver powered ");
+  if (state) { VF("up"); } else { VF("down"); }
+
   if (Pins->enable != OFF && Pins->enable != SHARED) {
-    V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); } VF(" using pin "); VL(Pins->enable);
+    VF(" using pin "); VL(Pins->enable);
     digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
-    driver->enable(state);
+    if (driver->enable(state)) { VLF(" using secondary method"); } else { VLF(" skipped no control available"); }
   }
 }
 

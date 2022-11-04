@@ -38,6 +38,10 @@ void Rotator::init() {
   axis3.setSlewAccelerationTime(AXIS3_ACCELERATION_TIME);
   axis3.setSlewAccelerationTimeAbort(AXIS3_RAPID_STOP_TIME);
   if (AXIS3_POWER_DOWN == ON) axis3.setPowerDownTime(AXIS3_POWER_DOWN_TIME);
+}
+
+void Rotator::begin() {
+  axis3.calibrate();
 
   // start monitor task
   VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");

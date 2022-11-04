@@ -45,6 +45,7 @@ extern Axis axis2;
 class Mount {
   public:
     void init();
+    void begin();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 

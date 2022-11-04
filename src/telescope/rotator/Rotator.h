@@ -35,6 +35,7 @@ class Rotator {
   public:
     // initialize rotator
     void init();
+    void begin();
 
     // process rotator commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);

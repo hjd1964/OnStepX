@@ -291,6 +291,9 @@ class Axis {
     // checks for an sense error that would disallow motion in a given direction or DIR_BOTH for any motion
     bool motionErrorSensed(Direction direction);
 
+    // calibrate the motor if required
+    void calibrate() { motor->calibrate(); }
+
     // monitor movement
     void poll();
 

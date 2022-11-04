@@ -61,8 +61,10 @@
   #define LIMIT_SENSE_PIN       OFF              // 37
 #endif
 
+#define SHARED_ENABLE_PIN       GPIO_PIN(13)     // Hint that the enable pins are shared
+
 // Axis1 RA/Azm step/dir driver
-#define AXIS1_ENABLE_PIN        GPIO_PIN(13)     // [must be low at boot 12]
+#define AXIS1_ENABLE_PIN        SHARED           // [must be low at boot 12]
 #define AXIS1_M0_PIN            23               // 13 SPI MOSI
 #define AXIS1_M1_PIN            18               // 14 SPI SCK
 #define AXIS1_M2_PIN            25               // 23 SPI CS (UART TX)

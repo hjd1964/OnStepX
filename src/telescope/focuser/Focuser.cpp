@@ -148,10 +148,15 @@ void Focuser::init() {
         axes[index]->setSlewAccelerationTime(configuration[index].accelerationTime);
         axes[index]->setSlewAccelerationTimeAbort(configuration[index].rapidStopTime);
         if (configuration[index].powerDown) axes[index]->setPowerDownTime(configuration[index].powerDownTime);
-
-        unpark(index);
       }
     }
+  }
+
+}
+
+void Focuser::begin() {
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrate();
   }
 
   // start task for temperature compensated focusing
@@ -175,6 +180,10 @@ void Focuser::init() {
       outButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_OUT_PIN, FOCUSER_BUTTON_SENSE_INIT, FOCUSER_BUTTON_SENSE_OUT);
     } else { VLF("FAILED!"); }
   #endif
+
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (configuration[index].present && axes[index] != NULL) unpark(index);
+  }
 }
 
 // get focuser temperature in deg. C
