@@ -58,7 +58,9 @@ CommandError Home::request() {
       #if AXIS2_TANGENT_ARM == OFF
         state = HS_HOMING;
         if (transform.mountType == ALTAZM) transform.horToEqu(&position);
-        return goTo.request(&position, PSS_EAST_ONLY, false);
+        CommandError result = goTo.request(&position, PSS_EAST_ONLY, false);
+        if (result != CE_NONE) { VLF("WRN: Mount, moving to home goto failed"); }
+        return result;
       #else
         axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
         axis2.setTargetCoordinate(axis2.getIndexPosition());
