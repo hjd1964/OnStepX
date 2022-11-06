@@ -656,7 +656,7 @@ void Axis::setMotionLimitsCheck(bool state) {
   limitsCheck = state;
 }
 
-// checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
+// checks for an error that would disallow motion in a given direction or DIR_BOTH for either direction
 bool Axis::motionError(Direction direction) {
   if (fault()) return true;
 
