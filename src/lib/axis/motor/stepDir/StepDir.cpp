@@ -202,13 +202,14 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     }
   #endif
 
+  Y;
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
 
   // if in backlash override the frequency OR change
   // microstep mode and/or swap in fast ISRs as required
-  if (inBacklash) frequency = backlashFrequency; else modeSwitch();
+  if (inBacklash) frequency = backlashFrequency;
 
   if (frequency != currentFrequency || microstepModeControl >= MMC_SLEWING_PAUSE) {
     lastFrequency = frequency;
@@ -257,11 +258,12 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     step = dir;
     interrupts();
   }
+
+  if (!inBacklash) modeSwitch();
 }
 
 // switch microstep modes as needed
 void StepDirMotor::modeSwitch() {
-  Y;
   if (lastFrequency <= backlashFrequency*2.0F) {
     if (microstepModeControl >= MMC_SLEWING) {
       microstepModeControl = MMC_TRACKING_READY;
@@ -275,7 +277,11 @@ void StepDirMotor::modeSwitch() {
     }
   } else {
     if (microstepModeControl == MMC_TRACKING) {
-      microstepModeControl = MMC_SLEWING_REQUEST;
+      noInterrupts();
+      if (!synchronized || (step == -1 && direction == dirRev || step == 1 && direction == dirFwd)) {
+        microstepModeControl = MMC_SLEWING_REQUEST;
+      }
+      interrupts();
       switchStartTimeMs = millis();
     } else
     if (microstepModeControl == MMC_SLEWING_PAUSE) {
@@ -283,9 +289,8 @@ void StepDirMotor::modeSwitch() {
         V(axisPrefix); VLF("mode switch slewing set");
         stepSize = driver->modeMicrostepSlewing();
       }
-      if (enableMoveFast(true)) {
-        microstepModeControl = MMC_SLEWING_READY;
-      }
+      enableMoveFast(true);
+      microstepModeControl = MMC_SLEWING_READY;
     }
   }
 }
@@ -307,26 +312,12 @@ void StepDirMotor::setSlewing(bool state) {
 // swaps in/out fast unidirectional ISR for slewing 
 bool StepDirMotor::enableMoveFast(const bool fast) {
   if (fast) {
-    if (!synchronized) {
-      if (direction == dirRev) {
-        tasks.setCallback(taskHandle, callbackFR);
-        V(axisPrefix); VF("high speed Rev ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
-      } else {
-        tasks.setCallback(taskHandle, callbackFF);
-        V(axisPrefix); VF("high speed Fwd ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
-      }
+    if (direction == dirRev) {
+      tasks.setCallback(taskHandle, callbackFR);
+      V(axisPrefix); VF("high speed Rev ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
     } else {
-      if (step == -1) {
-        tasks.setCallback(taskHandle, callbackFR);
-        V(axisPrefix); VF("high speed Rev ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
-      } else 
-      if (step == 1) {
-        tasks.setCallback(taskHandle, callbackFF);
-        V(axisPrefix); VF("high speed Fwd ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
-      } else {
-        V(axisPrefix); VLF("high speed ISR swap skipped");
-        return false;
-      }
+      tasks.setCallback(taskHandle, callbackFF);
+      V(axisPrefix); VF("high speed Fwd ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
     }
   } else {
     tasks.setCallback(taskHandle, callback);
