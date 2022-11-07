@@ -341,7 +341,7 @@ IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
     if (direction > DirNone) return;
   #endif
 
-  if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0) {
+  if (microstepModeControl == MMC_SLEWING_REQUEST && (motorSteps + backlashSteps) % homeSteps == 0 && direction < DirNone) {
     microstepModeControl = MMC_SLEWING_PAUSE;
     tasks.immediate(monitorHandle);
   }
