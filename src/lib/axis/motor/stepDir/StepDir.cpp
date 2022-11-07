@@ -266,9 +266,7 @@ void StepDirMotor::modeSwitch() {
     if (microstepModeControl >= MMC_SLEWING) {
       microstepModeControl = MMC_TRACKING_READY;
 
-      if (enableMoveFast(false)) {
-        V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
-      }
+      enableMoveFast(false);
 
       if (driver->modeSwitchAllowed || driver->modeSwitchFastAllowed) {
         V(axisPrefix); VLF("mode switch tracking set");
@@ -286,7 +284,6 @@ void StepDirMotor::modeSwitch() {
         stepSize = driver->modeMicrostepSlewing();
       }
       if (enableMoveFast(true)) {
-        V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
         microstepModeControl = MMC_SLEWING_READY;
       }
     }
@@ -311,16 +308,30 @@ void StepDirMotor::setSlewing(bool state) {
 bool StepDirMotor::enableMoveFast(const bool fast) {
   if (fast) {
     if (!synchronized) {
-      if (direction == dirRev) tasks.setCallback(taskHandle, callbackFR); else tasks.setCallback(taskHandle, callbackFF);
+      if (direction == dirRev) {
+        tasks.setCallback(taskHandle, callbackFR);
+        V(axisPrefix); VF("high speed Rev ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
+      } else {
+        tasks.setCallback(taskHandle, callbackFF);
+        V(axisPrefix); VF("high speed Fwd ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
+      }
     } else {
       if (step == -1) {
         tasks.setCallback(taskHandle, callbackFR);
+        V(axisPrefix); VF("high speed Rev ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
       } else 
       if (step == 1) {
         tasks.setCallback(taskHandle, callbackFF);
-      } else return false;
+        V(axisPrefix); VF("high speed Fwd ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
+      } else {
+        V(axisPrefix); VLF("high speed ISR swap skipped");
+        return false;
+      }
     }
-  } else tasks.setCallback(taskHandle, callback);
+  } else {
+    tasks.setCallback(taskHandle, callback);
+    V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
+  }
   return true;
 }
 
