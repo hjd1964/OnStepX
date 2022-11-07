@@ -281,17 +281,14 @@ void StepDirMotor::modeSwitch() {
       switchStartTimeMs = millis();
     } else
     if (microstepModeControl == MMC_SLEWING_PAUSE) {
-
       if (driver->modeSwitchAllowed || driver->modeSwitchFastAllowed) {
         V(axisPrefix); VLF("mode switch slewing set");
         stepSize = driver->modeMicrostepSlewing();
       }
-
       if (enableMoveFast(true)) {
         V(axisPrefix); VF("high speed ISR swapped in at "); V(lastFrequency); VLF(" steps/sec.");
+        microstepModeControl = MMC_SLEWING_READY;
       }
-
-      microstepModeControl = MMC_SLEWING_READY;
     }
   }
 }
