@@ -313,7 +313,16 @@ void StepDirMotor::setSlewing(bool state) {
 // swaps in/out fast unidirectional ISR for slewing 
 bool StepDirMotor::enableMoveFast(const bool fast) {
   if (fast) {
-    if (direction == dirRev) tasks.setCallback(taskHandle, callbackFR); else tasks.setCallback(taskHandle, callbackFF);
+    if (!synchronized) {
+      if (direction == dirRev) tasks.setCallback(taskHandle, callbackFR); else tasks.setCallback(taskHandle, callbackFF);
+    } else {
+      if (step == -1) {
+        tasks.setCallback(taskHandle, callbackFR);
+      } else 
+      if (step == 1) {
+        tasks.setCallback(taskHandle, callbackFF);
+      } else return false;
+    }
   } else tasks.setCallback(taskHandle, callback);
   return true;
 }
