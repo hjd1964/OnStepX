@@ -321,10 +321,22 @@ void Task::setHardwareTimerPeriod() {
     next_period_units = PU_NONE;
     period_units = PU_SUB_MICROS;
     unsigned long temp = roundPeriod(next_period*(_taskMasterFrequencyRatio/(double)16000000.0L));
+    unsigned long lastPeriod = period;
+
     noInterrupts();
     period = temp;
     interrupts();
     HAL_HWTIMER_PREPARE_PERIOD(hardware_timer, period);
+
+    // if the current period is > 0.1 seconds and the new period < lastPeriod adopt the new rate immediately
+    if (lastPeriod > 1600000UL && period < lastPeriod) {
+      switch (hardware_timer) {
+        case 1: HAL_HWTIMER1_SET_PERIOD(); break;
+        case 2: HAL_HWTIMER2_SET_PERIOD(); break;
+        case 3: HAL_HWTIMER3_SET_PERIOD(); break;
+        case 4: HAL_HWTIMER4_SET_PERIOD(); break;
+      }
+    }
   }
 }
 
