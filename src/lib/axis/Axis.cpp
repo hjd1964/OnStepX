@@ -277,7 +277,6 @@ double Axis::getOriginOrTargetDistance() {
 void Axis::setSlewAccelerationRate(float mpsps) {
   if (autoRate == AR_NONE) {
     slewAccelRateFs = mpsps/FRACTIONAL_SEC;
-    if (slewAccelRateFs > backlashFreq) slewAccelRateFs = backlashFreq;
     slewAccelTime = NAN;
   }
 }
@@ -291,7 +290,6 @@ void Axis::setSlewAccelerationTime(float seconds) {
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
   if (autoRate == AR_NONE) {
     abortAccelRateFs = mpsps/FRACTIONAL_SEC;
-    if (abortAccelRateFs > backlashFreq) abortAccelRateFs = backlashFreq;
     abortAccelTime = NAN;
   }
 }
