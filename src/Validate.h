@@ -510,6 +510,14 @@
   #error "Configuration (Config.h): Setting AXIS4_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
 
+#if AXIS4_SLEW_RATE_MINIMUM < 5 || AXIS4_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS4_SLEW_RATE_DESIRED < 200 || AXIS4_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#endif
+
 #if AXIS4_DRIVER_STATUS != OFF && AXIS4_DRIVER_STATUS != ON && AXIS4_DRIVER_STATUS != HIGH && AXIS4_DRIVER_STATUS != LOW
   #error "Configuration (Config.h): Setting AXIS4_DRIVER_STATUS unknown, use OFF or valid driver status."
 #endif
@@ -593,6 +601,14 @@
     (AXIS5_DRIVER_MODEL < STEP_DIR_DRIVER_FIRST || AXIS5_DRIVER_MODEL > STEP_DIR_DRIVER_LAST) && \
     (AXIS5_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS5_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS5_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
+#endif
+
+#if AXIS5_SLEW_RATE_MINIMUM < 5 || AXIS5_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS5_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS5_SLEW_RATE_DESIRED < 200 || AXIS5_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS5_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS5_DRIVER_STATUS != OFF && AXIS5_DRIVER_STATUS != ON && AXIS5_DRIVER_STATUS != HIGH && AXIS5_DRIVER_STATUS != LOW
@@ -680,6 +696,14 @@
   #error "Configuration (Config.h): Setting AXIS6_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
 
+#if AXIS6_SLEW_RATE_MINIMUM < 5 || AXIS6_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS6_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS6_SLEW_RATE_DESIRED < 200 || AXIS6_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS6_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#endif
+
 #if AXIS6_DRIVER_STATUS != OFF && AXIS6_DRIVER_STATUS != ON && AXIS6_DRIVER_STATUS != HIGH && AXIS6_DRIVER_STATUS != LOW
   #error "Configuration (Config.h): Setting AXIS6_DRIVER_STATUS unknown, use OFF or valid driver status."
 #endif
@@ -760,6 +784,14 @@
     (AXIS7_DRIVER_MODEL < STEP_DIR_DRIVER_FIRST || AXIS7_DRIVER_MODEL > STEP_DIR_DRIVER_LAST) && \
     (AXIS7_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS7_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS7_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
+#endif
+
+#if AXIS7_SLEW_RATE_MINIMUM < 5 || AXIS7_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS7_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS7_SLEW_RATE_DESIRED < 200 || AXIS7_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS7_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS7_DRIVER_STATUS != OFF && AXIS7_DRIVER_STATUS != ON && AXIS7_DRIVER_STATUS != HIGH && AXIS7_DRIVER_STATUS != LOW
@@ -844,6 +876,14 @@
   #error "Configuration (Config.h): Setting AXIS8_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
 
+#if AXIS8_SLEW_RATE_MINIMUM < 5 || AXIS8_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS8_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS8_SLEW_RATE_DESIRED < 200 || AXIS8_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS8_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#endif
+
 #if AXIS8_DRIVER_STATUS != OFF && AXIS8_DRIVER_STATUS != ON && AXIS8_DRIVER_STATUS != HIGH && AXIS8_DRIVER_STATUS != LOW
   #error "Configuration (Config.h): Setting AXIS8_DRIVER_STATUS unknown, use OFF or valid driver status."
 #endif
@@ -924,6 +964,14 @@
     (AXIS9_DRIVER_MODEL < STEP_DIR_DRIVER_FIRST || AXIS9_DRIVER_MODEL > STEP_DIR_DRIVER_LAST) && \
     (AXIS9_DRIVER_MODEL < SERVO_DRIVER_FIRST || AXIS9_DRIVER_MODEL > SERVO_DRIVER_LAST)
   #error "Configuration (Config.h): Setting AXIS9_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
+#endif
+
+#if AXIS9_SLEW_RATE_MINIMUM < 5 || AXIS9_SLEW_RATE_MINIMUM > 50
+  #error "Configuration (Config.h): Setting AXIS9_SLEW_RATE_MINIMUM out of range, use a value between 5 and 50"
+#endif
+
+#if AXIS9_SLEW_RATE_DESIRED < 200 || AXIS9_SLEW_RATE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS9_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS9_DRIVER_STATUS != OFF && AXIS9_DRIVER_STATUS != ON && AXIS9_DRIVER_STATUS != HIGH && AXIS9_DRIVER_STATUS != LOW
