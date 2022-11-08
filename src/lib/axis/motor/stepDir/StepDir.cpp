@@ -278,7 +278,7 @@ void StepDirMotor::modeSwitch() {
   } else {
     if (microstepModeControl == MMC_TRACKING) {
       noInterrupts();
-      if (!synchronized || (step == -1 && direction == dirRev || step == 1 && direction == dirFwd)) {
+      if (!synchronized || (step == -1 && direction == dirRev) || (step == 1 && direction == dirFwd)) {
         microstepModeControl = MMC_SLEWING_REQUEST;
       }
       interrupts();
