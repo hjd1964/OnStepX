@@ -902,7 +902,7 @@
 #define AXIS4_ENABLE_STATE            LOW                         // enable pin state when driver is active
 #endif
 #ifndef AXIS4_SLEW_RATE_MINIMUM
-#define AXIS4_SLEW_RATE_MINIMUM       2                           // in microns/sec
+#define AXIS4_SLEW_RATE_MINIMUM       20                          // in microns/sec
 #endif
 #ifndef AXIS4_SLEW_RATE_DESIRED
 #define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
@@ -1055,7 +1055,7 @@
 #define AXIS5_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS5_SLEW_RATE_MINIMUM
-#define AXIS5_SLEW_RATE_MINIMUM       2
+#define AXIS5_SLEW_RATE_MINIMUM       20
 #endif
 #ifndef AXIS5_SLEW_RATE_DESIRED
 #define AXIS5_SLEW_RATE_DESIRED       500
@@ -1206,7 +1206,7 @@
 #define AXIS6_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS6_SLEW_RATE_MINIMUM
-#define AXIS6_SLEW_RATE_MINIMUM       2
+#define AXIS6_SLEW_RATE_MINIMUM       20
 #endif
 #ifndef AXIS6_SLEW_RATE_DESIRED
 #define AXIS6_SLEW_RATE_DESIRED       500
@@ -1357,7 +1357,7 @@
 #define AXIS7_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS7_SLEW_RATE_MINIMUM
-#define AXIS7_SLEW_RATE_MINIMUM       2
+#define AXIS7_SLEW_RATE_MINIMUM       20
 #endif
 #ifndef AXIS7_SLEW_RATE_DESIRED
 #define AXIS7_SLEW_RATE_DESIRED       500
@@ -1508,7 +1508,7 @@
 #define AXIS8_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS8_SLEW_RATE_MINIMUM
-#define AXIS8_SLEW_RATE_MINIMUM       2
+#define AXIS8_SLEW_RATE_MINIMUM       20
 #endif
 #ifndef AXIS8_SLEW_RATE_DESIRED
 #define AXIS8_SLEW_RATE_DESIRED       500
@@ -1659,7 +1659,7 @@
 #define AXIS9_ENABLE_STATE            LOW
 #endif
 #ifndef AXIS9_SLEW_RATE_MINIMUM
-#define AXIS9_SLEW_RATE_MINIMUM       2
+#define AXIS9_SLEW_RATE_MINIMUM       20
 #endif
 #ifndef AXIS9_SLEW_RATE_DESIRED
 #define AXIS9_SLEW_RATE_DESIRED       500
