@@ -146,6 +146,16 @@
 #define FileVersionConfig 5
 #endif
 
+//shared enables
+#ifndef SHARED_ENABLE_STATE
+#define SHARED_ENABLE_STATE           LOW                         // default state of shared ENable pin for motor power on
+#endif
+#ifndef SHARED2_ENABLE_STATE
+#define SHARED2_ENABLE_STATE          LOW                         // default state of shared ENable pin for motor power on
+#endif
+#ifndef SHARED3_ENABLE_STATE
+#define SHARED3_ENABLE_STATE          LOW                         // default state of shared ENable pin for motor power on
+#endif
 // -----------------------------------------------------------------------------------
 // mount settings
 
