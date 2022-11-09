@@ -23,14 +23,14 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *supressFram
       } else
     #endif
 
-    // :GXE6#     Get pec worm rotation steps (from NV)
+    // :GXE6#     Get number of steps per sidereal second
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '6') {
       sprintF(reply, "%0.6f", stepsPerSiderealSecond);
       *numericReply = false;
     } else
 
-    // :GXE7#     Get pec worm rotation steps (from NV)
+    // :GXE7#     Get PEC worm rotation steps (from NV)
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '7') {
       PecSettings temp;
@@ -39,7 +39,7 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *supressFram
       *numericReply = false;
     } else
 
-    // :GXE8#     Get pec buffer size in seconds
+    // :GXE8#     Get PEC buffer size in seconds
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '8') {
       sprintf(reply, "%ld", bufferSize);
