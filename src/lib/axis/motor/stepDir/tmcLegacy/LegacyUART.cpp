@@ -130,7 +130,7 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6);
 
   int maxCurrent;
-  if (settings.model == TMC2209) maxCurrent = 2000; else
+  if (settings.model == TMC2226) maxCurrent = 2800; else // allow enough range for TMC2209 and TMC2226
   {
     DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DLF(" unknown driver model!");
     return false;
