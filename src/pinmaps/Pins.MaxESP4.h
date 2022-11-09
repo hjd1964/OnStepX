@@ -31,8 +31,8 @@
 #define I2C_SCL_PIN             22
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
-#define AUX3_PIN                14               // Home SW for Axis1, or I2C SDA
-#define AUX4_PIN                13               // Home SW for Axis2, or I2C SCL
+#define AUX3_PIN                14               // Home SW for Axis1
+#define AUX4_PIN                13               // Home SW for Axis2
 #define AUX5_PIN                1                // TX0 main USB, etc.
 #define AUX6_PIN                3                // RX0 main USB, etc.
 #define AUX7_PIN                23               // Limit SW, PPS, etc.
