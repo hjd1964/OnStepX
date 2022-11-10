@@ -91,7 +91,7 @@ void StepDirDriver::init(float param1, float param2, float param3, float param4,
   UNUSED(param6);
 
   if (settings.intpol == ON) settings.intpol = true; else settings.intpol = false;
-  if (settings.decay == OFF) settings.decay = SPREADCYCLE;
+  if (settings.decay == OFF) settings.decay = STEALTHCHOP;
   if (settings.decaySlewing == OFF) settings.decaySlewing = SPREADCYCLE;
 
   VF("MSG: StepDirDriver"); V(axisNumber); VF(", init model "); V(DRIVER_NAME[settings.model]);
