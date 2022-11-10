@@ -9,6 +9,10 @@
 
 #include "../weather/Weather.h"
 
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
+#endif
+
 void thermistorWrapper() { temperature.poll(); }
 
 // prepare for operation
@@ -44,7 +48,7 @@ void Thermistor::poll() {
       int r = analogRead(devicePin[index]);
 
       // calculate the device resistance
-      float resistance = 1023.0F/r - 1.0F;
+      float resistance = (float)(ANALOG_READ_RANGE)/r - 1.0F;
       resistance = settings[thermistorType].rSeries / resistance;
 
       // convert to temperature in degrees C

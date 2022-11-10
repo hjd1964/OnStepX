@@ -10,12 +10,15 @@
 // 1/5000 second sidereal timer
 #define HAL_FRACTIONAL_SEC 5000.0F
 
-// This platform has up to 15 bit PWM
-#ifndef ANALOG_WRITE_PWM_BITS
-  #define ANALOG_WRITE_PWM_BITS 13
+// Analog read and write
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
 #endif
-#ifndef ANALOG_WRITE_PWM_RANGE
-  #define ANALOG_WRITE_PWM_RANGE 8191
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 8191
+#endif
+#ifndef ANALOG_WRITE_PWM_BITS
+  #define ANALOG_WRITE_PWM_BITS 13 // up to 15 bits
 #endif
 #ifndef ANALOG_WRITE_PWM_FREQUENCY
   #define ANALOG_WRITE_PWM_FREQUENCY 18310.55

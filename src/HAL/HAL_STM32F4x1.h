@@ -9,12 +9,15 @@
 // 1/500 second sidereal timer
 #define HAL_FRACTIONAL_SEC 500.0F
 
-// This platform has 16 bit PWM
-#ifndef ANALOG_WRITE_PWM_BITS
-  #define ANALOG_WRITE_PWM_BITS 8
+// Analog read and write
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
 #endif
-#ifndef ANALOG_WRITE_PWM_RANGE
-  #define ANALOG_WRITE_PWM_RANGE 255
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 255
+#endif
+#ifndef ANALOG_WRITE_PWM_BITS
+  #define ANALOG_WRITE_PWM_BITS 8 // up to 16 bits
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse

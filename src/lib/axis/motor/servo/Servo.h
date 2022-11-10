@@ -17,6 +17,10 @@
 
 #include "feedback/pid/Pid.h"
 
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 255
+#endif
+
 class ServoMotor : public Motor {
   public:
     // constructor
@@ -88,8 +92,8 @@ class ServoMotor : public Motor {
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
     float currentVelocity = 0.0F;       // last velocity set 
-    float acceleration = ANALOG_WRITE_PWM_RANGE/5.0F;
-    float accelerationFs = (ANALOG_WRITE_PWM_RANGE/5.0F)/FRACTIONAL_SEC;
+    float acceleration = ANALOG_WRITE_RANGE/5.0F;
+    float accelerationFs = (ANALOG_WRITE_RANGE/5.0F)/FRACTIONAL_SEC;
     int16_t syncThreshold = OFF;        // sync threshold in counts or OFF (for absolute encoders) 
 
     int32_t lastPosition = 0;           // the last encoder position for stall check

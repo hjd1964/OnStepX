@@ -4,6 +4,10 @@
 #include "../../Common.h"
 #include "PushButton.h"
 
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
+#endif
+
 Button::Button(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
@@ -18,7 +22,7 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
   if (isAnalog) {
-  	if (threshold + hysteresis > 1023) hysteresis = 1023;
+  	if (threshold + hysteresis > ANALOG_READ_RANGE) hysteresis = ANALOG_READ_RANGE;
 	  if (threshold - hysteresis < 0) hysteresis = 0;
   }
 

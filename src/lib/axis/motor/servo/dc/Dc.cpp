@@ -16,7 +16,7 @@ ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSetti
   this->Settings = Settings;
   model = Settings->model;
   statusMode = Settings->status;
-  velocityMax = (Settings->velocityMax/100.0F)*ANALOG_WRITE_PWM_RANGE;
+  velocityMax = (Settings->velocityMax/100.0F)*ANALOG_WRITE_RANGE;
   acceleration = (Settings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
@@ -63,7 +63,7 @@ void ServoDc::init() {
   #endif
 }
 
-// set motor velocity by adjusting power (0 to ANALOG_WRITE_PWM_RANGE for 0 to 100% power)
+// set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
 void ServoDc::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
   if (velocity > velocityMax) velocity = velocityMax; else

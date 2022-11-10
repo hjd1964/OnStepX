@@ -6,6 +6,10 @@
 #include "Sense.h"
 #include "../tasks/OnTask.h"
 
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
+#endif
+
 SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
@@ -15,7 +19,7 @@ SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   isAnalog    = threshold != 0;
 
   if (isAnalog) {
-  	if (threshold + hysteresis > 1023) {
+  	if (threshold + hysteresis > ANALOG_READ_RANGE) {
       hysteresis = 0;
       VL("");
       VF("WRN: SenseInput::SenseInput(), Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range hysteresis set to 0.");

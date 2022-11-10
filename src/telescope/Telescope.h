@@ -5,6 +5,10 @@
 #include "../Common.h"
 #include "../libApp/commands/ProcessCmds.h"
 
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 255
+#endif
+
 enum ParkState: uint8_t {PS_UNPARKED, PS_PARKING, PS_PARKED, PS_PARK_FAILED, PS_UNPARKING};
 
 typedef struct InitError {
@@ -51,6 +55,6 @@ class Telescope {
 };
 
 extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
-#define analog8BitToAnalogRange(v) roundf((v/255.0F)*(float)(ANALOG_WRITE_PWM_RANGE))
+#define analog8BitToAnalogRange(v) roundf((v/255.0F)*(float)(ANALOG_WRITE_RANGE))
 
 extern Telescope telescope;

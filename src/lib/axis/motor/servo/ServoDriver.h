@@ -10,6 +10,10 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 255
+#endif
+
 class ServoDriver {
   public:
     // decodes driver model and sets up the pin modes
@@ -19,7 +23,7 @@ class ServoDriver {
     // this is a required method for the Axis class, even if it does nothing
     virtual void enable(bool state);
 
-    // get the control range to the motor (-velocityMax to velocityMax) defaults to ANALOG_WRITE_PWM_RANGE
+    // get the control range to the motor (-velocityMax to velocityMax) defaults to ANALOG_WRITE_RANGE
     // must be ready at object creation!
     virtual float getMotorControlRange() { return velocityMax; }
 
@@ -48,7 +52,7 @@ class ServoDriver {
     int16_t model = OFF;
     int16_t statusMode = OFF;
 
-    float velocityMax = ANALOG_WRITE_PWM_RANGE;
+    float velocityMax = ANALOG_WRITE_RANGE;
     Direction motorDirection = DIR_FORWARD;
 
     int16_t enablePin = OFF;
