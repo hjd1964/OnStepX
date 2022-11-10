@@ -1,17 +1,14 @@
 // -----------------------------------------------------------------------------------
-// GEOMETRIC ALIGN FOR EQ MOUNTS
+// GOTO ASSIST GEOMETRIC ALIGN FOR ALT/AZM AND EQ MOUNTS (REFERENCE DESIGN)
 //
 // by Howard Dutton
 //
 // Copyright (C) 2012 to 2021 Howard Dutton
 //
 
-// -----------------------------------------------------------------------------------
-// ADVANCED GEOMETRIC ALIGN FOR EQUATORIAL MOUNTS (GOTO ASSIST)
+#include "Align.ref.h"
 
-#include "Align.h"
-
-#ifdef MOUNT_PRESENT
+#if defined(MOUNT_PRESENT) && !defined(HIGH_SPEED_ALIGN)
 
 #include "../../../lib/tasks/OnTask.h"
 
@@ -125,11 +122,16 @@ void GeoAlign::createModel(int numberStars) {
 }
 
 // returns the correction to be added to the requested RA,Dec to yield the actual RA,Dec that we will arrive at
-void GeoAlign::correct(AlignCoordinate &mount, float sf, float _deo, float _pd, float _pz, float _pe, float _df, float _ff, float _tf, float *a1r, float *a2r) {
+void GeoAlign::correct(float a1, float a2, float pierSide, float sf, float _deo, float _pd, float _pz, float _pe, float _df, float _ff, float _tf, float *a1r, float *a2r) {
   float DO1,DOh;
   float PD,PDh;
   float PZ,PA;
   float DF,DFd,TF,FF,FFd,TFh,TFd;
+
+  float cosA2 = cosf(a2);
+  float tanA2 = tanf(a2);
+  float sinA1 = sinf(a1);
+  float cosA1 = cosf(a1);
 
   // ------------------------------------------------------------
   // A. Misalignment due to tube/optics not being perp. to Dec axis
@@ -138,7 +140,7 @@ void GeoAlign::correct(AlignCoordinate &mount, float sf, float _deo, float _pd, 
   // becomes a (N) offset.  Unchanged with meridian flips.
   DO1 = _deo*sf;
   // works on HA.  meridian flips effect this in HA
-  DOh = DO1*(1.0F/mount.cosA2)*mount.side;
+  DOh = DO1*(1.0F/cosA2)*pierSide;
 
   // ------------------------------------------------------------
   // B. Misalignment, Declination axis relative to Polar axis
@@ -148,7 +150,7 @@ void GeoAlign::correct(AlignCoordinate &mount, float sf, float _deo, float _pd, 
   // At the SCP it is, again, a (S) offset
   PD  = _pd*sf;
   // works on HA.
-  PDh = -PD*mount.tanA2*mount.side;
+  PDh = -PD*tanA2*pierSide;
 
   // ------------------------------------------------------------
   // Misalignment, relative to NCP
@@ -162,23 +164,23 @@ void GeoAlign::correct(AlignCoordinate &mount, float sf, float _deo, float _pd, 
   // ------------------------------------------------------------
   // Axis flex
   DF  = _df*sf;
-  DFd = -DF*(cosLat*mount.cosA1+sinLat*mount.tanA2);
+  DFd = -DF*(cosLat*cosA1+sinLat*tanA2);
 
   // ------------------------------------------------------------
   // Fork flex
   FF  = _ff*sf;
-  FFd = FF*mount.cosA1;
+  FFd = FF*cosA1;
 
   // ------------------------------------------------------------
   // Optical axis sag
   TF  = _tf*sf;
 
-  TFh = TF*(cosLat*mount.sinA1*(1.0/mount.cosA2));
-  TFd = TF*(cosLat*mount.cosA1-sinLat*mount.cosA2);
+  TFh = TF*(cosLat*sinA1*(1.0/cosA2));
+  TFd = TF*(cosLat*cosA1-sinLat*cosA2);
 
   // ------------------------------------------------------------
-  *a1r  = (-PZ*mount.cosA1*mount.tanA2 + PA*mount.sinA1*mount.tanA2 + DOh + PDh + TFh);
-  *a2r  = (+PZ*mount.sinA1             + PA*mount.cosA1             + DFd + FFd + TFd);
+  *a1r  = (-PZ*cosA1*tanA2 + PA*sinA1*tanA2 + DOh +  PDh +       TFh);
+  *a2r  = (+PZ*sinA1       + PA*cosA1             +  DFd + FFd + TFd);
 }
 
 void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9) {
@@ -211,13 +213,21 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
   _oh_m = -p9 + round(best_ohe/sf); _oh_p = p9 + round(best_ohe/sf);
 
   float ma2, ma1;
+  for (_deo = _deo_m; _deo <= _deo_p; _deo++)
+  for (_pd = _pd_m; _pd <= _pd_p; _pd++)
+  for (_pz = _pz_m; _pz <= _pz_p; _pz++)
+  for (_pe = _pe_m; _pe <= _pe_p; _pe++)
+  for (_df = _df_m; _df <= _df_p; _df++)
+  for (_ff = _ff_m; _ff <= _ff_p; _ff++)
+  for (_tf = _tf_m; _tf <= _tf_p; _tf++)
   for (_ohe = _oh_m; _ohe <= _oh_p; _ohe++)
   for (_ode = _od_m; _ode <= _od_p; _ode++) {
     ode = _ode*sf1;
     odw = -ode;
     ohe = _ohe*sf1;
     ohw = ohe;
-
+    
+    // check the combinations for all samples
     for (l = 0; l < num; l++) {
       ma1 = mount[l].ax1;
       ma2 = mount[l].ax2;
@@ -232,68 +242,42 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
         ma1 = ma1 + ohe;
         ma2 = ma2 + ode;
       }
- 
-      mount[l].ma1 = ma1;
-      mount[l].ma2 = ma2;
-      mount[l].sinA1 = sinf(ma1);
-      mount[l].cosA1 = cosf(ma1);
-      mount[l].cosA2 = cosf(ma2);
-      mount[l].tanA2 = tanf(ma2);
+
+      float ma1r, ma2r;
+      correct(ma1, ma2, mount[l].side, sf1, _deo, _pd, _pz, _pe, _df, _ff, _tf, &ma1r, &ma2r);
+
+      delta[l].ax1 = actual[l].ax1 - (ma1 - ma1r);
+      if (delta[l].ax1 >  Deg180) delta[l].ax1 = delta[l].ax1 - Deg360; else
+      if (delta[l].ax1 < -Deg180) delta[l].ax1 = delta[l].ax1 + Deg360;
+      delta[l].ax2 = actual[l].ax2 - (ma2 - ma2r);
+      delta[l].side = mount[l].side;
+    }
+
+    // calculate the standard deviations
+    float a, b;
+    sum1 = 0.0; for (l = 0; l < num; l++) sum1 = sum1 + sq(delta[l].ax1*cosf(actual[l].ax2)); a = sqrtf(sum1/(num - 1));
+    sum1 = 0.0; for (l = 0; l < num; l++) sum1 = sum1 + sq(delta[l].ax2); b = sqrtf(sum1/(num - 1));
+    max_dist = sqrtf(sq(a) + sq(b));
+
+    // remember the best fit
+    if (max_dist < best_dist) {
+      best_dist = max_dist;
+      best_deo  = _deo*sf;
+      best_pd   = _pd*sf;
+      best_pz   = _pz*sf;
+      best_pe   = _pe*sf;
+
+      best_tf   = _tf*sf;
+      best_df   = _df*sf;
+      best_ff   = _ff*sf;
+      
+      if (p8 != 0) best_odw = radToArcsec(odw); else best_odw = best_pe/2.0;
+      if (p8 != 0) best_ode = radToArcsec(ode); else best_ode = -best_pe/2.0;
+      if (p9 != 0) best_ohw = radToArcsec(ohw);
+      if (p9 != 0) best_ohe = radToArcsec(ohe);
     }
     
-    for (_deo = _deo_m; _deo <= _deo_p; _deo++)
-    for (_pd = _pd_m; _pd <= _pd_p; _pd++)
-    for (_pz = _pz_m; _pz <= _pz_p; _pz++)
-    for (_pe = _pe_m; _pe <= _pe_p; _pe++)
-    for (_df = _df_m; _df <= _df_p; _df++)
-    for (_ff = _ff_m; _ff <= _ff_p; _ff++)
-    for (_tf = _tf_m; _tf <= _tf_p; _tf++) {
-
-      // check the combinations for all samples
-      for (l = 0; l < num; l++) {
-        float ma1r, ma2r;
-        correct(mount[l], sf1, _deo, _pd, _pz, _pe, _df, _ff, _tf, &ma1r, &ma2r);
-
-        delta[l].ax1 = actual[l].ax1 - (mount[l].ma1 - ma1r);
-        if (delta[l].ax1 >  Deg180) delta[l].ax1 = delta[l].ax1 - Deg360; else
-        if (delta[l].ax1 < -Deg180) delta[l].ax1 = delta[l].ax1 + Deg360;
-        delta[l].ax2 = actual[l].ax2 - (mount[l].ma2 - ma2r);
-        delta[l].side = mount[l].side;
-      }
-
-      // calculate the standard deviations
-      float a, b;
-
-      sum1 = 0.0;
-      for (l = 0; l < num; l++) sum1 = sum1 + sq(delta[l].ax1*cosf(actual[l].ax2));
-      a = sum1/(num - 1); // was sqrt(sum1/(num - 1))
-
-      sum1 = 0.0;
-      for (l = 0; l < num; l++) sum1 = sum1 + sq(delta[l].ax2);
-      b = sum1/(num - 1); // was sqrt(sum1/(num - 1))
-
-      max_dist = sqrtf(a + b); // was sq(a) + sq(b)
-
-      // remember the best fit
-      if (max_dist < best_dist) {
-        best_dist = max_dist;
-        best_deo  = _deo*sf;
-        best_pd   = _pd*sf;
-        best_pz   = _pz*sf;
-        best_pe   = _pe*sf;
-
-        best_tf   = _tf*sf;
-        best_df   = _df*sf;
-        best_ff   = _ff*sf;
-        
-        if (p8 != 0) best_odw = radToArcsec(odw); else best_odw = best_pe/2.0;
-        if (p8 != 0) best_ode = radToArcsec(ode); else best_ode = -best_pe/2.0;
-        if (p9 != 0) best_ohw = radToArcsec(ohw);
-        if (p9 != 0) best_ohe = radToArcsec(ohe);
-      }
-      
-      Y;
-    }
+    Y;
   }
 }
 

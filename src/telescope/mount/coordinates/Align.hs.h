@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// GEOMETRIC ALIGN FOR ALT/AZM AND EQ MOUNTS
+// GOTO ASSIST GEOMETRIC ALIGN FOR ALT/AZM AND EQ MOUNTS (HIGH SPEED)
 //
 // by Howard Dutton
 //
@@ -9,7 +9,7 @@
 
 #include "../../../Common.h"
 
-#ifdef MOUNT_PRESENT
+#if defined(MOUNT_PRESENT) && defined(HIGH_SPEED_ALIGN)
 
 #include "../../../libApp/commands/ProcessCmds.h"
 

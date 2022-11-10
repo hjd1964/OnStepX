@@ -8,7 +8,8 @@
 
 #include <Arduino.h>
 #include "../site/Site.h"
-#include "Align.h"
+#include "Align.ref.h"
+#include "Align.hs.h"
 
 // MOTOR      <--> apply index offset and backlash        <--> INSTRUMENT  (Axis)
 // INSTRUMENT <--> apply celestial coordinate conventions <--> MOUNT       (Transform)
