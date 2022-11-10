@@ -42,6 +42,8 @@ bool Ds2413::init() {
           if (deviceCount < DS2413_MAX_DEVICES) {
             VF(" allocated to GPIO("); V(deviceCount*2); VF(") and GPIO("); V(deviceCount*2 + 1); VLF(")");
           } else { VLF(" not assigned"); }
+
+          detected = true;
         #endif
 
         if (deviceCount < DS2413_MAX_DEVICES) {
@@ -49,7 +51,6 @@ bool Ds2413::init() {
           deviceCount++;
         }
 
-        detected = true;
       }
     }
   }
