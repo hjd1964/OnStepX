@@ -184,9 +184,11 @@ bool StepDirTmcSPI::enable(bool state) {
     I_run = settings.currentRun;
     I_hold = settings.currentHold;
     current(I_run);
+    modeDecayTracking();
   } else {
     driver->ihold(0);
     driver->irun(0);
+    setDecayMode(STEALTHCHOP);
   }
   return true;
 }

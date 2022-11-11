@@ -213,10 +213,16 @@ void StepDirTmcUART::updateStatus() {
 
 // secondary way to power down not using the enable pin
 bool StepDirTmcUART::enable(bool state) {
-  int I_run = 0, I_hold = 0;
-  if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
-  driver->setRunCurrent(I_run/25); // current in %
-  driver->setHoldCurrent(I_hold/25); // current in %
+  if (state) {
+    driver->setRunCurrent(settings.currentRun/25); // current in %
+    driver->setHoldCurrent(settings.currentHold/25); // current in %
+    modeDecayTracking();
+  } else {
+    driver->enableStealthChop();
+    driver->setRunCurrent(0); 
+    driver->setHoldCurrent(0);
+  }
+
   return true;
 }
 

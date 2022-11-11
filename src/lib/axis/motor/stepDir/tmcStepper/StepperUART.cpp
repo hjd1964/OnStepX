@@ -236,7 +236,9 @@ bool StepDirTmcUART::enable(bool state) {
     I_run = settings.currentRun;
     I_hold = settings.currentHold;
     driver->rms_current(I_run*0.707F);
+    modeDecayTracking();
   } else {
+    setDecayMode(STEALTHCHOP);
     driver->ihold(0);
     driver->irun(0);
   }

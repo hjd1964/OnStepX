@@ -164,9 +164,12 @@ void StepDirTmcSPI::updateStatus() {
 
 // secondary way to power down not using the enable pin
 bool StepDirTmcSPI::enable(bool state) {
-  int I_run = 0, I_hold = 0;
-  if (state) { I_run = settings.currentRun; I_hold = settings.currentHold; }
-  driver.mode(settings.intpol, settings.decay, microstepCode, I_run, I_hold);
+  if (state) {
+    driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+  } else {
+    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, 0, 0);
+  }
+
   return true;
 }
 
