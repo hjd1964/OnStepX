@@ -320,7 +320,7 @@ CommandError Focuser::gotoTarget(int index, long target) {
 
   axes[index]->setFrequencyBase(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
-  return axes[index]->autoGoto(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
+  return axes[index]->autoGoto(configuration[index].slewRateDesired);
 }
 
 // park focuser at its current location
@@ -339,7 +339,7 @@ CommandError Focuser::park(int index) {
   float targetMicrons = axes[index]->getInstrumentCoordinate();
   axes[index]->setTargetCoordinatePark(targetMicrons);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
 
   if (e == CE_NONE) {
     settings[index].position = targetMicrons;
@@ -380,7 +380,7 @@ CommandError Focuser::unpark(int index) {
   axes[index]->setBacklash(settings[index].backlash);
   axes[index]->setTargetCoordinate(settings[index].position);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired*configuration[index].accelerationTime, configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
 
   if (e == CE_NONE) {
     settings[index].parkState = PS_UNPARKING;

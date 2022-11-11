@@ -107,7 +107,7 @@ CommandError Rotator::gotoTarget(float target) {
   axis3.setFrequencyBase(0.0F);
   axis3.setTargetCoordinate(target);
 
-  return axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+  return axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED);
 }
 
 // parks rotator at current position
@@ -124,7 +124,7 @@ CommandError Rotator::park() {
   settings.position = axis3.getInstrumentCoordinate();
   axis3.setTargetCoordinatePark(settings.position);
 
-  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED);
 
   if (e == CE_NONE) {
     settings.parkState = PS_PARKING;
@@ -161,7 +161,7 @@ CommandError Rotator::unpark() {
   axis3.setBacklash(settings.backlash);
   axis3.setTargetCoordinate(settings.position);
 
-  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED*AXIS3_ACCELERATION_TIME, AXIS3_SLEW_RATE_DESIRED);
+  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_DESIRED);
 
   if (e == CE_NONE) {
     settings.parkState = PS_UNPARKING;

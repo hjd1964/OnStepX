@@ -302,9 +302,8 @@ void Axis::setSlewAccelerationTimeAbort(float seconds) {
 }
 
 // auto goto to destination target coordinate
-// \param distance: acceleration distance in measures (to frequency)
 // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
-CommandError Axis::autoGoto(float distance, float frequency) {
+CommandError Axis::autoGoto(float frequency) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
@@ -315,7 +314,6 @@ CommandError Axis::autoGoto(float distance, float frequency) {
   VF("autoGoto start ");
 
   motor->markOriginCoordinateSteps();
-  slewAccelerationDistance = distance;
   motor->setSynchronized(false);
   motor->setSlewing(true);
   autoRate = AR_RATE_BY_DISTANCE;
