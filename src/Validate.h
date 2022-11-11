@@ -1049,7 +1049,12 @@
   #endif
 #endif
 
-// FOCUSER TEMPERATURE
+// GENERAL TEMPERATURE ---------------------------
+#ifdef DS1820_DEVICES_PRESENT && THERMISTOR_DEVICES_PRESENT
+  #error "Configuration (Config.h): Setting DS18B20 devices and THERMISTOR devices can not both be used at the same time, use one or the other"
+#endif
+
+// FOCUSER TEMPERATURE ---------------------------
 #if FOCUSER_TEMPERATURE != OFF && \
     FOCUSER_TEMPERATURE & DS_MASK != DS18B20 && \
     FOCUSER_TEMPERATURE & DS_MASK != DS18S20 && \
