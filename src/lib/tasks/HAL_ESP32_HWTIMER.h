@@ -28,7 +28,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
       period /= TIMER_RATE_16MHZ_TICKS;
       reps    = period/4194304UL + 1;
       counts  = period/reps;
-    } else counts = 160000;           // set for a 10ms period, stopped
+    } else counts = 16000;            // set for a 1ms period, stopped
   
     noInterrupts();
     switch (num) {

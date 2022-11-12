@@ -19,7 +19,7 @@
       period /= TIMER_RATE_16MHZ_TICKS;
       reps    = period/65536 + 1;
       counts  = period/reps - 1;      // has -1 since this is dropped right into a timer register
-    } else counts = 20000;            // set for a 10ms period, stopped
+    } else counts = 2000;             // set for a 1ms period, stopped
   
     noInterrupts();
     switch (num) {

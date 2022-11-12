@@ -4,8 +4,8 @@
 // provides one 16 bit timer (Timer1) with 16 bit software pre-scaler, running at 2MHz
 // timer configured as ~0 to 0.032 seconds (granularity of timer is 0.5uS) /8  pre-scaler
 
-#define TIMER_RATE_MHZ          2L   // AtMega328 motor timers run at 2 MHz
-#define TIMER_RATE_16MHZ_TICKS  8L   // 16L/TIMER_RATE_MHZ, 8x slower than the default 16MHz "sub-micros"
+#define TIMER_RATE_MHZ          2L    // AtMega328 motor timers run at 2 MHz
+#define TIMER_RATE_16MHZ_TICKS  8L    // 16L/TIMER_RATE_MHZ, 8x slower than the default 16MHz "sub-micros"
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
@@ -15,11 +15,11 @@
     // maximum time is about 134 seconds for this design
     uint32_t counts, reps = 0;
     if (period != 0 && period <= 2144000000) {
-      if (period < 16) period = 16;  // minimum time is 1us
+      if (period < 16) period = 16;   // minimum time is 1us
       period /= TIMER_RATE_16MHZ_TICKS;
       reps    = period/65536 + 1;
-      counts  = period/reps - 1;     // has -1 since this is dropped right into a timer register
-    } else counts = 20000;           // set for a 10ms period, stopped
+      counts  = period/reps - 1;      // has -1 since this is dropped right into a timer register
+    } else counts = 2000;             // set for a 1ms period, stopped
   
     noInterrupts();
     _nextPeriod1 = counts; _nextRep1 = reps;

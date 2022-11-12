@@ -2,7 +2,7 @@
 // STM32 hardware timers
 
 // provides four 16 bit timers with 16 bit software pre-scalers, running at 4MHz
-// each timer configured as ~0 to 0.032 seconds (granularity of timer is 0.062uS)
+// each timer configured as ~0 to 0.016 seconds (granularity of timer is 0.25uS)
 // note that timer use may collide with PWM depending on which pin is being controlled
 // I tried to stay away from tone() and use the most basic timers first where possible
 
@@ -21,7 +21,7 @@
       period /= TIMER_RATE_16MHZ_TICKS;
       reps   = period/65536 + 1;
       counts = period/reps - 1;       // has -1 since this is dropped right into a timer register
-    } else counts = 20000;            // set for a 10ms period, stopped
+    } else counts = 4000;             // set for a 1ms period, stopped
   
     noInterrupts();
     switch (num) {

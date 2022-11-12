@@ -22,7 +22,7 @@
       double fperiod = period/timerRate16MHzTicks;
       reps           = fperiod/4194304.0 + 1.0;
       counts         = round(fperiod/reps)/16.0;
-    } else counts = 160000;                 // set for a 10ms period, stopped
+    } else counts = 16000;            // set for a 1ms period, stopped
   
     noInterrupts();
     switch (num) {
