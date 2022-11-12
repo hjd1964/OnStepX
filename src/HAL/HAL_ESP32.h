@@ -4,8 +4,8 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
-// 1/150 second sidereal timer
-#define HAL_FRACTIONAL_SEC 150.0F
+// 1/200 second sidereal timer
+#define HAL_FRACTIONAL_SEC 200.0F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE

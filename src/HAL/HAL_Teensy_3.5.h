@@ -10,8 +10,8 @@
 // turn on support for using DACs to output digital signals using Arduino standard commands
 #define HAL_DAC_AS_DIGITAL
 
-// 1/500 second sidereal timer
-#define HAL_FRACTIONAL_SEC 500.0F
+// 1/250 second sidereal timer
+#define HAL_FRACTIONAL_SEC 250.0F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
