@@ -92,7 +92,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
 
   // initialize the stepper driver
   if (settings.model == TMC2208) {
-    rSense = 0.011F;
+    rSense = 0.11F;
     driver = new TMC2208Stepper(&SerialTMC, 0.11F);
     ((TMC2208Stepper*)driver)->begin();
     ((TMC2208Stepper*)driver)->intpol(settings.intpol);
@@ -102,7 +102,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     ((TMC2208Stepper*)driver)->en_spreadCycle(true);
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
-    rSense = 0.011F;
+    rSense = 0.11F;
     driver = new TMC2209Stepper(&SerialTMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
     ((TMC2209Stepper*)driver)->begin();
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
@@ -176,18 +176,17 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 }
 
 void StepDirTmcUART::modeDecayTracking() {
+  setDecayMode(settings.decay);
   driver->irun(mAToCs(settings.currentRun));
   driver->ihold(mAToCs(settings.currentHold));
-  setDecayMode(settings.decay);
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
+  setDecayMode(settings.decaySlewing);
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  DL(IGOTO);
   driver->irun(mAToCs(IGOTO));
   driver->ihold(mAToCs(settings.currentHold));
-  setDecayMode(settings.decaySlewing);
 }
 
 // set the decay mode STEALTHCHOP or SPREADCYCLE
