@@ -167,7 +167,7 @@ bool StepDirTmcSPI::enable(bool state) {
   if (state) {
     driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
   } else {
-    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, 0, 0);
+    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, 0);
   }
 
   return true;
@@ -178,7 +178,7 @@ void StepDirTmcSPI::calibrate() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
-    delay(100);
+    delay(1000);
     driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
   }
 }

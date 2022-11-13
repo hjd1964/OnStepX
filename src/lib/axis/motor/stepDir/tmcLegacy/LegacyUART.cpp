@@ -28,8 +28,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     if (settings.currentHold == OFF) settings.currentHold = lround(settings.currentRun/2.0F);
   } else {
     // set current defaults for TMC drivers
-    settings.currentRun = 600;
-    if (settings.model == TMC2130) settings.currentRun = 2500;
+    settings.currentRun = 2500;
     settings.currentGoto = settings.currentRun;
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
@@ -103,7 +102,6 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     VF("WRN: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver interpolation control not supported");
   }
   modeMicrostepTracking();
-
   driver->setRunCurrent(settings.currentRun/25); // current in %
   driver->setHoldCurrent(settings.currentHold/25); // current in %
   driver->disableStealthChop();
@@ -171,17 +169,17 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 }
 
 void StepDirTmcUART::modeDecayTracking() {
-  driver->disableStealthChop();
-//  if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   driver->setRunCurrent(settings.currentRun/25); // current in %
+  driver->setHoldCurrent(settings.currentHold/25); // current in %
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver->disableStealthChop();
-//  if (settings.decaySlewing == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  if (settings.decaySlewing == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   driver->setRunCurrent(IGOTO/25); // current in %
+  driver->setHoldCurrent(settings.currentHold/25); // current in %
 }
 
 void StepDirTmcUART::updateStatus() {
@@ -216,12 +214,9 @@ void StepDirTmcUART::updateStatus() {
 // secondary way to power down not using the enable pin
 bool StepDirTmcUART::enable(bool state) {
   if (state) {
-    driver->setRunCurrent(settings.currentRun/25); // current in %
-    driver->setHoldCurrent(settings.currentHold/25); // current in %
     modeDecayTracking();
   } else {
-//    driver->enableStealthChop();
-    driver->setRunCurrent(0); 
+    driver->enableStealthChop();
     driver->setHoldCurrent(0);
   }
 
@@ -234,10 +229,11 @@ void StepDirTmcUART::calibrate() {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->setRunCurrent(settings.currentRun/25); // current in %
     driver->setHoldCurrent(settings.currentRun/25); // current in %
-    delay(100);
-   // driver->enableStealthChop();
+    driver->enableStealthChop();
+    delay(1000);
     driver->setRunCurrent(settings.currentRun/25); // current in %
     driver->setHoldCurrent(settings.currentHold/25); // current in %
+    driver->disableStealthChop();
   }
 }
 

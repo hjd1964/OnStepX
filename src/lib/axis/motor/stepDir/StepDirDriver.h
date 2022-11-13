@@ -83,6 +83,9 @@ class StepDirDriver {
     StepDirDriverSettings settings;
 
   protected:
+    inline float mAToCs(float mA) { return 32.0*mA/1000.0*(rSense+0.02)/0.325 - 1; }
+    float rSense = 0.11F;
+
     uint8_t axisNumber;
     DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};
     #if DEBUG != OFF

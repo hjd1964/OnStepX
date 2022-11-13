@@ -55,9 +55,6 @@ class StepDirTmcSPI : public StepDirDriver {
 
     // set the decay mode STEALTH_CHOP or SPREAD_CYCLE
     void setDecayMode(int decayMode);
-
-    // set the peak current
-    void current(int mA);
 };
 
 #endif

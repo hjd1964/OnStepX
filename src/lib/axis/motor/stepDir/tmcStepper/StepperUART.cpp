@@ -37,8 +37,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     if (settings.currentHold == OFF) settings.currentHold = lround(settings.currentRun/2.0F);
   } else {
     // set current defaults for TMC drivers
-    settings.currentRun = 600;
-    if (settings.model == TMC2130) settings.currentRun = 2500;
+    settings.currentRun = 2500;
     settings.currentGoto = settings.currentRun;
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
@@ -93,20 +92,25 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
 
   // initialize the stepper driver
   if (settings.model == TMC2208) {
+    rSense = 0.011F;
     driver = new TMC2208Stepper(&SerialTMC, 0.11F);
     ((TMC2208Stepper*)driver)->begin();
-    ((TMC2208Stepper*)driver)->pwm_autoscale(true);
     ((TMC2208Stepper*)driver)->intpol(settings.intpol);
+    modeMicrostepTracking();
+    driver->irun(mAToCs(settings.currentRun));
+    driver->ihold(mAToCs(settings.currentHold));
+    ((TMC2208Stepper*)driver)->en_spreadCycle(true);
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
+    rSense = 0.011F;
     driver = new TMC2209Stepper(&SerialTMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
     ((TMC2209Stepper*)driver)->begin();
-    ((TMC2209Stepper*)driver)->pwm_autoscale(true);
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
+    modeMicrostepTracking();
+    driver->irun(mAToCs(settings.currentRun));
+    driver->ihold(mAToCs(settings.currentHold));
+    ((TMC2209Stepper*)driver)->en_spreadCycle(true);
   }
-  driver->hold_multiplier(settings.currentHold/settings.currentRun);
-  modeMicrostepTracking();
-  modeDecayTracking();
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -172,15 +176,18 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 }
 
 void StepDirTmcUART::modeDecayTracking() {
+  driver->irun(mAToCs(settings.currentRun));
+  driver->ihold(mAToCs(settings.currentHold));
   setDecayMode(settings.decay);
-  driver->rms_current(settings.currentRun*0.707F);
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
-  setDecayMode(settings.decaySlewing);
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver->rms_current(IGOTO*0.707F);
+  DL(IGOTO);
+  driver->irun(mAToCs(IGOTO));
+  driver->ihold(mAToCs(settings.currentHold));
+  setDecayMode(settings.decaySlewing);
 }
 
 // set the decay mode STEALTHCHOP or SPREADCYCLE
@@ -231,16 +238,11 @@ void StepDirTmcUART::updateStatus() {
 
 // secondary way to power down not using the enable pin
 bool StepDirTmcUART::enable(bool state) {
-  int I_run = 0, I_hold = 0;
   if (state) {
-    I_run = settings.currentRun;
-    I_hold = settings.currentHold;
-    driver->rms_current(I_run*0.707F);
     modeDecayTracking();
   } else {
     setDecayMode(STEALTHCHOP);
     driver->ihold(0);
-    driver->irun(0);
   }
   return true;
 }
@@ -249,11 +251,17 @@ bool StepDirTmcUART::enable(bool state) {
 void StepDirTmcUART::calibrate() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->hold_multiplier(1.0F);
-    driver->rms_current(settings.currentRun*0.707F);
-    setDecayMode(STEALTHCHOP);
-    delay(100);
-    driver->hold_multiplier(settings.currentHold/settings.currentRun);
+    driver->irun(mAToCs(settings.currentRun));
+    driver->ihold(mAToCs(settings.currentRun));
+    if (settings.model == TMC2208) {
+      ((TMC2208Stepper*)driver)->pwm_autoscale(true);
+      ((TMC2208Stepper*)driver)->en_spreadCycle(false);
+    } else
+    if (settings.model == TMC2209) { // also handles TMC2226
+      ((TMC2209Stepper*)driver)->pwm_autoscale(true);
+      ((TMC2209Stepper*)driver)->en_spreadCycle(false);
+    }
+    delay(1000);
     modeDecayTracking();
   }
 }

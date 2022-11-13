@@ -74,6 +74,7 @@ class StepDirTmcUART : public StepDirDriver {
 
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
+
 };
 
 #endif
