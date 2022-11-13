@@ -106,7 +106,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
 
   driver->setRunCurrent(settings.currentRun/25); // current in %
   driver->setHoldCurrent(settings.currentHold/25); // current in %
-  if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  driver->disableStealthChop();
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -171,14 +171,16 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 }
 
 void StepDirTmcUART::modeDecayTracking() {
-  if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  driver->disableStealthChop();
+//  if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   driver->setRunCurrent(settings.currentRun/25); // current in %
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  if (settings.decaySlewing == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
+  driver->disableStealthChop();
+//  if (settings.decaySlewing == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   driver->setRunCurrent(IGOTO/25); // current in %
 }
 
@@ -218,7 +220,7 @@ bool StepDirTmcUART::enable(bool state) {
     driver->setHoldCurrent(settings.currentHold/25); // current in %
     modeDecayTracking();
   } else {
-    driver->enableStealthChop();
+//    driver->enableStealthChop();
     driver->setRunCurrent(0); 
     driver->setHoldCurrent(0);
   }
@@ -232,11 +234,10 @@ void StepDirTmcUART::calibrate() {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->setRunCurrent(settings.currentRun/25); // current in %
     driver->setHoldCurrent(settings.currentRun/25); // current in %
-    driver->enableStealthChop();
     delay(100);
+   // driver->enableStealthChop();
     driver->setRunCurrent(settings.currentRun/25); // current in %
     driver->setHoldCurrent(settings.currentHold/25); // current in %
-    if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   }
 }
 
