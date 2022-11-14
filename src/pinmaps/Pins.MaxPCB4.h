@@ -40,15 +40,15 @@
 #define AUX0_PIN                23               // Status LED
 #define AUX2_PIN                20               // PPS
 #define AUX3_PIN                21               // Home SW
-#define AUX4_PIN                22               // 1-Wire, Home SW
-#define AUX5_PIN                1                // TX1 
+#define AUX4_PIN                22               // Home SW
+#define AUX5_PIN                1                // 1-Wire, TX1 
 #define AUX6_PIN                0                // RX1
 #define AUX7_PIN                9                // Limit SW
 #define AUX8_PIN                10               // Status2 LED, Reticle LED
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
-  #define ONE_WIRE_PIN          AUX4_PIN         // Default Pin for OneWire bus (note: this pin has a 0.1uF capacitor that must be removed for OneWire to function)
+  #define ONE_WIRE_PIN          AUX5_PIN         // Default Pin for 1-Wire bus
 #endif
 #define ADDON_GPIO0_PIN         OFF              // ESP8266 GPIO0 (shared with AXIS2_DIR_PIN)
 #define ADDON_RESET_PIN         OFF              // ESP8266 RST
