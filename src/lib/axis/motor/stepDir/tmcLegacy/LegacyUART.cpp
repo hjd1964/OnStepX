@@ -172,7 +172,7 @@ void StepDirTmcUART::modeDecayTracking() {
   if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
   driver->setRunCurrent(settings.currentRun/25); // current in %
   driver->setHoldCurrent(settings.currentHold/25); // current in %
-}
+}  
 
 void StepDirTmcUART::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
