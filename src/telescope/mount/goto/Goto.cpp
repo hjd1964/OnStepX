@@ -274,14 +274,13 @@ void Goto::stop() {
 CommandError Goto::validate() {
   if (axis1.fault())           return CE_SLEW_ERR_HARDWARE_FAULT;
   if (axis2.fault())           return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (axis1.motionError(DIR_BOTH) || axis1.motionErrorSensed(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (axis2.motionError(DIR_BOTH) || axis2.motionErrorSensed(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (!axis1.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (!axis2.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
   if (state != GS_NONE)        return CE_SLEW_IN_SLEW;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.isSlewing())       return CE_SLEW_IN_MOTION;
+  if (limits.isError())        return CE_SLEW_ERR_OUTSIDE_LIMITS;
   return CE_NONE;
 }
 
