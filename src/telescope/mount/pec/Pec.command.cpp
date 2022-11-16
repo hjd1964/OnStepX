@@ -26,7 +26,7 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *supressFram
     // :GXE6#     Get number of steps per sidereal second
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '6') {
-      sprintF(reply, "%0.6f", stepsPerSiderealSecond);
+      sprintF(reply, "%0.6f", (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F);
       *numericReply = false;
     } else
 
