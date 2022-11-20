@@ -38,6 +38,8 @@ typedef struct Firmware {
 
 class Telescope {
   public:
+    Telescope();
+    
     // setup the location, time keeping, and coordinate converson
     void init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig);
 
