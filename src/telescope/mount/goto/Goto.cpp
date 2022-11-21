@@ -303,8 +303,8 @@ CommandError Goto::alignAddStar() {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
 
     // update the targets HA and Horizon coords as necessary
-    transform.rightAscensionToHourAngle(&gotoTarget, true);
-    if (transform.mountType == ALTAZM) transform.equToHor(&gotoTarget);
+    transform.rightAscensionToHourAngle(&target, true);
+    if (transform.mountType == ALTAZM) transform.equToHor(&target);
 
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &mountPosition);
