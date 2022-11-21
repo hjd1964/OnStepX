@@ -59,7 +59,7 @@ class Goto {
     // set target equatorial position (Native coordinate system)
     inline void setGotoTarget(Coordinate *coords) { gotoTarget = *coords; }
 
-    // set goto or sync target
+    // checks for valid target and determines pier side (Mount coordinate system)
     CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect);
 
     // stop any presently active goto
@@ -114,8 +114,10 @@ class Goto {
     // start slews with approach correction and parking support
     CommandError startAutoSlew();
 
-    Coordinate gotoTarget;
-    Coordinate start, destination, target;
+    Coordinate gotoTarget;                     // initial requested goto destination Native coordinate (eq or hor)
+    Coordinate start;                          // goto starts from this Mount coordinate (eq or hor)
+    Coordinate destination;                    // goto next destination Mount coordinate (eq or hor)
+    Coordinate target;                         // goto final destination Mount coordinate (eq or hor)
     GotoStage  stage                = GG_NONE;
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;

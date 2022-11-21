@@ -33,7 +33,6 @@ void GeoAlign::init(int8_t mountType, float latitude) {
   }
 }
 
-
 void GeoAlign::modelRead() {
   // get misc settings from NV
   if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::readModel(), AlignModelSize error"); }

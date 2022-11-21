@@ -161,7 +161,7 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
   return CE_NONE;
 }
 
-// converts from native to mount coordinates and checks for valid target
+// checks for valid target and determines pier side (Mount coordinate system)
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect) {
 
   CommandError e = validate();
