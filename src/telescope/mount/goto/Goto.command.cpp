@@ -293,13 +293,13 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
 
     // :MS#       Goto the Target Object
     //            Returns:
-    //              0=Goto is possible
+    //              0=goto is possible
     //              1=below the horizon limit
     //              2=above overhead limit
     //              3=controller in standby
     //              4=mount is parked
     //              5=Goto in progress
-    //              6=outside limits (AXIS2_LIMIT_MAX, AXIS2_LIMIT_MIN, AXIS1_LIMIT_MIN/MAX, MERIDIAN_E/W)
+    //              6=outside limits
     //              7=hardware fault
     //              8=already in motion
     //              9=unspecified error
