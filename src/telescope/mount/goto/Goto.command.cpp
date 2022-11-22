@@ -298,7 +298,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //              2=above overhead limit
     //              3=controller in standby
     //              4=mount is parked
-    //              5=Goto in progress
+    //              5=goto in progress
     //              6=outside limits
     //              7=hardware fault
     //              8=already in motion
