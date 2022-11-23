@@ -19,8 +19,12 @@
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
-#define HAL_MAXRATE_LOWER_LIMIT 16
-#define HAL_PULSE_WIDTH 200  // in ns, measured 1/18/22
+#if !defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION <= 131072 + 0 // version 2.0.0
+  #define HAL_MAXRATE_LOWER_LIMIT 16
+#else
+  #define HAL_MAXRATE_LOWER_LIMIT 40
+#endif
+#define HAL_PULSE_WIDTH 200  // in ns, measured 1/18/22 (ESP32 v2.0.0)
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
