@@ -27,7 +27,7 @@
 
 // time limit in seconds for slew home refine phases
 #ifndef SLEW_HOME_REFINE_TIME_LIMIT
-#define SLEW_HOME_REFINE_TIME_LIMIT 30
+#define SLEW_HOME_REFINE_TIME_LIMIT 60
 #endif
 
 // ON blocks all motion when min/max are on the same pin, applies to all axes (mount/rotator/focusers)
