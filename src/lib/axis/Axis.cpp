@@ -284,7 +284,10 @@ void Axis::setSlewAccelerationRate(float mpsps) {
 
 // set acceleration rate in seconds (for autoSlew)
 void Axis::setSlewAccelerationTime(float seconds) {
-  if (autoRate == AR_NONE) slewAccelTime = seconds;
+  if (autoRate == AR_NONE) {
+    if (seconds < 0.1F) seconds = 0.1F;
+    slewAccelTime = seconds;
+  }
 }
 
 // set acceleration for emergency stop movement in "measures" per second per second
