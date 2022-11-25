@@ -14,7 +14,7 @@
 typedef struct FocuserConfiguration {
   bool present;
   uint16_t slewRateDesired;
-  uint8_t  slewRateMinimum;
+  uint16_t slewRateMinimum;
   float    accelerationTime;
   float    rapidStopTime;
   bool     powerDown;

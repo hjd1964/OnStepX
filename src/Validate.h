@@ -531,8 +531,8 @@
   #error "Configuration (Config.h): Setting AXIS4_DRIVER_MODEL unknown, use OFF or a valid DRIVER (from Constants.h)"
 #endif
 
-#if AXIS4_SLEW_RATE_MINIMUM < 5 || AXIS4_SLEW_RATE_MINIMUM > 200
-  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
+#if AXIS4_SLEW_RATE_MINIMUM < 5 || AXIS4_SLEW_RATE_MINIMUM > 600
+  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_MINIMUM out of range, use a value between 5 and 600"
 #endif
 
 #if AXIS4_SLEW_RATE_DESIRED < 200 || AXIS4_SLEW_RATE_DESIRED > 5000
