@@ -16,7 +16,7 @@
 
 // default time for spiral guides is 103.4 seconds
 #define GUIDE_SPIRAL_TIME_LIMIT 103.4
-enum GuideState: uint8_t       {GU_NONE, GU_PULSE_GUIDE, GU_GUIDE, GU_SPIRAL_GUIDE, GU_HOME_GUIDE};
+enum GuideState: uint8_t       {GU_NONE, GU_PULSE_GUIDE, GU_GUIDE, GU_SPIRAL_GUIDE, GU_HOME_GUIDE, GU_HOME_GUIDE_ABORT};
 enum GuideRateSelect: uint8_t  {GR_QUARTER, GR_HALF, GR_1X, GR_2X, GR_4X, GR_8X, GR_20X, GR_48X, GR_HALF_MAX, GR_MAX, GR_CUSTOM};
 enum GuideAction: uint8_t      {GA_NONE, GA_BREAK, GA_FORWARD, GA_REVERSE, GA_SPIRAL, GA_HOME };
 
