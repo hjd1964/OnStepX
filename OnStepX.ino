@@ -80,7 +80,7 @@ void setup() {
   VLF("");
   VF("MSG: OnStepX, version "); V(FirmwareVersionMajor); V("."); V(FirmwareVersionMinor); VL(FirmwareVersionPatch);
   VF("MSG: OnStepX, MCU "); VLF(MCU_STR);
-  VF("MSGL OnStepX, pinmap "); VLF(PINMAP_STR);
+  VF("MSG: OnStepX, pinmap "); VLF(PINMAP_STR);
 
   // start low level hardware
   VLF("MSG: Setup, HAL initalize");
