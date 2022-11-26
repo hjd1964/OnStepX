@@ -6,7 +6,7 @@
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial1: RX1 Pin 0, TX1 Pin 1
-// Serial2: RX4 Pin 7, TX4 Pin 8
+// Serial2: RX2 Pin 7, TX2 Pin 8
 
 #if SERIAL_A_BAUD_DEFAULT != OFF
   #define SERIAL_A              Serial
