@@ -8,8 +8,8 @@
 #if !defined(DRIVER_TMC_STEPPER) && defined(STEP_DIR_TMC_UART_PRESENT)
 
 // help with pin names
-#define rx m2
-#define tx m3
+#define rx m3
+#define tx m2
 
 // constructor
 StepDirTmcUART::StepDirTmcUART(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
