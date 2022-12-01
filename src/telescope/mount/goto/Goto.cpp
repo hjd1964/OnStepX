@@ -385,7 +385,7 @@ float Goto::usPerStepLowerLimit() {
   float r_us_axis2 = r_us/axis2.getStepsPerStepSlewing();
 
   // average in axis2 step rate scaling for drives where the reduction ratio isn't equal
-  r_us = (r_us_axis1 + r_us_axis2)/2.0F;
+  r_us = (1.0F/(1.0F/r_us_axis1 + 1.0F/r_us_axis2))*2.0F;
 
   // return rate in us units
   return r_us;
