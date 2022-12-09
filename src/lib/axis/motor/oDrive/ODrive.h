@@ -54,7 +54,7 @@
   // ODrive servo motor serial driver
   extern ODriveArduino *_oDriveDriver;
 #elif ODRIVE_COMM_MODE == OD_CAN
-  #include <FlexCAN_T4.h> //https://github.com/tonton81/FlexCAN_T4.git
+  #include <FlexCAN_T4.h> // https://github.com/tonton81/FlexCAN_T4.git
   // changes were required to this CAN library so it is local now
   #include "src/plugins/DDScope/ODriveTeensyCAN/ODriveTeensyCAN.h" //https://github.com/Malaphor/ODriveTeensyCAN.git
   extern ODriveTeensyCAN *_oDriveDriver;
