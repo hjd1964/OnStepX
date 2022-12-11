@@ -9,6 +9,7 @@
 #include "../../lib/axis/Axis.h"
 #include "../../libApp/commands/ProcessCmds.h"
 #include "coordinates/Transform.h"
+#include "home/Home.h"
 
 enum RateCompensation: uint8_t {RC_NONE, RC_REFRACTION, RC_REFRACTION_DUAL, RC_MODEL, RC_MODEL_DUAL};
 
@@ -58,11 +59,8 @@ class Mount {
     // returns true if either of the mount motor drivers reported a fault
     inline bool isFault() { return axis1.fault() || axis2.fault(); }
 
-    // set flag for mount at the home (startup) position
-    inline void setHome(bool state) { atHome = state; };
-
     // returns true if the mount is at the home (startup) position
-    inline bool isHome() { return atHome; }
+    inline bool isHome() { return axis1.getInstrumentCoordinate() == home.position.a1 && axis2.getInstrumentCoordinate() == home.position.a2; }
 
     // returns true if the mount is slewing (doing a goto or guide > 2X)
     inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }

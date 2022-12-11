@@ -123,6 +123,8 @@ CommandError Home::reset(bool fullReset) {
     axis1.setInstrumentCoordinate(position.h);
     axis2.setInstrumentCoordinate(position.d);
   }
+  position.a1 = axis1.getInstrumentCoordinate();
+  position.a2 = axis2.getInstrumentCoordinate();
 
   axis1.setBacklash(mount.settings.backlash.axis1);
   axis2.setBacklash(mount.settings.backlash.axis2);
@@ -136,8 +138,6 @@ CommandError Home::reset(bool fullReset) {
   #if GOTO_FEATURE == ON
     if (fullReset) goTo.alignReset();
   #endif
-
-  mount.setHome(true);
 
   if (fullReset) { VLF("MSG: Mount, reset at home and in standby"); } else { VLF("MSG: Mount, reset at home"); }
 
