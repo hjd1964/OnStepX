@@ -85,7 +85,7 @@
 #define AXIS1_M1_PIN            14               // SPI SCK
 #define AXIS1_M2_PIN            23               // SPI CS (UART TX)
 #if AXIS4_POWER_DOWN != ON
-#define AXIS1_M3_PIN            AUX2_PIN         // SPI MISO (UART RX)
+  #define AXIS1_M3_PIN          AUX2_PIN         // SPI MISO (UART RX)
 #endif
 #define AXIS1_STEP_PIN          18
 #define AXIS1_DIR_PIN           0                // [must be high at boot 0]
@@ -99,7 +99,7 @@
 #define AXIS2_M1_PIN            14               // SPI SCK
 #define AXIS2_M2_PIN            5                // SPI CS (UART TX)
 #if AXIS4_POWER_DOWN != ON
-#define AXIS2_M3_PIN            AUX2_PIN         // SPI MISO (UART RX)
+  #define AXIS2_M3_PIN          AUX2_PIN         // SPI MISO (UART RX)
 #endif
 #define AXIS2_STEP_PIN          27
 #define AXIS2_DIR_PIN           26
