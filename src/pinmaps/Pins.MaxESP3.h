@@ -117,9 +117,7 @@
 #define AXIS3_DIR_PIN           15
 
 // For focuser1 stepper driver
-#ifdef SERIAL_TMC_HARDWARE_UART
-  #define AXIS4_ENABLE_PIN      OFF
-#else
+#if !defined(SERIAL_TMC_HARDWARE_UART) && AXIS4_POWER_DOWN == ON
   #define AXIS4_ENABLE_PIN      AUX2_PIN
 #endif
 #define AXIS4_M0_PIN            OFF              // SPI MOSI
