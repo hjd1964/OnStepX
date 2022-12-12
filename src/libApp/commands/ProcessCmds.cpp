@@ -162,6 +162,20 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   // silent bool "errors" allow processing commands more than once
   if (commandError == CE_0 || commandError == CE_1) return commandError;
 
+  // (char)6 - Special
+  if (command[0] == (char)6) {
+    if (command[1] == '0') {
+      reply[0] = command[1];
+      strcpy(reply,"CK_FAIL");  // last cmd checksum failed
+    } else {
+      reply[0] = command[1];
+      reply[1] = 0;             // Equatorial or Horizon mode, A or P
+      *supressFrame = true;
+    }
+    *numericReply = false;
+    return commandError;
+  } else
+
   // :SB[n]#    Set Baud Rate where n is an ASCII digit (1..9) with the following interpertation
   //            B=460.8K, A=230.4K, 0=115.2K, 1=56.7K, 2=38.4K, 3=28.8K, 4=19.2K, 5=14.4K, 6=9600, 7=4800, 8=2400, 9=1200
   //            Returns: 1 (at the current baud rate and then changes to the new rate for further communication)
