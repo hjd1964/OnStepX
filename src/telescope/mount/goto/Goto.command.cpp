@@ -104,6 +104,20 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     *numericReply = false;
   } else
 
+  //  D - Distance Bars
+  // :D#        Return: "\0x7f#" if the mount is moving, otherwise "#".
+  if (command[0] == 'D' && command[1] == 0) {
+    if (goTo.state == GS_GOTO) {
+      reply[0] = (char)127;
+      reply[1] = 0;
+    } else {
+      reply[0] = '#';
+      reply[1] = 0;
+      *supressFrame = true;
+    }
+    *numericReply = false;
+  } else
+
   if (command[0] == 'G') {
     // :Gr#       Get target Right Ascension
     //            Returns: HH:MM.T# or HH:MM:SS (based on precision setting)
