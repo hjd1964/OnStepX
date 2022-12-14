@@ -350,6 +350,14 @@ void Limits::poll() {
     if (!lastError.altitude.min && error.altitude.min) stop();
     if (!lastError.altitude.max && error.altitude.max) stop();
   }
+
+  // if first time breaking a meridian or min/max limit stop all guides
+  if ((!lastError.meridian.east && error.meridian.east) ||
+      (!lastError.meridian.west && error.meridian.west) ||
+      (!lastError.limit.axis1.min && error.limit.axis1.min) ||
+      (!lastError.limit.axis1.max && error.limit.axis1.max) ||
+      (!lastError.limit.axis2.min && error.limit.axis2.min) ||
+      (!lastError.limit.axis2.max && error.limit.axis2.max)) stop();
 }
 
 Limits limits;
