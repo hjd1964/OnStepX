@@ -187,19 +187,16 @@ void Limits::poll() {
     if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
     if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
-    // flag if near the NCP or SCP
-    bool nearPole = site.location.latitude >= 0.0 ? abs(current.d - HALF_PI) < SmallestFloat : abs(current.d + HALF_PI) < SmallestFloat;
-
     // meridian limits
     if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
-      if (!nearPole && current.h < -settings.pastMeridianE) {
+      if (current.h < -settings.pastMeridianE) {
         stopAxis1(GA_REVERSE);
         error.meridian.east = true;
       } else error.meridian.east = false;
     } else error.meridian.east = false;
 
     if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
-      if (!nearPole && current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
+      if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
         #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
             // disable this limit for a second to allow goto to exit the out of limits region
