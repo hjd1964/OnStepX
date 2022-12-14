@@ -115,7 +115,6 @@ bool Limits::isGotoError() {
          initError.value ||
          !site.dateIsReady ||
          !site.timeIsReady ||
-         error.altitude.min ||
          error.altitude.max ||
          error.limitSense.axis1.min ||
          error.limitSense.axis1.max ||

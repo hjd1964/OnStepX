@@ -281,7 +281,7 @@ CommandError Goto::validate() {
   if (state != GS_NONE)        return CE_SLEW_IN_SLEW;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.isSlewing())       return CE_SLEW_IN_MOTION;
-  if (limits.isError())        return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (limits.isGotoError())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
   return CE_NONE;
 }
 
