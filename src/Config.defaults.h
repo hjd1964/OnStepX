@@ -559,16 +559,18 @@
 #define TIME_LOCATION_PPS_SENSE       OFF
 #endif
 
-// sensors
+// limits
 #ifndef LIMIT_SENSE
-#define LIMIT_SENSE                   OFF
+#define LIMIT_SENSE                   OFF                         // applied to AXIS1 and AXIS2
 #endif
 #ifndef LIMIT_SENSE_INIT
-#define LIMIT_SENSE_INIT              INPUT_PULLUP
+#define LIMIT_SENSE_INIT              INPUT_PULLUP                // applied to AXIS1 and AXIS2
 #endif
-// ON blocks all motion when min/max are on the same pin, applies to all axes (mount/rotator/focusers)
 #ifndef LIMIT_SENSE_STRICT
-#define LIMIT_SENSE_STRICT            OFF
+#define LIMIT_SENSE_STRICT            OFF                         // for all axes, ON blocks motion if min/max are on the same pin
+#endif
+#ifndef LIMIT_STRICT
+#define LIMIT_STRICT                  ON                          // ON enables Mount limits at startup if date/time are set
 #endif
 
 // st4

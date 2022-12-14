@@ -11,6 +11,7 @@
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
+#include "../site/Site.h"
 
 inline void limitsWrapper() { limits.poll(); }
 
@@ -89,7 +90,7 @@ CommandError Limits::validateCoords(Coordinate *coords) {
   return CE_NONE;
 }
 
-// true if an limit related error is exists
+// true if an error exists
 bool Limits::isError() {
   return initError.nv ||
          initError.value ||
@@ -106,6 +107,20 @@ bool Limits::isError() {
          error.limitSense.axis2.max ||
          error.meridian.east ||
          error.meridian.west;
+}
+
+// true if an error exists that impacts goto safety
+bool Limits::isGotoError() {
+  return initError.nv ||
+         initError.value ||
+         !site.dateIsReady ||
+         !site.timeIsReady ||
+         error.altitude.min ||
+         error.altitude.max ||
+         error.limitSense.axis1.min ||
+         error.limitSense.axis1.max ||
+         error.limitSense.axis2.min ||
+         error.limitSense.axis2.max;
 }
 
 // return general error code

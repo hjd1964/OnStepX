@@ -99,14 +99,21 @@ void Mount::begin() {
 
   #if TRACK_AUTOSTART == ON
     if (park.state == PS_PARKED) {
-      VLF("MSG: Mount, parked autostart tracking ignored");
+      #if GOTO_FEATURE == ON
+        if (site.isDateTimeReady()) {
+          VLF("MSG: Mount, autostart tracking from park");
+          park.restore(true);
+        } else {
+          VLF("MSG: Mount, autostart tracking from park requires date/time");
+        }
+      #endif
     } else {
-      VLF("MSG: Mount, set tracking sidereal");
-      tracking(true);
-      trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-      if (!site.isDateTimeReady()) {
-        VLF("MSG: Mount, set date/time is unknown so limits are disabled");
-        limits.enabled(false);
+      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
+        VLF("MSG: Mount, autostart tracking sidereal");
+        tracking(true);
+        trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+      } else {
+        VLF("MSG: Mount, can't autostart ALTAZM tracking without date/time");
       }
     }
   #else
@@ -114,6 +121,10 @@ void Mount::begin() {
     #if GOTO_FEATURE == ON
       if (park.state == PS_PARKED) park.restore(false);
     #endif
+  #endif
+
+  #if LIMIT_STRICT == ON
+    limits.enabled(site.isDateTimeReady());
   #endif
 
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");

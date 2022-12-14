@@ -59,6 +59,9 @@ class Limits {
     // true if an limit related error is exists
     bool isError();
 
+    // true if an error exists that impacts goto safety
+    bool isGotoError();
+
     // return general error code
     uint8_t errorCode();
 
