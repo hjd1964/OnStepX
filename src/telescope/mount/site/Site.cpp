@@ -10,6 +10,7 @@
 #include "../../Telescope.h"
 #include "../park/Park.h"
 #include "../home/Home.h"
+#include "../limits/Limits.h"
 #include "../Mount.h"
 
 // fractional second sidereal clock (fracsec or millisecond)
@@ -161,11 +162,14 @@ void Site::updateTLS() {
     tls.set(ut1);
   #endif
 
-  if (initError.tls && dateIsReady && timeIsReady) {
-    initError.tls = false;
-    #if GOTO_FEATURE == ON
-      if (park.state == PS_PARKED) park.restore(false);
-    #endif
+  if (dateIsReady && timeIsReady) {
+    if (initError.tls) {
+      initError.tls = false;
+
+      #if GOTO_FEATURE == ON
+        if (park.state == PS_PARKED) park.restore(false);
+      #endif
+    }
   }
 }
 
@@ -187,6 +191,10 @@ void Site::setDateTime(JulianDate julianDate) {
 
   if (writeTime) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
   if (NV_ENDURANCE < NVE_MID) writeTime = false;
+
+  #if LIMIT_STRICT == ON
+    limits.enabled(dateIsReady && timeIsReady);
+  #endif
 }
 
 // gets the time in sidereal hours

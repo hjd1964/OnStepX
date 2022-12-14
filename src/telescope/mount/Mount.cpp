@@ -123,10 +123,6 @@ void Mount::begin() {
     #endif
   #endif
 
-  #if LIMIT_STRICT == ON
-    limits.enabled(site.isDateTimeReady());
-  #endif
-
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");
   if (tasks.add(1000, 0, true, 6, mountWrapper, "MntTrk")) { VLF("success"); } else { VLF("FAILED!"); }
 
