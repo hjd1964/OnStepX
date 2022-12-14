@@ -147,6 +147,8 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
   CommandError e = setTarget(coords, pierSideSelect);
   if (e != CE_NONE) return e;
   
+  if (mount.isHome()) mount.tracking(true);
+
   double a1, a2;
   transform.mountToInstrument(&target, &a1, &a2);
   axis1.setInstrumentCoordinate(a1);
@@ -154,7 +156,6 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
 
   limits.enabled(true);
   mount.syncToEncoders(true);
-  if (mount.isHome()) mount.tracking(true);
 
   VLF("MSG: Mount, sync instrument coordinates updated");
 

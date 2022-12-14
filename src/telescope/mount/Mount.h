@@ -115,8 +115,6 @@ class Mount {
     TrackingState trackingState = TS_NONE;
 
     bool syncToEncodersEnabled = false;
-
-    bool atHome = true;
 };
 
 #ifdef AXIS1_STEP_DIR_PRESENT

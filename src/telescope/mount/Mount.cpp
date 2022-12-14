@@ -146,7 +146,6 @@ void Mount::tracking(bool state) {
   if (state == true) {
     enable(state);
     trackingState = TS_SIDEREAL;
-    atHome = false;
   } else
 
   if (state == false) {
@@ -352,7 +351,7 @@ void Mount::updatePosition(CoordReturn coordReturn) {
     if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
     if (coordReturn == CR_MOUNT_HOR || coordReturn == CR_MOUNT_ALL) transform.equToHor(&current);
   }
-  if (atHome) current.pierSide = PIER_SIDE_NONE;
+  if (isHome()) current.pierSide = PIER_SIDE_NONE;
 }
 
 Mount mount;
