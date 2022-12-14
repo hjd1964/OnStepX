@@ -60,7 +60,7 @@ class Goto {
     inline void setGotoTarget(Coordinate *coords) { gotoTarget = *coords; }
 
     // checks for valid target and determines pier side (Mount coordinate system)
-    CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect);
+    CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto = true);
 
     // stop any presently active goto
     void stop();

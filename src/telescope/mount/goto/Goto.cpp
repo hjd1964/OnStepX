@@ -144,7 +144,7 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
     transform.nativeToMount(coords);
   }
 
-  CommandError e = setTarget(coords, pierSideSelect);
+  CommandError e = setTarget(coords, pierSideSelect, false);
   if (e != CE_NONE) return e;
   
   if (mount.isHome()) mount.tracking(true);
@@ -163,10 +163,11 @@ CommandError Goto::requestSync(Coordinate *coords, PierSideSelect pierSideSelect
 }
 
 // checks for valid target and determines pier side (Mount coordinate system)
-CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect) {
+CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
 
   CommandError e = validate();
   if (e == CE_SLEW_ERR_IN_STANDBY && mount.isHome()) { mount.enable(true); e = validate(); }
+  if (e == CE_NONE && isGoto && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (e != CE_NONE) return e;
 
   target = *coords;
@@ -180,7 +181,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect) 
   Coordinate current = mount.getMountPosition(CR_MOUNT);
 
   target.pierSide = current.pierSide;
-  e = limits.validateCoords(&target);
+  e = limits.validateTarget(&target);
   if (e != CE_NONE) return e;
 
   if (transform.meridianFlips) {

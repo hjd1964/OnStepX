@@ -54,13 +54,16 @@ class Limits {
     void constrainMeridianLimits();
 
     // target coordinate check ahead of sync, goto, etc.
-    CommandError validateCoords(Coordinate *coords);
+    CommandError validateTarget(Coordinate *coords);
 
     // true if an limit related error is exists
     bool isError();
 
     // true if an error exists that impacts goto safety
     bool isGotoError();
+
+    // true if an above overhead limit
+    bool isAboveOverhead() { return error.altitude.max; }
 
     // return general error code
     uint8_t errorCode();

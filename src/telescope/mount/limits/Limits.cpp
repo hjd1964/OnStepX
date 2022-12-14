@@ -56,7 +56,7 @@ void Limits::constrainMeridianLimits() {
 }
 
 // target coordinate check ahead of sync, goto, etc.
-CommandError Limits::validateCoords(Coordinate *coords) {
+CommandError Limits::validateTarget(Coordinate *coords) {
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;
   if (fgt(coords->a, settings.altitude.max)) return CE_SLEW_ERR_ABOVE_OVERHEAD;
   if (transform.mountType == ALTAZM) {
@@ -115,7 +115,6 @@ bool Limits::isGotoError() {
          initError.value ||
          !site.dateIsReady ||
          !site.timeIsReady ||
-         error.altitude.max ||
          error.limitSense.axis1.min ||
          error.limitSense.axis1.max ||
          error.limitSense.axis2.min ||

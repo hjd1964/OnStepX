@@ -288,7 +288,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       if (transform.mountType != ALTAZM) {
         Coordinate newTarget = mount.getPosition();
         CommandError e = validate();
-        if (e == CE_NONE) e = limits.validateCoords(&newTarget);
+        if (e == CE_NONE) e = limits.validateTarget(&newTarget);
         if (e == CE_NONE) {
           #if ALIGN_MAX_NUM_STARS > 1
             transform.align.model.altCor = 0.0;
