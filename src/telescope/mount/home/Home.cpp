@@ -28,6 +28,10 @@ void Home::init() {
 // move mount to the home position
 CommandError Home::request() {
   #if GOTO_FEATURE == ON
+    #if LIMIT_STRICT == ON
+      if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
+    #endif
+
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
       if (guide.state == GU_HOME_GUIDE) guide.stop();
