@@ -123,7 +123,7 @@ void Ds1820::poll() {
 
 // nine temperature sensors are supported, this gets the averaged temperature
 // in deg. C otherwise it falls back to the weather sensor temperature
-// index 0 is the focuser temperature, 1 through 8 are auxiliary features #1, #2, etc.
+// index 0 is the ambient temperature, 1 through 8 are point temperatures #1, #2, etc.
 // returns NAN if no temperature source is available or if a communications failure
 // results in no valid readings for > 30 seconds
 float Ds1820::getChannel(int index) {
