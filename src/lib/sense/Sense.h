@@ -39,6 +39,7 @@ class SenseInput {
     int hysteresis;
     int triggerMode;
     int lastValue = LOW;
+    int lastChangedValue = LOW;
     int lastResult = LOW;
     int stableSample = 0;
     unsigned long stableStartMs = 0;

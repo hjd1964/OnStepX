@@ -58,7 +58,7 @@ int SenseInput::isOn() {
 }
 
 int SenseInput::changed() {
-  int value = lastValue;
+  int value = lastChangedValue;
   if (isAnalog) {
     int sample = analogRead(pin);
     if (sample >= threshold + hysteresis) value = HIGH;
@@ -69,7 +69,9 @@ int SenseInput::changed() {
     long stableMs = (long)(millis() - stableStartMs);
     if (stableMs >= hysteresis) value = stableSample;
   }
-  return lastValue != value;
+  bool result = lastChangedValue != value;
+  lastChangedValue = value;
+  return result;
 }
 
 void SenseInput::poll() {
