@@ -36,7 +36,7 @@
 #define AUX3_PIN                21               // Home SW for Axis1, or I2C SDA
 #define AUX4_PIN                22               // Home SW for Axis2, or I2C SCL
 #define AUX7_PIN                39               // Limit SW, PPS, etc.
-#define AUX8_PIN                25               // 1-Wire, Status LED, Status2 LED, Reticle LED, Tone, etc.
+#define AUX8_PIN                25               // 1-Wire, Status LED, Reticle LED, Tone, etc.
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN

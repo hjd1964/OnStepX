@@ -44,7 +44,7 @@
 #define AUX5_PIN                1                // 1-Wire, TX1 
 #define AUX6_PIN                0                // RX1
 #define AUX7_PIN                9                // Limit SW
-#define AUX8_PIN                10               // Status2 LED, Reticle LED
+#define AUX8_PIN                10               // Reticle LED, 1-Wire alternate
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN

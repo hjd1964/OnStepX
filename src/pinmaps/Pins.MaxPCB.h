@@ -35,7 +35,7 @@
 #define AUX5_PIN               DAC_PIN(A21)      // AXIS3_EN_PIN; true analog output
 #define AUX6_PIN               DAC_PIN(A22)      // AXIS4_EN_PIN; true analog output
 #define AUX7_PIN               4                 // Limit SW
-#define AUX8_PIN               22                // Status2 LED, Reticle LED
+#define AUX8_PIN               22                // Reticle LED
 
 // Misc. pins
 #ifndef DS3234_CS_PIN

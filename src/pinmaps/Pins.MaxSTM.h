@@ -45,7 +45,7 @@
 #define AUX5_PIN                PA9              // TX1 
 #define AUX6_PIN                PA10             // RX1
 #define AUX7_PIN                PB15             // Limit SW
-#define AUX8_PIN                PA8              // Status2 LED, Reticle LED
+#define AUX8_PIN                PA8              // Reticle LED, 1-Wire alternate
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN

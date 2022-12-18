@@ -36,7 +36,7 @@
 #define AUX5_PIN                1                // TX0 main USB, etc.
 #define AUX6_PIN                3                // RX0 main USB, etc.
 #define AUX7_PIN                23               // Limit SW, PPS, etc.
-#define AUX8_PIN                25               // 1-Wire, Status LED, Status2 LED, Reticle LED, Tone, etc.
+#define AUX8_PIN                25               // 1-Wire, Status LED, Reticle LED, Tone, etc.
 
 // Misc. pins
 #ifndef ONE_WIRE_PIN
