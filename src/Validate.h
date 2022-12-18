@@ -165,6 +165,10 @@
   #error "Configuration (Config.h): Setting AXIS1_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
+#if (AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) == OFF
+  #error "Configuration (Config.h): Enabling AXIS1_SENSE_HOME requires enabling AXIS2_SENSE_HOME also."
+#endif
+
 #if (AXIS1_SENSE_LIMIT_MIN) != OFF && (AXIS1_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS1_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
@@ -262,6 +266,10 @@
 
 #if AXIS2_TANGENT_ARM_CORRECTION != ON && AXIS2_TANGENT_ARM_CORRECTION != OFF
   #error "Configuration (Config.h): Setting AXIS2_TANGENT_ARM_CORRECTION unknown, use OFF or ON."
+#endif
+
+#if AXIS2_TANGENT_ARM == OFF && (AXIS2_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME) == OFF
+  #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
 #endif
 
 // MOUNT TYPE
