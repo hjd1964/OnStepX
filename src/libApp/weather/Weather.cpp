@@ -126,7 +126,7 @@ float Weather::getTemperature() {
 // set temperature in deg. C
 bool Weather::setTemperature(float t) {
   if (weatherSensor == WS_NONE) { 
-    if (t >= -100.0 && t < 100.0) temperature = t; else return false;
+    if (t >= -100.0 && t < 100.0) { temperature = t; averageTemperature = t; } else return false;
   }
   return true;
 }

@@ -13,12 +13,7 @@ bool Temperature::init() {
 
 float Temperature::getChannel(int index) {
   UNUSED(index);
-  #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BME280_SPI || \
-      WEATHER == BMP280 || WEATHER == BMP280_0x76 || WEATHER == BMP280_SPI
-    return weather.getTemperature();
-  #else
-    return NAN;
-  #endif
+  return weather.getTemperature();
 }
 
 Temperature temperature;
