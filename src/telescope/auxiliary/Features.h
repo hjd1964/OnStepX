@@ -13,7 +13,7 @@
 
 typedef struct Device {
    const char* name;
-   const int16_t purpose;
+   int16_t purpose;
    const int64_t temp;
    int16_t pin;
    int16_t value;

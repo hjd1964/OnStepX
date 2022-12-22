@@ -23,7 +23,7 @@ void Features::init() {
       pinModeEx(device[i].pin, OUTPUT);
       digitalWriteEx(device[i].pin, device[i].value == device[i].active);
       if (device[i].purpose == MOMENTARY_SWITCH && device[i].value) momentarySwitchTime[i] = 50;
-      if (device[i].purpose == HIDDEN_SWITCH) device[i].purpose == OFF;
+      if (device[i].purpose == HIDDEN_SWITCH) device[i].purpose = OFF;
     } else
 
     if (device[i].purpose == ANALOG_OUTPUT) {
