@@ -30,7 +30,9 @@
     #define I2C_SDA_PIN         21
     #define I2C_SCL_PIN         22
   #else
-    #define SERIAL_TMC_RX       0                // Recieving data (GPIO0 unused except for flashing)
+    #ifndef SERIAL_TMC_RX
+      #define SERIAL_TMC_RX     0                // Recieving data (GPIO0 unused except for flashing)
+    #endif
     #define SERIAL_TMC_TX       15               // Transmit data (Z-MIN)
     #define SPARE_RX_PIN        OFF              // Not supported in this case
   #endif
