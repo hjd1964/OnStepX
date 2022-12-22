@@ -4,7 +4,7 @@
 
 #include "../../../Common.h"
 
-#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
+#if defined(MOUNT_PRESENT)
 
 #include "../../Telescope.h"
 #include "../coordinates/Transform.h"

@@ -23,11 +23,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Returns: Nothing
     if (command[1] == 'F' && parameter[0] == 0) {
       *commandError = reset(true);
-
-      #if GOTO_FEATURE == ON
-        park.reset();
-      #endif
-
+      park.reset();
       *numericReply = false;
     } else return false; 
   } else return false;

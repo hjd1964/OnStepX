@@ -4,7 +4,7 @@
 
 #include "../../../Common.h"
 
-#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
+#if defined(MOUNT_PRESENT)
 
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
@@ -45,13 +45,13 @@ class Goto {
     CommandError request();
 
     // goto equatorial position (Native or Mount coordinate system)
-    CommandError request(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
+    CommandError request(Coordinate coords, PierSideSelect pierSideSelect, bool native = true);
 
     // sync to equatorial target position (Native coordinate system) using the default preferredPierSide
     CommandError requestSync();
 
     // sync to equatorial position (Native or Mount coordinate system)
-    CommandError requestSync(Coordinate *coords, PierSideSelect pierSideSelect, bool native = true);
+    CommandError requestSync(Coordinate coords, PierSideSelect pierSideSelect, bool native = true);
 
     // get target equatorial position (Native coordinate system)
     inline Coordinate getGotoTarget() { return gotoTarget; }
@@ -102,17 +102,19 @@ class Goto {
 
   private:
 
+    #if GOTO_FEATURE == ON
     // set any additional destinations required for a goto
     void waypoint(Coordinate *current);
+
+    // start slews with approach correction and parking support
+    CommandError startAutoSlew();
+    #endif
 
     // update acceleration rates for goto and guiding
     void updateAccelerationRates();
 
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
-
-    // start slews with approach correction and parking support
-    CommandError startAutoSlew();
 
     Coordinate gotoTarget;                     // initial requested goto destination Native coordinate (eq or hor)
     Coordinate start;                          // goto starts from this Mount coordinate (eq or hor)
@@ -129,7 +131,6 @@ class Goto {
 
     AlignState alignState = {0, 0};
 
-    float      usPerStepDefault     = 64.0F;
     float      usPerStepBase        = 128.0F;
     float      radsPerSecondCurrent;
 

@@ -83,11 +83,9 @@ void Mount::begin() {
     limits.settings.pastMeridianW = Deg360;
   }
 
-  #if GOTO_FEATURE == ON
-    goTo.init();
-    library.init();
-    park.init();
-  #endif
+  goTo.init();
+  library.init();
+  park.init();
 
   #if AXIS1_PEC == ON
     pec.init();

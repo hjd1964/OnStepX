@@ -250,9 +250,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       #endif
     } else
     if (command[1] == 'd') {
-      #if GOTO_FEATURE == ON
-        tracking(false);
-      #endif
+      tracking(false);
     } else *commandError = CE_CMD_UNKNOWN;
 
     if (transform.mountType == ALTAZM) {

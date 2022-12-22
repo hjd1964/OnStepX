@@ -3,7 +3,7 @@
 
 #include "Park.h"
 
-#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
+#if defined(MOUNT_PRESENT)
 
 #include "../../../lib/tasks/OnTask.h"
 
@@ -90,7 +90,6 @@ CommandError Park::set() {
 
 // move the mount to the park position
 CommandError Park::request() {
-  #if GOTO_FEATURE == ON
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
@@ -133,8 +132,8 @@ CommandError Park::request() {
 
     // goto the park (mount) target coordinate
     VLF("MSG: Mount, parking");
-    if (parkTarget.pierSide == PIER_SIDE_EAST) e = goTo.request(&parkTarget, PSS_EAST_ONLY, false); else
-    if (parkTarget.pierSide == PIER_SIDE_WEST) e = goTo.request(&parkTarget, PSS_WEST_ONLY, false);
+    if (parkTarget.pierSide == PIER_SIDE_EAST) e = goTo.request(parkTarget, PSS_EAST_ONLY, false); else
+    if (parkTarget.pierSide == PIER_SIDE_WEST) e = goTo.request(parkTarget, PSS_WEST_ONLY, false);
 
     if (e != CE_NONE) {
       mount.tracking(wasTracking);
@@ -146,7 +145,6 @@ CommandError Park::request() {
       VF(": Mount::parkGoto(), Failed to start goto (CE "); V(e); VL(")");
       return e;
     }
-  #endif
   return CE_NONE;
 }
 

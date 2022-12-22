@@ -3,7 +3,7 @@
 
 #include "Status.h"
 
-#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
+#if defined(MOUNT_PRESENT)
 
 #include "../Mount.h"
 #include "../coordinates/Transform.h"

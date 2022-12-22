@@ -384,6 +384,19 @@
   #error "Configuration (Config.h): Setting TRACK_BACKLASH_RATE unknown, use a value between 2 and 100 (x Sidereal.)"
 #endif
 
+// GOTO_FEATURE CHECKS
+#if GOTO_FEATURE == OFF && TRACK_BACKLASH_RATE > 20
+  #error "Configuration (Config.h): Setting TRACK_BACKLASH_RATE must be <= 20 when GOTO_FEATURE is OFF."
+#endif
+
+#if GOTO_FEATURE == OFF && (MOUNT_TYPE == GEM_TA || MOUNT_TYPE == GEM_TAC)
+  #error "Configuration (Config.h): Setting GEM_TA/GEM_TAC not available when GOTO_FEATURE is OFF."
+#endif
+
+#if GOTO_FEATURE == OFF && (MOUNT_TYPE == FORK_TA || MOUNT_TYPE == FORK_TAC)
+  #error "Configuration (Config.h): Setting FORK_TA/FORK_TAC not available when GOTO_FEATURE is OFF."
+#endif
+
 // PIER SIDE BEHAVIOUR
 #if MFLIP_SKIP_HOME != ON && MFLIP_SKIP_HOME != OFF
   #error "Configuration (Config.h): Setting MFLIP_SKIP_HOME unknown, use OFF or ON."

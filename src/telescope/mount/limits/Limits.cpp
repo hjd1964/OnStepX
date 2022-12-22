@@ -203,7 +203,7 @@ void Limits::poll() {
             autoFlipDelayCycles = 10;
             VLF("MSG: Mount, start automatic meridian flip");
             Coordinate target = mount.getMountPosition();
-            CommandError e = goTo.request(&target, PSS_EAST_ONLY, false);
+            CommandError e = goTo.request(target, PSS_EAST_ONLY, false);
             if (e != CE_NONE) {
               stopAxis1(GA_FORWARD);
               error.meridian.west = true;
@@ -245,7 +245,7 @@ void Limits::poll() {
           autoFlipDelayCycles = 10;
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
-          CommandError e = goTo.request(&target, PSS_WEST_ONLY, false);
+          CommandError e = goTo.request(target, PSS_WEST_ONLY, false);
           if (e != CE_NONE) {
             stopAxis1(GA_FORWARD);
             error.limit.axis1.max = true;

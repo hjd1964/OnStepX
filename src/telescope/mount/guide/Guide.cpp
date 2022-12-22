@@ -252,10 +252,14 @@ float Guide::rateSelectToRate(GuideRateSelect rateSelect, uint8_t axis) {
     case GR_4X: return limitGuideRate(4.0F);
     case GR_8X: return limitGuideRate(8.0F);
     case GR_20X: return limitGuideRate(20.0F);
-    case GR_48X: return limitGuideRate(48.0F);
     #if GOTO_FEATURE == ON
+      case GR_48X: return limitGuideRate(48.0F);
       case GR_HALF_MAX: return radToDegF(goTo.rate)*120.0F;
       case GR_MAX: return radToDegF(goTo.rate)*240.0F;
+    #else
+      case GR_48X: return limitGuideRate(20.0F);
+      case GR_HALF_MAX: return limitGuideRate(20.0F);
+      case GR_MAX: return limitGuideRate(20.0F);
     #endif
     case GR_CUSTOM: if (axis == 1) return customRateAxis1; else if (axis == 2) return customRateAxis2; else return 0.0F;
     default: return 0.0F;

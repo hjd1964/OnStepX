@@ -35,12 +35,10 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (guide.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (gpio.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    #if GOTO_FEATURE == ON
-      if (mountStatus.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-      if (goTo.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-      if (park.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-      if (library.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    #endif
+    if (mountStatus.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (goTo.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (park.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (library.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (limits.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (home.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;

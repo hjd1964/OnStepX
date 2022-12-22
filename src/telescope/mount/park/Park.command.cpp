@@ -3,7 +3,7 @@
 
 #include "Park.h"
 
-#if defined(MOUNT_PRESENT) && GOTO_FEATURE == ON
+#if defined(MOUNT_PRESENT)
 
 bool Park::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
@@ -34,5 +34,4 @@ bool Park::command(char *reply, char *command, char *parameter, bool *supressFra
 
   return true;
 }
-
 #endif
