@@ -114,7 +114,8 @@
 #define DEW_HEATER                  3      // control an dew heater
 #define INTERVALOMETER              4      // control an camera shutter
 #define MOMENTARY_SWITCH            5      // control an simple momentary on/off switch
-#define AUX_FEATURE_PURPOSE_LAST    5
+#define HIDDEN_SWITCH               6      // control an hidden on/off switch (for controlling a pin state at boot)
+#define AUX_FEATURE_PURPOSE_LAST    6
 
 // GPIO devices (pin# 512 up to 543)
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin

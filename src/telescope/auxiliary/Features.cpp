@@ -19,10 +19,11 @@ void Features::init() {
     if (device[i].value == ON) device[i].value = 1; else
       if (device[i].value < 0 || device[i].value > 255) device[i].value = 0;
 
-    if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH) {
+    if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == HIDDEN_SWITCH) {
       pinModeEx(device[i].pin, OUTPUT);
       digitalWriteEx(device[i].pin, device[i].value == device[i].active);
       if (device[i].purpose == MOMENTARY_SWITCH && device[i].value) momentarySwitchTime[i] = 50;
+      if (device[i].purpose == HIDDEN_SWITCH) device[i].purpose == OFF;
     } else
 
     if (device[i].purpose == ANALOG_OUTPUT) {
