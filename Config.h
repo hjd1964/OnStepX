@@ -15,6 +15,11 @@
 // =================================================================================================================================
 // CONTROLLER ======================================================================================================================
 
+#define THERMISTOR1_TNOM               25 //         Nominal temperature (Celsius)
+#define THERMISTOR1_RNOM            10000 //         Nominal resistance (Ohms) at nominal temperature
+#define THERMISTOR1_BETA             3950 //         Beta coefficient
+#define THERMISTOR1_RSERIES          4700 //         Series resistor value (Ohms)
+
 #define LIMIT_SENSE_PIN                34 //         Override default and move limit sense to the FYSETC E4's X-MIN connector
 #define SERIAL_TMC_RX                  35 //         Override default TMC2209 RX pin move to Y-MIN (enable _DRIVER_STATUS to use)
 
