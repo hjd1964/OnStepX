@@ -95,8 +95,10 @@ void setup() {
   if (tasks.add(10, 0, true, 7, systemServices, "SysSvcs")) { VLF("success"); } else { VLF("FAILED!"); }
 
   // start input sense polling task
-  VF("MSG: Setup, start input sense polling task (rate 1ms priority 7)... ");
-  if (tasks.add(1, 0, true, 7, sensesPoll, "SenPoll")) { VLF("success"); } else { VLF("FAILED!"); }
+  int pollingRate = round((1000.0F/HAL_FRACTIONAL_SEC)/2.0F);
+  if (pollingRate < 1) pollingRate = 1;
+  VF("MSG: Setup, start input sense polling task (rate "); V(pollingRate); VF("ms priority 7)... ");
+  if (tasks.add(pollingRate, 0, true, 7, sensesPoll, "SenPoll")) { VLF("success"); } else { VLF("FAILED!"); }
 
   // start telescope object
   telescope.init(FirmwareName, FirmwareVersionMajor, FirmwareVersionMinor, FirmwareVersionPatch, FirmwareVersionConfig);
