@@ -24,8 +24,8 @@ bool Thermistor::init() {
 
   if (deviceCount > 0) {
     found = true;
-    VF("MSG: Temperature, start Thermistor monitor task (rate 100ms priority 6)... ");
-    if (tasks.add(100, 0, true, 6, thermistorWrapper, "therm")) { VLF("success"); } else { VLF("FAILED!"); }
+    VF("MSG: Temperature, start Thermistor monitor task (rate 500ms priority 6)... ");
+    if (tasks.add(500, 0, true, 6, thermistorWrapper, "therm")) { VLF("success"); } else { VLF("FAILED!"); }
   } else found = false;
 
   found = true;
@@ -34,7 +34,7 @@ bool Thermistor::init() {
   return found;
 }
 
-// read devices, designed for a 0.1s polling interval
+// read devices, designed for a 0.5s polling interval
 void Thermistor::poll() {
   static int index = 0;
 

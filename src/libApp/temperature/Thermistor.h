@@ -37,7 +37,10 @@ class Thermistor {
     float averageTemperature[9] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
     unsigned long goodUntil[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    ThermistorSettings settings[2] = { { THERMISTOR1_TNOM, THERMISTOR1_RNOM, THERMISTOR1_BETA, THERMISTOR1_RSERIES }, { THERMISTOR2_TNOM, THERMISTOR2_RNOM, THERMISTOR2_BETA, THERMISTOR2_RSERIES } };
+    ThermistorSettings settings[2] = {
+      { THERMISTOR1_TNOM, THERMISTOR1_RNOM, THERMISTOR1_BETA, THERMISTOR1_RSERIES },
+      { THERMISTOR2_TNOM, THERMISTOR2_RNOM, THERMISTOR2_BETA, THERMISTOR2_RSERIES }
+    };
 };
 
 extern Thermistor temperature;
