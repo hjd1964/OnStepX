@@ -129,7 +129,7 @@ void SerialWrapper::begin(long baud) {
     if (isChannel(channel++)) SERIAL_PIP3.begin(9998, 120L*1000L, true);
   #endif
   #ifdef SERIAL_SIP
-    if (isChannel(channel++)) SERIAL_SIP.begin(9999, 2L*1000L);
+    if (isChannel(channel++)) SERIAL_SIP.begin(9999, 120L*1000L, true);
   #endif
   #ifdef SERIAL_LOCAL
     if (isChannel(channel++)) SERIAL_LOCAL.begin(baud);
