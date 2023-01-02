@@ -21,13 +21,13 @@
 
 // polling frequency for monitoring axis motion (default 100X/second) 
 #ifndef FRACTIONAL_SEC
-  #define FRACTIONAL_SEC            100.0F
+#define FRACTIONAL_SEC              100.0F
 #endif
 #define FRACTIONAL_SEC_US           (lround(1000000.0F/FRACTIONAL_SEC))
 
 // time limit in seconds for slew home refine phases
 #ifndef SLEW_HOME_REFINE_TIME_LIMIT
-#define SLEW_HOME_REFINE_TIME_LIMIT 60
+#define SLEW_HOME_REFINE_TIME_LIMIT 120
 #endif
 
 // ON blocks all motion when min/max are on the same pin, applies to all axes (mount/rotator/focusers)
