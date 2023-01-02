@@ -20,6 +20,7 @@ void Sound::init() {
   void buzzerOff() {
     digitalWriteEx(STATUS_BUZZER_PIN, !STATUS_BUZZER_ON_STATE);
     tasks.setDurationComplete(_buzzerHandle);
+    _buzzerHandle = 0;
   }
 #endif
 
