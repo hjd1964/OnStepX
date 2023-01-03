@@ -52,6 +52,7 @@ class ServoDc : public ServoDriver {
 
     const ServoDcPins *Pins;
 
+    float currentVelocity = 0.0F;
     float acceleration;
     float accelerationFs;
 };
