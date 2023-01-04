@@ -91,7 +91,6 @@ class ServoMotor : public Motor {
     float currentFrequency = 0.0F;      // last frequency set 
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
-    float currentVelocity = 0.0F;       // last velocity set 
     float acceleration = ANALOG_WRITE_RANGE/5.0F;
     float accelerationFs = (ANALOG_WRITE_RANGE/5.0F)/FRACTIONAL_SEC;
     int16_t syncThreshold = OFF;        // sync threshold in counts or OFF (for absolute encoders) 

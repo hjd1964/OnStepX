@@ -435,16 +435,16 @@ void Guide::poll() {
 
   // handle end of home guiding
   if ((state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) && !mount.isSlewing()) {
-    #if AXIS2_TANGENT_ARM == OFF
-      state = GU_NONE;
-      guideActionAxis1 = GA_NONE;
-      guideActionAxis2 = GA_NONE;
-      mountStatus.sound.alert();
-      if (state == GU_HOME_GUIDE) {
-        VLF("MSG: Guide, arrival at home detected");
+    guideActionAxis1 = GA_NONE;
+    guideActionAxis2 = GA_NONE;
+    mountStatus.sound.alert();
+    if (state == GU_HOME_GUIDE) {
+      VLF("MSG: Guide, arrival at home detected");
+      #if AXIS2_TANGENT_ARM == OFF
+        state = GU_NONE;
         home.reset(home.isRequestWithReset);
-      }
-    #endif
+      #endif
+    }
   }
 
   // watch for finished guides

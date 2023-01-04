@@ -80,7 +80,7 @@ void ServoDc::setMotorVelocity(float velocity) {
   if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
   pwmUpdate(fabs(currentVelocity));
- }
+}
 
 // motor control update
 void ServoDc::pwmUpdate(float power) {
