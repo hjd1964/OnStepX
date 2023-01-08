@@ -1077,8 +1077,8 @@
 
 // FOCUSER TEMPERATURE ---------------------------
 #if FOCUSER_TEMPERATURE != OFF && \
-    FOCUSER_TEMPERATURE & DS_MASK != DS18B20 && \
-    FOCUSER_TEMPERATURE & DS_MASK != DS18S20 && \
+    (FOCUSER_TEMPERATURE & DS_MASK) != DS18B20 && \
+    (FOCUSER_TEMPERATURE & DS_MASK) != DS18S20 && \
     (FOCUSER_TEMPERATURE < TEMPERATURE_FIRST || FOCUSER_TEMPERATURE > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FOCUSER_TEMPERATURE unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
@@ -1111,50 +1111,50 @@
 #endif
 
 #if FEATURE1_TEMP != OFF && \
-    FEATURE1_TEMP & DS_MASK != DS18B20 && \
-    FEATURE1_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE1_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE1_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE1_TEMP < TEMPERATURE_FIRST || FEATURE1_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE1_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE2_TEMP != OFF && \
-    FEATURE2_TEMP & DS_MASK != DS18B20 && \
-    FEATURE2_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE2_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE2_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE2_TEMP < TEMPERATURE_FIRST || FEATURE2_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE2_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE3_TEMP != OFF && \
-    FEATURE3_TEMP & DS_MASK != DS18B20 && \
-    FEATURE3_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE3_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE3_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE3_TEMP < TEMPERATURE_FIRST || FEATURE3_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE3_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE4_TEMP != OFF && \
-    FEATURE4_TEMP & DS_MASK != DS18B20 && \
-    FEATURE4_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE4_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE4_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE4_TEMP < TEMPERATURE_FIRST || FEATURE4_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE4_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE5_TEMP != OFF && \
-    FEATURE5_TEMP & DS_MASK != DS18B20 && \
-    FEATURE5_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE5_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE5_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE5_TEMP < TEMPERATURE_FIRST || FEATURE5_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE5_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE6_TEMP != OFF && \
-    FEATURE6_TEMP & DS_MASK != DS18B20 && \
-    FEATURE6_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE6_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE6_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE6_TEMP < TEMPERATURE_FIRST || FEATURE6_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE6_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE7_TEMP != OFF && \
-    FEATURE7_TEMP & DS_MASK != DS18B20 && \
-    FEATURE7_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE7_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE7_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE7_TEMP < TEMPERATURE_FIRST || FEATURE7_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE7_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
 #if FEATURE8_TEMP != OFF && \
-    FEATURE8_TEMP & DS_MASK != DS18B20 && \
-    FEATURE8_TEMP & DS_MASK != DS18S20 && \
+    (FEATURE8_TEMP & DS_MASK) != DS18B20 && \
+    (FEATURE8_TEMP & DS_MASK) != DS18S20 && \
     (FEATURE8_TEMP < TEMPERATURE_FIRST || FEATURE8_TEMP > TEMPERATURE_LAST)
   #error "Configuration (Config.h): Setting FEATURE8_TEMP unknown, use OFF or TEMPERATURE device (from Constants.h)"
 #endif
