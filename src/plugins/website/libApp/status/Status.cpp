@@ -218,7 +218,15 @@ bool Status::auxiliaryScan() {
         if (strlen(name_str) > 10) name_str[11] = 0;
         strcpy(feature[i].name, name_str);
         if (purpose_str) feature[i].purpose = atoi(purpose_str);
-        VF("MSG: AuxFeature, found "); V(name_str); V(" purpose "); VL(feature[i].purpose);
+
+        VF("MSG: Auxiliary Feature, found "); V(name_str);
+        switch (feature[i].purpose) {
+          case 1: VL("_SWITCH"); break;
+          case 2: VL("_ANALOG_OUTPUT"); break;
+          case 3: VL("_DEW_HEATER"); break;
+          case 4: VL("_INTERVALOMETER"); break;
+          default: VL("_UNKNOWN!"); break;
+        }
 
         auxiliaryFound = SD_TRUE;
       }

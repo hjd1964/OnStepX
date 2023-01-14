@@ -106,6 +106,9 @@ class NonVolatileStorage {
     inline void update(uint16_t i,   double j) { updateBytes(i, (uint8_t*)&j, sizeof(double)); }
     inline void update(uint16_t i,    char* j) { updateBytes(i, j, strlen(j) + 1); }
 
+    // checks bytes for null (up to 32767) starting at position i into value j
+    // for char arrays a negative count represents the maximum length read (if a terminating null is not found)
+    bool isNull(uint16_t i, int16_t count);
     // read count bytes (up to 32767) starting at position i into value j
     // for char arrays a negative count represents the maximum length read (if a terminating null is not found)
     void readBytes(uint16_t i, void *j, int16_t count);

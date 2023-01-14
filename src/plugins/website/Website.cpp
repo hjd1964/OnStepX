@@ -32,6 +32,8 @@ void Website::init() {
   www.on("/auxiliary-ajax-get.txt", auxAjaxGet);
   www.on("/auxiliary-ajax.txt", auxAjax);
 
+  www.on("/net.htm", handleNetwork);
+
   www.on("/", handleRoot);
   
   www.onNotFound(handleNotFound);

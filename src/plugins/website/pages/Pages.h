@@ -23,4 +23,6 @@ void handleAux();
 void auxAjaxGet();
 void auxAjax();
 
+void handleNetwork();
+
 void handleNotFound();

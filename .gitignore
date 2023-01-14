@@ -6,3 +6,5 @@ __vm/*
 *.sln
 Debug/*
 Release/*
+debug.cfg
+esp32.svd

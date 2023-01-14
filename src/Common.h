@@ -5,10 +5,22 @@
 #define SERIAL_LOCAL_MODE ON
 #define STANDARD_IPSERIAL_CHANNEL ON
 #define PERSISTENT_IPSERIAL_CHANNEL ON
+
 #include <Arduino.h>
 #include "Constants.h"
 #include "lib/Constants.h"
-#include "Config.common.h"
+#include "../Config.h"
+#include "Config.defaults.h"
+
+#ifdef ESP32
+  #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
+    #define NV_WIFI_SETTINGS_BASE (NV_LAST+1) // bytes: 451 , 451
+  #endif
+  #define NV_PEC_BUFFER_BASE    (NV_LAST+452) // bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+#else
+  #define NV_PEC_BUFFER_BASE      (NV_LAST+1) // bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+#endif
+
 #include "HAL/HAL.h"
 #include "lib/Macros.h"
 #include "pinmaps/Models.h"

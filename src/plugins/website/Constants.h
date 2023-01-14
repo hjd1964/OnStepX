@@ -17,3 +17,4 @@
 // be changed in the web interface OR with a reset (for initialization again) as described in the Config.h comments
 #define TIMEOUT_WEB                  200
 #define TIMEOUT_CMD                  200
+

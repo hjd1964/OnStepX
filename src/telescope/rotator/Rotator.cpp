@@ -24,7 +24,7 @@ void Rotator::init() {
   // get settings stored in NV ready
   if (!nv.hasValidKey()) {
     VLF("MSG: Rotator, writing defaults to NV");
-    writeSettings();
+    nv.updateBytes(NV_ROTATOR_SETTINGS_BASE + RotatorSettingsSize, &settings, sizeof(RotatorSettings));
   }
   readSettings();
 

@@ -48,6 +48,12 @@ void pageHeader(int selected) {
     data.concat(FPSTR(html_links_aux_end));
   }
 
+  if (status.onStepFound) {
+    data.concat(FPSTR(html_links_net_begin));
+    if (selected == PAGE_NETWORK) data.concat(FPSTR(html_links_selected));
+    data.concat(FPSTR(html_links_net_end));
+  }
+
   data.concat(FPSTR(html_onstep_header_end));
   www.sendContentAndClear(data);
 }

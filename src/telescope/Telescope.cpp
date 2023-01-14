@@ -160,6 +160,16 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     features.init();
   #endif
 
+  // write the default settings to NV
+  if (!nv.hasValidKey()) {
+    VLF("MSG: Telescope, writing defaults to NV");
+    nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
+  }
+
+  #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
+    wifiManager.init();
+  #endif
+
   // init is done, write the NV key if necessary
   if (!nv.hasValidKey()) {
     nv.writeKey((uint32_t)INIT_NV_KEY);
@@ -168,12 +178,6 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   }
 
   initError.nv = nv.initError;
-
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Telescope, writing defaults to NV");
-    nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
-  }
 
   #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
     #if RETICLE_LED_MEMORY == ON
