@@ -161,10 +161,10 @@ bool As37h39bb::readEnc(uint32_t &position) {
 
   // trap errors
   int16_t errors = 0;
-  if (!foundAck) { VLF("WRN: BISSC Encoder, Ack bit invalid"); errors++; } else
-  if (!foundStart) { VLF("WRN: BISSC Encoder, Start bit invalid"); errors++; } else
-  if (!foundCds) { VLF("WRN: BISSC Encoder, Cds bit invalid"); errors++; } else
-  if (encErr) { VLF("WRN: BISSC Encoder, Error bit set"); errors++; } else errors = 0;
+  if (!foundAck) { VF("WRN: BISSC Encoder"); V(axis); VLF(", Ack bit invalid"); errors++; } else
+  if (!foundStart) { VF("WRN: BISSC Encoder"); V(axis); VLF(", Start bit invalid"); errors++; } else
+  if (!foundCds) { VF("WRN: BISSC Encoder"); V(axis); VLF(", Cds bit invalid"); errors++; } else
+  if (encErr) { VF("WRN: BISSC Encoder"); V(axis); VLF(", Error bit set"); errors++; } else errors = 0;
   // todo: solve CRC and return false if it fails
 
   if (errors > 0) {
