@@ -266,6 +266,12 @@ float    NonVolatileStorage::readF (uint16_t i) { float j;    readBytes(i, (uint
 double   NonVolatileStorage::readD (uint16_t i) { double j;   readBytes(i, (uint8_t*)&j, sizeof(double));   return j; }
 void     NonVolatileStorage::readStr(uint16_t i, char* j, int16_t maxLen) { readBytes(i, j, -maxLen); }
 
+bool NonVolatileStorage::isNull(uint16_t i, int16_t count) {
+  if (count < 0) count = -count;
+  for (int16_t k = 0; k < count; k++) { if (read(i++) != 0) return false; }
+  return true;
+}
+
 void NonVolatileStorage::readBytes(uint16_t i, void *j, int16_t count) {
   if (count < 0) {
     count = -count;

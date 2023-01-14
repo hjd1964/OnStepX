@@ -95,8 +95,9 @@ void Focuser::init() {
   if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); }
 
   // init settings stored in NV
-  if (!nv.hasValidKey()) {
-    for (int index = 0; index < FOCUSER_MAX; index++) {
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    uint16_t nvFocuserSettingsBase = NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize;
+    if (!nv.hasValidKey() || nv.isNull(nvFocuserSettingsBase, sizeof(FocuserSettings))) {
       VF("MSG: Focuser"); V(index + 1); VLF(", writing defaults to NV");
       settings[index].tcf.enabled = false;
       settings[index].tcf.coef = 0.0F;
@@ -105,7 +106,7 @@ void Focuser::init() {
       settings[index].parkState = PS_UNPARKED;
       settings[index].backlash = 0.0F;
       settings[index].position = 0.0F;
-      writeSettings(index);
+      nv.updateBytes(nvFocuserSettingsBase, &settings[index], sizeof(FocuserSettings));
     }
   }
 

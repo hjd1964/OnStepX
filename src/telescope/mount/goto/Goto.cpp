@@ -25,7 +25,7 @@ void Goto::init() {
   if (GotoSettingsSize < sizeof(GotoSettings)) { nv.initError = true; DLF("ERR: Goto::init(), GotoSettingsSize error"); }
 
   // write the default settings to NV
-  if (!nv.hasValidKey()) {
+  if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_GOTO_BASE, sizeof(GotoSettings))) {
     VLF("MSG: Mount, goto writing defaults to NV");
     nv.writeBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
   }

@@ -27,7 +27,7 @@
     if (PecSettingsSize < sizeof(PecSettings)) { nv.initError = true; DL("ERR: Pec::init(), PecSettingsSize error"); }
 
     // write the default settings to NV
-    if (!nv.hasValidKey()) {
+    if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_PEC_BASE, sizeof(PecSettings))) {
       VLF("MSG: Mount, PEC writing defaults to NV");
       nv.writeBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
     }
