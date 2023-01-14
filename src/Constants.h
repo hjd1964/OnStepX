@@ -147,7 +147,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928929UL
+#define INIT_NV_KEY                 583928930UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
@@ -170,4 +170,5 @@
 #define NV_ROTATOR_SETTINGS_BASE    785    // bytes: 7   , 7
 #define NV_FEATURE_SETTINGS_BASE    792    // bytes: 3 *8, 24
 #define NV_TELESCOPE_SETTINGS_BASE  816    // bytes: 2   , 2
-#define NV_PEC_BUFFER_BASE          818    // Bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+
+#define NV_LAST                     817
