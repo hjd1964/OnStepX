@@ -48,7 +48,7 @@
                                           //         BME280 or BMP280 for temperature, pressure.  BME280 for humidity also.
 
 // SIGNALING ------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Controller#SIGNALING
-#define STEP_WAVE_FORM             SQUARE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
+#define STEP_WAVE_FORM              PULSE // SQUARE, PULSE Step signal wave form faster rates. SQUARE best signal integrity.  Adjust
                                           //         Applies to all axes.
 
 // =================================================================================================================================
