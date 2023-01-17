@@ -22,6 +22,9 @@ void Home::init() {
   #else
     if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
+  if (transform.mountType != ALTAZM) {
+    axis1.setReverse(site.locationEx.latitude.sign < 0.0);
+  }
   position.pierSide = PIER_SIDE_NONE;
 }
 

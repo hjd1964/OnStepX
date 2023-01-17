@@ -165,12 +165,12 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
 }
 
 void StepDirTmcUART::modeMicrostepTracking() {
-  driver->microsteps(settings.microsteps);
+  if (settings.microsteps == 1) driver->microsteps(0); else driver->microsteps(settings.microsteps);
 }
 
 int StepDirTmcUART::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
-    driver->microsteps(settings.microstepsSlewing);
+    if (settings.microstepsSlewing == 1) driver->microsteps(0); else driver->microsteps(settings.microstepsSlewing);
   }
   return microstepRatio;
 }
