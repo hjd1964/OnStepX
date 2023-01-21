@@ -75,14 +75,13 @@ void moveStepDirMotorFRAxis9() { stepDirMotorInstance[8]->moveFR(AXIS9_STEP_PIN)
 StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirPins *Pins, StepDirDriver *Driver, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
+  driverType = STEP_DIR;
   strcpy(axisPrefix, "MSG: StepDir_, ");
   axisPrefix[12] = '0' + axisNumber;
-  driverType = STEP_DIR;
   this->axisNumber = axisNumber;
   this->Pins = Pins;
-  #ifdef SHARED_DIRECTION_PINS
-    if (axisNumber > 2) useFastHardwareTimers = false;
-  #endif
+
+  if (axisNumber > 2) useFastHardwareTimers = false;
   this->useFastHardwareTimers = useFastHardwareTimers;
 
   driver = Driver;
