@@ -23,6 +23,7 @@ IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
 ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, int16_t syncThreshold, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
+  driverType = SERVO;
   strcpy(axisPrefix, "MSG: Servo_, ");
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
@@ -30,8 +31,10 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   this->feedback = feedback;
   this->control = control;
   this->syncThreshold = syncThreshold;
+
+  if (axisNumber > 2) useFastHardwareTimers = false;
   this->useFastHardwareTimers = useFastHardwareTimers;
-  driverType = SERVO;
+
   this->driver = Driver;
 
   encoder->init();

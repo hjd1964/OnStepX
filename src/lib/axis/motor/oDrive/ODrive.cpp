@@ -24,17 +24,18 @@ IRAM_ATTR void moveODriveMotorAxis2() { odriveMotorInstance[1]->move(); }
 ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Settings, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 2) return;
 
+  driverType = ODRIVER;
+  strcpy(axisPrefix, "MSG: ODrive_, ");
+  axisPrefix[11] = '0' + this->axisNumber;
   #if ODRIVE_SWAP_AXES == ON
     this->axisNumber = 3 - axisNumber;
   #else
     this->axisNumber = axisNumber;
   #endif
 
-  strcpy(axisPrefix, "MSG: ODrive_, ");
-  axisPrefix[11] = '0' + this->axisNumber;
 
+  if (axisNumber > 2) useFastHardwareTimers = false;
   this->useFastHardwareTimers = useFastHardwareTimers;
-  driverType = ODRIVER;
 
   if (axisNumber == 1) { // only do once since motor 2 object creation could
     #if ODRIVE_COMM_MODE == OD_UART
