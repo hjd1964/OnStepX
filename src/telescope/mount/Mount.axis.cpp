@@ -25,6 +25,8 @@
     As37h39bb encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
   #elif AXIS1_ENCODER == SERIAL_BRIDGE
     SerialBridge encAxis1(1);
+  #elif AXIS1_ENCODER == SWS_BRIDGE
+    SwsBridge encAxis1(1);
   #endif
 
   #if AXIS1_SERVO_FEEDBACK == FB_PID
@@ -83,6 +85,8 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS);
     As37h39bb encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
   #elif AXIS2_ENCODER == SERIAL_BRIDGE
     SerialBridge encAxis2(2);
+  #elif AXIS2_ENCODER == SWS_BRIDGE
+    SwsBridge encAxis2(2);
   #endif
 
   #if AXIS2_SERVO_FEEDBACK == FB_PID

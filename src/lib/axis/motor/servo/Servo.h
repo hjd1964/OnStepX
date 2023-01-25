@@ -11,6 +11,7 @@
 #include "../../../encoder/pulseOnly/PulseOnly.h"
 #include "../../../encoder/quadrature/Quadrature.h"
 #include "../../../encoder/serialBridge/SerialBridge.h"
+#include "../../../encoder/swsBridge/SwsBridge.h"
 
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
@@ -77,8 +78,11 @@ class ServoMotor : public Motor {
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
 
-    // DC servo motor driver
+    // servo motor driver
     ServoDriver *driver;
+
+    // servo encoder
+    Encoder *encoder;
 
   private:
     uint8_t servoMonitorHandle = 0;
@@ -102,7 +106,6 @@ class ServoMotor : public Motor {
 
     void (*callback)() = NULL;
 
-    Encoder *encoder;
     Feedback *feedback;
     ServoControl *control;
 

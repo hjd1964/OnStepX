@@ -81,7 +81,8 @@
 #define PULSE_ONLY                  4      // pulse only encoder
 #define AS37_H39B_B                 5      // Broadcom AS37-H39B-B BISS-C interface encoder
 #define SERIAL_BRIDGE               6      // serial bridge to encoders
-#define ENC_LAST                    6
+#define SWS_BRIDGE                  7      // uses SWS encoder coordinate pushes
+#define ENC_LAST                    7
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1
