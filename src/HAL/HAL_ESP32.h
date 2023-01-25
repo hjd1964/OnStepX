@@ -94,6 +94,6 @@
 // a really short fixed delay (none needed)
 #define HAL_DELAY_25NS()
 
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))
-
+// stand-in for delayNanoseconds(), assumes 240MHz clock
+#include "xtensa/core-macros.h"
+#define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }
