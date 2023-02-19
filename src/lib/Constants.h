@@ -24,6 +24,7 @@
 #define STANDARD                    -19
 #define PERSISTENT                  -20
 #define ERRORS_ONLY                 -21
+#define KALAMAN                     -22
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
