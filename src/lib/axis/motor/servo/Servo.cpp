@@ -121,8 +121,7 @@ void ServoMotor::resetPositionSteps(long value) {
   } else {
     // disregard any home position, the absolute encoders are the final authority
     Motor::resetPositionSteps(encoder->read());
-    D(axisPrefix);
-    DL("absolute encoder ignored reset position");
+    V(axisPrefix); VL("absolute encoder ignored reset position");
   }
 }
 
@@ -139,8 +138,7 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
   if (syncThreshold == OFF || syncThreshold >= i) {
     indexSteps = i;
   } else {
-    D(axisPrefix);
-    DL("absolute encoder ignored sync exceeds threshold");
+    V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
   }
 }
 
