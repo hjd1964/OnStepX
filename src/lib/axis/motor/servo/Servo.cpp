@@ -33,37 +33,37 @@
   #define AXIS9_ENCODER_FLTR OFF
 #endif
 
-#if AXIS1_ENCODER_FLTR == KALAMAN || AXIS2_ENCODER_FLTR == KALAMAN || AXIS3_ENCODER_FLTR == KALAMAN || \
-    AXIS4_ENCODER_FLTR == KALAMAN || AXIS5_ENCODER_FLTR == KALAMAN || AXIS6_ENCODER_FLTR == KALAMAN || \
-    AXIS7_ENCODER_FLTR == KALAMAN || AXIS8_ENCODER_FLTR == KALAMAN || AXIS9_ENCODER_FLTR == KALAMAN
+#if AXIS1_ENCODER_FLTR == KALMAN || AXIS2_ENCODER_FLTR == KALMAN || AXIS3_ENCODER_FLTR == KALMAN || \
+    AXIS4_ENCODER_FLTR == KALMAN || AXIS5_ENCODER_FLTR == KALMAN || AXIS6_ENCODER_FLTR == KALMAN || \
+    AXIS7_ENCODER_FLTR == KALMAN || AXIS8_ENCODER_FLTR == KALMAN || AXIS9_ENCODER_FLTR == KALMAN
   #include <SimpleKalmanFilter.h> // https://github.com/denyssene/SimpleKalmanFilter
 #endif
 
-#if AXIS1_ENCODER_FLTR == KALAMAN
+#if AXIS1_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis1EncoderKalmanFilter(AXIS1_ENCODER_FLTR_MEAS_U, AXIS1_ENCODER_FLTR_MEAS_U, AXIS1_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS2_ENCODER_FLTR == KALAMAN
+#if AXIS2_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis2EncoderKalmanFilter(AXIS2_ENCODER_FLTR_MEAS_U, AXIS2_ENCODER_FLTR_MEAS_U, AXIS2_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS3_ENCODER_FLTR == KALAMAN
+#if AXIS3_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis3EncoderKalmanFilter(AXIS3_ENCODER_FLTR_MEAS_U, AXIS3_ENCODER_FLTR_MEAS_U, AXIS3_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS4_ENCODER_FLTR == KALAMAN
+#if AXIS4_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis4EncoderKalmanFilter(AXIS4_ENCODER_FLTR_MEAS_U, AXIS4_ENCODER_FLTR_MEAS_U, AXIS4_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS5_ENCODER_FLTR == KALAMAN
+#if AXIS5_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis5EncoderKalmanFilter(AXIS5_ENCODER_FLTR_MEAS_U, AXIS5_ENCODER_FLTR_MEAS_U, AXIS5_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS6_ENCODER_FLTR == KALAMAN
+#if AXIS6_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis6EncoderKalmanFilter(AXIS6_ENCODER_FLTR_MEAS_U, AXIS6_ENCODER_FLTR_MEAS_U, AXIS6_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS7_ENCODER_FLTR == KALAMAN
+#if AXIS7_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis7EncoderKalmanFilter(AXIS7_ENCODER_FLTR_MEAS_U, AXIS7_ENCODER_FLTR_MEAS_U, AXIS7_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS8_ENCODER_FLTR == KALAMAN
+#if AXIS8_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis8EncoderKalmanFilter(AXIS8_ENCODER_FLTR_MEAS_U, AXIS8_ENCODER_FLTR_MEAS_U, AXIS8_ENCODER_FLTR_VARIANCE);
 #endif
-#if AXIS9_ENCODER_FLTR == KALAMAN
+#if AXIS9_ENCODER_FLTR == KALMAN
   SimpleKalmanFilter axis9EncoderKalmanFilter(AXIS9_ENCODER_FLTR_MEAS_U, AXIS9_ENCODER_FLTR_MEAS_U, AXIS9_ENCODER_FLTR_VARIANCE);
 #endif
 
@@ -280,47 +280,47 @@ void ServoMotor::poll() {
   // apply Kalaman filter if enabled
   switch (axisNumber) {
     case 1:
-      #if AXIS1_ENCODER_FLTR == KALAMAN
+      #if AXIS1_ENCODER_FLTR == KALMAN
         position = round(axis1EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 2:
-      #if AXIS2_ENCODER_FLTR == KALAMAN
+      #if AXIS2_ENCODER_FLTR == KALMAN
         position = round(axis2EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 3:
-      #if AXIS3_ENCODER_FLTR == KALAMAN
+      #if AXIS3_ENCODER_FLTR == KALMAN
         position = round(axis3EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 4:
-      #if AXIS4_ENCODER_FLTR == KALAMAN
+      #if AXIS4_ENCODER_FLTR == KALMAN
         position = round(axis4EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 5:
-      #if AXIS5_ENCODER_FLTR == KALAMAN
+      #if AXIS5_ENCODER_FLTR == KALMAN
         position = round(axis5EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 6:
-      #if AXIS6_ENCODER_FLTR == KALAMAN
+      #if AXIS6_ENCODER_FLTR == KALMAN
         position = round(axis6EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 7:
-      #if AXIS7_ENCODER_FLTR == KALAMAN
+      #if AXIS7_ENCODER_FLTR == KALMAN
         position = round(axis7EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 8:
-      #if AXIS8_ENCODER_FLTR == KALAMAN
+      #if AXIS8_ENCODER_FLTR == KALMAN
         position = round(axis8EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
     case 9:
-      #if AXIS9_ENCODER_FLTR == KALAMAN
+      #if AXIS9_ENCODER_FLTR == KALMAN
         position = round(axis9EncoderKalmanFilter.updateEstimate(position - target)) + target;
       #endif
     break;
