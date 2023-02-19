@@ -97,7 +97,7 @@ class ServoMotor : public Motor {
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
     float acceleration = ANALOG_WRITE_RANGE/5.0F;
     float accelerationFs = (ANALOG_WRITE_RANGE/5.0F)/FRACTIONAL_SEC;
-    int16_t syncThreshold = OFF;        // sync threshold in counts or OFF (for absolute encoders) 
+    int16_t syncThreshold = OFF;        // sync threshold in counts (for absolute encoders) or OFF
 
     int32_t lastPosition = 0;           // the last encoder position for stall check
     unsigned long lastCheckTime = 0;    // time since the last encoder position was checked

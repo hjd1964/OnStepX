@@ -264,7 +264,7 @@
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_SYNC_THRESHOLD
-  #define AXIS1_SERVO_SYNC_THRESHOLD    OFF                       // sync threshold in counts or OFF (for absolute encoders)
+  #define AXIS1_SERVO_SYNC_THRESHOLD    OFF                       // sync threshold in counts (for absolute encoders) or OFF
   #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
