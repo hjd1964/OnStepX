@@ -32,7 +32,9 @@
 
 #define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 18
+#define CrealityMelzi               19     // For Creality Melzi Boars
+
+#define PINMAP_LAST                 19
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1

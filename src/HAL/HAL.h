@@ -24,6 +24,10 @@
   #define MCU_STR "Mega1280"
   #include "HAL_Mega2560.h"
 
+#elif defined(__AVR_ATmega1284P__)
+  #define MCU_STR "Mega1284P"
+  #include "HAL_Mega1284P.h"
+  
 #elif defined(__AVR_ATmega2560__)
   #define MCU_STR "Mega2560"
   #include "HAL_Mega2560.h"

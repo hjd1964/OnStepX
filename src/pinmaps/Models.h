@@ -71,6 +71,10 @@
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
 #endif
+#if PINMAP == CrealityMelzi
+  #define PINMAP_STR "Creality Melzi"
+  #include "Pins.CrealityMelzi.h"
+#endif
 
 // all unassigned pins OFF
 #include "../pinmaps/Pins.defaults.h"
