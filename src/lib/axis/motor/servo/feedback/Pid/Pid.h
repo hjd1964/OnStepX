@@ -40,6 +40,8 @@ class Pid : public Feedback {
 
     float p, i, d, c;
 
+    unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
+
     char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
 };
 

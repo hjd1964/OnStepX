@@ -71,6 +71,9 @@ void Pid::selectSlewingParameters() {
 
 // manage feedback, variable PID params
 void Pid::variableParameters(float percent) {
+  if ((long)(millis() - timeSinceLastUpdate) < 1000) return;
+  timeSinceLastUpdate = millis();
+
   if (percent < 0.0F) percent = 0.0F;
   if (percent > 100.0F) percent = 100.0F;
 
