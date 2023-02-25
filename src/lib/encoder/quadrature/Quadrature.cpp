@@ -58,10 +58,16 @@ Quadrature *quadratureInstance[9];
 
 Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
-  initialized = true;
 
-  quadratureInstance[axis - 1] = this;
+  this->APin = APin;
+  this->BPin = BPin;
+  this->axis = axis;
+  quadratureInstance[this->axis - 1] = this;
+}
 
+void Quadrature::init() {
+  if (initialized || axis < 1 || axis > 9) return;
+  
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);
 
@@ -126,10 +132,12 @@ Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
       break;
     #endif
   }
+
+  initialized = true;
 }
 
 int32_t Quadrature::read() {
-  if (!initialized) return 0;
+  if (!initialized) { VLF("WRN: Quadrature read(), not initialized!"); return 0; }
 
   int32_t count = 0;
   noInterrupts();
@@ -139,7 +147,7 @@ int32_t Quadrature::read() {
 }
 
 void Quadrature::write(int32_t count) {
-  if (!initialized) return;
+  if (!initialized) { VLF("WRN: Quadrature write(), not initialized!"); return; }
 
   noInterrupts();
   this->count = count;

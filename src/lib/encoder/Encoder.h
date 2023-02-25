@@ -36,11 +36,14 @@ class Encoder {
     // get device ready for use
     virtual void init();
 
-    // get current count
+    // get current position
     virtual int32_t read();
 
-    // set current count to value
+    // set current position to value
     virtual void write(int32_t count);
+
+    // true if encoder count is ready
+    bool ready = true;
 
     // true if errors were detected
     bool error = false;
@@ -52,6 +55,7 @@ class Encoder {
     int32_t offset = 0;
 
   protected:
+    int16_t axis = 0;
     volatile int32_t count = 0;
     bool initialized = false;
 

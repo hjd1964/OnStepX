@@ -18,15 +18,16 @@ bool _serial_bridge_initialized = false;
 SerialBridge::SerialBridge(int16_t axis) {
   if (axis < 1 || axis > 9) return;
   initialized = true;
-
+  
+  this->axis = axis;
   axis--;
-  this->channel[axis] = '1' + axis;
+  this->channel[0] = '1' + axis;
 }
 
 int32_t SerialBridge::read() {
-  if (!initialized) return 0;
+  if (!initialized) { VLF("WRN: SerialBridge read(), not initialized!"); return 0; }
 
-  if (millis() - lastReadMillis > 20) {
+  if (millis() - lastReadMillis > 10) {
     count = raw();
     lastReadMillis = millis();
   }
@@ -34,7 +35,7 @@ int32_t SerialBridge::read() {
 }
 
 void SerialBridge::write(int32_t count) {
-  if (!initialized) return;
+  if (!initialized) { VLF("WRN: SerialBridge write(), not initialized!"); return; }
 
   offset = count - raw();
 }
@@ -67,7 +68,7 @@ int32_t SerialBridge::raw() {
   if (strlen(result) > 0) {
     return atoi(result);
   } else {
-    VLF("WRN: SerialBridge, timed out!");
+    VLF("WRN: SerialBridge raw(), timed out!");
     error = true;
     return 0;
   }

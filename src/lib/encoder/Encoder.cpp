@@ -4,5 +4,4 @@
 
 // get device ready for use
 void Encoder::init() {
-  // default does nothing
 }

@@ -10,11 +10,13 @@
 class PulseOnly : public Encoder {
   public:
     PulseOnly(int16_t pulsePin, int16_t *direction, int16_t axis);
+    void init();
+
     int32_t read();
     void write(int32_t count);
 
   private:
-    int16_t axis;
+    int16_t pulsePin;
 };
 
 #endif
