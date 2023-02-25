@@ -76,6 +76,9 @@ class ServoMotor : public Motor {
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
+    
+    // calibrate the motor if required
+    void calibrate() { driver->calibrate(); }
 
     // servo motor driver
     ServoDriver *driver;

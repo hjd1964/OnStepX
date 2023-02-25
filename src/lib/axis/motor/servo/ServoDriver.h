@@ -40,6 +40,9 @@ class ServoDriver {
     // get status info.
     // this is a required method for the Axis class
     DriverStatus getStatus() { return status; }
+   
+    // calibrate the motor if required
+    virtual void calibrate();
 
   protected:
     int axisNumber;
