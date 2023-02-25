@@ -143,55 +143,63 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       //                Return: 0 on failure
       //                        1 on success
       if (parameter[0] == '4') {
+        double d;
+        static double encoderAxis1 = NAN;
+        static double encoderAxis2 = NAN;
+
         switch (parameter[1]) {
-          double d;
-          static double encoderAxis1 = NAN;
-          static double encoderAxis2 = NAN;
+
           // set encoder Axis1 value
           case '0':
             d = strtod(&parameter[3], &conv_end);
-            if (&parameter[3] != conv_end && fabs(d) <= 360.0F) {
-              encoderAxis1 = degToRad(d);
-            } else {
-              encoderAxis1 = NAN;
-              *commandError = CE_PARAM_RANGE;
-            }
-            #if AXIS1_ENCODER == SWS_BRIDGE && AXIS2_ENCODER == SWS_BRIDGE
-              if (isnan(encoderAxis1) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
-              motor1.encoder->write(radToDeg(encoderAxis1)*AXIS1_STEPS_PER_DEGREE);
-            #endif
+            if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
           break;
+
           // set encoder Axis2 value
           case '1':
             d = strtod(&parameter[3], &conv_end);
-            if (&parameter[3] != conv_end && fabs(d) <= 360.0F) {
-              encoderAxis2 = degToRad(d);
-            } else {
-              encoderAxis2 = NAN;
-              *commandError = CE_PARAM_RANGE;
-            }
-            #if AXIS1_ENCODER == SWS_BRIDGE && AXIS2_ENCODER == SWS_BRIDGE
-              if (isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
-              motor2.encoder->write(radToDeg(encoderAxis2)*AXIS2_STEPS_PER_DEGREE);
-            #endif
+            if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis2 = degToRad(d); } else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
           break;
+
           // sync from encoder values
           case '2':
-            #if AXIS1_ENCODER != SWS_BRIDGE || AXIS2_ENCODER != SWS_BRIDGE
-              if (parameter[3] == '1' && parameter[4] == 0) {
-                #if GOTO_FEATURE == ON
-                  CommandError e = goTo.validate();
-                  if (e != CE_NONE) { *commandError = e; return true; }
-                  if (goTo.alignActive()) { *commandError = CE_0; return true; }
-                #endif
-                if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
-                axis1.setInstrumentCoordinate(encoderAxis1);
-                axis2.setInstrumentCoordinate(encoderAxis2);
-              }
-            #endif
+            if (parameter[3] == '1' && parameter[4] == 0) {
+              #if GOTO_FEATURE == ON
+                CommandError e = goTo.validate();
+                if (e != CE_NONE || goTo.alignActive()) { *commandError = e; return true; }
+              #endif
+              if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
+              axis1.setInstrumentCoordinate(encoderAxis1);
+              axis2.setInstrumentCoordinate(encoderAxis2);
+            }
           break;
+
+          // allow sws to control sync mode
           case '3': syncToEncodersEnabled = false; break;
-          default: *commandError = CE_CMD_UNKNOWN;
+
+          // set and sync encoder Axis1 and Axis2 values
+          case '4':
+            d = strtod(&parameter[3], &conv_end);
+            if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; }
+
+            {
+              char *parameter2 = strchr(&parameter[3], ','); parameter2++;
+              d = strtod(parameter2, &conv_end);
+              if (parameter2 != conv_end && fabs(d) <= 360.0L) { encoderAxis2 = degToRad(d); } else { encoderAxis2 = NAN; }
+            }
+            if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
+
+            #if GOTO_FEATURE == ON
+            {
+              CommandError e = goTo.validate();
+              if (e != CE_NONE || goTo.alignActive()) { *commandError = e; return true; }
+            }
+            #endif
+            axis1.setInstrumentCoordinate(encoderAxis1);
+            axis2.setInstrumentCoordinate(encoderAxis2);
+          break;
+
+          default: *commandError = CE_CMD_UNKNOWN; break;
         }
       } else
 

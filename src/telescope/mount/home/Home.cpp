@@ -128,6 +128,7 @@ CommandError Home::reset(bool fullReset) {
     axis1.setInstrumentCoordinate(position.h);
     axis2.setInstrumentCoordinate(position.d);
   }
+
   position.a1 = axis1.getInstrumentCoordinate();
   position.a2 = axis2.getInstrumentCoordinate();
 

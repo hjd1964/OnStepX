@@ -11,7 +11,6 @@
 #include "../../../encoder/pulseOnly/PulseOnly.h"
 #include "../../../encoder/quadrature/Quadrature.h"
 #include "../../../encoder/serialBridge/SerialBridge.h"
-#include "../../../encoder/swsBridge/SwsBridge.h"
 
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
