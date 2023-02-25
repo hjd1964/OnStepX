@@ -5,6 +5,10 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
+#ifndef SERVO_SLEW_DIRECT
+  #define SERVO_SLEW_DIRECT OFF
+#endif
+
 #ifndef AXIS1_ENCODER_FLTR
   #define AXIS1_ENCODER_FLTR OFF
 #endif
@@ -82,7 +86,7 @@ IRAM_ATTR void moveServoMotorAxis8() { servoMotorInstance[7]->move(); }
 IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, int16_t syncThreshold, bool useFastHardwareTimers) {
+ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   driverType = SERVO;
@@ -177,13 +181,12 @@ DriverStatus ServoMotor::getDriverStatus() {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ServoMotor::resetPositionSteps(long value) {
+  Motor::resetPositionSteps(value);
   if (syncThreshold == OFF) {
-    Motor::resetPositionSteps(value);
     encoder->write(value);
   } else {
-    // disregard any home position, the absolute encoders are the final authority
-    Motor::resetPositionSteps(encoder->read());
-    V(axisPrefix); VL("absolute encoder ignored reset position");
+    V(axisPrefix);
+    VL("absolute encoder ignored reset position");
   }
 }
 
@@ -197,8 +200,12 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
   noInterrupts();
   long i = value - motorSteps;
   interrupts();
-  if (syncThreshold == OFF || syncThreshold >= i) {
+
+  bool atHome = indexSteps == 0 && motorSteps == 0 && targetSteps == 0 && backlashSteps == 0;
+
+  if (syncThreshold == OFF || atHome) {
     indexSteps = i;
+    if (atHome) homeSet = true;
   } else {
     V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
   }
@@ -206,13 +213,11 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
 
 // distance to target in steps (+/-)
 long ServoMotor::getTargetDistanceSteps() {
-  int32_t position = encoder->read();
-
+  long encoderCounts = encoder->read();
   noInterrupts();
-  long distance = targetSteps - position;
+  long dist = targetSteps - encoderCounts;
   interrupts();
-
-  return distance;
+  return dist;
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
@@ -271,75 +276,90 @@ void ServoMotor::setSlewing(bool state) {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
-  int32_t position = encoder->read();
+  long encoderCounts = encoder->read();
+
+  long encoderCountsOrig = encoderCounts;
+
+  // for absolute encoders initalize the motor position at startup
+  if (syncThreshold != OFF) {
+    if (!motorStepsInitDone && encoder->ready && homeSet) {
+      noInterrupts();
+      motorSteps = encoderCounts;
+      interrupts();
+      motorStepsInitDone = true;
+    }
+  }
+
+  long motorCounts = 0;
 
   noInterrupts();
-  long target = motorSteps + backlashSteps;
+  motorCounts = motorSteps;
   interrupts();
 
   // apply Kalaman filter if enabled
   switch (axisNumber) {
     case 1:
       #if AXIS1_ENCODER_FLTR == KALMAN
-        position = round(axis1EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis1EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 2:
       #if AXIS2_ENCODER_FLTR == KALMAN
-        position = round(axis2EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis2EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 3:
       #if AXIS3_ENCODER_FLTR == KALMAN
-        position = round(axis3EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis3EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 4:
       #if AXIS4_ENCODER_FLTR == KALMAN
-        position = round(axis4EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis4EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 5:
       #if AXIS5_ENCODER_FLTR == KALMAN
-        position = round(axis5EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis5EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 6:
       #if AXIS6_ENCODER_FLTR == KALMAN
-        position = round(axis6EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis6EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 7:
       #if AXIS7_ENCODER_FLTR == KALMAN
-        position = round(axis7EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis7EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 8:
       #if AXIS8_ENCODER_FLTR == KALMAN
-        position = round(axis8EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis8EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 9:
       #if AXIS9_ENCODER_FLTR == KALMAN
-        position = round(axis9EncoderKalmanFilter.updateEstimate(position - target)) + target;
+        encoderCounts = round(axis9EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
   }
 
-  control->set = target;
-  control->in = position;
+  control->set = motorCounts;
+  control->in = encoderCounts;
   feedback->poll();
 
   float velocity = control->out;
   if (!enabled) velocity = 0.0F;
-  float velocityPercent = (velocity/driver->getMotorControlRange()) * 100.0F;
 
-  // for range 0% tracking params to >= 25% for slewing params
-  feedback->variableParameters(fabs(velocityPercent*4.0F));
+  float velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
+  if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
-  // if we're not moving "fast" and the motor is above 70% power something is seriously wrong, so shut it down
+  feedback->variableParameters(fabs(velocityPercent*50.0F));
+
+  // if we're not moving "fast" and the motor is above 50% power something is seriously wrong, so shut it down
   if (millis() - lastCheckTime > 1000) {
-    if (labs(position - lastPosition) < 10 && abs(velocityPercent) >= 70) {
+    if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 50) {
       D(axisPrefix);
       D("stall detected!");
       D(" control->in = "); D(control->in);
@@ -348,7 +368,7 @@ void ServoMotor::poll() {
       D(", velocity % = "); DL(velocityPercent);
       enable(false);
     }
-    lastPosition = position;
+    lastEncoderCounts = encoderCounts;
     lastCheckTime = millis();
   }
 
@@ -357,40 +377,67 @@ void ServoMotor::poll() {
       static uint16_t count = 0;
       count++;
       if (count % 25 == 0) {
-        char s[80];
-        sprintf(s, "Servo%d_Delta: %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (target - position), (int)axisNumber, velocityPercent * 10.0F);
+        char s[800];
+
+        float spas = 0;
+        if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
+
+        #if AXIS1_ENCODER_FLTR == OFF
+//        sprintf(s, "Servo%d_Delta: %6ld, Motor %6ld, Encoder %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
+//        sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
+          sprintf(s, "Servo%d: DeltaAS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (int)axisNumber, velocityPercent);
+        #else
+//        sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld, Encoder2 %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts, (long)encoderCountsOrig);
+          sprintf(s, "Servo%d: DeltaAS: %0.2f, Delta2AS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - encoderCountsOrig)/spas, (int)axisNumber, velocityPercent);
+        #endif
+
         D(s);
+        UNUSED(spas);
       }
     }
   #endif
 
-  driver->setMotorVelocity(velocity);
-  if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
+  UNUSED(encoderCountsOrig);
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
 IRAM_ATTR void ServoMotor::move() {
-  if (synchronized && !inBacklash) targetSteps += step;
 
-  if (motorSteps > targetSteps) {
-    if (backlashSteps > 0) {
-      backlashSteps -= absStep;
-      inBacklash = backlashSteps > 0;
-    } else {
-      motorSteps -= absStep;
-      inBacklash = false;
-    }
-  } else
+  #if SERVO_SLEW_DIRECT == ON
+    if (synchronized && !inBacklash) targetSteps += step;
 
-  if (motorSteps < targetSteps || inBacklash) {
-    if (backlashSteps < backlashAmountSteps) {
-      backlashSteps += absStep;
-      inBacklash = backlashSteps < backlashAmountSteps;
-    } else {
-      motorSteps += absStep;
-      inBacklash = false;
+    if (motorSteps > targetSteps) {
+      motorSteps = targetSteps;
+    } else
+
+    if (motorSteps < targetSteps + backlashAmountSteps) {
+      motorSteps = targetSteps + backlashAmountSteps;
     }
-  }
+
+  #else
+    if (synchronized && !inBacklash) targetSteps += step;
+
+    if (motorSteps > targetSteps) {
+      if (backlashSteps > 0) {
+        backlashSteps -= absStep;
+        inBacklash = backlashSteps > 0;
+      } else {
+        motorSteps -= absStep;
+        inBacklash = false;
+      }
+    } else
+
+    if (motorSteps < targetSteps || inBacklash) {
+      if (backlashSteps < backlashAmountSteps) {
+        backlashSteps += absStep;
+        inBacklash = backlashSteps < backlashAmountSteps;
+      } else {
+        motorSteps += absStep;
+        inBacklash = false;
+      }
+    }
+
+  #endif
 
 }
 
