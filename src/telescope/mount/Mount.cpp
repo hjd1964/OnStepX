@@ -50,8 +50,6 @@ void Mount::init() {
 }
 
 void Mount::begin() {
-  axis1.calibrate();
-  axis2.calibrate();
 
   // initialize the critical subsystems
   site.init();
@@ -162,7 +160,9 @@ void Mount::enable(bool state) {
     #if LIMIT_STRICT == ON
       if (!site.dateIsReady || !site.timeIsReady) return;
     #endif
-    if (firstEnable) mountStatus.ready();
+
+    if (firstEnable) { mountStatus.ready(); }
+
     firstEnable = false;
   } else
 

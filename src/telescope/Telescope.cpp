@@ -108,19 +108,6 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   weather.init();
   temperature.init();
 
-  #ifdef SHARED_ENABLE_PIN
-    pinModeEx(SHARED_ENABLE_PIN, OUTPUT);
-    digitalWriteEx(SHARED_ENABLE_PIN, !SHARED_ENABLE_STATE);
-  #endif
-  #ifdef SHARED_ENABLE_PIN2
-    pinModeEx(SHARED_ENABLE_PIN2, OUTPUT);
-    digitalWriteEx(SHARED_ENABLE_PIN2, !SHARED2_ENABLE_STATE);
-  #endif
-  #ifdef SHARED_ENABLE_PIN3
-    pinModeEx(SHARED_ENABLE_PIN3, OUTPUT);
-    digitalWriteEx(SHARED_ENABLE_PIN3, !SHARED3_ENABLE_STATE);
-  #endif
-
   #ifdef MOUNT_PRESENT
     mount.init();
     mountStatus.init();

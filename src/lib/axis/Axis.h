@@ -348,6 +348,7 @@ class Axis {
     bool unitsRadians = false;
 
     bool enabled = false;        // enable/disable logical state (disabled is powered down)
+    bool firstEnable = true;     // flag it indicate if this is the first time this axis has been enabled
     bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
 
     uint8_t homeSenseHandle = 0; // home sensor handle
