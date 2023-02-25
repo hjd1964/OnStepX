@@ -49,49 +49,62 @@ As37h39bb::As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis) {
   clkPin = maPin;
   this->sloPin = sloPin;
   this->axis = axis;
-
-  pinMode(clkPin, OUTPUT);
-  digitalWriteF(clkPin, LOW);
-  pinMode(sloPin, INPUT_PULLUP);
 }
 
 // get device ready for use
 void As37h39bb::init(uint16_t nvAddress) {
+  if (initialized || axis < 1 || axis > 9) return;
+
+  pinMode(clkPin, OUTPUT);
+  digitalWriteF(clkPin, LOW);
+  pinMode(sloPin, INPUT_PULLUP);
+
   if (nvAddress != 0) {
     this->nvAddress = nvAddress + axis*8;
 
     #ifdef AS37_SINGLE_TURN
-      VF("MSG: As37h39bb"); V(axis); VLF(", reading origin from NV");
-      origin = nv.readUL(this->nvAddress);
+      #ifndef AS37_NO_NV
+        VF("MSG: As37h39bb"); V(axis); VLF(", reading origin from NV");
+        origin = nv.readUL(this->nvAddress);
+      #endif
     #endif
 
-    VF("MSG: As37h39bb"); V(axis); VLF(", reading offset from NV");
-    offset = nv.readUL(this->nvAddress + 4);
-    initialized = true;
+    #ifndef AS37_NO_NV
+      VF("MSG: As37h39bb"); V(axis); VLF(", reading offset from NV");
+      offset = nv.readUL(this->nvAddress + 4);
+    #endif
   }
+
+  initialized = true;
 }
 
 // set encoder origin
 void As37h39bb::setOrigin(int32_t count) {
-  if (!initialized) return;
+  if (!initialized) { VLF("WRN: As37h39bb setOrigin(), not initialized!"); return; }
 
   #ifdef AS37_SINGLE_TURN
-    VF("MSG: As37h39bb"); V(axis); VLF(", writing origin to NV");
-    uint32_t position;
-    if (readEnc(position)) {
-      origin = uint32_t(4194304 - position);
-      if (nvAddress != 0) nv.write(nvAddress, origin);
-    }
+    #ifndef AS37_NO_NV
+      VF("MSG: As37h39bb"); V(axis); VLF(", writing origin to NV");
+      uint32_t position;
+      if (readEnc(position)) {
+        origin = uint32_t(4194304 - position);
+        if (nvAddress != 0) nv.write(nvAddress, origin);
+      }
+    #else
+      origin = (uint32_t)count;
+    #endif
   #endif
 
-  VF("MSG: As37h39bb"); V(axis); VLF(", writing offset to NV");
-  write(count);
-  if (nvAddress != 0) nv.update(nvAddress + 4, offset);
+  #ifndef AS37_NO_NV
+    write(count);
+    VF("MSG: As37h39bb"); V(axis); VLF(", writing offset to NV");
+    if (nvAddress != 0) nv.update(nvAddress + 4, offset);
+  #endif
 }
 
 // read encoder count
 int32_t As37h39bb::read() {
-  if (!initialized) return 0;
+  if (!initialized) { VLF("WRN: As37h39bb read(), not initialized!"); return 0; }
 
   uint32_t temp;
   if (readEncLatest(temp)) {
@@ -101,7 +114,7 @@ int32_t As37h39bb::read() {
 
 // write encoder count
 void As37h39bb::write(int32_t count) {
-  if (!initialized) return;
+  if (!initialized) { VLF("WRN: As37h39bb write(), not initialized!"); return; }
 
   if (count != INT32_MAX) {
     uint32_t temp;
