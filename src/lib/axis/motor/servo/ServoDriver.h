@@ -27,8 +27,8 @@ class ServoDriver {
     // must be ready at object creation!
     virtual float getMotorControlRange() { return velocityMax; }
 
-    // set motor velocity
-    virtual void setMotorVelocity(float velocity);
+    // set motor velocity, returns velocity actually set
+    virtual float setMotorVelocity(float velocity);
 
     // returns motor direction (DIR_FORMWARD or DIR_REVERSE)
     Direction getMotorDirection() { return motorDirection; };

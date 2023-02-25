@@ -64,7 +64,7 @@ void ServoDc::init() {
 }
 
 // set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
-void ServoDc::setMotorVelocity(float velocity) {
+float ServoDc::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
@@ -80,6 +80,7 @@ void ServoDc::setMotorVelocity(float velocity) {
   if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
   pwmUpdate(fabs(currentVelocity));
+  return currentVelocity;
 }
 
 // motor control update
