@@ -20,7 +20,7 @@ IRAM_ATTR void axisWrapper8() { axisWrapper[7]->poll(); }
 IRAM_ATTR void axisWrapper9() { axisWrapper[8]->poll(); }
 
 // constructor
-Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure) {
+Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure, float targetTolerance) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
 
@@ -49,7 +49,9 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
     case AXIS_MEASURE_MICRONS: strcpy(unitsStr, "um"); unitsRadians = false; break;
     case AXIS_MEASURE_DEGREES: strcpy(unitsStr, " deg"); unitsRadians = false; break;
     case AXIS_MEASURE_RADIANS: strcpy(unitsStr, " deg"); unitsRadians = true;  break;
-  } 
+  }
+
+  this->targetTolerance = targetTolerance;
 }
 
 // sets up the driver step/dir/enable pins and any associated driver mode control
@@ -258,7 +260,7 @@ double Axis::getTargetCoordinate() {
 
 // returns true if at target
 bool Axis::atTarget() {
-  return labs(motor->getTargetDistanceSteps()) == 0;
+  return labs(motor->getTargetDistanceSteps()) <= targetTolerance*settings.stepsPerMeasure;
 }
 
 // returns true if within one second of the target at the backlash takeup rate
