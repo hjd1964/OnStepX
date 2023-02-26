@@ -497,6 +497,12 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
+#ifndef AXIS1_TARGET_TOLERANCE
+#define AXIS1_TARGET_TOLERANCE        0.0F
+#endif
+#ifndef AXIS2_TARGET_TOLERANCE
+#define AXIS2_TARGET_TOLERANCE        0.0F
+#endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF
 #endif
