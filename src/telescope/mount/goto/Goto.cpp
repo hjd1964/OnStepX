@@ -289,8 +289,8 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (target.pierSide != PIER_SIDE_WEST) target.pierSide = PIER_SIDE_EAST;
 
   if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
-  transform.hourAngleToRightAscension(&target, false);
   transform.observedPlaceToMount(&target);
+  transform.hourAngleToRightAscension(&target, false);
 
   return CE_NONE;
 }
