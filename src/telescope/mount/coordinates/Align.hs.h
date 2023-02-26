@@ -105,7 +105,7 @@ class GeoAlign
     void correct(AlignCoordinate &mount, float sf, float _deo, float _pd, float _pz, float _pe, float _da, float _ff, float _tf, float *h1, float *d1);
     void doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9);
 
-    bool modelIsReady;
+    bool modelIsReady = false;
     int8_t mountType;
     float cosLat, sinLat;
 

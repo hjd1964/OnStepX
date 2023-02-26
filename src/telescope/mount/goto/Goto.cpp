@@ -290,6 +290,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
   transform.hourAngleToRightAscension(&target, false);
+  transform.observedPlaceToMount(&target);
 
   return CE_NONE;
 }
