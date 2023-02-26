@@ -710,6 +710,8 @@
 #define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
 #endif
 
+#define HIGH_SPEED_ALIGN
+
 // -----------------------------------------------------------------------------------
 // rotator settings, ROTATOR
 #ifndef AXIS3_DRIVER_MODEL
