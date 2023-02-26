@@ -227,6 +227,20 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
 
+  } else
+
+  // :GX98#     Get rotator availablity
+  //            Returns: D for rotate/derotate
+  //                     R for rotate only
+  //                     N for none
+  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8' && parameter[2] == 0) {
+    *numericReply = false;
+    if (AXIS3_DRIVER_MODEL != OFF) {
+      #if defined(MOUNT_PRESENT)
+        if (transform.mountType == ALTAZM) strcpy(reply, "D"); else
+      #endif
+      strcpy(reply, "R");
+    } else strcpy(reply, "N");
   } else return false;
 
   return true;

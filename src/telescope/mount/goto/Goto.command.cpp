@@ -208,12 +208,6 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           case '5': sprintf(reply, "%d", (int)settings.meridianFlipAuto); break;            // autoMeridianFlip
           case '6': reply[0] = "EWB"[settings.preferredPierSide - 1]; reply[1] = 0; break;  // preferred pier side
           case '7': sprintF(reply, "%0.1f", (1000000.0F/settings.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break;
-          // rotator availablity 2 = rotate/derotate, 1 = rotate, 0 = off
-          case '8':
-            if (AXIS3_DRIVER_MODEL != OFF) {
-              if (transform.mountType == ALTAZM) strcpy(reply, "D"); else strcpy(reply, "R");
-            } else strcpy(reply, "N");
-          break;
           case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;          // fastest step rate in us
           default: return false;
         }
