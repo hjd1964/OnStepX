@@ -66,8 +66,8 @@ Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
 }
 
 void Quadrature::init() {
-  if (initialized || axis < 1 || axis > 9) return;
-  
+  if (initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" init(), already initialized!"); return; }
+
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);
 
@@ -137,17 +137,20 @@ void Quadrature::init() {
 }
 
 int32_t Quadrature::read() {
-  if (!initialized) { VLF("WRN: Quadrature read(), not initialized!"); return 0; }
+  if (!initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" read(), not initialized!"); return 0; }
 
   int32_t count = 0;
   noInterrupts();
   count = this->count;
   interrupts();
-  return count;
+
+  return count + origin;
 }
 
 void Quadrature::write(int32_t count) {
-  if (!initialized) { VLF("WRN: Quadrature write(), not initialized!"); return; }
+  if (!initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" write(), not initialized!"); return; }
+
+  count -= origin;
 
   noInterrupts();
   this->count = count;

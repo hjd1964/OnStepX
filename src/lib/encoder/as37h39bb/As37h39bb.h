@@ -21,10 +21,10 @@
       As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis);
 
       // get device ready for use
-      void init(uint16_t nvAddress = 0);
+      void init();
 
       // set encoder origin
-      void setOrigin(int32_t count);
+      void setOrigin(uint32_t count);
 
       // read encoder count
       int32_t read();
@@ -47,7 +47,6 @@
       int16_t clkPin;
       int16_t sloPin;
 
-      uint32_t origin = 0;
       uint32_t lastValidTime = 0;
       uint32_t lastValidPosition = 0;
   };

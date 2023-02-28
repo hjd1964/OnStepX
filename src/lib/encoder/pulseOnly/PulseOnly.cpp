@@ -54,7 +54,7 @@ PulseOnly::PulseOnly(int16_t pulsePin, int16_t *direction, int16_t axis) {
 }
 
 void PulseOnly::init() {
-  if (initialized || axis < 1 || axis > 9) return;
+  if (initialized) { VF("WRN: Encoder PulseOnly"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(pulsePin, INPUT_PULLUP);
   #if AXIS1_ENCODER == PULSE_ONLY
@@ -107,17 +107,19 @@ void PulseOnly::init() {
 }
 
 int32_t PulseOnly::read() {
-  if (!initialized) { VLF("WRN: PulseOnly read(), not initialized!"); return 0; }
+  if (!initialized) { VF("WRN: Encoder PulseOnly"); V(axis); VLF(" read(), not initialized!"); return 0; }
 
-  int32_t count = 0;
   noInterrupts();
-  count = _pulse_count[axis];
+  int32 count = _pulse_count[axis];
   interrupts();
-  return count;
+
+  return count + origin;
 }
 
 void PulseOnly::write(int32_t count) {
-  if (!initialized) { VLF("WRN: PulseOnly write(), not initialized!"); return; }
+  if (!initialized) { VF("WRN: Encoder PulseOnly"); V(axis); VLF(" write(), not initialized!"); return; }
+
+  count -= origin;
 
   noInterrupts();
   _pulse_count[axis] = count;
@@ -125,7 +127,7 @@ void PulseOnly::write(int32_t count) {
 }
 
 void PulseOnly::setDirection(int16_t direction) {
-  if (!initialized) { VLF("WRN: PulseOnly setDirection(), not initialized!"); return; }
+  if (!initialized) { VF("WRN: Encoder PulseOnly"); V(axis); VLF(" setDirection(), not initialized!"); return; }
 
   _direction[axis] = direction;
 }

@@ -52,59 +52,37 @@ As37h39bb::As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis) {
 }
 
 // get device ready for use
-void As37h39bb::init(uint16_t nvAddress) {
-  if (initialized || axis < 1 || axis > 9) return;
+void As37h39bb::init() {
+  if (initialized) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(clkPin, OUTPUT);
   digitalWriteF(clkPin, LOW);
   pinMode(sloPin, INPUT_PULLUP);
 
-  if (nvAddress != 0) {
-    this->nvAddress = nvAddress + axis*8;
-
-    #ifdef AS37_SINGLE_TURN
-      #ifndef AS37_NO_NV
-        VF("MSG: As37h39bb"); V(axis); VLF(", reading origin from NV");
-        origin = nv.readUL(this->nvAddress);
-      #endif
-    #endif
-
-    #ifndef AS37_NO_NV
-      VF("MSG: As37h39bb"); V(axis); VLF(", reading offset from NV");
-      offset = nv.readUL(this->nvAddress + 4);
-    #endif
-  }
-
   initialized = true;
 }
 
 // set encoder origin
-void As37h39bb::setOrigin(int32_t count) {
-  if (!initialized) { VLF("WRN: As37h39bb setOrigin(), not initialized!"); return; }
+void As37h39bb::setOrigin(uint32_t count) {
+  if (!initialized) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(" setOrigin(), not initialized!"); return; }
 
-  #ifdef AS37_SINGLE_TURN
-    #ifndef AS37_NO_NV
-      VF("MSG: As37h39bb"); V(axis); VLF(", writing origin to NV");
-      uint32_t position;
-      if (readEnc(position)) {
-        origin = uint32_t(4194304 - position);
-        if (nvAddress != 0) nv.write(nvAddress, origin);
-      }
-    #else
-      origin = (uint32_t)count;
-    #endif
-  #endif
+  long temp = offset;
+  offset = 0;
+  origin = 0;
 
-  #ifndef AS37_NO_NV
-    write(count);
-    VF("MSG: As37h39bb"); V(axis); VLF(", writing offset to NV");
-    if (nvAddress != 0) nv.update(nvAddress + 4, offset);
-  #endif
+  VLF("----------------------------------------------------------------------------------------");
+  VF("MSG: Encoder As37h39bb"); V(axis); VLF(", >>> with the mount in the home position <<<");
+  VF("MSG: Encoder As37h39bb"); V(axis); VF(", if used AXIS"); V(axis); VF("_ENCODER_OFFSET in counts should be set to "); VL(uint32_t(-read()));
+  origin = count;
+  VF("MSG: Encoder As37h39bb"); V(axis); VF(", counts at home should be 0 and currently are "); VL(read());
+  VLF("----------------------------------------------------------------------------------------");
+
+  offset = temp;
 }
 
 // read encoder count
 int32_t As37h39bb::read() {
-  if (!initialized) { VLF("WRN: As37h39bb read(), not initialized!"); return 0; }
+  if (!initialized) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(" read(), not initialized!"); return 0; }
 
   uint32_t temp;
   if (readEncLatest(temp)) {
@@ -114,7 +92,7 @@ int32_t As37h39bb::read() {
 
 // write encoder count
 void As37h39bb::write(int32_t count) {
-  if (!initialized) { VLF("WRN: As37h39bb write(), not initialized!"); return; }
+  if (!initialized) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(" write(), not initialized!"); return; }
 
   if (count != INT32_MAX) {
     uint32_t temp;
@@ -265,13 +243,13 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
 
   if (_crcBiSS(encData) != as37Crc) {
     bad++;
-    VF("WRN: As37h39bb"); V(axis); VF(", Crc invalid (overall "); V(((float)bad/good)*100.0F); V('%'); VLF(")"); errors++;
+    VF("WRN: Encoder As37h39bb"); V(axis); VF(", Crc invalid (overall "); V(((float)bad/good)*100.0F); V('%'); VLF(")"); errors++;
   } else {
     good++;
-    if (!foundAck) { VF("WRN: As37h39bb"); V(axis); VLF(", Ack bit invalid"); errors++; } else
-    if (!foundStart) { VF("WRN: As37h39bb"); V(axis); VLF(", Start bit invalid"); errors++; } else
-    if (!foundCds) { VF("WRN: As37h39bb"); V(axis); VLF(", Cds bit invalid"); errors++; } else
-    if (encErr) { VF("WRN: As37h39bb"); V(axis); VLF(", Error bit set"); errors++; } else errors = 0;
+    if (!foundAck) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(", Ack bit invalid"); errors++; } else
+    if (!foundStart) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(", Start bit invalid"); errors++; } else
+    if (!foundCds) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(", Cds bit invalid"); errors++; } else
+    if (encErr) { VF("WRN: Encoder As37h39bb"); V(axis); VLF(", Error bit set"); errors++; } else errors = 0;
   }
 
   if (errors > 0) {
@@ -292,11 +270,11 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
   #ifdef AS37_SINGLE_TURN
     if ((int32_t)position > 8388608) position -= 8388608;
     if ((int32_t)position < 0) position += 8388608;
-//    if (axis == 2) DL1(((int32_t)position)/23301.638F);
   #endif
+
+  position -= 4194304;
 
   return true;
 }
-
 
 #endif

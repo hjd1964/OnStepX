@@ -36,6 +36,9 @@ class Encoder {
     // get device ready for use
     virtual void init();
 
+    // set encoder origin
+    virtual void setOrigin(uint32_t count);
+
     // get current position
     virtual int32_t read();
 
@@ -54,9 +57,12 @@ class Encoder {
     // index offset (r/w)
     int32_t offset = 0;
 
+    // origin for absolute encoders
+    uint32_t origin = 0;
+
   protected:
-    int16_t axis = 0;
-    volatile int32_t count = 0;
     bool initialized = false;
 
+    int16_t axis = 0;
+    volatile int32_t count = 0;
 };
