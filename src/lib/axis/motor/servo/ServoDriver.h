@@ -42,7 +42,7 @@ class ServoDriver {
     DriverStatus getStatus() { return status; }
    
     // calibrate the motor if required
-    virtual void calibrate();
+    virtual void calibrate() {}
 
   protected:
     int axisNumber;
