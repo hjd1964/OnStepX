@@ -41,7 +41,7 @@
     ServoTmc2209 driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
   #endif
 
-  ServoMotor motor1(1, ((ServoDriver*)&driver1), &encAxis1, &pidAxis1, &servoControlAxis1, AXIS1_SERVO_SYNC_THRESHOLD);
+  ServoMotor motor1(1, ((ServoDriver*)&driver1), &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &pidAxis1, &servoControlAxis1, AXIS1_SERVO_SYNC_THRESHOLD);
 #endif
 
 #ifdef AXIS1_STEP_DIR_PRESENT
@@ -99,7 +99,7 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     ServoTmc2209 driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
   #endif
 
-  ServoMotor motor2(2, ((ServoDriver*)&driver2), &encAxis2, &pidAxis2, &servoControlAxis2, AXIS2_SERVO_SYNC_THRESHOLD);
+  ServoMotor motor2(2, ((ServoDriver*)&driver2), &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &pidAxis2, &servoControlAxis2, AXIS2_SERVO_SYNC_THRESHOLD);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
 #endif
 

@@ -24,7 +24,7 @@
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
@@ -80,6 +80,8 @@ class ServoMotor : public Motor {
     // calibrate the motor if required
     void calibrate() { driver->calibrate(); }
 
+    inline int32_t encoderRead() { return encoderReverse ? -encoder->read() : encoder->read(); }
+
     // servo motor driver
     ServoDriver *driver;
 
@@ -116,6 +118,7 @@ class ServoMotor : public Motor {
     bool slewing = false;
     bool motorStepsInitDone = false;
     bool homeSet = false;
+    bool encoderReverse = false;
 };
 
 #endif

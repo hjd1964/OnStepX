@@ -36,7 +36,7 @@
     ServoTmc2209 driver3(3, &ServoPinsAxis3, &ServoSettingsAxis3);
   #endif
 
-  ServoMotor motor3(3, ((ServoDriver*)&driver3), &encAxis3, &pidAxis3, &servoControlAxis3, AXIS3_SERVO_SYNC_THRESHOLD);
+  ServoMotor motor3(3, ((ServoDriver*)&driver3), &encAxis3, AXIS3_ENCODER_ORIGIN, AXIS3_ENCODER_REVERSE == ON, &pidAxis3, &servoControlAxis3, AXIS3_SERVO_SYNC_THRESHOLD);
 #endif
 
 #ifdef AXIS3_STEP_DIR_PRESENT

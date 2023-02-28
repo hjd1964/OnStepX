@@ -86,7 +86,7 @@ IRAM_ATTR void moveServoMotorAxis8() { servoMotorInstance[7]->move(); }
 IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers) {
+ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   driverType = SERVO;
@@ -104,6 +104,8 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   this->driver = Driver;
 
   encoder->init();
+  encoder->setOrigin(encoderOrigin);
+  this->encoderReverse = encoderReverse;
 
   feedback->getDefaultParameters(&default_param1, &default_param2, &default_param3, &default_param4, &default_param5, &default_param6);
 
@@ -192,7 +194,7 @@ void ServoMotor::resetPositionSteps(long value) {
 
 // get instrument coordinate, in steps
 long ServoMotor::getInstrumentCoordinateSteps() {
-  return encoder->read() + indexSteps;
+  return encoderRead() + indexSteps;
 }
 
 // set instrument coordinate, in steps
@@ -213,7 +215,7 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
 
 // distance to target in steps (+/-)
 long ServoMotor::getTargetDistanceSteps() {
-  long encoderCounts = encoder->read();
+  long encoderCounts = encoderRead();
   noInterrupts();
   long dist = targetSteps - encoderCounts;
   interrupts();
@@ -276,7 +278,7 @@ void ServoMotor::setSlewing(bool state) {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
-  long encoderCounts = encoder->read();
+  long encoderCounts = encoderRead();
 
   long encoderCountsOrig = encoderCounts;
 

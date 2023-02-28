@@ -37,7 +37,7 @@
       ServoTmc2209 driver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
     #endif
 
-    ServoMotor motor4(4, ((ServoDriver*)&driver4), &encAxis4, &pidAxis4, &servoControlAxis4, AXIS4_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor4(4, ((ServoDriver*)&driver4), &encAxis4, AXIS4_ENCODER_ORIGIN, AXIS4_ENCODER_REVERSE == ON, &pidAxis4, &servoControlAxis4, AXIS4_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS4_STEP_DIR_PRESENT
@@ -92,7 +92,7 @@
       ServoTmc2209 driver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
     #endif
 
-    ServoMotor motor5(5, ((ServoDriver*)&driver5), &encAxis5, &pidAxis5, &servoControlAxis5, AXIS5_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor5(5, ((ServoDriver*)&driver5), &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &pidAxis5, &servoControlAxis5, AXIS5_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS5_STEP_DIR_PRESENT
@@ -147,7 +147,7 @@
       ServoTmc2209 driver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
     #endif
 
-    ServoMotor motor6(6, ((ServoDriver*)&driver6), &encAxis6, &pidAxis6, &servoControlAxis6, AXIS6_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor6(6, ((ServoDriver*)&driver6), &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &pidAxis6, &servoControlAxis6, AXIS6_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS6_STEP_DIR_PRESENT
@@ -202,7 +202,7 @@
       ServoTmc2209 driver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
     #endif
 
-    ServoMotor motor7(7, ((ServoDriver*)&driver7), &encAxis7, &pidAxis7, &servoControlAxis7, AXIS7_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor7(7, ((ServoDriver*)&driver7), &encAxis7, AXIS7_ENCODER_ORIGIN, AXIS7_ENCODER_REVERSE == ON, &pidAxis7, &servoControlAxis7, AXIS7_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS7_STEP_DIR_PRESENT
@@ -257,7 +257,7 @@
       ServoTmc2209 driver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
     #endif
 
-    ServoMotor motor8(8, ((ServoDriver*)&driver8), &encAxis8, &pidAxis8, &servoControlAxis8, AXIS8_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor8(8, ((ServoDriver*)&driver8), &encAxis8, AXIS8_ENCODER_ORIGIN, AXIS8_ENCODER_REVERSE == ON, &pidAxis8, &servoControlAxis8, AXIS8_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS8_STEP_DIR_PRESENT
@@ -312,7 +312,7 @@
       ServoTmc2209 driver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
     #endif
 
-    ServoMotor motor9(9, ((ServoDriver*)&driver9), &encAxis9, &pidAxis9, &servoControlAxis9, AXIS9_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor9(9, ((ServoDriver*)&driver9), &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &pidAxis9, &servoControlAxis9, AXIS9_SERVO_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS9_STEP_DIR_PRESENT
