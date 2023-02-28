@@ -287,6 +287,12 @@
   #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
   #endif
+  #ifndef AXIS1_ENCODER_ORIGIN
+  #define AXIS1_ENCODER_ORIGIN          0                         // +/- offset so encoder count is 0 at home (for absolute encoders)
+  #endif
+  #ifndef AXIS1_ENCODER_REVERSE
+  #define AXIS1_ENCODER_REVERSE         OFF                       // reverse count direction of encoder
+  #endif
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
   #endif
@@ -435,6 +441,12 @@
   #endif
   #ifndef AXIS2_ENCODER
   #define AXIS2_ENCODER                 AB
+  #endif
+  #ifndef AXIS2_ENCODER_ORIGIN
+  #define AXIS2_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS2_ENCODER_REVERSE
+  #define AXIS2_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          FB_PID
@@ -858,6 +870,12 @@
   #ifndef AXIS3_ENCODER
   #define AXIS3_ENCODER                 AB
   #endif
+  #ifndef AXIS3_ENCODER_ORIGIN
+  #define AXIS3_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS3_ENCODER_REVERSE
+  #define AXIS3_ENCODER_REVERSE         OFF
+  #endif
   #ifndef AXIS3_SERVO_FEEDBACK
   #define AXIS3_SERVO_FEEDBACK          FB_PID
   #endif
@@ -1034,6 +1052,12 @@
   #ifndef AXIS4_ENCODER
   #define AXIS4_ENCODER                 AB
   #endif
+  #ifndef AXIS4_ENCODER_ORIGIN
+  #define AXIS4_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS4_ENCODER_REVERSE
+  #define AXIS4_ENCODER_REVERSE         OFF
+  #endif
   #ifndef AXIS4_SERVO_FEEDBACK
   #define AXIS4_SERVO_FEEDBACK          FB_PID
   #endif
@@ -1184,6 +1208,12 @@
   #endif
   #ifndef AXIS5_ENCODER
   #define AXIS5_ENCODER                 AB
+  #endif
+  #ifndef AXIS5_ENCODER_ORIGIN
+  #define AXIS5_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS5_ENCODER_REVERSE
+  #define AXIS5_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          FB_PID
@@ -1336,6 +1366,12 @@
   #ifndef AXIS6_ENCODER
   #define AXIS6_ENCODER                 AB
   #endif
+  #ifndef AXIS6_ENCODER_ORIGIN
+  #define AXIS6_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS6_ENCODER_REVERSE
+  #define AXIS6_ENCODER_REVERSE         OFF
+  #endif
   #ifndef AXIS6_SERVO_FEEDBACK
   #define AXIS6_SERVO_FEEDBACK          FB_PID
   #endif
@@ -1486,6 +1522,12 @@
   #endif
   #ifndef AXIS7_ENCODER
   #define AXIS7_ENCODER                 AB
+  #endif
+  #ifndef AXIS7_ENCODER_ORIGIN
+  #define AXIS7_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS7_ENCODER_REVERSE
+  #define AXIS7_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          FB_PID
@@ -1638,6 +1680,12 @@
   #ifndef AXIS8_ENCODER
   #define AXIS8_ENCODER                 AB
   #endif
+  #ifndef AXIS8_ENCODER_ORIGIN
+  #define AXIS8_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS8_ENCODER_REVERSE
+  #define AXIS8_ENCODER_REVERSE         OFF
+  #endif
   #ifndef AXIS8_SERVO_FEEDBACK
   #define AXIS8_SERVO_FEEDBACK          FB_PID
   #endif
@@ -1788,6 +1836,12 @@
   #endif
   #ifndef AXIS9_ENCODER
   #define AXIS9_ENCODER                 AB
+  #endif
+  #ifndef AXIS9_ENCODER_ORIGIN
+  #define AXIS9_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS9_ENCODER_REVERSE
+  #define AXIS9_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          FB_PID
