@@ -55,6 +55,22 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
       } else *commandError = CE_0;
     } else
 
+    #ifdef SERVO_MOTOR_PRESENT
+      // :GXS[n]#   Get axis servo delta (in counts) and velocity
+      //            Returns: Values
+      if (parameter[0] == 'S') {
+        int index = parameter[1] - '1';
+        if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
+        if (index + 1 != axisNumber) return false; // command wasn't processed
+        if (motor->driverType != SERVO) { *commandError = CE_CMD_UNKNOWN; return true; } // not a servo
+
+        char temp[20];
+        sprintF(temp, "%0.3f", ((ServoMotor*)motor)->velocityPercent);
+        sprintf(reply, "%ld,%s", ((ServoMotor*)motor)->delta, temp);
+        *numericReply = false;
+      } else
+    #endif
+
     // :GXU[n]#   Get stepper driver statUs for axis [n]
     //            Returns: Value
     if (parameter[0] == 'U') {

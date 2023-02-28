@@ -354,7 +354,8 @@ void ServoMotor::poll() {
   float velocity = control->out;
   if (!enabled) velocity = 0.0F;
 
-  float velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
+  delta = motorCounts - encoderCounts;
+  velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
   feedback->variableParameters(fabs(velocityPercent*50.0F));

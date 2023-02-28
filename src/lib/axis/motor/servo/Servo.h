@@ -88,6 +88,9 @@ class ServoMotor : public Motor {
     // servo encoder
     Encoder *encoder;
 
+    float velocityPercent = 0.0F;
+    long delta = 0;
+
   private:
     uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
