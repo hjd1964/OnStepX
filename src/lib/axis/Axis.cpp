@@ -129,7 +129,6 @@ bool Axis::init(Motor *motor) {
 // also calibrates the driver if this is the first time its been enabled
 void Axis::enable(bool state) {
   enabled = state;
-  if (enabled & firstEnable) { calibrate(); firstEnable = false; }
   motor->enable(enabled & !poweredDown);
 }
 

@@ -101,6 +101,19 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   if (!gpio.init()) initError.gpio = true;
 
+  #ifdef SHARED_ENABLE_PIN
+    pinModeEx(SHARED_ENABLE_PIN, OUTPUT);
+    digitalWriteEx(SHARED_ENABLE_PIN, !SHARED_ENABLE_STATE);
+  #endif
+  #ifdef SHARED_ENABLE_PIN2
+    pinModeEx(SHARED_ENABLE_PIN2, OUTPUT);
+    digitalWriteEx(SHARED_ENABLE_PIN2, !SHARED2_ENABLE_STATE);
+  #endif
+  #ifdef SHARED_ENABLE_PIN3
+    pinModeEx(SHARED_ENABLE_PIN3, OUTPUT);
+    digitalWriteEx(SHARED_ENABLE_PIN3, !SHARED3_ENABLE_STATE);
+  #endif
+  
   #if SERIAL_B_ESP_FLASHING == ON
     addonFlasher.init();
   #endif

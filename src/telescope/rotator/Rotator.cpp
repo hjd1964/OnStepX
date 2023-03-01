@@ -41,6 +41,8 @@ void Rotator::init() {
 }
 
 void Rotator::begin() {
+  axis3.calibrate();
+
   // start monitor task
   VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
   if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
