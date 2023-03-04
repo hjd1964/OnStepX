@@ -77,12 +77,13 @@
 // servo encoder (must match Encoder library)
 #define ENC_FIRST                   1
 #define AB                          1      // AB quadrature encoder
-#define CW_CCW                      2      // clockwise/counter-clockwise encoder
-#define PULSE_DIR                   3      // pulse/direction encoder
-#define PULSE_ONLY                  4      // pulse only encoder
-#define AS37_H39B_B                 5      // Broadcom AS37-H39B-B BISS-C interface encoder
-#define SERIAL_BRIDGE               6      // serial bridge to encoders
-#define ENC_LAST                    6
+#define AB_ESP32                    2      // AB quadrature encoder (using fast ESP32 hardware decode)
+#define CW_CCW                      3      // clockwise/counter-clockwise encoder
+#define PULSE_DIR                   4      // pulse/direction encoder
+#define PULSE_ONLY                  5      // pulse only encoder
+#define AS37_H39B_B                 6      // Broadcom AS37-H39B-B BISS-C interface encoder
+#define SERIAL_BRIDGE               7      // serial bridge to encoders
+#define ENC_LAST                    7
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1
