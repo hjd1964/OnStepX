@@ -8,7 +8,7 @@
     AXIS7_ENCODER == AB || AXIS8_ENCODER == AB || AXIS9_ENCODER == AB
 
 // for example:
-// ABEncoder encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+// Quadrature encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
 
 // Phase 1: LLHH LLHH
 // Phase 2: LHHL LHHL

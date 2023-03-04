@@ -7,7 +7,7 @@
     AXIS7_ENCODER == AB_ESP32 || AXIS8_ENCODER == AB_ESP32 || AXIS9_ENCODER == AB_ESP32
 
 // for example:
-// ABEncoder encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+// QuadratureEsp32 encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
 
 QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
@@ -18,7 +18,14 @@ QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
 void QuadratureEsp32::init() {
   if (initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" init(), already initialized!"); return; }
 
-  ab.attachFullQuad(APin, BPin);
+  ab = new ESP32Encoder;
+  if (ab == NULL) {
+    VF("ERR: Encoder QuadratureEsp32"); V(axis); VLF(" init(), didn't get instance!"); 
+    return;
+  }
+
+  ab->attachFullQuad(APin, BPin);
+  ab->setCount(0);
 
   initialized = true;
 }
@@ -26,7 +33,7 @@ void QuadratureEsp32::init() {
 int32_t QuadratureEsp32::read() {
   if (!initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" read(), not initialized!"); return 0; }
 
-  return (int32_t)ab.getCount() + origin;
+  return (int32_t)ab->getCount() + origin;
 }
 
 void QuadratureEsp32::write(int32_t count) {
@@ -34,7 +41,7 @@ void QuadratureEsp32::write(int32_t count) {
 
   count -= origin;
 
-  ab.setCount(count);
+  ab->setCount(count);
 }
 
 #endif

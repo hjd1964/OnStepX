@@ -54,7 +54,7 @@ Quadrature *quadratureInstance[9];
 #endif
 
 // for example:
-// ABEncoder encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+// Quadrature encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
 
 Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
