@@ -59,7 +59,7 @@
 
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
-#define HAL_TEMP() ( NAN )
+#define HAL_TEMP() ( tempmonGetTemp() )
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
