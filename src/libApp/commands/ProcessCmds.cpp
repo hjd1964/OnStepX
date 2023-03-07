@@ -207,7 +207,13 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   //            Returns: +/-n.n
   if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == 'F' && parameter[2] == 0) {
     float t = HAL_TEMP();
-    if (!isnan(t)) sprintF(reply, "%1.0f", t); else { *numericReply = true; commandError = CE_0; }
+    if (!isnan(t)) {
+      sprintF(reply, "%1.0f", t);
+      *numericReply = false;
+    } else {
+      *numericReply = true;
+      commandError = CE_0;
+    }
     return commandError;
   } else
 

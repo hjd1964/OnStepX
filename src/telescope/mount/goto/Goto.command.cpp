@@ -196,7 +196,6 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       //            Returns: Value
       if (parameter[0] == '9')  {
         Coordinate current;
-        *numericReply = false;
         switch (parameter[1]) {
           case '2': sprintF(reply, "%0.3f", settings.usPerStepCurrent); break;     // current
           case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                 // default base
@@ -211,6 +210,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;          // fastest step rate in us
           default: return false;
         }
+       *numericReply = false;
       } else return false;
     } else return false;
   } else

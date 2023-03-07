@@ -17,7 +17,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   //            Returns: n.nn#
   if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '0' && parameter[2] == 0) {
     sprintF(reply, "%0.2f", rateSelectToRate(settings.pulseRateSelect));
-     *numericReply = false;
+    *numericReply = false;
   } else
 
   // M - Telescope Movement (Guiding) Commands
