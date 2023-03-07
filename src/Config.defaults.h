@@ -750,8 +750,8 @@
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW                         // stepper enable state
 #endif
-#ifndef AXIS3_SLEW_RATE_DESIRED
-#define AXIS3_SLEW_RATE_DESIRED       3.0                         // in degrees/sec
+#ifndef AXIS3_SLEW_RATE_BASE_DESIRED
+#define AXIS3_SLEW_RATE_BASE_DESIRED  3.0                         // in degrees/sec
 #endif
 #ifndef AXIS3_ACCELERATION_TIME
 #define AXIS3_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
@@ -760,7 +760,7 @@
 #define AXIS3_RAPID_STOP_TIME         1.0                         // in seconds, to stop
 #endif
 #ifndef AXIS3_BACKLASH_RATE
-#define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_DESIRED/4) // in degrees/sec
+#define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_BASE_DESIRED/4) // in degrees/sec
 #endif
 #ifndef AXIS3_LIMIT_MIN
 #define AXIS3_LIMIT_MIN               -180                        // in degrees
@@ -932,8 +932,8 @@
 #ifndef AXIS4_SLEW_RATE_MINIMUM
 #define AXIS4_SLEW_RATE_MINIMUM       20                          // in microns/sec
 #endif
-#ifndef AXIS4_SLEW_RATE_DESIRED
-#define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
+#ifndef AXIS4_SLEW_RATE_BASE_DESIRED
+#define AXIS4_SLEW_RATE_BASE_DESIRED  500                         // in microns/sec
 #endif
 #ifndef AXIS4_ACCELERATION_TIME
 #define AXIS4_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
@@ -942,7 +942,7 @@
 #define AXIS4_RAPID_STOP_TIME         1.0                         // in seconds, to stop
 #endif
 #ifndef AXIS4_BACKLASH_RATE
-#define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_BASE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS4_LIMIT_MIN
 #define AXIS4_LIMIT_MIN               0                           // in mm
@@ -1091,8 +1091,8 @@
 #ifndef AXIS5_SLEW_RATE_MINIMUM
 #define AXIS5_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS5_SLEW_RATE_DESIRED
-#define AXIS5_SLEW_RATE_DESIRED       500
+#ifndef AXIS5_SLEW_RATE_BASE_DESIRED
+#define AXIS5_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS5_ACCELERATION_TIME
 #define AXIS5_ACCELERATION_TIME       2.0
@@ -1101,7 +1101,7 @@
 #define AXIS5_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS5_BACKLASH_RATE
-#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4)
+#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS5_LIMIT_MIN
 #define AXIS5_LIMIT_MIN               0
@@ -1248,8 +1248,8 @@
 #ifndef AXIS6_SLEW_RATE_MINIMUM
 #define AXIS6_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS6_SLEW_RATE_DESIRED
-#define AXIS6_SLEW_RATE_DESIRED       500
+#ifndef AXIS6_SLEW_RATE_BASE_DESIRED
+#define AXIS6_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS6_ACCELERATION_TIME
 #define AXIS6_ACCELERATION_TIME       2.0
@@ -1258,7 +1258,7 @@
 #define AXIS6_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS6_BACKLASH_RATE
-#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4)
+#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS6_LIMIT_MIN
 #define AXIS6_LIMIT_MIN               0
@@ -1405,8 +1405,8 @@
 #ifndef AXIS7_SLEW_RATE_MINIMUM
 #define AXIS7_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS7_SLEW_RATE_DESIRED
-#define AXIS7_SLEW_RATE_DESIRED       500
+#ifndef AXIS7_SLEW_RATE_BASE_DESIRED
+#define AXIS7_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS7_ACCELERATION_TIME
 #define AXIS7_ACCELERATION_TIME       2.0
@@ -1415,7 +1415,7 @@
 #define AXIS7_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS7_BACKLASH_RATE
-#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4)
+#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS7_LIMIT_MIN
 #define AXIS7_LIMIT_MIN               0
@@ -1562,8 +1562,8 @@
 #ifndef AXIS8_SLEW_RATE_MINIMUM
 #define AXIS8_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS8_SLEW_RATE_DESIRED
-#define AXIS8_SLEW_RATE_DESIRED       500
+#ifndef AXIS8_SLEW_RATE_BASE_DESIRED
+#define AXIS8_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS8_ACCELERATION_TIME
 #define AXIS8_ACCELERATION_TIME       2.0
@@ -1572,7 +1572,7 @@
 #define AXIS8_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS8_BACKLASH_RATE
-#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4)
+#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS8_LIMIT_MIN
 #define AXIS8_LIMIT_MIN               0
@@ -1719,8 +1719,8 @@
 #ifndef AXIS9_SLEW_RATE_MINIMUM
 #define AXIS9_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS9_SLEW_RATE_DESIRED
-#define AXIS9_SLEW_RATE_DESIRED       500
+#ifndef AXIS9_SLEW_RATE_BASE_DESIRED
+#define AXIS9_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS9_ACCELERATION_TIME
 #define AXIS9_ACCELERATION_TIME       2.0
@@ -1729,7 +1729,7 @@
 #define AXIS9_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS9_BACKLASH_RATE
-#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4)
+#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS9_LIMIT_MIN
 #define AXIS9_LIMIT_MIN               0
