@@ -6,12 +6,12 @@
 #ifdef SERVO_MOTOR_PRESENT
 
 // the various servo driver models
-#define DRIVER_MODEL_COUNT 3
+#define SERVO_DRIVER_MODEL_COUNT 3
 
 #include "../Motor.h"
 
 #if DEBUG != OFF
-  const char* SERVO_DRIVER_NAME[DRIVER_MODEL_COUNT] =
+  const char* SERVO_DRIVER_NAME[SERVO_DRIVER_MODEL_COUNT] =
   {
     "SERVO_PE",     // Phase (Direction)/Enable
     "SERVO_EE",     // Enable/Enable
@@ -49,7 +49,7 @@ void ServoDriver::updateStatus() {
         (status.outputA.openLoad          != lastStatus.outputA.openLoad) ||
         (status.outputB.shortToGround     != lastStatus.outputB.shortToGround) ||
         (status.outputB.openLoad          != lastStatus.outputB.openLoad) ||
-        (status.overTemperatureWarning != lastStatus.overTemperatureWarning) ||
+        (status.overTemperatureWarning    != lastStatus.overTemperatureWarning) ||
         (status.overTemperature           != lastStatus.overTemperature) ||
         (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {

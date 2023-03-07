@@ -6,7 +6,7 @@
 #ifdef STEP_DIR_MOTOR_PRESENT
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 17
+#define DRIVER_MODEL_COUNT 17 
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
