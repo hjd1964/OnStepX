@@ -509,6 +509,9 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
+#ifndef MOUNT_ENABLE_AT_STARTUP
+#define MOUNT_ENABLE_AT_STARTUP       OFF                         // ON Enables mount motor drivers at startup.
+#endif
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
