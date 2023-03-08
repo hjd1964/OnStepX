@@ -197,8 +197,8 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       if (parameter[0] == '9')  {
         Coordinate current;
         switch (parameter[1]) {
-          case '2': sprintF(reply, "%0.3f", settings.usPerStepCurrent); break;     // current
-          case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                 // default base
+          case '2': sprintF(reply, "%0.3f", settings.usPerStepCurrent); break;              // current
+          case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                          // default base
           // pierSide 0 = None, 1 = East, 2 = West (with suffix 'N' if meridian flips are disabled)
           case '4':
               current = mount.getMountPosition();
@@ -207,7 +207,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           case '5': sprintf(reply, "%d", (int)settings.meridianFlipAuto); break;            // autoMeridianFlip
           case '6': reply[0] = "EWB"[settings.preferredPierSide - 1]; reply[1] = 0; break;  // preferred pier side
           case '7': sprintF(reply, "%0.1f", (1000000.0F/settings.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break;
-          case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;          // fastest step rate in us
+          case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;                   // fastest step rate in us
           default: return false;
         }
        *numericReply = false;
