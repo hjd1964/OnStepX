@@ -255,10 +255,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :Fg#       Get focuser goto rate
+    // :FW#       Get focuser working slew rate
     //            goto rate in um/s
     //            Returns: n#
-    if (command[1] == 'g') {
+    if (command[1] == 'W') {
       sprintf(reply, "%d", settings[index].gotoRate);
       *numericReply = false;
     } else

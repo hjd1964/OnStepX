@@ -113,9 +113,9 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :rg#       Get goto rate in deg/s
+    // :rW#       Get working slew rate in deg/s
     //            Returns: d.d#
-    if (command[1] == 'g') {
+    if (command[1] == 'W') {
       sprintF(reply, "%0.1f", settings.gotoRate);
       *numericReply = false;
     } else
