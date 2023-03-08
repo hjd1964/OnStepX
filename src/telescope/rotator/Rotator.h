@@ -18,7 +18,7 @@
   #elif NV_ENDURANCE == NVE_HIGH
     #define ROTATOR_WRITE_DELAY 60
   #else
-    #define ROTATOR_WRITE_DELAY 180
+    #define ROTATOR_WRITE_DELAY 300
   #endif
 #endif
 

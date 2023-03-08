@@ -43,7 +43,7 @@
   #elif NV_ENDURANCE == NVE_HIGH
     #define FOCUSER_WRITE_DELAY 60
   #else
-    #define FOCUSER_WRITE_DELAY 180
+    #define FOCUSER_WRITE_DELAY 300
   #endif
 #endif
 
