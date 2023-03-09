@@ -136,8 +136,8 @@ bool ServoMotor::init() {
   // start the motion timer
   V(axisPrefix);
   VF("start task to track motion... ");
-  char timerName[] = "Target_";
-  timerName[6] = '0' + axisNumber;
+  char timerName[] = "Servo_";
+  timerName[5] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     V("success");
