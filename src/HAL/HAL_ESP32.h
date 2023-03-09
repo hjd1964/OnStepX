@@ -56,7 +56,7 @@
 #endif
 
 #if SERIAL_BT_MODE != OFF && SERIAL_IP_MODE != OFF
-  #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
+  #warning "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE might not work if enabled at the same time, disable one or both options as needed."
 #endif
 
 #if !defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION < 131072 + 3 // version 2.0.3
