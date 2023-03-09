@@ -16,7 +16,7 @@
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
 
-#include "feedback/pid/Pid.h"
+#include "feedback/Pid/Pid.h"
 
 #ifndef ANALOG_WRITE_RANGE
   #define ANALOG_WRITE_RANGE 255
