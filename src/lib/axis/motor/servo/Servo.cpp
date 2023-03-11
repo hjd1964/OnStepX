@@ -287,6 +287,8 @@ void ServoMotor::poll() {
     if (!motorStepsInitDone && encoder->ready && homeSet) {
       noInterrupts();
       motorSteps = encoderCounts;
+      targetSteps = encoderCounts;
+      backlashSteps = 0;
       interrupts();
       motorStepsInitDone = true;
     }
