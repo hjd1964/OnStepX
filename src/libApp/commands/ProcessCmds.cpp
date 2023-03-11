@@ -247,25 +247,25 @@ void commandChannelInit() {
   #endif
   #ifdef SERIAL_A
     VF("MSG: Setup, start command channel A task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsA, "PrcCmdA");
+    handle = tasks.add(0, 0, true, 5, processCmdsA, "CmdA");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_B
     VF("MSG: Setup, start command channel B task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsB, "PrcCmdB");
+    handle = tasks.add(0, 0, true, 5, processCmdsB, "CmdB");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_C
     VF("MSG: Setup, start command channel C task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsC, "PrcCmdC");
+    handle = tasks.add(0, 0, true, 5, processCmdsC, "CmdC");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_D
     VF("MSG: Setup, start command channel D task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsD, "PrcCmdD");
+    handle = tasks.add(0, 0, true, 5, processCmdsD, "CmdD");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
