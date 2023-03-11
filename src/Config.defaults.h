@@ -185,6 +185,9 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
+#ifndef AXIS1_SYNC_THRESHOLD
+#define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in counts (required for absolute encoders) or OFF
+#endif
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
 #endif
@@ -263,9 +266,6 @@
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
-  #ifndef AXIS1_SERVO_SYNC_THRESHOLD
-  #define AXIS1_SERVO_SYNC_THRESHOLD    OFF                       // sync threshold in counts (for absolute encoders) or OFF
-  #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
   #endif
@@ -339,6 +339,9 @@
 #endif
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
+#endif
+#ifndef AXIS2_SYNC_THRESHOLD
+#define AXIS2_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
@@ -417,9 +420,6 @@
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS2_SERVO_SYNC_THRESHOLD
-  #define AXIS2_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
@@ -771,6 +771,9 @@
 #ifndef AXIS3_LIMIT_MAX
 #define AXIS3_LIMIT_MAX               180                         // in degrees
 #endif
+#ifndef AXIS3_SYNC_THRESHOLD
+#define AXIS3_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS3_SENSE_HOME
 #define AXIS3_SENSE_HOME              OFF
 #endif
@@ -848,9 +851,6 @@
   #endif
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS3_SERVO_SYNC_THRESHOLD
-  #define AXIS3_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS3_SERVO_P
   #define AXIS3_SERVO_P                 2.0
@@ -953,6 +953,9 @@
 #ifndef AXIS4_LIMIT_MAX
 #define AXIS4_LIMIT_MAX               50                          // in mm
 #endif
+#ifndef AXIS4_SYNC_THRESHOLD
+#define AXIS4_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
 #endif
@@ -1030,9 +1033,6 @@
   #endif
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS4_SERVO_SYNC_THRESHOLD
-  #define AXIS4_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
@@ -1112,6 +1112,9 @@
 #ifndef AXIS5_LIMIT_MAX
 #define AXIS5_LIMIT_MAX               50
 #endif
+#ifndef AXIS5_SYNC_THRESHOLD
+#define AXIS5_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
 #endif
@@ -1187,9 +1190,6 @@
   #endif
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS5_SERVO_SYNC_THRESHOLD
-  #define AXIS5_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS5_SERVO_P
   #define AXIS5_SERVO_P                 2.0
@@ -1269,6 +1269,9 @@
 #ifndef AXIS6_LIMIT_MAX
 #define AXIS6_LIMIT_MAX               50
 #endif
+#ifndef AXIS6_SYNC_THRESHOLD
+#define AXIS6_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
 #endif
@@ -1344,9 +1347,6 @@
   #endif
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS6_SERVO_SYNC_THRESHOLD
-  #define AXIS6_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS6_SERVO_P
   #define AXIS6_SERVO_P                 2.0
@@ -1426,6 +1426,9 @@
 #ifndef AXIS7_LIMIT_MAX
 #define AXIS7_LIMIT_MAX               50
 #endif
+#ifndef AXIS7_SYNC_THRESHOLD
+#define AXIS7_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
 #endif
@@ -1501,9 +1504,6 @@
   #endif
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS7_SERVO_SYNC_THRESHOLD
-  #define AXIS7_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS7_SERVO_P
   #define AXIS7_SERVO_P                 2.0
@@ -1583,6 +1583,9 @@
 #ifndef AXIS8_LIMIT_MAX
 #define AXIS8_LIMIT_MAX               50
 #endif
+#ifndef AXIS8_SYNC_THRESHOLD
+#define AXIS8_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
 #endif
@@ -1658,9 +1661,6 @@
   #endif
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS8_SERVO_SYNC_THRESHOLD
-  #define AXIS8_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS8_SERVO_P
   #define AXIS8_SERVO_P                 2.0
@@ -1740,6 +1740,9 @@
 #ifndef AXIS9_LIMIT_MAX
 #define AXIS9_LIMIT_MAX               50
 #endif
+#ifndef AXIS9_SYNC_THRESHOLD
+#define AXIS9_SYNC_THRESHOLD          OFF
+#endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
 #endif
@@ -1815,9 +1818,6 @@
   #endif
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
-  #endif
-  #ifndef AXIS9_SERVO_SYNC_THRESHOLD
-  #define AXIS9_SERVO_SYNC_THRESHOLD    OFF
   #endif
   #ifndef AXIS9_SERVO_P
   #define AXIS9_SERVO_P                 2.0
