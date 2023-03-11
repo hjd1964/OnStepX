@@ -207,9 +207,14 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
 
   if (syncThreshold == OFF || atHome) {
     indexSteps = i;
+    originIndexSteps = i;
     if (atHome) homeSet = true;
   } else {
-    V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
+    if (abs(originIndexSteps - i) < syncThreshold) {
+      indexSteps = i;
+    } else {
+      V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
+    }
   }
 }
 
