@@ -110,7 +110,7 @@ CommandProcessor::~CommandProcessor() {
 
 void CommandProcessor::poll() {
   if (!serialReady) { delay(200); SerialPort.begin(serialBaud); serialReady = true; }
-  if (SerialPort.available()) buffer.add(SerialPort.read()); else return;
+  while (SerialPort.available()) { char c = SerialPort.read(); buffer.add(c); if (c == '#') break; }
 
   if (buffer.ready()) {
     char reply[80] = "";
@@ -241,9 +241,9 @@ void commandChannelInit() {
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   uint8_t handle;
   #ifdef HAL_SLOW_PROCESSOR
-    long comPollRate = 2000;
+    long comPollRate = 5000;
   #else
-    long comPollRate = 500;
+    long comPollRate = 2500;
   #endif
   #ifdef SERIAL_A
     VF("MSG: Setup, start command channel A task (priority 5)... ");
