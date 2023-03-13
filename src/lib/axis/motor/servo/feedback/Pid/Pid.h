@@ -6,7 +6,7 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#include <PID_v1.h>  // https://github.com/hjd1964/Arduino-PID-Library
+#include <QuickPID.h>  // https://github.com/Dlloydev/QuickPID or https://github.com/hjd1964/QuickPID (fix compile fail on ESP32)
 
 class Pid : public Feedback {
   public:
@@ -21,21 +21,26 @@ class Pid : public Feedback {
     // get driver type code so clients understand the use of the six parameters
     char getParameterTypeCode() { return 'P'; }
 
-    // select PID param set for tracking or slewing
-    void selectAlternateParameters(bool alternate);
+    // set feedback control direction
+    void setControlDirection(int8_t state);
+
+    // select PID param set for tracking
+    void selectTrackingParameters();
+
+    // select PID param set for slewing
+    void selectSlewingParameters();
 
     // variable feedback, variable PID params
     void variableParameters(float percent);
 
-    // set feedback control direction
-    void setControlDirection(int8_t state);
-
     inline void poll() { pid->Compute(); }
 
   private:
-    PID *pid;
+    QuickPID *pid;
 
     float p, i, d, c;
+
+    unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
 
     char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
 };

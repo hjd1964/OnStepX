@@ -115,9 +115,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     } else
 
     // :FT#       Get status
-    //            Returns: M# (for moving) or S# (for stopped)
+    //            Returns: s#
     if (command[1] == 'T') {
-      if (axes[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");
+      if (axes[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");     // [M] for moving or [S] for stopped
+      char temp[2] = "0"; temp[0] = '0' + getGotoRate(index); strcat(reply, temp); // [1] to [5] for 0.5x to 2x goto rate
       *numericReply = false;
     } else
 
@@ -242,25 +243,37 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :F[n]#     Set focuser move rate, where n = 1 for 1um/sec, 2 for 10um/sec, 3 for 250um/sec, 4 for 5mm/second
+    // :F[n]#     Set focuser move or goto rate
+    //            move rate where n = 1 for 1um/sec, 2 for 10um/sec, 3 for 100um/sec, 4 for 0.5x goto rate
+    //            goto rate where n = 5 for 0.5x, 6 for 0.66x, 7 for 1x, 8 for 1.5x, 9 for 2x AXISn_SLEW_RATE_BASE_DESIRED
     //            Returns: Nothing
-    if (command[1] >= '1' && command[1] <= '4') {
-      int p[] = {1, 10, 250, 5000};
-      if (strlen(parameter) == 0) moveRate[index] = p[command[1] - '1']; else *commandError = CE_PARAM_FORM;
+    if (command[1] >= '1' && command[1] <= '9') {
+      if (strlen(parameter) == 0) {
+        int v = command[1] - '0';
+        if (v < 5) setMoveRate(index, v); else setGotoRate(index, v - 4);
+      } else *commandError = CE_PARAM_FORM;
+      *numericReply = false;
+    } else
+
+    // :FW#       Get focuser working slew rate
+    //            goto rate in um/s
+    //            Returns: n#
+    if (command[1] == 'W') {
+      sprintf(reply, "%d", settings[index].gotoRate);
       *numericReply = false;
     } else
 
     // :F+#       Move focuser in (toward objective)
     //            Returns: Nothing
     if (command[1] == '+') {
-      *commandError = slew(index, DIR_FORWARD);
+      *commandError = move(index, DIR_FORWARD);
       *numericReply = false;
     } else
 
     // :F-#       Move focuser out (away from objective)
     //            Returns: Nothing
     if (command[1] == '-') {
-      *commandError = slew(index, DIR_REVERSE);
+      *commandError = move(index, DIR_REVERSE);
       *numericReply = false;
     } else
 
@@ -271,14 +284,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :FR[sn]#   Move focuser target position relative (in microns or steps)
+    // :FR[sn]#   Goto focuser target position relative (in microns or steps)
     //            Returns: Nothing
     if (toupper(command[1]) == 'R') {
       if (strlen(parameter) > 0) *commandError = gotoTarget(index, target[index] + atol(parameter)*UnitsToSteps); else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
 
-    // :FS[n]#    Move focuser to Set target position (in microns or steps)
+    // :FS[n]#    Goto focuser target position (in microns or steps)
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'S') {

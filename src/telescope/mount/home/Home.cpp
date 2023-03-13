@@ -128,8 +128,20 @@ CommandError Home::reset(bool fullReset) {
     axis1.setInstrumentCoordinate(position.h);
     axis2.setInstrumentCoordinate(position.d);
   }
-  position.a1 = axis1.getInstrumentCoordinate();
-  position.a2 = axis2.getInstrumentCoordinate();
+
+  // don't bother adjusting to actual step based coordinates if there are absolute encoders
+  if (AXIS1_SYNC_THRESHOLD == OFF) {
+    position.a1 = axis1.getInstrumentCoordinate();
+    position.a2 = axis2.getInstrumentCoordinate();
+  } else {
+    if (transform.mountType == ALTAZM) {
+      position.a1 = position.z;
+      position.a2 = position.a;
+    } else {
+      position.a1 = position.h;
+      position.a2 = position.d;
+    }
+  }
 
   axis1.setBacklash(mount.settings.backlash.axis1);
   axis2.setBacklash(mount.settings.backlash.axis2);

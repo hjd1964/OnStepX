@@ -20,7 +20,7 @@ IRAM_ATTR void axisWrapper8() { axisWrapper[7]->poll(); }
 IRAM_ATTR void axisWrapper9() { axisWrapper[8]->poll(); }
 
 // constructor
-Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure) {
+Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure, float targetTolerance) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
 
@@ -49,7 +49,9 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
     case AXIS_MEASURE_MICRONS: strcpy(unitsStr, "um"); unitsRadians = false; break;
     case AXIS_MEASURE_DEGREES: strcpy(unitsStr, " deg"); unitsRadians = false; break;
     case AXIS_MEASURE_RADIANS: strcpy(unitsStr, " deg"); unitsRadians = true;  break;
-  } 
+  }
+
+  this->targetTolerance = targetTolerance;
 }
 
 // sets up the driver step/dir/enable pins and any associated driver mode control
@@ -124,6 +126,7 @@ bool Axis::init(Motor *motor) {
 }
 
 // enables or disables the associated step/dir driver
+// also calibrates the driver if this is the first time its been enabled
 void Axis::enable(bool state) {
   enabled = state;
   motor->enable(enabled & !poweredDown);
@@ -256,7 +259,7 @@ double Axis::getTargetCoordinate() {
 
 // returns true if at target
 bool Axis::atTarget() {
-  return labs(motor->getTargetDistanceSteps()) == 0;
+  return labs(motor->getTargetDistanceSteps()) <= targetTolerance*settings.stepsPerMeasure;
 }
 
 // returns true if within one second of the target at the backlash takeup rate
@@ -599,7 +602,7 @@ void Axis::setFrequencySlew(float frequency) {
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
 void Axis::setFrequency(float frequency) {
-  if (powerDownStandstill && frequency == 0.0F) {
+  if (powerDownStandstill && frequency == 0.0F && baseFreq == 0.0F) {
     if (!poweredDown) {
       if (!powerDownOverride || (long)(millis() - powerDownOverrideEnds) > 0) {
         powerDownOverride = false;

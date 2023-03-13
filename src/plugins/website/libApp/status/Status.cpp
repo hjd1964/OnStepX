@@ -5,7 +5,6 @@
 #include "../../Constants.h"
 #include "../../Config.h"
 #include "../../../../lib/debug/Debug.h"
-#include "../../../../lib/tasks/OnTask.h"
 
 #include "../../locales/Locale.h"
 #include "../cmd/Cmd.h"
@@ -24,11 +23,11 @@ bool Status::update(bool all)
     if (!onStep.command(":GVP#", result) || result[0] == 0 || !strstr(result, "On-Step")) {
       onStepFound = false;
       return false;
-    } Y;
+    } delay(0);
     if (!onStep.command(":GVN#", result) || result[0] == 0 ) {
       onStepFound = false;
       return false;
-    } Y;
+    } delay(0);
     strcpy(id, "OnStep");
     strcpy(ver, result);
     if (strlen(result) > 0) {
@@ -60,7 +59,7 @@ bool Status::update(bool all)
 
     if (mountFound == SD_TRUE) {
       if (onStep.command(":GU#", result)) {
-        Y;
+        delay(0);
         tracking = false;
         inGoto = false;
         if (!strstr(result, "N")) inGoto = true; else tracking = !strstr(result, "n");
@@ -115,7 +114,7 @@ bool Status::update(bool all)
 
         // get meridian status
         if (onStep.command(":GX94#", result) && result[0] != 0) {
-          Y;
+          delay(0);
           meridianFlips = !strstr(result, "N");
           pierSide = strtol(&result[0], NULL, 10);
 
@@ -132,12 +131,12 @@ bool Status::update(bool all)
             aligning = false;
             onStepFound = false;
           }
-          Y;
+          delay(0);
         } else onStepFound = false;
       } else onStepFound = false;
     } else {
       if (!onStep.command(":GVP#", result) || result[0] == 0 || !strstr(result, "On-Step")) onStepFound = false;
-      Y;
+      delay(0);
     }
   }
 
@@ -147,7 +146,7 @@ bool Status::update(bool all)
 void Status::mountScan() {
   if (mountFound == SD_UNKNOWN) {
     char result[80] = "";
-    if (!onStep.command(":GU#", result) || result[0] == 0) mountFound = SD_FALSE; else mountFound = SD_TRUE; Y;
+    if (!onStep.command(":GU#", result) || result[0] == 0) mountFound = SD_FALSE; else mountFound = SD_TRUE; delay(0);
   }
 }
 
@@ -156,15 +155,15 @@ void Status::focuserScan() {
     focuserFound = SD_FALSE;
     focuserCount = 0;
     if (getVersionMajor() >= 10) {
-      if (onStep.commandBool(":F1a#")) { focuserPresent[0] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":F2a#")) { focuserPresent[1] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":F3a#")) { focuserPresent[2] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":F4a#")) { focuserPresent[3] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":F5a#")) { focuserPresent[4] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":F6a#")) { focuserPresent[5] = true; focuserCount++; } Y;
+      if (onStep.commandBool(":F1a#")) { focuserPresent[0] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":F2a#")) { focuserPresent[1] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":F3a#")) { focuserPresent[2] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":F4a#")) { focuserPresent[3] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":F5a#")) { focuserPresent[4] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":F6a#")) { focuserPresent[5] = true; focuserCount++; } delay(0);
     } else {
-      if (onStep.commandBool(":FA#")) { focuserPresent[0] = true; focuserCount++; } Y;
-      if (onStep.commandBool(":fA#")) { focuserPresent[1] = true; focuserCount++; } Y;
+      if (onStep.commandBool(":FA#")) { focuserPresent[0] = true; focuserCount++; } delay(0);
+      if (onStep.commandBool(":fA#")) { focuserPresent[1] = true; focuserCount++; } delay(0);
     }
     if (focuserCount > 0) focuserFound = SD_TRUE;
   }
@@ -178,7 +177,7 @@ void Status::rotatorScan() {
     if (onStep.command(":GX98#", temp)) {
       if (temp[0] == 'R') { rotatorFound = SD_TRUE; derotatorFound = false; }
       if (temp[0] == 'D') { rotatorFound = SD_TRUE; derotatorFound = true; }
-    } Y;
+    } delay(0);
   }
 }
 
@@ -188,11 +187,11 @@ bool Status::auxiliaryScan() {
 
   if (auxiliaryFound == SD_UNKNOWN) {
     // check which feature #'s are present
-    if (!onStep.command(":GXY0#", present) || present[0] == 0 || strlen(present) != 8) valid = false; else valid = true; Y;
+    if (!onStep.command(":GXY0#", present) || present[0] == 0 || strlen(present) != 8) valid = false; else valid = true; delay(0);
 
     // try to get the AF presense twice before giving up
     if (!valid) {
-      if (!onStep.command(":GXY0#", present) || present[0] == 0 || strlen(present) != 8) valid = false; else valid = true; Y;
+      if (!onStep.command(":GXY0#", present) || present[0] == 0 || strlen(present) != 8) valid = false; else valid = true; delay(0);
       if (!valid) { for (uint8_t j = 0; j < 8; j++) feature[j].purpose = 0; auxiliaryFound = SD_FALSE; return false; }
     }
 
@@ -203,7 +202,7 @@ bool Status::auxiliaryScan() {
       if (present[i] == '0') continue;
 
       sprintf(cmd, ":GXY%d#", i+1);
-      if (!onStep.command(cmd, out) || out[0] == 0) valid = false; Y;
+      if (!onStep.command(cmd, out) || out[0] == 0) valid = false; delay(0);
       if (!valid) { for (uint8_t j = 0; j < 8; j++) feature[j].purpose = 0; auxiliaryFound = SD_FALSE; return false; }
 
       if (strlen(out) > 1) {

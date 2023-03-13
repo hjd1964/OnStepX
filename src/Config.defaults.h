@@ -185,6 +185,9 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
+#ifndef AXIS1_SYNC_THRESHOLD
+#define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in counts (required for absolute encoders) or OFF
+#endif
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
 #endif
@@ -263,9 +266,6 @@
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
-  #ifndef AXIS1_SERVO_SYNC_THRESHOLD
-  #define AXIS1_SERVO_SYNC_THRESHOLD    OFF                       // sync threshold in counts or OFF (for absolute encoders)
-  #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional
   #endif
@@ -286,6 +286,12 @@
   #endif
   #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
+  #endif
+  #ifndef AXIS1_ENCODER_ORIGIN
+  #define AXIS1_ENCODER_ORIGIN          0                         // +/- offset so encoder count is 0 at home (for absolute encoders)
+  #endif
+  #ifndef AXIS1_ENCODER_REVERSE
+  #define AXIS1_ENCODER_REVERSE         OFF                       // reverse count direction of encoder
   #endif
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
@@ -333,6 +339,9 @@
 #endif
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
+#endif
+#ifndef AXIS2_SYNC_THRESHOLD
+#define AXIS2_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
@@ -412,9 +421,6 @@
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS2_SERVO_SYNC_THRESHOLD
-  #define AXIS2_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS2_SERVO_P
   #define AXIS2_SERVO_P                 2.0
   #endif
@@ -435,6 +441,12 @@
   #endif
   #ifndef AXIS2_ENCODER
   #define AXIS2_ENCODER                 AB
+  #endif
+  #ifndef AXIS2_ENCODER_ORIGIN
+  #define AXIS2_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS2_ENCODER_REVERSE
+  #define AXIS2_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          FB_PID
@@ -496,6 +508,15 @@
 #endif
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
+#endif
+#ifndef MOUNT_ENABLE_AT_STARTUP
+#define MOUNT_ENABLE_AT_STARTUP       OFF                         // ON Enables mount motor drivers at startup.
+#endif
+#ifndef AXIS1_TARGET_TOLERANCE
+#define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
+#endif
+#ifndef AXIS2_TARGET_TOLERANCE
+#define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF
@@ -710,6 +731,8 @@
 #define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
 #endif
 
+#define HIGH_SPEED_ALIGN
+
 // -----------------------------------------------------------------------------------
 // rotator settings, ROTATOR
 #ifndef AXIS3_DRIVER_MODEL
@@ -730,8 +753,8 @@
 #ifndef AXIS3_ENABLE_STATE
 #define AXIS3_ENABLE_STATE            LOW                         // stepper enable state
 #endif
-#ifndef AXIS3_SLEW_RATE_DESIRED
-#define AXIS3_SLEW_RATE_DESIRED       3.0                         // in degrees/sec
+#ifndef AXIS3_SLEW_RATE_BASE_DESIRED
+#define AXIS3_SLEW_RATE_BASE_DESIRED  3.0                         // in degrees/sec
 #endif
 #ifndef AXIS3_ACCELERATION_TIME
 #define AXIS3_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
@@ -740,13 +763,16 @@
 #define AXIS3_RAPID_STOP_TIME         1.0                         // in seconds, to stop
 #endif
 #ifndef AXIS3_BACKLASH_RATE
-#define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_DESIRED/4) // in degrees/sec
+#define AXIS3_BACKLASH_RATE           (AXIS3_SLEW_RATE_BASE_DESIRED/4) // in degrees/sec
 #endif
 #ifndef AXIS3_LIMIT_MIN
 #define AXIS3_LIMIT_MIN               -180                        // in degrees
 #endif
 #ifndef AXIS3_LIMIT_MAX
 #define AXIS3_LIMIT_MAX               180                         // in degrees
+#endif
+#ifndef AXIS3_SYNC_THRESHOLD
+#define AXIS3_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS3_SENSE_HOME
 #define AXIS3_SENSE_HOME              OFF
@@ -826,9 +852,6 @@
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS3_SERVO_SYNC_THRESHOLD
-  #define AXIS3_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS3_SERVO_P
   #define AXIS3_SERVO_P                 2.0
   #endif
@@ -849,6 +872,12 @@
   #endif
   #ifndef AXIS3_ENCODER
   #define AXIS3_ENCODER                 AB
+  #endif
+  #ifndef AXIS3_ENCODER_ORIGIN
+  #define AXIS3_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS3_ENCODER_REVERSE
+  #define AXIS3_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS3_SERVO_FEEDBACK
   #define AXIS3_SERVO_FEEDBACK          FB_PID
@@ -906,8 +935,8 @@
 #ifndef AXIS4_SLEW_RATE_MINIMUM
 #define AXIS4_SLEW_RATE_MINIMUM       20                          // in microns/sec
 #endif
-#ifndef AXIS4_SLEW_RATE_DESIRED
-#define AXIS4_SLEW_RATE_DESIRED       500                         // in microns/sec
+#ifndef AXIS4_SLEW_RATE_BASE_DESIRED
+#define AXIS4_SLEW_RATE_BASE_DESIRED  500                         // in microns/sec
 #endif
 #ifndef AXIS4_ACCELERATION_TIME
 #define AXIS4_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
@@ -916,13 +945,16 @@
 #define AXIS4_RAPID_STOP_TIME         1.0                         // in seconds, to stop
 #endif
 #ifndef AXIS4_BACKLASH_RATE
-#define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_DESIRED/4) // in microns/sec
+#define AXIS4_BACKLASH_RATE           (AXIS4_SLEW_RATE_BASE_DESIRED/4) // in microns/sec
 #endif
 #ifndef AXIS4_LIMIT_MIN
 #define AXIS4_LIMIT_MIN               0                           // in mm
 #endif
 #ifndef AXIS4_LIMIT_MAX
 #define AXIS4_LIMIT_MAX               50                          // in mm
+#endif
+#ifndef AXIS4_SYNC_THRESHOLD
+#define AXIS4_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
@@ -1002,9 +1034,6 @@
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS4_SERVO_SYNC_THRESHOLD
-  #define AXIS4_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS4_SERVO_P
   #define AXIS4_SERVO_P                 2.0
   #endif
@@ -1025,6 +1054,12 @@
   #endif
   #ifndef AXIS4_ENCODER
   #define AXIS4_ENCODER                 AB
+  #endif
+  #ifndef AXIS4_ENCODER_ORIGIN
+  #define AXIS4_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS4_ENCODER_REVERSE
+  #define AXIS4_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS4_SERVO_FEEDBACK
   #define AXIS4_SERVO_FEEDBACK          FB_PID
@@ -1059,8 +1094,8 @@
 #ifndef AXIS5_SLEW_RATE_MINIMUM
 #define AXIS5_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS5_SLEW_RATE_DESIRED
-#define AXIS5_SLEW_RATE_DESIRED       500
+#ifndef AXIS5_SLEW_RATE_BASE_DESIRED
+#define AXIS5_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS5_ACCELERATION_TIME
 #define AXIS5_ACCELERATION_TIME       2.0
@@ -1069,13 +1104,16 @@
 #define AXIS5_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS5_BACKLASH_RATE
-#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_DESIRED/4)
+#define AXIS5_BACKLASH_RATE           (AXIS5_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS5_LIMIT_MIN
 #define AXIS5_LIMIT_MIN               0
 #endif
 #ifndef AXIS5_LIMIT_MAX
 #define AXIS5_LIMIT_MAX               50
+#endif
+#ifndef AXIS5_SYNC_THRESHOLD
+#define AXIS5_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
@@ -1153,9 +1191,6 @@
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS5_SERVO_SYNC_THRESHOLD
-  #define AXIS5_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS5_SERVO_P
   #define AXIS5_SERVO_P                 2.0
   #endif
@@ -1176,6 +1211,12 @@
   #endif
   #ifndef AXIS5_ENCODER
   #define AXIS5_ENCODER                 AB
+  #endif
+  #ifndef AXIS5_ENCODER_ORIGIN
+  #define AXIS5_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS5_ENCODER_REVERSE
+  #define AXIS5_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          FB_PID
@@ -1210,8 +1251,8 @@
 #ifndef AXIS6_SLEW_RATE_MINIMUM
 #define AXIS6_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS6_SLEW_RATE_DESIRED
-#define AXIS6_SLEW_RATE_DESIRED       500
+#ifndef AXIS6_SLEW_RATE_BASE_DESIRED
+#define AXIS6_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS6_ACCELERATION_TIME
 #define AXIS6_ACCELERATION_TIME       2.0
@@ -1220,13 +1261,16 @@
 #define AXIS6_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS6_BACKLASH_RATE
-#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_DESIRED/4)
+#define AXIS6_BACKLASH_RATE           (AXIS6_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS6_LIMIT_MIN
 #define AXIS6_LIMIT_MIN               0
 #endif
 #ifndef AXIS6_LIMIT_MAX
 #define AXIS6_LIMIT_MAX               50
+#endif
+#ifndef AXIS6_SYNC_THRESHOLD
+#define AXIS6_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
@@ -1304,9 +1348,6 @@
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS6_SERVO_SYNC_THRESHOLD
-  #define AXIS6_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS6_SERVO_P
   #define AXIS6_SERVO_P                 2.0
   #endif
@@ -1327,6 +1368,12 @@
   #endif
   #ifndef AXIS6_ENCODER
   #define AXIS6_ENCODER                 AB
+  #endif
+  #ifndef AXIS6_ENCODER_ORIGIN
+  #define AXIS6_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS6_ENCODER_REVERSE
+  #define AXIS6_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS6_SERVO_FEEDBACK
   #define AXIS6_SERVO_FEEDBACK          FB_PID
@@ -1361,8 +1408,8 @@
 #ifndef AXIS7_SLEW_RATE_MINIMUM
 #define AXIS7_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS7_SLEW_RATE_DESIRED
-#define AXIS7_SLEW_RATE_DESIRED       500
+#ifndef AXIS7_SLEW_RATE_BASE_DESIRED
+#define AXIS7_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS7_ACCELERATION_TIME
 #define AXIS7_ACCELERATION_TIME       2.0
@@ -1371,13 +1418,16 @@
 #define AXIS7_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS7_BACKLASH_RATE
-#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_DESIRED/4)
+#define AXIS7_BACKLASH_RATE           (AXIS7_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS7_LIMIT_MIN
 #define AXIS7_LIMIT_MIN               0
 #endif
 #ifndef AXIS7_LIMIT_MAX
 #define AXIS7_LIMIT_MAX               50
+#endif
+#ifndef AXIS7_SYNC_THRESHOLD
+#define AXIS7_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
@@ -1455,9 +1505,6 @@
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS7_SERVO_SYNC_THRESHOLD
-  #define AXIS7_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS7_SERVO_P
   #define AXIS7_SERVO_P                 2.0
   #endif
@@ -1478,6 +1525,12 @@
   #endif
   #ifndef AXIS7_ENCODER
   #define AXIS7_ENCODER                 AB
+  #endif
+  #ifndef AXIS7_ENCODER_ORIGIN
+  #define AXIS7_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS7_ENCODER_REVERSE
+  #define AXIS7_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          FB_PID
@@ -1512,8 +1565,8 @@
 #ifndef AXIS8_SLEW_RATE_MINIMUM
 #define AXIS8_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS8_SLEW_RATE_DESIRED
-#define AXIS8_SLEW_RATE_DESIRED       500
+#ifndef AXIS8_SLEW_RATE_BASE_DESIRED
+#define AXIS8_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS8_ACCELERATION_TIME
 #define AXIS8_ACCELERATION_TIME       2.0
@@ -1522,13 +1575,16 @@
 #define AXIS8_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS8_BACKLASH_RATE
-#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_DESIRED/4)
+#define AXIS8_BACKLASH_RATE           (AXIS8_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS8_LIMIT_MIN
 #define AXIS8_LIMIT_MIN               0
 #endif
 #ifndef AXIS8_LIMIT_MAX
 #define AXIS8_LIMIT_MAX               50
+#endif
+#ifndef AXIS8_SYNC_THRESHOLD
+#define AXIS8_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
@@ -1606,9 +1662,6 @@
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS8_SERVO_SYNC_THRESHOLD
-  #define AXIS8_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS8_SERVO_P
   #define AXIS8_SERVO_P                 2.0
   #endif
@@ -1629,6 +1682,12 @@
   #endif
   #ifndef AXIS8_ENCODER
   #define AXIS8_ENCODER                 AB
+  #endif
+  #ifndef AXIS8_ENCODER_ORIGIN
+  #define AXIS8_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS8_ENCODER_REVERSE
+  #define AXIS8_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS8_SERVO_FEEDBACK
   #define AXIS8_SERVO_FEEDBACK          FB_PID
@@ -1663,8 +1722,8 @@
 #ifndef AXIS9_SLEW_RATE_MINIMUM
 #define AXIS9_SLEW_RATE_MINIMUM       20
 #endif
-#ifndef AXIS9_SLEW_RATE_DESIRED
-#define AXIS9_SLEW_RATE_DESIRED       500
+#ifndef AXIS9_SLEW_RATE_BASE_DESIRED
+#define AXIS9_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS9_ACCELERATION_TIME
 #define AXIS9_ACCELERATION_TIME       2.0
@@ -1673,13 +1732,16 @@
 #define AXIS9_RAPID_STOP_TIME         1.0
 #endif
 #ifndef AXIS9_BACKLASH_RATE
-#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_DESIRED/4)
+#define AXIS9_BACKLASH_RATE           (AXIS9_SLEW_RATE_BASE_DESIRED/4)
 #endif
 #ifndef AXIS9_LIMIT_MIN
 #define AXIS9_LIMIT_MIN               0
 #endif
 #ifndef AXIS9_LIMIT_MAX
 #define AXIS9_LIMIT_MAX               50
+#endif
+#ifndef AXIS9_SYNC_THRESHOLD
+#define AXIS9_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
@@ -1757,9 +1819,6 @@
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS9_SERVO_SYNC_THRESHOLD
-  #define AXIS9_SERVO_SYNC_THRESHOLD    OFF
-  #endif
   #ifndef AXIS9_SERVO_P
   #define AXIS9_SERVO_P                 2.0
   #endif
@@ -1780,6 +1839,12 @@
   #endif
   #ifndef AXIS9_ENCODER
   #define AXIS9_ENCODER                 AB
+  #endif
+  #ifndef AXIS9_ENCODER_ORIGIN
+  #define AXIS9_ENCODER_ORIGIN          0
+  #endif
+  #ifndef AXIS9_ENCODER_REVERSE
+  #define AXIS9_ENCODER_REVERSE         OFF
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          FB_PID

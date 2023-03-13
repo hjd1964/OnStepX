@@ -24,3 +24,14 @@ const char html_rotateCcw[] PROGMEM =
 const char html_rotateCw[] PROGMEM =
   "<button class='bbh' style='width: 2em' onpointerdown=\"s('rot','cw')\" onpointerup=\"s('rot','stop')\" type='button'>" ARROW_R "</button>"
   "<button class='bbh' style='height: 2.1em' onpointerdown=\"s('rot','cwf')\" onpointerup=\"s('rot','stop')\" type='button'>" ARROW_RR "</button><br />";
+
+const char html_rotateSlewSpeed[] PROGMEM =
+  L_MAX_SLEW_SPEED " <span id='rot_rate' class='c'>%s</span>:<br />";
+
+const char html_rotateGotoSelect[] PROGMEM =
+  "<button id='rot_rate_vf' class='btns_right' onpointerdown=\"s('rot','vf')\" type='button'>" L_VFAST "</button>"
+  "<button id='rot_rate_f' class='btns_mid' onpointerdown=\"s('rot','f')\"  type='button'>" L_FAST "</button>"
+  "<button id='rot_rate_n' class='btns_mid' onpointerdown=\"s('rot','n')\"  type='button'>" L_NORMAL "</button>"
+  "<button id='rot_rate_s' class='btns_mid' onpointerdown=\"s('rot','s')\"  type='button'>" L_SLOW "</button>"
+  "<button id='rot_rate_vs' class='btns_left' onpointerdown=\"s('rot','vs')\" type='button'>" L_VSLOW "</button>"
+  "<br /><br />\n";

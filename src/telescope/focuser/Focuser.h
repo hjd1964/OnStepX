@@ -55,12 +55,13 @@ typedef struct Tcf {
   float t0;         // in °C, temperature when first enabled
 } Tcf;
 
-#define FocuserSettingsSize 18
+#define FocuserSettingsSize 20
 typedef struct FocuserSettings {
   Tcf tcf;
   ParkState parkState;
   int16_t backlash;  // in steps
   float position;    // in microns
+  int16_t gotoRate;  // in microns/s
 } FocuserSettings;
 #pragma pack()
 
@@ -85,7 +86,7 @@ class Focuser {
     float getTemperature();
 
     // check for DC motor focuser
-    bool  isDC(int index);
+    bool isDC(int index);
 
     // get DC power in %
     int getDcPower(int index);
@@ -94,7 +95,7 @@ class Focuser {
     bool setDcPower(int index, int value);
 
     // get TCF enable
-    bool  getTcfEnable(int index);
+    bool getTcfEnable(int index);
 
     // set TCF enable
     CommandError setTcfEnable(int index, bool value);
@@ -103,28 +104,37 @@ class Focuser {
     float getTcfCoef(int index);
 
     // set TCF coefficient, in microns per deg. C
-    bool  setTcfCoef(int index, float value);
+    bool setTcfCoef(int index, float value);
 
     // get TCF deadband, in steps
-    int   getTcfDeadband(int index);
+    int getTcfDeadband(int index);
 
     // set TCF deadband, in steps
-    bool  setTcfDeadband(int index, int value);
+    bool setTcfDeadband(int index, int value);
 
     // get TCF T0, in deg. C
     float getTcfT0(int index);
 
     // set TCF T0, in deg. C
-    bool  setTcfT0(int index, float value);
+    bool setTcfT0(int index, float value);
 
     // get backlash in microns
-    int  getBacklash(int index);
+    int getBacklash(int index);
 
     // set backlash in microns
     CommandError setBacklash(int index, int value);
 
-    // start slew in the specified direction
-    CommandError slew(int index, Direction dir);
+    // set move rate
+    void setMoveRate(int index, int value);
+
+    // start move in the specified direction
+    CommandError move(int index, Direction dir);
+
+    // get goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
+    int getGotoRate(int index);
+
+    // set goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
+    void setGotoRate(int index, int value);
 
     // move focuser to a specific location (in steps)
     CommandError gotoTarget(int index, long target);

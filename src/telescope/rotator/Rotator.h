@@ -23,11 +23,12 @@
 #endif
 
 #pragma pack(1)
-#define RotatorSettingsSize 7
+#define RotatorSettingsSize 11
 typedef struct RotatorSettings {
   ParkState parkState;
   int16_t backlash;  // in steps
   float position;    // in degrees
+  float gotoRate;    // in degrees/s
 } RotatorSettings;
 #pragma pack()
 
@@ -58,8 +59,17 @@ class Rotator {
       double parallacticRate(Coordinate *coord);
     #endif
 
+    // set move rate
+    void setMoveRate(int value);
+
     // start slew in the specified direction
-    CommandError slew(Direction dir);
+    CommandError move(Direction dir);
+
+    // get goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
+    int getGotoRate();
+
+    // set goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
+    void setGotoRate(int value);
 
     // move rotator to a specific location
     CommandError gotoTarget(float target);
@@ -73,9 +83,9 @@ class Rotator {
     void readSettings();
     void writeSettings();
 
-    float slewRate = AXIS3_SLEW_RATE_DESIRED;  // in degs/sec
+    float moveRate = 0.1;  // in degs/sec
 
-    RotatorSettings settings = {PS_UNPARKED, 0, 0.0F};
+    RotatorSettings settings = {PS_UNPARKED, 0, 0.0F, AXIS3_SLEW_RATE_BASE_DESIRED};
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;

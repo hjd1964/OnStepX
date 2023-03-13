@@ -10,7 +10,7 @@ void focuserBacklashTcfTile(String &data)
 {
   char temp[240] = "";
 
-  sprintf_P(temp, html_tile_text_beg, "22em", "11em", "Backlash and TCF");
+  sprintf_P(temp, html_tile_text_beg, "22em", "13em", "Backlash and TCF");
   data.concat(temp);
 
   data.concat(F("<div style='float: right; text-align: right;' id='f_temp' class='c'>"));

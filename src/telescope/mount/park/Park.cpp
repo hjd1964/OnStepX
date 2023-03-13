@@ -220,35 +220,39 @@ CommandError Park::restore(bool withTrackingOn) {
     wormSenseSteps = settings.wormSensePositionSteps;
   #endif
 
-  // reset the mount, zero backlash
-  home.reset();
-  axis1.setBacklashSteps(0);
-  axis2.setBacklashSteps(0);
+  // don't bother unparking if there are absolute encoders since it's irrelevant
+  if (AXIS1_SYNC_THRESHOLD == OFF) {
 
-  // load the pointing model
-  #if ALIGN_MAX_NUM_STARS > 1  
-    transform.align.modelRead();
-  #endif
+    // reset the mount, zero backlash
+    home.reset();
+    axis1.setBacklashSteps(0);
+    axis2.setBacklashSteps(0);
 
-  // get the park coordinate ready
-  Coordinate parkTarget;
-  parkTarget.h = settings.position.h;
-  parkTarget.d = settings.position.d;
-  parkTarget.pierSide = settings.position.pierSide;
+    // load the pointing model
+    #if ALIGN_MAX_NUM_STARS > 1  
+      transform.align.modelRead();
+    #endif
 
-  // set the mount target
-  double a1, a2;
-  if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
-  transform.mountToInstrument(&parkTarget, &a1, &a2);
-  axis1.setInstrumentCoordinatePark(a1);
-  axis2.setInstrumentCoordinatePark(a2);
+    // get the park coordinate ready
+    Coordinate parkTarget;
+    parkTarget.h = settings.position.h;
+    parkTarget.d = settings.position.d;
+    parkTarget.pierSide = settings.position.pierSide;
 
-  VF("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
-  VF("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
+    // set the mount target
+    double a1, a2;
+    if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
+    transform.mountToInstrument(&parkTarget, &a1, &a2);
+    axis1.setInstrumentCoordinatePark(a1);
+    axis2.setInstrumentCoordinatePark(a2);
 
-  // restore backlash settings
-  axis1.setBacklash(mount.settings.backlash.axis1);
-  axis2.setBacklash(mount.settings.backlash.axis2);
+    VF("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
+    VF("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
+
+    // restore backlash settings
+    axis1.setBacklash(mount.settings.backlash.axis1);
+    axis2.setBacklash(mount.settings.backlash.axis2);
+  }
   
   state = PS_UNPARKED;
   settings.state = state;

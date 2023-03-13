@@ -11,7 +11,9 @@
 
     #if AXIS4_ENCODER == AB
       Quadrature encAxis4(AXIS4_ENCODER_A_PIN, AXIS4_ENCODER_B_PIN, 4);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS4_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis4(AXIS4_ENCODER_A_PIN, AXIS4_ENCODER_B_PIN, 4);
+    #elif AXIS4_ENCODER == CW_CCW
       CwCcw encAxis4(AXIS4_ENCODER_A_PIN, AXIS4_ENCODER_B_PIN, 4);
     #elif AXIS4_ENCODER == PULSE_DIR
       PulseDir encAxis4(AXIS4_ENCODER_A_PIN, AXIS4_ENCODER_B_PIN, 4);
@@ -37,7 +39,7 @@
       ServoTmc2209 driver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
     #endif
 
-    ServoMotor motor4(4, ((ServoDriver*)&driver4), &encAxis4, &pidAxis4, &servoControlAxis4, AXIS4_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor4(4, ((ServoDriver*)&driver4), &encAxis4, AXIS4_ENCODER_ORIGIN, AXIS4_ENCODER_REVERSE == ON, &pidAxis4, &servoControlAxis4, AXIS4_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS4_STEP_DIR_PRESENT
@@ -66,7 +68,9 @@
 
     #if AXIS5_ENCODER == AB
       Quadrature encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS5_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
+    #elif AXIS5_ENCODER == CW_CCW
       CwCcw encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
     #elif AXIS5_ENCODER == PULSE_DIR
       PulseDir encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
@@ -92,7 +96,7 @@
       ServoTmc2209 driver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
     #endif
 
-    ServoMotor motor5(5, ((ServoDriver*)&driver5), &encAxis5, &pidAxis5, &servoControlAxis5, AXIS5_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor5(5, ((ServoDriver*)&driver5), &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &pidAxis5, &servoControlAxis5, AXIS5_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS5_STEP_DIR_PRESENT
@@ -121,7 +125,9 @@
 
     #if AXIS6_ENCODER == AB
       Quadrature encAxis6(AXIS6_ENCODER_A_PIN, AXIS6_ENCODER_B_PIN, 6);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS6_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis6(AXIS6_ENCODER_A_PIN, AXIS6_ENCODER_B_PIN, 6);
+    #elif AXIS6_ENCODER == CW_CCW
       CwCcw encAxis6(AXIS6_ENCODER_A_PIN, AXIS6_ENCODER_B_PIN, 6);
     #elif AXIS6_ENCODER == PULSE_DIR
       PulseDir encAxis6(AXIS6_ENCODER_A_PIN, AXIS6_ENCODER_B_PIN, 6);
@@ -147,7 +153,7 @@
       ServoTmc2209 driver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
     #endif
 
-    ServoMotor motor6(6, ((ServoDriver*)&driver6), &encAxis6, &pidAxis6, &servoControlAxis6, AXIS6_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor6(6, ((ServoDriver*)&driver6), &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &pidAxis6, &servoControlAxis6, AXIS6_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS6_STEP_DIR_PRESENT
@@ -176,7 +182,9 @@
 
     #if AXIS7_ENCODER == AB
       Quadrature encAxis7(AXIS7_ENCODER_A_PIN, AXIS7_ENCODER_B_PIN, 7);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS7_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis7(AXIS7_ENCODER_A_PIN, AXIS7_ENCODER_B_PIN, 7);
+    #elif AXIS7_ENCODER == CW_CCW
       CwCcw encAxis7(AXIS7_ENCODER_A_PIN, AXIS7_ENCODER_B_PIN, 7);
     #elif AXIS7_ENCODER == PULSE_DIR
       PulseDir encAxis7(AXIS7_ENCODER_A_PIN, AXIS7_ENCODER_B_PIN, 7);
@@ -202,7 +210,7 @@
       ServoTmc2209 driver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
     #endif
 
-    ServoMotor motor7(7, ((ServoDriver*)&driver7), &encAxis7, &pidAxis7, &servoControlAxis7, AXIS7_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor7(7, ((ServoDriver*)&driver7), &encAxis7, AXIS7_ENCODER_ORIGIN, AXIS7_ENCODER_REVERSE == ON, &pidAxis7, &servoControlAxis7, AXIS7_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS7_STEP_DIR_PRESENT
@@ -231,7 +239,9 @@
 
     #if AXIS8_ENCODER == AB
       Quadrature encAxis8(AXIS8_ENCODER_A_PIN, AXIS8_ENCODER_B_PIN, 8);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS8_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis8(AXIS8_ENCODER_A_PIN, AXIS8_ENCODER_B_PIN, 8);
+    #elif AXIS8_ENCODER == CW_CCW
       CwCcw encAxis8(AXIS8_ENCODER_A_PIN, AXIS8_ENCODER_B_PIN, 8);
     #elif AXIS8_ENCODER == PULSE_DIR
       PulseDir encAxis8(AXIS8_ENCODER_A_PIN, AXIS8_ENCODER_B_PIN, 8);
@@ -257,7 +267,7 @@
       ServoTmc2209 driver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
     #endif
 
-    ServoMotor motor8(8, ((ServoDriver*)&driver8), &encAxis8, &pidAxis8, &servoControlAxis8, AXIS8_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor8(8, ((ServoDriver*)&driver8), &encAxis8, AXIS8_ENCODER_ORIGIN, AXIS8_ENCODER_REVERSE == ON, &pidAxis8, &servoControlAxis8, AXIS8_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS8_STEP_DIR_PRESENT
@@ -286,7 +296,9 @@
 
     #if AXIS9_ENCODER == AB
       Quadrature encAxis9(AXIS9_ENCODER_A_PIN, AXIS9_ENCODER_B_PIN, 9);
-    #elif AXIS1_ENCODER == CW_CCW
+    #elif AXIS9_ENCODER == AB_ESP32
+      QuadratureEsp32 encAxis9(AXIS9_ENCODER_A_PIN, AXIS9_ENCODER_B_PIN, 9);
+    #elif AXIS9_ENCODER == CW_CCW
       CwCcw encAxis9(AXIS9_ENCODER_A_PIN, AXIS9_ENCODER_B_PIN, 9);
     #elif AXIS9_ENCODER == PULSE_DIR
       PulseDir encAxis9(AXIS9_ENCODER_A_PIN, AXIS9_ENCODER_B_PIN, 9);
@@ -312,7 +324,7 @@
       ServoTmc2209 driver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
     #endif
 
-    ServoMotor motor9(9, ((ServoDriver*)&driver9), &encAxis9, &pidAxis9, &servoControlAxis9, AXIS9_SERVO_SYNC_THRESHOLD);
+    ServoMotor motor9(9, ((ServoDriver*)&driver9), &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &pidAxis9, &servoControlAxis9, AXIS9_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS9_STEP_DIR_PRESENT

@@ -36,11 +36,17 @@ class Encoder {
     // get device ready for use
     virtual void init();
 
-    // get current count
+    // set encoder origin
+    virtual void setOrigin(uint32_t count);
+
+    // get current position
     virtual int32_t read();
 
-    // set current count to value
+    // set current position to value
     virtual void write(int32_t count);
+
+    // true if encoder count is ready
+    bool ready = true;
 
     // true if errors were detected
     bool error = false;
@@ -51,8 +57,12 @@ class Encoder {
     // index offset (r/w)
     int32_t offset = 0;
 
+    // origin for absolute encoders
+    uint32_t origin = 0;
+
   protected:
-    volatile int32_t count = 0;
     bool initialized = false;
 
+    int16_t axis = 0;
+    volatile int32_t count = 0;
 };

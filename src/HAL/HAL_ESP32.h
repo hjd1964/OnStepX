@@ -4,8 +4,8 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
-// 1/200 second sidereal timer
-#define HAL_FRACTIONAL_SEC 200.0F
+// 1/100 second sidereal timer
+#define HAL_FRACTIONAL_SEC 100.0F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
@@ -94,6 +94,6 @@
 // a really short fixed delay (none needed)
 #define HAL_DELAY_25NS()
 
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))
-
+// stand-in for delayNanoseconds(), assumes 240MHz clock
+#include "xtensa/core-macros.h"
+#define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }

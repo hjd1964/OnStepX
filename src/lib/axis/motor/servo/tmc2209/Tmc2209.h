@@ -57,14 +57,25 @@ class ServoTmc2209 : public ServoDriver {
     void enable(bool state);
 
     // power level to the motor
-    void setMotorVelocity(float power);
+    float setMotorVelocity(float power);
 
     // update status info. for driver
     void updateStatus();
 
+    // calibrate the motor if required
+    void calibrate();
+
     const ServoTmcSettings *Settings;
 
   private:
+    inline float mAToCs(float mA) { return 32.0F*(((mA/1000.0F)*(rSense+0.02F))/0.325F) - 1.0F; }
+    float rSense = 0.11F;
+
+    bool stealthChop() { 
+      if ((axisNumber == 1 && AXIS1_DRIVER_DECAY == AXIS1_DRIVER_DECAY_GOTO && AXIS1_DRIVER_DECAY == STEALTHCHOP) ||
+         (axisNumber == 2 && AXIS2_DRIVER_DECAY == AXIS2_DRIVER_DECAY_GOTO && AXIS2_DRIVER_DECAY == STEALTHCHOP)) return true; else return false;
+    }
+
     #if SERIAL_TMC == SoftSerial
       SoftwareSerial SerialTMC;
     #endif

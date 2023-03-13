@@ -3,7 +3,6 @@
 #include "State.h"
 
 #include "Status.h"
-#include "../../../../lib/tasks/OnTask.h"
 #include "../cmd/Cmd.h"
 #include "../../locales/Locale.h"
 #include "../../../../lib/convert/Convert.h"
@@ -23,63 +22,63 @@ void State::updateMount(bool now)
     if (temp[0] == '0') strcpy(&temp[0], &temp[1]);
     strncpyex(dateStr, temp, 10);
   }
-  Y;
+  delay(0);
 
   // LST
   if (!onStep.command(":GS#", temp)) strcpy(temp, "?");
-  strncpyex(lastStr, temp, 10); Y;
+  strncpyex(lastStr, temp, 10); delay(0);
 
   if (DISPLAY_HIGH_PRECISION_COORDS == ON && status.getVersionMajor() >= 10)
   {
     // Azm,Alt current
     if (!onStep.command(":GZH#", temp)) strcpy(temp, "?");
     strncpyex(indexAzmStr, temp, 14);
-    formatDegreesStr(indexAzmStr); Y;
+    formatDegreesStr(indexAzmStr); delay(0);
     if (!onStep.command(":GAH#", temp)) strcpy(temp, "?");
     strncpyex(indexAltStr, temp, 14);
-    formatDegreesStr(indexAltStr); Y;
+    formatDegreesStr(indexAltStr); delay(0);
   } else {
     // Azm,Alt current
     if (!onStep.command(":GZ#", temp)) strcpy(temp, "?");
     strncpyex(indexAzmStr, temp, 14);
-    formatDegreesStr(indexAzmStr); Y;
+    formatDegreesStr(indexAzmStr); delay(0);
     if (!onStep.command(":GA#", temp)) strcpy(temp, "?");
     strncpyex(indexAltStr, temp, 14);
-    formatDegreesStr(indexAltStr); Y;
+    formatDegreesStr(indexAltStr); delay(0);
   }
 
   #if DISPLAY_HIGH_PRECISION_COORDS == ON
     // RA,Dec current
     if (!onStep.command(":GRa#", temp)) strcpy(temp, "?");
     strncpyex(indexRaStr, temp, 14);
-    formatHoursStr(indexRaStr); Y;
+    formatHoursStr(indexRaStr); delay(0);
     if (!onStep.command(":GDe#", temp)) strcpy(temp, "?");
     strncpyex(indexDecStr, temp, 14);
-    formatDegreesStr(indexDecStr); Y;
+    formatDegreesStr(indexDecStr); delay(0);
 
     // RA,Dec target
     if (!onStep.command(":Gra#", temp)) strcpy(temp, "?");
     strncpyex(targetRaStr, temp, 14);
-    formatHoursStr(targetRaStr); Y;
+    formatHoursStr(targetRaStr); delay(0);
     if (!onStep.command(":Gde#", temp)) strcpy(temp, "?");
     strncpyex(targetDecStr, temp, 14);
-    formatDegreesStr(targetDecStr); Y;
+    formatDegreesStr(targetDecStr); delay(0);
   #else
     // RA,Dec Current
     if (!onStep.command(":GR#", temp)) strcpy(temp, "?");
     strncpyex(indexRaStr, temp, 14);
-    formatHoursStr(indexRaStr); Y;
+    formatHoursStr(indexRaStr); delay(0);
     if (!onStep.command(":GD#", temp)) strcpy(temp, "?");
     strncpyex(indexDecStr, temp, 14);
-    formatDegreesStr(indexDecStr); Y;
+    formatDegreesStr(indexDecStr); delay(0);
 
     // RA,Dec Target
     if (!onStep.command(":Gr#", temp)) strcpy(temp, "?");
     strncpyex(targetRaStr, temp, 14);
-    formatHoursStr(targetRaStr); Y;
+    formatHoursStr(targetRaStr); delay(0);
     if (!onStep.command(":Gd#", temp)) strcpy(temp, "?");
     strncpyex(targetDecStr, temp, 14);
-    formatDegreesStr(targetDecStr); Y;
+    formatDegreesStr(targetDecStr); delay(0);
   #endif
 
   // Latitude
@@ -91,7 +90,7 @@ void State::updateMount(bool now)
   strncpyex(latitudeStr, temp, 10);
   convert.dmsToDouble(&latitude, latitudeStr, true);
   formatDegreesStr(latitudeStr);
-  Y;
+  delay(0);
 
   // Longitude
   if (status.getVersionMajor() > 3) {
@@ -101,7 +100,7 @@ void State::updateMount(bool now)
   }
   strncpyex(longitudeStr, temp, 11);
   formatDegreesStr(longitudeStr);
-  Y;
+  delay(0);
 
   // Pier side
   if ((status.pierSide == PierSideFlipWE1) || (status.pierSide == PierSideFlipWE2) || (status.pierSide == PierSideFlipWE3)) strcpy(temp, L_MERIDIAN_FLIP_W_TO_E); else
@@ -142,7 +141,7 @@ void State::updateMount(bool now)
       strncpyex(alignLrStr, temp, 16);
 
       sprintf_P(temp, "%s %ld%c", ud_s, labs(ud), units);
-      strncpyex(alignUdStr, temp, 16); Y;
+      strncpyex(alignUdStr, temp, 16); delay(0);
     }
   }
 
@@ -160,7 +159,7 @@ void State::updateMount(bool now)
   if (status.parkFail) strcpy(temp, L_PARK_FAILED);
   if (status.atHome) strcat(temp, " (" L_AT_HOME ")");
   if (!status.onStepFound) strcpy(temp, "?");
-  strncpyex(parkStr, temp, 40); Y;
+  strncpyex(parkStr, temp, 40); delay(0);
 
   // Tracking
   double r = 0;
@@ -169,7 +168,7 @@ void State::updateMount(bool now)
       r = atof(temp);
       sprintF(temp, "%5.3fHz", r);
     } else strcpy(temp, "?");
-    Y;
+    delay(0);
   } else strcpy(temp, L_INACTIVE);
   if (!status.onStepFound) strcpy(temp, "?");
   trackingSidereal = fabs(r - 60.164) < 0.001;
@@ -189,9 +188,9 @@ void State::updateMount(bool now)
   // Slew speed
   if (isnan(slewSpeedNominal))
   {
-    if (!onStep.command(":GX93#", temp)) strcpy(temp, "?"); else { slewSpeedNominal = atof(temp); } Y;
+    if (!onStep.command(":GX93#", temp)) strcpy(temp, "?"); else { slewSpeedNominal = atof(temp); } delay(0);
   }
-  if (!onStep.command(":GX92#", temp)) strcpy(temp, "?"); else { slewSpeedCurrent = atof(temp); } Y;
-  if (!onStep.command(":GX97#", temp)) strcpy(temp, "?"); else { strcat(temp, "&deg;/s"); } Y;
+  if (!onStep.command(":GX92#", temp)) strcpy(temp, "?"); else { slewSpeedCurrent = atof(temp); } delay(0);
+  if (!onStep.command(":GX97#", temp)) strcpy(temp, "?"); else { strcat(temp, "&deg;/s"); } delay(0);
   strncpyex(slewSpeedStr, temp, 16);
 }

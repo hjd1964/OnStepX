@@ -2,7 +2,6 @@
 #include "State.h"
 
 #include "Status.h"
-#include "../../../../lib/tasks/OnTask.h"
 #include "../cmd/Cmd.h"
 #include "../misc/Misc.h"
 #include "../../locales/Locale.h"
@@ -19,13 +18,13 @@ void State::updateController(bool now)
   // Ambient conditions
   #if DISPLAY_WEATHER == ON
     if (!onStep.command(":GX9A#", temp)) strcpy(temp, "?"); else localeTemperature(temp);
-    strncpy(siteTemperatureStr, temp, 16); siteTemperatureStr[15] = 0; Y;
+    strncpy(siteTemperatureStr, temp, 16); siteTemperatureStr[15] = 0; delay(0);
     if (!onStep.command(":GX9B#", temp)) strcpy(temp, "?"); else localePressure(temp);
-    strncpy(sitePressureStr, temp, 16); sitePressureStr[15] = 0; Y;
+    strncpy(sitePressureStr, temp, 16); sitePressureStr[15] = 0; delay(0);
     if (!onStep.command(":GX9C#", temp)) strcpy(temp, "?"); else localeHumidity(temp);
-    strncpy(siteHumidityStr, temp, 16); siteHumidityStr[15] = 0; Y;
+    strncpy(siteHumidityStr, temp, 16); siteHumidityStr[15] = 0; delay(0);
     if (!onStep.command(":GX9E#", temp)) strcpy(temp, "?"); else localeTemperature(temp);
-    strncpy(siteDewPointStr, temp, 16); siteDewPointStr[15] = 0; Y;
+    strncpy(siteDewPointStr, temp, 16); siteDewPointStr[15] = 0; delay(0);
   #endif
 
   // Driver status
@@ -58,14 +57,14 @@ void State::updateController(bool now)
       if (strlen(temp1) == 0) strcpy(temp1, "Ok");
 
       char *thisDriverStatusStr = driverStatusStr[axis];
-      strncpy(thisDriverStatusStr, temp1, 40); thisDriverStatusStr[39] = 0; Y;
+      strncpy(thisDriverStatusStr, temp1, 40); thisDriverStatusStr[39] = 0; delay(0);
     }
   }
 
   // MCU Temperature
   #if DISPLAY_INTERNAL_TEMPERATURE == ON
     if (!onStep.command(":GX9F#", temp)) strcpy(temp, "?"); else localeTemperature(temp);
-    strncpy(controllerTemperatureStr, temp, 16); controllerTemperatureStr[15] = 0; Y;
+    strncpy(controllerTemperatureStr, temp, 16); controllerTemperatureStr[15] = 0; delay(0);
   #endif
 
   // General Error
@@ -74,12 +73,12 @@ void State::updateController(bool now)
   status.getLastErrorMessage(temp1);
   if (!status.onStepFound) strcat(temp, "?"); else strcat(temp, temp1);
   if (status.lastError != ERR_NONE) strcat(temp, "</font>"); 
-  strncpy(lastErrorStr, temp, 80); lastErrorStr[79] = 0; Y;
+  strncpy(lastErrorStr, temp, 80); lastErrorStr[79] = 0; delay(0);
 
   // Loop time
   if (status.getVersionMajor() < 10) {
     if (!onStep.command(":GXFA#", temp)) strcpy(temp, "?%");
-    strncpy(workLoadStr, temp, 20); workLoadStr[19] = 0; Y;
+    strncpy(workLoadStr, temp, 20); workLoadStr[19] = 0; delay(0);
   }
 
   // wifi signal strength
@@ -89,7 +88,7 @@ void State::updateController(bool now)
     if (signal_strength_qty > 100) signal_strength_qty = 100; 
     else if (signal_strength_qty < 0) signal_strength_qty = 0;
     sprintf(temp, "%lddBm (%ld%%)", signal_strength_dbm, signal_strength_qty);
-    strncpy(signalStrengthStr, temp, 20); signalStrengthStr[19] = 0; Y;
+    strncpy(signalStrengthStr, temp, 20); signalStrengthStr[19] = 0; delay(0);
   #endif
 
   // update the axis status
@@ -122,7 +121,7 @@ void State::axisStatusUpdate() {
         driverStatusFailedAttempts[axis]++;
         driver[axis].valid = false;
       }
-      Y;
+      delay(0);
     }
   }
 }

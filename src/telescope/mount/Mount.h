@@ -60,7 +60,10 @@ class Mount {
     inline bool isFault() { return axis1.fault() || axis2.fault(); }
 
     // returns true if the mount is at the home (startup) position
-    inline bool isHome() { return axis1.getInstrumentCoordinate() == home.position.a1 && axis2.getInstrumentCoordinate() == home.position.a2; }
+    inline bool isHome() {
+      return abs(axis1.getInstrumentCoordinate() - home.position.a1) <= arcsecToRad(AXIS1_TARGET_TOLERANCE) &&
+             abs(axis2.getInstrumentCoordinate() - home.position.a2) <= arcsecToRad(AXIS2_TARGET_TOLERANCE);
+    }
 
     // returns true if the mount is slewing (doing a goto or guide > 2X)
     inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }

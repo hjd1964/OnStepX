@@ -4,8 +4,12 @@
 #include "Common.h"
 #include "pages/Pages.h"
 
-void pollWebSvr() {
-  www.handleClient();
+TaskHandle_t _webSvrTask;
+void pollWebSvr(void * parameter) {
+  for(;;) {
+    www.handleClient();
+    state.poll();
+  }
 }
 
 void Website::init() {
@@ -13,6 +17,7 @@ void Website::init() {
 
   VLF("MSG: Set webpage handlers");
   www.on("/index.htm", handleRoot);
+  www.on("/index-ajax-get.txt", indexAjaxGet);
   www.on("/index.txt", indexAjax);
 
   www.on("/mount.htm", handleMount);
@@ -51,9 +56,8 @@ void Website::init() {
 
   state.init();
 
-  VF("MSG: Setup, starting web server polling");
-  VF(" task (rate 10ms priority 7)... ");
-  if (tasks.add(10, 0, true, 7, pollWebSvr, "webPoll")) { VL("success"); } else { VL("FAILED!"); }
+  VLF("MSG: Setup, starting web server FreeRTOS task (priority 1)");
+  xTaskCreatePinnedToCore(pollWebSvr,"WebSvrTask", 10000, NULL, 1, &_webSvrTask, 0);
 
   VLF("MSG: Website Plugin ready");
 }

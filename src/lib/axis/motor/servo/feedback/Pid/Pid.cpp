@@ -22,48 +22,58 @@ void Pid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
 
   V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
 
-  pid = new PID(&control->in, &control->out, &control->set, 0, 0, 0, DIRECT);
+  pid = new QuickPID(&control->in, &control->out, &control->set,
+                     0, 0, 0,
+                     QuickPID::pMode::pOnError, QuickPID::dMode::dOnError, QuickPID::iAwMode::iAwCondition,
+                     QuickPID::Action::direct);
 
-  pid->SetSampleTime(1);
+  pid->SetSampleTimeUs(1000);
   pid->SetOutputLimits(-controlRange, controlRange);
-  pid->SetMode(AUTOMATIC);
+  pid->SetMode(QuickPID::Control::automatic);
 }
 
 // reset feedback control and parameters
 void Pid::reset() {
   V(axisPrefix); VLF("reset");
-  pid->SetMode(MANUAL);
+  pid->SetMode(QuickPID::Control::manual);
   control->in = 0;
   control->set = 0;
   control->out = 0;
-  pid->SetMode(AUTOMATIC);
-  selectAlternateParameters(false);
+  pid->SetMode(QuickPID::Control::automatic);
+  selectTrackingParameters();
 }
 
-// select PID param set for tracking or slewing
-void Pid::selectAlternateParameters(bool alternate) {
+void Pid::setControlDirection(int8_t state) {
+  if (state == ON) pid->SetControllerDirection(QuickPID::Action::reverse); else pid->SetControllerDirection(QuickPID::Action::direct);
+}
+
+// select PID param set for slewing
+void Pid::selectTrackingParameters() {
   V(axisPrefix);
-  if (!alternate) {
-    p = param1;
-    i = param2;
-    d = param3;
-    VF("select tracking parameters");
-  } else {
-    p = param4;
-    i = param5;
-    d = param6;
-    VF("select slewing parameters");
-  }
+  p = param1;
+  i = param2;
+  d = param3;
+  VF("select tracking parameters");
   VF(" P="); V(p); VF(", I="); V(i); VF(", D="); VL(d);
   pid->SetTunings(p, i, d);
 }
 
-void Pid::setControlDirection(int8_t state) {
-  if (state == ON) pid->SetControllerDirection(REVERSE); else pid->SetControllerDirection(DIRECT);
+// select PID param set for slewing
+void Pid::selectSlewingParameters() {
+  V(axisPrefix);
+  p = param4;
+  i = param5;
+  d = param6;
+  VF("select slewing parameters");
+  VF(" P="); V(p); VF(", I="); V(i); VF(", D="); VL(d);
+  pid->SetTunings(p, i, d);
 }
 
 // manage feedback, variable PID params
 void Pid::variableParameters(float percent) {
+  if ((long)(millis() - timeSinceLastUpdate) < 1000) return;
+  timeSinceLastUpdate = millis();
+
   if (percent < 0.0F) percent = 0.0F;
   if (percent > 100.0F) percent = 100.0F;
 

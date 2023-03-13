@@ -2,7 +2,6 @@
 #include "State.h"
 
 #include "Status.h"
-#include "../../../../lib/tasks/OnTask.h"
 #include "../../libApp/cmd/Cmd.h"
 
 bool State::updateAuxiliary(bool all, bool now) {
@@ -20,7 +19,7 @@ bool State::updateAuxiliary(bool all, bool now) {
 
     if (all || (status.feature[i].purpose == SWITCH || status.feature[i].purpose == ANALOG_OUTPUT || status.feature[i].purpose == DEW_HEATER || status.feature[i].purpose == INTERVALOMETER)) {
       sprintf(cmd,":GXX%d#", i + 1);
-      if (!onStep.command(cmd, out) || strlen(out) == 0) valid = false; else valid = true; Y;
+      if (!onStep.command(cmd, out) || strlen(out) == 0) valid = false; else valid = true; delay(0);
       if (!valid) {
         status.feature[i].value1 = 0;
         status.feature[i].value2 = NAN;

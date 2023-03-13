@@ -6,9 +6,9 @@
 #ifdef SERVO_MOTOR_PRESENT
 
 typedef struct ServoControl {
-  double in;
-  double out;
-  double set;
+  float in;
+  float out;
+  float set;
   volatile int8_t directionHint;
 } ServoControl;
 
@@ -35,8 +35,11 @@ class Feedback {
     // validate driver parameters
     virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // select feedback PID param set
-    virtual void selectAlternateParameters(bool alternate);
+    // select feedback PID param set for tracking
+    virtual void selectTrackingParameters();
+
+    // select feedback PID param set for slewing
+    virtual void selectSlewingParameters();
 
     // variable feedback PID params
     virtual void variableParameters(float percent);

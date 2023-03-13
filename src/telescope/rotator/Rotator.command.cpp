@@ -49,14 +49,13 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
 
     // :rT#       Get rotator sTatus
     //            Returns: s#
-    // note: for now returns only M# when moving for compatability with the ASCOM driver
-    // future changes might
     if (command[1] == 'T') {
       if (axis3.isSlewing()) strcat(reply, "M"); else { // [M]oving
         strcat(reply, "S");                             // [S]topped)
         if (derotatorEnabled) strcat(reply, "D");       // [D]e-Rotate enabled
         if (derotatorReverse) strcat(reply, "R");       // De-Rotate [R]everse
       }
+      char temp[2] = "0"; temp[0] = '0' + getGotoRate(); strcat(reply, temp); // [1] to [5] for 0.5x to 2x goto rate
       *numericReply = false;
     } else
 
@@ -102,11 +101,22 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :r[n]#     Set rotator move rate where n = 1 for .01 deg/s, 2 for 0.1 deg/s, 3 for 1.0 deg/s, 4 for 10.0 deg/s
+    // :r[n]#     Set rotator move or goto rate
+    //            move where n = 1 for 0.01 deg/s, 2 for 0.1 deg/s, 3 for 1.0 deg/s, 4 for 0.5x goto rate
+    //            goto rate where n = 5 for 0.5x, 6 for 0.66x, 7 for 1x, 8 for 1.5x, 9 for 2x AXISn_SLEW_RATE_BASE_DESIRED
     //            Returns: Nothing
-    if (command[1] >= '1' && command[1] <= '4') {
-      float p[] = {0.01F, 0.1F, 1.0F, 10.0F};
-      slewRate = p[command[1] - '1'];
+    if (command[1] >= '1' && command[1] <= '9') {
+      if (strlen(parameter) == 0) {
+        int v = command[1] - '0';
+        if (v < 5) setMoveRate(v); else setGotoRate(v - 4);
+      } else *commandError = CE_PARAM_FORM;
+      *numericReply = false;
+    } else
+
+    // :rW#       Get working slew rate in deg/s
+    //            Returns: d.d#
+    if (command[1] == 'W') {
+      sprintF(reply, "%0.1f", settings.gotoRate);
       *numericReply = false;
     } else
 
@@ -120,14 +130,14 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :r>#       Move rotator CW
     //            Returns: Nothing
     if (command[1] == '>') {
-      *commandError = slew(DIR_FORWARD);
+      *commandError = move(DIR_FORWARD);
       *numericReply = false;
     } else
 
     // :r<#       Move rotator CCW
     //            Returns: Nothing
     if (command[1] == '<') {
-      *commandError = slew(DIR_REVERSE);
+      *commandError = move(DIR_REVERSE);
       *numericReply = false;
     } else
 
@@ -227,6 +237,20 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
 
+  } else
+
+  // :GX98#     Get rotator availablity
+  //            Returns: D for rotate/derotate
+  //                     R for rotate only
+  //                     N for none
+  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8' && parameter[2] == 0) {
+    *numericReply = false;
+    if (AXIS3_DRIVER_MODEL != OFF) {
+      #if defined(MOUNT_PRESENT)
+        if (transform.mountType == ALTAZM) strcpy(reply, "D"); else
+      #endif
+      strcpy(reply, "R");
+    } else strcpy(reply, "N");
   } else return false;
 
   return true;

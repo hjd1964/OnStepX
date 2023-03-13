@@ -9,16 +9,19 @@ int webTimeout = TIMEOUT_WEB;
 int cmdTimeout = TIMEOUT_CMD;
 
 void OnStepCmd::serialRecvFlush() {
+  while (SERIAL_ONSTEP.available() > 0) SERIAL_ONSTEP.read();
 }
 
 // smart LX200 aware command and response (up to 80 chars) over serial
 bool OnStepCmd::processCommand(const char* cmd, char* response, long timeOutMs) {
   SERIAL_ONSTEP.setTimeout(timeOutMs);
 
-  SERIAL_ONSTEP.flush();
+  // clear the read/write buffers
+  serialRecvFlush();
 
   // send the command
   SERIAL_ONSTEP.transmit(cmd);
+  delay(0);
 
   response[0] = 0;
   bool noResponse = false;
@@ -104,24 +107,27 @@ bool OnStepCmd::processCommand(const char* cmd, char* response, long timeOutMs) 
   } else
   if (shortResponse) {
     while ((long)(timeout - millis()) > 0) {
-      tasks.yield(1);
+      delay(1);
       if (SERIAL_ONSTEP.receiveAvailable() >= 1) {
         char *recv = SERIAL_ONSTEP.receive();
         strcpy(response, recv);
         break;
       }
     }
+
     return (response[0] != 0);
   } else {
+    int i = 0;
     // get full response, '#' terminated
     while ((long)(timeout - millis()) > 0) {
-      tasks.yield(1);
+      if (i++ % 10 == 0) delay(1);
       if (SERIAL_ONSTEP.receiveAvailable() >= 1) {
         char *recv = SERIAL_ONSTEP.receive();
-        strcpy(response, recv);
-        break;
+        strcat(response, recv);
+        if (response[strlen(response) - 1] == '#') break;
       }
     }
+
     return response[strlen(response) - 1] == '#';
   }
 }

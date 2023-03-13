@@ -193,7 +193,7 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
 
   CommandError e = validate();
-  if (e == CE_SLEW_ERR_IN_STANDBY && mount.isHome()) { mount.enable(true); e = validate(); }
+  if (e == CE_SLEW_ERR_IN_STANDBY && (mount.isHome() || AXIS1_SYNC_THRESHOLD != OFF)) { mount.enable(true); e = validate(); }
   if (e == CE_NONE && isGoto && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (e != CE_NONE) return e;
 
@@ -289,6 +289,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (target.pierSide != PIER_SIDE_WEST) target.pierSide = PIER_SIDE_EAST;
 
   if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
+  transform.observedPlaceToMount(&target);
   transform.hourAngleToRightAscension(&target, false);
 
   return CE_NONE;
@@ -511,7 +512,7 @@ CommandError Goto::startAutoSlew() {
     axis2.setTargetCoordinate(a2);
   }
 
-  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); V("deg, a2="); V(radToDeg(a2)); DL(" deg)");
+  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF("deg, a2="); V(radToDeg(a2)); VLF(" deg)");
 
   e = axis1.autoGoto(radsPerSecondCurrent);
   if (e == CE_NONE) e = axis2.autoGoto(radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));

@@ -7,6 +7,20 @@
   #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 5 for this OnStep."
 #endif
 
+// BACKWARDS COMPATABILITY ------------------------
+#ifdef AXIS3_SLEW_RATE_DESIRED
+  #warning "Configuration (Config.h): AXIS3_SLEW_RATE_DESIRED has been replaced with AXIS3_SLEW_RATE_BASE_DESIRED please update"
+  #define AXIS3_SLEW_RATE_BASE_DESIRED AXIS3_SLEW_RATE_DESIRED
+#endif
+#ifdef AXIS4_SLEW_RATE_DESIRED
+  #warning "Configuration (Config.h): AXIS4_SLEW_RATE_DESIRED has been replaced with AXIS4_SLEW_RATE_BASE_DESIRED please update"
+  #define AXIS4_SLEW_RATE_BASE_DESIRED AXIS4_SLEW_RATE_DESIRED
+#endif
+#ifdef AXIS5_SLEW_RATE_DESIRED
+  #warning "Configuration (Config.h): AXIS5_SLEW_RATE_DESIRED has been replaced with AXIS5_SLEW_RATE_BASE_DESIRED please update"
+  #define AXIS5_SLEW_RATE_BASE_DESIRED AXIS5_SLEW_RATE_DESIRED
+#endif
+
 // GENERAL ---------------------------------------
 #if defined(STEP_DIR_TMC_UART_PRESENT) && (!defined(SERIAL_TMC) || !defined(SERIAL_TMC_BAUD))
   #error "Configuration (Config.h): This PINMAP doesn't support TMC UART mode drivers"
@@ -145,6 +159,10 @@
   #endif
 #endif
 
+#if AXIS1_SYNC_THRESHOLD != OFF && AXIS2_SYNC_THRESHOLD == OFF
+  #error "Configuration (Config.h): Setting AXIS2_SYNC_THRESHOLD must be set if AXIS1_SYNC_THRESHOLD is set"
+#endif
+
 #if AXIS1_REVERSE != ON && AXIS1_REVERSE != OFF
   #error "Configuration (Config.h): Setting AXIS1_REVERSE unknown, use OFF or ON."
 #endif
@@ -230,6 +248,10 @@
   #if AXIS2_ENCODER < ENC_FIRST || AXIS2_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS2_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+#endif
+
+#if AXIS2_SYNC_THRESHOLD != OFF && AXIS1_SYNC_THRESHOLD == OFF
+  #error "Configuration (Config.h): Setting AXIS1_SYNC_THRESHOLD must be set if AXIS2_SYNC_THRESHOLD is set"
 #endif
 
 #if AXIS2_REVERSE != ON && AXIS2_REVERSE != OFF
@@ -535,8 +557,8 @@
   #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS4_SLEW_RATE_DESIRED < 200 || AXIS4_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS4_SLEW_RATE_BASE_DESIRED < 200 || AXIS4_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS4_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS4_DRIVER_STATUS != OFF && AXIS4_DRIVER_STATUS != ON && AXIS4_DRIVER_STATUS != HIGH && AXIS4_DRIVER_STATUS != LOW
@@ -628,8 +650,8 @@
   #error "Configuration (Config.h): Setting AXIS5_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS5_SLEW_RATE_DESIRED < 200 || AXIS5_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS5_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS5_SLEW_RATE_BASE_DESIRED < 200 || AXIS5_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS5_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS5_DRIVER_STATUS != OFF && AXIS5_DRIVER_STATUS != ON && AXIS5_DRIVER_STATUS != HIGH && AXIS5_DRIVER_STATUS != LOW
@@ -721,8 +743,8 @@
   #error "Configuration (Config.h): Setting AXIS6_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS6_SLEW_RATE_DESIRED < 200 || AXIS6_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS6_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS6_SLEW_RATE_BASE_DESIRED < 200 || AXIS6_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS6_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS6_DRIVER_STATUS != OFF && AXIS6_DRIVER_STATUS != ON && AXIS6_DRIVER_STATUS != HIGH && AXIS6_DRIVER_STATUS != LOW
@@ -811,8 +833,8 @@
   #error "Configuration (Config.h): Setting AXIS7_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS7_SLEW_RATE_DESIRED < 200 || AXIS7_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS7_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS7_SLEW_RATE_BASE_DESIRED < 200 || AXIS7_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS7_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS7_DRIVER_STATUS != OFF && AXIS7_DRIVER_STATUS != ON && AXIS7_DRIVER_STATUS != HIGH && AXIS7_DRIVER_STATUS != LOW
@@ -901,8 +923,8 @@
   #error "Configuration (Config.h): Setting AXIS8_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS8_SLEW_RATE_DESIRED < 200 || AXIS8_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS8_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS8_SLEW_RATE_BASE_DESIRED < 200 || AXIS8_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS8_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS8_DRIVER_STATUS != OFF && AXIS8_DRIVER_STATUS != ON && AXIS8_DRIVER_STATUS != HIGH && AXIS8_DRIVER_STATUS != LOW
@@ -991,8 +1013,8 @@
   #error "Configuration (Config.h): Setting AXIS9_SLEW_RATE_MINIMUM out of range, use a value between 5 and 200"
 #endif
 
-#if AXIS9_SLEW_RATE_DESIRED < 200 || AXIS9_SLEW_RATE_DESIRED > 5000
-  #error "Configuration (Config.h): Setting AXIS9_SLEW_RATE_DESIRED out of range, use a value between 200 and 5000"
+#if AXIS9_SLEW_RATE_BASE_DESIRED < 200 || AXIS9_SLEW_RATE_BASE_DESIRED > 5000
+  #error "Configuration (Config.h): Setting AXIS9_SLEW_RATE_BASE_DESIRED out of range, use a value between 200 and 5000"
 #endif
 
 #if AXIS9_DRIVER_STATUS != OFF && AXIS9_DRIVER_STATUS != ON && AXIS9_DRIVER_STATUS != HIGH && AXIS9_DRIVER_STATUS != LOW

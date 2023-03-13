@@ -4,5 +4,9 @@
 
 // get device ready for use
 void Encoder::init() {
-  // default does nothing
+}
+
+// set encoder origin
+void Encoder::setOrigin(uint32_t count) {
+  origin = count;
 }

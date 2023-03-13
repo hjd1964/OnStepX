@@ -10,7 +10,7 @@ void focuserSelectTile(String &data)
 {
   char temp[240] = "";
 
-  sprintf_P(temp, html_tile_beg, "22em", "11em", "Select");
+  sprintf_P(temp, html_tile_beg, "22em", "13em", "Select");
   data.concat(temp);
   data.concat("<br /><hr>");
 

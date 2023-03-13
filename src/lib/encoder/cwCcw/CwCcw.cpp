@@ -55,76 +55,91 @@ volatile int32_t _cw_ccw_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
-  initialized = true;
 
+  this->cwPin = cwPin;
+  this->ccwPin = ccwPin;
   this->axis = axis - 1;
+}
+
+void CwCCW::init() {
+  if (initialized) { VF("WRN: Encoder CwCcw"); V(axis); VLF(" init(), already initialized!"); return; }
+
   pinMode(cwPin, INPUT_PULLUP);
   pinMode(ccwPin, INPUT_PULLUP);
   #if AXIS1_ENCODER == CW_CCW
-    if (this->axis == 0) {
+    if (axis == 0) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis1, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis1, CHANGE);
     }
   #endif
   #if AXIS2_ENCODER == CW_CCW
-    if (this->axis == 1) {
+    if (axis == 1) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis2, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis2, CHANGE);
     }
   #endif
   #if AXIS3_ENCODER == CW_CCW
-    if (this->axis == 2) {
+    if (axis == 2) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis3, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis3, CHANGE);
     }
   #endif
   #if AXIS4_ENCODER == CW_CCW
-    if (this->axis == 3) {
+    if (axis == 3) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis4, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis4, CHANGE);
     }
   #endif
   #if AXIS5_ENCODER == CW_CCW
-    if (this->axis == 4) {
+    if (axis == 4) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis5, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis5, CHANGE);
     }
   #endif
   #if AXIS6_ENCODER == CW_CCW
-    if (this->axis == 5) {
+    if (axis == 5) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis6, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis6, CHANGE);
     }
   #endif
   #if AXIS7_ENCODER == CW_CCW
-    if (this->axis == 6) {
+    if (axis == 6) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis7, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis7, CHANGE);
     }
   #endif
   #if AXIS8_ENCODER == CW_CCW
-    if (this->axis == 7) {
+    if (axis == 7) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis8, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis8, CHANGE);
     }
   #endif
   #if AXIS9_ENCODER == CW_CCW
-    if (this->axis == 8) {
+    if (axis == 8) {
       attachInterrupt(digitalPinToInterrupt(cwPin), cwCcw_A_Axis9, CHANGE);
       attachInterrupt(digitalPinToInterrupt(ccwPin), cwCcw_B_Axis9, CHANGE);
     }
   #endif
+
+  initialized = true;
 }
 
 int32_t CwCcw::read() {
+  if (!initialized) { VF("WRN: Encoder CwCcw"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  
   int32_t count = 0;
   noInterrupts();
   count = _cw_ccw_count[axis];
   interrupts();
-  return count;
+
+  return count + origin;
 }
 
 void CwCcw::write(int32_t count) {
+  if (!initialized) { VF("WRN: Encoder CwCcw"); V(axis); VLF(" write(), not initialized!"); return; }
+
+  count -= origin;
+
   noInterrupts();
   _cw_ccw_count[axis] = count;
   interrupts();

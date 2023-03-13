@@ -104,7 +104,7 @@ enum AxisMeasure: uint8_t {AXIS_MEASURE_UNKNOWN, AXIS_MEASURE_MICRONS, AXIS_MEAS
 class Axis {
   public:
     // constructor
-    Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure);
+    Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure, float targetTolerance = 0.0F);
 
     // process axis commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
@@ -383,6 +383,8 @@ class Axis {
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
     float backlashFreq = 0.0F;
+
+    float targetTolerance = 0.0F;
 
     AutoRate autoRate = AR_NONE;       // auto slew mode
     float slewAccelRateFs;             // auto slew rate in measures per second per frac-sec

@@ -110,7 +110,7 @@ CommandProcessor::~CommandProcessor() {
 
 void CommandProcessor::poll() {
   if (!serialReady) { delay(200); SerialPort.begin(serialBaud); serialReady = true; }
-  if (SerialPort.available()) buffer.add(SerialPort.read()); else return;
+  while (SerialPort.available()) { char c = SerialPort.read(); buffer.add(c); if (c == '#') break; }
 
   if (buffer.ready()) {
     char reply[80] = "";
@@ -207,7 +207,13 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   //            Returns: +/-n.n
   if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == 'F' && parameter[2] == 0) {
     float t = HAL_TEMP();
-    if (!isnan(t)) sprintF(reply, "%1.0f", t); else { *numericReply = true; commandError = CE_0; }
+    if (!isnan(t)) {
+      sprintF(reply, "%1.0f", t);
+      *numericReply = false;
+    } else {
+      *numericReply = true;
+      commandError = CE_0;
+    }
     return commandError;
   } else
 
@@ -235,31 +241,31 @@ void commandChannelInit() {
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   uint8_t handle;
   #ifdef HAL_SLOW_PROCESSOR
-    long comPollRate = 2000;
+    long comPollRate = 5000;
   #else
-    long comPollRate = 500;
+    long comPollRate = 2500;
   #endif
   #ifdef SERIAL_A
     VF("MSG: Setup, start command channel A task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsA, "PrcCmdA");
+    handle = tasks.add(0, 0, true, 5, processCmdsA, "CmdA");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_B
     VF("MSG: Setup, start command channel B task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsB, "PrcCmdB");
+    handle = tasks.add(0, 0, true, 5, processCmdsB, "CmdB");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_C
     VF("MSG: Setup, start command channel C task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsC, "PrcCmdC");
+    handle = tasks.add(0, 0, true, 5, processCmdsC, "CmdC");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif
   #ifdef SERIAL_D
     VF("MSG: Setup, start command channel D task (priority 5)... ");
-    handle = tasks.add(0, 0, true, 5, processCmdsD, "PrcCmdD");
+    handle = tasks.add(0, 0, true, 5, processCmdsD, "CmdD");
     if (handle) { VLF("success"); } else { VLF("FAILED!"); }
     tasks.setPeriodMicros(handle, comPollRate);
   #endif

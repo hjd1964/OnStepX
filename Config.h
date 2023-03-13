@@ -263,7 +263,7 @@
 
 // AXIS4 FOCUSER 1 ------------------------------------- see https://onstep.groups.io/g/developer/wiki/Configuration_Rotator_Focuser
 #define AXIS4_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) to activate the focuser.                Option
-#define AXIS4_SLEW_RATE_DESIRED      1000 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
+#define AXIS4_SLEW_RATE_BASE_DESIRED 1000 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
 #define AXIS4_SLEW_RATE_MINIMUM        50 //     20, n. Where n=5..200 (um/s.) Minimum microns/second.                        Adjust
 
 // If runtime axis settings are enabled changes in the section below may be ignored unless you reset to defaults:
@@ -295,7 +295,7 @@
 
 // AXIS5 FOCUSER 2 -----------------------------------------------------------------------------------------------------------------
 #define AXIS5_DRIVER_MODEL        TMC2209 //    OFF, Enter motor driver model (above) to activate the focuser.                Option
-#define AXIS5_SLEW_RATE_DESIRED      1000 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
+#define AXIS5_SLEW_RATE_BASE_DESIRED 1000 //    500, n, Where n=200..5000 (um/s.) Desired (maximum) microns/second.           Adjust
 #define AXIS5_SLEW_RATE_MINIMUM        50 //     20, n. Where n=5..200 (um/s.) Minimum microns/second.                        Adjust
 
 // If runtime axis settings are enabled changes in the section below may be ignored unless you reset to defaults:

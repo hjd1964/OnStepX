@@ -39,7 +39,7 @@ class ServoDc : public ServoDriver {
     void init();
 
     // set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
-    void setMotorVelocity(float power);
+    float setMotorVelocity(float power);
 
     // update status info. for driver
     void updateStatus();

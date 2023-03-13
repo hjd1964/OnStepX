@@ -10,14 +10,14 @@ void pollStateFast() { state.pollFast(); }
 
 void State::init()
 {
-  VF("MSG: State, start polling task (rate "); V(STATE_POLLING_RATE_MS); VF("ms, priority 6)... ");
-  if (tasks.add(STATE_POLLING_RATE_MS, 0, true, 7, pollState, "StaPoll")) { VLF("success"); } else { VLF("FAILED!"); }
-
   status.update();
 }
 
 void State::poll()
 {
+  if ((long)(millis() - lastPoll) < STATE_POLLING_RATE_MS) return;
+  lastPoll = millis();
+
   status.update(true);
   if (status.mountFound == SD_TRUE) updateMount();
   if (status.focuserFound == SD_TRUE) updateFocuser();
@@ -26,8 +26,8 @@ void State::poll()
 
   if (status.focuserFound == SD_TRUE && millis() - lastFocuserPageLoadTime < 2000) {
     char temp[80];
-    if (!onStep.command(":FG#", temp)) strcpy(temp, "?"); else strcat(temp, " microns"); Y;
-    strncpy(focuserPositionStr, temp, 20); focuserPositionStr[19] = 0; Y;
+    if (!onStep.command(":FG#", temp)) strcpy(temp, "?"); else strcat(temp, " microns"); delay(0);
+    strncpy(focuserPositionStr, temp, 20); focuserPositionStr[19] = 0; delay(0);
   }
 
   if (status.rotatorFound == SD_TRUE) updateRotator();

@@ -74,6 +74,11 @@ void handleRoot()
 
   data.concat("<br class=\"clear\" />\n");
 
+  #if DISPLAY_SERVO_MONITOR == ON
+    servoTile(data);
+    data.concat("<br class=\"clear\" />\n");
+  #endif
+
   #if DRIVE_CONFIGURATION == ON
     if (numShown == 0) data.concat("<br />" L_ADV_SET_NO_EDIT "<br />");
 
@@ -129,6 +134,9 @@ void indexAjax() {
     int numAxes = 2;
     if (status.getVersionMajor() >= 10) numAxes = 9;
     for (int axis = 0; axis < numAxes; axis++) axisTileAjax(axis, data);
+    #if DISPLAY_SERVO_MONITOR == ON
+      servoTileAjax(data);
+    #endif
   }
 
   www.sendContentAndClear(data);
@@ -154,6 +162,9 @@ void processIndexGet()
   #endif
   statusTileGet();
   axisTileGet();
+  #if DISPLAY_SERVO_MONITOR == ON
+    servoTileGet();
+  #endif
 
   state.lastControllerPageLoadTime = millis();
 }
