@@ -92,6 +92,8 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
+#define AXIS1_SERVO_PH1_PIN     AXIS1_DIR_PIN
+#define AXIS1_SERVO_PH2_PIN     AXIS1_STEP_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        SHARED
@@ -106,6 +108,8 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
+#define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        OFF              // No enable pin control (always enabled)
@@ -115,6 +119,8 @@
 #define AXIS3_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          2                // [must be low at boot 2]
 #define AXIS3_DIR_PIN           15
+#define AXIS1_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #if !defined(SERIAL_TMC_HARDWARE_UART) && AXIS4_POWER_DOWN == ON
@@ -126,6 +132,8 @@
 #define AXIS4_M3_PIN            OFF              // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          19
 #define AXIS4_DIR_PIN           15
+#define AXIS2_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS2_ENCODER_B_PIN     AUX2_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        OFF              // No enable pin control (always enabled)

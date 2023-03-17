@@ -83,6 +83,8 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
+#define AXIS1_SERVO_PH1_PIN     AXIS1_DIR_PIN
+#define AXIS1_SERVO_PH2_PIN     AXIS1_STEP_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        9
@@ -95,6 +97,8 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
+#define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        AUX5_PIN
@@ -104,6 +108,8 @@
 #define AXIS3_M3_PIN            AUX1_PIN         // SPI MISO
 #define AXIS3_STEP_PIN          30
 #define AXIS3_DIR_PIN           33
+#define AXIS1_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #define AXIS4_ENABLE_PIN        AUX6_PIN
@@ -113,6 +119,8 @@
 #define AXIS4_M3_PIN            AUX1_PIN         // SPI MISO
 #define AXIS4_STEP_PIN          34
 #define AXIS4_DIR_PIN           35
+#define AXIS2_ENCODER_A_PIN     AXIS4_STEP_PIN
+#define AXIS2_ENCODER_B_PIN     AUX1_PIN         // for consistancy, use AXIS4_DIR instead if you like
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        AUX5_PIN
