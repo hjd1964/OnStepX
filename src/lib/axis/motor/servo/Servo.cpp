@@ -167,10 +167,8 @@ bool ServoMotor::validateParameters(float param1, float param2, float param3, fl
 
 // sets motor enable on/off (if possible)
 void ServoMotor::enable(bool state) {
-  V(axisPrefix); VF("driver powered ");
-  if (state) { VLF("up"); } else { VLF("down"); } 
-
   if (!state) feedback->reset();
+
   driver->enable(state);
   enabled = state;
 }
