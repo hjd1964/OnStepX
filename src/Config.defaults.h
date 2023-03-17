@@ -264,7 +264,7 @@
   #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_ACCELERATION
-  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s/s for DC, in steps/s/s for SERVO_TMC2209
+  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_P
   #define AXIS1_SERVO_P                 2.0                       // P = proportional

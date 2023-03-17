@@ -26,7 +26,7 @@ void ServoDc::init() {
 
   // show velocity control settings
   VF("MSG: ServoDriver"); V(axisNumber);
-  VF(", Vmax = "); V(Settings->velocityMax); VF("% power, Acceleration = "); V(Settings->acceleration); VLF("%/s/s");
+  VF(", Vmax = "); V(Settings->velocityMax); VF("% power, Acceleration = "); V(Settings->acceleration); VLF("%/s");
 
   #if DEBUG == VERBOSE
     VF("MSG: ServoDriver"); V(axisNumber);
