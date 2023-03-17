@@ -10,7 +10,7 @@
 
 class Pid : public Feedback {
   public:
-    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto);
+    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity = 20);
 
     // initialize PID control and parameters
     void init(uint8_t axisNumber, ServoControl *control, float controlRange);
@@ -38,7 +38,7 @@ class Pid : public Feedback {
   private:
     QuickPID *pid;
 
-    float p, i, d, c;
+    float p, i, d, c, sensitivity;
 
     unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
 

@@ -284,6 +284,9 @@
   #ifndef AXIS1_SERVO_D_GOTO
   #define AXIS1_SERVO_D_GOTO            AXIS1_SERVO_D             // D = derivative
   #endif
+  #ifndef AXIS1_SERVO_VAR_PID_SENS
+  #define AXIS1_SERVO_VAR_PID_SENS      20                        // in % power to using 100% of pid set two (_GOTO)
+  #endif
   #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
   #endif
@@ -438,6 +441,9 @@
   #endif
   #ifndef AXIS2_SERVO_D_GOTO
   #define AXIS2_SERVO_D_GOTO            AXIS2_SERVO_D
+  #endif
+  #ifndef AXIS2_SERVO_VAR_PID_SENS
+  #define AXIS2_SERVO_VAR_PID_SENS      20
   #endif
   #ifndef AXIS2_ENCODER
   #define AXIS2_ENCODER                 AB
@@ -870,6 +876,9 @@
   #ifndef AXIS3_SERVO_D_GOTO
   #define AXIS3_SERVO_D_GOTO            AXIS3_SERVO_D
   #endif
+  #ifndef AXIS3_SERVO_VAR_PID_SENS
+  #define AXIS3_SERVO_VAR_PID_SENS      20
+  #endif
   #ifndef AXIS3_ENCODER
   #define AXIS3_ENCODER                 AB
   #endif
@@ -1052,6 +1061,9 @@
   #ifndef AXIS4_SERVO_D_GOTO
   #define AXIS4_SERVO_D_GOTO            AXIS4_SERVO_D
   #endif
+  #ifndef AXIS4_SERVO_VAR_PID_SENS
+  #define AXIS4_SERVO_VAR_PID_SENS      20
+  #endif
   #ifndef AXIS4_ENCODER
   #define AXIS4_ENCODER                 AB
   #endif
@@ -1208,6 +1220,9 @@
   #endif
   #ifndef AXIS5_SERVO_D_GOTO
   #define AXIS5_SERVO_D_GOTO            AXIS5_SERVO_D
+  #endif
+  #ifndef AXIS5_SERVO_VAR_PID_SENS
+  #define AXIS5_SERVO_VAR_PID_SENS      20
   #endif
   #ifndef AXIS5_ENCODER
   #define AXIS5_ENCODER                 AB
@@ -1366,6 +1381,9 @@
   #ifndef AXIS6_SERVO_D_GOTO
   #define AXIS6_SERVO_D_GOTO            AXIS6_SERVO_D
   #endif
+  #ifndef AXIS6_SERVO_VAR_PID_SENS
+  #define AXIS6_SERVO_VAR_PID_SENS      20
+  #endif
   #ifndef AXIS6_ENCODER
   #define AXIS6_ENCODER                 AB
   #endif
@@ -1522,6 +1540,9 @@
   #endif
   #ifndef AXIS7_SERVO_D_GOTO
   #define AXIS7_SERVO_D_GOTO            AXIS7_SERVO_D
+  #endif
+  #ifndef AXIS7_SERVO_VAR_PID_SENS
+  #define AXIS7_SERVO_VAR_PID_SENS      20
   #endif
   #ifndef AXIS7_ENCODER
   #define AXIS7_ENCODER                 AB
@@ -1680,6 +1701,9 @@
   #ifndef AXIS8_SERVO_D_GOTO
   #define AXIS8_SERVO_D_GOTO            AXIS8_SERVO_D
   #endif
+  #ifndef AXIS8_SERVO_VAR_PID_SENS
+  #define AXIS8_SERVO_VAR_PID_SENS      20
+  #endif
   #ifndef AXIS8_ENCODER
   #define AXIS8_ENCODER                 AB
   #endif
@@ -1836,6 +1860,9 @@
   #endif
   #ifndef AXIS9_SERVO_D_GOTO
   #define AXIS9_SERVO_D_GOTO            AXIS9_SERVO_D
+  #endif
+  #ifndef AXIS9_SERVO_VAR_PID_SENS
+  #define AXIS9_SERVO_VAR_PID_SENS      20
   #endif
   #ifndef AXIS9_ENCODER
   #define AXIS9_ENCODER                 AB

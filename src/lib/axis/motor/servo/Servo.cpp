@@ -129,7 +129,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
-
+  
   driver->init();
   enable(false);
 
@@ -365,7 +365,8 @@ void ServoMotor::poll() {
   velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
-  feedback->variableParameters(fabs(velocityPercent*50.0F));
+  // was velocityPercent*50 for 1/50th of the range i.e. 2%, now defaults to 20% and must be set
+  feedback->variableParameters(fabs(velocityPercent));
 
   // if we're not moving "fast" and the motor is above 50% power something is seriously wrong, so shut it down
   if (millis() - lastCheckTime > 1000) {

@@ -5,8 +5,9 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-Pid::Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto) {
+Pid::Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity) {
   setDefaultParameters(P, I, D, P_goto, I_goto, D_goto);
+  this->sensitivity = sensitivity;
 }
 
 // initialize PID control and parameters
@@ -74,6 +75,7 @@ void Pid::variableParameters(float percent) {
   if ((long)(millis() - timeSinceLastUpdate) < 1000) return;
   timeSinceLastUpdate = millis();
 
+  percent = percent*(100.0F/sensitivity);
   if (percent < 0.0F) percent = 0.0F;
   if (percent > 100.0F) percent = 100.0F;
 
