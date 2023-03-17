@@ -108,8 +108,8 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
-#define AXIS2_SERVO_PH1_PIN     AXIS1_DIR_PIN
-#define AXIS2_SERVO_PH2_PIN     AXIS1_STEP_PIN
+#define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        SHARED
