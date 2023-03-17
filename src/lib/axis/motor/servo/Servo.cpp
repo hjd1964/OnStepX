@@ -9,66 +9,66 @@
   #define SERVO_SLEW_DIRECT OFF
 #endif
 
-#ifndef AXIS1_ENCODER_FLTR
-  #define AXIS1_ENCODER_FLTR OFF
+#ifndef AXIS1_SERVO_FLTR
+  #define AXIS1_SERVO_FLTR OFF
 #endif
-#ifndef AXIS2_ENCODER_FLTR
-  #define AXIS2_ENCODER_FLTR OFF
+#ifndef AXIS2_SERVO_FLTR
+  #define AXIS2_SERVO_FLTR OFF
 #endif
-#ifndef AXIS3_ENCODER_FLTR
-  #define AXIS3_ENCODER_FLTR OFF
+#ifndef AXIS3_SERVO_FLTR
+  #define AXIS3_SERVO_FLTR OFF
 #endif
-#ifndef AXIS4_ENCODER_FLTR
-  #define AXIS4_ENCODER_FLTR OFF
+#ifndef AXIS4_SERVO_FLTR
+  #define AXIS4_SERVO_FLTR OFF
 #endif
-#ifndef AXIS5_ENCODER_FLTR
-  #define AXIS5_ENCODER_FLTR OFF
+#ifndef AXIS5_SERVO_FLTR
+  #define AXIS5_SERVO_FLTR OFF
 #endif
-#ifndef AXIS6_ENCODER_FLTR
-  #define AXIS6_ENCODER_FLTR OFF
+#ifndef AXIS6_SERVO_FLTR
+  #define AXIS6_SERVO_FLTR OFF
 #endif
-#ifndef AXIS7_ENCODER_FLTR
-  #define AXIS7_ENCODER_FLTR OFF
+#ifndef AXIS7_SERVO_FLTR
+  #define AXIS7_SERVO_FLTR OFF
 #endif
-#ifndef AXIS8_ENCODER_FLTR
-  #define AXIS8_ENCODER_FLTR OFF
+#ifndef AXIS8_SERVO_FLTR
+  #define AXIS8_SERVO_FLTR OFF
 #endif
-#ifndef AXIS9_ENCODER_FLTR
-  #define AXIS9_ENCODER_FLTR OFF
+#ifndef AXIS9_SERVO_FLTR
+  #define AXIS9_SERVO_FLTR OFF
 #endif
 
-#if AXIS1_ENCODER_FLTR == KALMAN || AXIS2_ENCODER_FLTR == KALMAN || AXIS3_ENCODER_FLTR == KALMAN || \
-    AXIS4_ENCODER_FLTR == KALMAN || AXIS5_ENCODER_FLTR == KALMAN || AXIS6_ENCODER_FLTR == KALMAN || \
-    AXIS7_ENCODER_FLTR == KALMAN || AXIS8_ENCODER_FLTR == KALMAN || AXIS9_ENCODER_FLTR == KALMAN
+#if AXIS1_SERVO_FLTR == KALMAN || AXIS2_SERVO_FLTR == KALMAN || AXIS3_SERVO_FLTR == KALMAN || \
+    AXIS4_SERVO_FLTR == KALMAN || AXIS5_SERVO_FLTR == KALMAN || AXIS6_SERVO_FLTR == KALMAN || \
+    AXIS7_SERVO_FLTR == KALMAN || AXIS8_SERVO_FLTR == KALMAN || AXIS9_SERVO_FLTR == KALMAN
   #include <SimpleKalmanFilter.h> // https://github.com/denyssene/SimpleKalmanFilter
 #endif
 
-#if AXIS1_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis1EncoderKalmanFilter(AXIS1_ENCODER_FLTR_MEAS_U, AXIS1_ENCODER_FLTR_MEAS_U, AXIS1_ENCODER_FLTR_VARIANCE);
+#if AXIS1_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis1EncoderKalmanFilter(AXIS1_SERVO_FLTR_MEAS_U, AXIS1_SERVO_FLTR_MEAS_U, AXIS1_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS2_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis2EncoderKalmanFilter(AXIS2_ENCODER_FLTR_MEAS_U, AXIS2_ENCODER_FLTR_MEAS_U, AXIS2_ENCODER_FLTR_VARIANCE);
+#if AXIS2_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis2EncoderKalmanFilter(AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS3_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis3EncoderKalmanFilter(AXIS3_ENCODER_FLTR_MEAS_U, AXIS3_ENCODER_FLTR_MEAS_U, AXIS3_ENCODER_FLTR_VARIANCE);
+#if AXIS3_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis3EncoderKalmanFilter(AXIS3_SERVO_FLTR_MEAS_U, AXIS3_SERVO_FLTR_MEAS_U, AXIS3_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS4_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis4EncoderKalmanFilter(AXIS4_ENCODER_FLTR_MEAS_U, AXIS4_ENCODER_FLTR_MEAS_U, AXIS4_ENCODER_FLTR_VARIANCE);
+#if AXIS4_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis4EncoderKalmanFilter(AXIS4_SERVO_FLTR_MEAS_U, AXIS4_SERVO_FLTR_MEAS_U, AXIS4_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS5_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis5EncoderKalmanFilter(AXIS5_ENCODER_FLTR_MEAS_U, AXIS5_ENCODER_FLTR_MEAS_U, AXIS5_ENCODER_FLTR_VARIANCE);
+#if AXIS5_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis5EncoderKalmanFilter(AXIS5_SERVO_FLTR_MEAS_U, AXIS5_SERVO_FLTR_MEAS_U, AXIS5_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS6_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis6EncoderKalmanFilter(AXIS6_ENCODER_FLTR_MEAS_U, AXIS6_ENCODER_FLTR_MEAS_U, AXIS6_ENCODER_FLTR_VARIANCE);
+#if AXIS6_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis6EncoderKalmanFilter(AXIS6_SERVO_FLTR_MEAS_U, AXIS6_SERVO_FLTR_MEAS_U, AXIS6_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS7_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis7EncoderKalmanFilter(AXIS7_ENCODER_FLTR_MEAS_U, AXIS7_ENCODER_FLTR_MEAS_U, AXIS7_ENCODER_FLTR_VARIANCE);
+#if AXIS7_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis7EncoderKalmanFilter(AXIS7_SERVO_FLTR_MEAS_U, AXIS7_SERVO_FLTR_MEAS_U, AXIS7_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS8_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis8EncoderKalmanFilter(AXIS8_ENCODER_FLTR_MEAS_U, AXIS8_ENCODER_FLTR_MEAS_U, AXIS8_ENCODER_FLTR_VARIANCE);
+#if AXIS8_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis8EncoderKalmanFilter(AXIS8_SERVO_FLTR_MEAS_U, AXIS8_SERVO_FLTR_MEAS_U, AXIS8_SERVO_FLTR_VARIANCE);
 #endif
-#if AXIS9_ENCODER_FLTR == KALMAN
-  SimpleKalmanFilter axis9EncoderKalmanFilter(AXIS9_ENCODER_FLTR_MEAS_U, AXIS9_ENCODER_FLTR_MEAS_U, AXIS9_ENCODER_FLTR_VARIANCE);
+#if AXIS9_SERVO_FLTR == KALMAN
+  SimpleKalmanFilter axis9EncoderKalmanFilter(AXIS9_SERVO_FLTR_MEAS_U, AXIS9_SERVO_FLTR_MEAS_U, AXIS9_SERVO_FLTR_VARIANCE);
 #endif
 
 #include "../../../tasks/OnTask.h"
@@ -306,47 +306,47 @@ void ServoMotor::poll() {
   // apply Kalaman filter if enabled
   switch (axisNumber) {
     case 1:
-      #if AXIS1_ENCODER_FLTR == KALMAN
+      #if AXIS1_SERVO_FLTR == KALMAN
         encoderCounts = round(axis1EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 2:
-      #if AXIS2_ENCODER_FLTR == KALMAN
+      #if AXIS2_SERVO_FLTR == KALMAN
         encoderCounts = round(axis2EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 3:
-      #if AXIS3_ENCODER_FLTR == KALMAN
+      #if AXIS3_SERVO_FLTR == KALMAN
         encoderCounts = round(axis3EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 4:
-      #if AXIS4_ENCODER_FLTR == KALMAN
+      #if AXIS4_SERVO_FLTR == KALMAN
         encoderCounts = round(axis4EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 5:
-      #if AXIS5_ENCODER_FLTR == KALMAN
+      #if AXIS5_SERVO_FLTR == KALMAN
         encoderCounts = round(axis5EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 6:
-      #if AXIS6_ENCODER_FLTR == KALMAN
+      #if AXIS6_SERVO_FLTR == KALMAN
         encoderCounts = round(axis6EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 7:
-      #if AXIS7_ENCODER_FLTR == KALMAN
+      #if AXIS7_SERVO_FLTR == KALMAN
         encoderCounts = round(axis7EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 8:
-      #if AXIS8_ENCODER_FLTR == KALMAN
+      #if AXIS8_SERVO_FLTR == KALMAN
         encoderCounts = round(axis8EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
     case 9:
-      #if AXIS9_ENCODER_FLTR == KALMAN
+      #if AXIS9_SERVO_FLTR == KALMAN
         encoderCounts = round(axis9EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
       #endif
     break;
@@ -391,7 +391,7 @@ void ServoMotor::poll() {
         float spas = 0;
         if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
 
-        #if AXIS1_ENCODER_FLTR == OFF
+        #if AXIS1_SERVO_FLTR == OFF
 //        sprintf(s, "Servo%d_Delta: %6ld, Motor %6ld, Encoder %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
 //        sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
           sprintf(s, "Servo%d: DeltaAS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (int)axisNumber, velocityPercent);
