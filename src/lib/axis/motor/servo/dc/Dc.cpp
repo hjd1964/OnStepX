@@ -86,9 +86,42 @@ void ServoDc::init() {
   #endif
 }
 
+// enable or disable the driver using the enable pin or other method
+void ServoDc::enable(bool state) {
+  int32_t power = 0;
+
+  enabled = state;
+  if (enablePin == SHARED) {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using PE or EE signals");
+
+    if (!enabled) {
+      if (model == SERVO_EE) {
+        if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
+        if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
+      } else
+      if (model == SERVO_PE) {
+        digitalWriteF(Pins->in1, Pins->inState1);
+        if (Pins->inState2 == HIGH) power = velocityMax; else power = 0; 
+        #ifdef ARDUINO_TEENSY41
+          if (Pins->in2 == 38) analogWritePin38(round(power)); else
+        #endif
+        analogWrite(Pins->in2, round(power));
+      }
+    }
+  } else {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
+    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
+  }
+
+  ServoDriver::updateStatus();
+}
+
 // set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
 float ServoDc::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
+
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
 
@@ -108,6 +141,8 @@ float ServoDc::setMotorVelocity(float velocity) {
 
 // motor control update
 void ServoDc::pwmUpdate(float power) {
+  if (!enabled) return;
+
   if (model == SERVO_EE) {
     if (motorDirection == DIR_FORWARD) {
       if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);

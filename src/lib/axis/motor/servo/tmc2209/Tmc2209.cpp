@@ -127,7 +127,7 @@ void ServoTmc2209::init() {
   #endif
 }
 
-// secondary way to power down not using the enable pin
+// enable or disable the driver using the enable pin or other method
 void ServoTmc2209::enable(bool state) {
   enabled = state;
   if (enablePin == SHARED) {
@@ -142,6 +142,8 @@ void ServoTmc2209::enable(bool state) {
       driver->ihold(0);
     }
   } else {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
     if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
   }
 
