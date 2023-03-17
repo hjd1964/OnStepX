@@ -44,12 +44,12 @@ void ServoDc::init() {
   #if DEBUG == VERBOSE
     VF("MSG: ServoDriver"); V(axisNumber);
     if (model == SERVO_EE) {
-      V(", pins pwm1="); if (Pins->in1 == OFF) V("OFF"); else V(Pins->in1);
-      V(", pwm2="); if (Pins->in2 == OFF) VF("OFF"); else V(Pins->in2);
+      V(", pins pwm1="); if (Pins->in1 == OFF) VF("OFF"); else V(Pins->in1);
+      V(", pwm2="); if (Pins->in2 == OFF) VLF("OFF"); else VL(Pins->in2);
     } else
     if (model == SERVO_PE) {
-      V(", pins dir="); if (Pins->in1 == OFF) V("OFF"); else V(Pins->in1);
-      V(", pwm="); if (Pins->in2 == OFF) VF("OFF"); else V(Pins->in2);
+      V(", pins dir="); if (Pins->in1 == OFF) VF("OFF"); else V(Pins->in1);
+      V(", pwm="); if (Pins->in2 == OFF) VLF("OFF"); else VL(Pins->in2);
     }
   #endif
 
