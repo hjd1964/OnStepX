@@ -377,6 +377,17 @@ void ServoMotor::poll() {
       D(", velocity % = "); DL(velocityPercent);
       enable(false);
     }
+
+    // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
+    if (wasBelow33 && wasAbove33) {
+      D(axisPrefix);
+      DL("oscillation detected, below -33% and above 33% power in a 1 second period!");
+      enable(false);
+    }
+    #endif
+
+    wasAbove33 = false;
+    wasBelow33 = false;
     lastEncoderCounts = encoderCounts;
     lastCheckTime = millis();
   }
