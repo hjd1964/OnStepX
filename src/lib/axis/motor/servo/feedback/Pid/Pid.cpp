@@ -82,9 +82,9 @@ void Pid::variableParameters(float percent) {
   i = param2 + (param5 - param2)*s;
   d = param3 + (param6 - param3)*s;
   if (lastP != p || lastI != i || lastD != d) {
-    V(axisPrefix);
-    V("variable parameters");
-    V(" P="); V(p); V(", I="); V(i); V(", D="); VL(d);
+//    V(axisPrefix);
+//    V("variable parameters");
+//    V(" P="); V(p); V(", I="); V(i); V(", D="); VL(d);
     pid->SetTunings(p, i, d);
     lastP = p;
     lastI = i;
