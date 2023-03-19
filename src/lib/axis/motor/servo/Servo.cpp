@@ -385,7 +385,7 @@ void ServoMotor::poll() {
     if (axisNumber == DEBUG_SERVO) {
       static uint16_t count = 0;
       count++;
-      if (count % 25 == 0) {
+      if (count % 10 == 0) {
         char s[800];
 
         float spas = 0;
