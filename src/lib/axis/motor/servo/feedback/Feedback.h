@@ -49,6 +49,8 @@ class Feedback {
 
     virtual void poll();
 
+    bool useVariableParameters = false;
+
   protected:
     float default_param1 = 0, default_param2 = 0, default_param3 = 0, default_param4 = 0, default_param5 = 0, default_param6 = 0;
     float param1 = 0, param2 = 0, param3 = 0, param4 = 0, param5 = 0, param6 = 0;

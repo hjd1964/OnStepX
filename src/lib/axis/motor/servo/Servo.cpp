@@ -354,7 +354,7 @@ void ServoMotor::poll() {
 
   control->set = motorCounts;
   control->in = encoderCounts;
-  feedback->poll();
+  if (enabled) feedback->poll();
 
   float velocity = control->out;
   if (!enabled) velocity = 0.0F;
@@ -363,8 +363,11 @@ void ServoMotor::poll() {
   velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
-  // was velocityPercent*50 for 1/50th of the range i.e. 2%, now defaults to 20% and must be set
-  feedback->variableParameters(fabs(velocityPercent));
+  if (feedback->useVariableParameters) {
+    feedback->variableParameters(fabs(velocityPercent));
+  } else {
+    if (!slewing && enabled) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+  }
 
   if (velocityPercent < -33) wasBelow33 = true;
   if (velocityPercent > 33) wasAbove33 = true;
