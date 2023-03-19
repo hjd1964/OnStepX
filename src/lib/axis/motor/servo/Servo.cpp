@@ -366,15 +366,17 @@ void ServoMotor::poll() {
   // was velocityPercent*50 for 1/50th of the range i.e. 2%, now defaults to 20% and must be set
   feedback->variableParameters(fabs(velocityPercent));
 
-  // if we're not moving "fast" and the motor is above 50% power something is seriously wrong, so shut it down
+  if (velocityPercent < -33) wasBelow33 = true;
+  if (velocityPercent > 33) wasAbove33 = true;
+
   if (millis() - lastCheckTime > 1000) {
-    if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 50) {
+
+    #ifndef SERVO_SAFETY_DISABLE
+    // if we're not moving and the motor is above 33% power something is seriously wrong, so shut it down
+    if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 33) {
       D(axisPrefix);
-      D("stall detected!");
-      D(" control->in = "); D(control->in);
-      D(", control->set = "); D(control->set);
-      D(", control->out = "); D(control->out);
-      D(", velocity % = "); DL(velocityPercent);
+      D("stall detected!"); D(" control->in = "); D(control->in); D(", control->set = "); D(control->set);
+      D(", control->out = "); D(control->out); D(", velocity % = "); DL(velocityPercent);
       enable(false);
     }
 
