@@ -144,6 +144,8 @@ void ODriveMotor::enable(bool state) {
 
   V(axisPrefix); VF("closed loop control - ");
   if (state) { VLF("Active"); } else { VLF("Idle"); }
+
+  enabled = state;
 }
 
 void ODriveMotor::setInstrumentCoordinateSteps(long value) {

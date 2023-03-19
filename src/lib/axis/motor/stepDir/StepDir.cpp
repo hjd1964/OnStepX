@@ -179,6 +179,7 @@ void StepDirMotor::enable(bool state) {
   } else {
     if (driver->enable(state)) { VLF(" using secondary method"); } else { VLF(" skipped no control available"); }
   }
+  enabled = state;
 }
 
 // get the associated stepper drivers status
