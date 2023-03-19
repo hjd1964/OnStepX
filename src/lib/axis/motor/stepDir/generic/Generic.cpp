@@ -83,15 +83,15 @@ void StepDirGeneric::init(float param1, float param2, float param3, float param4
 }
 
 IRAM_ATTR void StepDirGeneric::modeMicrostepTracking() {
-  digitalWriteF(m0Pin, microstepBitCodeM0);
-  digitalWriteF(m1Pin, microstepBitCodeM1);
+  if (m0Pin != OFF) digitalWriteF(m0Pin, microstepBitCodeM0);
+  if (m1Pin != OFF) digitalWriteF(m1Pin, microstepBitCodeM1);
   digitalWriteEx(m2Pin, microstepBitCodeM2);
 }
 
 IRAM_ATTR int StepDirGeneric::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
-    digitalWriteF(m0Pin, microstepBitCodeGotoM0);
-    digitalWriteF(m1Pin, microstepBitCodeGotoM1);
+    if (m0Pin != OFF) digitalWriteF(m0Pin, microstepBitCodeGotoM0);
+    if (m1Pin != OFF) digitalWriteF(m1Pin, microstepBitCodeGotoM1);
     digitalWriteEx(m2Pin, microstepBitCodeGotoM2);
   }
   return microstepRatio;
