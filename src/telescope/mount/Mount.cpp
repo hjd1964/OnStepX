@@ -294,7 +294,6 @@ void Mount::poll() {
   behind.h += trackingRateOffsetRadsRA;
   ahead.d += trackingRateOffsetRadsDec;
   behind.d -= trackingRateOffsetRadsDec;
-  Serial.println(trackingRateOffsetDec);
 
   // transfer to variables named appropriately for mount coordinates
   float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
