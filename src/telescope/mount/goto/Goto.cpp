@@ -474,6 +474,8 @@ void Goto::poll() {
   if (!axis1.nearTarget() || !axis2.nearTarget()) nearTargetTimeout = millis();
 
   if (mount.isTracking()) {
+    target.a += siderealToRad(mount.trackingRateOffsetRA)/FRACTIONAL_SEC;
+    target.d += siderealToRad(mount.trackingRateOffsetDec)/FRACTIONAL_SEC;
     transform.rightAscensionToHourAngle(&target, false);
     if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
       if (millis() - nearTargetTimeout < 4000) {

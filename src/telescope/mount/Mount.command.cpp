@@ -104,7 +104,22 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         default:
           return false;
         }
+      } else
+
+      // :GXTD#     Get tracking rate offset Dec in arc-seconds/sidereal second
+      //            Returns: n.nnnnnn#
+      if (parameter[0] == 'T' && parameter[1] == 'D' && parameter[2] == 0) {
+        sprintF(reply, "%0.8f", trackingRateOffsetDec*15.0F);
+        *numericReply = false;
+      } else
+
+      // :GXTR#     Get tracking rate offset RA in arc-seconds/sidereal second
+      //            Returns: n.nnnnnn#
+      if (parameter[0] == 'T' && parameter[1] == 'R' && parameter[2] == 0) {
+        sprintF(reply, "%0.8f", trackingRateOffsetRA*15.0F);
+        *numericReply = false;
       } else return false;
+
     } else
 
     // :GZ#       Get Mount Azimuth
@@ -214,8 +229,26 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
             (l == ALTAZM && AXIS2_TANGENT_ARM == OFF)) {
           nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l);
         } else *commandError = CE_PARAM_RANGE;
+      } else
 
+      // :SXTD,n.n# Set tracking rate offset Dec in arc-seconds/sidereal second
+      //            Return: 0 failure, 1 success
+      if (parameter[0] == 'T' && parameter[1] == 'D') {
+        float f = strtod(&parameter[3], &conv_end);
+        if (f < -1800.0F) f = -1800.0F;
+        if (f > 1800.0F) f = 1800.0F;
+        trackingRateOffsetDec = f/15.0F;
+      } else
+
+      // :SXTR,n.n# Set tracking rate offset RA in arc-seconds/sidereal second
+      //            Return: 0 failure, 1 success
+      if (parameter[0] == 'T' && parameter[1] == 'R') {
+        float f = strtod(&parameter[3], &conv_end);
+        if (f < -1800.0F) f = -1800.0F;
+        if (f > 1800.0F) f = 1800.0F;
+        trackingRateOffsetRA = f/15.0F;
       } else return false;
+
     } else return false;
   } else
 

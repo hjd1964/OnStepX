@@ -93,9 +93,11 @@ class Mount {
 
     void poll();
 
-    float trackingRate = 1.0F;
-    float trackingRateAxis1 = 0.0F;
-    float trackingRateAxis2 = 0.0F;
+    float trackingRate = 1.0F;            // in sidereal units 1x = 15 arc-seconds/sidereal second
+    float trackingRateAxis1 = 0.0F;       // in sidereal units 1x = 15 arc-seconds/sidereal second
+    float trackingRateAxis2 = 0.0F;       // in sidereal units 1x = 15 arc-seconds/sidereal second
+    float trackingRateOffsetRA = 0.0F;    // in sidereal units 1x = 15 arc-seconds/sidereal second
+    float trackingRateOffsetDec = 0.0F;   // in sidereal units 1x = 15 arc-seconds/sidereal second
 
     MountSettings settings = {RC_DEFAULT, { 0, 0 }};
 
