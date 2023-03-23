@@ -16,7 +16,7 @@
   #define PID_SAMPLE_TIME_US 10000 // PID sample time in microseconds (defaults to 10 milliseconds)
 #endif
 #ifndef PID_PMODE
-  #define PID_PMODE pOnMeas // http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+  #define PID_PMODE pOnError // http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
 #endif
 #ifndef PID_IMODE
   #define PID_IMODE iAwCondition
