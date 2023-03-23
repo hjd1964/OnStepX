@@ -27,10 +27,9 @@ void Pid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
                      0, 0, 0,
-                     QuickPID::pMode::pOnError, QuickPID::dMode::dOnError, QuickPID::iAwMode::iAwCondition,
+                     QuickPID::pMode::PID_PMODE, QuickPID::dMode::PID_DMODE, QuickPID::iAwMode::PID_IMODE,
                      QuickPID::Action::direct);
-
-  pid->SetSampleTimeUs(1000);
+  pid->SetSampleTimeUs(PID_SAMPLE_TIME_US);
   pid->SetOutputLimits(-controlRange, controlRange);
   pid->SetMode(QuickPID::Control::automatic);
 }

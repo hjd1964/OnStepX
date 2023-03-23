@@ -259,6 +259,12 @@
   #else
     #define AXIS1_SERVO_DC
   #endif
+  #ifndef AXIS1_SERVO_PH1_STATE
+  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
+  #endif
+  #ifndef AXIS1_SERVO_PH2_STATE
+  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
+  #endif
 
   #ifndef AXIS1_SERVO_MAX_VELOCITY
   #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
@@ -266,27 +272,32 @@
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
-  #ifndef AXIS1_SERVO_P
-  #define AXIS1_SERVO_P                 2.0                       // P = proportional
+  #ifndef AXIS1_SERVO_FEEDBACK
+  #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
   #endif
-  #ifndef AXIS1_SERVO_I
-  #define AXIS1_SERVO_I                 5.0                       // I = integral
+
+  #ifndef AXIS1_PID_P
+  #define AXIS1_PID_P                   2.0                       // P = proportional
   #endif
-  #ifndef AXIS1_SERVO_D
-  #define AXIS1_SERVO_D                 1.0                       // D = derivative
+  #ifndef AXIS1_PID_I
+  #define AXIS1_PID_I                   5.0                       // I = integral
   #endif
-  #ifndef AXIS1_SERVO_P_GOTO
-  #define AXIS1_SERVO_P_GOTO            AXIS1_SERVO_P             // P = proportional
+  #ifndef AXIS1_PID_D
+  #define AXIS1_PID_D                   1.0                       // D = derivative
   #endif
-  #ifndef AXIS1_SERVO_I_GOTO
-  #define AXIS1_SERVO_I_GOTO            AXIS1_SERVO_I             // I = integral
+  #ifndef AXIS1_PID_P_GOTO
+  #define AXIS1_PID_P_GOTO              AXIS1_PID_P               // P = proportional
   #endif
-  #ifndef AXIS1_SERVO_D_GOTO
-  #define AXIS1_SERVO_D_GOTO            AXIS1_SERVO_D             // D = derivative
+  #ifndef AXIS1_PID_I_GOTO
+  #define AXIS1_PID_I_GOTO              AXIS1_PID_I               // I = integral
   #endif
-  #ifndef AXIS1_SERVO_VAR_PID_SENS
-  #define AXIS1_SERVO_VAR_PID_SENS      0                         // 0 to use slewing state, or % power for 100% pid set two (_GOTO)
+  #ifndef AXIS1_PID_D_GOTO
+  #define AXIS1_PID_D_GOTO              AXIS1_PID_D               // D = derivative
   #endif
+  #ifndef AXIS1_PID_SENSITIVITY
+  #define AXIS1_PID_SENSITIVITY         0                         // 0 to use slewing state, or % power for 100% pid set two (_GOTO)
+  #endif
+
   #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
   #endif
@@ -295,15 +306,6 @@
   #endif
   #ifndef AXIS1_ENCODER_REVERSE
   #define AXIS1_ENCODER_REVERSE         OFF                       // reverse count direction of encoder
-  #endif
-  #ifndef AXIS1_SERVO_FEEDBACK
-  #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
-  #endif
-  #ifndef AXIS1_SERVO_PH1_STATE
-  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
-  #endif
-  #ifndef AXIS1_SERVO_PH2_STATE
-  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
   #endif
 #endif
 #if AXIS1_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
@@ -417,6 +419,12 @@
   #else
     #define AXIS2_SERVO_DC
   #endif
+  #ifndef AXIS2_SERVO_PH1_STATE
+  #define AXIS2_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS2_SERVO_PH2_STATE
+  #define AXIS2_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS2_SERVO_MAX_VELOCITY
   #define AXIS2_SERVO_MAX_VELOCITY      100
@@ -424,27 +432,32 @@
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS2_SERVO_P
-  #define AXIS2_SERVO_P                 2.0
+  #ifndef AXIS2_SERVO_FEEDBACK
+  #define AXIS2_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS2_SERVO_I
-  #define AXIS2_SERVO_I                 5.0
+
+  #ifndef AXIS2_PID_P
+  #define AXIS2_PID_P                   2.0
   #endif
-  #ifndef AXIS2_SERVO_D
-  #define AXIS2_SERVO_D                 1.0
+  #ifndef AXIS2_PID_I
+  #define AXIS2_PID_I                   5.0
   #endif
-  #ifndef AXIS2_SERVO_P_GOTO
-  #define AXIS2_SERVO_P_GOTO            AXIS2_SERVO_P
+  #ifndef AXIS2_PID_D
+  #define AXIS2_PID_D                   1.0
   #endif
-  #ifndef AXIS2_SERVO_I_GOTO
-  #define AXIS2_SERVO_I_GOTO            AXIS2_SERVO_I
+  #ifndef AXIS2_PID_P_GOTO
+  #define AXIS2_PID_P_GOTO              AXIS2_PID_P
   #endif
-  #ifndef AXIS2_SERVO_D_GOTO
-  #define AXIS2_SERVO_D_GOTO            AXIS2_SERVO_D
+  #ifndef AXIS2_PID_I_GOTO
+  #define AXIS2_PID_I_GOTO              AXIS2_PID_I
   #endif
-  #ifndef AXIS2_SERVO_VAR_PID_SENS
-  #define AXIS2_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS2_PID_D_GOTO
+  #define AXIS2_PID_D_GOTO              AXIS2_PID_D
   #endif
+  #ifndef AXIS2_PID_SENSITIVITY
+  #define AXIS2_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS2_ENCODER
   #define AXIS2_ENCODER                 AB
   #endif
@@ -453,15 +466,6 @@
   #endif
   #ifndef AXIS2_ENCODER_REVERSE
   #define AXIS2_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS2_SERVO_FEEDBACK
-  #define AXIS2_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS2_SERVO_PH1_STATE
-  #define AXIS2_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS2_SERVO_PH2_STATE
-  #define AXIS2_SERVO_PH2_STATE         LOW
   #endif
 #endif
 #if AXIS2_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
@@ -851,6 +855,12 @@
   #else
     #define AXIS3_SERVO_DC
   #endif
+  #ifndef AXIS3_SERVO_PH1_STATE
+  #define AXIS3_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS3_SERVO_PH2_STATE
+  #define AXIS3_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS3_SERVO_MAX_VELOCITY
   #define AXIS3_SERVO_MAX_VELOCITY      100
@@ -858,27 +868,32 @@
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS3_SERVO_P
-  #define AXIS3_SERVO_P                 2.0
+  #ifndef AXIS3_SERVO_FEEDBACK
+  #define AXIS3_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS3_SERVO_I
-  #define AXIS3_SERVO_I                 5.0
+
+  #ifndef AXIS3_PID_P
+  #define AXIS3_PID_P                   2.0
   #endif
-  #ifndef AXIS3_SERVO_D
-  #define AXIS3_SERVO_D                 1.0
+  #ifndef AXIS3_PID_I
+  #define AXIS3_PID_I                   5.0
   #endif
-  #ifndef AXIS3_SERVO_P_GOTO
-  #define AXIS3_SERVO_P_GOTO            AXIS3_SERVO_P
+  #ifndef AXIS3_PID_D
+  #define AXIS3_PID_D                   1.0
   #endif
-  #ifndef AXIS3_SERVO_I_GOTO
-  #define AXIS3_SERVO_I_GOTO            AXIS3_SERVO_I
+  #ifndef AXIS3_PID_P_GOTO
+  #define AXIS3_PID_P_GOTO              AXIS3_PID_P
   #endif
-  #ifndef AXIS3_SERVO_D_GOTO
-  #define AXIS3_SERVO_D_GOTO            AXIS3_SERVO_D
+  #ifndef AXIS3_PID_I_GOTO
+  #define AXIS3_PID_I_GOTO              AXIS3_PID_I
   #endif
-  #ifndef AXIS3_SERVO_VAR_PID_SENS
-  #define AXIS3_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS3_PID_D_GOTO
+  #define AXIS3_PID_D_GOTO              AXIS3_PID_D
   #endif
+  #ifndef AXIS3_PID_SENSITIVITY
+  #define AXIS3_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS3_ENCODER
   #define AXIS3_ENCODER                 AB
   #endif
@@ -887,15 +902,6 @@
   #endif
   #ifndef AXIS3_ENCODER_REVERSE
   #define AXIS3_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS3_SERVO_FEEDBACK
-  #define AXIS3_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS3_SERVO_PH1_STATE
-  #define AXIS3_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS3_SERVO_PH2_STATE
-  #define AXIS3_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1036,6 +1042,12 @@
   #else
     #define AXIS4_SERVO_DC
   #endif
+  #ifndef AXIS4_SERVO_PH1_STATE
+  #define AXIS4_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS4_SERVO_PH2_STATE
+  #define AXIS4_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS4_SERVO_MAX_VELOCITY
   #define AXIS4_SERVO_MAX_VELOCITY      100
@@ -1043,27 +1055,32 @@
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS4_SERVO_P
-  #define AXIS4_SERVO_P                 2.0
+  #ifndef AXIS4_SERVO_FEEDBACK
+  #define AXIS4_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS4_SERVO_I
-  #define AXIS4_SERVO_I                 5.0
+
+  #ifndef AXIS4_PID_P
+  #define AXIS4_PID_P                 2.0
   #endif
-  #ifndef AXIS4_SERVO_D
-  #define AXIS4_SERVO_D                 1.0
+  #ifndef AXIS4_PID_I
+  #define AXIS4_PID_I                 5.0
   #endif
-  #ifndef AXIS4_SERVO_P_GOTO
-  #define AXIS4_SERVO_P_GOTO            AXIS4_SERVO_P
+  #ifndef AXIS4_PID_D
+  #define AXIS4_PID_D                 1.0
   #endif
-  #ifndef AXIS4_SERVO_I_GOTO
-  #define AXIS4_SERVO_I_GOTO            AXIS4_SERVO_I
+  #ifndef AXIS4_PID_P_GOTO
+  #define AXIS4_PID_P_GOTO            AXIS4_PID_P
   #endif
-  #ifndef AXIS4_SERVO_D_GOTO
-  #define AXIS4_SERVO_D_GOTO            AXIS4_SERVO_D
+  #ifndef AXIS4_PID_I_GOTO
+  #define AXIS4_PID_I_GOTO            AXIS4_PID_I
   #endif
-  #ifndef AXIS4_SERVO_VAR_PID_SENS
-  #define AXIS4_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS4_PID_D_GOTO
+  #define AXIS4_PID_D_GOTO            AXIS4_PID_D
   #endif
+  #ifndef AXIS4_PID_SENSITIVITY
+  #define AXIS4_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS4_ENCODER
   #define AXIS4_ENCODER                 AB
   #endif
@@ -1072,15 +1089,6 @@
   #endif
   #ifndef AXIS4_ENCODER_REVERSE
   #define AXIS4_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS4_SERVO_FEEDBACK
-  #define AXIS4_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS4_SERVO_PH1_STATE
-  #define AXIS4_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS4_SERVO_PH2_STATE
-  #define AXIS4_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1196,6 +1204,12 @@
   #if AXIS5_DRIVER_MODEL == SERVO_PE || AXIS5_DRIVER_MODEL == SERVO_EE
     #define AXIS5_SERVO_DC
   #endif
+  #ifndef AXIS5_SERVO_PH1_STATE
+  #define AXIS5_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS5_SERVO_PH2_STATE
+  #define AXIS5_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS5_SERVO_MAX_VELOCITY
   #define AXIS5_SERVO_MAX_VELOCITY      100
@@ -1203,27 +1217,32 @@
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS5_SERVO_P
-  #define AXIS5_SERVO_P                 2.0
+  #ifndef AXIS5_SERVO_FEEDBACK
+  #define AXIS5_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS5_SERVO_I
-  #define AXIS5_SERVO_I                 5.0
+
+  #ifndef AXIS5_PID_P
+  #define AXIS5_PID_P                   2.0
   #endif
-  #ifndef AXIS5_SERVO_D
-  #define AXIS5_SERVO_D                 1.0
+  #ifndef AXIS5_PID_I
+  #define AXIS5_PID_I                   5.0
   #endif
-  #ifndef AXIS5_SERVO_P_GOTO
-  #define AXIS5_SERVO_P_GOTO            AXIS5_SERVO_P
+  #ifndef AXIS5_PID_D
+  #define AXIS5_PID_D                   1.0
   #endif
-  #ifndef AXIS5_SERVO_I_GOTO
-  #define AXIS5_SERVO_I_GOTO            AXIS5_SERVO_I
+  #ifndef AXIS5_PID_P_GOTO
+  #define AXIS5_PID_P_GOTO              AXIS5_PID_P
   #endif
-  #ifndef AXIS5_SERVO_D_GOTO
-  #define AXIS5_SERVO_D_GOTO            AXIS5_SERVO_D
+  #ifndef AXIS5_PID_I_GOTO
+  #define AXIS5_PID_I_GOTO              AXIS5_PID_I
   #endif
-  #ifndef AXIS5_SERVO_VAR_PID_SENS
-  #define AXIS5_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS5_PID_D_GOTO
+  #define AXIS5_PID_D_GOTO              AXIS5_PID_D
   #endif
+  #ifndef AXIS5_PID_SENSITIVITY
+  #define AXIS5_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS5_ENCODER
   #define AXIS5_ENCODER                 AB
   #endif
@@ -1232,15 +1251,6 @@
   #endif
   #ifndef AXIS5_ENCODER_REVERSE
   #define AXIS5_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS5_SERVO_FEEDBACK
-  #define AXIS5_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS5_SERVO_PH1_STATE
-  #define AXIS5_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS5_SERVO_PH2_STATE
-  #define AXIS5_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1356,6 +1366,12 @@
   #if AXIS6_DRIVER_MODEL == SERVO_PE || AXIS6_DRIVER_MODEL == SERVO_EE
     #define AXIS6_SERVO_DC
   #endif
+  #ifndef AXIS6_SERVO_PH1_STATE
+  #define AXIS6_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS6_SERVO_PH2_STATE
+  #define AXIS6_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS6_SERVO_MAX_VELOCITY
   #define AXIS6_SERVO_MAX_VELOCITY      100
@@ -1363,27 +1379,32 @@
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS6_SERVO_P
-  #define AXIS6_SERVO_P                 2.0
+  #ifndef AXIS6_SERVO_FEEDBACK
+  #define AXIS6_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS6_SERVO_I
-  #define AXIS6_SERVO_I                 5.0
+
+  #ifndef AXIS6_PID_P
+  #define AXIS6_PID_P                   2.0
   #endif
-  #ifndef AXIS6_SERVO_D
-  #define AXIS6_SERVO_D                 1.0
+  #ifndef AXIS6_PID_I
+  #define AXIS6_PID_I                   5.0
   #endif
-  #ifndef AXIS6_SERVO_P_GOTO
-  #define AXIS6_SERVO_P_GOTO            AXIS6_SERVO_P
+  #ifndef AXIS6_PID_D
+  #define AXIS6_PID_D                   1.0
   #endif
-  #ifndef AXIS6_SERVO_I_GOTO
-  #define AXIS6_SERVO_I_GOTO            AXIS6_SERVO_I
+  #ifndef AXIS6_PID_P_GOTO
+  #define AXIS6_PID_P_GOTO              AXIS6_PID_P
   #endif
-  #ifndef AXIS6_SERVO_D_GOTO
-  #define AXIS6_SERVO_D_GOTO            AXIS6_SERVO_D
+  #ifndef AXIS6_PID_I_GOTO
+  #define AXIS6_PID_I_GOTO              AXIS6_PID_I
   #endif
-  #ifndef AXIS6_SERVO_VAR_PID_SENS
-  #define AXIS6_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS6_PID_D_GOTO
+  #define AXIS6_PID_D_GOTO              AXIS6_PID_D
   #endif
+  #ifndef AXIS6_PID_SENSITIVITY
+  #define AXIS6_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS6_ENCODER
   #define AXIS6_ENCODER                 AB
   #endif
@@ -1392,15 +1413,6 @@
   #endif
   #ifndef AXIS6_ENCODER_REVERSE
   #define AXIS6_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS6_SERVO_FEEDBACK
-  #define AXIS6_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS6_SERVO_PH1_STATE
-  #define AXIS6_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS6_SERVO_PH2_STATE
-  #define AXIS6_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1516,6 +1528,12 @@
   #if AXIS7_DRIVER_MODEL == SERVO_PE || AXIS7_DRIVER_MODEL == SERVO_EE
     #define AXIS7_SERVO_DC
   #endif
+  #ifndef AXIS7_SERVO_PH1_STATE
+  #define AXIS7_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS7_SERVO_PH2_STATE
+  #define AXIS7_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS7_SERVO_MAX_VELOCITY
   #define AXIS7_SERVO_MAX_VELOCITY      100
@@ -1523,27 +1541,32 @@
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS7_SERVO_P
-  #define AXIS7_SERVO_P                 2.0
+  #ifndef AXIS7_SERVO_FEEDBACK
+  #define AXIS7_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS7_SERVO_I
-  #define AXIS7_SERVO_I                 5.0
+
+  #ifndef AXIS7_PID_P
+  #define AXIS7_PID_P                   2.0
   #endif
-  #ifndef AXIS7_SERVO_D
-  #define AXIS7_SERVO_D                 1.0
+  #ifndef AXIS7_PID_I
+  #define AXIS7_PID_I                   5.0
   #endif
-  #ifndef AXIS7_SERVO_P_GOTO
-  #define AXIS7_SERVO_P_GOTO            AXIS7_SERVO_P
+  #ifndef AXIS7_PID_D
+  #define AXIS7_PID_D                   1.0
   #endif
-  #ifndef AXIS7_SERVO_I_GOTO
-  #define AXIS7_SERVO_I_GOTO            AXIS7_SERVO_I
+  #ifndef AXIS7_PID_P_GOTO
+  #define AXIS7_PID_P_GOTO              AXIS7_PID_P
   #endif
-  #ifndef AXIS7_SERVO_D_GOTO
-  #define AXIS7_SERVO_D_GOTO            AXIS7_SERVO_D
+  #ifndef AXIS7_PID_I_GOTO
+  #define AXIS7_PID_I_GOTO              AXIS7_PID_I
   #endif
-  #ifndef AXIS7_SERVO_VAR_PID_SENS
-  #define AXIS7_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS7_PID_D_GOTO
+  #define AXIS7_PID_D_GOTO              AXIS7_PID_D
   #endif
+  #ifndef AXIS7_PID_SENSITIVITY
+  #define AXIS7_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS7_ENCODER
   #define AXIS7_ENCODER                 AB
   #endif
@@ -1552,15 +1575,6 @@
   #endif
   #ifndef AXIS7_ENCODER_REVERSE
   #define AXIS7_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS7_SERVO_FEEDBACK
-  #define AXIS7_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS7_SERVO_PH1_STATE
-  #define AXIS7_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS7_SERVO_PH2_STATE
-  #define AXIS7_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1676,6 +1690,12 @@
   #if AXIS8_DRIVER_MODEL == SERVO_PE || AXIS8_DRIVER_MODEL == SERVO_EE
     #define AXIS8_SERVO_DC
   #endif
+  #ifndef AXIS8_SERVO_PH1_STATE
+  #define AXIS8_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS8_SERVO_PH2_STATE
+  #define AXIS8_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS8_SERVO_MAX_VELOCITY
   #define AXIS8_SERVO_MAX_VELOCITY      100
@@ -1683,27 +1703,32 @@
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS8_SERVO_P
-  #define AXIS8_SERVO_P                 2.0
+  #ifndef AXIS8_SERVO_FEEDBACK
+  #define AXIS8_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS8_SERVO_I
-  #define AXIS8_SERVO_I                 5.0
+
+  #ifndef AXIS8_PID_P
+  #define AXIS8_PID_P                   2.0
   #endif
-  #ifndef AXIS8_SERVO_D
-  #define AXIS8_SERVO_D                 1.0
+  #ifndef AXIS8_PID_I
+  #define AXIS8_PID_I                   5.0
   #endif
-  #ifndef AXIS8_SERVO_P_GOTO
-  #define AXIS8_SERVO_P_GOTO            AXIS8_SERVO_P
+  #ifndef AXIS8_PID_D
+  #define AXIS8_PID_D                   1.0
   #endif
-  #ifndef AXIS8_SERVO_I_GOTO
-  #define AXIS8_SERVO_I_GOTO            AXIS8_SERVO_I
+  #ifndef AXIS8_PID_P_GOTO
+  #define AXIS8_PID_P_GOTO              AXIS8_PID_P
   #endif
-  #ifndef AXIS8_SERVO_D_GOTO
-  #define AXIS8_SERVO_D_GOTO            AXIS8_SERVO_D
+  #ifndef AXIS8_PID_I_GOTO
+  #define AXIS8_PID_I_GOTO              AXIS8_PID_I
   #endif
-  #ifndef AXIS8_SERVO_VAR_PID_SENS
-  #define AXIS8_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS8_PID_D_GOTO
+  #define AXIS8_PID_D_GOTO              AXIS8_PID_D
   #endif
+  #ifndef AXIS8_PID_SENSITIVITY
+  #define AXIS8_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS8_ENCODER
   #define AXIS8_ENCODER                 AB
   #endif
@@ -1712,15 +1737,6 @@
   #endif
   #ifndef AXIS8_ENCODER_REVERSE
   #define AXIS8_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS8_SERVO_FEEDBACK
-  #define AXIS8_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS8_SERVO_PH1_STATE
-  #define AXIS8_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS8_SERVO_PH2_STATE
-  #define AXIS8_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
@@ -1836,6 +1852,12 @@
   #if AXIS9_DRIVER_MODEL == SERVO_PE || AXIS9_DRIVER_MODEL == SERVO_EE
     #define AXIS9_SERVO_DC
   #endif
+  #ifndef AXIS9_SERVO_PH1_STATE
+  #define AXIS9_SERVO_PH1_STATE         LOW
+  #endif
+  #ifndef AXIS9_SERVO_PH2_STATE
+  #define AXIS9_SERVO_PH2_STATE         LOW
+  #endif
 
   #ifndef AXIS9_SERVO_MAX_VELOCITY
   #define AXIS9_SERVO_MAX_VELOCITY      100
@@ -1843,27 +1865,32 @@
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
   #endif
-  #ifndef AXIS9_SERVO_P
-  #define AXIS9_SERVO_P                 2.0
+  #ifndef AXIS9_SERVO_FEEDBACK
+  #define AXIS9_SERVO_FEEDBACK          FB_PID
   #endif
-  #ifndef AXIS9_SERVO_I
-  #define AXIS9_SERVO_I                 5.0
+
+  #ifndef AXIS9_PID_P
+  #define AXIS9_PID_P                   2.0
   #endif
-  #ifndef AXIS9_SERVO_D
-  #define AXIS9_SERVO_D                 1.0
+  #ifndef AXIS9_PID_I
+  #define AXIS9_PID_I                   5.0
   #endif
-  #ifndef AXIS9_SERVO_P_GOTO
-  #define AXIS9_SERVO_P_GOTO            AXIS9_SERVO_P
+  #ifndef AXIS9_PID_D
+  #define AXIS9_PID_D                   1.0
   #endif
-  #ifndef AXIS9_SERVO_I_GOTO
-  #define AXIS9_SERVO_I_GOTO            AXIS9_SERVO_I
+  #ifndef AXIS9_PID_P_GOTO
+  #define AXIS9_PID_P_GOTO              AXIS9_PID_P
   #endif
-  #ifndef AXIS9_SERVO_D_GOTO
-  #define AXIS9_SERVO_D_GOTO            AXIS9_SERVO_D
+  #ifndef AXIS9_PID_I_GOTO
+  #define AXIS9_PID_I_GOTO              AXIS9_PID_I
   #endif
-  #ifndef AXIS9_SERVO_VAR_PID_SENS
-  #define AXIS9_SERVO_VAR_PID_SENS      0
+  #ifndef AXIS9_PID_D_GOTO
+  #define AXIS9_PID_D_GOTO              AXIS9_PID_D
   #endif
+  #ifndef AXIS9_PID_SENSITIVITY
+  #define AXIS9_PID_SENSITIVITY         0
+  #endif
+
   #ifndef AXIS9_ENCODER
   #define AXIS9_ENCODER                 AB
   #endif
@@ -1872,15 +1899,6 @@
   #endif
   #ifndef AXIS9_ENCODER_REVERSE
   #define AXIS9_ENCODER_REVERSE         OFF
-  #endif
-  #ifndef AXIS9_SERVO_FEEDBACK
-  #define AXIS9_SERVO_FEEDBACK          FB_PID
-  #endif
-  #ifndef AXIS9_SERVO_PH1_STATE
-  #define AXIS9_SERVO_PH1_STATE         LOW
-  #endif
-  #ifndef AXIS9_SERVO_PH2_STATE
-  #define AXIS9_SERVO_PH2_STATE         LOW
   #endif
 #endif
 
