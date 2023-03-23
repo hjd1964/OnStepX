@@ -8,8 +8,8 @@
 
 #include <QuickPID.h>  // https://github.com/Dlloydev/QuickPID or https://github.com/hjd1964/QuickPID (fix compile fail on ESP32)
 
-#ifndef SERVO_SLEWING_TO_TRACKING_TIME
-  #define SERVO_SLEWING_TO_TRACKING_TIME 1000 // time to switch from PID slewing to tracking parameters in ms
+#ifndef PID_SLEWING_TO_TRACKING_TIME_MS
+  #define PID_SLEWING_TO_TRACKING_TIME_MS 1000 // time to switch from PID slewing to tracking parameters in milliseconds
 #endif
 
 class Pid : public Feedback {
@@ -45,7 +45,7 @@ class Pid : public Feedback {
           if (trackingSelected) parameterSelect--;
           if (parameterSelect < 0) parameterSelect = 0;
           variableParameters(parameterSelect);
-          nextSelectIncrementTime = millis() + round(SERVO_SLEWING_TO_TRACKING_TIME/100.0F);
+          nextSelectIncrementTime = millis() + round(PID_SLEWING_TO_TRACKING_TIME_MS/100.0F);
         }
       }
     }
