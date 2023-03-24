@@ -375,20 +375,28 @@ void ServoMotor::poll() {
   if (millis() - lastCheckTime > 1000) {
 
     #ifndef SERVO_SAFETY_DISABLE
-    // if we're not moving and the motor is above 33% power something is seriously wrong, so shut it down
-    if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 33) {
-      D(axisPrefix);
-      D("stall detected!"); D(" control->in = "); D(control->in); D(", control->set = "); D(control->set);
-      D(", control->out = "); D(control->out); D(", velocity % = "); DL(velocityPercent);
-      enable(false);
-    }
+      // if above 33% power and we're not moving something is seriously wrong, so shut it down
+      if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 33) {
+        D(axisPrefix);
+        D("stall detected!"); D(" control->in = "); D(control->in); D(", control->set = "); D(control->set);
+        D(", control->out = "); D(control->out); D(", velocity % = "); DL(velocityPercent);
+        enable(false);
+      }
 
-    // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
-    if (wasBelow33 && wasAbove33) {
-      D(axisPrefix);
-      DL("oscillation detected, below -33% and above 33% power in a 1 second period!");
-      enable(false);
-    }
+      // if above 90% power and we're moving away from the target something is seriously wrong, so shut it down
+      if (labs(encoderCounts - lastEncoderCounts) > lastTargetDistance && abs(velocityPercent) >= 90) {
+        D(axisPrefix);
+        DL("runaway detected, > 90% power while moving away from the target!");
+        enable(false);
+      }
+      lastTargetDistance = labs(encoderCounts - lastEncoderCounts);
+
+      // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
+      if (wasBelow33 && wasAbove33) {
+        D(axisPrefix);
+        DL("oscillation detected, below -33% and above 33% power in a 1 second period!");
+        enable(false);
+      }
     #endif
 
     wasAbove33 = false;
