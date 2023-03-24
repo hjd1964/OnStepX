@@ -372,7 +372,7 @@ void ServoMotor::poll() {
   if (velocityPercent < -33) wasBelow33 = true;
   if (velocityPercent > 33) wasAbove33 = true;
 
-  if (millis() - lastCheckTime > 1000) {
+  if (millis() - lastCheckTime > 2000) {
 
     #ifndef SERVO_SAFETY_DISABLE
       // if above 33% power and we're not moving something is seriously wrong, so shut it down
@@ -394,7 +394,7 @@ void ServoMotor::poll() {
       // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
       if (wasBelow33 && wasAbove33) {
         D(axisPrefix);
-        DL("oscillation detected, below -33% and above 33% power in a 1 second period!");
+        DL("oscillation detected, below -33% and above 33% power in a 2 second period!");
         enable(false);
       }
     #endif
