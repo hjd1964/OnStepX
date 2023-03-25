@@ -581,6 +581,9 @@
 #ifndef RETICLE_LED_MEMORY
 #define RETICLE_LED_MEMORY            OFF
 #endif
+#ifndef RETICLE_LED_INVERT
+#define RETICLE_LED_INVERT            OFF
+#endif
 
 // time and location
 #ifndef TIME_LOCATION_SOURCE
