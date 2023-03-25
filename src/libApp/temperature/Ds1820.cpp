@@ -8,7 +8,7 @@
 #include "../../lib/tasks/OnTask.h"
 
 #include "../../lib/1wire/1Wire.h"
-#include <DallasTemp.h>        // my Dallas Temperature library https://github.com/hjd1964/Arduino-Temperature-Control-Library
+#include <DallasTemp.h>        // my Dallas Temperature library https://github.com/hjd1964/DS18x20Temp
 DallasTemperature DS18X20(&oneWire);
 
 #include "../weather/Weather.h"
