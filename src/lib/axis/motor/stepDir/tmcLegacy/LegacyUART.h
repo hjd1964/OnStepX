@@ -32,7 +32,7 @@
 #endif
 
 #define TMC2209_DEBUG false
-#include <TMC2209.h> // https://github.com/hjd1964/TMC2209
+#include <TMC2209X.h> // https://github.com/hjd1964/TMC2209X
 
 class StepDirTmcUART : public StepDirDriver {
   public:
