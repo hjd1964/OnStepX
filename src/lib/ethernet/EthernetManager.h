@@ -17,7 +17,7 @@
   #endif
   #include <Ethernet2.h>  // https://github.com/adafruit/Ethernet2
 #else
-  #include <Ethernet.h>
+  #include <EthernetX.h>
 #endif
 
 #define EthernetSettingsSize 128
