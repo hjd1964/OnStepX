@@ -129,7 +129,7 @@ void Site::init() {
   setSiderealTime(ut1);
 
   VF("MSG: Mount, site start sidereal timer task (rate 10ms priority 0)... ");
-  delay(1000);
+  delay(100);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
   taskHandle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
   if (taskHandle) {
