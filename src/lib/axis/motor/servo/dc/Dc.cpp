@@ -59,8 +59,8 @@ void ServoDc::init() {
       if (_pwm_period_us < 0.125F) _pwm_period_us = 0.125F;
       itimer4.priority(0);
       itimer4.begin(PWM38_HWTIMER, _pwm_period_us);
+      VF("MSG: ServoDriver"); V(axisNumber); VF(", emulating PWM on pin 38 with frequency of "); V(1.0F/((_pwm_period_us/1000000.0F) * (ANALOG_WRITE_RANGE + 1.0F))); VLF("hz");
     }
-    VF("MSG: ServoDriver"); V(axisNumber); VF(", emulating PWM on pin 38 with frequency of "); V(1.0F/((_pwm_period_us/1000000.0F) * (ANALOG_WRITE_RANGE + 1.0F))); VLF("hz");
   #endif
 
   // init default driver control pins
