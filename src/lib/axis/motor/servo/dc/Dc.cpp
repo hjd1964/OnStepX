@@ -5,7 +5,7 @@
 
 #ifdef SERVO_DC_PRESENT
 
-#ifdef ARDUINO_TEENSY41
+#if defined(ARDUINO_TEENSY41) && defined(AXIS1_STEP_PIN) && AXIS1_STEP_PIN == 38 && defined(ANALOG_WRITE_PWM_FREQUENCY)
   // this is only for pin 38 of a Teensy4.1
   IntervalTimer itimer4; uint16_t _pwm38_period = 0; uint8_t _pwm38_toggle = 0; float _pwm_period_us = (((1.0F/ANALOG_WRITE_PWM_FREQUENCY))/ANALOG_WRITE_RANGE)*1000000.0F;
   void PWM38_HWTIMER() {
@@ -54,7 +54,7 @@ void ServoDc::init() {
   #endif
 
   // if this is a T4.1 and we're using a PE driver and in2 == 38, assume its a MaxPCB4 and make our own PWM on that pin
-  #ifdef ARDUINO_TEENSY41
+  #ifdef analogWritePin38
     if (model == SERVO_PE && Pins->in2 == 38) {
       if (_pwm_period_us < 0.125F) _pwm_period_us = 0.125F;
       itimer4.priority(0);
@@ -103,7 +103,7 @@ void ServoDc::enable(bool state) {
       if (model == SERVO_PE) {
         digitalWriteF(Pins->in1, Pins->inState1);
         if (Pins->inState2 == HIGH) power = velocityMax; else power = 0; 
-        #ifdef ARDUINO_TEENSY41
+        #ifdef analogWritePin38
           if (Pins->in2 == 38) analogWritePin38(round(power)); else
         #endif
         analogWrite(Pins->in2, round(power));
@@ -170,7 +170,7 @@ void ServoDc::pwmUpdate(float power) {
       digitalWriteF(Pins->in1, Pins->inState1);
       if (Pins->inState2 == HIGH) power = velocityMax; else power = 0;
     }
-    #ifdef ARDUINO_TEENSY41
+    #ifdef analogWritePin38
       if (Pins->in2 == 38) analogWritePin38(round(power)); else
     #endif
     analogWrite(Pins->in2, round(power));
