@@ -110,7 +110,9 @@ CommandProcessor::~CommandProcessor() {
 
 void CommandProcessor::poll() {
   if (!serialReady) { delay(200); SerialPort.begin(serialBaud); serialReady = true; }
-  while (SerialPort.available()) { char c = SerialPort.read(); buffer.add(c); if (c == '#') break; }
+
+  unsigned long tout = micros() + 500;
+  while (SerialPort.available()) { char c = SerialPort.read(); buffer.add(c); if (buffer.ready() || (long)(micros() - tout) > 0) break; }
 
   if (buffer.ready()) {
     char reply[80] = "";
