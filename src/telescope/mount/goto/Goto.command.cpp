@@ -89,7 +89,8 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
   if (command[0] == 'C' && (command[1] == 'S' || command[1] == 'M') && parameter[0] == 0) {
     CommandError e;
     if (alignActive()) {
-      e = alignAddStar();
+      e = requestSync(gotoTarget, PSS_SAME_ONLY);
+      if (e == CE_NONE) e = alignAddStar();
       if (e != CE_NONE) { alignState.lastStar = 0; alignState.currentStar = 0; *commandError = e; }
     } else {
       PierSideSelect pps = settings.preferredPierSide;
