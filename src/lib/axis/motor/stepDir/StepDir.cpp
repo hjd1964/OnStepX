@@ -202,6 +202,8 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     }
   #endif
 
+  if (!inBacklash) modeSwitch();
+
   Y;
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
@@ -258,8 +260,6 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     step = dir;
     interrupts();
   }
-
-  if (!inBacklash) modeSwitch();
 }
 
 // switch microstep modes as needed
