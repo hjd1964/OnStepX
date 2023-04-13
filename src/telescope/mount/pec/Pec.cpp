@@ -35,9 +35,9 @@
     // read the settings
     nv.readBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
 
-    stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO_F)/240.0F;
+    stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO)/240.0L;
     stepsPerSiderealSecondI = lroundf(stepsPerSiderealSecond);
-    stepsPerSiderealFrac = (stepsPerSiderealSecond*SIDEREAL_RATIO_F)/FRACTIONAL_SEC;
+    stepsPerMicroSecond = (stepsPerSiderealSecond*SIDEREAL_RATIO)/1000000.0L;
 
     wormRotationSeconds = round(settings.wormRotationSteps/stepsPerSiderealSecond);
     bufferSize = wormRotationSeconds;
@@ -134,10 +134,12 @@
       static long lastWormRotationSteps = wormRotationSteps;
     #endif
     wormRotationSteps = axis1Steps - wormSenseSteps;
-    wormRotationSteps = ((wormRotationSteps % settings.wormRotationSteps) + settings.wormRotationSteps) % settings.wormRotationSteps;
+    while (wormRotationSteps >= settings.wormRotationSteps) wormRotationSteps -= settings.wormRotationSteps;
+    while (wormRotationSteps < 0) wormRotationSteps += settings.wormRotationSteps;
+
     #if PEC_SENSE == OFF
       if (wormRotationSteps - lastWormRotationSteps < 0) {
-        VLF("MSG: Mount, virtual index detected");
+        VLF("MSG: Mount, PEC virtual index detected");
         bufferStart = true;
       } else bufferStart = false;
     #endif
@@ -151,7 +153,7 @@
     if (settings.state == PEC_READY_PLAY) {
       // makes sure the index is at the start of a second before resuming play
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
-        VLF("MSG: Mount, started PEC playing");
+        VLF("MSG: Mount, PEC started playing");
         settings.state = PEC_PLAY;
         bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         wormRotationStartTimeFs = lastFs;
@@ -160,7 +162,7 @@
     // start recording PEC
     if (settings.state == PEC_READY_RECORD) {
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
-        VF("MSG: Mount, started PEC recording at ");
+        VF("MSG: Mount, PEC started recording at ");
         settings.state = PEC_RECORD;
         bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
         firstRecording = !settings.recorded;
@@ -168,7 +170,7 @@
         V(wormRotationStartTimeFs);
         recordStopTimeFs = wormRotationStartTimeFs + (uint32_t)(wormRotationSeconds*(long)FRACTIONAL_SEC);
         V(" and stopping at "); VL(recordStopTimeFs);
-        accGuideAxis1 = 0.0F;
+        accGuideAxis1 = 0.0L;
       }
     } else
     // and once the PEC data is all stored, indicate that it's valid and start using it
@@ -191,7 +193,11 @@
     bufferIndex = ((bufferIndex % wormRotationSeconds) + wormRotationSeconds) % wormRotationSeconds;
 
     // accumulate guide steps for PEC
-    if (guide.rateAxis1 != 0.0F) { accGuideAxis1 += stepsPerSiderealFrac*guide.rateAxis1; }
+    if (guide.rateAxis1 != 0.0F) {
+      if (accGuideStartTime != 0) accGuideAxis1 += stepsPerMicroSecond*(micros() - accGuideStartTime)*guide.rateAxis1;
+      accGuideStartTime = micros();
+      if (accGuideStartTime == 0) accGuideStartTime = 1;
+    } else accGuideStartTime = 0;
 
     // falls in whenever the pecIndex changes, which is once a sidereal second
     static long lastBufferIndex = 0;
@@ -241,13 +247,13 @@
     if (settings.state == PEC_RECORD || settings.state == PEC_READY_RECORD) {
       VLF("MSG: Mount, PEC recording stopped");
       settings.state = PEC_NONE;
-      rate = 0.0;
+      rate = 0.0F;
     } 
     // get ready to re-index when tracking comes back
     if (settings.state == PEC_PLAY) {
       VLF("MSG: Mount, PEC playing paused");
       settings.state = PEC_READY_PLAY;
-      rate = 0.0;
+      rate = 0.0F;
     } 
   }
 
