@@ -128,8 +128,8 @@
 #define AXIS4_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          32
 #define AXIS4_DIR_PIN           27
-#define AXIS1_ENCODER_A_PIN     AXIS4_STEP_PIN
-#define AXIS1_ENCODER_B_PIN     AUX1_PIN
+#define AXIS2_ENCODER_A_PIN     AXIS4_STEP_PIN
+#define AXIS2_ENCODER_B_PIN     AUX1_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        11
