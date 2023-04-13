@@ -117,8 +117,8 @@
 #define AXIS3_STEP_PIN          26
 #define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           27
-#define AXIS3_ENCODER_A_PIN     AXIS3_STEP_PIN
-#define AXIS3_ENCODER_B_PIN     AXIS3_DIR_PIN
+#define AXIS1_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #define AXIS4_ENABLE_PIN        28
@@ -128,8 +128,8 @@
 #define AXIS4_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          32
 #define AXIS4_DIR_PIN           27
-#define AXIS4_ENCODER_A_PIN     AXIS4_STEP_PIN
-#define AXIS4_ENCODER_B_PIN     AUX1_PIN
+#define AXIS1_ENCODER_A_PIN     AXIS4_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AUX1_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        11
