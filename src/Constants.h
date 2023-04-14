@@ -76,9 +76,11 @@
 #define TLS_FIRST                   1
 #define DS3231                      1      // DS3231 RTC on I2C
 #define DS3234                      2      // DS3234 RTC on SPI (DS3234_CS_PIN) Makuna library
-#define TEENSY                      3      // TEENSY3.2 RTC (Built-in)
-#define GPS                         4      // GPS device
-#define TLS_LAST                    4
+#define SD3031                      3      // SD3031 RTC on I2C
+#define TEENSY                      4      // TEENSY3.2 RTC (Built-in)
+#define GPS                         5      // GPS device
+#define NTP                         6      // NTP
+#define TLS_LAST                    6
 
 // PIER SIDE
 #define PIER_SIDE_FIRST             1
