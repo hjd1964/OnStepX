@@ -47,7 +47,7 @@ typedef struct Coordinate {
 typedef struct AlignCoordinate {
   float ax1, ma1;
   float ax2, ma2;
-  float cosA1, sinA1, cosA2, tanA2;
+  float cosA1, sinA1, cosA2, sinA2, tanA2;
   float h;
   float d;
   int side;
