@@ -38,6 +38,7 @@ void rotatorSlewingTile(String &data)
 
     data.concat(FPSTR(html_collapsable_end));
   }
+
   data.concat(FPSTR(html_tile_end));
   www.sendContentAndClear(data);
 }

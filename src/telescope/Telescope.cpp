@@ -55,15 +55,33 @@ InitError initError;
 
 Telescope::Telescope() {
   // early init for stepper drivers
+  #ifdef AXIS1_STEP_DIR_PRESENT
   if (AXIS1_STEP_PIN >= 0 && AXIS1_STEP_PIN <= 255) pinMode(AXIS1_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS2_STEP_DIR_PRESENT
   if (AXIS2_STEP_PIN >= 0 && AXIS2_STEP_PIN <= 255) pinMode(AXIS2_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS3_STEP_DIR_PRESENT
   if (AXIS3_STEP_PIN >= 0 && AXIS3_STEP_PIN <= 255) pinMode(AXIS3_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS4_STEP_DIR_PRESENT
   if (AXIS4_STEP_PIN >= 0 && AXIS4_STEP_PIN <= 255) pinMode(AXIS4_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS5_STEP_DIR_PRESENT
   if (AXIS5_STEP_PIN >= 0 && AXIS5_STEP_PIN <= 255) pinMode(AXIS5_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS6_STEP_DIR_PRESENT
   if (AXIS6_STEP_PIN >= 0 && AXIS6_STEP_PIN <= 255) pinMode(AXIS6_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS7_STEP_DIR_PRESENT
   if (AXIS7_STEP_PIN >= 0 && AXIS7_STEP_PIN <= 255) pinMode(AXIS7_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS8_STEP_DIR_PRESENT
   if (AXIS8_STEP_PIN >= 0 && AXIS8_STEP_PIN <= 255) pinMode(AXIS8_STEP_PIN, OUTPUT);
+  #endif
+  #ifdef AXIS9_STEP_DIR_PRESENT
   if (AXIS9_STEP_PIN >= 0 && AXIS9_STEP_PIN <= 255) pinMode(AXIS9_STEP_PIN, OUTPUT);
+  #endif
 
   if (AXIS1_ENABLE_PIN >= 0 && AXIS1_ENABLE_PIN <= 255) { pinMode(AXIS1_ENABLE_PIN, OUTPUT); digitalWrite(AXIS1_ENABLE_PIN, !AXIS1_ENABLE_STATE); }
   if (AXIS2_ENABLE_PIN >= 0 && AXIS2_ENABLE_PIN <= 255) { pinMode(AXIS2_ENABLE_PIN, OUTPUT); digitalWrite(AXIS2_ENABLE_PIN, !AXIS2_ENABLE_STATE); }

@@ -34,14 +34,6 @@ void ServoDriver::init() {
   }
 }
 
-// secondary way to power down, but using the enable pin in this case
-void ServoDriver::enable(bool state) {
-  if (enablePin != SHARED) {
-    enabled = state;
-    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
-  }
-}
-
 // update status info. for driver
 void ServoDriver::updateStatus() {
   #if DEBUG == VERBOSE

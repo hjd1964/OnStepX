@@ -11,7 +11,9 @@
 #endif
 
 #if TIME_LOCATION_SOURCE != OFF
-  #if TIME_LOCATION_SOURCE == DS3231
+  #if TIME_LOCATION_SOURCE == SD3031
+    #include "SD3031.h"
+  #elif TIME_LOCATION_SOURCE == DS3231
     #include "DS3231.h"
   #elif TIME_LOCATION_SOURCE == DS3234
     #include "DS3234.h"
@@ -22,6 +24,6 @@
   #elif TIME_LOCATION_SOURCE == TEENSY
     #include "Teensy.h" 
   #else
-    #error "Configuration (Config.h): TIME_LOCATION_SOURCE must be either OFF, DS3231, DS3234, GPS, or NTP"
+    #error "Configuration (Config.h): TIME_LOCATION_SOURCE unknown"
   #endif
 #endif

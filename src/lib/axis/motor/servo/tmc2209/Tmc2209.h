@@ -53,7 +53,7 @@ class ServoTmc2209 : public ServoDriver {
     // decodes driver model and sets up the pin modes
     void init();
 
-    // secondary way to power down, but using the enable pin in this case
+    // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
     // power level to the motor

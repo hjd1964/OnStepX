@@ -18,7 +18,7 @@ void siteTile(String &data)
   char temp[240] = "";
   char reply[80] = "";
 
-  sprintf_P(temp, html_tile_text_beg, "22em", "15em", "Time and Location");
+  sprintf_P(temp, html_tile_text_beg, "22em", "15em", L_LOCATION_TITLE);
   data.concat(temp);
   data.concat("<br/><hr>");
 

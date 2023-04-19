@@ -31,6 +31,7 @@
 #define I2C_SCL_PIN             22
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
+#define AUX2_PIN                39               // M3 pin TMC UART RX
 #define AUX3_PIN                14               // Home SW for Axis1
 #define AUX4_PIN                13               // Home SW for Axis2
 #define AUX5_PIN                1                // TX0 main USB, etc.
@@ -94,6 +95,8 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
+#define AXIS1_SERVO_PH1_PIN     AXIS1_DIR_PIN
+#define AXIS1_SERVO_PH2_PIN     AXIS1_STEP_PIN
 
 // Axis2 Dec/Alt step/dir driver
 #define AXIS2_ENABLE_PIN        SHARED
@@ -106,6 +109,8 @@
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
+#define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
+#define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
 // For rotator stepper driver
 #define AXIS3_ENABLE_PIN        SHARED
@@ -115,6 +120,8 @@
 #define AXIS3_M3_PIN            OFF              // UART RX
 #define AXIS3_STEP_PIN          2                // [must be low at boot 2]
 #define AXIS3_DIR_PIN           15
+#define AXIS1_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #define AXIS4_ENABLE_PIN        SHARED
@@ -124,6 +131,8 @@
 #define AXIS4_M3_PIN            OFF              // UART RX
 #define AXIS4_STEP_PIN          19
 #define AXIS4_DIR_PIN           15
+#define AXIS2_ENCODER_A_PIN     AXIS4_STEP_PIN
+#define AXIS2_ENCODER_B_PIN     AUX2_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        SHARED

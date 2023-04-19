@@ -116,10 +116,16 @@ class Goto {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
-    Coordinate gotoTarget;                     // initial requested goto destination Native coordinate (eq or hor)
-    Coordinate start;                          // goto starts from this Mount coordinate (eq or hor)
-    Coordinate destination;                    // goto next destination Mount coordinate (eq or hor)
-    Coordinate target;                         // goto final destination Mount coordinate (eq or hor)
+    // requested goto/sync destination Native coordinate (eq or hor)
+    Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    // goto starts from this Mount coordinate (eq or hor)
+    Coordinate start;
+    // goto next destination Mount coordinate (eq or hor)
+    Coordinate destination;
+    // goto final destination Mount coordinate (eq or hor)
+    Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    // last align (goto) target Mount coordinate (eq or hor)
+    Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     GotoStage  stage                = GG_NONE;
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;

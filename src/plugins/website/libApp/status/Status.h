@@ -37,7 +37,7 @@ typedef struct Features {
 
 class Status {
   public:
-    bool update(bool all = false);
+    bool update();
 
     inline bool getProduct(char product[]) { if (!mountFound) return false; else { strcpy(product, id); return true; } }
     inline bool getVersionStr(char version[]) { if (!mountFound) return false; else { strcpy(version, ver); return true; } }

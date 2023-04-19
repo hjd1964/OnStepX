@@ -50,7 +50,7 @@ void Website::init() {
   delay(2000);
 
   if (status.onStepFound) {
-    status.update(false);
+    status.update();
     delay(100);
   }
 

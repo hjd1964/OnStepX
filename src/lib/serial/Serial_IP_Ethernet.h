@@ -14,7 +14,7 @@
     #endif
     #include <Ethernet2.h>  // https://github.com/adafruit/Ethernet2
   #else
-    #include <Ethernet.h>
+    #include <Ethernet.h>   // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
   #endif
 
   class IPSerial : public Stream {

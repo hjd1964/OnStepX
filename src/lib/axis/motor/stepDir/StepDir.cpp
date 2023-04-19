@@ -179,6 +179,7 @@ void StepDirMotor::enable(bool state) {
   } else {
     if (driver->enable(state)) { VLF(" using secondary method"); } else { VLF(" skipped no control available"); }
   }
+  enabled = state;
 }
 
 // get the associated stepper drivers status
@@ -200,6 +201,8 @@ void StepDirMotor::setFrequencySteps(float frequency) {
       }
     }
   #endif
+
+  if (!inBacklash) modeSwitch();
 
   Y;
   // negative frequency, convert to positive and reverse the direction
@@ -257,8 +260,6 @@ void StepDirMotor::setFrequencySteps(float frequency) {
     step = dir;
     interrupts();
   }
-
-  if (!inBacklash) modeSwitch();
 }
 
 // switch microstep modes as needed

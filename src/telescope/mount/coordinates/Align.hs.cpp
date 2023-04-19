@@ -171,7 +171,7 @@ void GeoAlign::correct(AlignCoordinate &mount, float sf, float _deo, float _pd, 
   TF  = _tf*sf;
 
   TFh = TF*(cosLat*mount.sinA1*(1.0/mount.cosA2));
-  TFd = TF*(cosLat*mount.cosA1-sinLat*mount.cosA2);
+  TFd = TF*(cosLat*mount.cosA1*mount.sinA2-sinLat*mount.cosA2);
 
   // ------------------------------------------------------------
   *a1r  = (-PZ*mount.cosA1*mount.tanA2 + PA*mount.sinA1*mount.tanA2 + DOh + PDh + TFh);
@@ -229,15 +229,16 @@ void GeoAlign::doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6
         ma1 = ma1 + ohe;
         ma2 = ma2 + ode;
       }
- 
+
       mount[l].ma1 = ma1;
       mount[l].ma2 = ma2;
       mount[l].sinA1 = sinf(ma1);
       mount[l].cosA1 = cosf(ma1);
+      mount[l].sinA2 = sinf(ma2);
       mount[l].cosA2 = cosf(ma2);
-      mount[l].tanA2 = tanf(ma2);
+      mount[l].tanA2 = mount[l].sinA2/mount[l].cosA2;
     }
-    
+
     for (_deo = _deo_m; _deo <= _deo_p; _deo++)
     for (_pd = _pd_m; _pd <= _pd_p; _pd++)
     for (_pz = _pz_m; _pz <= _pz_p; _pz++)
@@ -432,7 +433,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   
       // Tube flex
       float TFh = model.tfCor*(cosLat*sinAx1*(1.0F/cosAx2));
-      float TFd = model.tfCor*(cosLat*cosAx1 - sinLat*cosAx2);
+      float TFd = model.tfCor*(cosLat*cosAx1*sinAx2 - sinLat*cosAx2);
   
       // polar misalignment
       float ax1c = -model.azmCor*cosAx1*(sinAx2/cosAx2) + model.altCor*sinAx1*(sinAx2/cosAx2);
@@ -503,7 +504,7 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
 
     // Tube flex
     float TFh = model.tfCor*(cosLat*sinAx1*(1.0F/cosAx2));
-    float TFd = model.tfCor*(cosLat*cosAx1 - sinLat*cosAx2);
+    float TFd = model.tfCor*(cosLat*cosAx1*sinAx2 - sinLat*cosAx2);
    
     // ------------------------------------------------------------
     // polar misalignment

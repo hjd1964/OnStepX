@@ -38,6 +38,9 @@ class ServoDc : public ServoDriver {
     // decodes driver model and sets up the pin modes
     void init();
 
+    // enable or disable the driver using the enable pin or other method
+    void enable(bool state);
+
     // set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
     float setMotorVelocity(float power);
 

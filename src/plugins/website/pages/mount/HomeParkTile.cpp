@@ -12,7 +12,7 @@ void homeParkTile(String &data)
 {
   char temp[240] = "";
 
-  sprintf_P(temp, html_tile_beg, "22em", "15em", "Homing and Parking");
+  sprintf_P(temp, html_tile_beg, "22em", "15em", L_HOME_PARK_TITLE);
   data.concat(temp);
   data.concat(F("<div style='float: right; text-align: right;' id='hp_sta' class='c'>"));
   data.concat(getHomeParkStateStr());
@@ -28,7 +28,7 @@ void homeParkTile(String &data)
   sprintf_P(temp, html_collapsable_beg, L_CONTROLS "...");
   data.concat(temp);
 
-  data.concat(F("Set park position at current coordinates:<br /><br />"));
+  data.concat(F(L_SET_PARK_CURRENT_COORDS ":<br /><br />"));
 
   data.concat(FPSTR(html_setpark));
 

@@ -36,6 +36,7 @@ void focuserSlewingTile(String &data)
     sprintf_P(temp, html_focuserSlewSpeed, state.focuserSlewSpeedStr);
     data.concat(temp);
     data.concat(FPSTR(html_focuserGotoSelect));
+
     data.concat(FPSTR(html_collapsable_end));
   }
 
@@ -68,7 +69,6 @@ extern void focuserSlewingTileGet()
   v = www.arg("foc");
   if (!v.equals(EmptyStr))
   {
-    VF("Sending: "); VL(v);
     if (v.equals("stop")) onStep.commandBlind(":FQ#");     // stop
     if (v.equals("inf"))  onStep.commandBlind(":F4#:F-#"); // rate fast, move in
     if (v.equals("in"))   onStep.commandBlind(":F2#:F-#"); // rate slow, move in

@@ -11,7 +11,7 @@
 
 #include "Status.h"
 
-bool Status::update(bool all)
+bool Status::update()
 {
   char result[80] = "";
   if (!onStepFound) {
@@ -154,6 +154,7 @@ void Status::focuserScan() {
   if (focuserFound == SD_UNKNOWN) {
     focuserFound = SD_FALSE;
     focuserCount = 0;
+    for (int i = 0; i < 6; i++) focuserPresent[i] = false;
     if (getVersionMajor() >= 10) {
       if (onStep.commandBool(":F1a#")) { focuserPresent[0] = true; focuserCount++; } delay(0);
       if (onStep.commandBool(":F2a#")) { focuserPresent[1] = true; focuserCount++; } delay(0);

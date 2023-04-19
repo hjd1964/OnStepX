@@ -81,6 +81,8 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   if (e == CE_SLEW_IN_SLEW) { stop(); return e; }
   if (e != CE_NONE) return e;
 
+  lastAlignTarget = target;
+
   // handle special case of a tangent arm mount
   #if AXIS2_TANGENT_ARM == ON
     double a1, a2;
@@ -333,11 +335,11 @@ CommandError Goto::alignAddStar() {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
 
     // update the targets HA and Horizon coords as necessary
-    transform.rightAscensionToHourAngle(&target, true);
-    if (transform.mountType == ALTAZM) transform.equToHor(&target);
+    transform.rightAscensionToHourAngle(&lastAlignTarget, true);
+    if (transform.mountType == ALTAZM) transform.equToHor(&lastAlignTarget);
 
     #if ALIGN_MAX_NUM_STARS > 1
-      e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &target, &mountPosition);
+      e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &lastAlignTarget, &mountPosition);
     #endif
     if (e == CE_NONE) alignState.currentStar++;
   }
@@ -474,6 +476,8 @@ void Goto::poll() {
   if (!axis1.nearTarget() || !axis2.nearTarget()) nearTargetTimeout = millis();
 
   if (mount.isTracking()) {
+    target.r += siderealToRad(mount.trackingRateOffsetRA)/FRACTIONAL_SEC;
+    target.d += siderealToRad(mount.trackingRateOffsetDec)/FRACTIONAL_SEC;
     transform.rightAscensionToHourAngle(&target, false);
     if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
       if (millis() - nearTargetTimeout < 4000) {

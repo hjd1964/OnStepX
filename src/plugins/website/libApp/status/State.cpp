@@ -18,7 +18,7 @@ void State::poll()
   if ((long)(millis() - lastPoll) < STATE_POLLING_RATE_MS) return;
   lastPoll = millis();
 
-  status.update(true);
+  status.update();
   if (status.mountFound == SD_TRUE) updateMount();
   if (status.focuserFound == SD_TRUE) updateFocuser();
   if (status.auxiliaryFound == SD_TRUE) updateAuxiliary();

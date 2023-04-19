@@ -166,6 +166,7 @@
 
 #define L_HINT_CLOCK "Set Date/Time"
 #define L_HINT_CONTINUE_GOTO "Continue Goto (when paused at home)"
+#define L_HOME_PARK_TITLE "Homing and Parking"
 #define L_FIND_HOME "Find Home"
 #define L_RESET_HOME "Home (Reset)"
 #define L_UNPARK "Un-Park"
@@ -238,10 +239,10 @@
 // --------------------------- Encoders --------------------------
 
 // general settings
-#define L_ENC_SYNC_TO_ENC "Sync OnStep to Encoders"
-#define L_ENC_SYNC_TO_ONS "Sync Encoders to OnStep"
-#define L_ENC_ZERO_TO_ONS "Set Absolute Encoder Zero to OnStep"
-#define L_ENC_AUTO_SYNC "Automatically Sync OnStep to Encoders"
+#define L_ENC_SYNC_TO_ENC "Sync OnStep -> Encoders"
+#define L_ENC_SYNC_TO_ONS "Sync Encoders -> OnStep"
+#define L_ENC_ORIGIN_TO_ONS "Set OnStep -> Encoders Origin"
+#define L_ENC_AUTO_SYNC "Automatically Sync Encoders -> OnStep"
 #define L_ENC_CONF "Encoder Configuration"
 #define L_ENC_SET_TPD "Counts per degree"
 #define L_ENC_SYNC_THLD "Auto Sync threshold"
@@ -279,6 +280,7 @@
 
 #define L_PARK "Park"
 #define L_SET_PARK "Set-Park"
+#define L_SET_PARK_CURRENT_COORDS "Set park position at current coordinates"
 
 #define L_TRK_FASTER "faster"
 #define L_TRK_SLOWER "slower"
@@ -330,7 +332,7 @@
 #define L_LIMITS_RANGE_MERIDIAN_W "Past Meridian, West of pier &pm;270&deg;"
 
 // location
-#define L_LOCATION_TITLE "Site Latitude, Longitude, UTC Offset"
+#define L_LOCATION_TITLE "Time and Location"
 #define L_LOCATION_LONG "Longitude deg. min. sec. &pm;180, W is +"
 #define L_LOCATION_LAT  "Latitude deg. min. sec. &pm;90, N is +"
 #define L_LOCATION_RANGE_UTC_OFFSET "UTC Offset, in hours and min. -14 to +12"

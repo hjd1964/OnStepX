@@ -8,9 +8,26 @@
 
 #include <QuickPID.h>  // https://github.com/Dlloydev/QuickPID or https://github.com/hjd1964/QuickPID (fix compile fail on ESP32)
 
+// various options for QuickPID read about them here https://github.com/Dlloydev/QuickPID
+#ifndef PID_SLEWING_TO_TRACKING_TIME_MS
+  #define PID_SLEWING_TO_TRACKING_TIME_MS 1000 // time to switch from PID slewing to tracking parameters in milliseconds
+#endif
+#ifndef PID_SAMPLE_TIME_US
+  #define PID_SAMPLE_TIME_US 10000 // PID sample time in microseconds (defaults to 10 milliseconds)
+#endif
+#ifndef PID_PMODE
+  #define PID_PMODE pOnError // http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+#endif
+#ifndef PID_IMODE
+  #define PID_IMODE iAwCondition
+#endif
+#ifndef PID_DMODE
+  #define PID_DMODE dOnMeas
+#endif
+
 class Pid : public Feedback {
   public:
-    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto);
+    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity = 0);
 
     // initialize PID control and parameters
     void init(uint8_t axisNumber, ServoControl *control, float controlRange);
@@ -33,16 +50,34 @@ class Pid : public Feedback {
     // variable feedback, variable PID params
     void variableParameters(float percent);
 
-    inline void poll() { pid->Compute(); }
+    inline void poll() {
+      pid->Compute();
+
+      if (!useVariableParameters) {
+        if ((long)(millis() - nextSelectIncrementTime) > 0) {
+          if (trackingSelected) parameterSelect--;
+          if (parameterSelect < 0) parameterSelect = 0;
+          variableParameters(parameterSelect);
+          nextSelectIncrementTime = millis() + round(PID_SLEWING_TO_TRACKING_TIME_MS/100.0F);
+        }
+      }
+    }
 
   private:
     QuickPID *pid;
 
-    float p, i, d, c;
+    float p, i, d, c, sensitivity;
+    float lastP = 0;
+    float lastI = 0;
+    float lastD = 0;
 
     unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
 
     char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
+
+    int parameterSelect = 0;
+    bool trackingSelected = true;
+    unsigned long nextSelectIncrementTime = 0;
 };
 
 #endif

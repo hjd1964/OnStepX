@@ -166,6 +166,7 @@
 
 #define L_HINT_CLOCK "设置日期/时间"
 #define L_HINT_CONTINUE_GOTO "继续转到（如果在原位）"
+#define L_HOME_PARK_TITLE "归巢和停车"
 #define L_FIND_HOME "搜索起始位置"
 #define L_RESET_HOME "原始位置（重置）"
 #define L_UNPARK "取消停车"
@@ -239,10 +240,10 @@
 // --------------------------- Encoders --------------------------
 
 // general settings
-#define L_ENC_SYNC_TO_ENC "将OnStep同步到编码器"
-#define L_ENC_SYNC_TO_ONS "将编码器同步到OnStep"
-#define L_ENC_ZERO_TO_ONS "将绝对编码器零设置为OnStep"
-#define L_ENC_AUTO_SYNC "将OnStep自动同步到编码器"
+#define L_ENC_SYNC_TO_ENC "同步 OnStep -> 编码器"
+#define L_ENC_SYNC_TO_ONS "同步 编码器 -> OnStep"
+#define L_ENC_ORIGIN_TO_ONS "设置 OnStep -> 编码器原点"
+#define L_ENC_AUTO_SYNC "自动同步 编码器 -> OnStep"
 #define L_ENC_CONF "编码器配置"
 #define L_ENC_SET_TPD "每度数"
 #define L_ENC_SYNC_THLD "同步阈值"
@@ -280,6 +281,7 @@
 
 #define L_PARK "停车"
 #define L_SET_PARK "设置停车位置"
+#define L_SET_PARK_CURRENT_COORDS "在当前坐标处设置停放位置"
 
 #define L_TRK_FASTER "跟进"
 #define L_TRK_SLOWER "更快"
@@ -331,7 +333,7 @@
 #define L_LIMITS_RANGE_MERIDIAN_W "如果将望远镜放在坐骑西侧，则指向子午线，以+/- 270度为单位"
 
 // location
-#define L_LOCATION_TITLE "站点纬度，经度，UTC偏移"
+#define L_LOCATION_TITLE "时间地点"
 #define L_LOCATION_LONG "经度，以度和分钟为单位。+/-180，W为+"
 #define L_LOCATION_LAT "纬度，以度和分钟为单位。+/-90，N为+"
 #define L_LOCATION_RANGE_UTC_OFFSET "UTC 偏移，以-14到+12小时为单位"

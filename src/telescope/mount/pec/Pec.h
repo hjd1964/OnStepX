@@ -48,9 +48,9 @@ class Pec {
       void cleanup();
     #endif
   
-    float     stepsPerSiderealSecond    = 0.0F;
+    double    stepsPerSiderealSecond    = 0.0L;
     int       stepsPerSiderealSecondI   = 0;
-    float     stepsPerSiderealFrac      = 0.0F;
+    double    stepsPerMicroSecond       = 0.0L;
     long      bufferSize                = 0;      // in bytes
     #if AXIS1_PEC == ON
       uint8_t  monitorHandle            = 0;
@@ -65,8 +65,9 @@ class Pec {
       uint32_t recordStopTimeFs         = 0;
       uint32_t wormRotationStartTimeFs  = 0;      // start time of worm rotation sequence, in fracsecs or milliseconds
       long     wormRotationSeconds      = 0;      // time for a worm rotation, in seconds
+      unsigned long accGuideStartTime   = 0;
 
-      float    accGuideAxis1            = 0.0F;
+      double   accGuideAxis1            = 0.0L;
 
       bool     bufferStart              = false;
       long     bufferIndex              = 0;      // index into the pec buffer

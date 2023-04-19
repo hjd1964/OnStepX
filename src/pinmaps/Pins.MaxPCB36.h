@@ -28,6 +28,7 @@
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX0_PIN                23               // Status LED
+#define AUX1_PIN                37               // TMC SPI MISO/Fault
 #define AUX2_PIN                20               // PPS
 #define AUX3_PIN                21               // Home SW
 #define AUX4_PIN                22               // 1-Wire, Home SW
@@ -71,14 +72,12 @@
 #define AXIS1_M0_PIN            34               // SPI MOSI
 #define AXIS1_M1_PIN            35               // SPI SCK
 #define AXIS1_M2_PIN            36               // SPI CS (UART TX)
-#define AXIS1_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS1_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS1_STEP_PIN          38
 #define AXIS1_DIR_PIN           39
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
-#define AXIS1_ENCODER_A_PIN     AXIS1_M0_PIN
-#define AXIS1_ENCODER_B_PIN     AXIS1_M1_PIN
 #define AXIS1_SERVO_PH1_PIN     AXIS1_DIR_PIN
 #define AXIS1_SERVO_PH2_PIN     AXIS1_STEP_PIN
 
@@ -87,14 +86,12 @@
 #define AXIS2_M0_PIN            41               // SPI MOSI
 #define AXIS2_M1_PIN            13               // SPI SCK
 #define AXIS2_M2_PIN            14               // SPI CS (UART TX)
-#define AXIS2_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS2_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS2_STEP_PIN          15
 #define AXIS2_DIR_PIN           16
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
 #endif
-#define AXIS2_ENCODER_A_PIN     AXIS2_M0_PIN
-#define AXIS2_ENCODER_B_PIN     AXIS2_M1_PIN
 #define AXIS2_SERVO_PH1_PIN     AXIS2_DIR_PIN
 #define AXIS2_SERVO_PH2_PIN     AXIS2_STEP_PIN
 
@@ -103,40 +100,32 @@
 #define AXIS3_M0_PIN            12               // SPI MOSI
 #define AXIS3_M1_PIN            24               // SPI SCK
 #define AXIS3_M2_PIN            25               // SPI CS (UART TX)
-#define AXIS3_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS3_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS3_STEP_PIN          26
 #define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
 #define AXIS3_DIR_PIN           27
-#define AXIS3_ENCODER_A_PIN     AXIS3_M0_PIN
-#define AXIS3_ENCODER_B_PIN     AXIS3_M1_PIN
-#define AXIS3_SERVO_PH1_PIN     AXIS3_DIR_PIN
-#define AXIS3_SERVO_PH2_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_A_PIN     AXIS3_STEP_PIN
+#define AXIS1_ENCODER_B_PIN     AXIS3_DIR_PIN
 
 // For focuser1 stepper driver
 #define AXIS4_ENABLE_PIN        28
 #define AXIS4_M0_PIN            29               // SPI MOSI
 #define AXIS4_M1_PIN            30               // SPI SCK
 #define AXIS4_M2_PIN            31               // SPI CS (UART TX)
-#define AXIS4_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS4_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS4_STEP_PIN          32
 #define AXIS4_DIR_PIN           27
-#define AXIS4_ENCODER_A_PIN     AXIS4_M0_PIN
-#define AXIS4_ENCODER_B_PIN     AXIS4_M1_PIN
-#define AXIS4_SERVO_PH1_PIN     AXIS4_DIR_PIN
-#define AXIS4_SERVO_PH2_PIN     AXIS4_STEP_PIN
+#define AXIS2_ENCODER_A_PIN     AXIS4_STEP_PIN
+#define AXIS2_ENCODER_B_PIN     AUX1_PIN
 
 // For focuser2 stepper driver
 #define AXIS5_ENABLE_PIN        11
 #define AXIS5_M0_PIN            12               // SPI MOSI
 #define AXIS5_M1_PIN            24               // SPI SCK
 #define AXIS5_M2_PIN            25               // SPI CS (UART TX)
-#define AXIS5_M3_PIN            37               // SPI MISO (UART RX)
+#define AXIS5_M3_PIN            AUX1_PIN         // SPI MISO (UART RX)
 #define AXIS5_STEP_PIN          26
 #define AXIS5_DIR_PIN           27
-#define AXIS5_ENCODER_A_PIN     AXIS4_M0_PIN
-#define AXIS5_ENCODER_B_PIN     AXIS4_M1_PIN
-#define AXIS5_SERVO_PH1_PIN     AXIS4_DIR_PIN
-#define AXIS5_SERVO_PH2_PIN     AXIS4_STEP_PIN
 
 // ST4 interface
 #define ST4_RA_W_PIN            3                // ST4 RA- West

@@ -22,7 +22,7 @@ class Watchdog {
 
   private:
     volatile int16_t count = 0;
-    volatile int16_t seconds = 0;
+    volatile int16_t seconds = -1;
     volatile bool enabled = false;
 };
 
