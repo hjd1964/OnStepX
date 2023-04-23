@@ -94,7 +94,10 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
   limits.enabled(true);
   mount.syncToEncoders(false);
-  if (mount.isHome()) mount.tracking(true);
+  if (firstGoto) {
+    mount.tracking(true);
+    firstGoto = false;
+  }
   guide.backlashEnableControl(true);
 
   // allow slewing near target for Eq modes if not too close to the poles
@@ -195,7 +198,10 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
 
   CommandError e = validate();
-  if (e == CE_SLEW_ERR_IN_STANDBY && (mount.isHome() || AXIS1_SYNC_THRESHOLD != OFF)) { mount.enable(true); e = validate(); }
+  if (e == CE_SLEW_ERR_IN_STANDBY && (mount.isHome() || AXIS1_SYNC_THRESHOLD != OFF || AXIS1_TARGET_TOLERANCE != OFF)) {
+    mount.enable(true);
+    e = validate();
+  }
   if (e == CE_NONE && isGoto && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (e != CE_NONE) return e;
 

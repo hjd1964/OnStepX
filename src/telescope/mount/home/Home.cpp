@@ -116,6 +116,7 @@ CommandError Home::reset(bool fullReset) {
   mount.trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   mount.trackingRateOffsetRA = 0.0F;
   mount.trackingRateOffsetDec = 0.0F;
+  goTo.firstGoto = true;
 
   tasks.yieldMicros(10000);
 
@@ -152,13 +153,17 @@ CommandError Home::reset(bool fullReset) {
   axis2.setFrequencySlew(degToRadF(0.1F));
 
   // make sure the motors are powered off
-  if (fullReset) mount.enable(false);
+  if (fullReset) {
+    mount.enable(false);
 
-  #if GOTO_FEATURE == ON
-    if (fullReset) goTo.alignReset();
-  #endif
+    #if GOTO_FEATURE == ON
+      goTo.alignReset();
+    #endif
 
-  if (fullReset) { VLF("MSG: Mount, reset at home and in standby"); } else { VLF("MSG: Mount, reset at home"); }
+    VLF("MSG: Mount, reset at home and in standby");
+  } else {
+    VLF("MSG: Mount, reset at home");
+  }
 
   return CE_NONE;
 }

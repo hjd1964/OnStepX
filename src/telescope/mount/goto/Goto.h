@@ -100,6 +100,9 @@ class Goto {
     // current goto rate in radians per second
     float rate;
 
+    // flag to start tracking if this is the first goto
+    bool firstGoto = true;
+
   private:
 
     #if GOTO_FEATURE == ON
