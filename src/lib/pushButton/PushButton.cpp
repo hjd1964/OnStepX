@@ -32,11 +32,11 @@ Button::Button(int pin, int initState, int32_t trigger) {
     }
 	  if (threshold - hysteresis < 0) {
       hysteresis = threshold;
-      VF("WRN: Button::Button(), Threshold - hysteresis for pin "); V(pin); VF(" below Analog range hysteresis set to "); VL(hysteresis);
+      VF("WRN: Button::Button(), Threshold - Hysteresis for pin "); V(pin); VF(" is below Analog range setting Hysteresis to "); VL(hysteresis);
     } else
   	if (threshold + hysteresis > ANALOG_READ_RANGE) {
       hysteresis = ANALOG_READ_RANGE - threshold;
-      VF("WRN: Button::Button(), Threshold + hysteresis for pin "); V(pin); VF(" above Analog range hysteresis set to "); VL(hysteresis);
+      VF("WRN: Button::Button(), Threshold + Hysteresis for pin "); V(pin); VF(" is above Analog range setting Hysteresis to "); VL(hysteresis);
     }
   }
 
