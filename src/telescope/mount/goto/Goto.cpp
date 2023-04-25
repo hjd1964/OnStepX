@@ -115,7 +115,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   // prepare for goto
   Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
   state = GS_GOTO;
-  stage = GG_NEAR_DESTINATION;
+  stage = GG_NEAR_DESTINATION_START;
   start = current;
   destination = target;
   nearDestinationRefineStages = 1;
@@ -422,9 +422,22 @@ void Goto::poll() {
       meridianFlipHome.resume = false;
 
       VLF("MSG: Mount, goto home reached");
-      stage = GG_NEAR_DESTINATION;
+      stage = GG_NEAR_DESTINATION_START;
       destination = target;
       startAutoSlew();
+    } else
+
+    if (stage == GG_NEAR_DESTINATION_START) {
+      VLF("MSG: Mount, goto near destination wait started");
+      nearDestinationTimeout = millis() + GOTO_SETTLE_TIME;
+      stage = GG_NEAR_DESTINATION_WAIT;
+    } else
+
+    if (stage == GG_NEAR_DESTINATION_WAIT) {
+      if ((long)(millis() - nearDestinationTimeout) > 0) {
+        VLF("MSG: Mount, goto near destination wait done");
+        stage = GG_NEAR_DESTINATION;
+      }
     } else
 
     if (stage == GG_NEAR_DESTINATION) {

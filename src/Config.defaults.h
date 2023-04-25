@@ -708,6 +708,9 @@
 #ifndef GOTO_OFFSET_ALIGN
 #define GOTO_OFFSET_ALIGN             OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
+#ifndef GOTO_SETTLE_TIME
+#define GOTO_SETTLE_TIME             3000                         // settle time in milliseconds for final phase of goto offset
+#endif                                                            // allows for settle and encoder sync if available
 
 // meridian flip, pier side
 #ifndef MFLIP_SKIP_HOME
