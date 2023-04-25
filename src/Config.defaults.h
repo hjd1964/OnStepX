@@ -715,7 +715,7 @@
 #define GOTO_OFFSET_ALIGN             OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
 #ifndef GOTO_SETTLE_TIME
-#define GOTO_SETTLE_TIME             3000                         // settle time in milliseconds for final phase of goto offset
+#define GOTO_SETTLE_TIME             1500                         // settle time in milliseconds for final phase of goto offset
 #endif                                                            // allows for settle and encoder sync if available
 #ifndef GOTO_REFINE_STAGES
 #define GOTO_REFINE_STAGES           1                            // number of times to perform the goto refinement stage
