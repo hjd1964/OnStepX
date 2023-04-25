@@ -59,6 +59,11 @@ void Goto::init() {
   if (settings.usPerStepCurrent < usPerStepBase/2.0F) settings.usPerStepCurrent = usPerStepBase/2.0F;
   if (settings.usPerStepCurrent > usPerStepBase*2.0F) settings.usPerStepCurrent = usPerStepBase*2.0F;
 
+  if (AXIS1_TARGET_TOLERANCE != 0.0F ||
+      AXIS2_TARGET_TOLERANCE != 0.0F ||
+      AXIS1_SYNC_THRESHOLD != OFF ||
+      AXIS2_SYNC_THRESHOLD != OFF) encodersPresent = true;
+
   updateAccelerationRates();
 }
 
@@ -100,13 +105,10 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   }
   guide.backlashEnableControl(true);
 
-  // allow slewing near target for Eq modes if not too close to the poles
+  // allow slewing near target for Eq modes but disable for alt/az, parking, homing if encoders are not present
   slewDestinationDistHA = 0.0;
   slewDestinationDistDec = 0.0;
-  if (transform.mountType != ALTAZM && 
-      park.state != PS_PARKING &&
-      home.state != HS_HOMING &&
-      fabs(target.d) < Deg90 - degToRad(GOTO_OFFSET)) {
+  if ((encodersPresent || (transform.mountType != ALTAZM && park.state != PS_PARKING && home.state != HS_HOMING))) {
     slewDestinationDistHA = degToRad(GOTO_OFFSET);
     slewDestinationDistDec = degToRad(GOTO_OFFSET);
     if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
@@ -198,7 +200,7 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
 
   CommandError e = validate();
-  if (e == CE_SLEW_ERR_IN_STANDBY && (mount.isHome() || AXIS1_SYNC_THRESHOLD != OFF || AXIS1_TARGET_TOLERANCE != OFF)) {
+  if (e == CE_SLEW_ERR_IN_STANDBY && (encodersPresent || mount.isHome())) {
     mount.enable(true);
     e = validate();
   }

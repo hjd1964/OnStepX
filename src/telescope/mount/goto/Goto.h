@@ -105,6 +105,9 @@ class Goto {
     // flag to start tracking if this is the first goto
     bool firstGoto = true;
 
+    // flag to indicate that encoders are present
+    bool encodersPresent = false;
+
   private:
 
     #if GOTO_FEATURE == ON
