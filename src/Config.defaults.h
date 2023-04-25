@@ -528,6 +528,12 @@
 #ifndef AXIS2_TARGET_TOLERANCE
 #define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
+#ifndef AXIS1_HOME_TOLERANCE
+#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE      // in arc-seconds
+#endif
+#ifndef AXIS2_HOME_TOLERANCE
+#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE      // in arc-seconds
+#endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF
 #endif

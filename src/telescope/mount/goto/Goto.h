@@ -106,6 +106,7 @@ class Goto {
     bool firstGoto = true;
 
     // flag to indicate that encoders are present
+    bool absoluteEncodersPresent = false;
     bool encodersPresent = false;
 
   private:
