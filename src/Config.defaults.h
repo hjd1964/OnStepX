@@ -717,6 +717,9 @@
 #ifndef GOTO_SETTLE_TIME
 #define GOTO_SETTLE_TIME             3000                         // settle time in milliseconds for final phase of goto offset
 #endif                                                            // allows for settle and encoder sync if available
+#ifndef GOTO_REFINE_STAGES
+#define GOTO_REFINE_STAGES           1                            // number of times to perform the goto refinement stage
+#endif
 
 // meridian flip, pier side
 #ifndef MFLIP_SKIP_HOME

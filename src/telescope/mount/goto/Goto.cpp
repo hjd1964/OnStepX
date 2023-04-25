@@ -105,12 +105,16 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   guide.backlashEnableControl(true);
 
   // allow slewing near target for Eq modes but disable for alt/az, parking, homing if encoders are not present
+  nearDestinationRefineStages = 0;
   slewDestinationDistHA = 0.0;
   slewDestinationDistDec = 0.0;
-  if ((encodersPresent || (transform.mountType != ALTAZM && park.state != PS_PARKING && home.state != HS_HOMING))) {
-    slewDestinationDistHA = degToRad(GOTO_OFFSET);
-    slewDestinationDistDec = degToRad(GOTO_OFFSET);
-    if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
+  if ((encodersPresent || (park.state != PS_PARKING && home.state != HS_HOMING))) {
+    nearDestinationRefineStages = GOTO_REFINE_STAGES;
+    if (transform.mountType != ALTAZM) { 
+      slewDestinationDistHA = degToRad(GOTO_OFFSET);
+      slewDestinationDistDec = degToRad(GOTO_OFFSET);
+      if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
+    }
   }
 
   // prepare for goto
@@ -119,7 +123,6 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   stage = GG_NEAR_DESTINATION_START;
   start = current;
   destination = target;
-  nearDestinationRefineStages = 1;
 
   // add waypoint if needed
   if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
@@ -442,10 +445,9 @@ void Goto::poll() {
     } else
 
     if (stage == GG_NEAR_DESTINATION) {
-      if (slewDestinationDistHA != 0.0 || transform.mountType == ALTAZM) {
+      if (nearDestinationRefineStages >= 1) {
 
-        if (transform.mountType != ALTAZM || !nearDestinationRefineStages) stage = GG_DESTINATION;
-        nearDestinationRefineStages--;
+        if (--nearDestinationRefineStages) stage = GG_NEAR_DESTINATION_START; else stage = GG_DESTINATION;
 
         VLF("MSG: Mount, goto near destination reached");
         destination = target;
