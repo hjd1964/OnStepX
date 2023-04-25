@@ -747,6 +747,10 @@
 #define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
 #endif
 
+#ifndef ALIGN_MODEL_MEMORY
+#define ALIGN_MODEL_MEMORY            OFF                         // restores any pointing model saved in NV at startup
+#endif
+
 #define HIGH_SPEED_ALIGN
 
 // -----------------------------------------------------------------------------------
