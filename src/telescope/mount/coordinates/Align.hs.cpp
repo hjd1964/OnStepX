@@ -23,10 +23,6 @@ void autoModelWrapper() { transform.align.autoModel(modelNumberStars); }
 void GeoAlign::init(int8_t mountType, float latitude) {
   modelClear();
 
-  #if ALIGN_MODEL_MEMORY == ON
-    modelRead();
-  #endif
-
   this->mountType = mountType;
   if (mountType == ALTAZM) {
     cosLat = cosf(Deg90);

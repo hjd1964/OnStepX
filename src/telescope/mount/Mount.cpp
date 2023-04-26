@@ -123,6 +123,10 @@ void Mount::begin() {
     #endif
   #endif
 
+  #if ALIGN_MAX_NUM_STARS > 1 && ALIGN_MODEL_MEMORY == ON
+    transform.align.modelRead();
+  #endif
+
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");
   if (tasks.add(1000, 0, true, 6, mountWrapper, "MntTrk")) { VLF("success"); } else { VLF("FAILED!"); }
 
