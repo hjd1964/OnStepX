@@ -520,7 +520,7 @@ void Goto::poll() {
     target.d += siderealToRad(mount.trackingRateOffsetDec)/FRACTIONAL_SEC;
     transform.rightAscensionToHourAngle(&target, false);
     if (stage >= GG_NEAR_DESTINATION_START) {
-      if (millis() - nearTargetTimeout < 4000) {
+      if (millis() - nearTargetTimeout < 5000) {
         Coordinate nearTarget = target;
         nearTarget.h -= slewDestinationDistHA;
         nearTarget.d -= slewDestinationDistDec;
