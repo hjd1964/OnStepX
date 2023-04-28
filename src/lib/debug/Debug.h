@@ -24,6 +24,7 @@
     #define DL(x)    SERIAL_DEBUG.println(x)
     #define DLF(x)   SERIAL_DEBUG.println(F(x))
   #endif
+  #define D1(x) { static long t = 0; if (millis() > t + 1000L) { D(x); t = millis(); } }
   #define DL1(x) { static long t = 0; if (millis() > t + 1000L) { DL(x); t = millis(); } }
 #else
   #define D(x)
