@@ -140,6 +140,8 @@ class Goto {
     uint8_t    taskHandle           = 0;
     int        nearDestinationRefineStages;
     unsigned long nearTargetTimeout = 0;
+    unsigned long nearTargetTimeoutAxis1 = 0;
+    unsigned long nearTargetTimeoutAxis2 = 0;
     unsigned long nearDestinationTimeout = 0;
 
     MeridianFlipHome meridianFlipHome = {false, false};

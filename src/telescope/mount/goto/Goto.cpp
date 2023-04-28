@@ -412,6 +412,22 @@ void Goto::poll() {
     axis2.autoSlewAbort();
   }
 
+  // abort any goto that might hang!
+  if (axis1.isSlewing()) {
+    if (!axis1.nearTarget()) nearTargetTimeoutAxis1 = millis();
+    if ((long)(millis() - nearTargetTimeoutAxis1) > 15000) {
+      DLF("WRN: Mount, goto axis1 timed out aborting slew!");
+      axis1.autoSlewAbort();
+    }
+  }
+  if (axis1.isSlewing()) {
+    if (!axis2.nearTarget()) nearTargetTimeoutAxis2 = millis();
+    if ((long)(millis() - nearTargetTimeoutAxis2) > 15000) {
+      DLF("WRN: Mount, goto axis2 timed out aborting slew!");
+      axis2.autoSlewAbort();
+    }
+  }
+
   if (!mount.isSlewing()) {
     if (stage == GG_WAYPOINT_AVOID) {
       VLF("MSG: Mount, goto waypoint reached");
@@ -523,6 +539,9 @@ void Goto::poll() {
 // start slews with approach correction and parking support
 CommandError Goto::startAutoSlew() {
   CommandError e;
+
+  nearTargetTimeoutAxis1 = millis();
+  nearTargetTimeoutAxis2 = millis();
 
   if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
     destination.h -= slewDestinationDistHA;
