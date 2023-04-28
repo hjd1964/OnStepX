@@ -432,9 +432,11 @@ void Goto::poll() {
     } else
 
     if (stage == GG_NEAR_DESTINATION_START) {
-      VLF("MSG: Mount, goto near destination wait started");
-      nearDestinationTimeout = millis() + GOTO_SETTLE_TIME;
-      stage = GG_NEAR_DESTINATION_WAIT;
+      if (nearDestinationRefineStages >= 1) {
+        VLF("MSG: Mount, goto near destination wait started");
+        nearDestinationTimeout = millis() + GOTO_SETTLE_TIME;
+        stage = GG_NEAR_DESTINATION_WAIT;
+      } else stage = GG_NEAR_DESTINATION;
     } else
 
     if (stage == GG_NEAR_DESTINATION_WAIT) {
