@@ -105,7 +105,14 @@ class Motor {
     inline bool getSynchronized() { return synchronized; }
 
     // set synchronized state (automatic movement of target at setFrequencySteps() rate)
-    inline void setSynchronized(bool state) { synchronized = state; if (synchronized) targetSteps = motorSteps; }
+    virtual inline void setSynchronized(bool state) {
+      if (state) {
+        noInterrupts();
+        synchronized = state;
+        targetSteps = motorSteps;
+        interrupts();
+      } else synchronized = state;
+    }
 
     // get the current direction of motion
     Direction getDirection();
@@ -136,7 +143,7 @@ class Motor {
     volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
     char axisPrefix[16];                       // prefix for debug messages
 
-    bool synchronized = true;                  // locks movement of axis target with timer rate
+    volatile bool synchronized = true;         // locks movement of axis target with timer rate
     bool limitsCheck = true;                   // enable/disable numeric range limits (doesn't apply to limit switches)
 
     uint8_t homeSenseHandle = 0;               // home sensor handle
