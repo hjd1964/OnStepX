@@ -497,7 +497,7 @@ void Goto::poll() {
 
   // keep updating the axis targets to match the mount target
   // but allow timeout to stop tracking to guarantee synchronization
-  if (!axis1.nearTarget() || !axis2.nearTarget()) nearTargetTimeout = millis();
+  if (AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || !axis1.nearTarget() || !axis2.nearTarget()) nearTargetTimeout = millis();
 
   if (mount.isTracking()) {
     target.r += siderealToRad(mount.trackingRateOffsetRA)/FRACTIONAL_SEC;
