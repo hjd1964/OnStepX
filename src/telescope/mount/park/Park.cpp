@@ -220,8 +220,7 @@ CommandError Park::restore(bool withTrackingOn) {
     wormSenseSteps = settings.wormSensePositionSteps;
   #endif
 
-  // don't bother unparking if there are absolute encoders since it's irrelevant
-  if (AXIS1_SYNC_THRESHOLD == OFF) {
+  if (!goTo.absoluteEncodersPresent) {
 
     // reset the mount, zero backlash
     home.reset();
