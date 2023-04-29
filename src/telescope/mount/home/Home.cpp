@@ -53,6 +53,7 @@ CommandError Home::request() {
 
     // make sure the motors are powered on
     mount.enable(true);
+    goTo.firstGoto = false;
 
     VLF("MSG: Mount, moving to home");
 

@@ -105,6 +105,8 @@ CommandError Park::request() {
     // stop tracking
     wasTracking = mount.isTracking();
     mount.tracking(false);
+    mount.enable(true);
+    goTo.firstGoto = false;
 
     #if AXIS1_PEC == ON
       // turn off PEC while we park
