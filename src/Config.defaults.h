@@ -260,10 +260,10 @@
     #define AXIS1_SERVO_DC
   #endif
   #ifndef AXIS1_SERVO_PH1_STATE
-  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
+  #define AXIS1_SERVO_PH1_STATE         LOW                       // default (inactive) motor driver state, IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
   #endif
   #ifndef AXIS1_SERVO_PH2_STATE
-  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
+  #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
   #ifndef AXIS1_SERVO_MAX_VELOCITY
