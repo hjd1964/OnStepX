@@ -141,10 +141,7 @@ CommandError Home::reset(bool fullReset) {
   }
 
   // don't bother adjusting to actual step based coordinates if there are absolute encoders
-  if (AXIS1_SYNC_THRESHOLD == OFF) {
-    position.a1 = axis1.getInstrumentCoordinate();
-    position.a2 = axis2.getInstrumentCoordinate();
-  } else {
+  {
     if (transform.mountType == ALTAZM) {
       position.a1 = position.z;
       position.a2 = position.a;
