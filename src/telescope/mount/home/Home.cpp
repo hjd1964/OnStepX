@@ -104,7 +104,11 @@ void Home::requestDone() {
 // reset mount at home
 CommandError Home::reset(bool fullReset) {
   #if GOTO_FEATURE == ON
-    if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
+    if (goTo.state != GS_NONE) {
+      axis1.autoSlewAbort();
+      axis2.autoSlewAbort();
+      return CE_SLEW_IN_MOTION;
+    }
   #endif
   if (guide.state != GU_NONE) {
     if (guide.state == GU_HOME_GUIDE) guide.stop();
