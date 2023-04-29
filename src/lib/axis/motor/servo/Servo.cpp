@@ -364,7 +364,9 @@ void ServoMotor::poll() {
   if (feedback->useVariableParameters) {
     feedback->variableParameters(fabs(velocityPercent));
   } else {
-    if (!slewing && enabled) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+    if (!slewing && enabled) {
+      if (delta <= syncThreshold) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+    } else feedback->selectSlewingParameters();
   }
 
   if (velocityPercent < -33) wasBelow33 = true;
