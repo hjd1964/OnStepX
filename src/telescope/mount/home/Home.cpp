@@ -128,26 +128,24 @@ CommandError Home::reset(bool fullReset) {
 
   tasks.yieldMicros(10000);
 
-  // setup axis1 and axis2
-  if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
-  if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
-
   if (transform.mountType == ALTAZM) {
-    axis1.setInstrumentCoordinate(position.z);
-    axis2.setInstrumentCoordinate(position.a);
+    position.a1 = position.z;
+    position.a2 = position.a;
   } else {
-    axis1.setInstrumentCoordinate(position.h);
-    axis2.setInstrumentCoordinate(position.d);
+    position.a1 = position.h;
+    position.a2 = position.d;
   }
 
-  // don't bother adjusting to actual step based coordinates if there are absolute encoders
-  {
+  if (!goTo.absoluteEncodersPresent || mount.isHome()) {
+    if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
+    if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
+
     if (transform.mountType == ALTAZM) {
-      position.a1 = position.z;
-      position.a2 = position.a;
+      axis1.setInstrumentCoordinate(position.z);
+      axis2.setInstrumentCoordinate(position.a);
     } else {
-      position.a1 = position.h;
-      position.a2 = position.d;
+      axis1.setInstrumentCoordinate(position.h);
+      axis2.setInstrumentCoordinate(position.d);
     }
   }
 
