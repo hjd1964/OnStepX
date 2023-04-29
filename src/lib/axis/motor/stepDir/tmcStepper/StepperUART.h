@@ -12,6 +12,10 @@
 #include "../../Drivers.h"
 #include "../StepDirDriver.h"
 
+#ifndef DRIVER_TMC_STEPPER_AUTOGRAD
+  #define DRIVER_TMC_STEPPER_AUTOGRAD true
+#endif
+
 // default settings for any TMC UART drivers that may be present
 #ifndef SERIAL_TMC
   #define SERIAL_TMC                  SoftSerial     // Use software serial w/ TX on M3 (CS) and RX on M4 (MISO) of each axis

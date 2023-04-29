@@ -208,6 +208,7 @@ void ServoTmc2209::calibrate() {
     VF("MSG: ServoTmc2209 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(Settings->current));
     driver->ihold(mAToCs(Settings->current));
+    ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
     ((TMC2209Stepper*)driver)->en_spreadCycle(false);
     delay(1000);

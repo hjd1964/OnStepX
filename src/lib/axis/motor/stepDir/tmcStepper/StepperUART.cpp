@@ -252,10 +252,12 @@ void StepDirTmcUART::calibrate() {
     driver->irun(mAToCs(settings.currentRun));
     driver->ihold(mAToCs(settings.currentRun));
     if (settings.model == TMC2208) {
+      ((TMC2208Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC2208Stepper*)driver)->pwm_autoscale(true);
       ((TMC2208Stepper*)driver)->en_spreadCycle(false);
     } else
     if (settings.model == TMC2209) { // also handles TMC2226
+      ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC2209Stepper*)driver)->pwm_autoscale(true);
       ((TMC2209Stepper*)driver)->en_spreadCycle(false);
     }

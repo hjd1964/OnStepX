@@ -12,6 +12,10 @@
 #include "../../Drivers.h"
 #include "../StepDirDriver.h"
 
+#ifndef DRIVER_TMC_STEPPER_AUTOGRAD
+  #define DRIVER_TMC_STEPPER_AUTOGRAD true
+#endif
+
 class StepDirTmcSPI : public StepDirDriver {
   public:
     // constructor
