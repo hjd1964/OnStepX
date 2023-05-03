@@ -136,6 +136,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     addonFlasher.init();
   #endif
 
+   #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
+    wifiManager.init();
+  #endif
+  
   weather.init();
   temperature.init();
 
@@ -184,11 +188,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
   }
 
-  #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
-    wifiManager.init();
-  #endif
-
-  // init is done, write the NV key if necessary
+   // init is done, write the NV key if necessary
   if (!nv.hasValidKey()) {
     nv.writeKey((uint32_t)INIT_NV_KEY);
     nv.wait();
