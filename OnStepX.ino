@@ -85,7 +85,10 @@ void setup() {
   // start low level hardware
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
-  HAL_NV_INIT();
+  if (!HAL_NV_INIT()) {
+    DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");
+    nv.initError = true;
+  }
   delay(2000);
 
   // start system service task

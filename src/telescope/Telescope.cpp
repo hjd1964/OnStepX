@@ -113,8 +113,12 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   strcpy(firmware.time, __TIME__);
 
   if (!nv.isKeyValid(INIT_NV_KEY)) {
-    VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
-    if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
+    if (!nv.initError) {
+      VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
+      if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
+    } else {
+      DLF("WRN: NV, can't be accessed skipping verification!");
+    }
   } else { VLF("MSG: NV, correct key found"); }
 
   if (!gpio.init()) initError.gpio = true;
