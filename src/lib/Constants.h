@@ -112,6 +112,18 @@
 #define NVE_HIGH                    2   // high (~ 1M writes)
 #define NVE_VHIGH                   3   // very high (> 1M writes)
 
+// GPIO devices (pin# 512 up to 543)
+// these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
+#define GPIO_FIRST                  1
+#define DS2413                      1      // DS2413 2-channel GPIO
+#define MCP23008                    2      // MCP23008 8-channel GPIO
+#define MCP23017                    3      // MCP23017 16-channel GPIO
+#define X9555                       4      // TCA/PCA9555 16-channel GPIO
+#define X8575                       5      // PCF8575 16-channel GPIO
+#define SWS                         6      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
+#define SSR74HC595                  7      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
+#define GPIO_LAST                   7
+
 // angular
 #define RAD_DEG_RATIO               57.29577951308232L
 #define RAD_DEG_RATIO_F             57.295780F
