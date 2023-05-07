@@ -44,7 +44,7 @@
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        15     // minor version 00 to 99
-#define FirmwareVersionPatch        "i"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "k"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       5      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -85,7 +85,10 @@ void setup() {
   // start low level hardware
   VLF("MSG: Setup, HAL initalize");
   HAL_INIT();
-  HAL_NV_INIT();
+  if (!HAL_NV_INIT()) {
+    DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");
+    nv.initError = true;
+  }
   delay(2000);
 
   // start system service task

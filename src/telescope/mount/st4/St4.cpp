@@ -118,7 +118,7 @@
 
       #if GOTO_FEATURE == ON
         const long AltMode_ms = 2000;
-        if (goTo.state != GS_NONE && !goTo.isHomePaused()) {
+        if (goTo.state == GS_NONE && !goTo.isHomePaused()) {
           if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
             if (!altModeA) { altModeA = true; mountStatus.sound.beep(); }
           }
@@ -127,7 +127,7 @@
           }
         }
       #endif
-  
+
       // if the alternate mode is allowed & selected & hasn't timed out, handle it
       if ( (altModeA || altModeB) && (st4Axis2Fwd.timeUp() < Shed_ms || st4Axis2Rev.timeUp() < Shed_ms || st4Axis1Rev.timeUp() < Shed_ms || st4Axis1Fwd.timeUp() < Shed_ms) ) {
 
