@@ -197,8 +197,7 @@ void Park::requestDone() {
     VLF("MSG: Mount, parking done");
   } else { DLF("ERR: Mount::parkFinish(), Parking failed"); }
 
-  axis1.enable(false);
-  axis2.enable(false);
+  mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 }
 
 // returns a parked telescope to operation
