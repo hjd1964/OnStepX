@@ -51,9 +51,9 @@ void Mount::init() {
 
 void Mount::begin() {
   axis1.calibrate();
-  axis1.enable(MOUNT_ENABLE_AT_STARTUP == ON);
+  axis1.enable(MOUNT_ENABLE_IN_STANDBY == ON);
   axis2.calibrate();
-  axis2.enable(MOUNT_ENABLE_AT_STARTUP == ON);
+  axis2.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 
   // initialize the critical subsystems
   site.init();

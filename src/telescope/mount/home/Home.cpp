@@ -157,7 +157,7 @@ CommandError Home::reset(bool fullReset) {
 
   // make sure the motors are powered off
   if (fullReset) {
-    mount.enable(false);
+    mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 
     #if GOTO_FEATURE == ON
       goTo.alignReset();
