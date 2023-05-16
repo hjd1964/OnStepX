@@ -6,7 +6,7 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#include <QuickPID.h>  // https://github.com/Dlloydev/QuickPID or https://github.com/hjd1964/QuickPID (fix compile fail on ESP32)
+#include <QuickPID.h>  // https://github.com/Dlloydev/QuickPID
 
 // various options for QuickPID read about them here https://github.com/Dlloydev/QuickPID
 #ifndef PID_SLEWING_TO_TRACKING_TIME_MS
