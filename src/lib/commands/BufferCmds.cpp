@@ -28,27 +28,34 @@ bool Buffer::add(char c) {
     if (!(cbp > 1) && ((cb[0] == ':') || (cb[0] == ';')) && (cb[cbp-1] == '#')) { flush(); return false; }
     if (((cb[0] == ':') || (cb[0] == ';')) && (cb[1] == '#') && (cb[2] == 0)) { flush(); return false; }
 
-    checksum=(cb[0] == ';');
+    checksum = (cb[0] == ';');
     if (checksum) {
-      byte len=strlen(cb)-1;
+      byte len = strlen(cb) - 1;
 
       // Minimum length for a valid command is 5 ';CCS#'
       if (len < 5) {
-        flush(); cb[0]=':'; cb[1]=(char)6; cb[2]='0'; cb[3]='#'; cb[4]=0; cbp=4; 
+        flush();
+        cb[0] = ':'; cb[1] = (char)6; cb[2] = '0'; cb[3] = '#'; cb[4] = 0; cbp = 4; 
         return true; 
       }
       
       // checksum the data, for example ";111111CCS#".  I don't include the command frame in the checksum.  The error response is a checksumed string "CK_FAILS#" to request re-transmit.
-      byte cks=0; for (int cksCount0=1; cksCount0 < len-3; cksCount0++) {  cks+=cb[cksCount0]; }
-      char chkSum[3]; sprintf(chkSum,"%02X",cks);
-      seq=cb[len-1];
-      if (!((chkSum[0] == cb[len-3]) && (chkSum[1] == cb[len-2]))) { 
-        flush(); cb[0]=':'; cb[1]=(char)6; cb[2]='0'; cb[3]='#'; cb[4]=0; cbp=4; 
+      byte cks = 0;
+      for (int cksCount0 = 1; cksCount0 < len - 3; cksCount0++) {  cks += cb[cksCount0]; }
+
+      char chkSum[12];
+      sprintf(chkSum, "%02X", cks);
+
+      seq = cb[len - 1];
+      if (!((chkSum[0] == cb[len - 3]) && (chkSum[1] == cb[len - 2]))) { 
+        flush();
+        cb[0] = ':'; cb[1] = (char)6; cb[2] = '0'; cb[3] = '#'; cb[4] = 0;
+        cbp = 4; 
         return true;
       }
 
       // remove the sequence char and checksum from string
-      --len; --len; cb[--len]=0;
+      --len; --len; cb[--len] = 0;
     }
 
     return true;
