@@ -81,11 +81,8 @@ class Mount {
     // returns true if the mount motors are powered on
     inline bool isEnabled() { return axis1.isEnabled() || axis2.isEnabled(); }
 
-    // allow syncing to the encoders instead of from them
-    void syncToEncoders(bool state);
-
-    // returns true if syncing only from OnStep to the Encoders
-    inline bool isSyncToEncoders() { return syncToEncodersEnabled; }
+    // true if syncing only from OnStep to the Encoders
+    bool syncFromOnStepToEncoders = false;
 
     // updates the tracking rates, etc. as appropriate for the mount state
     // called once a second by poll() but available here for immediate action
@@ -118,8 +115,6 @@ class Mount {
     Coordinate current;
 
     TrackingState trackingState = TS_NONE;
-
-    bool syncToEncodersEnabled = false;
 };
 
 #ifdef AXIS1_STEP_DIR_PRESENT

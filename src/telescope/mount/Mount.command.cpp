@@ -183,14 +183,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
                 CommandError e = goTo.validate();
                 if (e != CE_NONE) { *commandError = e; return true; }
               #endif
-              if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncToEncodersEnabled) { *commandError = CE_0; return true; }
+              if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncFromOnStepToEncoders) { *commandError = CE_0; return true; }
               axis1.setInstrumentCoordinate(encoderAxis1);
               axis2.setInstrumentCoordinate(encoderAxis2);
             }
           break;
 
           // allow sws to control sync mode
-          case '3': syncToEncodersEnabled = false; break;
+          case '3': syncFromOnStepToEncoders = false; break;
 
           // set and sync encoder Axis1 and Axis2 values
           case '4': {
@@ -208,7 +208,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
 
             if ( isnan(encoderAxis1) ||
                  isnan(encoderAxis2) ||
-                 syncToEncodersEnabled ||
+                 syncFromOnStepToEncoders ||
                  (goTo.state != GS_NONE && goTo.stage != GG_NEAR_DESTINATION_WAIT) ||
                  guide.state != GU_NONE) { *commandError = CE_0; return true; }
 

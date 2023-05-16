@@ -181,11 +181,6 @@ void Mount::enable(bool state) {
   axis2.enable(state);
 }
 
-// allow syncing to the encoders instead of from them
-void Mount::syncToEncoders(bool state) {
-  syncToEncodersEnabled = state;
-}
-
 // updates the tracking rates, etc. as appropriate for the mount state
 // called once a second by poll() but available here for immediate action
 void Mount::update() {

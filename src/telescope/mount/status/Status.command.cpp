@@ -41,7 +41,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (park.state == PS_PARKING)            reply[i++]='I'; else                // Parking [I]n-progress
       if (park.state == PS_PARKED)             reply[i++]='P'; else                // [P]arked
       if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // Park [F]ailed
-      if (mount.isSyncToEncoders())            reply[i++]='e';                     // Sync to [e]ncoders only
+      if (mount.syncFromOnStepToEncoders)      reply[i++]='e';                     // Sync to [e]ncoders only
       if (mount.isHome())                      reply[i++]='H';                     // At [H]ome
       if (home.state == HS_HOMING)             reply[i++]='h';                     // Slewing [h]ome
       #if TIME_LOCATION_PPS_SENSE != OFF
@@ -110,7 +110,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
         if (fequal(r, 60.136F))                    reply[1]|=0b10000011;           // King rate selected
       }
 
-      if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // Sync to encoders only
+      if (mount.syncFromOnStepToEncoders)          reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.active())                          reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing [h]ome

@@ -97,7 +97,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   #endif
 
   limits.enabled(true);
-  mount.syncToEncoders(false);
+  mount.syncFromOnStepToEncoders = false;
   if (firstGoto) {
     mount.tracking(true);
     firstGoto = false;
@@ -191,7 +191,7 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
   axis2.setInstrumentCoordinate(a2);
 
   limits.enabled(true);
-  mount.syncToEncoders(true);
+  mount.syncFromOnStepToEncoders = true;
 
   VLF("MSG: Mount, sync instrument coordinates updated");
 
