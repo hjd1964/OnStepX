@@ -259,7 +259,7 @@ CommandError Park::restore(bool withTrackingOn) {
   nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
 
   limits.enabled(true);
-  mount.syncToEncoders(true);
+  if (!goTo.absoluteEncodersPresent) mount.syncFromOnStepToEncoders = true;
   if (withTrackingOn) mount.tracking(true);
 
   VLF("MSG: Mount, unparking done");
