@@ -120,6 +120,10 @@
 #define STA_SN_MASK                   {255,255,255,0}             // Wifi Station/Ethernet SUBNET Mask.
 #endif
 
+#ifndef TIME_IP_ADDR
+#define TIME_IP_ADDR                  {129,6,15,28}               // for NTP if enabled we often use an address like
+#endif                                                            // time-a-g.nist.gov at 129,6,15,28 or 129,6,15,29, 129,6,15,30, etc.
+
 // sensors
 #ifndef WEATHER
 #define WEATHER                       OFF

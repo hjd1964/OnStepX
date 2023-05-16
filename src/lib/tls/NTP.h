@@ -14,6 +14,10 @@
 #endif
 #include "../calendars/Calendars.h"
 
+#ifndef NTP_TIMEOUT_SECONDS
+  #define NTP_TIMEOUT_SECONDS 300 // wait up to 5 minutes to get date/time, use 0 to disable timeout
+#endif
+
 class TimeLocationSource {
   public:
     // initialize (also enables the RTC PPS if available)
