@@ -3,7 +3,7 @@
 
 // We define a more generic symbol, in case more Platform_Name boards based on different lines are supported
 
-// 1/100 second sidereal timer
+// Base rate for critical task timing
 #define HAL_FRACTIONAL_SEC 100.0F
 
 // Analog read and write

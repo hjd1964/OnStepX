@@ -6,8 +6,8 @@
 
 #define HAL_FAST_PROCESSOR
 
-// 1/500 second sidereal timer
 #define HAL_FRACTIONAL_SEC 500.0F
+// Base rate for critical task timing
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
