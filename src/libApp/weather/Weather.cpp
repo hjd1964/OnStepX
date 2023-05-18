@@ -45,7 +45,7 @@ bool Weather::init() {
     success = false;
     #if WEATHER == BME280 || WEATHER == BME280_0x76
       if (bmx.begin(BME_ADDRESS, &HAL_Wire)) {
-        bmx.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
+        bmx.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
         weatherSensor = WS_BME280; success = true;
       } else { DF("WRN: Weather.init(), BME280 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(BME_ADDRESS, HEX); DLF(") not found"); }
     #elif WEATHER == BMP280 || WEATHER == BMP280_0x76
@@ -55,7 +55,7 @@ bool Weather::init() {
       } else { DF("WRN: Weather.init(), BMP280 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(BMP_ADDRESS, HEX); DLF(") not found"); }
     #elif WEATHER == BME280_SPI
       if (bmx.begin()) {
-        bmx.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
+        bmx.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
         weatherSensor = WS_BME280; success = true;
       } else { DLF("WRN: Weather.init(), BME280 (SPI) not found"); }
     #elif WEATHER == BMP280_SPI
