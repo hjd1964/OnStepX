@@ -4,7 +4,7 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
-// 1/100 second sidereal timer
+// Base rate for critical task timing
 #define HAL_FRACTIONAL_SEC 100.0F
 
 // Analog read and write

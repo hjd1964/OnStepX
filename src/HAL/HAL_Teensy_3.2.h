@@ -8,7 +8,7 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-// 1/200 second sidereal timer
+// Base rate for critical task timing
 #define HAL_FRACTIONAL_SEC 200.0F
 
 // Analog read and write
