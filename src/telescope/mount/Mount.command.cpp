@@ -150,7 +150,18 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         }
       } else *commandError = CE_PARAM_RANGE;
     } else
-    
+
+    //  :SEO#         Set encoder origin (for Encoder Bridge)
+    //                Return: 0 on failure
+    //                        1 on success
+    if (command[1] == 'E' && parameter[0] == 'O' && parameter[1] == 0) {
+      #ifdef SERVO_MOTOR_PRESENT
+        #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
+          SERIAL_ENCODER.print(":SO#");
+        #endif
+      #endif
+    } else
+
     if (command[1] == 'X') {
       if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; }
 
@@ -233,8 +244,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         } else *commandError = CE_PARAM_RANGE;
       } else
 
-      // :SXTD,n.n# Set tracking rate offset Dec in arc-seconds/sidereal second
-      //            Return: 0 failure, 1 success
+      // :SXTD,n.n#   Set tracking rate offset Dec in arc-seconds/sidereal second
+      //              Return: 0 on failure
+      //                      1 on success
       if (parameter[0] == 'T' && parameter[1] == 'D') {
         float f = strtod(&parameter[3], &conv_end);
         if (f < -1800.0F) f = -1800.0F;
