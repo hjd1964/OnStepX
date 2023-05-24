@@ -161,6 +161,8 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
             VLF("MSG: Mount, setting absolute encoder origin");
             SERIAL_ENCODER.print(":SO#");
             #ifdef HAL_RESET
+              delay(100);
+              enable(false);
               VLF("MSG: Mount, resetting OnStep...");
               nv.wait();
               tasks.yield(1000);
