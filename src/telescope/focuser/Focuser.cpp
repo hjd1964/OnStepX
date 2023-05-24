@@ -144,7 +144,7 @@ void Focuser::init() {
 
         axes[index]->resetPositionSteps(0);
         axes[index]->setBacklashSteps(settings[index].backlash);
-        axes[index]->setFrequencyMax(configuration[index].slewRateDesired);
+        axes[index]->setFrequencyMax(configuration[index].slewRateDesired*2.0F);
         axes[index]->setFrequencyMin(configuration[index].slewRateMinimum);
         axes[index]->setFrequencySlew(configuration[index].slewRateDesired);
         axes[index]->setSlewAccelerationTime(configuration[index].accelerationTime);
