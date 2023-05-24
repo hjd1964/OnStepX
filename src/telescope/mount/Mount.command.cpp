@@ -151,13 +151,25 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       } else *commandError = CE_PARAM_RANGE;
     } else
 
-    //  :SEO#         Set encoder origin (for Encoder Bridge)
+    //  :SEO#         Set encoder origin (for Encoder Bridge) also resets OnStep
     //                Return: 0 on failure
     //                        1 on success
     if (command[1] == 'E' && parameter[0] == 'O' && parameter[1] == 0) {
       #ifdef SERVO_MOTOR_PRESENT
         #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
-          SERIAL_ENCODER.print(":SO#");
+          if (!mount.isTracking() && !mount.isSlewing()) {
+            VLF("MSG: Mount, setting absolute encoder origin");
+            SERIAL_ENCODER.print(":SO#");
+            #ifdef HAL_RESET
+              VLF("MSG: Mount, resetting OnStep...");
+              nv.wait();
+              tasks.yield(1000);
+              HAL_RESET();
+            #endif
+          } else {
+            *commandError = CE_0;
+            DLF("MSG: Mount, setting absolute encoder origin failed; the mount is in motion!");
+          }
         #endif
       #endif
     } else
