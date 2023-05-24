@@ -22,6 +22,10 @@
   #define ANALOG_WRITE_RANGE 255
 #endif
 
+#ifndef SERVO_SLEWING_TO_TRACKING_DELAY
+  #define SERVO_SLEWING_TO_TRACKING_DELAY 3000 // in milliseconds
+#endif
+
 class ServoMotor : public Motor {
   public:
     // constructor
@@ -103,13 +107,12 @@ class ServoMotor : public Motor {
     float currentFrequency = 0.0F;      // last frequency set 
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
-    float acceleration = ANALOG_WRITE_RANGE/5.0F;
-    float accelerationFs = (ANALOG_WRITE_RANGE/5.0F)/FRACTIONAL_SEC;
     long syncThreshold = OFF;           // sync threshold in counts (for absolute encoders) or OFF
 
     long lastEncoderCounts = 0;         // the last encoder position for stall check
     unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
     unsigned long startTime = 0;        // time at start of servo polling
+    unsigned long lastSlewingTime = 0;  // time when last slewing
 
     volatile int absStep = 1;           // absolute step size (unsigned)
     volatile long originIndexSteps = 0; // for absolute motor position to axis position at coordinate origin
