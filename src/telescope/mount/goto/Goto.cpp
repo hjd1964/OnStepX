@@ -420,7 +420,7 @@ void Goto::poll() {
       axis1.autoSlewAbort();
     }
   }
-  if (axis1.isSlewing()) {
+  if (axis2.isSlewing()) {
     if (!axis2.nearTarget()) nearTargetTimeoutAxis2 = millis();
     if ((long)(millis() - nearTargetTimeoutAxis2) > 15000) {
       DLF("WRN: Mount, goto axis2 timed out aborting slew!");
