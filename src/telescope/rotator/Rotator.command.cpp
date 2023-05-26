@@ -194,6 +194,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'C') {
       if (AXIS3_SENSE_HOME != OFF) {
+        axis3.setFrequencySlew(settings.gotoRate);
         axis3.autoSlewHome();
       } else {
         *commandError = gotoTarget(round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0));
