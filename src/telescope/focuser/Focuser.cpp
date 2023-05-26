@@ -373,7 +373,7 @@ CommandError Focuser::park(int index) {
   float targetMicrons = axes[index]->getInstrumentCoordinate();
   axes[index]->setTargetCoordinatePark(targetMicrons);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
 
   if (e == CE_NONE) {
     settings[index].position = targetMicrons;
@@ -414,7 +414,7 @@ CommandError Focuser::unpark(int index) {
   axes[index]->setBacklash(settings[index].backlash);
   axes[index]->setTargetCoordinate(settings[index].position);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
 
   if (e == CE_NONE) {
     settings[index].parkState = PS_UNPARKING;
