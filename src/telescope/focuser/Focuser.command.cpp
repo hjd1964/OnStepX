@@ -321,6 +321,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'h') {
       if (axes[index]->hasHomeSense()) {
+        axes[index]->setFrequencySlew(settings[index].gotoRate);
         axes[index]->autoSlewHome();
       } else {
         long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
