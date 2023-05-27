@@ -97,7 +97,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rQ#       Stop (Quit) rotator movement
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axis3.autoSlewStop();
+      if (axis3.isHoming()) axis3.autoSlewAbort(); else axis3.autoSlewStop();
       *numericReply = false;
     } else
 

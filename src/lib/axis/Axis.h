@@ -260,8 +260,11 @@ class Axis {
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlew(Direction direction, float frequency = NAN);
 
-     // slew to home using home sensor, with acceleration in "measures" per second per second
+    // slew to home using home sensor, with acceleration in "measures" per second per second
     CommandError autoSlewHome(unsigned long timeout = 0);
+
+    // check if homing is in progress
+    bool isHoming() { return homingStage != HOME_NONE; }
 
     // check if a home sensor is available
     inline bool hasHomeSense() { return pins->axisSense.homeTrigger != OFF; }

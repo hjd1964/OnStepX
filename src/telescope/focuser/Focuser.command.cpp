@@ -239,7 +239,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FQ#       Stop the focuser
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axes[index]->autoSlewStop();
+      if (axes[index]->isHoming()) axes[index]->autoSlewAbort(); else axes[index]->autoSlewStop();
       *numericReply = false;
     } else
 

@@ -423,8 +423,6 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
 
 // stops, with deacceleration by time
 void Axis::autoSlewStop() {
-  if (homingStage != HOME_NONE) { autoSlewAbort(); return; }
-
   if (autoRate <= AR_RATE_BY_TIME_END) return;
 
   motor->setSynchronized(true);
