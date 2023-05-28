@@ -89,6 +89,7 @@ class Rotator {
 
     bool derotatorEnabled = false;
     bool derotatorReverse = false;
+    bool homing = false;
 
     unsigned long writeTime = 0;
     unsigned long secs = 0;

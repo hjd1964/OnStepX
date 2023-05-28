@@ -121,6 +121,7 @@ void Focuser::init() {
     target[index] = 0;
     writeTime[index] = 0;
     parkHandle[index] = 0;
+    homing[index] = false;
 
     if (configuration[index].present) {
       if (axes[index] != NULL) {
@@ -496,6 +497,13 @@ void Focuser::monitor() {
             }
           } else tcfSteps[index] = 0;
 
+          if (homing[index]) {
+            long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*axes[index]->getStepsPerMeasure();
+            axes[index]->resetPositionSteps(p);
+            axes[index]->setBacklash(getBacklash(index));
+            homing[index] = false;
+          }
+
           // delayed write of focuser position
           if (FOCUSER_WRITE_DELAY != 0) {
             if (secs > writeTime[index]) {
@@ -504,6 +512,7 @@ void Focuser::monitor() {
               VF("MSG: Focuser"); V(index + 1); VF(", writing position ("); V(targetMicrons); VLF("um) to NV"); 
             }
           }
+
         }
       }
     }

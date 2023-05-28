@@ -259,6 +259,12 @@ void Rotator::monitor() {
         }
       #endif
 
+      if (homing) {
+        axis3.resetPosition((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
+        axis3.setBacklashSteps(getBacklash());
+        homing = false;
+      }
+
       // delayed write of focuser position
       if (ROTATOR_WRITE_DELAY != 0) {
         if (secs > writeTime) {
@@ -268,6 +274,7 @@ void Rotator::monitor() {
         }
       }
     }
+
   }
 }
 
