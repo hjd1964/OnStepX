@@ -221,7 +221,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
 
     //  :SU[s.s]#
     //            Set the number of seconds (up to +/-0.9) added to UTC to yield UT1 (DUT1)
-    //            presently only applied to GPS UTC time for UT1 conversion
+    //            presently only applied to GPS and NTP UTC time for UT1 conversion
     //            Return: 0 failure, 1 success
     if (command[1] == 'U') {
       char *conv_end;
