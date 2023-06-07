@@ -106,6 +106,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   encoder->init();
   encoder->setOrigin(encoderOrigin);
   this->encoderReverse = encoderReverse;
+  this->encoderReverseDefault = encoderReverse;
 
   feedback->getDefaultParameters(&default_param1, &default_param2, &default_param3, &default_param4, &default_param5, &default_param6);
 
