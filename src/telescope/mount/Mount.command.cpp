@@ -57,9 +57,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     // :GX          OnStep extended command
     if (command[1] == 'X' && parameter[2] == 0)  {
 
-      // :GX4[n]#   Get encoder absolute angle [n]
-      //            (0 and 1) Returns: DDD:MM:SS
-      //            (2 and 3) Returns: n.nnnnnn
+      // :GX4[n]#   Get angles [n]
+      //            (0 and 1) Returns instrument angle in: DDD:MM:SS#
+      //            (2 and 3) Returns instrument angle in: n.nnnnnn#
+      //            (4 and 5) Returns encoder angle in counts: n#
       if (parameter[0] == '4')  {
         *numericReply = false;
         switch (parameter[1]) {
@@ -67,6 +68,8 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
           case '1': convert.doubleToDms(reply, radToDeg(axis2.getInstrumentCoordinate()), true, true, PM_HIGH); break; 
           case '2': sprintF(reply, "%0.6f", radToDeg(axis1.getInstrumentCoordinate())); break;
           case '3': sprintF(reply, "%0.6f", radToDeg(axis2.getInstrumentCoordinate())); break;
+          case '4': sprintf(reply, "%d", axis1.motor->getEncoderCount()); break;
+          case '5': sprintf(reply, "%d", axis2.motor->getEncoderCount()); break;
           default:  *numericReply = true; *commandError = CE_CMD_UNKNOWN;
         }
       } else

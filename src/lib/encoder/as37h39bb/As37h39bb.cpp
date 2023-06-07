@@ -86,7 +86,8 @@ int32_t As37h39bb::read() {
 
   uint32_t temp;
   if (readEncLatest(temp)) {
-    return (int32_t)temp + offset;
+    count = (int32_t)temp;
+    return count + offset;
   } else return INT32_MAX;
 }
 

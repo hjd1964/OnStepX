@@ -60,9 +60,10 @@ class Encoder {
     // origin for absolute encoders
     uint32_t origin = 0;
 
+    int32_t count = 0;
+
   protected:
     bool initialized = false;
 
     int16_t axis = 0;
-    volatile int32_t count = 0;
 };

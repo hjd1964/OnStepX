@@ -76,6 +76,9 @@ class ServoMotor : public Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
 
+    // get encoder count
+    int32_t getEncoderCount() { return encoder->count; }
+
     // updates PID and sets servo motor power/direction
     void poll();
 
