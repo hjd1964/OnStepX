@@ -26,7 +26,7 @@
     long at = time_to_next_task - period; \
     average_arrival_time += at; \
     average_arrival_time_count++; \
-    if (labs(at) > max_arrival_time) max_arrival_time = labs(at); \
+    if (labs(at + period) > max_arrival_time) max_arrival_time = labs(at + period); \
     unsigned long runtime_t0 = micros(); 
   #define TASKS_PROFILER_SUFFIX \
     at = micros()-runtime_t0; \

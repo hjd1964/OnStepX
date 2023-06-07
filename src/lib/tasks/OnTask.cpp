@@ -297,6 +297,7 @@ float Task::getArrivalMax() {
 float Task::getRuntimeTotal() {
   if (hardware_timer) { noInterrupts(); total_runtime = _task_total_runtime[hardware_timer-1]; _task_total_runtime[hardware_timer-1] = 0; total_runtime_count=_task_total_runtime_count[hardware_timer-1]; interrupts(); };
   float value = total_runtime;
+  if (value > 2147483647) value = 0.0;
   total_runtime = 0;
   return value;
 }
