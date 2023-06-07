@@ -129,7 +129,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
-  
+
   driver->init();
   enable(false);
 
@@ -153,6 +153,7 @@ bool ServoMotor::init() {
 // set driver reverse state
 void ServoMotor::setReverse(int8_t state) {
   feedback->setControlDirection(state);
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
 }
 
 // set driver parameters

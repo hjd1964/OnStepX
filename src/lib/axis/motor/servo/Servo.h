@@ -127,6 +127,7 @@ class ServoMotor : public Motor {
     bool motorStepsInitDone = false;
     bool homeSet = false;
     bool encoderReverse = false;
+    bool encoderReverseDefault = false;
     bool wasAbove33 = false;
     bool wasBelow33 = false;
     long lastTargetDistance = 0;
