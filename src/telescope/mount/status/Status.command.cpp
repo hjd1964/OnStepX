@@ -145,15 +145,26 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
   // :SX97,[n]#     Set buzzer state
   //                Return: see below
   if (command[0] == 'S' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '7'  && parameter[2] == ','  && parameter[4] == 0) {
-    if (parameter[3] == '0' || parameter[3] == '1') {
-      sound.enabled = parameter[3] - '0';
-      #if STATUS_BUZZER_MEMORY == ON
-        nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
-      #endif
-    } 
-    if (parameter[3] == '2') sound.beep(); 
-    if (parameter[3] == '3') sound.alert();    
-    else *commandError = CE_PARAM_RANGE;
+    switch (parameter[3]) {
+      case '0': case '1':
+        sound.enabled = parameter[3] - '0';
+        #if STATUS_BUZZER_MEMORY == ON
+          nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
+        #endif
+      break;
+      case '2':
+        sound.beep();
+      break;
+      case '3':
+        sound.alert();
+      break;
+      case '4':
+        sound.click();
+      break;
+      default:
+        *commandError = CE_PARAM_RANGE;
+      break;
+    }
   } else return false;
 
   return true;
