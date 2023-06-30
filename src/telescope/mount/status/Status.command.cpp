@@ -150,7 +150,10 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       #if STATUS_BUZZER_MEMORY == ON
         nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
       #endif
-    } else *commandError = CE_PARAM_RANGE;
+    } 
+    if (parameter[3] == '2') sound.beep(); 
+    if (parameter[3] == '3') sound.alert();    
+    else *commandError = CE_PARAM_RANGE;
   } else return false;
 
   return true;
