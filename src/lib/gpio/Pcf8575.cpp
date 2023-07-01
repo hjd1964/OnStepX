@@ -6,7 +6,7 @@
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X8575
 
 #ifndef GPIO_PCF8575_I2C_ADDRESS
-  #define GPIO_PCF8575_I2C_ADDRESS 0x38
+  #define GPIO_PCF8575_I2C_ADDRESS 0x20
 #endif
 
 #include "../tasks/OnTask.h"
