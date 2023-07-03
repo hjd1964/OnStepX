@@ -17,7 +17,7 @@
 #endif
 
 // Use the following settings for any TMC UART driver (TMC2209) that may be present
-#if defined(STEP_DIR_TMC_UART_PRESENT)
+#if defined(STEP_DIR_TMC_UART_PRESENT) || defined(SERVO_TMC2209_PRESENT)
   #define SERIAL_TMC_HARDWARE_UART
   #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD       460800           // Baud rate
