@@ -44,12 +44,14 @@
 
     if (!cmdSvrClient) {
       if (cmdSvr->hasClient()) {
-        #if DEBUG_CMDSERVER == ON
-          VLF("MSG: available(), NEW cmdSvrClient");
-        #endif
         cmdSvrClient = cmdSvr->available();
         clientEndTimeMs = millis() + clientTimeoutMs;
       }
+      if (cmdSvrClient) {
+        #if DEBUG_CMDSERVER == ON
+          VLF("MSG: available(), NEW cmdSvrClient");
+        #endif
+      } else return 0;
     } else {
       if (!cmdSvrClient.connected()) { 
         #if DEBUG_CMDSERVER == ON
