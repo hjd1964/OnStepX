@@ -224,6 +224,8 @@ bool Axis::validateAxisSettings(int axisNum, AxisStoredSettings a) {
     return false;
   }
 
+  UNUSED(axisNum);
+
   return true;
 }
 

@@ -452,10 +452,12 @@ void Guide::poll() {
 }
 
 // enables or disables backlash for the GUIDE_DISABLE_BACKLASH option
-void Guide::backlashEnableControl(bool enabled) {
+void Guide::backlashEnableControl(bool enable) {
   #if GUIDE_DISABLE_BACKLASH == ON
-    axis1.setBacklash(state ? mount.settings.backlash.axis1 : 0.0F);
-    axis2.setBacklash(state ? mount.settings.backlash.axis2 : 0.0F);
+    axis1.setBacklash(enable ? mount.settings.backlash.axis1 : 0.0F);
+    axis2.setBacklash(enable ? mount.settings.backlash.axis2 : 0.0F);
+  #else
+    UNUSED(enable);
   #endif
 }
 

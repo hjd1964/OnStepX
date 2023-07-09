@@ -350,7 +350,10 @@ CommandError Goto::alignAddStar() {
 
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &lastAlignTarget, &mountPosition);
+    #else
+      UNUSED(mountPosition);
     #endif
+
     if (e == CE_NONE) alignState.currentStar++;
   }
 
