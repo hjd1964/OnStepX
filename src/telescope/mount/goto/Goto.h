@@ -115,7 +115,7 @@ class Goto {
     // set any additional destinations required for a goto
     void waypoint(Coordinate *current);
 
-    // start slews with approach correction and parking support
+    // start slews with approach correction and parking/homing support
     CommandError startAutoSlew();
     #endif
 

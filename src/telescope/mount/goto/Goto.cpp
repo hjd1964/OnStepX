@@ -536,7 +536,7 @@ void Goto::poll() {
   }
 }
 
-// start slews with approach correction and parking support
+// start slews with approach correction and parking/homing support
 CommandError Goto::startAutoSlew() {
   CommandError e;
 
