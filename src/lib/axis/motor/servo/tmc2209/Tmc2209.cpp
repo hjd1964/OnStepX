@@ -106,8 +106,8 @@ void ServoTmc2209::init() {
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF (set by Vref)");
-    driver->rms_current(2.5F*0.707F);
+    VLF("current control OFF (300mA)");
+    driver->rms_current(0.3F*0.707F);
   } else {
     VF("Irun="); V(Settings->current); VLF("mA");
     driver->rms_current(Settings->current*0.707F);
