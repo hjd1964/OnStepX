@@ -85,8 +85,8 @@ class ServoMotor : public Motor {
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
     
-    // calibrate the motor if required
-    void calibrate() { driver->calibrate(); }
+    // calibrate the motor driver
+    void calibrateDriver() { driver->calibrateDriver(); }
 
     inline int32_t encoderRead() { return encoderReverse ? -encoder->read() : encoder->read(); }
 

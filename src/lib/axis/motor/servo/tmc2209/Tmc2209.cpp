@@ -203,7 +203,7 @@ void ServoTmc2209::updateStatus() {
 }
 
 // calibrate the motor driver if required
-void ServoTmc2209::calibrate() {
+void ServoTmc2209::calibrateDriver() {
   if (stealthChop()) {
     VF("MSG: ServoTmc2209 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(Settings->current));

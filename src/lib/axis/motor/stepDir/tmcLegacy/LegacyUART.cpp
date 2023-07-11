@@ -224,7 +224,7 @@ bool StepDirTmcUART::enable(bool state) {
 }
 
 // calibrate the motor driver if required
-void StepDirTmcUART::calibrate() {
+void StepDirTmcUART::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->setRunCurrent(settings.currentRun/25); // current in %

@@ -199,7 +199,7 @@ bool StepDirTmcSPI::enable(bool state) {
 }
 
 // calibrate the motor driver if required
-void StepDirTmcSPI::calibrate() {
+void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(settings.currentRun));

@@ -50,9 +50,9 @@ void Mount::init() {
 }
 
 void Mount::begin() {
-  axis1.calibrate();
+  axis1.calibrateDriver();
   axis1.enable(MOUNT_ENABLE_IN_STANDBY == ON);
-  axis2.calibrate();
+  axis2.calibrateDriver();
   axis2.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 
   // initialize the critical subsystems

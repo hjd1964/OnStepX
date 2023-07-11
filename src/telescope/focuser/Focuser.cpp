@@ -159,7 +159,7 @@ void Focuser::init() {
 
 void Focuser::begin() {
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrate();
+    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrateDriver();
   }
 
   // start task for temperature compensated focusing

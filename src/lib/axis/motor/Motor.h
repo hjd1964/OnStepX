@@ -124,7 +124,10 @@ class Motor {
     virtual void setSlewing(bool state);
 
     // calibrate the motor if required
-    virtual void calibrate() {}
+    virtual void calibrate(float value) { UNUSED(value); }
+
+    // calibrate the motor driver if required
+    virtual void calibrateDriver() {}
 
     // monitor and respond to motor state as required
     virtual void poll() {}

@@ -49,7 +49,7 @@ class StepDirTmcSPI : public StepDirDriver {
     bool enable(bool state);
 
     // calibrate the motor driver if required
-    void calibrate();
+    void calibrateDriver();
 
     TMCStepper *driver;
 

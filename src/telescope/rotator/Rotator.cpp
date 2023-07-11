@@ -41,7 +41,7 @@ void Rotator::init() {
 }
 
 void Rotator::begin() {
-  axis3.calibrate();
+  axis3.calibrateDriver();
 
   // start monitor task
   VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");

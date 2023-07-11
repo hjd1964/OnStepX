@@ -303,7 +303,10 @@ class Axis {
     bool motionErrorSensed(Direction direction);
 
     // calibrate the motor if required
-    void calibrate() { motor->calibrate(); }
+    void calibrate(float value) { motor->calibrate(value); }
+
+    // calibrate the motor driver if required
+    void calibrateDriver() { motor->calibrateDriver(); }
 
     // monitor movement
     void poll();

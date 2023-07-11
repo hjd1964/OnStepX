@@ -69,7 +69,7 @@ class StepDirDriver {
     virtual bool enable(bool state) { UNUSED(state); return false; }
 
     // calibrate the motor driver if required
-    virtual void calibrate() {}
+    virtual void calibrateDriver() {}
 
     // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
     long getPulseWidth();

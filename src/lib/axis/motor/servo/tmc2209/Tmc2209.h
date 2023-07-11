@@ -67,7 +67,7 @@ class ServoTmc2209 : public ServoDriver {
     void updateStatus();
 
     // calibrate the motor if required
-    void calibrate();
+    void calibrateDriver();
 
     const ServoTmcSettings *Settings;
 

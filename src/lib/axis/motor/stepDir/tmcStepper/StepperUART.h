@@ -67,7 +67,7 @@ class StepDirTmcUART : public StepDirDriver {
     bool enable(bool state);
 
     // calibrate the motor driver if required
-    void calibrate();
+    void calibrateDriver();
 
   private:
     #if SERIAL_TMC == SoftSerial
