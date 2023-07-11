@@ -217,6 +217,7 @@ bool Focuser::setDcPower(int index, int value) {
 // get TCF enable
 bool Focuser::getTcfEnable(int index) {
   if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (isnan(getTemperature())) setTcfEnable(index, false);
   return settings[index].tcf.enabled;
 }
 
@@ -225,6 +226,7 @@ CommandError Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
+  if (isnan(getTemperature())) value = false;
   settings[index].tcf.enabled = value;
   if (value) {
     settings[index].tcf.t0 = getTemperature();
