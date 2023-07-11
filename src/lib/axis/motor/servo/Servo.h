@@ -100,6 +100,8 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+    long encoderApplyFilter(long encoderCounts);
+
     uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
 
