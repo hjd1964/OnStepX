@@ -20,7 +20,7 @@
   #define SERIAL_TMC_RXTX_SET
 #endif
 
-ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings) {
+ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings, float velocityCorrectionFactor) {
   this->axisNumber = axisNumber;
 
   this->Pins = Pins;
@@ -34,6 +34,8 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   velocityMax = TmcSettings->velocityMax;
   acceleration = TmcSettings->acceleration;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+
+  this->velocityCorrectionFactor = -velocityCorrectionFactor;
 }
 
 void ServoTmc2209::init() {
@@ -169,7 +171,8 @@ float ServoTmc2209::setMotorVelocity(float velocity) {
 
   if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F));
+  driver->VACTUAL(currentVelocity/0.715F - 1.0F);
+
   return currentVelocity;
 }
 

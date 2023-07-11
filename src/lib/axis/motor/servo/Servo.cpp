@@ -79,8 +79,15 @@ bool ServoMotor::init() {
   timerName[5] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
-    V("success");
-    if (useFastHardwareTimers && !tasks.requestHardwareTimer(taskHandle, 0)) { VLF(" (no hardware timer!)"); } else { VLF(""); }
+    VF("success");
+    if (useFastHardwareTimers) {
+      if (!tasks.requestHardwareTimer(taskHandle, 0)) {
+        VF(" (no hardware timer!)");
+      } else {
+        maxFrequency = 1000000.0F/HAL_MAXRATE_LOWER_LIMIT;
+      };
+    }
+    VLF("");
   } else {
     VLF("FAILED!");
     return false;
@@ -173,14 +180,18 @@ void ServoMotor::setFrequencySteps(float frequency) {
   if (inBacklash) frequency = backlashFrequency;
 
   if (frequency != currentFrequency) {
-    lastFrequency = frequency;
-
-    // if slewing has a larger step size divide the frequency to account for it
-    if (lastFrequency <= backlashFrequency * 2.0F) stepSize = 1; else { if (!inBacklash) stepSize = 64; }
-    frequency /= stepSize;
+    // compensate for performace limitations by taking larger steps as needed
+    if (frequency < maxFrequency) stepSize = 1; else
+    if (frequency < maxFrequency*2) stepSize = 2; else
+    if (frequency < maxFrequency*4) stepSize = 4; else
+    if (frequency < maxFrequency*8) stepSize = 8; else
+    if (frequency < maxFrequency*16) stepSize = 16; else
+    if (frequency < maxFrequency*32) stepSize = 32; else
+    if (frequency < maxFrequency*64) stepSize = 64; else
+    if (frequency < maxFrequency*128) stepSize = 128; else stepSize = 256;
 
     // timer period in microseconds
-    float period = 1000000.0F / frequency;
+    float period = 1000000.0F / (frequency/stepSize);
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
@@ -193,6 +204,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
     }
 
     currentFrequency = frequency;
+    velocityEstimate = driver->getVelocityEstimate(currentFrequency*dir);
 
     // change the motor rate/direction
     noInterrupts();
@@ -247,7 +259,7 @@ void ServoMotor::poll() {
   control->in = encoderCounts;
   if (enabled) feedback->poll();
 
-  float velocity = control->out;
+  float velocity = velocityEstimate + control->out;
   if (!enabled) velocity = 0.0F;
 
   delta = motorCounts - encoderCounts;
@@ -367,7 +379,14 @@ IRAM_ATTR void ServoMotor::move() {
     }
 
   #endif
+}
 
+int32_t ServoMotor::encoderRead() {
+  int32_t encoderCounts = encoder->read();
+
+
+  if (encoderReverse) encoderCounts = -encoderCounts;
+  return encoderCounts;
 }
 
 #endif

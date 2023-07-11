@@ -88,7 +88,7 @@ class ServoMotor : public Motor {
     // calibrate the motor driver
     void calibrateDriver() { driver->calibrateDriver(); }
 
-    inline int32_t encoderRead() { return encoderReverse ? -encoder->read() : encoder->read(); }
+    int32_t encoderRead();
 
     // servo motor driver
     ServoDriver *driver;
@@ -100,10 +100,14 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+    float velocityEstimate = 0.0F;
+    float velocityOverride = 0.0F;
+
     long encoderApplyFilter(long encoderCounts);
 
     uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
+    float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
 
     int  stepSize = 1;                  // step size
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)

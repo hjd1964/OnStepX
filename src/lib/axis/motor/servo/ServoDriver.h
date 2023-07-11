@@ -43,6 +43,9 @@ class ServoDriver {
     // calibrate the motor if required
     virtual void calibrateDriver() {}
 
+    // return the velocity estimate factor
+    virtual float getVelocityEstimate(float frequency) { return frequency*velocityCorrectionFactor; }
+
   protected:
     int axisNumber;
     DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
@@ -61,6 +64,8 @@ class ServoDriver {
     uint8_t enabledState = LOW;
     bool enabled = false;
     int16_t faultPin = OFF;
+
+    float velocityCorrectionFactor = 0;
 };
 
 #endif

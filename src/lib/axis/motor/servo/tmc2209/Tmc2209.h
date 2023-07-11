@@ -52,7 +52,7 @@ typedef struct ServoTmcSettings {
 class ServoTmc2209 : public ServoDriver {
   public:
     // constructor
-    ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings);
+    ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings, float velocityCorrectionFactor = 0);
 
     // decodes driver model and sets up the pin modes
     void init();

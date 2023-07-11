@@ -273,6 +273,9 @@
   #ifndef AXIS1_SERVO_MAX_VELOCITY
   #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
   #endif
+  #ifndef AXIS1_SERVO_TRACKING_VELOCITY
+  #define AXIS1_SERVO_TRACKING_VELOCITY 0                         // tracking velocity, in steps/s for SERVO_TMC2209
+  #endif
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
   #endif
@@ -432,6 +435,9 @@
 
   #ifndef AXIS2_SERVO_MAX_VELOCITY
   #define AXIS2_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS2_SERVO_TRACKING_VELOCITY
+  #define AXIS2_SERVO_TRACKING_VELOCITY 0
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
