@@ -5,10 +5,6 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#ifndef SERVO_SLEW_DIRECT
-  #define SERVO_SLEW_DIRECT OFF
-#endif
-
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 

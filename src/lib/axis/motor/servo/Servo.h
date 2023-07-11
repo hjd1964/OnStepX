@@ -18,8 +18,8 @@
 
 #include "feedback/Pid/Pid.h"
 
-#ifndef ANALOG_WRITE_RANGE
-  #define ANALOG_WRITE_RANGE 255
+#ifndef SERVO_SLEW_DIRECT
+  #define SERVO_SLEW_DIRECT OFF
 #endif
 
 #ifndef SERVO_SLEWING_TO_TRACKING_DELAY
