@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------------
-// axis servo TMC2209 stepper motor driver
+// axis servo TMC5160 stepper motor driver
 #pragma once
 
 #include <Arduino.h>
 #include "../../../../../Common.h"
 
-#ifdef SERVO_TMC2209_PRESENT
+#ifdef SERVO_TMC5160_PRESENT
 
 #include "../ServoDriver.h"
 
@@ -13,30 +13,17 @@
   #define DRIVER_TMC_STEPPER_AUTOGRAD true
 #endif
 
-// default settings for any TMC UART drivers that may be present
-#ifndef SERIAL_TMC
-  #define SERIAL_TMC                  SoftSerial     // Use software serial w/ TX on M3 (CS) and RX on M4 (MISO) of each axis
-#endif
-#ifndef SERIAL_TMC_BAUD
-  #define SERIAL_TMC_BAUD             115200         // Baud rate
-#endif
-#ifndef SERIAL_TMC_ADDRESS_MAP
-  #define SERIAL_TMC_ADDRESS_MAP(x)   (0)            // driver addresses are 0 for all axes
-#endif
-
-#if SERIAL_TMC == SoftSerial
-  #include <SoftwareSerial.h> // must be built into the board libraries
-#endif
-
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
 
-typedef struct ServoTmcPins {
+typedef struct ServoTmcSpiPins {
   int16_t step;
   int16_t dir;
   int16_t enable;
   uint8_t enabledState;
   int16_t m0;
   int16_t m1;
+  int16_t m2;
+  int16_t m3;
   int16_t fault;
 } ServoTmcPins;
 
@@ -49,10 +36,10 @@ typedef struct ServoTmcSettings {
   int16_t current;
 } ServoTmcSettings;
 
-class ServoTmc2209 : public ServoDriver {
+class ServoTmc5160 : public ServoDriver {
   public:
     // constructor
-    ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings);
+    ServoTmc5160(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings);
 
     // decodes driver model and sets up the pin modes
     void init();
@@ -73,7 +60,7 @@ class ServoTmc2209 : public ServoDriver {
 
   private:
     inline float mAToCs(float mA) { return 32.0F*(((mA/1000.0F)*(rSense+0.02F))/0.325F) - 1.0F; }
-    float rSense = 0.11F;
+    float rSense = 0.075F;
 
     bool stealthChop() { 
       if ((axisNumber == 1 && AXIS1_DRIVER_DECAY == AXIS1_DRIVER_DECAY_GOTO && AXIS1_DRIVER_DECAY == STEALTHCHOP) ||
@@ -84,13 +71,13 @@ class ServoTmc2209 : public ServoDriver {
       SoftwareSerial SerialTMC;
     #endif
 
-    TMC2209Stepper *driver;
+    TMC5160Stepper *driver;
 
     bool powered = false;
     float currentVelocity = 0.0F;
     float acceleration;
     float accelerationFs;
-    const ServoTmcPins *Pins;
+    const ServoTmcSpiPins *Pins;
 };
 
 #endif

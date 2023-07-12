@@ -1,26 +1,19 @@
 // -----------------------------------------------------------------------------------
-// axis servo TMC2209 stepper motor driver
+// axis servo TMC5160 stepper motor driver
 
-#include "Tmc2209.h"
+#include "Tmc5160.h"
 
-#ifdef SERVO_TMC2209_PRESENT
+#ifdef SERVO_TMC5160_PRESENT
 
 #include "../../../../tasks/OnTask.h"
 
 // help with pin names
-#define rx m3
-#define tx m2
+#define mosi m0
+#define sck  m1
+#define cs   m2
+#define miso m3
 
-// provide for using hardware serial
-#if SERIAL_TMC == HardSerial
-  #include <HardwareSerial.h>
-  #undef SERIAL_TMC
-  HardwareSerial HWSerialTMC(SERIAL_TMC_RX, SERIAL_TMC_TX);
-  #define SERIAL_TMC HWSerialTMC
-  #define SERIAL_TMC_RXTX_SET
-#endif
-
-ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings) {
+ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, const ServoTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 
   this->Pins = Pins;
@@ -36,15 +29,13 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
-void ServoTmc2209::init() {
+void ServoTmc5160::init() {
   ServoDriver::init();
 
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;
 
-  // get TMC UART driver ready
-  pinModeEx(Pins->m0, OUTPUT);
-  pinModeEx(Pins->m1, OUTPUT);
+  // get TMC SPI driver ready
   pinModeEx(Pins->step, OUTPUT);
   pinModeEx(Pins->dir, OUTPUT);
 
@@ -56,42 +47,7 @@ void ServoTmc2209::init() {
   VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
-  // initialize the serial port
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
-  #if defined(SERIAL_TMC_HARDWARE_UART)
-    #if defined(DEDICATED_MODE_PINS)
-      // program the device address 0,1,2,3 since M0 and M1 are all unique
-    int deviceAddress = SERIAL_TMC_ADDRESS_MAP(axisNumber - 1);
-      digitalWriteEx(Pins->m0, bitRead(deviceAddress, 0));
-      digitalWriteEx(Pins->m1, bitRead(deviceAddress, 1));
-    #else
-      // help user hard code the device address 0,1,2,3 by cutting pins
-      digitalWriteEx(Pins->m0, HIGH);
-      digitalWriteEx(Pins->m1, HIGH);
-    #endif
-
-    #define SerialTMC SERIAL_TMC
-    static bool initialized = false;
-    if (!initialized) {
-      #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
-        VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
-        SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
-      #else
-        VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
-        SerialTMC.begin(SERIAL_TMC_BAUD);
-      #endif
-      initialized = true;
-    }
-  #else
-    // pull MS1 and MS2 low for device address 0
-    digitalWriteEx(Pins->m0, LOW);
-    digitalWriteEx(Pins->m1, LOW);
-    VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
-    SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
-    SerialTMC.begin(SERIAL_TMC_BAUD);
-  #endif
-
-  driver = new TMC2209Stepper(&SERIAL_TMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+  driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
   driver->begin();
   driver->intpol(true);
 
@@ -106,14 +62,16 @@ void ServoTmc2209::init() {
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF (300mA)");
-    driver->rms_current(0.3F*0.707F);
+    VLF("current control OFF (600mA)");
+    driver->rms_current(0.6F*0.707F);
   } else {
     VF("Irun="); V(Settings->current); VLF("mA");
     driver->rms_current(Settings->current*0.707F);
   }
   driver->hold_multiplier(1.0F);
-  driver->en_spreadCycle(true);
+  driver->en_pwm_mode(false);
+  driver->AMAX(65535);
+  driver->RAMPMODE(1);
 
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;
@@ -128,17 +86,17 @@ void ServoTmc2209::init() {
 }
 
 // enable or disable the driver using the enable pin or other method
-void ServoTmc2209::enable(bool state) {
+void ServoTmc5160::enable(bool state) {
   enabled = state;
   if (enablePin == SHARED) {
     VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
     if (state) {
-      driver->en_spreadCycle(!stealthChop());
+      driver->en_pwm_mode(stealthChop());
       driver->irun(mAToCs(Settings->current*0.707F));
       driver->ihold(mAToCs(Settings->current*0.707F));
     } else {
-      driver->en_spreadCycle(false);
+      driver->en_pwm_mode(true);
       driver->ihold(0);
     }
   } else {
@@ -153,7 +111,7 @@ void ServoTmc2209::enable(bool state) {
 }
 
 // set motor velocity (in microsteps/s)
-float ServoTmc2209::setMotorVelocity(float velocity) {
+float ServoTmc5160::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
@@ -167,15 +125,21 @@ float ServoTmc2209::setMotorVelocity(float velocity) {
     if (currentVelocity < velocity) currentVelocity = velocity;
   }
 
-  if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
+  if (currentVelocity >= 0.0F) {
+    driver->shaft(false);
+    motorDirection = DIR_FORWARD;
+  } else {
+    driver->shaft(true);
+    motorDirection = DIR_REVERSE;
+  }
 
-  driver->VACTUAL(currentVelocity/0.715F);
+  driver->VMAX(abs(currentVelocity/0.715F));
 
   return currentVelocity;
 }
 
 // update status info. for driver
-void ServoTmc2209::updateStatus() {
+void ServoTmc5160::updateStatus() {
   if (statusMode == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
@@ -204,14 +168,14 @@ void ServoTmc2209::updateStatus() {
 }
 
 // calibrate the motor driver if required
-void ServoTmc2209::calibrateDriver() {
+void ServoTmc5160::calibrateDriver() {
   if (stealthChop()) {
-    VF("MSG: ServoTmc2209 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    VF("MSG: ServoTmc5160 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(Settings->current));
     driver->ihold(mAToCs(Settings->current));
-    ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
-    ((TMC2209Stepper*)driver)->pwm_autoscale(true);
-    ((TMC2209Stepper*)driver)->en_spreadCycle(false);
+    driver->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
+    driver->pwm_autoscale(true);
+    driver->en_pwm_mode(true);
     delay(1000);
   }
 }

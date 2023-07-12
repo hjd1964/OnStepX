@@ -67,7 +67,8 @@
 #define SERVO_PE                    100    // SERVO, direction (phase) and pwm (enable) connections
 #define SERVO_EE                    101    // SERVO, dual pwm input (enable/enable) connections
 #define SERVO_TMC2209               102    // TMC2209 stepper driver using VACTUAL velocity control
-#define SERVO_DRIVER_LAST           102
+#define SERVO_TMC5160               103    // TMC5160 stepper driver using VMAX velocity control
+#define SERVO_DRIVER_LAST           103
 
 // odrive driver
 #define ODRIVE_DRIVER_FIRST         200

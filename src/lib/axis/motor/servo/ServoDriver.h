@@ -14,6 +14,34 @@
   #define ANALOG_WRITE_RANGE 255
 #endif
 
+#ifndef AXIS1_SERVO_VELOCITY_FACTOR
+  #define AXIS1_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS2_SERVO_VELOCITY_FACTOR
+  #define AXIS2_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS3_SERVO_VELOCITY_FACTOR
+  #define AXIS3_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS4_SERVO_VELOCITY_FACTOR
+  #define AXIS4_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS5_SERVO_VELOCITY_FACTOR
+  #define AXIS5_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS6_SERVO_VELOCITY_FACTOR
+  #define AXIS6_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS7_SERVO_VELOCITY_FACTOR
+  #define AXIS7_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS8_SERVO_VELOCITY_FACTOR
+  #define AXIS8_SERVO_VELOCITY_FACTOR 0
+#endif
+#ifndef AXIS9_SERVO_VELOCITY_FACTOR
+  #define AXIS9_SERVO_VELOCITY_FACTOR 0
+#endif
+
 class ServoDriver {
   public:
     // decodes driver model and sets up the pin modes
@@ -44,7 +72,21 @@ class ServoDriver {
     virtual void calibrateDriver() {}
 
     // return the velocity estimate factor
-    virtual float getVelocityEstimate(float frequency) { return frequency*velocityCorrectionFactor; }
+    virtual float getVelocityEstimate(float frequency) {
+      UNUSED(frequency);
+      switch (axisNumber) {
+        case 1: return AXIS1_SERVO_VELOCITY_FACTOR;
+        case 2: return AXIS2_SERVO_VELOCITY_FACTOR;
+        case 3: return AXIS3_SERVO_VELOCITY_FACTOR;
+        case 4: return AXIS4_SERVO_VELOCITY_FACTOR;
+        case 5: return AXIS5_SERVO_VELOCITY_FACTOR;
+        case 6: return AXIS6_SERVO_VELOCITY_FACTOR;
+        case 7: return AXIS7_SERVO_VELOCITY_FACTOR;
+        case 8: return AXIS8_SERVO_VELOCITY_FACTOR;
+        case 9: return AXIS9_SERVO_VELOCITY_FACTOR;
+        default: return 0;
+      }
+    }
 
   protected:
     int axisNumber;
@@ -64,8 +106,6 @@ class ServoDriver {
     uint8_t enabledState = LOW;
     bool enabled = false;
     int16_t faultPin = OFF;
-
-    float velocityCorrectionFactor = 0;
 };
 
 #endif
