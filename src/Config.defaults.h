@@ -276,7 +276,7 @@
   #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_VELOCITY_FACTOR
-  #define AXIS1_SERVO_VELOCITY_FACTOR   0                         // tracking velocity factor
+  #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
@@ -441,7 +441,7 @@
   #define AXIS2_SERVO_MAX_VELOCITY      100
   #endif
   #ifndef AXIS2_SERVO_VELOCITY_FACTOR
-  #define AXIS2_SERVO_VELOCITY_FACTOR   0
+  #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
