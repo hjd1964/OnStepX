@@ -5,7 +5,8 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#include "../../../encoder/as37h39bb/As37h39bb.h"
+#include "../../../encoder/bissc/As37h39bb.h"
+#include "../../../encoder/bissc/Jtw24.h"
 #include "../../../encoder/cwCcw/CwCcw.h"
 #include "../../../encoder/pulseDir/PulseDir.h"
 #include "../../../encoder/pulseOnly/PulseOnly.h"
