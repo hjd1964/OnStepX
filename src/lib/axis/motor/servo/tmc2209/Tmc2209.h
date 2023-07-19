@@ -57,6 +57,9 @@ class ServoTmc2209 : public ServoDriver {
     // decodes driver model and sets up the pin modes
     void init();
 
+    // move using step/dir signals
+    void alternateMode(bool state);
+
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
@@ -87,6 +90,7 @@ class ServoTmc2209 : public ServoDriver {
     TMC2209Stepper *driver;
 
     bool powered = false;
+    bool sdMode = false;
     float currentVelocity = 0.0F;
     float acceleration;
     float accelerationFs;

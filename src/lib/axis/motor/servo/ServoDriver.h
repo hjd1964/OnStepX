@@ -47,6 +47,9 @@ class ServoDriver {
     // decodes driver model and sets up the pin modes
     virtual void init();
 
+    // alternate mode for movement
+    virtual void alternateMode(bool state) { UNUSED(state); }
+
     // enable or disable the driver using the enable pin or other method
     virtual void enable(bool state) { UNUSED(state); }
 
@@ -57,7 +60,7 @@ class ServoDriver {
     // set motor velocity, returns velocity actually set
     virtual float setMotorVelocity(float velocity);
 
-    // returns motor direction (DIR_FORMWARD or DIR_REVERSE)
+    // returns motor direction (DIR_FORWARD or DIR_REVERSE)
     Direction getMotorDirection() { return motorDirection; };
 
     // update status info. for driver

@@ -127,6 +127,12 @@ void ServoTmc2209::init() {
   #endif
 }
 
+// move using step/dir signals
+void ServoTmc2209::alternateMode(bool state) {
+  sdMode = state;
+  if (sdMode) driver->VACTUAL(0);
+}
+
 // enable or disable the driver using the enable pin or other method
 void ServoTmc2209::enable(bool state) {
   enabled = state;
@@ -154,6 +160,8 @@ void ServoTmc2209::enable(bool state) {
 
 // set motor velocity (in microsteps/s)
 float ServoTmc2209::setMotorVelocity(float velocity) {
+  if (sdMode) return velocity;
+
   if (!enabled) velocity = 0.0F;
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
