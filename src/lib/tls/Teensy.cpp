@@ -1,11 +1,9 @@
 // -----------------------------------------------------------------------------------
 // Time/Location source TEENSY 3.2 RTC support
 
-#include "../../Common.h"
+#include "Teensy.h"
 
 #if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY
-
-#include "Teensy.h"
 
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 
