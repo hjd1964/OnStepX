@@ -17,7 +17,7 @@ void TimeLocationSource::set(JulianDate ut1) {
   greg.year -= 2000;
   if (greg.year >= 100) greg.year -= 100;
 
-  double f1 = fabs(ut1.hour) + TLS_CLOCK_SKEW;
+  double f1 = fabs(ut1.hour);
   int h = floor(f1);
   double m = (f1 - h)*60.0;
   double s = (m - floor(m))*60.0;
@@ -37,7 +37,10 @@ void TimeLocationSource::set(int year, int month, int day, int hour, int minute,
 
 void TimeLocationSource::get(JulianDate &ut1) {
   unsigned long TeensyTime = Teensy3Clock.get(); // get time from Teensy RTC
-  setTime(TeensyTime);                           // set system time
+
+  // due to broken Teensy4.x RTC libraries, apply clock skew on read (where we have control) instead of write as typically done
+  // this allows "correcting" local time into UTC
+  setTime(TeensyTime - TLS_CLOCK_SKEW*3600);     // set system time
 
   if (year() >= 0 && year() <= 3000 && month() >= 1 && month() <= 12 && day() >= 1 && day() <= 31 &&
       hour() <= 23 && minute() <= 59 && second() <= 59) {
