@@ -39,7 +39,7 @@ void TimeLocationSource::get(JulianDate &ut1) {
   unsigned long TeensyTime = Teensy3Clock.get(); // get time from Teensy RTC
 
   // due to broken Teensy4.x RTC libraries, apply clock skew on read (where we have control) instead of write as typically done
-  // this allows "correcting" local time into UTC
+  // this allows "correcting" local time (as set during Sketch upload) into UTC
   setTime(TeensyTime - TLS_CLOCK_SKEW*3600);     // set system time
 
   if (year() >= 0 && year() <= 3000 && month() >= 1 && month() <= 12 && day() >= 1 && day() <= 31 &&
