@@ -28,7 +28,11 @@ void TimeLocationSource::set(JulianDate ut1) {
 void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
   setTime(hour, minute, second, day, month, year);
   unsigned long TeensyTime = now();              // get time in epoch
-  Teensy3Clock.set(TeensyTime);                  // set Teensy time
+
+  // due to broken Teensy4.x RTC libraries, no point calling this as all it does is corrupt the possibly good time
+  #if !defined(ARDUINO_TEENSY40) && !defined(ARDUINO_TEENSY41)
+    Teensy3Clock.set(TeensyTime);                // set Teensy time
+  #endif
 }
 
 void TimeLocationSource::get(JulianDate &ut1) {
