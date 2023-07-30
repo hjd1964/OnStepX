@@ -28,9 +28,6 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
 
   // prepare for a reading
   position = 0;
-  encErr = 0;
-  encWrn = 0;
-  as37Crc = 0;
 
   // bit delay in nanoseconds
   int rate = lround(500000.0/BISSC_CLOCK_RATE_KHZ);
