@@ -14,7 +14,7 @@ bool NonVolatileStorageMB85RC::init(uint16_t size, bool cacheEnable, uint16_t wa
   NonVolatileStorage::init(size, cacheEnable, wait, checkEnable, wire, address);
 
   this->wire = wire;
-  this->framAddress = framAddress;
+  framAddress = address;
   wire->begin();
 
   wire->beginTransmission(framAddress);
