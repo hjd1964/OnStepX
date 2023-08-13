@@ -138,9 +138,10 @@
 #define TIME_LOCATION_PPS_SENSE       OFF //    OFF, HIGH senses PPS (pulse per second,) signal rising edge, or use LOW for   Option
                                           //         falling edge, or use BOTH for rising and falling edges.
                                           //         Better tracking accuracy especially for Mega2560's w/ceramic resonator.
-// Non-Volitale memory ------------------------------------------
-#define NV_DRIVER              NV_DEFAULT //    NV_DEFAULT, For alternate use NV_AT24C32 on DS3231 module. Use                Option
-                                          //         NV_MB85RC64 on new MaxESP4i                                                       
+
+// NON-VOLATILE MEMORY --------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#NV
+#define NV_DRIVER             NV_DEFAULT  //    NV_DEFAULT, Use platforms default non-volatile device or use alternate        Option
+                                          //         NV_AT24C32 on DS3231 module, etc. to remember runtime settings.                                                  
 
 // STATUS ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#STATUS
 #define STATUS_MOUNT_LED              OFF //    OFF, ON Flashes proportional to rate of movement or solid on for slews.       Option
