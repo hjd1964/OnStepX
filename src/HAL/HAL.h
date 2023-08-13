@@ -133,6 +133,8 @@
   #define E2END 32767
 #elif NV_DRIVER == NV_MB85RC256
   #define E2END 32767
+#elif NV_DRIVER == NV_MB85RC64
+  #define E2END 8191
 #endif
 #if NV_DRIVER == NV_2416 || NV_DRIVER == NV_2432 || NV_DRIVER == NV_AT24C32 || NV_DRIVER == NV_2464 || NV_DRIVER == NV_24128 || NV_DRIVER == NV_24256
   #if NV_DRIVER == NV_AT24C32
@@ -152,7 +154,7 @@
   #endif
   #include "../lib/nv/NV_24XX.h"
   #define HAL_NV_INIT() nv.init(E2END + 1, NV_CACHED, 0, false, &HAL_Wire, NV_ADDRESS)
-#elif NV_DRIVER == NV_MB85RC256
+#elif NV_DRIVER == NV_MB85RC256 || NV_DRIVER == NV_MB85RC64
   #ifndef NV_ENDURANCE
     #define NV_ENDURANCE NVE_VHIGH
   #endif
