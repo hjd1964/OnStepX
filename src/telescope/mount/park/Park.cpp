@@ -205,17 +205,25 @@ CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
   if (state != PS_PARKED) {
     #if PARK_STRICT == ON
-      VLF("MSG: Unpark ignored, not parked");
+      VLF("MSG: Mount, unpark ignored not parked");
       return CE_NOT_PARKED;
+    #else
+      if (!mount.isHome()) {
+        VLF("MSG: Mount, unpark when not parked allowed at home only");
+        return CE_NOT_PARKED;
+      }
     #endif
-    if (!mount.isHome())       return CE_NOT_PARKED;
   }
-  if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
-  if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
-  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!site.isDateTimeReady()) return CE_PARKED;
+  if (mount.isFault()) {
+    VLF("MSG: Mount, unpark failed due to mount fault");
+    return CE_SLEW_ERR_HARDWARE_FAULT;
+  }
+  if (!site.isDateTimeReady()) {
+    VLF("MSG: Mount, unpark postponed no date/time");
+    return CE_PARKED;
+  }
 
-  VLF("MSG: Unparking");
+  VLF("MSG: Mount, unparking");
 
   #if AXIS1_PEC == ON
     wormSenseSteps = settings.wormSensePositionSteps;
