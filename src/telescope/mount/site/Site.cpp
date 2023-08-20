@@ -163,13 +163,11 @@ void Site::updateTLS() {
   #endif
 
   if (dateIsReady && timeIsReady) {
-    if (initError.tls) {
-      initError.tls = false;
+    if (initError.tls) initError.tls = false;
 
-      #if GOTO_FEATURE == ON
-        if (park.state == PS_PARKED) park.restore(false);
-      #endif
-    }
+    #if GOTO_FEATURE == ON
+      if (park.state == PS_PARKED) park.restore(false);
+    #endif
   }
 }
 
