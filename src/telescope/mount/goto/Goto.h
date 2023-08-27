@@ -125,6 +125,9 @@ class Goto {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
+    // get least distance between coordinates
+    inline double dist(double a, double b) { if (a > b) return a - b; else return b - a; }
+
     // requested goto/sync destination Native coordinate (eq or hor)
     Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // goto starts from this Mount coordinate (eq or hor)
@@ -133,6 +136,8 @@ class Goto {
     Coordinate destination;
     // goto final destination Mount coordinate (eq or hor)
     Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    // goto final destination Mount Azimuth coordinate correction for coordinate wrap 
+    double azimuthTargetCorrection = 0.0;
     // last align (goto) target Mount coordinate (eq or hor)
     Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     GotoState  stateAbort           = GS_NONE;
