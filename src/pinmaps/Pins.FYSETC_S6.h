@@ -117,24 +117,12 @@
 // Soft SPI bus to stepper drivers
 #if PINMAP == FYSETC_S6_2
   #define SS_MOSI               PE14
-  #define AXIS1_M0_PINPORT     GPIOE
-  #define AXIS1_M0_PINBIT       GPIO_PIN_14
   #define SS_SCK                PE12
-  #define AXIS1_M1_PINPORT      GPIOE
-  #define AXIS1_M1_PINBIT       GPIO_PIN_12
   #define SS_MISO               PE13
-  #define AXIS1_M3_PINPORT      GPIOE
-  #define AXIS1_M3_PINBIT       GPIO_PIN_13
 #else
   #define SS_MOSI               PA7
-  #define AXIS1_M0_PINPORT      GPIOA
-  #define AXIS1_M0_PINBIT       GPIO_PIN_7
   #define SS_SCK                PA5
-  #define AXIS1_M1_PINPORT      GPIOA
-  #define AXIS1_M1_PINBIT       GPIO_PIN_5
   #define SS_MISO               PA6
-  #define AXIS1_M3_PINPORT      GPIOA
-  #define AXIS1_M3_PINBIT       GPIO_PIN_6
 #endif
 
 // Axis1 RA/Azm step/dir driver
