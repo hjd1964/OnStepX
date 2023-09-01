@@ -68,6 +68,9 @@ class Mount {
     // returns true if the mount is slewing (doing a goto or guide > 2X)
     inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }
 
+    // one time initialization of tracking
+    void trackingAutostart();
+
     // enables or disables tracking, enabling tracking powers on the motors if necessary
     void tracking(bool state);
 
