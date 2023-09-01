@@ -325,11 +325,15 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == '-') { site.setSiderealPeriod(site.getSiderealPeriod() + hzToSubMicros(0.02F)); } else
     if (command[1] == 'R') { site.setSiderealPeriod(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
-      #if GOTO_FEATURE == ON
-        if (park.state != PS_PARKED) tracking(true); else *commandError = CE_PARKED;
-      #else
-        tracking(true);
-      #endif
+      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
+        #if GOTO_FEATURE == ON
+          if (park.state != PS_PARKED) tracking(true); else *commandError = CE_PARKED;
+        #else
+          tracking(true);
+        #endif
+      } else {
+        *commandError = CE_REPLY_UNKNOWN;
+      }
     } else
     if (command[1] == 'd') {
       tracking(false);
