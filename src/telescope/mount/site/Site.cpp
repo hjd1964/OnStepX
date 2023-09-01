@@ -162,7 +162,7 @@ void Site::updateTLS() {
     tls.set(ut1);
   #endif
 
-  if (dateIsReady && timeIsReady) {
+  if (isDateTimeReady()) {
     if (initError.tls) initError.tls = false;
 
     #if GOTO_FEATURE == ON
