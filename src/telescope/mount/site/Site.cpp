@@ -165,9 +165,25 @@ void Site::updateTLS() {
   if (isDateTimeReady()) {
     if (initError.tls) initError.tls = false;
 
-    #if GOTO_FEATURE == ON
-      if (park.state == PS_PARKED) park.restore(false);
+    #if TRACK_AUTOSTART == ON
+      if (park.state == PS_PARKED) {
+        #if GOTO_FEATURE == ON
+          if (site.isDateTimeReady()) {
+            VLF("MSG: Mount, autostart tracking from park");
+            park.restore(true);
+          }
+        #endif
+      } else {
+        VLF("MSG: Mount, autostart tracking sidereal");
+        tracking(true);
+        trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+      }
+    #else
+      #if GOTO_FEATURE == ON
+        if (park.state == PS_PARKED) park.restore(false);
+      #endif
     #endif
+
   }
 }
 
