@@ -188,7 +188,7 @@ void Site::setDateTime(JulianDate julianDate) {
   if (NV_ENDURANCE < NVE_MID) writeTime = false;
 
   #if LIMIT_STRICT == ON
-    limits.enabled(dateIsReady && timeIsReady);
+    limits.enabled(isDateTimeReady());
   #endif
 }
 
