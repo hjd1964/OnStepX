@@ -142,7 +142,7 @@ void Mount::trackingAutostart() {
         VLF("MSG: Mount, autostart tracking postponed no date/time");
         return;
       }
-    #else
+    #endif
   }
 
   completed = true;
