@@ -300,17 +300,17 @@ bool Guide::validAxis2(GuideAction guideAction) {
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
     if (pierSide == PIER_SIDE_WEST) {
-      if (location.a2 > axis2.settings.limits.max) return false;
+      if (fgt(location.a2, axis2.settings.limits.max)) return false;
     } else {
-      if (location.a2 < axis2.settings.limits.min) return false;
+      if (flt(location.a2, axis2.settings.limits.min)) return false;
     }
   }
 
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
     if (pierSide == PIER_SIDE_WEST) {
-      if (location.a2 < axis2.settings.limits.min) return false;
+      if (flt(location.a2, axis2.settings.limits.min)) return false;
     } else {
-      if (location.a2 > axis2.settings.limits.max) return false;
+      if (fgt(location.a2, axis2.settings.limits.max)) return false;
     }
   }
   if (guideAction == GA_SPIRAL) {
