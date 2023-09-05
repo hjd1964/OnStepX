@@ -202,7 +202,7 @@ void Park::requestDone() {
 
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
-  if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
+  if (!settings.saved) return CE_NO_PARK_POSITION_SET;
   if (state != PS_PARKED) {
     #if PARK_STRICT == ON
       VLF("MSG: Mount, unpark ignored not parked");
@@ -223,7 +223,7 @@ CommandError Park::restore(bool withTrackingOn) {
     return CE_PARKED;
   }
 
-  VLF("MSG: Mount, unparking");
+  VF("MSG: Mount, unparking "); if (withTrackingOn) { VLF("with tracking sidereal"); } else { VLF("with tracking disabled"); } 
 
   #if AXIS1_PEC == ON
     wormSenseSteps = settings.wormSensePositionSteps;
