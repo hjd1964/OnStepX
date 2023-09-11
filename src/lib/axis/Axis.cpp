@@ -314,6 +314,7 @@ CommandError Axis::autoGoto(float frequency) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
 
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
@@ -344,6 +345,7 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
   if (autoRate == AR_RATE_BY_DISTANCE) return CE_SLEW_IN_SLEW;
   if (motionError(direction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (direction != DIR_FORWARD && direction != DIR_REVERSE) return CE_SLEW_ERR_UNSPECIFIED;
+  if (getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
 
   if (!isnan(frequency)) setFrequencySlew(frequency);
 
@@ -384,6 +386,7 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
   if (motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (getStatus().fault) return CE_SLEW_ERR_HARDWARE_FAULT;
 
   if (pins->axisSense.homeTrigger != OFF) {
     motor->setSynchronized(true);
