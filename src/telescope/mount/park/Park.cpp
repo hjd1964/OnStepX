@@ -51,11 +51,11 @@ void Park::init() {
 
 // sets the park position
 CommandError Park::set() {
+  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
   if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
   if (state == PS_PARKED)      return CE_PARKED;
   if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
-  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
 
   VLF("MSG: Mount, setting park position");
 
@@ -90,12 +90,12 @@ CommandError Park::set() {
 
 // move the mount to the park position
 CommandError Park::request() {
+    if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
     if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
-    if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
     if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
 
@@ -202,6 +202,7 @@ void Park::requestDone() {
 
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
+  if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!settings.saved) return CE_NO_PARK_POSITION_SET;
   if (state != PS_PARKED) {
     #if PARK_STRICT == ON
@@ -213,10 +214,6 @@ CommandError Park::restore(bool withTrackingOn) {
         return CE_NOT_PARKED;
       }
     #endif
-  }
-  if (mount.isFault()) {
-    VLF("MSG: Mount, unpark failed due to mount fault");
-    return CE_SLEW_ERR_HARDWARE_FAULT;
   }
   if (!site.isDateTimeReady()) {
     VLF("MSG: Mount, unpark postponed no date/time");

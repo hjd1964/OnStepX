@@ -343,8 +343,7 @@ void Goto::stop() {
 
 // general status checks ahead of sync or goto
 CommandError Goto::validate() {
-  if (axis1.fault())           return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (axis2.fault())           return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (!axis2.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;

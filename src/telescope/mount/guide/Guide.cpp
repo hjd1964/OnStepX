@@ -321,8 +321,8 @@ bool Guide::validAxis2(GuideAction guideAction) {
 
 // general validation of guide request
 CommandError Guide::validate(int axis, GuideAction guideAction) {
-  if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if ((guideAction == GA_SPIRAL || guideAction == GA_HOME) && mount.isSlewing()) return CE_SLEW_IN_MOTION;
 
   #if GOTO_FEATURE == ON
