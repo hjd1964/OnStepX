@@ -135,12 +135,15 @@ CommandError Rotator::gotoTarget(float target) {
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target); VL(" deg)");
-  VLF("MSG: Rotator, starting goto");
+  VLF("MSG: Rotator, attempting goto");
 
   axis3.setFrequencyBase(0.0F);
   axis3.setTargetCoordinate(target);
 
-  return axis3.autoGoto(settings.gotoRate);
+  CommandError e = axis3.autoGoto(settings.gotoRate);
+  if (e != CE_NONE) { VLF("MSG: Rotator, goto failed"); }
+
+  return e;
 }
 
 // parks rotator at current position

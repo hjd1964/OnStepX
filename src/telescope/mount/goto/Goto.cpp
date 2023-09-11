@@ -135,10 +135,13 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   taskHandle = tasks.add(0, 0, true, 3, gotoWrapper, "MntGoto");
   if (taskHandle) {
     VLF("MSG: Mount, create goto monitor task (idle, priority 3)... success");
-    VLF("MSG: Mount, starting goto");
+    VLF("MSG: Mount, attempting goto");
 
     e = startAutoSlew();
-    if (e != CE_NONE) return e;
+    if (e != CE_NONE) {
+      VLF("MSG: Mount, goto failed");
+      return e;
+    }
 
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
     VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VL("us");
