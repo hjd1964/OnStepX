@@ -151,7 +151,7 @@ uint8_t Limits::errorCode() {
 
 void Limits::stop() {
   #if GOTO_FEATURE == ON
-    goTo.stop();
+    goTo.abort();
   #endif
   guide.stopAxis1(GA_BREAK, true);
   guide.stopAxis2(GA_BREAK, true);
@@ -160,7 +160,7 @@ void Limits::stop() {
 
 void Limits::stopAxis1(GuideAction stopDirection) {
   #if GOTO_FEATURE == ON
-    goTo.stop();
+    goTo.abort();
   #endif
   guide.stopAxis1(stopDirection, true);
   if (stopDirection == GA_FORWARD || transform.mountType == ALTAZM) mount.tracking(false);
@@ -168,7 +168,7 @@ void Limits::stopAxis1(GuideAction stopDirection) {
 
 void Limits::stopAxis2(GuideAction stopDirection) {
   #if GOTO_FEATURE == ON
-    goTo.stop();
+    goTo.abort();
   #endif
   guide.stopAxis2(stopDirection, true);
   if (transform.mountType == ALTAZM) mount.tracking(false);

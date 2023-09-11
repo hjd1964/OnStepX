@@ -87,7 +87,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   if (command[0] == 'Q') {
     if (command[1] == 0) {
         #if GOTO_FEATURE == ON
-          goTo.stop();
+          goTo.abort();
         #endif
         stop();
         *numericReply = false;

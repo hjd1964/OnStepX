@@ -223,7 +223,7 @@
         if (st4GuideActionAxis1 != GA_BREAK) {
           #if ST4_HAND_CONTROL == ON && GOTO_FEATURE == ON
             if (goTo.isHomePaused()) goTo.homeContinue(); else
-            if (goTo.state == GS_GOTO) goTo.stop(); else
+            if (goTo.state == GS_GOTO) goTo.abort(); else
           #endif
           guide.startAxis1(st4GuideActionAxis1, pulseGuiding ? guide.settings.pulseRateSelect : guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
         } else guide.stopAxis1();
@@ -240,7 +240,7 @@
         if (st4GuideActionAxis2 != GA_BREAK) {
           #if ST4_HAND_CONTROL == ON && GOTO_FEATURE == ON
             if (goTo.isHomePaused()) goTo.homeContinue(); else
-            if (goTo.state == GS_GOTO) goTo.stop(); else
+            if (goTo.state == GS_GOTO) goTo.abort(); else
           #endif
           guide.startAxis2(st4GuideActionAxis2, pulseGuiding ? guide.settings.pulseRateSelect : guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
         } else guide.stopAxis2();

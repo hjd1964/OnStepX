@@ -82,7 +82,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   }
 
   CommandError e = setTarget(&coords, pierSideSelect);
-  if (e == CE_SLEW_IN_SLEW) { stop(); return e; }
+  if (e == CE_SLEW_IN_SLEW) { abort(); return e; }
   if (e != CE_NONE) return e;
 
   lastAlignTarget = target;
@@ -337,7 +337,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 }
 
 // stop any presently active goto
-void Goto::stop() {
+void Goto::abort() {
   if (state == GS_GOTO && stage > GG_READY_ABORT) stage = GG_READY_ABORT;
 }
 

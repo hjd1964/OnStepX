@@ -327,7 +327,7 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
 
   #if GOTO_FEATURE == ON
     if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
-    if (goTo.state != GS_NONE) { goTo.stop(); return CE_SLEW_IN_MOTION; }
+    if (goTo.state != GS_NONE) { goTo.abort(); return CE_SLEW_IN_MOTION; }
   #endif
 
   if (axis == 1 || guideAction == GA_SPIRAL) {
@@ -349,16 +349,19 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
 
 // start axis1 movement
 void Guide::axis1AutoSlew(GuideAction guideAction) {
-  if (guideAction == GA_REVERSE) axis1.autoSlew(DIR_REVERSE); else axis1.autoSlew(DIR_FORWARD);
+  if (guideAction == GA_REVERSE) axis1.autoSlew(DIR_REVERSE); else
+    if (guideAction == GA_FORWARD) axis1.autoSlew(DIR_FORWARD);
 }
 
 // start axis2 movement
 void Guide::axis2AutoSlew(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT);
   if (location.pierSide == PIER_SIDE_WEST) {
-    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_FORWARD); else axis2.autoSlew(DIR_REVERSE);
+    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_FORWARD); else
+      if (guideAction == GA_FORWARD) axis2.autoSlew(DIR_REVERSE);
   } else {
-    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else axis2.autoSlew(DIR_FORWARD);
+    if (guideAction == GA_REVERSE) axis2.autoSlew(DIR_REVERSE); else
+      if (guideAction == GA_FORWARD) axis2.autoSlew(DIR_FORWARD);
   }
 }
 

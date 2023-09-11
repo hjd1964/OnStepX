@@ -62,8 +62,8 @@ class Goto {
     // checks for valid target and determines pier side (Mount coordinate system)
     CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto = true);
 
-    // stop any presently active goto
-    void stop();
+    // abort any presently active goto
+    void abort();
 
     // general status checks ahead of sync or goto
     CommandError validate();
