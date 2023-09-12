@@ -51,11 +51,11 @@ void Park::init() {
 
 // sets the park position
 CommandError Park::set() {
-  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
   if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
   if (state == PS_PARKED)      return CE_PARKED;
   if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
+  if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
 
   VLF("MSG: Mount, setting park position");
 
@@ -90,7 +90,6 @@ CommandError Park::set() {
 
 // move the mount to the park position
 CommandError Park::request() {
-    if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
@@ -98,6 +97,7 @@ CommandError Park::request() {
     if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
     if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
+    if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
 
     CommandError e = goTo.validate();
     if (e != CE_NONE) return e;
@@ -202,7 +202,6 @@ void Park::requestDone() {
 
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
-  if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!settings.saved) return CE_NO_PARK_POSITION_SET;
   if (state != PS_PARKED) {
     #if PARK_STRICT == ON
@@ -219,6 +218,7 @@ CommandError Park::restore(bool withTrackingOn) {
     VLF("MSG: Mount, unpark postponed no date/time");
     return CE_PARKED;
   }
+  if (mount.motorFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
 
   VF("MSG: Mount, unparking "); if (withTrackingOn) { VLF("with tracking sidereal"); } else { VLF("with tracking disabled"); } 
 

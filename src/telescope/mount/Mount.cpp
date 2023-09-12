@@ -195,6 +195,7 @@ void Mount::update() {
   #else
   if (guide.state < GU_GUIDE) {
   #endif
+
     if (trackingState != TS_SIDEREAL) {
       trackingRateAxis1 = 0.0F;
       trackingRateAxis2 = 0.0F;
@@ -333,6 +334,11 @@ void Mount::poll() {
   if (altitude > Deg85) {
     if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a);
     trackingRateAxis2 = 0.0F;
+  }
+
+  // stop any movement on motor hardware fault
+  if (mount.motorFault()) {
+    if (goTo.state > GG_NONE) goTo.abort(); else if (guide.state > GS_NONE) guide.abort();
   }
 
   update();

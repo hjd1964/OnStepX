@@ -343,7 +343,6 @@ void Goto::abort() {
 
 // general status checks ahead of sync or goto
 CommandError Goto::validate() {
-  if (mount.isFault())         return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!axis1.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (!axis2.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
@@ -351,6 +350,7 @@ CommandError Goto::validate() {
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.isSlewing())       return CE_SLEW_IN_MOTION;
   if (limits.isGotoError())    return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
   return CE_NONE;
 }
 

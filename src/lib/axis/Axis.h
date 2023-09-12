@@ -288,7 +288,7 @@ class Axis {
     inline bool getSynchronized() { return motor->getSynchronized(); }
 
     // report fault status of motor driver, if available
-    inline bool fault() { return motor->getDriverStatus().fault; };
+    inline bool motorFault() { return motor->getDriverStatus().fault; };
 
     // get associated motor driver status
     DriverStatus getStatus();

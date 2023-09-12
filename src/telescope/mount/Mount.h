@@ -56,8 +56,8 @@ class Mount {
     // get current equatorial position (Mount coordinate system)
     Coordinate getMountPosition(CoordReturn coordReturn = CR_MOUNT_EQU);
 
-    // returns true if either of the mount motor drivers reported a fault
-    inline bool isFault() { return axis1.fault() || axis2.fault(); }
+    // returns true if either of the mount motor drivers report a fault
+    inline bool motorFault() { return axis1.motorFault() || axis2.motorFault(); }
 
     // returns true if the mount is at the home (startup) position
     inline bool isHome() {

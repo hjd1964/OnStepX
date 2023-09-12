@@ -321,7 +321,6 @@ bool Guide::validAxis2(GuideAction guideAction) {
 
 // general validation of guide request
 CommandError Guide::validate(int axis, GuideAction guideAction) {
-  if (mount.isFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   if ((guideAction == GA_SPIRAL || guideAction == GA_HOME) && mount.isSlewing()) return CE_SLEW_IN_MOTION;
 
@@ -343,6 +342,8 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
       if (limits.isError() || axis2.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
   }
+
+  if (mount.motorFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
 
   return CE_NONE;
 }
