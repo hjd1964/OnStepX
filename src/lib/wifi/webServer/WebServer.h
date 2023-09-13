@@ -17,10 +17,10 @@
 
   #if defined(ESP32)
     extern WebServer www;
+    #define sendContentAndClear(x) sendContent(x); x = "";
   #elif defined(ESP8266)
     extern ESP8266WebServer www;
+    #define sendContentAndClear(x) sendContent(x); x = ""; delay(1);
   #endif
-
-  #define sendContentAndClear(x) sendContent(x); x = "";
 
 #endif
