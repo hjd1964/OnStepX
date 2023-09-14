@@ -338,7 +338,7 @@ void Mount::poll() {
 
   // stop any movement on motor hardware fault
   if (mount.motorFault()) {
-    if (goTo.state > GG_NONE) goTo.abort(); else if (guide.state > GS_NONE) guide.abort();
+    if (goTo.state > GS_NONE) goTo.abort(); else if (guide.state > GU_NONE) guide.abort();
   }
 
   update();
