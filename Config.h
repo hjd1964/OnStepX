@@ -363,5 +363,5 @@
 #define FEATURE8_ON_STATE            HIGH //   HIGH, LOW to invert so "ON" is 0V and "OFF" is Vcc (3.3V usually.)             Adjust
 
 // ---------------------------------------------------------------------------------------------------------------------------------
-#define FileVersionConfig 5
+#define FileVersionConfig 6
 #include "Extended.config.h"
