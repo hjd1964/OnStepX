@@ -28,6 +28,7 @@
 #define HAL_MAXRATE_LOWER_LIMIT 1.5
 #define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
 #define HAL_FAST_PROCESSOR
+#define HAL_VFAST_PROCESSOR
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
