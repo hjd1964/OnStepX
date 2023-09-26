@@ -75,6 +75,9 @@
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
 #endif
+#ifndef PINMAP_STR
+  #define PINMAP_STR "Unknown"
+#endif
 
 // all unassigned pins OFF
 #include "../pinmaps/Pins.defaults.h"
