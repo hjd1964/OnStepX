@@ -129,7 +129,11 @@
 // task manager
 #define TASKS_MAX                   48     // up to 48 tasks
 #define TASKS_SKIP_MISSED                  // just skip missed tasks if too late
-#define TASKS_HWTIMERS              3      // up to 3 hardware timers
+#ifdef ESP32
+  #define TASKS_HWTIMERS             4     // up to 4 hardware timers
+#else
+  #define TASKS_HWTIMERS             3
+#endif
 
 // default start of axis class hardware timers
 #define AXIS_HARDWARE_TIMER_BASE    2      // in the OnStepX timer#1 is the sidereal clock
