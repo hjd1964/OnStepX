@@ -199,20 +199,23 @@ bool StepDirTmcSPI::enable(bool state) {
 }
 
 // calibrate the motor driver if required
-void StepDirTmcSPI::calibrate() {
+void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(settings.currentRun));
     driver->ihold(mAToCs(settings.currentRun));
     if (settings.model == TMC2130) {
+      ((TMC2130Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);
       ((TMC2130Stepper*)driver)->en_pwm_mode(true);
     } else
     if (settings.model == TMC5160) {
+      ((TMC5160Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC5160Stepper*)driver)->pwm_autoscale(true);
       ((TMC5160Stepper*)driver)->en_pwm_mode(true);
     } else
     if (settings.model == TMC5161) {
+      ((TMC5161Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC5161Stepper*)driver)->pwm_autoscale(true);
       ((TMC5161Stepper*)driver)->en_pwm_mode(true);
     }

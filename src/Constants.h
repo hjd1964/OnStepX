@@ -27,12 +27,15 @@
 
 #define MaxESP3                     14     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
 #define MaxESP4                     15     // for ESP32S w/TMC2209 support
-#define CNC3                        16     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
-#define MicroScope                  17     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
+#define MaxESPS2                    16     // for ESP32S w/TMC2209 support
+#define CNC3                        17     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MicroScope                  18     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
-#define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define STM32Blue                   19     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 18
+#define JTWSTM                      20     // JTW Astronomy PCB rev 2.1
+
+#define PINMAP_LAST                 20
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1
@@ -119,18 +122,6 @@
 #define HIDDEN_SWITCH               6      // control an hidden on/off switch (for controlling a pin state at boot)
 #define AUX_FEATURE_PURPOSE_LAST    6
 
-// GPIO devices (pin# 512 up to 543)
-// these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin
-#define GPIO_FIRST                  1
-#define DS2413                      1      // DS2413 2-channel GPIO
-#define MCP23008                    2      // MCP23008 8-channel GPIO
-#define MCP23017                    3      // MCP23017 16-channel GPIO
-#define X9555                       4      // TCA/PCA9555 16-channel GPIO
-#define X8575                       5      // PCF8575 16-channel GPIO
-#define SWS                         6      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
-#define SSR74HC595                  7      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
-#define GPIO_LAST                   7
-
 // --------------------------------------------------------------------------------------------------------------------------
 
 // a short string describing this product
@@ -139,7 +130,11 @@
 // task manager
 #define TASKS_MAX                   48     // up to 48 tasks
 #define TASKS_SKIP_MISSED                  // just skip missed tasks if too late
-#define TASKS_HWTIMERS              3      // up to 3 hardware timers
+#ifdef ESP32
+  #define TASKS_HWTIMERS             4     // up to 4 hardware timers
+#else
+  #define TASKS_HWTIMERS             3
+#endif
 
 // default start of axis class hardware timers
 #define AXIS_HARDWARE_TIMER_BASE    2      // in the OnStepX timer#1 is the sidereal clock

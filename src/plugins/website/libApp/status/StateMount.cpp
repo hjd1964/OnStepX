@@ -111,6 +111,15 @@ void State::updateMount(bool now)
   if (!status.onStepFound) strcpy(temp, "?");
   strncpyex(pierSideStr, temp, 10);
 
+  // Preferred pier side
+  if (status.mountType != MT_ALTAZM) {
+    preferredPierSideChar = '?';
+    char temp[80];
+    if (onStep.command(":GX96#", temp)) {
+      if (temp[0] == 'E' || temp[0] == 'W' || temp[0] == 'B') preferredPierSideChar = temp[0];
+    }
+  }
+
   // Meridian flip
   if (status.meridianFlips) {
     strcpy(temp, "On");

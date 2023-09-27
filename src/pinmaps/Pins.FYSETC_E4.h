@@ -17,7 +17,7 @@
 #define I2C_SCL_PIN             22
 
 // Use the following settings for the 4x TMC UART drivers
-#ifdef STEP_DIR_TMC_UART_PRESENT
+#if defined(STEP_DIR_TMC_UART_PRESENT) || defined(SERVO_TMC2209_PRESENT)
   #define SERIAL_TMC_HARDWARE_UART
   #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD       460800           // Baud rate
@@ -110,6 +110,18 @@
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  AUX3_PIN
 #endif
+#ifndef AXIS1_SERVO_PH1_PIN
+  #define AXIS1_SERVO_PH1_PIN   OFF
+#endif
+#ifndef AXIS1_SERVO_PH2_PIN
+  #define AXIS1_SERVO_PH2_PIN   OFF
+#endif
+#ifndef AXIS1_ENCODER_A_PIN
+  #define AXIS1_ENCODER_A_PIN   OFF
+#endif
+#ifndef AXIS1_ENCODER_B_PIN
+  #define AXIS1_ENCODER_B_PIN   OFF
+#endif
 
 // Axis2 Dec/Alt step/dir driver (Y-AXIS)
 #define AXIS2_ENABLE_PIN        SHARED
@@ -121,6 +133,18 @@
 #define AXIS2_DIR_PIN           32
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  AUX4_PIN
+#endif
+#ifndef AXIS2_SERVO_PH1_PIN
+  #define AXIS2_SERVO_PH1_PIN   OFF
+#endif
+#ifndef AXIS2_SERVO_PH2_PIN
+  #define AXIS2_SERVO_PH2_PIN   OFF
+#endif
+#ifndef AXIS2_ENCODER_PH1_PIN
+  #define AXIS2_ENCODER_A_PIN   OFF
+#endif
+#ifndef AXIS2_ENCODER_B_PIN
+  #define AXIS2_ENCODER_B_PIN   OFF
 #endif
 
 // For rotator stepper driver (Z-AXIS)

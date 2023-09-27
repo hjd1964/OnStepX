@@ -9,6 +9,10 @@
 
 #include "../ServoDriver.h"
 
+#ifndef DRIVER_TMC_STEPPER_AUTOGRAD
+  #define DRIVER_TMC_STEPPER_AUTOGRAD true
+#endif
+
 // default settings for any TMC UART drivers that may be present
 #ifndef SERIAL_TMC
   #define SERIAL_TMC                  SoftSerial     // Use software serial w/ TX on M3 (CS) and RX on M4 (MISO) of each axis
@@ -53,6 +57,9 @@ class ServoTmc2209 : public ServoDriver {
     // decodes driver model and sets up the pin modes
     void init();
 
+    // move using step/dir signals
+    void alternateMode(bool state);
+
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
@@ -63,7 +70,7 @@ class ServoTmc2209 : public ServoDriver {
     void updateStatus();
 
     // calibrate the motor if required
-    void calibrate();
+    void calibrateDriver();
 
     const ServoTmcSettings *Settings;
 
@@ -83,6 +90,7 @@ class ServoTmc2209 : public ServoDriver {
     TMC2209Stepper *driver;
 
     bool powered = false;
+    bool sdMode = false;
     float currentVelocity = 0.0F;
     float acceleration;
     float accelerationFs;

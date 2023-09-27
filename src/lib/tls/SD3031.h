@@ -9,7 +9,9 @@
 
 #include "../calendars/Calendars.h"
 
+#ifndef TLS_CLOCK_SKEW
 #define TLS_CLOCK_SKEW 0.0 // in hours
+#endif
 
 class TimeLocationSource {
   public:

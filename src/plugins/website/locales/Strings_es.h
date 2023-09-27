@@ -43,6 +43,7 @@
 #define L_COMPLETE "Completo"
 #define L_ACTIVE "Activado"
 #define L_INACTIVE "Desactivado"
+#define L_BEST "El mejor"
 
 // ---------------------------- Index ----------------------------
 // date/time
@@ -296,6 +297,7 @@
 #define L_MERIDIAN_FLIP_AUTO "Volteo de meridiano automático en el límite"
 #define L_MERIDIAN_FLIP_NOW "Ahora"
 #define L_MERIDIAN_FLIP_PAUSE "Volteo de Meridiano, Pausa en Posicion de Inicio"
+#define L_MERIDIAN_FLIP_PPS "Volteo de Meridiano, lado del muelle preferido"
 
 // ------------------------ Configuration ------------------------
 

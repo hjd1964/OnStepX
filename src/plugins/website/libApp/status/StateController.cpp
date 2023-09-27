@@ -33,7 +33,6 @@ void State::updateController(bool now)
   for (int axis = 0; axis < numAxes; axis++) {
     if (driver[axis].valid) {
       strcpy(temp1, "");
-      if (driver[axis].fault) strcat(temp1, L_DRIVER_FAULT "  ");
       if (driver[axis].communicationFailure) strcat(temp1, L_COMMS_FAILURE ", ");
       if (!driver[axis].communicationFailure) {
         if (driver[axis].standstill) strcat(temp1, L_STANDSTILL ", "); else {
@@ -54,6 +53,8 @@ void State::updateController(bool now)
         if (driver[axis].overTemperaturePreWarning) strcat(temp1, L_PRE_WARNING " &gt;120C, ");
       }
       if (strlen(temp1) > 2) temp1[strlen(temp1) - 2] = 0;
+
+      if (driver[axis].fault) strcat(temp1, " (" L_DRIVER_FAULT ")");
       if (strlen(temp1) == 0) strcpy(temp1, "Ok");
 
       char *thisDriverStatusStr = driverStatusStr[axis];

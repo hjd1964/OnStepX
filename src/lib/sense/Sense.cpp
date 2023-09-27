@@ -18,23 +18,29 @@ SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   hysteresis  = (trigger & 0b0111111111100000000000) >> 11;
   isAnalog    = threshold != 0;
 
-  if (isAnalog) {
-  	if (threshold + hysteresis > ANALOG_READ_RANGE) {
-      hysteresis = 0;
-      VL("");
-      VF("WRN: SenseInput::SenseInput(), Threshold + hysteresis for pin "); V(pin); VLF(" above Analog range hysteresis set to 0.");
-    }
-	  if (threshold - hysteresis < 0) {
-      hysteresis = 0;
-      VL("");
-      VF("WRN: SenseInput::SenseInput(), Threshold - hysteresis for pin "); V(pin); VLF(" below Analog range hysteresis set to 0.");
-    }
-  }
-
   VF("pin="); V(pin); V(", ");
   VF("active="); V(activeState ? "HIGH" : "LOW"); V(", ");
   VF("ths="); V(threshold); V(", ");
   VF("hys="); VL(hysteresis);
+
+  if (isAnalog) {
+    if (threshold < 0) {
+      threshold = 0;
+      VF("WRN: SenseInput::SenseInput(), Threshold for pin "); V(pin); VLF(" is below Analog range setting to "); VL(threshold);
+    } else
+    if (threshold > ANALOG_READ_RANGE) {
+      threshold = ANALOG_READ_RANGE;
+      VF("WRN: SenseInput::SenseInput(), Threshold for pin "); V(pin); VF(" is above Analog range setting to "); VL(threshold);
+    }
+	  if (threshold - hysteresis < 0) {
+      hysteresis = threshold;
+      VF("WRN: SenseInput::SenseInput(), Threshold - Hysteresis for pin "); V(pin); VF(" is below Analog range setting Hysteresis to "); VL(hysteresis);
+    } else
+  	if (threshold + hysteresis > ANALOG_READ_RANGE) {
+      hysteresis = ANALOG_READ_RANGE - threshold;
+      VF("WRN: SenseInput::SenseInput(), Threshold + Hysteresis for pin "); V(pin); VF(" is above Analog range setting Hysteresis to "); VL(hysteresis);
+    }
+  }
 
   pinModeEx(pin, initState);
 
@@ -46,7 +52,7 @@ int SenseInput::isOn() {
   if (isAnalog) {
     int sample = analogRead(pin);
     if (sample >= threshold + hysteresis) value = HIGH;
-    if (sample < threshold - hysteresis) value = LOW;
+    if (sample <= threshold - hysteresis) value = LOW;
   } else {
     int sample = digitalReadEx(pin);
     if (stableSample != sample) { stableStartMs = millis(); stableSample = sample; }

@@ -11,7 +11,7 @@
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION, GG_DESTINATION};
+enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
@@ -62,8 +62,8 @@ class Goto {
     // checks for valid target and determines pier side (Mount coordinate system)
     CommandError setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto = true);
 
-    // stop any presently active goto
-    void stop();
+    // abort any presently active goto
+    void abort();
 
     // general status checks ahead of sync or goto
     CommandError validate();
@@ -95,10 +95,19 @@ class Goto {
     // monitor goto
     void poll();
 
+    // for determining goto state
     GotoState state = GS_NONE;
+    GotoStage stage = GG_NONE;
 
     // current goto rate in radians per second
     float rate;
+
+    // flag to start tracking if this is the first goto
+    bool firstGoto = true;
+
+    // flag to indicate that encoders are present
+    bool absoluteEncodersPresent = false;
+    bool encodersPresent = false;
 
   private:
 
@@ -106,7 +115,7 @@ class Goto {
     // set any additional destinations required for a goto
     void waypoint(Coordinate *current);
 
-    // start slews with approach correction and parking support
+    // start slews with approach correction and parking/homing support
     CommandError startAutoSlew();
     #endif
 
@@ -116,6 +125,9 @@ class Goto {
     // estimate average microseconds per step lower limit
     float usPerStepLowerLimit();
 
+    // get least distance between coordinates
+    inline double dist(double a, double b) { if (a > b) return a - b; else return b - a; }
+
     // requested goto/sync destination Native coordinate (eq or hor)
     Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // goto starts from this Mount coordinate (eq or hor)
@@ -124,14 +136,18 @@ class Goto {
     Coordinate destination;
     // goto final destination Mount coordinate (eq or hor)
     Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    // goto final destination Mount Azimuth coordinate correction for coordinate wrap 
+    double azimuthTargetCorrection = 0.0;
     // last align (goto) target Mount coordinate (eq or hor)
     Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
-    GotoStage  stage                = GG_NONE;
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;
     int        nearDestinationRefineStages;
     unsigned long nearTargetTimeout = 0;
+    unsigned long nearTargetTimeoutAxis1 = 0;
+    unsigned long nearTargetTimeoutAxis2 = 0;
+    unsigned long nearDestinationTimeout = 0;
 
     MeridianFlipHome meridianFlipHome = {false, false};
 

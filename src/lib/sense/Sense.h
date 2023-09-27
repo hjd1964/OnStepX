@@ -5,8 +5,12 @@
 #pragma once
 #include "../../Common.h"
 
-#define THLD(v) ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
-#define HYST(v) ((v)<<11) // 10 bit hysteresis, bits 11 through 20
+#ifndef THLD
+  #define THLD(v) ((v)<<1)  // 10 bit analog threshold, bits 1 through 10
+#endif
+#ifndef HYST
+  #define HYST(v) ((v)<<11) // 10 bit hysteresis, bits 11 through 20
+#endif
 #ifndef INPUT_PULLDOWN
   #define INPUT_PULLDOWN INPUT
 #endif

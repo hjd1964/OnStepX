@@ -53,7 +53,7 @@ void handleFocuser() {
   sprintf_P(temp, html_script_ajax_get, "focuser-ajax-get.txt");
   data.concat(temp);
   data.concat(FPSTR(html_script_ajax_shortcuts));
-  data.concat("<script>var ajaxPage='focuser-ajax.txt';</script>\n");
+  data.concat(F("<script>var ajaxPage='focuser-ajax.txt';</script>\n"));
   www.sendContentAndClear(data);
   data.concat(FPSTR(html_script_ajax));
   www.sendContentAndClear(data);
@@ -64,7 +64,7 @@ void handleFocuser() {
   focuserSlewingTile(data);
   focuserBacklashTcfTile(data);
 
-  data.concat("<br class='clear' />");
+  data.concat(F("<br class='clear' />"));
   data.concat(FPSTR(html_page_and_body_end));
 
   data.concat(FPSTR(html_script_collapsible));

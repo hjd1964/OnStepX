@@ -67,7 +67,7 @@ class StepDirTmcUART : public StepDirDriver {
     bool enable(bool state);
 
     // calibrate the motor driver if required
-    void calibrate();
+    void calibrateDriver();
 
     TMC2209Stepper *driver;
 

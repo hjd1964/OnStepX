@@ -103,6 +103,7 @@ bool OnStepCmd::processCommand(const char* cmd, char* response, long timeOutMs) 
   unsigned long timeout = millis() + (unsigned long)timeOutMs;
   if (noResponse) {
     response[0] = 0;
+    delay(50);
     return true;
   } else
   if (shortResponse) {

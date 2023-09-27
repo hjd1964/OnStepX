@@ -12,7 +12,7 @@ void statusTile(String &data)
 
   sprintf_P(temp, html_tile_text_beg, "22em", "11em", L_STATE);
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   // General status
 
@@ -70,17 +70,17 @@ void statusTile(String &data)
   #endif
 
   #if DISPLAY_RESET_CONTROLS != OFF
-    if (mountType != 0) data.concat("<br /><hr>");
+    if (mountType != 0) data.concat(F("<br /><hr>"));
     sprintf_P(temp, html_form_begin, "index.htm");
     data.concat(temp);
     data.concat(L_RESET_TITLE "<br/><br/>");
-    data.concat("<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','reset')\" type='button'>" L_RESET "!</button><br />");
-    data.concat("<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','wipe')\" type='button'>" L_WIPE_RESET "!</button>");
+    data.concat(F("<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','reset')\" type='button'>" L_RESET "!</button><br />"));
+    data.concat(F("<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','wipe')\" type='button'>" L_WIPE_RESET "!</button>"));
     #if defined(BOOT0_PIN) && DISPLAY_RESET_CONTROLS == FWU
-      data.concat(" &nbsp;&nbsp;<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','fwu')\" type='button'>" L_RESET_FWU "!</button>");
+      data.concat(F(" &nbsp;&nbsp;<button onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('boot','fwu')\" type='button'>" L_RESET_FWU "!</button>"));
     #endif
     data.concat(FPSTR(html_form_end));
-    data.concat("<br/>\n");
+    data.concat(F("<br/>\n"));
     data.concat(FPSTR(html_resetNotes));
     www.sendContentAndClear(data);
   #endif
@@ -99,24 +99,24 @@ void statusTile(String &data)
 void statusTileAjax(String &data)
 {
   #if DISPLAY_INTERNAL_TEMPERATURE == ON
-    data.concat("tphd_m|");
+    data.concat(F("tphd_m|"));
     data.concat(state.controllerTemperatureStr);
     data.concat("\n");
   #endif
 
-  data.concat("last_err|");
+  data.concat(F("last_err|"));
   data.concat(state.lastErrorStr);
   data.concat("\n");
 
   if (status.getVersionMajor() < 10)
   {
-    data.concat("work_load|");
+    data.concat(F("work_load|"));
     data.concat(state.workLoadStr);
     data.concat("\n");
   }
 
   #if OPERATIONAL_MODE == WIFI && DISPLAY_WIFI_SIGNAL_STRENGTH == ON
-    data.concat("signal|");
+    data.concat(F("signal|"));
     data.concat(state.signalStrengthStr);
     data.concat("\n");
   #endif

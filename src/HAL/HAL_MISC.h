@@ -3,7 +3,7 @@
 
 // We define a more generic symbol, in case more Platform_Name boards based on different lines are supported
 
-// 1/100 second sidereal timer
+// Base rate for critical task timing
 #define HAL_FRACTIONAL_SEC 100.0F
 
 // Analog read and write
@@ -33,7 +33,7 @@
 // Non-volatile storage ----------------------------------------------------------------------------
 #if NV_DRIVER == NV_DEFAULT
   #include "../lib/nv/NV_EEPROM.h"
-  #define HAL_NV_INIT() nv.init(2048, true, 0, false);
+  #define HAL_NV_INIT() nv.init(2048, true, 0, false)
 #endif
 
 //--------------------------------------------------------------------------------------------------

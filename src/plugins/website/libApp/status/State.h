@@ -86,6 +86,7 @@ class State {
     char encAngleAxis2Str[20] = "?";
 
     char pierSideStr[10] = "?";
+    char preferredPierSideChar = '?';
     char meridianFlipStr[10] = "?";
 
     char alignUdStr[16] = "?";

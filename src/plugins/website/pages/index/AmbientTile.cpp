@@ -14,7 +14,7 @@ void ambientTile(String &data)
 
   sprintf_P(temp, html_tile_text_beg, "22em", "11em", "Weather");
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   // Ambient conditions
   sprintf_P(temp, html_indexTPHD, L_AMBIENT_TEMPERATURE ":", 't', state.siteTemperatureStr); data.concat(temp);
@@ -23,7 +23,7 @@ void ambientTile(String &data)
   sprintf_P(temp, html_indexTPHD, L_DEW_POINT ":", 'd', state.siteDewPointStr); data.concat(temp);
   www.sendContentAndClear(data);
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   data.concat(FPSTR(html_tile_end));
   www.sendContentAndClear(data);
@@ -34,10 +34,10 @@ void ambientTile(String &data)
 void ambientTileAjax(String &data)
 {
   #if DISPLAY_WEATHER == ON
-    data.concat("tphd_t|"); data.concat(state.siteTemperatureStr); data.concat("\n");
-    data.concat("tphd_p|"); data.concat(state.sitePressureStr); data.concat("\n");
-    data.concat("tphd_h|"); data.concat(state.siteHumidityStr); data.concat("\n");
-    data.concat("tphd_d|"); data.concat(state.siteDewPointStr); data.concat("\n");
+    data.concat(F("tphd_t|")); data.concat(state.siteTemperatureStr); data.concat("\n");
+    data.concat(F("tphd_p|")); data.concat(state.sitePressureStr); data.concat("\n");
+    data.concat(F("tphd_h|")); data.concat(state.siteHumidityStr); data.concat("\n");
+    data.concat(F("tphd_d|")); data.concat(state.siteDewPointStr); data.concat("\n");
   #endif
 
   www.sendContentAndClear(data);

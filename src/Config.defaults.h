@@ -120,6 +120,10 @@
 #define STA_SN_MASK                   {255,255,255,0}             // Wifi Station/Ethernet SUBNET Mask.
 #endif
 
+#ifndef TIME_IP_ADDR
+#define TIME_IP_ADDR                  {129,6,15,28}               // for NTP if enabled we often use an address like
+#endif                                                            // time-a-g.nist.gov at 129,6,15,28 or 129,6,15,29, 129,6,15,30, etc.
+
 // sensors
 #ifndef WEATHER
 #define WEATHER                       OFF
@@ -254,20 +258,25 @@
 #endif
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS1_SERVO_PRESENT
-  #if AXIS1_DRIVER_MODEL == SERVO_TMC2209
+  #if AXIS1_DRIVER_MODEL == SERVO_TMC5160
+    #define AXIS1_SERVO_TMC5160
+  #elif AXIS1_DRIVER_MODEL == SERVO_TMC2209
     #define AXIS1_SERVO_TMC2209
   #else
     #define AXIS1_SERVO_DC
   #endif
   #ifndef AXIS1_SERVO_PH1_STATE
-  #define AXIS1_SERVO_PH1_STATE         LOW                       // default state motor driver IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
+  #define AXIS1_SERVO_PH1_STATE         LOW                       // default (inactive) motor driver state, IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
   #endif
   #ifndef AXIS1_SERVO_PH2_STATE
-  #define AXIS1_SERVO_PH2_STATE         LOW                       // default state motor driver IN2 or ENABLE (pwm) pin
+  #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
   #ifndef AXIS1_SERVO_MAX_VELOCITY
   #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
+  #endif
+  #ifndef AXIS1_SERVO_VELOCITY_FACTOR
+  #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
@@ -414,7 +423,9 @@
 #endif
 #if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS2_SERVO_PRESENT
-  #if AXIS2_DRIVER_MODEL == SERVO_TMC2209
+  #if AXIS2_DRIVER_MODEL == SERVO_TMC5160
+    #define AXIS2_SERVO_TMC5160
+  #elif AXIS2_DRIVER_MODEL == SERVO_TMC2209
     #define AXIS2_SERVO_TMC2209
   #else
     #define AXIS2_SERVO_DC
@@ -428,6 +439,9 @@
 
   #ifndef AXIS2_SERVO_MAX_VELOCITY
   #define AXIS2_SERVO_MAX_VELOCITY      100
+  #endif
+  #ifndef AXIS2_SERVO_VELOCITY_FACTOR
+  #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
@@ -519,14 +533,20 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
-#ifndef MOUNT_ENABLE_AT_STARTUP
-#define MOUNT_ENABLE_AT_STARTUP       OFF                         // ON Enables mount motor drivers at startup.
+#ifndef MOUNT_ENABLE_IN_STANDBY
+#define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
 #endif
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
 #ifndef AXIS2_TARGET_TOLERANCE
 #define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
+#endif
+#ifndef AXIS1_HOME_TOLERANCE
+#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE) // in arc-seconds
+#endif
+#ifndef AXIS2_HOME_TOLERANCE
+#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE) // in arc-seconds
 #endif
 #ifndef AXIS1_WRAP
 #define AXIS1_WRAP                    OFF
@@ -708,6 +728,12 @@
 #ifndef GOTO_OFFSET_ALIGN
 #define GOTO_OFFSET_ALIGN             OFF                         // skip final phase of goto for align stars so user tends to
 #endif                                                            // approach from the correct direction when centering
+#ifndef GOTO_SETTLE_TIME
+#define GOTO_SETTLE_TIME             1500                         // settle time in milliseconds for final phase of goto offset
+#endif                                                            // allows for settle and encoder sync if available
+#ifndef GOTO_REFINE_STAGES
+#define GOTO_REFINE_STAGES           1                            // number of times to perform the goto refinement stage
+#endif
 
 // meridian flip, pier side
 #ifndef MFLIP_SKIP_HOME
@@ -742,6 +768,10 @@
 
 #ifndef ALIGN_AUTO_HOME
 #define ALIGN_AUTO_HOME               OFF                         // uses home switches to find home before starting the align
+#endif
+
+#ifndef ALIGN_MODEL_MEMORY
+#define ALIGN_MODEL_MEMORY            OFF                         // restores any pointing model saved in NV at startup
 #endif
 
 #define HIGH_SPEED_ALIGN
@@ -1943,6 +1973,10 @@
     defined(AXIS4_SERVO_TMC2209) || defined(AXIS5_SERVO_TMC2209) || defined(AXIS6_SERVO_TMC2209) || \
     defined(AXIS7_SERVO_TMC2209) || defined(AXIS8_SERVO_TMC2209) || defined(AXIS9_SERVO_TMC2209)
   #define SERVO_TMC2209_PRESENT
+#endif
+
+#if defined(AXIS1_SERVO_TMC5160) || defined(AXIS2_SERVO_TMC5160)
+  #define SERVO_TMC5160_PRESENT
 #endif
 
 #if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)

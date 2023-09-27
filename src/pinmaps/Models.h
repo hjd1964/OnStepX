@@ -67,9 +67,16 @@
   #define PINMAP_STR "FYSETC S6 v2"
   #include "Pins.FYSETC_S6.h"
 #endif
+#if PINMAP == JTWSTM
+  #define PINMAP_STR "JTW v2.1"
+  #include "Pins.JTWPCB2.h"
+#endif
 #if PINMAP == MaxSTM3 || PINMAP == MaxSTM3I
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
+#endif
+#ifndef PINMAP_STR
+  #define PINMAP_STR "Unknown"
 #endif
 
 // all unassigned pins OFF

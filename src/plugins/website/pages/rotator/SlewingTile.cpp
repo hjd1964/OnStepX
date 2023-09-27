@@ -18,7 +18,7 @@ void rotatorSlewingTile(String &data)
 
   data.concat(L_CURRENT ": <span id='rotatorpos' class='c'>");
   data.concat(state.rotatorPositionStr);
-  data.concat("</span><br /><br />");
+  data.concat(F("</span><br /><br />"));
 
   data.concat(FPSTR(html_rotPosition));
   data.concat(FPSTR(html_rotStop));
@@ -26,7 +26,7 @@ void rotatorSlewingTile(String &data)
   data.concat(FPSTR(html_rotateCcw));
   data.concat(FPSTR(html_rotateCw));
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   if (status.getVersionMajor() >= 10) {
     sprintf_P(temp, html_collapsable_beg, L_CONTROLS "...");
@@ -46,7 +46,7 @@ void rotatorSlewingTile(String &data)
 // use Ajax key/value pairs to pass related data to the web client in the background
 void rotatorSlewingTileAjax(String &data)
 {
-  data.concat(keyValueString("rot_sta", state.focuserSlewing ? L_ACTIVE : L_INACTIVE));
+  data.concat(keyValueString("rot_sta", state.rotatorSlewing ? L_ACTIVE : L_INACTIVE));
   data.concat(keyValueString("rotatorpos", state.rotatorPositionStr));
   data.concat(keyValueString("rot_rate", state.rotateSlewSpeedStr));
 

@@ -12,12 +12,12 @@ void focuserSelectTile(String &data)
 
   sprintf_P(temp, html_tile_beg, "22em", "13em", "Select");
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   if (status.focuserCount >= 1 && state.focuserSelected == 0) state.focuserSelected = 1;
 
   // show the active focuser
-  data.concat("<big><span id='foc_sel' class='c'>");
+  data.concat(F("<big><span id='foc_sel' class='c'>"));
   if (state.focuserSelected == 0)
   {
     data.concat(L_FOCUSER " " L_INACTIVE);
@@ -26,7 +26,7 @@ void focuserSelectTile(String &data)
     sprintf(temp, L_FOCUSER "%d " L_SELECTED, state.focuserSelected);
     data.concat(temp);
   }
-  data.concat("</span></big><br /><br />");
+  data.concat(F("</span></big><br /><br />"));
 
   if (status.focuserCount > 1)
   {
@@ -38,7 +38,7 @@ void focuserSelectTile(String &data)
     if (status.focuserPresent[5]) data.concat(FPSTR(html_selectFocuser6));
   }
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   data.concat(FPSTR(html_tile_end));
   www.sendContentAndClear(data);

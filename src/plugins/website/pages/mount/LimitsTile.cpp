@@ -14,7 +14,7 @@ void limitsTile(String &data)
   sprintf_P(temp, html_tile_text_beg, "22em", "15em", "Backlash and Limits");
   data.concat(temp);
 
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   // get backlash and limits
   if (!onStep.command(":%BR#", reply)) strcpy(reply, "0");
@@ -60,7 +60,7 @@ void limitsTile(String &data)
   data.concat(temp);
 
   // Backlash
-  data.concat("Backlash:<br />");
+  data.concat(F("Backlash:<br />"));
 
   sprintf_P(temp, html_configBlAxis1, backlashAxis1);
   data.concat(temp);
@@ -69,7 +69,7 @@ void limitsTile(String &data)
   sprintf_P(temp, html_configBlAxis2, backlashAxis2);
   data.concat(temp);
 
-  data.concat("<br />Limits:<br />");
+  data.concat(F("<br />Limits:<br />"));
 
   // Overhead and Horizon Limits
   sprintf_P(temp, html_configMinAlt, minAlt);
@@ -88,7 +88,7 @@ void limitsTile(String &data)
     data.concat(temp);
   }
   else
-    data.concat("<br />\n");
+    data.concat(F("<br />\n"));
 
   data.concat(F("<button type='submit'>" L_UPLOAD "</button>\n"));
 

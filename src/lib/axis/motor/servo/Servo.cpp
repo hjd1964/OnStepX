@@ -5,72 +5,6 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-#ifndef SERVO_SLEW_DIRECT
-  #define SERVO_SLEW_DIRECT OFF
-#endif
-
-#ifndef AXIS1_SERVO_FLTR
-  #define AXIS1_SERVO_FLTR OFF
-#endif
-#ifndef AXIS2_SERVO_FLTR
-  #define AXIS2_SERVO_FLTR OFF
-#endif
-#ifndef AXIS3_SERVO_FLTR
-  #define AXIS3_SERVO_FLTR OFF
-#endif
-#ifndef AXIS4_SERVO_FLTR
-  #define AXIS4_SERVO_FLTR OFF
-#endif
-#ifndef AXIS5_SERVO_FLTR
-  #define AXIS5_SERVO_FLTR OFF
-#endif
-#ifndef AXIS6_SERVO_FLTR
-  #define AXIS6_SERVO_FLTR OFF
-#endif
-#ifndef AXIS7_SERVO_FLTR
-  #define AXIS7_SERVO_FLTR OFF
-#endif
-#ifndef AXIS8_SERVO_FLTR
-  #define AXIS8_SERVO_FLTR OFF
-#endif
-#ifndef AXIS9_SERVO_FLTR
-  #define AXIS9_SERVO_FLTR OFF
-#endif
-
-#if AXIS1_SERVO_FLTR == KALMAN || AXIS2_SERVO_FLTR == KALMAN || AXIS3_SERVO_FLTR == KALMAN || \
-    AXIS4_SERVO_FLTR == KALMAN || AXIS5_SERVO_FLTR == KALMAN || AXIS6_SERVO_FLTR == KALMAN || \
-    AXIS7_SERVO_FLTR == KALMAN || AXIS8_SERVO_FLTR == KALMAN || AXIS9_SERVO_FLTR == KALMAN
-  #include <SimpleKalmanFilter.h> // https://github.com/denyssene/SimpleKalmanFilter
-#endif
-
-#if AXIS1_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis1EncoderKalmanFilter(AXIS1_SERVO_FLTR_MEAS_U, AXIS1_SERVO_FLTR_MEAS_U, AXIS1_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS2_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis2EncoderKalmanFilter(AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS3_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis3EncoderKalmanFilter(AXIS3_SERVO_FLTR_MEAS_U, AXIS3_SERVO_FLTR_MEAS_U, AXIS3_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS4_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis4EncoderKalmanFilter(AXIS4_SERVO_FLTR_MEAS_U, AXIS4_SERVO_FLTR_MEAS_U, AXIS4_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS5_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis5EncoderKalmanFilter(AXIS5_SERVO_FLTR_MEAS_U, AXIS5_SERVO_FLTR_MEAS_U, AXIS5_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS6_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis6EncoderKalmanFilter(AXIS6_SERVO_FLTR_MEAS_U, AXIS6_SERVO_FLTR_MEAS_U, AXIS6_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS7_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis7EncoderKalmanFilter(AXIS7_SERVO_FLTR_MEAS_U, AXIS7_SERVO_FLTR_MEAS_U, AXIS7_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS8_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis8EncoderKalmanFilter(AXIS8_SERVO_FLTR_MEAS_U, AXIS8_SERVO_FLTR_MEAS_U, AXIS8_SERVO_FLTR_VARIANCE);
-#endif
-#if AXIS9_SERVO_FLTR == KALMAN
-  SimpleKalmanFilter axis9EncoderKalmanFilter(AXIS9_SERVO_FLTR_MEAS_U, AXIS9_SERVO_FLTR_MEAS_U, AXIS9_SERVO_FLTR_VARIANCE);
-#endif
-
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
@@ -106,6 +40,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
   encoder->init();
   encoder->setOrigin(encoderOrigin);
   this->encoderReverse = encoderReverse;
+  this->encoderReverseDefault = encoderReverse;
 
   feedback->getDefaultParameters(&default_param1, &default_param2, &default_param3, &default_param4, &default_param5, &default_param6);
 
@@ -129,7 +64,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder
 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
-  
+
   driver->init();
   enable(false);
 
@@ -140,8 +75,15 @@ bool ServoMotor::init() {
   timerName[5] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
-    V("success");
-    if (useFastHardwareTimers && !tasks.requestHardwareTimer(taskHandle, 0)) { VLF(" (no hardware timer!)"); } else { VLF(""); }
+    VF("success");
+    if (useFastHardwareTimers) {
+      if (!tasks.requestHardwareTimer(taskHandle, 0)) {
+        VF(" (no hardware timer!)");
+      } else {
+        maxFrequency = 1000000.0F/HAL_MAXRATE_LOWER_LIMIT;
+      };
+    }
+    VLF("");
   } else {
     VLF("FAILED!");
     return false;
@@ -153,6 +95,7 @@ bool ServoMotor::init() {
 // set driver reverse state
 void ServoMotor::setReverse(int8_t state) {
   feedback->setControlDirection(state);
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
 }
 
 // set driver parameters
@@ -167,8 +110,6 @@ bool ServoMotor::validateParameters(float param1, float param2, float param3, fl
 
 // sets motor enable on/off (if possible)
 void ServoMotor::enable(bool state) {
-  if (!state) feedback->reset();
-
   driver->enable(state);
   enabled = state;
 }
@@ -235,14 +176,18 @@ void ServoMotor::setFrequencySteps(float frequency) {
   if (inBacklash) frequency = backlashFrequency;
 
   if (frequency != currentFrequency) {
-    lastFrequency = frequency;
-
-    // if slewing has a larger step size divide the frequency to account for it
-    if (lastFrequency <= backlashFrequency * 2.0F) stepSize = 1; else { if (!inBacklash) stepSize = 64; }
-    frequency /= stepSize;
+    // compensate for performace limitations by taking larger steps as needed
+    if (frequency < maxFrequency) stepSize = 1; else
+    if (frequency < maxFrequency*2) stepSize = 2; else
+    if (frequency < maxFrequency*4) stepSize = 4; else
+    if (frequency < maxFrequency*8) stepSize = 8; else
+    if (frequency < maxFrequency*16) stepSize = 16; else
+    if (frequency < maxFrequency*32) stepSize = 32; else
+    if (frequency < maxFrequency*64) stepSize = 64; else
+    if (frequency < maxFrequency*128) stepSize = 128; else stepSize = 256;
 
     // timer period in microseconds
-    float period = 1000000.0F / frequency;
+    float period = 1000000.0F / (frequency/stepSize);
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
@@ -255,6 +200,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
     }
 
     currentFrequency = frequency;
+    velocityEstimate = -driver->getVelocityEstimate(currentFrequency*dir);
 
     // change the motor rate/direction
     noInterrupts();
@@ -303,60 +249,13 @@ void ServoMotor::poll() {
   motorCounts = motorSteps;
   interrupts();
 
-  // apply Kalaman filter if enabled
-  switch (axisNumber) {
-    case 1:
-      #if AXIS1_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis1EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 2:
-      #if AXIS2_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis2EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 3:
-      #if AXIS3_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis3EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 4:
-      #if AXIS4_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis4EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 5:
-      #if AXIS5_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis5EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 6:
-      #if AXIS6_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis6EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 7:
-      #if AXIS7_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis7EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 8:
-      #if AXIS8_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis8EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-    case 9:
-      #if AXIS9_SERVO_FLTR == KALMAN
-        encoderCounts = round(axis9EncoderKalmanFilter.updateEstimate(encoderCounts - motorCounts)) + motorCounts;
-      #endif
-    break;
-  }
+  encoderCounts = encoderApplyFilter(encoderCounts - motorCounts) + motorCounts;
 
   control->set = motorCounts;
   control->in = encoderCounts;
   if (enabled) feedback->poll();
 
-  float velocity = control->out;
+  float velocity = velocityEstimate + control->out;
   if (!enabled) velocity = 0.0F;
 
   delta = motorCounts - encoderCounts;
@@ -366,7 +265,12 @@ void ServoMotor::poll() {
   if (feedback->useVariableParameters) {
     feedback->variableParameters(fabs(velocityPercent));
   } else {
-    if (!slewing && enabled) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+    if (!slewing && enabled) {
+      if ((long)(millis() - lastSlewingTime) > SERVO_SLEWING_TO_TRACKING_DELAY) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+    } else {
+      lastSlewingTime = millis();
+      feedback->selectSlewingParameters();
+    } 
   }
 
   if (velocityPercent < -33) wasBelow33 = true;
@@ -471,7 +375,14 @@ IRAM_ATTR void ServoMotor::move() {
     }
 
   #endif
+}
 
+int32_t ServoMotor::encoderRead() {
+  int32_t encoderCounts = encoder->read();
+
+
+  if (encoderReverse) encoderCounts = -encoderCounts;
+  return encoderCounts;
 }
 
 #endif

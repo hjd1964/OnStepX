@@ -113,8 +113,12 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   strcpy(firmware.time, __TIME__);
 
   if (!nv.isKeyValid(INIT_NV_KEY)) {
-    VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
-    if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
+    if (!nv.initError) {
+      VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
+      if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
+    } else {
+      DLF("WRN: NV, can't be accessed skipping verification!");
+    }
   } else { VLF("MSG: NV, correct key found"); }
 
   if (!gpio.init()) initError.gpio = true;
@@ -138,6 +142,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   weather.init();
   temperature.init();
+
+  #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
+    wifiManager.init();
+  #endif
 
   #ifdef MOUNT_PRESENT
     mount.init();
@@ -183,10 +191,6 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     VLF("MSG: Telescope, writing defaults to NV");
     nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
   }
-
-  #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
-    wifiManager.init();
-  #endif
 
   // init is done, write the NV key if necessary
   if (!nv.hasValidKey()) {

@@ -162,14 +162,9 @@ void Site::updateTLS() {
     tls.set(ut1);
   #endif
 
-  if (dateIsReady && timeIsReady) {
-    if (initError.tls) {
-      initError.tls = false;
-
-      #if GOTO_FEATURE == ON
-        if (park.state == PS_PARKED) park.restore(false);
-      #endif
-    }
+  if (isDateTimeReady()) {
+    if (initError.tls) initError.tls = false;
+    mount.trackingAutostart();
   }
 }
 
@@ -193,7 +188,7 @@ void Site::setDateTime(JulianDate julianDate) {
   if (NV_ENDURANCE < NVE_MID) writeTime = false;
 
   #if LIMIT_STRICT == ON
-    limits.enabled(dateIsReady && timeIsReady);
+    limits.enabled(isDateTimeReady());
   #endif
 }
 

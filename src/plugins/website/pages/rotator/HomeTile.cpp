@@ -12,11 +12,11 @@ void rotatorHomeTile(String &data)
 
   sprintf_P(temp, html_tile_beg, "22em", "13em", L_HOMING);
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   data.concat(FPSTR(html_rotatorHome));
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   data.concat(FPSTR(html_tile_end));
   www.sendContentAndClear(data);

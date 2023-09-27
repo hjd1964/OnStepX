@@ -46,11 +46,16 @@ void servoTile(String &data)
       sprintf_P(temp, html_servoSelect, i, i, '0'+ i); data.concat(temp);
     }
   }
-  data.concat("</div>");
+  data.concat(F("</div>"));
 
   // the servo canvas
   strcpy_P(temp, html_servoGraph);
   data.concat(temp);
+
+  #if DISPLAY_SERVO_ORIGIN_CONTROLS == ON
+    sprintf_P(temp, html_servoZeroEncoders);
+    data.concat(temp);
+  #endif
 
   // servo monitor tile end
   data.concat(FPSTR(html_tile_end));
@@ -70,10 +75,10 @@ void servoTileAjax(String &data)
     if (temp1 != NULL) {
       temp1[0] = 0;
       temp1++;
-      data.concat("svoD|"); data.concat(temp); data.concat("\n");
-      data.concat("svoP|"); data.concat(temp1); data.concat("\n");
-    } else { data.concat("svoD|?\n"); data.concat("svoP|?\n"); }
-  } else { data.concat("svoD|?\n"); data.concat("svoP|?\n"); _servo_axis = 0; }
+      data.concat(F("svoD|")); data.concat(temp); data.concat("\n");
+      data.concat(F("svoP|")); data.concat(temp1); data.concat("\n");
+    } else { data.concat(F("svoD|?\n")); data.concat(F("svoP|?\n")); }
+  } else { data.concat(F("svoD|?\n")); data.concat(F("svoP|?\n")); _servo_axis = 0; }
 
   data.concat(keyValueBoolEnabled("svax1", _servo_axis == 0));
   data.concat(keyValueBoolEnabled("svax2", _servo_axis == 0));
@@ -93,11 +98,16 @@ void servoTileGet()
 {
   String v;
 
+  // set chart to display the axis requested
   v = www.arg("svax");
   if (!v.equals(EmptyStr)) {
     int axis = v.toInt();
     if (axis >= 0 && axis <= 9) _servo_axis = axis;
   }
+
+  // trigger encoder bridge to set zero
+  v = www.arg("sv");
+  if (v.equals("zro")) { onStep.commandBool(":SEO#"); }
 }
 
 #endif

@@ -97,7 +97,10 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     // :rQ#       Stop (Quit) rotator movement
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axis3.autoSlewStop();
+      if (axis3.isHoming()) {
+        axis3.autoSlewAbort();
+        homing = false;
+      } else axis3.autoSlewStop();
       *numericReply = false;
     } else
 
@@ -184,8 +187,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'F') {
       settings.parkState = PS_UNPARKED;
-      double t = round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0);
-      *commandError = axis3.resetPosition(t);
+      *commandError = axis3.resetPosition((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
       axis3.setBacklashSteps(getBacklash());
       *numericReply = false;
     } else
@@ -194,9 +196,15 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'C') {
       if (AXIS3_SENSE_HOME != OFF) {
-        axis3.autoSlewHome();
+        if (settings.parkState == PS_UNPARKED) {
+          axis3.setFrequencySlew(settings.gotoRate);
+          *commandError = axis3.autoSlewHome();
+          if (*commandError == CE_NONE) {
+            homing = true;
+          }
+        } else *commandError = CE_PARKED;
       } else {
-        *commandError = gotoTarget(round((axis3.settings.limits.max + axis3.settings.limits.min)/2.0));
+        *commandError = gotoTarget((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
       }
       *numericReply = false;
     } else

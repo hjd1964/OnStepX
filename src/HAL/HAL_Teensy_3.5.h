@@ -10,7 +10,7 @@
 // turn on support for using DACs to output digital signals using Arduino standard commands
 #define HAL_DAC_AS_DIGITAL
 
-// 1/250 second sidereal timer
+// Base rate for critical task timing
 #define HAL_FRACTIONAL_SEC 250.0F
 
 // Analog read and write
@@ -43,7 +43,7 @@
 #if NV_DRIVER == NV_DEFAULT
   #include "EEPROM.h"
   #include "../lib/nv/NV_EEPROM.h"
-  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false);
+  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false)
 #endif
 
 //--------------------------------------------------------------------------------------------------

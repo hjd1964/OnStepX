@@ -1,11 +1,9 @@
 // -----------------------------------------------------------------------------------
 // Time/Location source TEENSY 3.2 RTC support
 
-#include "../../Common.h"
+#include "Teensy.h"
 
 #if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY
-
-#include "Teensy.h"
 
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 
@@ -16,15 +14,13 @@ bool TimeLocationSource::init() {
 
 void TimeLocationSource::set(JulianDate ut1) {
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
-  greg.year -= 2000;
-  if (greg.year >= 100) greg.year -= 100;
 
   double f1 = fabs(ut1.hour) + TLS_CLOCK_SKEW;
   int h = floor(f1);
   double m = (f1 - h)*60.0;
   double s = (m - floor(m))*60.0;
 
-  set(h, floor(m), floor(s), greg.day, greg.month, greg.year);
+  set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
 }
 
 void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {

@@ -43,6 +43,7 @@
 #define L_COMPLETE "完全的"
 #define L_ACTIVE "积极的"
 #define L_INACTIVE "不活跃"
+#define L_BEST "最好的"
 
 // ---------------------------- Index ----------------------------
 // date/time
@@ -297,6 +298,7 @@
 #define L_MERIDIAN_FLIP_AUTO "越过边界时自动翻转子午线"
 #define L_MERIDIAN_FLIP_NOW "目前"
 #define L_MERIDIAN_FLIP_PAUSE "子午线翻转期间在原始位置暂停"
+#define L_MERIDIAN_FLIP_PPS "经络翻转, 首选码头侧"
 
 // ------------------------ Configuration ------------------------
 

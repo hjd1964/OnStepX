@@ -41,7 +41,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (park.state == PS_PARKING)            reply[i++]='I'; else                // Parking [I]n-progress
       if (park.state == PS_PARKED)             reply[i++]='P'; else                // [P]arked
       if (park.state == PS_PARK_FAILED)        reply[i++]='F';                     // Park [F]ailed
-      if (mount.isSyncToEncoders())            reply[i++]='e';                     // Sync to [e]ncoders only
+      if (mount.syncFromOnStepToEncoders)      reply[i++]='e';                     // Sync to [e]ncoders only
       if (mount.isHome())                      reply[i++]='H';                     // At [H]ome
       if (home.state == HS_HOMING)             reply[i++]='h';                     // Slewing [h]ome
       #if TIME_LOCATION_PPS_SENSE != OFF
@@ -110,7 +110,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
         if (fequal(r, 60.136F))                    reply[1]|=0b10000011;           // King rate selected
       }
 
-      if (mount.isSyncToEncoders())                reply[1]|=0b10000100;           // Sync to encoders only
+      if (mount.syncFromOnStepToEncoders)          reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.active())                          reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing [h]ome
@@ -139,18 +139,48 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       reply[8] = limits.errorCode()|0b10000000;                                    // General error
       reply[9] = 0;
       *numericReply = false;
+    } else
+
+    // :GW#       Get tracking and basic mount state
+    //            Returns: s#
+    if (command[1] == 'W' && parameter[0] == 0)  {
+      int i = 0;
+      if (transform.mountType == GEM)          reply[i++] = 'G'; else
+      if (transform.mountType == FORK)         reply[i++] = 'P'; else
+      if (transform.mountType == ALTAZM)       reply[i++] = 'A';
+      if (mount.isTracking())                  reply[i++] = 'N'; else reply[i++] = 'T';
+      if (park.state == PS_PARKED)             reply[i++] = 'P'; else
+      if (mount.isHome())                      reply[i++] = 'H'; else
+      if (goTo.alignDone())                    reply[i++] = '1'; else reply[i++] = '0';
+      reply[i++] = 0;
+      *numericReply = false;
     } else return false;
+
   } else
 
   // :SX97,[n]#     Set buzzer state
   //                Return: see below
   if (command[0] == 'S' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '7'  && parameter[2] == ','  && parameter[4] == 0) {
-    if (parameter[3] == '0' || parameter[3] == '1') {
-      sound.enabled = parameter[3] - '0';
-      #if STATUS_BUZZER_MEMORY == ON
-        nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
-      #endif
-    } else *commandError = CE_PARAM_RANGE;
+    switch (parameter[3]) {
+      case '0': case '1':
+        sound.enabled = parameter[3] - '0';
+        #if STATUS_BUZZER_MEMORY == ON
+          nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
+        #endif
+      break;
+      case '2':
+        sound.beep();
+      break;
+      case '3':
+        sound.alert();
+      break;
+      case '4':
+        sound.click();
+      break;
+      default:
+        *commandError = CE_PARAM_RANGE;
+      break;
+    }
   } else return false;
 
   return true;

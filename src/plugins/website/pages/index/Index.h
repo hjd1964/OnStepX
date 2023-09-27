@@ -21,7 +21,7 @@
 
   const char html_configAxesNotesOnStep[] PROGMEM =
   #if DRIVE_MAIN_AXES_CURRENT == ON
-    "<li>" L_ADV_SET_FOOTER_MSG3 "</li>"
+	"<li>" L_ADV_SET_FOOTER_MSG3 "</li>"
   #endif
   "<li>" L_ADV_SET_FOOTER_MSG4 "</li>"
   "</ul>";

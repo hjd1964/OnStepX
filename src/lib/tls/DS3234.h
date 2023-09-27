@@ -13,7 +13,9 @@
   #error "Configuration (Config.h): DS3234_CS_PIN must be defined for TIME_LOCATION_SOURCE DS3234"
 #endif
 
+#ifndef TLS_CLOCK_SKEW
 #define TLS_CLOCK_SKEW 0.000139 // +5 seconds ahead when setting time
+#endif
 
 class TimeLocationSource {
   public:

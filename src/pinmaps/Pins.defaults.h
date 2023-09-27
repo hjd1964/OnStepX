@@ -204,16 +204,10 @@
 #define AXIS1_DECAY_PIN             OFF
 #endif
 #ifndef AXIS1_SERVO_PH1_PIN
-#define AXIS1_SERVO_PH1_PIN         OFF
+#define AXIS1_SERVO_PH1_PIN         AXIS1_DIR_PIN
 #endif
 #ifndef AXIS1_SERVO_PH2_PIN
-#define AXIS1_SERVO_PH2_PIN         OFF
-#endif
-#ifndef AXIS1_ENCODER_A_PIN
-#define AXIS1_ENCODER_A_PIN         OFF
-#endif
-#ifndef AXIS1_ENCODER_B_PIN
-#define AXIS1_ENCODER_B_PIN         OFF
+#define AXIS1_SERVO_PH2_PIN         AXIS1_STEP_PIN
 #endif
 #ifndef AXIS1_FAULT_PIN
 #define AXIS1_FAULT_PIN             OFF
@@ -253,16 +247,10 @@
 #define AXIS2_DECAY_PIN             OFF
 #endif
 #ifndef AXIS2_SERVO_PH1_PIN
-#define AXIS2_SERVO_PH1_PIN         OFF
+#define AXIS2_SERVO_PH1_PIN         AXIS2_DIR_PIN
 #endif
 #ifndef AXIS2_SERVO_PH2_PIN
-#define AXIS2_SERVO_PH2_PIN         OFF
-#endif
-#ifndef AXIS2_ENCODER_A_PIN
-#define AXIS2_ENCODER_A_PIN         OFF
-#endif
-#ifndef AXIS2_ENCODER_B_PIN
-#define AXIS2_ENCODER_B_PIN         OFF
+#define AXIS2_SERVO_PH2_PIN         AXIS2_STEP_PIN
 #endif
 #ifndef AXIS2_FAULT_PIN
 #define AXIS2_FAULT_PIN             OFF
@@ -373,6 +361,23 @@
 #endif
 #ifndef AXIS4_SENSE_LIMIT_MAX_PIN
 #define AXIS4_SENSE_LIMIT_MAX_PIN   OFF
+#endif
+
+#ifndef AXIS1_ENCODER_A_PIN
+#define AXIS1_ENCODER_A_PIN         AXIS3_STEP_PIN
+#endif
+#ifndef AXIS1_ENCODER_B_PIN
+#define AXIS1_ENCODER_B_PIN         AXIS3_DIR_PIN
+#endif
+#ifndef AXIS2_ENCODER_A_PIN
+#define AXIS2_ENCODER_A_PIN         AXIS4_STEP_PIN
+#endif
+#ifndef AXIS2_ENCODER_B_PIN
+  #if AXIS4_DIR_PIN != AXIS3_DIR_PIN || AXIS4_DIR_PIN == OFF
+    #define AXIS2_ENCODER_B_PIN     AXIS4_DIR_PIN
+  #else
+    #define AXIS2_ENCODER_B_PIN     AXIS2_M3_PIN
+  #endif
 #endif
 
 #ifndef AXIS5_ENABLE_PIN

@@ -55,9 +55,9 @@ class StepDirMotor : public Motor {
     void enable(bool value);
 
     // calibrate stealthChop then return to tracking mode
-    void calibrate() {
+    void calibrateDriver() {
       digitalWriteEx(Pins->enable, Pins->enabledState);
-      driver->calibrate();
+      driver->calibrateDriver();
       digitalWriteEx(Pins->enable, !Pins->enabledState);
     }
 

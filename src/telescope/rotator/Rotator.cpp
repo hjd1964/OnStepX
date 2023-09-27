@@ -32,7 +32,7 @@ void Rotator::init() {
   if (!axis3.init(&motor3)) { initError.driver = true; DLF("ERR: Axis3, no motion controller!"); }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
-  axis3.setFrequencyMax(AXIS3_SLEW_RATE_BASE_DESIRED);
+  axis3.setFrequencyMax(AXIS3_SLEW_RATE_BASE_DESIRED*2.0F);
   axis3.setFrequencyMin(0.01F);
   axis3.setFrequencySlew(AXIS3_SLEW_RATE_BASE_DESIRED);
   axis3.setSlewAccelerationTime(AXIS3_ACCELERATION_TIME);
@@ -41,7 +41,7 @@ void Rotator::init() {
 }
 
 void Rotator::begin() {
-  axis3.calibrate();
+  axis3.calibrateDriver();
 
   // start monitor task
   VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
@@ -88,7 +88,7 @@ CommandError Rotator::setBacklash(int value) {
   }
 #endif
 
-// set move rate, 1 for 1um/sec slew, 2 for 10um/sec, 3 for 100um/sec, 4 for 0.5x goto rate
+// set move rate, 1 for 0.01 deg/sec slew, 2 for 0.1 deg/sec, 3 for 1 deg/sec, 4 for 0.5x goto rate
 void Rotator::setMoveRate(int value) {
   switch (value) {
     case 1: moveRate = 0.01F; break;
@@ -97,6 +97,7 @@ void Rotator::setMoveRate(int value) {
     case 4: moveRate = settings.gotoRate/2.0F; break;
     default: moveRate = 0.1F; break;
   }
+  if (moveRate > settings.gotoRate/2.0F) moveRate = settings.gotoRate/2.0F;
 }
 
 // start slew in the specified direction
@@ -134,12 +135,15 @@ CommandError Rotator::gotoTarget(float target) {
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target); VL(" deg)");
-  VLF("MSG: Rotator, starting goto");
+  VLF("MSG: Rotator, attempting goto");
 
   axis3.setFrequencyBase(0.0F);
   axis3.setTargetCoordinate(target);
 
-  return axis3.autoGoto(AXIS3_SLEW_RATE_BASE_DESIRED);
+  CommandError e = axis3.autoGoto(settings.gotoRate);
+  if (e != CE_NONE) { VLF("MSG: Rotator, goto failed"); }
+
+  return e;
 }
 
 // parks rotator at current position
@@ -156,7 +160,7 @@ CommandError Rotator::park() {
   settings.position = axis3.getInstrumentCoordinate();
   axis3.setTargetCoordinatePark(settings.position);
 
-  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_BASE_DESIRED);
+  CommandError e = axis3.autoGoto(settings.gotoRate);
 
   if (e == CE_NONE) {
     settings.parkState = PS_PARKING;
@@ -193,7 +197,7 @@ CommandError Rotator::unpark() {
   axis3.setBacklash(settings.backlash);
   axis3.setTargetCoordinate(settings.position);
 
-  CommandError e = axis3.autoGoto(AXIS3_SLEW_RATE_BASE_DESIRED);
+  CommandError e = axis3.autoGoto(settings.gotoRate);
 
   if (e == CE_NONE) {
     settings.parkState = PS_UNPARKING;
@@ -258,6 +262,12 @@ void Rotator::monitor() {
         }
       #endif
 
+      if (homing) {
+        axis3.resetPosition((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
+        axis3.setBacklashSteps(getBacklash());
+        homing = false;
+      }
+
       // delayed write of focuser position
       if (ROTATOR_WRITE_DELAY != 0) {
         if (secs > writeTime) {
@@ -267,6 +277,7 @@ void Rotator::monitor() {
         }
       }
     }
+
   }
 }
 

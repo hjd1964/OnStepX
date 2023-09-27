@@ -19,7 +19,7 @@ void Watchdog::enable(int seconds) {
     if (taskHandle) {
       VLF("success"); 
       if (!tasks.requestHardwareTimer(taskHandle, 0)) { DLF("WRN: Watchdog::enable(), didn't get h/w timer (using s/w timer!!!)"); }
-    } else { VLF("FAILED!"); return false; }
+    } else { VLF("FAILED!"); return; }
   }
   enabled = true;
 }

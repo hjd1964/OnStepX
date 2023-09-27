@@ -16,12 +16,12 @@ void rotatorBacklashTile(String &data)
 
   sprintf_P(temp, html_tile_text_beg, "22em", "13em", "Backlash");
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   sprintf_P(temp, html_backlashValue, backlash);
   data.concat(temp);
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   sprintf_P(temp, html_collapsable_beg, L_SETTINGS "...");
   data.concat(temp);

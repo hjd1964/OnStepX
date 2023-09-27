@@ -106,8 +106,8 @@ void ServoTmc2209::init() {
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF (set by Vref)");
-    driver->rms_current(2.5F*0.707F);
+    VLF("current control OFF (300mA)");
+    driver->rms_current(0.3F*0.707F);
   } else {
     VF("Irun="); V(Settings->current); VLF("mA");
     driver->rms_current(Settings->current*0.707F);
@@ -125,6 +125,12 @@ void ServoTmc2209::init() {
   #else
     if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
   #endif
+}
+
+// move using step/dir signals
+void ServoTmc2209::alternateMode(bool state) {
+  sdMode = state;
+  if (sdMode) driver->VACTUAL(0);
 }
 
 // enable or disable the driver using the enable pin or other method
@@ -154,6 +160,8 @@ void ServoTmc2209::enable(bool state) {
 
 // set motor velocity (in microsteps/s)
 float ServoTmc2209::setMotorVelocity(float velocity) {
+  if (sdMode) return velocity;
+
   if (!enabled) velocity = 0.0F;
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
@@ -169,7 +177,8 @@ float ServoTmc2209::setMotorVelocity(float velocity) {
 
   if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  driver->VACTUAL(round((currentVelocity/0.715F)*2.0F));
+  driver->VACTUAL(currentVelocity/0.715F);
+
   return currentVelocity;
 }
 
@@ -203,11 +212,12 @@ void ServoTmc2209::updateStatus() {
 }
 
 // calibrate the motor driver if required
-void ServoTmc2209::calibrate() {
+void ServoTmc2209::calibrateDriver() {
   if (stealthChop()) {
     VF("MSG: ServoTmc2209 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->irun(mAToCs(Settings->current));
     driver->ihold(mAToCs(Settings->current));
+    ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
     ((TMC2209Stepper*)driver)->en_spreadCycle(false);
     delay(1000);

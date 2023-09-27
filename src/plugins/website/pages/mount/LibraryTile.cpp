@@ -38,11 +38,11 @@ void libraryTile(String &data)
   data.concat(" ");
   data.concat(L_RECS_AVAIL);
   data.concat(F("</div><br />"));
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   data.concat(FPSTR(html_libCatalogSelect));
   www.sendContentAndClear(data);
-  data.concat("<br />");
+  data.concat(F("<br />"));
   data.concat(FPSTR(html_libShowMessage));
   www.sendContentAndClear(data);
 
@@ -52,7 +52,7 @@ void libraryTile(String &data)
   data.concat(FPSTR(html_catShowMessage));
   www.sendContentAndClear(data);
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   sprintf_P(temp, html_collapsable_beg, L_CONTROLS "...");
   data.concat(temp);
@@ -60,7 +60,7 @@ void libraryTile(String &data)
   data.concat(FPSTR(html_libUploadCatalog));
   data.concat(FPSTR(html_libDownloadCatalog));
   data.concat(FPSTR(html_libClearCatalog));
-  data.concat("<br /><br />");
+  data.concat(F("<br /><br />"));
   www.sendContentAndClear(data);
   data.concat(FPSTR(html_libEditCatalog));
   data.concat(FPSTR(html_libCatalogHelp));
@@ -73,31 +73,31 @@ void libraryTile(String &data)
 // use Ajax key/value pairs to pass related data to the web client in the background
 void libraryTileAjax(String &data)
 {
-  data.concat("lib_free|");
+  data.concat(F("lib_free|"));
   data.concat(onStep.commandString(":L?#"));
   data.concat(" ");
   data.concat(L_RECS_AVAIL);
   data += "\n";
 
   data.concat("cat_message|" + currentObject + "\n");
-  data.concat("cat_name|"); data.concat(currentCatName); data.concat("\n");
+  data.concat(F("cat_name|")); data.concat(currentCatName); data.concat("\n");
 
   if (currentCatalog > 0) {
-    data.concat("cat_prev|enabled\n");
-    data.concat("cat_next|enabled\n");
-    data.concat("cat_select|enabled\n");
+    data.concat(F("cat_prev|enabled\n"));
+    data.concat(F("cat_next|enabled\n"));
+    data.concat(F("cat_select|enabled\n"));
   } else {
-    data.concat("cat_prev|disabled\n");
-    data.concat("cat_next|disabled\n");
-    data.concat("cat_select|disabled\n");
+    data.concat(F("cat_prev|disabled\n"));
+    data.concat(F("cat_next|disabled\n"));
+    data.concat(F("cat_select|disabled\n"));
   }
   if (currentObject.equals(">") || currentObject.equals("-")) {
-    data.concat("cat_prev|disabled\n");
-    data.concat("cat_select|disabled\n");
+    data.concat(F("cat_prev|disabled\n"));
+    data.concat(F("cat_select|disabled\n"));
   }
   if (currentObject.equals("<")) {
-    data.concat("cat_next|disabled\n");
-    data.concat("cat_select|disabled\n");
+    data.concat(F("cat_next|disabled\n"));
+    data.concat(F("cat_select|disabled\n"));
   }
 
   if (currentCatName[0] != 0) {
@@ -123,8 +123,8 @@ void libraryTileAjax(String &data)
 
   if (catalogIndexChanged)
   {
-    if (currentCatalog == 0) data.concat("lib_clear|" L_CAT_CLEAR_LIB "\n"); else data.concat("lib_clear|" L_CAT_CLEAR "\n");
-    data.concat("cat_upload|disabled\n");
+    if (currentCatalog == 0) data.concat(F("lib_clear|" L_CAT_CLEAR_LIB "\n")); else data.concat(F("lib_clear|" L_CAT_CLEAR "\n"));
+    data.concat(F("cat_upload|disabled\n"));
     strcpy(currentCatName, "");
     if (currentCatalog != 0)
     {
@@ -147,7 +147,7 @@ void libraryTileAjax(String &data)
           }
           else
           {
-            data.concat("cat_download|enabled\n");
+            data.concat(F("cat_download|enabled\n"));
             showMessage = L_CATALOG " ";
             showMessage += currentCatName;
             showMessage += " " L_SELECTED ".";
@@ -155,29 +155,29 @@ void libraryTileAjax(String &data)
         }
         else
         {
-          data.concat("cat_download|disabled\n");
+          data.concat(F("cat_download|disabled\n"));
           showMessage = F(L_CAT_NO_NAME);
         }
       }
       else
       {
-        data.concat("cat_download|disabled\n");
+        data.concat(F("cat_download|disabled\n"));
         showMessage = F(L_CAT_GET_NAME_FAIL);
       }
     }
     else
     {
-      data.concat("cat_download|disabled\n");
+      data.concat(F("cat_download|disabled\n"));
       showMessage = F(L_CAT_NO_CAT);
     }
-    data.concat("cat_data&\n");
+    data.concat(F("cat_data&\n"));
     catalogIndexChanged = false;
   }
   else if (downloadCatalogData)
   {
     if (currentCatalog != 0)
     {
-      data.concat("cat_data&");
+      data.concat(F("cat_data&"));
       bool success = false;
       char temp[80] = "";
       sprintf(temp, ":Lo%ld#", (long)currentCatalog - 1);

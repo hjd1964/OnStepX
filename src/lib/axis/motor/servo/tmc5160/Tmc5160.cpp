@@ -1,0 +1,183 @@
+// -----------------------------------------------------------------------------------
+// axis servo TMC5160 stepper motor driver
+
+#include "Tmc5160.h"
+
+#ifdef SERVO_TMC5160_PRESENT
+
+#include "../../../../tasks/OnTask.h"
+
+// help with pin names
+#define mosi m0
+#define sck  m1
+#define cs   m2
+#define miso m3
+
+ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, const ServoTmcSettings *TmcSettings) {
+  this->axisNumber = axisNumber;
+
+  this->Pins = Pins;
+  enablePin = Pins->enable;
+  enabledState = Pins->enabledState;
+  faultPin = Pins->fault;
+
+  this->Settings = TmcSettings;
+  model = TmcSettings->model;
+  statusMode = TmcSettings->status;
+  velocityMax = TmcSettings->velocityMax;
+  acceleration = TmcSettings->acceleration;
+  accelerationFs = acceleration/FRACTIONAL_SEC;
+}
+
+void ServoTmc5160::init() {
+  ServoDriver::init();
+
+  // automatically set fault status for known drivers
+  status.active = statusMode != OFF;
+
+  // get TMC SPI driver ready
+  pinModeEx(Pins->step, OUTPUT);
+  pinModeEx(Pins->dir, OUTPUT);
+
+  // set S/D motion pins to known, fixed state
+  digitalWriteEx(Pins->step, LOW);
+  digitalWriteEx(Pins->dir, LOW);
+
+  // show velocity control settings
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
+
+  driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
+  driver->begin();
+  driver->intpol(true);
+
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
+  if (Settings->microsteps == OFF) {
+    VLF("OFF (assuming 1X)");
+    driver->microsteps(1);
+  } else {
+    V(Settings->microsteps); VLF("X");
+    driver->microsteps(Settings->microsteps);
+  }
+
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
+  if (Settings->current == OFF) {
+    VLF("current control OFF (600mA)");
+    driver->rms_current(0.6F*0.707F);
+  } else {
+    VF("Irun="); V(Settings->current); VLF("mA");
+    driver->rms_current(Settings->current*0.707F);
+  }
+  driver->hold_multiplier(1.0F);
+  driver->en_pwm_mode(false);
+  driver->AMAX(65535);
+  driver->RAMPMODE(1);
+
+  // automatically set fault status for known drivers
+  status.active = statusMode != OFF;
+
+  // set fault pin mode
+  if (statusMode == LOW) pinModeEx(faultPin, INPUT_PULLUP);
+  #ifdef PULLDOWN
+    if (statusMode == HIGH) pinModeEx(faultPin, INPUT_PULLDOWN);
+  #else
+    if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
+  #endif
+}
+
+// enable or disable the driver using the enable pin or other method
+void ServoTmc5160::enable(bool state) {
+  enabled = state;
+  if (enablePin == SHARED) {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
+    if (state) {
+      driver->en_pwm_mode(stealthChop());
+      driver->irun(mAToCs(Settings->current*0.707F));
+      driver->ihold(mAToCs(Settings->current*0.707F));
+    } else {
+      driver->en_pwm_mode(true);
+      driver->ihold(0);
+    }
+  } else {
+    VF("MSG: ServoDriver"); V(axisNumber);
+    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
+    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
+  }
+
+  currentVelocity = 0.0F;
+
+  ServoDriver::updateStatus();
+}
+
+// set motor velocity (in microsteps/s)
+float ServoTmc5160::setMotorVelocity(float velocity) {
+  if (!enabled) velocity = 0.0F;
+  if (velocity > velocityMax) velocity = velocityMax; else
+  if (velocity < -velocityMax) velocity = -velocityMax;
+
+  if (velocity > currentVelocity) {
+    currentVelocity += accelerationFs;
+    if (currentVelocity > velocity) currentVelocity = velocity;
+  } else
+  if (velocity < currentVelocity) {
+    currentVelocity -= accelerationFs;
+    if (currentVelocity < velocity) currentVelocity = velocity;
+  }
+
+  if (currentVelocity >= 0.0F) {
+    driver->shaft(false);
+    motorDirection = DIR_FORWARD;
+  } else {
+    driver->shaft(true);
+    motorDirection = DIR_REVERSE;
+  }
+
+  driver->VMAX(abs(currentVelocity/0.715F));
+
+  return currentVelocity;
+}
+
+// update status info. for driver
+void ServoTmc5160::updateStatus() {
+  if (statusMode == ON) {
+    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+
+      TMC2208_n::DRV_STATUS_t status_result;
+      status_result.sr = driver->DRV_STATUS();
+      status.outputA.shortToGround = status_result.s2ga;
+      status.outputA.openLoad      = status_result.ola;
+      status.outputB.shortToGround = status_result.s2gb;
+      status.outputB.openLoad      = status_result.olb;
+      status.overTemperatureWarning = status_result.otpw;
+      status.overTemperature       = status_result.ot;
+      status.standstill            = status_result.stst;
+
+      // open load indication is not reliable in standstill
+      if (status.outputA.shortToGround ||
+          status.outputB.shortToGround ||
+          status.overTemperatureWarning ||
+          status.overTemperature) status.fault = true; else status.fault = false;
+
+      timeLastStatusUpdate = millis();
+    }
+  } else
+  if (statusMode == LOW || statusMode == HIGH) {
+    status.fault = digitalReadEx(Pins->fault) == statusMode;
+  }
+}
+
+// calibrate the motor driver if required
+void ServoTmc5160::calibrateDriver() {
+  if (stealthChop()) {
+    VF("MSG: ServoTmc5160 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    driver->irun(mAToCs(Settings->current));
+    driver->ihold(mAToCs(Settings->current));
+    driver->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
+    driver->pwm_autoscale(true);
+    driver->en_pwm_mode(true);
+    delay(1000);
+  }
+}
+
+#endif

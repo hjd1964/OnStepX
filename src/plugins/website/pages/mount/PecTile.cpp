@@ -12,13 +12,13 @@ void pecTile(String &data)
 
   sprintf_P(temp, html_tile_beg, "22em", "15em", L_PAGE_PEC);
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
 
   if (status.pecEnabled) {
     data.concat(FPSTR(html_pecStatus));
   }
 
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
   sprintf_P(temp, html_collapsable_beg, L_CONTROLS "...");
   data.concat(temp);
 
@@ -43,14 +43,14 @@ void pecTileAjax(String &data)
 {
   char temp[80] = "";
 
-  data.concat("pec_sta|");
+  data.concat(F("pec_sta|"));
   if (status.mountType != MT_ALTAZM && onStep.command(":$QZ?#", temp)) {
     if (temp[0] == 'I') data.concat(L_PEC_IDLE); else
     if (temp[0] == 'p') data.concat(L_PEC_WAIT_PLAY); else
     if (temp[0] == 'P') data.concat(L_PEC_PLAYING); else
     if (temp[0] == 'r') data.concat(L_PEC_WAIT_REC); else
     if (temp[0] == 'R') data.concat(L_PEC_RECORDING); else data.concat(L_PEC_UNK);
-    if (status.pecRecording) data.concat(" (" L_PEC_EEWRITING ")");
+    if (status.pecRecording) data.concat(F(" (" L_PEC_EEWRITING ")"));
   } else { data.concat("?"); }
   data.concat("\n");
 

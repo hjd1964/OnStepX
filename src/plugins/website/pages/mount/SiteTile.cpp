@@ -20,7 +20,7 @@ void siteTile(String &data)
 
   sprintf_P(temp, html_tile_text_beg, "22em", "15em", L_LOCATION_TITLE);
   data.concat(temp);
-  data.concat("<br/><hr>");
+  data.concat(F("<br/><hr>"));
 
   data.concat(FPSTR(html_browserTime));
   sprintf_P(temp, html_date, state.dateStr);
@@ -32,7 +32,7 @@ void siteTile(String &data)
   sprintf_P(temp, html_site, state.latitudeStr, state.longitudeStr);
   data.concat(temp);
   data.concat(FPSTR(html_setDateTime));
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   sprintf_P(temp, html_collapsable_beg, L_SETTINGS "...");
   data.concat(temp);
@@ -66,7 +66,7 @@ void siteTile(String &data)
     sprintf_P(temp, html_ninput, "t3", &reply[7], "0", "60", "\"");
     data.concat(temp);
   }
-  data.concat("<br />");
+  data.concat(F("<br />"));
   www.sendContentAndClear(data);
 
   // Longitude
@@ -98,7 +98,7 @@ void siteTile(String &data)
     sprintf_P(temp, html_ninput, "g3", &reply[8], "0", "60", "\"");
     data.concat(temp);
   }
-  data.concat("<br />");
+  data.concat(F("<br />"));
   www.sendContentAndClear(data);
 
   // UTC Offset
@@ -131,7 +131,6 @@ void siteTileAjax(String &data)
   data.concat(keyValueString("site_long", state.longitudeStr));
   data.concat(keyValueString("site_lat", state.latitudeStr));
   data.concat(keyValueString("call", "update_date_time"));
-//  data.concat("call|update_date_time\n");
   www.sendContentAndClear(data);
 }
 

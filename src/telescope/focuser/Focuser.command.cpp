@@ -239,7 +239,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FQ#       Stop the focuser
     //            Returns: Nothing
     if (command[1] == 'Q') {
-      axes[index]->autoSlewStop();
+      if (axes[index]->isHoming()) {
+        axes[index]->autoSlewAbort();
+        homing[index] = true;
+      } else axes[index]->autoSlewStop();
       *numericReply = false;
     } else
 
@@ -321,12 +324,18 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'h') {
       if (axes[index]->hasHomeSense()) {
-        axes[index]->autoSlewHome();
+        if (settings[index].parkState == PS_UNPARKED) {
+          axes[index]->setFrequencySlew(settings[index].gotoRate);
+          *commandError = axes[index]->autoSlewHome();
+          if (*commandError == CE_NONE) {
+            homing[index] = true;
+          }
+        } else *commandError = CE_PARKED;
       } else {
         long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
         *commandError = gotoTarget(index, t);
-        *numericReply = false;
       }
+      *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
 
   } else return false;

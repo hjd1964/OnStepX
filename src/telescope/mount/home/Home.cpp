@@ -53,6 +53,7 @@ CommandError Home::request() {
 
     // make sure the motors are powered on
     mount.enable(true);
+    goTo.firstGoto = false;
 
     VLF("MSG: Mount, moving to home");
 
@@ -65,7 +66,10 @@ CommandError Home::request() {
         state = HS_HOMING;
         if (transform.mountType == ALTAZM) transform.horToEqu(&position);
         CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
-        if (result != CE_NONE) { VLF("WRN: Mount, moving to home goto failed"); }
+        if (result != CE_NONE) {
+          VLF("WRN: Mount, moving to home goto failed");
+          state = HS_NONE;
+        }
         return result;
       #else
         axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
@@ -101,7 +105,11 @@ void Home::requestDone() {
 // reset mount at home
 CommandError Home::reset(bool fullReset) {
   #if GOTO_FEATURE == ON
-    if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
+    if (goTo.state != GS_NONE) {
+      axis1.autoSlewAbort();
+      axis2.autoSlewAbort();
+      return CE_SLEW_IN_MOTION;
+    }
   #endif
   if (guide.state != GU_NONE) {
     if (guide.state == GU_HOME_GUIDE) guide.stop();
@@ -116,32 +124,28 @@ CommandError Home::reset(bool fullReset) {
   mount.trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   mount.trackingRateOffsetRA = 0.0F;
   mount.trackingRateOffsetDec = 0.0F;
+  goTo.firstGoto = true;
 
   tasks.yieldMicros(10000);
 
-  // setup axis1 and axis2
-  if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
-  if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
-
   if (transform.mountType == ALTAZM) {
-    axis1.setInstrumentCoordinate(position.z);
-    axis2.setInstrumentCoordinate(position.a);
+    position.a1 = position.z;
+    position.a2 = position.a;
   } else {
-    axis1.setInstrumentCoordinate(position.h);
-    axis2.setInstrumentCoordinate(position.d);
+    position.a1 = position.h;
+    position.a2 = position.d;
   }
 
-  // don't bother adjusting to actual step based coordinates if there are absolute encoders
-  if (AXIS1_SYNC_THRESHOLD == OFF) {
-    position.a1 = axis1.getInstrumentCoordinate();
-    position.a2 = axis2.getInstrumentCoordinate();
-  } else {
+  if (!goTo.absoluteEncodersPresent || mount.isHome()) {
+    if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
+    if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
+
     if (transform.mountType == ALTAZM) {
-      position.a1 = position.z;
-      position.a2 = position.a;
+      axis1.setInstrumentCoordinate(position.z);
+      axis2.setInstrumentCoordinate(position.a);
     } else {
-      position.a1 = position.h;
-      position.a2 = position.d;
+      axis1.setInstrumentCoordinate(position.h);
+      axis2.setInstrumentCoordinate(position.d);
     }
   }
 
@@ -152,13 +156,17 @@ CommandError Home::reset(bool fullReset) {
   axis2.setFrequencySlew(degToRadF(0.1F));
 
   // make sure the motors are powered off
-  if (fullReset) mount.enable(false);
+  if (fullReset) {
+    mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 
-  #if GOTO_FEATURE == ON
-    if (fullReset) goTo.alignReset();
-  #endif
+    #if GOTO_FEATURE == ON
+      goTo.alignReset();
+    #endif
 
-  if (fullReset) { VLF("MSG: Mount, reset at home and in standby"); } else { VLF("MSG: Mount, reset at home"); }
+    VLF("MSG: Mount, reset at home and in standby");
+  } else {
+    VLF("MSG: Mount, reset at home");
+  }
 
   return CE_NONE;
 }

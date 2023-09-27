@@ -31,7 +31,7 @@ L_CATALOG " <select name='selBox' onchange=\"busy(); s('lib_index',this.value);\
 "</select>&nbsp;\n";
 
 const char html_libShowMessage[] PROGMEM =
-"<div id='lib_message' style='margin: 0 auto; width: 14em; margin-top: 0.5em; margin-bottom: 1em; background-color: #222222; color: #aaaaaa; border: 1px solid #551111; padding: 2px;'>" L_CAT_NO_CAT "</div>\n";
+"<div id='lib_message' style='margin: 0 auto; width: 14em; margin-top: 0.5em; margin-bottom: 1em; background-color: " COLOR_LIGHT_BACKGROUND "; color: " COLOR_LIGHT_FOREGROUND "; border: 1px solid " COLOR_BORDER "; padding: 2px;'>" L_CAT_NO_CAT "</div>\n";
 
 const char html_catPrevRec[] PROGMEM =
 "&nbsp;<button id='cat_prev' type='button' onclick=\"s('lib','cat_prev');\" disabled>" "Prev" "</button>\n";
@@ -43,7 +43,7 @@ const char html_catSetTarget[] PROGMEM =
 "&nbsp;<button id='cat_select' type='button' onclick=\"s('lib','cat_select');\" disabled>" "Set Target" "</button>\n";
 
 const char html_catShowMessage[] PROGMEM =
-"<div id='cat_message' style='margin: 0 auto; width: 14em; margin-top: 0.5em; margin-bottom: 1em; background-color: #222222; color: #aaaaaa; border: 1px solid #551111; padding: 2px;'>" L_CAT_NO_OBJECT "</div>\n";
+"<div id='cat_message' style='margin: 0 auto; width: 14em; margin-top: 0.5em; margin-bottom: 1em; background-color: " COLOR_LIGHT_BACKGROUND "; color: " COLOR_LIGHT_FOREGROUND "; border: 1px solid " COLOR_BORDER "; padding: 2px;'>" L_CAT_NO_OBJECT "</div>\n";
 
 const char html_libUploadCatalog[] PROGMEM =
 "&nbsp;&nbsp;<button id='cat_upload' type='button' onclick=\"busy(); t('cat_upload',document.getElementById('cat_data').value);\" disabled>" L_UPLOAD "</button>\n";
@@ -56,7 +56,7 @@ const char html_libClearCatalog[] PROGMEM =
 
 const char html_libEditCatalog[] PROGMEM =
 L_CAT_DATA "<br />"
-"<textarea id='cat_data' style='background-color: #222222; color: #ffffff; border: 1px solid #551111;' "
+"<textarea id='cat_data' style='background-color: " COLOR_LIGHT_BACKGROUND "; color: #ffffff; border: 1px solid " COLOR_BORDER ";' "
 "rows='10' cols='40' oninput=\"document.getElementById('cat_upload').disabled=false;\"></textarea><br /><br />\n";
 
 const char html_libCatalogHelp[] PROGMEM =

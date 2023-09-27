@@ -49,7 +49,7 @@ void handleRoot()
   }
 
   // scripts
-  data.concat("<script>var ajaxPage='index.txt';</script>\n");
+  data.concat(F("<script>var ajaxPage='index.txt';</script>\n"));
   www.sendContentAndClear(data);
   data.concat(FPSTR(html_script_ajax));
   www.sendContentAndClear(data);
@@ -72,21 +72,21 @@ void handleRoot()
     if (axisTile(axis, data)) numShown++;
   }
 
-  data.concat("<br class=\"clear\" />\n");
+  data.concat(F("<br class=\"clear\" />\n"));
 
   #if DISPLAY_SERVO_MONITOR == ON
     servoTile(data);
-    data.concat("<br class=\"clear\" />\n");
+    data.concat(F("<br class=\"clear\" />\n"));
   #endif
 
   #if DRIVE_CONFIGURATION == ON
-    if (numShown == 0) data.concat("<br />" L_ADV_SET_NO_EDIT "<br />");
+    if (numShown == 0) data.concat(F("<br />" L_ADV_SET_NO_EDIT "<br />"));
 
     sprintf_P(temp, html_form_begin, "index.htm");
     data.concat(temp);
 
     data.concat(F("<br /><button name='advanced' type='submit' "));
-    if (numShown == 0) data.concat("value='enable'>" L_ADV_ENABLE "</button>"); else data.concat("value='disable'>" L_ADV_DISABLE "</button>");
+    if (numShown == 0) data.concat(F("value='enable'>" L_ADV_ENABLE "</button>")); else data.concat(F("value='disable'>" L_ADV_DISABLE "</button>"));
 
     data.concat(FPSTR(html_form_end));
     www.sendContentAndClear(data);
@@ -95,7 +95,7 @@ void handleRoot()
       data.concat(FPSTR(html_configAxesNotes));
       if (status.getVersionMajor() < 10) data.concat(FPSTR(html_configAxesNotesOnStep));
     } else
-      data.concat("<br />");
+      data.concat(F("<br />"));
     www.sendContentAndClear(data);
   #endif
 

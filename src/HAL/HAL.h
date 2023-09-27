@@ -131,6 +131,8 @@
   #define E2END 16383
 #elif NV_DRIVER == NV_24256
   #define E2END 32767
+#elif NV_DRIVER == NV_MB85RC64
+  #define E2END 8191
 #elif NV_DRIVER == NV_MB85RC256
   #define E2END 32767
 #endif
@@ -151,8 +153,8 @@
     #define NV_CACHED true
   #endif
   #include "../lib/nv/NV_24XX.h"
-  #define HAL_NV_INIT() nv.init(E2END + 1, NV_CACHED, 0, false, &HAL_Wire, NV_ADDRESS);
-#elif NV_DRIVER == NV_MB85RC256
+  #define HAL_NV_INIT() nv.init(E2END + 1, NV_CACHED, 0, false, &HAL_Wire, NV_ADDRESS)
+#elif NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256
   #ifndef NV_ENDURANCE
     #define NV_ENDURANCE NVE_VHIGH
   #endif
@@ -163,7 +165,7 @@
     #define NV_CACHED true
   #endif
   #include "../lib/nv/NV_MB85RC.h"
-  #define HAL_NV_INIT() nv.init(E2END + 1, NV_CACHED, 0, false, &HAL_Wire, NV_ADDRESS);
+  #define HAL_NV_INIT() nv.init(E2END + 1, NV_CACHED, 0, false, &HAL_Wire, NV_ADDRESS)
 #endif
 
 // Non-volatile storage

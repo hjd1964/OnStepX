@@ -11,34 +11,30 @@ void sendAxisParams(AxisSettings* a, int axis);
 bool axisTile(int axis, String &data)
 {
   bool success = false;
-  char temp[240] = "";
+  char temp[256] = "";
   char temp1[80] = "";
-  char temp2[80] = "";
 
   if (axis <= 1 && status.mountFound != SD_TRUE) return success;
   if (axis == 2 && status.rotatorFound != SD_TRUE) return success;
   if (axis >= 3 && !status.focuserPresent[axis - 3]) return success;
 
-  char axisTitleStr[32] = "";
   switch (axis) {
-    case 0: sprintf(axisTitleStr, "Axis%d RA/Azm", 1); break;
-    case 1: sprintf(axisTitleStr, "Axis%d Dec/Alt", 2); break;
-    case 2: sprintf(axisTitleStr, "Axis%d Rotator", 3); break;
-    case 3: sprintf(axisTitleStr, "Axis%d Focuser1", 4); break;
-    case 4: sprintf(axisTitleStr, "Axis%d Focuser2", 5); break;
-    case 5: sprintf(axisTitleStr, "Axis%d Focuser3", 6); break;
-    case 6: sprintf(axisTitleStr, "Axis%d Focuser4", 7); break;
-    case 7: sprintf(axisTitleStr, "Axis%d Focuser5", 8); break;
-    case 8: sprintf(axisTitleStr, "Axis%d Focuser6", 9); break;
+    case 0: sprintf(temp1, "Axis%d RA/Azm", 1); break;
+    case 1: sprintf(temp1, "Axis%d Dec/Alt", 2); break;
+    case 2: sprintf(temp1, "Axis%d Rotator", 3); break;
+    case 3: case 4: case 5: case 6: case 7: case 8:
+      sprintf(temp1, "Axis%d Focuser%d", axis + 1, axis - 2);
+    break;
   }
-  sprintf_P(temp, html_tile_text_beg, "22em", "11em", axisTitleStr);
+  sprintf_P(temp, html_tile_text_beg, "22em", "11em", temp1);
   data.concat(temp);
-  data.concat("<br /><hr>");
+  data.concat(F("<br /><hr>"));
   if (state.driverStatusStr[axis][0] == '?') strcpy(temp1, L_UNKNOWN); else strcpy(temp1, state.driverStatusStr[axis]);
   sprintf_P(temp, html_indexDriverStatus, axis, temp1);
   data.concat(temp);
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
+  www.sendContentAndClear(data);
 
   #if DRIVE_CONFIGURATION == ON
     if (status.getVersionMajor() > 3) {
@@ -174,6 +170,7 @@ bool axisTile(int axis, String &data)
       if (axis >= 3 && axis <= 8) {
         int focuser = axis - 3;
         if (status.focuserPresent[focuser]) {
+          char temp2[12] = "";
           sprintf(temp2, ":GXA%d#", focuser + 4);
           if (!onStep.command(temp2, temp1)) strcpy(temp1, "0");
           if (decodeAxisSettings(temp1, &a)) {
@@ -351,7 +348,7 @@ void sendAxisParams(AxisSettings* a, int axis) {
 
   if (a->driverType == DT_SERVO) {
     data.concat(L_ADV_SET_IMMEDIATE);
-    data.concat("<br/><br/>");
+    data.concat(F("<br/><br/>"));
     www.sendContentAndClear(data);
 
     dtostrf(a->p, 1, 3, temp1);
@@ -393,7 +390,7 @@ void sendAxisParams(AxisSettings* a, int axis) {
 
   if (a->driverType == DT_STEP_DIR_STANDARD) {
     data.concat(L_ADV_SET_SPECIAL);
-    data.concat("<br/><br/>");
+    data.concat(F("<br/><br/>"));
     www.sendContentAndClear(data);
 
     #if DRIVE_MAIN_AXES_MICROSTEPS == ON
@@ -409,7 +406,7 @@ void sendAxisParams(AxisSettings* a, int axis) {
 
   if (a->driverType == DT_STEP_DIR_TMC_SPI) {
     data.concat(L_ADV_SET_SPECIAL);
-    data.concat("<br/><br/>");
+    data.concat(F("<br/><br/>"));
     www.sendContentAndClear(data);
 
     #if DRIVE_MAIN_AXES_MICROSTEPS == ON

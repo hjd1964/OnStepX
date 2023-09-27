@@ -3,8 +3,8 @@
 #pragma once
 #include "Common.h"
 
-#if FileVersionConfig != 5
-  #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 5 for this OnStep."
+#if !defined(FileVersionConfig) || FileVersionConfig != 6
+  #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 6 for this OnStep."
 #endif
 
 // BACKWARDS COMPATABILITY ------------------------

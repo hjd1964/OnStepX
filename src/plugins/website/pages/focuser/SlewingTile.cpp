@@ -18,16 +18,16 @@ void focuserSlewingTile(String &data)
 
   data.concat(L_CURRENT ": <span id='focuserpos' class='c'>");
   data.concat(state.focuserPositionStr);
-  data.concat("</span><br /><br />");
+  data.concat(F("</span><br /><br />"));
 
   data.concat(FPSTR(html_focPosition));
   if (status.getVersionMajor() >= 10) data.concat(FPSTR(html_focStop));
-  data.concat("<br />");
+  data.concat(F("<br />"));
 
   data.concat(FPSTR(html_focuserIn));
   data.concat(FPSTR(html_focuserOut));
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   if (status.getVersionMajor() >= 10) {
     sprintf_P(temp, html_collapsable_beg, L_CONTROLS "...");

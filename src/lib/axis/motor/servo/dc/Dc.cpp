@@ -67,9 +67,9 @@ void ServoDc::init() {
 
   // init default driver control pins
   pinModeEx(Pins->in1, OUTPUT);
-  digitalWriteF(Pins->in1, !Pins->inState1); // either in1 or direction, state should default to inactive
+  digitalWriteF(Pins->in1, Pins->inState1); // either in1 or direction, state should default to inactive
   pinModeEx(Pins->in2, OUTPUT);
-  digitalWriteF(Pins->in2, !Pins->inState2); // either in2 or phase (PWM,) state should default to inactive
+  digitalWriteF(Pins->in2, Pins->inState2); // either in2 or phase (PWM,) state should default to inactive
 
   // if this is a T4.1 and we're using a PE driver and in2 == 38, assume its a MaxPCB4 and make our own PWM on that pin
   #ifdef analogWritePin38

@@ -121,6 +121,7 @@ void Focuser::init() {
     target[index] = 0;
     writeTime[index] = 0;
     parkHandle[index] = 0;
+    homing[index] = false;
 
     if (configuration[index].present) {
       if (axes[index] != NULL) {
@@ -144,7 +145,7 @@ void Focuser::init() {
 
         axes[index]->resetPositionSteps(0);
         axes[index]->setBacklashSteps(settings[index].backlash);
-        axes[index]->setFrequencyMax(configuration[index].slewRateDesired);
+        axes[index]->setFrequencyMax(configuration[index].slewRateDesired*2.0F);
         axes[index]->setFrequencyMin(configuration[index].slewRateMinimum);
         axes[index]->setFrequencySlew(configuration[index].slewRateDesired);
         axes[index]->setSlewAccelerationTime(configuration[index].accelerationTime);
@@ -158,7 +159,7 @@ void Focuser::init() {
 
 void Focuser::begin() {
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrate();
+    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrateDriver();
   }
 
   // start task for temperature compensated focusing
@@ -216,6 +217,7 @@ bool Focuser::setDcPower(int index, int value) {
 // get TCF enable
 bool Focuser::getTcfEnable(int index) {
   if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (isnan(getTemperature())) setTcfEnable(index, false);
   return settings[index].tcf.enabled;
 }
 
@@ -224,6 +226,7 @@ CommandError Focuser::setTcfEnable(int index, bool value) {
   if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
+  if (isnan(getTemperature())) value = false;
   settings[index].tcf.enabled = value;
   if (value) {
     settings[index].tcf.t0 = getTemperature();
@@ -350,11 +353,14 @@ CommandError Focuser::gotoTarget(int index, long target) {
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
-  VF("MSG: Focuser"); V(index + 1); VLF(", starting goto");
+  VF("MSG: Focuser"); V(index + 1); VLF(", attempting goto");
 
   axes[index]->setFrequencyBase(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
-  return axes[index]->autoGoto(settings[index].gotoRate);
+  CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
+  if (e != CE_NONE) { VF("MSG: Focuser"); V(index + 1); VLF(", goto failed"); }
+
+  return e; 
 }
 
 // park focuser at its current location
@@ -373,7 +379,7 @@ CommandError Focuser::park(int index) {
   float targetMicrons = axes[index]->getInstrumentCoordinate();
   axes[index]->setTargetCoordinatePark(targetMicrons);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
 
   if (e == CE_NONE) {
     settings[index].position = targetMicrons;
@@ -414,7 +420,7 @@ CommandError Focuser::unpark(int index) {
   axes[index]->setBacklash(settings[index].backlash);
   axes[index]->setTargetCoordinate(settings[index].position);
 
-  CommandError e = axes[index]->autoGoto(configuration[index].slewRateDesired);
+  CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
 
   if (e == CE_NONE) {
     settings[index].parkState = PS_UNPARKING;
@@ -496,6 +502,13 @@ void Focuser::monitor() {
             }
           } else tcfSteps[index] = 0;
 
+          if (homing[index]) {
+            long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*axes[index]->getStepsPerMeasure();
+            axes[index]->resetPositionSteps(p);
+            axes[index]->setBacklash(getBacklash(index));
+            homing[index] = false;
+          }
+
           // delayed write of focuser position
           if (FOCUSER_WRITE_DELAY != 0) {
             if (secs > writeTime[index]) {
@@ -504,6 +517,7 @@ void Focuser::monitor() {
               VF("MSG: Focuser"); V(index + 1); VF(", writing position ("); V(targetMicrons); VLF("um) to NV"); 
             }
           }
+
         }
       }
     }

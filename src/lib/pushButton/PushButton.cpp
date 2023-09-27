@@ -22,8 +22,22 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
   if (isAnalog) {
-  	if (threshold + hysteresis > ANALOG_READ_RANGE) hysteresis = ANALOG_READ_RANGE;
-	  if (threshold - hysteresis < 0) hysteresis = 0;
+    if (threshold < 0) {
+      threshold = 0;
+      VF("WRN: Button::Button(), Threshold for pin "); V(pin); VLF(" is below Analog range setting to "); VL(threshold);
+    } else
+    if (threshold > ANALOG_READ_RANGE) {
+      threshold = ANALOG_READ_RANGE;
+      VF("WRN: Button::Button(), Threshold for pin "); V(pin); VF(" is above Analog range setting to "); VL(threshold);
+    }
+	  if (threshold - hysteresis < 0) {
+      hysteresis = threshold;
+      VF("WRN: Button::Button(), Threshold - Hysteresis for pin "); V(pin); VF(" is below Analog range setting Hysteresis to "); VL(hysteresis);
+    } else
+  	if (threshold + hysteresis > ANALOG_READ_RANGE) {
+      hysteresis = ANALOG_READ_RANGE - threshold;
+      VF("WRN: Button::Button(), Threshold + Hysteresis for pin "); V(pin); VF(" is above Analog range setting Hysteresis to "); VL(hysteresis);
+    }
   }
 
   pinModeEx(pin, initState);
@@ -39,7 +53,7 @@ void Button::poll() {
     }
 
     if (DOWN == LOW) {
-      if (analogValue < threshold - hysteresis) state = LOW; else state = HIGH;
+      if (analogValue <= threshold - hysteresis) state = LOW; else state = HIGH;
     }
 
   } else state = digitalReadEx(pin);

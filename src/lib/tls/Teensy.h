@@ -8,7 +8,9 @@
 
 #include "../calendars/Calendars.h"
 
+#ifndef TLS_CLOCK_SKEW
 #define TLS_CLOCK_SKEW 0.000139 // +5 seconds ahead when setting time
+#endif
 
 class TimeLocationSource {
   public:

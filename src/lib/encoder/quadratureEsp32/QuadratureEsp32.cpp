@@ -33,7 +33,9 @@ void QuadratureEsp32::init() {
 int32_t QuadratureEsp32::read() {
   if (!initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" read(), not initialized!"); return 0; }
 
-  return (int32_t)ab->getCount() + origin;
+  count = (int32_t)ab->getCount();
+
+  return count + origin;
 }
 
 void QuadratureEsp32::write(int32_t count) {

@@ -31,7 +31,7 @@ void focuserBacklashTcfTile(String &data)
   sprintf_P(temp, html_tcfCoefValue, state.focuserTcfCoefStr);
   data.concat(temp);
 
-  data.concat("<hr>");
+  data.concat(F("<hr>"));
 
   sprintf_P(temp, html_collapsable_beg, L_SETTINGS "...");
   data.concat(temp);

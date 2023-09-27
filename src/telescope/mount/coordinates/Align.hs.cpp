@@ -345,6 +345,7 @@ void GeoAlign::autoModel(int n) {
   #ifdef HAL_SLOW_PROCESSOR
     doSearch(256,Do,0,1,1,0, 0, 0,1,1);
     doSearch(128,Do,0,1,1,0, 0, 0,1,1);
+    doSearch( 64,Do,0,1,1,0, 0, 0,1,1);
   #else
     if (num > 4) {
       doSearch(256,Do,1,1,1,0,Ff,Df,1,1);
@@ -353,6 +354,10 @@ void GeoAlign::autoModel(int n) {
       #ifdef HAL_FAST_PROCESSOR
         doSearch( 32,Do,1,1,1,1,Ff,Df,1,1);
         doSearch( 16,Do,1,1,1,1,Ff,Df,1,1);
+        doSearch(  8,Do,1,1,1,1,Ff,Df,1,1);
+        #ifdef HAL_VFAST_PROCESSOR
+          doSearch(  4,Do,1,1,1,1,Ff,Df,1,1);
+        #endif
       #endif
     } else {
       doSearch(256,Do,0,1,1,0, 0, 0,1,1);
@@ -361,6 +366,10 @@ void GeoAlign::autoModel(int n) {
       doSearch( 32,Do,0,1,1,0, 0, 0,1,1);
       #ifdef HAL_FAST_PROCESSOR
         doSearch( 16,Do,0,1,1,0, 0, 0,1,1);
+        doSearch(  8,Do,0,1,1,0, 0, 0,1,1);
+        #ifdef HAL_VFAST_PROCESSOR
+          doSearch(  4,Do,0,1,1,0, 0, 0,1,1);
+        #endif
       #endif
     }
   #endif

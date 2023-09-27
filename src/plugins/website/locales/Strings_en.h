@@ -43,6 +43,7 @@
 #define L_COMPLETE "Complete"
 #define L_ACTIVE "Active"
 #define L_INACTIVE "Inactive"
+#define L_BEST "Best"
 
 // ---------------------------- Index ----------------------------
 // date/time
@@ -296,6 +297,7 @@
 #define L_MERIDIAN_FLIP_AUTO "Automatic Meridian Flip at Limit"
 #define L_MERIDIAN_FLIP_NOW "Now"
 #define L_MERIDIAN_FLIP_PAUSE "Meridian Flip, Pause at Home"
+#define L_MERIDIAN_FLIP_PPS "Meridian Flip, Preferred Pier Side"
 
 // ------------------------ Configuration ------------------------
 

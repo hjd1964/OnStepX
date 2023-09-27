@@ -50,10 +50,10 @@ void Mount::init() {
 }
 
 void Mount::begin() {
-  axis1.calibrate();
-  axis1.enable(MOUNT_ENABLE_AT_STARTUP == ON);
-  axis2.calibrate();
-  axis2.enable(MOUNT_ENABLE_AT_STARTUP == ON);
+  axis1.calibrateDriver();
+  axis1.enable(MOUNT_ENABLE_IN_STANDBY == ON);
+  axis2.calibrateDriver();
+  axis2.enable(MOUNT_ENABLE_IN_STANDBY == ON);
 
   // initialize the critical subsystems
   site.init();
@@ -97,30 +97,11 @@ void Mount::begin() {
     st4.init();
   #endif
 
-  #if TRACK_AUTOSTART == ON
-    if (park.state == PS_PARKED) {
-      #if GOTO_FEATURE == ON
-        if (site.isDateTimeReady()) {
-          VLF("MSG: Mount, autostart tracking from park");
-          park.restore(true);
-        } else {
-          VLF("MSG: Mount, autostart tracking from park requires date/time");
-        }
-      #endif
-    } else {
-      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
-        VLF("MSG: Mount, autostart tracking sidereal");
-        tracking(true);
-        trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-      } else {
-        VLF("MSG: Mount, can't autostart ALTAZM tracking without date/time");
-      }
-    }
-  #else
-    tracking(false);
-    #if GOTO_FEATURE == ON
-      if (park.state == PS_PARKED) park.restore(false);
-    #endif
+  tracking(false);
+  trackingAutostart();
+
+  #if ALIGN_MAX_NUM_STARS > 1 && ALIGN_MODEL_MEMORY == ON
+    transform.align.modelRead();
   #endif
 
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");
@@ -139,6 +120,32 @@ Coordinate Mount::getPosition(CoordReturn coordReturn) {
 Coordinate Mount::getMountPosition(CoordReturn coordReturn) {
   updatePosition(coordReturn);
   return current;
+}
+
+// one time initialization of tracking
+void Mount::trackingAutostart() {
+  static bool completed = false;
+  if (completed) return;
+
+  if (park.state == PS_PARKED) {
+    #if GOTO_FEATURE == ON
+      CommandError e = park.restore(TRACK_AUTOSTART == ON);
+      if (e == CE_PARKED) return;
+    #endif
+  } else {
+    #if TRACK_AUTOSTART == ON
+      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
+        VLF("MSG: Mount, autostart tracking sidereal");
+        tracking(true);
+        trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+      } else {
+        VLF("MSG: Mount, autostart tracking postponed no date/time");
+        return;
+      }
+    #endif
+  }
+
+  completed = true;
 }
 
 // enables or disables tracking, enabling tracking powers on the motors if necessary
@@ -177,11 +184,6 @@ void Mount::enable(bool state) {
   axis2.enable(state);
 }
 
-// allow syncing to the encoders instead of from them
-void Mount::syncToEncoders(bool state) {
-  syncToEncodersEnabled = state;
-}
-
 // updates the tracking rates, etc. as appropriate for the mount state
 // called once a second by poll() but available here for immediate action
 void Mount::update() {
@@ -193,6 +195,7 @@ void Mount::update() {
   #else
   if (guide.state < GU_GUIDE) {
   #endif
+
     if (trackingState != TS_SIDEREAL) {
       trackingRateAxis1 = 0.0F;
       trackingRateAxis2 = 0.0F;
@@ -331,6 +334,11 @@ void Mount::poll() {
   if (altitude > Deg85) {
     if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a);
     trackingRateAxis2 = 0.0F;
+  }
+
+  // stop any movement on motor hardware fault
+  if (mount.motorFault()) {
+    if (goTo.state > GS_NONE) goTo.abort(); else if (guide.state > GU_NONE) guide.abort();
   }
 
   update();

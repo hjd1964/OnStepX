@@ -7,8 +7,8 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-// 1/1000 second sidereal timer
 #define HAL_FRACTIONAL_SEC 1000.0F
+// Base rate for critical task timing
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
@@ -28,6 +28,7 @@
 #define HAL_MAXRATE_LOWER_LIMIT 1.5
 #define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
 #define HAL_FAST_PROCESSOR
+#define HAL_VFAST_PROCESSOR
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
@@ -40,7 +41,7 @@
 #if NV_DRIVER == NV_DEFAULT
   #include "EEPROM.h"
   #include "../lib/nv/NV_EEPROM.h"
-  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false);
+  #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false)
 #endif
 
 //--------------------------------------------------------------------------------------------------
