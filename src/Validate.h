@@ -3,7 +3,7 @@
 #pragma once
 #include "Common.h"
 
-#if !defined(FileVersionConfig) || FileVersionConfig != 6
+#if !defined(FileVersionConfig) || FileVersionConfig != 6 // per FirmwareVersionConfig
   #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 6 for this OnStep."
 #endif
 
