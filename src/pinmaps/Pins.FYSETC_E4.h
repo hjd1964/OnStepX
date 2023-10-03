@@ -27,8 +27,6 @@
     #define SERIAL_TMC_RX       3                // Recieving data
     #define SERIAL_TMC_TX       1                // Transmit data
     #define SPARE_RX_PIN        OFF              // Set _RX above to 0 (GPIO0) and use 3 here
-    #define I2C_SDA_PIN         21
-    #define I2C_SCL_PIN         22
   #else
     #ifndef SERIAL_TMC_RX
       #define SERIAL_TMC_RX     0                // Recieving data (GPIO0 unused except for flashing)
