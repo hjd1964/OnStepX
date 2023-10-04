@@ -57,6 +57,6 @@ class Telescope {
 };
 
 extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
-#define analog8BitToAnalogRange(v) roundf((v/255.0F)*(float)(ANALOG_WRITE_RANGE))
+#define analog8BitToAnalogRange(v) roundf(((v)/255.0F)*(float)(ANALOG_WRITE_RANGE))
 
 extern Telescope telescope;
