@@ -299,7 +299,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
     if (pierSideSelect == PSS_WEST_ONLY && target.pierSide != PIER_SIDE_WEST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
     if (pierSideSelect == PSS_SAME_ONLY && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
-    if (MOUNT_TYPE == ALTAZM) {
+    if (transform.mountType == ALTAZM) {
       // adjust coordinate range to allow going past +/-180 degrees
       if (current.z >= 0) {
         VLF("MSG: Mount, current azimuth >= 0");
@@ -560,7 +560,7 @@ void Goto::poll() {
 
         double a1, a2;
         transform.mountToInstrument(&nearTarget, &a1, &a2);
-        if (MOUNT_TYPE == ALTAZM) a1 += azimuthTargetCorrection;
+        if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
         axis1.setTargetCoordinate(a1);
         axis2.setTargetCoordinate(a2);
@@ -583,7 +583,7 @@ CommandError Goto::startAutoSlew() {
 
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
-  if (MOUNT_TYPE == ALTAZM) a1 += azimuthTargetCorrection;
+  if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
   if (stage == GG_DESTINATION && park.state == PS_PARKING) {
     axis1.setTargetCoordinatePark(a1);
