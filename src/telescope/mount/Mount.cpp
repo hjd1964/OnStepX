@@ -98,6 +98,21 @@ void Mount::begin() {
   #endif
 
   tracking(false);
+
+  // restore where we were pointing
+  #if MOUNT_COORDS_MEMORY == ON
+    if (!goTo.absoluteEncodersPresent && park.state != PS_PARKED) {
+      int8_t lastMountType = nv.readC(NV_MOUNT_LAST_POSITION);
+      if (transform.mountType == lastMountType) {
+        VLF("MSG: Mount, reading last position");
+        float a1 = nv.readF(NV_MOUNT_LAST_POSITION + 1);
+        float a2 = nv.readF(NV_MOUNT_LAST_POSITION + 5);
+        axis1.setInstrumentCoordinate(a1);
+        axis2.setInstrumentCoordinate(a2);
+      }
+    }
+  #endif
+
   trackingAutostart();
 
   #if ALIGN_MAX_NUM_STARS > 1 && ALIGN_MODEL_MEMORY == ON
@@ -236,6 +251,15 @@ void Mount::poll() {
   #else
     #define DiffRange  2.908882086657216e-4L // 1 arc-minute in radians
     #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
+  #endif
+
+  // keep track of where we are pointing
+  #if MOUNT_COORDS_MEMORY == ON
+    if (!goTo.absoluteEncodersPresent) {
+      nv.write(NV_MOUNT_LAST_POSITION, transform.mountType);
+      nv.write(NV_MOUNT_LAST_POSITION + 1, (float)axis1.getInstrumentCoordinate());
+      nv.write(NV_MOUNT_LAST_POSITION + 5, (float)axis2.getInstrumentCoordinate());
+    }
   #endif
 
   if (trackingState == TS_NONE) {

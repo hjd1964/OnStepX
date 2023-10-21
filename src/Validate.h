@@ -303,6 +303,18 @@
   #error "Configuration (Config.h): Setting MOUNT_COORDS unknown, use a valid MOUNT COORDS (from Constants.h)"
 #endif
 
+#if MOUNT_COORDS_MEMORY != ON && MOUNT_COORDS_MEMORY != OFF
+  #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY unknown, use ON or OFF"
+#endif
+
+#if MOUNT_COORDS_MEMORY == ON && NV_ENDURANCE < NVE_LOW
+  #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY requires a NV storage device with very high write endurance (FRAM)"
+#endif
+
+#if MOUNT_ENABLE_IN_STANDBY != ON && MOUNT_ENABLE_IN_STANDBY != OFF
+  #error "Configuration (Config.h): Setting MOUNT_ENABLE_IN_STANDBY unknown, use ON or OFF"
+#endif
+
 #if ALIGN_MAX_STARS != AUTO && (ALIGN_MAX_STARS < 1 && ALIGN_MAX_STARS > 9)
   #error "Configuration (Config.h): Setting ALIGN_MAX_STARS unknown, use AUTO or a value from 1 to 9."
 #endif

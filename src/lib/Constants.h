@@ -114,7 +114,7 @@
 #define NVE_LOW                     0   // low (< 100K writes)
 #define NVE_MID                     1   // mid (~ 100K writes)
 #define NVE_HIGH                    2   // high (~ 1M writes)
-#define NVE_VHIGH                   3   // very high (> 1M writes)
+#define NVE_VHIGH                   3   // very high (> 300M writes, FRAM)
 
 // GPIO devices (pin# 512 up to 543)
 // these can work for most digital I/O EXCEPT: STEP/DIR, 1-WIRE/I2C/SPI (CS is ok), the ST4 port, and the PPS pin

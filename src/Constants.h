@@ -143,7 +143,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928934UL
+#define INIT_NV_KEY                 583928936UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
@@ -158,13 +158,14 @@
 #define NV_MOUNT_PARK_BASE          216    // bytes: 15  , 15
 #define NV_MOUNT_PEC_BASE           231    // bytes: 6   , 6
 #define NV_MOUNT_STATUS_BASE        237    // bytes: 1   , 1
+#define NV_MOUNT_LAST_POSITION      238    // bytes: 9   , 9
 
-#define NV_ALIGN_MODEL_BASE         238    // bytes: 32  , 32
-#define NV_AXIS_SETTINGS_REVERT     270    // bytes: 2   , 2
-#define NV_AXIS_SETTINGS_BASE       272    // bytes: 45*9, 405
-#define NV_FOCUSER_SETTINGS_BASE    677    // bytes: 20*6, 120
-#define NV_ROTATOR_SETTINGS_BASE    797    // bytes: 11  , 11
-#define NV_FEATURE_SETTINGS_BASE    808    // bytes: 3 *8, 24
-#define NV_TELESCOPE_SETTINGS_BASE  832    // bytes: 2   , 2
+#define NV_ALIGN_MODEL_BASE         247    // bytes: 32  , 32
+#define NV_AXIS_SETTINGS_REVERT     279    // bytes: 2   , 2
+#define NV_AXIS_SETTINGS_BASE       281    // bytes: 45*9, 405
+#define NV_FOCUSER_SETTINGS_BASE    686    // bytes: 20*6, 120
+#define NV_ROTATOR_SETTINGS_BASE    806    // bytes: 11  , 11
+#define NV_FEATURE_SETTINGS_BASE    817    // bytes: 3 *8, 24
+#define NV_TELESCOPE_SETTINGS_BASE  841    // bytes: 2   , 2
 
-#define NV_LAST                     833
+#define NV_LAST                     842
