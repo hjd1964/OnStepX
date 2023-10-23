@@ -533,6 +533,12 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
+#ifndef MOUNT_COORDS
+#define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
+#endif
+#ifndef MOUNT_COORDS_MEMORY
+#define MOUNT_COORDS_MEMORY           OFF                         // ON Enables mount position memory
+#endif
 #ifndef MOUNT_ENABLE_IN_STANDBY
 #define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
 #endif
@@ -562,10 +568,6 @@
 #endif
 #ifndef TANGENT_ARM_MOUNT_TO_INSTRUMENT
 #define TANGENT_ARM_MOUNT_TO_INSTRUMENT(a) (tan(a))               // angle (a) in radians
-#endif
-
-#ifndef MOUNT_COORDS
-#define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
 #endif
 
 // user feedback
