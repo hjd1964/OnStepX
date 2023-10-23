@@ -28,7 +28,8 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     // :A?#       Align status
     //            Returns: mno#
     //            where m is the maximum number of alignment stars
-    //                  n is the current alignment star (0 otherwise)
+    //                  n is the current alignment star (0 otherwise) note: this is always 1 greater than the number
+    //                    of alignment stars accepted and so can range from '0' to ':' (':' = '0' + 10)
     //                  o is the last required alignment star when an alignment is in progress (0 otherwise)
     if (command[1] == '?' && parameter[0] == 0) {
       reply[0] = '0' + ALIGN_MAX_NUM_STARS;
