@@ -341,7 +341,7 @@ void ServoMotor::poll() {
 IRAM_ATTR void ServoMotor::move() {
 
   #if SERVO_SLEW_DIRECT == ON
-    if (synchronized && !inBacklash) targetSteps += step;
+    if (sync && !inBacklash) targetSteps += step;
 
     if (motorSteps > targetSteps) {
       motorSteps = targetSteps;
@@ -352,7 +352,7 @@ IRAM_ATTR void ServoMotor::move() {
     }
 
   #else
-    if (synchronized && !inBacklash) targetSteps += step;
+    if (sync && !inBacklash) targetSteps += step;
 
     if (motorSteps > targetSteps) {
       if (backlashSteps > 0) {
