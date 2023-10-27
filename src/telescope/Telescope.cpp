@@ -148,6 +148,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   #endif
 
   #ifdef MOUNT_PRESENT
+    #if defined(ESP32) && STATUS_BUZZER >= 0
+      // hack to trigger one-time ESP32 code debug message to get it out of the way early
+      tone(STATUS_BUZZER_PIN, STATUS_BUZZER, 10);
+    #endif
     mount.init();
     mountStatus.init();
   #endif
