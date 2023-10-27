@@ -220,7 +220,11 @@ CommandError Park::restore(bool withTrackingOn) {
   }
   if (mount.motorFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
 
-  VF("MSG: Mount, unparking "); if (withTrackingOn) { VLF("with tracking sidereal"); } else { VLF("with tracking disabled"); } 
+  if (withTrackingOn) {
+    VLF("MSG: Mount, unparking");
+  } else {
+    VLF("MSG: Mount, recovering unpark position");
+  }
 
   #if AXIS1_PEC == ON
     wormSenseSteps = settings.wormSensePositionSteps;
@@ -259,15 +263,19 @@ CommandError Park::restore(bool withTrackingOn) {
     axis2.setBacklash(mount.settings.backlash.axis2);
   }
   
-  state = PS_UNPARKED;
-  settings.state = state;
-  nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
-
   limits.enabled(true);
   if (!goTo.absoluteEncodersPresent) mount.syncFromOnStepToEncoders = true;
-  if (withTrackingOn) mount.tracking(true);
 
-  VLF("MSG: Mount, unparking done");
+  if (withTrackingOn) {
+    state = PS_UNPARKED;
+    settings.state = state;
+    nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+    mount.tracking(true);
+    VLF("MSG: Mount, unparking done");
+  } else {
+    VLF("MSG: Mount, recovering unpark position done");
+  }
+
   return CE_NONE;
 }
 
