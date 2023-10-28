@@ -146,7 +146,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
     VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VL("us");
 
-    mountStatus.sound.alert();
+    mountStatus.soundAlert();
 
   } else { DLF("WRN: Mount, start goto monitor task... FAILED!"); }
 
@@ -156,7 +156,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
 // sync replaces goto to equatorial position (Native or Mount coordinate system) when GOTO_FEATURE is OFF
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
-  mountStatus.sound.alert();
+  mountStatus.soundAlert();
 
   CommandError result = requestSync(coords, pierSideSelect, native);
 
@@ -534,7 +534,7 @@ void Goto::poll() {
       // reset goto stage
       stage = GG_NONE;
 
-      mountStatus.sound.alert();
+      mountStatus.soundAlert();
 
       return;
     }

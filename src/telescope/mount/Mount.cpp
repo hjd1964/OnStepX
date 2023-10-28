@@ -178,18 +178,13 @@ void Mount::tracking(bool state) {
 }
 
 // enables or disables power to the mount motors
-// first enable starts the mount status indications
 void Mount::enable(bool state) {
-  static bool firstEnable = true;
-
   if (state == true) {
     #if LIMIT_STRICT == ON
       if (!site.dateIsReady || !site.timeIsReady) return;
     #endif
 
-    if (firstEnable) { mountStatus.ready(); }
-
-    firstEnable = false;
+    mountStatus.wake();
   } else {
     trackingState = TS_NONE;
     update();

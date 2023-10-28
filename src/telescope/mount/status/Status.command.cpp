@@ -169,13 +169,13 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
         #endif
       break;
       case '2':
-        sound.beep();
+        soundBeep();
       break;
       case '3':
-        sound.alert();
+        soundAlert();
       break;
       case '4':
-        sound.click();
+        soundClick();
       break;
       default:
         *commandError = CE_PARAM_RANGE;
