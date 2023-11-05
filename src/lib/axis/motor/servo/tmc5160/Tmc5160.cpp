@@ -60,15 +60,17 @@ void ServoTmc5160::init() {
     driver->microsteps(Settings->microsteps);
   }
 
+  currentRms = current*0.7071F;
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
     VLF("current control OFF (600mA)");
-    driver->rms_current(0.6F*0.707F);
-  } else {
-    VF("Irun="); V(Settings->current); VLF("mA");
-    driver->rms_current(Settings->current*0.707F);
+    Settings->current = 600*0.7071F;
   }
   driver->hold_multiplier(1.0F);
+
+  VF("Irun="); V(currentRms/0.7071F); VLF("mA");
+  driver->rms_current(currentRms);
+
   driver->en_pwm_mode(false);
   driver->AMAX(65535);
   driver->RAMPMODE(1);
@@ -93,8 +95,7 @@ void ServoTmc5160::enable(bool state) {
     VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
     if (state) {
       driver->en_pwm_mode(stealthChop());
-      driver->irun(mAToCs(Settings->current*0.707F));
-      driver->ihold(mAToCs(Settings->current*0.707F));
+      driver->rms_current(currentRms);
     } else {
       driver->en_pwm_mode(true);
       driver->ihold(0);
@@ -171,8 +172,7 @@ void ServoTmc5160::updateStatus() {
 void ServoTmc5160::calibrateDriver() {
   if (stealthChop()) {
     VF("MSG: ServoTmc5160 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->irun(mAToCs(Settings->current));
-    driver->ihold(mAToCs(Settings->current));
+    driver->rms_current(currentRms);
     driver->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     driver->pwm_autoscale(true);
     driver->en_pwm_mode(true);
