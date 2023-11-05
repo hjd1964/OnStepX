@@ -93,6 +93,9 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     }
   }
 
+  driver->useExternalSenseResistors();
+  driver->enableAnalogCurrentScaling();
+
   driver->enable();
   driver->moveUsingStepDirInterface();
   driver->setPwmOffset(pc_pwm_ofs);
