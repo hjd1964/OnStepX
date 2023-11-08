@@ -53,7 +53,7 @@
 // AXIS1 RA/AZM -------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Axes
 #define AXIS1_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
 
-// If runtime axis settings are enabled changes in the section below will be ignored (disable again in SWS or by wiping NV/EEPROM):
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
 // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ 
 #define AXIS1_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -88,7 +88,7 @@
 // AXIS2 DEC/ALT ------------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Axes
 #define AXIS2_DRIVER_MODEL            OFF //    OFF, Enter motor driver model (above) in both axes to activate the mount.    <-Often
 
-// If runtime axis settings are enabled changes in the section below will be ignored (disable again in SWS or by wiping NV/EEPROM):
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
 // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 #define AXIS2_STEPS_PER_DEGREE      12800 //  12800, n. Number of steps per degree:                                          <-Req'd
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
@@ -230,7 +230,7 @@
 #define AXIS3_SLEW_RATE_BASE_DESIRED  1.0 //    1.0, n. Desired slew rate in deg/sec. Adjustable at run-time from            <-Req'd
                                           //         1/2 to 2x this rate, and as performance considerations require.
 
-// If runtime axis settings are enabled changes in the section below will be ignored (disable again in SWS or by wiping NV/EEPROM):
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
 // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 #define AXIS3_STEPS_PER_DEGREE       64.0 //   64.0, n. Number of steps per degree for rotator/de-rotator.                    Adjust
                                           //         Alt/Az de-rotation: n = (num_circumference_pixels * 2)/360, minimum
@@ -270,7 +270,7 @@
                                           //         1/2 to 2x this rate, and as performance considerations require.
 #define AXIS4_SLEW_RATE_MINIMUM        20 //     20, n. Where n=5..200 (um/s.) Minimum microns/second.                        Adjust
 
-// If runtime axis settings are enabled changes in the section below will be ignored (disable again in SWS or by wiping NV/EEPROM):
+// If runtime axis settings are enabled changes in the section below will be ignored (disable in SWS or by wiping NV/EEPROM):
 // \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 #define AXIS4_STEPS_PER_MICRON        0.5 //    0.5, n. Steps per micrometer. Figure this out by testing or other means.      Adjust
 #define AXIS4_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.    Option
