@@ -81,6 +81,9 @@ void setup() {
     delay(2000);
   #endif
 
+  // let any special processing the pinmap needs happen
+  #ifdef PIN_INIT
+    PIN_INIT();
   // say hello
   VLF("");
   VF("MSG: OnStepX, version "); V(FirmwareVersionMajor); V("."); V(FirmwareVersionMinor); VL(FirmwareVersionPatch);
