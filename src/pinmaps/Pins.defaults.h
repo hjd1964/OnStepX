@@ -118,6 +118,10 @@
 #define ADDON_TRIGR_PIN             OFF
 #endif
 
+#ifndef ADDON_SELECT_PIN
+#define ADDON_SELECT_PIN            OFF
+#endif
+
 #ifndef ADDON_GPIO0_PIN
 #define ADDON_GPIO0_PIN             OFF
 #endif

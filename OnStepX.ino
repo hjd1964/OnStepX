@@ -71,6 +71,11 @@ void sensesPoll() {
 }
 
 void setup() {
+  #if ADDON_SELECT_PIN != OFF
+    pinMode(ADDON_SELECT_PIN, OUTPUT);
+    digitalWrite(ADDON_SELECT_PIN, HIGH);
+  #endif
+
   #if DEBUG != OFF
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
     delay(2000);
