@@ -148,7 +148,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == GEM)          reply[i++] = 'G'; else
       if (transform.mountType == FORK)         reply[i++] = 'P'; else
       if (transform.mountType == ALTAZM)       reply[i++] = 'A';
-      if (mount.isTracking())                  reply[i++] = 'N'; else reply[i++] = 'T';
+      if (mount.isTracking())                  reply[i++] = 'T'; else reply[i++] = 'N';
       if (park.state == PS_PARKED)             reply[i++] = 'P'; else
       if (mount.isHome())                      reply[i++] = 'H'; else
       if (goTo.alignDone())                    reply[i++] = '1'; else reply[i++] = '0';
