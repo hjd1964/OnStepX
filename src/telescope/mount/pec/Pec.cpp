@@ -14,7 +14,7 @@
   #include "../guide/Guide.h"
   #include "../park/Park.h"
 
-  #if PEC_SENSE == OFF
+  #if (PEC_SENSE) == OFF
     bool wormSenseFirst = true;
   #else
     bool wormSenseFirst = false;
@@ -76,7 +76,7 @@
 
           if (!settings.recorded) settings.state = PEC_NONE;
 
-          #if PEC_SENSE == OFF
+          #if (PEC_SENSE) == OFF
             #if GOTO_FEATURE == ON
               park.settings.wormSensePositionSteps = 0;
             #endif
@@ -106,7 +106,7 @@
     // keep track of our current step position, and when the step position on the worm wraps during playback
     long axis1Steps = axis1.getMotorPositionSteps();
 
-    #if PEC_SENSE == OFF
+    #if (PEC_SENSE) == OFF
       wormSenseFirst = true;
     #else
       static int lastState;
@@ -130,14 +130,14 @@
     if (!wormSenseFirst) return;
 
     // worm step position corrected for any index found
-    #if PEC_SENSE == OFF
+    #if (PEC_SENSE) == OFF
       static long lastWormRotationSteps = wormRotationSteps;
     #endif
     wormRotationSteps = axis1Steps - wormSenseSteps;
     while (wormRotationSteps >= settings.wormRotationSteps) wormRotationSteps -= settings.wormRotationSteps;
     while (wormRotationSteps < 0) wormRotationSteps += settings.wormRotationSteps;
 
-    #if PEC_SENSE == OFF
+    #if (PEC_SENSE) == OFF
       if (wormRotationSteps - lastWormRotationSteps < 0) {
         VLF("MSG: Mount, PEC virtual index detected");
         bufferStart = true;
