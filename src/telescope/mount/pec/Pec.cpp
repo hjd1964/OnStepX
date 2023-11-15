@@ -114,7 +114,11 @@
       wormIndexState = sense.isOn(senseHandle);
 
       // digital or analog pec sense, with 60 second delay before redetect
-      long dist; if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
+      long dist;
+      if (wormSenseSteps > axis1Steps) dist = wormSenseSteps - axis1Steps; else dist = axis1Steps - wormSenseSteps;
+
+      if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecond*2.0) wormIndexSenseThisSecond = false;
+
       if (dist > stepsPerSiderealSecond*60.0 && wormIndexState != lastState && wormIndexState == true) {
         VLF("MSG: Mount, PEC index detected");
         wormSenseSteps = axis1Steps;
@@ -123,7 +127,6 @@
         wormIndexSenseThisSecond = true;
       } else bufferStart = false;
 
-      if (wormIndexSenseThisSecond && dist > stepsPerSiderealSecond) wormIndexSenseThisSecond = false;
     #endif
 
     if (settings.state == PEC_NONE) { rate = 0.0F; return; }
