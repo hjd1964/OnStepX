@@ -8,9 +8,6 @@
 #define HAL_FRACTIONAL_SEC 100.0F
 
 // Analog read and write
-#ifndef ANALOG_READ_RANGE
-  #define ANALOG_READ_RANGE 4095
-#endif
 #ifndef ANALOG_WRITE_RANGE
   #define ANALOG_WRITE_RANGE 1023
 #endif
@@ -60,6 +57,9 @@
 #endif
 
 #if !defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION < 131072 + 3 // version 2.0.3
+  #ifndef ANALOG_READ_RANGE
+    #define ANALOG_READ_RANGE 4095
+  #endif
   #define HAL_INIT() { \
     analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
     SERIAL_BT_BEGIN(); \
@@ -70,7 +70,11 @@
   }
 #else
   #ifdef ANALOG_WRITE_PWM_FREQUENCY
+    #ifndef ANALOG_READ_RANGE
+      #define ANALOG_READ_RANGE 1023
+    #endif
     #define HAL_INIT() { \
+      analogReadResolution(10); \
       analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
       analogWriteFrequency(ANALOG_WRITE_PWM_FREQUENCY); \
       SERIAL_BT_BEGIN(); \
@@ -81,6 +85,7 @@
     }
   #else
     #define HAL_INIT() { \
+      analogReadResolution(10); \
       analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
       SERIAL_BT_BEGIN(); \
       if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \

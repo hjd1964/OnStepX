@@ -52,13 +52,13 @@ TinyGPSPlus gps;
 #endif
 
 void gpsPoll() {
-  #if TIME_LOCATION_PPS_SENSE != OFF
+  #if (TIME_LOCATION_PPS_SENSE) != OFF
     if (pps.synced) {
   #endif
 
   if (!tls.isReady()) tls.poll();
 
-  #if TIME_LOCATION_PPS_SENSE != OFF
+  #if (TIME_LOCATION_PPS_SENSE) != OFF
     }
   #endif
 }

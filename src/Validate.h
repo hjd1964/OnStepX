@@ -324,10 +324,10 @@
   #error "Configuration (Config.h): Setting TIME_LOCATION_SOURCE unknown, use OFF or valid TIME LOCATION SOURCE (from Constants.h)"
 #endif
 
-#if TIME_LOCATION_PPS_SENSE != OFF && \
-    TIME_LOCATION_PPS_SENSE != LOW && \
-    TIME_LOCATION_PPS_SENSE != HIGH && \
-    TIME_LOCATION_PPS_SENSE != BOTH
+#if (TIME_LOCATION_PPS_SENSE) != OFF && \
+    (TIME_LOCATION_PPS_SENSE) != LOW && \
+    (TIME_LOCATION_PPS_SENSE) != HIGH && \
+    (TIME_LOCATION_PPS_SENSE) != BOTH
   #error "Configuration (Config.h): Setting TIME_LOCATION_PPS_SENSE unknown, use OFF or LOW or HIGH or BOTH."
 #endif
 
@@ -597,11 +597,11 @@
   #error "Configuration (Config.h): Setting AXIS4_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MIN != OFF && AXIS4_SENSE_LIMIT_MIN < 0
+#if (AXIS4_SENSE_LIMIT_MIN) != OFF && (AXIS4_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MAX != OFF && AXIS4_SENSE_LIMIT_MAX < 0
+#if (AXIS4_SENSE_LIMIT_MAX) != OFF && (AXIS4_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 

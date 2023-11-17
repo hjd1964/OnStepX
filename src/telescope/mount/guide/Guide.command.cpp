@@ -127,7 +127,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
         VF("MSG: set Axis1 custom guide rate to "); V(f); VLF(" deg/s");
         settings.axis1RateSelect = GR_CUSTOM;
         customRateAxis1 = f*240.0F;
-      }
+      } else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
 
@@ -143,7 +143,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
         VF("MSG: set Axis2 custom guide rate to "); V(f); VLF(" deg/s");
         settings.axis2RateSelect = GR_CUSTOM;
         customRateAxis2 = f*240.0F;
-      }
+      } else *commandError = CE_PARAM_FORM;
       *numericReply = false;
     } else
 
@@ -162,16 +162,19 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (command[1] == 'M') r = 6; else
       if (command[1] == 'F') r = 7; else
       if (command[1] == 'S') r = 8; else r = command[1] - '0';
-      #if GOTO_FEATURE != ON
-        if (r > 6) r = 6;
-      #endif
-      settings.axis1RateSelect = (GuideRateSelect)r;
-      settings.axis2RateSelect = (GuideRateSelect)r;
-      VF("MSG: Guide rate "); V(r); VLF(" selected");
-      if (GUIDE_SEPARATE_PULSE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
-        settings.pulseRateSelect = (GuideRateSelect)r;
-        nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
-      }
+
+      if (r >= 0 && r <= 9) { 
+        #if GOTO_FEATURE != ON
+          if (r > 6) r = 6;
+        #endif
+        settings.axis1RateSelect = (GuideRateSelect)r;
+        settings.axis2RateSelect = (GuideRateSelect)r;
+        VF("MSG: Guide rate "); V(r); VLF(" selected");
+        if (GUIDE_SEPARATE_PULSE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
+          settings.pulseRateSelect = (GuideRateSelect)r;
+          nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
+        }
+      } else *commandError = CE_PARAM_RANGE;
       *numericReply = false; 
     } else return false;
   } else return false;

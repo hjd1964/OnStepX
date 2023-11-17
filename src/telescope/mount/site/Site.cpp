@@ -139,7 +139,7 @@ void Site::init() {
 
   setSiderealPeriod(SIDEREAL_PERIOD);
 
-  #if TIME_LOCATION_PPS_SENSE != OFF
+  #if (TIME_LOCATION_PPS_SENSE) != OFF
     pps.init();
   #endif
 }

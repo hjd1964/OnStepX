@@ -3,7 +3,7 @@
 
 #include "PPS.h"
 
-#if defined(TIME_LOCATION_PPS_SENSE) && TIME_LOCATION_PPS_SENSE != OFF
+#if defined(TIME_LOCATION_PPS_SENSE) && (TIME_LOCATION_PPS_SENSE) != OFF
 
 #include "../tasks/OnTask.h"
 
@@ -24,11 +24,11 @@ void ppsIsr() {
 void Pps::init() {
     VLF("MSG: PPS, attaching ISR to sense input");
     pinMode(PPS_SENSE_PIN, INPUT_PULLUP);
-    #if TIME_LOCATION_PPS_SENSE == HIGH
+    #if (TIME_LOCATION_PPS_SENSE) == HIGH
       attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, RISING);
-    #elif TIME_LOCATION_PPS_SENSE == LOW
+    #elif (TIME_LOCATION_PPS_SENSE) == LOW
       attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, FALLING);
-    #elif TIME_LOCATION_PPS_SENSE == BOTH
+    #elif (TIME_LOCATION_PPS_SENSE) == BOTH
       attachInterrupt(digitalPinToInterrupt(PPS_SENSE_PIN), ppsIsr, CHANGE);
     #endif
 }
