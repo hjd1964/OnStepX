@@ -164,6 +164,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     focuser.init();
   #endif
 
+  delay(1000);
+
   #ifdef SHARED_ENABLE_PIN
     digitalWriteEx(SHARED_ENABLE_PIN, SHARED_ENABLE_STATE);
   #endif
