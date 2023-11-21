@@ -618,6 +618,7 @@ void Axis::setFrequencySlew(float frequency) {
 
 // set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
 void Axis::setFrequency(float frequency) {
+  frequency *= scaleFreq;
   if (powerDownStandstill && frequency == 0.0F && baseFreq == 0.0F) {
     if (!poweredDown) {
       if (!powerDownOverride || (long)(millis() - powerDownOverrideEnds) > 0) {

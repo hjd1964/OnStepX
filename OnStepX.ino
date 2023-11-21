@@ -44,7 +44,7 @@
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
 #define FirmwareVersionMinor        19     // minor version 00 to 99
-#define FirmwareVersionPatch        "h"    // for example major.minor patch: 10.03c
+#define FirmwareVersionPatch        "i"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       6      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -93,7 +93,7 @@ void setup() {
   VF("MSG: OnStepX, pinmap "); VLF(PINMAP_STR);
 
   // start low level hardware
-  VLF("MSG: Setup, HAL initalize");
+  VLF("MSG: Setup, HAL initialize");
   HAL_INIT();
   if (!HAL_NV_INIT()) {
     DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");

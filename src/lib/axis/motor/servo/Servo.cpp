@@ -231,7 +231,7 @@ void ServoMotor::poll() {
 
   long encoderCountsOrig = encoderCounts;
 
-  // for absolute encoders initalize the motor position at startup
+  // for absolute encoders initialize the motor position at startup
   if (syncThreshold != OFF) {
     if (!motorStepsInitDone && encoder->ready && homeSet) {
       noInterrupts();

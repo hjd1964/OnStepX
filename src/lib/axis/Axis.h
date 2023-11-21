@@ -239,6 +239,9 @@ class Axis {
     // set maximum frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
+    // set frequency scaling factor (0.0 to 1.0)
+    void setFrequencyScale(float frequency) { if (frequency >= 0.0F && frequency <= 1.0F) scaleFreq = frequency; }
+
     // set acceleration rate in "measures" per second per second (for autoSlew)
     void setSlewAccelerationRate(float mpsps);
 
@@ -388,6 +391,7 @@ class Axis {
     float minFreq = 0.0F;
     float slewFreq = 0.0F;
     float maxFreq = 0.0F;
+    float scaleFreq = 1.0F;
     float backlashFreq = 0.0F;
 
     float targetTolerance = 0.0F;
