@@ -93,7 +93,7 @@ void setup() {
   VF("MSG: OnStepX, pinmap "); VLF(PINMAP_STR);
 
   // start low level hardware
-  VLF("MSG: Setup, HAL initalize");
+  VLF("MSG: Setup, HAL initialize");
   HAL_INIT();
   if (!HAL_NV_INIT()) {
     DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");
