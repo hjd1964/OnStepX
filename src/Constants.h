@@ -32,7 +32,7 @@
 
 #define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define JTWSTM                      19     // JTW Astronomy PCB rev 2.1
+#define JTWSTM                      19     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
 
 #define PINMAP_LAST                 19
 
