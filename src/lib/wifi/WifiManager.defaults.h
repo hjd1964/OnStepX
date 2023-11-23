@@ -30,6 +30,11 @@
 #define SERIAL_CLIENT OFF                 // ON to enable SERIAL_IP
 #endif
 
+// mDNS default name
+#ifndef MDNS_NAME
+#define MDNS_NAME               "arduino"
+#endif
+
 // -------------------------------------------------------------------------------------------------
 // wifi manager settings
 
