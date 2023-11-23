@@ -30,9 +30,13 @@
 #define SERIAL_CLIENT OFF                 // ON to enable SERIAL_IP
 #endif
 
-// mDNS default name
+// mDNS defaults
+#ifndef MDNS_SERVER
+#define MDNS_SERVER OFF                   // by default mDNS is disabled
+#endif
+
 #ifndef MDNS_NAME
-#define MDNS_NAME               "arduino"
+#define MDNS_NAME "arduino"
 #endif
 
 // -------------------------------------------------------------------------------------------------

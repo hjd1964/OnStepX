@@ -18,7 +18,7 @@
   #include <Ethernet2.h>     // https://github.com/adafruit/Ethernet2
 #else
   #include <Ethernet.h>      // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
-  #if ETHERNET_MDNS == ON
+  #if MDNS_SERVER == ON
     #include <EthernetUdp.h> // built-in library
     #include <ArduinoMDNS.h> // https://www.arduino.cc/reference/en/libraries/arduinomdns/
   #endif

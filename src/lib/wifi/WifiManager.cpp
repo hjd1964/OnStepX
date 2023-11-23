@@ -120,7 +120,9 @@ bool WifiManager::init() {
       active = true;
       VLF("MSG: WiFi, initialized");
 
-      if (MDNS.begin(MDNS_NAME)) { VLF("MSG: WiFi, mDNS started"); } else { VLF("WRN: WiFi, mDNS start failed!"); }
+      #if MDNS_SERVER == ON
+        if (MDNS.begin(MDNS_NAME)) { VLF("MSG: WiFi, mDNS started"); } else { VLF("WRN: WiFi, mDNS start failed!"); }
+      #endif
 
       #if STA_AUTO_RECONNECT == true
         if (settings.stationEnabled) {

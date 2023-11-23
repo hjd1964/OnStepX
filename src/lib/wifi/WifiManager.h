@@ -15,12 +15,16 @@
   #include <WiFi.h>
   #include <WiFiClient.h>
   #include <WiFiAP.h>
-  #include <ESPmDNS.h>
+  #if MDNS_SERVER == ON
+    #include <ESPmDNS.h>
+  #endif
 #elif defined(ESP8266)
   #include <ESP8266WiFi.h>
   #include <WiFiClient.h>
   #include <ESP8266WiFiAP.h>
-  #include <ESP8266mDNS.h>
+  #if MDNS_SERVER == ON
+    #include <ESP8266mDNS.h>
+  #endif
 #else
   #error "Configuration (Config.h): No Wifi support is present for this device"
 #endif

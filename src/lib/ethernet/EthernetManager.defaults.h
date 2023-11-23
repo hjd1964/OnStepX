@@ -30,17 +30,17 @@
 #define SERIAL_CLIENT OFF                    // ON for SERIAL_IP at port 9998
 #endif
 
-// mDNS default name
+// mDNS defaults
+#ifndef MDNS_SERVER
+#define MDNS_SERVER OFF                      // by default mDNS is disabled
+#endif
+
 #ifndef MDNS_NAME
-#define MDNS_NAME               "arduino"
+#define MDNS_NAME "arduino"
 #endif
 
 // -------------------------------------------------------------------------------------------------
 // ethernet manager settings
-
-#ifndef ETHERNET_MDNS
-#define ETHERNET_MDNS                 OFF    // by default mDNS is disabled
-#endif
 
 #ifndef MAC
 #define MAC {0xDE,0xAD,0xBE,0xEF,0xFE,0xED}  // unique MAC address
