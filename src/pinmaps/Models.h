@@ -68,7 +68,7 @@
   #include "Pins.FYSETC_S6.h"
 #endif
 #if PINMAP == JTWSTM
-  #define PINMAP_STR "JTW v2.1"
+  #define PINMAP_STR "JTWSTM v2.1"
   #include "Pins.JTWPCB2.h"
 #endif
 #if PINMAP == MaxSTM3 || PINMAP == MaxSTM3I
@@ -80,6 +80,6 @@
 #endif
 
 // all unassigned pins OFF
-#include "../pinmaps/Pins.defaults.h"
+#include "Pins.defaults.h"
 
 #include "Validate.h"
