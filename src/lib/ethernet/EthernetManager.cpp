@@ -1,7 +1,15 @@
 // ethernet manager, used by the webserver and ethernet serial IP
 #include "EthernetManager.h"
 
+#include "..\tasks\OnTask.h"
+
 #if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+
+#if ETHERNET_MDNS == ON
+  EthernetUDP udp;
+  MDNS mdns(udp);
+  void mdnsPoll() { mdns.run(); }
+#endif
 
 bool EthernetManager::init() {
   if (!active) {
@@ -44,6 +52,17 @@ bool EthernetManager::init() {
     }
 
     VLF("MSG: Ethernet, initialized");
+
+    #if ETHERNET_MDNS == ON
+      if (mdns.begin(settings.ip, MDNS_NAME)) {
+        VLF("MSG: Ethernet, mDNS started");
+        VF("MSG: Ethernet, starting mDNS polling");
+        VF(" task (rate 5ms priority 7)... ");
+        if (tasks.add(5, 0, true, 7, mdnsPoll, "mdPoll")) { VL("success"); } else { VL("FAILED!"); }
+      } else {
+        VLF("WRN: Ethernet, mDNS start failed!");
+      }
+    #endif
   }
   return active;
 }
