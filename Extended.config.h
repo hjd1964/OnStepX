@@ -37,9 +37,9 @@
 // ESP32 VIRTUAL SERIAL BLUETOOTH AND IP COMMAND CHANNELS --------------------------------------------------------------------------
 #define SERIAL_BT_MODE                OFF //    OFF, Use SLAVE to enable the interface (ESP32 only.)                          Option
 #define SERIAL_BT_NAME          "OnStepX" //         "OnStepX", Bluetooth device name.                                        Adjust
-#define MDNS_NAME               "onstepx" //    "onstepx", mDNS device name                                                           Adjust
 #define SERIAL_IP_MODE                OFF //    OFF, WIFI_ACCESS_POINT or WIFI_STATION enables interface (ESP32 only.)        Option
-#define WEB_SERVER                    OFF //    OFF, ON enables Webserver (for Website plugin)                                Option
+#define MDNS_NAME               "onstepx" //    "onstepx", mDNS device name.                                                  Adjust
+#define WEB_SERVER                    OFF //    OFF, ON enables Webserver (for Website plugin.)                               Option
 
 // EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
 #define GPIO_DEVICE                   OFF //    OFF, DS2413: for 2-ch or 4-ch using 1-wire gpio's (one or two devices.)       Option
