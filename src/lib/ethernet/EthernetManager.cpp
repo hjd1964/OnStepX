@@ -1,9 +1,9 @@
 // ethernet manager, used by the webserver and ethernet serial IP
 #include "EthernetManager.h"
 
-#include "..\tasks\OnTask.h"
-
 #if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
+
+#include "../tasks/OnTask.h"
 
 #if MDNS_SERVER == ON
   EthernetUDP udp;
