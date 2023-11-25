@@ -24,15 +24,18 @@ class SwsGpio {
     // one eight channel SWS GPIO is supported, this sets each output on or off
     void digitalWrite(int pin, bool value);
 
+    // one eight channel SWS GPIO is supported
+    void analogWrite(int pin, int value);
+
   private:
     bool found = false;
 
     bool virtualRead[8] = {false, false, false, false, false, false, false, false};
-    bool virtualWrite[8] = {false, false, false, false, false, false, false, false};
+    int virtualWrite[8] = {false, false, false, false, false, false, false, false};
     char virtualMode[8] = {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' };
 
     int mode[8] = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
-    bool state[8] = {false, false, false, false, false, false, false, false};
+    int state[8] = {false, false, false, false, false, false, false, false};
 };
 
 extern SwsGpio gpio;
