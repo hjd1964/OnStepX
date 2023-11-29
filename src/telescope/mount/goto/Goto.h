@@ -69,7 +69,7 @@ class Goto {
     CommandError validate();
 
     // add an align star (at the current position relative to target)
-    CommandError alignAddStar();
+    CommandError alignAddStar(bool sync = false);
 
     // reset the alignment model
     void alignReset();

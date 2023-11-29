@@ -355,7 +355,7 @@ CommandError Goto::validate() {
 }
 
 // add an align star (at the current position relative to target)
-CommandError Goto::alignAddStar() {
+CommandError Goto::alignAddStar(bool sync) {
   if (alignState.currentStar > alignState.lastStar) return CE_PARAM_RANGE;
 
   CommandError e = CE_NONE;
@@ -365,7 +365,11 @@ CommandError Goto::alignAddStar() {
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.init(transform.mountType, site.location.latitude);
     #endif
-    e = requestSync(gotoTarget, settings.preferredPierSide);
+    e = requestSync(gotoTarget, PSS_SAME_ONLY);
+    lastAlignTarget = mount.getMountPosition(CR_MOUNT_ALL);
+    transform.hourAngleToRightAscension(&lastAlignTarget, true);
+  } else {
+    if (sync) e = requestSync(gotoTarget, PSS_SAME_ONLY);
   }
 
   // add an align star
