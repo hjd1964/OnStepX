@@ -100,7 +100,7 @@
 
 // automatically use analogWrite
 #ifndef analogWriteEx
-  #define analogWriteEx(pin,value)     { if (device[i].pin >= 0 && device[i].pin <= 255) analogWrite(pin,value); }
+  #define analogWriteEx(pin,value)     { analogWrite(pin,value); }
 #endif
 
 // supress compiler warnings for unused parameters
