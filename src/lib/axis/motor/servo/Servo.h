@@ -90,6 +90,13 @@ class ServoMotor : public Motor {
     // calibrate the motor driver
     void calibrateDriver() { driver->calibrateDriver(); }
 
+    // set zero of absolute encoders
+    uint32_t encoderZero();
+
+    // set origin of absolute encoders
+    void encoderSetOrigin(uint32_t origin) { encoder->setOrigin(origin); }
+
+    // read encoder
     int32_t encoderRead();
 
     // servo motor driver

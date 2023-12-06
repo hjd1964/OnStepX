@@ -159,10 +159,22 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     //                        1 on success
     if (command[1] == 'E' && parameter[0] == 'O' && parameter[1] == 0) {
       #ifdef SERVO_MOTOR_PRESENT
-        #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
+        #if AXIS1_ENCODER != OFF && AXIS2_ENCODER != OFF
+
           if (!mount.isTracking() && !mount.isSlewing()) {
             VLF("MSG: Mount, setting absolute encoder origin");
-            SERIAL_ENCODER.print(":SO#");
+
+            #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
+              SERIAL_ENCODER.print(":SO#");
+            #else
+              uint32_t offset = (uint32_t)axis1.motor->encoderZero();
+              V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(offset)); VLF(" to NV/EEPROM");
+              nv.write(NV_AXIS_ENCODER_ZERO_BASE, offset);
+              offset = (uint32_t)axis2.motor->encoderZero();
+              V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(offset)); VLF(" to NV/EEPROM");
+              nv.write(NV_AXIS_ENCODER_ZERO_BASE + 4, offset);
+            #endif
+
             #ifdef HAL_RESET
               delay(100);
               enable(false);
@@ -171,6 +183,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
               tasks.yield(1000);
               HAL_RESET();
             #endif
+
           } else {
             *commandError = CE_0;
             DLF("MSG: Mount, setting absolute encoder origin failed; the mount is in motion!");

@@ -385,4 +385,15 @@ int32_t ServoMotor::encoderRead() {
   return encoderCounts;
 }
 
+// set zero/origin of absolute encoders
+uint32_t ServoMotor::encoderZero() {
+  encoder->origin = 0;
+  encoder->offset = 0;
+
+  uint32_t zero = (uint32_t)(-encoder->read());
+  encoder->origin = zero;
+
+  return zero;
+}
+
 #endif

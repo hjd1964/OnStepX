@@ -129,6 +129,12 @@ class Motor {
     // calibrate the motor driver if required
     virtual void calibrateDriver() {}
 
+    // set zero of absolute encoders
+    virtual uint32_t encoderZero() { return 0; }
+
+    // set origin of absolute encoders
+    virtual void encoderSetOrigin(uint32_t origin) {}
+
     // monitor and respond to motor state as required
     virtual void poll() {}
 
