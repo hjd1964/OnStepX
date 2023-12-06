@@ -12,6 +12,7 @@
 #include "../guide/Guide.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
+#include "../status/Status.h"
 
 bool Goto::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;
@@ -99,9 +100,12 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
         DLF("ERR: Mount, failed to add align point");
       } else { VLF("MSG: Mount, align point added"); }
     } else {
+      Coordinate before = mount.getMountPosition(CR_MOUNT);
       PierSideSelect pps = settings.preferredPierSide;
       if (!mount.isHome() && PIER_SIDE_SYNC_CHANGE_SIDES == OFF) pps = PSS_SAME_ONLY;
       e = requestSync(gotoTarget, pps);
+      Coordinate after = mount.getMountPosition(CR_MOUNT);
+      if (before.pierSide != PIER_SIDE_NONE && before.pierSide != after.pierSide) mountStatus.soundAlert();
     }
 
     if (command[1] == 'M') {
