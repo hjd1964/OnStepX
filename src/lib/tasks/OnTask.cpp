@@ -89,9 +89,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   if (period_units == PU_MILLIS) hardware_timer_period *= 16000UL; else
   if (period_units == PU_MICROS) hardware_timer_period *= 16UL;
 
-  hardware_timer_period = roundPeriod((double)hardware_timer_period*_task_masterFrequencyRatio);
-
-  HAL_HWTIMER_PREPARE_PERIOD(num, hardware_timer_period);
+  HAL_HWTIMER_PREPARE_PERIOD(num, roundPeriod((double)hardware_timer_period*_task_masterFrequencyRatio));
 
   bool success = true;
   switch (num) {
@@ -114,8 +112,11 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   }
   if (!success) { DF("ERR: Task::requestHardwareTimer(), HAL_HWTIMER"); D(num); DLF("_INIT() failed"); return false; }
   hardware_timer = num;
+
   period = hardware_timer_period;
   period_units = PU_SUB_MICROS;
+  next_period = period;
+  next_period_units = PU_NONE;
   return true;
 }
 
