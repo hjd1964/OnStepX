@@ -194,6 +194,7 @@ bool Task::poll() {
 
 void Task::refreshPeriod() {
   if (hardware_timer) {
+    next_period_units = PU_SUB_MICROS;
     setHardwareTimerPeriod();
   }
 }
