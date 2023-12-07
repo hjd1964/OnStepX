@@ -6,7 +6,7 @@
 #if defined(TIME_LOCATION_PPS_SENSE) && (TIME_LOCATION_PPS_SENSE) != OFF
 
 #define PPS_SECS_TO_AVERAGE 40   // running average of 40 samples (1 per second)
-#define PPS_WINDOW_MICROS 20000  // +/- window in microseconds to meet synced criteria (2%)
+#define PPS_WINDOW_MICROS 50000  // +/- window in microseconds to meet synced criteria (5%)
 
 #if !defined(PPS_SENSE_PIN) || PPS_SENSE_PIN == OFF
   #error "Configuration (Config.h): PPS_SENSE_PIN must be defined for TIME_LOCATION_PPS_SENSE ON"
