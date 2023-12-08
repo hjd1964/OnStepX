@@ -48,8 +48,8 @@
 #elif defined(STM32F446xx)
   #define STM32_TIMER1       TIM14   // for STM32F446 (tone uses timer6, servo uses timer2, serial uses timer7)
   #define STM32_TIMER2       TIM13
-  #define STM32_TIMER3       TIM12   // new timers was TIM1, TIM10, TIM11
-  #define STM32_TIMER4       TIM11
+  #define STM32_TIMER3       TIM11   // new timers was TIM1, TIM10, TIM11
+  #define STM32_TIMER4       TIM1
 #elif defined(STM32F303xC)
   #define STM32_TIMER1       TIM17   // for STM32F303 (tone uses timer6, servo uses timer2)
   #define STM32_TIMER2       TIM16
