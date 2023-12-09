@@ -273,6 +273,9 @@ void ServoMotor::poll() {
     } 
   }
 
+  // if the driver has shutdown itself we should also shutdown
+  if (driver->getStatus().fault && enabled) enable(false);
+
   if (velocityPercent < -33) wasBelow33 = true;
   if (velocityPercent > 33) wasAbove33 = true;
 
