@@ -36,8 +36,8 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
       if (parameter[0] == 'G' && parameter[1] == 'O') {
         for (int i = 0; i < 8; i++) {
           char newMode = 'X';
-          if (mode[i] == INPUT) newMode = 'I'; else
-          if (mode[i] == INPUT_PULLUP) newMode = 'U'; else
+          if (mode[i] == INPUT) { if (virtualRead[i] == LOW) newMode = 'i'; else newMode = 'I'; } else
+          if (mode[i] == INPUT_PULLUP) { if (virtualRead[i] == LOW) newMode = 'u'; else newMode = 'U'; } else
           if (mode[i] == OUTPUT) newMode = 'O';
 
           if (virtualMode[i] != newMode) {
@@ -48,7 +48,7 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
               if (virtualWrite[i] == 0) reply[i] = '0'; else
               if (virtualWrite[i] == 1) reply[i] = '1'; else
               if (virtualWrite[i] >= 2) reply[i] = (char)((virtualWrite[i] - 2) + 128);
-            } else reply[i] = 'X';
+            } else reply[i] = newMode;
           }
 
           reply[i + 1] = 0;
@@ -84,7 +84,6 @@ void SwsGpio::pinMode(int pin, int mode) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
-    if (mode == INPUT_PULLUP) mode = INPUT;
     this->mode[pin] = mode;
   }
 }
