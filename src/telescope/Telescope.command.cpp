@@ -126,6 +126,14 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
         SERIAL_A.println("SWS microcontroller reset and in run mode, resuming operation...");
         tasks.yield(1000);
       } else
+    #elif ADDON_SELECT_PIN != OFF
+      if (command[1] == 'S' && parameter[0] == 'P' && parameter[1] == 'F' && parameter[2] == 'L' && parameter[3] == 'A' && parameter[4] == 'S' && parameter[5] == 'H' && parameter[6] == 0) {
+        SERIAL_A.println("The SWS microcontroller will now be connected to USB for flashing firmware.");
+        SERIAL_A.println("Once done uploading power cycle or reboot to restore normal operation.");
+        tasks.yield(1000);
+        pinModeEx(ADDON_SELECT_PIN, OUTPUT);
+        digitalWriteEx(ADDON_SELECT_PIN, LOW);
+      } else
     #endif
     *commandError = CE_CMD_UNKNOWN;
   } else

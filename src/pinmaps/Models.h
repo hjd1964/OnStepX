@@ -71,6 +71,10 @@
   #define PINMAP_STR "JTWSTM v2.1"
   #include "Pins.JTWPCB2.h"
 #endif
+#if PINMAP == MANTICORE
+  #define PINMAP_STR "JTW MANTICORE v1.0"
+  #include "Pins.Manticore.h"
+#endif
 #if PINMAP == MaxSTM3 || PINMAP == MaxSTM3I
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
