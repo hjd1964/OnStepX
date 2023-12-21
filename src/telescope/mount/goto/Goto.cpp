@@ -368,13 +368,12 @@ CommandError Goto::alignAddStar(bool sync) {
     e = requestSync(gotoTarget, PSS_SAME_ONLY);
     lastAlignTarget = mount.getMountPosition(CR_MOUNT_ALL);
     transform.hourAngleToRightAscension(&lastAlignTarget, true);
-  } else {
-    if (sync) e = requestSync(gotoTarget, PSS_SAME_ONLY);
   }
 
   // add an align star
   if (e == CE_NONE) {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
+    if (sync) { lastAlignTarget = gotoTarget; }
 
     // update the targets HA and Horizon coords as necessary
     transform.rightAscensionToHourAngle(&lastAlignTarget, true);
