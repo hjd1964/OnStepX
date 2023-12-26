@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../../Common.h"
+#include "../sense/Sense.h"
 
 #ifdef MOTOR_PRESENT
 
@@ -225,6 +226,7 @@ class Axis {
       } else {
         motor->setReverse(settings.reverse);
       }
+      sense.reverse(homeSenseHandle, reverse);
     }
 
     // set base movement frequency in "measures" (radians, microns, etc.) per second
