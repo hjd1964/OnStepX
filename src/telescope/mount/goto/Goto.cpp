@@ -410,10 +410,10 @@ void Goto::waypoint(Coordinate *current) {
   stage = GG_WAYPOINT_HOME;
 
   // default goes straight to the home position
-  destination = home.position;
+  destination = home.getPosition(CR_MOUNT);
 
   // if the home position is at 0 hours, we're done
-  if (home.position.h == 0.0) return;
+  if (destination.h == 0.0) return;
 
   double d60 = degToRad(120);
   double d45 = degToRad(135);
@@ -466,7 +466,7 @@ void Goto::poll() {
     if (stage == GG_WAYPOINT_AVOID) {
       VLF("MSG: Mount, goto waypoint reached");
       stage = GG_WAYPOINT_HOME;
-      destination = home.position;
+      destination = home.getPosition(CR_MOUNT);
       startAutoSlew();
     } else
 

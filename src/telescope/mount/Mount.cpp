@@ -384,10 +384,6 @@ float Mount::ztr(float a) {
 }
 
 // update where we are pointing *now*
-// CR_MOUNT for Horizon or Equatorial mount coordinates, depending on mount
-// CR_MOUNT_EQU for Equatorial mount coordinates, depending on mode
-// CR_MOUNT_ALT for altitude (a) and Horizon or Equatorial mount coordinates, depending on mode
-// CR_MOUNT_HOR for Horizon mount coordinates, depending on mode
 void Mount::updatePosition(CoordReturn coordReturn) {
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
   if (transform.mountType == ALTAZM) {
