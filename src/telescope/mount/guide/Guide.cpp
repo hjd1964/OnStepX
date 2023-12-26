@@ -446,7 +446,7 @@ void Guide::poll() {
       VLF("MSG: Guide, arrival at home detected");
       #if AXIS2_TANGENT_ARM == OFF
         state = GU_NONE;
-        home.reset(home.isRequestWithReset);
+        home.guideDone();
       #endif
     }
   }

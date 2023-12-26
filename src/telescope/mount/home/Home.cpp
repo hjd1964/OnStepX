@@ -25,14 +25,13 @@ void Home::init() {
   if (transform.mountType != ALTAZM) {
     axis1.setReverse(site.locationEx.latitude.sign < 0.0);
   }
+
   position.pierSide = PIER_SIDE_NONE;
 }
 
 // move mount to the home position
 CommandError Home::request() {
-    #if LIMIT_STRICT == ON
-      if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
-    #endif
+    if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
 
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
@@ -40,13 +39,26 @@ CommandError Home::request() {
       return CE_SLEW_IN_MOTION;
     }
 
-    if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
+    if (hasSense) {
+      double a1 = axis1.getInstrumentCoordinate();
+      double a2 = axis2.getInstrumentCoordinate();
+      if (transform.mountType == ALTAZM) {
+        a1 -= position.z;
+        a2 -= position.a;
+      } else {
+        a1 -= position.h;
+        a2 -= position.d;
+      }
+      // both -180 to 180
+      VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
+      if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
       CommandError e = reset();
       if (e != CE_NONE) return e;
     }
 
     #if AXIS2_TANGENT_ARM == OFF
-      // stop tracking
       wasTracking = mount.isTracking();
       mount.tracking(false);
     #endif
@@ -57,8 +69,8 @@ CommandError Home::request() {
 
     VLF("MSG: Mount, moving to home");
 
-    if (((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) ||
-         (AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF)) {
+    if (hasSense || (AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF)) {
+      state = HS_HOMING;
       isRequestWithReset = false;
       guide.startHome();
     } else {
@@ -83,7 +95,7 @@ CommandError Home::request() {
 
 // reset mount, moves to the home position first if home switches are present
 CommandError Home::requestWithReset() {
-  if ((AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF) {
+  if (hasSense) {
     CommandError result = request();
     isRequestWithReset = true;
     return result;
@@ -94,6 +106,23 @@ CommandError Home::requestWithReset() {
 void Home::requestAborted() {
   state = HS_NONE;
   mount.tracking(wasTracking);
+}
+
+// after finding home switches displace the mount axes as specified
+void Home::guideDone() {
+  if (useOffset()) {
+    reset(isRequestWithReset);
+    if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+    VLF("WRN: Mount, finishing move to home");
+    axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*senseOffset.axis1));
+    axis1.autoGoto(goTo.getRadsPerSecond());
+    axis2.setTargetCoordinate(axis2.getTargetCoordinate() - arcsecToRad(senseOffset.axis2));
+    axis2.autoGoto(goTo.getRadsPerSecond());
+    state = HS_NONE;
+  } else {
+    state = HS_NONE;
+    reset(isRequestWithReset);
+  }
 }
 
 // once homed mark as done
@@ -140,12 +169,12 @@ CommandError Home::reset(bool fullReset) {
     if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
-    if (transform.mountType == ALTAZM) {
-      axis1.setInstrumentCoordinate(position.z);
-      axis2.setInstrumentCoordinate(position.a);
+    if (!fullReset && state == HS_HOMING && useOffset()) {
+      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*senseOffset.axis1));
+      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(senseOffset.axis2));
     } else {
-      axis1.setInstrumentCoordinate(position.h);
-      axis2.setInstrumentCoordinate(position.d);
+      axis1.setInstrumentCoordinate(position.a1);
+      axis2.setInstrumentCoordinate(position.a2);
     }
   }
 
@@ -190,6 +219,10 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     break;
   }
   return position;
+}
+
+bool Home::useOffset() {
+  if (hasSense && (senseOffset.axis1 != 0 || senseOffset.axis2 != 0)) return true; else return false;
 }
 
 Home home;

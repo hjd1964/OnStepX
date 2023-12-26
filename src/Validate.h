@@ -294,6 +294,14 @@
   #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
 #endif
 
+#if AXIS2_TANGENT_ARM != OFF && (AXIS1_SENSE_HOME) != OFF
+  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM requires AXIS1_SENSE_HOME to be OFF."
+#endif
+
+#if AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME_OFFSET) != 0
+  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
+#endif
+
 // MOUNT TYPE
 #if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
   #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"

@@ -205,6 +205,9 @@
 #ifndef AXIS1_SENSE_HOME_INIT
 #define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
 #endif
+#ifndef AXIS1_SENSE_HOME_OFFSET
+#define AXIS1_SENSE_HOME_OFFSET       0                           // default offset in arc-seconds to home from the sense position
+#endif
 #ifndef AXIS1_SENSE_HOME_DIST_LIMIT
 #define AXIS1_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees
 #endif
@@ -369,6 +372,9 @@
 #endif
 #ifndef AXIS2_SENSE_HOME_INIT
 #define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+#endif
+#ifndef AXIS2_SENSE_HOME_OFFSET
+#define AXIS2_SENSE_HOME_OFFSET       0                           // default offset in arc-seconds to home from the sense position
 #endif
 #ifndef AXIS2_SENSE_HOME_DIST_LIMIT
 #define AXIS2_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees

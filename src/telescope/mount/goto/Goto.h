@@ -92,6 +92,9 @@ class Goto {
     // returns true if the automatic meridian flip feature is enabled
     inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto; }
 
+    // return selected slew rate
+    inline float getRadsPerSecond() { return radsPerSecondCurrent; }
+
     // monitor goto
     void poll();
 

@@ -11,6 +11,13 @@
 
 enum HomeState: uint8_t {HS_NONE, HS_HOMING};
 
+#pragma pack(1)
+typedef struct SenseOffset {
+  long axis1;
+  long axis2;
+} SenseOffset;
+#pragma pack()
+
 class Home {
   public:
     // init the home position (according to settings and mount type)
@@ -27,6 +34,9 @@ class Home {
     // clear home state on abort
     void requestAborted();
 
+    // after finding home switches displace the mount axes as specified
+    void guideDone();
+
     // once homed mark as done
     void requestDone();
 
@@ -36,6 +46,10 @@ class Home {
     // get the home position
     Coordinate getPosition(CoordReturn coordReturn = CR_MOUNT_EQU);
 
+    // home sensing
+    bool useOffset();
+    bool hasSense = (AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF;
+    SenseOffset senseOffset = {AXIS1_SENSE_HOME_OFFSET, AXIS2_SENSE_HOME_OFFSET};
 
     bool isRequestWithReset = false;
 
