@@ -25,6 +25,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
     if (command[1] == 'm' && parameter[0] == 0)  {
       strcpy(reply, "?");
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE) reply[0]='N';
       if (current.pierSide == PIER_SIDE_EAST) reply[0]='E';
       if (current.pierSide == PIER_SIDE_WEST) reply[0]='W';
@@ -75,6 +76,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // Pier side n[o]ne
       if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // Pier side eas[T]
       if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // Pier side [W]est
@@ -124,6 +126,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == ALTAZM)           reply[3]|=0b10001000;           // ALTAZM
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE)      reply[3]|=0b10010000; else      // Pier side none
       if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else      // Pier side east
       if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west

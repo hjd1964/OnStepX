@@ -33,7 +33,9 @@ class Home {
     // reset mount at home
     CommandError reset(bool fullReset = true);
 
-    Coordinate position;
+    // get the home position
+    Coordinate getPosition(CoordReturn coordReturn = CR_MOUNT_EQU);
+
 
     bool isRequestWithReset = false;
 
@@ -41,6 +43,7 @@ class Home {
 
   private:
     bool wasTracking = false;
+    Coordinate position;
 
 };
 

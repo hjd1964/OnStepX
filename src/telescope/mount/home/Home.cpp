@@ -171,6 +171,27 @@ CommandError Home::reset(bool fullReset) {
   return CE_NONE;
 }
 
+// get the home position
+Coordinate Home::getPosition(CoordReturn coordReturn) {
+  switch (coordReturn) {
+    case CR_MOUNT:
+    break;
+    case CR_MOUNT_EQU:
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+      transform.hourAngleToRightAscension(&position, false);
+    break;
+    case CR_MOUNT_ALT:
+    case CR_MOUNT_HOR:
+      if (transform.mountType != ALTAZM) transform.equToHor(&position);
+    break;
+    case CR_MOUNT_ALL:
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else transform.equToHor(&position);
+      transform.hourAngleToRightAscension(&position, false);
+    break;
+  }
+  return position;
+}
+
 Home home;
 
 #endif
