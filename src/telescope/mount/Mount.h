@@ -68,7 +68,8 @@ class Mount {
     inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }
 
     // one time initialization of tracking
-    void trackingAutostart();
+    void autostart();
+    void autostartPostponed();
 
     // enables or disables tracking, enabling tracking powers on the motors if necessary
     void tracking(bool state);

@@ -164,7 +164,6 @@ void Site::updateTLS() {
 
   if (isDateTimeReady()) {
     if (initError.tls) initError.tls = false;
-    mount.trackingAutostart();
   }
 }
 

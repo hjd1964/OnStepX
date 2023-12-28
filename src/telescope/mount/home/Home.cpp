@@ -12,6 +12,18 @@
 
 // init the home position (according to settings and mount type)
 void Home::init() {
+  // confirm the data structure size
+  if (SettingsSize < sizeof(Settings)) { nv.initError = true; DL("ERR: Home::init(), SettingsSize error"); }
+
+  // write the default settings to NV
+  if (!nv.hasValidKey()) {
+    VLF("MSG: Mount, home writing defaults to NV");
+    nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+  }
+
+  // get settings from NV
+  nv.readBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+
   #ifndef AXIS1_HOME_DEFAULT
     if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0; position.z = 0; }
   #else
@@ -32,12 +44,20 @@ void Home::init() {
 // move mount to the home position
 CommandError Home::request() {
     if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
-
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE) {
       if (guide.state == GU_HOME_GUIDE) guide.stop();
       return CE_SLEW_IN_MOTION;
     }
+
+    #if AXIS2_TANGENT_ARM == OFF
+      wasTracking = mount.isTracking();
+      mount.tracking(false);
+    #endif
+
+    // make sure the motors are powered on
+    mount.enable(true);
+    goTo.firstGoto = false;
 
     if (hasSense) {
       double a1 = axis1.getInstrumentCoordinate();
@@ -51,21 +71,12 @@ CommandError Home::request() {
       }
       // both -180 to 180
       VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
-      if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
       CommandError e = reset();
       if (e != CE_NONE) return e;
     }
-
-    #if AXIS2_TANGENT_ARM == OFF
-      wasTracking = mount.isTracking();
-      mount.tracking(false);
-    #endif
-
-    // make sure the motors are powered on
-    mount.enable(true);
-    goTo.firstGoto = false;
 
     VLF("MSG: Mount, moving to home");
 
@@ -109,14 +120,14 @@ void Home::requestAborted() {
 }
 
 // after finding home switches displace the mount axes as specified
-void Home::guideDone() {
-  if (useOffset()) {
+void Home::guideDone(bool success) {
+  if (success && useOffset()) {
     reset(isRequestWithReset);
     if (transform.mountType == ALTAZM) transform.horToEqu(&position);
-    VLF("WRN: Mount, finishing move to home");
-    axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*senseOffset.axis1));
+    VLF("MSG: Mount, finishing move to home with goto");
+    axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
     axis1.autoGoto(goTo.getRadsPerSecond());
-    axis2.setTargetCoordinate(axis2.getTargetCoordinate() - arcsecToRad(senseOffset.axis2));
+    axis2.setTargetCoordinate(axis2.getTargetCoordinate() - arcsecToRad(settings.senseOffset.axis2));
     axis2.autoGoto(goTo.getRadsPerSecond());
     state = HS_NONE;
   } else {
@@ -170,8 +181,8 @@ CommandError Home::reset(bool fullReset) {
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
     if (!fullReset && state == HS_HOMING && useOffset()) {
-      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*senseOffset.axis1));
-      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(senseOffset.axis2));
+      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
+      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.senseOffset.axis2));
     } else {
       axis1.setInstrumentCoordinate(position.a1);
       axis2.setInstrumentCoordinate(position.a2);
@@ -222,7 +233,7 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
 }
 
 bool Home::useOffset() {
-  if (hasSense && (senseOffset.axis1 != 0 || senseOffset.axis2 != 0)) return true; else return false;
+  if (hasSense && (settings.senseOffset.axis1 != 0 || settings.senseOffset.axis2 != 0)) return true; else return false;
 }
 
 Home home;

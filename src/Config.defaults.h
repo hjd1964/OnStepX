@@ -555,6 +555,9 @@
 #ifndef MOUNT_ENABLE_IN_STANDBY
 #define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
 #endif
+#ifndef MOUNT_AUTO_HOME_DEFAULT
+#define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
+#endif
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif

@@ -144,7 +144,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928937UL
+#define INIT_NV_KEY                 583928938UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
@@ -156,18 +156,19 @@
 #define NV_MOUNT_GOTO_BASE          191    // bytes: 6   , 6
 #define NV_MOUNT_GUIDE_BASE         197    // bytes: 3   , 3
 #define NV_MOUNT_LIMITS_BASE        200    // bytes: 16  , 16
-#define NV_MOUNT_PARK_BASE          216    // bytes: 15  , 15
-#define NV_MOUNT_PEC_BASE           231    // bytes: 6   , 6
-#define NV_MOUNT_STATUS_BASE        237    // bytes: 1   , 1
-#define NV_MOUNT_LAST_POSITION      238    // bytes: 9   , 9
+#define NV_MOUNT_HOME_BASE          216    // bytes: 9  ,  9
+#define NV_MOUNT_PARK_BASE          225    // bytes: 15  , 15
+#define NV_MOUNT_PEC_BASE           240    // bytes: 6   , 6
+#define NV_MOUNT_STATUS_BASE        246    // bytes: 1   , 1
+#define NV_MOUNT_LAST_POSITION      247    // bytes: 9   , 9
 
-#define NV_ALIGN_MODEL_BASE         247    // bytes: 32  , 32
-#define NV_AXIS_SETTINGS_REVERT     279    // bytes: 2   , 2
-#define NV_AXIS_SETTINGS_BASE       281    // bytes: 45*9, 405
-#define NV_AXIS_ENCODER_ZERO_BASE   686    // bytes: 4 *2, 8
-#define NV_FOCUSER_SETTINGS_BASE    695    // bytes: 20*6, 120
-#define NV_ROTATOR_SETTINGS_BASE    814    // bytes: 11  , 11
-#define NV_FEATURE_SETTINGS_BASE    825    // bytes: 3 *8, 24
-#define NV_TELESCOPE_SETTINGS_BASE  849    // bytes: 2   , 2
+#define NV_ALIGN_MODEL_BASE         256    // bytes: 32  , 32
+#define NV_AXIS_SETTINGS_REVERT     288    // bytes: 2   , 2
+#define NV_AXIS_SETTINGS_BASE       290    // bytes: 45*9, 405
+#define NV_AXIS_ENCODER_ZERO_BASE   695    // bytes: 4 *2, 8
+#define NV_FOCUSER_SETTINGS_BASE    703    // bytes: 20*6, 120
+#define NV_ROTATOR_SETTINGS_BASE    823    // bytes: 11  , 11
+#define NV_FEATURE_SETTINGS_BASE    834    // bytes: 3 *8, 24
+#define NV_TELESCOPE_SETTINGS_BASE  858    // bytes: 2   , 2
 
-#define NV_LAST                     850
+#define NV_LAST                     859

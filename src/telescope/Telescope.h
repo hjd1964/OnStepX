@@ -51,6 +51,8 @@ class Telescope {
 
     void statusInit();
 
+    bool ready = false;
+
   private:
     Firmware firmware;
     int16_t reticleBrightness = RETICLE_LED_DEFAULT;

@@ -12,10 +12,15 @@
 enum HomeState: uint8_t {HS_NONE, HS_HOMING};
 
 #pragma pack(1)
+#define SettingsSize 9
 typedef struct SenseOffset {
   long axis1;
   long axis2;
 } SenseOffset;
+typedef struct Settings {
+  boolean automaticAtBoot;
+  SenseOffset senseOffset;
+} Settings;
 #pragma pack()
 
 class Home {
@@ -35,7 +40,7 @@ class Home {
     void requestAborted();
 
     // after finding home switches displace the mount axes as specified
-    void guideDone();
+    void guideDone(bool success);
 
     // once homed mark as done
     void requestDone();
@@ -49,7 +54,7 @@ class Home {
     // home sensing
     bool useOffset();
     bool hasSense = (AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF;
-    SenseOffset senseOffset = {AXIS1_SENSE_HOME_OFFSET, AXIS2_SENSE_HOME_OFFSET};
+    Settings settings = {MOUNT_AUTO_HOME_DEFAULT == ON, {AXIS1_SENSE_HOME_OFFSET, AXIS2_SENSE_HOME_OFFSET}};
 
     bool isRequestWithReset = false;
 

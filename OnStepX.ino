@@ -151,6 +151,10 @@ void setup() {
   #if DEBUG == PROFILER
     tasks.add(142, 0, true, 7, profiler, "Profilr");
   #endif
+
+  sense.poll();
+
+  telescope.ready = true;
 }
 
 void loop() {
