@@ -199,7 +199,6 @@ void StepDirTmcSPI::calibrateDriver() {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
     driver->rms_current(settings.currentRun*0.7071F, 1.0F);
     if (settings.model == TMC2130) {
-      ((TMC2130Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);
       ((TMC2130Stepper*)driver)->en_pwm_mode(true);
     } else
