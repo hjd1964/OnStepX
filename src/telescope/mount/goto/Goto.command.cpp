@@ -481,7 +481,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
 
           // autoMeridianFlip
           case '5':
-            if (transform.meridianFlips && GOTO_FEATURE != OFF) {
+            if (transform.mountType != ALTAZM && transform.meridianFlips && GOTO_FEATURE != OFF) {
               if (parameter[3] == '0' || parameter[3] == '1') {
                 settings.meridianFlipAuto = parameter[3] - '0';
                 #if MFLIP_AUTOMATIC_MEMORY == ON

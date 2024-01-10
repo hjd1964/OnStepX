@@ -323,7 +323,7 @@ void Limits::poll() {
 
     if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
       #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
-        if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
+        if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           // disable this limit for a second to allow goto to exit the out of limits region
           autoFlipDelayCycles = 10;
           VLF("MSG: Mount, start automatic meridian flip");
