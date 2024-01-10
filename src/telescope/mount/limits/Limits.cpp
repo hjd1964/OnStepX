@@ -57,37 +57,117 @@ void Limits::constrainMeridianLimits() {
 
 // target coordinate check ahead of sync, goto, etc.
 CommandError Limits::validateTarget(Coordinate *coords) {
+  bool eastReachable, westReachable;
+  double eastCorrection, westCorrection;
+  return validateTarget(coords, &eastReachable, &westReachable, &eastCorrection, &westCorrection);
+}
+
+// target coordinate check ahead of sync, goto, etc.
+CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection) {
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;
   if (fgt(coords->a, settings.altitude.max)) return CE_SLEW_ERR_ABOVE_OVERHEAD;
-  if (transform.mountType == ALTAZM) {
-    if (flt(coords->z, axis1.settings.limits.min)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (fgt(coords->z, axis1.settings.limits.max)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  } else {
-    if (coords->h > Deg180) coords->h -= Deg360; else
-    if (coords->h < -Deg180) coords->h += Deg360;
-    if (flt(coords->h, axis1.settings.limits.min)) {
-        VF("MSG: Mount, validate failed HA past min limit by ");
-        V(radToDeg(coords->h - axis1.settings.limits.min)*3600.0); VLF(" arc-secs");
+
+  double a1e, a2e, a1w, a2w;
+
+  Coordinate current = mount.getMountPosition(CR_MOUNT);
+
+  PierSide lastPierSide = coords->pierSide; 
+  coords->pierSide = PIER_SIDE_EAST;
+  transform.mountToInstrument(coords, &a1e, &a2e);
+  coords->pierSide = PIER_SIDE_WEST;
+  transform.mountToInstrument(coords, &a1w, &a2w);
+  coords->pierSide = lastPierSide;
+
+  float eastLimitMin = axis1.settings.limits.min;
+  float eastLimitMax = axis1.settings.limits.max;
+  float westLimitMin = axis1.settings.limits.min;
+  float westLimitMax = axis1.settings.limits.max;
+  if (transform.mountType == GEM) {
+    if (-limits.settings.pastMeridianE > eastLimitMin) eastLimitMin = -limits.settings.pastMeridianE;
+    if (limits.settings.pastMeridianW < westLimitMax) westLimitMax = limits.settings.pastMeridianW;
+    westLimitMin += Deg180;
+    westLimitMax += Deg180;
+  }
+
+  double a1 = axis1.getInstrumentCoordinate();
+
+  bool inRange;
+  if ((a1e >= eastLimitMin) && (a1e <= eastLimitMax)) inRange = true; else inRange = false;
+
+  if ((a1e + Deg360 > eastLimitMin) && (a1e + Deg360 < eastLimitMax) && inRange && (dist(a1, a1e) > dist(a1, a1e + Deg360))) {
+    a1e += Deg360;
+    *eastCorrection = Deg360;
+    VF("MSG: Mount, validate destination east axis1 best normalized to "); VL(radToDeg(a1e));
+  } else
+  if ((a1e - Deg360 > eastLimitMin) && (a1e - Deg360 < eastLimitMax) && inRange && (dist(a1, a1e) > dist(a1, a1e - Deg360))) {
+    a1e -= Deg360;
+    *eastCorrection = -Deg360;
+    VF("MSG: Mount, validate destination east axis1 best normalized to "); VL(radToDeg(a1e));
+  }
+
+  if ((a1e + Deg360 > eastLimitMin) && (a1e + Deg360 < eastLimitMax) && !inRange) {
+    a1e += Deg360;
+    *eastCorrection = Deg360;
+    VF("MSG: Mount, validate destination east axis1 normalized to "); VL(radToDeg(a1e));
+  } else
+  if ((a1e - Deg360 > eastLimitMin) && (a1e - Deg360 < eastLimitMax) && !inRange) {
+    a1e -= Deg360;
+    *eastCorrection = -Deg360;
+    VF("MSG: Mount, validate destination east axis1 normalized to "); VL(radToDeg(a1e));
+  }
+
+  if ((a1w >= westLimitMin) && (a1w <= westLimitMax)) inRange = true; else inRange = false;
+
+  if ((a1w + Deg360 > westLimitMin) && (a1w + Deg360 < westLimitMax) && inRange && (dist(a1, a1w) > dist(a1, a1w + Deg360))) {
+    a1w += Deg360;
+    *westCorrection = Deg360;
+    VF("MSG: Mount, validate destination best west axis1 normalized to "); VL(radToDeg(a1w));
+  } else
+  if ((a1w - Deg360 > westLimitMin) && (a1w - Deg360 < westLimitMax) && inRange && (dist(a1, a1w) > dist(a1, a1w - Deg360))) {
+    a1w -= Deg360;
+    *westCorrection = -Deg360;
+    VF("MSG: Mount, validate destination best west axis1 normalized to "); VL(radToDeg(a1w));
+  }
+
+  if ((a1w + Deg360 > westLimitMin) && (a1w + Deg360 < westLimitMax) && !inRange) {
+    a1w += Deg360;
+    *westCorrection = Deg360;
+    VF("MSG: Mount, validate destination west axis1 normalized to "); VL(radToDeg(a1w));
+  } else
+  if ((a1w - Deg360 > westLimitMin) && (a1w - Deg360 < westLimitMax) && !inRange) {
+    a1w -= Deg360;
+    *westCorrection = -Deg360;
+    VF("MSG: Mount, validate destination west axis1 normalized to "); VL(radToDeg(a1w));
+  }
+
+  *eastReachable = a1e >= eastLimitMin && a1e <= eastLimitMax;
+  *westReachable = a1w >= westLimitMin && a1w <= westLimitMax;
+
+  VF("MSG: Mount, validate east target axis1 "); V(radToDeg(eastLimitMin)); VF(" < "); V(radToDeg(a1e)); VF(" < "); V(radToDeg(eastLimitMax));
+  if (*eastReachable) VLF(" TRUE"); else VLF(" FALSE");
+  VF("MSG: Mount, validate west target axis1 "); V(radToDeg(westLimitMin)); VF(" < "); V(radToDeg(a1w)); VF(" < "); V(radToDeg(westLimitMax));
+  if (*westReachable) VLF(" TRUE"); else VLF(" FALSE");
+
+  if (!*eastReachable && !*westReachable) {
+    VLF("MSG: Mount, validate target outside limits");
+    *eastCorrection = 0.0;
+    *westCorrection = 0.0;
+    return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  }
+
+  if (AXIS2_TANGENT_ARM == OFF) {
+    if (flt(coords->d, axis2.settings.limits.min)) {
+      VF("MSG: Mount, validate failed Dec past min limit by ");
+      V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VLF(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
-    if (fgt(coords->h, axis1.settings.limits.max)) {
-        VF("MSG: Mount, validate failed HA past max limit by ");
-        V(radToDeg(coords->h - axis1.settings.limits.max)*3600.0); VLF(" arc-secs");
+    if (fgt(coords->d, axis2.settings.limits.max)) {
+      VF("MSG: Mount, validate failed Dec past max limit by ");
+      V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VLF(" arc-secs");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    }
-    if (AXIS2_TANGENT_ARM == OFF) {
-      if (flt(coords->d, axis2.settings.limits.min)) {
-        VF("MSG: Mount, validate failed Dec past min limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VLF(" arc-secs");
-        return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      }
-      if (fgt(coords->d, axis2.settings.limits.max)) {
-        VF("MSG: Mount, validate failed Dec past max limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VLF(" arc-secs");
-        return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      }
     }
   }
+
   return CE_NONE;
 }
 
@@ -189,14 +269,14 @@ void Limits::poll() {
     if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
 
     // meridian limits
-    if (transform.meridianFlips && current.pierSide == PIER_SIDE_EAST) {
+    if (transform.mountType == GEM && current.pierSide == PIER_SIDE_EAST) {
       if (current.h < -settings.pastMeridianE) {
         stopAxis1(GA_REVERSE);
         error.meridian.east = true;
       } else error.meridian.east = false;
     } else error.meridian.east = false;
 
-    if (transform.meridianFlips && current.pierSide == PIER_SIDE_WEST) {
+    if (transform.mountType == GEM && current.pierSide == PIER_SIDE_WEST) {
       if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
         #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
@@ -223,18 +303,20 @@ void Limits::poll() {
       current.a2 = axis2.getMotorPosition();
     #endif
 
+    // for Fork and Alt/Azm mounts limits are based on shaft angles
+    // so convert axis1 into normal PIER_SIDE_EAST coordinates
+    if (transform.mountType != GEM && current.pierSide == PIER_SIDE_WEST) current.a1 += Deg180;
+
     // min and max limits
     if (flt(current.a1, axis1.settings.limits.min)) {
       stopAxis1(GA_REVERSE);
       error.limit.axis1.min = true;
       // ---------------------------------------------------------
       if (lastError.limit.axis1.min != error.limit.axis1.min) {
-        D("WRN: Limits, min error A1 = ");
-        D(radToDeg(current.a1));
-        D(" A2 = ");
-        D(radToDeg(current.a2));
-        D(" MIN = ");
-        DL(radToDeg(axis1.settings.limits.min));
+        D("WRN: Mount, limits min axis1 "); D(radToDeg(current.a1)); D(" > "); D(radToDeg(axis1.settings.limits.min));
+        D(" ("); D(current.pierSide == PIER_SIDE_WEST ? "W" : "E"); D(")");
+        DLF(" FAILED");
+        V("MSG: Mount, axis1 = "); VL(degToRad(axis1.getInstrumentCoordinate()));
       }
       // ---------------------------------------------------------
     } else error.limit.axis1.min = false;
@@ -259,12 +341,8 @@ void Limits::poll() {
         error.limit.axis1.max = true;
         // -------------------------------------------------------------
         if (lastError.limit.axis1.max != error.limit.axis1.max) {
-          D("MSG: Limits, max error A1 = ");
-          D(radToDeg(current.a1));
-          D(" A2 = ");
-          D(radToDeg(current.a2));
-          D(" MAX = ");
-          DL(radToDeg(axis1.settings.limits.max));
+          D("WRN: Mount, limits max axis1 "); V(radToDeg(current.a1)); V(" < "); V(radToDeg(axis1.settings.limits.max));
+          VLF(" FAILED");
         }
         // -------------------------------------------------------------
       }

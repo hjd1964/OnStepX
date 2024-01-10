@@ -272,17 +272,22 @@ bool Guide::validAxis1(GuideAction guideAction) {
 
   if (!limits.isEnabled()) return true;
 
-  double a1;
-  if (transform.mountType == ALTAZM) a1 = location.z; else a1 = location.h;
+  // for Fork and Alt/Azm mounts limits are based on shaft angles
+  // so convert axis1 into normal PIER_SIDE_EAST coordinates
+  if (transform.mountType != GEM && location.pierSide == PIER_SIDE_WEST) location.a1 += Deg180;
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
-    if (transform.meridianFlips && location.pierSide == PIER_SIDE_EAST) { if (location.h < -limits.settings.pastMeridianE) return false; }
-    if (a1 < axis1.settings.limits.min) return false;
+    if (transform.mountType == GEM && location.pierSide == PIER_SIDE_EAST) {
+      if (location.h < -limits.settings.pastMeridianE) return false;
+    }
+    if (location.a1 < axis1.settings.limits.min) return false;
   }
 
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
-    if (transform.meridianFlips && location.pierSide == PIER_SIDE_WEST) { if (location.h > limits.settings.pastMeridianW) return false; }
-    if (a1 > axis1.settings.limits.max) return false;
+    if (transform.mountType == GEM && location.pierSide == PIER_SIDE_WEST) {
+      if (location.h > limits.settings.pastMeridianW) return false;
+    }
+    if (location.a1 > axis1.settings.limits.max) return false;
   }
   return true;
 }

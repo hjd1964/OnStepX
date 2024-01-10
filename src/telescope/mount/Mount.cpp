@@ -78,17 +78,10 @@ void Mount::begin() {
   limits.init();
   guide.init();
 
-  if (transform.mountType == FORK) {
-    limits.settings.pastMeridianE = Deg360;
-    limits.settings.pastMeridianW = Deg360;
-  }
-
   if (AXIS1_WRAP == ON) {
     axis1.coordinateWrap(Deg360);
     axis1.settings.limits.min = -Deg360;
     axis1.settings.limits.max = Deg360;
-    limits.settings.pastMeridianE = Deg360;
-    limits.settings.pastMeridianW = Deg360;
   }
 
   goTo.init();
@@ -431,13 +424,16 @@ float Mount::ztr(float a) {
 // update where we are pointing *now*
 void Mount::updatePosition(CoordReturn coordReturn) {
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+  if (isHome()) {
+    transform.mountToInstrument(&current, &current.a1, &current.a2);
+    current.pierSide = PIER_SIDE_NONE;
+  }
   if (transform.mountType == ALTAZM) {
     if (coordReturn == CR_MOUNT_EQU || coordReturn == CR_MOUNT_ALL) transform.horToEqu(&current);
   } else {
     if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
     if (coordReturn == CR_MOUNT_HOR || coordReturn == CR_MOUNT_ALL) transform.equToHor(&current);
   }
-  if (isHome()) current.pierSide = PIER_SIDE_NONE;
 }
 
 Mount mount;

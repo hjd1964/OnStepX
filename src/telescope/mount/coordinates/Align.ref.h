@@ -35,6 +35,7 @@ typedef struct Coordinate {
   double a;
   double z;
   double a1;
+  double a1Correction;
   double a2;
   PierSide pierSide;
 } Coordinate;

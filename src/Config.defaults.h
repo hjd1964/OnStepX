@@ -546,6 +546,11 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
+
+#ifndef MOUNT_ALTERNATE_ORIENTATION
+#define MOUNT_ALTERNATE_ORIENTATION   OFF                         // use ON or OFF, for FORK and ALTAZM mounts only
+#endif
+
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
 #endif

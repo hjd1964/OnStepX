@@ -247,8 +247,10 @@ CommandError Park::restore(bool withTrackingOn) {
     parkTarget.h = settings.position.h;
     parkTarget.d = settings.position.d;
     parkTarget.pierSide = settings.position.pierSide;
-    if (parkTarget.pierSide == PIER_SIDE_EAST && parkTarget.h < -limits.settings.pastMeridianE) parkTarget.h += PI*2.0;
-    if (parkTarget.pierSide == PIER_SIDE_WEST && parkTarget.h > limits.settings.pastMeridianW) parkTarget.h -= PI*2.0;
+    if (transform.mountType == GEM) {
+      if (parkTarget.pierSide == PIER_SIDE_EAST && parkTarget.h < -limits.settings.pastMeridianE) parkTarget.h += PI*2.0;
+      if (parkTarget.pierSide == PIER_SIDE_WEST && parkTarget.h > limits.settings.pastMeridianW) parkTarget.h -= PI*2.0;
+    }
 
     // set the mount target
     double a1, a2;

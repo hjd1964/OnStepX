@@ -46,7 +46,9 @@ void Transform::init() {
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  if (mountType == ALTAZM) meridianFlips = false; else meridianFlips = true;
+  if (mountType == GEM) meridianFlips = true; else
+  if (mountType == FORK)  meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON); else
+  if (mountType == ALTAZM) meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON);
 
   #if ALIGN_MAX_NUM_STARS > 1
     align.init(mountType, site.location.latitude);
@@ -161,13 +163,19 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
     a2 = TANGENT_ARM_INSTRUMENT_TO_MOUNT(a2)
   #endif
 
-  if (a2 < -Deg90 || a2 > Deg90) {
-    mount.pierSide = PIER_SIDE_WEST;
-    a1 -= Deg180;
-    a2  = Deg180 - a2;
-  } else mount.pierSide = PIER_SIDE_EAST;
-
-  if (a2 > Deg180) a2 -= Deg360; else if (a2 <= -Deg180) a2 += Deg360;
+  if (site.location.latitude >= 0.0 || mountType == ALTAZM) {
+    if (a2 > Deg90) {
+      mount.pierSide = PIER_SIDE_WEST;
+      a1 -= Deg180;
+      a2  = Deg180 - a2;
+    } else mount.pierSide = PIER_SIDE_EAST;
+  } else {
+    if (a2 < -Deg90) {
+      mount.pierSide = PIER_SIDE_WEST;
+      a1 -= Deg180;
+      a2  = (-Deg180) - a2;
+    } else mount.pierSide = PIER_SIDE_EAST;
+  }
 
   if (mountType == ALTAZM) {
     mount.z = a1;
@@ -180,19 +188,25 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   mount.a1 = a1;
   mount.a2 = a2;
 
+  mount.a1Correction = 0.0;
+
   return mount;
 }
 
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
 
-  if (coord->pierSide == PIER_SIDE_WEST) *a1 += Deg180;
-  if (site.location.latitude >= 0.0) {
-    if (coord->pierSide == PIER_SIDE_WEST) *a2 = Deg180 - *a2;
+  if (site.location.latitude >= 0.0 || mountType == ALTAZM) {
+    if (coord->pierSide == PIER_SIDE_WEST) {
+      *a1 += Deg180;
+      *a2 = Deg180 - *a2;
+    }
   } else {
-    if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
+    if (coord->pierSide == PIER_SIDE_WEST) {
+      *a1 += Deg180;
+      *a2 = (-Deg180) - *a2;
+    }
   }
-  if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
     *a2 = TANGENT_ARM_MOUNT_TO_INSTRUMENT(*a2)
@@ -243,7 +257,7 @@ void Transform::horToEqu(Coordinate *coord) {
   coord->d      = asin(sinDec); 
   double t1     = sin(coord->z);
   double t2     = cosAzm*site.locationEx.latitude.sine - tan(coord->a)*site.locationEx.latitude.cosine;
-  coord->h      = atan2(t1,t2);
+  coord->h      = atan2(t1, t2);
   coord->h     += Deg180;
   if (coord->h > Deg180) coord->h -= Deg360;
 }

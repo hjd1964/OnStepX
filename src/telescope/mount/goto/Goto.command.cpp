@@ -207,19 +207,21 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       // :GX9[n]#   Get setting [n]
       //            Returns: Value
       if (parameter[0] == '9')  {
-        Coordinate current;
         switch (parameter[1]) {
-          case '2': sprintF(reply, "%0.3f", settings.usPerStepCurrent); break;              // current
-          case '3': sprintF(reply, "%0.3f", usPerStepBase); break;                          // default base
+          // current rate in us/step
+          case '2': sprintF(reply, "%0.3f", settings.usPerStepCurrent); break;
+          // default base rate in us/step
+          case '3': sprintF(reply, "%0.3f", usPerStepBase); break;
           // pierSide 0 = None, 1 = East, 2 = West (with suffix 'N' if meridian flips are disabled)
-          case '4':
-              current = mount.getMountPosition();
-              sprintf(reply, "%d%s", (int)current.pierSide, (!transform.meridianFlips)?" N":"");
-          break;
-          case '5': sprintf(reply, "%d", (int)settings.meridianFlipAuto); break;            // autoMeridianFlip
-          case '6': reply[0] = "EWB"[settings.preferredPierSide - 1]; reply[1] = 0; break;  // preferred pier side
+          case '4': sprintf(reply, "%d%s", (int)mount.getMountPosition().pierSide, (!transform.meridianFlips)?" N":""); break;
+          // autoMeridianFlip
+          case '5': sprintf(reply, "%d", (int)isAutoFlipEnabled()); break;
+          // preferred pier side
+          case '6': reply[0] = transform.meridianFlips ? "EWB"[settings.preferredPierSide - 1] : 'E'; reply[1] = 0; break;
+          // current step rate in deg/s
           case '7': sprintF(reply, "%0.1f", (1000000.0F/settings.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break;
-          case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;                   // fastest step rate in us
+          // fastest step rate in us/step
+          case '9': sprintF(reply, "%0.3f",usPerStepLowerLimit()); break;
           default: return false;
         }
        *numericReply = false;
@@ -262,7 +264,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //  :MNw#  Goto current RA/Dec but West of the Pier (within meridian limit overlap)
     //         Returns: 0..9, see :MS#
     if (command[1] == 'N') {
-      if (transform.mountType != ALTAZM) {
+      if (transform.meridianFlips) {
         Coordinate newTarget = mount.getPosition();
         CommandError e = CE_NONE;
 
@@ -476,49 +478,54 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
               updateAccelerationRates();
             } else *commandError = CE_SLEW_IN_MOTION;
           break;
+
           // autoMeridianFlip
           case '5':
-            if (transform.meridianFlips) {
+            if (transform.meridianFlips && GOTO_FEATURE != OFF) {
               if (parameter[3] == '0' || parameter[3] == '1') {
-                if (GOTO_FEATURE == OFF) parameter[3] = '0'; // disable autoflip
                 settings.meridianFlipAuto = parameter[3] - '0';
                 #if MFLIP_AUTOMATIC_MEMORY == ON
                   nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
                 #endif
               } else *commandError = CE_PARAM_RANGE;
-            }
+            } else *commandError = CE_CMD_UNKNOWN;
           break;
           // preferred pier side
           case '6':
-            switch (parameter[3]) {
-              case 'E': settings.preferredPierSide = PSS_EAST; break;
-              case 'W': settings.preferredPierSide = PSS_WEST; break;
-              case 'B': settings.preferredPierSide = PSS_BEST; break;
-              default: *commandError = CE_PARAM_RANGE;
-            }
-            #if PIER_SIDE_PREFERRED_MEMORY == ON
-              nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
-            #endif
+            if (transform.meridianFlips && GOTO_FEATURE != OFF) {
+              switch (parameter[3]) {
+                case 'E': settings.preferredPierSide = PSS_EAST; break;
+                case 'W': settings.preferredPierSide = PSS_WEST; break;
+                case 'B': settings.preferredPierSide = PSS_BEST; break;
+                default: *commandError = CE_PARAM_RANGE;
+              }
+              #if PIER_SIDE_PREFERRED_MEMORY == ON
+                nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
+              #endif
+            } else *commandError = CE_CMD_UNKNOWN;
           break;
-
           // pause at home on meridian flip
           case '8':
-            if (parameter[3] == '0' || parameter[3] == '1') {
-              #if GOTO_FEATURE == ON
-                settings.meridianFlipPause = parameter[3] - '0';
-                #if MFLIP_PAUSE_HOME_MEMORY == ON
-                  nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
-                #endif
-             #endif
-            } else *commandError = CE_PARAM_RANGE;
+            if (transform.meridianFlips && GOTO_FEATURE != OFF) {
+              if (parameter[3] == '0' || parameter[3] == '1') {
+                #if GOTO_FEATURE == ON
+                  settings.meridianFlipPause = parameter[3] - '0';
+                  #if MFLIP_PAUSE_HOME_MEMORY == ON
+                    nv.updateBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
+                  #endif
+              #endif
+              } else *commandError = CE_PARAM_RANGE;
+            } else *commandError = CE_CMD_UNKNOWN;
           break;
           // continue if paused at home
           case '9':
-            if (parameter[3] == '1') {
-              #if GOTO_FEATURE == ON
-                if (meridianFlipHome.paused) meridianFlipHome.resume = true;
-              #endif
-            } else *commandError = CE_PARAM_RANGE;
+            if (transform.meridianFlips && GOTO_FEATURE != OFF) {
+              if (parameter[3] == '1') {
+                #if GOTO_FEATURE == ON
+                  if (meridianFlipHome.paused) meridianFlipHome.resume = true;
+                #endif
+              } else *commandError = CE_PARAM_RANGE;
+            } else *commandError = CE_CMD_UNKNOWN;
           break;
           default: return false;
         }

@@ -302,9 +302,12 @@
   #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
 #endif
 
-// MOUNT TYPE
 #if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
   #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
+#endif
+
+#if MOUNT_ALTERNATE_ORIENTATION != OFF && MOUNT_ALTERNATE_ORIENTATION != ON
+  #error "Configuration (Config.h): Setting MOUNT_ALTERNATE_ORIENTATION unknown, use ON or OFF"
 #endif
 
 #if MOUNT_COORDS < MOUNT_COORDS_FIRST && MOUNT_COORDS > MOUNT_COORDS_LAST

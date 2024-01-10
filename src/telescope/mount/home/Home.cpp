@@ -203,9 +203,13 @@ CommandError Home::reset(bool fullReset) {
       goTo.alignReset();
     #endif
 
-    VLF("MSG: Mount, reset at home and in standby");
+    VF("MSG: Mount, reset at home (");
+    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    VLF(") and in standby");
   } else {
-    VLF("MSG: Mount, reset at home");
+    VF("MSG: Mount, reset at home (");
+    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    VLF(")");
   }
 
   return CE_NONE;
