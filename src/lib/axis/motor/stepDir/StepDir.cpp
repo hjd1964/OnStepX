@@ -278,7 +278,7 @@ void StepDirMotor::modeSwitch() {
   } else {
     if (microstepModeControl == MMC_TRACKING) {
       noInterrupts();
-      if (!synchronized || (step == -1 && direction == dirRev) || (step == 1 && direction == dirFwd)) {
+      if (!sync || (step == -1 && direction == dirRev) || (step == 1 && direction == dirFwd)) {
         microstepModeControl = MMC_SLEWING_REQUEST;
       }
       interrupts();
@@ -360,7 +360,7 @@ IRAM_ATTR void StepDirMotor::move(const int16_t stepPin) {
   #endif
 
   long lastTargetSteps = targetSteps;
-  if (synchronized && !inBacklash) targetSteps += step;
+  if (sync && !inBacklash) targetSteps += step;
 
   if (motorSteps > targetSteps || (inBacklash && direction == dirRev)) {
     if (direction != dirRev) {
@@ -432,7 +432,7 @@ IRAM_ATTR void StepDirMotor::moveFF(const int16_t stepPin) {
     if (takeStep) {
   #endif
 
-  if (synchronized) targetSteps += stepSize;
+  if (sync) targetSteps += stepSize;
 
   if (motorSteps < targetSteps) {
     motorSteps += stepSize;
@@ -460,7 +460,7 @@ IRAM_ATTR void StepDirMotor::moveFR(const int16_t stepPin) {
     if (takeStep) {
   #endif
 
-  if (synchronized) targetSteps -= stepSize;
+  if (sync) targetSteps -= stepSize;
 
   if (motorSteps > targetSteps) {
     motorSteps -= stepSize;

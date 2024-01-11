@@ -23,3 +23,14 @@ const char html_park[] PROGMEM =
 "<button id='park' onpointerdown=\"s('pk','p')\" type='button' disabled>" ARROW_DR " " L_PARK "</button>";
 const char html_setpark[] PROGMEM =
 "<button id='setpark' onpointerdown=\"s('pk','s')\" type='button'>" L_SET_PARK "</button><br />";
+
+// Home automatically
+const char html_homeAuto[] PROGMEM = 
+"<button id='auto_on' class='btns_right' onpointerdown=\"s('ha','1')\" type='button'>" L_ON "</button>"
+"<button id='auto_off' class='btns_left' onpointerdown=\"s('ha','0')\" type='button'>" L_OFF "</button><br />\n";
+
+// Home offset
+const char html_homeOffsetAxis1[] PROGMEM =
+  "<input style='width:6em;' value='%d' type='number' name='hc1' min='-162000' max='162000'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS1 "<br />\n";
+const char html_homeOffsetAxis2[] PROGMEM =
+  "<input style='width:6em;' value='%d' type='number' name='hc2' min='-162000' max='162000'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS2 "<br /><br />\n";

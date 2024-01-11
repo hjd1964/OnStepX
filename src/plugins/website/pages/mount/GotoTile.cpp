@@ -37,7 +37,7 @@ const char *goto_key[18] =
 // create the related webpage tile
 void gotoTile(String &data)
 {
-  char temp[320] = "";
+  char temp[400] = "";
 
   sprintf_P(temp, html_tile_beg, "22em", "15em", "Goto");
   data.concat(temp);
@@ -76,18 +76,33 @@ void gotoTile(String &data)
   www.sendContentAndClear(data);
 
   // Goto Meridian Flips
-  if (status.mountType == MT_GEM || (status.getVersionMajor() >= 10 && status.mountType == MT_FORK))
+  if (status.mountType == MT_GEM || (status.getVersionMajor() >= 10 && status.meridianFlips))
   {
-    data.concat(FPSTR(html_gotoMfAuto));
-    data.concat(FPSTR(html_gotoMfPause));
+    if (status.mountType == MT_ALTAZM) {
+      data.concat(FPSTR(html_gotoMfNow));
+      sprintf_P(temp, html_gotoMfPause, L_ORIENTATION_CHANGE_PAUSE);
+      data.concat(temp);
+    } else {
+      data.concat(FPSTR(html_gotoMfAuto));
+      sprintf_P(temp, html_gotoMfPause, L_MERIDIAN_FLIP_PAUSE);
+      data.concat(temp);
+    }
+
     www.sendContentAndClear(data);
   }
 
   // Goto Preferred Pier Side
-  if (status.mountType != MT_ALTAZM)
+  if (status.mountType != MT_ALTAZM || (status.getVersionMajor() >= 10 && status.meridianFlips))
   {
     data.concat(F("<br />"));
-    data.concat(FPSTR(html_gotoPreferredPierSide));
+
+    if (status.mountType == MT_ALTAZM) {
+      sprintf_P(temp, html_gotoPreferredPierSide, L_ORIENTATION_CHANGE_PPS, L_NORMAL, L_ALTERNATE);
+      data.concat(temp);
+    } else {
+      sprintf_P(temp, html_gotoPreferredPierSide, L_MERIDIAN_FLIP_PPS, L_EAST, L_WEST);
+      data.concat(temp);
+    }
   }
 
   data.concat(FPSTR(html_collapsable_end));
@@ -115,7 +130,7 @@ void gotoTileAjax(String &data)
 
   data.concat(keyValueToggleBoolSelected("gto_bzr_on", "gto_bzr_off", status.buzzerEnabled));
 
-  if (status.mountType == MT_GEM || (status.getVersionMajor() >= 10 && status.mountType == MT_FORK))
+  if (status.mountType == MT_GEM || (status.getVersionMajor() >= 10 && status.meridianFlips))
   {
     data.concat(keyValueBoolEnabled("gto_mfa_on", true));
     data.concat(keyValueBoolEnabled("gto_mfa_off", true));
@@ -126,7 +141,7 @@ void gotoTileAjax(String &data)
     data.concat(keyValueBoolEnabled("gto_mfa_off", false));
   }
 
-  if (status.mountType != MT_ALTAZM)
+  if (status.mountType != MT_ALTAZM || (status.getVersionMajor() >= 10 && status.meridianFlips))
   {
     data.concat(keyValueBoolSelected("gto_pps_east", state.preferredPierSideChar == 'E'));
     data.concat(keyValueBoolSelected("gto_pps_west", state.preferredPierSideChar == 'W'));
@@ -137,14 +152,14 @@ void gotoTileAjax(String &data)
 
   if (!isnan(state.slewSpeedNominal) && !isnan(state.slewSpeedCurrent))
   {
-    double rateRatio = state.slewSpeedNominal / state.slewSpeedCurrent;
+    float rateRatio = state.slewSpeedNominal / state.slewSpeedCurrent;
     char rate_key[5][12] = {"gto_rate_vf", "gto_rate_f", "gto_rate_n", "gto_rate_s", "gto_rate_vs"};
     bool rate_en[5] = {false, false, false, false, false};
 
-    if (rateRatio > 1.75) { rate_en[0] = true; }
-    else if (rateRatio > 1.25) { rate_en[1] = true; }
-    else if (rateRatio > 0.875) { rate_en[2] = true; }
-    else if (rateRatio > 0.625) { rate_en[3] = true; }
+    if (rateRatio > 1.75F) { rate_en[0] = true; }
+    else if (rateRatio > 1.25F) { rate_en[1] = true; }
+    else if (rateRatio > 0.875F) { rate_en[2] = true; }
+    else if (rateRatio > 0.625F) { rate_en[3] = true; }
     else rate_en[4] = true;
     for (int i = 0; i < 5; i++) {
       String s = keyValueBoolSelected(rate_key[i], rate_en[i]);
@@ -180,12 +195,9 @@ extern void gotoTileGet()
     if (v.equals("mp_off")) onStep.commandBool(":SX98,0#");  // meridian-flip, pause at home off
     if (v.equals("mp_cnt")) onStep.commandBool(":SX99,1#");  // meridian flip, pause->continue
 
-    if (status.mountType != MT_ALTAZM)
-    {
-      if (v.equals("pps_e")) onStep.commandBool(":SX96,E#"); // meridian-flip, preferred pier side East
-      if (v.equals("pps_w")) onStep.commandBool(":SX96,W#"); // meridian-flip, preferred pier side West
-      if (v.equals("pps_b")) onStep.commandBool(":SX96,B#"); // meridian flip, preferred pier side Best
-    }
+    if (v.equals("pps_e")) onStep.commandBool(":SX96,E#");   // meridian-flip, preferred pier side East
+    if (v.equals("pps_w")) onStep.commandBool(":SX96,W#");   // meridian-flip, preferred pier side West
+    if (v.equals("pps_b")) onStep.commandBool(":SX96,B#");   // meridian flip, preferred pier side Best
 
     if (v.equals("go")) onStep.command(":MS#", temp);        // goto start
     if (v.equals("stop")) onStep.commandBlind(":Q#");        // goto/slew stop

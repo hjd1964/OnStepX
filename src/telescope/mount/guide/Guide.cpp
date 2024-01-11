@@ -199,7 +199,7 @@ CommandError Guide::startHome() {
     backlashEnableControl(true);
 
     // use guiding and switches to find home
-    mountStatus.sound.alert();
+    mountStatus.soundAlert();
     state = GU_HOME_GUIDE;
 
     #if AXIS2_TANGENT_ARM == OFF
@@ -441,12 +441,12 @@ void Guide::poll() {
   if ((state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) && !mount.isSlewing()) {
     guideActionAxis1 = GA_NONE;
     guideActionAxis2 = GA_NONE;
-    mountStatus.sound.alert();
+    mountStatus.soundAlert();
     if (state == GU_HOME_GUIDE) {
       VLF("MSG: Guide, arrival at home detected");
       #if AXIS2_TANGENT_ARM == OFF
         state = GU_NONE;
-        home.reset(home.isRequestWithReset);
+        home.guideDone(state == GU_HOME_GUIDE);
       #endif
     }
   }

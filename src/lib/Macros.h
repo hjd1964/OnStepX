@@ -63,6 +63,11 @@
   #endif
   // no support for DAC input
   #define digitalReadEx(pin)          ( (pin >= 0)?((pin < 0x100)?digitalReadF(CLEAN_PIN(pin)):gpio.digitalRead(pin-0x200)):0 )
+
+  // external GPIO analogWrite
+  #if GPIO_DEVICE == SWS
+    #define analogWriteEx(pin,value)  { if (pin >= 0x200) gpio.analogWrite(pin-0x200,value); else if (pin >= 0) analogWrite(CLEAN_PIN(pin),value); }
+  #endif
 #else
   #if defined(HAL_DAC_AS_DIGITAL)
     // DAC but no external GPIO
@@ -91,6 +96,11 @@
   #else
     #define digitalWriteF(pin,value)   { digitalWrite(pin,value); }
   #endif
+#endif
+
+// automatically use analogWrite
+#ifndef analogWriteEx
+  #define analogWriteEx(pin,value)     { analogWrite(pin,value); }
 #endif
 
 // supress compiler warnings for unused parameters

@@ -65,7 +65,9 @@
 #endif
 
 // For a piezo buzzer
-#define STATUS_BUZZER_PIN       17               // Tone
+#ifndef STATUS_BUZZER_PIN 
+  #define STATUS_BUZZER_PIN     17               // Tone
+#endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
 #ifndef PPS_SENSE_PIN

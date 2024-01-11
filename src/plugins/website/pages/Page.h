@@ -42,4 +42,4 @@ const char html_links_enc_end[] PROGMEM = "'>" L_PAGE_ENCODERS "</a>";
 const char html_links_net_begin[] PROGMEM = "<a href='/net.htm' ";
 const char html_links_net_end[] PROGMEM = "'>" L_PAGE_NETWORK "</a>";
 
-const char html_links_selected[] PROGMEM =" style='background-color: #552222;";
+const char html_links_selected[] PROGMEM =" style='background-color: " COLOR_LINK_SELECTED_BACKGROUND ";";

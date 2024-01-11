@@ -43,8 +43,8 @@
 // Firmware version ----------------------------------------------------------------------------------------------------------------
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
-#define FirmwareVersionMinor        18     // minor version 00 to 99
-#define FirmwareVersionPatch        "c"    // for example major.minor patch: 10.03c
+#define FirmwareVersionMinor        20     // minor version 00 to 99
+#define FirmwareVersionPatch        "a"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       6      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
@@ -71,9 +71,19 @@ void sensesPoll() {
 }
 
 void setup() {
+  #if ADDON_SELECT_PIN != OFF
+    pinMode(ADDON_SELECT_PIN, OUTPUT);
+    digitalWrite(ADDON_SELECT_PIN, HIGH);
+  #endif
+
   #if DEBUG != OFF
     SERIAL_DEBUG.begin(SERIAL_DEBUG_BAUD);
     delay(2000);
+  #endif
+
+  // let any special processing the pinmap needs happen
+  #ifdef PIN_INIT
+    PIN_INIT();
   #endif
 
   // say hello
@@ -83,7 +93,7 @@ void setup() {
   VF("MSG: OnStepX, pinmap "); VLF(PINMAP_STR);
 
   // start low level hardware
-  VLF("MSG: Setup, HAL initalize");
+  VLF("MSG: Setup, HAL initialize");
   HAL_INIT();
   if (!HAL_NV_INIT()) {
     DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");
@@ -141,6 +151,10 @@ void setup() {
   #if DEBUG == PROFILER
     tasks.add(142, 0, true, 7, profiler, "Profilr");
   #endif
+
+  sense.poll();
+
+  telescope.ready = true;
 }
 
 void loop() {

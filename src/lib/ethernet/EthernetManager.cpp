@@ -3,6 +3,14 @@
 
 #if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
 
+#include "../tasks/OnTask.h"
+
+#if MDNS_SERVER == ON
+  EthernetUDP udp;
+  MDNS mdns(udp);
+  void mdnsPoll() { mdns.run(); }
+#endif
+
 bool EthernetManager::init() {
   if (!active) {
     #ifdef NV_ETHERNET_SETTINGS_BASE
@@ -44,6 +52,17 @@ bool EthernetManager::init() {
     }
 
     VLF("MSG: Ethernet, initialized");
+
+    #if MDNS_SERVER == ON
+      if (mdns.begin(settings.ip, MDNS_NAME)) {
+        VLF("MSG: Ethernet, mDNS started");
+        VF("MSG: Ethernet, starting mDNS polling");
+        VF(" task (rate 5ms priority 7)... ");
+        if (tasks.add(5, 0, true, 7, mdnsPoll, "mdPoll")) { VL("success"); } else { VL("FAILED!"); }
+      } else {
+        VLF("WRN: Ethernet, mDNS start failed!");
+      }
+    #endif
   }
   return active;
 }

@@ -3,7 +3,7 @@
 #pragma once
 #include "Common.h"
 
-#if !defined(FileVersionConfig) || FileVersionConfig != 6
+#if !defined(FileVersionConfig) || FileVersionConfig != 6 // per FirmwareVersionConfig
   #error "Configuration (Config.h): FileVersionConfig (Config.h version) must be 6 for this OnStep."
 #endif
 
@@ -294,6 +294,14 @@
   #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
 #endif
 
+#if AXIS2_TANGENT_ARM != OFF && (AXIS1_SENSE_HOME) != OFF
+  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM requires AXIS1_SENSE_HOME to be OFF."
+#endif
+
+#if AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME_OFFSET) != 0
+  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
+#endif
+
 // MOUNT TYPE
 #if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
   #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
@@ -301,6 +309,18 @@
 
 #if MOUNT_COORDS < MOUNT_COORDS_FIRST && MOUNT_COORDS > MOUNT_COORDS_LAST
   #error "Configuration (Config.h): Setting MOUNT_COORDS unknown, use a valid MOUNT COORDS (from Constants.h)"
+#endif
+
+#if MOUNT_COORDS_MEMORY != ON && MOUNT_COORDS_MEMORY != OFF
+  #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY unknown, use ON or OFF"
+#endif
+
+#if MOUNT_COORDS_MEMORY == ON && NV_ENDURANCE < NVE_VHIGH
+  #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY requires a NV storage device with very high write endurance (FRAM)"
+#endif
+
+#if MOUNT_ENABLE_IN_STANDBY != ON && MOUNT_ENABLE_IN_STANDBY != OFF
+  #error "Configuration (Config.h): Setting MOUNT_ENABLE_IN_STANDBY unknown, use ON or OFF"
 #endif
 
 #if ALIGN_MAX_STARS != AUTO && (ALIGN_MAX_STARS < 1 && ALIGN_MAX_STARS > 9)
@@ -312,10 +332,10 @@
   #error "Configuration (Config.h): Setting TIME_LOCATION_SOURCE unknown, use OFF or valid TIME LOCATION SOURCE (from Constants.h)"
 #endif
 
-#if TIME_LOCATION_PPS_SENSE != OFF && \
-    TIME_LOCATION_PPS_SENSE != LOW && \
-    TIME_LOCATION_PPS_SENSE != HIGH && \
-    TIME_LOCATION_PPS_SENSE != BOTH
+#if (TIME_LOCATION_PPS_SENSE) != OFF && \
+    (TIME_LOCATION_PPS_SENSE) != LOW && \
+    (TIME_LOCATION_PPS_SENSE) != HIGH && \
+    (TIME_LOCATION_PPS_SENSE) != BOTH
   #error "Configuration (Config.h): Setting TIME_LOCATION_PPS_SENSE unknown, use OFF or LOW or HIGH or BOTH."
 #endif
 
@@ -585,11 +605,11 @@
   #error "Configuration (Config.h): Setting AXIS4_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MIN != OFF && AXIS4_SENSE_LIMIT_MIN < 0
+#if (AXIS4_SENSE_LIMIT_MIN) != OFF && (AXIS4_SENSE_LIMIT_MIN) < 0
   #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MIN unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if AXIS4_SENSE_LIMIT_MAX != OFF && AXIS4_SENSE_LIMIT_MAX < 0
+#if (AXIS4_SENSE_LIMIT_MAX) != OFF && (AXIS4_SENSE_LIMIT_MAX) < 0
   #error "Configuration (Config.h): Setting AXIS4_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 

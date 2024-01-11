@@ -80,6 +80,7 @@ bool Status::update()
         syncToEncodersOnly = strstr(result, "e");
         atHome      = strstr(result, "H");
         homing      = strstr(result, "h");
+        autoHome    = strstr(result, "B");
         ppsSync     = strstr(result, "S");
         pulseGuiding= strstr(result, "G");
         guiding     = strstr(result, "g");

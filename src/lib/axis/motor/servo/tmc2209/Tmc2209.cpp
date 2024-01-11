@@ -91,7 +91,8 @@ void ServoTmc2209::init() {
     SerialTMC.begin(SERIAL_TMC_BAUD);
   #endif
 
-  driver = new TMC2209Stepper(&SERIAL_TMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+  rSense = 0.11F;
+  driver = new TMC2209Stepper(&SERIAL_TMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   driver->begin();
   driver->intpol(true);
 
@@ -104,15 +105,18 @@ void ServoTmc2209::init() {
     driver->microsteps(Settings->microsteps);
   }
 
+  currentRms = Settings->current*0.7071F;
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF (300mA)");
-    driver->rms_current(0.3F*0.707F);
-  } else {
-    VF("Irun="); V(Settings->current); VLF("mA");
-    driver->rms_current(Settings->current*0.707F);
+    VLF("current control OFF setting 300mA");
+    currentRms = 300*0.7071F;
   }
+
   driver->hold_multiplier(1.0F);
+
+  VF("Irun="); V(currentRms/0.7071F); VLF("mA");
+  driver->rms_current(currentRms);
+
   driver->en_spreadCycle(true);
 
   // automatically set fault status for known drivers
@@ -141,8 +145,7 @@ void ServoTmc2209::enable(bool state) {
     VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
     if (state) {
       driver->en_spreadCycle(!stealthChop());
-      driver->irun(mAToCs(Settings->current*0.707F));
-      driver->ihold(mAToCs(Settings->current*0.707F));
+      driver->rms_current(currentRms);
     } else {
       driver->en_spreadCycle(false);
       driver->ihold(0);
@@ -215,8 +218,7 @@ void ServoTmc2209::updateStatus() {
 void ServoTmc2209::calibrateDriver() {
   if (stealthChop()) {
     VF("MSG: ServoTmc2209 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->irun(mAToCs(Settings->current));
-    driver->ihold(mAToCs(Settings->current));
+    driver->rms_current(currentRms);
     ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
     ((TMC2209Stepper*)driver)->en_spreadCycle(false);

@@ -53,6 +53,7 @@
 #define L_ACTIVE "Aktiv"
 #define L_INACTIVE "Inaktiv"
 #define L_BEST "Am besten"
+#define L_ALTERNATE "Wechseln"
 
 // ---------------------------- Index ----------------------------
 // date/time
@@ -95,6 +96,10 @@
 #define L_AT_HOME "Bei Homeposition"
 #define L_SLEWING "Schwenke"
 #define L_PPS_SYNC "PPS Sync"
+#define L_HOME_OFFSET "Versatz zur Home-Sense-Position:"
+#define L_HOME_OFFSET_RANGE_AXIS1 "Axis1, +/-162000 arc-sec"
+#define L_HOME_OFFSET_RANGE_AXIS2 "Axis2, +/-162000 arc-sec"
+#define L_HOME_AUTO "Automatisch nach Hause beim Start:"
 
 // tracking
 #define L_REFR_COMP_RA "RC"
@@ -308,6 +313,11 @@
 #define L_MERIDIAN_FLIP_NOW "Jetzt"
 #define L_MERIDIAN_FLIP_PAUSE "Pausiere an Homeposition w&auml;hrend Meridian Flip"
 #define L_MERIDIAN_FLIP_PPS "Meridianflip, bevorzugte Pierseite"
+
+#define L_ORIENTATION_AUTO "Orientierungsänderung"
+#define L_ORIENTATION_CHANGE_NOW L_MERIDIAN_FLIP_NOW
+#define L_ORIENTATION_CHANGE_PAUSE "Umdrehen, zu Hause innehalten"
+#define L_ORIENTATION_CHANGE_PPS "Umdrehen, bevorzugte Ausrichtung"
 
 // ------------------------ Configuration ------------------------
 

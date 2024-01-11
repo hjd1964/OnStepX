@@ -51,12 +51,16 @@ class Telescope {
 
     void statusInit();
 
+    bool ready = false;
+
   private:
     Firmware firmware;
     int16_t reticleBrightness = RETICLE_LED_DEFAULT;
 };
 
-extern bool xBusy;            // true during timing sensitive operations (for disabling I2C etc.)
-#define analog8BitToAnalogRange(v) roundf((v/255.0F)*(float)(ANALOG_WRITE_RANGE))
+// true during timing sensitive operations (for disabling I2C etc.)
+extern bool xBusy;
+
+#define analog8BitToAnalogRange(v) ((v)*ANALOG_WRITE_RANGE/255)
 
 extern Telescope telescope;

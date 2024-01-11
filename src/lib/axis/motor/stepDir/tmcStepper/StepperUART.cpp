@@ -93,22 +93,20 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   // initialize the stepper driver
   if (settings.model == TMC2208) {
     rSense = 0.11F;
-    driver = new TMC2208Stepper(&SerialTMC, 0.11F);
+    driver = new TMC2208Stepper(&SerialTMC, rSense);
     ((TMC2208Stepper*)driver)->begin();
     ((TMC2208Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
-    driver->irun(mAToCs(settings.currentRun));
-    driver->ihold(mAToCs(settings.currentHold));
+    driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
     ((TMC2208Stepper*)driver)->en_spreadCycle(true);
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
     rSense = 0.11F;
-    driver = new TMC2209Stepper(&SerialTMC, 0.11F, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+    driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
     ((TMC2209Stepper*)driver)->begin();
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
-    driver->irun(mAToCs(settings.currentRun));
-    driver->ihold(mAToCs(settings.currentHold));
+    driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
     ((TMC2209Stepper*)driver)->en_spreadCycle(true);
   }
 
@@ -177,16 +175,14 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 
 void StepDirTmcUART::modeDecayTracking() {
   setDecayMode(settings.decay);
-  driver->irun(mAToCs(settings.currentRun));
-  driver->ihold(mAToCs(settings.currentHold));
+  driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
   setDecayMode(settings.decaySlewing);
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver->irun(mAToCs(IGOTO));
-  driver->ihold(mAToCs(settings.currentHold));
+  driver->rms_current(IGOTO*0.7071F, 1.0F);
 }
 
 // set the decay mode STEALTHCHOP or SPREADCYCLE
@@ -249,8 +245,8 @@ bool StepDirTmcUART::enable(bool state) {
 void StepDirTmcUART::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->irun(mAToCs(settings.currentRun));
-    driver->ihold(mAToCs(settings.currentRun));
+    driver->rms_current(settings.currentRun*0.7071F, 1.0F);
+
     if (settings.model == TMC2208) {
       ((TMC2208Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
       ((TMC2208Stepper*)driver)->pwm_autoscale(true);

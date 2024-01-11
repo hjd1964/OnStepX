@@ -87,7 +87,7 @@ void handleAux() {
         data.concat(F("&bull;"));
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxAnalog));
-        sprintf(temp,"%d' onchange=\"sf('x%dv1',this.value)\">",state.featureValue1(),i+1);
+        sprintf(temp, "%d' onchange=\"sz('x%dv1',this.value)\">", state.featureValue1(), i + 1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         sprintf(temp,"<span id='x%dv1'>%d</span>%%", i + 1, (int)lround((state.featureValue1()/255.0)*100.0));
@@ -113,7 +113,7 @@ void handleAux() {
         data.concat(L_ZERO " (100% " L_POWER ")");
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxHeater));
-        sprintf(temp,"%d' onchange=\"sf('x%dv2',this.value)\">", (int)lround(celsiusToNativeRelative(state.featureValue2())*10.0F), i + 1);
+        sprintf(temp,"%d' onchange=\"sz('x%dv2',this.value)\">", (int)lround(celsiusToNativeRelative(state.featureValue2())*10.0F), i + 1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         dtostrf(celsiusToNativeRelative(state.featureValue2()), 3, 1, temp1);
@@ -125,7 +125,7 @@ void handleAux() {
         data.concat(L_SPAN " (0% " L_POWER ")");
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxHeater));
-        sprintf(temp,"%d' onchange=\"sf('x%dv3',this.value)\">", (int)lround(celsiusToNativeRelative(state.featureValue3())*10.0), i + 1);
+        sprintf(temp,"%d' onchange=\"sz('x%dv3',this.value)\">", (int)lround(celsiusToNativeRelative(state.featureValue3())*10.0), i + 1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         dtostrf(celsiusToNativeRelative(state.featureValue3()), 3, 1, temp1);
@@ -157,7 +157,7 @@ void handleAux() {
         data.concat(L_CAMERA_COUNT);
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxCount));
-        sprintf(temp,"%d' onchange=\"sf('x%dv4',this.value)\">",(int)state.featureValue4(),i+1);
+        sprintf(temp,"%d' onchange=\"sz('x%dv4',this.value)\">",(int)state.featureValue4(),i+1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         dtostrf(state.featureValue4(),0,0,temp1);
@@ -169,7 +169,7 @@ void handleAux() {
         data.concat(L_CAMERA_EXPOSURE);
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxExposure));
-        sprintf(temp,"%d' onchange=\"sf('x%dv2',this.value)\">",(int)timeToByte(state.featureValue2()),i+1);
+        sprintf(temp,"%d' onchange=\"sz('x%dv2',this.value)\">",(int)timeToByte(state.featureValue2()),i+1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         float v; int d;
@@ -183,7 +183,7 @@ void handleAux() {
         data.concat(L_CAMERA_DELAY);
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxDelay));
-        sprintf(temp,"%d' onchange=\"sf('x%dv3',this.value)\">",(int)timeToByte(state.featureValue3()),i+1);
+        sprintf(temp,"%d' onchange=\"sz('x%dv3',this.value)\">",(int)timeToByte(state.featureValue3()),i+1);
         data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
         v=state.featureValue3(); if (v < 10.0) d=2; else if (v < 30.0) d=1; else d=0;

@@ -92,7 +92,12 @@
   // Arduino Due
   #define MCU_STR "SAM3X8E (Arduino DUE)"
   #include "HAL_Due.h"  
-  
+
+#elif defined(ARDUINO_UNOWIFIR4)
+  // Arduino UNO R4 WIFI
+  #define MCU_STR "RENESAS RA4M1 (Arduino UNO R4 WIFI)"
+  #include "HAL_UNO_R4_WIFI.h"  
+
 #else
   // Generic
   #warning "Unknown Platform! If this is a new platform, it would probably do best with a new HAL designed for it."

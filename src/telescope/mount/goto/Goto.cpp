@@ -146,7 +146,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
     VF("MSG: Mount, goto monitor task set rate "); V(FRACTIONAL_SEC_US); VL("us");
 
-    mountStatus.sound.alert();
+    mountStatus.soundAlert();
 
   } else { DLF("WRN: Mount, start goto monitor task... FAILED!"); }
 
@@ -156,7 +156,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
 // sync replaces goto to equatorial position (Native or Mount coordinate system) when GOTO_FEATURE is OFF
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
-  mountStatus.sound.alert();
+  mountStatus.soundAlert();
 
   CommandError result = requestSync(coords, pierSideSelect, native);
 
@@ -299,7 +299,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
     if (pierSideSelect == PSS_WEST_ONLY && target.pierSide != PIER_SIDE_WEST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
     if (pierSideSelect == PSS_SAME_ONLY && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   } else {
-    if (MOUNT_TYPE == ALTAZM) {
+    if (transform.mountType == ALTAZM) {
       // adjust coordinate range to allow going past +/-180 degrees
       if (current.z >= 0) {
         VLF("MSG: Mount, current azimuth >= 0");
@@ -355,7 +355,7 @@ CommandError Goto::validate() {
 }
 
 // add an align star (at the current position relative to target)
-CommandError Goto::alignAddStar() {
+CommandError Goto::alignAddStar(bool sync) {
   if (alignState.currentStar > alignState.lastStar) return CE_PARAM_RANGE;
 
   CommandError e = CE_NONE;
@@ -365,12 +365,15 @@ CommandError Goto::alignAddStar() {
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.init(transform.mountType, site.location.latitude);
     #endif
-    e = requestSync(gotoTarget, settings.preferredPierSide);
+    e = requestSync(gotoTarget, PSS_SAME_ONLY);
+    lastAlignTarget = mount.getMountPosition(CR_MOUNT_ALL);
+    transform.hourAngleToRightAscension(&lastAlignTarget, true);
   }
 
   // add an align star
   if (e == CE_NONE) {
     Coordinate mountPosition = mount.getMountPosition(CR_MOUNT_ALL);
+    if (sync) { lastAlignTarget = gotoTarget; }
 
     // update the targets HA and Horizon coords as necessary
     transform.rightAscensionToHourAngle(&lastAlignTarget, true);
@@ -407,10 +410,10 @@ void Goto::waypoint(Coordinate *current) {
   stage = GG_WAYPOINT_HOME;
 
   // default goes straight to the home position
-  destination = home.position;
+  destination = home.getPosition(CR_MOUNT);
 
   // if the home position is at 0 hours, we're done
-  if (home.position.h == 0.0) return;
+  if (destination.h == 0.0) return;
 
   double d60 = degToRad(120);
   double d45 = degToRad(135);
@@ -463,7 +466,7 @@ void Goto::poll() {
     if (stage == GG_WAYPOINT_AVOID) {
       VLF("MSG: Mount, goto waypoint reached");
       stage = GG_WAYPOINT_HOME;
-      destination = home.position;
+      destination = home.getPosition(CR_MOUNT);
       startAutoSlew();
     } else
 
@@ -516,6 +519,10 @@ void Goto::poll() {
       state = GS_NONE;
       mount.update();
 
+      // back to normal motor frequencies
+      axis1.setFrequencyScale(1.0F);
+      axis2.setFrequencyScale(1.0F);
+
       // kill this monitor
       tasks.setDurationComplete(taskHandle);
       taskHandle = 0;
@@ -534,9 +541,38 @@ void Goto::poll() {
       // reset goto stage
       stage = GG_NONE;
 
-      mountStatus.sound.alert();
+      mountStatus.soundAlert();
 
       return;
+    }
+  }
+
+  // adjust rates near the horizon to help avoid exceeding the minimum altitude limit
+  if (transform.mountType != ALTAZM) {
+    if (site.locationEx.latitude.absval > degToRad(10.0)) {
+      static float last_a2 = 0;
+      Coordinate coords = mount.getMountPosition(CR_MOUNT_ALT);
+      float a2 = site.locationEx.latitude.sign*coords.d;
+
+      // range 0.2 to 1.0, where a larger distance has less slowdown effect
+      float slowdownFactor =  radToDeg(coords.a - limits.settings.altitude.min)/(SLEW_ACCELERATION_DIST*2.0);
+
+      // constrain
+      if (slowdownFactor > 1.0F) slowdownFactor = 1.0F;
+      if (slowdownFactor < 0.2F) slowdownFactor = 0.2F;
+
+      // if Dec is decreasing slow down the Dec axis, if Dec is increasing slow down the RA axis
+      if (a2 < last_a2) {
+        axis1.setFrequencyScale(1.0F);
+        axis2.setFrequencyScale(slowdownFactor);
+      } else {
+        axis1.setFrequencyScale(slowdownFactor);
+        axis2.setFrequencyScale(1.0F);
+      }
+      last_a2 = a2;
+    } else {
+      axis1.setFrequencyScale(1.0F);
+      axis2.setFrequencyScale(1.0F);
     }
   }
 
@@ -560,7 +596,7 @@ void Goto::poll() {
 
         double a1, a2;
         transform.mountToInstrument(&nearTarget, &a1, &a2);
-        if (MOUNT_TYPE == ALTAZM) a1 += azimuthTargetCorrection;
+        if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
         axis1.setTargetCoordinate(a1);
         axis2.setTargetCoordinate(a2);
@@ -583,7 +619,7 @@ CommandError Goto::startAutoSlew() {
 
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
-  if (MOUNT_TYPE == ALTAZM) a1 += azimuthTargetCorrection;
+  if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
   if (stage == GG_DESTINATION && park.state == PS_PARKING) {
     axis1.setTargetCoordinatePark(a1);
@@ -593,7 +629,7 @@ CommandError Goto::startAutoSlew() {
     axis2.setTargetCoordinate(a2);
   }
 
-  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF("deg, a2="); V(radToDeg(a2)); VLF(" deg)");
+  VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF(" deg, a2="); V(radToDeg(a2)); VLF(" deg)");
 
   e = axis1.autoGoto(radsPerSecondCurrent);
   if (e == CE_NONE) e = axis2.autoGoto(radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));

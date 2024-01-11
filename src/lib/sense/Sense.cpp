@@ -60,7 +60,11 @@ int SenseInput::isOn() {
     if (stableMs >= hysteresis) value = stableSample;
   }
   lastValue = value;
-  return value == activeState;
+  if (reverseState) {
+    return value != activeState;
+  } else {
+    return value == activeState;
+  }
 }
 
 int SenseInput::changed() {
@@ -120,6 +124,11 @@ int Sense::isOn(uint8_t handle) {
 int Sense::changed(uint8_t handle) {
   if (handle == 0) return false;
   return senseInput[handle - 1]->changed();
+}
+
+void Sense::reverse(uint8_t handle, bool state) {
+  if (handle == 0) return;
+  senseInput[handle - 1]->reverse(state);
 }
 
 void Sense::poll() {

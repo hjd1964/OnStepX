@@ -15,9 +15,13 @@
   #ifndef ETHERNET_W5500
     #error "The ESP8266 Ethernet option supports the W5500 only"
   #endif
-  #include <Ethernet2.h>  // https://github.com/adafruit/Ethernet2
+  #include <Ethernet2.h>     // https://github.com/adafruit/Ethernet2
 #else
-  #include <Ethernet.h>   // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
+  #include <Ethernet.h>      // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
+  #if MDNS_SERVER == ON
+    #include <EthernetUdp.h> // built-in library
+    #include <ArduinoMDNS.h> // https://www.arduino.cc/reference/en/libraries/arduinomdns/
+  #endif
 #endif
 
 #define EthernetSettingsSize 128

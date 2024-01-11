@@ -75,15 +75,20 @@ const char html_gotoMfAuto[] PROGMEM =
   "<button onpointerdown=\"s('goto','af_now')\" type='button'>" L_MERIDIAN_FLIP_NOW "</button>"
   "<br /><br />\n";
 
+const char html_gotoMfNow[] PROGMEM =
+  L_ORIENTATION_AUTO ":<br />"
+  "<button onpointerdown=\"s('goto','af_now')\" type='button'>" L_MERIDIAN_FLIP_NOW "</button>"
+  "<br /><br />\n";
+
 const char html_gotoMfPause[] PROGMEM =
-L_MERIDIAN_FLIP_PAUSE ": <br />"
+  "%s: <br />"
   "<button id='gto_mfp_on' class='btns_right' onpointerdown=\"s('goto','mp_on')\"  type='button'>" L_ON "</button>"
   "<button id='gto_mfp_off' class='btns_left' onpointerdown=\"s('goto','mp_off')\" type='button'>" L_OFF "</button>"
   "<br />\n";
 
 const char html_gotoPreferredPierSide[] PROGMEM =
-L_MERIDIAN_FLIP_PPS ": <br />"
-  "<button id='gto_pps_east' class='btns_right' onpointerdown=\"s('goto','pps_e')\"  type='button'>" L_EAST "</button>"
-  "<button id='gto_pps_west' class='btns_mid' onpointerdown=\"s('goto','pps_w')\" type='button'>" L_WEST "</button>"
+  "%s: <br />"
+  "<button id='gto_pps_east' class='btns_right' onpointerdown=\"s('goto','pps_e')\"  type='button'>%s</button>"
+  "<button id='gto_pps_west' class='btns_mid' onpointerdown=\"s('goto','pps_w')\" type='button'>%s</button>"
   "<button id='gto_pps_best' class='btns_left' onpointerdown=\"s('goto','pps_b')\" type='button'>" L_BEST "</button>"
   "<br />\n";

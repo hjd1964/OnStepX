@@ -21,6 +21,7 @@
 #include "status/Status.h"
 
 inline void mountWrapper() { mount.poll(); }
+inline void autostartWrapper() { mount.autostartPostponed(); }
 
 void Mount::init() {
   // confirm the data structure size
@@ -41,12 +42,18 @@ void Mount::init() {
   axis1.setBacklash(settings.backlash.axis1);
   axis1.setMotionLimitsCheck(false);
   if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(AXIS1_POWER_DOWN_TIME);
+  #ifdef AXIS1_ENCODER_ORIGIN
+    if (AXIS1_ENCODER_ORIGIN == 0) axis1.motor->encoderSetOrigin(nv.readUL(NV_AXIS_ENCODER_ZERO_BASE));
+  #endif
 
   delay(100);
   if (!axis2.init(&motor2)) { initError.driver = true; DLF("ERR: Axis2, no motion controller!"); }
   axis2.setBacklash(settings.backlash.axis2);
   axis2.setMotionLimitsCheck(false);
   if (AXIS2_POWER_DOWN == ON) axis2.setPowerDownTime(AXIS2_POWER_DOWN_TIME);
+  #ifdef AXIS2_ENCODER_ORIGIN
+    if (AXIS2_ENCODER_ORIGIN == 0) axis2.motor->encoderSetOrigin(nv.readUL(NV_AXIS_ENCODER_ZERO_BASE + 4));
+  #endif
 }
 
 void Mount::begin() {
@@ -67,7 +74,6 @@ void Mount::begin() {
   }
 
   // initialize the other subsystems
-  home.init();
   home.reset();
   limits.init();
   guide.init();
@@ -98,7 +104,20 @@ void Mount::begin() {
   #endif
 
   tracking(false);
-  trackingAutostart();
+
+  // restore where we were pointing
+  #if MOUNT_COORDS_MEMORY == ON
+    if (!goTo.absoluteEncodersPresent && park.state != PS_PARKED) {
+      int8_t lastMountType = nv.readC(NV_MOUNT_LAST_POSITION);
+      if (transform.mountType == lastMountType) {
+        VLF("MSG: Mount, reading last position");
+        float a1 = nv.readF(NV_MOUNT_LAST_POSITION + 1);
+        float a2 = nv.readF(NV_MOUNT_LAST_POSITION + 5);
+        axis1.setInstrumentCoordinate(a1);
+        axis2.setInstrumentCoordinate(a2);
+      }
+    }
+  #endif
 
   #if ALIGN_MAX_NUM_STARS > 1 && ALIGN_MODEL_MEMORY == ON
     transform.align.modelRead();
@@ -108,6 +127,7 @@ void Mount::begin() {
   if (tasks.add(1000, 0, true, 6, mountWrapper, "MntTrk")) { VLF("success"); } else { VLF("FAILED!"); }
 
   update();
+  autostart();
 }
 
 // get current equatorial position (Native coordinate system)
@@ -122,30 +142,76 @@ Coordinate Mount::getMountPosition(CoordReturn coordReturn) {
   return current;
 }
 
-// one time initialization of tracking
-void Mount::trackingAutostart() {
-  static bool completed = false;
-  if (completed) return;
+// handle all autostart tasks
+void Mount::autostart() {
+  tasks.setDurationComplete(tasks.getHandleByName("mnt_as"));
+  tasks.add(500, 0, true, 7, autostartWrapper, "mnt_as");
+}
 
-  if (park.state == PS_PARKED) {
+void Mount::autostartPostponed() {
+  // wait until OnStepX is fully up and running
+  if (!telescope.ready) return;
+
+  // stop this task if already completed
+  static bool autoStartDone = false;
+  if (autoStartDone) {
+    tasks.setDurationComplete(tasks.getHandleByName("mnt_as"));
+    return;
+  }
+
+  // handle the one case where this completes without the date/time available
+  static bool autoTrackDone = false;
+  if (!autoTrackDone && TRACK_AUTOSTART == ON && transform.mountType != ALTAZM && park.state != PS_PARKED && !home.settings.automaticAtBoot) {
+    VLF("MSG: Mount, autostart tracking sidereal");
+    tracking(true);
+    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+    autoStartDone = true;
+    return;
+  }
+
+  // wait for the date/time to be set
+  if (!site.isDateTimeReady()) return;
+
+  // auto unpark
+  static bool autoUnparkDone = false;
+  if (!autoUnparkDone && park.state == PS_PARKED) {
     #if GOTO_FEATURE == ON
+      VLF("MSG: Mount, autostart park restore");
       CommandError e = park.restore(TRACK_AUTOSTART == ON);
-      if (e == CE_PARKED) return;
-    #endif
-  } else {
-    #if TRACK_AUTOSTART == ON
-      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
-        VLF("MSG: Mount, autostart tracking sidereal");
-        tracking(true);
-        trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
-      } else {
-        VLF("MSG: Mount, autostart tracking postponed no date/time");
+      if (e != CE_NONE) {
+        VF("WRN: Mount, autostart park restore failed with code "); VL(e);
+        autoStartDone = true;
         return;
       }
     #endif
   }
+  autoUnparkDone = true;
 
-  completed = true;
+  // auto home
+  static bool autoHomeDone = false;
+  if (!autoHomeDone && home.settings.automaticAtBoot) {
+    VLF("MSG: Mount, autostart home");
+    CommandError e = home.request();
+    if (e != CE_NONE) {
+      VF("WRN: Mount, autostart home request failed with code "); VL(e);
+      autoStartDone = true;
+      return;
+    }
+  }
+  autoHomeDone = true;
+
+  // wait for any homing operation to complete
+  if (home.state == HS_HOMING) return;
+
+  // auto tracking
+  if (!autoTrackDone && TRACK_AUTOSTART == ON) {
+    VLF("MSG: Mount, autostart tracking sidereal");
+    tracking(true);
+    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+  }
+  autoTrackDone = true;
+
+  autoStartDone = true;
 }
 
 // enables or disables tracking, enabling tracking powers on the motors if necessary
@@ -163,18 +229,13 @@ void Mount::tracking(bool state) {
 }
 
 // enables or disables power to the mount motors
-// first enable starts the mount status indications
 void Mount::enable(bool state) {
-  static bool firstEnable = true;
-
   if (state == true) {
     #if LIMIT_STRICT == ON
       if (!site.dateIsReady || !site.timeIsReady) return;
     #endif
 
-    if (firstEnable) { mountStatus.ready(); }
-
-    firstEnable = false;
+    mountStatus.wake();
   } else {
     trackingState = TS_NONE;
     update();
@@ -236,6 +297,15 @@ void Mount::poll() {
   #else
     #define DiffRange  2.908882086657216e-4L // 1 arc-minute in radians
     #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
+  #endif
+
+  // keep track of where we are pointing
+  #if MOUNT_COORDS_MEMORY == ON
+    if (!goTo.absoluteEncodersPresent) {
+      nv.write(NV_MOUNT_LAST_POSITION, transform.mountType);
+      nv.write(NV_MOUNT_LAST_POSITION + 1, (float)axis1.getInstrumentCoordinate());
+      nv.write(NV_MOUNT_LAST_POSITION + 5, (float)axis2.getInstrumentCoordinate());
+    }
   #endif
 
   if (trackingState == TS_NONE) {
@@ -359,10 +429,6 @@ float Mount::ztr(float a) {
 }
 
 // update where we are pointing *now*
-// CR_MOUNT for Horizon or Equatorial mount coordinates, depending on mount
-// CR_MOUNT_EQU for Equatorial mount coordinates, depending on mode
-// CR_MOUNT_ALT for altitude (a) and Horizon or Equatorial mount coordinates, depending on mode
-// CR_MOUNT_HOR for Horizon mount coordinates, depending on mode
 void Mount::updatePosition(CoordReturn coordReturn) {
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
   if (transform.mountType == ALTAZM) {

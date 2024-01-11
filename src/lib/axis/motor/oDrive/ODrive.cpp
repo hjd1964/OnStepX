@@ -272,7 +272,7 @@ void ODriveMotor::poll() {
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
 IRAM_ATTR void ODriveMotor::move() {
-  if (synchronized && !inBacklash) targetSteps += step;
+  if (sync && !inBacklash) targetSteps += step;
 
   if (motorSteps > targetSteps) {
     if (backlashSteps > 0) {

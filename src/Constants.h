@@ -27,13 +27,13 @@
 
 #define MaxESP3                     14     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
 #define MaxESP4                     15     // for ESP32S w/TMC2209 support
-#define MaxESPS2                    16     // for ESP32S w/TMC2209 support
-#define CNC3                        17     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
-#define MicroScope                  18     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
+#define CNC3                        16     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MicroScope                  17     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
-#define STM32Blue                   19     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define JTWSTM                      20     // JTW Astronomy PCB rev 2.1
+#define JTWSTM                      19     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
+#define MANTICORE                   20     // JTW Astronomy MANTICORE telescope mount controller Rev 1.0
 
 #define PINMAP_LAST                 20
 
@@ -144,7 +144,7 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928934UL
+#define INIT_NV_KEY                 583928938UL
 
 #define NV_KEY                      0      // bytes: 4   , 4
 #define NV_SITE_NUMBER              4      // bytes: 1   , 1
@@ -156,16 +156,19 @@
 #define NV_MOUNT_GOTO_BASE          191    // bytes: 6   , 6
 #define NV_MOUNT_GUIDE_BASE         197    // bytes: 3   , 3
 #define NV_MOUNT_LIMITS_BASE        200    // bytes: 16  , 16
-#define NV_MOUNT_PARK_BASE          216    // bytes: 15  , 15
-#define NV_MOUNT_PEC_BASE           231    // bytes: 6   , 6
-#define NV_MOUNT_STATUS_BASE        237    // bytes: 1   , 1
+#define NV_MOUNT_HOME_BASE          216    // bytes: 9  ,  9
+#define NV_MOUNT_PARK_BASE          225    // bytes: 15  , 15
+#define NV_MOUNT_PEC_BASE           240    // bytes: 6   , 6
+#define NV_MOUNT_STATUS_BASE        246    // bytes: 1   , 1
+#define NV_MOUNT_LAST_POSITION      247    // bytes: 9   , 9
 
-#define NV_ALIGN_MODEL_BASE         238    // bytes: 32  , 32
-#define NV_AXIS_SETTINGS_REVERT     270    // bytes: 2   , 2
-#define NV_AXIS_SETTINGS_BASE       272    // bytes: 45*9, 405
-#define NV_FOCUSER_SETTINGS_BASE    677    // bytes: 20*6, 120
-#define NV_ROTATOR_SETTINGS_BASE    797    // bytes: 11  , 11
-#define NV_FEATURE_SETTINGS_BASE    808    // bytes: 3 *8, 24
-#define NV_TELESCOPE_SETTINGS_BASE  832    // bytes: 2   , 2
+#define NV_ALIGN_MODEL_BASE         256    // bytes: 32  , 32
+#define NV_AXIS_SETTINGS_REVERT     288    // bytes: 2   , 2
+#define NV_AXIS_SETTINGS_BASE       290    // bytes: 45*9, 405
+#define NV_AXIS_ENCODER_ZERO_BASE   695    // bytes: 4 *2, 8
+#define NV_FOCUSER_SETTINGS_BASE    703    // bytes: 20*6, 120
+#define NV_ROTATOR_SETTINGS_BASE    823    // bytes: 11  , 11
+#define NV_FEATURE_SETTINGS_BASE    834    // bytes: 3 *8, 24
+#define NV_TELESCOPE_SETTINGS_BASE  858    // bytes: 2   , 2
 
-#define NV_LAST                     833
+#define NV_LAST                     859

@@ -120,10 +120,10 @@
         const long AltMode_ms = 2000;
         if (goTo.state == GS_NONE && !goTo.isHomePaused()) {
           if (st4Axis1Rev.timeDown() > AltMode_ms && st4Axis1Fwd.timeDown() > AltMode_ms && !altModeB) {
-            if (!altModeA) { altModeA = true; mountStatus.sound.beep(); }
+            if (!altModeA) { altModeA = true; mountStatus.soundBeep(); }
           }
           if (st4Axis2Fwd.timeDown() > AltMode_ms && st4Axis2Rev.timeDown() > AltMode_ms && !altModeA) {
-            if (!altModeB) { altModeB = true; mountStatus.sound.beep(); }
+            if (!altModeB) { altModeB = true; mountStatus.soundBeep(); }
           }
         }
       #endif
@@ -142,7 +142,7 @@
               #else
                 SERIAL_LOCAL.transmit(":B+#");
               #endif
-              mountStatus.sound.click();
+              mountStatus.soundClick();
             }
             if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
               #if GOTO_FEATURE == ON
@@ -150,7 +150,7 @@
               #else
                 SERIAL_LOCAL.transmit(":B-#");
               #endif
-              mountStatus.sound.click();
+              mountStatus.soundClick();
             }
             if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
               #if GOTO_FEATURE == ON
@@ -158,9 +158,9 @@
               #else
                 SERIAL_LOCAL.transmit(":CS#");
               #endif
-              mountStatus.sound.click();
+              mountStatus.soundClick();
             }
-            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); mountStatus.sound.click(); }
+            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); mountStatus.soundClick(); }
             guide.settings.axis1RateSelect = (GuideRateSelect)r;
             guide.settings.axis2RateSelect = (GuideRateSelect)r;
             if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
@@ -170,8 +170,8 @@
               static int fs = 0;
               static int fn = 0;
               if (!fn && !fs) {
-                if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); mountStatus.sound.click(); }
-                if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); mountStatus.sound.click(); }
+                if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); mountStatus.soundClick(); }
+                if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); mountStatus.soundClick(); }
               }
               if (!fn) {
                 if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) {
@@ -192,10 +192,10 @@
                 if (st4Axis2Fwd.isUp()) { if (fn > 0) { SERIAL_LOCAL.transmit(":FQ#"); fn = 0; } }
               }
             #else
-              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); mountStatus.sound.click(); }
-              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); mountStatus.sound.click(); }
-              if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); mountStatus.sound.click(); }
-              if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { mountStatus.sound.click(); mountStatus.sound.enabled = !mountStatus.sound.enabled; mountStatus.sound.click(); }
+              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); mountStatus.soundClick(); }
+              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); mountStatus.soundClick(); }
+              if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); mountStatus.soundClick(); }
+              if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { mountStatus.soundClick(); mountStatus.soundToggleEnable(); mountStatus.soundClick(); }
             #endif
           }
         }
@@ -206,7 +206,7 @@
           #endif
           altModeA = false;
           altModeB = false;
-          mountStatus.sound.beep();
+          mountStatus.soundBeep();
         }
     #endif
 

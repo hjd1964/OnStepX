@@ -75,7 +75,6 @@ class ServoTmc2209 : public ServoDriver {
     const ServoTmcSettings *Settings;
 
   private:
-    inline float mAToCs(float mA) { return 32.0F*(((mA/1000.0F)*(rSense+0.02F))/0.325F) - 1.0F; }
     float rSense = 0.11F;
 
     bool stealthChop() { 
@@ -89,6 +88,7 @@ class ServoTmc2209 : public ServoDriver {
 
     TMC2209Stepper *driver;
 
+    int16_t currentRms;
     bool powered = false;
     bool sdMode = false;
     float currentVelocity = 0.0F;

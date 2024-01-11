@@ -26,7 +26,6 @@ enum RateCompensation: uint8_t {RC_NONE, RC_REFRACTION, RC_REFRACTION_DUAL, RC_M
 #endif
 
 enum TrackingState: uint8_t    {TS_NONE, TS_SIDEREAL};
-enum CoordReturn: uint8_t      {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
 
 #pragma pack(1)
 #define MountSettingsSize 9
@@ -61,15 +60,16 @@ class Mount {
 
     // returns true if the mount is at the home (startup) position
     inline bool isHome() {
-      return abs(axis1.getInstrumentCoordinate() - home.position.a1) <= arcsecToRad(AXIS1_HOME_TOLERANCE) &&
-             abs(axis2.getInstrumentCoordinate() - home.position.a2) <= arcsecToRad(AXIS2_HOME_TOLERANCE);
+      return abs(axis1.getInstrumentCoordinate() - home.getPosition(CR_MOUNT).a1) <= arcsecToRad(AXIS1_HOME_TOLERANCE) &&
+             abs(axis2.getInstrumentCoordinate() - home.getPosition(CR_MOUNT).a2) <= arcsecToRad(AXIS2_HOME_TOLERANCE);
     }
 
     // returns true if the mount is slewing (doing a goto or guide > 2X)
     inline bool isSlewing() { return axis1.isSlewing() || axis2.isSlewing(); }
 
     // one time initialization of tracking
-    void trackingAutostart();
+    void autostart();
+    void autostartPostponed();
 
     // enables or disables tracking, enabling tracking powers on the motors if necessary
     void tracking(bool state);
@@ -106,10 +106,6 @@ class Mount {
     float ztr(float a);
 
     // update where we are pointing *now*
-    // CR_MOUNT for Horizon or Equatorial mount coordinates, depending on mount
-    // CR_MOUNT_EQU for Equatorial mount coordinates, depending on mode
-    // CR_MOUNT_ALT for altitude (a) and Horizon or Equatorial mount coordinates, depending on mode
-    // CR_MOUNT_HOR for Horizon mount coordinates, depending on mode
     void updatePosition(CoordReturn coordReturn);
 
     // current position in Mount coordinates (Observed Place with no corrections except index offset)

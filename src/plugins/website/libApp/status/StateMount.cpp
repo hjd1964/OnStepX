@@ -112,7 +112,7 @@ void State::updateMount(bool now)
   strncpyex(pierSideStr, temp, 10);
 
   // Preferred pier side
-  if (status.mountType != MT_ALTAZM) {
+  if (status.mountType != MT_ALTAZM || (status.getVersionMajor() >= 10 && status.meridianFlips)) {
     preferredPierSideChar = '?';
     char temp[80];
     if (onStep.command(":GX96#", temp)) {

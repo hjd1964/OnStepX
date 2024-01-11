@@ -44,6 +44,7 @@
 #define L_ACTIVE "Active"
 #define L_INACTIVE "Inactive"
 #define L_BEST "Best"
+#define L_ALTERNATE "Alternate"
 
 // ---------------------------- Index ----------------------------
 // date/time
@@ -86,6 +87,10 @@
 #define L_AT_HOME "At Home"
 #define L_SLEWING "Slewing"
 #define L_PPS_SYNC "PPS Sync"
+#define L_HOME_OFFSET "Offset from home sense position:"
+#define L_HOME_OFFSET_RANGE_AXIS1 "Axis1, +/-162000 arc-sec"
+#define L_HOME_OFFSET_RANGE_AXIS2 "Axis2, +/-162000 arc-sec"
+#define L_HOME_AUTO "Automatically home at startup:"
 
 // tracking
 #define L_REFR_COMP_RA "RC"
@@ -298,6 +303,11 @@
 #define L_MERIDIAN_FLIP_NOW "Now"
 #define L_MERIDIAN_FLIP_PAUSE "Meridian Flip, Pause at Home"
 #define L_MERIDIAN_FLIP_PPS "Meridian Flip, Preferred Pier Side"
+
+#define L_ORIENTATION_AUTO "Orientation Change"
+#define L_ORIENTATION_CHANGE_NOW L_MERIDIAN_FLIP_NOW
+#define L_ORIENTATION_CHANGE_PAUSE "Flip, Pause at Home"
+#define L_ORIENTATION_CHANGE_PPS "Flip, Preferred Orientation"
 
 // ------------------------ Configuration ------------------------
 

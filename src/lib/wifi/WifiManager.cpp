@@ -120,6 +120,10 @@ bool WifiManager::init() {
       active = true;
       VLF("MSG: WiFi, initialized");
 
+      #if MDNS_SERVER == ON && !defined(ESP8266)
+        if (MDNS.begin(MDNS_NAME)) { VLF("MSG: WiFi, mDNS started"); } else { VLF("WRN: WiFi, mDNS start failed!"); }
+      #endif
+
       #if STA_AUTO_RECONNECT == true
         if (settings.stationEnabled) {
           VF("MSG: WiFi, start connection check task (rate 8s priority 7)... ");

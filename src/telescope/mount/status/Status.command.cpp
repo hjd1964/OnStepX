@@ -25,6 +25,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
     if (command[1] == 'm' && parameter[0] == 0)  {
       strcpy(reply, "?");
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE) reply[0]='N';
       if (current.pierSide == PIER_SIDE_EAST) reply[0]='E';
       if (current.pierSide == PIER_SIDE_WEST) reply[0]='W';
@@ -44,7 +45,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (mount.syncFromOnStepToEncoders)      reply[i++]='e';                     // Sync to [e]ncoders only
       if (mount.isHome())                      reply[i++]='H';                     // At [H]ome
       if (home.state == HS_HOMING)             reply[i++]='h';                     // Slewing [h]ome
-      #if TIME_LOCATION_PPS_SENSE != OFF
+      if (home.settings.automaticAtBoot)       reply[i++]='B';                     // Auto home at [B]oot
+      #if (TIME_LOCATION_PPS_SENSE) != OFF
         if (pps.synced)                        reply[i++]='S';                     // PPS [S]ync
       #endif
       if (guide.activePulseGuide())            reply[i++]='G';                     // Pulse [G]uide active
@@ -75,6 +77,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE)  reply[i++]='o'; else                // Pier side n[o]ne
       if (current.pierSide == PIER_SIDE_EAST)  reply[i++]='T'; else                // Pier side eas[T]
       if (current.pierSide == PIER_SIDE_WEST)  reply[i++]='W';                     // Pier side [W]est
@@ -94,7 +97,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       memset(reply, (char)0b10000000, 9);
       if (!mount.isTracking())                     reply[0]|=0b10000001;           // Not tracking
       if (goTo.state == GS_NONE)                   reply[0]|=0b10000010;           // No goto
-      #if TIME_LOCATION_PPS_SENSE != OFF
+      #if (TIME_LOCATION_PPS_SENSE) != OFF
         if (pps.synced)                            reply[0]|=0b10000100;           // PPS sync
       #endif
       if (guide.activePulseGuide())                reply[0]|=0b10001000;           // Pulse guide active
@@ -113,7 +116,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (mount.syncFromOnStepToEncoders)          reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.active())                          reply[1]|=0b10001000;           // Guide active
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
-      if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing [h]ome
+      if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing home
+      if (home.settings.automaticAtBoot)           reply[2]|=0b11000000;           // Auto home at boot
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
       if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home enabled?
       if (sound.enabled)                           reply[2]|=0b10001000;           // Buzzer enabled?
@@ -124,6 +128,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == ALTAZM)           reply[3]|=0b10001000;           // ALTAZM
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
+      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
       if (current.pierSide == PIER_SIDE_NONE)      reply[3]|=0b10010000; else      // Pier side none
       if (current.pierSide == PIER_SIDE_EAST)      reply[3]|=0b10100000; else      // Pier side east
       if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
@@ -148,7 +153,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (transform.mountType == GEM)          reply[i++] = 'G'; else
       if (transform.mountType == FORK)         reply[i++] = 'P'; else
       if (transform.mountType == ALTAZM)       reply[i++] = 'A';
-      if (mount.isTracking())                  reply[i++] = 'N'; else reply[i++] = 'T';
+      if (mount.isTracking())                  reply[i++] = 'T'; else reply[i++] = 'N';
       if (park.state == PS_PARKED)             reply[i++] = 'P'; else
       if (mount.isHome())                      reply[i++] = 'H'; else
       if (goTo.alignDone())                    reply[i++] = '1'; else reply[i++] = '0';
@@ -169,13 +174,13 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
         #endif
       break;
       case '2':
-        sound.beep();
+        soundBeep();
       break;
       case '3':
-        sound.alert();
+        soundAlert();
       break;
       case '4':
-        sound.click();
+        soundClick();
       break;
       default:
         *commandError = CE_PARAM_RANGE;

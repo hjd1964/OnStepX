@@ -84,7 +84,8 @@ CommandError Limits::validateTarget(Coordinate *coords) {
       if (fgt(coords->d, axis2.settings.limits.max)) {
         VF("MSG: Mount, validate failed Dec past max limit by ");
         V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VLF(" arc-secs");
-        return CE_SLEW_ERR_OUTSIDE_LIMITS;}
+        return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      }
     }
   }
   return CE_NONE;
@@ -278,6 +279,7 @@ void Limits::poll() {
       stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
       error.limit.axis2.max = true;
     } else error.limit.axis2.max = false;
+
   } else {
     error.altitude.min = false;
     error.altitude.max = false;

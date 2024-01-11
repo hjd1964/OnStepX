@@ -16,6 +16,13 @@
 // MOUNT      <--> apply pointing model                   <--> OBSERVED    (Transform)
 // OBSERVED   <--> apply refraction                       <--> TOPOCENTRIC (Transform)
 
+// CR_MOUNT for Horizon or Equatorial mount coordinates, depending on the mount type
+// CR_MOUNT_EQU for Equatorial mount coordinates
+// CR_MOUNT_ALT for altitude (a) and Horizon or Equatorial mount coordinates
+// CR_MOUNT_HOR for Horizon mount coordinates
+// CR_MOUNT_ALL for both Equatorial and Horizon mount coordinates
+enum CoordReturn: uint8_t {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, CR_MOUNT_ALL};
+
 class Transform {
   public:
     // setup for coordinate transformation

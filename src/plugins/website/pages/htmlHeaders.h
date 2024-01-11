@@ -31,6 +31,9 @@
 #ifndef COLOR_LINK_BACKGROUND
 #define COLOR_LINK_BACKGROUND "#332222"
 #endif
+#ifndef COLOR_LINK_SELECTED_BACKGROUND
+#define COLOR_LINK_SELECTED_BACKGROUND "#552222"
+#endif
 #ifndef COLOR_LINK_BORDER
 #define COLOR_LINK_BORDER "red"
 #endif
@@ -105,7 +108,7 @@ const char html_main_css_core[] PROGMEM =
 ".b { padding: 10px; border-left: 5px solid " COLOR_BORDER "; border-right: 5px solid " COLOR_BORDER "; border-bottom: 5px solid " COLOR_BORDER "; margin: 0px 25px 25px 25px; color: " COLOR_FOREGROUND ";"
 "background-color: " COLOR_BACKGROUND "; min-width: 30em; } select { width:4em; font-weight: bold; background-color: " COLOR_CONTROL "; padding: 2px 2px; }"
 ".c { color: " COLOR_CONTROL "; font-weight: bold; }"
-"h1 { text-align: right; } a:hover, a:active { background-color: red; } .y { color: " COLOR_ALERT "; font-weight: bold; }"
+"h1 { text-align: right; } a:hover, a:active { background-color: " COLOR_LINK_BORDER "; } .y { color: " COLOR_ALERT "; font-weight: bold; }"
 "a:link, a:visited { background-color: " COLOR_LINK_BACKGROUND "; color: " COLOR_LINK "; border:1px solid " COLOR_LINK_BORDER "; padding: 5px 10px; margin: none; text-align: center; text-decoration: none; display: inline-block; }"
 "button:disabled { background-color: " COLOR_CONTROL_DISABLED_BACKGROUND "; color: " COLOR_CONTROL_DISABLED "; } button { background-color: " COLOR_CONTROL "; font-weight: bold; border-radius: 5px; margin: 2px; padding: 4px 8px; }";
 

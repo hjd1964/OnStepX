@@ -76,6 +76,13 @@
 #define STA_ENABLED true
 #endif
 
+#ifndef MDNS_SERVER
+#define MDNS_SERVER                  ON                           // mDNS enabled
+#endif
+#ifndef MDNS_NAME
+#define MDNS_NAME                    "onstepx"                    // mDNS device name
+#endif
+
 #ifndef AP_SSID
 #define AP_SSID                       "OnStepX"                   // Wifi Access Point SSID
 #endif
@@ -197,6 +204,9 @@
 #endif
 #ifndef AXIS1_SENSE_HOME_INIT
 #define AXIS1_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+#endif
+#ifndef AXIS1_SENSE_HOME_OFFSET
+#define AXIS1_SENSE_HOME_OFFSET       0                           // default offset in arc-seconds to home from the sense position
 #endif
 #ifndef AXIS1_SENSE_HOME_DIST_LIMIT
 #define AXIS1_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees
@@ -362,6 +372,9 @@
 #endif
 #ifndef AXIS2_SENSE_HOME_INIT
 #define AXIS2_SENSE_HOME_INIT         INPUT_PULLUP                // pin mode for home sensing
+#endif
+#ifndef AXIS2_SENSE_HOME_OFFSET
+#define AXIS2_SENSE_HOME_OFFSET       0                           // default offset in arc-seconds to home from the sense position
 #endif
 #ifndef AXIS2_SENSE_HOME_DIST_LIMIT
 #define AXIS2_SENSE_HOME_DIST_LIMIT   180.0                       // max distance in degrees
@@ -533,8 +546,17 @@
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
+#ifndef MOUNT_COORDS
+#define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
+#endif
+#ifndef MOUNT_COORDS_MEMORY
+#define MOUNT_COORDS_MEMORY           OFF                         // ON Enables mount position memory
+#endif
 #ifndef MOUNT_ENABLE_IN_STANDBY
 #define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
+#endif
+#ifndef MOUNT_AUTO_HOME_DEFAULT
+#define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
@@ -562,10 +584,6 @@
 #endif
 #ifndef TANGENT_ARM_MOUNT_TO_INSTRUMENT
 #define TANGENT_ARM_MOUNT_TO_INSTRUMENT(a) (tan(a))               // angle (a) in radians
-#endif
-
-#ifndef MOUNT_COORDS
-#define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
 #endif
 
 // user feedback

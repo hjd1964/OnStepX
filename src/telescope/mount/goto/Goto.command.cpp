@@ -12,6 +12,7 @@
 #include "../guide/Guide.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
+#include "../status/Status.h"
 
 bool Goto::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;
@@ -28,7 +29,8 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     // :A?#       Align status
     //            Returns: mno#
     //            where m is the maximum number of alignment stars
-    //                  n is the current alignment star (0 otherwise)
+    //                  n is the current alignment star (0 otherwise) note: this is always 1 greater than the number
+    //                    of alignment stars accepted and so can range from '0' to ':' (':' = '0' + 10)
     //                  o is the last required alignment star when an alignment is in progress (0 otherwise)
     if (command[1] == '?' && parameter[0] == 0) {
       reply[0] = '0' + ALIGN_MAX_NUM_STARS;
@@ -88,19 +90,24 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
   //            Returns: "N/A#" on success, "En#" on failure where n is the error code per the :MS# command
   if (command[0] == 'C' && (command[1] == 'S' || command[1] == 'M') && parameter[0] == 0) {
     CommandError e;
+
     if (alignActive()) {
-      e = alignAddStar();
+      e = alignAddStar(true);
       if (e != CE_NONE) {
-          alignState.lastStar = 0;
-          alignState.currentStar = 0;
-          *commandError = e;
-          DLF("ERR: Mount, failed to add align point");
-        } else { VLF("MSG: Mount, align point added"); }
-      } else {
+        alignState.lastStar = 0;
+        alignState.currentStar = 0;
+        *commandError = e;
+        DLF("ERR: Mount, failed to add align point");
+      } else { VLF("MSG: Mount, align point added"); }
+    } else {
+      Coordinate before = mount.getMountPosition(CR_MOUNT);
       PierSideSelect pps = settings.preferredPierSide;
       if (!mount.isHome() && PIER_SIDE_SYNC_CHANGE_SIDES == OFF) pps = PSS_SAME_ONLY;
       e = requestSync(gotoTarget, pps);
+      Coordinate after = mount.getMountPosition(CR_MOUNT);
+      if (before.pierSide != PIER_SIDE_NONE && before.pierSide != after.pierSide) mountStatus.soundAlert();
     }
+
     if (command[1] == 'M') {
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0");
       reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';

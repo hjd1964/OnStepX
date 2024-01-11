@@ -69,7 +69,7 @@ class Goto {
     CommandError validate();
 
     // add an align star (at the current position relative to target)
-    CommandError alignAddStar();
+    CommandError alignAddStar(bool sync = false);
 
     // reset the alignment model
     void alignReset();
@@ -91,6 +91,9 @@ class Goto {
 
     // returns true if the automatic meridian flip feature is enabled
     inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto; }
+
+    // return selected slew rate
+    inline float getRadsPerSecond() { return radsPerSecondCurrent; }
 
     // monitor goto
     void poll();

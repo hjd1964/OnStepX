@@ -36,15 +36,19 @@ bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supress
       if (parameter[0] == 'G' && parameter[1] == 'O') {
         for (int i = 0; i < 8; i++) {
           char newMode = 'X';
-          if (mode[i] == INPUT) newMode = 'I'; else
-          if (mode[i] == INPUT_PULLUP) newMode = 'U'; else
+          if (mode[i] == INPUT) { if (virtualRead[i] == LOW) newMode = 'i'; else newMode = 'I'; } else
+          if (mode[i] == INPUT_PULLUP) { if (virtualRead[i] == LOW) newMode = 'u'; else newMode = 'U'; } else
           if (mode[i] == OUTPUT) newMode = 'O';
 
           if (virtualMode[i] != newMode) {
             reply[i] = newMode;
             virtualMode[i] = newMode;
           } else {
-            if (virtualMode[i] == 'O') { reply[i] = (virtualWrite[i]) ? '1' : '0'; } else reply[i] = 'X';
+            if (virtualMode[i] == 'O') {
+              if (virtualWrite[i] == 0) reply[i] = '0'; else
+              if (virtualWrite[i] == 1) reply[i] = '1'; else
+              if (virtualWrite[i] >= 2) reply[i] = (char)((virtualWrite[i] - 2) + 128);
+            } else reply[i] = newMode;
           }
 
           reply[i + 1] = 0;
@@ -80,7 +84,6 @@ void SwsGpio::pinMode(int pin, int mode) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
-    if (mode == INPUT_PULLUP) mode = INPUT;
     this->mode[pin] = mode;
   }
 }
@@ -97,6 +100,15 @@ int SwsGpio::digitalRead(int pin) {
 // one four channel SWS GPIO is supported, this sets each output on or off
 void SwsGpio::digitalWrite(int pin, bool value) {
   if (found && pin >= 0 && pin <= 7) {
+    state[pin] = value;
+    virtualWrite[pin] = value;
+  } else return;
+}
+
+// one four channel SWS GPIO is supported
+void SwsGpio::analogWrite(int pin, int value) {
+  value = (value*127)/ANALOG_WRITE_RANGE + 2;
+  if (found && pin >= 0 && pin <= 7 && value >= 2 && value <= 129) {
     state[pin] = value;
     virtualWrite[pin] = value;
   } else return;

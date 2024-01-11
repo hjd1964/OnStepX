@@ -135,7 +135,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == ANALOG_OUTPUT) {
         if (parameter[3] == 'V') { // value 0..255 for 0..100% power
           if (v >= 0 && v <= 255) {
-            if (device[i].pin >= 0 && device[i].pin <= 255) analogWrite(device[i].pin, analog8BitToAnalogRange(v));
+            analogWriteEx(device[i].pin, analog8BitToAnalogRange(v));
           } else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       } else
