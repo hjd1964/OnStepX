@@ -307,6 +307,8 @@ void Limits::poll() {
     // so convert axis1 into normal PIER_SIDE_EAST coordinates
     if (transform.mountType != GEM && current.pierSide == PIER_SIDE_WEST) current.a1 += Deg180;
 
+    if (mount.isHome()) current.a1 = home.getPosition(CR_MOUNT).a1;
+
     // min and max limits
     if (flt(current.a1, axis1.settings.limits.min)) {
       stopAxis1(GA_REVERSE);
@@ -347,6 +349,8 @@ void Limits::poll() {
         // -------------------------------------------------------------
       }
     } else error.limit.axis1.max = false;
+
+    if (mount.isHome()) current.a2 = home.getPosition(CR_MOUNT).a2;
 
     if (flt(current.a2, axis2.settings.limits.min)) {
       stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);

@@ -25,7 +25,7 @@ void Home::init() {
   nv.readBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
 
   #ifndef AXIS1_HOME_DEFAULT
-    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0; position.z = 0; }
+    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0.0L; position.z = 0.0L; }
   #else
     if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
   #endif
