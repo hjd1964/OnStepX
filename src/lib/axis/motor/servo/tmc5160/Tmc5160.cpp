@@ -60,11 +60,11 @@ void ServoTmc5160::init() {
     driver->microsteps(Settings->microsteps);
   }
 
-  currentRms = current*0.7071F;
+  currentRms = Settings->current*0.7071F;
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
     VLF("current control OFF (600mA)");
-    Settings->current = 600*0.7071F;
+    currentRms = 600*0.7071F;
   }
   driver->hold_multiplier(1.0F);
 
