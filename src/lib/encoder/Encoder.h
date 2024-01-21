@@ -61,6 +61,15 @@ class Encoder {
     // set current position to value
     virtual void write(int32_t count);
 
+    // set the virtual encoder velocity in counts per second
+    virtual void setVelocity(float countsPerSec) { /* normally does nothing */ }
+
+    // set the virtual encoder direction (-1 is reverse, 1 is forward)
+    virtual void setDirection(volatile int8_t *direction);
+
+    // true if this is a virtual encoder
+    bool isVirtual = false;
+
     // true if encoder count is ready
     bool ready = true;
 

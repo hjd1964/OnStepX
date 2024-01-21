@@ -23,6 +23,8 @@
     PulseDir encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
   #elif AXIS1_ENCODER == PULSE_ONLY
     PulseOnly encAxis1(AXIS1_ENCODER_A_PIN, &servoControlAxis1.directionHint, 1);
+  #elif AXIS1_ENCODER == VIRTUAL
+    VirtualEnc encAxis1(1);
   #elif AXIS1_ENCODER == AS37_H39B_B
     As37h39bb encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
   #elif AXIS1_ENCODER == JTW_24BIT
@@ -93,6 +95,8 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     PulseDir encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
   #elif AXIS2_ENCODER == PULSE_ONLY
     PulseOnly encAxis2(AXIS2_ENCODER_A_PIN, &servoControlAxis2.directionHint, 2);
+  #elif AXIS2_ENCODER == VIRTUAL
+    VirtualEnc encAxis2(2);
   #elif AXIS2_ENCODER == AS37_H39B_B
     As37h39bb encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
   #elif AXIS2_ENCODER == JTW_24BIT

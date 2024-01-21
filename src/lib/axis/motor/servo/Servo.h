@@ -10,6 +10,7 @@
 #include "../../../encoder/cwCcw/CwCcw.h"
 #include "../../../encoder/pulseDir/PulseDir.h"
 #include "../../../encoder/pulseOnly/PulseOnly.h"
+#include "../../../encoder/virtualEnc/VirtualEnc.h"
 #include "../../../encoder/quadrature/Quadrature.h"
 #include "../../../encoder/quadratureEsp32/QuadratureEsp32.h"
 #include "../../../encoder/serialBridge/SerialBridge.h"

@@ -18,6 +18,8 @@
     PulseDir encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
   #elif AXIS3_ENCODER == PULSE_ONLY
     PulseOnly encAxis3(AXIS3_ENCODER_A_PIN, &servoControlAxis3.directionHint, 3);
+  #elif AXIS3_ENCODER == VIRTUAL
+    VirtualEnc encAxis3(AXIS3_ENCODER_VSPS_TO_ECPS, 3);
   #elif AXIS3_ENCODER == AS37_H39B_B
     As37h39bb encAxis3(AXIS3_ENCODER_A_PIN, AXIS3_ENCODER_B_PIN, 3);
   #elif AXIS3_ENCODER == SERIAL_BRIDGE

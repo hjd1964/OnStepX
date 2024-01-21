@@ -258,6 +258,14 @@ void ServoMotor::poll() {
   float velocity = velocityEstimate + control->out;
   if (!enabled) velocity = 0.0F;
 
+  // for virtual encoders set the velocity and direction
+  if (encoder->isVirtual) {
+    encoder->setVelocity(abs(velocity*driver->getVelocityScale()));
+    volatile int8_t dir = -1;
+    if (velocity < 0.0F) dir = 1;
+    encoder->setDirection(&dir);
+  }
+
   delta = motorCounts - encoderCounts;
   velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
