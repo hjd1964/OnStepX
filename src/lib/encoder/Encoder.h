@@ -65,7 +65,7 @@ class Encoder {
     virtual void setVelocity(float countsPerSec) { /* normally does nothing */ }
 
     // set the virtual encoder direction (-1 is reverse, 1 is forward)
-    virtual void setDirection(volatile int8_t *direction);
+    virtual void setDirection(volatile int8_t *direction) { /* normally does nothing */ }
 
     // true if this is a virtual encoder
     bool isVirtual = false;
