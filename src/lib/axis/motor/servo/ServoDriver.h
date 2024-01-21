@@ -39,7 +39,7 @@
   #define AXIS8_SERVO_VELOCITY_FACTOR 0.0F
 #endif
 #ifndef AXIS9_SERVO_VELOCITY_FACTOR
-  #define AXIS9_SERVO_VELOCITY_FACTOR 0
+  #define AXIS9_SERVO_VELOCITY_FACTOR 0.0F
 #endif
 
 class ServoDriver {
