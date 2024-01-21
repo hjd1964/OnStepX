@@ -25,8 +25,8 @@ void ServoDc::init() {
   ServoDriver::init();
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber);
-  VF(", Vmax = "); V(Settings->velocityMax); VF("% power, Acceleration = "); V(Settings->acceleration); VLF("%/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
 
   #if DEBUG == VERBOSE
     VF("MSG: ServoDriver"); V(axisNumber);
@@ -70,7 +70,7 @@ void ServoDc::enable(bool state) {
   if (enablePin == SHARED) {
     VF("MSG: ServoDriver"); V(axisNumber);
     VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using PE or EE signals");
-
+   
     if (!enabled) {
       if (model == SERVO_EE) {
         if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
