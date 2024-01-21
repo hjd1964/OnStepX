@@ -282,8 +282,8 @@
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
-  #ifndef AXIS1_SERVO_MAX_VELOCITY
-  #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
+  #ifndef AXIS1_SERVO_VELOCITY_MAX
+  #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
   #endif
   #ifndef AXIS1_SERVO_VELOCITY_FACTOR
   #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
@@ -450,8 +450,8 @@
   #define AXIS2_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS2_SERVO_MAX_VELOCITY
-  #define AXIS2_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS2_SERVO_VELOCITY_MAX
+  #define AXIS2_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS2_SERVO_VELOCITY_FACTOR
   #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
@@ -918,8 +918,8 @@
   #define AXIS3_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS3_SERVO_MAX_VELOCITY
-  #define AXIS3_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS3_SERVO_VELOCITY_MAX
+  #define AXIS3_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
@@ -1105,8 +1105,8 @@
   #define AXIS4_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS4_SERVO_MAX_VELOCITY
-  #define AXIS4_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS4_SERVO_VELOCITY_MAX
+  #define AXIS4_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
@@ -1267,8 +1267,8 @@
   #define AXIS5_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS5_SERVO_MAX_VELOCITY
-  #define AXIS5_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS5_SERVO_VELOCITY_MAX
+  #define AXIS5_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
@@ -1429,8 +1429,8 @@
   #define AXIS6_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS6_SERVO_MAX_VELOCITY
-  #define AXIS6_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS6_SERVO_VELOCITY_MAX
+  #define AXIS6_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
@@ -1591,8 +1591,8 @@
   #define AXIS7_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS7_SERVO_MAX_VELOCITY
-  #define AXIS7_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS7_SERVO_VELOCITY_MAX
+  #define AXIS7_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
@@ -1753,8 +1753,8 @@
   #define AXIS8_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS8_SERVO_MAX_VELOCITY
-  #define AXIS8_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS8_SERVO_VELOCITY_MAX
+  #define AXIS8_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
@@ -1915,8 +1915,8 @@
   #define AXIS9_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS9_SERVO_MAX_VELOCITY
-  #define AXIS9_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS9_SERVO_VELOCITY_MAX
+  #define AXIS9_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
