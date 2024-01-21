@@ -17,6 +17,7 @@
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
 #include "tmc5160/Tmc5160.h"
+#include "dcTmcSPI/DcTmcSPI.h"
 
 #include "feedback/Pid/Pid.h"
 

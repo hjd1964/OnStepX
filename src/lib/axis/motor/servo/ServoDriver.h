@@ -42,6 +42,34 @@
   #define AXIS9_SERVO_VELOCITY_FACTOR 0.0F
 #endif
 
+#ifndef AXIS1_SERVO_VELOCITY_SCALE
+  #define AXIS1_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS2_SERVO_VELOCITY_SCALE
+  #define AXIS2_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS3_SERVO_VELOCITY_SCALE
+  #define AXIS3_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS4_SERVO_VELOCITY_SCALE
+  #define AXIS4_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS5_SERVO_VELOCITY_SCALE
+  #define AXIS5_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS6_SERVO_VELOCITY_SCALE
+  #define AXIS6_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS7_SERVO_VELOCITY_SCALE
+  #define AXIS7_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS8_SERVO_VELOCITY_SCALE
+  #define AXIS8_SERVO_VELOCITY_SCALE 1.0F
+#endif
+#ifndef AXIS9_SERVO_VELOCITY_SCALE
+  #define AXIS9_SERVO_VELOCITY_SCALE 1.0F
+#endif
+
 class ServoDriver {
   public:
     // decodes driver model and sets up the pin modes
@@ -74,19 +102,35 @@ class ServoDriver {
     // calibrate the motor if required
     virtual void calibrateDriver() {}
 
-    // return the velocity estimate factor
+    // return the velocity estimate
     virtual float getVelocityEstimate(float frequency) {
       UNUSED(frequency);
       switch (axisNumber) {
-        case 1: return AXIS1_SERVO_VELOCITY_FACTOR;
-        case 2: return AXIS2_SERVO_VELOCITY_FACTOR;
-        case 3: return AXIS3_SERVO_VELOCITY_FACTOR;
-        case 4: return AXIS4_SERVO_VELOCITY_FACTOR;
-        case 5: return AXIS5_SERVO_VELOCITY_FACTOR;
-        case 6: return AXIS6_SERVO_VELOCITY_FACTOR;
-        case 7: return AXIS7_SERVO_VELOCITY_FACTOR;
-        case 8: return AXIS8_SERVO_VELOCITY_FACTOR;
-        case 9: return AXIS9_SERVO_VELOCITY_FACTOR;
+        case 1: return AXIS1_SERVO_VELOCITY_FACTOR/AXIS1_SERVO_VELOCITY_SCALE;
+        case 2: return AXIS2_SERVO_VELOCITY_FACTOR/AXIS2_SERVO_VELOCITY_SCALE;
+        case 3: return AXIS3_SERVO_VELOCITY_FACTOR/AXIS3_SERVO_VELOCITY_SCALE;
+        case 4: return AXIS4_SERVO_VELOCITY_FACTOR/AXIS4_SERVO_VELOCITY_SCALE;
+        case 5: return AXIS5_SERVO_VELOCITY_FACTOR/AXIS5_SERVO_VELOCITY_SCALE;
+        case 6: return AXIS6_SERVO_VELOCITY_FACTOR/AXIS6_SERVO_VELOCITY_SCALE;
+        case 7: return AXIS7_SERVO_VELOCITY_FACTOR/AXIS7_SERVO_VELOCITY_SCALE;
+        case 8: return AXIS8_SERVO_VELOCITY_FACTOR/AXIS8_SERVO_VELOCITY_SCALE;
+        case 9: return AXIS9_SERVO_VELOCITY_FACTOR/AXIS9_SERVO_VELOCITY_SCALE;
+        default: return 0;
+      }
+    }
+
+    // return the velocity scale factor
+    virtual float getVelocityScale() {
+      switch (axisNumber) {
+        case 1: return AXIS1_SERVO_VELOCITY_SCALE;
+        case 2: return AXIS2_SERVO_VELOCITY_SCALE;
+        case 3: return AXIS3_SERVO_VELOCITY_SCALE;
+        case 4: return AXIS4_SERVO_VELOCITY_SCALE;
+        case 5: return AXIS5_SERVO_VELOCITY_SCALE;
+        case 6: return AXIS6_SERVO_VELOCITY_SCALE;
+        case 7: return AXIS7_SERVO_VELOCITY_SCALE;
+        case 8: return AXIS8_SERVO_VELOCITY_SCALE;
+        case 9: return AXIS9_SERVO_VELOCITY_SCALE;
         default: return 0;
       }
     }
@@ -103,6 +147,7 @@ class ServoDriver {
     int16_t statusMode = OFF;
 
     float velocityMax = ANALOG_WRITE_RANGE;
+
     Direction motorDirection = DIR_FORWARD;
 
     int16_t enablePin = OFF;
