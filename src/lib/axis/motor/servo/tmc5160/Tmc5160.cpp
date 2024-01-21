@@ -25,7 +25,7 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, cons
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
   velocityMax = TmcSettings->velocityMax;
-  acceleration = TmcSettings->acceleration;
+  acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 

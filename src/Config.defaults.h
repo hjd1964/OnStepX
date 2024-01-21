@@ -285,7 +285,7 @@
   #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
   #ifndef AXIS1_SERVO_ACCELERATION
-  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
+  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s
   #endif
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID

@@ -32,7 +32,7 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
   velocityMax = TmcSettings->velocityMax;
-  acceleration = TmcSettings->acceleration;
+  acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
