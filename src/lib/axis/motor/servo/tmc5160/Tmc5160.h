@@ -66,10 +66,6 @@ class ServoTmc5160 : public ServoDriver {
          (axisNumber == 2 && AXIS2_DRIVER_DECAY == AXIS2_DRIVER_DECAY_GOTO && AXIS2_DRIVER_DECAY == STEALTHCHOP)) return true; else return false;
     }
 
-    #if SERIAL_TMC == SoftSerial
-      SoftwareSerial SerialTMC;
-    #endif
-
     TMC5160Stepper *driver;
 
     int16_t currentRms;
