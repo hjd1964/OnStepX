@@ -6,7 +6,7 @@
 #ifdef SERVO_MOTOR_PRESENT
 
 // the various servo driver models
-#define SERVO_DRIVER_MODEL_COUNT 3
+#define SERVO_DRIVER_MODEL_COUNT (SERVO_DRIVER_LAST - SERVO_DRIVER_FIRST + 1)
 
 #include "../Motor.h"
 
