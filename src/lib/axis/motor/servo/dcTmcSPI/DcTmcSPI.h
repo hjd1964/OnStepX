@@ -56,11 +56,9 @@ class ServoDcTmcSPI : public ServoDriver {
     const ServoDcTmcSettings *Settings;
 
   private:
-    float rSense = 0.075F;
 
     TMCStepper *driver;
 
-    int16_t currentRms;
     bool powered = false;
     float currentVelocity = 0.0F;
     float acceleration;

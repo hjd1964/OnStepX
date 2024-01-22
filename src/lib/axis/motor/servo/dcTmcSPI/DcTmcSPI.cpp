@@ -47,8 +47,6 @@ void ServoDcTmcSPI::init() {
   VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
 
-  currentRms = Settings->current*0.7071F;
-
   VF("MSG: ServoDriver"); V(axisNumber); VLF(", TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
 
   if (model == SERVO_TMC2130_DC) {
@@ -98,15 +96,8 @@ void ServoDcTmcSPI::enable(bool state) {
 
   VF("MSG: ServoDriver"); V(axisNumber);
   VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
-  if (state) {
-//    if (model == SERVO_TMC2130_DC) { ((TMC2130Stepper*)driver)->freewheel(false); } else
-//    if (model == SERVO_TMC5160_DC) { ((TMC5160Stepper*)driver)->freewheel(false); }
-    driver->ihold(31);
-  } else {
-    driver->ihold(0);
-//    if (model == SERVO_TMC2130_DC) { ((TMC2130Stepper*)driver)->freewheel(true); } else
-//    if (model == SERVO_TMC5160_DC) { ((TMC5160Stepper*)driver)->freewheel(true); }
-  }
+
+  if (state) { driver->ihold(31); } else { driver->ihold(0); }
 
   currentVelocity = 0.0F;
 
