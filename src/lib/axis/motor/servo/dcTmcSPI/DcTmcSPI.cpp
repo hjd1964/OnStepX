@@ -121,8 +121,6 @@ float ServoDcTmcSPI::setMotorVelocity(float velocity) {
   }
   if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  if (axisNumber == 2) DL1(currentVelocity);
-
   if (model == SERVO_TMC2130_DC) { ((TMC2130Stepper*)driver)->XDIRECT((uint32_t)(lround(currentVelocity) & 0b111111111)); } else
   if (model == SERVO_TMC5160_DC) { ((TMC5160Stepper*)driver)->XTARGET((uint32_t)(lround(currentVelocity) & 0b111111111)); }
 
