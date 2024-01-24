@@ -330,14 +330,9 @@ void ServoMotor::poll() {
         float spas = 0;
         if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
 
-        #if AXIS1_SERVO_FLTR == OFF
-//        sprintf(s, "Servo%d_Delta: %6ld, Motor %6ld, Encoder %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
-//        sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
-          sprintf(s, "Servo%d: DeltaAS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (int)axisNumber, velocityPercent);
-        #else
-//        sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld, Encoder2 %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts, (long)encoderCountsOrig);
-          sprintf(s, "Servo%d: DeltaAS: %0.2f, Delta2AS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - encoderCountsOrig)/spas, (int)axisNumber, velocityPercent);
-        #endif
+      sprintf(s, "Servo%d_Delta: %6ld, Motor %6ld, Encoder %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
+//      sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
+//      sprintf(s, "Servo%d: DeltaAS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (int)axisNumber, velocityPercent);
 
         D(s);
         UNUSED(spas);
