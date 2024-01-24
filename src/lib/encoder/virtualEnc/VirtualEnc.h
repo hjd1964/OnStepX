@@ -21,7 +21,7 @@ class VirtualEnc : public Encoder {
   private:
     uint8_t virtualEncoderHandle = 0; 
     long countsPerSec = 0;
-    long timerRateMs = 100;
+    long timerRateMs = 3000/HAL_FRACTIONAL_SEC; // (1.0/HAL_FRACTIONAL_SEC)*3*1000
 };
 
 #endif
