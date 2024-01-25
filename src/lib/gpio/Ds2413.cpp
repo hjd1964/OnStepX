@@ -32,7 +32,7 @@ bool Ds2413::init() {
   uint8_t addressFound[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
   while (oneWire.search(addressFound)) {
     if (oneWire.crc8(addressFound, 7) == addressFound[7]) {
-      if (addressFound[0] == 0x3A) {
+      if (addressFound[0] == 0x3A || addressFound[0] == 0xBA) {
         #if DEBUG == VERBOSE
           VF("DS2413: 0x");
           for (int i = 0; i < 8; i++) {
