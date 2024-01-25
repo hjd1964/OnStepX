@@ -277,7 +277,7 @@ void Limits::poll() {
 
   Coordinate current = mount.getMountPosition(CR_MOUNT_ALT);
 
-  if (limitsEnabled) {
+  if (limitsEnabled && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
     // overhead and horizon limits
     if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
     if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;

@@ -26,7 +26,7 @@
 #endif
 #define FRACTIONAL_SEC_US           (lround(1000000.0F/FRACTIONAL_SEC))
 
-// time limit in seconds for slew home refine phases
+// time limit in seconds for slew home phases
 #ifndef SLEW_HOME_REFINE_TIME_LIMIT
 #define SLEW_HOME_REFINE_TIME_LIMIT 120
 #endif

@@ -50,8 +50,8 @@ CommandError Home::request() {
       return CE_SLEW_IN_MOTION;
     }
 
-    #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-      wasTracking = mount.isTracking();
+    wasTracking = mount.isTracking();
+    #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == OFF
       mount.tracking(false);
     #endif
 
@@ -60,32 +60,33 @@ CommandError Home::request() {
     goTo.firstGoto = false;
 
     if (hasSense) {
-      double a1 = axis1.getInstrumentCoordinate();
-      double a2 = axis2.getInstrumentCoordinate();
-      if (transform.mountType == ALTAZM) {
-        a1 -= position.z;
-        a2 -= position.a;
-      } else {
-        a1 -= position.h;
-        a2 -= position.d;
-      }
-      // both -180 to 180
-      VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
-      if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        double a1 = axis1.getInstrumentCoordinate();
+        double a2 = axis2.getInstrumentCoordinate();
+        if (transform.mountType == ALTAZM) {
+          a1 -= position.z;
+          a2 -= position.a;
+        } else {
+          a1 -= position.h;
+          a2 -= position.d;
+        }
 
-      CommandError e = reset();
-      if (e != CE_NONE) return e;
-    }
+        // both -180 to 180
+        VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
+        if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
-    VLF("MSG: Mount, moving to home");
+        CommandError e = reset();
+        if (e != CE_NONE) return e;
+      #endif
 
-    if (hasSense) {
+      VLF("MSG: Mount, guiding to home");
       state = HS_HOMING;
       isRequestWithReset = false;
       guide.startHome();
     } else {
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        VLF("MSG: Mount, moving to home");
         state = HS_HOMING;
         if (transform.mountType == ALTAZM) transform.horToEqu(&position);
         CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
@@ -96,12 +97,14 @@ CommandError Home::request() {
         return result;
       #else
         #if AXIS1_SECTOR_GEAR == ON
+          VLF("MSG: Mount, moving SG to home");
           axis1.setFrequencySlew(goTo.rate);
           axis1.setTargetCoordinate(axis1.getIndexPosition());
           VLF("Mount, axis1 home target coordinates set");
           axis1.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));
         #endif
         #if AXIS2_TANGENT_ARM == ON
+          VLF("MSG: Mount, moving TA to home");
           axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
           axis2.setTargetCoordinate(axis2.getIndexPosition());
           VLF("Mount, axis2 home target coordinates set");
@@ -151,6 +154,7 @@ void Home::guideDone(bool success) {
       double h = axis1.getInstrumentCoordinate();
       if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::guideDone(), failed to resetPosition Axis1"); exit; }
       axis1.setInstrumentCoordinate(h);
+      mount.tracking(wasTracking);
     #endif
 
     #if AXIS2_TANGENT_ARM == ON 
