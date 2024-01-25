@@ -87,13 +87,25 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
   lastAlignTarget = target;
 
-  // handle special case of a tangent arm mount
-  #if AXIS2_TANGENT_ARM == ON
+
+  #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == ON
     double a1, a2;
-    transform.mountToInstrument(&target, &a1, &a2);
-    a2 = a2 - axis2.getIndexPosition();
-    if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
+    // handle special case of a sector gear RA
+    #if AXIS1_SECTOR_GEAR == ON
+      transform.mountToInstrument(&target, &a1, &a2);
+      a1 = a1 - axis1.getIndexPosition();
+      if (a1 < axis1.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 > axis1.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    #endif
+
+    // handle special case of a tangent arm Dec
+    #if AXIS2_TANGENT_ARM == ON
+      transform.mountToInstrument(&target, &a1, &a2);
+      a2 = a2 - axis2.getIndexPosition();
+      if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    #endif
   #endif
 
   limits.enabled(true);
@@ -224,7 +236,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   Coordinate current = mount.getMountPosition(CR_MOUNT);
 
   if (!transform.meridianFlips) pierSideSelect = PSS_EAST_ONLY;
-  
+
   bool pierSideBest = false;
   if (pierSideSelect == PSS_BEST) {
     if (current.pierSide == PIER_SIDE_WEST) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
@@ -241,7 +253,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   double axis1TargetCorrectionE = 0.0;
   double axis1TargetCorrectionW = 0.0;
-  e = limits.validateTarget(&target, &eastReachable, &westReachable, &axis1TargetCorrectionE, &axis1TargetCorrectionW);
+  e = limits.validateTarget(&target, &eastReachable, &westReachable, &axis1TargetCorrectionE, &axis1TargetCorrectionW, isGoto);
   if (e != CE_NONE) return e;
 
   double a1, a2, a1e, a1w, a2e, a2w;

@@ -54,8 +54,8 @@ class Limits {
     void constrainMeridianLimits();
 
     // target coordinate check ahead of sync, goto, etc.
-    CommandError validateTarget(Coordinate *coords);
-    CommandError validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection);
+    CommandError validateTarget(Coordinate *coords, bool isGoto);
+    CommandError validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto);
 
     // true if an limit related error is exists
     bool isError();

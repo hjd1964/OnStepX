@@ -53,7 +53,11 @@ class Home {
 
     // home sensing
     bool useOffset();
-    bool hasSense = (AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) != OFF;
+
+    bool hasSense = (((AXIS1_SENSE_HOME) != OFF) && ((AXIS2_SENSE_HOME) != OFF)) || \
+                    (((AXIS1_SECTOR_GEAR) == ON) && ((AXIS1_SENSE_HOME) != OFF)) || \
+                    (((AXIS2_TANGENT_ARM) == ON) && ((AXIS2_SENSE_HOME) != OFF));
+
     Settings settings = {MOUNT_AUTO_HOME_DEFAULT == ON, {AXIS1_SENSE_HOME_OFFSET, AXIS2_SENSE_HOME_OFFSET}};
 
     bool isRequestWithReset = false;

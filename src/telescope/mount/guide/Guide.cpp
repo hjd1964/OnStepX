@@ -202,7 +202,7 @@ CommandError Guide::startHome() {
     mountStatus.soundAlert();
     state = GU_HOME_GUIDE;
 
-    #if AXIS2_TANGENT_ARM == OFF
+    #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == OFF
       guideFinishTimeAxis1 = millis() + (unsigned long)(GUIDE_HOME_TIME_LIMIT * 1000.0);
       guideActionAxis1 = GA_HOME;
       axis1.setFrequencySlew(goTo.rate);
@@ -271,6 +271,10 @@ bool Guide::validAxis1(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT_ALT);
 
   if (!limits.isEnabled()) return true;
+
+  #if AXIS1_SECTOR_GEAR == ON
+    location.a1 = axis1.getMotorPosition();
+  #endif
 
   // for Fork and Alt/Azm mounts limits are based on shaft angles
   // so convert axis1 into normal PIER_SIDE_EAST coordinates
@@ -449,10 +453,8 @@ void Guide::poll() {
     mountStatus.soundAlert();
     if (state == GU_HOME_GUIDE) {
       VLF("MSG: Guide, arrival at home detected");
-      #if AXIS2_TANGENT_ARM == OFF
-        state = GU_NONE;
-        home.guideDone(state == GU_HOME_GUIDE);
-      #endif
+      state = GU_NONE;
+      home.guideDone(state == GU_HOME_GUIDE);
     }
   }
 

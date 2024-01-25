@@ -534,14 +534,13 @@
 #define MOUNT_SUBTYPE                 ALTAZM
 #define AXIS1_WRAP                    ON
 #endif
+
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
 #endif
-
 #ifndef MOUNT_ALTERNATE_ORIENTATION
 #define MOUNT_ALTERNATE_ORIENTATION   OFF                         // use ON or OFF, for FORK and ALTAZM mounts only
 #endif
-
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
 #endif
@@ -554,26 +553,31 @@
 #ifndef MOUNT_AUTO_HOME_DEFAULT
 #define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif
+
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
+#ifndef AXIS1_HOME_TOLERANCE                                      // in arc-seconds
+#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE)
+#endif
+#ifndef AXIS1_SECTOR_GEAR
+#define AXIS1_SECTOR_GEAR             OFF                         // special case of a Sector Gear RA with limited travel
+#endif
+#ifndef AXIS1_WRAP
+#define AXIS1_WRAP                    OFF                         // allow unlimited motion about an Azimuth axis
+#endif
+
 #ifndef AXIS2_TARGET_TOLERANCE
 #define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
-#ifndef AXIS1_HOME_TOLERANCE
-#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE) // in arc-seconds
-#endif
-#ifndef AXIS2_HOME_TOLERANCE
-#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE) // in arc-seconds
-#endif
-#ifndef AXIS1_WRAP
-#define AXIS1_WRAP                    OFF
+#ifndef AXIS2_HOME_TOLERANCE                                      // in arc-seconds
+#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE)
 #endif
 #ifndef AXIS2_TANGENT_ARM
-#define AXIS2_TANGENT_ARM             OFF
+#define AXIS2_TANGENT_ARM             OFF                         // special case of a Tangent Arm Dec with limited travel
 #endif
 #ifndef AXIS2_TANGENT_ARM_CORRECTION
-#define AXIS2_TANGENT_ARM_CORRECTION  OFF
+#define AXIS2_TANGENT_ARM_CORRECTION  OFF                         // apply formula below to correct for Tangent Arm geometry
 #endif
 #ifndef TANGENT_ARM_INSTRUMENT_TO_MOUNT
 #define TANGENT_ARM_INSTRUMENT_TO_MOUNT(a) (atan(a))              // returns angle in radians
@@ -593,7 +597,7 @@
 #define STATUS_MOUNT_LED              OFF
 #endif
 #ifndef MOUNT_LED_ON_STATE
-#define MOUNT_LED_ON_STATE     LOW
+#define MOUNT_LED_ON_STATE            LOW
 #endif
 #ifndef STATUS_BUZZER
 #define STATUS_BUZZER                 OFF

@@ -56,14 +56,14 @@ void Limits::constrainMeridianLimits() {
 }
 
 // target coordinate check ahead of sync, goto, etc.
-CommandError Limits::validateTarget(Coordinate *coords) {
+CommandError Limits::validateTarget(Coordinate *coords, bool isGoto) {
   bool eastReachable, westReachable;
   double eastCorrection, westCorrection;
-  return validateTarget(coords, &eastReachable, &westReachable, &eastCorrection, &westCorrection);
+  return validateTarget(coords, &eastReachable, &westReachable, &eastCorrection, &westCorrection, isGoto);
 }
 
 // target coordinate check ahead of sync, goto, etc.
-CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection) {
+CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto) {
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;
   if (fgt(coords->a, settings.altitude.max)) return CE_SLEW_ERR_ABOVE_OVERHEAD;
 
@@ -82,6 +82,20 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
   float eastLimitMax = axis1.settings.limits.max;
   float westLimitMin = axis1.settings.limits.min;
   float westLimitMax = axis1.settings.limits.max;
+
+  if (AXIS1_SECTOR_GEAR == ON) {
+    if (isGoto) {
+      *eastReachable = true;
+      *westReachable = true;
+      return CE_NONE;
+    } else {
+      eastLimitMin = -Deg180;
+      eastLimitMax = Deg180;
+      westLimitMin = -Deg180;
+      westLimitMax = Deg180;
+    }
+  }
+
   if (transform.mountType == GEM) {
     if (-limits.settings.pastMeridianE > eastLimitMin) eastLimitMin = -limits.settings.pastMeridianE;
     if (limits.settings.pastMeridianW < westLimitMax) westLimitMax = limits.settings.pastMeridianW;
@@ -278,7 +292,7 @@ void Limits::poll() {
 
     if (transform.mountType == GEM && current.pierSide == PIER_SIDE_WEST) {
       if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
-        #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
+        #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
             // disable this limit for a second to allow goto to exit the out of limits region
             autoFlipDelayCycles = 10;
@@ -299,15 +313,15 @@ void Limits::poll() {
       } else error.meridian.west = false;
     } else error.meridian.west = false;
 
-    #if AXIS2_TANGENT_ARM == ON
-      current.a2 = axis2.getMotorPosition();
-    #endif
-
     // for Fork and Alt/Azm mounts limits are based on shaft angles
     // so convert axis1 into normal PIER_SIDE_EAST coordinates
     if (transform.mountType != GEM && current.pierSide == PIER_SIDE_WEST) current.a1 += Deg180;
 
     if (mount.isHome()) current.a1 = home.getPosition(CR_MOUNT).a1;
+
+    #if AXIS1_SECTOR_GEAR == ON
+      current.a1 = axis1.getMotorPosition();
+    #endif
 
     // min and max limits
     if (flt(current.a1, axis1.settings.limits.min)) {
@@ -324,7 +338,7 @@ void Limits::poll() {
     } else error.limit.axis1.min = false;
 
     if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
-      #if GOTO_FEATURE == ON && AXIS2_TANGENT_ARM == OFF
+      #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           // disable this limit for a second to allow goto to exit the out of limits region
           autoFlipDelayCycles = 10;
@@ -351,6 +365,10 @@ void Limits::poll() {
     } else error.limit.axis1.max = false;
 
     if (mount.isHome()) current.a2 = home.getPosition(CR_MOUNT).a2;
+
+    #if AXIS2_TANGENT_ARM == ON
+      current.a2 = axis2.getMotorPosition();
+    #endif
 
     if (flt(current.a2, axis2.settings.limits.min)) {
       stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);

@@ -171,20 +171,34 @@
   #error "Configuration (Config.h): Setting AXIS1_POWER_DOWN unknown, use OFF or ON."
 #endif
 
-#if AXIS1_LIMIT_MIN < -360 || AXIS1_LIMIT_MIN > -90
-  #error "Configuration (Config.h): Setting AXIS1_LIMIT_MIN unknown, use value in the range -90 to -360."
+#if AXIS1_SECTOR_GEAR != ON && AXIS1_SECTOR_GEAR != OFF
+  #error "Configuration (Config.h): Setting AXIS1_SECTOR_GEAR unknown, use OFF or ON."
 #endif
 
-#if AXIS1_LIMIT_MAX < 90 || AXIS1_LIMIT_MAX > 360
-  #error "Configuration (Config.h): Setting AXIS1_LIMIT_MAX unknown, use value in the range 90 to 360."
+#if AXIS1_SECTOR_GEAR == ON
+  #if MOUNT_SUBTYPE == ALTAZM
+    #error "Configuration (Config.h): Setting MOUNT_TYPE ALTAZM is not compatible with AXIS1_SECTOR_GEAR ON  (from Constants.h)"
+  #endif
+  #if (AXIS1_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME_OFFSET) != 0
+    #error "Configuration (Config.h): Enabling AXIS1_SECTOR_GEAR and AXIS1_SENSE_HOME requires an AXIS1_SENSE_HOME_OFFSET of 0."
+  #endif
+  #if (AXIS2_SENSE_HOME) != OFF && AXIS2_TANGENT_ARM == OFF
+    #error "Configuration (Config.h): Enabling AXIS1_SECTOR_GEAR requires AXIS2_SENSE_HOME to be OFF (except for tangent arm Dec mounts.)"
+  #endif
+#else
+  #if (AXIS1_SENSE_HOME) == OFF && (AXIS2_SENSE_HOME) != OFF
+    #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
+  #endif
+  #if AXIS1_LIMIT_MIN < -360 || AXIS1_LIMIT_MIN > -90
+    #error "Configuration (Config.h): Setting AXIS1_LIMIT_MIN unknown, use value in the range -90 to -360."
+  #endif
+  #if AXIS1_LIMIT_MAX < 90 || AXIS1_LIMIT_MAX > 360
+    #error "Configuration (Config.h): Setting AXIS1_LIMIT_MAX unknown, use value in the range 90 to 360."
+  #endif
 #endif
 
 #if (AXIS1_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME) < 0
   #error "Configuration (Config.h): Setting AXIS1_SENSE_HOME unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
-#endif
-
-#if (AXIS1_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME) == OFF
-  #error "Configuration (Config.h): Enabling AXIS1_SENSE_HOME requires enabling AXIS2_SENSE_HOME also."
 #endif
 
 #if (AXIS1_SENSE_LIMIT_MIN) != OFF && (AXIS1_SENSE_LIMIT_MIN) < 0
@@ -282,28 +296,32 @@
   #error "Configuration (Config.h): Setting AXIS2_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
+#if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
+  #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
+#endif
+
 #if AXIS2_TANGENT_ARM != ON && AXIS2_TANGENT_ARM != OFF
   #error "Configuration (Config.h): Setting AXIS2_TANGENT_ARM unknown, use OFF or ON."
 #endif
 
+#if AXIS2_TANGENT_ARM == ON
+  #if MOUNT_SUBTYPE == ALTAZM
+    #error "Configuration (Config.h): Setting MOUNT_TYPE ALTAZM is not compatible with AXIS2_TANGENT_ARM ON  (from Constants.h)"
+  #endif
+  #if (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME_OFFSET) != 0
+    #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
+  #endif
+  #if (AXIS1_SENSE_HOME) != OFF && AXIS1_SECTOR_GEAR == OFF
+    #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM requires AXIS1_SENSE_HOME to be OFF (except for sector gear RA mounts.)"
+  #endif
+#else
+  #if (AXIS2_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME) == OFF
+    #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
+  #endif
+#endif
+
 #if AXIS2_TANGENT_ARM_CORRECTION != ON && AXIS2_TANGENT_ARM_CORRECTION != OFF
   #error "Configuration (Config.h): Setting AXIS2_TANGENT_ARM_CORRECTION unknown, use OFF or ON."
-#endif
-
-#if AXIS2_TANGENT_ARM == OFF && (AXIS2_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME) == OFF
-  #error "Configuration (Config.h): Enabling AXIS2_SENSE_HOME requires enabling AXIS1_SENSE_HOME or AXIS2_TANGENT_ARM."
-#endif
-
-#if AXIS2_TANGENT_ARM != OFF && (AXIS1_SENSE_HOME) != OFF
-  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM requires AXIS1_SENSE_HOME to be OFF."
-#endif
-
-#if AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME_OFFSET) != 0
-  #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
-#endif
-
-#if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
-  #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
 #endif
 
 #if MOUNT_ALTERNATE_ORIENTATION != OFF && MOUNT_ALTERNATE_ORIENTATION != ON
