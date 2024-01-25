@@ -26,7 +26,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'A' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double a = getPosition(CR_MOUNT_ALT).a;
-      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) a = home.getPosition(CR_MOUNT_ALT).a;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) a = home.getPosition(CR_MOUNT_ALT).a;
+      #endif
       convert.doubleToDms(reply, radToDeg(a), false, true, precisionMode);
       *numericReply = false;
     } else
@@ -37,7 +39,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'D' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H' || parameter[0] == 'e') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double d = getPosition().d;
-      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) d = home.getPosition().d;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) d = home.getPosition().d;
+      #endif
       convert.doubleToDms(reply, radToDeg(d), false, true, precisionMode);
       *numericReply = false;
     } else
@@ -48,7 +52,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'R' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H' || parameter[0] == 'a') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double r = getPosition().r;
-      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) r = home.getPosition().r;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) r = home.getPosition().r;
+      #endif
       convert.doubleToHms(reply, radToHrs(r), false, precisionMode);
       *numericReply = false;
     } else
@@ -143,7 +149,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == 'Z' && (parameter[0] == 0 || parameter[1] == 0)) {
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double z = getPosition(CR_MOUNT_HOR).z;
-      if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) z = home.getPosition(CR_MOUNT_HOR).z;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) z = home.getPosition(CR_MOUNT_HOR).z;
+      #endif
       convert.doubleToDms(reply, NormalizeAzimuth(radToDeg(z)), true, false, precisionMode);
       *numericReply = false;
     } else return false;
