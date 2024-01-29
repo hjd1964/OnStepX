@@ -94,7 +94,7 @@
 #define ENC_FILT_FIRST              1
 #define KALMAN                      1
 #define ROLLING                     2
-#define WINDOWING                      3
+#define WINDOWING                   3
 #define ENC_FILT_LAST               3
 
 // servo feedback (must match Encoder library)

@@ -7,6 +7,7 @@
 
 #include "../../../encoder/bissc/As37h39bb.h"
 #include "../../../encoder/bissc/Jtw24.h"
+#include "../../../encoder/bissc/Jtw26.h"
 #include "../../../encoder/cwCcw/CwCcw.h"
 #include "../../../encoder/pulseDir/PulseDir.h"
 #include "../../../encoder/pulseOnly/PulseOnly.h"

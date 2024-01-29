@@ -58,8 +58,14 @@ void Bissc::write(int32_t count) {
 
 // read encoder count with (1 second) error recovery
 bool Bissc::readEncLatest(uint32_t &position) {
+  if ((long)(millis() - lastValidTime) < 2) {
+    position = lastValidPosition;
+    return true;
+  }
+
   uint32_t temp = position;
   bool success = readEnc(temp);
+
   if (success) {
     lastValidTime = millis();
     lastValidPosition = temp;
