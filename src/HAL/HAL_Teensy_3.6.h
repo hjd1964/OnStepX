@@ -10,8 +10,8 @@
 // turn on support for using DACs to output digital signals using Arduino standard commands
 #define HAL_DAC_AS_DIGITAL
 
-#define HAL_FRACTIONAL_SEC 500.0F
 // Base rate for critical task timing
+#define HAL_FRACTIONAL_SEC 300.0F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE

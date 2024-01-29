@@ -6,8 +6,8 @@
 
 #define HAL_FAST_PROCESSOR
 
-#define HAL_FRACTIONAL_SEC 200.0F
 // Base rate for critical task timing
+#define HAL_FRACTIONAL_SEC 200.0F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
