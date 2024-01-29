@@ -91,7 +91,7 @@ CommandError Home::request() {
         if (transform.mountType == ALTAZM) transform.horToEqu(&position);
         CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
         if (result != CE_NONE) {
-          VLF("WRN: Mount, moving to home goto failed");
+          VF("WRN: Mount, moving to home goto failed (code "); V(result); VLF(")");
           state = HS_NONE;
         }
         return result;
