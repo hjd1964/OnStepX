@@ -188,12 +188,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
             #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
               SERIAL_ENCODER.print(":SO#");
             #else
-              uint32_t offset = (uint32_t)axis1.motor->encoderZero();
-              V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(offset)); VLF(" to NV/EEPROM");
-              nv.write(NV_AXIS_ENCODER_ZERO_BASE, offset);
-              offset = (uint32_t)axis2.motor->encoderZero();
-              V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(offset)); VLF(" to NV/EEPROM");
-              nv.write(NV_AXIS_ENCODER_ZERO_BASE + 4, offset);
+              uint32_t zero = (uint32_t)axis1.motor->encoderZero();
+              V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+              nv.write(NV_AXIS_ENCODER_ZERO_BASE, zero);
+              zero = (uint32_t)axis2.motor->encoderZero();
+              V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+              nv.write(NV_AXIS_ENCODER_ZERO_BASE + 4, zero);
             #endif
 
             #ifdef HAL_RESET
