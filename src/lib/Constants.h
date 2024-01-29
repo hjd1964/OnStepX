@@ -24,7 +24,6 @@
 #define STANDARD                    -19
 #define PERSISTENT                  -20
 #define ERRORS_ONLY                 -21
-#define KALMAN                      -22
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
@@ -87,8 +86,16 @@
 #define VIRTUAL                     6      // virtual encoder (uses hints for velocity and direction)
 #define AS37_H39B_B                 7      // Broadcom AS37-H39B-B BISS-C interface encoder
 #define JTW_24BIT                   8      // JTW Trident BISS-C interface 24bit encoder
-#define SERIAL_BRIDGE               9      // serial bridge to encoders
-#define ENC_LAST                    9
+#define JTW_26BIT                   9      // JTW Trident BISS-C interface 26bit encoder
+#define SERIAL_BRIDGE               10     // serial bridge to encoders
+#define ENC_LAST                    10
+
+// encoder filter types
+#define ENC_FILT_FIRST              1
+#define KALMAN                      1
+#define ROLLING                     2
+#define WINDOWING                      3
+#define ENC_FILT_LAST               3
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1
