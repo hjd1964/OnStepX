@@ -106,15 +106,15 @@ class ServoDriver {
     virtual float getVelocityEstimate(float frequency) {
       UNUSED(frequency);
       switch (axisNumber) {
-        case 1: return AXIS1_SERVO_VELOCITY_FACTOR/AXIS1_SERVO_VELOCITY_SCALE;
-        case 2: return AXIS2_SERVO_VELOCITY_FACTOR/AXIS2_SERVO_VELOCITY_SCALE;
-        case 3: return AXIS3_SERVO_VELOCITY_FACTOR/AXIS3_SERVO_VELOCITY_SCALE;
-        case 4: return AXIS4_SERVO_VELOCITY_FACTOR/AXIS4_SERVO_VELOCITY_SCALE;
-        case 5: return AXIS5_SERVO_VELOCITY_FACTOR/AXIS5_SERVO_VELOCITY_SCALE;
-        case 6: return AXIS6_SERVO_VELOCITY_FACTOR/AXIS6_SERVO_VELOCITY_SCALE;
-        case 7: return AXIS7_SERVO_VELOCITY_FACTOR/AXIS7_SERVO_VELOCITY_SCALE;
-        case 8: return AXIS8_SERVO_VELOCITY_FACTOR/AXIS8_SERVO_VELOCITY_SCALE;
-        case 9: return AXIS9_SERVO_VELOCITY_FACTOR/AXIS9_SERVO_VELOCITY_SCALE;
+        case 1: return AXIS1_SERVO_VELOCITY_FACTOR;
+        case 2: return AXIS2_SERVO_VELOCITY_FACTOR;
+        case 3: return AXIS3_SERVO_VELOCITY_FACTOR;
+        case 4: return AXIS4_SERVO_VELOCITY_FACTOR;
+        case 5: return AXIS5_SERVO_VELOCITY_FACTOR;
+        case 6: return AXIS6_SERVO_VELOCITY_FACTOR;
+        case 7: return AXIS7_SERVO_VELOCITY_FACTOR;
+        case 8: return AXIS8_SERVO_VELOCITY_FACTOR;
+        case 9: return AXIS9_SERVO_VELOCITY_FACTOR;
         default: return 0;
       }
     }
