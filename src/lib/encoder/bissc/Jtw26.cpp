@@ -20,7 +20,6 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
   bool foundAck = false;
   bool foundStart = false;
   bool foundCds = false;
-  bool foundStop = true;
 
   uint8_t  encErr = 0;
   uint8_t  encWrn = 0;
@@ -127,7 +126,6 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
   encData = (encData << 1) | encErr;
   encData = (encData << 1) | encWrn;
 
-  if (!foundStop)  { VF("WRN: Encoder JTW_26BIT"); V(axis); VLF(", Stop state invalid"); errors++; } else
   if (!foundAck)   { VF("WRN: Encoder JTW_26BIT"); V(axis); VLF(", Ack bit invalid"); errors++; } else
   if (!foundStart) { VF("WRN: Encoder JTW_26BIT"); V(axis); VLF(", Start bit invalid"); errors++; } else
   if (!foundCds)   { VF("WRN: Encoder JTW_26BIT"); V(axis); VLF(", Cds bit invalid"); errors++; } else
