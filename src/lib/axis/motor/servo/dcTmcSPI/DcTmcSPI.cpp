@@ -24,7 +24,7 @@ ServoDcTmcSPI::ServoDcTmcSPI(uint8_t axisNumber, const ServoDcTmcSpiPins *Pins, 
   this->Settings = TmcSettings;
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
-  velocityMax = (Settings->velocityMax/100.0F)*255;
+  velocityMax = (Settings->velocityMax/100.0F)*255*getVelocityScale();
   acceleration = (Settings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
@@ -121,8 +121,8 @@ float ServoDcTmcSPI::setMotorVelocity(float velocity) {
   }
   if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  if (model == SERVO_TMC2130_DC) { ((TMC2130Stepper*)driver)->XDIRECT((uint32_t)(lround(currentVelocity) & 0b111111111)); } else
-  if (model == SERVO_TMC5160_DC) { ((TMC5160Stepper*)driver)->XTARGET((uint32_t)(lround(currentVelocity) & 0b111111111)); }
+  if (model == SERVO_TMC2130_DC) { ((TMC2130Stepper*)driver)->XDIRECT((uint32_t)(lround(currentVelocity/getVelocityScale()) & 0b111111111)); } else
+  if (model == SERVO_TMC5160_DC) { ((TMC5160Stepper*)driver)->XTARGET((uint32_t)(lround(currentVelocity/getVelocityScale()) & 0b111111111)); }
 
   return currentVelocity;
 }
