@@ -13,7 +13,7 @@
   #endif
 
   // default to single turn mode
-  #ifndef BISSC_SINGLE
+  #ifndef BISSC_SINGLE_TURN
     #define BISSC_SINGLE_TURN ON
   #endif
 
