@@ -117,6 +117,8 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+    Filter *filter;
+
     float velocityEstimate = 0.0F;
     float velocityOverride = 0.0F;
 
