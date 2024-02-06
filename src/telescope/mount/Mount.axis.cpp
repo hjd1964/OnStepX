@@ -39,6 +39,18 @@
     Pid pidAxis1(AXIS1_PID_P, AXIS1_PID_I, AXIS1_PID_D, AXIS1_PID_P_GOTO, AXIS1_PID_I_GOTO, AXIS1_PID_D_GOTO, AXIS1_PID_SENSITIVITY);
   #endif
 
+  #if AXIS1_SERVO_FLTR == KALMAN
+    KalmanFilter filterAxis1(AXIS1_SERVO_FLTR_MEAS_U, AXIS1_SERVO_FLTR_VARIANCE);
+  #elif AXIS1_SERVO_FLTR == LEARNING
+    // nothing to do as this is auotmatically created... LearningFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE, 240);
+  #elif AXIS1_SERVO_FLTR == ROLLING
+    RollingFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE);
+  #elif AXIS1_SERVO_FLTR == WINDOWING
+    WindowingFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE);
+  #elif AXIS1_SERVO_FLTR == OFF
+    Filter filterAxis1;
+  #endif
+
   #if AXIS1_DRIVER_MODEL == SERVO_EE || AXIS1_DRIVER_MODEL == SERVO_PE
     const ServoDcPins ServoPinsAxis1 = {AXIS1_SERVO_PH1_PIN, AXIS1_SERVO_PH1_STATE, AXIS1_SERVO_PH2_PIN, AXIS1_SERVO_PH2_STATE, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE, AXIS1_FAULT_PIN};
     const ServoDcSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS, AXIS1_SERVO_VELOCITY_MAX, AXIS1_SERVO_ACCELERATION};
@@ -57,7 +69,7 @@
     ServoTmc5160 driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
   #endif
 
-  ServoMotor motor1(1, ((ServoDriver*)&driver1), &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &pidAxis1, &servoControlAxis1, AXIS1_SYNC_THRESHOLD);
+  ServoMotor motor1(1, ((ServoDriver*)&driver1), &filterAxis1, &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &pidAxis1, &servoControlAxis1, AXIS1_SYNC_THRESHOLD);
 #endif
 
 #ifdef AXIS1_STEP_DIR_PRESENT
@@ -113,6 +125,16 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     Pid pidAxis2(AXIS2_PID_P, AXIS2_PID_I, AXIS2_PID_D, AXIS2_PID_P_GOTO, AXIS2_PID_I_GOTO, AXIS2_PID_D_GOTO, AXIS2_PID_SENSITIVITY);
   #endif
 
+  #if AXIS2_SERVO_FLTR == KALMAN
+    KalmanFilter filterAxis2(AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_VARIANCE);
+  #elif AXIS2_SERVO_FLTR == ROLLING
+    RollingFilter filterAxis2(AXIS2_SERVO_FLTR_WSIZE);
+  #elif AXIS2_SERVO_FLTR == WINDOWING
+    WindowingFilter filterAxis2(AXIS2_SERVO_FLTR_WSIZE);
+  #elif AXIS2_SERVO_FLTR == OFF
+    Filter filterAxis2;
+  #endif
+
   #if AXIS2_DRIVER_MODEL == SERVO_EE || AXIS2_DRIVER_MODEL == SERVO_PE
     const ServoDcPins ServoPinsAxis2 = {AXIS2_SERVO_PH1_PIN, AXIS2_SERVO_PH1_STATE, AXIS2_SERVO_PH2_PIN, AXIS2_SERVO_PH2_STATE, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE, AXIS2_FAULT_PIN};
     const ServoDcSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS, AXIS2_SERVO_VELOCITY_MAX, AXIS2_SERVO_ACCELERATION};
@@ -131,7 +153,7 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     ServoTmc5160 driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
   #endif
 
-  ServoMotor motor2(2, ((ServoDriver*)&driver2), &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &pidAxis2, &servoControlAxis2, AXIS2_SYNC_THRESHOLD);
+  ServoMotor motor2(2, ((ServoDriver*)&driver2), &filterAxis2, &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &pidAxis2, &servoControlAxis2, AXIS2_SYNC_THRESHOLD);
   IRAM_ATTR void moveAxis2() { motor2.move(); }
 #endif
 

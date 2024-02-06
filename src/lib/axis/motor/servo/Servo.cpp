@@ -20,13 +20,14 @@ IRAM_ATTR void moveServoMotorAxis8() { servoMotorInstance[7]->move(); }
 IRAM_ATTR void moveServoMotorAxis9() { servoMotorInstance[8]->move(); }
 
 // constructor
-ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers) {
+ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   driverType = SERVO;
   strcpy(axisPrefix, "MSG: Servo_, ");
   axisPrefix[10] = '0' + axisNumber;
   this->axisNumber = axisNumber;
+  this->filter = filter;
   this->encoder = encoder;
   this->feedback = feedback;
   this->control = control;
@@ -67,6 +68,9 @@ bool ServoMotor::init() {
 
   driver->init();
   enable(false);
+
+
+  trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
   // start the motion timer
   V(axisPrefix);
@@ -251,7 +255,9 @@ void ServoMotor::poll() {
 
   long unfilteredEncoderCounts = encoderCounts;
   UNUSED(unfilteredEncoderCounts);
-  encoderCounts = encoderApplyFilter(encoderCounts - motorCounts) + motorCounts;
+  bool isTracking = (abs(currentFrequency - trackingFrequency) < trackingFrequency/10.0F);
+
+  encoderCounts = filter->update(encoderCounts, motorCounts, isTracking);
 
   control->set = motorCounts;
   control->in = encoderCounts;
@@ -262,7 +268,7 @@ void ServoMotor::poll() {
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
-    encoder->setVelocity(abs(velocity*driver->getVelocityScale()));
+    encoder->setVelocity(abs(velocity));
     volatile int8_t dir = -1;
     if (velocity < 0.0F) dir = 1;
     encoder->setDirection(&dir);

@@ -31,6 +31,16 @@
       Pid pidAxis4(AXIS4_PID_P, AXIS4_PID_I, AXIS4_PID_D, AXIS4_PID_P_GOTO, AXIS4_PID_I_GOTO, AXIS4_PID_D_GOTO, AXIS4_PID_SENSITIVITY);
     #endif
 
+    #if AXIS4_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis4(AXIS4_SERVO_FLTR_MEAS_U, AXIS4_SERVO_FLTR_VARIANCE);
+    #elif AXIS4_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis4(AXIS4_SERVO_FLTR_WSIZE);
+    #elif AXIS4_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis4(AXIS4_SERVO_FLTR_WSIZE);
+    #elif AXIS4_SERVO_FLTR == OFF
+      Filter filterAxis4;
+    #endif
+
     #if AXIS4_DRIVER_MODEL == SERVO_EE || AXIS4_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis4 = {AXIS4_SERVO_PH1_PIN, AXIS4_SERVO_PH1_STATE, AXIS4_SERVO_PH2_PIN, AXIS4_SERVO_PH2_STATE, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE, AXIS4_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS, AXIS4_SERVO_VELOCITY_MAX, AXIS4_SERVO_ACCELERATION};
@@ -49,7 +59,7 @@
       ServoTmc5160 driver4(4, &ServoPinsAxis4, &ServoSettingsAxis4);
     #endif
 
-    ServoMotor motor4(4, ((ServoDriver*)&driver4), &encAxis4, AXIS4_ENCODER_ORIGIN, AXIS4_ENCODER_REVERSE == ON, &pidAxis4, &servoControlAxis4, AXIS4_SYNC_THRESHOLD);
+    ServoMotor motor4(4, ((ServoDriver*)&driver4), &filterAxis4, &encAxis4, AXIS4_ENCODER_ORIGIN, AXIS4_ENCODER_REVERSE == ON, &pidAxis4, &servoControlAxis4, AXIS4_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS4_STEP_DIR_PRESENT
@@ -98,6 +108,16 @@
       Pid pidAxis5(AXIS5_PID_P, AXIS5_PID_I, AXIS5_PID_D, AXIS5_PID_P_GOTO, AXIS5_PID_I_GOTO, AXIS5_PID_D_GOTO, AXIS5_PID_SENSITIVITY);
     #endif
 
+    #if AXIS5_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis5(AXIS5_SERVO_FLTR_MEAS_U, AXIS5_SERVO_FLTR_VARIANCE);
+    #elif AXIS5_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis5(AXIS5_SERVO_FLTR_WSIZE);
+    #elif AXIS5_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis5(AXIS5_SERVO_FLTR_WSIZE);
+    #elif AXIS5_SERVO_FLTR == OFF
+      Filter filterAxis5;
+    #endif
+
     #if AXIS5_DRIVER_MODEL == SERVO_EE || AXIS5_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis5 = {AXIS5_SERVO_PH1_PIN, AXIS5_SERVO_PH1_STATE, AXIS5_SERVO_PH2_PIN, AXIS5_SERVO_PH2_STATE, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE, AXIS5_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS, AXIS5_SERVO_VELOCITY_MAX, AXIS5_SERVO_ACCELERATION};
@@ -116,7 +136,7 @@
       ServoTmc5160 driver5(5, &ServoPinsAxis5, &ServoSettingsAxis5);
     #endif
 
-    ServoMotor motor5(5, ((ServoDriver*)&driver5), &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &pidAxis5, &servoControlAxis5, AXIS5_SYNC_THRESHOLD);
+    ServoMotor motor5(5, ((ServoDriver*)&driver5), &filterAxis5, &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &pidAxis5, &servoControlAxis5, AXIS5_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS5_STEP_DIR_PRESENT
@@ -165,6 +185,16 @@
       Pid pidAxis6(AXIS6_PID_P, AXIS6_PID_I, AXIS6_PID_D, AXIS6_PID_P_GOTO, AXIS6_PID_I_GOTO, AXIS6_PID_D_GOTO, AXIS6_PID_SENSITIVITY);
     #endif
 
+    #if AXIS6_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis6(AXIS6_SERVO_FLTR_MEAS_U, AXIS6_SERVO_FLTR_VARIANCE);
+    #elif AXIS6_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis6(AXIS6_SERVO_FLTR_WSIZE);
+    #elif AXIS6_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis6(AXIS6_SERVO_FLTR_WSIZE);
+    #elif AXIS6_SERVO_FLTR == OFF
+      Filter filterAxis6;
+    #endif
+
     #if AXIS6_DRIVER_MODEL == SERVO_EE || AXIS6_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis6 = {AXIS6_SERVO_PH1_PIN, AXIS6_SERVO_PH1_STATE, AXIS6_SERVO_PH2_PIN, AXIS6_SERVO_PH2_STATE, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE, AXIS6_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS, AXIS6_SERVO_VELOCITY_MAX, AXIS6_SERVO_ACCELERATION};
@@ -183,7 +213,7 @@
       ServoTmc5160 driver6(6, &ServoPinsAxis6, &ServoSettingsAxis6);
     #endif
 
-    ServoMotor motor6(6, ((ServoDriver*)&driver6), &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &pidAxis6, &servoControlAxis6, AXIS6_SYNC_THRESHOLD);
+    ServoMotor motor6(6, ((ServoDriver*)&driver6), &filterAxis6, &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &pidAxis6, &servoControlAxis6, AXIS6_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS6_STEP_DIR_PRESENT
@@ -232,6 +262,16 @@
       Pid pidAxis7(AXIS7_PID_P, AXIS7_PID_I, AXIS7_PID_D, AXIS7_PID_P_GOTO, AXIS7_PID_I_GOTO, AXIS7_PID_D_GOTO, AXIS7_PID_SENSITIVITY);
     #endif
 
+    #if AXIS7_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis7(AXIS7_SERVO_FLTR_MEAS_U, AXIS7_SERVO_FLTR_VARIANCE);
+    #elif AXIS7_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis7(AXIS7_SERVO_FLTR_WSIZE);
+    #elif AXIS7_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis7(AXIS7_SERVO_FLTR_WSIZE);
+    #elif AXIS7_SERVO_FLTR == OFF
+      Filter filterAxis7;
+    #endif
+
     #if AXIS7_DRIVER_MODEL == SERVO_EE || AXIS7_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis7 = {AXIS7_SERVO_PH1_PIN, AXIS7_SERVO_PH1_STATE, AXIS7_SERVO_PH2_PIN, AXIS7_SERVO_PH2_STATE, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE, AXIS7_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS, AXIS7_SERVO_VELOCITY_MAX, AXIS7_SERVO_ACCELERATION};
@@ -250,7 +290,7 @@
       ServoTmc5160 driver7(7, &ServoPinsAxis7, &ServoSettingsAxis7);
     #endif
 
-    ServoMotor motor7(7, ((ServoDriver*)&driver7), &encAxis7, AXIS7_ENCODER_ORIGIN, AXIS7_ENCODER_REVERSE == ON, &pidAxis7, &servoControlAxis7, AXIS7_SYNC_THRESHOLD);
+    ServoMotor motor7(7, ((ServoDriver*)&driver7), &filterAxis7, &encAxis7, AXIS7_ENCODER_ORIGIN, AXIS7_ENCODER_REVERSE == ON, &pidAxis7, &servoControlAxis7, AXIS7_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS7_STEP_DIR_PRESENT
@@ -299,6 +339,16 @@
       Pid pidAxis8(AXIS8_PID_P, AXIS8_PID_I, AXIS8_PID_D, AXIS8_PID_P_GOTO, AXIS8_PID_I_GOTO, AXIS8_PID_D_GOTO, AXIS8_PID_SENSITIVITY);
     #endif
 
+    #if AXIS8_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis8(AXIS8_SERVO_FLTR_MEAS_U, AXIS8_SERVO_FLTR_VARIANCE);
+    #elif AXIS8_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis8(AXIS8_SERVO_FLTR_WSIZE);
+    #elif AXIS8_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis8(AXIS8_SERVO_FLTR_WSIZE);
+    #elif AXIS8_SERVO_FLTR == OFF
+      Filter filterAxis8;
+    #endif
+
     #if AXIS8_DRIVER_MODEL == SERVO_EE || AXIS8_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis8 = {AXIS8_SERVO_PH1_PIN, AXIS8_SERVO_PH1_STATE, AXIS8_SERVO_PH2_PIN, AXIS8_SERVO_PH2_STATE, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE, AXIS8_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS, AXIS8_SERVO_VELOCITY_MAX, AXIS8_SERVO_ACCELERATION};
@@ -317,7 +367,7 @@
       ServoTmc5160 driver8(8, &ServoPinsAxis8, &ServoSettingsAxis8);
     #endif
 
-    ServoMotor motor8(8, ((ServoDriver*)&driver8), &encAxis8, AXIS8_ENCODER_ORIGIN, AXIS8_ENCODER_REVERSE == ON, &pidAxis8, &servoControlAxis8, AXIS8_SYNC_THRESHOLD);
+    ServoMotor motor8(8, ((ServoDriver*)&driver8), &filterAxis8, &encAxis8, AXIS8_ENCODER_ORIGIN, AXIS8_ENCODER_REVERSE == ON, &pidAxis8, &servoControlAxis8, AXIS8_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS8_STEP_DIR_PRESENT
@@ -366,6 +416,16 @@
       Pid pidAxis9(AXIS9_PID_P, AXIS9_PID_I, AXIS9_PID_D, AXIS9_PID_P_GOTO, AXIS9_PID_I_GOTO, AXIS9_PID_D_GOTO, AXIS9_PID_SENSITIVITY);
     #endif
 
+    #if AXIS9_SERVO_FLTR == KALMAN
+      KalmanFilter filterAxis9(AXIS9_SERVO_FLTR_MEAS_U, AXIS9_SERVO_FLTR_VARIANCE);
+    #elif AXIS9_SERVO_FLTR == ROLLING
+      RollingFilter filterAxis9(AXIS9_SERVO_FLTR_WSIZE);
+    #elif AXIS9_SERVO_FLTR == WINDOWING
+      WindowingFilter filterAxis9(AXIS9_SERVO_FLTR_WSIZE);
+    #elif AXIS9_SERVO_FLTR == OFF
+      Filter filterAxis9;
+    #endif
+
     #if AXIS9_DRIVER_MODEL == SERVO_EE || AXIS9_DRIVER_MODEL == SERVO_PE
       const ServoDcPins ServoPinsAxis9 = {AXIS9_SERVO_PH1_PIN, AXIS9_SERVO_PH1_STATE, AXIS9_SERVO_PH2_PIN, AXIS9_SERVO_PH2_STATE, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE, AXIS9_FAULT_PIN};
       const ServoDcSettings ServoSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS, AXIS9_SERVO_VELOCITY_MAX, AXIS9_SERVO_ACCELERATION};
@@ -384,7 +444,7 @@
       ServoTmc5160 driver9(9, &ServoPinsAxis9, &ServoSettingsAxis9);
     #endif
 
-    ServoMotor motor9(9, ((ServoDriver*)&driver9), &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &pidAxis9, &servoControlAxis9, AXIS9_SYNC_THRESHOLD);
+    ServoMotor motor9(9, ((ServoDriver*)&driver9), &filterAxis9, &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &pidAxis9, &servoControlAxis9, AXIS9_SYNC_THRESHOLD);
   #endif
 
   #ifdef AXIS9_STEP_DIR_PRESENT

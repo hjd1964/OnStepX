@@ -291,6 +291,10 @@
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
   #endif
 
+  #ifndef AXIS1_SERVO_FLTR
+  #define AXIS1_SERVO_FLTR              OFF                       // servo encoder filter: OFF
+  #endif
+
   #ifndef AXIS1_PID_P
   #define AXIS1_PID_P                   2.0                       // P = proportional
   #endif
@@ -452,6 +456,10 @@
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS2_SERVO_FLTR
+  #define AXIS2_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS2_PID_P
@@ -923,6 +931,10 @@
   #define AXIS3_SERVO_FEEDBACK          FB_PID
   #endif
 
+  #ifndef AXIS3_SERVO_FLTR
+  #define AXIS3_SERVO_FLTR              OFF
+  #endif
+
   #ifndef AXIS3_PID_P
   #define AXIS3_PID_P                   2.0
   #endif
@@ -1110,6 +1122,10 @@
   #define AXIS4_SERVO_FEEDBACK          FB_PID
   #endif
 
+  #ifndef AXIS4_SERVO_FLTR
+  #define AXIS4_SERVO_FLTR              OFF
+  #endif
+
   #ifndef AXIS4_PID_P
   #define AXIS4_PID_P                 2.0
   #endif
@@ -1272,6 +1288,10 @@
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS5_SERVO_FLTR
+  #define AXIS5_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS5_PID_P
@@ -1438,6 +1458,10 @@
   #define AXIS6_SERVO_FEEDBACK          FB_PID
   #endif
 
+  #ifndef AXIS6_SERVO_FLTR
+  #define AXIS6_SERVO_FLTR              OFF
+  #endif
+
   #ifndef AXIS6_PID_P
   #define AXIS6_PID_P                   2.0
   #endif
@@ -1600,6 +1624,10 @@
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS7_SERVO_FLTR
+  #define AXIS7_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS7_PID_P
@@ -1766,6 +1794,10 @@
   #define AXIS8_SERVO_FEEDBACK          FB_PID
   #endif
 
+  #ifndef AXIS8_SERVO_FLTR
+  #define AXIS8_SERVO_FLTR              OFF
+  #endif
+
   #ifndef AXIS8_PID_P
   #define AXIS8_PID_P                   2.0
   #endif
@@ -1928,6 +1960,10 @@
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS9_SERVO_FLTR
+  #define AXIS9_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS9_PID_P
