@@ -45,6 +45,11 @@
   #define STM32_TIMER2       TIM9
   #define STM32_TIMER3       TIM4    // same use as prior to this point (but different order)
   #define STM32_TIMER4       TIM5
+#elif defined(STM32F407xx)
+  #define STM32_TIMER1       TIM1    // no idea which timers to use so kept F446 layout!
+  #define STM32_TIMER2       TIM10   // keep in mind we use pwm/tone *sometimes* and that uses hw timers
+  #define STM32_TIMER3       TIM11   // supports timers TIM1 to TIM14, TIM 1/8 are advanced, TIM2/5 are 32bit (no library support for 32 bit)
+  #define STM32_TIMER4       TIM14   // the rest and general purpose or basic TIM 6/7 (this can use any type AFAIK)
 #elif defined(STM32F446xx)
   #define STM32_TIMER1       TIM1    // for STM32F446 (tone uses timer6, servo uses timer2, serial uses timer7)
   #define STM32_TIMER2       TIM10
