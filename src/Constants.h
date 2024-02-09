@@ -13,29 +13,31 @@
 #define FYSETC_S6_1                 3      // FYSETC S6 Version 1.2
 #define FYSETC_S6_2                 4      // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design
 
-#define MiniPCB                     5      // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
-#define MiniPCB13                   6      // improved version 1.3 adds better support for ESP-01 flashing and optional I2C
+#define BTT_SKR_PRO                 5      // BigTreeTech SKR PRO Version 1.2
 
-#define MiniPCB2                    7      // 2-axis design for small alum. case, Teensy3.2
+#define MiniPCB                     6      // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
+#define MiniPCB13                   7      // improved version 1.3 adds better support for ESP-01 flashing and optional I2C
 
-#define MaxPCB                      8      // first generation custom 4-axis board, Teensy3.5/Teensy3.6
-#define MaxPCB2                     9      // improved second generation for alum. case, Teensy3.5/Teensy3.6
-#define MaxPCB3                     10     // improved third generation for alum. case, Teensy4.1
-#define MaxPCB4                     11     // for Teensy4.1 w/TMC2209 support
-#define MaxSTM3                     12     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
-#define MaxSTM3I                    13     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
+#define MiniPCB2                    8      // 2-axis design for small alum. case, Teensy3.2
 
-#define MaxESP3                     14     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
-#define MaxESP4                     15     // for ESP32S w/TMC2209 support
-#define CNC3                        16     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
-#define MicroScope                  17     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
+#define MaxPCB                      9      // first generation custom 4-axis board, Teensy3.5/Teensy3.6
+#define MaxPCB2                     10     // improved second generation for alum. case, Teensy3.5/Teensy3.6
+#define MaxPCB3                     11     // improved third generation for alum. case, Teensy4.1
+#define MaxPCB4                     12     // for Teensy4.1 w/TMC2209 support
+#define MaxSTM3                     13     // update to the MaxPCB3 using an Blackpill F411CE instead of the Teensy3.5/3.6
+#define MaxSTM3I                    14     // as above but using an onboard STM32F411CE with M24C64 EEPROM as default
 
-#define STM32Blue                   18     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
+#define MaxESP3                     15     // adds 4th axis and option to flash the WeMos D1 Mini WiFi through OnStep
+#define MaxESP4                     16     // for ESP32S w/TMC2209 support
+#define CNC3                        17     // Arduino CNC Sheild on WeMos D1 R32 (ESP32)
+#define MicroScope                  18     // MicroScope PCB (ESP32, experimental and may be removed at any point!, USE AY YOUR OWN RISK!!!)
 
-#define JTWSTM                      19     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
-#define MANTICORE                   20     // JTW Astronomy MANTICORE telescope mount controller Rev 1.0
+#define STM32Blue                   19     // Khalid and Dave's PCB for STM32 Blue pill (STM32F103CB and STM32F303CC)
 
-#define PINMAP_LAST                 20
+#define JTWSTM                      20     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
+#define MANTICORE                   21     // JTW Astronomy MANTICORE telescope mount controller Rev 1.0
+
+#define PINMAP_LAST                 21
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1
