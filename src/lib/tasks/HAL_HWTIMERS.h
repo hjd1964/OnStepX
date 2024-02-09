@@ -32,7 +32,10 @@
   #include "HAL_ATMEGA328_HWTIMER.h"
 #elif defined(__AVR_ATmega1280__) ||defined(__AVR_ATmega2560__)
   #include "HAL_MEGA2560_HWTIMER.h"
-#elif defined(STM32F401xC) || defined(STM32F407xx) || defined(STM32F411xE) || defined(STM32F446xx) || defined(STM32F303xC) || defined(STM32F103xB)
+#elif defined(STM32H743xx) || defined(STM32H750xx) || \
+      defined(STM32F446xx) || defined(STM32F411xE) || \
+      defined(STM32F401xC) || defined(STM32F407xx) || \
+      defined(STM32F303xC) || defined(STM32F103xB)
   #include "HAL_STM32_HWTIMER.h"
 // Teensy3.0, 3.1, 3.2, 3.5, 3.6, and 4.0
 #elif defined(_mk20dx128_h_) || defined(__MK20DX128__) || \

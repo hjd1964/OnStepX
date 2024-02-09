@@ -18,7 +18,7 @@ typedef struct SenseOffset {
   long axis2;
 } SenseOffset;
 typedef struct Settings {
-  boolean automaticAtBoot;
+  bool automaticAtBoot;
   SenseOffset senseOffset;
 } Settings;
 #pragma pack()

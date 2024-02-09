@@ -16,12 +16,13 @@
 #endif
 
 // Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 300.0F
+#define HAL_FRACTIONAL_SEC 500.0F
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
+#define HAL_MAXRATE_LOWER_LIMIT 1.5
+#define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
 #define HAL_FAST_PROCESSOR
-#define HAL_MAXRATE_LOWER_LIMIT 14   // assumes optimization set to Fastest (-O3)
-#define HAL_PULSE_WIDTH         250  // in ns, estimated
+#define HAL_VFAST_PROCESSOR
 
 #include <HardwareTimer.h>
 
@@ -39,27 +40,21 @@
 // Non-volatile storage ------------------------------------------------------------------------------
 #undef E2END
 #if NV_DRIVER == NV_DEFAULT
-  #if PINMAP == FYSETC_S6_2
-    // The FYSETC S6 v2 has a 4096 byte EEPROM built-in
-    #define E2END 4095
-    #define NV_ADDRESS 0x50
-  #elif PINMAP == FYSETC_S6
-    // The FYSETC S6 has a 2048 byte EEPROM built-in
-    #define E2END 2047
-    #define NV_ADDRESS 0x50
-  #else
-    // fall back to the DS3231/AT24C32
-    #define E2END 4095
-    #define NV_ADDRESS 0x57
-  #endif
+  #define E2END 4095
+  #define NV_ADDRESS 0x57
   #include "../lib/nv/NV_24XX.h"
   #define HAL_NV_INIT() nv.init(E2END + 1, true, 0, false, &HAL_Wire, NV_ADDRESS)
 #endif
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
+
 #define HAL_INIT() { \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+  HAL_Wire.setSDA(PB9); \
+  HAL_Wire.setSCL(PB8); \
+  HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+  HAL_Wire.begin(); \
 }
 
 //--------------------------------------------------------------------------------------------------
