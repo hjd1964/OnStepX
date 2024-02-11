@@ -45,17 +45,17 @@
 #define TEMP2_PIN               PF5              // Connector Labeled T2
 #define TEMP3_PIN               PF6              // Connector Labeled T3
 
-#ifndef FOCUSER_TEMPERATURE_PIN
-  #define FOCUSER_TEMPERATURE_PIN  TEMP0_PIN
-#endif
 #ifndef FEATURE1_TEMPERATURE_PIN
-  #define FEATURE1_TEMPERATURE_PIN TEMP1_PIN
+  #define FEATURE1_TEMPERATURE_PIN TEMP0_PIN
 #endif
 #ifndef FEATURE2_TEMPERATURE_PIN
-  #define FEATURE2_TEMPERATURE_PIN TEMP2_PIN
+  #define FEATURE2_TEMPERATURE_PIN TEMP1_PIN
 #endif
 #ifndef FEATURE3_TEMPERATURE_PIN
-  #define FEATURE3_TEMPERATURE_PIN TEMP3_PIN
+  #define FEATURE3_TEMPERATURE_PIN TEMP2_PIN
+#endif
+#ifndef FOCUSER_TEMPERATURE_PIN
+  #define FOCUSER_TEMPERATURE_PIN  TEMP3_PIN
 #endif
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
