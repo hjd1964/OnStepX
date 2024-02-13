@@ -149,9 +149,9 @@
 
 // ST4 interface (Connector Labeled EXTENSION-2 which has Gnd and +5V so near ideal)
 #define ST4_RA_W_PIN            PD0              // ST4 RA- West
-#define ST4_DEC_S_PIN           PE4              // ST4 DE- South
-#define ST4_DEC_N_PIN           PD2              // ST4 DE+ North
-#define ST4_RA_E_PIN            PE2              // ST4 RA+ East
+#define ST4_DEC_S_PIN           PD2              // ST4 DE- South
+#define ST4_DEC_N_PIN           PD5              // ST4 DE+ North
+#define ST4_RA_E_PIN            PE0              // ST4 RA+ East
 
 #else
 #error "Wrong processor for this configuration!"
