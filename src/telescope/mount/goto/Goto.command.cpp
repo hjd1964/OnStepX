@@ -109,9 +109,14 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     }
 
     if (command[1] == 'M') {
-      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) strcpy(reply,"E0");
-      reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
-      if (e == CE_NONE) strcpy(reply,"N/A");
+      if (e == CE_NONE) strcpy(reply, "N/A"); else
+      if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) {
+        strcpy(reply, "E0");
+        reply[1] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
+      } else {
+        DF("ERR: Mount, sync unspecified error occured ("); D(e); DLF(")");
+        strcpy(reply, "E9");
+      }
     }
     *numericReply = false;
   } else
