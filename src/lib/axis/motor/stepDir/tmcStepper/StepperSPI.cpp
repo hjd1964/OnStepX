@@ -155,7 +155,7 @@ void StepDirTmcSPI::modeDecaySlewing() {
 void StepDirTmcSPI::updateStatus() {
   if (settings.status == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
-      uint32_t status_word;
+
       TMC2130_n::DRV_STATUS_t status_result;
       if (settings.model == TMC2130) { status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); } else
       if (settings.model == TMC5160) { status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); } else
