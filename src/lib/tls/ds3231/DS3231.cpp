@@ -14,7 +14,7 @@
 #include <RtcDS3231.h> // https://github.com/Makuna/Rtc/archive/master.zip
 RtcDS3231<TwoWire> rtcDS3231(HAL_Wire);
 
-bool TimeLocationSource::init() {
+bool TlsDs3231::init() {
   HAL_Wire.begin();
   HAL_Wire.setClock(HAL_WIRE_CLOCK);
   HAL_Wire.beginTransmission(0x68);
@@ -46,7 +46,7 @@ bool TimeLocationSource::init() {
   return ready;
 }
 
-void TimeLocationSource::set(JulianDate ut1) {
+void TlsDs3231::set(JulianDate ut1) {
   if (!ready) return;
 
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
@@ -59,7 +59,7 @@ void TimeLocationSource::set(JulianDate ut1) {
   set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
 }
 
-void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+void TlsDs3231::set(int year, int month, int day, int hour, int minute, int second) {
   #ifdef TLS_TIMELIB
     setTime(hour, minute, second, day, month, year);
   #endif
@@ -67,7 +67,7 @@ void TimeLocationSource::set(int year, int month, int day, int hour, int minute,
   rtcDS3231.SetDateTime(updateTime);
 }
 
-void TimeLocationSource::get(JulianDate &ut1) {
+bool TlsDs3231::get(JulianDate &ut1) {
   if (!ready) return;
 
   RtcDateTime now = rtcDS3231.GetDateTime();
@@ -77,8 +77,8 @@ void TimeLocationSource::get(JulianDate &ut1) {
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = now.Hour() + now.Minute()/60.0 + now.Second()/3600.0;
   }
-}
 
-TimeLocationSource tls;
+  return true;
+}
 
 #endif

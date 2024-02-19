@@ -14,7 +14,7 @@
 #include <RtcDS3234.h> // https://github.com/Makuna/Rtc/archive/master.zip
 RtcDS3234<SPIClass> rtcDS3234(SPI, DS3234_CS_PIN);
 
-bool TimeLocationSource::init() {
+bool TlsDs3234::init() {
   SPI.begin();
   rtcDS3234.Begin();
   if (!rtcDS3234.GetIsRunning()) rtcDS3234.SetIsRunning(true);
@@ -38,7 +38,7 @@ bool TimeLocationSource::init() {
   return ready;
 }
 
-void TimeLocationSource::set(JulianDate ut1) {
+void TlsDs3234::set(JulianDate ut1) {
   if (!ready) return;
 
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
@@ -51,7 +51,7 @@ void TimeLocationSource::set(JulianDate ut1) {
   set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
 }
 
-void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+void TlsDs3234::set(int year, int month, int day, int hour, int minute, int second) {
   #ifdef TLS_TIMELIB
     setTime(hour, minute, second, day, month, year);
   #endif
@@ -65,7 +65,7 @@ void TimeLocationSource::set(int year, int month, int day, int hour, int minute,
   #endif
 }
 
-void TimeLocationSource::get(JulianDate &ut1) {
+bool TlsDs3234::get(JulianDate &ut1) {
   if (!ready) return;
 
   #ifdef SSPI_SHARED
@@ -81,8 +81,8 @@ void TimeLocationSource::get(JulianDate &ut1) {
   #ifdef SSPI_SHARED
     SPI.end();
   #endif
-}
 
-TimeLocationSource tls;
+  return true;
+}
 
 #endif

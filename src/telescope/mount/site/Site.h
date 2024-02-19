@@ -9,7 +9,12 @@
 #include "../../../lib/convert/Convert.h"
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
-#include "../../../lib/tls/Tls.h"
+#include "../../../lib/tls/ds3231/DS3231.h"
+#include "../../../lib/tls/ds3234/DS3234.h"
+#include "../../../lib/tls/gps/GPS.h"
+#include "../../../lib/tls/ntp/NTP.h"
+#include "../../../lib/tls/sd3031/SD3031.h"
+#include "../../../lib/tls/teensy/Teensy.h"
 #include "../../../lib/tls/PPS.h"
 
 extern volatile unsigned long fracLAST;
@@ -85,6 +90,10 @@ class Site {
 
     bool dateIsReady = false;
     bool timeIsReady = false;
+
+    #if TIME_LOCATION_SOURCE != OFF
+      TimeLocationSource *tls;
+    #endif
 
   private:
     // gets the time in hours that have passed since Julian Day was set (UT1)

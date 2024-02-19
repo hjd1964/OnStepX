@@ -7,12 +7,12 @@
 
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 
-bool TimeLocationSource::init() {
+bool TlsTeensy::init() {
   ready = true;
   return ready;
 }
 
-void TimeLocationSource::set(JulianDate ut1) {
+void TlsTeensy::set(JulianDate ut1) {
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
 
   double f1 = fabs(ut1.hour) + TLS_CLOCK_SKEW;
@@ -23,13 +23,13 @@ void TimeLocationSource::set(JulianDate ut1) {
   set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
 }
 
-void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+void TlsTeensy::set(int year, int month, int day, int hour, int minute, int second) {
   setTime(hour, minute, second, day, month, year);
   unsigned long TeensyTime = now();              // get time in epoch
   Teensy3Clock.set(TeensyTime);                  // set Teensy time
 }
 
-void TimeLocationSource::get(JulianDate &ut1) {
+bool TlsTeensy::get(JulianDate &ut1) {
   unsigned long TeensyTime = Teensy3Clock.get(); // get time from Teensy RTC
   setTime(TeensyTime);                           // set system time
 
@@ -39,8 +39,8 @@ void TimeLocationSource::get(JulianDate &ut1) {
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = hour() + minute()/60.0 + second()/3600.0;
   }
-}
 
-TimeLocationSource tls;
+  return true;
+}
 
 #endif

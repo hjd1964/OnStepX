@@ -228,7 +228,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       double dut1 = strtod(parameter, &conv_end);
       if (dut1 >= -0.9 && dut1 <= 0.9) {
         #if TIME_LOCATION_SOURCE != OFF
-          tls.DUT1 = dut1;
+          tls->DUT1 = dut1;
         #endif
       } else *commandError = CE_PARAM_FORM;
     } else
