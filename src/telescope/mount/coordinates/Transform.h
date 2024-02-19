@@ -70,7 +70,7 @@ class Transform {
     void equToHor(Coordinate *coord);
     // converts from Equatorial (h,d) to Horizon (a) altitude coordinate
     void equToAlt(Coordinate *coord);
-    // converts from Equatorial (h,d) to Horizon (a,z) coordinates
+    // converts from Horizon (a,z) to Equatorial (h,d) coordinates
     void horToEqu(Coordinate *coord);
 
     // refraction at altitude, pressure (millibars), and temperature (celsius)
