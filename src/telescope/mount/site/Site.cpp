@@ -93,10 +93,10 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 
 #if TIME_LOCATION_SOURCE == NTP
   void ntpCheck() {
-    if (tls->isReady()) {
+    if (site.tls->isReady()) {
       VLF("MSG: Mount, setting date/time from NTP");
       JulianDate jd;
-      tls->get(jd);
+      site.tls->get(jd);
       site.dateIsReady = true;
       site.timeIsReady = true;
       site.setDateTime(jd);
