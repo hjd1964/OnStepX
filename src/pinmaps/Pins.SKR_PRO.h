@@ -158,6 +158,15 @@
 #define AXIS6_STEP_PIN          PD13
 #define AXIS6_DIR_PIN           PG9
 
+// For focuser4 stepper driver (Labeled Z)
+#define AXIS7_ENABLE_PIN        PC0
+#define AXIS7_M0_PIN            PC12
+#define AXIS7_M1_PIN            PC10
+#define AXIS7_M2_PIN            PB9              // SPI CS (UART TX)
+#define AXIS7_M3_PIN            PC11
+#define AXIS7_STEP_PIN          PE13
+#define AXIS7_DIR_PIN           PC2
+
 // ST4 interface (Connector Labeled EXTENSION-2 which has Gnd and +5V so near ideal)
 #define ST4_RA_W_PIN            PD0              // ST4 RA- West
 #define ST4_DEC_S_PIN           PD2              // ST4 DE- South
