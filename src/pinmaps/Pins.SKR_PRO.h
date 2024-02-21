@@ -74,6 +74,15 @@
   #define RETICLE_LED_PIN       PE5              // Connector Labeled FAN1 (has an LED built in too)
 #endif
 
+#ifdef STATUS_LED_ON_STATE
+#undef STATUS_LED_ON_STATE
+#endif
+#define STATUS_LED_ON_STATE     HIGH
+#ifdef MOUNT_LED_ON_STATE
+#undef MOUNT_LED_ON_STATE
+#endif
+#define MOUNT_LED_ON_STATE      HIGH
+
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
   #define STATUS_BUZZER_PIN     PE6              // Connector Labeled FAN2
