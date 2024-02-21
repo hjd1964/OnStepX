@@ -68,7 +68,7 @@ void TlsDs3231::set(int year, int month, int day, int hour, int minute, int seco
 }
 
 bool TlsDs3231::get(JulianDate &ut1) {
-  if (!ready) return;
+  if (!ready) return false;
 
   RtcDateTime now = rtcDS3231.GetDateTime();
   if (now.Year() >= 2018 && now.Year() <= 3000 && now.Month() >= 1 && now.Month() <= 12 && now.Day() >= 1 && now.Day() <= 31 &&

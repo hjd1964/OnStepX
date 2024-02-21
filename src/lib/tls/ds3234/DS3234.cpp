@@ -66,7 +66,7 @@ void TlsDs3234::set(int year, int month, int day, int hour, int minute, int seco
 }
 
 bool TlsDs3234::get(JulianDate &ut1) {
-  if (!ready) return;
+  if (!ready) return false;
 
   #ifdef SSPI_SHARED
     SPI.begin();

@@ -30,6 +30,8 @@ void TlsTeensy::set(int year, int month, int day, int hour, int minute, int seco
 }
 
 bool TlsTeensy::get(JulianDate &ut1) {
+  if (!ready) return false;
+  
   unsigned long TeensyTime = Teensy3Clock.get(); // get time from Teensy RTC
   setTime(TeensyTime);                           // set system time
 

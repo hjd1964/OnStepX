@@ -59,7 +59,7 @@ void TlsSd3031::set(int year, int month, int day, int hour, int minute, int seco
 }
 
 bool TlsSd3031::get(JulianDate &ut1) {
-  if (!ready) return;
+  if (!ready) return false;
 
   sTimeData_t dateTime = rtcSD3031.getRTCTime();
 
