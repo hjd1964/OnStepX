@@ -13,7 +13,9 @@
   #define SERIAL_A              Serial
 #endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B              Serial6
+  #define SERIAL_B              HardSerial
+  #define SERIAL_B_RX           PC7
+  #define SERIAL_B_TX           PC6
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
   #define SERIAL_C              Serial3
@@ -133,7 +135,7 @@
 #define AXIS5_ENABLE_PIN        PA3
 #define AXIS5_M0_PIN            PC12
 #define AXIS5_M1_PIN            PC10
-#define AXIS5_M2_PIN            PBG15            // SPI CS (UART TX)
+#define AXIS5_M2_PIN            PG15             // SPI CS (UART TX)
 #define AXIS5_M3_PIN            PC11
 #define AXIS5_STEP_PIN          PD15
 #define AXIS5_DIR_PIN           PE7
