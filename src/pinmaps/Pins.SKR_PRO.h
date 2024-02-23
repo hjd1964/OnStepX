@@ -48,12 +48,14 @@
 #define HEATER1_PIN             PD14             // Connector Labeled HEAT1
 #define HEATER2_PIN             PB0              // Connector Labeled HEAT2
 #define HEATER3_PIN             PD12             // Connector Labeled BED
+#define HEATER4_PIN             PC8              // Connector Labeled FAN0
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX1_PIN                HEATER0_PIN
 #define AUX2_PIN                HEATER1_PIN
 #define AUX3_PIN                HEATER2_PIN
 #define AUX4_PIN                HEATER3_PIN
+#define AUX5_PIN                HEATER4_PIN
 
 // Thermistor (temperature) sensor inputs have built-in 4.7K Ohm pullups and a 10uF cap for noise supression
 #define TEMP0_PIN               PF3              // Connector Labeled T0
@@ -81,9 +83,9 @@
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
-  #define STATUS_LED_PIN        PC8              // Connector Labeled FAN0 (has an LED built in too)
+  #define STATUS_LED_PIN        PE6              // Connector Labeled FAN2 (has an LED built in too)
 #endif
-#define MOUNT_LED_PIN           PC8              // Connector Labeled FAN0 (shared)
+#define MOUNT_LED_PIN           PE6              // Connector Labeled FAN2 (shared)
 #ifndef RETICLE_LED_PIN 
   #define RETICLE_LED_PIN       PE5              // Connector Labeled FAN1 (has an LED built in too) TIM9
 #endif
@@ -99,7 +101,7 @@
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-  #define STATUS_BUZZER_PIN     PE6              // Connector Labeled FAN2 TIM9
+  #define STATUS_BUZZER_PIN     PF11             // Connector Labeled EXP2
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
