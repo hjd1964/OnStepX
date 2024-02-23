@@ -6,8 +6,9 @@
 
 // Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial: Built in USB (not TTL)
-// Serial6: RX6 Pin PC7, TX6 Pin PC6 (Connector Labeled ESP-01)
+// Serial1: RX1 Pin PA10, TX1 Pin PA9 (Connector Labeled TFT)
 // Serial3: RX3 Pin PD9, TX3 Pin PD8 (Connector Labeled SERIAL3)
+// Serial6: RX6 Pin PC7, TX6 Pin PC6 (Connector Labeled ESP-01)
 
 #if SERIAL_A_BAUD_DEFAULT != OFF
   #define SERIAL_A              Serial
@@ -18,7 +19,10 @@
   #define SERIAL_B_TX           PC6
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
-  #define SERIAL_C              Serial3
+  #define SERIAL_C              HardSerial
+  #define SERIAL_C_RX           PA10
+  #define SERIAL_C_TX           PA9
+ // #define SERIAL_C              Serial1
 #endif
 
 // Connector Labeled I2C uses PB6 (SCL) and PB7 (SDA) which are forced in the HAL
@@ -26,8 +30,18 @@
 // Auto assign the Serial1 port pins for GPS: RX1 Pin PA10, TX1 Pin PA9 (TFT Display)
 #if SERIAL_GPS_BAUD != OFF
   #ifndef SERIAL_GPS
-    #define SERIAL_GPS          Serial1
+    #define SERIAL_GPS          HardSerial
+    #define SERIAL_GPS_RX       PD9
+    #define SERIAL_GPS_TX       PD8
   #endif
+#endif
+
+// Allow resetting ESP8266 into firmware upload mode
+#ifndef ADDON_GPIO0_PIN
+  #define ADDON_GPIO0_PIN       PF14             // ESP8266 GPIO0
+#endif
+#ifndef ADDON_RESET_PIN
+  #define ADDON_RESET_PIN       PG1              // ESP8266 RST
 #endif
 
 #define HEATER0_PIN             PB1              // Connector Labeled HEAT0
@@ -71,7 +85,7 @@
 #endif
 #define MOUNT_LED_PIN           PC8              // Connector Labeled FAN0 (shared)
 #ifndef RETICLE_LED_PIN 
-  #define RETICLE_LED_PIN       PE5              // Connector Labeled FAN1 (has an LED built in too)
+  #define RETICLE_LED_PIN       PE5              // Connector Labeled FAN1 (has an LED built in too) TIM9
 #endif
 
 #ifdef STATUS_LED_ON_STATE
@@ -85,7 +99,7 @@
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-  #define STATUS_BUZZER_PIN     PE6              // Connector Labeled FAN2
+  #define STATUS_BUZZER_PIN     PE6              // Connector Labeled FAN2 TIM9
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
@@ -104,7 +118,7 @@
 #define AXIS1_M1_PIN            PC10             // SPI SCK
 #define AXIS1_M2_PIN            PA15             // SPI CS (UART TX)
 #define AXIS1_M3_PIN            PC11             // SPI MISO (UART RX)
-#define AXIS1_STEP_PIN          PE9
+#define AXIS1_STEP_PIN          PE9              // TIM1
 #define AXIS1_DIR_PIN           PF1
 #ifndef AXIS1_SENSE_HOME_PIN
   #define AXIS1_SENSE_HOME_PIN  PE10             // Home SW for Axis1 (Limit Connector Labeled E1)
@@ -116,7 +130,7 @@
 #define AXIS2_M1_PIN            PC10
 #define AXIS2_M2_PIN            PB8              // SPI CS (UART TX)
 #define AXIS2_M3_PIN            PC11
-#define AXIS2_STEP_PIN          PE11
+#define AXIS2_STEP_PIN          PE11             // TIM1
 #define AXIS2_DIR_PIN           PE0
 #ifndef AXIS2_SENSE_HOME_PIN
   #define AXIS2_SENSE_HOME_PIN  PG5              // Home SW for Axis1 (Limit Connector Labeled E2)

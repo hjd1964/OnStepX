@@ -32,9 +32,7 @@
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
 #define HAL_Wire Wire
-#ifndef HAL_WIRE_CLOCK
-  #define HAL_WIRE_CLOCK 100000
-#endif
+// no HAL_WIRE_CLOCK, it breaks the STM32 library
 
 // Non-volatile storage ------------------------------------------------------------------------------
 #if NV_DRIVER == NV_DEFAULT
@@ -49,7 +47,6 @@
 #define HAL_INIT() { \
   HAL_Wire.setSDA(PB7); \
   HAL_Wire.setSCL(PB6); \
-  HAL_Wire.setClock(HAL_WIRE_CLOCK); \
   analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
 }
 

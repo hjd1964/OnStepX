@@ -16,12 +16,18 @@ RtcDS3231<TwoWire> rtcDS3231(HAL_Wire);
 
 bool TlsDs3231::init() {
   HAL_Wire.begin();
-  HAL_Wire.setClock(HAL_WIRE_CLOCK);
+  #ifdef HAL_WIRE_CLOCK
+    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+  #endif
+
   HAL_Wire.beginTransmission(0x68);
   bool error = HAL_Wire.endTransmission() != 0;
   if (!error) {
     rtcDS3231.Begin();
-    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+    #ifdef HAL_WIRE_CLOCK
+      HAL_Wire.setClock(HAL_WIRE_CLOCK);
+    #endif
+
     if (!rtcDS3231.GetIsRunning()) rtcDS3231.SetIsRunning(true);
 
     // see if the RTC is present
@@ -41,7 +47,9 @@ bool TlsDs3231::init() {
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
     HAL_Wire.end();
     HAL_Wire.begin();
-    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+    #ifdef HAL_WIRE_CLOCK
+      HAL_Wire.setClock(HAL_WIRE_CLOCK);
+    #endif
   #endif
   return ready;
 }
