@@ -5,6 +5,31 @@
 
 #ifdef SERVO_DC_PRESENT
 
+#if defined(ARDUINO_TEENSY41) && defined(AXIS1_STEP_PIN) && AXIS1_STEP_PIN == 38 && defined(ANALOG_WRITE_PWM_FREQUENCY)
+  // this is only for pin 38 of a Teensy4.1
+  IntervalTimer itimer4;
+  uint16_t _pwm38_period = 0;
+  uint8_t _pwm38_toggle = 0;
+  float _base_freq_divider = ANALOG_WRITE_PWM_FREQUENCY/(1.0F/(ANALOG_WRITE_RANGE/1000000.0F));
+
+  void PWM38_HWTIMER() {
+    if (_pwm38_period == 0 || _pwm38_period == ANALOG_WRITE_RANGE) {
+      itimer4.update(ANALOG_WRITE_RANGE/_base_freq_divider);
+      digitalWriteF(38, _pwm38_period == ANALOG_WRITE_RANGE);
+    } else {
+      if (!_pwm38_toggle) {
+        itimer4.update(_pwm38_period/_base_freq_divider);
+        digitalWriteF(38, LOW);
+      } else {
+        itimer4.update((ANALOG_WRITE_RANGE - _pwm38_period)/_base_freq_divider);
+        digitalWriteF(38, HIGH);
+      }
+    }
+    _pwm38_toggle = !_pwm38_toggle;
+  }
+  #define analogWritePin38(x) _pwm38_period = x
+#endif
+
 ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSettings *Settings) {
   this->axisNumber = axisNumber;
 
@@ -46,9 +71,21 @@ void ServoDc::init() {
   pinModeEx(Pins->in2, OUTPUT);
   digitalWriteF(Pins->in2, Pins->inState2); // either in2 or phase (PWM,) state should default to inactive
 
+  // if this is a T4.1 and we're using a PE driver and in2 == 38, assume its a MaxPCB4 and make our own PWM on that pin
+  #ifdef analogWritePin38
+    if (model == SERVO_PE && Pins->in2 == 38) {
+      itimer4.priority(0);
+      itimer4.begin(PWM38_HWTIMER, 100);
+      VF("MSG: ServoDriver"); V(axisNumber); VLF(", emulating PWM on pin 38");
+    }
+  #endif
+
   // set fastest PWM speed for Teensy processors
   #ifdef ANALOG_WRITE_PWM_FREQUENCY
     VF("MSG: Servo"); V(axisNumber); VF(", setting control pins analog frequency "); VL(ANALOG_WRITE_PWM_FREQUENCY);
+    #ifndef analogWritePin38
+      analogWriteFrequency(Pins->in1, ANALOG_WRITE_PWM_FREQUENCY);
+    #endif
     analogWriteFrequency(Pins->in2, ANALOG_WRITE_PWM_FREQUENCY);
   #endif
 
@@ -70,7 +107,7 @@ void ServoDc::enable(bool state) {
   if (enablePin == SHARED) {
     VF("MSG: ServoDriver"); V(axisNumber);
     VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using PE or EE signals");
-   
+
     if (!enabled) {
       if (model == SERVO_EE) {
         if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
@@ -79,6 +116,9 @@ void ServoDc::enable(bool state) {
       if (model == SERVO_PE) {
         digitalWriteF(Pins->in1, Pins->inState1);
         if (Pins->inState2 == HIGH) power = velocityMax; else power = 0; 
+        #ifdef analogWritePin38
+          if (Pins->in2 == 38) analogWritePin38(round(power)); else
+        #endif
         analogWrite(Pins->in2, round(power));
       }
     }
@@ -143,7 +183,9 @@ void ServoDc::pwmUpdate(float power) {
       digitalWriteF(Pins->in1, Pins->inState1);
       if (Pins->inState2 == HIGH) power = velocityMax; else power = 0;
     }
-
+    #ifdef analogWritePin38
+      if (Pins->in2 == 38) analogWritePin38(round(power)); else
+    #endif
     analogWrite(Pins->in2, round(power));
   }
 }
