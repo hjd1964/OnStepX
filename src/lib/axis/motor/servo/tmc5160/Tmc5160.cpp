@@ -144,21 +144,19 @@ void ServoTmc5160::updateStatus() {
   if (statusMode == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
-      TMC2208_n::DRV_STATUS_t status_result;
-      status_result.sr = driver->DRV_STATUS();
+      TMC2130_n::DRV_STATUS_t status_result;
+      status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS();
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;
       status.outputB.openLoad      = status_result.olb;
-      status.overTemperatureWarning = status_result.otpw;
+      status.overTemperatureWarning= status_result.otpw;
       status.overTemperature       = status_result.ot;
       status.standstill            = status_result.stst;
 
       // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature) status.fault = true; else status.fault = false;
+      if (status.outputA.shortToGround || status.outputB.shortToGround ||
+          status.overTemperatureWarning || status.overTemperature) status.fault = true; else status.fault = false;
 
       timeLastStatusUpdate = millis();
     }
@@ -166,6 +164,8 @@ void ServoTmc5160::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
+
+  ServoDriver::updateStatus();
 }
 
 // calibrate the motor driver if required
