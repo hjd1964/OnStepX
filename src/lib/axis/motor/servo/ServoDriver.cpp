@@ -40,6 +40,7 @@ void ServoDriver::init() {
 // update status info. for driver
 void ServoDriver::updateStatus() {
   #if DEBUG == VERBOSE
+    if (status.standstill) { status.outputA.openLoad = false; status.outputB.openLoad = false; status.standstill = false; }
     if ((status.outputA.shortToGround     != lastStatus.outputA.shortToGround) ||
         (status.outputA.openLoad          != lastStatus.outputA.openLoad) ||
         (status.outputB.shortToGround     != lastStatus.outputB.shortToGround) ||

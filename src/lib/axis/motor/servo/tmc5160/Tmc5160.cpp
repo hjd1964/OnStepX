@@ -44,7 +44,7 @@ void ServoTmc5160::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);

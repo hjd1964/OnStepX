@@ -50,7 +50,7 @@ void ServoDc::init() {
   ServoDriver::init();
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
 
   #if DEBUG == VERBOSE
@@ -195,6 +195,7 @@ void ServoDc::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(faultPin) == statusMode;
   }
+
   ServoDriver::updateStatus();
 }
 

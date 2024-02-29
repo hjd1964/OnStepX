@@ -155,6 +155,8 @@ void ServoDcTmcSPI::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
+
+  ServoDriver::updateStatus();
 }
 
 #endif

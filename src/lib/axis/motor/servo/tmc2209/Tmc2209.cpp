@@ -53,7 +53,7 @@ void ServoTmc2209::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // initialize the serial port
@@ -212,6 +212,8 @@ void ServoTmc2209::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
+
+  ServoDriver::updateStatus();
 }
 
 // calibrate the motor driver if required
