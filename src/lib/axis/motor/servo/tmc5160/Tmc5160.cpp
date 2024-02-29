@@ -71,6 +71,11 @@ void ServoTmc5160::init() {
   VF("Irun="); V(currentRms/0.7071F); VLF("mA");
   driver->rms_current(currentRms);
 
+  unsigned long mode = driver->IOIN();
+  if (mode && 0b01000000 > 0) {
+    VF("WRN: ServoDriver"); V(axisNumber); VLF(", TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO mode!");
+  }
+
   driver->en_pwm_mode(false);
   driver->AMAX(65535);
   driver->RAMPMODE(1);
