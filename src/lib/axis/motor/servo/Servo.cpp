@@ -26,6 +26,9 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
   driverType = SERVO;
   strcpy(axisPrefix, "MSG: Servo_, ");
   axisPrefix[10] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Servo_, ");
+  axisPrefixWarn[10] = '0' + axisNumber;
+
   this->axisNumber = axisNumber;
   this->filter = filter;
   this->encoder = encoder;
@@ -291,7 +294,7 @@ void ServoMotor::poll() {
 
   // if the driver has shutdown itself we should also shutdown
   if (driver->getStatus().fault && enabled) {
-    D(axisPrefix);
+    D(axisPrefixWarn);
     DL("fault detected, shutting down axis!");
     enable(false);
   }
@@ -304,7 +307,7 @@ void ServoMotor::poll() {
     #ifndef SERVO_SAFETY_DISABLE
       // if above 33% power and we're not moving something is seriously wrong, so shut it down
       if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= 33) {
-        D(axisPrefix);
+        D(axisPrefixWarn);
         D("stall detected!"); D(" control->in = "); D(control->in); D(", control->set = "); D(control->set);
         D(", control->out = "); D(control->out); D(", velocity % = "); DL(velocityPercent);
         enable(false);
@@ -312,7 +315,7 @@ void ServoMotor::poll() {
 
       // if above 90% power and we're moving away from the target something is seriously wrong, so shut it down
       if (labs(encoderCounts - lastEncoderCounts) > lastTargetDistance && abs(velocityPercent) >= 90) {
-        D(axisPrefix);
+        D(axisPrefixWarn);
         DL("runaway detected, > 90% power while moving away from the target!");
         enable(false);
       }
@@ -320,7 +323,7 @@ void ServoMotor::poll() {
 
       // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
       if (wasBelow33 && wasAbove33) {
-        D(axisPrefix);
+        D(axisPrefixWarn);
         DL("oscillation detected, below -33% and above 33% power in a 2 second period!");
         enable(false);
       }

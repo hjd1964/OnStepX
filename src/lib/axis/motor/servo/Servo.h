@@ -120,6 +120,8 @@ class ServoMotor : public Motor {
 
     Filter *filter;
 
+    char axisPrefixWarn[16];            // additional prefix for debug messages
+
     float velocityEstimate = 0.0F;
     float velocityOverride = 0.0F;
 
