@@ -73,7 +73,7 @@ void ServoTmc5160::init() {
 
   unsigned long mode = driver->IOIN();
   if (mode && 0b01000000 > 0) {
-    VF("WRN: ServoDriver"); V(axisNumber); VLF(", TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO mode!");
+    VF("WRN: ServoDriver"); V(axisNumber); VLF(", TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
   }
 
   driver->en_pwm_mode(false);
