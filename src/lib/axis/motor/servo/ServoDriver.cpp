@@ -49,7 +49,7 @@ void ServoDriver::updateStatus() {
         (status.overTemperature           != lastStatus.overTemperature) ||
         (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
-      VF("MSG: StepDirDriver"); V(axisNumber); VF(", status change ");
+      VF("MSG: ServoDriver"); V(axisNumber); VF(", status change ");
       VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
       VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". "); 
       VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". "); 
