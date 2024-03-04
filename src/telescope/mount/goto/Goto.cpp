@@ -319,13 +319,13 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   }
 
   VF("MSG: Mount, set-target destination ");
-  if (current.pierSide == PIER_SIDE_NONE) VF("NONE"); else
-  if (current.pierSide == PIER_SIDE_EAST) VF("EAST"); else
-  if (current.pierSide == PIER_SIDE_WEST) VF("WEST"); else VF("?");
-  if (current.pierSide == target.pierSide) VF(" stays "); else VF(" to ");
-  if (target.pierSide == PIER_SIDE_NONE) VLF("NONE"); else
-  if (target.pierSide == PIER_SIDE_EAST) VLF("EAST"); else
-  if (target.pierSide == PIER_SIDE_WEST) VLF("WEST"); else VLF("?");
+  if (current.pierSide == PIER_SIDE_NONE) { VF("NONE"); } else
+  if (current.pierSide == PIER_SIDE_EAST) { VF("EAST"); } else
+  if (current.pierSide == PIER_SIDE_WEST) { VF("WEST"); } else { VF("?"); }
+  if (current.pierSide == target.pierSide) { VF(" stays "); } else { VF(" to "); }
+  if (target.pierSide == PIER_SIDE_NONE) { VLF("NONE"); } else
+  if (target.pierSide == PIER_SIDE_EAST) { VLF("EAST"); } else
+  if (target.pierSide == PIER_SIDE_WEST) { VLF("WEST"); } else { VLF("?"); }
 
   if (target.pierSide != PIER_SIDE_EAST && target.pierSide != PIER_SIDE_WEST) {
     VLF("MSG: Mount, set-target destination pier side defaults to EAST");
