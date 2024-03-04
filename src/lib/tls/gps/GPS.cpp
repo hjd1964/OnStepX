@@ -94,7 +94,7 @@ bool TlsGPS::init() {
   }
 
   VF("MSG: TLS, GPS start monitor task (rate 10ms priority 7)... ");
-  if (tasks.add(1, 0, true, 7, gpsPoll, "gpsPoll")) { VLF("success"); active = true; } else { VLF("FAILED!"); }
+  if (tasks.add(10, 0, true, 7, gpsPoll, "gpsPoll")) { VLF("success"); active = true; } else { VLF("FAILED!"); }
 
   return active;
 }
