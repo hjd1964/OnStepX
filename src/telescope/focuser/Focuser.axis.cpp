@@ -20,7 +20,7 @@
     #elif AXIS4_ENCODER == PULSE_ONLY
       PulseOnly encAxis4(AXIS4_ENCODER_A_PIN, &servoControlAxis4.directionHint, 4);
     #elif AXIS4_ENCODER == VIRTUAL
-      VirtualEnc encAxis4(AXIS4_ENCODER_VSPS_TO_ECPS, 4);
+      VirtualEnc encAxis4(4);
     #elif AXIS4_ENCODER == AS47_H49B_B
       As37h39bb encAxis4(AXIS4_ENCODER_A_PIN, AXIS4_ENCODER_B_PIN, 4);
     #elif AXIS4_ENCODER == SERIAL_BRIDGE
@@ -97,7 +97,7 @@
     #elif AXIS5_ENCODER == PULSE_ONLY
       PulseOnly encAxis5(AXIS5_ENCODER_A_PIN, &servoControlAxis5.directionHint, 5);
     #elif AXIS5_ENCODER == VIRTUAL
-      VirtualEnc encAxis5(AXIS5_ENCODER_VSPS_TO_ECPS, 5);
+      VirtualEnc encAxis5(5);
     #elif AXIS5_ENCODER == AS57_H59B_B
       As37h39bb encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
     #elif AXIS5_ENCODER == SERIAL_BRIDGE
@@ -174,7 +174,7 @@
     #elif AXIS6_ENCODER == PULSE_ONLY
       PulseOnly encAxis6(AXIS6_ENCODER_A_PIN, &servoControlAxis6.directionHint, 6);
     #elif AXIS6_ENCODER == VIRTUAL
-      VirtualEnc encAxis6(AXIS6_ENCODER_VSPS_TO_ECPS, 6);
+      VirtualEnc encAxis6(6);
     #elif AXIS6_ENCODER == AS67_H69B_B
       As37h39bb encAxis6(AXIS6_ENCODER_A_PIN, AXIS6_ENCODER_B_PIN, 6);
     #elif AXIS6_ENCODER == SERIAL_BRIDGE
@@ -251,7 +251,7 @@
     #elif AXIS7_ENCODER == PULSE_ONLY
       PulseOnly encAxis7(AXIS7_ENCODER_A_PIN, &servoControlAxis7.directionHint, 7);
     #elif AXIS7_ENCODER == VIRTUAL
-      VirtualEnc encAxis7(AXIS7_ENCODER_VSPS_TO_ECPS, 7);
+      VirtualEnc encAxis7(7);
     #elif AXIS7_ENCODER == AS77_H79B_B
       As37h39bb encAxis7(AXIS7_ENCODER_A_PIN, AXIS7_ENCODER_B_PIN, 7);
     #elif AXIS7_ENCODER == SERIAL_BRIDGE
@@ -328,7 +328,7 @@
     #elif AXIS8_ENCODER == PULSE_ONLY
       PulseOnly encAxis8(AXIS8_ENCODER_A_PIN, &servoControlAxis8.directionHint, 8);
     #elif AXIS8_ENCODER == VIRTUAL
-      VirtualEnc encAxis8(AXIS8_ENCODER_VSPS_TO_ECPS, 8);
+      VirtualEnc encAxis8(8);
     #elif AXIS8_ENCODER == AS87_H89B_B
       As37h39bb encAxis8(AXIS8_ENCODER_A_PIN, AXIS8_ENCODER_B_PIN, 8);
     #elif AXIS8_ENCODER == SERIAL_BRIDGE
@@ -405,7 +405,7 @@
     #elif AXIS9_ENCODER == PULSE_ONLY
       PulseOnly encAxis9(AXIS9_ENCODER_A_PIN, &servoControlAxis9.directionHint, 9);
     #elif AXIS9_ENCODER == VIRTUAL
-      VirtualEnc encAxis9(AXIS9_ENCODER_VSPS_TO_ECPS, 9);
+      VirtualEnc encAxis9(9);
     #elif AXIS9_ENCODER == AS97_H99B_B
       As37h39bb encAxis9(AXIS9_ENCODER_A_PIN, AXIS9_ENCODER_B_PIN, 9);
     #elif AXIS9_ENCODER == SERIAL_BRIDGE
