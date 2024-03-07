@@ -175,7 +175,7 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 
 void StepDirTmcUART::modeDecayTracking() {
   setDecayMode(settings.decay);
-  driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
+  driver->rms_current(settings.currentRun*0.7071F, (float)settings.currentHold/(float)settings.currentRun);
 }
 
 void StepDirTmcUART::modeDecaySlewing() {
