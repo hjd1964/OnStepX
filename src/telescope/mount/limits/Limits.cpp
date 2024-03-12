@@ -158,9 +158,9 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
   *westReachable = a1w >= westLimitMin && a1w <= westLimitMax;
 
   VF("MSG: Mount, validate east target axis1 "); V(radToDeg(eastLimitMin)); VF(" < "); V(radToDeg(a1e)); VF(" < "); V(radToDeg(eastLimitMax));
-  if (*eastReachable) VLF(" TRUE"); else VLF(" FALSE");
+  if (*eastReachable) { VLF(" TRUE"); } else { VLF(" FALSE"); }
   VF("MSG: Mount, validate west target axis1 "); V(radToDeg(westLimitMin)); VF(" < "); V(radToDeg(a1w)); VF(" < "); V(radToDeg(westLimitMax));
-  if (*westReachable) VLF(" TRUE"); else VLF(" FALSE");
+  if (*westReachable) { VLF(" TRUE"); } else { VLF(" FALSE"); }
 
   if (!*eastReachable && !*westReachable) {
     VLF("MSG: Mount, validate target outside limits");
