@@ -40,7 +40,7 @@
 #define SERIAL_C_BAUD_DEFAULT         OFF
 #endif
 #ifndef SERIAL_GPS_BAUD
-#define SERIAL_GPS_BAUD               OFF
+#define SERIAL_GPS_BAUD               9600
 #endif
 
 // ESP32 virtual serial bluetooth command channel
