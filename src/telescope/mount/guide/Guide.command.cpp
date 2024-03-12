@@ -124,7 +124,12 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (&parameter[0] != conv_end) {
         if (f < 0.0001F/3600.0F) f = 0.0001F/3600.0F;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
-        VF("MSG: set Axis1 custom guide rate to "); V(f); VLF(" deg/s");
+        VF("MSG: set Axis1 custom guide rate to ");
+        if (f < 0.1F) {
+          V(f*3600.0F); VLF(" arc-sec/s");
+        } else {
+          V(f); VLF(" deg/s");
+        }
         settings.axis1RateSelect = GR_CUSTOM;
         customRateAxis1 = f*240.0F;
       } else *commandError = CE_PARAM_FORM;
@@ -140,7 +145,12 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       if (&parameter[0] != conv_end) {
         if (f < 0.0001F/3600.0F) f = 0.0001F/3600.0F;
         if (f > maxDegsPerSec) f = maxDegsPerSec;
-        VF("MSG: set Axis2 custom guide rate to "); V(f); VLF(" deg/s");
+        VF("MSG: set Axis2 custom guide rate to ");
+        if (f < 0.1F) {
+          V(f*3600.0F); VLF(" arc-sec/s");
+        } else {
+          V(f); VLF(" deg/s");
+        }
         settings.axis2RateSelect = GR_CUSTOM;
         customRateAxis2 = f*240.0F;
       } else *commandError = CE_PARAM_FORM;
