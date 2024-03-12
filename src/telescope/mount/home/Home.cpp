@@ -76,7 +76,7 @@ CommandError Home::request() {
         if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
         if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
-        CommandError e = reset();
+        CommandError e = reset(false);
         if (e != CE_NONE) return e;
       #endif
 
