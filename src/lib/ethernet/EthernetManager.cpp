@@ -60,11 +60,11 @@ bool EthernetManager::init() {
     }
 
     if (settings.dhcpEnabled) {
-      active = Ethernet.begin(settings.mac);
+      Ethernet.begin(settings.mac);
     } else {
       Ethernet.begin(settings.mac, settings.ip, settings.dns, settings.gw, settings.sn);
-      active = true;
     }
+    active = true;
 
     VLF("MSG: Ethernet, initialized");
 
