@@ -99,7 +99,9 @@
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 // Correction for ESP32's internal temperture sensor
+#ifndef INTERNAL_TEMP_CORRECTION
 #define INTERNAL_TEMP_CORRECTION 0
+#endif
 #define HAL_TEMP() ( temperatureRead() + INTERNAL_TEMP_CORRECTION )
 
 //---------------------------------------------------------------------------------------------------
