@@ -73,10 +73,10 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     if (!initialized) {
       VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
-        VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
       #else
-        VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
         SerialTMC.begin(SERIAL_TMC_BAUD);
       #endif
       initialized = true;
@@ -85,7 +85,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     // pull MS1 and MS2 low for device address 0
     digitalWriteEx(Pins->m0, LOW);
     digitalWriteEx(Pins->m1, LOW);
-    VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+    VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
     SerialTMC.begin(SERIAL_TMC_BAUD);
   #endif

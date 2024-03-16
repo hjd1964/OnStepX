@@ -136,6 +136,9 @@ void CommandProcessor::poll() {
     }
 
     // debug, log errors and/or commands
+    #ifdef DEBUG_ECHO_COMMANDS_CH
+      if (DEBUG_ECHO_COMMANDS_CH == channel) {
+    #endif
     #if DEBUG_ECHO_COMMANDS != OFF
       if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) {
         DF("MSG: cmd"); D(channel); D(" = "); D(buffer.getCmd()); D(buffer.getParameter()); DF(", reply = "); D(reply);
@@ -149,6 +152,9 @@ void CommandProcessor::poll() {
     }
     #if DEBUG_ECHO_COMMANDS != OFF
       if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) { DL(""); }
+    #endif
+    #ifdef DEBUG_ECHO_COMMANDS_CH
+      }
     #endif
 
     buffer.flush();
