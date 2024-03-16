@@ -128,7 +128,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
 
 // validate driver parameters
 bool StepDirTmcUART::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6);
+  if (!StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6)) return false;
 
   int maxCurrent;
   if (settings.model == TMC2226) maxCurrent = 2800; else // allow enough range for TMC2209 and TMC2226
