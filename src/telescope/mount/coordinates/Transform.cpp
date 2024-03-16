@@ -46,9 +46,7 @@ void Transform::init() {
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  if (mountType == GEM) meridianFlips = true; else
-  if (mountType == FORK)  meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON); else
-  if (mountType == ALTAZM) meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON);
+  if (mountType == GEM) meridianFlips = true; else meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON);
 
   #if ALIGN_MAX_NUM_STARS > 1
     align.init(mountType, site.location.latitude);
@@ -66,11 +64,9 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
     #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
 
-  if (mountType == ALTAZM) {
-    horToEqu(&result);
-  } else {
-    if (returnHorizonCoords) equToHor(&result);
-  }
+  if (mountType == ALTAZM) horToEqu(&result);
+
+  if (isEquatorial() && returnHorizonCoords) equToHor(&result);
 
   hourAngleToRightAscension(&result, true);
   return result;
@@ -90,7 +86,8 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   #endif
 
   if (a1 != NULL && a2 != NULL) {
-    if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
+    if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else
+    if (isEquatorial()) { *a1 = coord->h; *a2 = coord->d; }
   }
 }
 
@@ -177,13 +174,8 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
     } else mount.pierSide = PIER_SIDE_EAST;
   }
 
-  if (mountType == ALTAZM) {
-    mount.z = a1;
-    mount.a = a2;
-  } else {
-    mount.h = a1;
-    mount.d = a2;
-  }
+  if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else
+  if (isEquatorial()) { mount.h = a1; mount.d = a2; }
 
   mount.a1 = a1;
   mount.a2 = a2;
@@ -194,7 +186,8 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
 }
 
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
-  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
+  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else
+  if (isEquatorial()) { *a1 = coord->h; *a2 = coord->d; }
 
   if (site.location.latitude >= 0.0 || !isEquatorial()) {
     if (coord->pierSide == PIER_SIDE_WEST) {
