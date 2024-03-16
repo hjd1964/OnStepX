@@ -328,7 +328,8 @@ void GeoAlign::autoModel(int n) {
   best_ohw = best_ohe;
 
   // fork flex or dec axis flex, as appropriate
-  if (mountType == ALTAZM) { Ff = 0; Df = 0; } else if (mountType == FORK) { Ff = 1; Df = 0; } else { Ff = 0; Df = 1; }
+  if (mountType == ALTAZM) { Ff = 0; Df = 0; } else
+  if (mountType == FORK) { Ff = 1; Df = 0; } else { Ff = 0; Df = 1; }
 
   // only search for cone error if > 2 stars
   int Do = 0;
