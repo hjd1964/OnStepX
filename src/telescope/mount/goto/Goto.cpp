@@ -122,7 +122,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   slewDestinationDistDec = 0.0;
   if ((encodersPresent || (park.state != PS_PARKING && home.state != HS_HOMING))) {
     nearDestinationRefineStages = GOTO_REFINE_STAGES;
-    if (transform.mountType != ALTAZM) { 
+    if (transform.isEquatorial()) { 
       slewDestinationDistHA = degToRad(GOTO_OFFSET);
       slewDestinationDistDec = degToRad(GOTO_OFFSET);
       if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
@@ -137,7 +137,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   destination = target;
 
   // add waypoint if needed
-  if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
+  if (transform.isEquatorial() && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
     VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
     waypoint(&current);
   }
@@ -216,7 +216,6 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
 // checks for valid target and determines pier side (Mount coordinate system)
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
-
   CommandError e = validate();
   if (e == CE_SLEW_ERR_IN_STANDBY && (encodersPresent || mount.isHome())) {
     mount.enable(true);
@@ -555,7 +554,7 @@ void Goto::poll() {
   }
 
   // adjust rates near the horizon to help avoid exceeding the minimum altitude limit
-  if (transform.mountType != ALTAZM) {
+  if (transform.isEquatorial()) {
     if (site.locationEx.latitude.absval > degToRad(10.0)) {
       static float last_a2 = 0;
       Coordinate coords = mount.getMountPosition(CR_MOUNT_ALT);

@@ -69,7 +69,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (goTo.isAutoFlipEnabled())            reply[i++]='a';                     // [a]uto meridian flip
       #if AXIS1_PEC == ON
         if (pec.settings.recorded)             reply[i++]='R';                     // PEC data has been [R]ecorded
-        if (transform.mountType != ALTAZM)
+        if (transform.isEquatorial())
           reply[i++]="/,~;^"[(int)pec.settings.state];                             // PEC State (/)gnore, ready (,)lay, (~)laying, ready (;)ecord, (^)ecording
       #endif
       if (transform.mountType == GEM)          reply[i++]='E'; else                // GEM
@@ -134,7 +134,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
 
       #if AXIS1_PEC == ON
-        if (transform.mountType != ALTAZM)
+        if (transform.isEquatorial())
           reply[4] = (int)pec.settings.state|0b10000000;                           // PEC state: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
         if (pec.settings.recorded)                 reply[4]|=0b11000000;           // PEC state: data has been recorded
       #endif

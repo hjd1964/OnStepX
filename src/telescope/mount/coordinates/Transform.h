@@ -80,6 +80,9 @@ class Transform {
     // returns the amount of refraction at the apparent altitude
     double apparentRefrac(double altitude);
 
+    // flag if this mount is equatorial or not
+    bool isEquatorial() { return mountType == GEM || mountType == FORK; };
+
     #if ALIGN_MAX_NUM_STARS > 1  
       GeoAlign align;
     #endif

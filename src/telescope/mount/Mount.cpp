@@ -68,7 +68,7 @@ void Mount::begin() {
 
   // setup compensated tracking as configured
   if (TRACK_COMPENSATION_MEMORY == OFF) settings.rc = RC_DEFAULT;
-  if (transform.mountType == ALTAZM) {
+  if (!transform.isEquatorial()) {
     if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
     if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL;
   }
@@ -154,7 +154,7 @@ void Mount::autostartPostponed() {
 
   // handle the one case where this completes without the date/time available
   static bool autoTrackDone = false;
-  if (!autoTrackDone && TRACK_AUTOSTART == ON && transform.mountType != ALTAZM && park.state != PS_PARKED && !home.settings.automaticAtBoot) {
+  if (!autoTrackDone && TRACK_AUTOSTART == ON && transform.isEquatorial() && park.state != PS_PARKED && !home.settings.automaticAtBoot) {
     VLF("MSG: Mount, autostart tracking sidereal");
     tracking(true);
     trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
@@ -308,7 +308,7 @@ void Mount::poll() {
     return;
   }
 
-  if (transform.mountType != ALTAZM && settings.rc == RC_NONE && trackingRateOffsetRA == 0.0F && trackingRateOffsetDec == 0.0F) {
+  if (transform.isEquatorial() && settings.rc == RC_NONE && trackingRateOffsetRA == 0.0F && trackingRateOffsetDec == 0.0F) {
     trackingRateAxis1 = trackingRate;
     trackingRateAxis2 = 0.0F;
     update();
@@ -428,6 +428,7 @@ void Mount::updatePosition(CoordReturn coordReturn) {
     transform.mountToInstrument(&current, &current.a1, &current.a2);
     current.pierSide = PIER_SIDE_NONE;
   }
+
   if (transform.mountType == ALTAZM) {
     if (coordReturn == CR_MOUNT_EQU || coordReturn == CR_MOUNT_ALL) transform.horToEqu(&current);
   } else {

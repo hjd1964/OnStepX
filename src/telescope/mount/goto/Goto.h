@@ -90,7 +90,7 @@ class Goto {
     inline void homeContinue() { meridianFlipHome.resume = true; }
 
     // returns true if the automatic meridian flip feature is enabled
-    inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto && transform.mountType != ALTAZM && transform.meridianFlips; }
+    inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto && transform.isEquatorial() && transform.meridianFlips; }
 
     // return selected slew rate
     inline float getRadsPerSecond() { return radsPerSecondCurrent; }

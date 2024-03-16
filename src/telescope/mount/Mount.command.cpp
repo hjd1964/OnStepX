@@ -359,7 +359,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
     if (command[1] == '-') { site.setSiderealPeriod(site.getSiderealPeriod() + hzToSubMicros(0.02F)); } else
     if (command[1] == 'R') { site.setSiderealPeriod(SIDEREAL_PERIOD); } else
     if (command[1] == 'e') {
-      if (transform.mountType != ALTAZM || site.isDateTimeReady()) {
+      if (transform.isEquatorial() || site.isDateTimeReady()) {
         #if GOTO_FEATURE == ON
           if (park.state != PS_PARKED) tracking(true); else *commandError = CE_PARKED;
         #else
@@ -373,7 +373,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       tracking(false);
     } else *commandError = CE_CMD_UNKNOWN;
 
-    if (transform.mountType == ALTAZM) {
+    if (!transform.isEquatorial()) {
       if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
       if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL;
     }

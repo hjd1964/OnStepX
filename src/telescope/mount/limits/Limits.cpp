@@ -258,7 +258,7 @@ void Limits::stopAxis1(GuideAction stopDirection) {
     goTo.abort();
   #endif
   guide.stopAxis1(stopDirection, true);
-  if (stopDirection == GA_FORWARD || transform.mountType == ALTAZM) mount.tracking(false);
+  if (stopDirection == GA_FORWARD || !transform.isEquatorial()) mount.tracking(false);
 }
 
 void Limits::stopAxis2(GuideAction stopDirection) {
@@ -266,7 +266,7 @@ void Limits::stopAxis2(GuideAction stopDirection) {
     goTo.abort();
   #endif
   guide.stopAxis2(stopDirection, true);
-  if (transform.mountType == ALTAZM) mount.tracking(false);
+  if (!transform.isEquatorial()) mount.tracking(false);
 }
 
 void Limits::poll() {

@@ -34,7 +34,7 @@ void Home::init() {
   #else
     if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
-  if (transform.mountType != ALTAZM) {
+  if (transform.isEquatorial()) {
     axis1.setReverse(site.locationEx.latitude.sign < 0.0);
   }
 
@@ -256,7 +256,7 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     break;
     case CR_MOUNT_ALT:
     case CR_MOUNT_HOR:
-      if (transform.mountType != ALTAZM) transform.equToHor(&position);
+      if (transform.isEquatorial()) transform.equToHor(&position);
     break;
     case CR_MOUNT_ALL:
       if (transform.mountType == ALTAZM) transform.horToEqu(&position); else transform.equToHor(&position);

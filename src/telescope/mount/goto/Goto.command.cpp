@@ -298,7 +298,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     // :MP#       Goto the Current Position for Polar Align
     //            Returns: 0..9, see :MS#
     if (command[1] == 'P' && parameter[0] == 0) {
-      if (transform.mountType != ALTAZM) {
+      if (transform.isEquatorial()) {
         Coordinate newTarget = mount.getPosition();
         CommandError e = validate();
         if (e == CE_NONE) e = limits.validateTarget(&newTarget, true);
@@ -486,7 +486,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
 
           // autoMeridianFlip
           case '5':
-            if (transform.mountType != ALTAZM && transform.meridianFlips && GOTO_FEATURE != OFF) {
+            if ((transform.isEquatorial()) && transform.meridianFlips && GOTO_FEATURE != OFF) {
               if (parameter[3] == '0' || parameter[3] == '1') {
                 settings.meridianFlipAuto = parameter[3] - '0';
                 #if MFLIP_AUTOMATIC_MEMORY == ON
