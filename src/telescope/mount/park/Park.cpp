@@ -255,6 +255,7 @@ CommandError Park::restore(bool withTrackingOn) {
     // set the mount target
     double a1, a2;
     if (transform.mountType == ALTAZM) transform.equToHor(&parkTarget);
+
     transform.mountToInstrument(&parkTarget, &a1, &a2);
     axis1.setInstrumentCoordinatePark(a1);
     axis2.setInstrumentCoordinatePark(a2);
