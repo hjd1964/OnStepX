@@ -69,8 +69,6 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
 
   double a1e, a2e, a1w, a2w;
 
-  Coordinate current = mount.getMountPosition(CR_MOUNT);
-
   PierSide lastPierSide = coords->pierSide; 
   coords->pierSide = PIER_SIDE_EAST;
   transform.mountToInstrument(coords, &a1e, &a2e);
