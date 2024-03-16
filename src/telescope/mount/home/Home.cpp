@@ -137,6 +137,7 @@ void Home::guideDone(bool success) {
       reset(isRequestWithReset);
 
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+
       VLF("MSG: Mount, finishing move to home with goto");
       axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
       axis1.autoGoto(goTo.getRadsPerSecond());
