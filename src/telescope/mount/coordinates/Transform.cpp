@@ -196,7 +196,7 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
   if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
 
-  if (site.location.latitude >= 0.0 || mountType == ALTAZM) {
+  if (site.location.latitude >= 0.0 || !isEquatorial()) {
     if (coord->pierSide == PIER_SIDE_WEST) {
       *a1 += Deg180;
       *a2 = Deg180 - *a2;
