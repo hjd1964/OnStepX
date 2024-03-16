@@ -135,6 +135,7 @@ void Home::guideDone(bool success) {
   #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
     if (success && useOffset()) {
       reset(isRequestWithReset);
+
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
       VLF("MSG: Mount, finishing move to home with goto");
       axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
