@@ -34,6 +34,11 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   velocityMax = TmcSettings->velocityMax;
   acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+  decay = TmcSettings->decay;
+  if (decay == OFF) decay = STEALTHCHOP;
+  decaySlewing = TmcSettings->decaySlewing;
+  if (decaySlewing == OFF) decaySlewing = SPREADCYCLE;
+  velocityThrs = TmcSettings->velocityThrs;
 }
 
 void ServoTmc2209::init() {
@@ -95,6 +100,11 @@ void ServoTmc2209::init() {
   driver = new TMC2209Stepper(&SERIAL_TMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   driver->begin();
   driver->intpol(true);
+
+  if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
+    VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    driver->TPWMTHRS(velocityThrs/0.715F);
+  }
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
   if (Settings->microsteps == OFF) {

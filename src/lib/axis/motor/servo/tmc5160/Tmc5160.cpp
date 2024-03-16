@@ -27,6 +27,11 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, cons
   velocityMax = TmcSettings->velocityMax;
   acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+  decay = TmcSettings->decay;
+  if (decay == OFF) decay = STEALTHCHOP;
+  decaySlewing = TmcSettings->decaySlewing;
+  if (decaySlewing == OFF) decaySlewing = SPREADCYCLE;
+  velocityThrs = TmcSettings->velocityThrs;
 }
 
 void ServoTmc5160::init() {
@@ -50,6 +55,11 @@ void ServoTmc5160::init() {
   driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
   driver->begin();
   driver->intpol(true);
+
+  if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
+    VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    driver->TPWMTHRS(velocityThrs/0.715F);
+  }
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
   if (Settings->microsteps == OFF) {

@@ -196,6 +196,9 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
+#ifdef AXIS1_SYNC_THRESHOLD_DEGREES
+#define AXIS1_SYNC_THRESHOLD lround(AXIS1_SYNC_THRESHOLD_DEGREES*AXIS1_STEPS_PER_DEGREE)
+#endif
 #ifndef AXIS1_SYNC_THRESHOLD
 #define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in counts (required for absolute encoders) or OFF
 #endif
@@ -220,6 +223,7 @@
 #ifndef AXIS1_SENSE_LIMIT_INIT
 #define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
+
 #if AXIS1_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS1_STEP_DIR_PRESENT
 
@@ -278,12 +282,18 @@
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
+  #ifdef AXIS1_SERVO_VELOCITY_MAX_DPS
+  #define AXIS1_SERVO_VELOCITY_MAX      lround(AXIS1_SERVO_VELOCITY_MAX_DPS*AXIS1_STEPS_PER_DEGREE)
+  #endif
   #ifndef AXIS1_SERVO_VELOCITY_MAX
-  #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
+  #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC motors, in steps/s for stepper motors
   #endif
   #ifndef AXIS1_SERVO_VELOCITY_FACTOR
   #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
+  #ifndef AXIS1_SERVO_VELOCITY_PWMTHRS                            // velocity (in steps per second) to switch from stealthChop to
+  #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // spreadCycle mode, should happen just above the 2x sidereal rate
+  #endif                                                          // for TMC2209 or TMC5160 only
   #ifndef AXIS1_SERVO_ACCELERATION
   #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s
   #endif
@@ -363,6 +373,9 @@
 #endif
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
+#endif
+#ifdef AXIS2_SYNC_THRESHOLD_DEGREES
+#define AXIS2_SYNC_THRESHOLD lround(AXIS2_SYNC_THRESHOLD_DEGREES*AXIS2_STEPS_PER_DEGREE)
 #endif
 #ifndef AXIS2_SYNC_THRESHOLD
 #define AXIS2_SYNC_THRESHOLD          OFF
@@ -445,11 +458,17 @@
   #define AXIS2_SERVO_PH2_STATE         LOW
   #endif
 
+  #ifdef AXIS2_SERVO_VELOCITY_MAX_DPS
+  #define AXIS2_SERVO_VELOCITY_MAX      lround(AXIS2_STEPS_PER_DEGREE*AXIS2_SERVO_VELOCITY_MAX_DPS)
+  #endif
   #ifndef AXIS2_SERVO_VELOCITY_MAX
   #define AXIS2_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS2_SERVO_VELOCITY_FACTOR
   #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
+  #endif
+  #ifndef AXIS2_SERVO_VELOCITY_PWMTHRS
+  #define AXIS2_SERVO_VELOCITY_PWMTHRS  OFF
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20

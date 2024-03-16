@@ -159,10 +159,6 @@
   #endif
 #endif
 
-#if AXIS1_SYNC_THRESHOLD != OFF && AXIS2_SYNC_THRESHOLD == OFF
-  #error "Configuration (Config.h): Setting AXIS2_SYNC_THRESHOLD must be set if AXIS1_SYNC_THRESHOLD is set"
-#endif
-
 #if AXIS1_REVERSE != ON && AXIS1_REVERSE != OFF
   #error "Configuration (Config.h): Setting AXIS1_REVERSE unknown, use OFF or ON."
 #endif
@@ -262,10 +258,6 @@
   #if AXIS2_ENCODER < ENC_FIRST || AXIS2_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS2_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
-#endif
-
-#if AXIS2_SYNC_THRESHOLD != OFF && AXIS1_SYNC_THRESHOLD == OFF
-  #error "Configuration (Config.h): Setting AXIS1_SYNC_THRESHOLD must be set if AXIS2_SYNC_THRESHOLD is set"
 #endif
 
 #if AXIS2_REVERSE != ON && AXIS2_REVERSE != OFF
