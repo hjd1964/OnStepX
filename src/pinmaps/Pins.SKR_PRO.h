@@ -4,7 +4,6 @@
 
 #if defined(STM32F407xx)
 
-// Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial: Built in USB (not TTL)
 // Serial1: RX1 Pin PA10, TX1 Pin PA9 (Connector Labeled TFT)
 // Serial3: RX3 Pin PD9, TX3 Pin PD8 (Connector Labeled SERIAL3)

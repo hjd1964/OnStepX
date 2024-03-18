@@ -19,7 +19,6 @@
   pinMode(33, INPUT); \
 }
 
-// Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial0: RX Pin GPIO3, TX Pin GPIO1 (to USB serial adapter)
 // Serial1: RX1 Pin GPIO17, TX1 Pin GPIO16 (for TMC2209 UART COMMS)
 // Serial2: RX2 Pin GPIO39, TX2 Pin GPIO18 (to secondary MCU)

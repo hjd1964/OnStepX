@@ -6,7 +6,6 @@
 
 // TX2/RX2 (PA2/PA3) is on the Y+ and Z+ end stops and is reserved for GPS (etc, no command channel is associated with this port)
 
-// Serial ports (see Pins.defaults.h for SERIAL_A)
 // Schematic isn't entirely clear, best guess:
 // Serial1 RX1 Pin PB7, TX1 Pin PB6
 // Serial2 RX2 Pin PA3, TX2 Pin PA2
