@@ -61,7 +61,7 @@ CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
   this->axis = axis - 1;
 }
 
-void CwCCW::init() {
+void CwCcw::init() {
   if (initialized) { VF("WRN: Encoder CwCcw"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(cwPin, INPUT_PULLUP);
