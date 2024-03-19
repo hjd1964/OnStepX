@@ -20,10 +20,11 @@
 #define WIFI                        -15
 #define WIFI_ACCESS_POINT           -16    // shorthand for easy WIFI mode settings
 #define WIFI_STATION                -17    // shorthand for easy WIFI mode settings
-#define SHARED                      -18
-#define STANDARD                    -19
-#define PERSISTENT                  -20
-#define ERRORS_ONLY                 -21
+#define BLUETOOTH                   -18    // shorthand for easy bluetooth mode settings
+#define SHARED                      -19
+#define STANDARD                    -20
+#define PERSISTENT                  -21
+#define ERRORS_ONLY                 -22
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
