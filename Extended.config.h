@@ -41,12 +41,4 @@
 #define MDNS_NAME               "onstepx" //    "onstepx", mDNS device name.                                                  Adjust
 #define WEB_SERVER                    OFF //    OFF, ON enables Webserver (for Website plugin.)                               Option
 
-// EXTERNAL GPIO SUPPORT -----------------------------------------------------------------------------------------------------------
-#define GPIO_DEVICE                   OFF //    OFF, DS2413: for 2-ch or 4-ch using 1-wire gpio's (one or two devices.)       Option
-                                          //         SWS: for 8-ch Serial gpio (normally 4 unused encoder pins.)
-                                          //         MCP23008: for 8-ch I2C gpio.
-                                          //         MCP23017, X9555, or X8575: for 16-ch I2C gpio.
-                                          //         SSR74HC595: for up to 32-ch gpio (serial shift register, output only.)
-                                          //         Works w/most OnStep features, channels assigned in order pin# 512 and up.
-
 // ---------------------------------------------------------------------------------------------------------------------------------
