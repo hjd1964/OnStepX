@@ -196,16 +196,21 @@ void StepDirTmcUART::setDecayMode(int decayMode) {
 }
 
 void StepDirTmcUART::updateStatus() {
+  bool crcError = false;
   if (settings.status == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
       TMC2208_n::DRV_STATUS_t status_result;
       if (settings.model == TMC2208) {
         status_result.sr = ((TMC2208Stepper*)driver)->DRV_STATUS();
+        crcError = ((TMC2208Stepper*)driver)->CRCerror;
       } else
       if (settings.model == TMC2209) {
         status_result.sr = ((TMC2209Stepper*)driver)->DRV_STATUS();
+        crcError = ((TMC2209Stepper*)driver)->CRCerror;
       }
+
+      if (crcError) status_result.sr = 0xFFFFFFFF;
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;

@@ -202,6 +202,8 @@ void ServoTmc2209::updateStatus() {
 
       TMC2208_n::DRV_STATUS_t status_result;
       status_result.sr = driver->DRV_STATUS();
+      if (driver->CRCerror) status_result.sr = 0xFFFFFFFF;
+
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;
