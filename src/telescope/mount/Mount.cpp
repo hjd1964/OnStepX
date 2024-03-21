@@ -108,6 +108,7 @@ void Mount::begin() {
         float a2 = nv.readF(NV_MOUNT_LAST_POSITION + 5);
         axis1.setInstrumentCoordinate(a1);
         axis2.setInstrumentCoordinate(a2);
+        if (!goTo.absoluteEncodersPresent) mount.syncFromOnStepToEncoders = true;
       }
     }
   #endif

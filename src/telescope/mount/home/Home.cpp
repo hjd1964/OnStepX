@@ -138,11 +138,15 @@ void Home::guideDone(bool success) {
 
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
 
-      VLF("MSG: Mount, finishing move to home with goto");
-      axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
+      VF("MSG: Mount, finishing move to home with goto to (");
+      double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1);
+      double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.senseOffset.axis2);
+      V(radToDeg(a1)); VF(","); V(radToDeg(a2)); VLF(")");
+      axis1.setTargetCoordinate(a1);
       axis1.autoGoto(goTo.getRadsPerSecond());
-      axis2.setTargetCoordinate(axis2.getTargetCoordinate() - arcsecToRad(settings.senseOffset.axis2));
+      axis2.setTargetCoordinate(a2);
       axis2.autoGoto(goTo.getRadsPerSecond());
+      mount.syncFromOnStepToEncoders = true;
       state = HS_NONE;
     } else {
       state = HS_NONE;
