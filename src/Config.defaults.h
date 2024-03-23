@@ -215,7 +215,7 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
-#ifdef AXIS1_SYNC_THRESHOLD_DEGREES
+#ifdef AXIS1_SYNC_THRESHOLD_DEGREES                               // maximum distance from absolute encoder pos in degrees for syncs
 #define AXIS1_SYNC_THRESHOLD lround(AXIS1_SYNC_THRESHOLD_DEGREES*AXIS1_STEPS_PER_DEGREE)
 #endif
 #ifndef AXIS1_SYNC_THRESHOLD
@@ -302,7 +302,7 @@
   #endif
 
   #ifdef AXIS1_SERVO_VELOCITY_MAX_DPS
-  #define AXIS1_SERVO_VELOCITY_MAX      lround(AXIS1_SERVO_VELOCITY_MAX_DPS*AXIS1_STEPS_PER_DEGREE)
+  #define AXIS1_SERVO_VELOCITY_MAX      lround(AXIS1_SERVO_VELOCITY_MAX_DPS*AXIS1_MOTOR_STEPS_PER_DEGREE)
   #endif
   #ifndef AXIS1_SERVO_VELOCITY_MAX
   #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC motors, in steps/s for stepper motors
@@ -478,7 +478,7 @@
   #endif
 
   #ifdef AXIS2_SERVO_VELOCITY_MAX_DPS
-  #define AXIS2_SERVO_VELOCITY_MAX      lround(AXIS2_STEPS_PER_DEGREE*AXIS2_SERVO_VELOCITY_MAX_DPS)
+  #define AXIS2_SERVO_VELOCITY_MAX      lround(AXIS2_SERVO_VELOCITY_MAX_DPS*AXIS2_MOTOR_STEPS_PER_DEGREE)
   #endif
   #ifndef AXIS2_SERVO_VELOCITY_MAX
   #define AXIS2_SERVO_VELOCITY_MAX      100
@@ -601,9 +601,9 @@
 #endif
 
 #ifndef AXIS1_TARGET_TOLERANCE
-#define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
+#define AXIS1_TARGET_TOLERANCE        0.0F                        // distance in arc-seconds when goto is at destination
 #endif
-#ifndef AXIS1_HOME_TOLERANCE                                      // in arc-seconds
+#ifndef AXIS1_HOME_TOLERANCE                                      // distance in arc-seconds when at home
 #define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE)
 #endif
 #ifndef AXIS1_SECTOR_GEAR
@@ -956,6 +956,9 @@
   #define AXIS3_SERVO_PH2_STATE         LOW
   #endif
 
+  #ifdef AXIS3_SERVO_VELOCITY_MAX_DPS
+  #define AXIS3_SERVO_VELOCITY_MAX      lround(AXIS3_SERVO_VELOCITY_MAX_DPS*AXIS3_MOTOR_STEPS_PER_DEGREE)
+  #endif
   #ifndef AXIS3_SERVO_VELOCITY_MAX
   #define AXIS3_SERVO_VELOCITY_MAX      100
   #endif
