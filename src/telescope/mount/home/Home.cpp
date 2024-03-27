@@ -137,8 +137,7 @@ void Home::guideDone(bool success) {
     if (useOffset()) {
       reset(isRequestWithReset);
 
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
-      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position);
 
       VF("MSG: Mount, finishing move to home with goto to (");
       double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
