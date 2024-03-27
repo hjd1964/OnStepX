@@ -12,14 +12,15 @@
 enum HomeState: uint8_t {HS_NONE, HS_HOMING};
 
 #pragma pack(1)
-#define SettingsSize 9
-typedef struct SenseOffset {
-  long axis1;
-  long axis2;
-} SenseOffset;
+#define SettingsSize 11
+typedef struct HomeSense {
+  long senseOffset;
+  bool senseReverse;
+} HomeSense;
 typedef struct Settings {
   bool automaticAtBoot;
-  SenseOffset senseOffset;
+  HomeSense axis1;
+  HomeSense axis2;
 } Settings;
 #pragma pack()
 
@@ -54,11 +55,14 @@ class Home {
     // home sensing
     bool useOffset();
 
+    // allow axis1 by latitude reversal and home switch reversal
+    void setReversal();
+
     bool hasSense = (((AXIS1_SENSE_HOME) != OFF) && ((AXIS2_SENSE_HOME) != OFF)) || \
                     (((AXIS1_SECTOR_GEAR) == ON) && ((AXIS1_SENSE_HOME) != OFF)) || \
                     (((AXIS2_TANGENT_ARM) == ON) && ((AXIS2_SENSE_HOME) != OFF));
 
-    Settings settings = {MOUNT_AUTO_HOME_DEFAULT == ON, {AXIS1_SENSE_HOME_OFFSET, AXIS2_SENSE_HOME_OFFSET}};
+    Settings settings = {MOUNT_AUTO_HOME_DEFAULT == ON, {AXIS1_SENSE_HOME_OFFSET, false}, {AXIS2_SENSE_HOME_OFFSET, false}};
 
     bool isRequestWithReset = false;
 

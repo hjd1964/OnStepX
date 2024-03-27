@@ -455,6 +455,10 @@ void Guide::poll() {
       VLF("MSG: Guide, arrival at home detected");
       state = GU_NONE;
       home.guideDone(true);
+    } else {
+      VLF("MSG: Guide, aborted homing");
+      state = GU_NONE;
+      home.guideDone(false);
     }
   }
 

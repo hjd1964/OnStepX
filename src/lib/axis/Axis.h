@@ -220,14 +220,16 @@ class Axis {
     float getBacklashFrequency();
 
     // reverse direction of motion
-    void setReverse(bool reverse) {
+    inline void setReverse(bool reverse) {
       if (reverse) {
         if (settings.reverse == ON) motor->setReverse(OFF); else motor->setReverse(ON);
       } else {
         motor->setReverse(settings.reverse);
       }
-      sense.reverse(homeSenseHandle, reverse);
     }
+
+    // reverse homing direction
+    inline void setHomeReverse(bool reverse) { sense.reverse(homeSenseHandle, reverse); }
 
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);

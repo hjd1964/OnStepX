@@ -14,7 +14,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     // :h?#       Get home status - has sense, auto home enabled, offset axis1, offset axis2 (in arcseconds.)
     //            Returns: n,n,n,n#
     if (command[1] == '?' && parameter[0] == 0) {
-      sprintf(reply, "%d,%ld,%ld",  (int)hasSense, settings.senseOffset.axis1, settings.senseOffset.axis2);
+      sprintf(reply, "%d,%ld,%ld",  (int)hasSense, settings.axis1.senseOffset, settings.axis2.senseOffset);
       *numericReply = false;
     } else
 
@@ -37,25 +37,37 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
       *numericReply = false;
     } else
 
-    // :hC1,n#    Set home offset for axis1 arcseconds.
+    // :hC1,n#    Set home sense direction and home offset for axis1 arcseconds.
     //            Returns: Nothing
     if (command[1] == 'C' && parameter[0] == '1' && parameter[1] == ',') {
-      long l = atol(&parameter[2]);
-      if (l >= -162000 || l <= 162000) {
-        settings.senseOffset.axis1 = l;
-        nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
-      } else *commandError = CE_PARAM_RANGE;     
+      if (parameter[2] == 'R' && parameter[3] == 0) {
+        settings.axis1.senseReverse = !settings.axis1.senseReverse;
+        V("MSG: Set Axis1 home reverse "); VL(settings.axis1.senseReverse);
+        setReversal();
+      } else {
+        long l = atol(&parameter[2]);
+        if (l >= -162000 || l <= 162000) {
+          settings.axis1.senseOffset = l;
+        } else *commandError = CE_PARAM_RANGE;
+      }
+      nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
       *numericReply = false;
     } else
 
-    // :hC2,n#    Set home offset for axis2 arcseconds.
+    // :hC2,n#    Set home sense direction and home offset for axis2 arcseconds.
     //            Returns: Nothing
     if (command[1] == 'C' && parameter[0] == '2' && parameter[1] == ',') {
-      long l = atol(&parameter[2]);
-      if (l >= -162000 || l <= 162000) {
-        settings.senseOffset.axis2 = l;
-        nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
-      } else *commandError = CE_PARAM_RANGE;     
+      if (parameter[2] == 'R' && parameter[3] == 0) {
+        settings.axis2.senseReverse = !settings.axis2.senseReverse;
+        V("MSG: Set Axis2 home reverse "); VL(settings.axis2.senseReverse);
+        setReversal();
+      } else {
+        long l = atol(&parameter[2]);
+        if (l >= -162000 || l <= 162000) {
+          settings.axis2.senseOffset = l;
+        } else *commandError = CE_PARAM_RANGE;
+      }
+      nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
       *numericReply = false;
     } else
 

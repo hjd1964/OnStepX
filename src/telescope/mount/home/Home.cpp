@@ -34,9 +34,8 @@ void Home::init() {
   #else
     if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
-  if (transform.isEquatorial()) {
-    axis1.setReverse(site.locationEx.latitude.sign < 0.0);
-  }
+
+  setReversal();
 
   position.pierSide = PIER_SIDE_NONE;
 }
@@ -73,8 +72,8 @@ CommandError Home::request() {
 
         // both -180 to 180
         VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
-        if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-        if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.axis1.senseOffset))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.axis2.senseOffset))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
         CommandError e = reset(false);
         if (e != CE_NONE) return e;
@@ -132,21 +131,25 @@ void Home::requestAborted() {
 
 // after finding home switches displace the mount axes as specified
 void Home::guideDone(bool success) {
+  if (!success) { state = HS_NONE; reset(isRequestWithReset); return; }
+
   #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-    if (success && useOffset()) {
+    if (useOffset()) {
       reset(isRequestWithReset);
 
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
 
       VF("MSG: Mount, finishing move to home with goto to (");
-      double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1);
-      double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.senseOffset.axis2);
+      double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
+      double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.axis2.senseOffset);
       V(radToDeg(a1)); VF(","); V(radToDeg(a2)); VLF(")");
       axis1.setTargetCoordinate(a1);
       axis1.autoGoto(goTo.getRadsPerSecond());
       axis2.setTargetCoordinate(a2);
       axis2.autoGoto(goTo.getRadsPerSecond());
       mount.syncFromOnStepToEncoders = true;
+
       state = HS_NONE;
     } else {
       state = HS_NONE;
@@ -217,8 +220,8 @@ CommandError Home::reset(bool fullReset) {
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
     if (!fullReset && state == HS_HOMING && useOffset()) {
-      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
-      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.senseOffset.axis2));
+      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset));
+      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.axis2.senseOffset));
     } else {
       axis1.setInstrumentCoordinate(position.a1);
       axis2.setInstrumentCoordinate(position.a2);
@@ -273,7 +276,14 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
 }
 
 bool Home::useOffset() {
-  if (hasSense && (settings.senseOffset.axis1 != 0 || settings.senseOffset.axis2 != 0)) return true; else return false;
+  if (hasSense && (settings.axis1.senseOffset != 0 || settings.axis2.senseOffset != 0)) return true; else return false;
+}
+
+void Home::setReversal() {
+  bool latitudeReversal = transform.isEquatorial() && site.locationEx.latitude.sign < 0.0;
+  axis1.setReverse(latitudeReversal);
+  if (!settings.axis1.senseReverse) axis1.setHomeReverse(latitudeReversal); else axis1.setHomeReverse(!latitudeReversal);
+  axis2.setHomeReverse(settings.axis2.senseReverse);
 }
 
 Home home;
