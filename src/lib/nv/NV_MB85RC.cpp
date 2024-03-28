@@ -6,9 +6,9 @@
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)
 
-// universal value works for all known 85RC series, 3ms
+// no wait needed for 85RC series
 #ifndef FRAM_WRITE_WAIT
-#define FRAM_WRITE_WAIT 3
+#define FRAM_WRITE_WAIT 0
 #endif
 
 bool NonVolatileStorageMB85RC::init(uint16_t size, bool cacheEnable, uint16_t wait, bool checkEnable, TwoWire* wire, uint8_t address) {
