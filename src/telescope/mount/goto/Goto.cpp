@@ -554,27 +554,39 @@ void Goto::poll() {
   }
 
   // adjust rates near the horizon to help avoid exceeding the minimum altitude limit
-  if (transform.isEquatorial()) {
+  if (transform.isEquatorial() && MOUNT_HORIZON_AVOIDANCE == ON) {
     if (site.locationEx.latitude.absval > degToRad(10.0)) {
       static float last_a2 = 0;
       Coordinate coords = mount.getMountPosition(CR_MOUNT_ALT);
       float a2 = site.locationEx.latitude.sign*coords.d;
 
       // range 0.2 to 1.0, where a larger distance has less slowdown effect
-      float slowdownFactor =  radToDeg(coords.a - limits.settings.altitude.min)/(SLEW_ACCELERATION_DIST*2.0);
+      float slowdownFactor = radToDeg(coords.a - limits.settings.altitude.min)/(SLEW_ACCELERATION_DIST*2.0);
 
       // constrain
       if (slowdownFactor > 1.0F) slowdownFactor = 1.0F;
       if (slowdownFactor < 0.2F) slowdownFactor = 0.2F;
 
       // if Dec is decreasing slow down the Dec axis, if Dec is increasing slow down the RA axis
-      if (a2 < last_a2) {
-        axis1.setFrequencyScale(1.0F);
-        axis2.setFrequencyScale(slowdownFactor);
-      } else {
-        axis1.setFrequencyScale(slowdownFactor);
-        axis2.setFrequencyScale(1.0F);
-      }
+      float sfr = 0.5F/FRACTIONAL_SEC;
+      float slowdownFactor1 = 1.0F;
+      float slowdownFactor2 = 1.0F;
+      static float slowdownFactor1a = 1.0F;
+      static float slowdownFactor2a = 1.0F;
+      if (a2 < last_a2) slowdownFactor2 = slowdownFactor; else slowdownFactor1 = slowdownFactor;
+
+      if (slowdownFactor1a < slowdownFactor1) { slowdownFactor1a += sfr; }
+      if (slowdownFactor1a > slowdownFactor1) { slowdownFactor1a -= sfr; }
+      if (slowdownFactor1a > 1.0F) slowdownFactor1a = 1.0F;
+      if (slowdownFactor1a < 0.2F) slowdownFactor1a = 0.2F;
+      if (slowdownFactor2a < slowdownFactor2) { slowdownFactor2a += sfr; }
+      if (slowdownFactor2a > slowdownFactor2) { slowdownFactor2a -= sfr; }
+      if (slowdownFactor2a > 1.0F) slowdownFactor2a = 1.0F;
+      if (slowdownFactor2a < 0.2F) slowdownFactor2a = 0.2F;
+
+      axis1.setFrequencyScale(slowdownFactor1a);
+      axis2.setFrequencyScale(slowdownFactor2a);
+
       last_a2 = a2;
     } else {
       axis1.setFrequencyScale(1.0F);

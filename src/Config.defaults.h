@@ -599,6 +599,9 @@
 #ifndef MOUNT_AUTO_HOME_DEFAULT
 #define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif
+#ifndef MOUNT_HORIZON_AVOIDANCE
+#define MOUNT_HORIZON_AVOIDANCE       ON                          // ON allows eq mode horizon avoidance
+#endif
 
 #ifndef AXIS1_TARGET_TOLERANCE
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // distance in arc-seconds when goto is at destination
