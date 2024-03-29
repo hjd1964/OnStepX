@@ -42,40 +42,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       unsigned long syncTimeout = millis() + 1000;
       while (!site.tls->get(jd) && (long)(millis() - syncTimeout) < 0) { };
 
-      if ((long)(millis() - syncTimeout) < 0) {
-        VLF("MSG: Mount, got updated date/time from GPS");
-
-        bool gpsSynced = true;
-        #if TIME_LOCATION_PPS_SENSE != OFF
-          syncTimeout = millis() + 1000;
-          int ppsInitialState = digitalReadF(PPS_SENSE_PIN);
-          while ((digitalReadF(PPS_SENSE_PIN) == ppsInitialState) && (long)(millis() - syncTimeout) < 0) { };
-          gpsSynced = (long)(millis() - syncTimeout) < 0;
-          if (gpsSynced) { VLF("MSG: Mount, setting date/time from GPS on PPS edge"); }
-        #else
-          VLF("MSG: Mount, setting date/time from GPS");
-        #endif
-
-        if (gpsSynced) {
-          site.setDateTime(jd);
-
-          site.dateIsReady = true;
-          site.timeIsReady = true;
-
-          #if GOTO_FEATURE == ON
-            if (park.state == PS_PARKED) park.restore(false);
-          #endif
-
-        } else {
-          VLF("MSG: Mount, GPS PPS sync timed out");
-          initError.tls = true; 
-        }
-
-      } else {
-        VLF("MSG: Mount, GPS sync timed out");
-        DL((long)(millis() - syncTimeout));
-        initError.tls = true; 
-      }
+      site.setDateTime(jd);
 
       VLF("MSG: Mount, stopping GPS monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
