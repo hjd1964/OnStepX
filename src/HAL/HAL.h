@@ -139,6 +139,10 @@
   #define FRACTIONAL_SEC  100.0F
 #endif
 
+#ifndef HAL_MIN_PPS_SUB_MICRO
+  #define HAL_MIN_PPS_SUB_MICRO 4
+#endif
+
 #if NV_DRIVER == NV_2416
   #define E2END 2047
 #elif NV_DRIVER == NV_2432

@@ -8,8 +8,8 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 200.0F
+// Base rate for critical task timing (0.0076s = 0.11", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 131.5789474F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE

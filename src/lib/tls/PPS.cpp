@@ -13,7 +13,7 @@ void ppsIsr() {
   if (oneSecond > 1000000UL - PPS_WINDOW_MICROS && oneSecond < 1000000UL + PPS_WINDOW_MICROS) {
     pps.averageSubMicros = (pps.averageSubMicros*(PPS_SECS_TO_AVERAGE - 1) + (oneSecond*16))/PPS_SECS_TO_AVERAGE;
     pps.synced = true;
-    tasks.setPeriodRatioSubMicros(pps.averageSubMicros);
+    tasks.setPeriodRatioSubMicros((long)pps.averageSubMicros + pps.averageSubMicrosSkew);
   } else {
     pps.synced = false;
     tasks.setPeriodRatioSubMicros(16000000UL);

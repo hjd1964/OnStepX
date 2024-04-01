@@ -85,6 +85,35 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
   }
 #endif
 
+#if (TIME_LOCATION_PPS_SENSE) != OFF && TIME_LOCATION_PPS_SYNC == ON
+  void ppsMonitor() {
+    static long deltaAvg = 0;
+
+    // monitor and adapt to keep PPS in sync with our UT1
+    static unsigned long lastMicros = 0;
+    long p = micros() - pps.lastMicros;
+    if (pps.lastMicros == lastMicros || p < 250000L) {
+      // DF("MSG: Site,"); D(pps.synced ? ' ' : '!'); DF("sub-micro delta="); D((long)pps.averageSubMicros - 16000000L); DLF("us");
+      return;
+    }
+    lastMicros = pps.lastMicros;
+
+    double h = site.getDateTime().hour*3600.0;
+    char syncc = ' ';
+    long s = round((h - floor(h))*1000000.0);
+    if (!pps.synced) { syncc = '!'; p = 1000000L; s = 1000000L; }
+
+    long delta = p - s;
+    deltaAvg = (delta + deltaAvg*19L)/20L;
+    // DF("MSG: Site,"); D(syncc); DF("sub-micro delta="); D((long)pps.averageSubMicros - 16000000L); DF("us, pps="); D(p/1000L); DF("ms, time.sec="); D(s/1000L); DF("ms, delta="); D(delta/1000); DLF("ms");
+
+    if (abs(deltaAvg) < 3000L) return;
+    pps.averageSubMicrosSkew = (-deltaAvg*HAL_MIN_PPS_SUB_MICRO)/2000L;
+    if (pps.averageSubMicrosSkew < -128) pps.averageSubMicrosSkew = -128; else
+    if (pps.averageSubMicrosSkew > 128) pps.averageSubMicrosSkew = 128;
+  }
+#endif
+
 void Site::init() {
   // get location
   VLF("MSG: Mount, site get Latitude/Longitude from NV");
@@ -152,8 +181,13 @@ void Site::init() {
 
   setSiderealPeriod(SIDEREAL_PERIOD);
 
-  #if (TIME_LOCATION_PPS_SENSE) != OFF
+  #if (TIME_LOCATION_PPS_SENSE) != OFF && TIME_LOCATION_PPS_SYNC == ON
     pps.init();
+
+    VF("MSG: Mount, site start PPS monitor task (rate 333ms priority 6)... ");
+    delay(100);
+    // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+    if (tasks.add(333, 0, true, 6, ppsMonitor, "ppsMon")) { VLF("success"); } else { VLF("FAILED!"); }
   #endif
 }
 

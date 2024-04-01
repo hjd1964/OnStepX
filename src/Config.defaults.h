@@ -679,6 +679,9 @@
 #ifndef TIME_LOCATION_PPS_SENSE
 #define TIME_LOCATION_PPS_SENSE       OFF
 #endif
+#ifndef TIME_LOCATION_PPS_SYNC
+#define TIME_LOCATION_PPS_SYNC        OFF                         // adjust timer rates to keep time in sync with PPS
+#endif
 
 // limits
 #ifndef LIMIT_SENSE

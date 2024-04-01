@@ -4,6 +4,9 @@
 // We define a more generic symbol, in case more STM32 boards based on different lines are supported
 #define __ARM_STM32__
 
+// Base rate for critical task timing (0.0019s = 0.03", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 526.3157895F
+
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
   #define ANALOG_READ_RANGE 1023
@@ -14,9 +17,6 @@
 #ifndef ANALOG_WRITE_PWM_BITS
   #define ANALOG_WRITE_PWM_BITS 8 // up to 16 bits
 #endif
-
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 500.0F
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 1.5

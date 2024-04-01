@@ -7,11 +7,12 @@
 
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
-// turn on support for using DACs to output digital signals using Arduino standard commands
+
+// Turn on support for using DACs to output digital signals using Arduino standard commands
 #define HAL_DAC_AS_DIGITAL
 
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 250.0F
+// Base rate for critical task timing (0.0057s = 0.09", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 175.4385965F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE

@@ -4,8 +4,8 @@
 // We define a more generic symbol, in case more STM32 boards based on different lines are supported
 #define __ARM_STM32__
 
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 100.0F
+// Base rate for critical task timing (0.0095s = 0.14", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 105.2631579F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
