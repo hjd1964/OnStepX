@@ -83,7 +83,9 @@ bool TlsDs3231::get(JulianDate &ut1) {
   unsigned long t = 0.5;
   #if defined(TIME_LOCATION_PPS_SENSE) && (TIME_LOCATION_PPS_SENSE) != OFF
     // wait until we're roughly in the middle of a second
-    do { t = micros() - pps.lastMicros; } while (t < 400000 || t > 600000);
+    if (pps.synced) {
+      do { t = micros() - pps.lastMicros; } while (t < 400000 || t > 600000);
+    }
   #endif
 
   GregorianDate greg;
