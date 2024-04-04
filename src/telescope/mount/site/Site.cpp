@@ -181,13 +181,14 @@ void Site::init() {
 
   setSiderealPeriod(SIDEREAL_PERIOD);
 
-  #if (TIME_LOCATION_PPS_SENSE) != OFF && TIME_LOCATION_PPS_SYNC == ON
+  #if (TIME_LOCATION_PPS_SENSE) != OFF
     pps.init();
-
-    VF("MSG: Mount, site start PPS monitor task (rate 333ms priority 6)... ");
-    delay(100);
-    // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-    if (tasks.add(333, 0, true, 6, ppsMonitor, "ppsMon")) { VLF("success"); } else { VLF("FAILED!"); }
+    #if TIME_LOCATION_PPS_SYNC == ON
+      VF("MSG: Mount, site start PPS monitor task (rate 333ms priority 6)... ");
+      delay(100);
+      // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
+      if (tasks.add(333, 0, true, 6, ppsMonitor, "ppsMon")) { VLF("success"); } else { VLF("FAILED!"); }
+    #endif
   #endif
 }
 
