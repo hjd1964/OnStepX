@@ -167,7 +167,7 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
     return CE_SLEW_ERR_OUTSIDE_LIMITS;
   }
 
-  if (AXIS2_TANGENT_ARM == OFF) {
+  if (transform.isEquatorial()) {
     if (flt(coords->d, axis2.settings.limits.min)) {
       VF("MSG: Mount, validate failed Dec past min limit by ");
       V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VLF(" arc-secs");
