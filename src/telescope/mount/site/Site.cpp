@@ -25,7 +25,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 #if TIME_LOCATION_SOURCE == GPS
   void gpsCheck() {
     if (site.tls->isReady()) {
-      VLF("MSG: Mount, setting site from GPS");
+      VLF("MSG: Mount, getting site from GPS");
       double latitude, longitude;
       float elevation;
       site.tls->getSite(latitude, longitude, elevation);
@@ -37,12 +37,18 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
       if (mount.isHome()) home.init();
 
       JulianDate jd;
-
-      // repeat query until we have the time
+      VLF("MSG: Mount, getting date/time from GPS");
       unsigned long syncTimeout = millis() + 1000;
       while (!site.tls->get(jd) && (long)(millis() - syncTimeout) < 0) { };
-
-      site.setDateTime(jd);
+      if ((long)(millis() - syncTimeout) < 0) {
+        site.dateIsReady = true;
+        site.timeIsReady = true;
+        site.setDateTime(jd);
+        site.updateTLS();
+      } else {
+        VLF("MSG: Mount, GPS timed out getting date/time from GPS");
+        initError.tls = true; 
+      }
 
       VLF("MSG: Mount, stopping GPS monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
@@ -61,15 +67,13 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
 #if TIME_LOCATION_SOURCE == NTP
   void ntpCheck() {
     if (site.tls->isReady()) {
-      VLF("MSG: Mount, setting date/time from NTP");
+      VLF("MSG: Mount, getting date/time from NTP");
       JulianDate jd;
       site.tls->get(jd);
       site.dateIsReady = true;
       site.timeIsReady = true;
       site.setDateTime(jd);
-      #if GOTO_FEATURE == ON
-        if (park.state == PS_PARKED) park.restore(false);
-      #endif
+      site.updateTLS();
 
       VLF("MSG: Mount, stopping NTP monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("ntpChk"));
@@ -204,7 +208,7 @@ void Site::updateLocation() {
   setSiderealTime(ut1);
 }
 
-// update the TLS 
+// update the initError status and restore the park position if necessary
 void Site::updateTLS() {
   #if TIME_LOCATION_SOURCE != OFF
     tls->set(ut1);
@@ -212,6 +216,9 @@ void Site::updateTLS() {
 
   if (isDateTimeReady()) {
     if (initError.tls) initError.tls = false;
+    #if GOTO_FEATURE == ON
+      if (park.state == PS_PARKED) park.restore(false);
+    #endif
   }
 }
 
