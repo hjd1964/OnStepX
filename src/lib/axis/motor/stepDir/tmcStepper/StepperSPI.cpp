@@ -47,34 +47,29 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
 
   if (settings.model == TMC2130) {
     rSense = 0.11F;
-    driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
+    driver = new TMC2130Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC2130Stepper*)driver)->begin();
-    ((TMC2130Stepper*)driver)->pwm_autoscale(true);
     ((TMC2130Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
-    driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
     ((TMC2130Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC5160) {
     rSense = 0.075F;
-    driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
+    driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5160Stepper*)driver)->begin();
-    ((TMC5160Stepper*)driver)->pwm_autoscale(true);
     ((TMC5160Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
-    driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
     ((TMC5160Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC5161) {
     rSense = 0.075F;
-    driver = new TMC5161Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
+    driver = new TMC5161Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5161Stepper*)driver)->begin();
-    ((TMC5161Stepper*)driver)->pwm_autoscale(true);
     ((TMC5161Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
-    driver->rms_current(settings.currentRun*0.7071F, settings.currentHold/settings.currentRun);
     ((TMC5161Stepper*)driver)->en_pwm_mode(false);
   }
+  current(settings.currentRun, (float)settings.currentHold/settings.currentRun);
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -142,14 +137,14 @@ int StepDirTmcSPI::modeMicrostepSlewing() {
 
 void StepDirTmcSPI::modeDecayTracking() {
   setDecayMode(settings.decay);
-  driver->rms_current(settings.currentRun*0.7071F, (float)settings.currentHold/(float)settings.currentRun);
+  current(settings.currentRun, (float)settings.currentHold/settings.currentRun);
 }
 
 void StepDirTmcSPI::modeDecaySlewing() {
   setDecayMode(settings.decaySlewing);
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver->rms_current(IGOTO*0.7071F, 1.0F);
+  current(IGOTO, 1.0F);
 }
 
 void StepDirTmcSPI::updateStatus() {
@@ -197,7 +192,7 @@ bool StepDirTmcSPI::enable(bool state) {
 void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->rms_current(settings.currentRun*0.7071F, 1.0F);
+    current(settings.currentRun, 1.0F);
     if (settings.model == TMC2130) {
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);
       ((TMC2130Stepper*)driver)->en_pwm_mode(true);
