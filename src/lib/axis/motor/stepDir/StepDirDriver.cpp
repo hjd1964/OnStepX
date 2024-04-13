@@ -180,12 +180,12 @@ int StepDirDriver::subdivisionsToCode(long microsteps) {
 void StepDirDriver::updateStatus() {
   #if DEBUG == VERBOSE
     if ((status.outputA.shortToGround     != lastStatus.outputA.shortToGround) ||
-        (status.outputA.openLoad          != lastStatus.outputA.openLoad) ||
+//      (status.outputA.openLoad          != lastStatus.outputA.openLoad) ||
         (status.outputB.shortToGround     != lastStatus.outputB.shortToGround) ||
-        (status.outputB.openLoad          != lastStatus.outputB.openLoad) ||
-        (status.overTemperatureWarning != lastStatus.overTemperatureWarning) ||
+//      (status.outputB.openLoad          != lastStatus.outputB.openLoad) ||
+        (status.overTemperatureWarning    != lastStatus.overTemperatureWarning) ||
         (status.overTemperature           != lastStatus.overTemperature) ||
-        (status.standstill                != lastStatus.standstill) ||
+//      (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
       VF("MSG: StepDirDriver"); V(axisNumber); VF(", status change ");
       VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
