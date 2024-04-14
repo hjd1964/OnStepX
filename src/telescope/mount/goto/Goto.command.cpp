@@ -395,11 +395,13 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
             case '3': transform.align.model.azmCor = arcsecToRad(atol(&parameter[3])); break; // azmCor
             case '4': transform.align.model.doCor = arcsecToRad(atol(&parameter[3])); break;  // doCor
             case '5': transform.align.model.pdCor = arcsecToRad(atol(&parameter[3])); break;  // pdCor
-            case '6': if (transform.mountType == FORK || transform.mountType == ALTAZM)
-              transform.align.model.dfCor = arcsecToRad(atol(&parameter[3])); break;          // fdCor or ffCor
+            case '6':
+              if (transform.mountType == FORK || transform.mountType == ALTAZM)               // fdCor or ffCor
+                transform.align.model.dfCor = arcsecToRad(atol(&parameter[3]));
             break;
-            case '7': if (transform.mountType != FORK && transform.mountType != ALTAZM)
-              transform.align.model.dfCor = arcsecToRad(atol(&parameter[3])); break;          // fdCor or ffCor
+            case '7':
+              if (transform.mountType != FORK && transform.mountType != ALTAZM)               // fdCor or ffCor
+                transform.align.model.dfCor = arcsecToRad(atol(&parameter[3]));                 
             break;
             case '8': transform.align.model.tfCor = arcsecToRad(atol(&parameter[3])); break;  // tfCor
             // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model
