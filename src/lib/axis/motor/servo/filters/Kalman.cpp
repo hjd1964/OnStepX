@@ -8,7 +8,7 @@
     AXIS7_SERVO_FLTR == KALMAN || AXIS8_SERVO_FLTR == KALMAN || AXIS9_SERVO_FLTR == KALMAN
 
 KalmanFilter::KalmanFilter(float measurementUncertainty, float variance) {
-  kalmanFilter = new axis1EncoderKalmanFilter(measurementUncertainty, measurementUncertainty, variance);
+  kalmanFilter = new SimpleKalmanFilter(measurementUncertainty, measurementUncertainty, variance);
 }
 
 long KalmanFilter::update(long encoderCounts, long motorCounts, bool isTracking) {
