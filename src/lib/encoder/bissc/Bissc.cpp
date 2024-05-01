@@ -27,7 +27,9 @@ void Bissc::setOrigin(uint32_t count) {
   VF("MSG: Encoder BiSS-C"); V(axis); VLF(", >>> with the mount in the home position <<<");
   VF("MSG: Encoder BiSS-C"); V(axis); VF(", if used AXIS"); V(axis); VF("_ENCODER_OFFSET in counts should be set to "); VL(uint32_t(-read()));
   origin = count;
-  VF("MSG: Encoder BiSS-C"); V(axis); VF(", counts at home should be 0 and currently are "); VL(read());
+  uint32_t current;
+  readEnc(current);
+  VF("MSG: Encoder BiSS-C"); V(axis); VF(", counts at home should be 0 and currently are "); VL((int32_t)current);
   VLF("----------------------------------------------------------------------------------------");
 
   offset = temp;
