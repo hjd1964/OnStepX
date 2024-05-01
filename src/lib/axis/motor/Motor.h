@@ -145,6 +145,8 @@ class Motor {
 
     bool enabled = false;                      // enable/disable logical state
 
+    bool calibrating = false;                  // shadow disable when calibrating
+
   protected:
     // disable backlash compensation, to work properly there must be an enable call to match
     void disableBacklash();

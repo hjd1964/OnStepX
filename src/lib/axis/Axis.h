@@ -117,7 +117,7 @@ class Axis {
     void enable(bool value);
 
     // get the enabled state
-    inline bool isEnabled() { return enabled; }
+    inline bool isEnabled() { return enabled && !motor->calibrating; }
 
     // time (in ms) before automatic power down at standstill, use 0 to disable
     void setPowerDownTime(int value);
