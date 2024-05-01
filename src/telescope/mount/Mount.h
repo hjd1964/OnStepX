@@ -82,7 +82,7 @@ class Mount {
     void enable(bool state);
 
     // returns true if the mount motors are powered on
-    inline bool isEnabled() { return axis1.isEnabled() || axis2.isEnabled(); }
+    inline bool isEnabled() { return axis1.isEnabled() && axis2.isEnabled(); }
 
     // true if syncing only from OnStep to the Encoders
     bool syncFromOnStepToEncoders = false;
