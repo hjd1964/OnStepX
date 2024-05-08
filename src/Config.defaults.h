@@ -573,6 +573,9 @@
 #define AXIS2_TANGENT_ARM             ON
 #define AXIS2_TANGENT_ARM_CORRECTION  ON
 #endif
+#if MOUNT_TYPE == ALTALT
+#define MOUNT_SUBTYPE                 ALTALT
+#endif
 #if MOUNT_TYPE == ALTAZM
 #define MOUNT_SUBTYPE                 ALTAZM
 #endif
