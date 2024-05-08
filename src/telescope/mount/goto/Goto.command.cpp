@@ -437,6 +437,19 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
                 transform.equToHor(&temp);
                 transform.align.mount[star].ax1 = temp.z;
                 transform.align.mount[star].ax2 = temp.a;
+              } else
+              if (transform.mountType == ALTALT) {
+                Coordinate temp;
+                temp.h = transform.align.actual[star].h;
+                temp.d = transform.align.actual[star].d;
+                transform.equToAa(&temp);
+                transform.align.actual[star].ax1 = temp.aa1;
+                transform.align.actual[star].ax2 = temp.aa2;
+                temp.h = transform.align.mount[star].h;
+                temp.d = transform.align.mount[star].d;
+                transform.equToAa(&temp);
+                transform.align.mount[star].ax1 = temp.aa1;
+                transform.align.mount[star].ax2 = temp.aa2;
               } else {
                 transform.align.actual[star].ax1 = transform.align.actual[star].h;
                 transform.align.actual[star].ax2 = transform.align.actual[star].d;

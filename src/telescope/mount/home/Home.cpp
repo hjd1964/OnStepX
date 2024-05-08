@@ -25,14 +25,17 @@ void Home::init() {
   nv.readBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
 
   #ifndef AXIS1_HOME_DEFAULT
-    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0.0L; position.z = 0.0L; }
+    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0.0L; position.z = 0.0L; position.aa1 = 0.0L; }
   #else
-    if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
+    if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else
+    if (transform.mountType == ALTALT) position.aa1 = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
   #endif
   #ifndef AXIS2_HOME_DEFAULT
-    if (transform.mountType == ALTAZM) position.a = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;
+    if (transform.mountType == ALTAZM) position.a = 0.0; else
+    if (transform.mountType == ALTALT) position.aa2 = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;
   #else
-    if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
+    if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT);
+    if (transform.mountType == ALTALT) position.aa2 = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
 
   setReversal();
@@ -65,6 +68,10 @@ CommandError Home::request() {
         if (transform.mountType == ALTAZM) {
           a1 -= position.z;
           a2 -= position.a;
+        } else
+        if (transform.mountType == ALTALT) {
+          a1 -= position.aa1;
+          a2 -= position.aa2;
         } else {
           a1 -= position.h;
           a2 -= position.d;
@@ -87,7 +94,10 @@ CommandError Home::request() {
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         VLF("MSG: Mount, moving to home");
         state = HS_HOMING;
-        if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+
+        if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+        if (transform.mountType == ALTALT) transform.aaToEqu(&position);
+
         CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
         if (result != CE_NONE) {
           VF("WRN: Mount, moving to home goto failed (code "); V(result); VLF(")");
@@ -137,7 +147,8 @@ void Home::guideDone(bool success) {
     if (useOffset()) {
       reset(isRequestWithReset);
 
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
 
       VF("MSG: Mount, finishing move to home with goto to (");
       double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
@@ -209,6 +220,10 @@ CommandError Home::reset(bool fullReset) {
   if (transform.mountType == ALTAZM) {
     position.a1 = position.z;
     position.a2 = position.a;
+  } else
+  if (transform.mountType == ALTALT) {
+    position.a1 = position.aa1;
+    position.a2 = position.aa2;
   } else {
     position.a1 = position.h;
     position.a2 = position.d;
@@ -260,14 +275,17 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     break;
     case CR_MOUNT_EQU:
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
       transform.hourAngleToRightAscension(&position, false);
     break;
     case CR_MOUNT_ALT:
     case CR_MOUNT_HOR:
       if (transform.isEquatorial()) transform.equToHor(&position);
+      else if (transform.mountType == ALTALT) transform.aaToHor(&position);
     break;
     case CR_MOUNT_ALL:
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else transform.equToHor(&position);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position); else transform.equToHor(&position);
       transform.hourAngleToRightAscension(&position, false);
     break;
   }

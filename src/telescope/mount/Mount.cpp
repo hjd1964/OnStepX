@@ -292,6 +292,7 @@ void Mount::poll() {
     #define DiffRange  2.908882086657216e-4L // 1 arc-minute in radians
     #define DiffRange2 5.817764173314432e-4L // 2 arc-minutes in radians
   #endif
+  #define DegenerateRange (DiffRange*1.5)    // we were using Deg85
 
   // keep track of where we are pointing
   #if MOUNT_COORDS_MEMORY == ON
@@ -320,11 +321,13 @@ void Mount::poll() {
   updatePosition(CR_MOUNT_ALL);
   double altitude = current.a;
   double declination = current.d;
+  double altitude2 = current.aa2;
 
   // on fast processors calculate true coordinate for a little more accuracy
   #ifndef HAL_SLOW_PROCESSOR
     transform.mountToTopocentric(&current);
-    if (transform.mountType == ALTAZM) transform.horToEqu(&current);
+    if (transform.mountType == ALTAZM) transform.horToEqu(&current); else
+    if (transform.mountType == ALTALT) transform.aaToEqu(&current);
   #endif
 
   Coordinate ahead = current;
@@ -334,10 +337,8 @@ void Mount::poll() {
   behind.h -= DiffRange;
 
   // create horizon coordinates that would exist ahead and behind the current position
-  if (transform.mountType == ALTAZM) {
-    transform.equToHor(&ahead); Y;
-    transform.equToHor(&behind); Y;
-  }
+  if (transform.mountType == ALTAZM) { transform.equToHor(&ahead); transform.equToHor(&behind); Y; } else
+  if (transform.mountType == ALTALT) { transform.equToAa(&ahead); transform.equToAa(&behind); Y; }
 
   // apply (optional) pointing model and refraction
   if (settings.rc == RC_MODEL || settings.rc == RC_MODEL_DUAL) {
@@ -370,6 +371,13 @@ void Mount::poll() {
     aheadAxis2 = ahead.a;
     behindAxis1 = behind.z;
     behindAxis2 = behind.a;
+  } else
+  if (transform.mountType == ALTALT) {
+    transform.equToAa(&ahead);
+    aheadAxis1 = ahead.aa1;
+    aheadAxis2 = ahead.aa2;
+    behindAxis1 = behind.aa1;
+    behindAxis2 = behind.aa2;
   } else {
     aheadAxis1 = ahead.h;
     aheadAxis2 = ahead.d;
@@ -389,16 +397,23 @@ void Mount::poll() {
   if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
 
   // override for special case of near a celestial pole
-  if (fabs(declination) > Deg85) {
-    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = trackingRate;
+  if (fabs(declination) > Deg90 - DegenerateRange) {
+    if (transform.isEquatorial()) trackingRateAxis1 = trackingRate; else
+    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else
+    if (transform.mountType == ALTALT) trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
   }
 
-  // override for both rates for special case near the zenith
-  if (altitude > Deg85) {
-    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; else trackingRateAxis1 = ztr(current.a);
+  // override for both rates for special case near the Azm axis of rotation (Zenith)
+  if (altitude > Deg90 - DegenerateRange) {
+//    if (transform.isEquatorial()) trackingRateAxis1 = ztr(current.a); else
+//    if (transform.mountType == ALTALT) trackingRateAxis1 = ztr(current.a); else
+    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; 
     trackingRateAxis2 = 0.0F;
   }
+
+  // override for both rates for special case near the aa1 axis of rotation
+  if (transform.mountType == ALTALT && fabs(altitude2) > Deg90 - DegenerateRange) { trackingRateAxis1 = 0.0F; }
 
   // stop any movement on motor hardware fault
   if (mount.motorFault()) {
@@ -432,6 +447,9 @@ void Mount::updatePosition(CoordReturn coordReturn) {
 
   if (transform.mountType == ALTAZM) {
     if (coordReturn == CR_MOUNT_EQU || coordReturn == CR_MOUNT_ALL) transform.horToEqu(&current);
+  } else
+  if (transform.mountType == ALTALT) {
+    transform.aaToEqu(&current);
   } else {
     if (coordReturn == CR_MOUNT_ALT) transform.equToAlt(&current); else
     if (coordReturn == CR_MOUNT_HOR || coordReturn == CR_MOUNT_ALL) transform.equToHor(&current);

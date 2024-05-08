@@ -278,7 +278,9 @@ void Limits::poll() {
   if (limitsEnabled && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
     // overhead and horizon limits
     if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;
-    if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
+    if (fabs(settings.altitude.max - Deg90) > OneArcSec) {
+      if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
+    } else error.altitude.max = false;
 
     // meridian limits
     if (transform.mountType == GEM && current.pierSide == PIER_SIDE_EAST) {

@@ -73,6 +73,15 @@ class Transform {
     // converts from Horizon (a,z) to Equatorial (h,d) coordinates
     void horToEqu(Coordinate *coord);
 
+    // converts from AltAlt (aa1,aa2) to Horizon (a,z) coordinates
+    void aaToHor(Coordinate *coord);
+    // converts from Horizon (a,z) to AltAlt (aa1,aa2) coordinates
+    void horToAa(Coordinate *coord);
+    // converts from AltAlt (aa1,aa2) to Equatorial (h,d) coordinates
+    void aaToEqu(Coordinate *coord) { aaToHor(coord); horToEqu(coord); };
+    // converts from equatorial (h,d) to AltAlt (aa1,aa2) coordinates
+    void equToAa(Coordinate *coord) { equToHor(coord); horToAa(coord); };
+
     // refraction at altitude, pressure (millibars), and temperature (celsius)
     // returns amount of refraction at the true altitude
     double trueRefrac(double altitude);

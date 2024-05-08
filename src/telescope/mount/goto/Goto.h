@@ -132,15 +132,15 @@ class Goto {
     inline double dist(double a, double b) { if (a > b) return a - b; else return b - a; }
 
     // requested goto/sync destination Native coordinate (eq or hor)
-    Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // goto starts from this Mount coordinate (eq or hor)
     Coordinate start;
     // goto next destination Mount coordinate (eq or hor)
     Coordinate destination;
     // goto final destination Mount coordinate (eq or hor)
-    Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // last align (goto) target Mount coordinate (eq or hor)
-    Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;

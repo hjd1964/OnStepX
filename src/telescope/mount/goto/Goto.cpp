@@ -226,7 +226,8 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   target = *coords;
 
-  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
+  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else
+  if (transform.mountType == ALTALT) transform.aaToEqu(&target); else transform.equToHor(&target);
 
   // east side of pier is always the default polar-home position
   // east side of pier - we're in the western sky and the HA's are positive
@@ -335,7 +336,9 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (target.pierSide == PIER_SIDE_EAST) target.a1Correction = axis1TargetCorrectionE;
   if (target.pierSide == PIER_SIDE_WEST) target.a1Correction = axis1TargetCorrectionW;
 
-  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
+  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else
+  if (transform.mountType == ALTALT) transform.aaToEqu(&target); else transform.equToHor(&target);
+
   transform.observedPlaceToMount(&target);
   transform.hourAngleToRightAscension(&target, false);
 
@@ -383,7 +386,8 @@ CommandError Goto::alignAddStar(bool sync) {
 
     // update the targets HA and Horizon coords as necessary
     transform.rightAscensionToHourAngle(&lastAlignTarget, true);
-    if (transform.mountType == ALTAZM) transform.equToHor(&lastAlignTarget);
+    if (transform.mountType == ALTAZM) transform.equToHor(&lastAlignTarget); else
+    if (transform.mountType == ALTALT) transform.equToAa(&lastAlignTarget);
 
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &lastAlignTarget, &mountPosition);
@@ -610,7 +614,8 @@ void Goto::poll() {
         nearTarget.h -= slewDestinationDistHA;
         nearTarget.d -= slewDestinationDistDec;
 
-        if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
+        if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget); else
+        if (transform.mountType == ALTALT) transform.equToAa(&nearTarget);
 
         double a1, a2;
         transform.mountToInstrument(&nearTarget, &a1, &a2);

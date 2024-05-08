@@ -27,6 +27,10 @@ void GeoAlign::init(int8_t mountType, float latitude) {
   if (mountType == ALTAZM) {
     cosLat = cosf(Deg90);
     sinLat = sinf(Deg90);
+  } else
+  if (mountType == ALTALT) {
+    cosLat = cosf(0.0F);
+    sinLat = sinf(0.0F);
   } else {
     cosLat = cosf(latitude);
     sinLat = sinf(latitude);
@@ -89,6 +93,15 @@ CommandError GeoAlign::addStar(int thisStar, int numberStars, Coordinate *actual
     transform.equToHor(actual);
     this->actual[i].ax1 = actual->z;
     this->actual[i].ax2 = actual->a;
+  } else
+  if (mountType == ALTALT) {
+    transform.equToAa(mount);
+    this->mount[i].ax1 = mount->aa1;
+    this->mount[i].ax2 = mount->aa2;
+
+    transform.equToAa(actual);
+    this->actual[i].ax1 = actual->aa1;
+    this->actual[i].ax2 = actual->aa2;
   } else {
     this->mount[i].ax1 = mount->h;
     this->mount[i].ax2 = mount->d;
@@ -402,13 +415,8 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   if (coord->pierSide == PIER_SIDE_WEST) p = -1.0F;
   
   float ax1, ax2;
-  if (mountType == ALTAZM) {
-    ax1 = coord->z;
-    ax2 = coord->a;
-  } else {
-    ax1 = coord->h;
-    ax2 = coord->d;
-  }
+  if (mountType == ALTAZM) { ax1 = coord->z; ax2 = coord->a; } else
+  if (mountType == ALTALT) { ax1 = coord->aa1; ax2 = coord->aa2; } else { ax1 = coord->h; ax2 = coord->d; }
   
   if (ax2 >  Deg90) ax2 =  Deg90;
   if (ax2 < -Deg90) ax2 = -Deg90;
@@ -459,13 +467,8 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   a1 = a1 - model.ax1Cor;
   a2 = a2 - model.ax2Cor*-p;
 
-  if (mountType == ALTAZM) {
-    coord->z = a1;
-    coord->a = a2;
-  } else {
-    coord->h = a1;
-    coord->d = a2;
-  }
+  if (mountType == ALTAZM) { coord->z = a1; coord->a = a2; } else
+  if (mountType == ALTALT) { coord->z = a1; coord->a = a2; } else { coord->h = a1; coord->d = a2; }
 }
 
 void GeoAlign::mountToObservedPlace(Coordinate *coord) {
@@ -475,13 +478,8 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
   if (coord->pierSide == PIER_SIDE_WEST) p = -1.0F;
 
   float ax1, ax2;
-  if (mountType == ALTAZM) {
-    ax1 = coord->z;
-    ax2 = coord->a;
-  } else {
-    ax1 = coord->h;
-    ax2 = coord->d;
-  }
+  if (mountType == ALTAZM) { ax1 = coord->z; ax2 = coord->a; } else
+  if (mountType == ALTALT) { ax1 = coord->aa1; ax2 = coord->aa2; } else { ax1 = coord->h; ax2 = coord->d; }
   
   ax1 = ax1 + model.ax1Cor;
   ax2 = ax2 + model.ax2Cor*-p;
@@ -533,6 +531,12 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     while (ax1 < -Deg360) ax1 += Deg360;
     coord->z = ax1;
     coord->a = ax2;
+  } else
+  if (mountType == ALTALT) {
+    while (ax1 >  Deg360) ax1 -= Deg360;
+    while (ax1 < -Deg360) ax1 += Deg360;
+    coord->aa1 = ax1;
+    coord->aa2 = ax2;
   } else {
     while (ax1 >  Deg180) ax1 -= Deg360;
     while (ax1 < -Deg180) ax1 += Deg360;
