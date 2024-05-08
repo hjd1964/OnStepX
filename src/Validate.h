@@ -172,8 +172,8 @@
 #endif
 
 #if AXIS1_SECTOR_GEAR == ON
-  #if MOUNT_SUBTYPE == ALTAZM
-    #error "Configuration (Config.h): Setting MOUNT_TYPE ALTAZM is not compatible with AXIS1_SECTOR_GEAR ON  (from Constants.h)"
+  #if MOUNT_SUBTYPE != GEM && MOUNT_SUBTYPE != FORK
+    #error "Configuration (Config.h): Setting MOUNT_TYPE is not compatible with AXIS1_SECTOR_GEAR ON  (from Constants.h)"
   #endif
   #if (AXIS1_SENSE_HOME) != OFF && (AXIS1_SENSE_HOME_OFFSET) != 0
     #error "Configuration (Config.h): Enabling AXIS1_SECTOR_GEAR and AXIS1_SENSE_HOME requires an AXIS1_SENSE_HOME_OFFSET of 0."
@@ -288,7 +288,7 @@
   #error "Configuration (Config.h): Setting AXIS2_SENSE_LIMIT_MAX unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if MOUNT_SUBTYPE < GEM || MOUNT_SUBTYPE > ALTAZM
+#if MOUNT_SUBTYPE < MOUNT_SUBTYPE_FIRST || MOUNT_SUBTYPE > MOUNT_SUBTYPE_LAST
   #error "Configuration (Config.h): Setting MOUNT_TYPE unknown, use a valid MOUNT TYPE (from Constants.h)"
 #endif
 
@@ -297,8 +297,8 @@
 #endif
 
 #if AXIS2_TANGENT_ARM == ON
-  #if MOUNT_SUBTYPE == ALTAZM
-    #error "Configuration (Config.h): Setting MOUNT_TYPE ALTAZM is not compatible with AXIS2_TANGENT_ARM ON  (from Constants.h)"
+  #if MOUNT_SUBTYPE != GEM && MOUNT_SUBTYPE != FORK
+    #error "Configuration (Config.h): Setting MOUNT_TYPE is not compatible with AXIS2_TANGENT_ARM ON  (from Constants.h)"
   #endif
   #if (AXIS2_SENSE_HOME) != OFF && (AXIS2_SENSE_HOME_OFFSET) != 0
     #error "Configuration (Config.h): Enabling AXIS2_TANGENT_ARM and AXIS2_SENSE_HOME requires an AXIS2_SENSE_HOME_OFFSET of 0."
