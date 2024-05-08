@@ -86,7 +86,9 @@
 #define ADDON_RESET_PIN         PA4              // ESP8266 RST (on EXP2 shared with the DS3234 CS pin)
 
 // The PEC index sense is a logic level input, resets the PEC index on rising edge then waits for 60 seconds before allowing another reset
+#ifndef PEC_SENSE_PIN
 #define PEC_SENSE_PIN           PA1              // PEC Sense, analog or digital (on X+ so it can have 3v3 or 5v on adjacent pin)
+#endif
 
 // The status LED is a two wire jumper with a 10k resistor in series to limit the current to the LED
 #ifndef STATUS_LED_PIN
