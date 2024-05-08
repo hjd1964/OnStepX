@@ -10,3 +10,12 @@ debug.cfg
 esp32.svd
 src/plugins/*
 debug.svd
+z.esp4.lxd75.servo.Config.h
+z.esp4.lxd75.std.Config.h
+z.esp4.standard.Config.h
+z.esp4.tri.servo23.Config.h
+z.esp4.tri.std.Config.h
+z.h423.std.Config.h
+z.mant.gtr.servo26.Config.h
+z.mant.gtr.std.Config.h
+z.pcb4.dc.servo.Config.h
