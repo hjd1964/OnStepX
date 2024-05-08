@@ -36,6 +36,36 @@
   #define SERVO_SLEWING_TO_TRACKING_DELAY 3000 // in milliseconds
 #endif
 
+#ifdef ABSOLUTE_ENCODER_CALIBRATION
+  #ifndef ENCODER_ECM_BUFFER_SIZE
+    #define ENCODER_ECM_BUFFER_SIZE 16384
+  #endif
+
+  #ifndef ENCODER_ECM_BUFFER_RESOLUTION
+    #define ENCODER_ECM_BUFFER_RESOLUTION 512
+  #endif
+
+  #ifndef ENCODER_ECM_HIGH_PASS_ORDER
+    #define ENCODER_ECM_HIGH_PASS_ORDER 2
+  #endif
+
+  #ifndef ENCODER_ECM_HIGH_PASS_POINTS
+    #define ENCODER_ECM_HIGH_PASS_POINTS 10
+  #endif
+
+  #ifndef ENCODER_ECM_LOW_PASS_ORDER
+    #define ENCODER_ECM_LOW_PASS_ORDER 5
+  #endif
+
+  #ifndef ENCODER_ECM_LOW_PASS_POINTS
+    #define ENCODER_ECM_LOW_PASS_POINTS 10
+  #endif
+
+  #define ECB_NO_DATA -32768
+
+  enum CalibrateMode {CM_NONE, CM_RECORDING, CM_FIXED_RATE};
+#endif
+
 class ServoMotor : public Motor {
   public:
     // constructor
@@ -95,6 +125,10 @@ class ServoMotor : public Motor {
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
     
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    void calibrate(float value);
+  #endif
+
     // calibrate the motor driver
     void calibrateDriver() { driver->calibrateDriver(); }
 
@@ -117,6 +151,30 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    void calibrateRecord(float &velocity, long &motorCounts, long &encoderCounts);
+    bool calibrationRead(const char *fileName);
+    bool calibrationWrite(const char *fileName);
+    bool calibrationAveragingWrite();
+    void calibrationClear();
+    void calibrationErase();
+    bool calibrationHighPass();
+    bool calibrationLowPass();
+    bool calibrationLinearRegression();
+    void calibrationPrint();
+    inline int16_t ecbn(int16_t value) { if (value == ECB_NO_DATA) return 0; else return value; };
+
+    int16_t *encoderCorrectionBuffer = NULL;
+    int32_t encoderCorrection = 0;
+    int32_t startCount = 0;
+    int32_t endCount = 0;
+    uint8_t handle = 0;
+
+    CalibrateMode calibrateMode = CM_NONE;
+
+    int32_t encoderIndex(int32_t offset = 0);
+  #endif
 
     Filter *filter;
 

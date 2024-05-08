@@ -8,6 +8,10 @@
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
+#ifdef ABSOLUTE_ENCODER_CALIBRATION
+  extern volatile long _calibrateStepPosition;
+#endif
+
 ServoMotor *servoMotorInstance[9];
 IRAM_ATTR void moveServoMotorAxis1() { servoMotorInstance[0]->move(); }
 IRAM_ATTR void moveServoMotorAxis2() { servoMotorInstance[1]->move(); }
@@ -72,6 +76,9 @@ bool ServoMotor::init() {
   driver->init();
   enable(false);
 
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    calibrationRead("/encoder.dat");
+  #endif
 
   trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
@@ -175,6 +182,18 @@ long ServoMotor::getTargetDistanceSteps() {
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void ServoMotor::setFrequencySteps(float frequency) {
+
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    if (axisNumber == 1 && calibrateMode == CM_RECORDING) {
+      // automatically write calibration data if tracking is stopped
+      if (abs(frequency) < 1.0F) {
+        calibrate(0);
+      } else {
+        frequency = trackingFrequency * AXIS1_SERVO_VELOCITY_CALIBRATION;
+      }
+    }
+  #endif
+
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
@@ -272,6 +291,16 @@ void ServoMotor::poll() {
 
   float velocity = velocityEstimate + control->out;
   if (!enabled) velocity = 0.0F;
+
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    if (axisNumber == 1) {
+      if (velocityOverride != 0.0F) velocity = velocityOverride;
+      if (calibrateMode == CM_RECORDING) {
+        motorCounts = _calibrateStepPosition/((AXIS1_SERVO_VELOCITY_TRACKING)/(AXIS1_STEPS_PER_DEGREE/240.0));
+        calibrateRecord(velocity, motorCounts, encoderCounts);
+      }
+    }
+  #endif
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
@@ -406,6 +435,30 @@ IRAM_ATTR void ServoMotor::move() {
 int32_t ServoMotor::encoderRead() {
   int32_t encoderCounts = encoder->read();
 
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    if (axisNumber == 1) {
+      if (calibrateMode != CM_RECORDING) {
+        if (encoderCorrectionBuffer != NULL) {
+          double index = ((double)encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2.0);
+          double frac = index - floor(index);
+          int16_t ecb = ecbn(encoderCorrectionBuffer[encoderIndex(-1)]);
+          int16_t eca = ecbn(encoderCorrectionBuffer[encoderIndex(1)]);
+          encoderCorrection = ecbn(encoderCorrectionBuffer[encoderIndex()]);
+
+          if (frac < 0) {
+            encoderCorrection = round(encoderCorrection * (frac + 1.0)); // frac at -1 = 0 and at 0 = 1
+            encoderCorrection += round(ecb * abs(frac));                 // frac at -1 = 1 and at 0 = 0 
+          } else {
+            encoderCorrection = round(encoderCorrection * (1.0 - frac)); // frac at 1 = 0 and at 0 = 1
+            encoderCorrection += round(eca * abs(frac));                 // frac at 1 = 1 and at 0 = 0 
+          }
+
+        } else encoderCorrection = 0;
+//        DL1(encoderCorrection);
+        encoderCounts += encoderCorrection;
+      }
+    }
+  #endif
 
   if (encoderReverse) encoderCounts = -encoderCounts;
   return encoderCounts;
@@ -421,5 +474,15 @@ uint32_t ServoMotor::encoderZero() {
 
   return zero;
 }
+
+#ifdef ABSOLUTE_ENCODER_CALIBRATION
+  int32_t ServoMotor::encoderIndex(int32_t offset) {
+    int32_t index = (encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2);
+    index += offset;
+    if (index < 0) index = 0;
+    if (index > ENCODER_ECM_BUFFER_SIZE - 1) index = ENCODER_ECM_BUFFER_SIZE - 1;
+    return index;
+  }
+#endif
 
 #endif
