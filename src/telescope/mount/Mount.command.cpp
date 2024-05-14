@@ -287,6 +287,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
                 switch (parameter[3]) {
                   case 'W': // stop and [W]rite data                   :SX4E,W#
                     axis1.motor->calibrate(0);
+                    tracking(false);
                   break;
                   case 'R': // start [R]ecording                       :SX4E,R#
                     if (limits.isEnabled() && isTracking()) {
