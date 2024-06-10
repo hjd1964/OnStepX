@@ -143,18 +143,21 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     //            Returns: MTH DD YYYY#
     // :GVM#      General Message
     //            Returns: s# (where s is a string up to 16 chars)
-    // :GVN#      Get OnStepX Firmware Number
+    // :GVN#      Get Firmware Number
     //            Returns: M.mp#
-    // :GVP#      Get OnStepX Product Name
+    // :GVP#      Get Product Name
     //            Returns: s#
-    // :GVT#      Get OnStepX Firmware Time
+    // :GVT#      Get Firmware Time
     //            Returns: HH:MM:SS#
+    // :GVC#      Get Firmware Config Name
+    //            Returns: s#
     if (command[1] == 'V' && parameter[1] == 0) {
       if (parameter[0] == 'D') strcpy(reply, firmware.date); else
       if (parameter[0] == 'M') sprintf(reply, "%s %i.%02i%s", firmware.name, firmware.version.major, firmware.version.minor, firmware.version.patch); else
       if (parameter[0] == 'N') sprintf(reply, "%i.%02i%s", firmware.version.major, firmware.version.minor, firmware.version.patch); else
       if (parameter[0] == 'P') strcpy(reply, firmware.name); else
-      if (parameter[0] == 'T') strcpy(reply, firmware.time); else *commandError = CE_CMD_UNKNOWN;
+      if (parameter[0] == 'T') strcpy(reply, firmware.time); else
+      if (parameter[0] == 'C') strncpy(reply, CONFIG_NAME, 40); else *commandError = CE_CMD_UNKNOWN;
       *numericReply = false;
     } else
 

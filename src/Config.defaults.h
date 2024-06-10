@@ -26,6 +26,11 @@
 #define SERIAL_DEBUG_BAUD             9600
 #endif
 
+// identification
+#ifndef CONFIG_NAME
+#define CONFIG_NAME "OnStepX"
+#endif
+
 // serial ports
 #ifndef SERIAL_A_BAUD_DEFAULT
 #define SERIAL_A_BAUD_DEFAULT         9600
