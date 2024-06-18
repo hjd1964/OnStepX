@@ -253,14 +253,12 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Returns:
     //              0=destination is East of the pier
     //              1=destination is West of the pier
-    //              2=destination pier side is Unknown
+    //              2=destination is Unknown
     if (command[1] == 'D' && parameter[0] == 0) {
       CommandError e = setTarget(&gotoTarget, settings.preferredPierSide);
       strcpy(reply, "2");
-      if (e == CE_NONE || e == CE_SLEW_IN_SLEW) {
-        if (target.pierSide == PIER_SIDE_EAST) reply[0] = '0'; else
-        if (target.pierSide == PIER_SIDE_WEST) reply[0] = '1';
-      }
+      if (e == CE_NONE && target.pierSide == PIER_SIDE_EAST) reply[0] = '0';
+      if (e == CE_NONE && target.pierSide == PIER_SIDE_WEST) reply[0] = '1';
       *numericReply = false;
       *supressFrame = true;
       *commandError = e;
