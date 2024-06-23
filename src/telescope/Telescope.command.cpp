@@ -189,6 +189,18 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
         if (parameter[1] == 'E') {
           sprintF(reply, "%3.1f", weather.getDewPoint());
           *numericReply = false;
+        } else
+
+        // :GX9F#     MCU temperature in deg. C
+        //            Returns: +/-n.n
+        if (parameter[1] == 'F') {
+          if (!isnan(telescope.mcuTemperature)) {
+            sprintF(reply, "%1.0f", telescope.mcuTemperature);
+            *numericReply = false;
+          } else {
+            *numericReply = true;
+            *commandError = CE_0;
+          }
         } else return false;
       } else
 

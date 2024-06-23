@@ -211,20 +211,6 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
     return commandError;
   } else
 
-  // :GX9F#     Get internal MCU temperature in deg. C
-  //            Returns: +/-n.n
-  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == 'F' && parameter[2] == 0) {
-    float t = HAL_TEMP();
-    if (!isnan(t)) {
-      sprintF(reply, "%1.0f", t);
-      *numericReply = false;
-    } else {
-      *numericReply = true;
-      commandError = CE_0;
-    }
-    return commandError;
-  } else
-
   // :GE#       Get last command error numeric code
   //            Returns: CC#
   if (command[0] == 'G' && command[1] == 'E' && parameter[0] == 0) {
