@@ -29,6 +29,8 @@ class Features {
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     void poll();
+
+    inline void deviceOff(int index) { device[index].value = 0; digitalWriteEx(device[index].pin, LOW); }
  
   private:
     int16_t auxPins[8] = { AUX1_PIN, AUX2_PIN, AUX3_PIN, AUX4_PIN, AUX5_PIN, AUX6_PIN, AUX7_PIN, AUX8_PIN };
