@@ -49,8 +49,37 @@ void Thermistor::poll() {
 
       // calculate the device resistance
       float resistance;
+
+      // handle special case where we add a resistor (say 10k) parallel to the (say 10k 3950) thermistor
+      #ifdef THERMISTOR_RPARALLEL
+        float voltage = (counts/(float)ANALOG_READ_RANGE)*3.3F;
+        float RtLow = settings[thermistorType].rNom/30.0F;
+        float RtHigh = settings[thermistorType].rNom*30.0F;
+        float Rpr = 1.0F/THERMISTOR_RPARALLEL;
+        bool vOutLowChanged = true;
+        bool vOutHighChanged = true;
+        float vOutLow, vOutHigh;
+        for (int i = 0; i < 100; i++) {
+          if (vOutLowChanged) {
+            resistance = 1.0F/(Rpr + 1.0F/RtLow);
+            vOutLow = 3.3F * (resistance/(settings[thermistorType].rSeries + resistance));
+            vOutLowChanged = false;
+          }
+          if (vOutHighChanged) {
+            resistance = 1.0F/(Rpr + 1.0F/RtHigh);
+            vOutHigh = 3.3F * (resistance/(settings[thermistorType].rSeries + resistance));
+            vOutHighChanged = false;
+          }
+          if (voltage < vOutLow) { RtLow /= 1.5F; vOutLowChanged = true; } else
+          if (voltage > vOutHigh) { RtHigh *= 1.5F; vOutHighChanged = true; } else
+          if (voltage > (vOutLow + vOutHigh)/2.0F) { RtLow = (RtLow*4.0F + RtHigh)/5.0F; vOutLowChanged = true; } else
+          if (voltage < (vOutLow + vOutHigh)/2.0F) { RtHigh = (RtLow + RtHigh*4.0F)/5.0F; vOutHighChanged = true; };
+        }
+        resistance = 1.0F/((1.0F/resistance) - Rpr);
+      #else
         resistance = (float)(ANALOG_READ_RANGE)/counts - 1.0F;
         resistance = settings[thermistorType].rSeries/resistance;
+      #endif
 
       // convert to temperature in degrees C
       float f = log(resistance/settings[thermistorType].rNom)/settings[thermistorType].beta;
