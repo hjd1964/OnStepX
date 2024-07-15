@@ -62,12 +62,13 @@ void Thermistor::poll() {
       // do a running average on the temperature
       if (!isnan(temperature)) {
         if (isnan(averageTemperature[index])) averageTemperature[index] = temperature;
-        averageTemperature[index] = (averageTemperature[index]*9.0F + temperature)/10.0F;
+        averageTemperature[index] = (averageTemperature[index]*19.0F + temperature)/20.0F;
         goodUntil[index] = millis() + 30000;
       } else {
         // we must get a reading at least once every 30 seconds otherwise flag the failure with a NAN
         if ((long)(millis() - goodUntil[index]) > 0) averageTemperature[index] = NAN;
       }
+
     }
   }
 
