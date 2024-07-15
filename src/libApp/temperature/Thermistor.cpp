@@ -57,7 +57,7 @@ void Thermistor::poll() {
       float temperature = 1.0F/f - 273.15F;
 
       // constrain to a reasonable range, outside of this something is definately wrong
-      if (temperature < -60.0F || temperature > 60.0F) temperature = NAN;
+      if (temperature < -30.0F || temperature > 60.0F) temperature = NAN;
 
       // do a running average on the temperature
       if (!isnan(temperature)) {
