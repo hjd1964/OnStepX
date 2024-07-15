@@ -45,11 +45,12 @@ void Thermistor::poll() {
 
     if (thermistorType >= 0 && devicePin[index] != OFF) {
       // get the total resistance
-      int r = analogRead(devicePin[index]);
+      int counts = analogRead(devicePin[index]);
 
       // calculate the device resistance
-      float resistance = (float)(ANALOG_READ_RANGE)/r - 1.0F;
-      resistance = settings[thermistorType].rSeries / resistance;
+      float resistance;
+        resistance = (float)(ANALOG_READ_RANGE)/counts - 1.0F;
+        resistance = settings[thermistorType].rSeries/resistance;
 
       // convert to temperature in degrees C
       float f = log(resistance/settings[thermistorType].rNom)/settings[thermistorType].beta;
