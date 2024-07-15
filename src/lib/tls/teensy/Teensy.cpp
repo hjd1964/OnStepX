@@ -3,7 +3,8 @@
 
 #include "Teensy.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY
+#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == TEENSY)
 
 #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 

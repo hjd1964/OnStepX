@@ -5,7 +5,8 @@
 
 #include "../../../Common.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3231
+#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3231 || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == DS3231)
 
 #include "../TLS.h"
 
@@ -24,6 +25,9 @@ class TlsDs3231 : public TimeLocationSource {
 
     // get the RTC's time
     bool get(JulianDate &ut1);
+
+    // secondary way to enable PPS
+    void ppsEnable();
 
     // not used, date/time is stored as UT1
     double DUT1 = 0.0L;

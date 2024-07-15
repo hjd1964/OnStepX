@@ -95,6 +95,10 @@ class Site {
       TimeLocationSource *tls;
     #endif
 
+    #if TIME_LOCATION_SOURCE_FALLBACK != OFF
+      TimeLocationSource *tlsFallback;
+    #endif
+
   private:
     // gets the time in hours that have passed since Julian Day was set (UT1)
     double getTime();

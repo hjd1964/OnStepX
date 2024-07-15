@@ -4,7 +4,8 @@
 
 #include "DS3231.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3231
+#if (defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3231) || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == DS3231)
 
 #ifdef TLS_TIMELIB
   #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
@@ -34,9 +35,9 @@ bool TlsDs3231::init() {
 
     // see if the RTC is present
     if (rtcDS3231.GetIsRunning()) {
-      // frequency 0 (1Hz) on the SQW pin
-      rtcDS3231.SetSquareWavePin(DS3231SquareWavePin_ModeClock);
-      rtcDS3231.SetSquareWavePinClockFrequency(DS3231SquareWaveClock_1Hz);
+      #if TIME_LOCATION_SOURCE == DS3231
+        ppsEnable();
+      #endif
 
       #ifdef TLS_TIMELIB
         RtcDateTime now = rtcDS3231.GetDateTime();
@@ -106,6 +107,12 @@ bool TlsDs3231::get(JulianDate &ut1) {
   }
 
   return true;
+}
+
+void TlsDs3231::ppsEnable() {
+  // frequency 0 (1Hz) on the SQW pin
+  rtcDS3231.SetSquareWavePin(DS3231SquareWavePin_ModeClock);
+  rtcDS3231.SetSquareWavePinClockFrequency(DS3231SquareWaveClock_1Hz);
 }
 
 #endif

@@ -5,7 +5,8 @@
 
 #include "../../../Common.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3234
+#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3234 || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == DS3234)
 
 #include "../TLS.h"
 

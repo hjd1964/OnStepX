@@ -4,7 +4,8 @@
 
 #include "../../../Common.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY
+#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == TEENSY)
 
 #include "../TLS.h"
 

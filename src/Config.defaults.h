@@ -688,7 +688,10 @@
 
 // time and location
 #ifndef TIME_LOCATION_SOURCE
-#define TIME_LOCATION_SOURCE          OFF
+#define TIME_LOCATION_SOURCE          OFF                        // specify device to get date/time and optionally location
+#endif
+#ifndef TIME_LOCATION_SOURCE_FALLBACK                            // alternate TLS, must be differnet than above and not GPS or NTP
+#define TIME_LOCATION_SOURCE_FALLBACK OFF
 #endif
 #ifndef TIME_LOCATION_PPS_SENSE
 #define TIME_LOCATION_PPS_SENSE       OFF
