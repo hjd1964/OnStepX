@@ -30,7 +30,7 @@ class TimeLocationSource {
     virtual void getSite(double &latitude, double &longitude, float &elevation) { UNUSED(latitude); UNUSED(longitude); UNUSED(elevation); }
 
     // secondary way to enable PPS
-    virtual void ppsEnable();
+    virtual void ppsEnable() {}
 
     // update from GPS or NTP
     virtual void poll() {}
