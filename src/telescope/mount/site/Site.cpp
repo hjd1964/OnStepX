@@ -236,6 +236,9 @@ void Site::updateTLS() {
   #if TIME_LOCATION_SOURCE != OFF
     tls->set(ut1);
   #endif
+  #if TIME_LOCATION_SOURCE_FALLBACK != OFF
+    tlsFallback->set(ut1);
+  #endif
 
   if (isDateTimeReady()) {
     if (initError.tls) initError.tls = false;
