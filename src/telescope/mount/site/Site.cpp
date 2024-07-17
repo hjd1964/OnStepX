@@ -129,11 +129,11 @@ void Site::init() {
 
     #if TIME_LOCATION_SOURCE_FALLBACK == DS3231
       tlsFallback = new TlsDs3231;
-    #elif TIME_LOCATION_SOURCE == DS3234
+    #elif TIME_LOCATION_SOURCE_FALLBACK == DS3234
       tlsFallback = new TlsDs3234;
-    #elif TIME_LOCATION_SOURCE == SD3031
+    #elif TIME_LOCATION_SOURCE_FALLBACK == SD3031
       tlsFallback = new TlsSd3031;
-    #elif TIME_LOCATION_SOURCE == TEENSY
+    #elif TIME_LOCATION_SOURCE_FALLBACK == TEENSY
       tlsFallback = new TlsTeensy;
     #endif
 
