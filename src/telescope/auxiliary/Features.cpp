@@ -29,7 +29,9 @@ void Features::init() {
     #ifdef COVER_SWITCH_SERVO_PRESENT
       if (device[i].purpose == COVER_SWITCH) {
         cover[i].servo = new Servo;
-        cover[i].servo->setPeriodHertz(COVER_SWITCH_SERVO_PERIOD_HZ);
+        #ifdef ESP32
+          cover[i].servo->setPeriodHertz(COVER_SWITCH_SERVO_PERIOD_HZ);
+        #endif
         cover[i].servo->attach(device[i].pin, COVER_SWITCH_SERVO_MIN, COVER_SWITCH_SERVO_MAX);
         cover[i].servo->write(COVER_SWITCH_SERVO_CLOSED_DEG);
         cover[i].position = COVER_SWITCH_SERVO_CLOSED_DEG;
