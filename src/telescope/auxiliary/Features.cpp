@@ -26,7 +26,7 @@ void Features::init() {
       if (device[i].purpose == HIDDEN_SWITCH) device[i].purpose = OFF;
     } else
 
-    #ifdef COVER_SWITCH_SERVO
+    #ifdef COVER_SWITCH_SERVO_PRESENT
       if (device[i].purpose == COVER_SWITCH) {
         cover[i].servo = new Servo;
         cover[i].servo->setPeriodHertz(COVER_SWITCH_SERVO_PERIOD_HZ);
@@ -85,7 +85,7 @@ void Features::poll() {
     }
   }
 
-  #ifdef COVER_SWITCH_SERVO
+  #ifdef COVER_SWITCH_SERVO_PRESENT
     // default moves at 25 degrees/second
     static int toggle = 0;
     if (toggle++ % (100/COVER_SWITCH_SERVO_SPEED_PERCENT) == 0) {

@@ -126,7 +126,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == COVER_SWITCH) {
         if (parameter[3] == 'V') {
           if (v >= 0 && v <= 1) { // value 0..1 for enabled or not
-            #ifdef COVER_SWITCH_SERVO
+            #ifdef COVER_SWITCH_SERVO_PRESENT
             if (device[i].purpose == COVER_SWITCH) {
               if (v == 0) cover[i].target = COVER_SWITCH_SERVO_OPEN_DEG; else
               if (v == 1) cover[i].target = COVER_SWITCH_SERVO_CLOSED_DEG;

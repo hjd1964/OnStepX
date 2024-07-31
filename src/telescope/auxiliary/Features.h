@@ -11,7 +11,7 @@
 #include "dewHeater/DewHeater.h"
 #include "intervalometer/Intervalometer.h"
 
-#ifdef COVER_SWITCH_SERVO
+#ifdef COVER_SWITCH_SERVO_PRESENT
   #ifdef ESP32
     #include <ESP32Servo.h>  // https://www.arduino.cc/reference/en/libraries/esp32servo/
   #else
@@ -77,7 +77,7 @@ class Features {
       { FEATURE7_NAME, FEATURE7_PURPOSE, FEATURE7_TEMP, FEATURE7_PIN, FEATURE7_VALUE_DEFAULT, FEATURE7_ON_STATE, NULL, NULL },
       { FEATURE8_NAME, FEATURE8_PURPOSE, FEATURE8_TEMP, FEATURE8_PIN, FEATURE8_VALUE_DEFAULT, FEATURE8_ON_STATE, NULL, NULL }
     };
-    #ifdef COVER_SWITCH_SERVO
+    #ifdef COVER_SWITCH_SERVO_PRESENT
       DeviceCoverServo cover[8] = {
         { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }, { 0, 0, NULL }
       };
