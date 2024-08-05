@@ -125,7 +125,8 @@
 #define INTERVALOMETER              4      // control an camera shutter
 #define MOMENTARY_SWITCH            5      // control an simple momentary on/off switch
 #define HIDDEN_SWITCH               6      // control an hidden on/off switch (for controlling a pin state at boot)
-#define AUX_FEATURE_PURPOSE_LAST    6
+#define COVER_SWITCH                7      // control an servo driven OTA cover where "on" is closed and "off" is open
+#define AUX_FEATURE_PURPOSE_LAST    7
 
 // --------------------------------------------------------------------------------------------------------------------------
 
