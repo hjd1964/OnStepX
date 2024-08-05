@@ -6,6 +6,14 @@
 
 #ifdef THERMISTOR_DEVICES_PRESENT
 
+#ifndef THERMISTOR_TEMPERATURE_MINIMUM
+  #define THERMISTOR_TEMPERATURE_MINIMUM -30.0F
+#endif
+
+#ifndef THERMISTOR_TEMPERATURE_MAXIMUM
+  #define THERMISTOR_TEMPERATURE_MAXIMUM 60.0F
+#endif
+
 typedef struct ThermistorSettings {
   float tNom;
   float rNom;
