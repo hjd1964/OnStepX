@@ -226,7 +226,30 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
 
         switch (parameter[1]) {
 
-          // commands :SX0, SX1, and SX2 are obsolete and have been replaced with :SX4
+          // set encoder Axis1 value
+          case '0':
+            d = strtod(&parameter[3], &conv_end);
+            if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
+          break;
+
+          // set encoder Axis2 value
+          case '1':
+            d = strtod(&parameter[3], &conv_end);
+            if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis2 = degToRad(d); } else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
+          break;
+
+          // sync from encoder values
+          case '2':
+            if (parameter[3] == '1' && parameter[4] == 0) {
+              #if GOTO_FEATURE == ON
+                CommandError e = goTo.validate();
+                if (e != CE_NONE) { *commandError = e; return true; }
+              #endif
+              if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncFromOnStepToEncoders) { *commandError = CE_0; return true; }
+              axis1.setInstrumentCoordinate(encoderAxis1);
+              axis2.setInstrumentCoordinate(encoderAxis2);
+            }
+          break;
 
           // allow sws to control sync mode
           case '3': syncFromOnStepToEncoders = false; break;
