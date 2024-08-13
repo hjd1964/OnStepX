@@ -426,14 +426,14 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
       float ax2c = +model.azmCor*sinAx1                 + model.altCor*cosAx1;
 
       // improved guess at instrument coordinate
-      a1 = ax1 - (ax1c + PDh + DOh + TFh);
-      a2 = ax2 - (ax2c + DFd + TFd);
+      a1 = ax1 + (ax1c + PDh + DOh + TFh);
+      a2 = ax2 + (ax2c + DFd + TFd);
     }
   }
 
   // finally, apply the index offsets
-  a1 = a1 + model.ax1Cor;
-  a2 = a2 + model.ax2Cor*-p;
+  a1 = a1 - model.ax1Cor;
+  a2 = a2 - model.ax2Cor*-p;
 
   if (mountType == ALTAZM) { coord->z = a1; coord->a = a2; } else {
   if (mountType == ALTALT) { coord->z = a1; coord->a = a2; } else { coord->h = a1; coord->d = a2; }
@@ -454,8 +454,8 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     ax2 = coord->d;
   }
   
-  ax1 = ax1 - model.ax1Cor;
-  ax2 = ax2 - model.ax2Cor*-p;
+  ax1 = ax1 + model.ax1Cor;
+  ax2 = ax2 + model.ax2Cor*-p;
   
   if (ax2 >  Deg90) ax2 =  Deg90;
   if (ax2 < -Deg90) ax2 = -Deg90;
@@ -492,8 +492,8 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     float a1 = -model.azmCor*cosAx1*(sinAx2/cosAx2) + model.altCor*sinAx1*(sinAx2/cosAx2);
     float a2 = +model.azmCor*sinAx1                 + model.altCor*cosAx1;
 
-    ax1 = ax1 + (a1 + PDh + DOh + TFh);
-    ax2 = ax2 + (a2 + DFd + TFd);
+    ax1 = ax1 - (a1 + PDh + DOh + TFh);
+    ax2 = ax2 - (a2 + DFd + TFd);
   }
 
   if (ax2 >  Deg90) ax2 =  Deg90;
