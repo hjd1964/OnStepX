@@ -87,7 +87,6 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
   lastAlignTarget = target;
 
-
   #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == ON
     double a1, a2;
 
