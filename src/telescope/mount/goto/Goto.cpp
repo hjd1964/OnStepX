@@ -336,10 +336,10 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (target.pierSide == PIER_SIDE_EAST) target.a1Correction = axis1TargetCorrectionE;
   if (target.pierSide == PIER_SIDE_WEST) target.a1Correction = axis1TargetCorrectionW;
 
+  transform.observedPlaceToMount(&target);
   if (transform.mountType == ALTAZM) transform.horToEqu(&target); else
   if (transform.mountType == ALTALT) transform.aaToEqu(&target); else transform.equToHor(&target);
 
-  transform.observedPlaceToMount(&target);
   transform.hourAngleToRightAscension(&target, false);
 
   return CE_NONE;
