@@ -468,7 +468,7 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   a2 = a2 - model.ax2Cor*-p;
 
   if (mountType == ALTAZM) { coord->z = a1; coord->a = a2; } else
-  if (mountType == ALTALT) { coord->z = a1; coord->a = a2; } else { coord->h = a1; coord->d = a2; }
+  if (mountType == ALTALT) { coord->aa1 = a1; coord->aa2 = a2; } else { coord->h = a1; coord->d = a2; }
 }
 
 void GeoAlign::mountToObservedPlace(Coordinate *coord) {
