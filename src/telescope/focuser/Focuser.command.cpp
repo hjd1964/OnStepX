@@ -310,17 +310,16 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       *numericReply = false;
     } else
 
-    // :FH#       Set focuser position as half-travel
+    // :FH#       Set focuser position as home
     //            Returns: Nothing
     if (command[1] == 'H') {
       settings[index].parkState = PS_UNPARKED;
-      long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-      *commandError = axes[index]->resetPositionSteps(p);
+      *commandError = axes[index]->resetPositionSteps(getHomePosition(index)*MicronsToSteps);
       axes[index]->setBacklash(getBacklash(index));
       *numericReply = false;
     } else
 
-    // :Fh#       Move focuser target position to half-travel
+    // :Fh#       Move focuser target position to home
     //            Returns: Nothing
     if (command[1] == 'h') {
       if (axes[index]->hasHomeSense()) {
@@ -332,8 +331,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
           }
         } else *commandError = CE_PARKED;
       } else {
-        long t = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*MicronsToSteps;
-        *commandError = gotoTarget(index, t);
+        *commandError = gotoTarget(index, getHomePosition(index)*MicronsToSteps);
       }
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
