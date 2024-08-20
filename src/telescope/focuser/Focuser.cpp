@@ -550,12 +550,12 @@ void Focuser::monitor() {
       bool out = sense.isOn(outButtonHandle);
       if (in && out) { in = false; out = false; }
       if (in) {
-        if (FOCUSER_BUTTON_MOVE_RATE > 0) slewRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
-        slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_FORWARD);
+        if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
+        move(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_FORWARD);
       } else
       if (out) {
-        if (FOCUSER_BUTTON_MOVE_RATE > 0) slewRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
-        slew(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_REVERSE);
+        if (FOCUSER_BUTTON_MOVE_RATE > 0) moveRate[FOCUSER_BUTTON_FOCUSER_INDEX - 1] = FOCUSER_BUTTON_MOVE_RATE;
+        move(FOCUSER_BUTTON_FOCUSER_INDEX - 1, DIR_REVERSE);
       } else
         axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1]->autoSlewStop();
     }
