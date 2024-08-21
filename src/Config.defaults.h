@@ -1099,7 +1099,7 @@
 #define AXIS4_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS4_HOME_DEFAULT
-#define AXIS4_HOME_DEFAULT            MID                         // use MIN (zero), MID (half travel), MAX (full travel), or a position in microns
+#define AXIS4_HOME_DEFAULT            MIDDLE                      // use MINIMUM (zero), MIDDLE (half travel), MAXIMUM (full travel), or a position in microns
 #endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
@@ -1270,7 +1270,7 @@
 #define AXIS5_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS5_HOME_DEFAULT
-#define AXIS5_HOME_DEFAULT            MID
+#define AXIS5_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
@@ -1441,7 +1441,7 @@
 #define AXIS6_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS6_HOME_DEFAULT
-#define AXIS6_HOME_DEFAULT            MID
+#define AXIS6_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
@@ -1612,7 +1612,7 @@
 #define AXIS7_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS7_HOME_DEFAULT
-#define AXIS7_HOME_DEFAULT            MID
+#define AXIS7_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
@@ -1783,7 +1783,7 @@
 #define AXIS8_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS8_HOME_DEFAULT
-#define AXIS8_HOME_DEFAULT            MID
+#define AXIS8_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
@@ -1954,7 +1954,7 @@
 #define AXIS9_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS9_HOME_DEFAULT
-#define AXIS9_HOME_DEFAULT            MID
+#define AXIS9_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF

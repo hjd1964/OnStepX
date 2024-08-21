@@ -291,11 +291,11 @@ long Focuser::getHomePosition(int index) {
   if (configuration[index].homeDefault >= 0 && configuration[index].homeDefault <= 500000) return configuration[index].homeDefault;
   
   switch (configuration[index].homeDefault) {
-    case MAX:
+    case MAXIMUM:
       return lround(axes[index]->settings.limits.max);
-    case MID:
+    case MIDDLE:
       return lround((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F);
-    case MIN:
+    case MINIMUM:
     default:
       return lround(axes[index]->settings.limits.min);
   }

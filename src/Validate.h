@@ -622,8 +622,8 @@
   #error "Configuration (Config.h): Setting AXIS4_LIMIT_MAX unknown, use value in the range AXIS4_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS4_HOME_DEFAULT != MIN && AXIS4_HOME_DEFAULT != MID && AXIS4_HOME_DEFAULT != MAX && (AXIS4_HOME_DEFAULT < 0 || AXIS4_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS4_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS4_HOME_DEFAULT != MINIMUM && AXIS4_HOME_DEFAULT != MIDDLE && AXIS4_HOME_DEFAULT != MAXIMUM && (AXIS4_HOME_DEFAULT < 0 || AXIS4_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS4_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif 
 
 #if (AXIS4_SENSE_HOME) != OFF && (AXIS4_SENSE_HOME) < 0
@@ -719,8 +719,8 @@
   #error "Configuration (Config.h): Setting AXIS5_LIMIT_MAX unknown, use value in the range AXIS5_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS5_HOME_DEFAULT != MIN && AXIS5_HOME_DEFAULT != MID && AXIS5_HOME_DEFAULT != MAX && (AXIS5_HOME_DEFAULT < 0 || AXIS5_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS5_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS5_HOME_DEFAULT != MINIMUM && AXIS5_HOME_DEFAULT != MIDDLE && AXIS5_HOME_DEFAULT != MAXIMUM && (AXIS5_HOME_DEFAULT < 0 || AXIS5_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS5_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif 
 
 #if (AXIS5_SENSE_HOME) != OFF && (AXIS5_SENSE_HOME) < 0
@@ -816,8 +816,8 @@
   #error "Configuration (Config.h): Setting AXIS6_LIMIT_MAX unknown, use value in the range AXIS6_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS6_HOME_DEFAULT != MIN && AXIS6_HOME_DEFAULT != MID && AXIS6_HOME_DEFAULT != MAX && (AXIS6_HOME_DEFAULT < 0 || AXIS6_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS6_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS6_HOME_DEFAULT != MINIMUM && AXIS6_HOME_DEFAULT != MIDDLE && AXIS6_HOME_DEFAULT != MAXIMUM && (AXIS6_HOME_DEFAULT < 0 || AXIS6_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS6_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif 
 
 #if (AXIS6_SENSE_HOME) != OFF && (AXIS6_SENSE_HOME) < 0
@@ -910,8 +910,8 @@
   #error "Configuration (Config.h): Setting AXIS7_LIMIT_MAX unknown, use value in the range AXIS7_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS7_HOME_DEFAULT != MIN && AXIS7_HOME_DEFAULT != MID && AXIS7_HOME_DEFAULT != MAX && (AXIS7_HOME_DEFAULT < 0 || AXIS7_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS7_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS7_HOME_DEFAULT != MINIMUM && AXIS7_HOME_DEFAULT != MIDDLE && AXIS7_HOME_DEFAULT != MAXIMUM && (AXIS7_HOME_DEFAULT < 0 || AXIS7_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS7_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif 
 
 #if (AXIS7_SENSE_HOME) != OFF && (AXIS7_SENSE_HOME) < 0
@@ -1004,8 +1004,8 @@
   #error "Configuration (Config.h): Setting AXIS8_LIMIT_MAX unknown, use value in the range AXIS8_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS8_HOME_DEFAULT != MIN && AXIS8_HOME_DEFAULT != MID && AXIS8_HOME_DEFAULT != MAX && (AXIS8_HOME_DEFAULT < 0 || AXIS8_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS8_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS8_HOME_DEFAULT != MINIMUM && AXIS8_HOME_DEFAULT != MIDDLE && AXIS8_HOME_DEFAULT != MAXIMUM && (AXIS8_HOME_DEFAULT < 0 || AXIS8_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS8_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif 
 
 #if (AXIS8_SENSE_HOME) != OFF && (AXIS8_SENSE_HOME) < 0
@@ -1098,8 +1098,8 @@
   #error "Configuration (Config.h): Setting AXIS9_LIMIT_MAX unknown, use value in the range AXIS9_LIMIT_MIN to 500 (mm.)"
 #endif
 
-#if AXIS9_HOME_DEFAULT != MIN && AXIS9_HOME_DEFAULT != MID && AXIS9_HOME_DEFAULT != MAX && (AXIS9_HOME_DEFAULT < 0 || AXIS9_HOME_DEFAULT > 500000)
-  #error "Configuration (Config.h): Setting AXIS9_HOME_DEFAULT unknown, use MIN (zero) or MID (half travel) or MAX (full travel) or the position in microns (0 to 500000.)"
+#if AXIS9_HOME_DEFAULT != MINIMUM && AXIS9_HOME_DEFAULT != MIDDLE && AXIS9_HOME_DEFAULT != MAXIMUM && (AXIS9_HOME_DEFAULT < 0 || AXIS9_HOME_DEFAULT > 500000)
+  #error "Configuration (Config.h): Setting AXIS9_HOME_DEFAULT unknown, use MINIMUM (zero) or MIDDLE (half travel) or MAXIMUM (full travel) or the position in microns (0 to 500000.)"
 #endif
 
 #if (AXIS9_SENSE_HOME) != OFF && (AXIS9_SENSE_HOME) < 0

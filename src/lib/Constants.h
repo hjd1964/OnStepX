@@ -25,9 +25,9 @@
 #define STANDARD                    -20
 #define PERSISTENT                  -21
 #define ERRORS_ONLY                 -22
-#define MIN                         -23
-#define MID                         -24
-#define MAX                         -25
+#define MINIMUM                     -23
+#define MIDDLE                      -24
+#define MAXIMUM                     -25
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
