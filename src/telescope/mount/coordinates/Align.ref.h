@@ -3,7 +3,7 @@
 //
 // by Howard Dutton
 //
-// Copyright (C) 2012 to 2021 Howard Dutton
+// Copyright (C) 2012 to 2024 Howard Dutton
 //
 #pragma once
 
@@ -55,7 +55,7 @@ typedef struct AlignCoordinate {
   int side;
 } AlignCoordinate;
 
-#define AlignModelSize 32
+#define AlignModelSize 48
 typedef struct AlignModel {
   float ax1Cor;
   float ax2Cor;
@@ -65,6 +65,10 @@ typedef struct AlignModel {
   float pdCor;
   float dfCor;
   float tfCor;
+  float hcp;
+  float hca;
+  float dcp;
+  float dca;
 } AlignModel;
 
 class GeoAlign

@@ -3,7 +3,7 @@
 //
 // by Howard Dutton
 //
-// Copyright (C) 2012 to 2021 Howard Dutton
+// Copyright (C) 2012 to 2024 Howard Dutton
 //
 #pragma once
 
@@ -56,7 +56,7 @@ typedef struct AlignCoordinate {
   int side;
 } AlignCoordinate;
 
-#define AlignModelSize 32
+#define AlignModelSize 48
 typedef struct AlignModel {
   float ax1Cor;
   float ax2Cor;
@@ -66,6 +66,10 @@ typedef struct AlignModel {
   float pdCor;
   float dfCor;
   float tfCor;
+  float hcp;
+  float hca;
+  float dcp;
+  float dca;
 } AlignModel;
 
 class GeoAlign
@@ -99,6 +103,8 @@ class GeoAlign
 
     void autoModel(int n);
 
+    bool modelIsReady = false;
+
     AlignCoordinate mount[ALIGN_MAX_NUM_STARS];
     AlignCoordinate actual[ALIGN_MAX_NUM_STARS];
     AlignCoordinate delta[ALIGN_MAX_NUM_STARS];
@@ -108,7 +114,6 @@ class GeoAlign
     void correct(AlignCoordinate &mount, float sf, float _deo, float _pd, float _pz, float _pe, float _da, float _ff, float _tf, float *h1, float *d1);
     void doSearch(float sf, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int p9);
 
-    bool modelIsReady = false;
     int8_t mountType;
     float cosLat, sinLat;
 

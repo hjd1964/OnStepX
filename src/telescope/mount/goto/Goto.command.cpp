@@ -196,6 +196,10 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
               sprintf(reply,"%ld",(long)(round(radToArcsec(transform.align.model.dfCor)))); else sprintf(reply,"%ld",(long)(0));
             break;
             case '8': sprintf(reply,"%ld",(long)(round(radToArcsec(transform.align.model.tfCor)))); break;  // tfCor
+            case 'a': sprintf(reply,"%ld",(long)(round(radToDeg(transform.align.model.hcp)))); break;       // hcp
+            case 'b': sprintf(reply,"%ld",(long)(round(radToArcsec(transform.align.model.hca)))); break;    // hca
+            case 'c': sprintf(reply,"%ld",(long)(round(radToDeg(transform.align.model.dcp)))); break;       // dcp
+            case 'd': sprintf(reply,"%ld",(long)(round(radToArcsec(transform.align.model.dca)))); break;    // dca
             // number of stars, reset to first star
             case '9': { int n = 0; if (alignState.currentStar > alignState.lastStar) n = alignState.lastStar; sprintf(reply,"%ld",(long)(n)); star = 0; } break;
             case 'A': { convert.doubleToHms(reply,radToHrs(transform.align.actual[star].h),true,PM_HIGH); } break;
@@ -407,14 +411,27 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
                 transform.align.model.dfCor = arcsecToRad(atol(&parameter[3]));                 
             break;
             case '8': transform.align.model.tfCor = arcsecToRad(atol(&parameter[3])); break;  // tfCor
-            // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model
+            case 'a': transform.align.model.hcp = degToRad(atol(&parameter[3])); break;       // hcp
+            case 'b': transform.align.model.hca = arcsecToRad(atol(&parameter[3])); break;    // hca
+            case 'c': transform.align.model.dcp = degToRad(atol(&parameter[3])); break;       // dcp
+            case 'd': transform.align.model.dca = arcsecToRad(atol(&parameter[3])); break;    // dca
+            // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model, or :SX09,2# to force model activation
             case '9': {
                 int n = atol(&parameter[3]);
-                if (n == 1 && star >= 2) {
-                  alignState.lastStar = star;
-                  alignState.currentStar = star + 1;
-                  transform.align.createModel(star);
-                } else star = 0;
+                if (n == 0) {
+                  star = 0;
+                  alignReset();
+                } else
+                if (n == 1) {
+                  if (star >= 1) {
+                    alignState.lastStar = star;
+                    alignState.currentStar = star + 1;
+                    transform.align.createModel(star);
+                  }
+                } else
+                if (n == 2) {
+                  transform.align.modelIsReady = true;
+                } else *commandError = CE_PARAM_RANGE;
               }
             break;
             // Actual HA (n)
@@ -427,39 +444,41 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
             case 'D': if (!convert.dmsToDouble(&d, &parameter[3], true, PM_HIGH)) *commandError = CE_PARAM_FORM; else transform.align.mount[star].d = degToRad(d); break;
             // Mount PierSide (and increment n)
             case 'E':
-              transform.align.actual[star].side = transform.align.mount[star].side = atol(&parameter[3]);
-              if (transform.mountType == ALTAZM) {
-                Coordinate temp;
-                temp.h = transform.align.actual[star].h;
-                temp.d = transform.align.actual[star].d;
-                transform.equToHor(&temp);
-                transform.align.actual[star].ax1 = temp.z;
-                transform.align.actual[star].ax2 = temp.a;
-                temp.h = transform.align.mount[star].h;
-                temp.d = transform.align.mount[star].d;
-                transform.equToHor(&temp);
-                transform.align.mount[star].ax1 = temp.z;
-                transform.align.mount[star].ax2 = temp.a;
-              } else
-              if (transform.mountType == ALTALT) {
-                Coordinate temp;
-                temp.h = transform.align.actual[star].h;
-                temp.d = transform.align.actual[star].d;
-                transform.equToAa(&temp);
-                transform.align.actual[star].ax1 = temp.aa1;
-                transform.align.actual[star].ax2 = temp.aa2;
-                temp.h = transform.align.mount[star].h;
-                temp.d = transform.align.mount[star].d;
-                transform.equToAa(&temp);
-                transform.align.mount[star].ax1 = temp.aa1;
-                transform.align.mount[star].ax2 = temp.aa2;
-              } else {
-                transform.align.actual[star].ax1 = transform.align.actual[star].h;
-                transform.align.actual[star].ax2 = transform.align.actual[star].d;
-                transform.align.mount[star].ax1 = transform.align.mount[star].h;
-                transform.align.mount[star].ax2 = transform.align.mount[star].d;
+              if (star <= 8) {
+                transform.align.actual[star].side = transform.align.mount[star].side = atol(&parameter[3]);
+                if (transform.mountType == ALTAZM) {
+                  Coordinate temp;
+                  temp.h = transform.align.actual[star].h;
+                  temp.d = transform.align.actual[star].d;
+                  transform.equToHor(&temp);
+                  transform.align.actual[star].ax1 = temp.z;
+                  transform.align.actual[star].ax2 = temp.a;
+                  temp.h = transform.align.mount[star].h;
+                  temp.d = transform.align.mount[star].d;
+                  transform.equToHor(&temp);
+                  transform.align.mount[star].ax1 = temp.z;
+                  transform.align.mount[star].ax2 = temp.a;
+                } else
+                if (transform.mountType == ALTALT) {
+                  Coordinate temp;
+                  temp.h = transform.align.actual[star].h;
+                  temp.d = transform.align.actual[star].d;
+                  transform.equToAa(&temp);
+                  transform.align.actual[star].ax1 = temp.aa1;
+                  transform.align.actual[star].ax2 = temp.aa2;
+                  temp.h = transform.align.mount[star].h;
+                  temp.d = transform.align.mount[star].d;
+                  transform.equToAa(&temp);
+                  transform.align.mount[star].ax1 = temp.aa1;
+                  transform.align.mount[star].ax2 = temp.aa2;
+                } else {
+                  transform.align.actual[star].ax1 = transform.align.actual[star].h;
+                  transform.align.actual[star].ax2 = transform.align.actual[star].d;
+                  transform.align.mount[star].ax1 = transform.align.mount[star].h;
+                  transform.align.mount[star].ax2 = transform.align.mount[star].d;
+                }
+                star++;
               }
-              star++;
             break;
             default: *commandError = CE_CMD_UNKNOWN;
           }
