@@ -229,7 +229,7 @@ CommandError Home::reset(bool fullReset) {
     position.a2 = position.d;
   }
 
-  if (!goTo.absoluteEncodersPresent || mount.isHome()) {
+  if (!goTo.absoluteEncodersPresent) {
     if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
