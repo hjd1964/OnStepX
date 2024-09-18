@@ -11,15 +11,15 @@ void DewHeater::init(int index) {
   // write the default settings to NV
   if (!nv.hasValidKey()) {
     VF("MSG: DewHeater/Feature"); V(index + 1); VLF(", writing defaults to NV");
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3, (uint8_t)round((zero + 5.0)*10.0));
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, (uint8_t)round((span + 5.0)*10.0));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, (uint8_t)round((zero + 5.0)*10.0));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, (uint8_t)round((span + 5.0)*10.0));
   }
 
-  zero = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*3)/10.0 - 5.0;
+  zero = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5)/10.0 - 5.0;
   if (zero < -5.0) { zero = -5.0; DLF("WRN: DewHeater::init(), NV zero too low (set to -5.0)"); }
   if (zero > 20) { zero = 20.0; DLF("WRN: DewHeater::init(), NV zero too high (set to 20.0)"); }
 
-  span = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*3 + 1)/10.0 - 5.0;
+  span = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5 + 1)/10.0 - 5.0;
   if (zero == -5.0 && span == -5.0) span = 20.0; // init. state is ok, no error or warning
   if (span < -5.0) { span = -5.0; DLF("WRN: DewHeater::init(), NV span too low (set to -5.0)"); }
   if (span > 20) { span = 20.0; DLF("WRN: DewHeater::init(), NV span too high (set to 20.0)"); }
@@ -64,7 +64,7 @@ void DewHeater::setZero(float t) {
   if (t >= -5.0 && t <= 20.0) {
     zero = t;
     if (zero >= span) zero = span - 0.1;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3, (uint8_t)round((zero + 5.0)*10.0));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, (uint8_t)round((zero + 5.0)*10.0));
   }
 }
 
@@ -76,7 +76,7 @@ void DewHeater::setSpan(float t) {
   if (t >= -5.0 && t <= 20.0) {
     span = t;
     if (span <= zero) span = zero + 0.1;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, (uint8_t)round((span + 5.0)*10.0));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, (uint8_t)round((span + 5.0)*10.0));
   }
 }
 
