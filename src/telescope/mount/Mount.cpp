@@ -139,7 +139,7 @@ Coordinate Mount::getMountPosition(CoordReturn coordReturn) {
 // handle all autostart tasks
 void Mount::autostart() {
   tasks.setDurationComplete(tasks.getHandleByName("mnt_as"));
-  tasks.add(500, 0, true, 7, autostartWrapper, "mnt_as");
+  tasks.add(2000, 0, true, 7, autostartWrapper, "mnt_as");
 }
 
 void Mount::autostartPostponed() {
