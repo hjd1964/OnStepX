@@ -276,7 +276,7 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     case CR_MOUNT_EQU:
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
       if (transform.mountType == ALTALT) transform.aaToEqu(&position);
-      transform.hourAngleToRightAscension(&position, false);
+      transform.hourAngleToRightAscension(&position, true);
     break;
     case CR_MOUNT_ALT:
     case CR_MOUNT_HOR:
@@ -286,7 +286,7 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     case CR_MOUNT_ALL:
       if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
       if (transform.mountType == ALTALT) transform.aaToEqu(&position); else transform.equToHor(&position);
-      transform.hourAngleToRightAscension(&position, false);
+      transform.hourAngleToRightAscension(&position, true);
     break;
   }
   return position;
