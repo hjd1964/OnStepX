@@ -36,6 +36,10 @@
   #define SERVO_SLEWING_TO_TRACKING_DELAY 3000 // in milliseconds
 #endif
 
+#ifndef SERVO_SAFETY_STALL_POWER
+  #define SERVO_SAFETY_STALL_POWER 33 // in percent
+#endif
+
 #ifdef ABSOLUTE_ENCODER_CALIBRATION
   #ifndef ENCODER_ECM_BUFFER_SIZE
     #define ENCODER_ECM_BUFFER_SIZE 16384
