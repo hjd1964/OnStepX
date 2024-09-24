@@ -202,7 +202,7 @@ CommandError Guide::startHome() {
     mountStatus.soundAlert();
     state = GU_HOME_GUIDE;
 
-    #if AXIS2_TANGENT_ARM == OFF
+    #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == OFF
       guideFinishTimeAxis1 = millis() + (unsigned long)(GUIDE_HOME_TIME_LIMIT * 1000.0);
       guideActionAxis1 = GA_HOME;
       axis1.setFrequencySlew(goTo.rate);
@@ -272,17 +272,26 @@ bool Guide::validAxis1(GuideAction guideAction) {
 
   if (!limits.isEnabled()) return true;
 
-  double a1;
-  if (transform.mountType == ALTAZM) a1 = location.z; else a1 = location.h;
+  #if AXIS1_SECTOR_GEAR == ON
+    location.a1 = axis1.getMotorPosition();
+  #endif
+
+  // for Fork and Alt/Azm mounts limits are based on shaft angles
+  // so convert axis1 into normal PIER_SIDE_EAST coordinates
+  if (transform.mountType != GEM && location.pierSide == PIER_SIDE_WEST) location.a1 += Deg180;
 
   if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
-    if (transform.meridianFlips && location.pierSide == PIER_SIDE_EAST) { if (location.h < -limits.settings.pastMeridianE) return false; }
-    if (a1 < axis1.settings.limits.min) return false;
+    if (transform.mountType == GEM && location.pierSide == PIER_SIDE_EAST) {
+      if (location.h < -limits.settings.pastMeridianE) return false;
+    }
+    if (location.a1 < axis1.settings.limits.min) return false;
   }
 
   if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
-    if (transform.meridianFlips && location.pierSide == PIER_SIDE_WEST) { if (location.h > limits.settings.pastMeridianW) return false; }
-    if (a1 > axis1.settings.limits.max) return false;
+    if (transform.mountType == GEM && location.pierSide == PIER_SIDE_WEST) {
+      if (location.h > limits.settings.pastMeridianW) return false;
+    }
+    if (location.a1 > axis1.settings.limits.max) return false;
   }
   return true;
 }
@@ -444,10 +453,12 @@ void Guide::poll() {
     mountStatus.soundAlert();
     if (state == GU_HOME_GUIDE) {
       VLF("MSG: Guide, arrival at home detected");
-      #if AXIS2_TANGENT_ARM == OFF
-        state = GU_NONE;
-        home.guideDone(state == GU_HOME_GUIDE);
-      #endif
+      state = GU_NONE;
+      home.guideDone(true);
+    } else {
+      VLF("MSG: Guide, aborted homing");
+      state = GU_NONE;
+      home.guideDone(false);
     }
   }
 

@@ -4,15 +4,26 @@
 // This is for fast processors with hardware FP
 #define HAL_FAST_PROCESSOR
 
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 100.0F
+// Base rate for critical task timing (0.0095s = 0.14", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 105.2631579F
 
 // Analog read and write
-#ifndef ANALOG_WRITE_RANGE
-  #define ANALOG_WRITE_RANGE 1023
-#endif
-#ifndef ANALOG_WRITE_PWM_BITS
-  #define ANALOG_WRITE_PWM_BITS 10
+#if !defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION <= 131072 + 17 // version 2.0.17
+  #define SET_ANALOG_WRITE_RESOLUTION() analogWriteResolution(ANALOG_WRITE_PWM_BITS);
+  #ifndef ANALOG_WRITE_RANGE
+    #define ANALOG_WRITE_RANGE 1023
+  #endif
+  #ifndef ANALOG_WRITE_PWM_BITS
+    #define ANALOG_WRITE_PWM_BITS 10
+  #endif
+#else
+  #define SET_ANALOG_WRITE_RESOLUTION()
+  #ifndef ANALOG_WRITE_RANGE
+    #define ANALOG_WRITE_RANGE 255
+  #endif
+  #ifndef ANALOG_WRITE_PWM_BITS
+    #define ANALOG_WRITE_PWM_BITS 8
+  #endif
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
@@ -61,11 +72,11 @@
     #define ANALOG_READ_RANGE 4095
   #endif
   #define HAL_INIT() { \
-    analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+    SET_ANALOG_WRITE_RESOLUTION(); \
     SERIAL_BT_BEGIN(); \
     if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
       HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
-      HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+      if (HAL_WIRE_CLOCK != 100000) HAL_Wire.setClock(HAL_WIRE_CLOCK); \
     } \
   }
 #else
@@ -75,22 +86,22 @@
     #endif
     #define HAL_INIT() { \
       analogReadResolution(10); \
-      analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+      SET_ANALOG_WRITE_RESOLUTION(); \
       analogWriteFrequency(ANALOG_WRITE_PWM_FREQUENCY); \
       SERIAL_BT_BEGIN(); \
       if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
         HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
-        HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+        if (HAL_WIRE_CLOCK != 100000) HAL_Wire.setClock(HAL_WIRE_CLOCK); \
       } \
     }
   #else
     #define HAL_INIT() { \
       analogReadResolution(10); \
-      analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+      SET_ANALOG_WRITE_RESOLUTION(); \
       SERIAL_BT_BEGIN(); \
       if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
         HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
-        HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+        if (HAL_WIRE_CLOCK != 100000) HAL_Wire.setClock(HAL_WIRE_CLOCK); \
       } \
     }
   #endif
@@ -99,7 +110,9 @@
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 // Correction for ESP32's internal temperture sensor
+#ifndef INTERNAL_TEMP_CORRECTION
 #define INTERNAL_TEMP_CORRECTION 0
+#endif
 #define HAL_TEMP() ( temperatureRead() + INTERNAL_TEMP_CORRECTION )
 
 //---------------------------------------------------------------------------------------------------

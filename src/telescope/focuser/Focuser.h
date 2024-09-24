@@ -118,6 +118,9 @@ class Focuser {
     // set TCF T0, in deg. C
     bool setTcfT0(int index, float value);
 
+    // get home position in microns
+    long getHomePosition(int index);
+
     // get backlash in microns
     int getBacklash(int index);
 

@@ -6,7 +6,7 @@
 #if defined(ESP8266) || defined(ESP32)
 
   // from the NV library
-  #if defined(ESP32)
+  #if defined(ESP32) && (!defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION <= 131072 + 17)
     extern void timerAlarmsDisable();
     extern void timerAlarmsEnable();
   #endif
@@ -23,11 +23,11 @@
 
   void NonVolatileStorageESP::poll(bool disableInterrupts) {
     if (dirty && ((long)(millis() - commitReadyTimeMs) >= 0)) {
-      #if defined(ESP32)
+      #if defined(ESP32) && (!defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION <= 131072 + 17)
         if (disableInterrupts) timerAlarmsDisable();
       #endif
       EEPROM.commit();
-      #if defined(ESP32)
+      #if defined(ESP32) && (!defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION <= 131072 + 17)
         if (disableInterrupts) timerAlarmsEnable();
       #endif
       dirty = false;

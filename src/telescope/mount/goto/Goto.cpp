@@ -87,13 +87,24 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
   lastAlignTarget = target;
 
-  // handle special case of a tangent arm mount
-  #if AXIS2_TANGENT_ARM == ON
+  #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == ON
     double a1, a2;
-    transform.mountToInstrument(&target, &a1, &a2);
-    a2 = a2 - axis2.getIndexPosition();
-    if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-    if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+
+    // handle special case of a sector gear RA
+    #if AXIS1_SECTOR_GEAR == ON
+      transform.mountToInstrument(&target, &a1, &a2);
+      a1 = a1 - axis1.getIndexPosition();
+      if (a1 < axis1.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 > axis1.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    #endif
+
+    // handle special case of a tangent arm Dec
+    #if AXIS2_TANGENT_ARM == ON
+      transform.mountToInstrument(&target, &a1, &a2);
+      a2 = a2 - axis2.getIndexPosition();
+      if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    #endif
   #endif
 
   limits.enabled(true);
@@ -110,7 +121,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   slewDestinationDistDec = 0.0;
   if ((encodersPresent || (park.state != PS_PARKING && home.state != HS_HOMING))) {
     nearDestinationRefineStages = GOTO_REFINE_STAGES;
-    if (transform.mountType != ALTAZM) { 
+    if (transform.isEquatorial()) { 
       slewDestinationDistHA = degToRad(GOTO_OFFSET);
       slewDestinationDistDec = degToRad(GOTO_OFFSET);
       if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
@@ -124,10 +135,17 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   start = current;
   destination = target;
 
-  // add waypoint if needed
-  if (transform.mountType != ALTAZM && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
-    VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
-    waypoint(&current);
+  // add waypoints if needed
+  if (transform.isEquatorial()) {
+    if (start.pierSide != destination.pierSide) {
+      VF("MSG: Mount, goto changes pier side");
+      if (MFLIP_SKIP_HOME == OFF) {
+        VF(", setting waypoint at home");
+        waypointThroughHome(&current);
+      }
+      VLF("");
+    }
+    waypointNearOverheadLimit(&current);
   }
 
   // start the goto monitor
@@ -139,7 +157,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
     e = startAutoSlew();
     if (e != CE_NONE) {
-      VLF("MSG: Mount, goto failed");
+      VF("MSG: Mount, goto failed with error "); VL(e);
       return e;
     }
 
@@ -190,7 +208,8 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
   double a1, a2;
   transform.mountToInstrument(&target, &a1, &a2);
-  axis1.setInstrumentCoordinate(a1);
+
+  axis1.setInstrumentCoordinate(a1 + target.a1Correction);
   axis2.setInstrumentCoordinate(a2);
 
   limits.enabled(true);
@@ -203,19 +222,21 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
 // checks for valid target and determines pier side (Mount coordinate system)
 CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, bool isGoto) {
-
   CommandError e = validate();
   if (e == CE_SLEW_ERR_IN_STANDBY && (encodersPresent || mount.isHome())) {
     mount.enable(true);
     e = validate();
   }
   if (e == CE_NONE && isGoto && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
-  if (e != CE_NONE) return e;
+  if (e != CE_NONE) {
+    VF("MSG: Mount, setTarget() failed with error code "); VL(e);
+    return e;
+  }
 
   target = *coords;
-  azimuthTargetCorrection = 0.0;
 
-  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
+  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else
+  if (transform.mountType == ALTALT) transform.aaToEqu(&target); else transform.equToHor(&target);
 
   // east side of pier is always the default polar-home position
   // east side of pier - we're in the western sky and the HA's are positive
@@ -223,114 +244,114 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
 
   Coordinate current = mount.getMountPosition(CR_MOUNT);
 
+  if (!transform.meridianFlips) pierSideSelect = PSS_EAST_ONLY;
+
+  bool pierSideBest = false;
+  if (pierSideSelect == PSS_BEST) {
+    if (current.pierSide == PIER_SIDE_WEST) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
+    pierSideBest = true;
+  }
+  if (pierSideSelect == PSS_SAME_ONLY) {
+    if (current.pierSide == PIER_SIDE_WEST) pierSideSelect = PSS_WEST_ONLY; else pierSideSelect = PSS_EAST_ONLY;
+  }
+
+  bool eastReachable, westReachable;
+
   target.pierSide = current.pierSide;
-  e = limits.validateTarget(&target);
-  if (e != CE_NONE) return e;
+  target.a1Correction = 0.0;
 
-  if (transform.meridianFlips) {
-    double a1;
-    if (transform.mountType == ALTAZM) a1 = target.z; else a1 = target.h;
+  double axis1TargetCorrectionE = 0.0;
+  double axis1TargetCorrectionW = 0.0;
+  e = limits.validateTarget(&target, &eastReachable, &westReachable, &axis1TargetCorrectionE, &axis1TargetCorrectionW, isGoto);
+  if (e != CE_NONE) {
+    VF("MSG: Mount, setTarget() failed with error code "); VL(e);
+    return e;
+  }
 
-    double a1e = a1, a1w = a1;
+  double a1, a2, a1e, a1w, a2e, a2w;
+  a1 = axis1.getInstrumentCoordinate();
+  a2 = axis2.getInstrumentCoordinate();
 
-    bool pastMeridianE = a1 < -limits.settings.pastMeridianE;
-    bool pastMeridianW = a1 > limits.settings.pastMeridianW;
-    if (pastMeridianE) a1e += Deg360;                          // range 0 to 360 degrees, east of pier
-    if (pastMeridianW) a1w -= Deg360;                          // range 0 to -360 degrees, west of pier
-    bool pastMaxE = a1e > axis1.settings.limits.max;
-    bool pastMinW = a1w < axis1.settings.limits.min;
+  target.pierSide = PIER_SIDE_EAST;
+  transform.mountToInstrument(&target, &a1e, &a2e);
+  a1e += axis1TargetCorrectionE;
 
-    if (mount.isHome()) {
-      VL("MSG: Mount, set target from home");
-      if (transform.mountType == FORK) {
-        if (settings.preferredPierSide == PSS_WEST) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
-      } else {
-        if (a1 < 0) target.pierSide = PIER_SIDE_WEST; else target.pierSide = PIER_SIDE_EAST;
-      }
+  target.pierSide = PIER_SIDE_WEST;
+  transform.mountToInstrument(&target, &a1w, &a2w);
+  a1w += axis1TargetCorrectionW;
+
+  target.pierSide = current.pierSide;
+
+  VF("MSG: Mount, set-target current axis1 "); V(radToDeg(a1)); VF(" and axis2 "); VL(radToDeg(a2));
+  VF("MSG: Mount, set-target targetE axis1 "); V(radToDeg(a1e)); VF(" and axis2 "); VL(radToDeg(a2e));
+  VF("MSG: Mount, set-target targetW axis1 "); V(radToDeg(a1w)); VF(" and axis2 "); VL(radToDeg(a2w));
+
+  double eastDistance, westDistance;
+  if (dist(a1, a1e) > dist(a2, a2e)) eastDistance = dist(a1, a1e); else eastDistance = dist(a2, a2e);
+  if (dist(a1, a1w) > dist(a2, a2w)) westDistance = dist(a1, a1w); else westDistance = dist(a2, a2w);
+
+  if (mount.isHome() && transform.mountType == GEM) {
+    VLF("MSG: Mount, set-target destination from home based on HA");
+    if (target.h < 0) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
+    pierSideBest = true;
+  }
+
+  target.pierSide = PIER_SIDE_NONE;
+
+  if (pierSideSelect == PSS_EAST_ONLY) {
+    VLF("MSG: Mount, set-target using PPS_EAST_ONLY");
+    if (eastReachable) target.pierSide = PIER_SIDE_EAST;
+  } else
+  if (pierSideSelect == PSS_WEST_ONLY) {
+    VLF("MSG: Mount, set-target using PPS_WEST_ONLY");
+    if (westReachable) target.pierSide = PIER_SIDE_WEST;
+  } else
+  if (pierSideSelect == PSS_EAST) {
+    VLF("MSG: Mount, set-target using PPS_EAST");
+    if (westReachable && !eastReachable) target.pierSide = PIER_SIDE_WEST; else
+    if (isGoto && westReachable && pierSideBest && westDistance < eastDistance) {
+      VLF("MSG: Mount, set-target destination in alternate (W) orientation is closer");
+      target.pierSide = PIER_SIDE_WEST; 
     } else
-    if (pierSideSelect == PSS_EAST || pierSideSelect == PSS_EAST_ONLY) {
+    if (eastReachable) target.pierSide = PIER_SIDE_EAST;
+  } else
+  if (pierSideSelect == PSS_WEST) {
+    VLF("MSG: Mount, set-target using PPS_WEST");
+    if (eastReachable && !westReachable) target.pierSide = PIER_SIDE_EAST; else
+    if (isGoto && eastReachable && pierSideBest && eastDistance < westDistance) {
+      VLF("MSG: Mount, set-target destination in normal (E) orientation is closer");
       target.pierSide = PIER_SIDE_EAST;
-      if (pastMeridianE && pastMaxE) {
-        VF("MSG: Mount, set target EAST TO WEST: ");
-        target.pierSide = PIER_SIDE_WEST;
-      } else { VF("MSG: Mount, set target EAST stays EAST: !("); }
-      V(radToDeg(a1)); V(" < "); V(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
-      if (pastMeridianE && !pastMaxE) a1 = a1e;
     } else
-    if (pierSideSelect == PSS_WEST || pierSideSelect == PSS_WEST_ONLY) {
-      target.pierSide = PIER_SIDE_WEST;
-      VLF("MSG: Mount, set target ");
-      if (pastMeridianW && pastMinW) {
-        VF("MSG: Mount, set target WEST TO EAST: (");
-        target.pierSide = PIER_SIDE_EAST;
-      } else { VF("MSG: Mount, set target WEST stays WEST: !(");  }
-      V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); V(" && "); V(radToDeg(a1w)); V(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
-      if (pastMeridianW && !pastMinW) a1 = a1w;
-    } else
-    if (pierSideSelect == PSS_BEST || pierSideSelect == PSS_SAME_ONLY) {
-      if (current.pierSide == PIER_SIDE_EAST) { 
-        if (pastMeridianE && pastMaxE) {
-          VF("MSG: Mount, set target BEST EAST TO WEST: (");
-          target.pierSide = PIER_SIDE_WEST;
-        } else { VF("MSG: Mount, set target BEST stays EAST: !("); }
-        V(radToDeg(a1)); V(" < "); V(-radToDeg(limits.settings.pastMeridianE)); V(" && "); V(radToDeg(a1e)); V(" > "); V(radToDeg(axis1.settings.limits.max)); VL(")");
-        if (pastMeridianE && !pastMaxE) a1 = a1e;
-      }
-      if (current.pierSide == PIER_SIDE_WEST) {
-          if (pastMeridianW && pastMinW) {
-          VF("MSG: Mount, set target BEST WEST TO EAST: (");
-          target.pierSide = PIER_SIDE_EAST;
-        } else { VF("MSG: Mount, set target BEST stays WEST: !("); }
-        V(radToDeg(a1)); V(" > "); V(radToDeg(limits.settings.pastMeridianW)); V(" && "); V(radToDeg(a1w)); V(" < "); V(radToDeg(axis1.settings.limits.min)); VL(")");
-        if (pastMeridianW && !pastMinW) a1 = a1w;
-      }
-    }
+    if (westReachable) target.pierSide = PIER_SIDE_WEST;
+  }
 
-    if (target.pierSide == PIER_SIDE_EAST) {
-      VF("MSG: Mount, set target final EAST (a1="); V(radToDeg(a1)); VL(")");
-    } else
-    if (target.pierSide == PIER_SIDE_WEST) {
-      VF("MSG: Mount, set target final WEST (a1="); V(radToDeg(a1)); VL(")");
-    }
+  if (target.pierSide == PIER_SIDE_NONE) {
+    VLF("MSG: Mount, set-target destination outside limits");
+    return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  }
 
-    if (transform.mountType == ALTAZM) target.z = a1; else target.h = a1;
+  VF("MSG: Mount, set-target destination ");
+  if (current.pierSide == PIER_SIDE_NONE) { VF("NONE"); } else
+  if (current.pierSide == PIER_SIDE_EAST) { VF("EAST"); } else
+  if (current.pierSide == PIER_SIDE_WEST) { VF("WEST"); } else { VF("?"); }
+  if (current.pierSide == target.pierSide) { VF(" stays "); } else { VF(" to "); }
+  if (target.pierSide == PIER_SIDE_NONE) { VLF("NONE"); } else
+  if (target.pierSide == PIER_SIDE_EAST) { VLF("EAST"); } else
+  if (target.pierSide == PIER_SIDE_WEST) { VLF("WEST"); } else { VLF("?"); }
 
-    if (pierSideSelect == PSS_EAST_ONLY && target.pierSide != PIER_SIDE_EAST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
-    if (pierSideSelect == PSS_WEST_ONLY && target.pierSide != PIER_SIDE_WEST) return CE_SLEW_ERR_OUTSIDE_LIMITS; else
-    if (pierSideSelect == PSS_SAME_ONLY && target.pierSide != current.pierSide) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  } else {
-    if (transform.mountType == ALTAZM) {
-      // adjust coordinate range to allow going past +/-180 degrees
-      if (current.z >= 0) {
-        VLF("MSG: Mount, current azimuth >= 0");
-        if (target.z < 0) {
-          VLF("MSG: Mount, target azimuth < 0");
-          double z1 = target.z + Deg360;
-          if ((z1 < axis1.settings.limits.max) && (dist(current.z, target.z) > dist(current.z, z1))) {
-            VF("MSG: Mount, target changed from "); V(radToDeg(target.z)); VF(" to "); VL(radToDeg(z1));
-            azimuthTargetCorrection = Deg360;
-          }
-        }
-      } else
-      if (current.z < 0) {
-        VLF("MSG: Mount, current azimuth < 0");
-        if (target.z > 0) {
-          VLF("MSG: Mount, target azimuth > 0");
-          double z1 = target.z - Deg360;
-          if ((z1 > axis1.settings.limits.min) && (dist(current.z, target.z) > dist(current.z, z1))) {
-            VF("MSG: Mount, target changed from "); V(radToDeg(target.z)); VF(" to "); VL(radToDeg(z1));
-            azimuthTargetCorrection = -Deg360;
-          }
-        }
-      }
-    }
+  if (target.pierSide != PIER_SIDE_EAST && target.pierSide != PIER_SIDE_WEST) {
+    VLF("MSG: Mount, set-target destination pier side defaults to EAST");
     target.pierSide = PIER_SIDE_EAST;
   }
 
-  if (target.pierSide != PIER_SIDE_WEST) target.pierSide = PIER_SIDE_EAST;
+  // adjust Axis1 coordinate range as needed to allow going past +/-180 degrees
+  if (target.pierSide == PIER_SIDE_EAST) target.a1Correction = axis1TargetCorrectionE;
+  if (target.pierSide == PIER_SIDE_WEST) target.a1Correction = axis1TargetCorrectionW;
 
-  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else transform.equToHor(&target);
   transform.observedPlaceToMount(&target);
+  if (transform.mountType == ALTAZM) transform.horToEqu(&target); else
+  if (transform.mountType == ALTALT) transform.aaToEqu(&target); else transform.equToHor(&target);
+
   transform.hourAngleToRightAscension(&target, false);
 
   return CE_NONE;
@@ -377,7 +398,8 @@ CommandError Goto::alignAddStar(bool sync) {
 
     // update the targets HA and Horizon coords as necessary
     transform.rightAscensionToHourAngle(&lastAlignTarget, true);
-    if (transform.mountType == ALTAZM) transform.equToHor(&lastAlignTarget);
+    if (transform.mountType == ALTAZM) transform.equToHor(&lastAlignTarget); else
+    if (transform.mountType == ALTALT) transform.equToAa(&lastAlignTarget);
 
     #if ALIGN_MAX_NUM_STARS > 1
       e = transform.align.addStar(alignState.currentStar, alignState.lastStar, &lastAlignTarget, &mountPosition);
@@ -402,7 +424,7 @@ void Goto::alignReset() {
 
 #if GOTO_FEATURE == ON
 // set any additional destinations required for a goto
-void Goto::waypoint(Coordinate *current) {
+void Goto::waypointThroughHome(Coordinate *current) {
   // HA goes from +90...0..-90
   //                W   .   E
   // meridian flip, only happens for equatorial mounts
@@ -420,17 +442,83 @@ void Goto::waypoint(Coordinate *current) {
   if (current->pierSide == PIER_SIDE_EAST) { d60 = Deg180 - d60; d45 = Deg180 - d45; }
 
   // decide if we should first move to 60 deg. HA (4 hours) to get away from the horizon limits
-  if (current->a < Deg10 && fabs(start.h) > Deg90) { destination.h = d60; stage = GG_WAYPOINT_AVOID; return; }
+  if (current->a < Deg10 && fabs(start.h) > Deg90) {
+    VLF("MSG: Mount, waypoint for alt < 10 degrees and start HA > 90 degrees");
+    destination.h = d60;
+    stage = GG_WAYPOINT_AVOID;
+    return;
+  }
 
   // decide if we should first move to 45 deg. HA (3 hours) to get away from the horizon limits
   // if at a low latitude and in the opposite sky, |HA| = 6 is very low on the horizon and we need
   // to delay arriving there during a meridian flip.  In the extreme case, where the user is very
   // near the Earths equator an Horizon limit of -10 or -15 may be necessary for proper operation
   if (current->a < Deg20 && site.locationEx.latitude.absval < Deg45) {
+    VLF("MSG: Mount, waypoint for alt < 20 degrees and |latitude| < 45 degrees");
     if (site.location.latitude >= 0) {
-      if (current->d <= Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; }
+      if (current->d <= Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; return; }
     } else {
-      if (current->d >= -Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; }
+      if (current->d >= -Deg90 - site.location.latitude) { destination.h = d45; stage = GG_WAYPOINT_AVOID; return; }
+    }
+  }
+}
+
+void Goto::waypointNearOverheadLimit(Coordinate *current) {
+  double overheadDec = site.location.latitude;
+  double overheadRadius = Deg90 - limits.settings.altitude.max;
+  double sign = 1.0;
+  if (current->pierSide == PIER_SIDE_WEST) sign = -1.0;
+  Coordinate newDestination = destination;
+  newDestination.h = sign*(overheadRadius*0.65);
+  if (start.d < overheadDec) {
+    newDestination.d = site.location.latitude - (overheadRadius + Deg10);
+  } else {
+    newDestination.d = site.location.latitude + (overheadRadius + Deg10);
+  }
+
+  bool disableOverheadWaypoints = false;
+  if (current->pierSide == PIER_SIDE_EAST && newDestination.h < -limits.settings.pastMeridianE) disableOverheadWaypoints = true;
+  if (current->pierSide == PIER_SIDE_WEST && -newDestination.h < -limits.settings.pastMeridianW) disableOverheadWaypoints = true;
+  if (site.location.latitude > degToRad(80.0)) disableOverheadWaypoints = true;
+  if (limits.settings.altitude.max >= Deg90) disableOverheadWaypoints = true;
+
+  VF("MSG: Mount, waypoint check start.h="); V(radToDeg(start.h)); VF(", dest.h="); VL(radToDeg(destination.h));
+
+  if (!disableOverheadWaypoints) {
+    if (start.pierSide != destination.pierSide) {
+      if (start.d < overheadDec && limits.settings.altitude.max - start.a < Deg10) {
+        VLF("MSG: Mount, waypoint for max altitude limit");
+        destination = newDestination;
+        destination.pierSide = current->pierSide;
+        if (stage == GG_WAYPOINT_HOME) stage = GG_WAYPOINT_AVOID; else stage = GG_WAYPOINT_AVOID_OVERHEAD3;
+        VL(stage);
+      }
+    } else {
+      if (((start.d < overheadDec && destination.d > overheadDec) || (start.d > overheadDec && destination.d < overheadDec) ||
+          limits.settings.altitude.max - start.a < Deg10)) {
+
+        if (sign*start.h < overheadRadius || sign*destination.h < overheadRadius) {
+          VLF("MSG: Mount, waypoint for max altitude limit");
+
+          if (stage == GG_WAYPOINT_HOME) stage = GG_WAYPOINT_AVOID; else {
+            if ((start.d < overheadDec && destination.d < overheadDec) ||
+                (start.d > overheadDec && destination.d > overheadDec)) {
+              destination = newDestination;
+              stage = GG_WAYPOINT_AVOID_OVERHEAD3;
+            } else {
+              destination = newDestination;
+              if (start.a < Deg60) {
+                destination.h = (Deg90 - limits.settings.altitude.max)*2.0;
+                if (destination.pierSide == PIER_SIDE_WEST) destination.h = -destination.h;
+                destination.d = site.location.latitude;
+                stage = GG_WAYPOINT_AVOID_OVERHEAD3;
+              } else {
+                stage = GG_WAYPOINT_AVOID_OVERHEAD1;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -467,6 +555,39 @@ void Goto::poll() {
       VLF("MSG: Mount, goto waypoint reached");
       stage = GG_WAYPOINT_HOME;
       destination = home.getPosition(CR_MOUNT);
+      startAutoSlew();
+    } else
+
+    if (stage == GG_WAYPOINT_AVOID_OVERHEAD1) {
+      VLF("MSG: Mount, goto waypoint AO1 reached");
+      stage = GG_WAYPOINT_AVOID_OVERHEAD2;
+
+      destination.h = (Deg90 - limits.settings.altitude.max)*2.0;
+      if (destination.pierSide == PIER_SIDE_WEST) destination.h = -destination.h;
+      destination.d = site.location.latitude;
+
+      startAutoSlew();
+    } else
+
+    if (stage == GG_WAYPOINT_AVOID_OVERHEAD2) {
+      VLF("MSG: Mount, goto waypoint AO2 reached");
+      stage = GG_WAYPOINT_AVOID_OVERHEAD3;
+
+      destination.h = (Deg90 - limits.settings.altitude.max)*0.65;
+      if (destination.pierSide == PIER_SIDE_WEST) destination.h = -destination.h;
+      if (target.d < site.location.latitude) {
+        destination.d = site.location.latitude - ((Deg90 - limits.settings.altitude.max) + Deg10);
+      } else {
+        destination.d = site.location.latitude + ((Deg90 - limits.settings.altitude.max) + Deg10);
+      }
+
+      startAutoSlew();
+    } else
+
+    if (stage == GG_WAYPOINT_AVOID_OVERHEAD3) {
+      VLF("MSG: Mount, goto waypoint AO3 reached");
+      stage = GG_NEAR_DESTINATION_START;
+      destination = target;
       startAutoSlew();
     } else
 
@@ -548,27 +669,39 @@ void Goto::poll() {
   }
 
   // adjust rates near the horizon to help avoid exceeding the minimum altitude limit
-  if (transform.mountType != ALTAZM) {
+  if (transform.isEquatorial() && MOUNT_HORIZON_AVOIDANCE == ON) {
     if (site.locationEx.latitude.absval > degToRad(10.0)) {
       static float last_a2 = 0;
       Coordinate coords = mount.getMountPosition(CR_MOUNT_ALT);
       float a2 = site.locationEx.latitude.sign*coords.d;
 
       // range 0.2 to 1.0, where a larger distance has less slowdown effect
-      float slowdownFactor =  radToDeg(coords.a - limits.settings.altitude.min)/(SLEW_ACCELERATION_DIST*2.0);
+      float slowdownFactor = radToDeg(coords.a - limits.settings.altitude.min)/(SLEW_ACCELERATION_DIST*2.0);
 
       // constrain
       if (slowdownFactor > 1.0F) slowdownFactor = 1.0F;
       if (slowdownFactor < 0.2F) slowdownFactor = 0.2F;
 
       // if Dec is decreasing slow down the Dec axis, if Dec is increasing slow down the RA axis
-      if (a2 < last_a2) {
-        axis1.setFrequencyScale(1.0F);
-        axis2.setFrequencyScale(slowdownFactor);
-      } else {
-        axis1.setFrequencyScale(slowdownFactor);
-        axis2.setFrequencyScale(1.0F);
-      }
+      float sfr = 0.5F/FRACTIONAL_SEC;
+      float slowdownFactor1 = 1.0F;
+      float slowdownFactor2 = 1.0F;
+      static float slowdownFactor1a = 1.0F;
+      static float slowdownFactor2a = 1.0F;
+      if (a2 < last_a2) slowdownFactor2 = slowdownFactor; else slowdownFactor1 = slowdownFactor;
+
+      if (slowdownFactor1a < slowdownFactor1) { slowdownFactor1a += sfr; }
+      if (slowdownFactor1a > slowdownFactor1) { slowdownFactor1a -= sfr; }
+      if (slowdownFactor1a > 1.0F) slowdownFactor1a = 1.0F;
+      if (slowdownFactor1a < 0.2F) slowdownFactor1a = 0.2F;
+      if (slowdownFactor2a < slowdownFactor2) { slowdownFactor2a += sfr; }
+      if (slowdownFactor2a > slowdownFactor2) { slowdownFactor2a -= sfr; }
+      if (slowdownFactor2a > 1.0F) slowdownFactor2a = 1.0F;
+      if (slowdownFactor2a < 0.2F) slowdownFactor2a = 0.2F;
+
+      axis1.setFrequencyScale(slowdownFactor1a);
+      axis2.setFrequencyScale(slowdownFactor2a);
+
       last_a2 = a2;
     } else {
       axis1.setFrequencyScale(1.0F);
@@ -592,13 +725,13 @@ void Goto::poll() {
         nearTarget.h -= slewDestinationDistHA;
         nearTarget.d -= slewDestinationDistDec;
 
-        if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget);
+        if (transform.mountType == ALTAZM) transform.equToHor(&nearTarget); else
+        if (transform.mountType == ALTALT) transform.equToAa(&nearTarget);
 
         double a1, a2;
         transform.mountToInstrument(&nearTarget, &a1, &a2);
-        if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
-        axis1.setTargetCoordinate(a1);
+        axis1.setTargetCoordinate(a1 + nearTarget.a1Correction);
         axis2.setTargetCoordinate(a2);
       }
     }
@@ -619,13 +752,12 @@ CommandError Goto::startAutoSlew() {
 
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
-  if (transform.mountType == ALTAZM) a1 += azimuthTargetCorrection;
 
   if (stage == GG_DESTINATION && park.state == PS_PARKING) {
-    axis1.setTargetCoordinatePark(a1);
+    axis1.setTargetCoordinatePark(a1 + destination.a1Correction);
     axis2.setTargetCoordinatePark(a2);
   } else {
-    axis1.setTargetCoordinate(a1);
+    axis1.setTargetCoordinate(a1 + destination.a1Correction);
     axis2.setTargetCoordinate(a2);
   }
 

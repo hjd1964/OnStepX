@@ -35,6 +35,7 @@ void handleAux() {
 
   // show this page
   data.concat(FPSTR(html_body_begin));
+  www.sendContentAndClear(data);
   pageHeader(PAGE_AUXILIARY);
   data.concat(FPSTR(html_onstep_page_begin));
 
@@ -61,30 +62,58 @@ void handleAux() {
   // Auxiliary Features --------------------------------------
   int j = 0;
   if (status.auxiliaryFound == SD_TRUE) {
-    data.concat(FPSTR(html_auxAuxB));
 
     for (int i = 0; i < 8; i++) {
       state.selectFeature(i);
 
-      if (state.featurePurpose() != 0 && j > 0) {
-        data.concat(F("<br/><div style='float: left; width: 26em'><hr></div>\n"));
+      if (state.featurePurpose() <= 0) continue;
+
+      char title[40];
+      strcpy(title, state.featureName());
+      strcat(title, " ");
+      switch (state.featurePurpose()) {
+        case SWITCH: strcat(title, "Switch"); break;
+        case ANALOG_OUTPUT: strcat(title, "Analog Out"); break;
+        case DEW_HEATER: strcat(title, "Dew Heater"); break;
+        case INTERVALOMETER: strcat(title, "Intervalometer"); break;
+        default: strcat(title, "Unknown");
       }
+      sprintf_P(temp, html_tile_beg, "27em", "8em", title); data.concat(temp);
+
+      data.concat(F("<div style='float: right; text-align: right;' class='c'>"));
+      #if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+        int voltageSensePin[8] = V_SENSE_PINS;
+        if (voltageSensePin[i] >= 0) {
+          sprintf(temp,"<span id='vout%d'>?</span>V", i + 1);
+          data.concat(temp);
+        }
+        #if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+          data.concat(" @ ");
+        #endif
+      #endif
+      #if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+        int currentSensePin[8] = I_SENSE_PINS;
+        if (currentSensePin[i] >= 0) {
+          sprintf(temp,"<span id='iout%d'>?</span>A", i + 1);
+          data.concat(temp);
+        }
+      #endif
+      data.concat(F("</div><br /><hr>"));
+
       if (state.featurePurpose() == SWITCH) {
-        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>&bull;"));
-        data.concat(state.featureName());
-        data.concat(F("&bull;"));
+        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>"));
+
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         sprintf_P(temp, html_auxOnSwitch, i + 1, i + 1); data.concat(temp);
         sprintf_P(temp, html_auxOffSwitch, i + 1, i + 1); data.concat(temp);
         data.concat(F("</div><div style='float: left; width: 4em; height: 2em; line-height: 2em'>"));
+
         data.concat(F("</div>\n"));
         www.sendContentAndClear(data);
         j++;
       } else
       if (state.featurePurpose() == ANALOG_OUTPUT) {
-        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>&bull;"));
-        data.concat(state.featureName());
-        data.concat(F("&bull;"));
+        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>"));
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxAnalog));
         sprintf(temp, "%d' onchange=\"sz('x%dv1',this.value)\">", state.featureValue1(), i + 1);
@@ -97,9 +126,7 @@ void handleAux() {
         j++;
       } else
       if (state.featurePurpose() == DEW_HEATER) {
-        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>&bull;"));
-        data.concat(state.featureName());
-        data.concat(F("&bull;"));
+        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>"));
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         sprintf_P(temp, html_auxOnSwitch, i + 1, i + 1); data.concat(temp);
         sprintf_P(temp, html_auxOffSwitch, i + 1, i + 1); data.concat(temp);
@@ -137,9 +164,7 @@ void handleAux() {
         j++;
       } else
       if (state.featurePurpose() == INTERVALOMETER) {
-        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>&bull;"));
-        data.concat(state.featureName());
-        data.concat(F("&bull;"));
+        data.concat(F("<div style='float: left; width: 8em; height: 2em; line-height: 2em'>"));
         data.concat(F("</div><div style='float: left; width: 14em; height: 2em; line-height: 2em'>"));
         data.concat(FPSTR(html_auxStartStop1));
         sprintf(temp,"x%dv1",i+1);
@@ -195,9 +220,9 @@ void handleAux() {
         www.sendContentAndClear(data);
         j++;
       }
+      data.concat(FPSTR(html_auxAuxE));
     }
-
-    data.concat(FPSTR(html_auxAuxE));
+    data.concat(F("<br class='clear' />"));
   }
 
   data.concat(FPSTR(html_auxEnd));
@@ -218,6 +243,13 @@ void auxAjaxGet() {
   www.sendContent("");
 }
 
+#if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+  extern float featureVoltage[8];
+#endif
+#if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+  extern float featureCurrent[8];
+#endif
+
 void auxAjax() {
   String data="";
   char temp[120]="";
@@ -228,8 +260,38 @@ void auxAjax() {
 
   // update auxiliary feature values
   if (status.auxiliaryFound == SD_TRUE) {
+
     for (int i = 0; i < 8; i++) {
       state.selectFeature(i);
+
+      #if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+        if (!isnan(featureVoltage[i])) {
+          if (state.featureValue1()) {
+            sprintf(temp, "vout%d|", i + 1);
+            data.concat(temp);
+            sprintF(temp, "%3.1f\n", featureVoltage[i]);
+            data.concat(temp);
+          } else {
+            sprintf(temp, "vout%d|0.0\n", i + 1);
+            data.concat(temp);
+          }
+        }
+      #endif
+
+      #if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+        if (!isnan(featureCurrent[i])) {
+          if (fabs(featureCurrent[i]) > 0.2499F) {
+            sprintf(temp, "iout%d|", i + 1);
+            data.concat(temp);
+            sprintF(temp, "%3.1f\n", featureCurrent[i]);
+            data.concat(temp);
+          } else {
+            sprintf(temp, "iout%d|0.0\n", i + 1);
+            data.concat(temp);
+          }
+        }
+      #endif
+
       if (state.featurePurpose() == SWITCH) {
         if (state.featureValue1() != 0) {
           sprintf(temp,"sw%d_on|%s\n",i+1,"selected"); data.concat(temp);
@@ -239,9 +301,11 @@ void auxAjax() {
           sprintf(temp,"sw%d_off|%s\n",i+1,"selected"); data.concat(temp);
         }
       } else
+
       if (state.featurePurpose() == ANALOG_OUTPUT) {
         sprintf(temp,"x%dv1|%d\n",i+1,(int)lround((state.featureValue1()/255.0)*100.0)); data.concat(temp);
       } else
+
       if (state.featurePurpose() == DEW_HEATER) {
         char s[40];
         if (state.featureValue1() != 0) {
@@ -255,6 +319,7 @@ void auxAjax() {
         dtostrf(celsiusToNativeRelative(state.featureValue3()),3,1,s); sprintf(temp,"x%dv3|%s\n",i+1,s); data.concat(temp);
         dtostrf(celsiusToNativeRelative(state.featureValue4()),3,1,s); sprintf(temp,"x%dv4|%s\n",i+1,s); data.concat(temp);
       } else
+
       if (state.featurePurpose() == INTERVALOMETER) {
         char s[40];
         float v; int d;
@@ -284,25 +349,51 @@ void processAuxGet() {
   // Auxiliary Feature set Value1 to Value4
   for (char c = '1'; c <= '8'; c++) {
     state.selectFeature(c - '1');
-    sprintf(temp, "x%cv1", c); v = www.arg(temp);
-    if (!v.equals(EmptyStr)) { sprintf(temp, ":SXX%c,V%s#", c, v.c_str()); onStep.commandBool(temp); }
+
+    sprintf(temp, "x%cv1", c);
+    v = www.arg(temp);
+    if (!v.equals(EmptyStr)) {
+      sprintf(temp, ":SXX%c,V%s#", c, v.c_str());
+      onStep.commandBool(temp);
+    }
+
     if (state.featurePurpose() == DEW_HEATER) {
-      sprintf(temp, "x%cv2", c); v = www.arg(temp);
+      sprintf(temp, "x%cv2", c);
+      v = www.arg(temp);
       if (!v.equals(EmptyStr)) {
-        dtostrf(nativeToCelsiusRelative(v.toFloat()/10.0), 0, 1, temp1); sprintf(temp, ":SXX%c,Z%s#", c, temp1); onStep.commandBool(temp);
+        dtostrf(nativeToCelsiusRelative(v.toFloat()/10.0), 0, 1, temp1);
+        sprintf(temp, ":SXX%c,Z%s#", c, temp1);
+        onStep.commandBool(temp);
       }
-      sprintf(temp, "x%cv3", c); v = www.arg(temp);
+      sprintf(temp, "x%cv3", c);
+      v = www.arg(temp);
       if (!v.equals(EmptyStr)) {
-        dtostrf(nativeToCelsiusRelative(v.toFloat()/10.0), 0, 1, temp1); sprintf(temp, ":SXX%c,S%s#", c, temp1); onStep.commandBool(temp);
+        dtostrf(nativeToCelsiusRelative(v.toFloat()/10.0), 0, 1, temp1);
+        sprintf(temp, ":SXX%c,S%s#", c, temp1);
+        onStep.commandBool(temp);
       }
     } else
+
     if (state.featurePurpose() == INTERVALOMETER) {
-      sprintf(temp, "x%cv2", c); v = www.arg(temp);
-      if (!v.equals(EmptyStr)) { dtostrf(byteToTime(v.toInt()), 0, 3, temp1); sprintf(temp, ":SXX%c,E%s#", c, temp1); onStep.commandBool(temp); }
+      sprintf(temp, "x%cv2", c);
+      v = www.arg(temp);
+      if (!v.equals(EmptyStr)) {
+        dtostrf(byteToTime(v.toInt()), 0, 3, temp1);
+        sprintf(temp, ":SXX%c,E%s#", c, temp1);
+        onStep.commandBool(temp);
+      }
       sprintf(temp, "x%cv3", c); v = www.arg(temp);
-      if (!v.equals(EmptyStr)) { dtostrf(byteToTime(v.toInt()), 0, 2, temp1); sprintf(temp, ":SXX%c,D%s#", c, temp1); onStep.commandBool(temp); }
+      if (!v.equals(EmptyStr)) {
+        dtostrf(byteToTime(v.toInt()), 0, 2, temp1);
+        sprintf(temp, ":SXX%c,D%s#", c, temp1);
+        onStep.commandBool(temp);
+      }
       sprintf(temp, "x%cv4", c); v = www.arg(temp);
-      if (!v.equals(EmptyStr)) { dtostrf(v.toFloat(), 0, 0, temp1); sprintf(temp, ":SXX%c,C%s#", c, temp1); onStep.commandBool(temp); }
+      if (!v.equals(EmptyStr)) {
+        dtostrf(v.toFloat(), 0, 0, temp1);
+        sprintf(temp, ":SXX%c,C%s#", c, temp1);
+        onStep.commandBool(temp);
+      }
     }
   }
 

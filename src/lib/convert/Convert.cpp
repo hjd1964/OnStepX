@@ -52,11 +52,14 @@ bool Convert::tzToDouble(double *value, char *hm) {
 
   if (strlen(hm) < 1 || strlen(hm) > 6) return false;
 
+  // if there's a decimal part just convert it and return
+  if (strchr(hm, '.') != NULL) { return atof2(hm, value); }
+
   // determine if the sign was used, skip any '+'
   if (hm[0] == '-') { sign = -1; hm++; } else if (hm[0] == '+') hm++;
 
   // if there's a minute part convert it and mark the end of the hours string
-  char* m = strchr(hm,':');
+  char* m = strchr(hm, ':');
   if (m != NULL) {
     m[0] = 0;
     m++;
@@ -273,7 +276,7 @@ bool Convert::atoi2(char *a, uint8_t *u, bool sign) {
 bool Convert::atof2(char *a, double *d, bool sign) {
   int16_t dc = 0;
   int16_t len = strlen(a);
-  for (int l=0; l < len; l++) {
+  for (int l = 0; l < len; l++) {
     if (l == 0 && (a[l] == '+' || a[l] == '-') && sign) continue;
     if (a[l] == '.') { if (dc == 0) { dc++; continue; } else return false; }
     if (a[l] < '0' || a[l] > '9') return false;

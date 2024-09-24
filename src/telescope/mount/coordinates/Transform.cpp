@@ -35,18 +35,20 @@ void Transform::init() {
     nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_SUBTYPE);
     VLF("MSG: Transform, revert mount type to default");
   } else
-  if (mountType < GEM || mountType > ALTAZM) {
+  if (mountType < MOUNT_SUBTYPE_FIRST || mountType > MOUNT_SUBTYPE_LAST) {
     mountType = MOUNT_SUBTYPE;
     initError.value = true;
     VLF("WRN: Transform, unknown mount type reverting to default");
   }
 
+  if (MOUNT_TYPE == ALTALT) mountType = MOUNT_SUBTYPE;
+
   #if DEBUG == VERBOSE
-    const char* MountTypeStr[4] = {"", "GEM", "FORK", "ALTAZM"};
+    const char* MountTypeStr[5] = {"", "GEM", "FORK", "ALTAZM", "ALTALT"};
     VF("MSG: Mount, type "); VL(MountTypeStr[mountType]);
   #endif
 
-  if (mountType == ALTAZM) meridianFlips = false; else meridianFlips = true;
+  if (mountType == GEM) meridianFlips = true; else meridianFlips = (MOUNT_ALTERNATE_ORIENTATION == ON);
 
   #if ALIGN_MAX_NUM_STARS > 1
     align.init(mountType, site.location.latitude);
@@ -64,11 +66,10 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
     #error "Configuration (Config.h): MOUNT_COORDS, Unknown native mount coordinate system!"
   #endif
 
-  if (mountType == ALTAZM) {
-    horToEqu(&result);
-  } else {
-    if (returnHorizonCoords) equToHor(&result);
-  }
+  if (mountType == ALTAZM) horToEqu(&result); else
+  if (mountType == ALTALT) aaToEqu(&result);
+
+  if (isEquatorial() && returnHorizonCoords) equToHor(&result);
 
   hourAngleToRightAscension(&result, true);
   return result;
@@ -77,7 +78,8 @@ Coordinate Transform::mountToNative(Coordinate *coord, bool returnHorizonCoords)
 void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   rightAscensionToHourAngle(coord, true);
 
-  if (mountType == ALTAZM) equToHor(coord);
+  if (mountType == ALTAZM) equToHor(coord); else
+  if (mountType == ALTALT) equToAa(coord);
 
   #if MOUNT_COORDS == OBSERVED_PLACE
     observedPlaceToMount(coord);
@@ -88,7 +90,9 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
   #endif
 
   if (a1 != NULL && a2 != NULL) {
-    if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
+    if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else
+    if (mountType == ALTALT) { *a1 = coord->aa1; *a2 = coord->aa2; } else
+    if (isEquatorial()) { *a1 = coord->h; *a2 = coord->d; }
   }
 }
 
@@ -161,38 +165,48 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
     a2 = TANGENT_ARM_INSTRUMENT_TO_MOUNT(a2)
   #endif
 
-  if (a2 < -Deg90 || a2 > Deg90) {
-    mount.pierSide = PIER_SIDE_WEST;
-    a1 -= Deg180;
-    a2  = Deg180 - a2;
-  } else mount.pierSide = PIER_SIDE_EAST;
-
-  if (a2 > Deg180) a2 -= Deg360; else if (a2 <= -Deg180) a2 += Deg360;
-
-  if (mountType == ALTAZM) {
-    mount.z = a1;
-    mount.a = a2;
+  if (site.location.latitude >= 0.0 || mountType == ALTAZM) {
+    if (a2 > Deg90) {
+      mount.pierSide = PIER_SIDE_WEST;
+      a1 -= Deg180;
+      a2  = Deg180 - a2;
+    } else mount.pierSide = PIER_SIDE_EAST;
   } else {
-    mount.h = a1;
-    mount.d = a2;
+    if (a2 < -Deg90) {
+      mount.pierSide = PIER_SIDE_WEST;
+      a1 -= Deg180;
+      a2  = (-Deg180) - a2;
+    } else mount.pierSide = PIER_SIDE_EAST;
   }
+
+  if (mountType == ALTAZM) { mount.z = a1; mount.a = a2; } else
+  if (mountType == ALTALT) { mount.aa1 = a1; mount.aa2 = a2; } else
+  if (isEquatorial()) { mount.h = a1; mount.d = a2; }
 
   mount.a1 = a1;
   mount.a2 = a2;
+
+  mount.a1Correction = 0.0;
 
   return mount;
 }
 
 void Transform::mountToInstrument(Coordinate *coord, double *a1, double *a2) {
-  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else { *a1 = coord->h; *a2 = coord->d; }
+  if (mountType == ALTAZM) { *a1 = coord->z; *a2 = coord->a; } else
+  if (mountType == ALTALT) { *a1 = coord->aa1; *a2 = coord->aa2; } else
+  if (isEquatorial()) { *a1 = coord->h; *a2 = coord->d; }
 
-  if (coord->pierSide == PIER_SIDE_WEST) *a1 += Deg180;
-  if (site.location.latitude >= 0.0) {
-    if (coord->pierSide == PIER_SIDE_WEST) *a2 = Deg180 - *a2;
+  if (site.location.latitude >= 0.0 || !isEquatorial()) {
+    if (coord->pierSide == PIER_SIDE_WEST) {
+      *a1 += Deg180;
+      *a2 = Deg180 - *a2;
+    }
   } else {
-    if (coord->pierSide == PIER_SIDE_WEST) *a2 = (-Deg180) - *a2;
+    if (coord->pierSide == PIER_SIDE_WEST) {
+      *a1 += Deg180;
+      *a2 = (-Deg180) - *a2;
+    }
   }
-  if (*a2 >  Deg360) *a2 -= Deg360; else if (*a2 < -Deg360) *a2 += Deg360;
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
     *a2 = TANGENT_ARM_MOUNT_TO_INSTRUMENT(*a2)
@@ -243,9 +257,35 @@ void Transform::horToEqu(Coordinate *coord) {
   coord->d      = asin(sinDec); 
   double t1     = sin(coord->z);
   double t2     = cosAzm*site.locationEx.latitude.sine - tan(coord->a)*site.locationEx.latitude.cosine;
-  coord->h      = atan2(t1,t2);
+  coord->h      = atan2(t1, t2);
   coord->h     += Deg180;
   if (coord->h > Deg180) coord->h -= Deg360;
+}
+
+void Transform::aaToHor(Coordinate *coord) {
+  double cosAA1 = cos(coord->aa1);
+  double sinAlt = cos(coord->aa2)*cosAA1;  
+  coord->a      = asin(sinAlt);
+  double t1     = sin(coord->aa1);
+  double t2     = -tan(coord->aa2);
+  // handle degenerate coordinates near the poles
+  if (fabs(coord->aa2 - Deg90) < TenthArcSec) coord->z = 0.0; else
+  if (fabs(coord->aa2 + Deg90) < TenthArcSec) coord->z = Deg180; else {
+    coord->z = atan2(t1, t2);
+    coord->z += Deg180;
+  }
+  if (coord->z > Deg180) coord->z -= Deg360;
+}
+
+void Transform::horToAa(Coordinate *coord) { 
+  double cosAzm = cos(coord->z);
+  double sinAA2 = cos(coord->a)*cosAzm;  
+  coord->aa2    = asin(sinAA2); 
+  double t1     = sin(coord->z);
+  double t2     = -tan(coord->a);
+  coord->aa1    = atan2(t1, t2);
+  coord->aa1    += Deg180;
+  if (coord->aa1 > Deg180) coord->aa1 -= Deg360;
 }
 
 double Transform::trueRefrac(double altitude) {

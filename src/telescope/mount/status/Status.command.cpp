@@ -69,12 +69,13 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (goTo.isAutoFlipEnabled())            reply[i++]='a';                     // [a]uto meridian flip
       #if AXIS1_PEC == ON
         if (pec.settings.recorded)             reply[i++]='R';                     // PEC data has been [R]ecorded
-        if (transform.mountType != ALTAZM)
+        if (transform.isEquatorial())
           reply[i++]="/,~;^"[(int)pec.settings.state];                             // PEC State (/)gnore, ready (,)lay, (~)laying, ready (;)ecord, (^)ecording
       #endif
       if (transform.mountType == GEM)          reply[i++]='E'; else                // GEM
       if (transform.mountType == FORK)         reply[i++]='K'; else                // FORK
-      if (transform.mountType == ALTAZM)       reply[i++]='A';                     // ALTAZM
+      if (transform.mountType == ALTAZM)       reply[i++]='A'; else                // ALTAZM
+      if (transform.mountType == ALTALT)       reply[i++]='L';                     // ALTALT
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
       if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
@@ -125,7 +126,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
 
       if (transform.mountType == GEM)              reply[3]|=0b10000001; else      // GEM
       if (transform.mountType == FORK)             reply[3]|=0b10000010; else      // FORK
-      if (transform.mountType == ALTAZM)           reply[3]|=0b10001000;           // ALTAZM
+      if (transform.mountType == ALTAZM)           reply[3]|=0b10001000; else      // ALTAZM
+      if (transform.mountType == ALTALT)           reply[3]|=0b10000100;           // ALTALT
 
       Coordinate current = mount.getMountPosition(CR_MOUNT);
       if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) current.pierSide = PIER_SIDE_NONE;
@@ -134,7 +136,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       if (current.pierSide == PIER_SIDE_WEST)      reply[3]|=0b11000000;           // Pier side west
 
       #if AXIS1_PEC == ON
-        if (transform.mountType != ALTAZM)
+        if (transform.isEquatorial())
           reply[4] = (int)pec.settings.state|0b10000000;                           // PEC state: 0 ignore, 1 ready play, 2 playing, 3 ready record, 4 recording
         if (pec.settings.recorded)                 reply[4]|=0b11000000;           // PEC state: data has been recorded
       #endif
@@ -152,7 +154,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *supressF
       int i = 0;
       if (transform.mountType == GEM)          reply[i++] = 'G'; else
       if (transform.mountType == FORK)         reply[i++] = 'P'; else
-      if (transform.mountType == ALTAZM)       reply[i++] = 'A';
+      if (transform.mountType == ALTAZM)       reply[i++] = 'A'; else
+      if (transform.mountType == ALTALT)       reply[i++] = 'L';
       if (mount.isTracking())                  reply[i++] = 'T'; else reply[i++] = 'N';
       if (park.state == PS_PARKED)             reply[i++] = 'P'; else
       if (mount.isHome())                      reply[i++] = 'H'; else

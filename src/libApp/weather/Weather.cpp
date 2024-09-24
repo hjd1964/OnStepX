@@ -72,8 +72,10 @@ bool Weather::init() {
       #ifdef HAL_WIRE_RESET_AFTER_CONNECT
         HAL_Wire.end();
         HAL_Wire.begin();
+        #ifdef HAL_WIRE_CLOCK
+          HAL_Wire.setClock(HAL_WIRE_CLOCK);
+        #endif
       #endif
-        HAL_Wire.setClock(HAL_WIRE_CLOCK);
     #endif
 
     if (success) {

@@ -29,6 +29,8 @@
 bool xBusy = false;
 InitError initError;
 
+void mcuTempWrapper() { telescope.mcuTemperature = (telescope.mcuTemperature*9.0F + HAL_TEMP())/10.0F; }
+
 #if STATUS_LED != OFF && STATUS_LED_PIN != OFF
   void statusFlash() {
     static uint8_t cycle = 0;
@@ -140,6 +142,11 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     addonFlasher.init();
   #endif
 
+  mcuTemperature = HAL_TEMP();
+  if (!isnan(mcuTemperature)) {
+    VF("MSG: Telescope, start MCU temperature monitor task (rate 500ms priority 7)... ");
+    if (tasks.add(500, 0, true, 6, mcuTempWrapper, "McuTemp")) { VLF("success"); } else { VLF("FAILED!"); }
+  }
   weather.init();
   temperature.init();
 

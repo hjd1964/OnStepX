@@ -4,7 +4,6 @@
 
 #if defined(ARDUINO_TEENSY41)
 
-// Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial1: RX1 Pin 0, TX1 Pin 1
 // Serial2: RX2 Pin 7, TX2 Pin 8
 

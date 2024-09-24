@@ -25,18 +25,20 @@ void Home::init() {
   nv.readBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
 
   #ifndef AXIS1_HOME_DEFAULT
-    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0; position.z = 0; }
+    if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0.0L; position.z = 0.0L; position.aa1 = 0.0L; }
   #else
-    if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
+    if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else
+    if (transform.mountType == ALTALT) position.aa1 = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
   #endif
   #ifndef AXIS2_HOME_DEFAULT
-    if (transform.mountType == ALTAZM) position.a = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;
+    if (transform.mountType == ALTAZM) position.a = 0.0; else
+    if (transform.mountType == ALTALT) position.aa2 = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;
   #else
-    if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
+    if (transform.mountType == ALTAZM) position.a = degToRad(AXIS2_HOME_DEFAULT);
+    if (transform.mountType == ALTALT) position.aa2 = degToRad(AXIS2_HOME_DEFAULT); else position.d = degToRad(AXIS2_HOME_DEFAULT);
   #endif
-  if (transform.mountType != ALTAZM) {
-    axis1.setReverse(site.locationEx.latitude.sign < 0.0);
-  }
+
+  setReversal();
 
   position.pierSide = PIER_SIDE_NONE;
 }
@@ -50,8 +52,8 @@ CommandError Home::request() {
       return CE_SLEW_IN_MOTION;
     }
 
-    #if AXIS2_TANGENT_ARM == OFF
-      wasTracking = mount.isTracking();
+    wasTracking = mount.isTracking();
+    #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == OFF
       mount.tracking(false);
     #endif
 
@@ -60,45 +62,63 @@ CommandError Home::request() {
     goTo.firstGoto = false;
 
     if (hasSense) {
-      double a1 = axis1.getInstrumentCoordinate();
-      double a2 = axis2.getInstrumentCoordinate();
-      if (transform.mountType == ALTAZM) {
-        a1 -= position.z;
-        a2 -= position.a;
-      } else {
-        a1 -= position.h;
-        a2 -= position.d;
-      }
-      // both -180 to 180
-      VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
-      if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis1))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.senseOffset.axis2))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        double a1 = axis1.getInstrumentCoordinate();
+        double a2 = axis2.getInstrumentCoordinate();
+        if (transform.mountType == ALTAZM) {
+          a1 -= position.z;
+          a2 -= position.a;
+        } else
+        if (transform.mountType == ALTALT) {
+          a1 -= position.aa1;
+          a2 -= position.aa2;
+        } else {
+          a1 -= position.h;
+          a2 -= position.d;
+        }
 
-      CommandError e = reset();
-      if (e != CE_NONE) return e;
-    }
+        // both -180 to 180
+        VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
+        if (abs(a1) > degToRad(AXIS1_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.axis1.senseOffset))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        if (abs(a2) > degToRad(AXIS2_SENSE_HOME_DIST_LIMIT) - abs(arcsecToRad(settings.axis2.senseOffset))) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
-    VLF("MSG: Mount, moving to home");
+        CommandError e = reset(false);
+        if (e != CE_NONE) return e;
+      #endif
 
-    if (hasSense || (AXIS2_TANGENT_ARM != OFF && (AXIS2_SENSE_HOME) != OFF)) {
+      VLF("MSG: Mount, guiding to home");
       state = HS_HOMING;
       isRequestWithReset = false;
       guide.startHome();
     } else {
-      #if AXIS2_TANGENT_ARM == OFF
+      #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        VLF("MSG: Mount, moving to home");
         state = HS_HOMING;
-        if (transform.mountType == ALTAZM) transform.horToEqu(&position);
+
+        if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+        if (transform.mountType == ALTALT) transform.aaToEqu(&position);
+
         CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
         if (result != CE_NONE) {
-          VLF("WRN: Mount, moving to home goto failed");
+          VF("WRN: Mount, moving to home goto failed (code "); V(result); VLF(")");
           state = HS_NONE;
         }
         return result;
       #else
-        axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
-        axis2.setTargetCoordinate(axis2.getIndexPosition());
-        VLF("Mount, axis2 home target coordinates set");
-        axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+        #if AXIS1_SECTOR_GEAR == ON
+          VLF("MSG: Mount, moving SG to home");
+          axis1.setFrequencySlew(goTo.rate);
+          axis1.setTargetCoordinate(axis1.getIndexPosition());
+          VLF("Mount, axis1 home target coordinates set");
+          axis1.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+        #endif
+        #if AXIS2_TANGENT_ARM == ON
+          VLF("MSG: Mount, moving TA to home");
+          axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
+          axis2.setTargetCoordinate(axis2.getIndexPosition());
+          VLF("Mount, axis2 home target coordinates set");
+          axis2.autoGoto(degToRadF((float)(SLEW_ACCELERATION_DIST)));
+        #endif
       #endif
     }
   return CE_NONE;
@@ -121,19 +141,48 @@ void Home::requestAborted() {
 
 // after finding home switches displace the mount axes as specified
 void Home::guideDone(bool success) {
-  if (success && useOffset()) {
-    reset(isRequestWithReset);
-    if (transform.mountType == ALTAZM) transform.horToEqu(&position);
-    VLF("MSG: Mount, finishing move to home with goto");
-    axis1.setTargetCoordinate(axis1.getTargetCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
-    axis1.autoGoto(goTo.getRadsPerSecond());
-    axis2.setTargetCoordinate(axis2.getTargetCoordinate() - arcsecToRad(settings.senseOffset.axis2));
-    axis2.autoGoto(goTo.getRadsPerSecond());
+  if (!success) { state = HS_NONE; reset(isRequestWithReset); return; }
+
+  #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+    if (useOffset()) {
+      reset(isRequestWithReset);
+
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
+
+      VF("MSG: Mount, finishing move to home with goto to (");
+      double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
+      double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.axis2.senseOffset);
+      V(radToDeg(a1)); VF(","); V(radToDeg(a2)); VLF(")");
+      axis1.setTargetCoordinate(a1);
+      axis1.autoGoto(goTo.getRadsPerSecond());
+      axis2.setTargetCoordinate(a2);
+      axis2.autoGoto(goTo.getRadsPerSecond());
+      mount.syncFromOnStepToEncoders = true;
+
+      state = HS_NONE;
+    } else {
+      state = HS_NONE;
+      reset(isRequestWithReset);
+    }
+  #else
     state = HS_NONE;
-  } else {
-    state = HS_NONE;
-    reset(isRequestWithReset);
-  }
+
+    #if AXIS1_SECTOR_GEAR == ON 
+      VLF("MSG: Mount, sector gear set origin");
+      double h = axis1.getInstrumentCoordinate();
+      if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::guideDone(), failed to resetPosition Axis1"); exit; }
+      axis1.setInstrumentCoordinate(h);
+      mount.tracking(wasTracking);
+    #endif
+
+    #if AXIS2_TANGENT_ARM == ON 
+      VLF("MSG: Mount, tangent arm set origin");
+      double d = axis2.getInstrumentCoordinate();
+      if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::guideDone(), failed to resetPosition Axis2"); exit; }
+      axis2.setInstrumentCoordinate(d);
+    #endif
+  #endif
 }
 
 // once homed mark as done
@@ -171,18 +220,22 @@ CommandError Home::reset(bool fullReset) {
   if (transform.mountType == ALTAZM) {
     position.a1 = position.z;
     position.a2 = position.a;
+  } else
+  if (transform.mountType == ALTALT) {
+    position.a1 = position.aa1;
+    position.a2 = position.aa2;
   } else {
     position.a1 = position.h;
     position.a2 = position.d;
   }
 
-  if (!goTo.absoluteEncodersPresent || mount.isHome()) {
+  if (!goTo.absoluteEncodersPresent) {
     if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
     if (!fullReset && state == HS_HOMING && useOffset()) {
-      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.senseOffset.axis1));
-      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.senseOffset.axis2));
+      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset));
+      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.axis2.senseOffset));
     } else {
       axis1.setInstrumentCoordinate(position.a1);
       axis2.setInstrumentCoordinate(position.a2);
@@ -203,9 +256,13 @@ CommandError Home::reset(bool fullReset) {
       goTo.alignReset();
     #endif
 
-    VLF("MSG: Mount, reset at home and in standby");
+    VF("MSG: Mount, reset at home (");
+    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    VLF(") and in standby");
   } else {
-    VLF("MSG: Mount, reset at home");
+    VF("MSG: Mount, reset at home (");
+    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    VLF(")");
   }
 
   return CE_NONE;
@@ -218,22 +275,32 @@ Coordinate Home::getPosition(CoordReturn coordReturn) {
     break;
     case CR_MOUNT_EQU:
       if (transform.mountType == ALTAZM) transform.horToEqu(&position);
-      transform.hourAngleToRightAscension(&position, false);
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
+      transform.hourAngleToRightAscension(&position, true);
     break;
     case CR_MOUNT_ALT:
     case CR_MOUNT_HOR:
-      if (transform.mountType != ALTAZM) transform.equToHor(&position);
+      if (transform.isEquatorial()) transform.equToHor(&position);
+      else if (transform.mountType == ALTALT) transform.aaToHor(&position);
     break;
     case CR_MOUNT_ALL:
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else transform.equToHor(&position);
-      transform.hourAngleToRightAscension(&position, false);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&position); else transform.equToHor(&position);
+      transform.hourAngleToRightAscension(&position, true);
     break;
   }
   return position;
 }
 
 bool Home::useOffset() {
-  if (hasSense && (settings.senseOffset.axis1 != 0 || settings.senseOffset.axis2 != 0)) return true; else return false;
+  if (hasSense && (settings.axis1.senseOffset != 0 || settings.axis2.senseOffset != 0)) return true; else return false;
+}
+
+void Home::setReversal() {
+  bool latitudeReversal = transform.isEquatorial() && site.locationEx.latitude.sign < 0.0;
+  axis1.setReverse(latitudeReversal);
+  if (!settings.axis1.senseReverse) axis1.setHomeReverse(latitudeReversal); else axis1.setHomeReverse(!latitudeReversal);
+  axis2.setHomeReverse(settings.axis2.senseReverse);
 }
 
 Home home;

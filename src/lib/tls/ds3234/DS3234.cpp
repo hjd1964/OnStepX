@@ -4,7 +4,9 @@
 
 #include "DS3234.h"
 
-#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3234
+#if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == DS3234 || \
+    (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == DS3234)
+
 
 #ifdef TLS_TIMELIB
   #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
@@ -14,7 +16,7 @@
 #include <RtcDS3234.h> // https://github.com/Makuna/Rtc/archive/master.zip
 RtcDS3234<SPIClass> rtcDS3234(SPI, DS3234_CS_PIN);
 
-bool TimeLocationSource::init() {
+bool TlsDs3234::init() {
   SPI.begin();
   rtcDS3234.Begin();
   if (!rtcDS3234.GetIsRunning()) rtcDS3234.SetIsRunning(true);
@@ -38,7 +40,7 @@ bool TimeLocationSource::init() {
   return ready;
 }
 
-void TimeLocationSource::set(JulianDate ut1) {
+void TlsDs3234::set(JulianDate ut1) {
   if (!ready) return;
 
   GregorianDate greg = calendars.julianDayToGregorian(ut1);
@@ -51,7 +53,7 @@ void TimeLocationSource::set(JulianDate ut1) {
   set(greg.year, greg.month, greg.day, h, floor(m), floor(s));
 }
 
-void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+void TlsDs3234::set(int year, int month, int day, int hour, int minute, int second) {
   #ifdef TLS_TIMELIB
     setTime(hour, minute, second, day, month, year);
   #endif
@@ -65,24 +67,33 @@ void TimeLocationSource::set(int year, int month, int day, int hour, int minute,
   #endif
 }
 
-void TimeLocationSource::get(JulianDate &ut1) {
-  if (!ready) return;
+bool TlsDs3234::get(JulianDate &ut1) {
+  if (!ready) return false;
 
   #ifdef SSPI_SHARED
     SPI.begin();
   #endif
+  GregorianDate greg;
   RtcDateTime now = rtcDS3234.GetDateTime();
   if (now.Year() >= 2018 && now.Year() <= 3000 && now.Month() >= 1 && now.Month() <= 12 && now.Day() >= 1 && now.Day() <= 31 &&
       now.Hour() <= 23 && now.Minute() <= 59 && now.Second() <= 59) {
-    GregorianDate greg; greg.year = now.Year(); greg.month = now.Month(); greg.day = now.Day();
+    greg.year = now.Year();
+    greg.month = now.Month();
+    greg.day = now.Day();
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = now.Hour() + now.Minute()/60.0 + now.Second()/3600.0;
+  } else {
+    greg.year = 2000;
+    greg.month = 1;
+    greg.day = 1;
+    ut1 = calendars.gregorianToJulianDay(greg);
+    ut1.hour = 0.0;
   }
   #ifdef SSPI_SHARED
     SPI.end();
   #endif
-}
 
-TimeLocationSource tls;
+  return true;
+}
 
 #endif

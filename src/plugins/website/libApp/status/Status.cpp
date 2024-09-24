@@ -2,9 +2,11 @@
 // Mount status from OnStep
 
 #include <Arduino.h>
+
+#include "../../../../lib/debug/Debug.h"
+
 #include "../../Constants.h"
 #include "../../Config.h"
-#include "../../../../lib/debug/Debug.h"
 
 #include "../../locales/Locale.h"
 #include "../cmd/Cmd.h"
@@ -48,7 +50,13 @@ bool Status::update()
       ver_min = -1;
       ver_patch = 0;
       onStepFound = false;
-    } else onStepFound = true;
+      strcpy(configName, "");
+    } else {
+      onStepFound = true;
+      if (onStep.command(":GVC#", result)) {
+        strncpy(configName, result, 40);
+      }
+    }
   }
 
   if (onStepFound) {

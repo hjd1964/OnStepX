@@ -4,7 +4,6 @@
 
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__)
 
-// Serial ports (see Pins.defaults.h for SERIAL_A)
 // Serial1: RX1 Pin 0, TX1 Pin 1
 // Serial4: RX4 Pin 31, TX4 Pin 32
 

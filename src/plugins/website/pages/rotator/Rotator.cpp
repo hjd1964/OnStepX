@@ -37,7 +37,7 @@ void handleRotator() {
 
   // show this page
   data.concat(FPSTR(html_body_begin));
-  pageHeader(PAGE_ROTATOR);
+  www.sendContentAndClear(data);
   data.concat(FPSTR(html_onstep_page_begin));
 
   // OnStep wasn't found, show warning and info.

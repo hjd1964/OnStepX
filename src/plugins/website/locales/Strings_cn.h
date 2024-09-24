@@ -87,9 +87,10 @@
 #define L_AT_HOME "在原位"
 #define L_SLEWING "快速定位"
 #define L_PPS_SYNC "同步卫星信号"
+#define L_HOME_REV "撤销"
 #define L_HOME_OFFSET "与起始位置的偏移:"
-#define L_HOME_OFFSET_RANGE_AXIS1 "Axis1, +/-162000 arc-sec"
-#define L_HOME_OFFSET_RANGE_AXIS2 "Axis2, +/-162000 arc-sec"
+#define L_HOME_OFFSET_RANGE_AXIS1 "Axis1, +/-" STR(HOME_OFFSET_RANGE_AXIS1) " arc-sec"
+#define L_HOME_OFFSET_RANGE_AXIS2 "Axis2, +/-" STR(HOME_OFFSET_RANGE_AXIS2) " arc-sec"
 #define L_HOME_AUTO "启动时自动归位:"
 
 // tracking
@@ -383,6 +384,7 @@
 #define L_ADV_DISABLE "禁用高级配置（重新启动时所有默认设置）。"
 #define L_ADV_SET_AXIS_NO_EDIT "目前禁用此轴的编辑 。"
 #define L_ADV_SET_NO_EDIT "目前禁止所有轴的编辑。可能未启用此功能，或者您需要重新启动OnStep。"
+#define L_ADV_SET_FOOTER_MSG0 "大多数轴设置更改需要重新启动才能生效。"
 #define L_ADV_SET_FOOTER_MSG1 "在按下[Upload]后，请注意上述更改，因为上载可能由于参数无效而被拒绝。"
 #define L_ADV_SET_FOOTER_MSG2 "当您选择[还原]时，该组将不可编辑，直到您重新启动OnStep。"
 #define L_ADV_SET_FOOTER_MSG3 "如果 IRUN 设置为非 Config.h 默认值，则 IHOLD 设置为 50% (HALF)。"

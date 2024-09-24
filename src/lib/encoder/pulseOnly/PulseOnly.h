@@ -15,6 +15,8 @@ class PulseOnly : public Encoder {
     int32_t read();
     void write(int32_t count);
 
+    void setDirection(volatile int8_t *direction);
+
   private:
     int16_t pulsePin;
 };

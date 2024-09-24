@@ -32,8 +32,13 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
   velocityMax = TmcSettings->velocityMax;
-  acceleration = TmcSettings->acceleration;
+  acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+  decay = TmcSettings->decay;
+  if (decay == OFF) decay = STEALTHCHOP;
+  decaySlewing = TmcSettings->decaySlewing;
+  if (decaySlewing == OFF) decaySlewing = SPREADCYCLE;
+  velocityThrs = TmcSettings->velocityThrs;
 }
 
 void ServoTmc2209::init() {
@@ -53,7 +58,7 @@ void ServoTmc2209::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // initialize the serial port
@@ -74,10 +79,10 @@ void ServoTmc2209::init() {
     static bool initialized = false;
     if (!initialized) {
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
-        VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
       #else
-        VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+        VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
         SerialTMC.begin(SERIAL_TMC_BAUD);
       #endif
       initialized = true;
@@ -86,7 +91,7 @@ void ServoTmc2209::init() {
     // pull MS1 and MS2 low for device address 0
     digitalWriteEx(Pins->m0, LOW);
     digitalWriteEx(Pins->m1, LOW);
-    VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF("bps");
+    VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
     SerialTMC.begin(SERIAL_TMC_BAUD);
   #endif
@@ -95,6 +100,11 @@ void ServoTmc2209::init() {
   driver = new TMC2209Stepper(&SERIAL_TMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   driver->begin();
   driver->intpol(true);
+
+  if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
+    VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    driver->TPWMTHRS(velocityThrs/0.715F);
+  }
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
   if (Settings->microsteps == OFF) {
@@ -192,6 +202,8 @@ void ServoTmc2209::updateStatus() {
 
       TMC2208_n::DRV_STATUS_t status_result;
       status_result.sr = driver->DRV_STATUS();
+      if (driver->CRCerror) status_result.sr = 0xFFFFFFFF;
+
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;
@@ -212,6 +224,8 @@ void ServoTmc2209::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
+
+  ServoDriver::updateStatus();
 }
 
 // calibrate the motor driver if required

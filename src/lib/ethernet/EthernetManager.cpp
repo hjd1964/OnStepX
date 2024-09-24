@@ -6,9 +6,24 @@
 #include "../tasks/OnTask.h"
 
 #if MDNS_SERVER == ON
+  enum MdnsReady {MD_WAIT, MD_READY, MD_FAIL};
+
   EthernetUDP udp;
   MDNS mdns(udp);
-  void mdnsPoll() { mdns.run(); }
+
+  void mdnsPoll() {
+    static MdnsReady mdnsReady = MD_WAIT;
+    if (mdnsReady == MD_WAIT && millis() > 5000) {
+      if (mdns.begin(Ethernet.localIP(), MDNS_NAME)) {
+        VLF("MSG: Ethernet, mDNS started");
+        mdnsReady = MD_READY;
+      } else {
+        VLF("WRN: Ethernet, mDNS start failed!");
+        mdnsReady = MD_FAIL;
+      }
+    }
+    if (mdnsReady == MD_READY) mdns.run();
+  }
 #endif
 
 bool EthernetManager::init() {
@@ -45,23 +60,18 @@ bool EthernetManager::init() {
     }
 
     if (settings.dhcpEnabled) {
-      active = Ethernet.begin(settings.mac);
+      Ethernet.begin(settings.mac);
     } else {
       Ethernet.begin(settings.mac, settings.ip, settings.dns, settings.gw, settings.sn);
-      active = true;
     }
+    active = true;
 
     VLF("MSG: Ethernet, initialized");
 
     #if MDNS_SERVER == ON
-      if (mdns.begin(settings.ip, MDNS_NAME)) {
-        VLF("MSG: Ethernet, mDNS started");
-        VF("MSG: Ethernet, starting mDNS polling");
-        VF(" task (rate 5ms priority 7)... ");
-        if (tasks.add(5, 0, true, 7, mdnsPoll, "mdPoll")) { VL("success"); } else { VL("FAILED!"); }
-      } else {
-        VLF("WRN: Ethernet, mDNS start failed!");
-      }
+      VF("MSG: Ethernet, starting mDNS polling");
+      VF(" task (rate 5ms priority 7)... ");
+      if (tasks.add(5, 0, true, 7, mdnsPoll, "mdPoll")) { VL("success"); } else { VL("FAILED!"); }
     #endif
   }
   return active;

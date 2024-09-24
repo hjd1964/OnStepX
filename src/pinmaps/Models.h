@@ -67,6 +67,10 @@
   #define PINMAP_STR "FYSETC S6 v2"
   #include "Pins.FYSETC_S6.h"
 #endif
+#if PINMAP == BTT_SKR_PRO
+  #define PINMAP_STR "BTT SKR PRO v1.2"
+  #include "Pins.SKR_PRO.h"
+#endif
 #if PINMAP == JTWSTM
   #define PINMAP_STR "JTWSTM v2.1"
   #include "Pins.JTWPCB2.h"

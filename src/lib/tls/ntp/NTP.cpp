@@ -16,20 +16,23 @@
   EthernetUDP Udp;
 #endif
 
-#include "../tasks/OnTask.h"
+#include "../../tasks/OnTask.h"
 
 IPAddress timeServer = IPAddress TIME_IP_ADDR;
 
 // local port to listen for UDP packets
 unsigned int localPort = 8888;
 
+TlsNTP *tlsNtp;
+
 void ntpWrapper() {
-  if (!tls.isReady()) tls.poll();
+  if (!tlsNtp->isReady()) tlsNtp->poll();
 }
 
 // initialize
-bool TimeLocationSource::init() {
-  
+bool TlsNTP::init() {
+  tlsNtp = this;
+
   VF("MSG: TLS, start NTP monitor task (rate 5 min priority 7)... ");
   handle = tasks.add(5*60*1000L, 0, true, 7, ntpWrapper, "ntp");
   if (handle) {
@@ -48,14 +51,14 @@ bool TimeLocationSource::init() {
   return active;
 }
 
-void TimeLocationSource::restart() {
+void TlsNTP::restart() {
 }
 
-void TimeLocationSource::set(JulianDate ut1) {
+void TlsNTP::set(JulianDate ut1) {
   ut1 = ut1;
 }
 
-void TimeLocationSource::set(int year, int month, int day, int hour, int minute, int second) {
+void TlsNTP::set(int year, int month, int day, int hour, int minute, int second) {
   #ifdef TLS_TIMELIB
     setTime(hour, minute, second, day, month, year);
   #else
@@ -63,17 +66,20 @@ void TimeLocationSource::set(int year, int month, int day, int hour, int minute,
   #endif
 }
 
-void TimeLocationSource::get(JulianDate &ut1) {
-  if (!ready) return;
+bool TlsNTP::get(JulianDate &ut1) {
+  if (!ready) return false;
+
   if (year() >= 0 && year() <= 3000 && month() >= 1 && month() <= 12 && day() >= 1 && day() <= 31 &&
       hour() <= 23 && minute() <= 59 && second() <= 59) {
     GregorianDate greg; greg.year = year(); greg.month = month(); greg.day = day();
     ut1 = calendars.gregorianToJulianDay(greg);
     ut1.hour = hour() + minute()/60.0 + (second() + DUT1)/3600.0;
   }
+
+  return true;
 }
 
-void TimeLocationSource::poll() {
+void TlsNTP::poll() {
   Udp.begin(localPort);
 
   // discard any previously received packets
@@ -115,7 +121,7 @@ void TimeLocationSource::poll() {
 }
 
 // send an NTP request to the time server at the given address
-void TimeLocationSource::sendNTPpacket(IPAddress &address) {
+void TlsNTP::sendNTPpacket(IPAddress &address) {
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -136,5 +142,4 @@ void TimeLocationSource::sendNTPpacket(IPAddress &address) {
   Udp.endPacket();
 }
 
-TimeLocationSource tls;
 #endif

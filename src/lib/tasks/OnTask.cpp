@@ -42,7 +42,7 @@ volatile unsigned long _task_ppsAverageSubMicros = 16000000UL;
 double _task_masterFrequencyRatio = 1.0L;
 
 // Task object
-Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)()) {
+Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
   idle = period == 0;
   this->period   = period;
   period_units   = PU_MILLIS;
@@ -120,7 +120,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   return true;
 }
 
-void Task::setCallback(void (*volatile callback)()) {
+void Task::setCallback(void (*callback)()) {
   this->callback = callback;
   noInterrupts();
   switch (hardware_timer) {

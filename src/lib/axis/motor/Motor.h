@@ -117,9 +117,6 @@ class Motor {
     // get the current direction of motion
     Direction getDirection();
 
-    // return the encoder count, if present
-    virtual int32_t getEncoderCount() { return 0; }
-
     // set slewing state (hint that we are about to slew or are done slewing)
     virtual void setSlewing(bool state);
 
@@ -131,6 +128,9 @@ class Motor {
 
     // set zero of absolute encoders
     virtual uint32_t encoderZero() { return 0; }
+
+    // return the encoder count, if present
+    virtual int32_t getEncoderCount() { return 0; }
 
     // set origin of absolute encoders
     virtual void encoderSetOrigin(uint32_t origin) {}
@@ -144,6 +144,8 @@ class Motor {
     volatile uint8_t monitorHandle = 0;        // handle to the axis task monitor
 
     bool enabled = false;                      // enable/disable logical state
+
+    bool calibrating = false;                  // shadow disable when calibrating
 
   protected:
     // disable backlash compensation, to work properly there must be an enable call to match

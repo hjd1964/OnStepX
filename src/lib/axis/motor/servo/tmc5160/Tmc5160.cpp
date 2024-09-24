@@ -25,8 +25,13 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, cons
   model = TmcSettings->model;
   statusMode = TmcSettings->status;
   velocityMax = TmcSettings->velocityMax;
-  acceleration = TmcSettings->acceleration;
+  acceleration = (TmcSettings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+  decay = TmcSettings->decay;
+  if (decay == OFF) decay = STEALTHCHOP;
+  decaySlewing = TmcSettings->decaySlewing;
+  if (decaySlewing == OFF) decaySlewing = SPREADCYCLE;
+  velocityThrs = TmcSettings->velocityThrs;
 }
 
 void ServoTmc5160::init() {
@@ -44,12 +49,17 @@ void ServoTmc5160::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" steps/s/s");
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
   VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   driver = new TMC5160Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
   driver->begin();
   driver->intpol(true);
+
+  if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
+    VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    driver->TPWMTHRS(velocityThrs/0.715F);
+  }
 
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
   if (Settings->microsteps == OFF) {
@@ -60,16 +70,21 @@ void ServoTmc5160::init() {
     driver->microsteps(Settings->microsteps);
   }
 
-  currentRms = current*0.7071F;
+  currentRms = Settings->current*0.7071F;
   VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
   if (Settings->current == OFF) {
     VLF("current control OFF (600mA)");
-    Settings->current = 600*0.7071F;
+    currentRms = 600*0.7071F;
   }
   driver->hold_multiplier(1.0F);
 
   VF("Irun="); V(currentRms/0.7071F); VLF("mA");
   driver->rms_current(currentRms);
+
+  unsigned long mode = driver->IOIN();
+  if (mode && 0b01000000 > 0) {
+    VF("WRN: ServoDriver"); V(axisNumber); VLF(", TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
+  }
 
   driver->en_pwm_mode(false);
   driver->AMAX(65535);
@@ -144,21 +159,19 @@ void ServoTmc5160::updateStatus() {
   if (statusMode == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
-      TMC2208_n::DRV_STATUS_t status_result;
-      status_result.sr = driver->DRV_STATUS();
+      TMC2130_n::DRV_STATUS_t status_result;
+      status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS();
       status.outputA.shortToGround = status_result.s2ga;
       status.outputA.openLoad      = status_result.ola;
       status.outputB.shortToGround = status_result.s2gb;
       status.outputB.openLoad      = status_result.olb;
-      status.overTemperatureWarning = status_result.otpw;
+      status.overTemperatureWarning= status_result.otpw;
       status.overTemperature       = status_result.ot;
       status.standstill            = status_result.stst;
 
       // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature) status.fault = true; else status.fault = false;
+      if (status.outputA.shortToGround || status.outputB.shortToGround ||
+          status.overTemperatureWarning || status.overTemperature) status.fault = true; else status.fault = false;
 
       timeLastStatusUpdate = millis();
     }
@@ -166,6 +179,8 @@ void ServoTmc5160::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
+
+  ServoDriver::updateStatus();
 }
 
 // calibrate the motor driver if required

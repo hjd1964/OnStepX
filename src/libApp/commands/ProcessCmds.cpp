@@ -136,6 +136,9 @@ void CommandProcessor::poll() {
     }
 
     // debug, log errors and/or commands
+    #ifdef DEBUG_ECHO_COMMANDS_CH
+      if (DEBUG_ECHO_COMMANDS_CH == channel) {
+    #endif
     #if DEBUG_ECHO_COMMANDS != OFF
       if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) {
         DF("MSG: cmd"); D(channel); D(" = "); D(buffer.getCmd()); D(buffer.getParameter()); DF(", reply = "); D(reply);
@@ -149,6 +152,9 @@ void CommandProcessor::poll() {
     }
     #if DEBUG_ECHO_COMMANDS != OFF
       if (DEBUG_ECHO_COMMANDS == ON || commandError > CE_0) { DL(""); }
+    #endif
+    #ifdef DEBUG_ECHO_COMMANDS_CH
+      }
     #endif
 
     buffer.flush();
@@ -202,20 +208,6 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
       SerialPort.begin(baud[rate]);
       *numericReply = false;
     } else commandError = CE_PARAM_RANGE;
-    return commandError;
-  } else
-
-  // :GX9F#     Get internal MCU temperature in deg. C
-  //            Returns: +/-n.n
-  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == 'F' && parameter[2] == 0) {
-    float t = HAL_TEMP();
-    if (!isnan(t)) {
-      sprintF(reply, "%1.0f", t);
-      *numericReply = false;
-    } else {
-      *numericReply = true;
-      commandError = CE_0;
-    }
     return commandError;
   } else
 

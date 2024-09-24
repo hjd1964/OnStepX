@@ -1,8 +1,11 @@
 // Platform setup ------------------------------------------------------------------------------------
 #pragma once
 
-// Base rate for critical task timing
-#define HAL_FRACTIONAL_SEC 100.0F
+// This is for fast processors with hardware FP
+#define HAL_FAST_PROCESSOR
+
+// Base rate for critical task timing (0.0095s = 0.14", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 105.2631579F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE

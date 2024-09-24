@@ -20,11 +20,14 @@
 #define WIFI                        -15
 #define WIFI_ACCESS_POINT           -16    // shorthand for easy WIFI mode settings
 #define WIFI_STATION                -17    // shorthand for easy WIFI mode settings
-#define SHARED                      -18
-#define STANDARD                    -19
-#define PERSISTENT                  -20
-#define ERRORS_ONLY                 -21
-#define KALMAN                      -22
+#define BLUETOOTH                   -18    // shorthand for easy bluetooth mode settings
+#define SHARED                      -19
+#define STANDARD                    -20
+#define PERSISTENT                  -21
+#define ERRORS_ONLY                 -22
+#define MINIMUM                     -23
+#define MIDDLE                      -24
+#define MAXIMUM                     -25
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
@@ -66,9 +69,11 @@
 #define SERVO_DRIVER_FIRST          100
 #define SERVO_PE                    100    // SERVO, direction (phase) and pwm (enable) connections
 #define SERVO_EE                    101    // SERVO, dual pwm input (enable/enable) connections
-#define SERVO_TMC2209               102    // TMC2209 stepper driver using VACTUAL velocity control
-#define SERVO_TMC5160               103    // TMC5160 stepper driver using VMAX velocity control
-#define SERVO_DRIVER_LAST           103
+#define SERVO_TMC2130_DC            102    // TMC2130 DC motor control
+#define SERVO_TMC5160_DC            103    // TMC5160 DC motor control
+#define SERVO_TMC2209               104    // TMC2209 stepper driver using VACTUAL velocity control
+#define SERVO_TMC5160               105    // TMC5160 stepper driver using VMAX velocity control
+#define SERVO_DRIVER_LAST           105
 
 // odrive driver
 #define ODRIVE_DRIVER_FIRST         200
@@ -81,11 +86,21 @@
 #define AB_ESP32                    2      // AB quadrature encoder (using fast ESP32 hardware decode)
 #define CW_CCW                      3      // clockwise/counter-clockwise encoder
 #define PULSE_DIR                   4      // pulse/direction encoder
-#define PULSE_ONLY                  5      // pulse only encoder
-#define AS37_H39B_B                 6      // Broadcom AS37-H39B-B BISS-C interface encoder
-#define JTW_24BIT                   7      // JTW Trident BISS-C interface 24bit encoder
-#define SERIAL_BRIDGE               8      // serial bridge to encoders
-#define ENC_LAST                    8
+#define PULSE_ONLY                  5      // pulse only encoder (uses hint for direction)
+#define VIRTUAL                     6      // virtual encoder (uses hints for velocity and direction)
+#define AS37_H39B_B                 7      // Broadcom AS37-H39B-B BISS-C interface encoder
+#define JTW_24BIT                   8      // JTW Trident BISS-C interface 24bit encoder
+#define JTW_26BIT                   9      // JTW Trident BISS-C interface 26bit encoder
+#define SERIAL_BRIDGE               10     // serial bridge to encoders
+#define ENC_LAST                    10
+
+// encoder filter types
+#define ENC_FILT_FIRST              1
+#define KALMAN                      1      // more advanced, predictive
+#define ROLLING                     2      // basic, rolling average
+#define WINDOWING                   3      // basic, average
+#define LEARNING                    4      // learning, for RA axis only (experimental may be removed)
+#define ENC_FILT_LAST               4
 
 // servo feedback (must match Encoder library)
 #define SERVO_FEEDBACK_FIRST        1

@@ -11,14 +11,14 @@ void Intervalometer::init(int index) {
   // write the default settings to NV
   if (!nv.hasValidKey()) {
     VF("MSG: Intervalometer/Feature"); V(index + 1); VLF(", writing defaults to NV");
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3, timeToByte(expTime));
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, timeToByte(expDelay));
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 2, (uint8_t)expCount);
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, timeToByte(expTime));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, timeToByte(expDelay));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 2, (uint8_t)expCount);
   }
 
-  expTime = byteToTime(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*3));
-  expDelay = byteToTime(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*3 + 1));
-  expCount = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*3 + 2);
+  expTime = byteToTime(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5));
+  expDelay = byteToTime(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5 + 1));
+  expCount = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5 + 2);
 }
 
 void Intervalometer::poll() {
@@ -55,7 +55,7 @@ float Intervalometer::getExposure() {
 void Intervalometer::setExposure(float t) {
   if (pressed == P_STANDBY && t >= 0 && t <= 3600) {
     expTime = t;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3, timeToByte(expTime));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, timeToByte(expTime));
   }
 }
 
@@ -66,7 +66,7 @@ float Intervalometer::getDelay() {
 void Intervalometer::setDelay(float t) {
   if (pressed == P_STANDBY && t >= 1 && t <= 3600) {
     expDelay = t;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 1, timeToByte(expDelay));
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, timeToByte(expDelay));
   }
 }
 
@@ -81,7 +81,7 @@ float Intervalometer::getCount() {
 void Intervalometer::setCount(float c) {
   if (pressed == P_STANDBY && c >= 0 && c <= 255) {
     expCount = c;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*3 + 2, (uint8_t)expCount);
+    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 2, (uint8_t)expCount);
   }
 }
 

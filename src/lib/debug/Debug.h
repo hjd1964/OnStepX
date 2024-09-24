@@ -30,6 +30,7 @@
   #define D(x)
   #define DF(x)
   #define DL(x)
+  #define D1(x)
   #define DL1(x)
   #define DLF(x)
 #endif

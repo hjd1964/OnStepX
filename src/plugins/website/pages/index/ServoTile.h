@@ -30,7 +30,7 @@ const char html_servoScript1[] PROGMEM =
   "var svr=false;" // has run?
   "var svt=0;"     // time (x axis, 0.5s ticks)
   "var svd=[];"    // array of servo deltas
-  "var svhs=[10,20,50,100,500,1000,5000,10000,50000,100000,500000,1000000,500000,10000000,50000000,100000000,500000000];"
+  "var svhs=[4,10,20,50,100,500,1000,5000,10000,50000,100000,500000,1000000,500000,10000000,50000000,100000000,500000000];"
   "var svs=10;"    // scale (y axis)
   "var svw=210;"   // half width
   "var svh=300;"   // height
@@ -58,7 +58,7 @@ const char html_servoScript1[] PROGMEM =
     "for (i=0;i<=x;i++) { if (Math.abs(svd[i])>max) max=Math.abs(svd[i]); }"
 
     "var osvs=svs;"
-    "for (i=0;i<=17;i++) { if (max<svhs[i]*0.9) { svs=svhs[i]; break; } }"
+    "for (i=0;i<=18;i++) { if (max<svhs[i]*0.9) { svs=svhs[i]; break; } }"
     "if (osvs!=svs) { clearServo(ctx); }\n"
 
     "y=svh/2-delta*((svh/2)/svs);"

@@ -40,16 +40,26 @@
 #define F_COMP             4000000   // timer clocks at 4MHz
 
 // search "TIMER_TONE" in github.com/stm32duino/Arduino_Core_STM32/blob/main/variants to find the timer use
-#if defined(STM32F401xC) || defined(STM32F411xE)
-  #define STM32_TIMER1       TIM11   // for STM32F401 and STM32F411 (tone uses timer10, servo uses timer11)
-  #define STM32_TIMER2       TIM9
-  #define STM32_TIMER3       TIM4    // same use as prior to this point (but different order)
-  #define STM32_TIMER4       TIM5
+#if defined(STM32H743xx) || defined(STM32H750xx)
+  #define STM32_TIMER1       TIM17   // this can use any type of timer AFAIK
+  #define STM32_TIMER2       TIM16   // tone uses TIM 6, servo TIM7, PWM is unknown
+  #define STM32_TIMER3       TIM15   // TIM 1/8 are advanced, TIM2/5 are 32bit (no library support for 32 bit)
+  #define STM32_TIMER4       TIM3    // TIM 3/4/12/13/14/15/16/17 are general purpose and TIM 6/7 are basic
 #elif defined(STM32F446xx)
   #define STM32_TIMER1       TIM1    // for STM32F446 (tone uses timer6, servo uses timer2, serial uses timer7)
   #define STM32_TIMER2       TIM10
   #define STM32_TIMER3       TIM11   // same use as prior to this point (but different order)
   #define STM32_TIMER4       TIM14
+#elif defined(STM32F411xE) || defined(STM32F401xC)
+  #define STM32_TIMER1       TIM11   // for STM32F401 and STM32F411 (tone uses timer10, servo uses timer11)
+  #define STM32_TIMER2       TIM9
+  #define STM32_TIMER3       TIM4    // same use as prior to this point (but different order)
+  #define STM32_TIMER4       TIM5
+#elif defined(STM32F407xx)
+  #define STM32_TIMER1       TIM3    // TIM1 is used for PWM on Axis1 and Axis2 step pins (for DC servo control)
+  #define STM32_TIMER2       TIM10   // TIM9 is used for PWM reticle and the buzzer (I think)
+  #define STM32_TIMER3       TIM11   // supports timers TIM1 to TIM14, TIM 1/8 are advanced, TIM2/5 are 32bit (no library support for 32 bit)
+  #define STM32_TIMER4       TIM14   // the rest and general purpose or basic TIM 6/7 (this can use any type AFAIK)
 #elif defined(STM32F303xC)
   #define STM32_TIMER1       TIM17   // for STM32F303 (tone uses timer6, servo uses timer2)
   #define STM32_TIMER2       TIM16

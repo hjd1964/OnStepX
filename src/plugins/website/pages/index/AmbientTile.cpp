@@ -33,12 +33,10 @@ void ambientTile(String &data)
 // use Ajax key/value pairs to pass related data to the web client in the background
 void ambientTileAjax(String &data)
 {
-  #if DISPLAY_WEATHER == ON
-    data.concat(F("tphd_t|")); data.concat(state.siteTemperatureStr); data.concat("\n");
-    data.concat(F("tphd_p|")); data.concat(state.sitePressureStr); data.concat("\n");
-    data.concat(F("tphd_h|")); data.concat(state.siteHumidityStr); data.concat("\n");
-    data.concat(F("tphd_d|")); data.concat(state.siteDewPointStr); data.concat("\n");
-  #endif
+  data.concat(F("tphd_t|")); data.concat(state.siteTemperatureStr); data.concat("\n");
+  data.concat(F("tphd_p|")); data.concat(state.sitePressureStr); data.concat("\n");
+  data.concat(F("tphd_h|")); data.concat(state.siteHumidityStr); data.concat("\n");
+  data.concat(F("tphd_d|")); data.concat(state.siteDewPointStr); data.concat("\n");
 
   www.sendContentAndClear(data);
 }

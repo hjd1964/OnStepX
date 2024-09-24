@@ -53,6 +53,8 @@ class Telescope {
 
     bool ready = false;
 
+    float mcuTemperature;
+
   private:
     Firmware firmware;
     int16_t reticleBrightness = RETICLE_LED_DEFAULT;

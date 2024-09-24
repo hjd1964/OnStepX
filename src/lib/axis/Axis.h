@@ -26,7 +26,7 @@
 #endif
 #define FRACTIONAL_SEC_US           (lround(1000000.0F/FRACTIONAL_SEC))
 
-// time limit in seconds for slew home refine phases
+// time limit in seconds for slew home phases
 #ifndef SLEW_HOME_REFINE_TIME_LIMIT
 #define SLEW_HOME_REFINE_TIME_LIMIT 120
 #endif
@@ -117,7 +117,7 @@ class Axis {
     void enable(bool value);
 
     // get the enabled state
-    inline bool isEnabled() { return enabled; }
+    inline bool isEnabled() { return enabled && !motor->calibrating; }
 
     // time (in ms) before automatic power down at standstill, use 0 to disable
     void setPowerDownTime(int value);
@@ -220,14 +220,16 @@ class Axis {
     float getBacklashFrequency();
 
     // reverse direction of motion
-    void setReverse(bool reverse) {
+    inline void setReverse(bool reverse) {
       if (reverse) {
         if (settings.reverse == ON) motor->setReverse(OFF); else motor->setReverse(ON);
       } else {
         motor->setReverse(settings.reverse);
       }
-      sense.reverse(homeSenseHandle, reverse);
     }
+
+    // reverse homing direction
+    inline void setHomeReverse(bool reverse) { sense.reverse(homeSenseHandle, reverse); }
 
     // set base movement frequency in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);

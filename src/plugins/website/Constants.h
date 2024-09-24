@@ -10,7 +10,7 @@
 #define FWU                          -204
 
 // ajax page update feature
-#define AJAX_PAGE_UPDATE_RATE_FAST_MS 200     // fast update rate
+#define AJAX_PAGE_UPDATE_RATE_FAST_MS 500     // fast update rate
 #define AJAX_PAGE_UPDATE_FAST_SHED_MS 5000    // time before return to normal update rate
 #define AJAX_PAGE_LAZY_GET_MS         1000    // wait time for lazy get
 

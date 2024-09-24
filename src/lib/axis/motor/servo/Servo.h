@@ -7,16 +7,24 @@
 
 #include "../../../encoder/bissc/As37h39bb.h"
 #include "../../../encoder/bissc/Jtw24.h"
+#include "../../../encoder/bissc/Jtw26.h"
 #include "../../../encoder/cwCcw/CwCcw.h"
 #include "../../../encoder/pulseDir/PulseDir.h"
 #include "../../../encoder/pulseOnly/PulseOnly.h"
+#include "../../../encoder/virtualEnc/VirtualEnc.h"
 #include "../../../encoder/quadrature/Quadrature.h"
 #include "../../../encoder/quadratureEsp32/QuadratureEsp32.h"
 #include "../../../encoder/serialBridge/SerialBridge.h"
 
+#include "filters/Kalman.h"
+#include "filters/Learning.h"
+#include "filters/Rolling.h"
+#include "filters/Windowing.h"
+
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
 #include "tmc5160/Tmc5160.h"
+#include "dcTmcSPI/DcTmcSPI.h"
 
 #include "feedback/Pid/Pid.h"
 
@@ -28,10 +36,44 @@
   #define SERVO_SLEWING_TO_TRACKING_DELAY 3000 // in milliseconds
 #endif
 
+#ifndef SERVO_SAFETY_STALL_POWER
+  #define SERVO_SAFETY_STALL_POWER 33 // in percent
+#endif
+
+#ifdef ABSOLUTE_ENCODER_CALIBRATION
+  #ifndef ENCODER_ECM_BUFFER_SIZE
+    #define ENCODER_ECM_BUFFER_SIZE 16384
+  #endif
+
+  #ifndef ENCODER_ECM_BUFFER_RESOLUTION
+    #define ENCODER_ECM_BUFFER_RESOLUTION 512
+  #endif
+
+  #ifndef ENCODER_ECM_HIGH_PASS_ORDER
+    #define ENCODER_ECM_HIGH_PASS_ORDER 2
+  #endif
+
+  #ifndef ENCODER_ECM_HIGH_PASS_POINTS
+    #define ENCODER_ECM_HIGH_PASS_POINTS 10
+  #endif
+
+  #ifndef ENCODER_ECM_LOW_PASS_ORDER
+    #define ENCODER_ECM_LOW_PASS_ORDER 5
+  #endif
+
+  #ifndef ENCODER_ECM_LOW_PASS_POINTS
+    #define ENCODER_ECM_LOW_PASS_POINTS 10
+  #endif
+
+  #define ECB_NO_DATA -32768
+
+  enum CalibrateMode {CM_NONE, CM_RECORDING, CM_FIXED_RATE};
+#endif
+
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
@@ -87,6 +129,10 @@ class ServoMotor : public Motor {
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
     
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    void calibrate(float value);
+  #endif
+
     // calibrate the motor driver
     void calibrateDriver() { driver->calibrateDriver(); }
 
@@ -109,10 +155,37 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    void calibrateRecord(float &velocity, long &motorCounts, long &encoderCounts);
+    bool calibrationRead(const char *fileName);
+    bool calibrationWrite(const char *fileName);
+    bool calibrationAveragingWrite();
+    void calibrationClear();
+    void calibrationErase();
+    bool calibrationHighPass();
+    bool calibrationLowPass();
+    bool calibrationLinearRegression();
+    void calibrationPrint();
+    inline int16_t ecbn(int16_t value) { if (value == ECB_NO_DATA) return 0; else return value; };
+
+    int16_t *encoderCorrectionBuffer = NULL;
+    int32_t encoderCorrection = 0;
+    int32_t startCount = 0;
+    int32_t endCount = 0;
+    uint8_t handle = 0;
+
+    CalibrateMode calibrateMode = CM_NONE;
+
+    int32_t encoderIndex(int32_t offset = 0);
+  #endif
+
+    Filter *filter;
+
+    char axisPrefixWarn[16];            // additional prefix for debug messages
+
     float velocityEstimate = 0.0F;
     float velocityOverride = 0.0F;
-
-    long encoderApplyFilter(long encoderCounts);
 
     uint8_t servoMonitorHandle = 0;
     uint8_t taskHandle = 0;
@@ -121,6 +194,7 @@ class ServoMotor : public Motor {
     int  stepSize = 1;                  // step size
     volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile bool takeStep = false;     // should we take a step
+    float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
 
     float currentFrequency = 0.0F;      // last frequency set 
     float lastFrequency = 0.0F;         // last frequency requested

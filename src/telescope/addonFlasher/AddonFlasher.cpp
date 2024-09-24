@@ -3,6 +3,13 @@
 #include "AddonFlasher.h"
 #include "../../lib/tasks/OnTask.h"
 
+#if SERIAL_PASSTHROUGH == HardSerial
+#define SERIAL_PASSTHROUGH_RXTX_SET
+extern HardwareSerial HWSerialB;
+#undef SERIAL_PASSTHROUGH
+#define SERIAL_PASSTHROUGH HWSerialB
+#endif
+
 // ADDON_TRIGR_PIN  HIGH for run and LOW for trigger serial passthrough mode
 // ADDON_RESET_PIN  HIGH for run and LOW for reset
 // ADDON_GPIO0_PIN  HIGH for run and LOW for firmware upload

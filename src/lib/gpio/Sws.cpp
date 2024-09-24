@@ -20,7 +20,6 @@ bool SwsGpio::init() {
 
 // no command processing
 bool SwsGpio::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  char *conv_end;
 
   if (command[0] == 'G') {
     if (command[1] == 'X' && parameter[2] == 0)  {

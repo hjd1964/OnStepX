@@ -13,8 +13,22 @@
   #endif
 
   // default to single turn mode
-  #ifndef BISSC_SINGLE
+  #ifndef BISSC_SINGLE_TURN
     #define BISSC_SINGLE_TURN ON
+  #endif
+
+  // allow for inverting the signal state to fix incorrect wiring if needed
+  #ifndef HIGH_SLO
+  #define HIGH_SLO HIGH
+  #endif
+  #ifndef LOW_SLO
+  #define LOW_SLO LOW
+  #endif
+  #ifndef HIGH_MA
+  #define HIGH_MA HIGH
+  #endif
+  #ifndef LOW_MA
+  #define LOW_MA LOW
   #endif
 
   class Bissc : public Encoder {

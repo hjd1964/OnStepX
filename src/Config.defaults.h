@@ -26,6 +26,11 @@
 #define SERIAL_DEBUG_BAUD             9600
 #endif
 
+// identification
+#ifndef CONFIG_NAME
+#define CONFIG_NAME "OnStepX"
+#endif
+
 // serial ports
 #ifndef SERIAL_A_BAUD_DEFAULT
 #define SERIAL_A_BAUD_DEFAULT         9600
@@ -39,8 +44,27 @@
 #ifndef SERIAL_C_BAUD_DEFAULT
 #define SERIAL_C_BAUD_DEFAULT         OFF
 #endif
+#ifndef SERIAL_D_BAUD_DEFAULT
+#define SERIAL_D_BAUD_DEFAULT         OFF
+#endif
+#ifndef SERIAL_E_BAUD_DEFAULT
+#define SERIAL_E_BAUD_DEFAULT         OFF
+#endif
 #ifndef SERIAL_GPS_BAUD
-#define SERIAL_GPS_BAUD               OFF
+#define SERIAL_GPS_BAUD               9600
+#endif
+
+// ESP32 automatically set wifi radio for bluetooth or IP modes 
+#ifdef SERIAL_RADIO
+#if SERIAL_RADIO == BLUETOOTH
+#define SERIAL_BT_MODE SLAVE
+#elif SERIAL_RADIO == WIFI_ACCESS_POINT
+#define SERIAL_IP_MODE WIFI_ACCESS_POINT
+#define WEB_SERVER ON
+#elif SERIAL_RADIO == WIFI_STATION
+#define SERIAL_IP_MODE WIFI_STATION
+#define WEB_SERVER ON
+#endif
 #endif
 
 // ESP32 virtual serial bluetooth command channel
@@ -48,7 +72,7 @@
 #define SERIAL_BT_MODE                OFF                         // use SLAVE to enable the interface (ESP32 only)
 #endif
 #ifndef SERIAL_BT_NAME
-#define SERIAL_BT_NAME                "OnStep"                    // Bluetooth name of command channel
+#define SERIAL_BT_NAME                "OnStepX"                   // Bluetooth name of command channel
 #endif
 
 // ESP32 virtual serial IP command channels
@@ -148,6 +172,12 @@
 #endif
 
 // gpio device
+// DS2413: for 2-ch or 4-ch using 1-wire gpio's (one or two devices.)
+// SWS: for 8-ch Serial gpio (normally 4 unused encoder pins.)
+// MCP23008: for 8-ch I2C gpio.
+// MCP23017, X9555, or X8575: for 16-ch I2C gpio.
+// SSR74HC595: for up to 32-ch gpio (serial shift register, output only.)
+// Works w/most OnStep features, channels assigned in order pin# 512 and up.
 #ifndef GPIO_DEVICE
 #define GPIO_DEVICE                   OFF
 #endif
@@ -196,6 +226,9 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
+#ifdef AXIS1_SYNC_THRESHOLD_DEGREES                               // maximum distance from absolute encoder pos in degrees for syncs
+#define AXIS1_SYNC_THRESHOLD lround(AXIS1_SYNC_THRESHOLD_DEGREES*AXIS1_STEPS_PER_DEGREE)
+#endif
 #ifndef AXIS1_SYNC_THRESHOLD
 #define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in counts (required for absolute encoders) or OFF
 #endif
@@ -220,8 +253,10 @@
 #ifndef AXIS1_SENSE_LIMIT_INIT
 #define AXIS1_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
+
 #if AXIS1_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS1_STEP_DIR_PRESENT
+
   #if AXIS1_DRIVER_MODEL >= TMC_DRIVER_FIRST
     #if AXIS1_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
       #define AXIS1_STEP_DIR_TMC_UART
@@ -266,15 +301,10 @@
   #define AXIS1_DRIVER_STATUS           OFF                       // driver status reporting (ON for TMC SPI or HIGH/LOW for fault pin)
   #endif
 #endif
+
 #if AXIS1_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS1_SERVO_PRESENT
-  #if AXIS1_DRIVER_MODEL == SERVO_TMC5160
-    #define AXIS1_SERVO_TMC5160
-  #elif AXIS1_DRIVER_MODEL == SERVO_TMC2209
-    #define AXIS1_SERVO_TMC2209
-  #else
-    #define AXIS1_SERVO_DC
-  #endif
+
   #ifndef AXIS1_SERVO_PH1_STATE
   #define AXIS1_SERVO_PH1_STATE         LOW                       // default (inactive) motor driver state, IN1 (SERVO_EE) or PHASE (SERVO_PE) pin
   #endif
@@ -282,17 +312,27 @@
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
-  #ifndef AXIS1_SERVO_MAX_VELOCITY
-  #define AXIS1_SERVO_MAX_VELOCITY      100                       // max velocity, in % for DC, in steps/s for SERVO_TMC2209
+  #ifdef AXIS1_SERVO_VELOCITY_MAX_DPS
+  #define AXIS1_SERVO_VELOCITY_MAX      lround(AXIS1_SERVO_VELOCITY_MAX_DPS*AXIS1_MOTOR_STEPS_PER_DEGREE)
+  #endif
+  #ifndef AXIS1_SERVO_VELOCITY_MAX
+  #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC motors, in steps/s for stepper motors
   #endif
   #ifndef AXIS1_SERVO_VELOCITY_FACTOR
   #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
+  #ifndef AXIS1_SERVO_VELOCITY_PWMTHRS                            // velocity (in steps per second) to switch from stealthChop to
+  #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // spreadCycle mode, should happen just above the 2x sidereal rate
+  #endif                                                          // for TMC2209 or TMC5160 only
   #ifndef AXIS1_SERVO_ACCELERATION
-  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s for DC, in steps/s/s for SERVO_TMC2209
+  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s
   #endif
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
+  #endif
+
+  #ifndef AXIS1_SERVO_FLTR
+  #define AXIS1_SERVO_FLTR              OFF                       // servo encoder filter: OFF
   #endif
 
   #ifndef AXIS1_PID_P
@@ -364,6 +404,9 @@
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
+#ifdef AXIS2_SYNC_THRESHOLD_DEGREES
+#define AXIS2_SYNC_THRESHOLD lround(AXIS2_SYNC_THRESHOLD_DEGREES*AXIS2_STEPS_PER_DEGREE)
+#endif
 #ifndef AXIS2_SYNC_THRESHOLD
 #define AXIS2_SYNC_THRESHOLD          OFF
 #endif
@@ -434,15 +477,10 @@
   #define AXIS2_DRIVER_STATUS           OFF
   #endif
 #endif
+
 #if AXIS2_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS2_SERVO_PRESENT
-  #if AXIS2_DRIVER_MODEL == SERVO_TMC5160
-    #define AXIS2_SERVO_TMC5160
-  #elif AXIS2_DRIVER_MODEL == SERVO_TMC2209
-    #define AXIS2_SERVO_TMC2209
-  #else
-    #define AXIS2_SERVO_DC
-  #endif
+
   #ifndef AXIS2_SERVO_PH1_STATE
   #define AXIS2_SERVO_PH1_STATE         LOW
   #endif
@@ -450,17 +488,27 @@
   #define AXIS2_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS2_SERVO_MAX_VELOCITY
-  #define AXIS2_SERVO_MAX_VELOCITY      100
+  #ifdef AXIS2_SERVO_VELOCITY_MAX_DPS
+  #define AXIS2_SERVO_VELOCITY_MAX      lround(AXIS2_SERVO_VELOCITY_MAX_DPS*AXIS2_MOTOR_STEPS_PER_DEGREE)
+  #endif
+  #ifndef AXIS2_SERVO_VELOCITY_MAX
+  #define AXIS2_SERVO_VELOCITY_MAX      100
   #endif
   #ifndef AXIS2_SERVO_VELOCITY_FACTOR
   #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
+  #endif
+  #ifndef AXIS2_SERVO_VELOCITY_PWMTHRS
+  #define AXIS2_SERVO_VELOCITY_PWMTHRS  OFF
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
   #define AXIS2_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS2_SERVO_FLTR
+  #define AXIS2_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS2_PID_P
@@ -536,6 +584,9 @@
 #define AXIS2_TANGENT_ARM             ON
 #define AXIS2_TANGENT_ARM_CORRECTION  ON
 #endif
+#if MOUNT_TYPE == ALTALT
+#define MOUNT_SUBTYPE                 ALTALT
+#endif
 #if MOUNT_TYPE == ALTAZM
 #define MOUNT_SUBTYPE                 ALTAZM
 #endif
@@ -543,8 +594,12 @@
 #define MOUNT_SUBTYPE                 ALTAZM
 #define AXIS1_WRAP                    ON
 #endif
+
 #ifndef MOUNT_SUBTYPE
 #define MOUNT_SUBTYPE                 OFF
+#endif
+#ifndef MOUNT_ALTERNATE_ORIENTATION
+#define MOUNT_ALTERNATE_ORIENTATION   OFF                         // use ON or OFF, for FORK and ALTAZM mounts only
 #endif
 #ifndef MOUNT_COORDS
 #define MOUNT_COORDS                  TOPOCENTRIC                 // mount coordinate system
@@ -558,26 +613,34 @@
 #ifndef MOUNT_AUTO_HOME_DEFAULT
 #define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif
-#ifndef AXIS1_TARGET_TOLERANCE
-#define AXIS1_TARGET_TOLERANCE        0.0F                        // in arc-seconds
+#ifndef MOUNT_HORIZON_AVOIDANCE
+#define MOUNT_HORIZON_AVOIDANCE       ON                          // ON allows eq mode horizon avoidance
 #endif
+
+#ifndef AXIS1_TARGET_TOLERANCE
+#define AXIS1_TARGET_TOLERANCE        0.0F                        // distance in arc-seconds when goto is at destination
+#endif
+#ifndef AXIS1_HOME_TOLERANCE                                      // distance in arc-seconds when at home
+#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE)
+#endif
+#ifndef AXIS1_SECTOR_GEAR
+#define AXIS1_SECTOR_GEAR             OFF                         // special case of a Sector Gear RA with limited travel
+#endif
+#ifndef AXIS1_WRAP
+#define AXIS1_WRAP                    OFF                         // allow unlimited motion about an Azimuth axis
+#endif
+
 #ifndef AXIS2_TARGET_TOLERANCE
 #define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
-#ifndef AXIS1_HOME_TOLERANCE
-#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE) // in arc-seconds
-#endif
-#ifndef AXIS2_HOME_TOLERANCE
-#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE) // in arc-seconds
-#endif
-#ifndef AXIS1_WRAP
-#define AXIS1_WRAP                    OFF
+#ifndef AXIS2_HOME_TOLERANCE                                      // in arc-seconds
+#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE)
 #endif
 #ifndef AXIS2_TANGENT_ARM
-#define AXIS2_TANGENT_ARM             OFF
+#define AXIS2_TANGENT_ARM             OFF                         // special case of a Tangent Arm Dec with limited travel
 #endif
 #ifndef AXIS2_TANGENT_ARM_CORRECTION
-#define AXIS2_TANGENT_ARM_CORRECTION  OFF
+#define AXIS2_TANGENT_ARM_CORRECTION  OFF                         // apply formula below to correct for Tangent Arm geometry
 #endif
 #ifndef TANGENT_ARM_INSTRUMENT_TO_MOUNT
 #define TANGENT_ARM_INSTRUMENT_TO_MOUNT(a) (atan(a))              // returns angle in radians
@@ -597,7 +660,7 @@
 #define STATUS_MOUNT_LED              OFF
 #endif
 #ifndef MOUNT_LED_ON_STATE
-#define MOUNT_LED_ON_STATE     LOW
+#define MOUNT_LED_ON_STATE            LOW
 #endif
 #ifndef STATUS_BUZZER
 #define STATUS_BUZZER                 OFF
@@ -625,10 +688,16 @@
 
 // time and location
 #ifndef TIME_LOCATION_SOURCE
-#define TIME_LOCATION_SOURCE          OFF
+#define TIME_LOCATION_SOURCE          OFF                        // specify device to get date/time and optionally location
+#endif
+#ifndef TIME_LOCATION_SOURCE_FALLBACK                            // alternate TLS, must be differnet than above and not GPS or NTP
+#define TIME_LOCATION_SOURCE_FALLBACK OFF
 #endif
 #ifndef TIME_LOCATION_PPS_SENSE
 #define TIME_LOCATION_PPS_SENSE       OFF
+#endif
+#ifndef TIME_LOCATION_PPS_SYNC
+#define TIME_LOCATION_PPS_SYNC        OFF                         // adjust timer rates to keep time in sync with PPS
 #endif
 
 // limits
@@ -818,7 +887,7 @@
 #define AXIS3_SLEW_RATE_BASE_DESIRED  3.0                         // in degrees/sec
 #endif
 #ifndef AXIS3_ACCELERATION_TIME
-#define AXIS3_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
+#define AXIS3_ACCELERATION_TIME       1.0                         // in seconds, to selected rate
 #endif
 #ifndef AXIS3_RAPID_STOP_TIME
 #define AXIS3_RAPID_STOP_TIME         1.0                         // in seconds, to stop
@@ -899,13 +968,10 @@
   #define AXIS3_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS3_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS3_SERVO_PRESENT
-  #if AXIS3_DRIVER_MODEL == SERVO_TMC2209
-    #define AXIS3_SERVO_TMC2209
-  #else
-    #define AXIS3_SERVO_DC
-  #endif
+
   #ifndef AXIS3_SERVO_PH1_STATE
   #define AXIS3_SERVO_PH1_STATE         LOW
   #endif
@@ -913,14 +979,24 @@
   #define AXIS3_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS3_SERVO_MAX_VELOCITY
-  #define AXIS3_SERVO_MAX_VELOCITY      100
+  #ifdef AXIS3_SERVO_VELOCITY_MAX_DPS
+  #define AXIS3_SERVO_VELOCITY_MAX      lround(AXIS3_SERVO_VELOCITY_MAX_DPS*AXIS3_MOTOR_STEPS_PER_DEGREE)
+  #endif
+  #ifndef AXIS3_SERVO_VELOCITY_MAX
+  #define AXIS3_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS3_SERVO_VELOCITY_FACTOR
+  #define AXIS3_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS3_SERVO_ACCELERATION
   #define AXIS3_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS3_SERVO_FEEDBACK
   #define AXIS3_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS3_SERVO_FLTR
+  #define AXIS3_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS3_PID_P
@@ -1005,7 +1081,7 @@
 #define AXIS4_SLEW_RATE_BASE_DESIRED  500                         // in microns/sec
 #endif
 #ifndef AXIS4_ACCELERATION_TIME
-#define AXIS4_ACCELERATION_TIME       2.0                         // in seconds, to selected rate
+#define AXIS4_ACCELERATION_TIME       1.0                         // in seconds, to selected rate
 #endif
 #ifndef AXIS4_RAPID_STOP_TIME
 #define AXIS4_RAPID_STOP_TIME         1.0                         // in seconds, to stop
@@ -1021,6 +1097,9 @@
 #endif
 #ifndef AXIS4_SYNC_THRESHOLD
 #define AXIS4_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS4_HOME_DEFAULT
+#define AXIS4_HOME_DEFAULT            MIDDLE                      // use MINIMUM (zero), MIDDLE (half travel), MAXIMUM (full travel), or a position in microns
 #endif
 #ifndef AXIS4_SENSE_HOME
 #define AXIS4_SENSE_HOME              OFF
@@ -1086,13 +1165,10 @@
   #define AXIS4_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS4_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS4_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS4_SERVO_PRESENT
-  #if AXIS4_DRIVER_MODEL == SERVO_TMC2209
-    #define AXIS4_SERVO_TMC2209
-  #else
-    #define AXIS4_SERVO_DC
-  #endif
+
   #ifndef AXIS4_SERVO_PH1_STATE
   #define AXIS4_SERVO_PH1_STATE         LOW
   #endif
@@ -1100,14 +1176,21 @@
   #define AXIS4_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS4_SERVO_MAX_VELOCITY
-  #define AXIS4_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS4_SERVO_VELOCITY_MAX
+  #define AXIS4_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS4_SERVO_VELOCITY_FACTOR
+  #define AXIS4_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS4_SERVO_ACCELERATION
   #define AXIS4_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS4_SERVO_FEEDBACK
   #define AXIS4_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS4_SERVO_FLTR
+  #define AXIS4_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS4_PID_P
@@ -1169,7 +1252,7 @@
 #define AXIS5_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS5_ACCELERATION_TIME
-#define AXIS5_ACCELERATION_TIME       2.0
+#define AXIS5_ACCELERATION_TIME       1.0
 #endif
 #ifndef AXIS5_RAPID_STOP_TIME
 #define AXIS5_RAPID_STOP_TIME         1.0
@@ -1185,6 +1268,9 @@
 #endif
 #ifndef AXIS5_SYNC_THRESHOLD
 #define AXIS5_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS5_HOME_DEFAULT
+#define AXIS5_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS5_SENSE_HOME
 #define AXIS5_SENSE_HOME              OFF
@@ -1250,11 +1336,10 @@
   #define AXIS5_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS5_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS5_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS5_SERVO_PRESENT
-  #if AXIS5_DRIVER_MODEL == SERVO_PE || AXIS5_DRIVER_MODEL == SERVO_EE
-    #define AXIS5_SERVO_DC
-  #endif
+
   #ifndef AXIS5_SERVO_PH1_STATE
   #define AXIS5_SERVO_PH1_STATE         LOW
   #endif
@@ -1262,14 +1347,21 @@
   #define AXIS5_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS5_SERVO_MAX_VELOCITY
-  #define AXIS5_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS5_SERVO_VELOCITY_MAX
+  #define AXIS5_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS5_SERVO_VELOCITY_FACTOR
+  #define AXIS5_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS5_SERVO_ACCELERATION
   #define AXIS5_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS5_SERVO_FLTR
+  #define AXIS5_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS5_PID_P
@@ -1331,7 +1423,7 @@
 #define AXIS6_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS6_ACCELERATION_TIME
-#define AXIS6_ACCELERATION_TIME       2.0
+#define AXIS6_ACCELERATION_TIME       1.0
 #endif
 #ifndef AXIS6_RAPID_STOP_TIME
 #define AXIS6_RAPID_STOP_TIME         1.0
@@ -1347,6 +1439,9 @@
 #endif
 #ifndef AXIS6_SYNC_THRESHOLD
 #define AXIS6_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS6_HOME_DEFAULT
+#define AXIS6_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS6_SENSE_HOME
 #define AXIS6_SENSE_HOME              OFF
@@ -1412,11 +1507,10 @@
   #define AXIS6_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS6_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS6_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS6_SERVO_PRESENT
-  #if AXIS6_DRIVER_MODEL == SERVO_PE || AXIS6_DRIVER_MODEL == SERVO_EE
-    #define AXIS6_SERVO_DC
-  #endif
+
   #ifndef AXIS6_SERVO_PH1_STATE
   #define AXIS6_SERVO_PH1_STATE         LOW
   #endif
@@ -1424,14 +1518,21 @@
   #define AXIS6_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS6_SERVO_MAX_VELOCITY
-  #define AXIS6_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS6_SERVO_VELOCITY_MAX
+  #define AXIS6_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS6_SERVO_VELOCITY_FACTOR
+  #define AXIS6_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS6_SERVO_ACCELERATION
   #define AXIS6_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS6_SERVO_FEEDBACK
   #define AXIS6_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS6_SERVO_FLTR
+  #define AXIS6_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS6_PID_P
@@ -1493,7 +1594,7 @@
 #define AXIS7_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS7_ACCELERATION_TIME
-#define AXIS7_ACCELERATION_TIME       2.0
+#define AXIS7_ACCELERATION_TIME       1.0
 #endif
 #ifndef AXIS7_RAPID_STOP_TIME
 #define AXIS7_RAPID_STOP_TIME         1.0
@@ -1509,6 +1610,9 @@
 #endif
 #ifndef AXIS7_SYNC_THRESHOLD
 #define AXIS7_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS7_HOME_DEFAULT
+#define AXIS7_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS7_SENSE_HOME
 #define AXIS7_SENSE_HOME              OFF
@@ -1574,11 +1678,10 @@
   #define AXIS7_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS7_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS7_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS7_SERVO_PRESENT
-  #if AXIS7_DRIVER_MODEL == SERVO_PE || AXIS7_DRIVER_MODEL == SERVO_EE
-    #define AXIS7_SERVO_DC
-  #endif
+
   #ifndef AXIS7_SERVO_PH1_STATE
   #define AXIS7_SERVO_PH1_STATE         LOW
   #endif
@@ -1586,14 +1689,21 @@
   #define AXIS7_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS7_SERVO_MAX_VELOCITY
-  #define AXIS7_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS7_SERVO_VELOCITY_MAX
+  #define AXIS7_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS7_SERVO_VELOCITY_FACTOR
+  #define AXIS7_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS7_SERVO_ACCELERATION
   #define AXIS7_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS7_SERVO_FLTR
+  #define AXIS7_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS7_PID_P
@@ -1655,7 +1765,7 @@
 #define AXIS8_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS8_ACCELERATION_TIME
-#define AXIS8_ACCELERATION_TIME       2.0
+#define AXIS8_ACCELERATION_TIME       1.0
 #endif
 #ifndef AXIS8_RAPID_STOP_TIME
 #define AXIS8_RAPID_STOP_TIME         1.0
@@ -1671,6 +1781,9 @@
 #endif
 #ifndef AXIS8_SYNC_THRESHOLD
 #define AXIS8_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS8_HOME_DEFAULT
+#define AXIS8_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS8_SENSE_HOME
 #define AXIS8_SENSE_HOME              OFF
@@ -1736,11 +1849,10 @@
   #define AXIS8_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS8_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS8_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS8_SERVO_PRESENT
-  #if AXIS8_DRIVER_MODEL == SERVO_PE || AXIS8_DRIVER_MODEL == SERVO_EE
-    #define AXIS8_SERVO_DC
-  #endif
+
   #ifndef AXIS8_SERVO_PH1_STATE
   #define AXIS8_SERVO_PH1_STATE         LOW
   #endif
@@ -1748,14 +1860,21 @@
   #define AXIS8_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS8_SERVO_MAX_VELOCITY
-  #define AXIS8_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS8_SERVO_VELOCITY_MAX
+  #define AXIS8_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS8_SERVO_VELOCITY_FACTOR
+  #define AXIS8_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS8_SERVO_ACCELERATION
   #define AXIS8_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS8_SERVO_FEEDBACK
   #define AXIS8_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS8_SERVO_FLTR
+  #define AXIS8_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS8_PID_P
@@ -1817,7 +1936,7 @@
 #define AXIS9_SLEW_RATE_BASE_DESIRED  500
 #endif
 #ifndef AXIS9_ACCELERATION_TIME
-#define AXIS9_ACCELERATION_TIME       2.0
+#define AXIS9_ACCELERATION_TIME       1.0
 #endif
 #ifndef AXIS9_RAPID_STOP_TIME
 #define AXIS9_RAPID_STOP_TIME         1.0
@@ -1833,6 +1952,9 @@
 #endif
 #ifndef AXIS9_SYNC_THRESHOLD
 #define AXIS9_SYNC_THRESHOLD          OFF
+#endif
+#ifndef AXIS9_HOME_DEFAULT
+#define AXIS9_HOME_DEFAULT            MIDDLE
 #endif
 #ifndef AXIS9_SENSE_HOME
 #define AXIS9_SENSE_HOME              OFF
@@ -1898,11 +2020,10 @@
   #define AXIS9_DRIVER_STATUS           OFF
   #endif
 #endif
-#if AXIS9_DRIVER_MODEL >= SERVO_DRIVER_FIRST
+
+#if AXIS9_DRIVER_MODEL >= SERVO_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= SERVO_DRIVER_LAST
   #define AXIS9_SERVO_PRESENT
-  #if AXIS9_DRIVER_MODEL == SERVO_PE || AXIS9_DRIVER_MODEL == SERVO_EE
-    #define AXIS9_SERVO_DC
-  #endif
+
   #ifndef AXIS9_SERVO_PH1_STATE
   #define AXIS9_SERVO_PH1_STATE         LOW
   #endif
@@ -1910,14 +2031,21 @@
   #define AXIS9_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifndef AXIS9_SERVO_MAX_VELOCITY
-  #define AXIS9_SERVO_MAX_VELOCITY      100
+  #ifndef AXIS9_SERVO_VELOCITY_MAX
+  #define AXIS9_SERVO_VELOCITY_MAX      100
+  #endif
+  #ifndef AXIS9_SERVO_VELOCITY_FACTOR
+  #define AXIS9_SERVO_VELOCITY_FACTOR   frequency*0
   #endif
   #ifndef AXIS9_SERVO_ACCELERATION
   #define AXIS9_SERVO_ACCELERATION      20
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          FB_PID
+  #endif
+
+  #ifndef AXIS9_SERVO_FLTR
+  #define AXIS9_SERVO_FLTR              OFF
   #endif
 
   #ifndef AXIS9_PID_P
@@ -1975,26 +2103,57 @@
   #define STEP_DIR_MOTOR_PRESENT
 #endif
 
-#if defined(AXIS1_SERVO_PRESENT) || defined(AXIS2_SERVO_PRESENT) || defined(AXIS3_SERVO_PRESENT) || \
-    defined(AXIS4_SERVO_PRESENT) || defined(AXIS5_SERVO_PRESENT) || defined(AXIS6_SERVO_PRESENT) || \
-    defined(AXIS7_SERVO_PRESENT) || defined(AXIS8_SERVO_PRESENT) || defined(AXIS9_SERVO_PRESENT)
-  #define SERVO_MOTOR_PRESENT
-#endif
-
-#if defined(AXIS1_SERVO_DC) || defined(AXIS2_SERVO_DC) || defined(AXIS3_SERVO_DC) || \
-    defined(AXIS4_SERVO_DC) || defined(AXIS5_SERVO_DC) || defined(AXIS6_SERVO_DC) || \
-    defined(AXIS7_SERVO_DC) || defined(AXIS8_SERVO_DC) || defined(AXIS9_SERVO_DC)
+// flag presence of servo motors
+#if AXIS1_DRIVER_MODEL == SERVO_PE || AXIS1_DRIVER_MODEL == SERVO_EE || \
+    AXIS2_DRIVER_MODEL == SERVO_PE || AXIS2_DRIVER_MODEL == SERVO_EE || \
+    AXIS3_DRIVER_MODEL == SERVO_PE || AXIS3_DRIVER_MODEL == SERVO_EE || \
+    AXIS4_DRIVER_MODEL == SERVO_PE || AXIS4_DRIVER_MODEL == SERVO_EE || \
+    AXIS5_DRIVER_MODEL == SERVO_PE || AXIS5_DRIVER_MODEL == SERVO_EE || \
+    AXIS6_DRIVER_MODEL == SERVO_PE || AXIS6_DRIVER_MODEL == SERVO_EE || \
+    AXIS7_DRIVER_MODEL == SERVO_PE || AXIS7_DRIVER_MODEL == SERVO_EE || \
+    AXIS8_DRIVER_MODEL == SERVO_PE || AXIS8_DRIVER_MODEL == SERVO_EE || \
+    AXIS9_DRIVER_MODEL == SERVO_PE || AXIS9_DRIVER_MODEL == SERVO_EE
   #define SERVO_DC_PRESENT
 #endif
 
-#if defined(AXIS1_SERVO_TMC2209) || defined(AXIS2_SERVO_TMC2209) || defined(AXIS3_SERVO_TMC2209) || \
-    defined(AXIS4_SERVO_TMC2209) || defined(AXIS5_SERVO_TMC2209) || defined(AXIS6_SERVO_TMC2209) || \
-    defined(AXIS7_SERVO_TMC2209) || defined(AXIS8_SERVO_TMC2209) || defined(AXIS9_SERVO_TMC2209)
+#if AXIS1_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS1_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS2_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS2_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS3_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS3_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS4_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS4_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS5_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS5_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS6_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS6_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS7_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS7_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS8_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS8_DRIVER_MODEL == SERVO_TMC5160_DC || \
+    AXIS9_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS9_DRIVER_MODEL == SERVO_TMC5160_DC
+  #define SERVO_DC_TMC_SPI_PRESENT
+#endif
+
+#if AXIS1_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS2_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS3_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS4_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS5_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS6_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS7_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS8_DRIVER_MODEL == SERVO_TMC2209 || \
+    AXIS9_DRIVER_MODEL == SERVO_TMC2209
   #define SERVO_TMC2209_PRESENT
 #endif
 
-#if defined(AXIS1_SERVO_TMC5160) || defined(AXIS2_SERVO_TMC5160)
+#if AXIS1_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS2_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS3_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS4_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS5_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS6_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS7_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS8_DRIVER_MODEL == SERVO_TMC5160 || \
+    AXIS9_DRIVER_MODEL == SERVO_TMC5160
   #define SERVO_TMC5160_PRESENT
+#endif
+
+#if defined(SERVO_DC_PRESENT) || defined (SERVO_DC_TMC_SPI_PRESENT) || defined(SERVO_TMC2209_PRESENT) || defined (SERVO_TMC5160_PRESENT)
+  #define SERVO_MOTOR_PRESENT
 #endif
 
 #if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)
@@ -2050,6 +2209,9 @@
 #ifndef FEATURE1_VALUE_DEFAULT
 #define FEATURE1_VALUE_DEFAULT        OFF                         // OUTPUT control pin default value/state ON, OFF, 0..255
 #endif
+#ifndef FEATURE1_VALUE_MEMORY
+#define FEATURE1_VALUE_MEMORY         OFF                         // ON remembers feature value across power cycles
+#endif
 #ifndef FEATURE1_ON_STATE
 #define FEATURE1_ON_STATE             HIGH                        // OUTPUT control pin ON (active) state
 #endif
@@ -2068,6 +2230,9 @@
 #endif
 #ifndef FEATURE2_VALUE_DEFAULT
 #define FEATURE2_VALUE_DEFAULT        OFF
+#endif
+#ifndef FEATURE2_VALUE_MEMORY
+#define FEATURE2_VALUE_MEMORY         OFF
 #endif
 #ifndef FEATURE2_ON_STATE
 #define FEATURE2_ON_STATE             HIGH
@@ -2088,6 +2253,9 @@
 #ifndef FEATURE3_VALUE_DEFAULT
 #define FEATURE3_VALUE_DEFAULT        OFF
 #endif
+#ifndef FEATURE3_VALUE_MEMORY
+#define FEATURE3_VALUE_MEMORY         OFF
+#endif
 #ifndef FEATURE3_ON_STATE
 #define FEATURE3_ON_STATE             HIGH
 #endif
@@ -2106,6 +2274,9 @@
 #endif
 #ifndef FEATURE4_VALUE_DEFAULT
 #define FEATURE4_VALUE_DEFAULT        OFF
+#endif
+#ifndef FEATURE4_VALUE_MEMORY
+#define FEATURE4_VALUE_MEMORY         OFF
 #endif
 #ifndef FEATURE4_ON_STATE
 #define FEATURE4_ON_STATE             HIGH
@@ -2126,6 +2297,9 @@
 #ifndef FEATURE5_VALUE_DEFAULT
 #define FEATURE5_VALUE_DEFAULT        OFF
 #endif
+#ifndef FEATURE5_VALUE_MEMORY
+#define FEATURE5_VALUE_MEMORY         OFF
+#endif
 #ifndef FEATURE5_ON_STATE
 #define FEATURE5_ON_STATE             HIGH
 #endif
@@ -2144,6 +2318,9 @@
 #endif
 #ifndef FEATURE6_VALUE_DEFAULT
 #define FEATURE6_VALUE_DEFAULT        OFF
+#endif
+#ifndef FEATURE6_VALUE_MEMORY
+#define FEATURE6_VALUE_MEMORY         OFF
 #endif
 #ifndef FEATURE6_ON_STATE
 #define FEATURE6_ON_STATE             HIGH
@@ -2164,6 +2341,9 @@
 #ifndef FEATURE7_VALUE_DEFAULT
 #define FEATURE7_VALUE_DEFAULT        OFF
 #endif
+#ifndef FEATURE7_VALUE_MEMORY
+#define FEATURE7_VALUE_MEMORY         OFF
+#endif
 #ifndef FEATURE7_ON_STATE
 #define FEATURE7_ON_STATE             HIGH
 #endif
@@ -2182,6 +2362,9 @@
 #endif
 #ifndef FEATURE8_VALUE_DEFAULT
 #define FEATURE8_VALUE_DEFAULT        OFF
+#endif
+#ifndef FEATURE8_VALUE_MEMORY
+#define FEATURE8_VALUE_MEMORY         OFF
 #endif
 #ifndef FEATURE8_ON_STATE
 #define FEATURE8_ON_STATE             HIGH

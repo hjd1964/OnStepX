@@ -47,6 +47,8 @@ class Status {
 
     bool getLastErrorMessage(char message[]);
 
+    char configName[40] = "";
+
     bool atHome = false;
     bool homing = false;
     bool hasHomeSense = false;

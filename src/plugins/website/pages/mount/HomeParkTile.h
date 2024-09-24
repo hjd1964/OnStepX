@@ -31,6 +31,12 @@ const char html_homeAuto[] PROGMEM =
 
 // Home offset
 const char html_homeOffsetAxis1[] PROGMEM =
-  "<input style='width:6em;' value='%d' type='number' name='hc1' min='-162000' max='162000'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS1 "<br />\n";
+  "<input style='width:6em;' value='%ld' type='number' name='hc1' min='-" STR(HOME_OFFSET_RANGE_AXIS1) "' max='" STR(HOME_OFFSET_RANGE_AXIS1) "'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS1 "<br />\n";
 const char html_homeOffsetAxis2[] PROGMEM =
-  "<input style='width:6em;' value='%d' type='number' name='hc2' min='-162000' max='162000'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS2 "<br /><br />\n";
+  "<input style='width:6em;' value='%ld' type='number' name='hc2' min='-" STR(HOME_OFFSET_RANGE_AXIS2) "' max='" STR(HOME_OFFSET_RANGE_AXIS2) "'>&nbsp;" L_HOME_OFFSET_RANGE_AXIS2 "<br /><br />\n";
+
+#ifdef HOME_SWITCH_DIRECTION_CONTROL
+  const char html_homeReverse[] PROGMEM =
+    "<button id='hrev1' onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('hr','1')\" type='button'>Axis1 Reverse</button>"
+    "<button id='hrev2' onpointerdown=\"if (confirm('" L_ARE_YOU_SURE "?')) s('hr','2')\" type='button'>Axis2 Reverse</button><br />";
+#endif

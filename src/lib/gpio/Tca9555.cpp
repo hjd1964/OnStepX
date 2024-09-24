@@ -24,7 +24,9 @@ bool Tca9555::init() {
     found = true;
     for (int i = 0; i < 16; i++) { tca.pinMode(i, INPUT); }
   } else { found = false; DLF("WRN: Gpio.init(), TCA9555 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_TCA9555_I2C_ADDRESS, HEX); DLF(") not found"); }
-  HAL_Wire.setClock(HAL_WIRE_CLOCK);
+  #ifdef HAL_WIRE_CLOCK
+    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+  #endif
 
   return found;
 }

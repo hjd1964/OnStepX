@@ -12,10 +12,14 @@
 #if DISPLAY_SERVO_MONITOR == ON
   #include "ServoTile.h"
 #endif
+#if DISPLAY_SERVO_CALIBRATION == ON
+  #include "ServoCalibrateTile.h"
+#endif
 
 #if DRIVE_CONFIGURATION == ON
   const char html_configAxesNotes[] PROGMEM =
   "<br />Notes:<ul>"
+  "<li>" L_ADV_SET_FOOTER_MSG0 "</li>"
   "<li>" L_ADV_SET_FOOTER_MSG1 "</li>"
   "<li>" L_ADV_SET_FOOTER_MSG2 "</li>";
 

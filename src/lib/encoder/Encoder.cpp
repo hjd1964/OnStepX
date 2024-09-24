@@ -10,3 +10,4 @@ void Encoder::init() {
 void Encoder::setOrigin(uint32_t count) {
   origin = count;
 }
+

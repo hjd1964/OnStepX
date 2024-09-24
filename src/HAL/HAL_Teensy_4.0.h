@@ -7,8 +7,8 @@
 // This platform has digitalReadFast, digitalWriteFast, etc.
 #define HAL_HAS_DIGITAL_FAST
 
-#define HAL_FRACTIONAL_SEC 1000.0F
-// Base rate for critical task timing
+// Base rate for critical task timing (0.0019s = 0.03", 0.2 sec/day)
+#define HAL_FRACTIONAL_SEC 526.3157895F
 
 // Analog read and write
 #ifndef ANALOG_READ_RANGE
@@ -32,7 +32,9 @@
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
-#define HAL_Wire Wire
+#ifndef HAL_Wire
+  #define HAL_Wire Wire
+#endif
 #ifndef HAL_WIRE_CLOCK
   #define HAL_WIRE_CLOCK 100000
 #endif

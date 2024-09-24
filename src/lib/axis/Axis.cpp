@@ -56,6 +56,8 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
 // sets up the driver step/dir/enable pins and any associated driver mode control
 bool Axis::init(Motor *motor) {
   this->motor = motor;
+  motor->getDefaultParameters(&settings.param1, &settings.param2, &settings.param3, &settings.param4, &settings.param5, &settings.param6);
+  AxisStoredSettings defaultSettings = settings;
 
   // check for reverting axis settings in NV
   if (!nv.hasValidKey()) {
@@ -73,7 +75,6 @@ bool Axis::init(Motor *motor) {
   uint16_t nvAxisSettingsBase = NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize;
   if (bitRead(axesToRevert, axisNumber) || nv.isNull(nvAxisSettingsBase, sizeof(AxisStoredSettings))) {
     V(axisPrefix); VLF("reverting settings to Config.h defaults");
-    motor->getDefaultParameters(&settings.param1, &settings.param2, &settings.param3, &settings.param4, &settings.param5, &settings.param6);
     nv.updateBytes(nvAxisSettingsBase, &settings, sizeof(AxisStoredSettings));
   }
   bitClear(axesToRevert, axisNumber);
@@ -82,8 +83,13 @@ bool Axis::init(Motor *motor) {
   // read axis settings from NV
   nv.readBytes(nvAxisSettingsBase, &settings, sizeof(AxisStoredSettings));
   if (!validateAxisSettings(axisNumber, settings)) {
-    DLF("ERR: Axis::init(); settings validation failed exiting!");
-    return false;
+    V(axisPrefix); VLF("settings validation failed reverting settings to Config.h defaults");
+    settings = defaultSettings;
+    nv.updateBytes(nvAxisSettingsBase, &settings, sizeof(AxisStoredSettings));
+    if (!validateAxisSettings(axisNumber, settings)) {
+      DLF("ERR: Axis::init(); settings validation still failed exiting!");
+      return false;
+    }
   }
 
   #if DEBUG == VERBOSE

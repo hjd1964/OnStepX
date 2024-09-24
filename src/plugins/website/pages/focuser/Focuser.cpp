@@ -37,6 +37,7 @@ void handleFocuser() {
 
   // show this page
   data.concat(FPSTR(html_body_begin));
+  www.sendContentAndClear(data);
   pageHeader(PAGE_FOCUSER);
   data.concat(FPSTR(html_onstep_page_begin));
 

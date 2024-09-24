@@ -2,7 +2,7 @@
  * Title       OnStepX
  * by          Howard Dutton
  *
- * Copyright (C) 2021-2023 Howard Dutton
+ * Copyright (C) 2021-2024 Howard Dutton
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@
 // Firmware version ----------------------------------------------------------------------------------------------------------------
 #define FirmwareName                "On-Step"
 #define FirmwareVersionMajor        10
-#define FirmwareVersionMinor        20     // minor version 00 to 99
-#define FirmwareVersionPatch        "a"    // for example major.minor patch: 10.03c
+#define FirmwareVersionMinor        24     // minor version 00 to 99
+#define FirmwareVersionPatch        "c"    // for example major.minor patch: 10.03c
 #define FirmwareVersionConfig       6      // internal, for tracking configuration file changes
 
 #include "src/Common.h"

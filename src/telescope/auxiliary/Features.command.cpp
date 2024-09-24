@@ -21,7 +21,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (i < 0 || i > 7)  { *commandError = CE_PARAM_FORM; return true; }
 
       char s[255];
-      if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH) {
+      if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == COVER_SWITCH) {
         sprintf(s, "%d", device[i].value);
         strcat(reply, s);
       } else
@@ -99,7 +99,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       strcat(reply, ",");
 
       int p = device[i].purpose;
-      if (p == MOMENTARY_SWITCH) p = SWITCH;
+      if (p == MOMENTARY_SWITCH || p == COVER_SWITCH) p = SWITCH;
       sprintf(s, "%d", p);
       strcat(reply, s);
 
@@ -123,11 +123,19 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
 
       if (parameter[3] == 'V' && v >= 0 && v <= 255) device[i].value = v;
 
-      if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH) {
+      if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == COVER_SWITCH) {
         if (parameter[3] == 'V') {
           if (v >= 0 && v <= 1) { // value 0..1 for enabled or not
+            #ifdef COVER_SWITCH_SERVO_PRESENT
+            if (device[i].purpose == COVER_SWITCH) {
+              if (v == 0) cover[i].target = COVER_SWITCH_SERVO_OPEN_DEG; else
+              if (v == 1) cover[i].target = COVER_SWITCH_SERVO_CLOSED_DEG;
+            } else
+            #endif
+
             digitalWriteEx(device[i].pin, v == device[i].active);
             if (device[i].purpose == MOMENTARY_SWITCH && device[i].value) momentarySwitchTime[i] = 50;
+
           } else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
       } else

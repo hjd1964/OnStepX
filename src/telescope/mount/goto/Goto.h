@@ -11,7 +11,7 @@
 
 enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
+enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_WAYPOINT_AVOID_OVERHEAD1, GG_WAYPOINT_AVOID_OVERHEAD2, GG_WAYPOINT_AVOID_OVERHEAD3, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
@@ -90,7 +90,7 @@ class Goto {
     inline void homeContinue() { meridianFlipHome.resume = true; }
 
     // returns true if the automatic meridian flip feature is enabled
-    inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto; }
+    inline bool isAutoFlipEnabled() { return settings.meridianFlipAuto && transform.isEquatorial() && transform.meridianFlips; }
 
     // return selected slew rate
     inline float getRadsPerSecond() { return radsPerSecondCurrent; }
@@ -116,7 +116,8 @@ class Goto {
 
     #if GOTO_FEATURE == ON
     // set any additional destinations required for a goto
-    void waypoint(Coordinate *current);
+    void waypointThroughHome(Coordinate *current);
+    void waypointNearOverheadLimit(Coordinate *current);
 
     // start slews with approach correction and parking/homing support
     CommandError startAutoSlew();
@@ -132,17 +133,15 @@ class Goto {
     inline double dist(double a, double b) { if (a > b) return a - b; else return b - a; }
 
     // requested goto/sync destination Native coordinate (eq or hor)
-    Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    Coordinate gotoTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // goto starts from this Mount coordinate (eq or hor)
     Coordinate start;
     // goto next destination Mount coordinate (eq or hor)
     Coordinate destination;
     // goto final destination Mount coordinate (eq or hor)
-    Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
-    // goto final destination Mount Azimuth coordinate correction for coordinate wrap 
-    double azimuthTargetCorrection = 0.0;
+    Coordinate target = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     // last align (goto) target Mount coordinate (eq or hor)
-    Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
+    Coordinate lastAlignTarget = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
     GotoState  stateAbort           = GS_NONE;
     GotoState  stateLast            = GS_NONE;
     uint8_t    taskHandle           = 0;

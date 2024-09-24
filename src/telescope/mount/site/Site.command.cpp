@@ -222,13 +222,17 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     //  :SU[s.s]#
     //            Set the number of seconds (up to +/-0.9) added to UTC to yield UT1 (DUT1)
     //            presently only applied to GPS and NTP UTC time for UT1 conversion
+    //            see: https://datacenter.iers.org/data/latestVersion/bulletinB.txt
     //            Return: 0 failure, 1 success
     if (command[1] == 'U') {
       char *conv_end;
       double dut1 = strtod(parameter, &conv_end);
       if (dut1 >= -0.9 && dut1 <= 0.9) {
         #if TIME_LOCATION_SOURCE != OFF
-          tls.DUT1 = dut1;
+          tls->DUT1 = dut1;
+        #endif
+        #if TIME_LOCATION_SOURCE_FALLBACK != OFF
+          tlsFallback->DUT1 = dut1;
         #endif
       } else *commandError = CE_PARAM_FORM;
     } else

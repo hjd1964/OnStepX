@@ -70,8 +70,17 @@ class Transform {
     void equToHor(Coordinate *coord);
     // converts from Equatorial (h,d) to Horizon (a) altitude coordinate
     void equToAlt(Coordinate *coord);
-    // converts from Equatorial (h,d) to Horizon (a,z) coordinates
+    // converts from Horizon (a,z) to Equatorial (h,d) coordinates
     void horToEqu(Coordinate *coord);
+
+    // converts from AltAlt (aa1,aa2) to Horizon (a,z) coordinates
+    void aaToHor(Coordinate *coord);
+    // converts from Horizon (a,z) to AltAlt (aa1,aa2) coordinates
+    void horToAa(Coordinate *coord);
+    // converts from AltAlt (aa1,aa2) to Equatorial (h,d) coordinates
+    void aaToEqu(Coordinate *coord) { aaToHor(coord); horToEqu(coord); };
+    // converts from equatorial (h,d) to AltAlt (aa1,aa2) coordinates
+    void equToAa(Coordinate *coord) { equToHor(coord); horToAa(coord); };
 
     // refraction at altitude, pressure (millibars), and temperature (celsius)
     // returns amount of refraction at the true altitude
@@ -79,6 +88,9 @@ class Transform {
     // refraction at altitude, pressure (millibars), and temperature (celsius)
     // returns the amount of refraction at the apparent altitude
     double apparentRefrac(double altitude);
+
+    // flag if this mount is equatorial or not
+    bool isEquatorial() { return mountType == GEM || mountType == FORK; };
 
     #if ALIGN_MAX_NUM_STARS > 1  
       GeoAlign align;

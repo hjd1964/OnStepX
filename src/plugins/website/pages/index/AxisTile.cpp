@@ -59,7 +59,7 @@ bool axisTile(int axis, String &data)
 
             dtostrf(a.stepsPerMeasure, 1, 3, temp1);
             stripNum(temp1);
-            sprintf_P(temp, html_configAxisSpd, temp1, 1, 150, 122400L);
+            sprintf_P(temp, html_configAxisSpd, temp1, 1, 150, 360000L);
             data.concat(temp);
             www.sendContentAndClear(data);
 
@@ -69,11 +69,11 @@ bool axisTile(int axis, String &data)
               www.sendContentAndClear(data);
             #endif
 
-            sprintf_P(temp, html_configAxisMin, (int)a.min, 1, -360, -90, "&deg;,");
+            sprintf_P(temp, html_configAxisMin, (int)a.min, 1, -360, 0, "&deg;,");
             data.concat(temp);
             www.sendContentAndClear(data);
 
-            sprintf_P(temp, html_configAxisMax, (int)a.max, 1, 90, 360, "&deg;,");
+            sprintf_P(temp, html_configAxisMax, (int)a.max, 1, 0, 360, "&deg;,");
             data.concat(temp);
             www.sendContentAndClear(data);
 
@@ -99,7 +99,7 @@ bool axisTile(int axis, String &data)
 
             dtostrf(a.stepsPerMeasure, 1, 3, temp1);
             stripNum(temp1);
-            sprintf_P(temp, html_configAxisSpd, temp1, 2, 150, 122400L);
+            sprintf_P(temp, html_configAxisSpd, temp1, 2, 150, 360000L);
             data.concat(temp);
             www.sendContentAndClear(data);
 

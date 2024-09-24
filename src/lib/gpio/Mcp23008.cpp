@@ -24,8 +24,10 @@ bool Mcp23008::init() {
     found = true;
     for (int i = 0; i < 8; i++) { mcp.pinMode(i, INPUT); }
   } else { found = false; DF("WRN: Gpio.init(), MCP23008 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_MCP23008_I2C_ADDRESS, HEX); DLF(") not found"); }
-  HAL_Wire.setClock(HAL_WIRE_CLOCK);
-
+  #ifdef HAL_WIRE_CLOCK
+    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+  #endif
+  
   return found;
 }
 

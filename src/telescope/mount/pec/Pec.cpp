@@ -46,12 +46,12 @@
       if (bufferSize < 61) {
         bufferSize = 0;
         initError.value = true;
-        DLF("ERR: Pec::init(), invalid bufferSize - PEC disabled");
+        DLF("WRN: Pec::init(), invalid bufferSize - PEC disabled");
       } else
       if (bufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
         bufferSize = 0;
         initError.value = true;
-        DLF("ERR: Pec::init(), bufferSize exceeds available NV - PEC disabled");
+        DLF("WRN: Pec::init(), bufferSize exceeds available NV - PEC disabled");
       } else {
         buffer = (int8_t*)malloc(bufferSize * sizeof(*buffer));
         if (buffer == NULL) {

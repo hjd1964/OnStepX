@@ -66,9 +66,7 @@ class Guide {
 
     // returns true if a guide is happening
     inline bool active() {
-      return
-        (guideActionAxis1 == GA_FORWARD || guideActionAxis1 == GA_REVERSE ||
-         guideActionAxis2 == GA_FORWARD || guideActionAxis2 == GA_REVERSE) && !activePulseGuide(); 
+      return (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) && !activePulseGuide(); 
     }
 
     // returns true if any guide is happening on Axis1
