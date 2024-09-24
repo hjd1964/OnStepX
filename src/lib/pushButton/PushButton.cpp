@@ -46,7 +46,11 @@ Button::Button(int pin, int initState, int32_t trigger) {
 void Button::poll() {
   int lastState = state;
   if (isAnalog) {
-    int analogValue = analogRead(pin);
+    #ifdef ESP32
+      int analogValue = round((analogReadMilliVolts(pin)/3300.0F)*(float)ANALOG_READ_RANGE);
+    #else
+      int analogValue = analogRead(pin);
+    #endif
 
     if (DOWN == HIGH) {
       if (analogValue >= threshold + hysteresis) state = HIGH; else state = LOW;

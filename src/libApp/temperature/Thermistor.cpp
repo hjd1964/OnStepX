@@ -44,8 +44,12 @@ void Thermistor::poll() {
     if (device[index] == THERMISTOR2) thermistorType = 1;
 
     if (thermistorType >= 0 && devicePin[index] != OFF) {
-      // get the total resistance
-      int counts = analogRead(devicePin[index]);
+
+      #ifdef ESP32
+        int counts = round((analogReadMilliVolts(devicePin[index])/3300.0F)*(float)ANALOG_READ_RANGE);
+      #else
+        int counts = analogRead(devicePin[index]);
+      #endif
 
       // calculate the device resistance
       float resistance;
