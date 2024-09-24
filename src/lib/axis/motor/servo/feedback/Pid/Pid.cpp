@@ -53,8 +53,7 @@ void Pid::setControlDirection(int8_t state) {
 // select PID param set for slewing
 void Pid::selectTrackingParameters() {
   if (!trackingSelected) {
-    pid->SetMode(QuickPID::Control::manual);
-    pid->SetMode(QuickPID::Control::automatic);
+    pid->Initialize();
     V(axisPrefix); VL("tracking selected");
     trackingSelected = true;
   }
@@ -63,8 +62,7 @@ void Pid::selectTrackingParameters() {
 // select PID param set for slewing
 void Pid::selectSlewingParameters() {
   if (trackingSelected) {
-    pid->SetMode(QuickPID::Control::manual);
-    pid->SetMode(QuickPID::Control::automatic);
+    pid->Initialize();
     V(axisPrefix); VL("slewing selected");
     trackingSelected = false;
     parameterSelect = 100;
