@@ -65,7 +65,7 @@ void Pid::selectSlewingParameters() {
     pid->Initialize();
     V(axisPrefix); VL("slewing selected");
     trackingSelected = false;
-    parameterSelect = 100;
+    PidParameterTransitionSteps = 100;
     p = param4;
     i = param5;
     d = param6;

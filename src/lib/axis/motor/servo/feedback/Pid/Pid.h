@@ -55,9 +55,9 @@ class Pid : public Feedback {
 
       if (!useVariableParameters) {
         if ((long)(millis() - nextSelectIncrementTime) > 0) {
-          if (trackingSelected) parameterSelect--;
-          if (parameterSelect < 0) parameterSelect = 0;
-          variableParameters(parameterSelect);
+          if (trackingSelected) PidParameterTransitionSteps--;
+          if (PidParameterTransitionSteps < 0) PidParameterTransitionSteps = 0;
+          variableParameters(PidParameterTransitionSteps);
           nextSelectIncrementTime = millis() + round(PID_SLEWING_TO_TRACKING_TIME_MS/100.0F);
         }
       }
@@ -75,7 +75,7 @@ class Pid : public Feedback {
 
     char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
 
-    int parameterSelect = 0;
+    int PidParameterTransitionSteps = 0;
     bool trackingSelected = true;
     unsigned long nextSelectIncrementTime = 0;
 };
