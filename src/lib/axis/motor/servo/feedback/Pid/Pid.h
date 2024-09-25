@@ -53,11 +53,11 @@ class Pid : public Feedback {
     inline void poll() {
       pid->Compute();
 
-      if (!useVariableParameters) {
+      if (autoScaleParameters) {
         if ((long)(millis() - nextSelectIncrementTime) > 0) {
-          if (trackingSelected) parameterSelect--;
-          if (parameterSelect < 0) parameterSelect = 0;
-          variableParameters(parameterSelect);
+          if (trackingSelected) parameterSelectPercent--;
+          if (parameterSelectPercent < 0) parameterSelectPercent = 0;
+          variableParameters(parameterSelectPercent);
           nextSelectIncrementTime = millis() + round(PID_SLEWING_TO_TRACKING_TIME_MS/100.0F);
         }
       }
@@ -75,7 +75,7 @@ class Pid : public Feedback {
 
     char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
 
-    int parameterSelect = 0;
+    int parameterSelectPercent = 0;
     bool trackingSelected = true;
     unsigned long nextSelectIncrementTime = 0;
 };

@@ -314,7 +314,7 @@ void ServoMotor::poll() {
   velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
-  if (feedback->useVariableParameters) {
+  if (!feedback->autoScaleParameters) {
     feedback->variableParameters(fabs(velocityPercent));
   } else {
     if (!slewing && enabled) {

@@ -49,7 +49,7 @@ class Feedback {
 
     virtual void poll();
 
-    bool useVariableParameters = false;
+    bool autoScaleParameters = true;
 
   protected:
     float default_param1 = 0, default_param2 = 0, default_param3 = 0, default_param4 = 0, default_param5 = 0, default_param6 = 0;

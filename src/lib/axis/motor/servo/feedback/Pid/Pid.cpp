@@ -7,8 +7,8 @@
 
 Pid::Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity) {
   setDefaultParameters(P, I, D, P_goto, I_goto, D_goto);
-  useVariableParameters = (sensitivity != 0);
-  if (useVariableParameters) this->sensitivity = sensitivity; else this->sensitivity = 100;
+  autoScaleParameters = (sensitivity == 0);
+  if (autoScaleParameters) this->sensitivity = 100; else this->sensitivity = sensitivity;
 }
 
 // initialize PID control and parameters
@@ -23,7 +23,7 @@ void Pid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
   c = controlRange;
 
   V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
-  V(axisPrefix); if (useVariableParameters) { VL("using manual parameter scaling"); } else { VL("using auto parameter scaling"); } 
+  V(axisPrefix); if (autoScaleParameters) { VL("using auto parameter scaling"); } else { VL("using manual parameter scaling"); } 
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
                      0, 0, 0,
@@ -67,7 +67,7 @@ void Pid::selectSlewingParameters() {
     pid->SetMode(QuickPID::Control::automatic);
     V(axisPrefix); VL("slewing selected");
     trackingSelected = false;
-    parameterSelect = 100;
+    parameterSelectPercent = 100;
     p = param4;
     i = param5;
     d = param6;
