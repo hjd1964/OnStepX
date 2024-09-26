@@ -84,7 +84,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   void HAL_HWTIMER2_WRAPPER();
 
   bool HAL_HWTIMER2_INIT(uint8_t priority) {
-    itimer2 = timerBegin(16000000); // ESP32 timer frequency is 80MHz
+    itimer2 = timerBegin(16000000); // ESP32 timer frequency is 16MHz
     timerAttachInterrupt(itimer2, &HAL_HWTIMER2_WRAPPER);
     timerAlarm(itimer2, 1000*16, true, 0); // startup one millisecond
     return true;
@@ -116,7 +116,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   void HAL_HWTIMER3_WRAPPER();
 
   bool HAL_HWTIMER3_INIT(uint8_t priority) {
-    itimer3 = timerBegin(16000000); // ESP32 timer frequency is 80MHz
+    itimer3 = timerBegin(16000000); // ESP32 timer frequency is 16MHz
     timerAttachInterrupt(itimer3, &HAL_HWTIMER3_WRAPPER);
     timerAlarm(itimer3, 1000*16, true, 0); // startup one millisecond
     return true;
@@ -148,7 +148,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   void HAL_HWTIMER4_WRAPPER();
 
   bool HAL_HWTIMER4_INIT(uint8_t priority) {
-    itimer4 = timerBegin(16000000); // ESP32 timer frequency is 80MHz
+    itimer4 = timerBegin(16000000); // ESP32 timer frequency is 16MHz
     timerAttachInterrupt(itimer4, &HAL_HWTIMER4_WRAPPER);
     timerAlarm(itimer4, 1000*16, true, 0); // startup one millisecond
     return true;
