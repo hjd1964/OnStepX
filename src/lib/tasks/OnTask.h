@@ -270,7 +270,7 @@ class Tasks {
     // in sub-microseconds per second, this is safe to call from within an ISR
     // values above 16M cause the timers to compensate by running slower
     // values below 16M cause the timers to compensate by running faster
-    IRAM_ATTR void setPeriodRatioSubMicros(unsigned long value);
+    void setPeriodRatioSubMicros(unsigned long value);
 
     // set process to run immediately on the next pass (within its priority level)
     IRAM_ATTR inline void immediate(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { task[handle - 1]->immediate = true; } }

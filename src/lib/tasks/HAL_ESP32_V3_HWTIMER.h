@@ -16,8 +16,6 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 #define TIMER_RATE_MHZ 16L                           // ESP32 motor timers run at 16MHz so use full resolution
 #define TIMER_RATE_16MHZ_TICKS 1L                    // 16L/TIMER_RATE_MHZ, for the default 16MHz "sub-micros" (16MHz)
 
-#define TASKS_HWTIMER1_ENABLE
-
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
   volatile uint32_t _nextPeriod1 = 16000, _nextPeriod2 = 16000, _nextPeriod3 = 16000, _nextPeriod4 = 16000;
