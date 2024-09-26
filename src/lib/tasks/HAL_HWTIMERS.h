@@ -44,7 +44,11 @@
       defined(__IMXRT1062__)  
   #include "HAL_TEENSY_HWTIMER.h"
 #elif defined(ESP32)
-  #include "HAL_ESP32_HWTIMER.h"
+  #if ESP_ARDUINO_VERSION >= 0x30000
+    #include "HAL_ESP32_V3_HWTIMER.h"
+  #else
+    #include "HAL_ESP32_HWTIMER.h"
+  #endif
 #else
   #include "HAL_EMPTY_HWTIMER.h"
 #endif

@@ -8,15 +8,27 @@
 #define HAL_FRACTIONAL_SEC 105.2631579F
 
 // Analog read and write
-#ifndef ANALOG_WRITE_RANGE
-  #define ANALOG_WRITE_RANGE 1023
+#ifndef ANALOG_READ_RANGE
+  #define ANALOG_READ_RANGE 1023
 #endif
-#ifndef ANALOG_WRITE_PWM_BITS
-  #define ANALOG_WRITE_PWM_BITS 10
+#ifndef ANALOG_READ_BITS
+  #define ANALOG_READ_BITS 10
+#endif
+#ifndef ANALOG_WRITE_RANGE
+  #define ANALOG_WRITE_RANGE 255
+#endif
+#ifndef SERVO_ANALOG_WRITE_FREQUENCY
+  #define SERVO_ANALOG_WRITE_FREQUENCY 1000
+#endif
+#ifndef SERVO_ANALOG_WRITE_RESOLUTION
+  #define SERVO_ANALOG_WRITE_RESOLUTION 8
+#endif
+#ifndef SERVO_ANALOG_WRITE_RANGE
+  #define SERVO_ANALOG_WRITE_RANGE 255
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
-#define HAL_MAXRATE_LOWER_LIMIT 16
+#define HAL_MAXRATE_LOWER_LIMIT 40
 #define HAL_PULSE_WIDTH 200  // in ns, measured 1/18/22 (ESP32 v2.0.0)
 
 // New symbol for the default I2C port -------------------------------------------------------------
@@ -52,15 +64,12 @@
   #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
-#ifndef ANALOG_READ_RANGE
-  #define ANALOG_READ_RANGE 4095
-#endif
 #define HAL_INIT() { \
-  analogWriteResolution(ANALOG_WRITE_PWM_BITS); \
+  analogReadResolution(10); \
   SERIAL_BT_BEGIN(); \
   if (I2C_SDA_PIN != OFF && I2C_SCL_PIN != OFF) { \
     HAL_Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN); \
-    HAL_Wire.setClock(HAL_WIRE_CLOCK); \
+    if (HAL_WIRE_CLOCK != 100000) HAL_Wire.setClock(HAL_WIRE_CLOCK); \
   } \
 }
 
@@ -74,7 +83,6 @@
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
-#include "../lib/analog/AN_ESP32.h"
 
 // MCU reset
 #define HAL_RESET() ESP.restart()
@@ -82,6 +90,11 @@
 // a really short fixed delay (none needed)
 #define HAL_DELAY_25NS()
 
-// stand-in for delayNanoseconds(), assumes 240MHz clock
-#include "xtensa/core-macros.h"
-#define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }
+#ifdef ARDUINO_ESP32C3_DEV
+  // stand-in for delayNanoseconds(), assumes 80MHz clock
+  #define delayNanoseconds(ns) { unsigned int c = ESP.getCycleCount() + ns/12.5F; do {} while ((int)(ESP.getCycleCount() - c) < 0); }
+#else
+  // stand-in for delayNanoseconds(), assumes 240MHz clock
+  #include "xtensa/core-macros.h"
+  #define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }
+#endif

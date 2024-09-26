@@ -5,12 +5,12 @@
 
 #ifdef SERVO_DC_PRESENT
 
-#if defined(ARDUINO_TEENSY41) && defined(AXIS1_STEP_PIN) && AXIS1_STEP_PIN == 38 && defined(ANALOG_WRITE_PWM_FREQUENCY)
+#if defined(ARDUINO_TEENSY41) && defined(AXIS1_STEP_PIN) && AXIS1_STEP_PIN == 38 && defined(SERVO_ANALOG_WRITE_FREQUENCY)
   // this is only for pin 38 of a Teensy4.1
   IntervalTimer itimer4;
   uint16_t _pwm38_period = 0;
   uint8_t _pwm38_toggle = 0;
-  float _base_freq_divider = ANALOG_WRITE_PWM_FREQUENCY/(1.0F/(ANALOG_WRITE_RANGE/1000000.0F));
+  float _base_freq_divider = SERVO_ANALOG_WRITE_FREQUENCY/(1.0F/(ANALOG_WRITE_RANGE/1000000.0F));
 
   void PWM38_HWTIMER() {
     if (_pwm38_period == 0 || _pwm38_period == ANALOG_WRITE_RANGE) {
@@ -41,7 +41,7 @@ ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSetti
   this->Settings = Settings;
   model = Settings->model;
   statusMode = Settings->status;
-  velocityMax = (Settings->velocityMax/100.0F)*ANALOG_WRITE_RANGE;
+  velocityMax = (Settings->velocityMax/100.0F)*SERVO_ANALOG_WRITE_RANGE;
   acceleration = (Settings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
@@ -80,13 +80,19 @@ void ServoDc::init() {
     }
   #endif
 
-  // set fastest PWM speed for Teensy processors
-  #ifdef ANALOG_WRITE_PWM_FREQUENCY
-    VF("MSG: Servo"); V(axisNumber); VF(", setting control pins analog frequency "); VL(ANALOG_WRITE_PWM_FREQUENCY);
+  // set PWM frequency
+  #ifdef SERVO_ANALOG_WRITE_FREQUENCY
+    VF("MSG: Servo"); V(axisNumber); VF(", setting control pins analog frequency "); VL(SERVO_ANALOG_WRITE_FREQUENCY);
     #ifndef analogWritePin38
-      analogWriteFrequency(Pins->in1, ANALOG_WRITE_PWM_FREQUENCY);
+      analogWriteFrequency(Pins->in1, SERVO_ANALOG_WRITE_FREQUENCY);
     #endif
-    analogWriteFrequency(Pins->in2, ANALOG_WRITE_PWM_FREQUENCY);
+    analogWriteFrequency(Pins->in2, SERVO_ANALOG_WRITE_FREQUENCY);
+  #endif
+
+  // set PWM bits
+  #ifdef SERVO_ANALOG_WRITE_RESOLUTION
+    VF("MSG: Servo"); V(axisNumber); VF(", setting control pins analog bits "); VL(SERVO_ANALOG_WRITE_RESOLUTION);
+    analogWriteResolution(Pins->in2, SERVO_ANALOG_WRITE_RESOLUTION);
   #endif
 
   // set fault pin mode
@@ -110,12 +116,12 @@ void ServoDc::enable(bool state) {
 
     if (!enabled) {
       if (model == SERVO_EE) {
-        if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
-        if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
+        if (Pins->inState1 == HIGH) analogWrite(Pins->in1, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
+        if (Pins->inState2 == HIGH) analogWrite(Pins->in2, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
       } else
       if (model == SERVO_PE) {
         digitalWriteF(Pins->in1, Pins->inState1);
-        if (Pins->inState2 == HIGH) power = velocityMax; else power = 0; 
+        if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
         #ifdef analogWritePin38
           if (Pins->in2 == 38) analogWritePin38(round(power)); else
         #endif
@@ -131,7 +137,7 @@ void ServoDc::enable(bool state) {
   ServoDriver::updateStatus();
 }
 
-// set motor velocity by adjusting power (0 to ANALOG_WRITE_RANGE for 0 to 100% power)
+// set motor velocity by adjusting power (0 to SERVO_ANALOG_WRITE_RANGE for 0 to 100% power)
 float ServoDc::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
 
@@ -158,30 +164,30 @@ void ServoDc::pwmUpdate(float power) {
 
   if (model == SERVO_EE) {
     if (motorDirection == DIR_FORWARD) {
-      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
-      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE - power;
       analogWrite(Pins->in2, round(power));
     } else
     if (motorDirection == DIR_REVERSE) {
-      if (Pins->inState1 == HIGH) power = velocityMax - power;
+      if (Pins->inState1 == HIGH) power = SERVO_ANALOG_WRITE_RANGE - power;
       analogWrite(Pins->in1, round(power));
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
     } else {
-      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, round(velocityMax)); else analogWrite(Pins->in1, 0);
-      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, round(velocityMax)); else analogWrite(Pins->in2, 0);
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
     }
   } else
   if (model == SERVO_PE) {
     if (motorDirection == DIR_FORWARD) {
       digitalWriteF(Pins->in1, Pins->inState1);
-      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE - power;
     } else
     if (motorDirection == DIR_REVERSE) {
       digitalWriteF(Pins->in1, !Pins->inState1);
-      if (Pins->inState2 == HIGH) power = velocityMax - power;
+      if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE - power;
     } else {
       digitalWriteF(Pins->in1, Pins->inState1);
-      if (Pins->inState2 == HIGH) power = velocityMax; else power = 0;
+      if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0;
     }
     #ifdef analogWritePin38
       if (Pins->in2 == 38) analogWritePin38(round(power)); else

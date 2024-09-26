@@ -42,7 +42,7 @@ volatile unsigned long _task_ppsAverageSubMicros = 16000000UL;
 double _task_masterFrequencyRatio = 1.0L;
 
 // Task object
-Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)()) {
+Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
   idle = period == 0;
   this->period   = period;
   period_units   = PU_MILLIS;
@@ -120,7 +120,7 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
   return true;
 }
 
-void Task::setCallback(void (*volatile callback)()) {
+void Task::setCallback(void (*callback)()) {
   this->callback = callback;
   noInterrupts();
   switch (hardware_timer) {
@@ -373,7 +373,7 @@ Tasks::~Tasks() {
   }
 }
 
-uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)()) {
+uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)()) {
   // check priority
   if (priority > 7) return false;
   if (priority > highest_priority) highest_priority = priority;
@@ -394,7 +394,7 @@ uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t prio
   return e + 1;
 }
 
-uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]) {
+uint8_t Tasks::add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)(), const char name[]) {
   uint8_t handle = add(period, duration, repeat, priority, callback);
   setNameStr(handle, name);
   return handle;
@@ -416,7 +416,7 @@ bool Tasks::requestHardwareTimer(uint8_t handle, uint8_t hwPriority) {
   return false;
 }
 
-bool Tasks::setCallback(uint8_t handle, void (*volatile callback)()) {
+bool Tasks::setCallback(uint8_t handle, void (*callback)()) {
   if (handle != 0 && allocated[handle - 1]) {
     task[handle - 1]->setCallback(callback);
     return true;

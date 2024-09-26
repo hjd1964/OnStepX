@@ -13,6 +13,9 @@
 #ifndef ANALOG_WRITE_RANGE
   #define ANALOG_WRITE_RANGE 255
 #endif
+#ifndef SERVO_ANALOG_WRITE_RANGE
+  #define SERVO_ANALOG_WRITE_RANGE ANALOG_WRITE_RANGE
+#endif
 
 #ifndef AXIS1_SERVO_VELOCITY_FACTOR
   #define AXIS1_SERVO_VELOCITY_FACTOR 0.0F
@@ -146,7 +149,7 @@ class ServoDriver {
     int16_t model = OFF;
     int16_t statusMode = OFF;
 
-    float velocityMax = ANALOG_WRITE_RANGE;
+    float velocityMax = SERVO_ANALOG_WRITE_RANGE;
 
     Direction motorDirection = DIR_FORWARD;
 

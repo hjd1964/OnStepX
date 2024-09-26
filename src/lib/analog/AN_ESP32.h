@@ -6,7 +6,7 @@
 #include "../../Common.h"
 
 #if defined(ESP32)
-  #if !defined(ESP_ARDUINO_VERSION) || ESP_ARDUINO_VERSION < 131072 + 3 // version 2.0.3
+  #if ESP_ARDUINO_VERSION < 0x20000 + 3
     // starts tone on the specified pin of frequency (Hz) for the duration (in ms)
     extern void tone(uint8_t pin, unsigned int frequency, unsigned long duration = 0);
     // stops tone on the specified pin

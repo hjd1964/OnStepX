@@ -102,13 +102,13 @@ enum TimingMode: uint8_t {TM_BALANCED, TM_MINIMUM, TM_GAP};
 
 class Task {
   public:
-    Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
+    Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
     ~Task();
 
     bool requestHardwareTimer(uint8_t num, uint8_t hwPriority);
     uint8_t hardware_timer = 0;
 
-    void setCallback(void (*volatile callback)());
+    void setCallback(void (*callback)());
 
     void setTimingMode(TimingMode mode);
 
@@ -189,7 +189,7 @@ class Tasks {
     //                  only higher priority tasks are allowed to run when a lower priority task yields
     // \param callback  function to handle this tasks processing
     // \return          handle to the task on success, or 0 on failure
-    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)());
+    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)());
 
     // add process task
     // \param period    between process calls in milliseconds, use 0 to disable
@@ -203,7 +203,7 @@ class Tasks {
     // \param callback  function to handle this tasks processing
     // \param name      an optional short (max length 7) char str describing the task 
     // \return          handle to the task on success, or 0 on failure
-    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*volatile callback)(), const char name[]);
+    uint8_t add(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, void (*callback)(), const char name[]);
 
     // allocates a hardware timer, if available, for this task. Note: for the associated task: *repeat* must be true,
     // *priority* must be 0 (all are higher than s/w task priority 0.)
@@ -217,7 +217,7 @@ class Tasks {
     // \param handle        task handle
     // \param callback      function to handle this tasks processing
     // \return              true if successful, or false if unable to find the associated task
-    bool setCallback(uint8_t handle, void (*volatile callback)());
+    bool setCallback(uint8_t handle, void (*callback)());
 
     // change task timing mode
     // \param handle        task handle

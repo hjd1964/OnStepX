@@ -101,7 +101,13 @@
 #elif defined(ESP32)
   // ESP32
   #define MCU_STR "ESP32"
-  #include "HAL_ESP32.h"
+  #if ESP_ARDUINO_VERSION >= 0x30000
+    #include "HAL_ESP32_V3.h"
+  #elif ESP_ARDUINO_VERSION >= 0x20000 + 3
+    #include "HAL_ESP32_V2.h"
+  #else
+    #include "HAL_ESP32.h"
+  #endif
 
 #elif defined(__SAM3X8E__)
   // Arduino Due

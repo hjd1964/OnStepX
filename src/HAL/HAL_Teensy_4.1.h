@@ -20,8 +20,8 @@
 #ifndef ANALOG_WRITE_PWM_BITS
   #define ANALOG_WRITE_PWM_BITS 13 // up to 15 bits
 #endif
-#ifndef ANALOG_WRITE_PWM_FREQUENCY
-  #define ANALOG_WRITE_PWM_FREQUENCY 18310.55
+#ifndef SERVO_ANALOG_WRITE_FREQUENCY
+  #define SERVO_ANALOG_WRITE_FREQUENCY 18310.55
 #endif
 
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
