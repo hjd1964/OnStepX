@@ -210,7 +210,7 @@ CommandError Home::reset(bool fullReset) {
 
   // stop tracking and set default rate
   mount.tracking(false);
-  mount.trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
+  mount.trackingRate = hzToSidereal(TRACKING_RATE_DEFAULT_HZ);
   mount.trackingRateOffsetRA = 0.0F;
   mount.trackingRateOffsetDec = 0.0F;
   goTo.firstGoto = true;

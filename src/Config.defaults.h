@@ -789,6 +789,9 @@
 #ifndef TRACK_BACKLASH_RATE
 #define TRACK_BACKLASH_RATE           25
 #endif
+#ifndef TRACKING_RATE_DEFAULT_HZ
+  #define TRACKING_RATE_DEFAULT_HZ    SIDEREAL_RATE_HZ
+#endif
 
 // slewing
 #ifndef GOTO_FEATURE

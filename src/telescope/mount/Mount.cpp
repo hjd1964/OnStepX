@@ -156,9 +156,8 @@ void Mount::autostartPostponed() {
   // handle the one case where this completes without the date/time available
   static bool autoTrackDone = false;
   if (!autoTrackDone && TRACK_AUTOSTART == ON && transform.isEquatorial() && park.state != PS_PARKED && !home.settings.automaticAtBoot) {
-    VLF("MSG: Mount, autostart tracking sidereal");
+    VLF("MSG: Mount, autostart tracking");
     tracking(true);
-    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
     autoStartDone = true;
     return;
   }
@@ -199,9 +198,8 @@ void Mount::autostartPostponed() {
 
   // auto tracking
   if (!autoTrackDone && TRACK_AUTOSTART == ON) {
-    VLF("MSG: Mount, autostart tracking sidereal");
+    VLF("MSG: Mount, autostart tracking");
     tracking(true);
-    trackingRate = hzToSidereal(SIDEREAL_RATE_HZ);
   }
   autoTrackDone = true;
 

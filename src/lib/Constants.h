@@ -152,6 +152,9 @@
 #define SIDEREAL_RATIO_F            1.0027379F
 #define SIDEREAL_PERIOD             15956313.06126534L
 #define SIDEREAL_RATE_HZ            60.16427456104770L
+#define SOLAR_RATE_HZ               60.0L
+#define LUNAR_RATE_HZ               57.9L
+#define KING_RATE_HZ                60.136L
 #define Deg10                       0.174532925199432L
 #define Deg20                       0.349065850398865L
 #define Deg45                       0.785398163397448L
