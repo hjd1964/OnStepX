@@ -10,6 +10,10 @@
 
 enum Direction: uint8_t {DIR_NONE, DIR_FORWARD, DIR_REVERSE, DIR_BOTH};
 
+#ifndef STEP_WAVE_FORM
+#define STEP_WAVE_FORM SQUARE
+#endif
+
 class Motor {
   public:
     // sets up the motor identification
