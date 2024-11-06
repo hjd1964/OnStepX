@@ -27,6 +27,8 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
   this->settings.stepsPerMeasure = settings->stepsPerMeasure;
   this->settings.reverse = settings->reverse;
   this->settings.limits = settings->limits;
+  this->settings.limits.max += 1.0F/this->settings.stepsPerMeasure;
+  this->settings.limits.min -= 1.0F/this->settings.stepsPerMeasure;
   backlashFreq = settings->backlashFreq;
 
   // attach the function pointers to the callbacks
