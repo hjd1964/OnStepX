@@ -27,8 +27,6 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
   this->settings.stepsPerMeasure = settings->stepsPerMeasure;
   this->settings.reverse = settings->reverse;
   this->settings.limits = settings->limits;
-  this->settings.limits.max += 1.0F/this->settings.stepsPerMeasure;
-  this->settings.limits.min -= 1.0F/this->settings.stepsPerMeasure;
   backlashFreq = settings->backlashFreq;
 
   // attach the function pointers to the callbacks
@@ -691,14 +689,14 @@ bool Axis::motionError(Direction direction) {
 
   if (direction == DIR_FORWARD || direction == DIR_BOTH) {
     result = getInstrumentCoordinateSteps() > lroundf(0.9F*INT32_MAX) ||
-             (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() > settings.limits.max) ||
+             (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() > settings.limits.max + 1.0F/this->settings.stepsPerMeasure) ||
              (!commonMinMaxSense && errors.maxLimitSensed);
     if (result == true && result != lastErrorResult) { V(axisPrefix); VLF("motion error forward limit"); }
   } else
 
   if (direction == DIR_REVERSE || direction == DIR_BOTH) {
     result = getInstrumentCoordinateSteps() < lroundf(0.9F*INT32_MIN) ||
-             (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() < settings.limits.min) ||
+             (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() < settings.limits.min - 1.0F/this->settings.stepsPerMeasure) ||
              (!commonMinMaxSense && errors.minLimitSensed);
     if (result == true && result != lastErrorResult) { V(axisPrefix); VLF("motion error reverse limit"); }
   }
