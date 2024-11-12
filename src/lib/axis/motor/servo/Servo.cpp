@@ -217,6 +217,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
+      //convert micro-seconds period to sub-microseconds for timers by * 16 (1/16 microsecond units)
       period *= 16.0F;
       lastPeriod = (unsigned long)lroundf(period);
     } else {
@@ -247,6 +248,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
 
 float ServoMotor::getFrequencySteps() {
   if (lastPeriod == 0) return 0;
+  // internally OnStepX has a 16 Mhz frequency for timers
   return (16000000.0F / lastPeriod) * absStep;
 }
 
