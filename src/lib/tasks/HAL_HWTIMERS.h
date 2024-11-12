@@ -37,11 +37,11 @@
       defined(STM32F401xC) || defined(STM32F407xx) || \
       defined(STM32F303xC) || defined(STM32F103xB)
   #include "HAL_STM32_HWTIMER.h"
-// Teensy3.0, 3.1, 3.2, 3.5, 3.6, and 4.0
+// Teensy3.0, 3.1, 3.2, 3.5, 3.6, 4.0, and 4.1
 #elif defined(_mk20dx128_h_) || defined(__MK20DX128__) || \
       defined(__MK20DX256__) || defined(__MK64FX512__) || \
       defined(__MK66FX1M0__) || defined(__IMXRT1052__) || \
-      defined(__IMXRT1062__)  
+      defined(__IMXRT1062__)
   #include "HAL_TEENSY_HWTIMER.h"
 #elif defined(ESP32)
   #if ESP_ARDUINO_VERSION >= 0x30000
