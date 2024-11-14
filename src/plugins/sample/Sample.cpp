@@ -30,4 +30,9 @@ void Sample::loop() {
   Serial.println();
 }
 
+// no command processing in this example, so just return false (not handled)
+bool Sample::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+  return false;
+}
+
 Sample sample;

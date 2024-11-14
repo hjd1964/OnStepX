@@ -23,6 +23,7 @@
 #include "rotator/Rotator.h"
 #include "focuser/Focuser.h"
 #include "auxiliary/Features.h"
+#include "../plugins/Plugins.config.h"
 
 // possible reset function for this MCU
 #ifdef HAL_RESET_FUNC
@@ -57,6 +58,31 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
 
   #ifdef FEATURES_PRESENT
     if (features.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+
+  #if PLUGIN1 != OFF && PLUGIN1_COMMAND_PROCESSING == ON
+    if (PLUGIN1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN2 != OFF && PLUGIN2_COMMAND_PROCESSING == ON
+    if (PLUGIN2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN3 != OFF && PLUGIN3_COMMAND_PROCESSING == ON
+    if (PLUGIN3.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN4 != OFF && PLUGIN4_COMMAND_PROCESSING == ON
+    if (PLUGIN4.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN5 != OFF && PLUGIN5_COMMAND_PROCESSING == ON
+    if (PLUGIN5.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN6 != OFF && PLUGIN6_COMMAND_PROCESSING == ON
+    if (PLUGIN6.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN7 != OFF && PLUGIN7_COMMAND_PROCESSING == ON
+    if (PLUGIN7.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  #endif
+  #if PLUGIN8 != OFF && PLUGIN8_COMMAND_PROCESSING == ON
+    if (PLUGIN8.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
   //  B - Reticle/Accessory Control
