@@ -174,31 +174,31 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 // disable hardware timer based tasks by clearing interrupt flag(s)
 void timerAlarmsDisable() {
 #ifdef TASKS_HWTIMER1_ENABLE
-  timerStop(itimer1);
+  if (itimer1 != NULL) timerStop(itimer1);
 #endif
 #ifdef TASKS_HWTIMER2_ENABLE
-  timerStop(itimer2);
+  if (itimer2 != NULL) timerStop(itimer2);
 #endif
 #ifdef TASKS_HWTIMER3_ENABLE
-  timerStop(itimer3);
+  if (itimer3 != NULL) timerStop(itimer3);
 #endif
 #ifdef TASKS_HWTIMER4_ENABLE
-  timerStop(itimer4);
+  if (itimer4 != NULL) timerStop(itimer4);
 #endif
 }
 
 // enable hardware timer based tasks by setting interrupt flag(s)
 void timerAlarmsEnable()  {
 #ifdef TASKS_HWTIMER1_ENABLE
-  timerStart(itimer1);
+  if (itimer1 != NULL) timerStart(itimer1);
 #endif
 #ifdef TASKS_HWTIMER2_ENABLE
-  timerStart(itimer2);
+  if (itimer2 != NULL) timerStart(itimer2);
 #endif
 #ifdef TASKS_HWTIMER3_ENABLE
-  timerStart(itimer3);
+  if (itimer3 != NULL) timerStart(itimer3);
 #endif
 #ifdef TASKS_HWTIMER4_ENABLE
-  timerStart(itimer4);
+  if (itimer4 != NULL) timerStart(itimer4);
 #endif
 }
