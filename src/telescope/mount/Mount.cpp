@@ -297,9 +297,11 @@ void Mount::poll() {
   // keep track of where we are pointing
   #if MOUNT_COORDS_MEMORY == ON
     if (!goTo.absoluteEncodersPresent) {
+      nv.ignoreCache(true);
       nv.write(NV_MOUNT_LAST_POSITION, transform.mountType);
       nv.write(NV_MOUNT_LAST_POSITION + 1, (float)axis1.getInstrumentCoordinate());
       nv.write(NV_MOUNT_LAST_POSITION + 5, (float)axis2.getInstrumentCoordinate());
+      nv.ignoreCache(false);
     }
   #endif
 
