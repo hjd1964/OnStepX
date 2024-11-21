@@ -11,9 +11,9 @@
 
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
-  volatile double _nextPeriod1 = 1000, _nextPeriod2 = 1000, _nextPeriod3 = 1000, _nextPeriod4 = 1000;
+  volatile double _nextPeriod1 = 1000.0, _nextPeriod2 = 1000.0, _nextPeriod3 = 1000.0, _nextPeriod4 = 1000.0;
   volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
-  const double timerRate16MHzTicks TIMER_RATE_16MHZ_TICKS;
+  const double timerRate16MHzTicks = TIMER_RATE_16MHZ_TICKS;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
     double counts;
     uint16_t reps = 0;
@@ -21,8 +21,8 @@
       if (period < 16) period = 16;         // minimum time is 1us
       double fperiod = period/timerRate16MHzTicks;
       reps           = fperiod/4194304.0 + 1.0;
-      counts         = round(fperiod/reps)/16.0;
-    } else counts = 1000;                   // set for a 1ms period, stopped
+      counts         = fperiod/reps/16.0;
+    } else counts = 1000.0;                   // set for a 1ms period, stopped
   
     noInterrupts();
     switch (num) {
