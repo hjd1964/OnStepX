@@ -30,7 +30,7 @@
 #include "../PPS.h"
 #include "../../tasks/OnTask.h"
 
-#include <TinyGPS++.h> // https://github.com/mikalhart/TinyGPSPlus/releases
+#include <TinyGPSPlus.h> // https://github.com/mikalhart/TinyGPSPlus/releases
 TinyGPSPlus gps;
 
 // provide for using software serial
