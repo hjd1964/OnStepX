@@ -110,28 +110,33 @@ void ServoDc::enable(bool state) {
   int32_t power = 0;
 
   enabled = state;
-  if (enablePin == SHARED) {
-    VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using PE or EE signals");
 
-    if (!enabled) {
-      if (model == SERVO_EE) {
-        if (Pins->inState1 == HIGH) analogWrite(Pins->in1, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
-        if (Pins->inState2 == HIGH) analogWrite(Pins->in2, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
-      } else
-      if (model == SERVO_PE) {
-        digitalWriteF(Pins->in1, Pins->inState1);
-        if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
-        #ifdef analogWritePin38
-          if (Pins->in2 == 38) analogWritePin38(round(power)); else
-        #endif
-        analogWrite(Pins->in2, round(power));
-      }
+  VF("MSG: ServoDriver"); V(axisNumber); VF(", ");
+  if (!enabled) {
+    if (model == SERVO_EE) {
+      VF("EE outputs off");
+      if (Pins->inState1 == HIGH) analogWrite(Pins->in1, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in1, 0);
+      if (Pins->inState2 == HIGH) analogWrite(Pins->in2, SERVO_ANALOG_WRITE_RANGE); else analogWrite(Pins->in2, 0);
+    } else
+    if (model == SERVO_PE) {
+      VF("PE outputs off");
+      digitalWriteF(Pins->in1, Pins->inState1);
+      if (Pins->inState2 == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
+      #ifdef analogWritePin38
+        if (Pins->in2 == 38) analogWritePin38(round(power)); else
+      #endif
+      analogWrite(Pins->in2, round(power));
     }
+    if (enablePin != SHARED) {
+      VF(" and powered down using enable pin");
+      digitalWriteF(enablePin, !enabledState);
+    }
+    VLF("");
   } else {
-    VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
-    if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
+    if (enablePin != SHARED) {
+      VLF("powered up using enable pin");
+      digitalWriteF(enablePin, enabledState);
+    }
   }
 
   ServoDriver::updateStatus();
