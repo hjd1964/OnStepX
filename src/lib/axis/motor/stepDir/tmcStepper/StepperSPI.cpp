@@ -152,6 +152,7 @@ void StepDirTmcSPI::updateStatus() {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
       TMC2130_n::DRV_STATUS_t status_result;
+      status_result.sr = 0;
       if (settings.model == TMC2130) { status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); } else
       if (settings.model == TMC5160) { status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); } else
       if (settings.model == TMC5161) { status_result.sr = ((TMC5161Stepper*)driver)->DRV_STATUS(); }

@@ -201,6 +201,7 @@ void StepDirTmcUART::updateStatus() {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
 
       TMC2208_n::DRV_STATUS_t status_result;
+      status_result.sr = 0;
       if (settings.model == TMC2208) {
         status_result.sr = ((TMC2208Stepper*)driver)->DRV_STATUS();
         crcError = ((TMC2208Stepper*)driver)->CRCerror;
