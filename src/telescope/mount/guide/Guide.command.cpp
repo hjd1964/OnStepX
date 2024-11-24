@@ -14,26 +14,10 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
   *supressFrame = false;
   
   // :GX90#     Get setting pulse guide rate
-  // :GX90A#    Get setting pulse guide rate for RA/Azm axis
-  // :GX90E#    Get setting pulse guide rate for Dec/Alt axis
   //            Returns: n.nn#
-  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '0') {
-    if (parameter[2] == 0) {
-      sprintF(reply, "%0.2f", rateSelectToRate(settings.pulseRateSelect));
-      *numericReply = false;
-    } else
-    if (parameter[2] == 'A' && parameter[3] == 0) {
-      GuideRateSelect axis1RateSelect = settings.axis1RateSelect;
-      if (axis1RateSelect != GR_CUSTOM && GUIDE_SEPARATE_PULSE_RATE == ON) axis1RateSelect = settings.pulseRateSelect;
-      sprintF(reply, "%0.5f", rateSelectToRate(axis1RateSelect));
-      *numericReply = false;
-    } else
-    if (parameter[2] == 'E' && parameter[3] == 0) {
-      GuideRateSelect axis2RateSelect = settings.axis2RateSelect;
-      if (axis2RateSelect != GR_CUSTOM && GUIDE_SEPARATE_PULSE_RATE == ON) axis2RateSelect = settings.pulseRateSelect;
-      sprintF(reply, "%0.5f", rateSelectToRate(axis2RateSelect));
-      *numericReply = false;
-    } else *commandError = CE_PARAM_FORM;
+  if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '0' && parameter[2] == 0) {
+    sprintF(reply, "%0.2f", rateSelectToRate(settings.pulseRateSelect));
+    *numericReply = false;
   } else
 
   // M - Telescope Movement (Guiding) Commands
@@ -48,15 +32,17 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *supressFr
       int16_t timeMs;
       if (convert.atoi2(&parameter[1], &timeMs)) {
         if (timeMs >= 0) {
-          if (parameter[0] == 'e' || parameter[0] == 'w') {
-            GuideRateSelect axis1RateSelect = settings.axis1RateSelect;
-            if (axis1RateSelect != GR_CUSTOM && GUIDE_SEPARATE_PULSE_RATE == ON) axis1RateSelect = settings.pulseRateSelect;
-            *commandError = startAxis1(parameter[0] == 'w' ? GA_FORWARD : GA_REVERSE, axis1RateSelect, timeMs, true);
+          if (parameter[0] == 'w') {
+            *commandError = startAxis1(GA_FORWARD, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
           } else
-          if (parameter[0] == 'n' || parameter[0] == 's') {
-            GuideRateSelect axis2RateSelect = settings.axis2RateSelect;
-            if (axis2RateSelect != GR_CUSTOM && GUIDE_SEPARATE_PULSE_RATE == ON) axis2RateSelect = settings.pulseRateSelect;
-            *commandError = startAxis2(parameter[0] == 'n' ? GA_FORWARD : GA_REVERSE, axis2RateSelect, timeMs, true);
+          if (parameter[0] == 'e') {
+            *commandError = startAxis1(GA_REVERSE, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis1RateSelect, timeMs);
+          } else
+          if (parameter[0] == 'n') {
+            *commandError = startAxis2(GA_FORWARD, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
+          } else
+          if (parameter[0] == 's') {
+            *commandError = startAxis2(GA_REVERSE, (GUIDE_SEPARATE_PULSE_RATE == ON) ? settings.pulseRateSelect : settings.axis2RateSelect, timeMs);
           } else *commandError = CE_CMD_UNKNOWN;
           if (command[1] == 'g') *numericReply = false;
         } else *commandError = CE_PARAM_RANGE;
