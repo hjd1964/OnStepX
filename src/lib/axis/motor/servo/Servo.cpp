@@ -227,17 +227,18 @@ void ServoMotor::setFrequencySteps(float frequency) {
     }
 
     currentFrequency = frequency;
-    if (encoderReverse) {
-      velocityEstimate = driver->getVelocityEstimate(currentFrequency*dir);
-    } else {
-      velocityEstimate = -driver->getVelocityEstimate(currentFrequency*dir);
-    }
 
     // change the motor rate/direction
     noInterrupts();
     step = 0;
     interrupts();
     tasks.setPeriodSubMicros(taskHandle, lastPeriod);
+  }
+
+  if (encoderReverse) {
+    velocityEstimate = driver->getVelocityEstimate(currentFrequency*dir);
+  } else {
+    velocityEstimate = -driver->getVelocityEstimate(currentFrequency*dir);
   }
 
   noInterrupts();
