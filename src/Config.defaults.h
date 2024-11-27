@@ -781,7 +781,10 @@
 
 // tracking
 #ifndef TRACK_AUTOSTART
-#define TRACK_AUTOSTART               OFF
+#define TRACK_AUTOSTART               OFF                         // begin tracking at startup
+#endif
+#ifndef TRACK_WITHOUT_LIMITS
+#define TRACK_WITHOUT_LIMITS          OFF                         // allow tracking even if limits are disabled
 #endif
 #ifndef TRACK_COMPENSATION_DEFAULT
 #define TRACK_COMPENSATION_DEFAULT    OFF

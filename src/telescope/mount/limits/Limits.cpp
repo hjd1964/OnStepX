@@ -277,6 +277,13 @@ void Limits::poll() {
 
   Coordinate current = mount.getMountPosition(CR_MOUNT_ALT);
 
+  #if TRACK_AUTOSTART == OFF && TRACK_WITHOUT_LIMITS == OFF
+    if (!limitsEnabled && mount.isTracking()) {
+      VLF("MSG: Mount, tracking without limits disallowed");
+      mount.tracking(false);
+    }
+  #endif
+
   if (limitsEnabled && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
     // overhead and horizon limits
     if (current.a < settings.altitude.min) error.altitude.min = true; else error.altitude.min = false;

@@ -438,7 +438,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         if (park.state != PS_PARKED) {
       #endif
       tracking(true);
-      if (!limits.isEnabled()) tracking(false);
       #if GOTO_FEATURE == ON
         } else *commandError = CE_PARKED;
       #endif
