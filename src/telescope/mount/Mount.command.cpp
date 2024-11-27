@@ -27,7 +27,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double a = getPosition(CR_MOUNT_ALT).a;
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) a = home.getPosition(CR_MOUNT_ALT).a;
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) {
+          Coordinate homePosition = home.getPosition(CR_MOUNT_ALT);
+          a = transform.mountToNative(&homePosition).a;
+        }
       #endif
       convert.doubleToDms(reply, radToDeg(a), false, true, precisionMode);
       *numericReply = false;
@@ -40,7 +43,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       if (parameter[0] == 'H' || parameter[0] == 'e') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double d = getPosition().d;
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) d = home.getPosition().d;
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) {
+          Coordinate homePosition = home.getPosition();
+          d = transform.mountToNative(&homePosition).d;
+        }
       #endif
       convert.doubleToDms(reply, radToDeg(d), false, true, precisionMode);
       *numericReply = false;
@@ -53,7 +59,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       if (parameter[0] == 'H' || parameter[0] == 'a') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double r = getPosition().r;
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) r = home.getPosition().r;
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) {
+          Coordinate homePosition = home.getPosition();
+          r = transform.mountToNative(&homePosition).r;
+        }
       #endif
       convert.doubleToHms(reply, radToHrs(r), false, precisionMode);
       *numericReply = false;
@@ -150,7 +159,10 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
       if (parameter[0] == 'H') precisionMode = PM_HIGHEST; else if (parameter[0] != 0) { *commandError = CE_PARAM_FORM; return true; }
       double z = getPosition(CR_MOUNT_HOR).z;
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) z = home.getPosition(CR_MOUNT_HOR).z;
+        if (guide.state == GU_HOME_GUIDE || guide.state == GU_HOME_GUIDE_ABORT) {
+          Coordinate homePosition = home.getPosition(CR_MOUNT_ALT);
+          z = transform.mountToNative(&homePosition).z;
+        }
       #endif
       convert.doubleToDms(reply, NormalizeAzimuth(radToDeg(z)), true, false, precisionMode);
       *numericReply = false;
