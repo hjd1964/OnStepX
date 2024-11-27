@@ -1,7 +1,7 @@
 // Sample plugin
 #pragma once
 
-#include "..\..\lib\commands\CommandErrors.h"
+#include "../../lib/commands/CommandErrors.h"
 
 class Sample {
 public:
