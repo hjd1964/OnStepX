@@ -613,6 +613,9 @@
 #ifndef MOUNT_AUTO_HOME_DEFAULT
 #define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif
+#ifndef MOUNT_HOME_AT_OFFSETS
+#define MOUNT_HOME_AT_OFFSETS         OFF                         // ON to incorporate runtime offsets into home position (switches)
+#endif
 #ifndef MOUNT_HORIZON_AVOIDANCE
 #define MOUNT_HORIZON_AVOIDANCE       ON                          // ON allows eq mode horizon avoidance
 #endif

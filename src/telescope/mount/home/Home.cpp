@@ -61,21 +61,12 @@ CommandError Home::request() {
     mount.enable(true);
     goTo.firstGoto = false;
 
+    Coordinate homePosition = getPosition(CR_MOUNT_EQU);
+
     if (hasSense) {
       #if AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-        double a1 = axis1.getInstrumentCoordinate();
-        double a2 = axis2.getInstrumentCoordinate();
-        if (transform.mountType == ALTAZM) {
-          a1 -= position.z;
-          a2 -= position.a;
-        } else
-        if (transform.mountType == ALTALT) {
-          a1 -= position.aa1;
-          a2 -= position.aa2;
-        } else {
-          a1 -= position.h;
-          a2 -= position.d;
-        }
+        double a1 = axis1.getInstrumentCoordinate() - homePosition.a1;
+        double a2 = axis2.getInstrumentCoordinate() - homePosition.a2;
 
         // both -180 to 180
         VF("MSG: Mount, homing from a1="); V(radToDeg(a1)); VF(" degrees a2="); V(radToDeg(a2)); VLF(" degrees");
@@ -95,10 +86,7 @@ CommandError Home::request() {
         VLF("MSG: Mount, moving to home");
         state = HS_HOMING;
 
-        if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
-        if (transform.mountType == ALTALT) transform.aaToEqu(&position);
-
-        CommandError result = goTo.request(position, PSS_EAST_ONLY, false);
+        CommandError result = goTo.request(homePosition, PSS_EAST_ONLY, false);
         if (result != CE_NONE) {
           VF("WRN: Mount, moving to home goto failed (code "); V(result); VLF(")");
           state = HS_NONE;
@@ -147,17 +135,16 @@ void Home::guideDone(bool success) {
     if (useOffset()) {
       reset(isRequestWithReset);
 
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
-      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
-
-      VF("MSG: Mount, finishing move to home with goto to (");
-      double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
-      double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.axis2.senseOffset);
-      V(radToDeg(a1)); VF(","); V(radToDeg(a2)); VLF(")");
-      axis1.setTargetCoordinate(a1);
-      axis1.autoGoto(goTo.getRadsPerSecond());
-      axis2.setTargetCoordinate(a2);
-      axis2.autoGoto(goTo.getRadsPerSecond());
+      #if MOUNT_HOME_AT_OFFSETS == OFF
+        VF("MSG: Mount, finishing move to home with goto to (");
+        double a1 = axis1.getInstrumentCoordinate() - arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
+        double a2 = axis2.getInstrumentCoordinate() - arcsecToRad(settings.axis2.senseOffset);
+        V(radToDeg(a1)); VF(","); V(radToDeg(a2)); VLF(")");
+        axis1.setTargetCoordinate(a1);
+        axis1.autoGoto(goTo.getRadsPerSecond());
+        axis2.setTargetCoordinate(a2);
+        axis2.autoGoto(goTo.getRadsPerSecond());
+      #endif
       mount.syncFromOnStepToEncoders = true;
 
       state = HS_NONE;
@@ -217,29 +204,21 @@ CommandError Home::reset(bool fullReset) {
 
   tasks.yieldMicros(10000);
 
-  if (transform.mountType == ALTAZM) {
-    position.a1 = position.z;
-    position.a2 = position.a;
-  } else
-  if (transform.mountType == ALTALT) {
-    position.a1 = position.aa1;
-    position.a2 = position.aa2;
-  } else {
-    position.a1 = position.h;
-    position.a2 = position.d;
-  }
+  Coordinate homePosition = getPosition(CR_MOUNT);
 
   if (!goTo.absoluteEncodersPresent) {
     if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
     if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
-    if (!fullReset && state == HS_HOMING && useOffset()) {
-      axis1.setInstrumentCoordinate(position.a1 + arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset));
-      axis2.setInstrumentCoordinate(position.a2 + arcsecToRad(settings.axis2.senseOffset));
-    } else {
-      axis1.setInstrumentCoordinate(position.a1);
-      axis2.setInstrumentCoordinate(position.a2);
-    }
+    #if MOUNT_HOME_AT_OFFSETS == OFF
+      if (useOffset() && state == HS_HOMING && !fullReset) {
+        homePosition.a1 += arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
+        homePosition.a2 += arcsecToRad(settings.axis2.senseOffset);
+      }
+    #endif
+
+    axis1.setInstrumentCoordinate(homePosition.a1);
+    axis2.setInstrumentCoordinate(homePosition.a2);
   }
 
   axis1.setBacklash(mount.settings.backlash.axis1);
@@ -257,39 +236,86 @@ CommandError Home::reset(bool fullReset) {
     #endif
 
     VF("MSG: Mount, reset at home (");
-    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    V(radToDeg(homePosition.a1)); VF(","); V(radToDeg(homePosition.a2));
     VLF(") and in standby");
   } else {
     VF("MSG: Mount, reset at home (");
-    V(radToDeg(position.a1)); VF(","); V(radToDeg(position.a2));
+    V(radToDeg(homePosition.a1)); VF(","); V(radToDeg(homePosition.a2));
     VLF(")");
   }
 
   return CE_NONE;
 }
 
-// get the home position
+// get the home position (Mount coordinate system)
 Coordinate Home::getPosition(CoordReturn coordReturn) {
+  Coordinate homePosition = position;
+
+  homePosition.pierSide = PIER_SIDE_EAST;
+
+  #if MOUNT_HOME_AT_OFFSETS == ON
+    if (useOffset()) {
+      if (transform.mountType == ALTAZM) {
+          homePosition.z += arcsecToRad(settings.axis1.senseOffset);
+          homePosition.a += arcsecToRad(settings.axis2.senseOffset);
+      } else
+      if (transform.mountType == ALTALT) {
+          homePosition.aa1 += arcsecToRad(settings.axis1.senseOffset);
+          homePosition.aa2 += arcsecToRad(settings.axis2.senseOffset);
+      } else {
+        homePosition.h += arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
+        homePosition.d += arcsecToRad(settings.axis2.senseOffset);
+      }
+    }
+  #endif
+
+  if (transform.mountType == ALTAZM) {
+    homePosition.a1 = homePosition.z;
+    homePosition.a2 = homePosition.a;
+  } else
+  if (transform.mountType == ALTALT) {
+    homePosition.a1 = homePosition.aa1;
+    homePosition.a2 = homePosition.aa2;
+  } else {
+    homePosition.a1 = homePosition.h;
+    homePosition.a2 = homePosition.d;
+
+    if (site.location.latitude >= 0.0) {
+      if (homePosition.d > Deg90) {
+        homePosition.pierSide = PIER_SIDE_WEST;
+        homePosition.h -= Deg180;
+        homePosition.d  = Deg180 - homePosition.d;
+      }
+    } else {
+      if (homePosition.d < -Deg90) {
+        homePosition.pierSide = PIER_SIDE_WEST;
+        homePosition.h -= Deg180;
+        homePosition.d  = (-Deg180) - homePosition.d;
+      }
+    }
+  }
+
   switch (coordReturn) {
     case CR_MOUNT:
     break;
     case CR_MOUNT_EQU:
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position);
-      if (transform.mountType == ALTALT) transform.aaToEqu(&position);
-      transform.hourAngleToRightAscension(&position, true);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&homePosition);
+      if (transform.mountType == ALTALT) transform.aaToEqu(&homePosition);
+      transform.hourAngleToRightAscension(&homePosition, true);
     break;
     case CR_MOUNT_ALT:
     case CR_MOUNT_HOR:
-      if (transform.isEquatorial()) transform.equToHor(&position);
-      else if (transform.mountType == ALTALT) transform.aaToHor(&position);
+      if (transform.isEquatorial()) transform.equToHor(&homePosition);
+      else if (transform.mountType == ALTALT) transform.aaToHor(&homePosition);
     break;
     case CR_MOUNT_ALL:
-      if (transform.mountType == ALTAZM) transform.horToEqu(&position); else
-      if (transform.mountType == ALTALT) transform.aaToEqu(&position); else transform.equToHor(&position);
-      transform.hourAngleToRightAscension(&position, true);
+      if (transform.mountType == ALTAZM) transform.horToEqu(&homePosition); else
+      if (transform.mountType == ALTALT) transform.aaToEqu(&homePosition); else transform.equToHor(&homePosition);
+      transform.hourAngleToRightAscension(&homePosition, true);
     break;
   }
-  return position;
+
+  return homePosition;
 }
 
 bool Home::useOffset() {
