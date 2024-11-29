@@ -74,9 +74,9 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
     } else
 
     // :GXY[n]#
-    // where [n] = 1..8 to get auXiliary feature temperature
+    // where [n] = 1..8 to get auXiliary feature name and purpose
     // :GXY0#
-    // return active features
+    // return active auXiliary features
     if (parameter[0] == 'Y') {
       int i = parameter[1] - '1';
 
@@ -181,9 +181,6 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       }
     } else return false;
   } else return false;
-
-  // silent errors for feature detection
-//if (parameter[0] == 'X' || parameter[0] == 'Y') *commandError = CE_0;
 
   return true;
 }
