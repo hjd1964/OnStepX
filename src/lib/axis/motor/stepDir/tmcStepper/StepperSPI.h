@@ -16,6 +16,22 @@
   #define DRIVER_TMC_STEPPER_AUTOGRAD false
 #endif
 
+#ifndef TMC2130_RSENSE
+  #define TMC2130_RSENSE 0.11F
+#endif
+
+#ifndef TMC2660_RSENSE
+  #define TMC2660_RSENSE 0.11F
+#endif
+
+#ifndef TMC5160_RSENSE
+  #define TMC5160_RSENSE 0.075F
+#endif
+
+#ifndef TMC5161_RSENSE
+  #define TMC5161_RSENSE 0.075F
+#endif
+
 class StepDirTmcSPI : public StepDirDriver {
   public:
     // constructor

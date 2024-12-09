@@ -46,7 +46,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   }
 
   if (settings.model == TMC2130) {
-    rSense = 0.11F;
+    rSense = TMC2130_RSENSE;
     driver = new TMC2130Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC2130Stepper*)driver)->begin();
     ((TMC2130Stepper*)driver)->intpol(settings.intpol);
@@ -54,7 +54,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC2130Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC5160) {
-    rSense = 0.075F;
+    rSense = TMC5160_RSENSE;
     driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5160Stepper*)driver)->begin();
     ((TMC5160Stepper*)driver)->intpol(settings.intpol);
@@ -62,7 +62,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC5160Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC5161) {
-    rSense = 0.075F;
+    rSense = TMC5161_RSENSE;
     driver = new TMC5161Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     ((TMC5161Stepper*)driver)->begin();
     ((TMC5161Stepper*)driver)->intpol(settings.intpol);

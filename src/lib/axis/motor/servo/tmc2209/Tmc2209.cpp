@@ -96,7 +96,7 @@ void ServoTmc2209::init() {
     SerialTMC.begin(SERIAL_TMC_BAUD);
   #endif
 
-  rSense = 0.11F;
+  rSense = TMC2209_RSENSE;
   driver = new TMC2209Stepper(&SERIAL_TMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   driver->begin();
   driver->intpol(true);

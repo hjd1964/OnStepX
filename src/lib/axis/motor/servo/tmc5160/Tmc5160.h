@@ -13,6 +13,10 @@
   #define DRIVER_TMC_STEPPER_AUTOGRAD true
 #endif
 
+#ifndef TMC5160_RSENSE
+  #define TMC5160_RSENSE 0.075F
+#endif
+
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
 
 typedef struct ServoTmcSpiPins {

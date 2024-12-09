@@ -92,7 +92,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
 
   // initialize the stepper driver
   if (settings.model == TMC2208) {
-    rSense = 0.11F;
+    rSense = TMC2208_RSENSE;
     driver = new TMC2208Stepper(&SerialTMC, rSense);
     ((TMC2208Stepper*)driver)->begin();
     ((TMC2208Stepper*)driver)->intpol(settings.intpol);
@@ -101,7 +101,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     ((TMC2208Stepper*)driver)->en_spreadCycle(true);
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
-    rSense = 0.11F;
+    rSense = TMC2209_RSENSE;
     driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
     ((TMC2209Stepper*)driver)->begin();
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
