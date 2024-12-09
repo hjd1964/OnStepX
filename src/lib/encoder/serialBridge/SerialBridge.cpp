@@ -17,7 +17,7 @@ bool _serial_bridge_initialized = false;
 
 SerialBridge::SerialBridge(int16_t axis) {
   if (axis < 1 || axis > 9) return;
-  initialized = true;
+  ready = true;
   
   this->axis = axis;
   axis--;
@@ -25,7 +25,7 @@ SerialBridge::SerialBridge(int16_t axis) {
 }
 
 int32_t SerialBridge::read() {
-  if (!initialized) { VF("WRN: Encoder SerialBridge"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   if (millis() - lastReadMillis > 10) {
     count = raw();
@@ -36,7 +36,7 @@ int32_t SerialBridge::read() {
 }
 
 void SerialBridge::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder SerialBridge"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   offset = count - raw();
 }
@@ -70,7 +70,7 @@ int32_t SerialBridge::raw() {
     return atoi(result) + origin;
   } else {
     VLF("WRN: SerialBridge raw(), timed out!");
-    error = true;
+    error++;
     return 0  + origin;
   }
 } 

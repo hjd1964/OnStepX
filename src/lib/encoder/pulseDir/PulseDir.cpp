@@ -53,7 +53,7 @@ PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
 }
 
 void PulseDir::init() {
-  if (initialized) { VF("WRN: Encoder PulseDir"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { VF("WRN: Encoder PulseDir"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(pulsePin, INPUT_PULLUP);
   pinMode(dirPin, INPUT_PULLUP);
@@ -103,11 +103,11 @@ void PulseDir::init() {
     }
   #endif
 
-  initialized = true;
+  ready = true;
 }
 
 int32_t PulseDir::read() {
-  if (!initialized) { VF("WRN: Encoder PulseDir"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   noInterrupts();
   int32 count = _pulse_dir_count[axis];
@@ -117,7 +117,7 @@ int32_t PulseDir::read() {
 }
 
 void PulseDir::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder PulseDir"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   count -= origin;
 

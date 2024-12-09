@@ -3,6 +3,11 @@
 
 #include "../../Common.h"
 
+// allow up to 20 errors per minute
+#ifndef ENCODER_ERROR_COUNT_THRESHOLD
+  #define ENCODER_ERROR_COUNT_THRESHOLD 20
+#endif
+
 #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER OFF
 #endif
@@ -73,28 +78,41 @@ class Encoder {
     // set the virtual encoder direction (-1 is reverse, 1 is forward)
     virtual void setDirection(volatile int8_t *direction) { /* normally does nothing */ }
 
+    // check for error state
+    bool errorThresholdExceeded();
+
+    // total number of errors
+    int32_t totalErrorCount = 0;
+
+    // total number of warnings
+    int32_t totalWarningCount = 0;
+
+    // true if encoder count is ready
+    bool ready = false;
+
     // true if this is a virtual encoder
     bool isVirtual = false;
 
-    // true if encoder count is ready
-    bool ready = true;
-
-    // true if errors were detected
-    bool error = false;
-
-    // true if issues with operation were detected
-    bool warn = false;
-
-    // index offset (r/w)
-    int32_t offset = 0;
-
-    // origin for absolute encoders
-    uint32_t origin = 0;
-
+    // raw position count (as last read)
     int32_t count = 0;
 
+    // raw position offset count (as last set)
+    int32_t offset = 0;
+
+    // raw origin count (as last set) for absolute encoders
+    uint32_t origin = 0;
+
   protected:
-    bool initialized = false;
+    unsigned long lastMinute = 0;
+
+    // accumulator for error detection
+    volatile int32_t error = 0;
+
+    // number of errors (resets once a minute)
+    int32_t errorCount = 0;
+
+    // accumulator for warning detection
+    volatile int32_t warn = 0;
 
     int16_t axis = 0;
 };

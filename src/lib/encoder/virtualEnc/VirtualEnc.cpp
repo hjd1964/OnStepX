@@ -62,7 +62,7 @@ VirtualEnc::VirtualEnc(int16_t axis) {
 }
 
 void VirtualEnc::init() {
-  if (initialized) { VF("WRN: Encoder Virtual"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { VF("WRN: Encoder Virtual"); V(axis); VLF(" init(), already initialized!"); return; }
 
   #if AXIS1_ENCODER == VIRTUAL
     if (axis == 0) {
@@ -110,11 +110,11 @@ void VirtualEnc::init() {
     }
   #endif
 
-  initialized = true;
+  ready = true;
 }
 
 int32_t VirtualEnc::read() {
-  if (!initialized) { VF("WRN: Encoder Virtual"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   noInterrupts();
   int32_t count = _pulse_count[axis];
@@ -124,7 +124,7 @@ int32_t VirtualEnc::read() {
 }
 
 void VirtualEnc::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder Virtual"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   count -= origin;
 
@@ -134,7 +134,7 @@ void VirtualEnc::write(int32_t count) {
 }
 
 void VirtualEnc::setVelocity(float countsPerSec) {
-  if (!initialized) { VF("WRN: Encoder Virtual"); V(axis); VLF(" setVelocity(), not initialized!"); return; }
+  if (!ready) { VF("WRN: Encoder Virtual"); V(axis); VLF(" setVelocity(), not ready!"); return; }
   _increment[axis] = (countsPerSec)*(timerRateMs/1000.0F);
 }
 

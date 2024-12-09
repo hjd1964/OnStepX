@@ -66,7 +66,7 @@ Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
 }
 
 void Quadrature::init() {
-  if (initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);
@@ -133,11 +133,11 @@ void Quadrature::init() {
     #endif
   }
 
-  initialized = true;
+  ready = true;
 }
 
 int32_t Quadrature::read() {
-  if (!initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   int32_t count = 0;
   noInterrupts();
@@ -148,7 +148,7 @@ int32_t Quadrature::read() {
 }
 
 void Quadrature::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder Quadrature"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   count -= origin;
 
@@ -167,22 +167,22 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
   static int16_t dir;
   switch (v) {
-    case 0b0000: dir = 0; error = true; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b0000: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
     case 0b0001: dir = -1; break;
     case 0b0010: dir = 1; break;
-    case 0b0011: warn = true; break;           // skipped pulse use last dir
+    case 0b0011: warn++; break;           // skipped pulse use last dir
     case 0b0100: dir = 1; break;
-    case 0b0101: dir = 0; error = true; break; // skipped pulse use last dir (way too fast if this is happening)
-    case 0b0110: warn = true; break;           // skipped pulse use last dir
+    case 0b0101: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b0110: warn++; break;           // skipped pulse use last dir
     case 0b0111: dir = -1; break;
     case 0b1000: dir = -1; break;
-    case 0b1001: warn = true; break;           // skipped pulse use last dir
-    case 0b1010: dir = 0; error = true; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b1001: warn++; break;           // skipped pulse use last dir
+    case 0b1010: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
     case 0b1011: dir = 1; break;
-    case 0b1100: warn = true; break;           // skipped pulse use last dir
+    case 0b1100: warn++; break;           // skipped pulse use last dir
     case 0b1101: dir = 1; break;
     case 0b1110: dir = -1; break;
-    case 0b1111: dir = 0; error = true; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b1111: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
   }
   count += dir;
   
@@ -196,22 +196,22 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
   static int16_t dir;
   switch (v) {
-    case 0b0000: dir = 0; error = true; break;
+    case 0b0000: dir = 0; error++; break;
     case 0b0001: dir = -1; break;
     case 0b0010: dir = 1; break;
-    case 0b0011: warn = true; break;
+    case 0b0011: warn++; break;
     case 0b0100: dir = 1; break;
-    case 0b0101: dir = 0; error = true; break;
-    case 0b0110: warn = true; break;
+    case 0b0101: dir = 0; error++; break;
+    case 0b0110: warn++; break;
     case 0b0111: dir = -1; break;
     case 0b1000: dir = -1; break;
-    case 0b1001: warn = true; break;
-    case 0b1010: dir = 0; error = true; break;
+    case 0b1001: warn++; break;
+    case 0b1010: dir = 0; error++; break;
     case 0b1011: dir = 1; break;
-    case 0b1100: warn = true; break;
+    case 0b1100: warn++; break;
     case 0b1101: dir = 1; break;
     case 0b1110: dir = -1; break;
-    case 0b1111: dir = 0; error = true; break;
+    case 0b1111: dir = 0; error++; break;
   }
   count += dir;
   

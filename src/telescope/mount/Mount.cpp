@@ -285,6 +285,14 @@ void Mount::update() {
 }
 
 void Mount::poll() {
+
+  // stop any movement then disable on motor hardware fault
+  if (mount.motorFault()) {
+    if (goTo.state > GS_NONE) goTo.abort(); else
+    if (guide.state > GU_NONE) guide.abort(); else
+    if (axis1.isEnabled() || axis2.isEnabled()) enable(false);
+  }
+
   #ifdef HAL_NO_DOUBLE_PRECISION
     #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
     #define DiffRange2 0.017453292F          // 60 arc-minutes in radians
@@ -426,11 +434,6 @@ void Mount::poll() {
 
   // override for both rates for special case near the aa1 axis of rotation
   if (transform.mountType == ALTALT && fabs(altitude2) > Deg90 - DegenerateRange) { trackingRateAxis1 = 0.0F; }
-
-  // stop any movement on motor hardware fault
-  if (mount.motorFault()) {
-    if (goTo.state > GS_NONE) goTo.abort(); else if (guide.state > GU_NONE) guide.abort();
-  }
 
   update();
 }

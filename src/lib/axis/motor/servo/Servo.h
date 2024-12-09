@@ -218,10 +218,12 @@ class ServoMotor : public Motor {
     bool slewing = false;
     bool motorStepsInitDone = false;
     bool homeSet = false;
+    uint32_t encoderOrigin = 0;
     bool encoderReverse = false;
     bool encoderReverseDefault = false;
     bool wasAbove33 = false;
     bool wasBelow33 = false;
+    bool safetyShutdown = false;
     long lastTargetDistance = 0;
 };
 

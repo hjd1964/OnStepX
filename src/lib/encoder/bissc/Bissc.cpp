@@ -6,18 +6,18 @@
 
 // get device ready for use
 void Bissc::init() {
-  if (initialized) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" init(), already initialized!"); return; }
 
   pinMode(maPin, OUTPUT);
   digitalWriteF(maPin, LOW);
   pinMode(sloPin, INPUT_PULLUP);
 
-  initialized = true;
+  ready = true;
 }
 
 // set encoder origin
 void Bissc::setOrigin(uint32_t count) {
-  if (!initialized) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" setOrigin(), not initialized!"); return; }
+  if (!ready) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" setOrigin(), not initialized!"); return; }
 
   long temp = offset;
   offset = 0;
@@ -37,7 +37,7 @@ void Bissc::setOrigin(uint32_t count) {
 
 // read encoder count
 int32_t Bissc::read() {
-  if (!initialized) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   uint32_t temp;
   if (readEncLatest(temp)) {
@@ -48,7 +48,7 @@ int32_t Bissc::read() {
 
 // write encoder count
 void Bissc::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder BiSS-C"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   if (count != INT32_MAX) {
     uint32_t temp;

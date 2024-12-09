@@ -16,7 +16,7 @@ QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
 }
 
 void QuadratureEsp32::init() {
-  if (initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" init(), already initialized!"); return; }
 
   ab = new ESP32Encoder;
   if (ab == NULL) {
@@ -27,11 +27,11 @@ void QuadratureEsp32::init() {
   ab->attachFullQuad(APin, BPin);
   ab->setCount(0);
 
-  initialized = true;
+  ready = true;
 }
 
 int32_t QuadratureEsp32::read() {
-  if (!initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" read(), not initialized!"); return 0; }
+  if (!ready) return 0;
 
   count = (int32_t)ab->getCount();
 
@@ -39,7 +39,7 @@ int32_t QuadratureEsp32::read() {
 }
 
 void QuadratureEsp32::write(int32_t count) {
-  if (!initialized) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" write(), not initialized!"); return; }
+  if (!ready) return;
 
   count -= origin;
 

@@ -144,11 +144,7 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
     if (!foundCds) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Cds bit invalid"); errors++; } else
     if (encErr) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Error bit set"); errors++; } else errors = 0;
   }
-
-  if (errors > 0) {
-    if (errors <= 2) warn = true; else error = true;
-    return false;
-  }
+  if (errors > 0) { error++; return false; }
 
   #if BISSC_SINGLE_TURN == ON
     // extend negative to 32 bits
