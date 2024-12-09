@@ -45,8 +45,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
 
   this->driver = Driver;
 
-  encoder->init();
-  encoder->setOrigin(encoderOrigin);
+  this->encoderOrigin = encoderOrigin;
   this->encoderReverse = encoderReverse;
   this->encoderReverseDefault = encoderReverse;
 
@@ -72,6 +71,10 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
+
+  encoder->init();
+  encoder->setOrigin(encoderOrigin);
+  if (!encoder->ready) return false;
 
   driver->init();
   enable(false);
