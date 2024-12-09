@@ -19,8 +19,9 @@ bool Encoder::errorThresholdExceeded() {
 
     // simulate an encoder error event
     //if (minute == 2) error = 30; 
+  
+    lastMinute = minute;
   }
-  lastMinute = minute;
 
   errorCount += error;
   #ifdef ENCODER_WARN_AS_ERROR
