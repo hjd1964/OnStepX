@@ -58,6 +58,11 @@
   #define MCU_STR "Teensy4.1"
   #include "HAL_Teensy_4.1.h"
 
+#elif defined(ARDUINO_TEENSY_MICROMOD)
+ // Teensy MicroMod
+ #define MCU_STR "TeensyMicroMod"
+ #include "HAL_Teensy_4.1.h"
+
 #elif defined(STM32F103xB)
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3
   #define MCU_STR "STM32F103"
