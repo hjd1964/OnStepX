@@ -31,6 +31,7 @@
 #define INVALID                     -127
 
 // driver (step/dir interface, usually for stepper motors)
+// changes here must be reflected in the StepDirDriver.cpp file, etc.
 #define STEP_DIR_DRIVER_FIRST       0
 #define A4988                       0      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x
 #define DRV8825                     1      // allows M0,M1,M2 bit patterens for 1x,2x,4x,8x,16x,32x
@@ -67,6 +68,7 @@
 #define DRIVER_DECAY_MODE_LAST      6
 
 // servo driver (usually for DC motors equipped with encoders)
+// changes here must be reflected in the ServoDriver.cpp file, etc.
 #define SERVO_DRIVER_FIRST          100
 #define SERVO_PE                    100    // SERVO, direction (phase) and pwm (enable) connections
 #define SERVO_EE                    101    // SERVO, dual pwm input (enable/enable) connections
