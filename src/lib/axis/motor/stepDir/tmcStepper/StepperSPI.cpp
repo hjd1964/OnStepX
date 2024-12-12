@@ -65,6 +65,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
       driver = new TMC2660Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
     #endif
     ((TMC2660Stepper*)driver)->begin();
+    ((TMC2660Stepper*)driver)->toff(5);
     ((TMC2660Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
   } else
