@@ -123,7 +123,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     }
   } else { VLF("MSG: NV, correct key found"); }
 
-  #ifdef USES_SPI
+  #ifdef USES_HW_SPI
     SPI.begin();
   #endif
 
