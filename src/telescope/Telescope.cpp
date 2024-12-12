@@ -123,6 +123,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     }
   } else { VLF("MSG: NV, correct key found"); }
 
+  #ifdef USES_SPI
+    SPI.begin();
+  #endif
+
   if (!gpio.init()) initError.gpio = true;
 
   #ifdef SHARED_ENABLE_PIN
