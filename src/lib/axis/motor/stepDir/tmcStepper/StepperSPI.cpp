@@ -47,7 +47,11 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
 
   if (settings.model == TMC2130) {
     rSense = TMC2130_RSENSE;
-    driver = new TMC2130Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #ifdef DRIVER_TMC_STEPPER_HW_SPI
+      driver = new TMC2130Stepper(Pins->cs, rSense);
+    #else
+      driver = new TMC2130Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #endif
     ((TMC2130Stepper*)driver)->begin();
     ((TMC2130Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
@@ -55,14 +59,22 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   } else
   if (settings.model == TMC2660) {
     rSense = TMC2660_RSENSE;
-    driver = new TMC2660Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #ifdef DRIVER_TMC_STEPPER_HW_SPI
+      driver = new TMC2660Stepper(Pins->cs, rSense);
+    #else
+      driver = new TMC2660Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #endif
     ((TMC2660Stepper*)driver)->begin();
     ((TMC2660Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
   } else
   if (settings.model == TMC5160) {
     rSense = TMC5160_RSENSE;
-    driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #ifdef DRIVER_TMC_STEPPER_HW_SPI
+      driver = new TMC5160Stepper(Pins->cs, rSense);
+    #else
+      driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #endif
     ((TMC5160Stepper*)driver)->begin();
     ((TMC5160Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
@@ -70,7 +82,11 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   } else
   if (settings.model == TMC5161) {
     rSense = TMC5161_RSENSE;
-    driver = new TMC5161Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #ifdef DRIVER_TMC_STEPPER_HW_SPI
+      driver = new TMC5161Stepper(Pins->cs, rSense);
+    #else
+      driver = new TMC5161Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #endif
     ((TMC5161Stepper*)driver)->begin();
     ((TMC5161Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();

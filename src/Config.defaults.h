@@ -31,6 +31,11 @@
 #define CONFIG_NAME "OnStepX"
 #endif
 
+// flag hardware SPI as active
+#ifdef DRIVER_TMC_STEPPER_HW_SPI
+#define USES_HW_SPI
+#endif
+
 // serial ports
 #ifndef SERIAL_A_BAUD_DEFAULT
 #define SERIAL_A_BAUD_DEFAULT         9600

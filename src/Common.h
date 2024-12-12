@@ -12,6 +12,10 @@
 #include "../Config.h"
 #include "Config.defaults.h"
 
+#ifdef USES_HW_SPI
+#include <SPI.h>
+#endif
+
 #ifdef ESP32
   #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
     #define NV_WIFI_SETTINGS_BASE (NV_LAST+1) // bytes: 451 , 451
