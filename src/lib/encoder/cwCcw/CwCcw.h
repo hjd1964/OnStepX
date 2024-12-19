@@ -1,7 +1,7 @@
 // CW/CCW encoders
 #pragma once
 
-#include "../Encoder.h"
+#include "../EncoderBase.h"
 
 #if AXIS1_ENCODER == CW_CCW || AXIS2_ENCODER == CW_CCW || AXIS3_ENCODER == CW_CCW || \
     AXIS4_ENCODER == CW_CCW || AXIS5_ENCODER == CW_CCW || AXIS6_ENCODER == CW_CCW || \

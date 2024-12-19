@@ -97,7 +97,7 @@ bool ServoMotor::init() {
       if (!tasks.requestHardwareTimer(taskHandle, 0)) {
         VF(" (no hardware timer!)");
       } else {
-        maxFrequency = 1000000.0F/HAL_MAXRATE_LOWER_LIMIT;
+        maxFrequency = (1000000.0F/HAL_MAXRATE_LOWER_LIMIT)/2.0F;
       };
     }
     VLF("");

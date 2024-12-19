@@ -372,7 +372,7 @@
   #define AXIS1_ENCODER_REVERSE         OFF                       // reverse count direction of encoder
   #endif
 #endif
-#if AXIS1_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
+#if AXIS1_DRIVER_MODEL == ODRIVE
   #define AXIS1_ODRIVE_PRESENT
   #ifndef AXIS1_ODRIVE_P
   #define AXIS1_ODRIVE_P                2.0                       // P = proportional
@@ -548,7 +548,7 @@
   #define AXIS2_ENCODER_REVERSE         OFF
   #endif
 #endif
-#if AXIS2_DRIVER_MODEL >= ODRIVE_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= ODRIVE_DRIVER_LAST
+#if AXIS2_DRIVER_MODEL == ODRIVE
   #define AXIS2_ODRIVE_PRESENT
   #ifndef AXIS2_ODRIVE_P
   #define AXIS2_ODRIVE_P                 2.0                       // P = proportional

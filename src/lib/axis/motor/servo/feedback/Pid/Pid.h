@@ -2,7 +2,7 @@
 // servo motor PID feedback
 #pragma once
 
-#include "../Feedback.h"
+#include "../FeedbackBase.h"
 
 #ifdef SERVO_MOTOR_PRESENT
 

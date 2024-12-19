@@ -1,11 +1,9 @@
 // JTW 24 BIT BISS-C encoders
 #pragma once
 
-#include "../Encoder.h"
+#include "Bissc.h"
 
 #ifdef HAS_JTW_24BIT
-
-  #include "Bissc.h"
 
   class Jtw24 : public Bissc {
     public:

@@ -1,7 +1,7 @@
 // A/B Quadrature encoders (fast ESP32 hardware decode)
 #pragma once
 
-#include "../Encoder.h"
+#include "../EncoderBase.h"
 
 #if AXIS1_ENCODER == AB_ESP32 || AXIS2_ENCODER == AB_ESP32 || AXIS3_ENCODER == AB_ESP32 || \
     AXIS4_ENCODER == AB_ESP32 || AXIS5_ENCODER == AB_ESP32 || AXIS6_ENCODER == AB_ESP32 || \

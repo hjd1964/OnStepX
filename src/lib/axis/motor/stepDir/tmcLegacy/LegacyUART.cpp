@@ -7,6 +7,8 @@
 
 #if !defined(DRIVER_TMC_STEPPER) && defined(STEP_DIR_TMC_UART_PRESENT)
 
+#include "../../../../gpioEx/GpioEx.h"
+
 // help with pin names
 #define rx m3
 #define tx m2

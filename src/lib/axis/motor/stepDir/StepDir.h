@@ -10,6 +10,8 @@
   #error "Configuration (Config.h): Having both GPIO_DIRECTION_PINS and SHARED_DIRECTION_PINS is not allowed"
 #endif
 
+#include "../../../gpioEx/GpioEx.h"
+
 #include "generic/Generic.h"
 #include "tmcLegacy/LegacySPI.h"
 #include "tmcLegacy/LegacyUART.h"

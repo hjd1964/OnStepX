@@ -5,9 +5,10 @@
 
 #ifdef ODRIVE_MOTOR_PRESENT
 
-#include "ODriveEnums.h"
-
 #include "../../../tasks/OnTask.h"
+#include "../../../gpioEx/GpioEx.h"
+
+#include "ODriveEnums.h"
 
 ODriveMotor *odriveMotorInstance[2];
 IRAM_ATTR void moveODriveMotorAxis1() { odriveMotorInstance[0]->move(); }

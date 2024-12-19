@@ -5,6 +5,8 @@
 
 #ifdef SERVO_DC_PRESENT
 
+#include "../../../../gpioEx/GpioEx.h"
+
 #if defined(ARDUINO_TEENSY41) && defined(AXIS1_STEP_PIN) && AXIS1_STEP_PIN == 38 && defined(SERVO_ANALOG_WRITE_FREQUENCY)
   // this is only for pin 38 of a Teensy4.1
   IntervalTimer itimer4;

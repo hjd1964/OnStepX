@@ -7,6 +7,8 @@
  
 #if defined(DRIVER_TMC_STEPPER) && defined(STEP_DIR_TMC_SPI_PRESENT)
 
+#include "../../../../gpioEx/GpioEx.h"
+
 // help with pin names
 #define mosi m0
 #define sck  m1

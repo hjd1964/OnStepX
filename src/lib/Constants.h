@@ -5,7 +5,6 @@
 #define AUTO                        -1
 #define OFF                         -1
 #define ON                          -2
-#define ALT                         -3
 #define AUX                         -4
 #define SLAVE                       -5
 #define BOTH                        -6
@@ -29,6 +28,15 @@
 #define MIDDLE                      -24
 #define MAXIMUM                     -25
 #define INVALID                     -127
+
+// CAN interface options
+#define CAN_SAN                     0
+#define CAN_ESP32                   1
+#define CAN_MCP2515                 2
+#define CAN0_TEENSY4                3
+#define CAN1_TEENSY4                4
+#define CAN2_TEENSY4                5
+#define CAN3_TEENSY4                6
 
 // driver (step/dir interface, usually for stepper motors)
 // changes here must be reflected in the StepDirDriver.cpp file, etc.
@@ -119,15 +127,18 @@
 #define NV_KEY_VALUE                111111111UL
 
 #define NV_DEF                      0
-#define NV_DEFAULT                  0
-#define NV_2416                     1  // 2KB I2C EEPROM AT DEFAULT ADDRESS 0x50
-#define NV_2432                     2  // 4KB I2C EEPROM AT DEFAULT ADDRESS 0x50
-#define NV_2464                     3  // 8KB I2C EEPROM AT DEFAULT ADDRESS 0x50
-#define NV_24128                    4  // 16KB I2C EEPROM AT DEFAULT ADDRESS 0x50
-#define NV_24256                    5  // 32KB I2C EEPROM AT DEFAULT ADDRESS 0x50
-#define NV_AT24C32                  6  // 4KB I2C EEPROM AT DEFAULT ADDRESS 0x57 (ZS-01 module for instance)
-#define NV_MB85RC64                 7  // 8KB I2C FRAM AT DEFAULT ADDRESS 0x50
-#define NV_MB85RC256                8  // 32KB I2C FRAM AT DEFAULT ADDRESS 0x50
+#define NV_DEFAULT                  0  // PLATFORM SPECIFIC (HAL)
+#define NV_EEPROM                   1  // EEPROM.h
+#define NV_ESP                      2  // ESP8266/ESP32 EEPROM emulation with commits
+#define NV_M0                       3  // Arduino M0 EEPROM emulation with commits
+#define NV_2416                     4  // 2KB I2C EEPROM AT DEFAULT ADDRESS 0x50
+#define NV_2432                     5  // 4KB I2C EEPROM AT DEFAULT ADDRESS 0x50
+#define NV_2464                     6  // 8KB I2C EEPROM AT DEFAULT ADDRESS 0x50
+#define NV_24128                    7  // 16KB I2C EEPROM AT DEFAULT ADDRESS 0x50
+#define NV_24256                    8  // 32KB I2C EEPROM AT DEFAULT ADDRESS 0x50
+#define NV_AT24C32                  9  // 4KB I2C EEPROM AT DEFAULT ADDRESS 0x57 (ZS042 module for instance)
+#define NV_MB85RC64                10  // 8KB I2C FRAM AT DEFAULT ADDRESS 0x50
+#define NV_MB85RC256               11  // 32KB I2C FRAM AT DEFAULT ADDRESS 0x50
 
 #define NVE_LOW                     0   // low (< 100K writes)
 #define NVE_MID                     1   // mid (~ 100K writes)

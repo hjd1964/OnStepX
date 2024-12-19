@@ -4,6 +4,7 @@
 #include "Axis.h"
 
 #include "../tasks/OnTask.h"
+#include "../nv/Nv.h"
 
 #ifdef MOTOR_PRESENT
 

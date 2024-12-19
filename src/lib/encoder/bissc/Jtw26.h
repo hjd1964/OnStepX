@@ -1,11 +1,9 @@
 // JTW 26 BIT BISS-C encoders
 #pragma once
 
-#include "../Encoder.h"
+#include "Bissc.h"
 
 #ifdef HAS_JTW_26BIT
-
-  #include "Bissc.h"
 
   class Jtw26 : public Bissc {
     public:

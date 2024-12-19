@@ -1,7 +1,7 @@
 // BISS-C encoders
 #pragma once
 
-#include "../Encoder.h"
+#include "../EncoderBase.h"
 
 #ifdef HAS_BISS_C
 

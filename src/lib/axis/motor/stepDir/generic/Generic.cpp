@@ -5,6 +5,8 @@
 
 #ifdef STEP_DIR_LEGACY_PRESENT
 
+#include "../../../../gpioEx/GpioEx.h"
+
 // constructor
 StepDirGeneric::StepDirGeneric(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;

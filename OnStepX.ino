@@ -48,8 +48,8 @@
 #define FirmwareVersionConfig       6      // internal, for tracking configuration file changes
 
 #include "src/Common.h"
-NVS nv;
 #include "src/Validate.h"
+#include "src/lib/nv/Nv.h"
 #include "src/lib/sense/Sense.h"
 #include "src/lib/tasks/OnTask.h"
 
@@ -95,8 +95,9 @@ void setup() {
   // start low level hardware
   VLF("MSG: Setup, HAL initialize");
   HAL_INIT();
-  if (!HAL_NV_INIT()) {
-    DLF("WRN: Setup, NV (EEPROM/FRAM/FlashMem/etc.) device not found!");
+
+  if (!nv.init()) {
+    DLF("WRN: Setup, NV (EEPROM/FRAM/Flash/etc.) device not found!");
     nv.initError = true;
   }
   delay(2000);

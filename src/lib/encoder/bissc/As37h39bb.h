@@ -1,11 +1,9 @@
 // Broadcom AS37-H39B-B BISS-C encoders
 #pragma once
 
-#include "../Encoder.h"
+#include "Bissc.h"
 
 #ifdef HAS_AS37_H39B_B
-
-  #include "Bissc.h"
 
   class As37h39bb : public Bissc {
     public:

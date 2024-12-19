@@ -8,6 +8,8 @@
 // the various servo driver models
 #define SERVO_DRIVER_MODEL_COUNT (SERVO_DRIVER_LAST - SERVO_DRIVER_FIRST + 1)
 
+#include "../../../gpioEx/GpioEx.h"
+
 #include "../Motor.h"
 
 #if DEBUG != OFF

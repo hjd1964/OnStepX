@@ -6,6 +6,7 @@
 #ifdef SERVO_TMC2209_PRESENT
 
 #include "../../../../tasks/OnTask.h"
+#include "../../../../gpioEx/GpioEx.h"
 
 // help with pin names
 #define rx m3
