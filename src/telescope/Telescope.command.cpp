@@ -64,7 +64,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
   #ifdef MOUNT_PRESENT
     if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (guide.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (gpio.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    #if GPIO_DEVICE != OFF
+      if (gpio.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    #endif
     if (mountStatus.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (goTo.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
     if (park.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
