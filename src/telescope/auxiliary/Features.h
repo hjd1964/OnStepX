@@ -6,6 +6,8 @@
 
 #ifdef FEATURES_PRESENT
 
+#include "../../lib/gpioEx/GpioEx.h"
+
 #include "../../libApp/commands/ProcessCmds.h"
 #include "../../libApp/temperature/Temperature.h"
 #include "dewHeater/DewHeater.h"
