@@ -5,10 +5,12 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
+
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
-#include "../../../lib/tasks/OnTask.h"
 
 // init the home position (according to settings and mount type)
 void Home::init() {

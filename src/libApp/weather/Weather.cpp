@@ -29,10 +29,10 @@ extern bool xBusy;
                                         // and https://github.com/adafruit/Adafruit_Sensor
   #if WEATHER == BMP280
     #define BMP_ADDRESS 0x77
-    Adafruit_BMP280 bmx(&HAL_Wire);
+    Adafruit_BMP280 bmx(&HAL_WIRE);
   #elif WEATHER == BMP280_0x76
     #define BMP_ADDRESS 0x76
-    Adafruit_BMP280 bmx(&HAL_Wire);
+    Adafruit_BMP280 bmx(&HAL_WIRE);
   #elif WEATHER == BMP280_SPI
     Adafruit_BMP280 bmx(BMx280_CS_PIN); // hardware SPI
   #endif
@@ -44,7 +44,7 @@ bool Weather::init() {
   #if WEATHER != OFF
     success = false;
     #if WEATHER == BME280 || WEATHER == BME280_0x76
-      if (bmx.begin(BME_ADDRESS, &HAL_Wire)) {
+      if (bmx.begin(BME_ADDRESS, &HAL_WIRE)) {
         bmx.setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
         weatherSensor = WS_BME280; success = true;
       } else { DF("WRN: Weather.init(), BME280 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(BME_ADDRESS, HEX); DLF(") not found"); }
@@ -70,10 +70,10 @@ bool Weather::init() {
     // follow any I2C device in-library init with a reset of the I2C bus speed
     #if WEATHER == BME280 || WEATHER == BME280_0x76 || WEATHER == BMP280_0x76 || WEATHER == BMP280
       #ifdef HAL_WIRE_RESET_AFTER_CONNECT
-        HAL_Wire.end();
-        HAL_Wire.begin();
+        HAL_WIRE.end();
+        HAL_WIRE.begin();
         #ifdef HAL_WIRE_CLOCK
-          HAL_Wire.setClock(HAL_WIRE_CLOCK);
+          HAL_WIRE.setClock(HAL_WIRE_CLOCK);
         #endif
       #endif
     #endif

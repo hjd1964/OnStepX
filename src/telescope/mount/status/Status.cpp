@@ -6,6 +6,9 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/gpioEx/GpioEx.h"
+#include "../../../lib/nv/Nv.h"
+
 #include "../park/Park.h"
 
 #if STATUS_MOUNT_LED != OFF && MOUNT_LED_PIN != OFF

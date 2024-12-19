@@ -1,8 +1,9 @@
 // -----------------------------------------------------------------------------------------------------------------------------
 // Handle push buttons
 
-#include "../../Common.h"
 #include "PushButton.h"
+
+#include "../gpioEx/GpioEx.h"
 
 #ifndef ANALOG_READ_RANGE
   #define ANALOG_READ_RANGE 1023

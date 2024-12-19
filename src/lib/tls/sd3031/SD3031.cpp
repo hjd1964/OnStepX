@@ -1,12 +1,11 @@
 // -----------------------------------------------------------------------------------
 // Time/Location source SD3031 RTC support
-// uses the default I2C port in most cases; though HAL_Wire can redirect to another port (as is done for the Teensy3.5/3.6)
+// uses the default I2C port in most cases; though HAL_WIRE can redirect to another port (as is done for the Teensy3.5/3.6)
 
 #include "SD3031.h"
 
 #if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == SD3031 || \
     (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == SD3031)
-
 
 #ifdef TLS_TIMELIB
   #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
@@ -14,18 +13,18 @@
 
 #include <Wire.h>
 #include <DFRobot_SD3031.h> // https://github.com/cdjq/DFRobot_SD3031
-DFRobot_SD3031 rtcSD3031(&HAL_Wire);
+DFRobot_SD3031 rtcSD3031(&HAL_WIRE);
 
 bool TlsSd3031::init() {
-  HAL_Wire.begin();
+  HAL_WIRE.begin();
   #ifdef HAL_WIRE_CLOCK
-    HAL_Wire.setClock(HAL_WIRE_CLOCK);
+    HAL_WIRE.setClock(HAL_WIRE_CLOCK);
   #endif
 
   bool error = !rtcSD3031.begin();
   if (!error) {
     #ifdef HAL_WIRE_CLOCK
-      HAL_Wire.setClock(HAL_WIRE_CLOCK);
+      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
     #endif
 
     rtcSD3031.setHourSystem(rtcSD3031.e24hours);
@@ -38,10 +37,10 @@ bool TlsSd3031::init() {
     ready = true;
   } else { DLF("WRN: tls.init(), SD3031 (I2C 0x32) not found"); }
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
-    HAL_Wire.end();
-    HAL_Wire.begin();
+    HAL_WIRE.end();
+    HAL_WIRE.begin();
     #ifdef HAL_WIRE_CLOCK
-      HAL_Wire.setClock(HAL_WIRE_CLOCK);
+      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
     #endif
   #endif
   return ready;

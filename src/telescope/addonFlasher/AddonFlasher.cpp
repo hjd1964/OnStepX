@@ -1,7 +1,9 @@
 // Flashes an esp8266 based SWS on the SERIAL_PASSTHROUGH interface by passing data to/from SERIAL_A
 
 #include "AddonFlasher.h"
+
 #include "../../lib/tasks/OnTask.h"
+#include "../../lib/gpioEx/GpioEx.h"
 
 #if SERIAL_PASSTHROUGH == HardSerial
 #define SERIAL_PASSTHROUGH_RXTX_SET

@@ -5,7 +5,10 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../../../lib/nv/Nv.h"
+
 #include "../../../libApp/commands/ProcessCmds.h"
+
 #include "../../Telescope.h"
 #include "../home/Home.h"
 #include "../Mount.h"

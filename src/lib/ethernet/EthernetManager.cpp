@@ -4,6 +4,7 @@
 #if defined(OPERATIONAL_MODE) && (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500)
 
 #include "../tasks/OnTask.h"
+#include "../nv/Nv.h"
 
 #if MDNS_SERVER == ON
   enum MdnsReady {MD_WAIT, MD_READY, MD_FAIL};

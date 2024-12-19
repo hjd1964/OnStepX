@@ -4,7 +4,9 @@
 // digital mode reads have basic hf EMI/RFI noise filtering
 
 #include "Sense.h"
+
 #include "../tasks/OnTask.h"
+#include "../gpioEx/GpioEx.h"
 
 #ifndef ANALOG_READ_RANGE
   #define ANALOG_READ_RANGE 1023

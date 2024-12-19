@@ -4,6 +4,30 @@
 
 #include "../../Common.h"
 
+// Watchdog control macros
+#ifdef __AVR_ATmega2560__
+  #if defined(WATCHDOG) && WATCHDOG != OFF
+    #include <avr/wdt.h>
+    #define WDT_ENABLE wdt_enable(WDTO_8S)
+    #define WDT_RESET wdt_reset()
+    #define WDT_DISABLE wdt_disable()
+  #else
+    #define WDT_ENABLE
+    #define WDT_RESET
+    #define WDT_DISABLE
+  #endif
+#else
+  #if defined(WATCHDOG) && WATCHDOG != OFF
+    #define WDT_ENABLE watchdog.enable(8);
+    #define WDT_RESET watchdog.reset();
+    #define WDT_DISABLE watchdog.disable();
+  #else
+    #define WDT_ENABLE
+    #define WDT_RESET
+    #define WDT_DISABLE
+  #endif
+#endif
+
 #if !defined(__AVR_ATmega2560__) && defined(WATCHDOG) && WATCHDOG != OFF
 
 class Watchdog {

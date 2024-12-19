@@ -2,9 +2,13 @@
 // OnStepX telescope control
 
 #include "../Common.h"
-#include "../lib/tasks/OnTask.h"
 
+#include "../lib/tasks/OnTask.h"
+#include "../lib/gpioEx/GpioEx.h"
+#include "../lib/nv/Nv.h"
 #include "../lib/convert/Convert.h"
+#include "../lib/canPlus/CanPlus.h"
+
 #include "../libApp/commands/ProcessCmds.h"
 #include "../libApp/weather/Weather.h"
 #include "../libApp/temperature/Temperature.h"
@@ -125,6 +129,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   #ifdef USES_HW_SPI
     SPI.begin();
+  #endif
+
+  #if defined(CAN_RX) && CAN_RX != OFF && defined(CAN_TX) && CAN_TX != OFF
+    canPlus.init();
   #endif
 
   if (!gpio.init()) initError.gpio = true;

@@ -6,6 +6,7 @@
 #ifdef ROTATOR_PRESENT
 
 #include "../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
 
 #include "../Telescope.h"
 #include "../mount/Mount.h"

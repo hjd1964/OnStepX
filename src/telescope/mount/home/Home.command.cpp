@@ -5,6 +5,8 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../../../lib/nv/Nv.h"
+
 #include "../park/Park.h"
 
 bool Home::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {

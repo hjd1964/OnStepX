@@ -5,6 +5,8 @@
 
 #ifdef FEATURES_PRESENT
 
+#include "../../../lib/nv/Nv.h"
+
 void Intervalometer::init(int index) {
   this->index = index;
 

@@ -11,6 +11,7 @@
 #if defined(MOUNT_PRESENT) && defined(HIGH_SPEED_ALIGN)
 
 #include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
 
 #include "../coordinates/Transform.h"
 #include "../../Telescope.h"

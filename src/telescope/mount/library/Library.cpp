@@ -5,6 +5,8 @@
 
 #if defined(MOUNT_PRESENT)
 
+#include "../../../lib/nv/Nv.h"
+
 #include "../../Telescope.h"
 
 char const * objectStr[] = {"UNK", "OC", "GC", "PN", "DN", "SG", "EG", "IG", "KNT", "SNR", "GAL", "CN", "STR", "PLA", "CMT", "AST"};

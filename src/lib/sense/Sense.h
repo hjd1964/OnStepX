@@ -3,6 +3,7 @@
 // analog mode reads uses software schmitt trigger with threshold/hysteresis-band
 // digital mode reads have basic hf EMI/RFI noise filtering
 #pragma once
+
 #include "../../Common.h"
 
 #ifndef THLD

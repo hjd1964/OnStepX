@@ -4,6 +4,7 @@
 #if OPERATIONAL_MODE == WIFI
 
 #include "../tasks/OnTask.h"
+#include "../nv/Nv.h"
 
 #if STA_AUTO_RECONNECT == true
   void reconnectStationWrapper() { wifiManager.reconnectStation(); }

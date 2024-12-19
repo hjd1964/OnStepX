@@ -9,13 +9,7 @@
 #include "../../../lib/convert/Convert.h"
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/calendars/Calendars.h"
-#include "../../../lib/tls/ds3231/DS3231.h"
-#include "../../../lib/tls/ds3234/DS3234.h"
-#include "../../../lib/tls/gps/GPS.h"
-#include "../../../lib/tls/ntp/NTP.h"
-#include "../../../lib/tls/sd3031/SD3031.h"
-#include "../../../lib/tls/teensy/Teensy.h"
-#include "../../../lib/tls/PPS.h"
+#include "../../../lib/tls/Tls.h"
 
 extern volatile unsigned long fracLAST;
 

@@ -1,8 +1,9 @@
 // -----------------------------------------------------------------------------------
 // Simple software SPI routines (CPOL=1, CPHA=1) just for TMC stepper drivers
 
-#include "../../Common.h"
 #include "SoftSpi.h"
+
+#include "../gpioEx/GpioEx.h"
 
 bool SoftSpi::init(int16_t mosi, int16_t sck, int16_t cs, int16_t miso) {
   this->miso = miso;

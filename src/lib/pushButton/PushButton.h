@@ -2,7 +2,7 @@
 // Handle push buttons
 #pragma once
 
-#include <Arduino.h>
+#include "../../Common.h"
 
 // threshold in milliseconds (for tone detection, 40ms/7 = +/-17.5%)
 #define TONE_FREQ_THRESHOLD 7.0

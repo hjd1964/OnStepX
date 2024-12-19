@@ -6,6 +6,8 @@
 #ifdef FEATURES_PRESENT
 
 #include "../../lib/tasks/OnTask.h"
+#include "../../lib/gpioEx/GpioEx.h"
+#include "../../lib/nv/Nv.h"
 
 #include "../../libApp/weather/Weather.h"
 #include "../../telescope/Telescope.h"

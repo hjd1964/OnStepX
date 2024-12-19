@@ -2,15 +2,13 @@
 // Time/Location source TEENSY 3.2 RTC support
 #pragma once
 
-#include "../../../Common.h"
+#include "../TlsBase.h"
 
 #if defined(TIME_LOCATION_SOURCE) && TIME_LOCATION_SOURCE == TEENSY || \
     (defined(TIME_LOCATION_SOURCE_FALLBACK) && TIME_LOCATION_SOURCE_FALLBACK == TEENSY)
 
-#include "../TLS.h"
-
 #ifndef TLS_CLOCK_SKEW
-#define TLS_CLOCK_SKEW 0.000139 // +5 seconds ahead when setting time
+  #define TLS_CLOCK_SKEW 0.000139 // in hours, +5 seconds ahead when setting time
 #endif
 
 class TlsTeensy : public TimeLocationSource {

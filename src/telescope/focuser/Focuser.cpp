@@ -6,10 +6,13 @@
 #ifdef FOCUSER_PRESENT
 
 #include "../../lib/tasks/OnTask.h"
+#include "../../lib/nv/Nv.h"
+#include "../../lib/sense/Sense.h"
+
 #include "../../libApp/weather/Weather.h"
 #include "../../libApp/temperature/Temperature.h"
+
 #include "../Telescope.h"
-#include "../../lib/sense/Sense.h"
 
 typedef struct FocuserConfiguration {
   bool present;

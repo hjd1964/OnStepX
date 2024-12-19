@@ -7,6 +7,7 @@
 
 #if AXIS1_PEC == ON
   #include "../../../lib/tasks/OnTask.h"
+  #include "../../../lib/nv/Nv.h"
 
   #include "../../../lib/sense/Sense.h"
   #include "../../Telescope.h"

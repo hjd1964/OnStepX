@@ -5,7 +5,10 @@
 
 #ifdef MOUNT_PRESENT
 
+#include "../../../lib/nv/Nv.h"
+
 #include "../../../libApp/weather/Weather.h"
+
 #include "../../Telescope.h"
 
 extern volatile unsigned long fracLAST;

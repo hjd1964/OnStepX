@@ -5,9 +5,11 @@
 
 #if defined(MOUNT_PRESENT)
 
+#include "../../../lib/nv/Nv.h"
+#include "../../../lib/tls/PPS.h"
+
 #include "../Mount.h"
 #include "../coordinates/Transform.h"
-#include "../../../lib/tls/PPS.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
 #include "../home/Home.h"

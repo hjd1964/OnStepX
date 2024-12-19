@@ -5,8 +5,10 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../../../libApp/commands/ProcessCmds.h"
 #include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
+
+#include "../../../libApp/commands/ProcessCmds.h"
 
 #include "../../Telescope.h"
 #include "../Mount.h"

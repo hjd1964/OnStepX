@@ -6,6 +6,7 @@
 #ifdef MOUNT_PRESENT
 
 #include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
 
 #include "../site/Site.h"
 #include "../goto/Goto.h"
