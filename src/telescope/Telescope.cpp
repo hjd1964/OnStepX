@@ -135,7 +135,9 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     canPlus.init();
   #endif
 
-  if (!gpio.init()) initError.gpio = true;
+  #if GPIO_DEVICE != OFF
+    if (!gpio.init()) initError.gpio = true;
+  #endif
 
   #ifdef SHARED_ENABLE_PIN
     pinModeEx(SHARED_ENABLE_PIN, OUTPUT);
