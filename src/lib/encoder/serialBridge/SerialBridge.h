@@ -16,7 +16,7 @@ class SerialBridge : public Encoder {
     SerialBridge(int16_t axis);
     int32_t read();
     void write(int32_t count);
-    bool errorThresholdExceeded() { return errorThresholdReached; }
+    bool errorThresholdExceeded() { return errorDetected; }
 
   private:
     int32_t raw();
@@ -25,7 +25,7 @@ class SerialBridge : public Encoder {
 
     char channel[2] = "0";
     unsigned long lastReadMillis = 0;
-    bool errorThresholdReached = false;
+    bool errorDetected = false;
 };
 
 #endif

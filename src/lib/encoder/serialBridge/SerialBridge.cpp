@@ -58,14 +58,14 @@ int32_t SerialBridge::raw() {
   char result[32] = "";
   int index = 0;
   unsigned long start = millis();
-  errorThresholdReached = false;
+  errorDetected = false;
   do {
     if (SERIAL_ENCODER.available()) c = SERIAL_ENCODER.read(); else c = 'x';
     if ((c >= '0' && c <= '9') || c == '-') {
       result[index++] = c;
       result[index] = 0;
     }
-    if (c == 'E') errorThresholdReached = true;
+    if (c == 'E') errorDetected = true;
   } while (c != 13 && (millis() - start) < 4 && index < 16);
 
   if (strlen(result) > 0) {

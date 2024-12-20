@@ -9,7 +9,11 @@ void strncpyex(char *result, const char *source, size_t length) {
   result[length - 1] = 0;
 }
 
-#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_MBED_RP2040) || defined(ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || \
+    defined(__TEENSYDUINO__) || \
+    defined(ARDUINO_ARCH_SAMD) || \
+    defined(ARDUINO_ARCH_MBED_RP2040) || \
+    defined(ARDUINO_ARCH_RP2040)
   void sprintF(char *result, const char *source, double f) {
     sprintf(result, source, f);
   }
