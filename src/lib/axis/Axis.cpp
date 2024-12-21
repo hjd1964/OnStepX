@@ -121,7 +121,7 @@ bool Axis::init(Motor *motor) {
   // start monitor
   V(axisPrefix); VF("start motion controller task (rate "); V(FRACTIONAL_SEC_US); VF("us priority 1)... ");
   uint8_t taskHandle = 0;
-  char taskName[] = "Ax_Mon";
+  char taskName[] = "Ax_Motn";
   taskName[2] = axisNumber + '0';
   taskHandle = tasks.add(0, 0, true, 1, callback, taskName);
   tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);
