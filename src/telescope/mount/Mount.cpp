@@ -21,6 +21,10 @@
 #include "st4/St4.h"
 #include "status/Status.h"
 
+#if MOUNT_COORDS_MEMORY == ON && NV_ENDURANCE < NVE_VHIGH
+  #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY requires a NV storage device with very high write endurance (FRAM)"
+#endif
+
 inline void mountWrapper() { mount.poll(); }
 inline void autostartWrapper() { mount.autostartPostponed(); }
 

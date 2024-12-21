@@ -6,6 +6,7 @@
 
 #ifdef ROTATOR_PRESENT
 
+#include "../../lib/nv/Nv.h"
 #include "../../lib/axis/Axis.h"
 #include "../../libApp/commands/ProcessCmds.h"
 #include "../Telescope.h"
