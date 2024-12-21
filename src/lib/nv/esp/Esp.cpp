@@ -17,7 +17,9 @@ bool NonVolatileStorageESP::init() {
   // setup size, cache, etc.
   if (!NonVolatileStorage::init(E2END + 1, NV_CACHED, NV_WAIT, false)) return false;
 
-  return EEPROM.begin(E2END + 1);
+  EEPROM.begin(E2END + 1);
+
+  return true;
 }
 
 void NonVolatileStorageESP::poll(bool disableInterrupts) {

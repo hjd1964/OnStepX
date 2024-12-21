@@ -50,9 +50,9 @@
   #endif
 
 #elif defined(ESP8266)
-  // ESP32
+  // ESP8266
   #define MCU_STR "ESP8266"
-  #include "HAL_ESP8266.h"
+  #include "esp/ESP8266.h"
 
 #elif defined(STM32F103xB)
   // STM32F103C8/CB: 72MHz, 128K flash, 64K RAM, ARM Cortex M3

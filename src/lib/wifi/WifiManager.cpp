@@ -59,6 +59,7 @@ bool WifiManager::init() {
       VF("MSG: WiFi, Sta GATEWAY = "); VL(sta_gw.toString());
       VF("MSG: WiFi, Sta SN      = "); VL(sta_sn.toString());
       IPAddress target = IPAddress(sta->target);
+      UNUSED(target);
       VF("MSG: WiFi, Sta TARGET  = "); VL(target.toString());
     }
 
