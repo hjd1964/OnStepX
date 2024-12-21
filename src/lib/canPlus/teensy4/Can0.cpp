@@ -28,7 +28,7 @@ void CanPlus0Teesny4::init() {
   if (ready) {
     VLF("success");
     
-    VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF(" priority 3)... ");
+    VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF("ms priority 3)... ");
     if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canT4Poll0, "SysCan0")) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
     VLF("FAILED!");
