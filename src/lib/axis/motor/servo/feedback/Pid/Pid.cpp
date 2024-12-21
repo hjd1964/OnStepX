@@ -42,8 +42,17 @@ void Pid::reset() {
   control->set = 0;
   control->out = 0;
   pid->SetMode(QuickPID::Control::automatic);
-  trackingSelected = true;
-  selectSlewingParameters();
+  pid->SetMode(QuickPID::Control::manual);
+  pid->SetMode(QuickPID::Control::automatic);
+  trackingSelected = false;
+  parameterSelectPercent = 100;
+  p = param4;
+  i = param5;
+  d = param6;
+  pid->SetTunings(p, i, d);
+  lastP = p;
+  lastI = i;
+  lastD = d;
 }
 
 void Pid::setControlDirection(int8_t state) {
