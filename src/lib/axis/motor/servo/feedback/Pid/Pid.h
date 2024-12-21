@@ -73,7 +73,7 @@ class Pid : public Feedback {
 
     unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
 
-    char axisPrefix[14] = "MSG: Pid_, ";       // prefix for debug messages
+    char axisPrefix[32] = "MSG: Axis_ServoFeedbackPID, "; // prefix for debug messages
 
     int parameterSelectPercent = 0;
     bool trackingSelected = true;

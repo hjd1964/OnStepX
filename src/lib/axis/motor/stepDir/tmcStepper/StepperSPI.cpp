@@ -18,6 +18,12 @@
 // constructor
 StepDirTmcSPI::StepDirTmcSPI(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
+
+  strcpy(axisPrefix, "MSG: Axis_StepDirTmcSPI, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_StepDirTmcSPI, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->Pins = Pins;
   settings = *Settings;
 }
@@ -38,7 +44,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+  VF(axisPrefix);
   if (settings.currentRun == OFF) {
     VLF("current control OFF (set by Vref)");
   } else {
@@ -124,7 +130,7 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   if (settings.model == TMC5160) maxCurrent = 3000; else
   if (settings.model == TMC5161) maxCurrent = 3500; else
   {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DLF(" unknown driver model!");
+    DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
 
@@ -134,17 +140,17 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
+    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+    DF(axisPrefixWarn); DF("bad current run="); DL(currentRun);
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
     return false;
   }
 
@@ -241,7 +247,7 @@ bool StepDirTmcSPI::enable(bool state) {
 // calibrate the motor driver if required
 void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    VF(axisPrefix); VL("standstill automatic current calibration");
     current(settings.currentRun, 1.0F);
     if (settings.model == TMC2130) {
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);

@@ -363,7 +363,7 @@ Tasks::Tasks() {
   }
 
   // start the task monitor
-  tasks.add(1000, 0, true, 7, tasksMonitor, "TaskMtr");
+  tasks.add(1000, 0, true, 7, tasksMonitor, "TaskMon");
 }
 
 Tasks::~Tasks() {

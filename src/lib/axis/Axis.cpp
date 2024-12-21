@@ -119,9 +119,9 @@ bool Axis::init(Motor *motor) {
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
 
   // start monitor
-  V(axisPrefix); VF("start monitor task (rate "); V(FRACTIONAL_SEC_US); VF("us priority 1)... ");
+  V(axisPrefix); VF("start motion controller task (rate "); V(FRACTIONAL_SEC_US); VF("us priority 1)... ");
   uint8_t taskHandle = 0;
-  char taskName[] = "Ax_Mtr";
+  char taskName[] = "Ax_Mon";
   taskName[2] = axisNumber + '0';
   taskHandle = tasks.add(0, 0, true, 1, callback, taskName);
   tasks.setPeriodMicros(taskHandle, FRACTIONAL_SEC_US);

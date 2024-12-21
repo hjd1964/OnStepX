@@ -33,7 +33,7 @@ void Limits::init() {
 
   // start limit monitor task
   VF("MSG: Mount, start limits monitor task (rate 100ms priority 2)... ");
-  if (tasks.add(100, 0, true, 2, limitsWrapper, "MntLmt")) { VLF("success"); } else { VLF("FAILED!"); }
+  if (tasks.add(100, 0, true, 2, limitsWrapper, "MtLimit")) { VLF("success"); } else { VLF("FAILED!"); }
 }
 
 // constrain meridian limits to the allowed range

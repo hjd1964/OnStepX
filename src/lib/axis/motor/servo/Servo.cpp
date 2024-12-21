@@ -28,12 +28,13 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
   if (axisNumber < 1 || axisNumber > 9) return;
 
   driverType = SERVO;
-  strcpy(axisPrefix, "MSG: Servo_, ");
-  axisPrefix[10] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Servo_, ");
-  axisPrefixWarn[10] = '0' + axisNumber;
 
   this->axisNumber = axisNumber;
+  strcpy(axisPrefix, "MSG: Axis_Servo, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_Servo, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->filter = filter;
   this->encoder = encoder;
   this->feedback = feedback;
@@ -88,8 +89,8 @@ bool ServoMotor::init() {
   // start the motion timer
   V(axisPrefix);
   VF("start task to track motion... ");
-  char timerName[] = "Servo_";
-  timerName[5] = '0' + axisNumber;
+  char timerName[] = "Ax_Svo";
+  timerName[2] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
   if (taskHandle) {
     VF("success");
@@ -382,10 +383,10 @@ void ServoMotor::poll() {
         float spas = 0;
         if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
 
-//      sprintf(s, "Servo%d_Delta: %6ld, Motor %6ld, Encoder %6ld, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
-//      sprintf(s, "Servo%d: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
-//      sprintf(s, "Servo%d: Delta %0.2f\r\n", (int)axisNumber, (motorCounts - (long)encoderCounts)/12.9425);
-      sprintf(s, "Servo%d: DeltaASf: %0.2f, DeltaAS: %0.2f, Servo%d_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - unfilteredEncoderCounts)/spas, (int)axisNumber, velocityPercent);
+//      sprintf(s, "Ax%dSvo_Delta: %6ld, Motor %6ld, Encoder %6ld, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
+//      sprintf(s, "Ax%dSvo: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
+//      sprintf(s, "Ax%dSvo: Delta %0.2f\r\n", (int)axisNumber, (motorCounts - (long)encoderCounts)/12.9425);
+      sprintf(s, "Ax%dSvo: DeltaASf: %0.2f, DeltaAS: %0.2f, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - unfilteredEncoderCounts)/spas, (int)axisNumber, velocityPercent);
 
         D(s);
         UNUSED(spas);

@@ -140,6 +140,10 @@ class ServoDriver {
 
   protected:
     int axisNumber;
+
+    char axisPrefix[36]; // prefix for debug messages
+    char axisPrefixWarn[36]; // additional prefix for debug messages
+
     DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
     #if DEBUG != OFF
       DriverStatus lastStatus = {false, {false, false}, {false, false}, false, false, false, false};

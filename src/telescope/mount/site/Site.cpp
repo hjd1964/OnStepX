@@ -201,7 +201,7 @@ void Site::init() {
   VF("MSG: Mount, site start sidereal timer task (rate 10ms priority 0)... ");
   delay(100);
   // period ms (0=idle), duration ms (0=forever), repeat, priority (highest 0..7 lowest), task_handle
-  taskHandle = tasks.add(0, 0, true, 0, clockTickWrapper, "ClkTick");
+  taskHandle = tasks.add(0, 0, true, 0, clockTickWrapper, "MtTick");
   if (taskHandle) {
     VLF("success"); 
     if (!tasks.requestHardwareTimer(taskHandle, 1)) { DLF("WRN: Site::init(), didn't get h/w timer for Clock (using s/w timer)"); }

@@ -289,6 +289,9 @@ class Tasks {
     // change process priority level (highest 0 to 7 lowest)
     void setPriority(uint8_t handle, uint8_t priority);
 
+    // gets process priority level (highest 0 to 7 lowest)
+    inline uint8_t getPriority(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { return task[handle - 1]->getPriority(); } }
+
     // set the process name
     void setNameStr(uint8_t handle, const char name[]);
 

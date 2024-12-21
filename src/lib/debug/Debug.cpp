@@ -35,7 +35,7 @@
         AAA /= count; AXA /= count; RAA /= count; RXA /= count;
         aau = scale_unit(&AAA); axu = scale_unit(&AXA); rtu = scale_unit(&RTT); rau = scale_unit(&RAA); rxu = scale_unit(&RXA);
     
-        sprintf(s, "                     ----------- ------------        ----------   --------   ----------");
+        sprintf(s, "                      ----------- ------------        ----------   --------   ----------");
         SERIAL_DEBUG.print(s); Y;
         SERIAL_DEBUG.println(); Y;
         SERIAL_DEBUG.print("\x1b[K");
@@ -66,17 +66,34 @@
       char *name = tasks.getNameStr(handle);
       
       if (!strstr(name, "Profilr")) {
+        char priority = tasks.getPriority(handle) + '0';
+
         double AA = tasks.getArrivalAvg(handle); Y;
+        aau = scale_unit(&AA);
+        AAA += AA;
+
         double AX = tasks.getArrivalMax(handle); Y;
+        axu = scale_unit(&AX);
+        AXA += AX;
+
         double RT = tasks.getRuntimeTotal(handle); Y;
+        rtu = scale_unit(&RT);
+        RTT += RT;
+
         double RTcount = tasks.getRuntimeTotalCount(handle); Y;
-        double RA; if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
+        double RA;
+        if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
+        rau = scale_unit(&RA);
+        RAA += RA;
+
         double RX = tasks.getRuntimeMax(handle); Y;
-        count++; AAA += AA; AXA += AX; RTT += RT; RAA += RA; RXA += RX;
-        aau = scale_unit(&AA); axu = scale_unit(&AX); rtu = scale_unit(&RT); rau = scale_unit(&RA); rxu = scale_unit(&RX);
+        rxu = scale_unit(&RX);
+        RXA += RX;
+
+        count++;
         
-        sprintf(s, "[%-10s] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
-        name, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
+        sprintf(s, "[%-9sP%c] arrives avg %5ld%cs, max ±%4ld%cs; run total %4ld%cs, avg %4ld%cs, max %4ld%cs", 
+        name, priority, lround(AA), aau, lround(AX), axu, lround(RT), rtu, lround(RA), rau, lround(RX), rxu); Y;
       
         SERIAL_DEBUG.print(s); Y;
         SERIAL_DEBUG.println();

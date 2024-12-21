@@ -15,7 +15,7 @@ Pid::Pid(const float P, const float I, const float D, const float P_goto, const 
 void Pid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
   Feedback::init(axisNumber, control);
 
-  axisPrefix[8] = '0' + axisNumber;
+  axisPrefix[9] = '0' + axisNumber;
 
   p = param1;
   i = param2;

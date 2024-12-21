@@ -10,7 +10,7 @@
 #include <ESP32CAN.h> // https://github.com/miwagner/ESP32-Arduino-CAN
 #include <CAN_config.h>
 
-IRAM_ATTR void canWrapper() { canPlus.poll(); }
+IRAM_ATTR void canEsp32Monitor() { canPlus.poll(); }
 
 CAN_device_t CAN_cfg;
 
@@ -41,7 +41,7 @@ void CanPlusESP32::init() {
     VLF("success");
     
     VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF(" priority 3)... ");
-    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canWrapper, "CanRecv")) { VLF("success"); } else { VLF("FAILED!"); }
+    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canEsp32Monitor, "SysCanE")) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
     VLF("FAILED!");
   }

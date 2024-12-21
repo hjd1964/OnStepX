@@ -25,6 +25,12 @@
 // constructor
 StepDirTmcUART::StepDirTmcUART(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
+
+  strcpy(axisPrefix, "MSG: Axis_StepDirTmcUART, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_StepDirTmcUART, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->Pins = Pins;
   settings = *Settings;
 }
@@ -44,7 +50,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+  VF(axisPrefix);
   if (settings.currentRun == OFF) {
     VLF("current control OFF (300mA)");
   } else {
@@ -73,7 +79,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     #define SerialTMC SERIAL_TMC
     static bool initialized = false;
     if (!initialized) {
-      VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+      VF(axisPrefix);
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
         VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
@@ -137,7 +143,7 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   if (settings.model == TMC2208) maxCurrent = 1700; else
   if (settings.model == TMC2226) maxCurrent = 2800; else // allow enough range for TMC2209 and TMC2226
   {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DLF(" unknown driver model!");
+    DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
 
@@ -147,17 +153,17 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
+    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+    DF(axisPrefixWarn); DF("bad current run="); DL(currentRun);
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
     return false;
   }
 
@@ -252,7 +258,7 @@ bool StepDirTmcUART::enable(bool state) {
 // calibrate the motor driver if required
 void StepDirTmcUART::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    VF("MSG: StepDirDriver Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    VF(axisPrefix); VL("standstill automatic current calibration");
     driver->rms_current(settings.currentRun*0.7071F, 1.0F);
 
     if (settings.model == TMC2208) {

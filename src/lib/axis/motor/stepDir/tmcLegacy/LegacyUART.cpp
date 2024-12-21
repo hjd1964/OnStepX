@@ -16,6 +16,12 @@
 // constructor
 StepDirTmcUART::StepDirTmcUART(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
+
+  strcpy(axisPrefix, "MSG: Axis_StepDirTmcUART legacy, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_StepDirTmcUART legacy, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->Pins = Pins;
   settings = *Settings;
 }
@@ -35,7 +41,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+  VF(axisPrefix);
   if (settings.currentRun == OFF) {
     VLF("current control OFF (300mA)");
   } else {
@@ -66,7 +72,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
       digitalWriteEx(Pins->m1, HIGH);
     #endif
 
-    VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+    VF(axisPrefix);
     VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     #if SERIAL_TMC_INVERT == ON
       driver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), SERIAL_TMC_RX, SERIAL_TMC_TX, true);
@@ -82,16 +88,16 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     #if SERIAL_TMC_RX_DISABLE == true
       rxPin = OFF;
     #endif
-    VF("MSG: StepDirDriver"); V(axisNumber); VF(", TMC ");
+    VF(axisPrefix);
     VF("SW UART driver pins rx="); V(rxPin); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     driver->setup(SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), rxPin, Pins->tx);
   #endif
 
   if (rxPin != OFF) {
     if (driver->isSetupAndCommunicating()) {
-      VF("MSG: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver found");
+      VF(axisPrefix); VLF("driver found");
     } else {
-      VF("WRN: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver detection failed");
+      VF(axisPrefixWarn); VLF("driver detection failed");
     }
   }
 
@@ -104,7 +110,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   driver->setPwmGradient(pc_pwm_grad);
   if (pc_pwm_auto) driver->enableAutomaticCurrentScaling();
   if (!settings.intpol) {
-    VF("WRN: StepDirDriver"); V(axisNumber); VLF(", TMC UART driver interpolation control not supported");
+    VF(axisPrefix); VLF("driver interpolation control not supported");
   }
   modeMicrostepTracking();
   driver->setRunCurrent(settings.currentRun/25); // current in %
@@ -135,7 +141,7 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   int maxCurrent;
   if (settings.model == TMC2226) maxCurrent = 2800; else // allow enough range for TMC2209 and TMC2226
   {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DLF(" unknown driver model!");
+    DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
 
@@ -145,17 +151,17 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current hold="); DL(currentHold);
+    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current run="); DL(currentRun);
+    DF(axisPrefixWarn); DF("bad current run="); DL(currentRun);
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF("ERR: StepDirDriver::validateParameters(), Axis"); D(axisNumber); DF(" bad current goto="); DL(currentGoto);
+    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
     return false;
   }
 

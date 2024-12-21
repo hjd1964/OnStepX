@@ -158,8 +158,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
   mcuTemperature = HAL_TEMP();
   if (!isnan(mcuTemperature)) {
-    VF("MSG: Telescope, start MCU temperature monitor task (rate 500ms priority 7)... ");
-    if (tasks.add(500, 0, true, 6, mcuTempWrapper, "McuTemp")) { VLF("success"); } else { VLF("FAILED!"); }
+    VF("MSG: System, start MCU temperature monitor task (rate 500ms priority 7)... ");
+    if (tasks.add(500, 0, true, 6, mcuTempWrapper, "SysTemp")) { VLF("success"); } else { VLF("FAILED!"); }
   }
   weather.init();
   temperature.init();

@@ -83,9 +83,13 @@ class StepDirDriver {
     StepDirDriverSettings settings;
 
   protected:
+    uint8_t axisNumber;
+
+    char axisPrefix[36]; // prefix for debug messages
+    char axisPrefixWarn[36]; // additional prefix for debug messages
+
     float rSense = 0.11F;
 
-    uint8_t axisNumber;
     DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};
     #if DEBUG != OFF
       DriverStatus lastStatus = {false, {false, false}, {false, false}, false, false, false, false};

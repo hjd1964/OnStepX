@@ -17,6 +17,11 @@
 ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, const ServoTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 
+  strcpy(axisPrefix, "MSG: Axis_ServoTmc5160, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_ServoTmc5160, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->Pins = Pins;
   enablePin = Pins->enable;
   enabledState = Pins->enabledState;
@@ -50,8 +55,8 @@ void ServoTmc5160::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
+  VF(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
+  VF(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   rSense = TMC5160_RSENSE;
   driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
@@ -59,11 +64,11 @@ void ServoTmc5160::init() {
   driver->intpol(true);
 
   if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
-    VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    VF(axisPrefix); VF("TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
     driver->TPWMTHRS(velocityThrs/0.715F);
   }
 
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC u-step mode ");
+  VF(axisPrefix); VF("TMC u-step mode ");
   if (Settings->microsteps == OFF) {
     VLF("OFF (assuming 1X)");
     driver->microsteps(1);
@@ -73,7 +78,7 @@ void ServoTmc5160::init() {
   }
 
   currentRms = Settings->current*0.7071F;
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", TMC ");
+  VF(axisPrefix); VF("TMC ");
   if (Settings->current == OFF) {
     VLF("current control OFF (600mA)");
     currentRms = 600*0.7071F;
@@ -85,7 +90,7 @@ void ServoTmc5160::init() {
 
   unsigned long mode = driver->IOIN();
   if (mode && 0b01000000 > 0) {
-    VF("WRN: ServoDriver"); V(axisNumber); VLF(", TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
+    VF(axisPrefix); VLF("TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
   }
 
   driver->en_pwm_mode(false);
@@ -108,8 +113,7 @@ void ServoTmc5160::init() {
 void ServoTmc5160::enable(bool state) {
   enabled = state;
   if (enablePin == SHARED) {
-    VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
+    VF(axisPrefix); VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
     if (state) {
       driver->en_pwm_mode(stealthChop());
       driver->rms_current(currentRms);
@@ -118,8 +122,7 @@ void ServoTmc5160::enable(bool state) {
       driver->ihold(0);
     }
   } else {
-    VF("MSG: ServoDriver"); V(axisNumber);
-    VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
+    VF(axisPrefix); VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
     if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
   }
 
@@ -188,7 +191,7 @@ void ServoTmc5160::updateStatus() {
 // calibrate the motor driver if required
 void ServoTmc5160::calibrateDriver() {
   if (stealthChop()) {
-    VF("MSG: ServoTmc5160 Axis"); V(axisNumber); VL(", TMC standstill automatic current calibration");
+    VF(axisPrefix); VL("TMC standstill automatic current calibration");
     driver->rms_current(currentRms);
     driver->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     driver->pwm_autoscale(true);

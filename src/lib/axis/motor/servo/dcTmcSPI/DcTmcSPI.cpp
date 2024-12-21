@@ -17,6 +17,11 @@
 ServoDcTmcSPI::ServoDcTmcSPI(uint8_t axisNumber, const ServoDcTmcSpiPins *Pins, const ServoDcTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 
+  strcpy(axisPrefix, "MSG: Axis_ServoTmcDC, ");
+  axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_ServoTmcDC, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
+
   this->Pins = Pins;
   enablePin = Pins->enable;
   enabledState = Pins->enabledState;
@@ -45,10 +50,10 @@ void ServoDcTmcSPI::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
-  VF("MSG: ServoDriver"); V(axisNumber); VF(", AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
+  VF(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
+  VF(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
 
-  VF("MSG: ServoDriver"); V(axisNumber); VLF(", TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
+  VF(axisPrefix); VLF("TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
 
   if (model == SERVO_TMC2130_DC) {
     driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
@@ -95,8 +100,7 @@ void ServoDcTmcSPI::init() {
 void ServoDcTmcSPI::enable(bool state) {
   enabled = state;
 
-  VF("MSG: ServoDriver"); V(axisNumber);
-  VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
+  VF(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
 
   if (state) { driver->ihold(31); } else { driver->ihold(0); }
 

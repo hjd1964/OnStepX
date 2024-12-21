@@ -7,8 +7,8 @@
 
 #include "../../tasks/OnTask.h"
 
-void canWrapper(const CAN_message_t &msg) { canPlus.poll(msg); }
-void canEventsWrapper() { canPlus.events(); }
+void canT4Recv0(const CAN_message_t &msg) { canPlus.poll(msg); }
+void canT4Poll0() { canPlus.events(); }
 
 FlexCAN_T4<CAN0, RX_SIZE_256, TX_SIZE_16> can0;
 
@@ -16,20 +16,20 @@ CanPlus0Teesny4::CanPlus0Teesny4() {
 }
 
 void CanPlus0Teesny4::init() {
-  VF("MSG: CanPlus, CAN_TEENSY4 can0 Start...");
+  VF("MSG: CanPlus, CAN_TEENSY4 CAN0 Start...");
   can0.begin();
   can0.setBaudRate(CAN_BAUD);
   can0.setMaxMB(16);
   can0.enableFIFO();
   can0.enableFIFOInterrupt();
-  can0.onReceive(canWrapper);
+  can0.onReceive(canT4Recv0);
   ready = true;
 
   if (ready) {
     VLF("success");
     
     VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF(" priority 3)... ");
-    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canEventsWrapper, "CanEvnt")) { VLF("success"); } else { VLF("FAILED!"); }
+    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canT4Poll0, "SysCan0")) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
     VLF("FAILED!");
   }

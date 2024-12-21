@@ -20,14 +20,14 @@
     "SERVO_TMC2130_DC", // TMC2130 w/ DC motor
     "SERVO_TMC5160_DC", // TMC5160 w/ DC motor
     "SERVO_TMC2209",    // TMC2209 w/ stepper motor
-    "SERVO_TMC5160"     // TMC5160 w/ stepper motor
+    "SERVO_TMC5160",    // TMC5160 w/ stepper motor
   };
 #endif
 
 void ServoDriver::init() {
   #if DEBUG == VERBOSE
-    VF("MSG: ServoDriver"); V(axisNumber); VF(", init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
-    VF("MSG: ServoDriver"); V(axisNumber); VF(", en=");
+    VF(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
+    VF(axisPrefix); VF("en=");
     if (enablePin == OFF) { VLF("OFF"); } else
     if (enablePin == SHARED) { VLF("SHARED"); } else { VL(enablePin); }
   #endif
@@ -51,7 +51,7 @@ void ServoDriver::updateStatus() {
         (status.overTemperature           != lastStatus.overTemperature) ||
         (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
-      VF("MSG: ServoDriver"); V(axisNumber); VF(", status change ");
+      VF(axisPrefix); VF("status change ");
       VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
       VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". "); 
       VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". "); 

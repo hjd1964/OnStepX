@@ -76,8 +76,8 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirPins *Pins, St
   if (axisNumber < 1 || axisNumber > 9) return;
 
   driverType = STEP_DIR;
-  strcpy(axisPrefix, "MSG: StepDir_, ");
-  axisPrefix[12] = '0' + axisNumber;
+  strcpy(axisPrefix, "MSG: Axis_StepDir, ");
+  axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->Pins = Pins;
 
@@ -170,8 +170,7 @@ bool StepDirMotor::validateParameters(float param1, float param2, float param3, 
 
 // sets motor enable on/off (if possible)
 void StepDirMotor::enable(bool state) {
-  V(axisPrefix); VF("driver powered ");
-  if (state) { VF("up"); } else { VF("down"); }
+  V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); }
 
   if (Pins->enable != OFF && Pins->enable != SHARED) {
     VF(" using pin "); VL(Pins->enable);

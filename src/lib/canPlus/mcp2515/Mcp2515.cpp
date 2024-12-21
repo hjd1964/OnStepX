@@ -12,7 +12,7 @@
 
 MCP_CAN mcp(CAN_CS_PIN);
 
-IRAM_ATTR void canWrapper() { canPlus.poll(); }
+IRAM_ATTR void canMcp2515Monitor() { canPlus.poll(); }
 
 CanPlusMCP2515::CanPlusMCP2515() {
 }
@@ -37,7 +37,7 @@ void CanPlusMCP2515::init() {
     VLF("success");
 
     VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF("ms priority 6)... ");
-    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canWrapper, "CanRecv")) { VLF("success"); } else { VLF("FAILED!"); }
+    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canMcp2515Monitor, "SysCanM")) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
     VLF("FAILED!");
   }
