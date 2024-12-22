@@ -29,8 +29,8 @@ void CanPlusESP32::init() {
   #else
     CAN_cfg.speed = CAN_SPEED_500KBPS;
   #endif
-  CAN_cfg.tx_pin_id = (gpio_num_t)CAN_TX;
-  CAN_cfg.rx_pin_id = (gpio_num_t)CAN_RX;
+  CAN_cfg.tx_pin_id = (gpio_num_t)CAN_TX_PIN;
+  CAN_cfg.rx_pin_id = (gpio_num_t)CAN_RX_PIN;
 
   VF("MSG: CanPlus, CAN_ESP32 Start... ");
   CAN_cfg.rx_queue = xQueueCreate(10, sizeof(CAN_frame_t));

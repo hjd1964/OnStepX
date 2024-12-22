@@ -160,6 +160,31 @@
 #define TIME_IP_ADDR                  {129,6,15,28}               // for NTP if enabled we often use an address like
 #endif                                                            // time-a-g.nist.gov at 129,6,15,28 or 129,6,15,29, 129,6,15,30, etc.
 
+#ifndef CAN_PLUS
+#define CAN_PLUS                      OFF                         // Select from CAN_SAN, CAN_ESP32, CAN_MCP2515, CANn_TEENSY4
+#endif
+#ifndef CAN_BAUD
+#define CAN_BAUD                      500000                      // 500000 baud default
+#endif
+#ifndef CAN_SEND_RATE_MS
+#define CAN_SEND_RATE_MS              25                          // 40 Hz CAN controller send message processing rate
+#endif
+#ifndef CAN_RECV_RATE_MS
+#define CAN_RECV_RATE_MS              5                           // 200 Hz CAN controller recv. message processing rate
+#endif
+#ifndef CAN_RX_PIN
+#define CAN_RX_PIN                    OFF                         // for ESP32 CAN interface
+#endif
+#ifndef CAN_TX_PIN
+#define CAN_TX_PIN                    OFF                         // for ESP32 CAN interface
+#endif
+#ifndef CAN_CS_PIN
+#define CAN_CS_PIN                    OFF                         // for MCP2515 SPI CAN controller
+#endif
+#ifndef CAN_INT_PIN
+#define CAN_INT_PIN                   OFF                         // for MCP2515 SPI CAN controller
+#endif
+
 // sensors
 #ifndef WEATHER
 #define WEATHER                       OFF

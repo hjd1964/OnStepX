@@ -13,7 +13,7 @@ CanPlusSan::CanPlusSan() {
 }
 
 void CanPlusSan::init() {
-  CAN.setPins(CAN_RX, CAN_TX);
+  CAN.setPins(CAN_RX_PIN, CAN_TX_PIN);
   VF("MSG: CanPlus, CAN Start... ");
   ready = CAN.begin(CAN_BAUD);
   if (ready) { VLF("success"); } else { VLF("FAILED!"); }

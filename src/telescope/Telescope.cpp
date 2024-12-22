@@ -131,7 +131,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     SPI.begin();
   #endif
 
-  #if defined(CAN_RX) && CAN_RX != OFF && defined(CAN_TX) && CAN_TX != OFF
+  #if CAN_PLUS != OFF
     canPlus.init();
   #endif
 

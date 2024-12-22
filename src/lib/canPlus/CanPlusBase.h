@@ -10,18 +10,28 @@
   #define CAN_MAX_CALLBACKS 8
 #endif
 
-#ifndef CAN_BAUD
-  #define CAN_BAUD 500000
-#endif
-
-#ifndef CAN_RECV_RATE_MS
-  // recv. message queue processing rate (when recv. message callbacks aren't implemented)
-  #define CAN_RECV_RATE_MS 5
-#endif
-
-#ifndef CAN_SEND_RATE_MS
-  // for clients how quickly to send messages so we don't overwhelm the recv. queue
-  #define CAN_SEND_RATE_MS 25
+#if defined(CAN_PLUS) && CAN_PLUS != OFF
+  #ifndef CAN_BAUD
+  #define CAN_BAUD                      500000                    // 500000 baud default
+  #endif
+  #ifndef CAN_SEND_RATE_MS
+  #define CAN_SEND_RATE_MS              25                        // 40 Hz CAN controller send message processing rate
+  #endif
+  #ifndef CAN_RECV_RATE_MS
+  #define CAN_RECV_RATE_MS              5                         // 200 Hz CAN controller recv. message processing rate
+  #endif
+  #ifndef CAN_RX_PIN
+  #define CAN_RX_PIN                    OFF                       // for ESP32 CAN interface
+  #endif
+  #ifndef CAN_TX_PIN
+  #define CAN_TX_PIN                    OFF                       // for ESP32 CAN interface
+  #endif
+  #ifndef CAN_CS_PIN
+  #define CAN_CS_PIN                    OFF                       // for MCP2515 SPI CAN controller
+  #endif
+  #ifndef CAN_INT_PIN
+  #define CAN_INT_PIN                   OFF                       // for MCP2515 SPI CAN controller
+  #endif
 #endif
 
 class CanPlus {
