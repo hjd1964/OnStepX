@@ -383,7 +383,7 @@ void ServoMotor::poll() {
         float spas = 0;
         if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
 
-//      sprintf(s, "Ax%dSvo_Delta: %6ld, Motor %6ld, Encoder %6ld, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
+//      sprintf(s, "Ax%dSvo: Delta %6ld, Motor %6ld, Encoder %6ld, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
 //      sprintf(s, "Ax%dSvo: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
 //      sprintf(s, "Ax%dSvo: Delta %0.2f\r\n", (int)axisNumber, (motorCounts - (long)encoderCounts)/12.9425);
       sprintf(s, "Ax%dSvo: DeltaASf: %0.2f, DeltaAS: %0.2f, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - unfilteredEncoderCounts)/spas, (int)axisNumber, velocityPercent);
