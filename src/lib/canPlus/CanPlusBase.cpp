@@ -60,6 +60,8 @@ int CanPlus::callbackProcess(int id, uint8_t *buffer, size_t size) {
       idCallback[i](buffer);
       return 1;
     }
+  }
+  for (int i = 0; i < msgCallbackCount; i++) {
     if (id == msgCallBackId[i] && buffer[0] == msgCallBackMsg[i]) {
       msgCallback[i](buffer);
       return 1;
