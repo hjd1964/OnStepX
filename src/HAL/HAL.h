@@ -42,11 +42,11 @@
   // ESP32
   #define MCU_STR "ESP32"
   #if ESP_ARDUINO_VERSION >= 0x30000
-    #include "esp/Esp32Libraries3.h"
+    #include "esp/ESP32Libraries3.h"
   #elif ESP_ARDUINO_VERSION >= 0x20000 + 3
-    #include "esp/Esp32Libraries2.h"
+    #include "esp/ESP32Libraries2.h"
   #else
-    #include "esp/Esp32Libraries1.h"
+    #include "esp/ESP32Libraries1.h"
   #endif
 
 #elif defined(ESP8266)
