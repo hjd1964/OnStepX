@@ -34,7 +34,7 @@
 
 class Filter {
   public:
-    virtual long update(long encoderCounts, long motorCounts, bool isTracking) { return encoderCounts; }
+    virtual long update(long encoderCounts, long motorCounts, bool isTracking) { UNUSED(motorCounts); UNUSED(isTracking); return encoderCounts; }
 
   private:
     bool initialized = false;

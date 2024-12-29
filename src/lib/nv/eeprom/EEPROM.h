@@ -7,7 +7,6 @@
 
 #if defined(NV_DRIVER) && NV_DRIVER == NV_EEPROM
 
-#include <EEPROM.h>
 #include "../NvBase.h"
 
 class NonVolatileStorageEEPROM : public NonVolatileStorage {
