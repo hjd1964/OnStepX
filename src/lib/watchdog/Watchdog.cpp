@@ -8,6 +8,7 @@
   #include "../tasks/OnTask.h"
   void watchdogWrapper() { watchdog.poll(); }
 #else
+  void (*mega2560restart) (void) = 0;
   #include <avr/wdt.h>
 #endif
 
@@ -40,7 +41,7 @@ void Watchdog::disable() {
   #ifndef __AVR_ATmega2560__
     enabled = false;
   #else
-    wdt_disable()
+    wdt_disable();
   #endif
 }
 
