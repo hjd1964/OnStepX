@@ -57,22 +57,22 @@
 
 #pragma pack(1)
 typedef struct AxisLimits {
-  float min;
-  float max;
+  float min;                  // unit (radians, microns, etc.) depends on axis settings
+  float max;                  // unit (radians, microns, etc.) depends on axis settings
 } AxisLimits;
 
 typedef struct AxisSettings {
-  double     stepsPerMeasure;
-  int8_t     reverse;
+  double     stepsPerMeasure; // unit (radians, microns, etc.) depends on axis settings
+  int8_t     reverse;         // ON or OFF
   AxisLimits limits;
-  float      backlashFreq;
+  float      backlashFreq;    // in measures/s
 } AxisSettings;
 
 #define AxisStoredSettingsSize 41
 typedef struct AxisStoredSettings {
-  double     stepsPerMeasure;
-  int8_t     reverse;
-  float      param1, param2, param3, param4, param5, param6;
+  double     stepsPerMeasure; // unit (radians, microns, etc.) depends on axis settings
+  int8_t     reverse;         // ON or OFF
+  float      param1, param2, param3, param4, param5, param6; // content depends on axis settings
   AxisLimits limits;
 } AxisStoredSettings;
 #pragma pack()
@@ -104,83 +104,104 @@ enum AxisMeasure: uint8_t {AXIS_MEASURE_UNKNOWN, AXIS_MEASURE_MICRONS, AXIS_MEAS
 
 class Axis {
   public:
-    // constructor
+    // constructor for this motion controller
+    // \param axisNumber: from 1 to 9
+    // \param *pins: provides pins and states for h/w limits and homing
+    // \param *settings: provides axis scale (steps per measure,) s/w limits, reversal, and backlash frequency
+    // \param axisMeasure: one of AXIS_MEASURE_MICRONS, _DEGREES, or _RADIANS for conversion to/from steps
+    // \param targetTolerance: in "measures" for detecting when slews arrive at their target
     Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure, float targetTolerance = 0.0F);
 
     // process axis commands
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
-    // sets up the driver step/dir/enable pins and any associated driver mode control
+    // init prepares this motion controller and the provided motor for operation
+    // \param motor: associated motor to be controlled
     bool init(Motor *motor);
 
-    // enables or disables the associated step/dir driver
-    void enable(bool value);
+    // sets the enabled state (and for its associated motor if supported)
+    // \param state: true to enable or false to disable
+    void enable(bool state);
 
-    // get the enabled state
+    // gets the enabled state
     inline bool isEnabled() { return enabled && !motor->calibrating; }
 
-    // time (in ms) before automatic power down at standstill, use 0 to disable
-    void setPowerDownTime(int value);
+    // sets the automatic power down time
+    // \param time: allowed standstill time in milliseconds before power down, or 0 to disable
+    void setPowerDownTime(int time);
 
-    // time (in ms) to disable automatic power down at standstill, use 0 to disable
-    void setPowerDownOverrideTime(int value);
+    // sets the automatic power down override time
+    // \param time: time in milliseconds to disable automatic power down, or 0 to disable
+    void setPowerDownOverrideTime(int time);
 
-    // get steps per measure
+    // get steps per "measure" (radian, micron, etc.)
     inline double getStepsPerMeasure() { return settings.stepsPerMeasure; }
 
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return motor->getStepsPerStepSlewing(); }
 
-    // reset motor and target angular position, in "measure" units
+    // reset motor and target position
+    // \param value: position in "measures" (radians, microns, etc.)
     CommandError resetPosition(double value);
 
-    // reset motor and target angular position, in steps
+    // reset motor and target position
+    // \param value: position in steps
     CommandError resetPositionSteps(long value);
 
-    // resets target position to the motor position
+    // resets the target position to the motor position
     inline void resetTargetToMotorPosition() { motor->resetTargetToMotorPosition(); }
 
-    // get motor position, in "measure" units
+    // get motor position, in "measures" (radians, microns, etc.)
+    // \note motor: position based on actual motion taken since startup/reset (including backlash)
     double getMotorPosition();
 
     // get motor position, in steps
+    // \note motor: position based on actual motion taken since startup/reset (including backlash)
     inline long getMotorPositionSteps() { return motor->getMotorPositionSteps(); }
 
-    // get index position, in "measure" units
+    // get index position, in "measures" (radians, microns, etc.)
+    // \note indexPosition: added to motorPositon (-backlash) yeilds an instrumentCoordinate
     double getIndexPosition();
 
     // get index position, in steps
+    // \note indexPosition: added to motorPositon (-backlash) yeilds an instrumentCoordinate
     inline long getIndexPositionSteps() { return motor->getIndexPositionSteps(); }
 
-    // coordinate wrap, in "measures" (radians, microns, etc.)
-    // wrap occurs when the coordinate exceeds the min or max limits
-    // default 0.0 (disabled)
+    // coordinate wrap
+    // \param value: one complete rotation in "measures" (radians, microns, etc.), 0.0 disables
+    // \note wrap occurs when the coordinate exceeds the min or max limits
     inline void coordinateWrap(double value) { wrapAmount = value; wrapEnabled = fabs(value) > 0.0F; }
 
-    // set instrument coordinate, in "measures" (radians, microns, etc.)
+    // set instrument coordinate
+    // \param value: position in "measures" (radians, microns, etc.)
     void setInstrumentCoordinate(double value);
 
-    // set instrument coordinate, in steps
+    // set instrument coordinate
+    // \param value: position in steps
     inline void setInstrumentCoordinateSteps(long value) { motor->setInstrumentCoordinateSteps(value); }
 
-    // get instrument coordinate
+    // get instrument coordinate in "measures" (radians, microns, etc.)
     double getInstrumentCoordinate();
 
     // get instrument coordinate, in steps
     inline long getInstrumentCoordinateSteps() { return motor->getInstrumentCoordinateSteps(); }
 
-    // set instrument coordinate park, in "measures" (radians, microns, etc.)
-    // with backlash disabled this indexes to the nearest position where the motor wouldn't cog
+    // set instrument coordinate to park at
+    // \param value: position in "measures" (radians, microns, etc.)
+    // \note with backlash disabled this indexes to the nearest position where the motor wouldn't cog
     void setInstrumentCoordinatePark(double value);
 
-    // set target coordinate park, in "measures" (degrees, microns, etc.)
-    // with backlash disabled this moves to the nearest position where the motor doesn't cog
+    // set the target coordinate for park
+    // \param value: postion in "measures" (degrees, microns, etc.)
+    // \note with backlash disabled this moves to the nearest position where the motor doesn't cog
     void setTargetCoordinatePark(double value);
 
-    // set target coordinate, in "measures" (degrees, microns, etc.)
+    // set target coordinate for autoGoto()
+    // \param value: postion in "measures" (degrees, microns, etc.)
     void setTargetCoordinate(double value);
 
-    // set target coordinate, in steps
+    // set target coordinate for autoGoto()
+    // \param value: postion in steps
     inline void setTargetCoordinateSteps(long value) { motor->setTargetCoordinateSteps(value); }
 
     // get target coordinate, in "measures" (degrees, microns, etc.)
@@ -192,16 +213,18 @@ class Axis {
     // distance to target in "measures" (degrees, microns, etc.)
     double getTargetDistance();
 
-    // returns true if at target
+    // returns true if at the target coordinate (+/- targetTolerance)
     bool atTarget();
 
-    // returns true if within one second of the target at the backlash takeup rate
+    // returns true if within one second of the target coordinate at the backlash takeup rate
     bool nearTarget();
 
-    // set backlash amount in "measures" (radians, microns, etc.)
+    // sets backlash amount
+    // \param value: backlash angular distance in "measures" (degrees, microns, etc.)
     void setBacklash(float value);
 
-    // set backlash amount in steps
+    // sets backlash amount
+    // \param value: backlash angular distance in steps
     inline void setBacklashSteps(long value) { if (autoRate == AR_NONE) motor->setBacklashSteps(value); }
 
     // get backlash amount in "measures" (radians, microns, etc.)
@@ -219,43 +242,54 @@ class Axis {
     // gets backlash frequency in "measures" (degrees, microns, etc.) per second
     float getBacklashFrequency();
 
-    // reverse direction of motion
     inline void setReverse(bool reverse) {
       if (reverse) {
+    // sets reversal of axis directions
+    // \param state: true reverses the direction behavior specified in settings
         if (settings.reverse == ON) motor->setReverse(OFF); else motor->setReverse(ON);
       } else {
         motor->setReverse(settings.reverse);
       }
     }
 
-    // reverse homing direction
     inline void setHomeReverse(bool reverse) { sense.reverse(homeSenseHandle, reverse); }
+    // sets reversal of homing directions
+    // \param state: true reverses the normal sense direction behavior
 
-    // set base movement frequency in "measures" (radians, microns, etc.) per second
+    // sets frequency for base motion (target synchronized)
+    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
     void setFrequencyBase(float frequency);
 
-    // set slew frequency in "measures" (radians, microns, etc.) per second
+    // sets maximum frequency for next slew
+    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
     void setFrequencySlew(float frequency);
 
-    // set minimum slew frequency in "measures" (radians, microns, etc.) per second
+    // sets overall minimum frequency
+    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
     void setFrequencyMin(float frequency);
 
-    // set maximum frequency in "measures" (radians, microns, etc.) per second
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
     void setFrequencyMax(float frequency);
 
-    // set frequency scaling factor (0.0 to 1.0)
+    // sets frequency scaling factor for slews
+    // \param frequency: scaling factor for this axis ranging from 0.0 (0%) to 1.0 (100%) of normal
     void setFrequencyScale(float frequency) { if (frequency >= 0.0F && frequency <= 1.0F) scaleFreq = frequency; }
 
-    // set acceleration rate in "measures" per second per second (for autoSlew)
+    // sets acceleration rate for slews
+    // \param mpsps: acceleration rate in "measures" per second per second
     void setSlewAccelerationRate(float mpsps);
 
-    // set acceleration rate in seconds (for autoSlew)
+    // set acceleration rate for slews
+    // \param seconds: time during which acceleration to/from the last specified slew frequency occurs
     void setSlewAccelerationTime(float seconds);
 
-    // set acceleration for emergency stop movement in "measures" per second per second
+    // sets acceleration rate for emergency stop of movement
+    // \param mpsps: deceleration rate in "measures" per second per second
     void setSlewAccelerationRateAbort(float mpsps);
 
-    // set acceleration for emergency stop movement in seconds (for autoSlewStop)
+    // set acceleration rate for emergency stop of movement
+    // \param seconds: time during which deceleration from the last specified slew frequency occurs
     void setSlewAccelerationTimeAbort(float seconds);
 
     // auto goto to destination target coordinate
@@ -267,52 +301,60 @@ class Axis {
     // \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
     CommandError autoSlew(Direction direction, float frequency = NAN);
 
-    // slew to home using home sensor, with acceleration in "measures" per second per second
+    // automatic slew to home
+    // \param timeout: time in seconds before aborting the operation
+    // \note requires a home sensor (switch)
     CommandError autoSlewHome(unsigned long timeout = 0);
 
-    // check if homing is in progress
+    // returns true homing is in progress
     bool isHoming() { return homingStage != HOME_NONE; }
 
-    // check if a home sensor is available
+    // returns true if a home sensor is available
     inline bool hasHomeSense() { return pins->axisSense.homeTrigger != OFF; }
 
-    // stops, with deacceleration by time
+    // stops any autoGoto() or autoSlew() or autoSlewHome() with deacceleration by time
     void autoSlewStop();
 
-    // emergency stops, with deacceleration by time
+    // stops any autoGoto() or autoSlew() or autoSlewHome() with deacceleration by time using the abort rate
     void autoSlewAbort();
 
-    // checks if slew is active on this axis
+    // returns true if a slew is active on this axis
     bool isSlewing();
 
     // returns 1 if departing origin or -1 if approaching target
     inline int getRampDirection() { return motor->getRampDirection(); }
 
-    // set synchronized state (automatic movement of target at setFrequencySteps() rate)
+    // set synchronized automatic target movement
+    // \param state: true to force target synchronized movement
+    // \note movement at the setFrequencySteps() rate
     inline void setSynchronized(bool state) { motor->setSynchronized(state); }
 
-    // get synchronized state (automatic movement of target at setFrequencySteps() rate)
+    // returns true if synchronized automatic target movement is active
+    // \note movement at the setFrequencySteps() rate
     inline bool getSynchronized() { return motor->getSynchronized(); }
 
-    // report fault status of motor driver, if available
+    // returns true if the associated motor reports a fault
     inline bool motorFault() { return motor->getDriverStatus().fault; };
 
-    // get associated motor driver status
+    // returns the associated motors driver status
     DriverStatus getStatus();
 
-    // enable/disable numeric position range limits (doesn't apply to limit switches)
+    // enables or disables software based position range limits
+    // \param state: true to enable or false to disable
     void setMotionLimitsCheck(bool state);
 
-    // checks for an error that would disallow motion in a given direction or DIR_BOTH for any motion
+    // check for all errors that would disallow motion in the given direction
+    // \param direction: one of DIR_FORWARD, DIR_REVERSE, or DIR_BOTH
     bool motionError(Direction direction);
 
-    // checks for an sense error that would disallow motion in a given direction or DIR_BOTH for any motion
+    // check for sense (h/w limit) errors that would disallow motion in the given direction
+    // \param direction: one of DIR_FORWARD, DIR_REVERSE, or DIR_BOTH
     bool motionErrorSensed(Direction direction);
 
-    // calibrate the motor if required
+    // calibrate the associated motor
     void calibrate(float value) { motor->calibrate(value); }
 
-    // calibrate the motor driver if required
+    // calibrate the associated motor's driver
     void calibrateDriver() { motor->calibrateDriver(); }
 
     // monitor movement
@@ -323,6 +365,7 @@ class Axis {
 
     AxisStoredSettings settings;
 
+    // hint that min and max pins are the same (no directional limit indication)
     bool commonMinMaxSense = false;
 
   private:
@@ -357,15 +400,16 @@ class Axis {
 
     uint8_t axisNumber = 0;
     char axisPrefix[13] = "MSG: Axis_, ";
+
     char unitsStr[5] = "?";
     bool unitsRadians = false;
 
-    bool enabled = false;        // enable/disable logical state (disabled is powered down)
-    bool limitsCheck = true;     // enable/disable numeric position range limits (doesn't apply to limit switches)
+    bool enabled = false;                // enabled or disabled axis and motor power
+    bool limitsCheck = true;             // enabled or disabled software range limits check
 
-    uint8_t homeSenseHandle = 0; // home sensor handle
-    uint8_t minSenseHandle = 0;  // min sensor handle
-    uint8_t maxSenseHandle = 0;  // max sensor handle
+    uint8_t homeSenseHandle = 0;         // home sensor handle
+    uint8_t minSenseHandle = 0;          // min sensor handle
+    uint8_t maxSenseHandle = 0;          // max sensor handle
 
     uint16_t backlashStepsStore;
     volatile uint16_t backlashSteps = 0;
@@ -380,31 +424,32 @@ class Axis {
     // power down standstill control
     bool powerDownStandstill = false;
     bool powerDownOverride = false;
-    unsigned long powerDownDelay;
-    unsigned long powerDownOverrideEnds;
     bool poweredDown = false;
-    unsigned long powerDownTime = 0;
+    unsigned long powerDownDelay;        // in milliseconds
+    unsigned long powerDownOverrideEnds; // in milliseconds
+    unsigned long powerDownTime = 0;     // in milliseconds
 
     // timeout for home switch detection
-    unsigned long homeTimeoutTime = 0;
+    unsigned long homeTimeoutTime = 0;   // in milliseconds
 
     // rates (in measures per second) to control motor movement
-    float freq = 0.0F;
     float rampFreq = 0.0F;
-    float baseFreq = 0.0F;
-    float minFreq = 0.0F;
-    float slewFreq = 0.0F;
-    float maxFreq = 0.0F;
+    float freq = 0.0F;                   // momentary frequency in measures/s
+    float baseFreq = 0.0F;               // base frequency for continuous movement in measures/s
+    float minFreq = 0.0F;                // minimum frequency in measures/s
+    float slewFreq = 0.0F;               // slewing frequency in measures/s
+    float maxFreq = 0.0F;                // maximum frequency in measures/s
+    float backlashFreq = 0.0F;           // in measures/s
+
     float scaleFreq = 1.0F;
-    float backlashFreq = 0.0F;
 
     float targetTolerance = 0.0F;
 
-    AutoRate autoRate = AR_NONE;       // auto slew mode
-    float slewAccelRateFs;             // auto slew rate in measures per second per frac-sec
-    float abortAccelRateFs;            // abort slew rate in measures per second per frac-sec
-    float slewAccelTime = NAN;         // auto slew acceleration time in seconds
-    float abortAccelTime = NAN;        // abort slew acceleration time in seconds
+    AutoRate autoRate = AR_NONE;         // auto slew mode
+    float slewAccelRateFs;               // auto slew rate in measures per second per frac-sec
+    float abortAccelRateFs;              // abort slew rate in measures per second per frac-sec
+    float slewAccelTime = NAN;           // auto slew acceleration time in seconds
+    float abortAccelTime = NAN;          // abort slew acceleration time in seconds
 
     HomingStage homingStage = HOME_NONE;
 

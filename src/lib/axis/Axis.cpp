@@ -19,7 +19,6 @@ IRAM_ATTR void axisWrapper7() { axisWrapper[6]->poll(); }
 IRAM_ATTR void axisWrapper8() { axisWrapper[7]->poll(); }
 IRAM_ATTR void axisWrapper9() { axisWrapper[8]->poll(); }
 
-// constructor
 Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *settings, const AxisMeasure axisMeasure, float targetTolerance) {
   axisPrefix[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
@@ -54,7 +53,6 @@ Axis::Axis(uint8_t axisNumber, const AxisPins *pins, const AxisSettings *setting
   this->targetTolerance = targetTolerance;
 }
 
-// sets up the driver step/dir/enable pins and any associated driver mode control
 bool Axis::init(Motor *motor) {
   this->motor = motor;
   motor->getDefaultParameters(&settings.param1, &settings.param2, &settings.param3, &settings.param4, &settings.param5, &settings.param6);
@@ -131,19 +129,15 @@ bool Axis::init(Motor *motor) {
   return true;
 }
 
-// enables or disables the associated step/dir driver
-// also calibrates the driver if this is the first time its been enabled
 void Axis::enable(bool state) {
   enabled = state;
   motor->enable(enabled & !poweredDown);
 }
 
-// time (in ms) before automatic power down at standstill, use 0 to disable
 void Axis::setPowerDownTime(int value) {
   if (value == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = value; }
 }
 
-// time (in ms) to disable automatic power down at standstill, use 0 to disable
 void Axis::setPowerDownOverrideTime(int value) {
   if (value == 0) powerDownOverride = false; else {
     if (poweredDown) {
@@ -155,22 +149,18 @@ void Axis::setPowerDownOverrideTime(int value) {
   }
 }
 
-// set backlash amount in "measures" (radians, microns, etc.)
 void Axis::setBacklash(float value) {
   if (autoRate == AR_NONE) motor->setBacklashSteps(round(value*settings.stepsPerMeasure));
 }
 
-// get backlash amount in "measures" (radians, microns, etc.)
 float Axis::getBacklash() {
   return motor->getBacklashSteps()/settings.stepsPerMeasure;
 }
 
-// reset motor and target angular position, in "measure" units
 CommandError Axis::resetPosition(double value) {
   return resetPositionSteps(lround(value*settings.stepsPerMeasure));
 }
 
-// reset motor and target angular position, in steps
 CommandError Axis::resetPositionSteps(long value) {
   if (autoRate != AR_NONE) return CE_SLEW_IN_MOTION;
   if (motor->getFrequencySteps() != 0) return CE_SLEW_IN_MOTION;
@@ -178,12 +168,10 @@ CommandError Axis::resetPositionSteps(long value) {
   return CE_NONE;
 }
 
-// get motor position, in "measure" units
 double Axis::getMotorPosition() {
   return motor->getMotorPositionSteps()/settings.stepsPerMeasure;
 }
 
-// get index position, in "measure" units
 double Axis::getIndexPosition() {
   return motor->getIndexPositionSteps()/settings.stepsPerMeasure;
 }
@@ -194,7 +182,6 @@ double distance(double c1, double c2) {
   if (d1 <= d2) return d1; else return d2;
 }
 
-// convert from unwrapped (full range) to normal (+/- wrapAmount) coordinate
 double Axis::wrap(double value) {
   if (wrapEnabled) {
     while (value > settings.limits.max) value -= wrapAmount;
@@ -203,7 +190,6 @@ double Axis::wrap(double value) {
   return value;
 }
 
-// convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
 double Axis::unwrap(double value) {
   if (wrapEnabled) {
     double position = motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure;
@@ -213,8 +199,6 @@ double Axis::unwrap(double value) {
   return value;
 }
 
-// convert from normal (+/- wrapAmount) to an unwrapped (full range) coordinate
-// nearest the instrument coordinate
 double Axis::unwrapNearest(double value) {
   if (wrapEnabled) {
     value = unwrap(value);
@@ -230,60 +214,47 @@ double Axis::unwrapNearest(double value) {
   return value;
 }
 
-// set instrument coordinate, in "measures" (radians, microns, etc.)
 void Axis::setInstrumentCoordinate(double value) {
   setInstrumentCoordinateSteps(lround(unwrap(value)*settings.stepsPerMeasure));
 }
 
-// get instrument coordinate
 double Axis::getInstrumentCoordinate() {
   return wrap(motor->getInstrumentCoordinateSteps()/settings.stepsPerMeasure);
 }
 
-// set instrument coordinate park, in "measures" (radians, microns, etc.)
-// with backlash disabled this indexes to the nearest position where the motor wouldn't cog
 void Axis::setInstrumentCoordinatePark(double value) {
   motor->setInstrumentCoordinateParkSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure), settings.subdivisions);
 }
 
-// set target coordinate park, in "measures" (degrees, microns, etc.)
-// with backlash disabled this moves to the nearest position where the motor doesn't cog
 void Axis::setTargetCoordinatePark(double value) {
   motor->setFrequencySteps(0);
   motor->setTargetCoordinateParkSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure), settings.subdivisions);
 }
 
-// set target coordinate, in "measures" (degrees, microns, etc.)
 void Axis::setTargetCoordinate(double value) {
   setTargetCoordinateSteps(lround(unwrapNearest(value)*settings.stepsPerMeasure));
 }
 
-// get target coordinate, in "measures" (degrees, microns, etc.)
 double Axis::getTargetCoordinate() {
   return wrap(motor->getTargetCoordinateSteps()/settings.stepsPerMeasure);
 }
 
-// returns true if at target
 bool Axis::atTarget() {
   return labs(motor->getTargetDistanceSteps()) <= targetTolerance*settings.stepsPerMeasure;
 }
 
-// returns true if within one second of the target at the backlash takeup rate
 bool Axis::nearTarget() {
   return labs(motor->getTargetDistanceSteps()) < backlashFreq*settings.stepsPerMeasure;
 }
 
-// distance to target in "measures" (degrees, microns, etc.)
 double Axis::getTargetDistance() {
   return labs(motor->getTargetDistanceSteps())/settings.stepsPerMeasure;
 }
 
-// distance to origin or target, whichever is closer, in "measures" (degrees, microns, etc.)
 double Axis::getOriginOrTargetDistance() {
   return motor->getOriginOrTargetDistanceSteps()/settings.stepsPerMeasure;
 }
 
-// set acceleration rate in "measures" per second per second (for autoSlew)
 void Axis::setSlewAccelerationRate(float mpsps) {
   if (autoRate == AR_NONE) {
     slewAccelRateFs = mpsps/FRACTIONAL_SEC;
@@ -292,7 +263,6 @@ void Axis::setSlewAccelerationRate(float mpsps) {
   }
 }
 
-// set acceleration rate in seconds (for autoSlew)
 void Axis::setSlewAccelerationTime(float seconds) {
   if (autoRate == AR_NONE) {
     if (seconds < 0.1F) seconds = 0.1F;
@@ -300,7 +270,6 @@ void Axis::setSlewAccelerationTime(float seconds) {
   }
 }
 
-// set acceleration for emergency stop movement in "measures" per second per second
 void Axis::setSlewAccelerationRateAbort(float mpsps) {
   if (autoRate == AR_NONE) {
     abortAccelRateFs = mpsps/FRACTIONAL_SEC;
@@ -309,13 +278,10 @@ void Axis::setSlewAccelerationRateAbort(float mpsps) {
   }
 }
 
-// set acceleration for emergency stop movement in seconds (for autoSlewStop)
 void Axis::setSlewAccelerationTimeAbort(float seconds) {
   if (autoRate == AR_NONE) abortAccelTime = seconds;
 }
 
-// auto goto to destination target coordinate
-// \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
 CommandError Axis::autoGoto(float frequency) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
@@ -343,9 +309,6 @@ CommandError Axis::autoGoto(float frequency) {
   return CE_NONE;
 }
 
-// auto slew
-// \param direction: direction of motion, DIR_FORWARD or DIR_REVERSE
-// \param frequency: optional frequency of slew in "measures" (radians, microns, etc.) per second
 CommandError Axis::autoSlew(Direction direction, float frequency) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate == AR_RATE_BY_DISTANCE) return CE_SLEW_IN_SLEW;
@@ -387,7 +350,6 @@ CommandError Axis::autoSlew(Direction direction, float frequency) {
   return CE_NONE;
 }
 
-// slew to home using home sensor, with acceleration in "measures" per second per second
 CommandError Axis::autoSlewHome(unsigned long timeout) {
   if (!enabled) return CE_SLEW_ERR_IN_STANDBY;
   if (autoRate != AR_NONE) return CE_SLEW_IN_SLEW;
@@ -430,7 +392,6 @@ CommandError Axis::autoSlewHome(unsigned long timeout) {
   return CE_NONE;
 }
 
-// stops, with deacceleration by time
 void Axis::autoSlewStop() {
   if (autoRate <= AR_RATE_BY_TIME_END) return;
 
@@ -441,7 +402,6 @@ void Axis::autoSlewStop() {
   poll();
 }
 
-// emergency stops, with deacceleration by time
 void Axis::autoSlewAbort() {
   if (autoRate <= AR_RATE_BY_TIME_ABORT) return;
 
@@ -453,12 +413,10 @@ void Axis::autoSlewAbort() {
   poll();
 }
 
-// checks if slew is active on this axis
 bool Axis::isSlewing() {
   return autoRate != AR_NONE;  
 }
 
-// monitor movement
 void Axis::poll() {
   // make sure we're ready
   if (axisNumber == 0) return;
@@ -596,22 +554,18 @@ void Axis::poll() {
   }
 }
 
-// set minimum slew frequency in "measures" (radians, microns, etc.) per second
 void Axis::setFrequencyMin(float frequency) {
   minFreq = frequency;
 }
 
-// set maximum slew frequency in "measures" (radians, microns, etc.) per second
 void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
 }
 
-// frequency for base movement in "measures" (radians, microns, etc.) per second
 void Axis::setFrequencyBase(float frequency) {
   baseFreq = frequency;
 }
 
-// frequency for slews in "measures" (radians, microns, etc.) per second
 void Axis::setFrequencySlew(float frequency) {
   if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
   if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;
@@ -622,7 +576,6 @@ void Axis::setFrequencySlew(float frequency) {
   if (!isnan(abortAccelTime)) abortAccelRateFs = (slewFreq/abortAccelTime)/FRACTIONAL_SEC;
 }
 
-// set frequency in "measures" (degrees, microns, etc.) per second (0 stops motion)
 void Axis::setFrequency(float frequency) {
   frequency *= scaleFreq;
   if (powerDownStandstill && frequency == 0.0F && baseFreq == 0.0F) {
@@ -665,17 +618,14 @@ void Axis::setFrequency(float frequency) {
   }
 }
 
-// get frequency in "measures" (degrees, microns, etc.) per second
 float Axis::getFrequency() {
   return motor->getFrequencySteps()/settings.stepsPerMeasure;
 }
 
-// gets backlash frequency in "measures" (degrees, microns, etc.) per second
 float Axis::getBacklashFrequency() {
   return backlashFreq;
 }
 
-// get associated motor driver status
 DriverStatus Axis::getStatus() {
   return motor->getDriverStatus();
 }
@@ -684,7 +634,6 @@ void Axis::setMotionLimitsCheck(bool state) {
   limitsCheck = state;
 }
 
-// checks for an error that would disallow motion in a given direction or DIR_BOTH for either direction
 bool Axis::motionError(Direction direction) {
   bool result = false;
 
@@ -707,7 +656,6 @@ bool Axis::motionError(Direction direction) {
   return lastErrorResult;
 }
 
-// checks for an sense error that would disallow motion in a given direction or DIR_BOTH for any motion
 bool Axis::motionErrorSensed(Direction direction) {
   if ((direction == DIR_REVERSE || direction == DIR_BOTH) && errors.minLimitSensed) return true; else
   if ((direction == DIR_FORWARD || direction == DIR_BOTH) && errors.maxLimitSensed) return true; else return false;
