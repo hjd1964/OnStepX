@@ -224,7 +224,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == '-') {
       derotatorEnabled = false;
-      axis3.setFrequencyBase(0.0F);
+      axis3.setSynchronizedFrequency(0.0F);
       *numericReply = false;
     } else
 

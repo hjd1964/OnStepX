@@ -263,13 +263,13 @@ void Mount::update() {
     if (!guide.activeAxis1() || guide.state == GU_PULSE_GUIDE) {
       f1 = trackingRateAxis1;
       if (transform.mountType != ALTAZM && transform.mountType != ALTALT)  f1 += guide.rateAxis1 + pec.rate;
-      axis1.setFrequencyBase(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
+      axis1.setSynchronizedFrequency(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
     if (!guide.activeAxis2() || guide.state == GU_PULSE_GUIDE) {
       f2 = trackingRateAxis2;
       if (transform.mountType != ALTAZM && transform.mountType != ALTALT)  f2 += guide.rateAxis2;
-      axis2.setFrequencyBase(siderealToRadF(f2)*SIDEREAL_RATIO_F*site.getSiderealRatio());
+      axis2.setSynchronizedFrequency(siderealToRadF(f2)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
     f1 = fabs(f1);
@@ -279,7 +279,7 @@ void Mount::update() {
     if (f1 > 3.0F) statusFlashMs = SF_SLEWING; else statusFlashMs = 500.0F/f1;
   } else {
     statusFlashMs = SF_SLEWING;
-    axis2.setFrequencyBase(0.0F);
+    axis2.setSynchronizedFrequency(0.0F);
   }
 
   if (statusFlashMs != lastStatusFlashMs) {

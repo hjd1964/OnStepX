@@ -560,10 +560,6 @@ void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
 }
 
-void Axis::setFrequencyBase(float frequency) {
-  baseFreq = frequency;
-}
-
 void Axis::setFrequencySlew(float frequency) {
   if (minFreq != 0.0F && frequency < minFreq) frequency = minFreq;
   if (maxFreq != 0.0F && frequency > maxFreq) frequency = maxFreq;

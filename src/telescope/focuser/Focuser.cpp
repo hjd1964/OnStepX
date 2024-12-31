@@ -339,7 +339,7 @@ CommandError Focuser::move(int index, Direction dir) {
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
 
   if (!axes[index]->isSlewing()) {
-    axes[index]->setFrequencyBase(0.0F);
+    axes[index]->setSynchronizedFrequency(0.0F);
     axes[index]->resetTargetToMotorPosition();
   }
   return axes[index]->autoSlew(dir, moveRate[index]);
@@ -375,7 +375,7 @@ CommandError Focuser::gotoTarget(int index, long target) {
   VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
   VF("MSG: Focuser"); V(index + 1); VLF(", attempting goto");
 
-  axes[index]->setFrequencyBase(0.0F);
+  axes[index]->setSynchronizedFrequency(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
   CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
   if (e != CE_NONE) { VF("MSG: Focuser"); V(index + 1); VLF(", goto failed"); }
@@ -516,9 +516,9 @@ void Focuser::monitor() {
             }
             if (!axes[index]->atTarget()) {
               axes[index]->setSynchronized(false);
-              axes[index]->setFrequencyBase(20.0F); // 20um/s
+              axes[index]->setSynchronizedFrequency(20.0F); // 20um/s
             } else {
-              axes[index]->setFrequencyBase(0.0F);
+              axes[index]->setSynchronizedFrequency(0.0F);
             }
           } else tcfSteps[index] = 0;
 

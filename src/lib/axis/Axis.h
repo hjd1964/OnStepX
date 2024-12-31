@@ -256,10 +256,6 @@ class Axis {
     // \param state: true reverses the normal sense direction behavior
     inline void setHomeReverse(bool state) { sense.reverse(homeSenseHandle, state); }
 
-    // sets frequency for base motion (target synchronized)
-    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
-    void setFrequencyBase(float frequency);
-
     // sets maximum frequency for next slew
     // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
     void setFrequencySlew(float frequency);
@@ -324,13 +320,17 @@ class Axis {
     // returns 1 if departing origin or -1 if approaching target
     inline int getRampDirection() { return motor->getRampDirection(); }
 
+    // sets synchronized automatic target movement frequency
+    // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
+    inline void setSynchronizedFrequency(float frequency) { baseFreq = frequency; }
+
     // set synchronized automatic target movement
     // \param state: true to force target synchronized movement
-    // \note movement at the setFrequencySteps() rate
+    // \note movement at the setSynchronizedFrequency() rate
     inline void setSynchronized(bool state) { motor->setSynchronized(state); }
 
     // returns true if synchronized automatic target movement is active
-    // \note movement at the setFrequencySteps() rate
+    // \note movement at the setSynchronizedFrequency() rate
     inline bool getSynchronized() { return motor->getSynchronized(); }
 
     // returns true if the associated motor reports a fault
