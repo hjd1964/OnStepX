@@ -220,11 +220,11 @@ class Axis {
     bool nearTarget();
 
     // sets backlash amount
-    // \param value: backlash angular distance in "measures" (degrees, microns, etc.)
+    // \param value: backlash distance in "measures" (degrees, microns, etc.)
     void setBacklash(float value);
 
     // sets backlash amount
-    // \param value: backlash angular distance in steps
+    // \param value: backlash distance in steps
     inline void setBacklashSteps(long value) { if (autoRate == AR_NONE) motor->setBacklashSteps(value); }
 
     // get backlash amount in "measures" (radians, microns, etc.)
