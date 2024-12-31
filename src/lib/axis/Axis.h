@@ -140,12 +140,12 @@ class Axis {
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return motor->getStepsPerStepSlewing(); }
 
-    // reset motor and target position
-    // \param value: position in "measures" (radians, microns, etc.)
+    // reset position, also zeros backlash and index
+    // \param value: position of motor and target in "measures" (radians, microns, etc.)
     CommandError resetPosition(double value);
 
-    // reset motor and target position
-    // \param value: position in steps
+    // reset position, also zeros backlash and index
+    // \param value: position of motor and target in steps
     CommandError resetPositionSteps(long value);
 
     // resets the target position to the motor position
