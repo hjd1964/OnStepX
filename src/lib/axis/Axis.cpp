@@ -134,18 +134,18 @@ void Axis::enable(bool state) {
   motor->enable(enabled & !poweredDown);
 }
 
-void Axis::setPowerDownTime(int value) {
-  if (value == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = value; }
+void Axis::setPowerDownTime(int time) {
+  if (time == 0) powerDownStandstill = false; else { powerDownStandstill = true; powerDownDelay = time; }
 }
 
-void Axis::setPowerDownOverrideTime(int value) {
-  if (value == 0) powerDownOverride = false; else {
+void Axis::setPowerDownOverrideTime(int time) {
+  if (time == 0) powerDownOverride = false; else {
     if (poweredDown) {
       poweredDown = false;
       motor->enable(true);
     }
     powerDownOverride = true;
-    powerDownOverrideEnds = millis() + value;
+    powerDownOverrideEnds = millis() + time;
   }
 }
 
@@ -297,7 +297,6 @@ CommandError Axis::autoGoto(float frequency) {
   motor->setSynchronized(false);
   motor->setSlewing(true);
   autoRate = AR_RATE_BY_DISTANCE;
-  rampFreq = 0.0F;
 
   #if DEBUG == VERBOSE
     if (unitsRadians) V(radToDeg(slewFreq)); else V(slewFreq);
@@ -485,7 +484,6 @@ void Axis::poll() {
         if (freq < backlashFreq) freq = backlashFreq;
         if (freq > slewFreq) freq = slewFreq;
         if (motor->getTargetDistanceSteps() < 0) freq = -freq;
-        rampFreq = freq;
       }
     } else
     if (autoRate == AR_RATE_BY_TIME_FORWARD) {

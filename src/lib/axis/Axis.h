@@ -242,19 +242,19 @@ class Axis {
     // gets backlash frequency in "measures" (degrees, microns, etc.) per second
     float getBacklashFrequency();
 
-    inline void setReverse(bool reverse) {
-      if (reverse) {
     // sets reversal of axis directions
     // \param state: true reverses the direction behavior specified in settings
+    inline void setReverse(bool state) {
+      if (state) {
         if (settings.reverse == ON) motor->setReverse(OFF); else motor->setReverse(ON);
       } else {
         motor->setReverse(settings.reverse);
       }
     }
 
-    inline void setHomeReverse(bool reverse) { sense.reverse(homeSenseHandle, reverse); }
     // sets reversal of homing directions
     // \param state: true reverses the normal sense direction behavior
+    inline void setHomeReverse(bool state) { sense.reverse(homeSenseHandle, state); }
 
     // sets frequency for base motion (target synchronized)
     // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
@@ -433,7 +433,6 @@ class Axis {
     unsigned long homeTimeoutTime = 0;   // in milliseconds
 
     // rates (in measures per second) to control motor movement
-    float rampFreq = 0.0F;
     float freq = 0.0F;                   // momentary frequency in measures/s
     float baseFreq = 0.0F;               // base frequency for continuous movement in measures/s
     float minFreq = 0.0F;                // minimum frequency in measures/s
