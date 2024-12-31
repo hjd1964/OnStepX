@@ -569,28 +569,27 @@ uint8_t Tasks::getHandleByName(const char name[]) {
   }
 #endif
 
-#ifdef TASKS_HIGHER_PRIORITY_ONLY
-  void Tasks::yield() {
+void Tasks::yield(YieldAllowPriority taskAllowPriority) {
+  static uint8_t highest_priority_active = 8;
+  if (taskAllowPriority == YA_PRIORITY_HIGHER) {
     ::yield();
     for (uint8_t priority = 0; priority <= highest_priority; priority++) {
-      uint8_t last_priority = highest_active_priority;
-      if (priority < highest_active_priority) {
-        highest_active_priority = priority;
+      uint8_t last_priority = highest_priority_active;
+      if (priority < highest_priority_active) {
+        highest_priority_active = priority;
         for (uint8_t i = 0; i <= highest_task; i++) {
           if (++number[priority] > highest_task) number[priority] = 0;
           if (allocated[number[priority]]) {
             if (task[number[priority]]->getPriority() == priority) {
-              if (task[number[priority]]->isDurationComplete()) { remove(number[priority] + 1); highest_active_priority = last_priority; return; }
-              if (task[number[priority]]->poll()) { highest_active_priority = last_priority; return; }
+              if (task[number[priority]]->isDurationComplete()) { remove(number[priority] + 1); highest_priority_active = last_priority; return; }
+              if (task[number[priority]]->poll()) { highest_priority_active = last_priority; return; }
             }
           }
         }
-        highest_active_priority = last_priority;
+        highest_priority_active = last_priority;
       }
     }
-  }
-#else
-  void Tasks::yield() {
+  } else {
     for (uint8_t priority = 0; priority <= highest_priority; priority++) {
       for (uint8_t i = 0; i <= highest_task; i++) {
         if (++number[priority] > highest_task) number[priority] = 0;
@@ -603,16 +602,16 @@ uint8_t Tasks::getHandleByName(const char name[]) {
       }
     }
   }
-#endif
-
-void Tasks::yield(unsigned long milliseconds) {
-  unsigned long endTime = millis() + milliseconds;
-  while ((long)(millis() - endTime) < 0) this->yield();
 }
 
-void Tasks::yieldMicros(unsigned long microseconds) {
+void Tasks::yield(unsigned long milliseconds, YieldAllowPriority taskAllowPriority) {
+  unsigned long endTime = millis() + milliseconds;
+  while ((long)(millis() - endTime) < 0) this->yield(taskAllowPriority);
+}
+
+void Tasks::yieldMicros(unsigned long microseconds, YieldAllowPriority taskAllowPriority) {
   unsigned long endTime = micros() + microseconds;
-  while ((long)(micros() - endTime) < 0) this->yield();
+  while ((long)(micros() - endTime) < 0) this->yield(taskAllowPriority);
 }
 
 void Tasks::updatePriorityRange() {
