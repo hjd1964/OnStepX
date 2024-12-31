@@ -7,6 +7,11 @@
 
 #if defined(NV_DRIVER) && NV_DRIVER == NV_EEPROM
 
+// don't bring in the EEPROM library here if this is an Mega2560, etc.
+#ifndef __AVR__
+  #include <EEPROM.h>
+#endif
+
 #include "../NvBase.h"
 
 class NonVolatileStorageEEPROM : public NonVolatileStorage {

@@ -5,7 +5,10 @@
 
 #if defined(NV_DRIVER) && NV_DRIVER == NV_EEPROM
 
-#include <EEPROM.h>
+// bring in the EEPROM library here if this is an Mega2560, etc.
+#ifdef __AVR__
+  #include <EEPROM.h>
+#endif
 
 bool NonVolatileStorageEEPROM::init() {
   // setup size, cache, etc.
