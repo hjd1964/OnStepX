@@ -81,9 +81,8 @@
 #endif
 
 // runs tasks at their prescribed interval
-// notes:
-//   allows only higher priority tasks to run
-//   each call can trigger running at most a single process
+// \note allows only higher priority tasks to run
+// \note each call can trigger running at most a single process
 #define Y tasks.yield()
 
 // short macro to allow momentary postponement of the current task
