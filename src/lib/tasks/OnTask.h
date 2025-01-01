@@ -92,9 +92,6 @@ extern unsigned char __task_postpone;
 
 enum PeriodUnits: uint8_t {PU_NONE, PU_MILLIS, PU_MICROS, PU_SUB_MICROS};
 
-// allows yield() to run all other tasks or only higher priority tasks
-enum YieldAllowPriority: uint8_t {YA_PRIORITY_ALL, YA_PRIORITY_HIGHER};
-
 // Timing modes
 // TM_BALANCED (default) to maintain the specified frequency/period where a task that runs late is next run early to compensate
 // TM_MINIMUM to run the task at an interval not less than the specified frequency/period from task start to next start
@@ -328,26 +325,41 @@ class Tasks {
       double getRuntimeMax(uint8_t handle);
     #endif
 
-    // runs tasks at their prescribed interval
-    // \param taskAllowPriority: YA_PRIORITY_HIGHER allows higher priority tasks only or YA_PRIORITY_ALL so any other task can run
+    // runs higher priority tasks at their prescribed interval
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
     // \note each call can trigger running at most a single process
-    void yield(YieldAllowPriority taskAllowPriority = YA_PRIORITY_HIGHER);
+    void yield();
 
-    // runs tasks at their prescribed interval
+    // runs higher priority tasks at their prescribed interval
     // \param milliseconds: time to repeatedly runs any tasks that need servicing
-    // \param taskAllowPriority: YA_PRIORITY_HIGHER allows higher priority tasks only or YA_PRIORITY_ALL so any other task can run
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
-    void yield(unsigned long milliseconds, YieldAllowPriority taskAllowPriority = YA_PRIORITY_HIGHER);
+    void yield(unsigned long milliseconds);
 
-    // runs tasks at their prescribed interval
+    // runs higher priority tasks at their prescribed interval
     // \param microseconds: time to repeatedly runs any tasks that need servicing
-    // \param taskAllowPriority: YA_PRIORITY_HIGHER allows higher priority tasks only or YA_PRIORITY_ALL so any other task can run
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
-    void yieldMicros(unsigned long microseconds, YieldAllowPriority taskAllowPriority = YA_PRIORITY_HIGHER);
+    void yieldMicros(unsigned long microseconds);
+
+    // runs all other tasks at their prescribed interval
+    // \note processes that are already running are ignored so it's ok to yield() within a process
+    // \note processes assigned to hardware timers run outside this mechanism
+    // \note each call can trigger running at most a single process
+    void yieldAll();
+
+    // runs all other tasks at their prescribed interval
+    // \param milliseconds: time to repeatedly runs any tasks that need servicing
+    // \note processes that are already running are ignored so it's ok to yield() within a process
+    // \note processes assigned to hardware timers run outside this mechanism
+    void yieldAll(unsigned long milliseconds);
+
+    // runs all other tasks at their prescribed interval
+    // \param microseconds: time to repeatedly runs any tasks that need servicing
+    // \note processes that are already running are ignored so it's ok to yield() within a process
+    // \note processes assigned to hardware timers run outside this mechanism
+    void yieldAllMicros(unsigned long microseconds);
 
   private:
     // keep track of the range of priorities so we don't waste cycles looking at empty ones
