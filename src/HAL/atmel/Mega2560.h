@@ -34,7 +34,7 @@
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
-#define HAL_Wire Wire
+#define HAL_WIRE Wire
 #ifndef HAL_WIRE_CLOCK
   #define HAL_WIRE_CLOCK 20000
 #endif
