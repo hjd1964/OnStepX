@@ -6,6 +6,7 @@
 #ifdef STATUS_BUZZER
 
 #include "../tasks/OnTask.h"
+#include "../gpioEx/GpioEx.h"
 
 void Sound::init() {
   #if STATUS_BUZZER == ON
