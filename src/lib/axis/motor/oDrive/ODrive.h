@@ -3,13 +3,6 @@
 #pragma once
 #include "../../../../Common.h"
 
-// ODRIVE DRIVER MODEL
-#ifndef ODRIVE_DRIVER_FIRST
-  #define ODRIVE_DRIVER_FIRST       200
-  #define ODRIVE                    200
-  #define ODRIVE_DRIVER_LAST        200
-#endif
-
 #ifdef ODRIVE_MOTOR_PRESENT
 
 #include "../Motor.h"
