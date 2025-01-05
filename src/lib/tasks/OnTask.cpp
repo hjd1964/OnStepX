@@ -432,6 +432,8 @@ bool Tasks::setTimingMode(uint8_t handle, TimingMode mode) {
 
 void Tasks::remove(uint8_t handle) {
   if (handle != 0 && allocated[handle - 1]) {
+    uint8_t hw_timer_number = task[handle - 1]->hardware_timer;
+    if (hw_timer_number) hardware_timer_allocated[hw_timer_number - 1] = false;
     delete task[handle - 1];
     allocated[handle - 1] = false;
     updateEventRange();

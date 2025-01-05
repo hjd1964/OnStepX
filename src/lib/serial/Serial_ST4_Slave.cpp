@@ -24,15 +24,9 @@ all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
 
 #if defined(SERIAL_ST4_SLAVE) && SERIAL_ST4_SLAVE == ON
 
-#define INTERVAL 40000 // microseconds
+#include "../tasks/OnTask.h"
 
-#ifdef __TEENSYDUINO__
-  IntervalTimer Timer1;  // built into Teensyduino
-#elif __AVR__
-  #include <TimerOne.h>  // from https://github.com/PaulStoffregen/TimerOne
-#elif ESP32
-  hw_timer_t * Timer1 = NULL;
-#endif
+#define INTERVAL 40000 // microseconds
 
 void Sst4::begin(long baudRate = 9600) {
   if (isActive) return;
@@ -40,55 +34,51 @@ void Sst4::begin(long baudRate = 9600) {
   xmit_head = 0; xmit_tail = 0; xmit_buffer[0] = 0;
   recv_head = 0; recv_tail = 0; recv_buffer[0] = 0;
   
-  pinMode(ST4_S_PIN, INPUT_PULLUP);
-  pinMode(ST4_N_PIN, INPUT_PULLUP);
-  pinMode(ST4_E_PIN, OUTPUT);
-  pinMode(ST4_W_PIN, OUTPUT);
+  VF("MSG: SerialST4Slave, start shcTone task (rate 40ms priority 0)... ");
+  handle = tasks.add(0, 0, true, 0, shcTone, "tone");
+  if (handle) {
+    pinMode(ST4_S_PIN, INPUT_PULLUP);
+    pinMode(ST4_N_PIN, INPUT_PULLUP);
+    pinMode(ST4_E_PIN, OUTPUT);
+    pinMode(ST4_W_PIN, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(ST4_S_PIN), dataClock, CHANGE);
+    if (!tasks.requestHardwareTimer(handle, 0)) { VLF("(no hardware timer!)"); } else { VLF("success"); }
+    tasks.setPeriodMicros(handle, INTERVAL);
 
-  #ifdef __TEENSYDUINO__
-    Timer1.begin(shcTone, INTERVAL);
-  #elif __AVR__
-    Timer1.initialize(INTERVAL);
-    Timer1.attachInterrupt(shcTone);
-  #elif ESP32
-    Timer1 = timerBegin(0, 80, true);
-    timerAttachInterrupt(Timer1, &shcTone, true);
-    timerAlarmWrite(Timer1, INTERVAL, true);
-    timerAlarmEnable(Timer1);
-  #endif
+    attachInterrupt(digitalPinToInterrupt(ST4_S_PIN), dataClock, CHANGE);
 
-  isActive = true;
+    isActive = true;
+  } else {
+    VLF("FAILED!");
+  }
 }
 
 void Sst4::end() {
+  if (!isActive) return;
+
   pinMode(ST4_E_PIN, INPUT_PULLUP);
   pinMode(ST4_W_PIN, INPUT_PULLUP);
 
   detachInterrupt(digitalPinToInterrupt(ST4_S_PIN));
 
-  #ifdef __TEENSYDUINO__
-    Timer1.end();
-  #elif __AVR__
-    Timer1.stop();
-  #elif ESP32
-    timerEnd(Timer1);
-    Timer1 = NULL;
-  #endif
+  tasks.remove(handle);
+  VLF("MSG: SerialST4Slave, stopped shcTone task");
+
   xmit_head = 0; xmit_tail = 0; xmit_buffer[0] = 0;
   recv_head = 0; recv_tail = 0; recv_buffer[0] = 0;
+
+  isActive = false;
 }
 
 void Sst4::paused(bool state) {
-  #ifdef ESP32
-    if (Timer1 != NULL) {
-      if (state == true) timerAlarmDisable(Timer1); else timerAlarmEnable(Timer1);
-    }
-  #endif
+  if (!isActive) return;
+
+  if (state) tasks.setPeriodMicros(handle, INTERVAL); else tasks.setPeriod(handle, 0);
 }
 
 bool Sst4::active() {
+  if (!isActive) return false;
+
   static unsigned long comp=0;
   bool result = false;
   noInterrupts();
@@ -98,6 +88,8 @@ bool Sst4::active() {
 }
 
 size_t Sst4::write(uint8_t data) {
+  if (!isActive) return 0;
+
   // wait for room in buffer to become available or give up
   unsigned long t_start = millis();
   uint8_t xh = xmit_head; xh--; while (xmit_tail == xh) { if ((millis() - t_start) > _timeout) return 0; }
@@ -122,6 +114,8 @@ size_t Sst4::write(uint8_t data) {
 }
 
 size_t Sst4::write(const uint8_t *data, size_t quantity) {
+  if (!isActive) return 0;
+
   // fail if trying to write more than the buffer can hold
   if ((int)quantity > 254) return 0;
 
@@ -130,22 +124,30 @@ size_t Sst4::write(const uint8_t *data, size_t quantity) {
 }
 
 int Sst4::available(void) {
+  if (!isActive) return 0;
+
   int a = 0;
   noInterrupts();
   for (uint8_t b = recv_head; recv_buffer[b] != (char)0; b++) a++;
   interrupts();
+
   return a;
 }
 
 int Sst4::read(void) {
+  if (!isActive) return -1;
+
   noInterrupts();
   int c = recv_buffer[recv_head]; if (c != 0) recv_head++;
   interrupts();
   if (c == 0) c = -1;
+
   return c;
 }
 
 int Sst4::peek(void) {
+  if (!isActive) return -1;
+
   noInterrupts();
   int c = recv_buffer[recv_head];
   interrupts();
@@ -155,6 +157,8 @@ int Sst4::peek(void) {
 }
 
 void Sst4::flush(void) {
+  if (!isActive) return;
+
   unsigned long startMs = millis();
   int c;
   do {
@@ -214,7 +218,7 @@ IRAM_ATTR void dataClock() {
     }
     i--;
     if (i == 8) { digitalWrite(ST4_W_PIN, LOW); }                  // send start bit
-    if (i >= 0 && i <= 7) {                                     // send data bit
+    if (i >= 0 && i <= 7) {                                        // send data bit
       state = bitRead(data_out, i); s_parity += state; digitalWrite(ST4_W_PIN, state);
     }
     if (i == -1) { digitalWrite(ST4_W_PIN, s_parity&1); }          // send parity bit

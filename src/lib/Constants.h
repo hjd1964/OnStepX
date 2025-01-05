@@ -6,27 +6,28 @@
 #define OFF                         -1
 #define ON                          -2
 #define AUX                         -4
-#define SLAVE                       -5
-#define BOTH                        -6
-#define SoftSerial                  -7
-#define HardSerial                  -8
-#define CONSOLE                     -9
-#define PROFILER                    -10
-#define VERBOSE                     -11
-#define REMOTE                      -12
-#define ETHERNET_W5100              -13
-#define ETHERNET_W5500              -14
-#define WIFI                        -15
-#define WIFI_ACCESS_POINT           -16    // shorthand for easy WIFI mode settings
-#define WIFI_STATION                -17    // shorthand for easy WIFI mode settings
-#define BLUETOOTH                   -18    // shorthand for easy bluetooth mode settings
-#define SHARED                      -19
-#define STANDARD                    -20
-#define PERSISTENT                  -21
-#define ERRORS_ONLY                 -22
-#define MINIMUM                     -23
-#define MIDDLE                      -24
-#define MAXIMUM                     -25
+#define MASTER                      -5
+#define SLAVE                       -6
+#define BOTH                        -7
+#define SoftSerial                  -8
+#define HardSerial                  -9
+#define CONSOLE                     -10
+#define PROFILER                    -11
+#define VERBOSE                     -12
+#define REMOTE                      -13
+#define ETHERNET_W5100              -14
+#define ETHERNET_W5500              -15
+#define WIFI                        -16
+#define WIFI_ACCESS_POINT           -17    // shorthand for easy WIFI mode settings
+#define WIFI_STATION                -18    // shorthand for easy WIFI mode settings
+#define BLUETOOTH                   -19    // shorthand for easy bluetooth mode settings
+#define SHARED                      -20
+#define STANDARD                    -21
+#define PERSISTENT                  -22
+#define ERRORS_ONLY                 -23
+#define MINIMUM                     -24
+#define MIDDLE                      -25
+#define MAXIMUM                     -26
 #define INVALID                     -127
 
 // CAN interface options

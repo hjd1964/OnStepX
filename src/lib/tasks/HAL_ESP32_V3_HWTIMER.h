@@ -58,6 +58,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   void HAL_HWTIMER1_DONE() {
     HAL_HWTIMER1_FUN = NULL;
+    timerDetachInterrupt(itimer1);
     timerEnd(itimer1);
   }
 
@@ -90,6 +91,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   void HAL_HWTIMER2_DONE() {
     HAL_HWTIMER2_FUN = NULL;
+    timerDetachInterrupt(itimer2);
     timerEnd(itimer2);
   }
   
@@ -122,6 +124,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   void HAL_HWTIMER3_DONE() {
     HAL_HWTIMER3_FUN = NULL;
+    timerDetachInterrupt(itimer3);
     timerEnd(itimer3);
   }
   
@@ -154,6 +157,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   void HAL_HWTIMER4_DONE() {
     HAL_HWTIMER4_FUN = NULL;
+    timerDetachInterrupt(itimer4);
     timerEnd(itimer4);
   }
 
