@@ -7,8 +7,6 @@
 
 bool BluetoothManager::init() {
   if (!active) {
-    VLF("MSG: Bluetooth, init");
-
     #ifdef NV_BT_SETTINGS_BASE
       if (BluetoothSettingsSize < sizeof(BluetoothSettings)) { nv.initError = true; DL("ERR: BluetoothManager::init(), BluetoothSettingsSize error"); }
 
@@ -22,11 +20,12 @@ bool BluetoothManager::init() {
 
     setStation(stationNumber);
 
-    VF("MSG: Bluetooth, Master Pwd  = "); VL(settings.masterPassword);
+    VF("MSG: Bluetooth, Master Pwd   = "); VL(settings.masterPassword);
+
     VF("MSG: Bluetooth, Station#     = "); VL(stationNumber);
     VF("MSG: Bluetooth, Station Name = "); VL(sta->host);
     VF("MSG: Bluetooth, Station MAC  = "); VL(sta->address);
-    VF("MSG: Bluetooth, Station PIN  = "); VL(sta->pin);
+    VF("MSG: Bluetooth, Station KEY  = "); VL(sta->passkey);
 
     active = true;
   }

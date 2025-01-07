@@ -14,7 +14,7 @@
 typedef struct BluetoothStationSettings {
   char host[16];
   char address[18];
-  char pin[5];
+  char passkey[5];
 } BluetoothStationSettings;
 
 #define BluetoothStationCount 3
@@ -38,15 +38,15 @@ class BluetoothManager {
 
       {
         {
-          ONSTEP1_BT_NAME, ONSTEP1_BT_ADDR, ONSTEP1_BT_PIN
+          ONSTEP1_BT_NAME, ONSTEP1_BT_ADDR, ONSTEP1_BT_PASSKEY
         },
 
         {
-          ONSTEP2_BT_NAME, ONSTEP2_BT_ADDR, ONSTEP2_BT_PIN
+          ONSTEP2_BT_NAME, ONSTEP2_BT_ADDR, ONSTEP2_BT_PASSKEY
         },
 
         {
-          ONSTEP3_BT_NAME, ONSTEP3_BT_ADDR, ONSTEP3_BT_PIN
+          ONSTEP3_BT_NAME, ONSTEP3_BT_ADDR, ONSTEP3_BT_PASSKEY
         }
 
       }
