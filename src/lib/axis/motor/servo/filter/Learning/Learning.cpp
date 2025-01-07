@@ -5,7 +5,7 @@
 
 #if AXIS1_SERVO_FLTR == LEARNING
 
-#include "..\..\..\..\tasks\OnTask.h"
+#include "../../../../tasks/OnTask.h"
 
 void learningAnalyze() { filterAxis1.analyze(); }
 

@@ -6,7 +6,7 @@
     AXIS4_ENCODER == VIRTUAL || AXIS5_ENCODER == VIRTUAL || AXIS6_ENCODER == VIRTUAL || \
     AXIS7_ENCODER == VIRTUAL || AXIS8_ENCODER == VIRTUAL || AXIS9_ENCODER == VIRTUAL
 
-#include "..\..\tasks\OnTask.h"
+#include "../../tasks/OnTask.h"
 
 float _pulse_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 float _direction[9];
