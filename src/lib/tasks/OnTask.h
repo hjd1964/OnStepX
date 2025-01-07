@@ -332,13 +332,13 @@ class Tasks {
     void yield();
 
     // runs higher priority tasks at their prescribed interval
-    // \param milliseconds: time to repeatedly runs any tasks that need servicing
+    // \param milliseconds: time to repeatedly run any tasks that need servicing
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
     void yield(unsigned long milliseconds);
 
     // runs higher priority tasks at their prescribed interval
-    // \param microseconds: time to repeatedly runs any tasks that need servicing
+    // \param microseconds: time to repeatedly run any tasks that need servicing
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
     void yieldMicros(unsigned long microseconds);
@@ -350,13 +350,13 @@ class Tasks {
     void yieldAll();
 
     // runs all other tasks at their prescribed interval
-    // \param milliseconds: time to repeatedly runs any tasks that need servicing
+    // \param milliseconds: time to repeatedly run any tasks that need servicing
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
     void yieldAll(unsigned long milliseconds);
 
     // runs all other tasks at their prescribed interval
-    // \param microseconds: time to repeatedly runs any tasks that need servicing
+    // \param microseconds: time to repeatedly run any tasks that need servicing
     // \note processes that are already running are ignored so it's ok to yield() within a process
     // \note processes assigned to hardware timers run outside this mechanism
     void yieldAllMicros(unsigned long microseconds);
