@@ -2,6 +2,16 @@
 // controller settings
 #pragma once
 
+// host name for this microcontroller
+#ifndef HOST_NAME
+#define HOST_NAME                    "OnStep"
+#endif
+
+// settings identification
+#ifndef CONFIG_NAME
+#define CONFIG_NAME                   HOST_NAME
+#endif
+
 // use the HAL specified default NV driver
 #ifndef NV_DRIVER
 #define NV_DRIVER                     NV_DEFAULT
@@ -24,11 +34,6 @@
 #endif
 #ifndef SERIAL_DEBUG_BAUD
 #define SERIAL_DEBUG_BAUD             9600
-#endif
-
-// identification
-#ifndef CONFIG_NAME
-#define CONFIG_NAME "OnStepX"
 #endif
 
 // flag hardware SPI as active
@@ -77,7 +82,10 @@
 #define SERIAL_BT_MODE                OFF                         // use SLAVE to enable the interface (ESP32 only)
 #endif
 #ifndef SERIAL_BT_NAME
-#define SERIAL_BT_NAME                "OnStepX"                   // Bluetooth name of command channel
+#define SERIAL_BT_NAME                HOST_NAME                   // Bluetooth name of command channel
+#endif
+#ifndef SERIAL_BT_PASSKEY
+#define SERIAL_BT_PASSKEY             ""                          // Bluetooth four digit passkey
 #endif
 
 // ESP32 virtual serial IP command channels
@@ -106,14 +114,14 @@
 #endif
 
 #ifndef MDNS_SERVER
-#define MDNS_SERVER                  ON                           // mDNS enabled
+#define MDNS_SERVER                   ON                          // mDNS enabled
 #endif
 #ifndef MDNS_NAME
-#define MDNS_NAME                    "onstepx"                    // mDNS device name
+#define MDNS_NAME                     HOST_NAME                   // mDNS device name
 #endif
 
 #ifndef AP_SSID
-#define AP_SSID                       "OnStepX"                   // Wifi Access Point SSID
+#define AP_SSID                       HOST_NAME                   // Wifi Access Point SSID
 #endif
 #ifndef AP_PASSWORD
 #define AP_PASSWORD                   "password"                  // Wifi Access Point password
