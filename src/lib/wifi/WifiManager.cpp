@@ -13,57 +13,30 @@
 bool WifiManager::init() {
   if (!active) {
 
-    #ifdef NV_WIFI_SETTINGS_BASE
-      if (WifiSettingsSize < sizeof(WifiSettings)) { nv.initError = true; DL("ERR: WifiManager::init(), WifiSettingsSize error"); }
+    readSettings();
 
-      if (!nv.hasValidKey() || nv.isNull(NV_WIFI_SETTINGS_BASE, sizeof(WifiSettings))) {
-        VLF("MSG: WiFi, writing defaults to NV");
-        nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
-      }
-
-      nv.readBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
-    #endif
+    setStation(stationNumber);
 
     IPAddress ap_ip = IPAddress(settings.ap.ip);
     IPAddress ap_gw = IPAddress(settings.ap.gw);
     IPAddress ap_sn = IPAddress(settings.ap.sn);
 
-    VF("MSG: WiFi, Master Pwd  = "); VL(settings.masterPassword);
-
-    VF("MSG: WiFi, AP Enable   = "); VL(settings.accessPointEnabled);
-    VF("MSG: WiFi, AP Fallback = "); VL(settings.stationApFallback);
-
-    if (settings.accessPointEnabled || settings.stationApFallback) {
-      VF("MSG: WiFi, AP SSID     = "); VL(settings.ap.ssid);
-      VF("MSG: WiFi, AP PWD      = "); VL(settings.ap.pwd);
-      VF("MSG: WiFi, AP CH       = "); VL(settings.ap.channel);
-      VF("MSG: WiFi, AP IP       = "); VL(ap_ip.toString());
-      VF("MSG: WiFi, AP GATEWAY  = "); VL(ap_gw.toString());
-      VF("MSG: WiFi, AP SN       = "); VL(ap_sn.toString());
-    }
-
-    sta = &settings.station[stationNumber - 1];
-
     IPAddress sta_ip = IPAddress(sta->ip);
     IPAddress sta_gw = IPAddress(sta->gw);
     IPAddress sta_sn = IPAddress(sta->sn);
 
-    VF("MSG: WiFi, Sta Enable  = "); VL(settings.stationEnabled);
-
-    if (settings.stationEnabled) {
-      VF("MSG: WiFi, Station#    = "); VL(stationNumber);
-      VF("MSG: WiFi, Sta DHCP En = "); VL(sta->dhcpEnabled);
-      VF("MSG: WiFi, Sta SSID    = "); VL(sta->ssid);
-      VF("MSG: WiFi, Sta PWD     = "); VL(sta->pwd);
-      VF("MSG: WiFi, Sta IP      = "); VL(sta_ip.toString());
-      VF("MSG: WiFi, Sta GATEWAY = "); VL(sta_gw.toString());
-      VF("MSG: WiFi, Sta SN      = "); VL(sta_sn.toString());
-      IPAddress target = IPAddress(sta->target);
-      UNUSED(target);
-      VF("MSG: WiFi, Sta TARGET  = "); VL(target.toString());
+  TryAgain:
+    if (staNameLookup && strlen(wifiManager.sta->host) > 0) {
+      IPAddress ip;
+      if (WiFi.hostByName(wifiManager.sta->host, ip)) {
+        IPAddress(wifiManager.sta->target) = ip;
+        VF("MSG: WiFi, host name "); V(wifiManager.sta->host); VF(" resolved to "); VL(ip.toString().c_str());
+      } else {
+        VF("MSG: WiFi, host name "); V(wifiManager.sta->host); VLF(" resolution failed!");
+        VLF("MSG: WiFi, falling back to static target IP");
+      }
     }
 
-  TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
       VLF("MSG: WiFi, starting Soft AP");
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
@@ -160,7 +133,68 @@ void WifiManager::disconnect() {
   VLF("MSG: WiFi, disconnected");      
 }
 
+void WifiManager::readSettings() {
+  if (settingsReady) return;
+
+  #ifdef NV_WIFI_SETTINGS_BASE
+    if (WifiSettingsSize < sizeof(WifiSettings)) { nv.initError = true; DL("ERR: WifiManager::init(), WifiSettingsSize error"); }
+
+    if (!nv.hasValidKey() || nv.isNull(NV_WIFI_SETTINGS_BASE, sizeof(WifiSettings))) {
+      VLF("MSG: WiFi, writing defaults to NV");
+      nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
+    }
+
+    nv.readBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
+  #endif
+
+  IPAddress ap_ip = IPAddress(settings.ap.ip);
+  IPAddress ap_gw = IPAddress(settings.ap.gw);
+  IPAddress ap_sn = IPAddress(settings.ap.sn);
+
+  VF("MSG: WiFi, Master Pwd   = "); VL(settings.masterPassword);
+
+  VF("MSG: WiFi, AP Enable    = "); VL(settings.accessPointEnabled);
+  VF("MSG: WiFi, AP Fallback  = "); VL(settings.stationApFallback);
+
+  VF("MSG: WiFi, AP SSID      = "); VL(settings.ap.ssid);
+  VF("MSG: WiFi, AP PWD       = "); VL(settings.ap.pwd);
+  VF("MSG: WiFi, AP CH        = "); VL(settings.ap.channel);
+  VF("MSG: WiFi, AP IP        = "); VL(ap_ip.toString());
+  VF("MSG: WiFi, AP GATEWAY   = "); VL(ap_gw.toString());
+  VF("MSG: WiFi, AP SN        = "); VL(ap_sn.toString());
+
+  int currentStationNumber = stationNumber;
+
+  VF("MSG: WiFi, Sta Enable   = "); VL(settings.stationEnabled);
+
+  VF("MSG: WiFi, Sta Select   = "); VL(stationNumber);
+
+  for (int station = 1; station <= WifiStationCount; station++) {
+    setStation(station);
+
+    IPAddress sta_ip = IPAddress(sta->ip); UNUSED(sta_ip);
+    IPAddress sta_gw = IPAddress(sta->gw); UNUSED(sta_gw);
+    IPAddress sta_sn = IPAddress(sta->sn); UNUSED(sta_sn);
+    IPAddress target = IPAddress(sta->target); UNUSED(target);
+
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" NAME    = "); VL(sta->host);
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SSID    = "); VL(sta->ssid);
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" PWD     = "); VL(sta->pwd);
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" DHCP En = "); VL(sta->dhcpEnabled);
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" IP      = "); VL(sta_ip.toString());
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" GATEWAY = "); VL(sta_gw.toString());
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SN      = "); VL(sta_sn.toString());
+    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" TARGET  = "); VL(target.toString());
+  }
+
+  stationNumber = currentStationNumber;
+
+  settingsReady = true;
+}
+
 void WifiManager::writeSettings() {
+  if (!settingsReady) return;
+  
   #ifdef NV_WIFI_SETTINGS_BASE
     VLF("MSG: WifiManager, writing settings to NV");
     nv.writeBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));

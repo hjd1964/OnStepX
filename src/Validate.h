@@ -73,6 +73,10 @@
   #warning "Configuration (Config.h): Setting SERIAL_E_BAUD_DEFAULT unknown, use OFF, 9600, 19200, 38400, 57600, 115200, 230400, 460800, or 921600 (baud.)"
 #endif
 
+#if SERIAL_RADIO != OFF && SERIAL_RADIO != BLUETOOTH && SERIAL_RADIO != WIFI_ACCESS_POINT && SERIAL_RADIO != WIFI_STATION
+  #warning "Configuration (Config.h): Setting SERIAL_RADIO unknown, use OFF, BLUETOOTH, WIFI_ACCESS_POINT, or WIFI_STATION"
+#endif
+
 #if STATUS_LED != OFF && STATUS_LED != ON
   #error "Configuration (Config.h): Setting STATUS_LED unknown, use OFF or ON."
 #endif

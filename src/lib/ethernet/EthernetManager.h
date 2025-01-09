@@ -36,6 +36,7 @@ class EthernetManager {
   public:
     bool init();
     void restart();
+    void readSettings();
     void writeSettings();
 
     EthernetSettings settings = {
@@ -47,6 +48,7 @@ class EthernetManager {
     };
 
     bool active = false;
+    bool settingsReady = false;
   private:
 };
 
