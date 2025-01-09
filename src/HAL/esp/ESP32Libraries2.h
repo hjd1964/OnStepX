@@ -50,20 +50,22 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL, optionally also early init of SERIAL_SIP/PIP or SERIAL_BT
-
-#if SERIAL_BT_MODE == SLAVE
+#ifndef SERIAL_BT_MODE
+  #define SERIAL_BT_MODE OFF
+#endif
+#if SERIAL_BT_MODE != OFF
   #include <BluetoothSerial.h>
   extern BluetoothSerial bluetoothSerial;
   #define SERIAL_BT bluetoothSerial
 #endif
-#if defined(SERIAL_BT)
-  #define SERIAL_BT_BEGIN() SERIAL_BT.begin(SERIAL_BT_NAME);
+#if SERIAL_BT_MODE == SLAVE
+  #ifdef SERIAL_BT_PASSKEY
+    #define SERIAL_BT_BEGIN() if (strlen(SERIAL_BT_PASSKEY) != 0) SERIAL_BT.setPin(SERIAL_BT_PASSKEY); SERIAL_BT.begin(SERIAL_BT_NAME)
+  #else
+    #define SERIAL_BT_BEGIN() SERIAL_BT.begin(SERIAL_BT_NAME)
+  #endif
 #else
   #define SERIAL_BT_BEGIN()
-#endif
-
-#if (defined(SERIAL_BT_MODE) && SERIAL_BT_MODE != OFF) && (defined(SERIAL_IP_MODE) && SERIAL_IP_MODE != OFF)
-  #error "Configuration (Config.h): SERIAL_BT_MODE and SERIAL_IP_MODE can't be enabled at the same time, disable one or both options."
 #endif
 
 #ifdef SERVO_ANALOG_WRITE_FREQUENCY
@@ -92,7 +94,7 @@
 // a really short fixed delay (none needed)
 #define HAL_DELAY_25NS()
 
-#ifdef ARDUINO_ESP32C3_DEV
+#ifdef CONFIG_IDF_TARGET_ESP32C3
   // stand-in for delayNanoseconds(), assumes 80MHz clock
   #define delayNanoseconds(ns) { unsigned int c = ESP.getCycleCount() + ns/12.5F; do {} while ((int)(ESP.getCycleCount() - c) < 0); }
 #else
