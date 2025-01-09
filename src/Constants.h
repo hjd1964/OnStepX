@@ -130,9 +130,6 @@
 
 // --------------------------------------------------------------------------------------------------------------------------
 
-// a short string describing this product
-#define PROD_ABV                    "OnStepX"
-
 // task manager
 #define TASKS_MAX                   52     // up to 52 tasks
 #define TASKS_SKIP_MISSED                  // just skip missed tasks if too late
