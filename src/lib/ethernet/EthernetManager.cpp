@@ -15,11 +15,13 @@
   void mdnsPoll() {
     static MdnsReady mdnsReady = MD_WAIT;
     if (mdnsReady == MD_WAIT && millis() > 5000) {
-      if (mdns.begin(Ethernet.localIP(), MDNS_NAME)) {
-        VLF("MSG: Ethernet, mDNS started");
+        char name[] = MDNS_NAME;
+        strtohostname2(name);
+        if (mdns.begin(Ethernet.localIP(), name)) {
+        VF("MSG: Ethernet, mDNS started for "); VL(name);
         mdnsReady = MD_READY;
       } else {
-        VLF("WRN: Ethernet, mDNS start failed!");
+        VF("WRN: Ethernet, mDNS start FAILED for "); VL(name);
         mdnsReady = MD_FAIL;
       }
     }

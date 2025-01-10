@@ -25,18 +25,12 @@ bool WifiManager::init() {
     IPAddress sta_gw = IPAddress(sta->gw);
     IPAddress sta_sn = IPAddress(sta->sn);
 
-  TryAgain:
-    if (staNameLookup && strlen(wifiManager.sta->host) > 0) {
-      IPAddress ip;
-      if (WiFi.hostByName(wifiManager.sta->host, ip)) {
-        IPAddress(wifiManager.sta->target) = ip;
-        VF("MSG: WiFi, host name "); V(wifiManager.sta->host); VF(" resolved to "); VL(ip.toString().c_str());
-      } else {
-        VF("MSG: WiFi, host name "); V(wifiManager.sta->host); VLF(" resolution failed!");
-        VLF("MSG: WiFi, falling back to static target IP");
-      }
-    }
+    char name[32] = HOST_NAME;
+    strtohostname(name);
 
+    WiFi.setHostname(name);
+
+  TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
       VLF("MSG: WiFi, starting Soft AP");
       WiFi.softAP(settings.ap.ssid, settings.ap.pwd, settings.ap.channel);
@@ -65,7 +59,7 @@ bool WifiManager::init() {
     }
 
     delay(100);
-    
+
     if (settings.stationEnabled && !sta->dhcpEnabled) WiFi.config(sta_ip, sta_gw, sta_sn);
     if (settings.accessPointEnabled) WiFi.softAPConfig(ap_ip, ap_gw, ap_sn);
 
@@ -85,19 +79,47 @@ bool WifiManager::init() {
         goto TryAgain;
       }
 
-      if (!settings.accessPointEnabled) {
-        VLF("MSG: WiFi, initialization failed");
-      } else {
+      // no fallback but the AP is still enabled
+      if (settings.accessPointEnabled) {
         active = true;
         VLF("MSG: WiFi, AP initialized station failed");
+      } else {
+        // the station failed to connect and the AP isn't enabled
+        VLF("MSG: WiFi, initialization failed");
+        WiFi.disconnect();
       }
     } else {
       active = true;
       VLF("MSG: WiFi, initialized");
 
       #if MDNS_SERVER == ON && !defined(ESP8266)
-        if (MDNS.begin(MDNS_NAME)) { VLF("MSG: WiFi, mDNS started"); } else { VLF("WRN: WiFi, mDNS start failed!"); }
+        strtohostname2(name);
+        if (MDNS.begin(name)) { VF("MSG: WiFi, mDNS started for "); VL(name); } else { VF("WRN: WiFi, mDNS start FAILED for "); VL(name); }
       #endif
+
+      if (staNameLookup && strlen(wifiManager.sta->host) > 0) {
+        IPAddress ip;
+        char name[32] = "";
+        strcpy(name, wifiManager.sta->host);
+        strtohostname(name);
+
+        if (WiFi.hostByName(name, ip)) {
+          VF("MSG: WiFi, host name "); V(name); VF(" DNS resolved to "); VL(ip.toString().c_str());
+          ip4toip4(wifiManager.sta->target, ip);
+        } else {
+          VF("MSG: WiFi, host name "); V(name); VLF(" DNS resolution failed!");
+          #if MDNS_SERVER == ON && !defined(ESP8266)
+            strtohostname2(name);
+            ip = MDNS.queryHost(name);
+            if (validip4(ip)) {
+              ip4toip4(wifiManager.sta->target, ip);
+              VF("MSG: WiFi, host name "); V(name); VF(" mDNS resolved to "); VL(ip.toString().c_str());
+            } else {
+              VF("MSG: WiFi, host name "); V(name); VLF(" mDNS resolution failed!");
+            }
+          #endif
+        }
+      }
 
       #if STA_AUTO_RECONNECT == true
         if (settings.stationEnabled) {
