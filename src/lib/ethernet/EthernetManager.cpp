@@ -15,9 +15,9 @@
   void mdnsPoll() {
     static MdnsReady mdnsReady = MD_WAIT;
     if (mdnsReady == MD_WAIT && millis() > 5000) {
-        char name[] = MDNS_NAME;
-        strtohostname2(name);
-        if (mdns.begin(Ethernet.localIP(), name)) {
+      char name[] = MDNS_NAME;
+      strtohostname2(name);
+      if (mdns.begin(Ethernet.localIP(), name)) {
         VF("MSG: Ethernet, mDNS started for "); VL(name);
         mdnsReady = MD_READY;
       } else {
