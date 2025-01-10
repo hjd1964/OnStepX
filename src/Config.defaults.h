@@ -6,7 +6,7 @@
 // PRODUCT_DESCRIPTION    the user friendly name for this device, appears on websites etc.
 // HOST_NAME              the name ESP WiFi provides to any DHCP server (Ethernet doesn't support this)
 // MDNS_NAME              the name mDNS (Multicast DNS) clients see for IP address resolution
-// AP_SSID                the name WiFi SSID clients see when the ESP32 WiFi Soft Access Point is enabled
+// AP_SSID                the SSID WiFi clients see when the ESP WiFi Soft Access Point is enabled
 // SERIAL_BT_NAME         the name Bluetooth Servers see when the ESP32 Bluetooth client is enabled
 #ifndef HOST_NAME
 #define HOST_NAME                    "OnStep"
