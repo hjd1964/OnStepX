@@ -19,7 +19,7 @@
 #ifdef HAL_SLOW_PROCESSOR
   #define XMIT_TIME 20
 #else
-  #define XMIT_TIME 50
+  #define XMIT_TIME 80
 #endif
 
 char SerialST4Master::poll() {
