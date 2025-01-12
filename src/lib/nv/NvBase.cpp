@@ -13,7 +13,7 @@ bool NonVolatileStorage::init(uint16_t size, bool cacheEnable, uint16_t wait, bo
   // set nv size
   this->size = size;
 
-  VF("MSG: NV, initalize ");
+  VF("MSG: NV, initialize ");
   VF("size "); V(size); VF(" bytes ");
   if (cacheEnable) { VF("cached "); }
   if (wait > 0) { VF("commit delayed "); V(wait); VF("ms"); }

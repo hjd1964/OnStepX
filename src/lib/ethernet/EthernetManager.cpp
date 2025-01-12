@@ -84,6 +84,15 @@ void EthernetManager::restart() {
   }
 }
 
+void EthernetManager::disconnect() {
+  VLF("MSG: Ethernet, disconnect ignored!");      
+}
+
+void EthernetManager::setStation(int number) {
+  if (number >= 1 && number <= EthernetStationCount) stationNumber = number;
+  sta = &settings.station[stationNumber - 1];
+}
+
 void EthernetManager::readSettings() {
   if (settingsReady) return;
 
@@ -98,11 +107,22 @@ void EthernetManager::readSettings() {
     nv.readBytes(NV_ETHERNET_SETTINGS_BASE, &settings, sizeof(EthernetSettings));
   #endif
 
-  VF("MSG: Ethernet, DHCP En = "); VL(settings.dhcpEnabled);
-  VF("MSG: Ethernet, IP      = "); V(settings.ip[0]); V("."); V(settings.ip[1]); V("."); V(settings.ip[2]); V("."); VL(settings.ip[3]);
-  VF("MSG: Ethernet, GW      = "); V(settings.gw[0]); V("."); V(settings.gw[1]); V("."); V(settings.gw[2]); V("."); VL(settings.gw[3]);
-  VF("MSG: Ethernet, SN      = "); V(settings.sn[0]); V("."); V(settings.sn[1]); V("."); V(settings.sn[2]); V("."); VL(settings.sn[3]);
-  VF("MSG: Ethernet, TARGET  = "); V(settings.target[0]); V("."); V(settings.target[1]); V("."); V(settings.target[2]); V("."); VL(settings.target[3]);
+  #if DEBUG != OFF
+    int currentStationNumber = stationNumber;
+
+    VF("MSG: Ethernet, DHCP En     = "); VL(settings.dhcpEnabled);
+    VF("MSG: Ethernet, IP          = "); V(settings.ip[0]); V("."); V(settings.ip[1]); V("."); V(settings.ip[2]); V("."); VL(settings.ip[3]);
+    VF("MSG: Ethernet, GW          = "); V(settings.gw[0]); V("."); V(settings.gw[1]); V("."); V(settings.gw[2]); V("."); VL(settings.gw[3]);
+    VF("MSG: Ethernet, SN          = "); V(settings.sn[0]); V("."); V(settings.sn[1]); V("."); V(settings.sn[2]); V("."); VL(settings.sn[3]);
+
+    for (int station = 1; station <= EthernetStationCount; station++) {
+      setStation(station);
+
+      VF("MSG: Ethernet, Sta"); V(stationNumber); VF(" NAME   = "); VL(sta->host);
+      VF("MSG: Ethernet, Sta"); V(stationNumber); VF(" TARGET = "); V(sta->target[0]); V("."); V(sta->target[1]); V("."); V(sta->target[2]); V("."); VL(sta->target[3]);
+    }
+    stationNumber = currentStationNumber;
+  #endif
 
   settingsReady = true;
 }

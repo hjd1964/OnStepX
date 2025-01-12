@@ -28,7 +28,7 @@ bool WifiManager::init() {
     char name[32] = HOST_NAME;
     strtohostname(name);
 
-    WiFi.setHostname(name);
+    WiFi.hostname(name);
 
   TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
@@ -169,47 +169,48 @@ void WifiManager::readSettings() {
     nv.readBytes(NV_WIFI_SETTINGS_BASE, &settings, sizeof(WifiSettings));
   #endif
 
-  IPAddress ap_ip = IPAddress(settings.ap.ip);
-  IPAddress ap_gw = IPAddress(settings.ap.gw);
-  IPAddress ap_sn = IPAddress(settings.ap.sn);
+  #if DEBUG != OFF
+    IPAddress ap_ip = IPAddress(settings.ap.ip);
+    IPAddress ap_gw = IPAddress(settings.ap.gw);
+    IPAddress ap_sn = IPAddress(settings.ap.sn);
 
-  VF("MSG: WiFi, Master Pwd   = "); VL(settings.masterPassword);
+    VF("MSG: WiFi, Master Pwd   = "); VL(settings.masterPassword);
 
-  VF("MSG: WiFi, AP Enable    = "); VL(settings.accessPointEnabled);
-  VF("MSG: WiFi, AP Fallback  = "); VL(settings.stationApFallback);
+    VF("MSG: WiFi, AP Enable    = "); VL(settings.accessPointEnabled);
+    VF("MSG: WiFi, AP Fallback  = "); VL(settings.stationApFallback);
 
-  VF("MSG: WiFi, AP SSID      = "); VL(settings.ap.ssid);
-  VF("MSG: WiFi, AP PWD       = "); VL(settings.ap.pwd);
-  VF("MSG: WiFi, AP CH        = "); VL(settings.ap.channel);
-  VF("MSG: WiFi, AP IP        = "); VL(ap_ip.toString());
-  VF("MSG: WiFi, AP GATEWAY   = "); VL(ap_gw.toString());
-  VF("MSG: WiFi, AP SN        = "); VL(ap_sn.toString());
+    VF("MSG: WiFi, AP SSID      = "); VL(settings.ap.ssid);
+    VF("MSG: WiFi, AP PWD       = "); VL(settings.ap.pwd);
+    VF("MSG: WiFi, AP CH        = "); VL(settings.ap.channel);
+    VF("MSG: WiFi, AP IP        = "); VL(ap_ip.toString());
+    VF("MSG: WiFi, AP GATEWAY   = "); VL(ap_gw.toString());
+    VF("MSG: WiFi, AP SN        = "); VL(ap_sn.toString());
 
-  int currentStationNumber = stationNumber;
+    int currentStationNumber = stationNumber;
 
-  VF("MSG: WiFi, Sta Enable   = "); VL(settings.stationEnabled);
+    VF("MSG: WiFi, Sta Enable   = "); VL(settings.stationEnabled);
 
-  VF("MSG: WiFi, Sta Select   = "); VL(stationNumber);
+    VF("MSG: WiFi, Sta Select   = "); VL(stationNumber);
 
-  for (int station = 1; station <= WifiStationCount; station++) {
-    setStation(station);
+    for (int station = 1; station <= WifiStationCount; station++) {
+      setStation(station);
 
-    IPAddress sta_ip = IPAddress(sta->ip); UNUSED(sta_ip);
-    IPAddress sta_gw = IPAddress(sta->gw); UNUSED(sta_gw);
-    IPAddress sta_sn = IPAddress(sta->sn); UNUSED(sta_sn);
-    IPAddress target = IPAddress(sta->target); UNUSED(target);
+      IPAddress sta_ip = IPAddress(sta->ip); UNUSED(sta_ip);
+      IPAddress sta_gw = IPAddress(sta->gw); UNUSED(sta_gw);
+      IPAddress sta_sn = IPAddress(sta->sn); UNUSED(sta_sn);
+      IPAddress target = IPAddress(sta->target); UNUSED(target);
 
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" NAME    = "); VL(sta->host);
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SSID    = "); VL(sta->ssid);
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" PWD     = "); VL(sta->pwd);
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" DHCP En = "); VL(sta->dhcpEnabled);
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" IP      = "); VL(sta_ip.toString());
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" GATEWAY = "); VL(sta_gw.toString());
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SN      = "); VL(sta_sn.toString());
-    VF("MSG: WiFi, Sta"); V(stationNumber); VF(" TARGET  = "); VL(target.toString());
-  }
-
-  stationNumber = currentStationNumber;
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SSID    = "); VL(sta->ssid);
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" PWD     = "); VL(sta->pwd);
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" DHCP En = "); VL(sta->dhcpEnabled);
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" IP      = "); VL(sta_ip.toString());
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" GATEWAY = "); VL(sta_gw.toString());
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" SN      = "); VL(sta_sn.toString());
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" NAME    = "); VL(sta->host);
+      VF("MSG: WiFi, Sta"); V(stationNumber); VF(" TARGET  = "); VL(target.toString());
+    }
+    stationNumber = currentStationNumber;
+  #endif
 
   settingsReady = true;
 }

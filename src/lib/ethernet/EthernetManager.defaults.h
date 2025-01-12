@@ -54,10 +54,6 @@
 #define PASSWORD_DEFAULT          "password"    // default password for settings
 #endif
 
-#ifndef STA_TARGET_IP_ADDR
-#define STA_TARGET_IP_ADDR     {192,168,0,1}    // IP Address to connect to (OnStep for example)
-#endif
-
 #ifndef DHCP_ENABLED
 #define DHCP_ENABLED                    true    // true to use LAN DHCP addresses
 #endif
@@ -72,4 +68,75 @@
 
 #ifndef STA_SN_MASK
 #define STA_SN_MASK          {255,255,255,0}    // SUBNET Mask
+#endif
+
+#ifndef STA_HOST_NAME
+#define STA_HOST_NAME                 "Home"    // Host name to connect to (OnStep for example)
+#endif
+
+#ifndef STA_TARGET_IP_ADDR
+#define STA_TARGET_IP_ADDR     {192,168,0,1}    // IP Address to connect to
+#endif
+#ifndef STA_TARGET
+#define STA_TARGET        STA_TARGET_IP_ADDR
+#endif
+
+// station 1
+
+#ifndef STA1_HOST_NAME
+#define STA1_HOST_NAME         STA_HOST_NAME
+#endif
+
+#ifndef STA1_TARGET_IP_ADDR 
+#define STA1_TARGET_IP_ADDR       STA_TARGET
+#endif
+
+// station 2
+
+#ifndef STA2_HOST_NAME
+#define STA2_HOST_NAME                    ""
+#endif
+
+#ifndef STA2_TARGET_IP_ADDR 
+#define STA2_TARGET_IP_ADDR    {192,168,0,1}
+#endif
+
+// station 3
+
+#ifndef STA3_HOST_NAME
+#define STA3_HOST_NAME                    ""
+#endif
+
+#ifndef STA3_TARGET_IP_ADDR 
+#define STA3_TARGET_IP_ADDR    {192,168,0,1}
+#endif
+
+// station 4
+
+#ifndef STA4_HOST_NAME
+#define STA4_HOST_NAME                    ""
+#endif
+
+#ifndef STA4_TARGET_IP_ADDR 
+#define STA4_TARGET_IP_ADDR    {192,168,0,1}
+#endif
+
+// station 5
+
+#ifndef STA5_HOST_NAME
+#define STA5_HOST_NAME                    ""
+#endif
+
+#ifndef STA5_TARGET_IP_ADDR 
+#define STA5_TARGET_IP_ADDR    {192,168,0,1}
+#endif
+
+// station 6
+
+#ifndef STA6_HOST_NAME
+#define STA6_HOST_NAME                    ""
+#endif
+
+#ifndef STA6_TARGET_IP_ADDR 
+#define STA6_TARGET_IP_ADDR    {192,168,0,1}
 #endif

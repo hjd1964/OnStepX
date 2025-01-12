@@ -92,10 +92,6 @@
 #define STA_AUTO_RECONNECT          false // normally not enabled
 #endif
 
-#ifndef STA_HOST_NAME
-#define STA_HOST_NAME               "Home" // Wifi Host Name
-#endif
-
 #ifndef STA_SSID
 #define STA_SSID                    "Home" // Wifi Station SSID to connnect to
 #endif
@@ -109,11 +105,6 @@
 #endif
 #define STA_DHCP        STA_DHCP_ENABLED
 
-#ifndef STA_TARGET_IP_ADDR 
-#define STA_TARGET_IP_ADDR  {192,168,0,1} // IP Address to connect to (OnStep for example)
-#endif
-#define STA_TARGET     STA_TARGET_IP_ADDR
-
 #ifndef STA_IP_ADDR
 #define STA_IP_ADDR         {192,168,0,2} // Wifi Station IP Address
 #endif
@@ -124,6 +115,17 @@
 
 #ifndef STA_SN_MASK
 #define STA_SN_MASK       {255,255,255,0} // Wifi Station SUBNET Mask
+#endif
+
+#ifndef STA_HOST_NAME
+#define STA_HOST_NAME              "Home" // Host name to connect to (OnStep for example)
+#endif
+
+#ifndef STA_TARGET_IP_ADDR
+#define STA_TARGET_IP_ADDR  {192,168,0,1} // IP Address to connect to
+#endif
+#ifndef STA_TARGET
+#define STA_TARGET     STA_TARGET_IP_ADDR
 #endif
 
 // station 1
@@ -162,10 +164,6 @@
 
 // station 2
 
-#ifndef STA2_HOST_NAME
-#define STA2_HOST_NAME                 ""
-#endif
-
 #ifndef STA2_SSID
 #define STA2_SSID                      ""
 #endif
@@ -176,10 +174,6 @@
 
 #ifndef STA2_DHCP_ENABLED
 #define STA2_DHCP_ENABLED           false
-#endif
-
-#ifndef STA2_TARGET_IP_ADDR 
-#define STA2_TARGET_IP_ADDR {192,168,0,1}
 #endif
 
 #ifndef STA2_IP_ADDR
@@ -194,11 +188,15 @@
 #define STA2_SN_MASK      {255,255,255,0}
 #endif
 
-// station 3
-
-#ifndef STA3_HOST_NAME
-#define STA3_HOST_NAME                 ""
+#ifndef STA2_HOST_NAME
+#define STA2_HOST_NAME                 ""
 #endif
+
+#ifndef STA2_TARGET_IP_ADDR 
+#define STA2_TARGET_IP_ADDR {192,168,0,1}
+#endif
+
+// station 3
 
 #ifndef STA3_SSID
 #define STA3_SSID                      ""
@@ -210,10 +208,6 @@
 
 #ifndef STA3_DHCP_ENABLED
 #define STA3_DHCP_ENABLED           false
-#endif
-
-#ifndef STA3_TARGET_IP_ADDR 
-#define STA3_TARGET_IP_ADDR {192,168,0,1}
 #endif
 
 #ifndef STA3_IP_ADDR
@@ -228,11 +222,15 @@
 #define STA3_SN_MASK      {255,255,255,0}
 #endif
 
-// station 4
-
-#ifndef STA4_HOST_NAME
-#define STA4_HOST_NAME                 ""
+#ifndef STA3_HOST_NAME
+#define STA3_HOST_NAME                 ""
 #endif
+
+#ifndef STA3_TARGET_IP_ADDR 
+#define STA3_TARGET_IP_ADDR {192,168,0,1}
+#endif
+
+// station 4
 
 #ifndef STA4_SSID
 #define STA4_SSID                      ""
@@ -244,10 +242,6 @@
 
 #ifndef STA4_DHCP_ENABLED
 #define STA4_DHCP_ENABLED           false
-#endif
-
-#ifndef STA4_TARGET_IP_ADDR 
-#define STA4_TARGET_IP_ADDR {192,168,0,1}
 #endif
 
 #ifndef STA4_IP_ADDR
@@ -262,11 +256,15 @@
 #define STA4_SN_MASK      {255,255,255,0}
 #endif
 
-// station 5
-
-#ifndef STA5_HOST_NAME
-#define STA5_HOST_NAME                 ""
+#ifndef STA4_HOST_NAME
+#define STA4_HOST_NAME                 ""
 #endif
+
+#ifndef STA4_TARGET_IP_ADDR 
+#define STA4_TARGET_IP_ADDR {192,168,0,1}
+#endif
+
+// station 5
 
 #ifndef STA5_SSID
 #define STA5_SSID                      ""
@@ -278,10 +276,6 @@
 
 #ifndef STA5_DHCP_ENABLED
 #define STA5_DHCP_ENABLED           false
-#endif
-
-#ifndef STA5_TARGET_IP_ADDR 
-#define STA5_TARGET_IP_ADDR {192,168,0,1}
 #endif
 
 #ifndef STA5_IP_ADDR
@@ -296,11 +290,15 @@
 #define STA5_SN_MASK      {255,255,255,0}
 #endif
 
-// station 6
-
-#ifndef STA6_HOST_NAME
-#define STA6_HOST_NAME                 ""
+#ifndef STA5_HOST_NAME
+#define STA5_HOST_NAME                 ""
 #endif
+
+#ifndef STA5_TARGET_IP_ADDR 
+#define STA5_TARGET_IP_ADDR {192,168,0,1}
+#endif
+
+// station 6
 
 #ifndef STA6_SSID
 #define STA6_SSID                      ""
@@ -312,10 +310,6 @@
 
 #ifndef STA6_DHCP_ENABLED
 #define STA6_DHCP_ENABLED           false
-#endif
-
-#ifndef STA6_TARGET_IP_ADDR 
-#define STA6_TARGET_IP_ADDR {192,168,0,1}
 #endif
 
 #ifndef STA6_IP_ADDR
@@ -330,3 +324,10 @@
 #define STA6_SN_MASK      {255,255,255,0}
 #endif
 
+#ifndef STA6_HOST_NAME
+#define STA6_HOST_NAME                 ""
+#endif
+
+#ifndef STA6_TARGET_IP_ADDR 
+#define STA6_TARGET_IP_ADDR {192,168,0,1}
+#endif
