@@ -82,7 +82,7 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   if (settings.model == TMC2130) maxCurrent = 1500; else
   if (settings.model == TMC5160) maxCurrent = 3000; else
   {
-    DF(axisPrefixWarning); DLF("unknown driver model!");
+    DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
 
@@ -92,17 +92,17 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF(axisPrefixWarning); DF("bad current hold="); DL(currentHold);
+    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF(axisPrefixWarning); DF(" bad current run="); DL(currentRun);
+    DF(axisPrefixWarn); DF(" bad current run="); DL(currentRun);
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF(axisPrefixWarning); DF("bad current goto="); DL(currentGoto);
+    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
     return false;
   }
 
