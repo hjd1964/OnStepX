@@ -28,7 +28,7 @@ int CanPlus::write(uint8_t byte) {
 int CanPlus::write(uint8_t *buffer, size_t size) {
   if (!ready) return 0;
   if (sendCount < 0 || size < 1 || size > 8) return 0;
-  for (int i = 0; i < size; i++) { if (!write(buffer[i])) return 0; }
+  for (unsigned int i = 0; i < size; i++) { if (!write(buffer[i])) return 0; }
   return size;
 }
 
