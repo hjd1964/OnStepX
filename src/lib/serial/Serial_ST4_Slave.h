@@ -5,7 +5,7 @@
 /*
 ST4 port data communication scheme:
 
-5V power ---- Teensy3.2, Nano, etc.
+5V power ---- ESP32-S, Teensy4.0, Teensy3.2, etc.
 Gnd ---------
 
 HC              Signal               OnStep
@@ -17,8 +17,7 @@ RAe  ---- 12.5Hz Square wave  --->   100% sure SHC is present, switches DEs & DE
 Data is exchanged on clock edges similar to SPI so is timing insensitive (runs with interrupts enabled.)
 
 One data byte is exchanged (in both directions w/basic error detection and recovery.)  A value 0x00 byte 
-means "no data" and is ignored on both sides.  Mega2560 hardware runs at (fastest) 10mS/byte (100 Bps) and 
-all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
+means "no data" and is ignored on both sides.
 */
 
 #include "../../Common.h"
@@ -38,7 +37,7 @@ all others (Teensy3.x, etc.) at 2mS/byte (500 Bps.)
 void dataClock();
 void shcTone();
 
-class Sst4 : public Stream {
+class SerialST4Slave : public Stream {
   public:
     void begin(long baudRate);
     void end();
@@ -58,21 +57,25 @@ class Sst4 : public Stream {
     inline size_t write(int n) { return write((uint8_t)n); }
     using Print::write;
 
+    void poll();
+
     volatile char xmit_buffer[256] = "";
-    volatile uint8_t xmit_head     = 0;
-    volatile uint8_t xmit_tail     = 0;
+    volatile uint8_t xmit_head = 0;
+    volatile uint8_t xmit_tail = 0;
     volatile char recv_buffer[256] = "";
-    volatile uint8_t recv_tail     = 0;
-    volatile unsigned long lastMs  = 0;
+    volatile uint8_t recv_tail = 0;
+    volatile unsigned long lastTimeInMicroseconds = 0;
 
   private:
     uint8_t recv_head = 0;
+    volatile uint8_t data_in = 0;
+    volatile uint8_t data_out = 0;
     long time_out = 500;
     bool isActive = false;
     uint8_t handle = 0;
 };
 
-extern Sst4 SerialST4;
+extern SerialST4Slave SerialST4;
 #ifdef SERIAL_ST4
   #undef SERIAL_ST4
 #endif
