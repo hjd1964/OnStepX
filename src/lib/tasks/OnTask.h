@@ -294,9 +294,9 @@ class Tasks {
     // \param priority: highest 0 to 7 lowest
     void setPriority(uint8_t handle, uint8_t priority);
 
-    // gets process priority level, highest 0 to 7 lowest
+    // gets process priority level, highest 0 to 7 lowest or -1 on failure
     // \param handle: task handle
-    inline uint8_t getPriority(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { return task[handle - 1]->getPriority(); } }
+    inline int getPriority(uint8_t handle) { if (handle != 0 && allocated[handle - 1]) { return task[handle - 1]->getPriority(); } else return -1; }
 
     // set the process name
     // \param handle: task handle
