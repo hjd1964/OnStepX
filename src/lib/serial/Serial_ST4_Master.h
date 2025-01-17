@@ -35,7 +35,7 @@ class SerialST4Master : public Stream {
 
     // call periodically to move data to/from buffers across the SerialST4 interface
     // recvd chars between 0 and 32 are returned directly and bypass the buffer
-    // 24 calls moves one byte of data in both directions so 150us/call results in a data rate of about 2800 bps (233 cps) 
+    // 24 calls moves one byte of data in both directions so 100us/call results in a data rate of about 4200 bps (350 cps) 
     char poll();
 
     virtual size_t write(uint8_t);
