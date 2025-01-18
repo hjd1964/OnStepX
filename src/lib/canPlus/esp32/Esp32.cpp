@@ -82,6 +82,6 @@ IRAM_ATTR void CanPlusESP32::poll() {
   }
 }
 
-CanPlus canPlus;
+CanPlusESP32 canPlus;
 
 #endif
