@@ -28,7 +28,9 @@ bool WifiManager::init() {
     char name[32] = HOST_NAME;
     strtohostname(name);
 
-    WiFi.hostname(name);
+    #if MDNS_SERVER == ON
+      WiFi.hostname(name);
+    #endif
 
   TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
@@ -93,6 +95,7 @@ bool WifiManager::init() {
       VLF("MSG: WiFi, initialized");
 
       #if MDNS_SERVER == ON && !defined(ESP8266)
+        sstrcpy(name, MDNS_NAME, 32);
         strtohostname2(name);
         if (MDNS.begin(name)) { VF("MSG: WiFi, mDNS started for "); VL(name); } else { VF("WRN: WiFi, mDNS start FAILED for "); VL(name); }
       #endif
@@ -108,7 +111,7 @@ bool WifiManager::init() {
           ip4toip4(wifiManager.sta->target, ip);
         } else {
           VF("MSG: WiFi, host name "); V(name); VLF(" DNS resolution failed!");
-          #if MDNS_SERVER == ON && !defined(ESP8266)
+          #if MDNS_CLIENT == ON && !defined(ESP8266)
             strtohostname2(name);
             ip = MDNS.queryHost(name);
             if (validip4(ip)) {

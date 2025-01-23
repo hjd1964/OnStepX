@@ -8,7 +8,7 @@
 #endif
 
 #ifndef SERIAL_BT_NAME
-#define SERIAL_BT_NAME          HOST_NAME // this bluetooth client name
+#define SERIAL_BT_NAME          HOST_NAME
 #endif
 
 // -------------------------------------------------------------------------------------------------

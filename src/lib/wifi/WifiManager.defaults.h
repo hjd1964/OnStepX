@@ -39,6 +39,10 @@
 #define MDNS_SERVER                   OFF
 #endif
 
+#ifndef MDNS_CLIENT
+#define MDNS_CLIENT                   OFF
+#endif
+
 #ifndef MDNS_NAME
 #define MDNS_NAME               HOST_NAME
 #endif

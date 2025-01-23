@@ -15,7 +15,7 @@
   #include <WiFi.h>
   #include <WiFiClient.h>
   #include <WiFiAP.h>
-  #if MDNS_SERVER == ON
+  #if MDNS_SERVER == ON || MDNS_CLIENT == ON
     #include <ESPmDNS.h>
   #endif
 #elif defined(ESP8266)

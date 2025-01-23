@@ -11,7 +11,27 @@ bool BluetoothManager::init() {
 
     setStation(stationNumber);
 
-    active = true;
+    VF("MSG: Bluetooth, init device ");
+    VF(sta->address); DF(" "); VF(sta->host);
+
+    int channel = 0;
+    BTAddress address = BTAddress(sta->address);
+    std::map<int, std::string> channels = SERIAL_BT.getChannels(address);
+    if (channels.size() > 0) { channel = channels.begin()->first; }
+    VF(" on ch "); V(channel);
+
+    if (strlen(sta->passkey) > 0) {
+      VF(" w/passkey "); V(bluetoothManager.sta->passkey);
+      SERIAL_BT.setPin(bluetoothManager.sta->passkey);
+    }
+
+    VF("...");
+    if (channel != 0 && SERIAL_BT.connect(address, channel, ESP_SPP_SEC_NONE, ESP_SPP_ROLE_SLAVE)) {
+      VLF(" success");
+      active = true;
+    } else {
+      VLF(" failed");
+    }
   }
 
   return active;
