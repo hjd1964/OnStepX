@@ -33,7 +33,11 @@
       static int handle = tasks.getFirstHandle();
       if (!handle) {
         AAA /= count; AXA /= count; RAA /= count; RXA /= count;
-        aau = scale_unit(&AAA); axu = scale_unit(&AXA); rtu = scale_unit(&RTT); rau = scale_unit(&RAA); rxu = scale_unit(&RXA);
+        aau = scale_unit(&AAA);
+        axu = scale_unit(&AXA);
+        rtu = scale_unit(&RTT);
+        rau = scale_unit(&RAA);
+        rxu = scale_unit(&RXA);
     
         sprintf(s, "                     ----------- ------------        ----------   --------   ----------");
         SERIAL_DEBUG.print(s); Y;
@@ -42,7 +46,7 @@
     
         sprintf(s, "                    avgd %5ld%cs  avgd %4ld%cs    totaled %4ld%cs avgd %4ld%cs avgd %4ld%cs", 
         lround(AAA), aau, lround(AXA), axu, lround(RTT), rtu, lround(RAA), rau, lround(RXA), rxu); Y;
-      
+
         SERIAL_DEBUG.print(s); Y;
         SERIAL_DEBUG.println(); Y;
         SERIAL_DEBUG.print("\x1b[K");
@@ -61,6 +65,8 @@
         SERIAL_DEBUG.print("\x1b[K");
         SERIAL_DEBUG.println();
         SERIAL_DEBUG.print("\x1b[K");
+
+        AAA = 0; AXA = 0; RTT = 0; RAA = 0; RXA = 0;
       }
     
       char *name = tasks.getNameStr(handle);
@@ -69,26 +75,26 @@
         char priority = tasks.getPriority(handle) + '0';
 
         double AA = tasks.getArrivalAvg(handle); Y;
-        aau = scale_unit(&AA);
         AAA += AA;
+        aau = scale_unit(&AA);
 
         double AX = tasks.getArrivalMax(handle); Y;
-        axu = scale_unit(&AX);
         AXA += AX;
+        axu = scale_unit(&AX);
 
         double RT = tasks.getRuntimeTotal(handle); Y;
-        rtu = scale_unit(&RT);
         RTT += RT;
+        rtu = scale_unit(&RT);
 
         double RTcount = tasks.getRuntimeTotalCount(handle); Y;
         double RA;
         if (RTcount == 0) RA = 0; else RA = RT/RTcount; 
-        rau = scale_unit(&RA);
         RAA += RA;
+        rau = scale_unit(&RA);
 
         double RX = tasks.getRuntimeMax(handle); Y;
-        rxu = scale_unit(&RX);
         RXA += RX;
+        rxu = scale_unit(&RX);
 
         count++;
         
