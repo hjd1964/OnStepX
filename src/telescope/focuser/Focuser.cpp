@@ -295,9 +295,13 @@ bool Focuser::setTcfT0(int index, float value) {
 }
 
 // get home position in microns
-long Focuser::getHomePosition(int index) {
+float Focuser::getHomePosition(int index) {
   if (index < 0 || index >= FOCUSER_MAX) return 0;
   
+  if (configuration[index].slavedToFocuser > 0) {
+    return axes[configuration[index].slavedToFocuser - 1]->getInstrumentCoordinate();
+  }
+
   if (configuration[index].homeDefault >= 0 && configuration[index].homeDefault <= 500000) return configuration[index].homeDefault;
   
   switch (configuration[index].homeDefault) {

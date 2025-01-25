@@ -313,7 +313,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FH#       Set focuser position as home
     //            Returns: Nothing
     if (command[1] == 'H') {
-      *commandError = resetTarget(index, getHomePosition(index)*MicronsToSteps);
+      *commandError = resetTarget(index, (long)round(getHomePosition(index)*MicronsToSteps));
       *numericReply = false;
     } else
 
@@ -323,7 +323,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       if (axes[index]->hasHomeSense()) {
         *commandError = moveHome(index);
       } else {
-        *commandError = gotoTarget(index, getHomePosition(index)*MicronsToSteps);
+        *commandError = gotoTarget(index, (long)round(getHomePosition(index)*MicronsToSteps));
       }
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
