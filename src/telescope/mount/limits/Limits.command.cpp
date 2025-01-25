@@ -72,7 +72,6 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *supressF
       if (convert.atoi2(parameter, &deg)) {
         if (deg >= 60.0F && deg <= 90.0F) {
           settings.altitude.max = degToRadF(deg);
-          if (transform.mountType == ALTAZM && settings.altitude.max > 87) settings.altitude.max = 87;
           nv.updateBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
         } else *commandError = CE_PARAM_RANGE;
       } else *commandError = CE_PARAM_FORM;
