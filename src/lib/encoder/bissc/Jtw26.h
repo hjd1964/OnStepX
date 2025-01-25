@@ -8,7 +8,6 @@
   class Jtw26 : public Bissc {
     public:
       // initialize Bissc encoder
-      // nvAddress holds settings for the 9 supported axes, 9*4 = 72 bytes; set nvAddress 0 to disable
       Jtw26(int16_t maPin, int16_t sloPin, int16_t axis);
 
     private:

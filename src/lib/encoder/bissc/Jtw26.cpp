@@ -5,7 +5,6 @@
 #ifdef HAS_JTW_26BIT
 
 // initialize BiSS-C encoder
-// nvAddress holds settings for the 9 supported axes, 9*4 = 72 bytes; set nvAddress 0 to disable
 Jtw26::Jtw26(int16_t maPin, int16_t sloPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
