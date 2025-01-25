@@ -7,7 +7,7 @@
 
   class Jtw24 : public Bissc {
     public:
-      // initialize Bissc encoder
+      // initialize BiSS-C encoder
       Jtw24(int16_t maPin, int16_t sloPin, int16_t axis);
 
     private:

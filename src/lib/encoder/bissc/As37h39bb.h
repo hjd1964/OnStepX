@@ -7,7 +7,7 @@
 
   class As37h39bb : public Bissc {
     public:
-      // initialize Bissc encoder
+      // initialize BiSS-C encoder
       As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis);
 
     private:
