@@ -117,8 +117,10 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FT#       Get status
     //            Returns: s#
     if (command[1] == 'T') {
-      if (axes[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S");     // [M] for moving or [S] for stopped
-      char temp[2] = "0"; temp[0] = '0' + getGotoRate(index); strcat(reply, temp); // [1] to [5] for 0.5x to 2x goto rate
+      if (axes[index]->isSlewing()) strcpy(reply,"M"); else strcpy(reply,"S"); // [M] for moving or [S] for stopped
+      char temp[2] = "0";
+      temp[0] = '0' + getGotoRate(index);
+      strcat(reply, temp); // [1] to [5] for 0.5x to 2x goto rate
       *numericReply = false;
     } else
 
@@ -304,18 +306,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FZ#       Set focuser position as zero
     //            Returns: Nothing
     if (command[1] == 'Z') {
-      settings[index].parkState = PS_UNPARKED;
-      *commandError = axes[index]->resetPositionSteps(0);
-      axes[index]->setBacklash(getBacklash(index));
+      *commandError = resetTarget(index, 0);
       *numericReply = false;
     } else
 
     // :FH#       Set focuser position as home
     //            Returns: Nothing
     if (command[1] == 'H') {
-      settings[index].parkState = PS_UNPARKED;
-      *commandError = axes[index]->resetPositionSteps(getHomePosition(index)*MicronsToSteps);
-      axes[index]->setBacklash(getBacklash(index));
+      *commandError = resetTarget(index, getHomePosition(index)*MicronsToSteps);
       *numericReply = false;
     } else
 
@@ -323,13 +321,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Returns: Nothing
     if (command[1] == 'h') {
       if (axes[index]->hasHomeSense()) {
-        if (settings[index].parkState == PS_UNPARKED) {
-          axes[index]->setFrequencySlew(settings[index].gotoRate);
-          *commandError = axes[index]->autoSlewHome();
-          if (*commandError == CE_NONE) {
-            homing[index] = true;
-          }
-        } else *commandError = CE_PARKED;
+        *commandError = moveHome(index);
       } else {
         *commandError = gotoTarget(index, getHomePosition(index)*MicronsToSteps);
       }

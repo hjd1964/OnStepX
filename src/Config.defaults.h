@@ -1101,6 +1101,9 @@
 #ifndef AXIS4_POWER_DOWN_TIME
 #define AXIS4_POWER_DOWN_TIME         30000                       // power down time in milliseconds
 #endif
+#ifndef AXIS4_SLAVED_TO_FOCUSER
+#define AXIS4_SLAVED_TO_FOCUSER       0                           // focuser to slave to, or 0 to disable
+#endif
 #ifndef AXIS4_ENABLE_STATE
 #define AXIS4_ENABLE_STATE            LOW                         // enable pin state when driver is active
 #endif
@@ -1274,6 +1277,9 @@
 #endif
 #ifndef AXIS5_POWER_DOWN_TIME
 #define AXIS5_POWER_DOWN_TIME         30000
+#endif
+#ifndef AXIS5_SLAVED_TO_FOCUSER
+#define AXIS5_SLAVED_TO_FOCUSER       0
 #endif
 #ifndef AXIS5_ENABLE_STATE
 #define AXIS5_ENABLE_STATE            LOW
@@ -1449,6 +1455,9 @@
 #ifndef AXIS6_POWER_DOWN_TIME
 #define AXIS6_POWER_DOWN_TIME         30000
 #endif
+#ifndef AXIS6_SLAVED_TO_FOCUSER
+#define AXIS6_SLAVED_TO_FOCUSER       0
+#endif
 #ifndef AXIS6_ENABLE_STATE
 #define AXIS6_ENABLE_STATE            LOW
 #endif
@@ -1622,6 +1631,9 @@
 #endif
 #ifndef AXIS7_POWER_DOWN_TIME
 #define AXIS7_POWER_DOWN_TIME         30000
+#endif
+#ifndef AXIS7_SLAVED_TO_FOCUSER
+#define AXIS7_SLAVED_TO_FOCUSER       0
 #endif
 #ifndef AXIS7_ENABLE_STATE
 #define AXIS7_ENABLE_STATE            LOW
@@ -1797,6 +1809,9 @@
 #ifndef AXIS8_POWER_DOWN_TIME
 #define AXIS8_POWER_DOWN_TIME         30000
 #endif
+#ifndef AXIS8_SLAVED_TO_FOCUSER
+#define AXIS8_SLAVED_TO_FOCUSER       0
+#endif
 #ifndef AXIS8_ENABLE_STATE
 #define AXIS8_ENABLE_STATE            LOW
 #endif
@@ -1970,6 +1985,9 @@
 #endif
 #ifndef AXIS9_POWER_DOWN_TIME
 #define AXIS9_POWER_DOWN_TIME         30000
+#endif
+#ifndef AXIS9_SLAVED_TO_FOCUSER
+#define AXIS9_SLAVED_TO_FOCUSER       0
 #endif
 #ifndef AXIS9_ENABLE_STATE
 #define AXIS9_ENABLE_STATE            LOW

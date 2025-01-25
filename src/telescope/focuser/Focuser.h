@@ -134,6 +134,9 @@ class Focuser {
     // start move in the specified direction
     CommandError move(int index, Direction dir);
 
+    // start move to the home position
+    CommandError moveHome(int index);
+
     // get goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
     int getGotoRate(int index);
 
@@ -142,6 +145,9 @@ class Focuser {
 
     // move focuser to a specific location (in steps)
     CommandError gotoTarget(int index, long target);
+
+    // reset focuser to a specific location (in steps)
+    CommandError resetTarget(int index, long target);
 
     // park focuser at its current location
     CommandError park(int index);
