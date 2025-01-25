@@ -44,24 +44,20 @@
     st4.poll();
   }
 
-  void St4::init() {
-    #ifdef HAL_SLOW_PROCESSOR
-      VF("MSG: Mount, ST4 start monitor task (rate 5ms priority 1)... ");
-      if (tasks.add(5, 0, true, 1, st4Wrapper, "St4Mntr")) { VLF("success"); } else { VLF("FAILED!"); }
-    #else
-      VF("MSG: Mount, ST4 start monitor task (rate 100us priority 1)... ");
-      uint8_t handle = tasks.add(0, 0, true, 1, st4Wrapper, "St4Mntr");
-      if (handle) { VLF("success"); } else { VLF("FAILED!"); }
-      tasks.setPeriodMicros(handle, 100);
-      tasks.setTimingMode(handle, TM_MINIMUM);
-    #endif
+  void serialSt4Wrapper() {
+    st4.pollSerial();
   }
 
-  // monitor ST4 port for guiding, basic hand controller, and smart hand controller
+  void St4::init() {
+    long rate = round(1000.0F/HAL_FRACTIONAL_SEC);
+    VF("MSG: Mount, ST4 start monitor task (rate "); V(rate); VF("ms priority 2)... ");
+    if (tasks.add(rate, 0, true, 2, st4Wrapper, "St4Mntr")) { VLF("success"); } else { VLF("FAILED!"); }
+  }
+
   void St4::poll() {
+    static bool shcActive = false;
 
     st4Axis1Rev.poll();
-    static bool shcActive = false;
     if (!shcActive) {
       st4Axis1Fwd.poll();
       st4Axis2Fwd.poll();
@@ -69,40 +65,43 @@
     }
 
     #if ST4_HAND_CONTROL == ON
-      if (st4Axis1Rev.hasTone()) {
-        if (!shcActive) {
-          // Smart Hand Controller activate
-          if (st4Axis1Fwd.hasTone()) {
-            pinMode(ST4_DEC_S_PIN, OUTPUT);     // clock
-            pinMode(ST4_DEC_N_PIN, OUTPUT);     // send data
-            digitalWriteF(ST4_DEC_S_PIN, HIGH); // idle
-            shcActive = true;
-            serialST4.begin();
-            VLF("MSG: SerialST4, activated");
-          }
-          return;
-        } else {
-          // Smart Hand Controller active
-          char c = serialST4.poll();
-          // process any single byte guide commands
-          if (c == ccMe) guide.startAxis1(GA_REVERSE, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMw) guide.startAxis1(GA_FORWARD, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMn) guide.startAxis2(GA_FORWARD, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccMs) guide.startAxis2(GA_REVERSE, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000);
-          if (c == ccQe || c == ccQw) guide.stopAxis1();
-          if (c == ccQn || c == ccQs) guide.stopAxis2();
-          return;
-        }
-      } else {
-        if (shcActive) {
-          // Smart Hand Controller deactivate
+
+      if (shcActive) {
+        // Smart Hand Controller deactivate
+        if (!st4Axis1Rev.hasTone()) {
           pinMode(ST4_DEC_S_PIN, ST4_INTERFACE_INIT);
           pinMode(ST4_DEC_N_PIN, ST4_INTERFACE_INIT);
-          shcActive = false;
+
           serialST4.end();
+
+          // stop the SHC task
+          VLF("MSG: Mount, stop SerialST4 comms task");
+          tasks.remove(handleSerialST4);
+          handleSerialST4 = 0;
+
           VLF("MSG: SerialST4, deactivated");
-          return;
+          shcActive = false;
         }
+        return;
+      }
+
+      // Smart Hand Controller activate
+      if (!shcActive && st4Axis1Rev.hasTone() && st4Axis1Fwd.hasTone()) {
+        pinMode(ST4_DEC_S_PIN, OUTPUT);     // SerialST4 clock
+        pinMode(ST4_DEC_N_PIN, OUTPUT);     // SerialST4 data out
+
+        serialST4.begin();
+
+        // start the SHC comms task
+        VF("MSG: Mount, start SerialST4 comms task (rate 100us priority 1)... ");
+        handleSerialST4 = tasks.add(0, 0, true, 1, serialSt4Wrapper, "St4Comm");
+        if (handleSerialST4) { VLF("success"); } else { VLF("FAILED!"); }
+        tasks.setPeriodMicros(handleSerialST4, 100);
+        tasks.setTimingMode(handleSerialST4, TM_MINIMUM);
+
+        VLF("MSG: SerialST4, activated");
+        shcActive = true;
+        return;
       }
 
       // standard hand control
@@ -247,10 +246,28 @@
       }
 
     }
+
     #if ST4_HAND_CONTROL == ON
     }
     #endif
   }
+
+  #if ST4_HAND_CONTROL == ON
+  void St4::pollSerial() {
+    char c = serialST4.poll();
+
+    // process any single byte guide commands
+    switch (c) {
+      case ccMe: guide.startAxis1(GA_REVERSE, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000); break;
+      case ccMw: guide.startAxis1(GA_FORWARD, guide.settings.axis1RateSelect, GUIDE_TIME_LIMIT*1000); break;
+      case ccMn: guide.startAxis2(GA_FORWARD, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000); break;
+      case ccMs: guide.startAxis2(GA_REVERSE, guide.settings.axis2RateSelect, GUIDE_TIME_LIMIT*1000); break;
+      case ccQe: case ccQw: guide.stopAxis1(); break;
+      case ccQn: case ccQs: guide.stopAxis2(); break;
+    }
+  }
+  #endif
+
 #endif
 
 St4 st4;
