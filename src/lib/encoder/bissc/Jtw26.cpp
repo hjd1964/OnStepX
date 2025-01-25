@@ -33,7 +33,7 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
   #ifdef ESP32
     portMUX_TYPE bisscMutex = portMUX_INITIALIZER_UNLOCKED;
     taskENTER_CRITICAL(&bisscMutex);
-  #elif defined(__TEENSYDUINO__)
+  #else
     noInterrupts();
   #endif
 
@@ -111,7 +111,7 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
 
   #ifdef ESP32
     taskEXIT_CRITICAL(&bisscMutex);
-  #elif defined(__TEENSYDUINO__)
+  #else
     interrupts();
   #endif
 
