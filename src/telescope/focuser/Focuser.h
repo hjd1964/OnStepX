@@ -120,7 +120,7 @@ class Focuser {
     bool setTcfT0(int index, float value);
 
     // get home position in microns
-    long getHomePosition(int index);
+    float getHomePosition(int index);
 
     // get backlash in microns
     int getBacklash(int index);
@@ -187,6 +187,8 @@ class Focuser {
     extern StepDirMotor motor4;
   #elif defined(AXIS4_SERVO_PRESENT)
     extern ServoMotor motor4;
+  #elif defined(AXIS4_KTECH_PRESENT)
+    extern KTechMotor motor4;
   #endif
   extern Axis axis4;
 #endif
@@ -196,6 +198,8 @@ class Focuser {
     extern StepDirMotor motor5;
   #elif defined(AXIS5_SERVO_PRESENT)
     extern ServoMotor motor5;
+  #elif defined(AXIS5_KTECH_PRESENT)
+    extern KTechMotor motor5;
   #endif
   extern Axis axis5;
 #endif
@@ -205,6 +209,8 @@ class Focuser {
     extern StepDirMotor motor6;
   #elif defined(AXIS6_SERVO_PRESENT)
     extern ServoMotor motor6;
+  #elif defined(AXIS6_KTECH_PRESENT)
+    extern KTechMotor motor6;
   #endif
   extern Axis axis6;
 #endif
@@ -214,6 +220,8 @@ class Focuser {
     extern StepDirMotor motor7;
   #elif defined(AXIS7_SERVO_PRESENT)
     extern ServoMotor motor7;
+  #elif defined(AXIS7_KTECH_PRESENT)
+    extern KTechMotor motor7;
   #endif
   extern Axis axis7;
 #endif
@@ -223,6 +231,8 @@ class Focuser {
     extern StepDirMotor motor8;
   #elif defined(AXIS8_SERVO_PRESENT)
     extern ServoMotor motor8;
+  #elif defined(AXIS8_KTECH_PRESENT)
+    extern KTechMotor motor8;
   #endif
   extern Axis axis8;
 #endif
@@ -232,6 +242,8 @@ class Focuser {
     extern StepDirMotor motor9;
   #elif defined(AXIS9_SERVO_PRESENT)
     extern ServoMotor motor9;
+  #elif defined(AXIS9_KTECH_PRESENT)
+    extern KTechMotor motor9;
   #endif
   extern Axis axis9;
 #endif
