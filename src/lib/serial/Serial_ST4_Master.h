@@ -64,7 +64,6 @@ class SerialST4Master : public Stream {
     bool recv_error = false;
     uint8_t recv_head = 0;
     uint32_t timeout = 80;
-    unsigned long lastMicros = 0;
 };
 
 extern SerialST4Master serialST4;

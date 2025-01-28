@@ -7,11 +7,11 @@
 
 #include "../tasks/OnTask.h"
 
-// interval in microseconds for generating the tone signal
-#define ST4_TONE_INTERVAL 40000
+// interval in milliseconds for generating the tone signal
+#define ST4_TONE_INTERVAL 40
 
-// interval in microseconds for a clock timeout
-#define ST4_MAX_BIT_TIME 100000
+// interval in milliseconds for a clock timeout
+#define ST4_MAX_BIT_TIME 100
 
 #define ST4_CLOCK_PIN ST4_S_PIN
 #define ST4_DATA_IN_PIN ST4_N_PIN
@@ -39,7 +39,7 @@ void SerialST4Slave::begin(long baudRate = 9600) {
     pinMode(ST4_DATA_OUT_PIN, OUTPUT);
 
     if (!tasks.requestHardwareTimer(handle, 0)) { VLF("(no hardware timer!)"); } else { VLF("success"); }
-    tasks.setPeriodMicros(handle, ST4_TONE_INTERVAL);
+    tasks.setPeriod(handle, ST4_TONE_INTERVAL);
 
     attachInterrupt(digitalPinToInterrupt(ST4_CLOCK_PIN), dataClock, CHANGE);
 
@@ -73,7 +73,7 @@ void SerialST4Slave::end() {
 void SerialST4Slave::paused(bool state) {
   if (!isActive) return;
 
-  if (state) tasks.setPeriodMicros(handle, ST4_TONE_INTERVAL); else tasks.setPeriod(handle, 0);
+  if (state) tasks.setPeriod(handle, ST4_TONE_INTERVAL); else tasks.setPeriod(handle, 0);
 }
 
 bool SerialST4Slave::active() {
@@ -82,9 +82,9 @@ bool SerialST4Slave::active() {
   static unsigned long comp = 0;
   bool result = false;
   noInterrupts();
-  if (comp != lastTimeInMicroseconds) {
+  if (comp != lastTimeInMilliseconds) {
     result = true;
-    comp = lastTimeInMicroseconds;
+    comp = lastTimeInMilliseconds;
   }
   interrupts();
   return result;
@@ -194,12 +194,12 @@ IRAM_ATTR void SerialST4Slave::poll() {
   static uint8_t r_parity = 0;
   uint8_t this_bit;
 
-  unsigned long timeInMicroseconds = micros();
-  if ((long)((timeInMicroseconds - lastTimeInMicroseconds) - (unsigned long)ST4_MAX_BIT_TIME) > 0) {
+  unsigned long timeInMilliseconds = millis();
+  if ((long)((timeInMilliseconds - lastTimeInMilliseconds) - (unsigned long)ST4_MAX_BIT_TIME) > 0) {
     DLF("WRN: SerialST4.poll(), timeout error");
     index = 9;
   }
-  lastTimeInMicroseconds = timeInMicroseconds;
+  lastTimeInMilliseconds = timeInMilliseconds;
 
   if (clockState == LOW) { if (--index == -4) index = 8; }
 
@@ -281,13 +281,13 @@ IRAM_ATTR void shcTone() {
   if (tone_state) { 
     tone_state = false; 
     digitalWrite(ST4_TONE_PIN, HIGH); 
-    if ((long)(micros() - SerialST4.lastTimeInMicroseconds) > 2000000L) {
+    if ((long)(millis() - SerialST4.lastTimeInMilliseconds) > 2000L) {
       digitalWrite(ST4_DATA_OUT_PIN, HIGH);
     }
   } else  {
     tone_state = true;
     digitalWrite(ST4_TONE_PIN, LOW);
-    if ((long)(micros() - SerialST4.lastTimeInMicroseconds) > 2000000L) {
+    if ((long)(millis() - SerialST4.lastTimeInMilliseconds) > 2000L) {
       digitalWrite(ST4_DATA_OUT_PIN, LOW); 
     }
   }

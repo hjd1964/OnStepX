@@ -64,7 +64,7 @@ class SerialST4Slave : public Stream {
     volatile uint8_t xmit_tail = 0;
     volatile char recv_buffer[256] = "";
     volatile uint8_t recv_tail = 0;
-    volatile unsigned long lastTimeInMicroseconds = 0;
+    volatile unsigned long lastTimeInMilliseconds = 0;
 
   private:
     uint8_t recv_head = 0;
