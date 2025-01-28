@@ -7,7 +7,9 @@
 
 #include "../../../lib/nv/Nv.h"
 
+#include "../limits/Limits.h"
 #include "../park/Park.h"
+#include "../site/Site.h"
 
 bool Home::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
@@ -79,6 +81,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *supressFra
     if (command[1] == 'F' && parameter[0] == 0) {
       *commandError = reset(true);
       park.reset();
+      limits.enabled(site.isDateTimeReady());
       *numericReply = false;
     } else return false;
 
