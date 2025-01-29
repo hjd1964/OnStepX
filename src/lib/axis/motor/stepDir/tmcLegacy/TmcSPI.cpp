@@ -8,6 +8,7 @@
 bool TmcSPI::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber) {
   active = false;
   this->model = model;
+  UNUSED(axisNumber);
 
   if (model == TMC2130 || model == TMC5160) {
     if (model == TMC5160) rsense = TMC5160_DRIVER_RSENSE; else

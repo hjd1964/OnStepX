@@ -137,7 +137,7 @@ class Motor {
     virtual int32_t getEncoderCount() { return 0; }
 
     // set origin of absolute encoders
-    virtual void encoderSetOrigin(uint32_t origin) {}
+    virtual void encoderSetOrigin(uint32_t origin) { UNUSED(origin); }
 
     // monitor and respond to motor state as required
     virtual void poll() {}
