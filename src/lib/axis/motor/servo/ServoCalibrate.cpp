@@ -6,9 +6,12 @@
 #ifdef SERVO_MOTOR_PRESENT
 #ifdef ABSOLUTE_ENCODER_CALIBRATION
 
-#include "../../../tasks/OnTask.h"
-#include "../../../convert/Convert.h"
 #include <curveFitting.h> // https://github.com/Rotario/arduinoCurveFitting
+
+#include "../../../tasks/OnTask.h"
+#include "../../../gpioEx/GpioEx.h"
+
+#include "../../../convert/Convert.h"
 
 #ifndef AXIS1_SERVO_VELOCITY_TRACKING
 #define AXIS1_SERVO_VELOCITY_TRACKING 0
