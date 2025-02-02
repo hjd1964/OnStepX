@@ -18,9 +18,9 @@
 
 #ifdef ESP32
   #if OPERATIONAL_MODE == WIFI && WEB_SERVER == ON
-    #define NV_WIFI_SETTINGS_BASE (NV_LAST+1) // bytes: 451 , 451
+    #define NV_WIFI_SETTINGS_BASE (NV_LAST+1) // bytes: 550 , 550
   #endif
-  #define NV_PEC_BUFFER_BASE    (NV_LAST+452) // bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
+  #define NV_PEC_BUFFER_BASE    (NV_LAST+551) // bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
 #else
   #define NV_PEC_BUFFER_BASE      (NV_LAST+1) // bytes: ?   , ? + (PEC_BUFFER_SIZE_LIMIT - 1)
 #endif
