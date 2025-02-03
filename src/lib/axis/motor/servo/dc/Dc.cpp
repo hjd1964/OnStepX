@@ -49,6 +49,7 @@ ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSetti
   model = Settings->model;
   statusMode = Settings->status;
   velocityMax = (Settings->velocityMax/100.0F)*SERVO_ANALOG_WRITE_RANGE;
+  velocityMin = velocityMax*SERVO_ANALOG_WRITE_RANGE_MIN;
   acceleration = (Settings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
@@ -159,10 +160,12 @@ float ServoDc::setMotorVelocity(float velocity) {
   if (velocity > currentVelocity) {
     currentVelocity += accelerationFs;
     if (currentVelocity > velocity) currentVelocity = velocity;
+    if (currentVelocity > 0 && currentVelocity < velocityMin) currentVelocity = velocityMin;
   } else
   if (velocity < currentVelocity) {
     currentVelocity -= accelerationFs;
     if (currentVelocity < velocity) currentVelocity = velocity;
+    if (currentVelocity < 0 && currentVelocity > -velocityMin) currentVelocity = -velocityMin;
   }
   if (currentVelocity >= 0) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
