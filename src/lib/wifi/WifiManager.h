@@ -48,7 +48,7 @@ typedef struct StationSettings {
 
 #ifndef WifiStationCount
   // number of wifi stations supported, between 1 and 6
-  #define WifiStationCount 3
+  #define WifiStationCount 1
 #endif
 #define WifiSettingsSize (112 + WifiStationCount*146)
 typedef struct WifiSettings {
