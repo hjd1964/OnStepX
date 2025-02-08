@@ -152,11 +152,11 @@ IRAM_ATTR bool LikaAsc85::readEnc(uint32_t &position) {
 // Designed according protocol description found in as38-H39e-b-an100.pdf and
 // Renishaw application note E201D02_02
 
-// BiSS-C 6-bit CRC of 26 bit data (24 position + 2 err/wrn)
+// BiSS-C 6-bit CRC of 27 bit data (25 position + 2 err/wrn)
 uint8_t LikaAsc85::crc6(uint64_t data) {
   uint8_t crc;
   uint64_t idx;
-  idx = ((data >> 24) & 0b000011);
+  idx = ((data >> 24) & 0b000111);
   crc = ((data >> 18) & 0b111111);
   idx = crc ^ CRC6[idx];
   crc = ((data >> 12) & 0b111111);
