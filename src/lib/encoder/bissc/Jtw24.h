@@ -14,7 +14,7 @@
       // read encoder position
       bool readEnc(uint32_t &position);
 
-      // BiSS-C 6-bit CRC of 50 bit data (24 multi-turn + 24 position + 2 err/wrn)
+      // BiSS-C 6-bit CRC of 26 bit data (24 position + 2 err/wrn)
       uint8_t crc6(uint64_t data);
 
       // BiSS-C 6-bit CRC table (x^6 + x^1 + 1)
