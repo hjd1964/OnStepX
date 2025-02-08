@@ -103,8 +103,9 @@
 #define AS37_H39B_B                 7      // Broadcom AS37-H39B-B BISS-C interface encoder
 #define JTW_24BIT                   8      // JTW Trident BISS-C interface 24bit encoder
 #define JTW_26BIT                   9      // JTW Trident BISS-C interface 26bit encoder
-#define SERIAL_BRIDGE               10     // serial bridge to encoders
-#define ENC_LAST                    10
+#define LIKA_ASC85                  10     // Lika ASC85 BISS-C interface 25bit encoder (experimental)
+#define SERIAL_BRIDGE               11     // serial bridge to encoders
+#define ENC_LAST                    11
 
 // encoder filter types
 #define ENC_FILT_FIRST              1
