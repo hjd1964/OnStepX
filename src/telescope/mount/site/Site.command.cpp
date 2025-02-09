@@ -132,7 +132,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       // :GX89#     Date/time ready status
       //            Return: 0 ready, 1 not ready
       if (parameter[1] == '9') {
-        if (dateIsReady && timeIsReady) *commandError = CE_0;
+        if (dateIsReady && timeIsReady) *commandError = CE_0; else *commandError = CE_1;
       } else return false;
 
     } else return false;
