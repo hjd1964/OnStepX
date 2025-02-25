@@ -87,8 +87,8 @@
 #define SERVO_TMC5160               105    // TMC5160 stepper driver using VMAX velocity control
 #define SERVO_DRIVER_LAST           105
 
-// odrive driver
 #define ODRIVE_DRIVER_FIRST         200
+// integrated motor drivers
 #define ODRIVE                      200    // First generation ODrive (axis 1 and 2 only)
 #define ODRIVE_DRIVER_LAST          200
 
