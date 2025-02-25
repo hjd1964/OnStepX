@@ -156,7 +156,7 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
   position += origin;
 
   #if BISSC_SINGLE_TURN == ON
-    if ((int32_t)position > 8388608) position -= 8388608;
+    if ((int32_t)position >= 8388608) position -= 8388608;
     if ((int32_t)position < 0) position += 8388608;
   #endif
 

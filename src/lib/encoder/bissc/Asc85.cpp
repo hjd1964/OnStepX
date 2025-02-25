@@ -141,7 +141,7 @@ IRAM_ATTR bool LikaAsc85::readEnc(uint32_t &position) {
 
   position += origin;
 
-  if ((int32_t)position > 33554432) position -= 33554432;
+  if ((int32_t)position >= 33554432) position -= 33554432;
   if ((int32_t)position < 0) position += 33554432;
 
   position -= 16777216;

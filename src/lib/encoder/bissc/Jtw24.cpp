@@ -141,7 +141,7 @@ IRAM_ATTR bool Jtw24::readEnc(uint32_t &position) {
 
   position += origin;
 
-  if ((int32_t)position > 16777216) position -= 16777216;
+  if ((int32_t)position >= 16777216) position -= 16777216;
   if ((int32_t)position < 0) position += 16777216;
 
   position -= 8388608;
