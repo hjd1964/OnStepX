@@ -52,7 +52,7 @@
   #define HAS_JTW_26BIT
 #endif
 
-#if defined(HAS_AS37_H39B_B) || defined(HAS_JTW_24BIT) || defined(HAS_JTW_26BIT)
+#if defined(HAS_AS37_H39B_B) || defined(HAS_LIKA_ASC85) || defined(HAS_JTW_24BIT) || defined(HAS_JTW_26BIT) 
   #define HAS_BISS_C
 #endif
 
