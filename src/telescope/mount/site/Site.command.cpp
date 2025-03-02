@@ -156,6 +156,18 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
     //            Return: 0 failure, 1 success
     if (command[1] == 'G') {
       double hour;
+      char colonIndex = 0xFF;
+      for (char i = 0; i < 6; i++) {
+        if (*(parameter + i) == ':') {
+          colonIndex = i;
+          break;
+        }
+      }
+      if (colonIndex != 0xFF) {
+        for (char i = 0; i < 3; i++){
+          *(parameter + (colonIndex + i)) = 0;
+        }
+      }
       if (convert.tzToDouble(&hour, parameter)) {
         if (hour >= -13.75 || hour <= 12.0) {
           location.timezone = hour;
