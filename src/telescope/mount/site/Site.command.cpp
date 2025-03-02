@@ -158,14 +158,19 @@ bool Site::command(char *reply, char *command, char *parameter, bool *supressFra
       double hour;
       char colonIndex = 0xFF;
       for (char i = 0; i < 6; i++) {
-        if (*(parameter + i) == ':') {
+        if (parameter[i] == ':') {
           colonIndex = i;
           break;
         }
       }
       if (colonIndex != 0xFF) {
-        for (char i = 0; i < 3; i++){
-          *(parameter + (colonIndex + i)) = 0;
+        char* mm_0 = &parameter[colonIndex + 1];
+        char* mm_1 = &parameter[colonIndex + 2];
+        char* end = &parameter[colonIndex + 3];
+        if (('0' <= *mm_0 && *mm_0 <= '9') && ('0' > *mm_1 || *mm_1 > '9')) {
+          *mm_1 = *mm_0;
+          *mm_0 = '0';
+          *end = 0;
         }
       }
       if (convert.tzToDouble(&hour, parameter)) {
