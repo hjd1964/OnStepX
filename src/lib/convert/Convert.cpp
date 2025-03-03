@@ -67,7 +67,7 @@ bool Convert::tzToDouble(double *value, char *hm) {
   if (m != NULL) {
     m[0] = 0;
     m++;
-    if (strlen(m) != 2) return false;
+    if (strlen(m) != 1 && strlen(m) != 2) return false;
     if (!atoi2(m, &minute, false)) return false;
     // only these exact minutes are allowed for time zones
     if (minute != 45 && minute != 30 && minute != 0) return false;
