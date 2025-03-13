@@ -84,6 +84,11 @@
   #define MCU_STR "STM32F446"
   #include "stm32/STM32F446.h"
 
+#elif defined(STM32H723xx)
+  // BTT Octopus Pro v1.1
+  #define MCU_STR "STM32H723"
+  #include "stm32/STM32H7xx.h"
+
 #elif defined(STM32H743xx)
   // WeAct Studio board with STM32H743
   #define MCU_STR "STM32H743"

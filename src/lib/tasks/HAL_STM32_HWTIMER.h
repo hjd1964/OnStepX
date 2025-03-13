@@ -40,7 +40,7 @@
 #define F_COMP             4000000   // timer clocks at 4MHz
 
 // search "TIMER_TONE" in github.com/stm32duino/Arduino_Core_STM32/blob/main/variants to find the timer use
-#if defined(STM32H743xx) || defined(STM32H750xx)
+#if defined(STM32H723xx) || defined(STM32H743xx) || defined(STM32H750xx)
   #define STM32_TIMER1       TIM17   // this can use any type of timer AFAIK
   #define STM32_TIMER2       TIM16   // tone uses TIM 6, servo TIM7, PWM is unknown
   #define STM32_TIMER3       TIM15   // TIM 1/8 are advanced, TIM2/5 are 32bit (no library support for 32 bit)
