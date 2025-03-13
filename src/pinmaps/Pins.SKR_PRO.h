@@ -26,7 +26,7 @@
 
 // Connector Labeled I2C uses PB6 (SCL) and PB7 (SDA) which are forced in the HAL
 
-// Auto assign the Serial1 port pins for GPS: RX1 Pin PA10, TX1 Pin PA9 (TFT Display)
+// Auto assign the Serial3 port pins for GPS
 #if SERIAL_GPS_BAUD != OFF
   #ifndef SERIAL_GPS
     #define SERIAL_GPS          HardSerial
