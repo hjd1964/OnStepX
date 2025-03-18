@@ -44,7 +44,7 @@
         SERIAL_DEBUG.println(); Y;
         SERIAL_DEBUG.print("\x1b[K");
     
-        sprintf(s, "                    avgd %5ld%cs  avgd %4ld%cs    totaled %4ld%cs avgd %4ld%cs avgd %4ld%cs", 
+        sprintf(s, "                    avgd %5ld%cs  avgd %4ld%cs   totalled %4ld%cs avgd %4ld%cs avgd %4ld%cs", 
         lround(AAA), aau, lround(AXA), axu, lround(RTT), rtu, lround(RAA), rau, lround(RXA), rxu); Y;
 
         SERIAL_DEBUG.print(s); Y;
