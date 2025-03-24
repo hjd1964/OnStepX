@@ -35,6 +35,11 @@
   #endif
 #endif
 
+// allow RX from TMC UART drivers
+#ifndef SERIAL_TMC_RX_DISABLE
+  #define SERIAL_TMC_RX_DISABLE false
+#endif
+
 // Allow resetting ESP8266 into firmware upload mode
 #ifndef ADDON_GPIO0_PIN
   #define ADDON_GPIO0_PIN       PF14             // ESP8266 GPIO0
@@ -117,8 +122,13 @@
 #define AXIS1_ENABLE_PIN        PF2
 #define AXIS1_M0_PIN            PC12             // SPI MOSI
 #define AXIS1_M1_PIN            PC10             // SPI SCK
-#define AXIS1_M2_PIN            PA15             // SPI CS (UART TX)
-#define AXIS1_M3_PIN            PC11             // SPI MISO (UART RX)
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS1_M2_PIN          PE4              // TX
+  #define AXIS1_M3_PIN          PC13             // RX
+#else
+  #define AXIS1_M2_PIN          PA15             // SPI CS
+  #define AXIS1_M3_PIN          PC11             // SPI MISO
+#endif
 #define AXIS1_STEP_PIN          PE9              // TIM1
 #define AXIS1_DIR_PIN           PF1
 #ifndef AXIS1_SENSE_HOME_PIN
@@ -129,8 +139,13 @@
 #define AXIS2_ENABLE_PIN        PD7
 #define AXIS2_M0_PIN            PC12
 #define AXIS2_M1_PIN            PC10
-#define AXIS2_M2_PIN            PB8              // SPI CS (UART TX)
-#define AXIS2_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS2_M2_PIN          PE2              // TX
+  #define AXIS2_M3_PIN          PE3              // RX
+#else
+  #define AXIS2_M2_PIN          PB8              // SPI CS
+  #define AXIS2_M3_PIN          PC11
+#endif
 #define AXIS2_STEP_PIN          PE11             // TIM1
 #define AXIS2_DIR_PIN           PE8
 #ifndef AXIS2_SENSE_HOME_PIN
@@ -141,8 +156,13 @@
 #define AXIS3_ENABLE_PIN        PC0
 #define AXIS3_M0_PIN            PC12
 #define AXIS3_M1_PIN            PC10
-#define AXIS3_M2_PIN            PB9              // SPI CS (UART TX)
-#define AXIS3_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS3_M2_PIN          PE0              // TX
+  #define AXIS3_M3_PIN          PE1              // RX
+#else
+  #define AXIS3_M2_PIN          PB9              // SPI CS
+  #define AXIS3_M3_PIN          PC11
+#endif
 #define AXIS3_STEP_PIN          PE13
 #define AXIS3_DIR_PIN           PC2
 
@@ -150,8 +170,13 @@
 #define AXIS4_ENABLE_PIN        PC3
 #define AXIS4_M0_PIN            PC12
 #define AXIS4_M1_PIN            PC10
-#define AXIS4_M2_PIN            PB3              // SPI CS (UART TX)
-#define AXIS4_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS4_M2_PIN          PD2              // TX
+  #define AXIS4_M3_PIN          PD4              // RX
+#else
+  #define AXIS4_M2_PIN          PB3              // SPI CS
+  #define AXIS4_M3_PIN          PC11
+#endif
 #define AXIS4_STEP_PIN          PE14
 #define AXIS4_DIR_PIN           PA0
 
@@ -159,8 +184,13 @@
 #define AXIS5_ENABLE_PIN        PA3
 #define AXIS5_M0_PIN            PC12
 #define AXIS5_M1_PIN            PC10
-#define AXIS5_M2_PIN            PG15             // SPI CS (UART TX)
-#define AXIS5_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS5_M2_PIN          PD0              // TX
+  #define AXIS5_M3_PIN          PD1              // RX
+#else
+  #define AXIS5_M2_PIN          PG15             // SPI CS
+  #define AXIS5_M3_PIN          PC11
+#endif
 #define AXIS5_STEP_PIN          PD15
 #define AXIS5_DIR_PIN           PE7
 
@@ -168,8 +198,13 @@
 #define AXIS6_ENABLE_PIN        PF0
 #define AXIS6_M0_PIN            PC12
 #define AXIS6_M1_PIN            PC10
-#define AXIS6_M2_PIN            PG12             // SPI CS (UART TX)
-#define AXIS6_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS6_M2_PIN          PD5              // TX
+  #define AXIS6_M3_PIN          PD6              // RX
+#else
+  #define AXIS6_M2_PIN          PG12             // SPI CS
+  #define AXIS6_M3_PIN          PC11
+#endif
 #define AXIS6_STEP_PIN          PD13
 #define AXIS6_DIR_PIN           PG9
 
@@ -177,8 +212,13 @@
 #define AXIS7_ENABLE_PIN        PC0
 #define AXIS7_M0_PIN            PC12
 #define AXIS7_M1_PIN            PC10
-#define AXIS7_M2_PIN            PB9              // SPI CS (UART TX)
-#define AXIS7_M3_PIN            PC11
+#if defined(STEP_DIR_TMC_UART_PRESENT) && !defined(SERIAL_TMC_HARDWARE_UART)
+  #define AXIS7_M2_PIN          PE0              // TX
+  #define AXIS7_M3_PIN          PE1              // RX
+#else
+  #define AXIS7_M2_PIN          PB9              // SPI CS
+  #define AXIS7_M3_PIN          PC11
+#endif
 #define AXIS7_STEP_PIN          PE13
 #define AXIS7_DIR_PIN           PC2
 
