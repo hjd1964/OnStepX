@@ -79,7 +79,7 @@ class StepDirTmcUART : public StepDirDriver {
 
   private:
     #if SERIAL_TMC == SoftSerial
-      SoftwareSerial SerialTMC;
+      SoftwareSerial *SerialTMC;
     #endif
 
     TMCStepper *driver;

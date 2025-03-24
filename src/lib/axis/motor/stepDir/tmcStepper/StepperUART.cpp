@@ -95,13 +95,17 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     digitalWriteEx(Pins->m1, LOW);
     VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
-    SerialTMC.begin(SERIAL_TMC_BAUD);
+    SerialTMC->begin(SERIAL_TMC_BAUD);
   #endif
 
   // initialize the stepper driver
   if (settings.model == TMC2208) {
     rSense = TMC2208_RSENSE;
-    driver = new TMC2208Stepper(&SerialTMC, rSense);
+    #if defined(SERIAL_TMC_HARDWARE_UART)
+      driver = new TMC2208Stepper(&SerialTMC, rSense);
+    #else
+      driver = new TMC2208Stepper(SerialTMC, rSense);
+    #endif
     ((TMC2208Stepper*)driver)->begin();
     ((TMC2208Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
@@ -110,7 +114,11 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
   } else
   if (settings.model == TMC2209) { // also handles TMC2226
     rSense = TMC2209_RSENSE;
-    driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+    #if defined(SERIAL_TMC_HARDWARE_UART)
+      driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+    #else
+      driver = new TMC2209Stepper(SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+    #endif
     ((TMC2209Stepper*)driver)->begin();
     ((TMC2209Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();

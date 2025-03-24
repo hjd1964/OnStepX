@@ -99,11 +99,15 @@ void ServoTmc2209::init() {
     digitalWriteEx(Pins->m1, LOW);
     VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
-    SerialTMC.begin(SERIAL_TMC_BAUD);
+    SerialTMC->begin(SERIAL_TMC_BAUD);
   #endif
 
   rSense = TMC2209_RSENSE;
-  driver = new TMC2209Stepper(&SERIAL_TMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+  #if defined(SERIAL_TMC_HARDWARE_UART)
+    driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+  #else
+    driver = new TMC2209Stepper(SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
+  #endif
   driver->begin();
   driver->intpol(true);
 

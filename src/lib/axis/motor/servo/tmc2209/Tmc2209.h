@@ -87,7 +87,7 @@ class ServoTmc2209 : public ServoDriver {
     bool stealthChop() { if (decay == STEALTHCHOP) return true; else return false; }
 
     #if SERIAL_TMC == SoftSerial
-      SoftwareSerial SerialTMC;
+      SoftwareSerial *SerialTMC;
     #endif
 
     TMC2209Stepper *driver;
