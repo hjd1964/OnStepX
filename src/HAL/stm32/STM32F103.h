@@ -57,6 +57,9 @@
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
 
+// always bring in the software serial library early as strange things happen otherwise
+#include <SoftwareSerial.h>
+
 // MCU reset
 #define HAL_RESET() NVIC_SystemReset()
 
