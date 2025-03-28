@@ -4,7 +4,7 @@
 #include "WebServer.h"
 #include "../../tasks/OnTask.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && WEB_SERVER == ON
+#if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && WEB_SERVER != OFF
 
   void WebServer::begin(long port, long timeToClose, bool autoReset) {
     if (webServer == NULL) {

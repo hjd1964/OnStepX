@@ -3,8 +3,7 @@
 
 #include "Serial_IP_Ethernet.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-    SERIAL_SERVER != OFF
+#if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && SERIAL_SERVER != OFF
 
   bool port9999Assigned = false;
   bool port9998Assigned = false;

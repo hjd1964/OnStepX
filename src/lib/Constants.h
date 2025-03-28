@@ -15,19 +15,16 @@
 #define PROFILER                    -11
 #define VERBOSE                     -12
 #define REMOTE                      -13
-#define ETHERNET_W5100              -14
-#define ETHERNET_W5500              -15
-#define WIFI                        -16
-#define WIFI_ACCESS_POINT           -17    // shorthand for easy WIFI mode settings
-#define WIFI_STATION                -18    // shorthand for easy WIFI mode settings
-#define BLUETOOTH                   -19    // shorthand for easy bluetooth mode settings
-#define SHARED                      -20
-#define STANDARD                    -21
-#define PERSISTENT                  -22
-#define ERRORS_ONLY                 -23
-#define MINIMUM                     -24
-#define MIDDLE                      -25
-#define MAXIMUM                     -26
+#define WIFI_ACCESS_POINT           -14    // shorthand for easy WIFI mode settings
+#define WIFI_STATION                -15    // shorthand for easy WIFI mode settings
+#define BLUETOOTH                   -16    // shorthand for easy bluetooth mode settings
+#define SHARED                      -17
+#define STANDARD                    -18
+#define PERSISTENT                  -19
+#define ERRORS_ONLY                 -20
+#define MINIMUM                     -21
+#define MIDDLE                      -22
+#define MAXIMUM                     -23
 #define INVALID                     -127
 
 // CAN interface options
@@ -38,6 +35,16 @@
 #define CAN1_TEENSY4                4
 #define CAN2_TEENSY4                5
 #define CAN3_TEENSY4                6
+
+// network interface options
+#define ETHERNET_FIRST              1
+#define ETHERNET_W5100              1
+#define ETHERNET_W5500              2
+#define ETHERNET_TEENSY41           3
+#define ETHERNET_LAST               3
+#define WIFI_FIRST                  4
+#define WIFI                        4
+#define WIFI_LAST                   4
 
 // driver (step/dir interface, usually for stepper motors)
 // changes here must be reflected in the StepDirDriver.cpp file, etc.

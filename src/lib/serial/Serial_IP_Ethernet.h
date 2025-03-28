@@ -5,8 +5,7 @@
 #include "../../Common.h"
 #include "../ethernet/EthernetManager.h"
 
-#if (OPERATIONAL_MODE == ETHERNET_W5100 || OPERATIONAL_MODE == ETHERNET_W5500) && \
-    SERIAL_SERVER != OFF
+#if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && SERIAL_SERVER != OFF
 
   #ifdef ESP8266
     #ifndef ETHERNET_W5500
@@ -14,7 +13,11 @@
     #endif
     #include <Ethernet2.h>  // https://github.com/adafruit/Ethernet2
   #else
-    #include <Ethernet.h>   // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
+    #if OPERATIONAL_MODE == ETHERNET_TEENSY41
+      #include <NativeEthernet.h>
+    #else
+      #include <Ethernet.h>   // built-in library or my https://github.com/hjd1964/Ethernet for ESP32 and ASCOM Alpaca support
+    #endif
   #endif
 
   class IPSerial : public Stream {
