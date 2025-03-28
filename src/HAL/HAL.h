@@ -85,7 +85,6 @@
   #include "stm32/STM32F446.h"
 
 #elif defined(STM32H723xx)
-  // BTT Octopus Pro v1.1
   #define MCU_STR "STM32H723"
   #include "stm32/STM32H7xx.h"
 
