@@ -134,7 +134,7 @@
     // isolate the content
     *line = line->substring(0, url_end);
     int url_start = 0;
-    int url_end2 = line->lastIndexOf('?');
+    int url_end2 = line->indexOf('?');
     if (url_end2 > 0) url_end = url_end2;
     requestedHandler = line->substring(url_start, url_end);
     *line = line->substring(url_end);
