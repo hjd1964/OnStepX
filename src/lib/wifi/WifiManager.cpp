@@ -72,7 +72,7 @@ bool WifiManager::init() {
 
       // if connection fails fall back to access-point mode
       if (settings.stationApFallback && !settings.accessPointEnabled) {
-        VLF("MSG: WiFi starting station failed");
+        VLF("MSG: WiFi, starting station failed");
         WiFi.disconnect();
         delay(3000);
         VLF("MSG: WiFi, switching to SoftAP mode");
@@ -84,15 +84,15 @@ bool WifiManager::init() {
       // no fallback but the AP is still enabled
       if (settings.accessPointEnabled) {
         active = true;
-        VLF("MSG: WiFi, AP initialized station failed");
+        VLF("MSG: WiFi, started AP but station failed");
       } else {
         // the station failed to connect and the AP isn't enabled
-        VLF("MSG: WiFi, initialization failed");
+        VLF("MSG: WiFi, starting station failed");
         WiFi.disconnect();
       }
     } else {
       active = true;
-      VLF("MSG: WiFi, initialized");
+      VLF("MSG: WiFi, started");
 
       #if MDNS_SERVER == ON && !defined(ESP8266)
         sstrcpy(name, MDNS_NAME, 32);
