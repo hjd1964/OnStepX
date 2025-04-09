@@ -142,6 +142,11 @@ int Sense::isOn(uint8_t handle) {
   return senseInput[handle - 1]->isOn();
 }
 
+long Sense::stableMillis(uint8_t handle) {
+  if (handle == 0) return false;
+  return senseInput[handle - 1]->stableMillis();
+}
+
 int Sense::changed(uint8_t handle) {
   if (handle == 0) return false;
   return senseInput[handle - 1]->changed();
