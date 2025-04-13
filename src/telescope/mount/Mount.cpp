@@ -177,7 +177,7 @@ void Mount::autostartPostponed() {
       VLF("MSG: Mount, autostart park restore");
       CommandError e = park.restore(TRACK_AUTOSTART == ON);
       if (e != CE_NONE) {
-        VF("WRN: Mount, autostart park restore failed with code "); VL(e);
+        DF("WRN: Mount, autostart park restore failed with code "); DL(e);
         autoStartDone = true;
         return;
       }
@@ -191,7 +191,7 @@ void Mount::autostartPostponed() {
     VLF("MSG: Mount, autostart home");
     CommandError e = home.request();
     if (e != CE_NONE) {
-      VF("WRN: Mount, autostart home request failed with code "); VL(e);
+      DF("WRN: Mount, autostart home request failed with code "); DL(e);
       autoStartDone = true;
       return;
     }

@@ -90,7 +90,7 @@ CommandError Home::request() {
 
         CommandError result = goTo.request(homePosition, PSS_EAST_ONLY, false);
         if (result != CE_NONE) {
-          VF("WRN: Mount, moving to home goto failed (code "); V(result); VLF(")");
+          DF("WRN: Mount, moving to home goto failed (code "); D(result); DLF(")");
           state = HS_NONE;
         }
         return result;
@@ -160,7 +160,7 @@ void Home::guideDone(bool success) {
     #if AXIS1_SECTOR_GEAR == ON 
       VLF("MSG: Mount, sector gear set origin");
       double h = axis1.getInstrumentCoordinate();
-      if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::guideDone(), failed to resetPosition Axis1"); exit; }
+      if (axis1.resetPosition(0.0L) != 0) { DLF("WRN: Home::guideDone(), failed to resetPosition Axis1"); exit; }
       axis1.setInstrumentCoordinate(h);
       mount.tracking(wasTracking);
     #endif
@@ -168,7 +168,7 @@ void Home::guideDone(bool success) {
     #if AXIS2_TANGENT_ARM == ON 
       VLF("MSG: Mount, tangent arm set origin");
       double d = axis2.getInstrumentCoordinate();
-      if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::guideDone(), failed to resetPosition Axis2"); exit; }
+      if (axis2.resetPosition(0.0L) != 0) { DLF("WRN: Home::guideDone(), failed to resetPosition Axis2"); exit; }
       axis2.setInstrumentCoordinate(d);
     #endif
   #endif
@@ -209,8 +209,8 @@ CommandError Home::reset(bool fullReset) {
   Coordinate homePosition = getPosition(CR_MOUNT);
 
   if (!goTo.absoluteEncodersPresent) {
-    if (axis1.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis1"); }
-    if (axis2.resetPosition(0.0L) != 0) { DL("WRN: Home::reset(), failed to resetPosition Axis2"); }
+    if (axis1.resetPosition(0.0L) != 0) { DLF("WRN: Home::reset(), failed to resetPosition Axis1"); }
+    if (axis2.resetPosition(0.0L) != 0) { DLF("WRN: Home::reset(), failed to resetPosition Axis2"); }
 
     #if MOUNT_HOME_AT_OFFSETS == OFF
       if (useOffset() && state == HS_HOMING && !fullReset) {

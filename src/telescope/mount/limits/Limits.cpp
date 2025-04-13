@@ -367,8 +367,8 @@ void Limits::poll() {
         error.limit.axis1.max = true;
         // -------------------------------------------------------------
         if (lastError.limit.axis1.max != error.limit.axis1.max) {
-          D("WRN: Mount, limits max axis1 "); V(radToDeg(current.a1)); V(" < "); V(radToDeg(axis1.settings.limits.max));
-          VLF(" FAILED");
+          D("WRN: Mount, limits max axis1 "); D(radToDeg(current.a1)); D(" < "); D(radToDeg(axis1.settings.limits.max));
+          DLF(" FAILED");
         }
         // -------------------------------------------------------------
       }

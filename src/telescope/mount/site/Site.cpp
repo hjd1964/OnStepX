@@ -56,9 +56,9 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
     } else
 
     if ((long)(millis() - site.updateTimeoutTime) > 0) {
-      VLF("WRN: Mount, GPS timed out stopping monitor task");
+      DLF("WRN: Mount, GPS timed out stopping monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("gpsChk"));
-      VLF("WRN: TLS, GPS timed out stopping GPS polling task");
+      DLF("WRN: TLS, GPS timed out stopping GPS polling task");
       tasks.setDurationComplete(tasks.getHandleByName("gpsPoll"));
       initError.tls = true; 
     }
@@ -81,9 +81,9 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
     } else
 
     if ((long)(millis() - site.updateTimeoutTime) > 0) {
-      VLF("MSG: Mount, NTP timed out stopping monitor task");
+      DLF("MSG: Mount, NTP timed out stopping monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("ntpChk"));
-      VLF("WRN: TLS, NTP timed out stopping monitor task");
+      DLF("WRN: TLS, NTP timed out stopping monitor task");
       tasks.setDurationComplete(tasks.getHandleByName("ntp"));
       initError.tls = true; 
     }
@@ -188,7 +188,7 @@ void Site::init() {
 
     if (initError.tls) {
       DLF("WRN: Site::init(), Warning TLS initialization failed");
-      VLF("WRN: Site::init(), fallback to last Date/Time from NV");
+      DLF("WRN: Site::init(), fallback to last Date/Time from NV");
       readJD();
     }
   #else

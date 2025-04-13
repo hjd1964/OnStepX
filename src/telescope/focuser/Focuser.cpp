@@ -175,7 +175,7 @@ void Focuser::begin() {
     if (FOCUSER_BUTTON_FOCUSER_INDEX - 1 < 0 ||
         FOCUSER_BUTTON_FOCUSER_INDEX - 1 >= FOCUSER_MAX ||
         axes[FOCUSER_BUTTON_FOCUSER_INDEX - 1] == NULL) {
-      VLF("WRN: Focusers, starting button monitor failed invalid FOCUSER_BUTTON_FOCUSER_INDEX");
+      DLF("WRN: Focusers, starting button monitor failed invalid FOCUSER_BUTTON_FOCUSER_INDEX");
       return;
     }
 

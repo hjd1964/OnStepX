@@ -142,11 +142,11 @@ void Weather::poll() {
       } else {
         if (nanCount < 15) {
           nanCount++;
-          VLF("WRN: Weather.poll(), ambient temp. invalid");
+          DLF("WRN: Weather.poll(), ambient temp. invalid");
         } else {
           averageTemperature = NAN;
           firstSample = true;
-          VLF("WRN: Weather.poll(), ambient temp. reset");
+          DLF("WRN: Weather.poll(), ambient temp. reset");
         }
       }
     }
