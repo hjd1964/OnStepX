@@ -4,6 +4,7 @@
 #include "bissc/As37h39bb.h"
 #include "bissc/Jtw24.h"
 #include "bissc/Jtw26.h"
+#include "bissc/Asc85.h"
 #include "ktech/KTech.h"
 #include "cwCcw/CwCcw.h"
 #include "pulseDir/PulseDir.h"
