@@ -10,6 +10,11 @@
   ODriveMotor motor1(1, &ODriveSettingsAxis1);
 #endif
 
+#ifdef AXIS1_KTECH_PRESENT
+  const KTechDriverSettings KTechSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS};
+  KTechMotor motor1(1, &KTechSettingsAxis1);
+#endif
+
 #ifdef AXIS1_SERVO_PRESENT
   ServoControl servoControlAxis1;
 
@@ -33,6 +38,10 @@
     Jtw26 encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
   #elif AXIS1_ENCODER == LIKA_ASC85
     LikaAsc85 encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+  #elif AXIS1_ENCODER == ECN_125
+    Ecn125 encAxis1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, AXIS1_ENCODER_C_PIN, 1);
+  #elif AXIS1_ENCODER == KTECH_IME
+    KTechIME encAxis1(1);
   #elif AXIS1_ENCODER == SERIAL_BRIDGE
     SerialBridge encAxis1(1);
   #endif
@@ -69,6 +78,9 @@
     const ServoTmcSpiPins ServoPinsAxis1 = {AXIS1_STEP_PIN, AXIS1_DIR_PIN, AXIS1_ENABLE_PIN, AXIS1_ENABLE_STATE, AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M3_PIN, AXIS1_FAULT_PIN};
     const ServoTmcSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS, AXIS1_SERVO_VELOCITY_MAX, AXIS1_SERVO_VELOCITY_PWMTHRS, AXIS1_SERVO_ACCELERATION, AXIS1_DRIVER_MICROSTEPS, AXIS1_DRIVER_IRUN, AXIS1_DRIVER_DECAY, AXIS1_DRIVER_DECAY_GOTO};
     ServoTmc5160 driver1(1, &ServoPinsAxis1, &ServoSettingsAxis1);
+  #elif AXIS1_DRIVER_MODEL == SERVO_KTECH
+    const ServoKTechSettings ServoSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS, AXIS1_SERVO_VELOCITY_MAX, AXIS1_SERVO_ACCELERATION};
+    ServoKTech driver1(1, &ServoSettingsAxis1);
   #endif
 
   ServoMotor motor1(1, ((ServoDriver*)&driver1), &filterAxis1, &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &pidAxis1, &servoControlAxis1, AXIS1_SYNC_THRESHOLD);
@@ -98,6 +110,11 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
   ODriveMotor motor2(2, &ODriveSettingsAxis2);
 #endif
 
+#ifdef AXIS2_KTECH_PRESENT
+  const KTechDriverSettings KTechSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS};
+  KTechMotor motor2(2, &KTechSettingsAxis2);
+#endif
+
 #ifdef AXIS2_SERVO_PRESENT
   ServoControl servoControlAxis2;
 
@@ -121,6 +138,10 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     Jtw26 encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
   #elif AXIS2_ENCODER == LIKA_ASC85
     LikaAsc85 encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, 2);
+  #elif AXIS2_ENCODER == ECN_125
+    Ecn125 encAxis2(AXIS2_ENCODER_A_PIN, AXIS2_ENCODER_B_PIN, AXIS2_ENCODER_C_PIN, 2);
+  #elif AXIS2_ENCODER == KTECH_IME
+    KTechIME encAxis2(2);
   #elif AXIS2_ENCODER == SERIAL_BRIDGE
     SerialBridge encAxis2(2);
   #endif
@@ -155,6 +176,9 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
     const ServoTmcSpiPins ServoPinsAxis2 = {AXIS2_STEP_PIN, AXIS2_DIR_PIN, AXIS2_ENABLE_PIN, AXIS2_ENABLE_STATE, AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_M2_PIN, AXIS2_M3_PIN, AXIS2_FAULT_PIN};
     const ServoTmcSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS, AXIS2_SERVO_VELOCITY_MAX, AXIS2_SERVO_VELOCITY_PWMTHRS, AXIS2_SERVO_ACCELERATION, AXIS2_DRIVER_MICROSTEPS, AXIS2_DRIVER_IRUN, AXIS2_DRIVER_DECAY, AXIS2_DRIVER_DECAY_GOTO};
     ServoTmc5160 driver2(2, &ServoPinsAxis2, &ServoSettingsAxis2);
+  #elif AXIS2_DRIVER_MODEL == SERVO_KTECH
+    const ServoKTechSettings ServoSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS, AXIS2_SERVO_VELOCITY_MAX, AXIS2_SERVO_ACCELERATION };
+    ServoKTech driver2(2, &ServoSettingsAxis2);
   #endif
 
   ServoMotor motor2(2, ((ServoDriver*)&driver2), &filterAxis2, &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &pidAxis2, &servoControlAxis2, AXIS2_SYNC_THRESHOLD);

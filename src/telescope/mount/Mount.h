@@ -123,6 +123,8 @@ class Mount {
   extern ServoMotor motor1;
 #elif defined(AXIS1_ODRIVE_PRESENT)
   extern ODriveMotor motor1;
+#elif defined(AXIS1_KTECH_PRESENT)
+  extern KTechMotor motor1;
 #endif
 extern Axis axis1;
 
@@ -132,6 +134,8 @@ extern Axis axis1;
   extern ServoMotor motor2;
 #elif defined(AXIS2_ODRIVE_PRESENT)
   extern ODriveMotor motor2;
+#elif defined(AXIS2_KTECH_PRESENT)
+  extern KTechMotor motor2;
 #endif
 extern Axis axis2;
 

@@ -92,12 +92,14 @@
 #define SERVO_TMC5160_DC            103    // TMC5160 DC motor control
 #define SERVO_TMC2209               104    // TMC2209 stepper driver using VACTUAL velocity control
 #define SERVO_TMC5160               105    // TMC5160 stepper driver using VMAX velocity control
-#define SERVO_DRIVER_LAST           105
+#define SERVO_KTECH                 106    // KTech servo motor using velocity control
+#define SERVO_DRIVER_LAST           106
 
 // integrated motor drivers
 #define MOTOR_DRIVER_FIRST          200
 #define ODRIVE                      200    // First generation ODrive (axis 1 and 2 only)
-#define MOTOR_DRIVER_LAST           200
+#define KTECH                       201    // KTech CAN driver (axis 1 and 2 only)
+#define MOTOR_DRIVER_LAST           201
 
 // servo encoder (must match Encoder library)
 #define ENC_FIRST                   1
@@ -111,8 +113,9 @@
 #define JTW_24BIT                   8      // JTW Trident BISS-C interface 24bit encoder
 #define JTW_26BIT                   9      // JTW Trident BISS-C interface 26bit encoder
 #define LIKA_ASC85                  10     // Lika ASC85 BISS-C interface 25bit encoder (experimental)
-#define SERIAL_BRIDGE               11     // serial bridge to encoders
-#define ENC_LAST                    11
+#define KTECH_IME                   11     // KTech in motor encoder
+#define SERIAL_BRIDGE               12     // serial bridge to encoders
+#define ENC_LAST                    12
 
 // encoder filter types
 #define ENC_FILT_FIRST              1

@@ -102,6 +102,8 @@ class Rotator {
   extern StepDirMotor motor3;
 #elif defined(AXIS3_SERVO_PRESENT)
   extern ServoMotor motor3;
+#elif defined(AXIS3_KTECH_PRESENT)
+  extern KTechMotor motor3;
 #endif
 extern Axis axis3;
 

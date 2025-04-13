@@ -13,6 +13,7 @@
 #include "tmc2209/Tmc2209.h"
 #include "tmc5160/Tmc5160.h"
 #include "dcTmcSPI/DcTmcSPI.h"
+#include "kTech/KTech.h"
 
 #ifndef SERVO_SLEW_DIRECT
   #define SERVO_SLEW_DIRECT OFF

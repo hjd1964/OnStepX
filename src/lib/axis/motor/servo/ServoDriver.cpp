@@ -21,6 +21,7 @@
     "SERVO_TMC5160_DC", // TMC5160 w/ DC motor
     "SERVO_TMC2209",    // TMC2209 w/ stepper motor
     "SERVO_TMC5160",    // TMC5160 w/ stepper motor
+    "SERVO_KTECH"       // KTech servo motor using velocity control
   };
 #endif
 
