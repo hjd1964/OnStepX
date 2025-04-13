@@ -97,7 +97,7 @@ void StepDirTmcUART::init(float param1, float param2, float param3, float param4
     if (driver->isSetupAndCommunicating()) {
       VF(axisPrefix); VLF("driver found");
     } else {
-      VF(axisPrefixWarn); VLF("driver detection failed");
+      DF(axisPrefixWarn); DLF("driver detection failed");
     }
   }
 

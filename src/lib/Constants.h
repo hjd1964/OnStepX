@@ -164,10 +164,11 @@
 #define MCP23008                    2      // MCP23008 8-channel GPIO
 #define MCP23017                    3      // MCP23017 16-channel GPIO
 #define X9555                       4      // TCA/PCA9555 16-channel GPIO
-#define X8575                       5      // PCF8575 16-channel GPIO
-#define SWS                         6      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
-#define SSR74HC595                  7      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
-#define GPIO_LAST                   7
+#define X8574                       5      // PCF8574 8-channel GPIO (up to 4)
+#define X8575                       6      // PCF8575 16-channel GPIO
+#define SWS                         7      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
+#define SSR74HC595                  8      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
+#define GPIO_LAST
 
 // angular
 #define RAD_DEG_RATIO               57.29577951308232L
