@@ -123,16 +123,16 @@ IRAM_ATTR bool Jtw24::readEnc(uint32_t &position) {
   encData = (encData << 1) | encErr;
   encData = (encData << 1) | encWrn;
 
-  if (!foundAck)   { VF("WRN: Encoder JTW_24BIT"); V(axis); VLF(", Ack bit invalid"); errors++; } else
-  if (!foundStart) { VF("WRN: Encoder JTW_24BIT"); V(axis); VLF(", Start bit invalid"); errors++; } else
-  if (!foundCds)   { VF("WRN: Encoder JTW_24BIT"); V(axis); VLF(", Cds bit invalid"); errors++; } else
-  if (!encErr)     { VF("WRN: Encoder JTW_24BIT"); V(axis); VLF(", Error bit set"); errors++; } else
-  if (!encWrn)     { VF("WRN: Encoder JTW_24BIT"); V(axis); VLF(", Warn bit set"); warn++; } else errors = 0;
+  if (!foundAck)   { DF("WRN: Encoder JTW_24BIT"); D(axis); DLF(", Ack bit invalid"); errors++; } else
+  if (!foundStart) { DF("WRN: Encoder JTW_24BIT"); D(axis); DLF(", Start bit invalid"); errors++; } else
+  if (!foundCds)   { DF("WRN: Encoder JTW_24BIT"); D(axis); DLF(", Cds bit invalid"); errors++; } else
+  if (!encErr)     { DF("WRN: Encoder JTW_24BIT"); D(axis); DLF(", Error bit set"); errors++; } else
+  if (!encWrn)     { DF("WRN: Encoder JTW_24BIT"); D(axis); DLF(", Warn bit set"); warn++; } else errors = 0;
   if (errors > 0) { error++; return false; }
 
   if (crc6(encData) != encCrc) {
     bad++;
-    VF("WRN: Encoder JTW_24BIT"); V(axis); VF(", Crc failed ("); V(((float)bad/good)*100.0F); VLF("%)"); 
+    DF("WRN: Encoder JTW_24BIT"); D(axis); DF(", Crc failed ("); D(((float)bad/good)*100.0F); DLF("%)"); 
     return false;
   } else good++;
 

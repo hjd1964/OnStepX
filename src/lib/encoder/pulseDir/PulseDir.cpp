@@ -53,7 +53,7 @@ PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
 }
 
 void PulseDir::init() {
-  if (ready) { VF("WRN: Encoder PulseDir"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { DF("WRN: Encoder PulseDir"); D(axis); DLF(" init(), already initialized!"); return; }
 
   pinMode(pulsePin, INPUT_PULLUP);
   pinMode(dirPin, INPUT_PULLUP);

@@ -9,8 +9,6 @@
   #define GPIO_PCF8575_I2C_ADDRESS 0x20
 #endif
 
-#include "../tasks/OnTask.h"
-
 #include <PCF8575.h> // https://www.arduino.cc/reference/en/libraries/pcf8575/
 
 PCF8575 pcf(GPIO_PCF8575_I2C_ADDRESS, &HAL_WIRE); // might need to change this I2C Address?

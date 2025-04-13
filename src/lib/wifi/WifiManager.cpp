@@ -66,7 +66,9 @@ bool WifiManager::init() {
     if (settings.accessPointEnabled) WiFi.softAPConfig(ap_ip, ap_gw, ap_sn);
 
     // wait for connection
-    if (settings.stationEnabled) { for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break; }
+    if (settings.stationEnabled) {
+      for (int i = 0; i < 8; i++) if (WiFi.status() != WL_CONNECTED) delay(1000); else break;
+    }
 
     if (settings.stationEnabled && WiFi.status() != WL_CONNECTED) {
 
@@ -87,7 +89,7 @@ bool WifiManager::init() {
         VLF("MSG: WiFi, started AP but station failed");
       } else {
         // the station failed to connect and the AP isn't enabled
-        VLF("MSG: WiFi, starting station failed");
+        DLF("WRN: WiFi, starting station failed");
         WiFi.disconnect();
       }
     } else {
@@ -97,7 +99,7 @@ bool WifiManager::init() {
       #if MDNS_SERVER == ON && !defined(ESP8266)
         sstrcpy(name, MDNS_NAME, 32);
         strtohostname2(name);
-        if (MDNS.begin(name)) { VF("MSG: WiFi, mDNS started for "); VL(name); } else { VF("WRN: WiFi, mDNS start FAILED for "); VL(name); }
+        if (MDNS.begin(name)) { VF("MSG: WiFi, mDNS started for "); VL(name); } else { DF("WRN: WiFi, mDNS start FAILED for "); DL(name); }
       #endif
 
       if (staNameLookup && strlen(wifiManager.sta->host) > 0) {

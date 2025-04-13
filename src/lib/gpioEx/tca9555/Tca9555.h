@@ -6,13 +6,10 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X9555
 
-class Tca9555 : public Gpio {
+class GpioTca9555 : public Gpio {
   public:
     // scan for TCA9555 device
     bool init();
-
-    // process any gpio commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     void pinMode(int pin, int mode);
 
@@ -29,6 +26,6 @@ class Tca9555 : public Gpio {
     bool state[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 };
 
-extern Tca9555 gpio;
+extern GpioTca9555 gpio;
 
 #endif

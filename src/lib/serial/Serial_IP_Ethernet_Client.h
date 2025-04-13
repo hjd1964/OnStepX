@@ -5,7 +5,7 @@
 #include "../../Common.h"
 #include "../ethernet/EthernetManager.h"
 
-#if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && SERIAL_SERVER != OFF
+#if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && SERIAL_CLIENT != OFF
 
   #ifdef ESP8266
     #ifndef ETHERNET_W5500
@@ -20,16 +20,17 @@
     #endif
   #endif
 
-  class IPSerial : public Stream {
+  class IPSerialClient : public Stream {
     public:
-      void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
-      void restart();
+      bool begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
       void end();
+      bool isConnected();
 
       void flush(void);
       int available(void);
       int peek(void);
       int read(void);
+      int availableForWrite() { return 1; }
       size_t write(uint8_t data);
       size_t write(const uint8_t* data, size_t count);
       inline size_t write(unsigned long n) { return write((uint8_t)n); }
@@ -40,8 +41,8 @@
       using Print::write;
 
     private:
-      EthernetServer *cmdSvr;
       EthernetClient cmdSvrClient;
+      IPAddress onStep;
 
       int port = -1;
       unsigned long clientTimeoutMs;
@@ -50,14 +51,7 @@
       bool persist = false;
   };
 
-  #if SERIAL_SERVER == STANDARD || SERIAL_SERVER == BOTH
-    extern IPSerial SerialIP;
-    #define SERIAL_SIP SerialIP
-  #endif
-
-  #if SERIAL_SERVER == PERSISTENT || SERIAL_SERVER == BOTH
-    extern IPSerial SerialPIP1;
-    #define SERIAL_PIP1 SerialPIP1
-  #endif
+  extern IPSerialClient SerialIPClient;
+  #define SERIAL_IP SerialIPClient
 
 #endif

@@ -28,19 +28,19 @@ SenseInput::SenseInput(int pin, int initState, int32_t trigger) {
   if (isAnalog) {
     if (threshold < 0) {
       threshold = 0;
-      VF("WRN: SenseInput::SenseInput(), Threshold for pin "); V(pin); VLF(" is below Analog range setting to "); VL(threshold);
+      DF("WRN: SenseInput::SenseInput(), Threshold for pin "); D(pin); DLF(" is below Analog range setting to "); DL(threshold);
     } else
     if (threshold > ANALOG_READ_RANGE) {
       threshold = ANALOG_READ_RANGE;
-      VF("WRN: SenseInput::SenseInput(), Threshold for pin "); V(pin); VF(" is above Analog range setting to "); VL(threshold);
+      DF("WRN: SenseInput::SenseInput(), Threshold for pin "); D(pin); DF(" is above Analog range setting to "); DL(threshold);
     }
 	  if (threshold - hysteresis < 0) {
       hysteresis = threshold;
-      VF("WRN: SenseInput::SenseInput(), Threshold - Hysteresis for pin "); V(pin); VF(" is below Analog range setting Hysteresis to "); VL(hysteresis);
+      DF("WRN: SenseInput::SenseInput(), Threshold - Hysteresis for pin "); D(pin); DF(" is below Analog range setting Hysteresis to "); DL(hysteresis);
     } else
   	if (threshold + hysteresis > ANALOG_READ_RANGE) {
       hysteresis = ANALOG_READ_RANGE - threshold;
-      VF("WRN: SenseInput::SenseInput(), Threshold + Hysteresis for pin "); V(pin); VF(" is above Analog range setting Hysteresis to "); VL(hysteresis);
+      DF("WRN: SenseInput::SenseInput(), Threshold + Hysteresis for pin "); D(pin); DF(" is above Analog range setting Hysteresis to "); DL(hysteresis);
     }
   }
 
@@ -125,10 +125,16 @@ void SenseInput::reset() {
 
 uint8_t Sense::add(int pin, int initState, int32_t trigger, bool force) {
   if ((pin == OFF || trigger == OFF) && !force) return 0;
-  if (senseCount >= SENSE_MAX) { VF("WRN: Sense::add(), senseCount exceeded ignoring pin "); VL(pin); return 0; }
-  if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) { VF("WRN: Sense::add(), trigger value invalid ignoring pin "); VL(pin); return 0; }
+  if (senseCount >= SENSE_MAX) {
+    DF("WRN: Sense::add(), senseCount exceeded ignoring pin "); DL(pin);
+    return 0;
+  }
+  if (trigger < 0 || trigger >= SENSE_MAX_TRIGGER) {
+    DF("WRN: Sense::add(), trigger value invalid ignoring pin "); DL(pin);
+    return 0;
+  }
   if (initState != INPUT && initState != INPUT_PULLUP && initState != INPUT_PULLDOWN) {
-    VF("WRN: Sense::add(), initState value invalid ignoring pin "); VL(pin);
+    DF("WRN: Sense::add(), initState value invalid ignoring pin "); DL(pin);
     return 0;
   }
   VF("MSG: Sense"); V(senseCount); V(", init ");

@@ -13,9 +13,6 @@ class GpioDs2413 : public Gpio {
     // scan for DS2413 devices on the 1-wire bus
     bool init();
 
-    // process any gpio commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
-
     // set GPIO pin mode for INPUT or OUTPUT (both pins of any device must be in the same mode)
     void pinMode(int pin, int mode);
 

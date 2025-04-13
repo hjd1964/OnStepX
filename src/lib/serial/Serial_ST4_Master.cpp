@@ -169,8 +169,7 @@ size_t SerialST4Master::write(uint8_t data) {
     Y; // yield from the command channel at priority level 5 (lets poll() run)
     if ((millis() - t_start) > timeout) return 0;
   }
-  xmit_buffer[xmit_tail] = data;
-  xmit_tail++;
+  xmit_buffer[xmit_tail] = data; xmit_tail++;
   xmit_buffer[xmit_tail] = 0;
   return 1;
 }

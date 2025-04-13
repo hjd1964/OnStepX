@@ -279,7 +279,7 @@ IRAM_ATTR void shcTone() {
   static volatile bool tone_state = false;
 
   if (tone_state) { 
-    tone_state = false; 
+    tone_state = false;
     digitalWrite(ST4_TONE_PIN, HIGH); 
     if ((long)(millis() - SerialST4.lastTimeInMilliseconds) > 2000L) {
       digitalWrite(ST4_DATA_OUT_PIN, HIGH);

@@ -25,19 +25,19 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (isAnalog) {
     if (threshold < 0) {
       threshold = 0;
-      VF("WRN: Button::Button(), Threshold for pin "); V(pin); VLF(" is below Analog range setting to "); VL(threshold);
+      DF("WRN: Button::Button(), Threshold for pin "); D(pin); DF(" is below Analog range setting to "); DL(threshold);
     } else
     if (threshold > ANALOG_READ_RANGE) {
       threshold = ANALOG_READ_RANGE;
-      VF("WRN: Button::Button(), Threshold for pin "); V(pin); VF(" is above Analog range setting to "); VL(threshold);
+      DF("WRN: Button::Button(), Threshold for pin "); D(pin); DF(" is above Analog range setting to "); DL(threshold);
     }
 	  if (threshold - hysteresis < 0) {
       hysteresis = threshold;
-      VF("WRN: Button::Button(), Threshold - Hysteresis for pin "); V(pin); VF(" is below Analog range setting Hysteresis to "); VL(hysteresis);
+      DF("WRN: Button::Button(), Threshold - Hysteresis for pin "); D(pin); DF(" is below Analog range setting Hysteresis to "); DL(hysteresis);
     } else
   	if (threshold + hysteresis > ANALOG_READ_RANGE) {
       hysteresis = ANALOG_READ_RANGE - threshold;
-      VF("WRN: Button::Button(), Threshold + Hysteresis for pin "); V(pin); VF(" is above Analog range setting Hysteresis to "); VL(hysteresis);
+      DF("WRN: Button::Button(), Threshold + Hysteresis for pin "); D(pin); DF(" is above Analog range setting Hysteresis to "); DL(hysteresis);
     }
   }
 

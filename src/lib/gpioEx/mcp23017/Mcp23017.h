@@ -6,13 +6,10 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == MCP23017
 
-class Mcp23017 : public Gpio {
+class GpioMcp23017 : public Gpio {
   public:
     // scan for MCP23017 device
     bool init();
-
-    // process any gpio commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
 
     void pinMode(int pin, int mode);
 

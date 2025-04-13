@@ -11,9 +11,6 @@ class GpioMcp23008 : public Gpio {
     // scan for MCP23008 device
     bool init();
 
-    // process any gpio commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
-
     void pinMode(int pin, int mode);
 
     // one eight channel MCP23008 GPIO is supported, this gets the last set value

@@ -11,7 +11,6 @@
   #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 #endif
 
-#include <Wire.h>
 #include <DFRobot_SD3031.h> // https://github.com/cdjq/DFRobot_SD3031
 DFRobot_SD3031 rtcSD3031(&HAL_WIRE);
 

@@ -123,16 +123,16 @@ IRAM_ATTR bool LikaAsc85::readEnc(uint32_t &position) {
   encData = (encData << 1) | encErr;
   encData = (encData << 1) | encWrn;
 
-  if (!foundAck)   { VF("WRN: Encoder LIKA_ASC85"); V(axis); VLF(", Ack bit invalid"); errors++; } else
-  if (!foundStart) { VF("WRN: Encoder LIKA_ASC85"); V(axis); VLF(", Start bit invalid"); errors++; } else
-  if (!foundCds)   { VF("WRN: Encoder LIKA_ASC85"); V(axis); VLF(", Cds bit invalid"); errors++; } else
-  if (!encErr)     { VF("WRN: Encoder LIKA_ASC85"); V(axis); VLF(", Error bit set"); errors++; } else
-  if (!encWrn)     { VF("WRN: Encoder LIKA_ASC85"); V(axis); VLF(", Warn bit set"); warn++; } else errors = 0;
+  if (!foundAck)   { DF("WRN: Encoder LIKA_ASC85"); D(axis); DLF(", Ack bit invalid"); errors++; } else
+  if (!foundStart) { DF("WRN: Encoder LIKA_ASC85"); D(axis); DLF(", Start bit invalid"); errors++; } else
+  if (!foundCds)   { DF("WRN: Encoder LIKA_ASC85"); D(axis); DLF(", Cds bit invalid"); errors++; } else
+  if (!encErr)     { DF("WRN: Encoder LIKA_ASC85"); D(axis); DLF(", Error bit set"); errors++; } else
+  if (!encWrn)     { DF("WRN: Encoder LIKA_ASC85"); D(axis); DLF(", Warn bit set"); warn++; } else errors = 0;
   if (errors > 0) { error++; return false; }
 
   if (crc6(encData) != encCrc) {
     bad++;
-    VF("WRN: Encoder LIKA_ASC85"); V(axis); VF(", Crc failed ("); V(((float)bad/good)*100.0F); VLF("%)"); 
+    DF("WRN: Encoder LIKA_ASC85"); D(axis); DF(", Crc failed ("); D(((float)bad/good)*100.0F); DLF("%)"); 
     return false;
   } else good++;
 

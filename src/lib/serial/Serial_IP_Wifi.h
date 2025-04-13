@@ -22,21 +22,14 @@
   class IPSerial : public Stream {
     public:
       void begin(long port, unsigned long clientTimeoutMs = 2000, bool persist = false);
-      
       void end();
 
-      int read(void);
-
-      int available(void);
-
-      int peek(void);
-
       void flush(void);
-
+      int available(void);
+      int peek(void);
+      int read(void);
       size_t write(uint8_t data);
-
       size_t write(const uint8_t* data, size_t count);
-
       inline size_t write(unsigned long n) { return write((uint8_t)n); }
       inline size_t write(long n) { return write((uint8_t)n); }
       inline size_t write(unsigned int n) { return write((uint8_t)n); }

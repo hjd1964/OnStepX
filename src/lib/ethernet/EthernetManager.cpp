@@ -29,7 +29,7 @@
           VF("MSG: Ethernet, mDNS started for "); VL(name);
           mdnsReady = MD_READY;
         } else {
-          VF("WRN: Ethernet, mDNS start FAILED for "); VL(name);
+          DF("WRN: Ethernet, mDNS start FAILED for "); DL(name);
           mdnsReady = MD_FAIL;
         }
       #endif
@@ -66,6 +66,17 @@ bool EthernetManager::init() {
     } else {
       Ethernet.begin(settings.mac, settings.ip, settings.dns, settings.gw, settings.sn);
     }
+
+    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+      DLF("WRN: Ethernet, no hardware");
+      return false;
+    }
+
+    if (Ethernet.linkStatus() == LinkOFF) {
+      DLF("WRN: Ethernet, no cable");
+      return false;
+    }
+
     active = true;
 
     VLF("MSG: Ethernet, initialized");
@@ -76,6 +87,7 @@ bool EthernetManager::init() {
       if (tasks.add(5, 0, true, 7, mdnsPoll, "mdPoll")) { VL("success"); } else { VL("FAILED!"); }
     #endif
   }
+
   return active;
 }
 

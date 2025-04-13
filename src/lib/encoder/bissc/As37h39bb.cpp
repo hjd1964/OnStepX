@@ -135,13 +135,13 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
 
   if (crc6(encData) != as37Crc) {
     bad++;
-    VF("WRN: Encoder AS37_H39B_B"); V(axis); VF(", Crc invalid (overall "); V(((float)bad/good)*100.0F); V("%"); VLF(")"); errors++;
+    DF("WRN: Encoder AS37_H39B_B"); D(axis); DF(", Crc invalid (overall "); D(((float)bad/good)*100.0F); D("%"); DLF(")"); errors++;
   } else {
     good++;
-    if (!foundAck) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Ack bit invalid"); errors++; } else
-    if (!foundStart) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Start bit invalid"); errors++; } else
-    if (!foundCds) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Cds bit invalid"); errors++; } else
-    if (encErr) { VF("WRN: Encoder AS37_H39B_B"); V(axis); VLF(", Error bit set"); errors++; } else errors = 0;
+    if (!foundAck) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Ack bit invalid"); errors++; } else
+    if (!foundStart) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Start bit invalid"); errors++; } else
+    if (!foundCds) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Cds bit invalid"); errors++; } else
+    if (encErr) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Error bit set"); errors++; } else errors = 0;
   }
   if (errors > 0) { error++; return false; }
 

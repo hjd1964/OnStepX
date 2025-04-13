@@ -11,7 +11,6 @@
   #include <TimeLib.h> // https://github.com/PaulStoffregen/Time/archive/master.zip
 #endif
 
-#include <Wire.h>
 #include <RtcDS3231.h> // https://github.com/Makuna/Rtc/archive/master.zip
 RtcDS3231<TwoWire> rtcDS3231(HAL_WIRE);
 

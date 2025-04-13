@@ -71,7 +71,7 @@ int32_t SerialBridge::raw() {
   if (strlen(result) > 0) {
     return atoi(result) + origin;
   } else {
-    VLF("WRN: SerialBridge raw(), timed out!");
+    DLF("WRN: SerialBridge raw(), timed out!");
     error++;
     return 0  + origin;
   }

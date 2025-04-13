@@ -42,7 +42,7 @@ bool Encoder::errorThresholdExceeded() {
 
   if (errorState != lastErrorState) {
     if (errorState) {
-      VF("WRN: Encoder"); V(axis); VF(" error, exceeded threshold/minute at "); VL(errorCount);
+      DF("WRN: Encoder"); D(axis); DF(" error, exceeded threshold/minute at "); DL(errorCount);
     } else {
       VF("MSG: Encoder"); V(axis); VF(" error, cleared");
     }

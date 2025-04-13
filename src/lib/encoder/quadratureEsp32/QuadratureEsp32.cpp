@@ -16,11 +16,11 @@ QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
 }
 
 void QuadratureEsp32::init() {
-  if (ready) { VF("WRN: Encoder QuadratureEsp32"); V(axis); VLF(" init(), already initialized!"); return; }
+  if (ready) { DF("WRN: Encoder QuadratureEsp32"); D(axis); DLF(" init(), already initialized!"); return; }
 
   ab = new ESP32Encoder;
   if (ab == NULL) {
-    VF("ERR: Encoder QuadratureEsp32"); V(axis); VLF(" init(), didn't get instance!"); 
+    DF("ERR: Encoder QuadratureEsp32"); D(axis); DLF(" init(), didn't get instance!"); 
     return;
   }
 
