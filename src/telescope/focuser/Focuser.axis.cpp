@@ -96,8 +96,6 @@
       PulseOnly encAxis5(AXIS5_ENCODER_A_PIN, &servoControlAxis5.directionHint, 5);
     #elif AXIS5_ENCODER == VIRTUAL
       VirtualEnc encAxis5(5);
-    #elif AXIS5_ENCODER == AS57_H59B_B
-      As37h39bb encAxis5(AXIS5_ENCODER_A_PIN, AXIS5_ENCODER_B_PIN, 5);
     #elif AXIS5_ENCODER == SERIAL_BRIDGE
       SerialBridge encAxis5(5);
     #endif
