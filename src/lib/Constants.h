@@ -168,7 +168,7 @@
 #define X8575                       6      // PCF8575 16-channel GPIO
 #define SWS                         7      // Smart Web Server 8-channel GPIO (usually on the four Encoder pins, if otherwise unused)
 #define SSR74HC595                  8      // 74HC595 8,16,24,32-channel GPIO (serial shift register, output only)
-#define GPIO_LAST
+#define GPIO_LAST                   8
 
 // angular
 #define RAD_DEG_RATIO               57.29577951308232L
