@@ -99,7 +99,7 @@ bool GpioPcf8574::init() {
 
 // set GPIO pin (0 to 31) mode for INPUT or OUTPUT
 void GpioPcf8574::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 31) {
+  if (found && pin >= 0 && pin <= GPIO_PCF8574_I2C_NUM_DEVICES*8 - 1) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
@@ -111,7 +111,7 @@ void GpioPcf8574::pinMode(int pin, int mode) {
 
 // get GPIO pin (0 to 31) state
 int GpioPcf8574::digitalRead(int pin) {
-  if (found && pin >= 0 && pin <= 31) {
+  if (found && pin >= 0 && pin <= GPIO_PCF8574_I2C_NUM_DEVICES*8 - 1) {
     if (mode[pin] == INPUT) {
       return pcf[pin >> 3]->digitalRead(pin & 0b111);
     } else return state[pin];
@@ -120,7 +120,7 @@ int GpioPcf8574::digitalRead(int pin) {
 
 // set GPIO pin (0 to 31) state
 void GpioPcf8574::digitalWrite(int pin, int value) {
-  if (found && pin >= 0 && pin <= 31) {
+  if (found && pin >= 0 && pin <= GPIO_PCF8574_I2C_NUM_DEVICES*8 - 1) {
     state[pin] = value;
     if (mode[pin] == OUTPUT) {
       pcf[pin >> 3]->digitalWrite(pin & 0b111, value);
