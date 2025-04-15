@@ -47,6 +47,7 @@
   bool IPSerialClient::isConnected() {
     if (Ethernet.linkStatus() != LinkOFF) {
       if (!cmdSvrClient.connected()) {
+        cmdSvrClient.stop();
         if (cmdSvrClient.connect(onStep, port)) {
           VLF("MSG: IPSerialClient, connection to target restarted");
           return true;
