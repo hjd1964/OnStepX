@@ -40,11 +40,14 @@
 
       using Print::write;
 
+      void poll();
+
     private:
       EthernetClient cmdSvrClient;
       IPAddress onStep;
 
       int port = -1;
+      unsigned long lastActivityTimeMs = 0;
       unsigned long clientTimeoutMs;
       unsigned long clientEndTimeMs = 0;
       bool active = false;

@@ -133,6 +133,16 @@
   #define MCU_STR "TeensyMicroMod"
   #include "teensy/Teensy4.1.h"
 
+#elif defined(ARDUINO_ARCH_RP2040)
+  // Raspberry pi pico
+  #define MCU_STR "Raspberry Pi Pico"
+  #include "mbed/Rpi2040.h"
+
+#elif defined(ARDUINO_ARCH_RP2350)
+  // Raspberry pi pico2
+  #define MCU_STR "Raspberry Pi Pico2"
+  #include "mbed/Rpi2350.h"
+
 #else
   // Generic
   #warning "Unknown Platform! If this is a new platform, it would probably do best with a new HAL designed for it."

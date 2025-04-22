@@ -7,6 +7,10 @@
 
 #if OPERATIONAL_MODE == WIFI && SERIAL_CLIENT == ON
 
+  #include "../tasks/OnTask.h"
+
+  void pollIPClient() { SerialIPClient.poll(); }
+
   bool IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) { 
     if (active) return true;
 
@@ -25,15 +29,16 @@
 
     delay(1000);
 
-    onStep = IPAddress(wifiManager.sta->target);
-    if (!cmdSvrClient.connect(onStep, port)) {
-      DLF("WRN: IPSerialClient, connection to target failed");
-      return false;
+    onStep = IPAddress(ethernetManager.sta->target);
+    VF("MSG: IPSerialClient, target "); V(onStep[0]); V("."); V(onStep[1]); V("."); V(onStep[2]); V("."); V(onStep[3]); V(":"); VL(port);
+
+    if (!persist) {
+      lastActivityTimeMs = millis();
+      VF("MSG: Setup, start IPSerialClient monitor task (rate 1s priority 7)... ");
+      if (tasks.add(1000, 0, true, 7, pollIPClient, "PollIP")) { VLF("success"); } else { VLF("FAILED!"); }
     }
 
-    VF("MSG: IPSerialClient, connected to "); V(onStep.toString()); V(":"); VL(port);
     active = true;
-
     return true;
   }
 
@@ -42,14 +47,19 @@
     
     cmdSvrClient.stop();
     VLF("MSG: IPSerialClient, connection to target closed");
+
+    tasks.remove(tasks.getHandleByName("PollIP"));
+  
     WiFi.disconnect();
     VLF("MSG: IPSerialClient, WiFi disconnected");
+
     active = false;
   }
 
   bool IPSerialClient::isConnected() {
     if (WiFi.status() == WL_CONNECTED) {
       if (!cmdSvrClient.connected()) {
+        cmdSvrClient.stop();
         if (cmdSvrClient.connect(onStep, port)) {
           VLF("MSG: IPSerialClient, connection to target restarted");
           return true;
@@ -97,5 +107,10 @@
     return cmdSvrClient.write(data, quantity);
   }
 
+  void IPSerialClient::poll() {
+    if ((long)(millis() - lastActivityTimeMs) > clientTimeoutMs && cmdSvrClient.connected()) cmdSvrClient.stop();
+  }
+
   IPSerialClient SerialIPClient;
+
 #endif

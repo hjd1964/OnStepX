@@ -42,11 +42,14 @@
 
       using Print::write;
 
+      void poll();
+
     private:
       WiFiClient cmdSvrClient;
       IPAddress onStep;
 
       int port = -1;
+      unsigned long lastActivityTimeMs = 0;
       unsigned long clientTimeoutMs;
       bool active = false;
       bool persist = false;

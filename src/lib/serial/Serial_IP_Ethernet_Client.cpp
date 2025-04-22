@@ -5,6 +5,10 @@
 
 #if OPERATIONAL_MODE >= ETHERNET_FIRST && OPERATIONAL_MODE <= ETHERNET_LAST && SERIAL_CLIENT != OFF
 
+  #include "../tasks/OnTask.h"
+
+  void pollIPClient() { SerialIPClient.poll(); }
+
   bool IPSerialClient::begin(long port, unsigned long clientTimeoutMs, bool persist) {
     if (active) return true;
 
@@ -24,14 +28,15 @@
     delay(1000);
 
     onStep = IPAddress(ethernetManager.sta->target);
-    if (!cmdSvrClient.connect(onStep, port)) {
-      DLF("WRN: IPSerialClient, connection to target failed");
-      return false;
+    VF("MSG: IPSerialClient, target "); V(onStep[0]); V("."); V(onStep[1]); V("."); V(onStep[2]); V("."); V(onStep[3]); V(":"); VL(port);
+
+    if (!persist) {
+      lastActivityTimeMs = millis();
+      VF("MSG: Setup, start IPSerialClient monitor task (rate 1s priority 7)... ");
+      if (tasks.add(1000, 0, true, 7, pollIPClient, "PollIP")) { VLF("success"); } else { VLF("FAILED!"); }
     }
 
-    VF("MSG: IPSerialClient, connected to "); V(onStep[0]); V("."); V(onStep[1]); V("."); V(onStep[2]); V("."); V(onStep[3]); V(":"); VL(port);
     active = true;
-
     return true;
   }
 
@@ -41,10 +46,13 @@
     cmdSvrClient.stop();
     VLF("MSG: IPSerialClient, connection to target closed");
 
+    tasks.remove(tasks.getHandleByName("PollIP"));
+
     active = false;
   }
 
   bool IPSerialClient::isConnected() {
+    lastActivityTimeMs = millis();
     if (Ethernet.linkStatus() != LinkOFF) {
       if (!cmdSvrClient.connected()) {
         cmdSvrClient.stop();
@@ -58,7 +66,6 @@
       } else return true;
     } else {
       DLF("WRN: IPSerialClient, connection to target failed no cable"); 
-      active = false;
       return false;
     }
   }
@@ -95,6 +102,10 @@
   size_t IPSerialClient::write(const uint8_t *data, size_t quantity) {
     if (!active || !isConnected()) return 0;
     return cmdSvrClient.write(data, quantity);
+  }
+
+  void IPSerialClient::poll() {
+    if ((long)(millis() - lastActivityTimeMs) > clientTimeoutMs && cmdSvrClient.connected()) cmdSvrClient.stop();
   }
 
   IPSerialClient SerialIPClient;
