@@ -67,6 +67,9 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   } else
   if (settings.model == TMC2160) {
     rSense = TMC2160_RSENSE;
+    #ifdef TMC2160_RSENSE_KRAKEN
+      if (axisNumber <= 4) rSense = TMC2160_RSENSE_KRAKEN;
+    #endif
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
       driver = new TMC2160Stepper(Pins->cs, rSense);
     #else
