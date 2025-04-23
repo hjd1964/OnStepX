@@ -65,6 +65,18 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     modeMicrostepTracking();
     ((TMC2130Stepper*)driver)->en_pwm_mode(false);
   } else
+  if (settings.model == TMC2160) {
+    rSense = TMC2160_RSENSE;
+    #ifdef DRIVER_TMC_STEPPER_HW_SPI
+      driver = new TMC2160Stepper(Pins->cs, rSense);
+    #else
+      driver = new TMC2160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
+    #endif
+    ((TMC2160Stepper*)driver)->begin();
+    ((TMC2160Stepper*)driver)->intpol(settings.intpol);
+    modeMicrostepTracking();
+    ((TMC2160Stepper*)driver)->en_pwm_mode(false);
+  } else
   if (settings.model == TMC2660) {
     rSense = TMC2660_RSENSE;
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
@@ -126,6 +138,7 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
 
   int maxCurrent;
   if (settings.model == TMC2130) maxCurrent = 1500; else
+  if (settings.model == TMC2160) maxCurrent = 3000; else
   if (settings.model == TMC2660) maxCurrent = 3000; else
   if (settings.model == TMC5160) maxCurrent = 3000; else
   if (settings.model == TMC5161) maxCurrent = 3500; else
@@ -162,6 +175,7 @@ void StepDirTmcSPI::modeMicrostepTracking() {
   if (settings.microsteps > 1) microsteps = settings.microsteps;
   switch (settings.model) {
     case TMC2130: ((TMC2130Stepper*)driver)->microsteps(microsteps); break;
+    case TMC2160: ((TMC2160Stepper*)driver)->microsteps(microsteps); break;
     case TMC2660: ((TMC2660Stepper*)driver)->microsteps(microsteps); break;
     case TMC5160: ((TMC5160Stepper*)driver)->microsteps(microsteps); break;
     case TMC5161: ((TMC5161Stepper*)driver)->microsteps(microsteps); break;
@@ -174,6 +188,7 @@ int StepDirTmcSPI::modeMicrostepSlewing() {
     if (settings.microstepsSlewing > 1) microsteps = settings.microstepsSlewing;
     switch (settings.model) {
       case TMC2130: ((TMC2130Stepper*)driver)->microsteps(microsteps); break;
+      case TMC2160: ((TMC2160Stepper*)driver)->microsteps(microsteps); break;
       case TMC2660: ((TMC2660Stepper*)driver)->microsteps(microsteps); break;
       case TMC5160: ((TMC5160Stepper*)driver)->microsteps(microsteps); break;
       case TMC5161: ((TMC5161Stepper*)driver)->microsteps(microsteps); break;
@@ -202,6 +217,7 @@ void StepDirTmcSPI::updateStatus() {
       status_result.sr = 0;
       switch (settings.model) {
         case TMC2130: status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); break;
+        case TMC2160: status_result.sr = ((TMC2160Stepper*)driver)->DRV_STATUS(); break;
         case TMC2660: status_result.sr = ((TMC2660Stepper*)driver)->DRV_STATUS(); break;
         case TMC5160: status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); break;
         case TMC5161: status_result.sr = ((TMC5161Stepper*)driver)->DRV_STATUS(); break;
@@ -236,6 +252,7 @@ bool StepDirTmcSPI::enable(bool state) {
     setDecayMode(STEALTHCHOP);
     switch (settings.model) {
       case TMC2130: ((TMC2130Stepper*)driver)->ihold(0); break;
+      case TMC2160: ((TMC2160Stepper*)driver)->ihold(0); break;
       case TMC2660: ((TMC2660Stepper*)driver)->rms_current(0); break;
       case TMC5160: ((TMC5160Stepper*)driver)->ihold(0); break;
       case TMC5161: ((TMC5161Stepper*)driver)->ihold(0); break;
@@ -252,6 +269,10 @@ void StepDirTmcSPI::calibrateDriver() {
     if (settings.model == TMC2130) {
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);
       ((TMC2130Stepper*)driver)->en_pwm_mode(true);
+    } else
+    if (settings.model == TMC2160) {
+      ((TMC2160Stepper*)driver)->pwm_autoscale(true);
+      ((TMC2160Stepper*)driver)->en_pwm_mode(true);
     } else
     if (settings.model == TMC5160) {
       ((TMC5160Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
@@ -272,6 +293,7 @@ void StepDirTmcSPI::calibrateDriver() {
 void StepDirTmcSPI::setDecayMode(int decayMode) {
   switch (settings.model) {
     case TMC2130: ((TMC2130Stepper*)driver)->en_pwm_mode(decayMode != SPREADCYCLE); break;
+    case TMC2160: ((TMC2160Stepper*)driver)->en_pwm_mode(decayMode != SPREADCYCLE); break;
     case TMC5160: ((TMC5160Stepper*)driver)->en_pwm_mode(decayMode != SPREADCYCLE); break;
     case TMC5161: ((TMC5161Stepper*)driver)->en_pwm_mode(decayMode != SPREADCYCLE); break;
   }
