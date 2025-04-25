@@ -43,6 +43,9 @@
 
 // flag hardware SPI as active
 #ifdef DRIVER_TMC_STEPPER_HW_SPI
+#ifndef DRIVER_TMC_STEPPER
+#define DRIVER_TMC_STEPPER
+#endif
 #define USES_HW_SPI
 #endif
 
