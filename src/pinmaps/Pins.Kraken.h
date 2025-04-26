@@ -77,7 +77,7 @@
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-  #define STATUS_BUZZER_PIN     PA3              // Connector Labeled FAN3
+  #define STATUS_BUZZER_PIN     PA6              // Connector Labeled FAN6
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
