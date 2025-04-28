@@ -98,6 +98,11 @@
   #error "Configuration (Config.h): This PINMAP only supports TMC2160 stepper drivers"
 #endif
 
+// Using the TMCStepper library
+#ifndef DRIVER_TMC_STEPPER
+#define DRIVER_TMC_STEPPER
+#endif
+
 // Use the Kraken Rsense values for the first four axes (the others are 0.075 ohms by default)
 #define TMC2160_RSENSE_KRAKEN   0.022
 
