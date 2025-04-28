@@ -97,7 +97,7 @@ void setup() {
   HAL_INIT();
 
   if (!nv.init()) {
-    DLF("WRN: Setup, NV (EEPROM/FRAM/Flash/etc.) device not found!");
+    DLF("ERR: Setup, NV (EEPROM/FRAM/Flash/etc.) device not found!");
     nv.initError = true;
   }
   delay(2000);
