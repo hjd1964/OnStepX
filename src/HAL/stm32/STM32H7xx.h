@@ -56,7 +56,7 @@
 #if (defined(I2C_SCL_PIN) && I2C_SCL_PIN != OFF) && (defined(I2C_SDA_PIN) && I2C_SDA_PIN != OFF)
   #define WIRE_BEGIN() HAL_WIRE.setSDA(I2C_SDA_PIN); HAL_WIRE.setSCL(I2C_SCL_PIN); HAL_WIRE.setClock(HAL_WIRE_CLOCK); HAL_WIRE.begin();
 #else
-  #define WIRE_BEGIN() HAL_WIRE.setClock(HAL_WIRE_CLOCK); HAL_WIRE.begin();
+  #define WIRE_BEGIN() HAL_WIRE.setSDA(PB11); HAL_WIRE.setSCL(PB10); HAL_WIRE.setClock(HAL_WIRE_CLOCK); HAL_WIRE.begin();
 #endif
 
 #define HAL_INIT() { \
