@@ -69,7 +69,7 @@ class ServoMotor : public Motor {
     inline char getParameterTypeCode() { return feedback->getParameterTypeCode(); }
 
     // set motor parameters
-    void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+    bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate motor parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);

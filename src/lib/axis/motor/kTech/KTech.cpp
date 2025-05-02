@@ -117,7 +117,7 @@ bool KTechMotor::init() {
 }
 
 // set driver parameters
-void KTechMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+bool KTechMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
   UNUSED(param2);
   UNUSED(param3);
@@ -125,6 +125,7 @@ void KTechMotor::setParameters(float param1, float param2, float param3, float p
   UNUSED(param5);
   stepsPerMeasure = param6;
   setSlewing(isSlewing);
+  return true;
 }
 
 // validate driver parameters

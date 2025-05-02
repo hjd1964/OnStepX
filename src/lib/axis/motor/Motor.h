@@ -29,7 +29,7 @@ class Motor {
     void setDefaultParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // set motor parameters
-    virtual void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+    virtual bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate motor parameters
     virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);

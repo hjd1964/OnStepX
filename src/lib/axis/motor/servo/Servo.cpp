@@ -111,9 +111,10 @@ bool ServoMotor::init() {
   return true;
 }
 
-void ServoMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
 // set motor parameters
+bool ServoMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   feedback->setParameters(param1, param2, param3, param4, param5, param6);
+  return true;
 }
 
 // validate motor parameters

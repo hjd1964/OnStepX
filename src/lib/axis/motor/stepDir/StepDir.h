@@ -45,7 +45,7 @@ class StepDirMotor : public Motor {
     inline char getParameterTypeCode() { return driver->getParameterTypeCode(); }
 
     // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-    void setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+    bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);

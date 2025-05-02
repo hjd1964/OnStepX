@@ -94,13 +94,14 @@ bool ODriveMotor::init() {
 }
 
 // set driver parameters
-void ODriveMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+bool ODriveMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
   UNUSED(param2);
   UNUSED(param3);
   UNUSED(param4);
   UNUSED(param5);
   stepsPerMeasure = param6;
+  return true;
 }
 
 // validate driver parameters
