@@ -124,7 +124,6 @@ bool KTechMotor::setParameters(float param1, float param2, float param3, float p
   UNUSED(param4);
   UNUSED(param5);
   stepsPerMeasure = param6;
-  setSlewing(isSlewing);
   return true;
 }
 
