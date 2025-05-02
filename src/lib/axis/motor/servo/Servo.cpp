@@ -107,6 +107,7 @@ bool ServoMotor::init() {
     return false;
   }
 
+  ready = true;
   return true;
 }
 
@@ -128,6 +129,8 @@ void ServoMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void ServoMotor::enable(bool state) {
+  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+
   driver->enable(state);
   if (state == false) feedback->reset(); else safetyShutdown = false;
   enabled = state;
@@ -135,7 +138,7 @@ void ServoMotor::enable(bool state) {
 
 // get the associated driver status
 DriverStatus ServoMotor::getDriverStatus() {
-  driver->updateStatus();
+  if (ready) driver->updateStatus();
   DriverStatus driverStatus = driver->getStatus();
   if (encoder->errorThresholdExceeded()) driverStatus.fault = true;
   if (safetyShutdown) driverStatus.fault = true;

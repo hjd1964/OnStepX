@@ -58,13 +58,14 @@ class StepDirMotor : public Motor {
 
     // calibrate stealthChop then return to tracking mode
     void calibrateDriver() {
+      if (!ready) return;
       digitalWriteEx(Pins->enable, Pins->enabledState);
       driver->calibrateDriver();
       digitalWriteEx(Pins->enable, !Pins->enabledState);
     }
 
     // get the associated stepper driver status
-    DriverStatus getDriverStatus();
+    DriverStatus getDriverStatus() { if (ready) driver->updateStatus(); return driver->getStatus(); }
 
     // get movement frequency in steps per second
     float getFrequencySteps();

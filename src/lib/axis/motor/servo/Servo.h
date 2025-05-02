@@ -121,7 +121,7 @@ class ServoMotor : public Motor {
   #endif
 
     // calibrate the motor driver
-    void calibrateDriver() { driver->calibrateDriver(); }
+    void calibrateDriver() { if (ready) driver->calibrateDriver(); }
 
     // set zero of absolute encoders
     uint32_t encoderZero();

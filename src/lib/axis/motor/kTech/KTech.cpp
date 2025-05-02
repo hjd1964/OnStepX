@@ -112,6 +112,7 @@ bool KTechMotor::init() {
     }
   }
 
+  ready = true;
   return true;
 }
 
@@ -147,6 +148,8 @@ void KTechMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void KTechMotor::enable(bool state) {
+  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+
   V(axisPrefix);
   if (state) {
     uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";

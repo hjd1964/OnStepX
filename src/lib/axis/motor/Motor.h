@@ -158,6 +158,8 @@ class Motor {
     // enable backlash compensation, to work properly this must be proceeded by a disable call
     void enableBacklash();
 
+    bool ready = false;
+
     volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
     char axisPrefix[24];                       // prefix for debug messages
     char axisPrefixWarn[24];                   // additional prefix for debug messages

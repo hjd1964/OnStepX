@@ -89,6 +89,7 @@ bool ODriveMotor::init() {
     return false;
   }
 
+  ready = true;
   return true;
 }
 
@@ -122,7 +123,9 @@ void ODriveMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void ODriveMotor::enable(bool state) {
-  V(axisPrefix); VF("driver powered "); if (state) { VLF("up"); } else { VLF("down"); } 
+  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+  
+  V(axisPrefix); VF("driver powered "); if (state) { VLF("up"); } else { VLF("down"); }
   
   int requestedState = AXIS_STATE_IDLE;
   if (state) requestedState = AXIS_STATE_CLOSED_LOOP_CONTROL;

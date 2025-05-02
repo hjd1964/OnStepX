@@ -147,6 +147,7 @@ bool StepDirMotor::init() {
   }
 
 
+  ready = true;
   return true;
 }
 
@@ -171,6 +172,8 @@ void StepDirMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void StepDirMotor::enable(bool state) {
+  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+
   V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); }
 
   if (Pins->enable != OFF && Pins->enable != SHARED) {
@@ -180,12 +183,6 @@ void StepDirMotor::enable(bool state) {
     if (driver->enable(state)) { VLF(" using secondary method"); } else { VLF(" skipped no control available"); }
   }
   enabled = state;
-}
-
-// get the associated stepper drivers status
-DriverStatus StepDirMotor::getDriverStatus() {
-  driver->updateStatus();
-  return driver->getStatus();
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
