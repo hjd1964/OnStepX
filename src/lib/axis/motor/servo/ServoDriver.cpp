@@ -44,6 +44,20 @@ bool ServoDriver::init() {
 
 // update status info. for driver
 void ServoDriver::updateStatus() {
+  if (statusMode == ON) {
+    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+      readStatus();
+
+      // open load indication is not reliable in standstill
+      if (status.outputA.shortToGround ||
+          status.outputB.shortToGround ||
+          status.overTemperatureWarning ||
+          status.overTemperature) status.fault = true; else status.fault = false;
+
+      timeLastStatusUpdate = millis();
+    }
+  }
+
   #if DEBUG == VERBOSE
     if (status.standstill) { status.outputA.openLoad = false; status.outputB.openLoad = false; status.standstill = false; }
     if ((status.outputA.shortToGround     != lastStatus.outputA.shortToGround) ||

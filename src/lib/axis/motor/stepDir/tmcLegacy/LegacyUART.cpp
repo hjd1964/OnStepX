@@ -193,34 +193,15 @@ void StepDirTmcUART::modeDecaySlewing() {
   driver->setHoldCurrent(settings.currentHold/25); // current in %
 }
 
-void StepDirTmcUART::updateStatus() {
-  if (settings.status == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
-      TMC2209Stepper::Status tmc2209Status = driver->getStatus();
-      status.outputA.shortToGround = (bool)tmc2209Status.short_to_ground_a || (bool)tmc2209Status.low_side_short_a;
-      status.outputA.openLoad      = (bool)tmc2209Status.open_load_a;
-      status.outputB.shortToGround = (bool)tmc2209Status.short_to_ground_b || (bool)tmc2209Status.low_side_short_b;
-      status.outputB.openLoad      = (bool)tmc2209Status.open_load_b;
-      status.overTemperatureWarning = (bool)tmc2209Status.over_temperature_warning;
-      status.overTemperature       = (bool)tmc2209Status.over_temperature_shutdown;
-      status.standstill            = (bool)tmc2209Status.standstill;
-
-      // open load indication is not reliable in standstill
-      if (
-        status.outputA.shortToGround ||
-        status.outputB.shortToGround ||
-        status.overTemperatureWarning ||
-        status.overTemperature
-      ) status.fault = true; else status.fault = false;
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
-  }
-
-  StepDirDriver::updateStatus();
+void StepDirTmcUART::readStatus() {
+  TMC2209Stepper::Status status_result = driver->getStatus();
+  status.outputA.shortToGround  = (bool)status_result.short_to_ground_a || (bool)status_result.low_side_short_a;
+  status.outputA.openLoad       = (bool)status_result.open_load_a;
+  status.outputB.shortToGround  = (bool)status_result.short_to_ground_b || (bool)status_result.low_side_short_b;
+  status.outputB.openLoad       = (bool)status_result.open_load_b;
+  status.overTemperatureWarning = (bool)status_result.over_temperature_warning;
+  status.overTemperature        = (bool)status_result.over_temperature_shutdown;
+  status.standstill             = (bool)status_result.standstill;
 }
 
 // secondary way to power down not using the enable pin

@@ -5,6 +5,8 @@
 
 #ifdef STEP_DIR_MOTOR_PRESENT
 
+#include "../../../gpioEx/GpioEx.h"
+
 // the various microsteps for different driver models, with the bit modes for each
 #define DRIVER_MODEL_COUNT 19
 
@@ -183,6 +185,23 @@ int StepDirDriver::subdivisionsToCode(long microsteps) {
 
 // update status info. for driver
 void StepDirDriver::updateStatus() {
+  if (settings.status == ON) {
+    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+      readStatus();
+
+      // open load indication is not reliable in standstill
+      if (status.outputA.shortToGround ||
+          status.outputB.shortToGround ||
+          status.overTemperatureWarning ||
+          status.overTemperature) status.fault = true; else status.fault = false;
+
+      timeLastStatusUpdate = millis();
+    }
+  } else
+  if (settings.status == LOW || settings.status == HIGH) {
+    status.fault = digitalReadEx(Pins->fault) == settings.status;
+  }
+
   #if DEBUG == VERBOSE
     if ((status.outputA.shortToGround     != lastStatus.outputA.shortToGround) ||
 //      (status.outputA.openLoad          != lastStatus.outputA.openLoad) ||

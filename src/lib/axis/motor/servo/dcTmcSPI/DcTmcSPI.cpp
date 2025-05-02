@@ -85,7 +85,7 @@ bool ServoDcTmcSPI::init() {
   }
 
   // automatically set fault status for known drivers
-  status.active = statusMode != OFF;
+  status.active = statusMode == ON;
 
   // set fault pin mode
   if (statusMode == LOW) pinModeEx(faultPin, INPUT_PULLUP);
@@ -134,36 +134,21 @@ float ServoDcTmcSPI::setMotorVelocity(float velocity) {
   return currentVelocity;
 }
 
-// update status info. for driver
-void ServoDcTmcSPI::updateStatus() {
-  if (statusMode == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+// read status info. from driver
+void ServoDcTmcSPI::readStatus() {
+  TMC2130_n::DRV_STATUS_t status_result;
+  status_result.sr = 0;
 
-      TMC2208_n::DRV_STATUS_t status_result;
-      if (model == SERVO_TMC2130_DC) { status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); } else
-      if (model == SERVO_TMC5160_DC) { status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); }
-      status.outputA.shortToGround = status_result.s2ga;
-      status.outputA.openLoad      = status_result.ola;
-      status.outputB.shortToGround = false;
-      status.outputB.openLoad      = false;
-      status.overTemperatureWarning= status_result.otpw;
-      status.overTemperature       = status_result.ot;
-      status.standstill            = status_result.stst;
+  if (model == SERVO_TMC2130_DC) { status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); } else
+  if (model == SERVO_TMC5160_DC) { status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); }
 
-      // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature) status.fault = true; else status.fault = false;
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (statusMode == LOW || statusMode == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == statusMode;
-  }
-
-  ServoDriver::updateStatus();
+  status.outputA.shortToGround = status_result.s2ga;
+  status.outputA.openLoad      = status_result.ola;
+  status.outputB.shortToGround = false;
+  status.outputB.openLoad      = false;
+  status.overTemperatureWarning= status_result.otpw;
+  status.overTemperature       = status_result.ot;
+  status.standstill            = status_result.stst;
 }
 
 #endif

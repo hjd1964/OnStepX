@@ -83,6 +83,9 @@ class StepDirDriver {
     StepDirDriverSettings settings;
 
   protected:
+    // read status from driver
+    virtual void readStatus();
+
     uint8_t axisNumber;
 
     char axisPrefix[36]; // prefix for debug messages

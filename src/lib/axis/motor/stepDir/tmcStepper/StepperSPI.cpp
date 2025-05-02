@@ -212,39 +212,25 @@ void StepDirTmcSPI::modeDecaySlewing() {
   current(IGOTO, 1.0F);
 }
 
-void StepDirTmcSPI::updateStatus() {
-  if (settings.status == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+void StepDirTmcSPI::readStatus() {
+  TMC2130_n::DRV_STATUS_t status_result;
+  status_result.sr = 0;
 
-      TMC2130_n::DRV_STATUS_t status_result;
-      status_result.sr = 0;
-      switch (settings.model) {
-        case TMC2130: status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); break;
-        case TMC2160: status_result.sr = ((TMC2160Stepper*)driver)->DRV_STATUS(); break;
-        case TMC2660: status_result.sr = ((TMC2660Stepper*)driver)->DRV_STATUS(); break;
-        case TMC5160: status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); break;
-        case TMC5161: status_result.sr = ((TMC5161Stepper*)driver)->DRV_STATUS(); break;
-      }
-      status.outputA.shortToGround = status_result.s2ga;
-      status.outputA.openLoad      = status_result.ola;
-      status.outputB.shortToGround = status_result.s2gb;
-      status.outputB.openLoad      = status_result.olb;
-      status.overTemperatureWarning= status_result.otpw;
-      status.overTemperature       = status_result.ot;
-      status.standstill            = status_result.stst;
-
-      // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround || status.outputB.shortToGround ||
-          status.overTemperatureWarning || status.overTemperature) status.fault = true; else status.fault = false;
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
+  switch (settings.model) {
+    case TMC2130: status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); break;
+    case TMC2160: status_result.sr = ((TMC2160Stepper*)driver)->DRV_STATUS(); break;
+    case TMC2660: status_result.sr = ((TMC2660Stepper*)driver)->DRV_STATUS(); break;
+    case TMC5160: status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); break;
+    case TMC5161: status_result.sr = ((TMC5161Stepper*)driver)->DRV_STATUS(); break;
   }
 
-  StepDirDriver::updateStatus();
+  status.outputA.shortToGround = status_result.s2ga;
+  status.outputA.openLoad      = status_result.ola;
+  status.outputB.shortToGround = status_result.s2gb;
+  status.outputB.openLoad      = status_result.olb;
+  status.overTemperatureWarning= status_result.otpw;
+  status.overTemperature       = status_result.ot;
+  status.standstill            = status_result.stst;
 }
 
 // secondary way to power down not using the enable pin

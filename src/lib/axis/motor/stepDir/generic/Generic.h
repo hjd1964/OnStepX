@@ -33,10 +33,10 @@ class StepDirGeneric : StepDirDriver {
     // set decay mode for slewing
     void modeDecaySlewing();
 
-    // update status info. for driver
-    void updateStatus();
-
   private:
+    // read status info. from driver
+    void readStatus();
+
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
 

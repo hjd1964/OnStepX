@@ -73,9 +73,6 @@ class ServoTmc2209 : public ServoDriver {
     // power level to the motor
     float setMotorVelocity(float power);
 
-    // update status info. for driver
-    void updateStatus();
-
     // calibrate the motor if required
     void calibrateDriver();
 
@@ -83,6 +80,8 @@ class ServoTmc2209 : public ServoDriver {
 
   private:
     float rSense = 0.11F;
+    // read status from driver
+    void readStatus();
 
     bool stealthChop() { if (decay == STEALTHCHOP) return true; else return false; }
 

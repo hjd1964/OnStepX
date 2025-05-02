@@ -159,7 +159,7 @@ void ServoKTech::requestStatus() {
   canPlus.writePacket(canID, cmd, 8);
 }
 
-void ServoKTech::updateStatus() {
+void ServoKTech::readStatus() {
   if (statusMode == OFF) return;
 
   if ((long)(millis() - lastStatusUpdateTime) > (KTECH_STATUS_MS*4)) {

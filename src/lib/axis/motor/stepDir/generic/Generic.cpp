@@ -117,10 +117,8 @@ void StepDirGeneric::modeDecaySlewing() {
   if (state != OFF) digitalWriteEx(decayPin, state);
 }
 
-void StepDirGeneric::updateStatus() {
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
-  }
+void StepDirGeneric::readStatus() {
+  status.sr = 0;
 }
 
 int8_t StepDirGeneric::getDecayPinState(int8_t decay) {

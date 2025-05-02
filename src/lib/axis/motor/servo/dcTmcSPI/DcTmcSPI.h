@@ -50,12 +50,11 @@ class ServoDcTmcSPI : public ServoDriver {
     // power level to the motor
     float setMotorVelocity(float power);
 
-    // update status info. for driver
-    void updateStatus();
-
     const ServoDcTmcSettings *Settings;
 
   private:
+    // read status info. from driver
+    void readStatus();
 
     TMCStepper *driver;
 

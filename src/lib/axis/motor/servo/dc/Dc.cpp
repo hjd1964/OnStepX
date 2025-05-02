@@ -218,8 +218,6 @@ void ServoDc::updateStatus() {
   if (statusMode == LOW || statusMode == HIGH) {
     status.fault = digitalReadEx(faultPin) == statusMode;
   }
-
-  ServoDriver::updateStatus();
 }
 
 #endif

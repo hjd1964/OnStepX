@@ -142,10 +142,15 @@ class ServoDriver {
     }
 
   protected:
+    virtual void readStatus() {}
+    
     int axisNumber;
 
     char axisPrefix[36]; // prefix for debug messages
     char axisPrefixWarn[36]; // additional prefix for debug messages
+
+    int16_t userCurrentMax = 0;
+    float user_rSense = 0.0F;
 
     DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
     #if DEBUG != OFF

@@ -98,7 +98,7 @@ bool ServoTmc5160::init() {
   driver->RAMPMODE(1);
 
   // automatically set fault status for known drivers
-  status.active = statusMode != OFF;
+  status.active = statusMode == ON;
 
   // set fault pin mode
   if (statusMode == LOW) pinModeEx(faultPin, INPUT_PULLUP);
@@ -161,33 +161,18 @@ float ServoTmc5160::setMotorVelocity(float velocity) {
   return currentVelocity;
 }
 
-// update status info. for driver
-void ServoTmc5160::updateStatus() {
-  if (statusMode == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+// read status info. from driver
+void ServoTmc5160::readStatus() {
+  TMC2130_n::DRV_STATUS_t status_result;
+  status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS();
 
-      TMC2130_n::DRV_STATUS_t status_result;
-      status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS();
-      status.outputA.shortToGround = status_result.s2ga;
-      status.outputA.openLoad      = status_result.ola;
-      status.outputB.shortToGround = status_result.s2gb;
-      status.outputB.openLoad      = status_result.olb;
-      status.overTemperatureWarning= status_result.otpw;
-      status.overTemperature       = status_result.ot;
-      status.standstill            = status_result.stst;
-
-      // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround || status.outputB.shortToGround ||
-          status.overTemperatureWarning || status.overTemperature) status.fault = true; else status.fault = false;
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (statusMode == LOW || statusMode == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == statusMode;
-  }
-
-  ServoDriver::updateStatus();
+  status.outputA.shortToGround  = status_result.s2ga;
+  status.outputA.openLoad       = status_result.ola;
+  status.outputB.shortToGround  = status_result.s2gb;
+  status.outputB.openLoad       = status_result.olb;
+  status.overTemperatureWarning = status_result.otpw;
+  status.overTemperature        = status_result.ot;
+  status.standstill             = status_result.stst;
 }
 
 // calibrate the motor driver if required

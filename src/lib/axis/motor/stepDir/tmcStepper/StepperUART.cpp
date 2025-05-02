@@ -211,45 +211,24 @@ void StepDirTmcUART::setDecayMode(int decayMode) {
   }
 }
 
-void StepDirTmcUART::updateStatus() {
+void StepDirTmcUART::readStatus() {
+  TMC2208_n::DRV_STATUS_t status_result;
+  status_result.sr = 0;
+
   bool crcError = false;
-  if (settings.status == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
-
-      TMC2208_n::DRV_STATUS_t status_result;
-      status_result.sr = 0;
-      if (settings.model == TMC2208) {
-        status_result.sr = ((TMC2208Stepper*)driver)->DRV_STATUS();
-        crcError = ((TMC2208Stepper*)driver)->CRCerror;
-      } else
-      if (settings.model == TMC2209) {
-        status_result.sr = ((TMC2209Stepper*)driver)->DRV_STATUS();
-        crcError = ((TMC2209Stepper*)driver)->CRCerror;
-      }
-
-      if (crcError) status_result.sr = 0xFFFFFFFF;
-      status.outputA.shortToGround = status_result.s2ga;
-      status.outputA.openLoad      = status_result.ola;
-      status.outputB.shortToGround = status_result.s2gb;
-      status.outputB.openLoad      = status_result.olb;
-      status.overTemperatureWarning = status_result.otpw;
-      status.overTemperature       = status_result.ot;
-      status.standstill            = status_result.stst;
-
-      // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature) status.fault = true; else status.fault = false;
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
+  switch (settings.model) {
+    case TMC2208: status_result.sr = ((TMC2208Stepper*)driver)->DRV_STATUS(); crcError = ((TMC2208Stepper*)driver)->CRCerror; break;
+    case TMC2209: status_result.sr = ((TMC2209Stepper*)driver)->DRV_STATUS(); crcError = ((TMC2209Stepper*)driver)->CRCerror; break;
   }
+  if (crcError) status_result.sr = 0xFFFFFFFF;
 
-  StepDirDriver::updateStatus();
+  status.outputA.shortToGround  = status_result.s2ga;
+  status.outputA.openLoad       = status_result.ola;
+  status.outputB.shortToGround  = status_result.s2gb;
+  status.outputB.openLoad       = status_result.olb;
+  status.overTemperatureWarning = status_result.otpw;
+  status.overTemperature        = status_result.ot;
+  status.standstill             = status_result.stst;
 }
 
 // secondary way to power down not using the enable pin

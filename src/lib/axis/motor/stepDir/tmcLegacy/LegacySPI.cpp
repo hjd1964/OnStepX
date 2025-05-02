@@ -130,44 +130,16 @@ void StepDirTmcSPI::modeDecaySlewing() {
   driver.mode(settings.intpol, settings.decaySlewing, microstepCode, IGOTO, settings.currentHold);
 }
 
-void StepDirTmcSPI::updateStatus() {
-  if (settings.status == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
-      if (driver.refresh_DRVSTATUS()) {
-        status.outputA.shortToGround = driver.get_DRVSTATUS_s2gA();
-        status.outputA.openLoad      = driver.get_DRVSTATUS_olA();
-        status.outputB.shortToGround = driver.get_DRVSTATUS_s2gB();
-        status.outputB.openLoad      = driver.get_DRVSTATUS_olB();
-        status.overTemperatureWarning = driver.get_DRVSTATUS_otpw();
-        status.overTemperature       = driver.get_DRVSTATUS_ot();
-        status.standstill            = driver.get_DRVSTATUS_stst();
-
-        // open load indication is not reliable in standstill
-        if (
-          status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature
-        ) status.fault = true; else status.fault = false;
-      } else {
-        status.outputA.shortToGround = true;
-        status.outputA.openLoad      = true;
-        status.outputB.shortToGround = true;
-        status.outputB.openLoad      = true;
-        status.overTemperatureWarning = true;
-        status.overTemperature       = true;
-        status.standstill            = true;
-        status.fault                 = true;
-      }
-
-      timeLastStatusUpdate = millis();
-    }
-  } else
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
+void StepDirTmcSPI::readStatus() {
+  if (driver.refresh_DRVSTATUS()) {
+    status.outputA.shortToGround  = driver.get_DRVSTATUS_s2gA();
+    status.outputA.openLoad       = driver.get_DRVSTATUS_olA();
+    status.outputB.shortToGround  = driver.get_DRVSTATUS_s2gB();
+    status.outputB.openLoad       = driver.get_DRVSTATUS_olB();
+    status.overTemperatureWarning = driver.get_DRVSTATUS_otpw();
+    status.overTemperature        = driver.get_DRVSTATUS_ot();
+    status.standstill             = driver.get_DRVSTATUS_stst();
   }
-
-  StepDirDriver::updateStatus();
 }
 
 // secondary way to power down not using the enable pin

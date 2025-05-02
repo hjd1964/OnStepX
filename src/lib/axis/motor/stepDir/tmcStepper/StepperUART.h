@@ -68,9 +68,6 @@ class StepDirTmcUART : public StepDirDriver {
     // set the decay mode STEALTH_CHOP or SPREAD_CYCLE
     void setDecayMode(int decayMode);
 
-    // update status info. for driver
-    void updateStatus();
-
     // secondary way to power down not using the enable pin
     bool enable(bool state);
 
@@ -78,6 +75,9 @@ class StepDirTmcUART : public StepDirDriver {
     void calibrateDriver();
 
   private:
+    // read status from driver
+    void readStatus();
+
     #if SERIAL_TMC == SoftSerial
       SoftwareSerial *SerialTMC;
     #endif

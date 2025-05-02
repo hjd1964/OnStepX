@@ -60,9 +60,6 @@ class StepDirTmcUART : public StepDirDriver {
     // set decay mode for slewing
     void modeDecaySlewing();
 
-    // update status info. for driver
-    void updateStatus();
-
     // secondary way to power down not using the enable pin
     bool enable(bool state);
 
@@ -72,6 +69,9 @@ class StepDirTmcUART : public StepDirDriver {
     TMC2209Stepper *driver;
 
   private:
+    // read status info. from driver
+    void readStatus();
+
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
 

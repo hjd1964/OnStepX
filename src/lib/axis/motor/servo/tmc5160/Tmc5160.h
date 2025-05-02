@@ -57,9 +57,6 @@ class ServoTmc5160 : public ServoDriver {
     // power level to the motor
     float setMotorVelocity(float power);
 
-    // update status info. for driver
-    void updateStatus();
-
     // calibrate the motor if required
     void calibrateDriver();
 
@@ -67,6 +64,8 @@ class ServoTmc5160 : public ServoDriver {
 
   private:
     float rSense = 0.075F;
+    // read status from driver
+    void readStatus();
 
     bool stealthChop() { if (decay == STEALTHCHOP) return true; else return false; }
 

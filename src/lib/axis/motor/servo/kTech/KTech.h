@@ -39,9 +39,6 @@ class ServoKTech : public ServoDriver {
     // power level to the motor
     float setMotorVelocity(float power);
 
-    // update the associated driver status
-    void updateStatus();
-
     // request driver status from CAN
     void requestStatus();
 
@@ -51,6 +48,9 @@ class ServoKTech : public ServoDriver {
     const ServoKTechSettings *Settings;
 
   private:
+    // read status info. from driver
+    void readStatus();
+
     int canID;
     unsigned long lastVelocityUpdateTime = 0;
     unsigned long lastStatusUpdateTime = 0;
