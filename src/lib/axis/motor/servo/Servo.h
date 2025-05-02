@@ -65,9 +65,6 @@ class ServoMotor : public Motor {
     // sets up the servo motor
     bool init();
 
-    // set motor reverse state
-    void setReverse(int8_t state);
-
     // get driver type code
     inline char getParameterTypeCode() { return feedback->getParameterTypeCode(); }
 
@@ -76,6 +73,9 @@ class ServoMotor : public Motor {
 
     // validate motor parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // set motor reverse state
+    void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)
     void enable(bool value);
