@@ -151,20 +151,20 @@ bool StepDirMotor::init() {
   return true;
 }
 
-// sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
   driver->init(param1, param2, param3, param4, param5, param6);
+// sets motor parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
 bool StepDirMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
   return true;
 }
 
-// validate driver parameters
+// validate motor parameters
 bool StepDirMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   return driver->validateParameters(param1, param2, param3, param4, param5, param6);
 }
 
-// set driver default reverse state
+// set motor default reverse state
 void StepDirMotor::setReverse(int8_t state) {
   if (state == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   digitalWriteEx(Pins->dir, dirFwd);

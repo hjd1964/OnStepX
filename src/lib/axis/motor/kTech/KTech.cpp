@@ -116,7 +116,7 @@ bool KTechMotor::init() {
   return true;
 }
 
-// set driver parameters
+// set motor parameters
 bool KTechMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
   UNUSED(param2);
@@ -128,7 +128,7 @@ bool KTechMotor::setParameters(float param1, float param2, float param3, float p
   return true;
 }
 
-// validate driver parameters
+// validate motor parameters
 bool KTechMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1);
   UNUSED(param2);

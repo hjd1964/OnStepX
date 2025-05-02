@@ -44,13 +44,13 @@ class StepDirMotor : public Motor {
     // get driver type code
     inline char getParameterTypeCode() { return driver->getParameterTypeCode(); }
 
-    // sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
+    // sets motor parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
     bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // validate driver parameters
+    // validate motor parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // set driver default reverse state
+    // set motor default reverse state
     void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)

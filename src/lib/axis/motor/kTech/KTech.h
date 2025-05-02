@@ -40,13 +40,13 @@ class KTechMotor : public Motor {
     // sets up the ktech motor
     bool init();
 
-    // get driver type code
+    // get motor type code
     inline char getParameterTypeCode() { return 'O'; }  // codes used so far are S(tep/dir), T(mc), P(id), and O(Drive)
 
-    // set driver parameters
+    // set motor parameters
     bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
-    // validate driver parameters
+    // validate motor parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // low level reversal of axis directions
