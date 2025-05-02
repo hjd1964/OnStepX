@@ -34,7 +34,7 @@
   class Bissc : public Encoder {
     public:
       // get device ready for use
-      void init();
+      bool init();
 
       // set encoder origin
       void setOrigin(uint32_t count);

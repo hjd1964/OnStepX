@@ -10,7 +10,7 @@
 class VirtualEnc : public Encoder {
   public:
     VirtualEnc(int16_t axis);
-    void init();
+    bool init();
 
     int32_t read();
     void write(int32_t count);

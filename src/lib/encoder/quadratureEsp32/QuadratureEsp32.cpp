@@ -15,19 +15,20 @@ QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
   this->BPin = BPin;
 }
 
-void QuadratureEsp32::init() {
-  if (ready) { DF("WRN: Encoder QuadratureEsp32"); D(axis); DLF(" init(), already initialized!"); return; }
+bool QuadratureEsp32::init() {
+  if (ready) return true;
 
   ab = new ESP32Encoder;
   if (ab == NULL) {
     DF("ERR: Encoder QuadratureEsp32"); D(axis); DLF(" init(), didn't get instance!"); 
-    return;
+    return false;
   }
 
   ab->attachFullQuad(APin, BPin);
   ab->setCount(0);
 
   ready = true;
+  return true;
 }
 
 int32_t QuadratureEsp32::read() {

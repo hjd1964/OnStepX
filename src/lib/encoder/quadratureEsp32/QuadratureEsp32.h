@@ -19,7 +19,7 @@
 class QuadratureEsp32 : public Encoder {
   public:
     QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis);
-    void init();
+    bool init();
 
     int32_t read();
     void write(int32_t count);

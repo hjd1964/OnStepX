@@ -56,14 +56,13 @@ KTechIME::KTechIME(int16_t axis) {
   }
 }
 
-void KTechIME::init() {
-  if (ready) { DF("WRN: Encoder KTECH_IME"); D(axis); DLF(" init(), already initialized!"); return; }
-  if (axis < 1 || axis > 9) return;
+bool KTechIME::init() {
+  if (ready) return true;
 
   if (!canPlus.ready) {
     DLF("WRN: Encoder KTech_IME"); D(axis); DLF(", no CAN interface!");
     ready = false;
-    return;
+    return false;
   }
 
   switch (this->axis) {
@@ -84,6 +83,7 @@ void KTechIME::init() {
   if (tasks.add(CAN_SEND_RATE_MS, 0, true, 6, callback, name)) { VLF("success"); } else { VLF("FAILED!"); }
 
   ready = true;
+  return true;
 }
 
 int32_t KTechIME::read() {

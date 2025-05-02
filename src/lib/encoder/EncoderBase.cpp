@@ -7,7 +7,8 @@
     AXIS7_ENCODER != OFF || AXIS8_ENCODER != OFF || AXIS9_ENCODER != OFF
 
 // get device ready for use
-void Encoder::init() {
+bool Encoder::init() {
+  return true;
 }
 
 // set encoder origin

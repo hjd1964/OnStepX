@@ -63,7 +63,7 @@
 class Encoder {
   public:
     // get device ready for use
-    virtual void init();
+    virtual bool init();
 
     // set encoder origin
     virtual void setOrigin(uint32_t count);

@@ -61,8 +61,8 @@ VirtualEnc::VirtualEnc(int16_t axis) {
   isVirtual = true;
 }
 
-void VirtualEnc::init() {
-  if (ready) { DF("WRN: Encoder Virtual"); D(axis); DLF(" init(), already initialized!"); return; }
+bool VirtualEnc::init() {
+  if (ready) return true;
 
   #if AXIS1_ENCODER == VIRTUAL
     if (axis == 0) {
@@ -111,6 +111,7 @@ void VirtualEnc::init() {
   #endif
 
   ready = true;
+  return true;
 }
 
 int32_t VirtualEnc::read() {

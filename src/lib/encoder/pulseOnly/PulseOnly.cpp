@@ -52,8 +52,8 @@ PulseOnly::PulseOnly(int16_t pulsePin, int16_t axis) {
   this->axis = axis - 1;
 }
 
-void PulseOnly::init() {
-  if (ready) { DF("WRN: Encoder PulseOnly"); D(axis); DLF(" init(), already initialized!"); return; }
+bool PulseOnly::init() {
+  if (ready) return true;
 
   pinMode(pulsePin, INPUT_PULLUP);
   #if AXIS1_ENCODER == PULSE_ONLY

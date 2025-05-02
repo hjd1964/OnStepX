@@ -65,8 +65,8 @@ Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
   quadratureInstance[this->axis - 1] = this;
 }
 
-void Quadrature::init() {
-  if (ready) { DF("WRN: Encoder Quadrature"); D(axis); DLF(" init(), already initialized!"); return; }
+bool Quadrature::init() {
+  if (ready) return true;
 
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);
@@ -134,6 +134,7 @@ void Quadrature::init() {
   }
 
   ready = true;
+  return true;
 }
 
 int32_t Quadrature::read() {
