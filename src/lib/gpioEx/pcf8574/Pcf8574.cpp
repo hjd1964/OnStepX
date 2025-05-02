@@ -87,10 +87,7 @@ bool GpioPcf8574::init() {
       }
     }
   }
-
-  #ifdef HAL_WIRE_CLOCK
-    HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-  #endif
+  HAL_WIRE_SET_CLOCK();
 
   for (int i = 0; i < 32; i++) { mode[i] = INPUT; state[i] = false; };
 

@@ -16,6 +16,10 @@
   #define SERIAL_B_TX           PD8
 #endif
 
+// Connector Labeled I2C uses PB10 (SCL) and PB11 (SDA) which are forced in the HAL
+#define I2C_SCL_PIN             PB10
+#define I2C_SDA_PIN             PB11
+
 // Use software serial for GPS
 
 // The multi-purpose pins (automatically associated with Auxiliary Features)

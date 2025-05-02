@@ -26,9 +26,7 @@
   #endif
 #endif
 
-// Specify the ESP32 I2C pins
-#define I2C_SDA_PIN             21
-#define I2C_SCL_PIN             22
+// Uses default ESP32 I2C GPIO21 (SDA) and GPIO22 (SCL)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX2_PIN                4                // ESP8266 RST control, or MISO for Axis1&2, or Axis4 EN support

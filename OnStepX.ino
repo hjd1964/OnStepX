@@ -95,6 +95,7 @@ void setup() {
   // start low level hardware
   VLF("MSG: System, HAL initialize");
   HAL_INIT();
+  WIRE_INIT();
 
   if (!nv.init()) {
     DLF("ERR: Setup, NV (EEPROM/FRAM/Flash/etc.) device not found!");

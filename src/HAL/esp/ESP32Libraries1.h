@@ -26,14 +26,11 @@
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
-#define HAL_WIRE Wire
+#ifndef HAL_WIRE
+  #define HAL_WIRE Wire
+#endif
 #ifndef HAL_WIRE_CLOCK
   #define HAL_WIRE_CLOCK 100000
-#endif
-#if (defined(I2C_SCL_PIN) && I2C_SCL_PIN != OFF) && (defined(I2C_SDA_PIN) && I2C_SDA_PIN != OFF)
-  #define WIRE_BEGIN() HAL_WIRE.begin(I2C_SDA_PIN, I2C_SCL_PIN); HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-#else
-  #define WIRE_BEGIN() HAL_WIRE.begin(); HAL_WIRE.setClock(HAL_WIRE_CLOCK);
 #endif
 
 // Non-volatile storage ----------------------------------------------------------------------------
@@ -76,7 +73,6 @@
 #define HAL_INIT() { \
   analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
   SERIAL_BT_BEGIN(); \
-  WIRE_BEGIN(); \
 }
 
 //---------------------------------------------------------------------------------------------------

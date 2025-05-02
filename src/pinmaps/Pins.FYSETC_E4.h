@@ -12,8 +12,7 @@
   #define SERIAL_A              Serial
 #endif
 
-#define I2C_SDA_PIN             21
-#define I2C_SCL_PIN             22
+// Uses default ESP32 I2C GPIO21 (SDA) and GPIO22 (SCL)
 
 // Use the following settings for the 4x TMC UART drivers
 #if defined(STEP_DIR_TMC_UART_PRESENT) || defined(SERVO_TMC2209_PRESENT)

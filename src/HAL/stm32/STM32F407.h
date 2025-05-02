@@ -33,7 +33,9 @@
 
 // New symbol for the default I2C port ---------------------------------------------------------------
 #include <Wire.h>
-#define HAL_WIRE Wire
+#ifndef HAL_WIRE
+  #define HAL_WIRE Wire
+#endif
 // no HAL_WIRE_CLOCK, it breaks the STM32 library
 
 // Non-volatile storage ------------------------------------------------------------------------------

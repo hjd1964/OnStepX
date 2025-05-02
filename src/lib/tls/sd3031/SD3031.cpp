@@ -16,15 +16,11 @@ DFRobot_SD3031 rtcSD3031(&HAL_WIRE);
 
 bool TlsSd3031::init() {
   HAL_WIRE.begin();
-  #ifdef HAL_WIRE_CLOCK
-    HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-  #endif
+  HAL_WIRE_SET_CLOCK();
 
   bool error = !rtcSD3031.begin();
   if (!error) {
-    #ifdef HAL_WIRE_CLOCK
-      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-    #endif
+    HAL_WIRE_SET_CLOCK();
 
     rtcSD3031.setHourSystem(rtcSD3031.e24hours);
 
@@ -38,9 +34,7 @@ bool TlsSd3031::init() {
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
     HAL_WIRE.end();
     HAL_WIRE.begin();
-    #ifdef HAL_WIRE_CLOCK
-      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-    #endif
+    HAL_WIRE_SET_CLOCK();
   #endif
   return ready;
 }

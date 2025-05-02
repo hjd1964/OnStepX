@@ -21,9 +21,7 @@ bool GpioPcf8575::init() {
   if (pcf.begin()) {
     found = true;
   } else { found = false; DF("WRN: Gpio.init(), PCF8575 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_PCF8575_I2C_ADDRESS, HEX); DLF(") not found"); }
-  #ifdef HAL_WIRE_CLOCK
-    HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-  #endif
+  HAL_WIRE_SET_CLOCK();
 
   return found;
 }

@@ -176,3 +176,9 @@
 #ifndef CAT_ATTR
   #define CAT_ATTR
 #endif
+
+#if defined(HAL_WIRE_CLOCK)
+  #define HAL_WIRE_SET_CLOCK() HAL_WIRE.setClock(HAL_WIRE_CLOCK)
+#else
+  #define HAL_WIRE_SET_CLOCK()
+#endif

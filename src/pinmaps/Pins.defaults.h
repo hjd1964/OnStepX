@@ -51,13 +51,27 @@
 #define ETHERNET_RESET_PIN          OFF
 #endif
 
-// Specify the default I2C pins (if they can be set via the HAL)
+// default settings for I2C
 #ifndef I2C_SDA_PIN
 #define I2C_SDA_PIN                 OFF
 #endif
 
 #ifndef I2C_SCL_PIN
 #define I2C_SCL_PIN                 OFF
+#endif
+
+#ifdef ESP32
+  #if (defined(I2C_SCL_PIN) && I2C_SCL_PIN != OFF) && (defined(I2C_SDA_PIN) && I2C_SDA_PIN != OFF)
+    #define WIRE_INIT() HAL_WIRE.begin(I2C_SDA_PIN, I2C_SCL_PIN); HAL_WIRE_SET_CLOCK()
+  #else
+    #define WIRE_INIT() HAL_WIRE_SET_CLOCK()
+  #endif
+#else
+  #if (defined(I2C_SCL_PIN) && I2C_SCL_PIN != OFF) && (defined(I2C_SDA_PIN) && I2C_SDA_PIN != OFF)
+    #define WIRE_INIT() HAL_WIRE.setSDA(I2C_SDA_PIN); HAL_WIRE.setSCL(I2C_SCL_PIN); HAL_WIRE_SET_CLOCK()
+  #else
+    #define WIRE_INIT() HAL_WIRE_SET_CLOCK()
+  #endif
 #endif
 
 // --------------------------------------------------------------------------------------------------------

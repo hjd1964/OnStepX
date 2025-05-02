@@ -48,9 +48,7 @@
   #define SERIAL_TMC_ADDRESS_MAP(x) ((x==4)?2 : x) // Axis1(0) is 0, Axis2(1) is 1, Axis3(2) is 2, Axis4(3) is 3, Axis5(4) is 2
 #endif
 
-// Specify the ESP32 I2C pins
-#define I2C_SDA_PIN             21
-#define I2C_SCL_PIN             22
+// Uses default ESP32 I2C GPIO21 (SDA) and GPIO22 (SCL)
 
 // The multi-purpose pins (Aux3..Aux8 can be analog pwm/dac if supported)
 #define AUX3_PIN                OFF              // Home SW for Axis1

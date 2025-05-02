@@ -18,17 +18,13 @@ RtcDS3231<TwoWire> rtcDS3231(HAL_WIRE);
 
 bool TlsDs3231::init() {
   HAL_WIRE.begin();
-  #ifdef HAL_WIRE_CLOCK
-    HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-  #endif
+  HAL_WIRE_SET_CLOCK();
 
   HAL_WIRE.beginTransmission(0x68);
   bool error = HAL_WIRE.endTransmission() != 0;
   if (!error) {
     rtcDS3231.Begin();
-    #ifdef HAL_WIRE_CLOCK
-      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-    #endif
+    HAL_WIRE_SET_CLOCK();
 
     if (!rtcDS3231.GetIsRunning()) rtcDS3231.SetIsRunning(true);
 
@@ -49,9 +45,7 @@ bool TlsDs3231::init() {
   #ifdef HAL_WIRE_RESET_AFTER_CONNECT
     HAL_WIRE.end();
     HAL_WIRE.begin();
-    #ifdef HAL_WIRE_CLOCK
-      HAL_WIRE.setClock(HAL_WIRE_CLOCK);
-    #endif
+    HAL_WIRE_SET_CLOCK();
   #endif
   return ready;
 }
