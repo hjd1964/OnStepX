@@ -54,7 +54,7 @@ ServoDc::ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSetti
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
-void ServoDc::init() {
+bool ServoDc::init() {
   ServoDriver::init();
 
   // show velocity control settings
@@ -111,6 +111,8 @@ void ServoDc::init() {
   #else
     if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
   #endif
+
+  return true;
 }
 
 // enable or disable the driver using the enable pin or other method

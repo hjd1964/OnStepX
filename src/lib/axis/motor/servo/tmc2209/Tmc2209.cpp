@@ -47,7 +47,7 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
   velocityThrs = TmcSettings->velocityThrs;
 }
 
-void ServoTmc2209::init() {
+bool ServoTmc2209::init() {
   ServoDriver::init();
 
   // automatically set fault status for known drivers
@@ -149,6 +149,8 @@ void ServoTmc2209::init() {
   #else
     if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
   #endif
+
+  return true;
 }
 
 // move using step/dir signals

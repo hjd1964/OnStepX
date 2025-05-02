@@ -25,7 +25,7 @@
   };
 #endif
 
-void ServoDriver::init() {
+bool ServoDriver::init() {
   #if DEBUG == VERBOSE
     VF(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
     VF(axisPrefix); VF("en=");
@@ -38,6 +38,8 @@ void ServoDriver::init() {
     pinModeEx(enablePin, OUTPUT);
     digitalWriteEx(enablePin, !enabledState);
   }
+
+  return true;
 }
 
 // update status info. for driver

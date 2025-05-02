@@ -35,7 +35,7 @@ ServoDcTmcSPI::ServoDcTmcSPI(uint8_t axisNumber, const ServoDcTmcSpiPins *Pins, 
   accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
-void ServoDcTmcSPI::init() {
+bool ServoDcTmcSPI::init() {
   ServoDriver::init();
 
   // automatically set fault status for known drivers
@@ -94,6 +94,8 @@ void ServoDcTmcSPI::init() {
   #else
     if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
   #endif
+
+  return true;
 }
 
 // enable or disable the driver using the enable pin or other method

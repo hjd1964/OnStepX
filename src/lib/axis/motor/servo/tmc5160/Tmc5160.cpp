@@ -40,7 +40,7 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, cons
   velocityThrs = TmcSettings->velocityThrs;
 }
 
-void ServoTmc5160::init() {
+bool ServoTmc5160::init() {
   ServoDriver::init();
 
   // automatically set fault status for known drivers
@@ -107,6 +107,8 @@ void ServoTmc5160::init() {
   #else
     if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
   #endif
+
+  return true;
 }
 
 // enable or disable the driver using the enable pin or other method

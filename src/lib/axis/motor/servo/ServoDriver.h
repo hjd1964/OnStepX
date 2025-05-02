@@ -79,7 +79,7 @@
 class ServoDriver {
   public:
     // decodes driver model and sets up the pin modes
-    virtual void init();
+    virtual bool init();
 
     // alternate mode for movement
     virtual void alternateMode(bool state) { UNUSED(state); }

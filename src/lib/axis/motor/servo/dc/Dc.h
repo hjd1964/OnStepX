@@ -32,7 +32,7 @@ class ServoDc : public ServoDriver {
     ServoDc(uint8_t axisNumber, const ServoDcPins *Pins, const ServoDcSettings *Settings);
 
     // decodes driver model and sets up the pin modes
-    void init();
+    bool init();
 
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);

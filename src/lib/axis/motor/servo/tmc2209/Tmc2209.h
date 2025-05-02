@@ -62,7 +62,7 @@ class ServoTmc2209 : public ServoDriver {
     ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings);
 
     // decodes driver model and sets up the pin modes
-    void init();
+    bool init();
 
     // move using step/dir signals
     void alternateMode(bool state);

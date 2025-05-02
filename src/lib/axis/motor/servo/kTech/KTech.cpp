@@ -66,7 +66,7 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettin
   }
 }
 
-void ServoKTech::init() {
+bool ServoKTech::init() {
   if (axisNumber < 1 || axisNumber > 9) return;
   ServoDriver::init();
 
@@ -95,6 +95,8 @@ void ServoKTech::init() {
   } else {
     VF(axisPrefix); VLF("no driver status");
   }
+
+  return true;
 }
 
 // enable or disable the driver using the enable pin or other method
