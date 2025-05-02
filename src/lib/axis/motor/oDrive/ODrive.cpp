@@ -100,7 +100,6 @@ void ODriveMotor::setParameters(float param1, float param2, float param3, float 
   UNUSED(param4);
   UNUSED(param5);
   stepsPerMeasure = param6;
-  setSlewing(isSlewing);
 }
 
 // validate driver parameters
