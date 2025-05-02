@@ -34,14 +34,14 @@ bool ServoDriver::init() {
   #endif
 
   // get the maximum current and Rsense for this axis
-  userCurrentMax = 0;
+  user_currentMax = 0;
   switch (axisNumber) {
     case 1:
       #ifdef AXIS1_DRIVER_RSENSE
         user_rSense = AXIS1_DRIVER_RSENSE;
       #endif
       #ifdef AXIS1_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS1_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS1_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 2:
@@ -49,7 +49,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS2_DRIVER_RSENSE;
       #endif
       #ifdef AXIS2_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS2_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS2_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 3:
@@ -57,7 +57,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS3_DRIVER_RSENSE;
       #endif
       #ifdef AXIS3_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS3_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS3_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 4:
@@ -65,7 +65,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS4_DRIVER_RSENSE;
       #endif
       #ifdef AXIS4_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS4_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS4_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 5:
@@ -73,7 +73,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS5_DRIVER_RSENSE;
       #endif
       #ifdef AXIS5_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS5_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS5_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 6:
@@ -81,7 +81,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS6_DRIVER_RSENSE;
       #endif
       #ifdef AXIS6_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS6_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS6_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 7:
@@ -89,7 +89,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS7_DRIVER_RSENSE;
       #endif
       #ifdef AXIS7_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS7_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS7_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 8:
@@ -97,7 +97,7 @@ bool ServoDriver::init() {
         user_rSense = AXIS8_DRIVER_RSENSE;
       #endif
       #ifdef AXIS8_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS8_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS8_DRIVER_CURRENT_MAX;
       #endif
     break;
     case 9:
@@ -105,12 +105,12 @@ bool ServoDriver::init() {
         user_rSense = AXIS9_DRIVER_RSENSE;
       #endif
       #ifdef AXIS9_DRIVER_CURRENT_MAX
-        userCurrentMax = AXIS9_DRIVER_CURRENT_MAX;
+        user_currentMax = AXIS9_DRIVER_CURRENT_MAX;
       #endif
     break;
     default:
       user_rSense = 0;
-      userCurrentMax = 0;
+      user_currentMax = 0;
     break;
   }
 

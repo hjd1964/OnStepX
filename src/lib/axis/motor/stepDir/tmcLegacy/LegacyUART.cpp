@@ -149,7 +149,7 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   }
 
   // override max current with user setting
-  if (userCurrentMax != 0) currentMax = userCurrentMax;
+  if (user_currentMax != 0) currentMax = user_currentMax;
 
   long currentHold = round(param3);
   long currentRun = round(param4);
