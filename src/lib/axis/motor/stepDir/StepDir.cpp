@@ -78,6 +78,8 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirPins *Pins, St
   driverType = STEP_DIR;
   strcpy(axisPrefix, "MSG: Axis_StepDir, ");
   axisPrefix[9] = '0' + axisNumber;
+  strcpy(axisPrefixWarn, "WRN: Axis_StepDir, ");
+  axisPrefixWarn[9] = '0' + axisNumber;
   this->axisNumber = axisNumber;
   this->Pins = Pins;
 
