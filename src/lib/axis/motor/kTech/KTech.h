@@ -87,7 +87,7 @@ class KTechMotor : public Motor {
     void updateStatus();
 
     // update the associated driver status from CAN
-    void updateStatusCallback(uint8_t data[8]);
+    void requestStatusCallback(uint8_t data[8]);
 
   private:
     int canID;

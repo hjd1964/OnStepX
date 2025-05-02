@@ -19,15 +19,15 @@ IRAM_ATTR void moveKTechMotorAxis7() { ktechMotorInstance[6]->move(); }
 IRAM_ATTR void moveKTechMotorAxis8() { ktechMotorInstance[7]->move(); }
 IRAM_ATTR void moveKTechMotorAxis9() { ktechMotorInstance[8]->move(); }
 
-void statusKTechMotorAxis1(uint8_t data[8]) { ktechMotorInstance[0]->updateStatusCallback(data); }
-void statusKTechMotorAxis2(uint8_t data[8]) { ktechMotorInstance[1]->updateStatusCallback(data); }
-void statusKTechMotorAxis3(uint8_t data[8]) { ktechMotorInstance[2]->updateStatusCallback(data); }
-void statusKTechMotorAxis4(uint8_t data[8]) { ktechMotorInstance[3]->updateStatusCallback(data); }
-void statusKTechMotorAxis5(uint8_t data[8]) { ktechMotorInstance[4]->updateStatusCallback(data); }
-void statusKTechMotorAxis6(uint8_t data[8]) { ktechMotorInstance[5]->updateStatusCallback(data); }
-void statusKTechMotorAxis7(uint8_t data[8]) { ktechMotorInstance[6]->updateStatusCallback(data); }
-void statusKTechMotorAxis8(uint8_t data[8]) { ktechMotorInstance[7]->updateStatusCallback(data); }
-void statusKTechMotorAxis9(uint8_t data[8]) { ktechMotorInstance[8]->updateStatusCallback(data); }
+void statusKTechMotorAxis1(uint8_t data[8]) { ktechMotorInstance[0]->requestStatusCallback(data); }
+void statusKTechMotorAxis2(uint8_t data[8]) { ktechMotorInstance[1]->requestStatusCallback(data); }
+void statusKTechMotorAxis3(uint8_t data[8]) { ktechMotorInstance[2]->requestStatusCallback(data); }
+void statusKTechMotorAxis4(uint8_t data[8]) { ktechMotorInstance[3]->requestStatusCallback(data); }
+void statusKTechMotorAxis5(uint8_t data[8]) { ktechMotorInstance[4]->requestStatusCallback(data); }
+void statusKTechMotorAxis6(uint8_t data[8]) { ktechMotorInstance[5]->requestStatusCallback(data); }
+void statusKTechMotorAxis7(uint8_t data[8]) { ktechMotorInstance[6]->requestStatusCallback(data); }
+void statusKTechMotorAxis8(uint8_t data[8]) { ktechMotorInstance[7]->requestStatusCallback(data); }
+void statusKTechMotorAxis9(uint8_t data[8]) { ktechMotorInstance[8]->requestStatusCallback(data); }
 
 // constructor
 KTechMotor::KTechMotor(uint8_t axisNumber, const KTechDriverSettings *Settings, bool useFastHardwareTimers) {
@@ -309,7 +309,7 @@ void KTechMotor::updateStatus() {
 }
 
 // update the associated driver status from CAN
-void KTechMotor::updateStatusCallback(uint8_t data[8]) {
+void KTechMotor::requestStatusCallback(uint8_t data[8]) {
   if (statusMode == OFF) return;
 
   uint8_t errorState = data[7];
