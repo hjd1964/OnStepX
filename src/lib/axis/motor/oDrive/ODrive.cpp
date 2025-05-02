@@ -92,13 +92,6 @@ bool ODriveMotor::init() {
   return true;
 }
 
-// set driver reverse state
-void ODriveMotor::setReverse(int8_t state) {
-  if (state == ON) {
-    VF(axisPrefix); VLF("axis reversal must be accomplished with hardware or ODrive setup!");
-  }
-}
-
 // set driver parameters
 void ODriveMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
@@ -119,6 +112,13 @@ bool ODriveMotor::validateParameters(float param1, float param2, float param3, f
   UNUSED(param5);
   UNUSED(param6);
   return true;
+}
+
+// set driver reverse state
+void ODriveMotor::setReverse(int8_t state) {
+  if (state == ON) {
+    VF(axisPrefix); VLF("axis reversal must be accomplished with hardware or ODrive setup!");
+  }
 }
 
 // sets motor enable on/off (if possible)

@@ -40,10 +40,6 @@ class KTechMotor : public Motor {
     // sets up the ktech motor
     bool init();
 
-    // low level reversal of axis directions
-    // \param state: OFF normal or ON to reverse
-    void setReverse(int8_t state);
-
     // get driver type code
     inline char getParameterTypeCode() { return 'O'; }  // codes used so far are S(tep/dir), T(mc), P(id), and O(Drive)
 
@@ -52,6 +48,10 @@ class KTechMotor : public Motor {
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // low level reversal of axis directions
+    // \param state: OFF normal or ON to reverse
+    void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)
     void enable(bool value);

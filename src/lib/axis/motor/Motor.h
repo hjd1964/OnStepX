@@ -19,9 +19,6 @@ class Motor {
     // sets up the motor identification
     virtual bool init();
 
-    // set motor reverse state
-    virtual void setReverse(int8_t state);
-
     // get motor parameters type code
     virtual char getParameterTypeCode();
 
@@ -36,6 +33,9 @@ class Motor {
 
     // validate motor parameters
     virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // set motor reverse state
+    virtual void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)
     virtual void enable(bool value);

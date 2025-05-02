@@ -41,9 +41,6 @@ class StepDirMotor : public Motor {
     // sets up the driver step/dir/enable pins
     bool init();
 
-    // set driver default reverse state
-    void setReverse(int8_t state);
-
     // get driver type code
     inline char getParameterTypeCode() { return driver->getParameterTypeCode(); }
 
@@ -52,6 +49,9 @@ class StepDirMotor : public Motor {
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+
+    // set driver default reverse state
+    void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)
     void enable(bool value);

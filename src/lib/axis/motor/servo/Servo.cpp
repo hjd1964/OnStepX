@@ -110,12 +110,6 @@ bool ServoMotor::init() {
   return true;
 }
 
-// set driver reverse state
-void ServoMotor::setReverse(int8_t state) {
-  feedback->setControlDirection(state);
-  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
-}
-
 // set driver parameters
 void ServoMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   feedback->setParameters(param1, param2, param3, param4, param5, param6);
@@ -124,6 +118,12 @@ void ServoMotor::setParameters(float param1, float param2, float param3, float p
 // validate driver parameters
 bool ServoMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   return feedback->validateParameters(param1, param2, param3, param4, param5, param6);
+}
+
+// set motor reverse state
+void ServoMotor::setReverse(int8_t state) {
+  feedback->setControlDirection(state);
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
 }
 
 // sets motor enable on/off (if possible)

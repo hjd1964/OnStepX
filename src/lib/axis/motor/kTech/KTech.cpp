@@ -115,14 +115,6 @@ bool KTechMotor::init() {
   return true;
 }
 
-// low level reversal of axis directions
-// \param state: OFF normal or ON to reverse
-void KTechMotor::setReverse(int8_t state) {
-  if (state == ON) {
-    VF(axisPrefixWarn); VLF("axis reversal must be accomplished with hardware or KTech setup!");
-  }
-}
-
 // set driver parameters
 void KTechMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
@@ -143,6 +135,14 @@ bool KTechMotor::validateParameters(float param1, float param2, float param3, fl
   UNUSED(param5);
   UNUSED(param6);
   return true;
+}
+
+// low level reversal of axis directions
+// \param state: OFF normal or ON to reverse
+void KTechMotor::setReverse(int8_t state) {
+  if (state == ON) {
+    VF(axisPrefixWarn); VLF("axis reversal must be accomplished with hardware or KTech setup!");
+  }
 }
 
 // sets motor enable on/off (if possible)
