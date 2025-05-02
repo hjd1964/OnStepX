@@ -105,7 +105,7 @@ StepDirMotor::StepDirMotor(const uint8_t axisNumber, const StepDirPins *Pins, St
 
 bool StepDirMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
- 
+
   #if DEBUG == VERBOSE
     V(axisPrefix); V("pins step="); if (Pins->step == OFF) V("OFF"); else V(Pins->step);
     V(", dir="); if (Pins->dir == OFF) VF("OFF"); else V(Pins->dir);
