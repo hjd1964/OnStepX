@@ -285,6 +285,63 @@ void ServoMotor::setSlewing(bool state) {
   slewing = state;
 }
 
+// set zero/origin of absolute encoders
+uint32_t ServoMotor::encoderZero() {
+  if (!ready) return 0;
+
+  encoder->origin = 0;
+  encoder->offset = 0;
+
+  uint32_t zero = (uint32_t)(-encoder->read());
+  encoder->origin = zero;
+
+  return zero;
+}
+
+#ifdef ABSOLUTE_ENCODER_CALIBRATION
+  int32_t ServoMotor::encoderIndex(int32_t offset) {
+    if (!ready) return 0;
+
+    int32_t index = (encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2);
+    index += offset;
+    if (index < 0) index = 0;
+    if (index > ENCODER_ECM_BUFFER_SIZE - 1) index = ENCODER_ECM_BUFFER_SIZE - 1;
+    return index;
+  }
+#endif
+
+int32_t ServoMotor::encoderRead() {
+  int32_t encoderCounts = encoder->read();
+
+  #ifdef ABSOLUTE_ENCODER_CALIBRATION
+    if (axisNumber == 1) {
+      if (calibrateMode != CM_RECORDING) {
+        if (encoderCorrectionBuffer != NULL) {
+          double index = ((double)encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2.0);
+          double frac = index - floor(index);
+          int16_t ecb = ecbn(encoderCorrectionBuffer[encoderIndex(-1)]);
+          int16_t eca = ecbn(encoderCorrectionBuffer[encoderIndex(1)]);
+          encoderCorrection = ecbn(encoderCorrectionBuffer[encoderIndex()]);
+
+          if (frac < 0) {
+            encoderCorrection = round(encoderCorrection * (frac + 1.0)); // frac at -1 = 0 and at 0 = 1
+            encoderCorrection += round(ecb * abs(frac));                 // frac at -1 = 1 and at 0 = 0 
+          } else {
+            encoderCorrection = round(encoderCorrection * (1.0 - frac)); // frac at 1 = 0 and at 0 = 1
+            encoderCorrection += round(eca * abs(frac));                 // frac at 1 = 1 and at 0 = 0 
+          }
+
+        } else encoderCorrection = 0;
+//        DL1(encoderCorrection);
+        encoderCounts += encoderCorrection;
+      }
+    }
+  #endif
+
+  if (encoderReverse) encoderCounts = -encoderCounts;
+  return encoderCounts;
+}
+
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
   long encoderCounts = encoderRead();
@@ -457,62 +514,5 @@ IRAM_ATTR void ServoMotor::move() {
 
   #endif
 }
-
-int32_t ServoMotor::encoderRead() {
-  int32_t encoderCounts = encoder->read();
-
-  #ifdef ABSOLUTE_ENCODER_CALIBRATION
-    if (axisNumber == 1) {
-      if (calibrateMode != CM_RECORDING) {
-        if (encoderCorrectionBuffer != NULL) {
-          double index = ((double)encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2.0);
-          double frac = index - floor(index);
-          int16_t ecb = ecbn(encoderCorrectionBuffer[encoderIndex(-1)]);
-          int16_t eca = ecbn(encoderCorrectionBuffer[encoderIndex(1)]);
-          encoderCorrection = ecbn(encoderCorrectionBuffer[encoderIndex()]);
-
-          if (frac < 0) {
-            encoderCorrection = round(encoderCorrection * (frac + 1.0)); // frac at -1 = 0 and at 0 = 1
-            encoderCorrection += round(ecb * abs(frac));                 // frac at -1 = 1 and at 0 = 0 
-          } else {
-            encoderCorrection = round(encoderCorrection * (1.0 - frac)); // frac at 1 = 0 and at 0 = 1
-            encoderCorrection += round(eca * abs(frac));                 // frac at 1 = 1 and at 0 = 0 
-          }
-
-        } else encoderCorrection = 0;
-//        DL1(encoderCorrection);
-        encoderCounts += encoderCorrection;
-      }
-    }
-  #endif
-
-  if (encoderReverse) encoderCounts = -encoderCounts;
-  return encoderCounts;
-}
-
-// set zero/origin of absolute encoders
-uint32_t ServoMotor::encoderZero() {
-  if (!ready) return 0;
-
-  encoder->origin = 0;
-  encoder->offset = 0;
-
-  uint32_t zero = (uint32_t)(-encoder->read());
-  encoder->origin = zero;
-
-  return zero;
-}
-
-#ifdef ABSOLUTE_ENCODER_CALIBRATION
-  int32_t ServoMotor::encoderIndex(int32_t offset) {
-    if (!ready) return 0;
-
-    int32_t index = (encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2);
-    index += offset;
-    if (index < 0) index = 0;
-    if (index > ENCODER_ECM_BUFFER_SIZE - 1) index = ENCODER_ECM_BUFFER_SIZE - 1;
-    return index;
-  }
-#endif
 
 #endif
