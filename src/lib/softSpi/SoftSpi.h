@@ -18,6 +18,8 @@ class SoftSpi {
     uint8_t transfer(uint8_t data_out);
     // send/receive an 32 bit value
     uint32_t transfer32(uint32_t data_out);
+    // returns true if this interface only supports sending data  
+    bool outOnly() { return miso == OFF; }
 
   private:
     int16_t miso, mosi, sck, cs;
