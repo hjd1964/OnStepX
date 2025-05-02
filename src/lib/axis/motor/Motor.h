@@ -149,6 +149,8 @@ class Motor {
 
     bool enabled = false;                      // enable/disable logical state
 
+    bool ready = false;                        // set to true after successful init
+
     bool calibrating = false;                  // shadow disable when calibrating
 
   protected:
@@ -157,8 +159,6 @@ class Motor {
 
     // enable backlash compensation, to work properly this must be proceeded by a disable call
     void enableBacklash();
-
-    bool ready = false;
 
     volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
     char axisPrefix[24];                       // prefix for debug messages
