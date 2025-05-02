@@ -107,8 +107,24 @@ class ServoMotor : public Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
 
+    #ifdef ABSOLUTE_ENCODER_CALIBRATION
+      void calibrate(float value);
+    #endif
+
+    // calibrate the motor driver
+    void calibrateDriver() { if (ready) driver->calibrateDriver(); }
+
     // get encoder count
-    int32_t getEncoderCount() { return encoder->count; }
+    int32_t getEncoderCount() { if (ready) return encoder->count; else return 0; }
+
+    // set zero of absolute encoders
+    uint32_t encoderZero();
+
+    // set origin of absolute encoders
+    void encoderSetOrigin(uint32_t origin) { if (ready) encoder->setOrigin(origin); }
+
+    // read encoder
+    int32_t encoderRead();
 
     // updates PID and sets servo motor power/direction
     void poll();
@@ -116,22 +132,6 @@ class ServoMotor : public Motor {
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
     
-  #ifdef ABSOLUTE_ENCODER_CALIBRATION
-    void calibrate(float value);
-  #endif
-
-    // calibrate the motor driver
-    void calibrateDriver() { if (ready) driver->calibrateDriver(); }
-
-    // set zero of absolute encoders
-    uint32_t encoderZero();
-
-    // set origin of absolute encoders
-    void encoderSetOrigin(uint32_t origin) { encoder->setOrigin(origin); }
-
-    // read encoder
-    int32_t encoderRead();
-
     // servo motor driver
     ServoDriver *driver;
 

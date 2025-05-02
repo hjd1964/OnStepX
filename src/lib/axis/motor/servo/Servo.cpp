@@ -126,13 +126,15 @@ bool ServoMotor::validateParameters(float param1, float param2, float param3, fl
 
 // set motor reverse state
 void ServoMotor::setReverse(int8_t state) {
+  if (!ready) return;
+
   feedback->setControlDirection(state);
   if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
 }
 
 // sets motor enable on/off (if possible)
 void ServoMotor::enable(bool state) {
-  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+  if (!ready) return;
 
   driver->enable(state);
   if (state == false) feedback->reset(); else safetyShutdown = false;
@@ -141,6 +143,8 @@ void ServoMotor::enable(bool state) {
 
 // get the associated motor driver status
 DriverStatus ServoMotor::getDriverStatus() {
+  if (!ready) return errorStatus;
+
   DriverStatus driverStatus;
   if (ready) { driver->updateStatus(); driverStatus = driver->getStatus(); } else driverStatus.fault = true;
   if (encoder->errorThresholdExceeded()) driverStatus.fault = true;
@@ -150,6 +154,8 @@ DriverStatus ServoMotor::getDriverStatus() {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ServoMotor::resetPositionSteps(long value) {
+  if (!ready) return;
+
   Motor::resetPositionSteps(value);
   if (syncThreshold == OFF) {
     encoder->write(value);
@@ -161,6 +167,8 @@ void ServoMotor::resetPositionSteps(long value) {
 
 // get instrument coordinate, in steps
 long ServoMotor::getInstrumentCoordinateSteps() {
+  if (!ready) return 0;
+
   return encoderRead() + indexSteps;
 }
 
@@ -187,6 +195,8 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
 
 // distance to target in steps (+/-)
 long ServoMotor::getTargetDistanceSteps() {
+  if (!ready) return 0;
+
   long encoderCounts = encoderRead();
   noInterrupts();
   long dist = targetSteps - encoderCounts;
@@ -196,6 +206,7 @@ long ServoMotor::getTargetDistanceSteps() {
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void ServoMotor::setFrequencySteps(float frequency) {
+  if (!ready) return;
 
   #ifdef ABSOLUTE_ENCODER_CALIBRATION
     if (axisNumber == 1 && calibrateMode == CM_RECORDING) {
@@ -261,12 +272,16 @@ void ServoMotor::setFrequencySteps(float frequency) {
 }
 
 float ServoMotor::getFrequencySteps() {
+  if (!ready) return 0;
+
   if (lastPeriod == 0) return 0;
   return (16000000.0F / lastPeriod) * absStep;
 }
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void ServoMotor::setSlewing(bool state) {
+  if (!ready) return;
+
   slewing = state;
 }
 
@@ -477,6 +492,8 @@ int32_t ServoMotor::encoderRead() {
 
 // set zero/origin of absolute encoders
 uint32_t ServoMotor::encoderZero() {
+  if (!ready) return 0;
+
   encoder->origin = 0;
   encoder->offset = 0;
 
@@ -488,6 +505,8 @@ uint32_t ServoMotor::encoderZero() {
 
 #ifdef ABSOLUTE_ENCODER_CALIBRATION
   int32_t ServoMotor::encoderIndex(int32_t offset) {
+    if (!ready) return 0;
+
     int32_t index = (encoder->count/ENCODER_ECM_BUFFER_RESOLUTION + ENCODER_ECM_BUFFER_SIZE/2);
     index += offset;
     if (index < 0) index = 0;

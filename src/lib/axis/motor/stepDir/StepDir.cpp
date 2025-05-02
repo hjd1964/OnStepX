@@ -170,6 +170,8 @@ bool StepDirMotor::validateParameters(float param1, float param2, float param3, 
 
 // set motor default reverse state
 void StepDirMotor::setReverse(int8_t state) {
+  if (!ready) return;
+
   if (state == OFF) { dirFwd = LOW; dirRev = HIGH; } else { dirFwd = HIGH; dirRev = LOW; }
   digitalWriteEx(Pins->dir, dirFwd);
   direction = dirFwd;
@@ -177,7 +179,7 @@ void StepDirMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void StepDirMotor::enable(bool state) {
-  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+  if (!ready) return;
 
   V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); }
 
@@ -192,6 +194,7 @@ void StepDirMotor::enable(bool state) {
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void StepDirMotor::setFrequencySteps(float frequency) {
+  if (!ready) return;
 
   // chart acceleration
   #if DEBUG != OFF && defined(DEBUG_STEPDIR_ACCEL)
@@ -312,6 +315,8 @@ void StepDirMotor::modeSwitch() {
 }
 
 float StepDirMotor::getFrequencySteps() {
+  if (!ready) return 0.0F;
+
   if (lastPeriod == 0) return 0;
   #if STEP_WAVE_FORM == SQUARE
     return 8000000.0F/lastPeriod;
@@ -322,6 +327,8 @@ float StepDirMotor::getFrequencySteps() {
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void StepDirMotor::setSlewing(bool state) {
+  if (!ready) return;
+  
   if (state == true) driver->modeDecaySlewing(); else driver->modeDecayTracking();
 }
 

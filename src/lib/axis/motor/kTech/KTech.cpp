@@ -141,6 +141,8 @@ bool KTechMotor::validateParameters(float param1, float param2, float param3, fl
 // low level reversal of axis directions
 // \param state: OFF normal or ON to reverse
 void KTechMotor::setReverse(int8_t state) {
+  if (!ready) return;
+
   if (state == ON) {
     VF(axisPrefixWarn); VLF("axis reversal must be accomplished with hardware or KTech setup!");
   }
@@ -148,7 +150,7 @@ void KTechMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void KTechMotor::enable(bool state) {
-  if (!ready) { D(axisPrefixWarn); DLF("enable/disable failed"); return; }
+  if (!ready) return;
 
   V(axisPrefix);
   if (state) {
@@ -170,6 +172,8 @@ void KTechMotor::setInstrumentCoordinateSteps(long value) {
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void KTechMotor::resetPositionSteps(long value) {
+  if (!ready) return;
+
   uint8_t cmd[] = "\x95\x00\x00\x00";
   canPlus.beginPacket(canID);
   canPlus.write(cmd, 4);
@@ -185,6 +189,8 @@ void KTechMotor::resetPositionSteps(long value) {
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void KTechMotor::setFrequencySteps(float frequency) {
+  if (!ready) return;
+
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
@@ -233,12 +239,16 @@ void KTechMotor::setFrequencySteps(float frequency) {
 }
 
 float KTechMotor::getFrequencySteps() {
+  if (!ready) return 0.0F;
+
   if (lastPeriod == 0) return 0;
   return (16000000.0F / lastPeriod) * absStep;
 }
 
 // set slewing state (hint that we are about to slew or are done slewing)
 void KTechMotor::setSlewing(bool state) {
+  if (!ready) return;
+
   isSlewing = state;
 }
 

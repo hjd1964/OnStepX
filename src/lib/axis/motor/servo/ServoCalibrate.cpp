@@ -39,6 +39,8 @@ void _calibrateMoveAxis()
 
 void ServoMotor::calibrate(float value)
 {
+  if (!ready) return;
+
   if (axisNumber != 1)
     return;
 

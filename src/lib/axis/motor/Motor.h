@@ -184,6 +184,9 @@ class Motor {
     volatile long step = 1;                    // step size, and for direction control
 
     float default_param1 = 0, default_param2 = 0, default_param3 = 0, default_param4 = 0, default_param5 = 0, default_param6 = 0;
+
+    // a fault return status
+    const DriverStatus errorStatus = {false, {false, false}, {false, false}, false, false, false, true};
 };
 
 #endif
