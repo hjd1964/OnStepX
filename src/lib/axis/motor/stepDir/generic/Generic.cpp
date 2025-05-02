@@ -20,9 +20,8 @@ StepDirGeneric::StepDirGeneric(uint8_t axisNumber, const StepDirDriverPins *Pins
   settings = *Settings;
 }
 
-// set up driver and parameters: microsteps, microsteps goto
-void StepDirGeneric::init(float param1, float param2, float param3, float param4, float param5, float param6) {
-  StepDirDriver::init(param1, param2, param3, param4, param5, param6);
+// setup driver
+void StepDirGeneric::init() {
 
   m0Pin = Pins->m0;
   m1Pin = Pins->m1;

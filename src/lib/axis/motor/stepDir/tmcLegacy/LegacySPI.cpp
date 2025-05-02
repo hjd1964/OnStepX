@@ -29,8 +29,7 @@ StepDirTmcSPI::StepDirTmcSPI(uint8_t axisNumber, const StepDirDriverPins *Pins, 
 }
 
 // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-void StepDirTmcSPI::init(float param1, float param2, float param3, float param4, float param5, float param6) {
-  StepDirDriver::init(param1, param2, param3, param4, param5, param6);
+bool StepDirTmcSPI::init() {
 
   if (settings.currentRun != OFF) {
     // automatically set goto and hold current if they are disabled
@@ -44,18 +43,28 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  VF(axisPrefix);
   if (settings.currentRun == OFF) {
-    VLF("current control OFF (set by Vref)");
+    VF(axisPrefix); VLF("current control OFF (set by Vref)");
   } else {
+    VF(axisPrefix);
     VF("Ihold="); V(settings.currentHold); VF("mA, ");
     VF("Irun="); V(settings.currentRun); VF("mA, ");
     VF("Igoto="); V(settings.currentGoto); VL("mA");
   }
 
-  // get TMC SPI driver ready
+  if (settings.model == TMC5160) {
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC5160_RSENSE;
+  } else
+  if (settings.model == TMC2130) {
+    if (user_rSense > 0.0F) rSense = user_rSense + 0.02; else rSense = TMC2130_RSENSE + 0.02;
+  }
+  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+
+  // get TMC SPI ready
   driver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3, axisNumber);
-  driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+
+  // get driver ready
+  if (!driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense)) return false;
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
@@ -72,37 +81,41 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   // use low speed mode switch for TMC drivers or high speed otherwise
   modeSwitchAllowed = microstepRatio != 1;
   modeSwitchFastAllowed = false;
+
+  return true;
 }
 
 // validate driver parameters
 bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   if (!StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6)) return false;
 
-  int maxCurrent;
-  if (settings.model == TMC2130) maxCurrent = 1500; else
-  if (settings.model == TMC5160) maxCurrent = 3000; else
+  if (settings.model == TMC2130) currentMax = TMC2130_MAX_CURRENT_MA; else
+  if (settings.model == TMC5160) currentMax = TMC5160_MAX_CURRENT_MA; else
   {
     DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
+
+  // override max current with user setting
+  if (userCurrentMax > 0) currentMax = userCurrentMax;
 
   long currentHold = round(param3);
   long currentRun = round(param4);
   long currentGoto = round(param5);
   UNUSED(param6);
 
-  if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
+  if (currentHold != OFF && (currentHold < 0 || currentHold > currentMax)) {
+    DF(axisPrefixWarn); DF("bad current hold="); D(currentHold); DLF("mA");
     return false;
   }
 
-  if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF(axisPrefixWarn); DF(" bad current run="); DL(currentRun);
+  if (currentRun != OFF && (currentRun < 0 || currentRun > currentMax)) {
+    DF(axisPrefixWarn); DF(" bad current run="); D(currentRun); DLF("mA");
     return false;
   }
 
-  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
+  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > currentMax)) {
+    DF(axisPrefixWarn); DF("bad current goto="); D(currentGoto); DLF("mA");
     return false;
   }
 
@@ -121,13 +134,13 @@ int StepDirTmcSPI::modeMicrostepSlewing() {
 }
 
 void StepDirTmcSPI::modeDecayTracking() {
-  driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+  driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense);
 }
 
 void StepDirTmcSPI::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
-  driver.mode(settings.intpol, settings.decaySlewing, microstepCode, IGOTO, settings.currentHold);
+  driver.mode(settings.intpol, settings.decaySlewing, microstepCode, IGOTO, settings.currentHold, rSense);
 }
 
 void StepDirTmcSPI::readStatus() {
@@ -145,11 +158,10 @@ void StepDirTmcSPI::readStatus() {
 // secondary way to power down not using the enable pin
 bool StepDirTmcSPI::enable(bool state) {
   if (state) {
-    driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+    driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense);
   } else {
-    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, 0);
+    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, 0, rSense);
   }
-
   return true;
 }
 
@@ -157,9 +169,9 @@ bool StepDirTmcSPI::enable(bool state) {
 void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF(axisPrefix); VL("TMC standstill automatic current calibration");
-    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun);
+    driver.mode(settings.intpol, STEALTHCHOP, microstepCode, settings.currentRun, settings.currentRun, rSense);
     delay(1000);
-    driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold);
+    driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense);
   }
 }
 

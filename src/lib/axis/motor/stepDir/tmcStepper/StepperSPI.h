@@ -16,26 +16,6 @@
   #define DRIVER_TMC_STEPPER_AUTOGRAD false
 #endif
 
-#ifndef TMC2130_RSENSE
-  #define TMC2130_RSENSE 0.11F
-#endif
-
-#ifndef TMC2160_RSENSE
-  #define TMC2160_RSENSE 0.075F
-#endif
-
-#ifndef TMC2660_RSENSE
-  #define TMC2660_RSENSE 0.075F
-#endif
-
-#ifndef TMC5160_RSENSE
-  #define TMC5160_RSENSE 0.075F
-#endif
-
-#ifndef TMC5161_RSENSE
-  #define TMC5161_RSENSE 0.075F
-#endif
-
 class StepDirTmcSPI : public StepDirDriver {
   public:
     // constructor
@@ -44,8 +24,8 @@ class StepDirTmcSPI : public StepDirDriver {
     // get driver type code
     inline char getParameterTypeCode() { return 'T'; }
 
-    // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-    void init(float param1, float param2, float param3, float param4, float param5, float param6);
+    // setup driver
+    bool init();
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);

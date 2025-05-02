@@ -90,7 +90,87 @@ const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
 #endif
 
 // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-void StepDirDriver::init(float param1, float param2, float param3, float param4, float param5, float param6) {
+bool StepDirDriver::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+
+  // get the maximum current and Rsense for this axis
+  user_rSense = 0;
+  userCurrentMax = 0;
+  switch (axisNumber) {
+    case 1:
+      #ifdef AXIS1_DRIVER_RSENSE
+        user_rSense = AXIS1_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS1_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS1_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 2:
+      #ifdef AXIS2_DRIVER_RSENSE
+        user_rSense = AXIS2_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS2_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS2_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 3:
+      #ifdef AXIS3_DRIVER_RSENSE
+        user_rSense = AXIS3_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS3_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS3_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 4:
+      #ifdef AXIS4_DRIVER_RSENSE
+        user_rSense = AXIS4_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS4_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS4_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 5:
+      #ifdef AXIS5_DRIVER_RSENSE
+        user_rSense = AXIS5_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS5_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS5_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 6:
+      #ifdef AXIS6_DRIVER_RSENSE
+        user_rSense = AXIS6_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS6_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS6_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 7:
+      #ifdef AXIS7_DRIVER_RSENSE
+        user_rSense = AXIS7_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS7_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS7_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 8:
+      #ifdef AXIS8_DRIVER_RSENSE
+        user_rSense = AXIS8_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS8_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS8_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+    case 9:
+      #ifdef AXIS9_DRIVER_RSENSE
+        user_rSense = AXIS9_DRIVER_RSENSE;
+      #endif
+      #ifdef AXIS9_DRIVER_CURRENT_MAX
+        userCurrentMax = AXIS9_DRIVER_CURRENT_MAX;
+      #endif
+    break;
+  }
+
+  // remember the settings
   settings.microsteps = round(param1);
   settings.microstepsSlewing = round(param2);
   settings.currentHold = round(param3);
@@ -110,6 +190,8 @@ void StepDirDriver::init(float param1, float param2, float param3, float param4,
   microstepCode = subdivisionsToCode(settings.microsteps);
   microstepCodeSlewing = subdivisionsToCode(settings.microstepsSlewing);
   microstepRatio = settings.microsteps/settings.microstepsSlewing;
+
+  return true;
 }
 
 // validate driver parameters

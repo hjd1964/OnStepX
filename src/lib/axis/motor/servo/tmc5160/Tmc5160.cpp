@@ -43,6 +43,9 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoTmcSpiPins *Pins, cons
 bool ServoTmc5160::init() {
   ServoDriver::init();
 
+  // override max current with user setting
+  if (userCurrentMax > 0) currentMax = userCurrentMax; else currentMax = TMC5160_MAX_CURRENT_MA;
+
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;
 
@@ -58,7 +61,9 @@ bool ServoTmc5160::init() {
   VF(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
   VF(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
-  rSense = TMC5160_RSENSE;
+  if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC5160_RSENSE;
+  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+
   driver = new TMC5160Stepper(Pins->cs, rSense, Pins->mosi, Pins->miso, Pins->sck);
   driver->begin();
   driver->intpol(true);
@@ -78,19 +83,24 @@ bool ServoTmc5160::init() {
   }
 
   currentRms = Settings->current*0.7071F;
-  VF(axisPrefix); VF("TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF (600mA)");
+    VF(axisPrefix); VLF("TMC current control OFF (600mA)");
     currentRms = 600*0.7071F;
   }
   driver->hold_multiplier(1.0F);
 
-  VF("Irun="); V(currentRms/0.7071F); VLF("mA");
+  if (currentRms < 0 || currentRms > currentMax*0.7071F) {
+    DF(axisPrefixWarn); DF("bad current setting="); DL(currentRms/0.7071F);
+    return false;
+  }
+
+  VF(axisPrefix); VF("Irun="); V(currentRms/0.7071F); VLF("mA");
   driver->rms_current(currentRms);
 
   unsigned long mode = driver->IOIN();
   if (mode && 0b01000000 > 0) {
-    VF(axisPrefix); VLF("TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
+    DF(axisPrefixWarn); DLF("TMC driver is in Step/Dir mode and WILL NOT WORK for TMC5160_SERVO!");
+    return false;
   }
 
   driver->en_pwm_mode(false);
@@ -100,7 +110,15 @@ bool ServoTmc5160::init() {
   // automatically set fault status for known drivers
   status.active = statusMode == ON;
 
+  // check to see if the driver is there and ok
+  #ifdef DRIVER_TMC_STEPPER_HW_SPI
+    readStatus();
+    if (!status.standstill || status.overTemperature) return false;
   #else
+    if (Pins->miso != OFF) {
+      readStatus();
+      if (!status.standstill || status.overTemperature) return false;
+    }
   #endif
 
   return true;

@@ -33,13 +33,65 @@ typedef struct StepDirDriverSettings {
   int8_t  status;
 } StepDirDriverSettings;
 
+#ifndef TMC2130_RSENSE
+#define TMC2130_RSENSE 0.11F
+#endif
+#ifndef TMC2130_MAX_CURRENT_MA
+#define TMC2130_MAX_CURRENT_MA (1700*0.8) // chip typically rated at 1.2A RMS, downrated to 80% due to typical step-stick form
+#endif
+
+#ifndef TMC2160_RSENSE
+#define TMC2160_RSENSE 0.075F
+#endif
+#ifndef TMC2160_MAX_CURRENT_MA
+#define TMC2160_MAX_CURRENT_MA 4230       // module typically rated at 3.0A RMS
+#endif
+
+#ifndef TMC2208_RSENSE
+#define TMC2208_RSENSE 0.11F
+#endif
+#ifndef TMC2208_MAX_CURRENT_MA
+#define TMC2208_MAX_CURRENT_MA (1974*0.8) // chip rated at 1.4A RMS, downrated to 80% due to typical step-stick form
+#endif
+
+#ifndef TMC2209_RSENSE
+#define TMC2209_RSENSE 0.11F
+#endif
+#ifndef TMC2209_MAX_CURRENT_MA
+#define TMC2209_MAX_CURRENT_MA (2820*0.8) // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
+#endif
+
+#ifndef TMC2660_RSENSE
+#define TMC2660_RSENSE 0.075F
+#endif
+#ifndef TMC2660_MAX_CURRENT_MA
+#define TMC2660_MAX_CURRENT_MA 2820       // module/chip rated at 2.0A RMS
+#endif
+
+#ifndef TMC5160_RSENSE
+#define TMC5160_RSENSE 0.075F
+#endif
+#ifndef TMC5160_MAX_CURRENT_MA
+#define TMC5160_MAX_CURRENT_MA 4230       // typical module rated at 3.0A RMS
+#endif
+
+#ifndef TMC5161_RSENSE
+#define TMC5161_RSENSE 0.075F
+#endif
+#ifndef TMC5161_MAX_CURRENT_MA
+#define TMC5161_MAX_CURRENT_MA (4935*0.8) // chip rated at 3.5A RMS, downrated to 80% due to typical step-stick form
+#endif
+
 class StepDirDriver {
   public:
     // get driver type code
     virtual char getParameterTypeCode() { return 'X'; }
 
-    // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-    virtual void init(float param1, float param2, float param3, float param4, float param5, float param6);
+    // set up driver
+    virtual bool init();
+
+    // set up parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
+    virtual bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // validate driver parameters
     virtual bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
@@ -91,6 +143,9 @@ class StepDirDriver {
     char axisPrefix[36]; // prefix for debug messages
     char axisPrefixWarn[36]; // additional prefix for debug messages
 
+    int16_t userCurrentMax = 0;
+    int16_t currentMax = 0;
+    float user_rSense = 0.0F;
     float rSense = 0.11F;
 
     DriverStatus status = {false, {false, false}, {false, false}, false, false, false, false};

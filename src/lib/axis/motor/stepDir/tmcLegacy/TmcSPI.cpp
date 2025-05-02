@@ -5,16 +5,14 @@
 
 #if !defined(DRIVER_TMC_STEPPER) && defined(STEP_DIR_TMC_SPI_PRESENT)
 
+#include "../StepDirDriver.h"
+
 bool TmcSPI::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber) {
   active = false;
   this->model = model;
   UNUSED(axisNumber);
 
   if (model == TMC2130 || model == TMC5160) {
-    if (model == TMC5160) rsense = TMC5160_DRIVER_RSENSE; else
-    if (model == TMC2130) rsense = TMC2130_DRIVER_RSENSE; else rsense = TMC2130_DRIVER_RSENSE;
-    VF("MSG: TmcSPI, init RSENSE="); VL(rsense);
-
     active = softSpi.init(mosi, sck, cs, miso);
     return true;
   } else
@@ -22,108 +20,119 @@ bool TmcSPI::init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso
   return false;
 }
 
-bool TmcSPI::mode(bool intpol, int decay_mode, byte micro_step_code, int irun, int ihold) {
+bool TmcSPI::mode(bool intpol, int decay_mode, byte micro_step_code, int irun, int ihold, float rsense) {
   if (!active) return false;
 
-  if (model == TMC2130 || model == TMC5160) {
-    softSpi.begin();
-    uint32_t data_out = 0;
+  uint8_t statusFlag = 0;
 
-    // *** My notes are limited, see the TMC2130 datasheet for more info. ***
+  softSpi.begin();
+  uint32_t data_out = 0;
 
-    // IHOLDDELAY=0x00, IRUN=0x1F, IHOLD=0x1F (  0,   31,   31   ) or 50% (0,16,16)
-    //                                         0b0000 11111 11111
-    // IHOLD,      default=16, range 0 to 31 (Standstill current 0=1/32... 31=32/32)
-    // IRUN,       default=31, range 0 to 31 (Run current 0=1/32... 31=32/32)
-    // IHOLDDELAY, default=4,  range 0 to 15 (Delay per current reduction step in x 2^18 clocks)
-    float Ifs = 0.325/rsense;
-    long IHOLD = round(( (ihold/1000.0)/Ifs)*32.0)-1;
-    long IRUN  = round(( (irun/1000.0)/Ifs)*32.0)-1;
-    if (IHOLD < 0) IHOLD = 0;
-    if (IHOLD > 31) IHOLD = 31;
-    if (IRUN < 0) IRUN = 0;
-    if (IRUN > 31) IRUN = 31;
-    if (IHOLD == OFF) IHOLD = IRUN/2;
+  // *** My notes are limited, see the TMC2130 datasheet for more info. ***
 
-    //          IHOLD       +  IRUN       +  IHOLDDELAY
-    data_out = (IHOLD << 0) + (IRUN << 8) + (4UL << 16);
-    if (last_IHOLD_IRUN != data_out) {
-      last_IHOLD_IRUN = data_out;
-      write(REG_IHOLD_IRUN, data_out);
+  // IHOLDDELAY=0x00, IRUN=0x1F, IHOLD=0x1F (  0,   31,   31   ) or 50% (0,16,16)
+  //                                         0b0000 11111 11111
+  // IHOLD,      default=16, range 0 to 31 (Standstill current 0=1/32... 31=32/32)
+  // IRUN,       default=31, range 0 to 31 (Run current 0=1/32... 31=32/32)
+  // IHOLDDELAY, default=4,  range 0 to 15 (Delay per current reduction step in x 2^18 clocks)
+  float Ifs = 0.325/rsense;
+  long IHOLD = round(( (ihold/1000.0)/Ifs)*32.0)-1;
+  long IRUN  = round(( (irun/1000.0)/Ifs)*32.0)-1;
+  if (IHOLD < 0) IHOLD = 0;
+  if (IHOLD > 31) IHOLD = 31;
+  if (IRUN < 0) IRUN = 0;
+  if (IRUN > 31) IRUN = 31;
+  if (IHOLD == OFF) IHOLD = IRUN/2;
+
+  //          IHOLD       +  IRUN       +  IHOLDDELAY
+  data_out = (IHOLD << 0) + (IRUN << 8) + (4UL << 16);
+  if (last_IHOLD_IRUN != data_out) {
+    last_IHOLD_IRUN = data_out;
+    statusFlag = write(REG_IHOLD_IRUN, data_out);
+    softSpi.pause();
+  }
+
+  // if we can, check if the driver is there
+  if (!softSpi.outOnly()) {
+    // check for standstill status flag
+    bool standstill = statusFlag & 0b00001000;
+    // check for fault status flag
+    bool fault = statusFlag & 0b00000010;
+    if (!standstill || fault) {
+      softSpi.end();
+      active = false;
+      return false;
+    }
+  }
+
+  // TPOWERDOWN, default=127, range 0 to 255 (Delay after standstill for motor current power down, about 0 to 4 seconds)
+  data_out = (tpd_value << 0);
+  if (last_TPOWERDOWN != data_out) {
+    last_TPOWERDOWN = data_out;
+    write(REG_TPOWERDOWN, data_out);
+    softSpi.pause();
+  }
+
+  // TPWMTHRS, default=0, range 0 to 2^20 (switchover upper velocity for stealthChop voltage PWM mode)
+  data_out = (tpt_value << 0);
+  if (last_TPWMTHRS != data_out) {
+    last_TPWMTHRS = data_out;
+    write(REG_TPWMTHRS, data_out);
+    softSpi.pause();
+  }
+
+  // THIGH, default=0, range 0 to 2^20 (switchover rate for vhighfs/vhighchm)
+  data_out = (thigh_value << 0);
+  if (last_THIGH != data_out) {
+    last_THIGH = data_out;
+    write(REG_THIGH, data_out);
+    softSpi.pause();
+  }
+
+  // PWMCONF
+  if (model == TMC2130) {
+    // default=0x00050480UL
+    data_out = (pc_pwm_ampl<<0)+(pc_pwm_grad<<8)+(pc_pwm_freq<<16)+(pc_pwm_auto<<18)+(pc_pwm_sym<<19)+(pc_pwm_freewheel<<20);
+    if (last_PWMCONF != data_out) {
+      last_PWMCONF = data_out;
+      write(REG_PWMCONF, data_out);
       softSpi.pause();
     }
-
-    // TPOWERDOWN, default=127, range 0 to 255 (Delay after standstill for motor current power down, about 0 to 4 seconds)
-    data_out = (tpd_value << 0);
-    if (last_TPOWERDOWN != data_out) {
-      last_TPOWERDOWN = data_out;
-      write(REG_TPOWERDOWN, data_out);
-      softSpi.pause();
-    }
-
-    // TPWMTHRS, default=0, range 0 to 2^20 (switchover upper velocity for stealthChop voltage PWM mode)
-    data_out = (tpt_value << 0);
-    if (last_TPWMTHRS != data_out) {
-      last_TPWMTHRS = data_out;
-      write(REG_TPWMTHRS, data_out);
-      softSpi.pause();
-    }
-
-    // THIGH, default=0, range 0 to 2^20 (switchover rate for vhighfs/vhighchm)
-    data_out = (thigh_value << 0);
-    if (last_THIGH != data_out) {
-      last_THIGH = data_out;
-      write(REG_THIGH, data_out);
-      softSpi.pause();
-    }
-
-    // PWMCONF
-    if (model == TMC2130) {
-      // default=0x00050480UL
-      data_out = (pc_pwm_ampl<<0)+(pc_pwm_grad<<8)+(pc_pwm_freq<<16)+(pc_pwm_auto<<18)+(pc_pwm_sym<<19)+(pc_pwm_freewheel<<20);
-      if (last_PWMCONF != data_out) {
-        last_PWMCONF = data_out;
-        write(REG_PWMCONF, data_out);
-        softSpi.pause();
-      }
-    } else
-    if (model == TMC5160) {
-      // default=0xC40C001EUL
-      data_out = (pc_pwm_ofs<<0)+(pc_pwm_grad<<8)+(pc_pwm_freq<<16)+(pc_pwm_auto<<18)+(pc_pwm_autograd<<19)+(pc_pwm_freewheel<<20)+(pc_pwm_reg<<24)+(pc_pwm_lim<<28);
-      if (last_PWMCONF != data_out) {
-        last_PWMCONF = data_out;
-        write(REG_PWMCONF, data_out);
-        softSpi.pause();
-      }
-    }
-
-    // CHOPCONF
-    if (intpol) cc_intpol=1; else cc_intpol=0; // set interpolation bit
-    // default=0x00008008UL
-    if (model == TMC2130) last_chop_config = (cc_toff<<0)+(cc_hstart<<4)+(cc_hend<<7)+(cc_rndtf<<13)+(cc_tbl<<15)+(cc_vsense<<17)+(cc_vhighfs<<18)+(cc_vhighchm<<19)+(cc_intpol<<28);
-    // default=0x10410150UL
-    if (model == TMC5160) last_chop_config = (cc_toff<<0)+(cc_hstart<<4)+(cc_hend<<7)+(cc_tbl<<15)+(cc_vhighfs<<18)+(cc_vhighchm<<19)+(cc_tpfd<<20)+(cc_intpol<<28);
-    if (micro_step_code != 255) {
-      data_out = last_chop_config + (((uint32_t)micro_step_code)<<24);
-      write(REG_CHOPCONF, data_out);
-      softSpi.pause();
-    }
-
-    // GCONF
-    // voltage on AIN is current reference
-    data_out = 0x00000001UL;
-    // set stealthChop bit
-    if (decay_mode == STEALTHCHOP) data_out |= 0x00000004UL;
-    if (last_GCONF != data_out) {
-      last_GCONF = data_out;
-      write(REG_GCONF, data_out);
-    }
-
-    softSpi.end();
-    return true;
   } else
+  if (model == TMC5160) {
+    // default=0xC40C001EUL
+    data_out = (pc_pwm_ofs<<0)+(pc_pwm_grad<<8)+(pc_pwm_freq<<16)+(pc_pwm_auto<<18)+(pc_pwm_autograd<<19)+(pc_pwm_freewheel<<20)+(pc_pwm_reg<<24)+(pc_pwm_lim<<28);
+    if (last_PWMCONF != data_out) {
+      last_PWMCONF = data_out;
+      write(REG_PWMCONF, data_out);
+      softSpi.pause();
+    }
+  }
 
-  return false;
+  // CHOPCONF
+  if (intpol) cc_intpol=1; else cc_intpol=0; // set interpolation bit
+  // default=0x00008008UL
+  if (model == TMC2130) last_chop_config = (cc_toff<<0)+(cc_hstart<<4)+(cc_hend<<7)+(cc_rndtf<<13)+(cc_tbl<<15)+(cc_vsense<<17)+(cc_vhighfs<<18)+(cc_vhighchm<<19)+(cc_intpol<<28);
+  // default=0x10410150UL
+  if (model == TMC5160) last_chop_config = (cc_toff<<0)+(cc_hstart<<4)+(cc_hend<<7)+(cc_tbl<<15)+(cc_vhighfs<<18)+(cc_vhighchm<<19)+(cc_tpfd<<20)+(cc_intpol<<28);
+  if (micro_step_code != 255) {
+    data_out = last_chop_config + (((uint32_t)micro_step_code)<<24);
+    write(REG_CHOPCONF, data_out);
+    softSpi.pause();
+  }
+
+  // GCONF
+  // voltage on AIN is current reference
+  data_out = 0x00000001UL;
+  // set stealthChop bit
+  if (decay_mode == STEALTHCHOP) data_out |= 0x00000004UL;
+  if (last_GCONF != data_out) {
+    last_GCONF = data_out;
+    write(REG_GCONF, data_out);
+  }
+
+  softSpi.end();
+  return true;
 }
 
 bool TmcSPI::error() {
@@ -134,9 +143,8 @@ bool TmcSPI::error() {
 
     // get global status register, look for driver error bit
     uint32_t data_out = 0;
-    //uint8_t result=read(REG_GSTAT,&data_out);
-    uint8_t result = read(REG_DRVSTATUS,&data_out);
-    
+    uint8_t result = read(REG_DRVSTATUS, &data_out);
+
     softSpi.end();
     if ((result & 2) != 0 || (result == 0 && data_out == 0)) return true; else return false;
   } else

@@ -28,9 +28,8 @@ StepDirTmcSPI::StepDirTmcSPI(uint8_t axisNumber, const StepDirDriverPins *Pins, 
   settings = *Settings;
 }
 
-// sets driver parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-void StepDirTmcSPI::init(float param1, float param2, float param3, float param4, float param5, float param6) {
-  StepDirDriver::init(param1, param2, param3, param4, param5, param6);
+// setup driver
+bool StepDirTmcSPI::init() {
 
   if (settings.currentRun != OFF) {
     // automatically set goto and hold current if they are disabled
@@ -44,17 +43,17 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     settings.currentHold = lround(settings.currentRun/2.0F);
   }
 
-  VF(axisPrefix);
   if (settings.currentRun == OFF) {
-    VLF("current control OFF (set by Vref)");
+    VF(axisPrefix); VLF("current control OFF (set by Vref)");
   } else {
+    VF(axisPrefix);
     VF("Ihold="); V(settings.currentHold); VF("mA, ");
     VF("Irun="); V(settings.currentRun); VF("mA, ");
     VF("Igoto="); V(settings.currentGoto); VL("mA");
   }
 
   if (settings.model == TMC2130) {
-    rSense = TMC2130_RSENSE;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2130_RSENSE;
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
       driver = new TMC2130Stepper(Pins->cs, rSense);
     #else
@@ -66,7 +65,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC2130Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC2160) {
-    rSense = TMC2160_RSENSE;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2160_RSENSE;
     #ifdef TMC2160_RSENSE_KRAKEN
       if (axisNumber <= 4) rSense = TMC2160_RSENSE_KRAKEN;
     #endif
@@ -81,7 +80,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC2160Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC2660) {
-    rSense = TMC2660_RSENSE;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2660_RSENSE;
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
       driver = new TMC2660Stepper(Pins->cs, rSense);
     #else
@@ -93,7 +92,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     modeMicrostepTracking();
   } else
   if (settings.model == TMC5160) {
-    rSense = TMC5160_RSENSE;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC5160_RSENSE;
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
       driver = new TMC5160Stepper(Pins->cs, rSense);
     #else
@@ -105,7 +104,7 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC5160Stepper*)driver)->en_pwm_mode(false);
   } else
   if (settings.model == TMC5161) {
-    rSense = TMC5161_RSENSE;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC5161_RSENSE;
     #ifdef DRIVER_TMC_STEPPER_HW_SPI
       driver = new TMC5161Stepper(Pins->cs, rSense);
     #else
@@ -115,11 +114,29 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
     ((TMC5161Stepper*)driver)->intpol(settings.intpol);
     modeMicrostepTracking();
     ((TMC5161Stepper*)driver)->en_pwm_mode(false);
+  } else {
+    DF(axisPrefixWarn); DLF("unknown driver model!");
+    return false;
   }
+
+  // show the selected Rsense
+  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+
   current(settings.currentRun, (float)settings.currentHold/settings.currentRun);
 
   // automatically set fault status for known drivers
   status.active = settings.status != OFF;
+
+  // if we can, check to see if the driver is there
+  #ifdef DRIVER_TMC_STEPPER_HW_SPI
+    readStatus();
+    if (!status.standstill || status.overTemperature) return false;
+  #else
+    if (Pins->miso != OFF) {
+      readStatus();
+      if (!status.standstill || status.overTemperature) return false;
+    }
+  #endif
 
   // set fault pin mode
   if (settings.status == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);
@@ -133,40 +150,44 @@ void StepDirTmcSPI::init(float param1, float param2, float param3, float param4,
   // use low speed mode switch for TMC drivers or high speed otherwise
   modeSwitchAllowed = microstepRatio != 1;
   modeSwitchFastAllowed = false;
+
+  return true;
 }
 
 // validate driver parameters
 bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   if (!StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6)) return false;
 
-  int maxCurrent;
-  if (settings.model == TMC2130) maxCurrent = 1500; else
-  if (settings.model == TMC2160) maxCurrent = 3000; else
-  if (settings.model == TMC2660) maxCurrent = 3000; else
-  if (settings.model == TMC5160) maxCurrent = 3000; else
-  if (settings.model == TMC5161) maxCurrent = 3500; else
+  if (settings.model == TMC2130) currentMax = TMC2130_MAX_CURRENT_MA; else
+  if (settings.model == TMC2160) currentMax = TMC2160_MAX_CURRENT_MA; else
+  if (settings.model == TMC2660) currentMax = TMC2660_MAX_CURRENT_MA; else
+  if (settings.model == TMC5160) currentMax = TMC5160_MAX_CURRENT_MA; else
+  if (settings.model == TMC5161) currentMax = TMC5161_MAX_CURRENT_MA; else
   {
     DF(axisPrefixWarn); DLF("unknown driver model!");
     return false;
   }
+
+  // override max current with user setting
+  if (userCurrentMax > 0) currentMax = userCurrentMax;
 
   long currentHold = round(param3);
   long currentRun = round(param4);
   long currentGoto = round(param5);
   UNUSED(param6);
 
-  if (currentHold != OFF && (currentHold < 0 || currentHold > maxCurrent)) {
-    DF(axisPrefixWarn); DF("bad current hold="); DL(currentHold);
+  if (currentHold != OFF && (currentHold < 0 || currentHold > currentMax)) {
+    DF(axisPrefixWarn); DF("bad current hold="); D(currentHold); DLF("mA");
     return false;
   }
 
-  if (currentRun != OFF && (currentRun < 0 || currentRun > maxCurrent)) {
-    DF(axisPrefixWarn); DF("bad current run="); DL(currentRun);
+  if (currentRun != OFF && (currentRun < 0 || currentRun > currentMax)) {
+    DF(axisPrefixWarn); DF("bad current run="); D(currentRun); DLF("mA");
     return false;
   }
 
-  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > maxCurrent)) {
-    DF(axisPrefixWarn); DF("bad current goto="); DL(currentGoto);
+  if (currentGoto != OFF && (currentGoto < 0 || currentGoto > currentMax)) {
+    DF(axisPrefixWarn); DF("bad current goto="); D(currentGoto); DLF("mA");
     return false;
   }
 

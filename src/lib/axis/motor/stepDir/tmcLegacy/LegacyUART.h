@@ -42,8 +42,8 @@ class StepDirTmcUART : public StepDirDriver {
     // get driver type code
     inline char getParameterTypeCode() { return 'T'; }
 
-    // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-    void init(float param1, float param2, float param3, float param4, float param5, float param6);
+    // setup driver
+    bool init();
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);

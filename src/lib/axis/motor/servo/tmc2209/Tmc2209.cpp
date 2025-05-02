@@ -50,6 +50,9 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const S
 bool ServoTmc2209::init() {
   ServoDriver::init();
 
+  // override max current with user setting
+  if (userCurrentMax > 0) currentMax = userCurrentMax; else currentMax = TMC2209_MAX_CURRENT_MA;
+
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;
 
@@ -102,7 +105,9 @@ bool ServoTmc2209::init() {
     SerialTMC->begin(SERIAL_TMC_BAUD);
   #endif
 
-  rSense = TMC2209_RSENSE;
+  if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2209_RSENSE;
+  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+
   #if defined(SERIAL_TMC_HARDWARE_UART)
     driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   #else
@@ -112,11 +117,11 @@ bool ServoTmc2209::init() {
   driver->intpol(true);
 
   if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
-    VF(axisPrefix); VF(", TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    VF(axisPrefix); VF("TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
     driver->TPWMTHRS(velocityThrs/0.715F);
   }
 
-  VF(axisPrefix); VF(", TMC u-step mode ");
+  VF(axisPrefix); VF("TMC u-step mode ");
   if (Settings->microsteps == OFF) {
     VLF("OFF (assuming 1X)");
     driver->microsteps(1);
@@ -126,15 +131,19 @@ bool ServoTmc2209::init() {
   }
 
   currentRms = Settings->current*0.7071F;
-  VF(axisPrefix); VF("TMC ");
   if (Settings->current == OFF) {
-    VLF("current control OFF setting 300mA");
+    VF(axisPrefix); VLF("TMC current control OFF setting 300mA");
     currentRms = 300*0.7071F;
+  }
+
+  if (currentRms < 0 || currentRms > currentMax*0.7071F) {
+    DF(axisPrefixWarn); DF("bad current setting="); DL(currentRms);
+    return false;
   }
 
   driver->hold_multiplier(1.0F);
 
-  VF("Irun="); V(currentRms/0.7071F); VLF("mA");
+  VF(axisPrefix); VF("Irun="); V(currentRms/0.7071F); VLF("mA");
   driver->rms_current(currentRms);
 
   driver->en_spreadCycle(true);
@@ -142,6 +151,9 @@ bool ServoTmc2209::init() {
   // automatically set fault status for known drivers
   status.active = statusMode == ON;
 
+  // check to see if the driver is there and ok
+  readStatus();
+  if (!status.standstill || status.overTemperature) return false;
 
   return true;
 }
@@ -172,6 +184,8 @@ void ServoTmc2209::enable(bool state) {
   currentVelocity = 0.0F;
 
   ServoDriver::updateStatus();
+
+  return;
 }
 
 // set motor velocity (in microsteps/s)

@@ -146,14 +146,16 @@ bool StepDirMotor::init() {
     return false;
   }
 
+  // start the driver
+  if (!driver->init()) { DLF("ERR: StepDirMotor::init(); no motor driver detected exiting!"); return false; }
 
   ready = true;
   return true;
 }
 
-  driver->init(param1, param2, param3, param4, param5, param6);
 // sets motor parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
 bool StepDirMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+  if (!driver->setParameters(param1, param2, param3, param4, param5, param6)) return false;
   homeSteps = driver->getMicrostepRatio();
   V(axisPrefix); VF("sequencer homes every "); V(homeSteps); VLF(" step(s)");
   return true;

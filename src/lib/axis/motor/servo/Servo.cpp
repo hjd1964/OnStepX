@@ -73,12 +73,14 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
 
-  encoder->init();
-  encoder->setOrigin(encoderOrigin);
-  if (!encoder->ready) return false;
+  if (!encoder->init()) { DLF("ERR: ServoMotor::init(); no encoder detected exiting!"); return false; }
 
-  driver->init();
-  enable(false);
+  encoder->setOrigin(encoderOrigin);
+
+  if (!driver->init()) { DLF("ERR: ServoMotor::init(); no motor driver detected exiting!"); return false; }
+
+  driver->enable(false);
+  feedback->reset();
 
   #ifdef ABSOLUTE_ENCODER_CALIBRATION
     calibrationRead("/encoder.dat");

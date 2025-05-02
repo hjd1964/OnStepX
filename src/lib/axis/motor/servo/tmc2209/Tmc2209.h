@@ -17,6 +17,10 @@
   #define TMC2209_RSENSE 0.11F
 #endif
 
+#ifndef TMC2209_MAX_CURRENT_MA
+  #define TMC2209_MAX_CURRENT_MA (2820*0.8)          // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
+#endif
+
 // default settings for any TMC UART drivers that may be present
 #ifndef SERIAL_TMC
   #define SERIAL_TMC                  SoftSerial     // Use software serial w/ TX on M3 (CS) and RX on M4 (MISO) of each axis
@@ -79,11 +83,13 @@ class ServoTmc2209 : public ServoDriver {
     const ServoTmcSettings *Settings;
 
   private:
-    float rSense = 0.11F;
     // read status from driver
     void readStatus();
 
     bool stealthChop() { if (decay == STEALTHCHOP) return true; else return false; }
+
+    int16_t currentMax = 0;
+    float rSense = 0.11F;
 
     #if SERIAL_TMC == SoftSerial
       SoftwareSerial *SerialTMC;

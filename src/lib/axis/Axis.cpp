@@ -81,6 +81,16 @@ bool Axis::init(Motor *motor) {
 
   // read axis settings from NV
   nv.readBytes(nvAxisSettingsBase, &settings, sizeof(AxisStoredSettings));
+
+  // special ODrive case, a way to pass the stepsPerMeasure to it
+  if (motor->getParameterTypeCode() == 'O') settings.param6 = settings.stepsPerMeasure;
+
+  // set parameters
+  if (!motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6)) {
+    DLF("ERR: Axis::init(); setting parameters failed exiting!"); return false;
+  }
+
+  // check parameters
   if (!validateAxisSettings(axisNumber, settings)) {
     V(axisPrefix); VLF("settings validation failed reverting settings to Config.h defaults");
     settings = defaultSettings;
@@ -109,10 +119,8 @@ bool Axis::init(Motor *motor) {
   #endif
 
   // setup motor
-  if (!motor->init()) { DLF("ERR: Axis::init(); no motor exiting!"); return false; }
-  // special ODrive case, a way to pass the stepsPerMeasure to it
-  if (motor->getParameterTypeCode() == 'O') settings.param6 = settings.stepsPerMeasure;
-  motor->setParameters(settings.param1, settings.param2, settings.param3, settings.param4, settings.param5, settings.param6);
+  if (!motor->init()) { DLF("ERR: Axis::init(); no motor/driver detected exiting!"); return false; }
+
   motor->setReverse(settings.reverse);
   motor->setBacklashFrequencySteps(backlashFreq*settings.stepsPerMeasure);
 

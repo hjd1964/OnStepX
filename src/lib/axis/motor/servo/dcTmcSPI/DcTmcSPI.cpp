@@ -87,7 +87,15 @@ bool ServoDcTmcSPI::init() {
   // automatically set fault status for known drivers
   status.active = statusMode == ON;
 
+  // check to see if the driver is there and ok
+  #ifdef DRIVER_TMC_STEPPER_HW_SPI
+    readStatus();
+    if (!status.standstill || status.overTemperature) return false;
   #else
+    if (Pins->miso != OFF) {
+      readStatus();
+      if (!status.standstill || status.overTemperature) return false;
+    }
   #endif
 
   return true;

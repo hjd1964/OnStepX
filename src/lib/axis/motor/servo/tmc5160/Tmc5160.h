@@ -17,6 +17,10 @@
   #define TMC5160_RSENSE 0.075F
 #endif
 
+#ifndef TMC5160_MAX_CURRENT_MA
+  #define TMC5160_MAX_CURRENT_MA 4230       // typical module rated at 3.0A RMS
+#endif
+
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
 
 typedef struct ServoTmcSpiPins {
@@ -63,11 +67,13 @@ class ServoTmc5160 : public ServoDriver {
     const ServoTmcSettings *Settings;
 
   private:
-    float rSense = 0.075F;
     // read status from driver
     void readStatus();
 
     bool stealthChop() { if (decay == STEALTHCHOP) return true; else return false; }
+
+    int16_t currentMax = 0;
+    float rSense = 0.075F;
 
     TMC5160Stepper *driver;
 

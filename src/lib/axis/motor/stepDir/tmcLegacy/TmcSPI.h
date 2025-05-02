@@ -9,17 +9,9 @@
 
 #include "../../../../softSpi/SoftSpi.h"
 
-#ifndef TMC5160_DRIVER_RSENSE
-  #define TMC5160_DRIVER_RSENSE (0.075)
-#endif
-
-#ifndef TMC2130_DRIVER_RSENSE
-  #define TMC2130_DRIVER_RSENSE (0.11 + 0.02)
-#endif
-
 class TmcSPI {
   public:
-    // setup SoftSpi or UART and driver model/Rsense
+    // setup SoftSpi or UART and driver model
     bool init(int model, int16_t mosi, int16_t sck, int16_t cs, int16_t miso, int16_t axisNumber = 0);
 
     // TMC setup most common settings
@@ -27,7 +19,7 @@ class TmcSPI {
     // decay mode:           decay_mode (STEALTHCHOP or SPREADCYCLE)
     // microstepping mode:   micro_step_code (0=256x, 1=128x, 2=64x, 3=32x, 4=16x, 5=8x, 6=4x, 7=2x, 8=1x)
     // irun, ihold, rsense:  current in mA and sense resistor value
-    bool mode(bool intpol, int decay_mode, byte micro_step_code, int irun, int ihold);
+    bool mode(bool intpol, int decay_mode, byte micro_step_code, int irun, int ihold, float rsense);
 
     // Check for TMC error from DRVSTATUS register
     bool error();
@@ -181,7 +173,6 @@ class TmcSPI {
 
     bool  active              = false;
     int   model;
-    float rsense              = 0.11 + 0.02; // default for TMC2130
 
     SoftSpi softSpi;
 };

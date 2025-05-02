@@ -16,14 +16,6 @@
   #define DRIVER_TMC_STEPPER_AUTOGRAD true
 #endif
 
-#ifndef TMC2208_RSENSE
-  #define TMC2208_RSENSE 0.11F
-#endif
-
-#ifndef TMC2209_RSENSE
-  #define TMC2209_RSENSE 0.11F
-#endif
-
 // default settings for any TMC UART drivers that may be present
 #ifndef SERIAL_TMC
   #define SERIAL_TMC                  SoftSerial     // Use software serial w/ TX on M3 (CS) and RX on M4 (MISO) of each axis
@@ -47,8 +39,8 @@ class StepDirTmcUART : public StepDirDriver {
     // get driver type code
     inline char getParameterTypeCode() { return 'T'; }
 
-    // set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-    void init(float param1, float param2, float param3, float param4, float param5, float param6);
+    // setup driver
+    bool init();
 
     // validate driver parameters
     bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
