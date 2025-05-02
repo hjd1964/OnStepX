@@ -14,7 +14,7 @@
 #define FYSETC_S6_2                 4      // FYSETC S6 Version 2.0, 3D printer board, a 6-axis design
 
 #define BTT_SKR_PRO                 5      // BigTreeTech SKR PRO Version 1.2
-#define BTT_KRAKEN                  6      // BigTreeTech Kraken Version 1.0
+#define BTT_OCTOPUS_PRO             6      // BigTreeTech Octopus Pro Version 1.1
 
 #define MiniPCB                     7      // small 2-axis design for embedded or mounting behind a panel, Teensy3.2
 #define MiniPCB13                   8      // improved version 1.3 adds better support for ESP-01 flashing and optional I2C

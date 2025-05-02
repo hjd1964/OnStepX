@@ -45,7 +45,7 @@
 #undef E2END
 #if NV_DRIVER == NV_DEFAULT
   #undef NV_DRIVER
-  #define NV_DRIVER NV_AT24C32
+  #define NV_DRIVER NV_24256
 #endif
 
 //--------------------------------------------------------------------------------------------------
