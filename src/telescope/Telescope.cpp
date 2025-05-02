@@ -40,6 +40,10 @@ void mcuTempWrapper() { telescope.mcuTemperature = (telescope.mcuTemperature*9.0
     static uint8_t cycle = 0;
     if (cycle++ > 16) cycle = 0;
 
+    #if GPIO_DEVICE != OFF
+      if (gpio.lateInitError) initError.gpio = true;
+    #endif
+
     // show only the most severe error (in order)
     uint8_t flashes = 0;
     if (initError.nv)      flashes = 1; else
