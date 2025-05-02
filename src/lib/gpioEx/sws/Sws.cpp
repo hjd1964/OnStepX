@@ -126,14 +126,16 @@ void GpioSws::analogWrite(int pin, int value) {
 
 // monitor SWS presence
 void GpioSws::poll() {
+  if (lateInitError) return;
+
   // init wait for indication of SWS presence
   if (active && !readyStage1) { startTimeMs = millis(); readyStage1 = true; VLF("MSG: GpioSws, active"); }
 
   // init delay for synchronization
-  if (readyStage1 && !readyStage2) { if ((long)(millis() - startTimeMs) > 2000) { readyStage2 = true; VLF("MSG: GpioSws, ready"); } }
+  if (readyStage1 && !readyStage2 && (long)(millis() - startTimeMs) > 2000) { readyStage2 = true; VLF("MSG: GpioSws, ready"); }
 
   // init timeout
-  if (!readyStage2 && (long)(millis() - startTimeMs) > 60000) { lateInitError = true; return false; DLF("ERR: GpioSws, connection failed");  }
+  if (!readyStage1 && !readyStage2 && (long)(millis() - startTimeMs) > 60000) { lateInitError = true; DLF("ERR: GpioSws, connection failed"); }
 
   // running timeout
   if (readyStage2 && (long)(millis() - lastActiveTimeMs) > 5000) { startTimeMs = millis(); lastActiveTimeMs = millis(); active = false; readyStage1 = false; readyStage2 = false; DLF("WRN: GpioSws, connection restart"); }
