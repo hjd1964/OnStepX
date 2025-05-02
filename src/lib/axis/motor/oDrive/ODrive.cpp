@@ -156,11 +156,6 @@ void ODriveMotor::setInstrumentCoordinateSteps(long value) {
   Motor::setInstrumentCoordinateSteps(value);
 }
 
-// get the associated driver status
-DriverStatus ODriveMotor::getDriverStatus() {
-  return status;
-}
-
 // resets motor and target angular position in steps, also zeros backlash and index
 void ODriveMotor::resetPositionSteps(long value) {
   // this is where the initial odrive position in "steps" is brought into agreement with the motor position in steps
