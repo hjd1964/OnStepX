@@ -63,9 +63,12 @@ class StepDirMotor : public Motor {
       driver->calibrateDriver();
       digitalWriteEx(Pins->enable, !Pins->enabledState);
     }
-
+  
     // get the associated stepper driver status
-    DriverStatus getDriverStatus() { if (ready) driver->updateStatus(); return driver->getStatus(); }
+    DriverStatus getDriverStatus() {
+      if (ready) { driver->updateStatus(); status = driver->getStatus(); } else status.fault = true;
+      return status;
+    }
 
     // get movement frequency in steps per second
     float getFrequencySteps();
@@ -136,6 +139,8 @@ class StepDirMotor : public Motor {
     volatile MicrostepModeControl microstepModeControl = MMC_TRACKING;
 
     bool useFastHardwareTimers = true;
+
+    DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
 
     void (*callback)() = NULL;
     void (*callbackFF)() = NULL;

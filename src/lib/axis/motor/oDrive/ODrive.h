@@ -85,7 +85,7 @@ class ODriveMotor : public Motor {
     void setInstrumentCoordinateSteps(long value);
 
     // get the associated driver status
-    inline DriverStatus getDriverStatus() { return status; }
+    inline DriverStatus getDriverStatus() { if (!ready) status.fault = true; return status; }
 
     // resets motor and target angular position in steps, also zeros backlash and index 
     void resetPositionSteps(long value);

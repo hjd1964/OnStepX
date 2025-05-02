@@ -141,8 +141,8 @@ void ServoMotor::enable(bool state) {
 
 // get the associated motor driver status
 DriverStatus ServoMotor::getDriverStatus() {
-  if (ready) driver->updateStatus();
-  DriverStatus driverStatus = driver->getStatus();
+  DriverStatus driverStatus;
+  if (ready) { driver->updateStatus(); driverStatus = driver->getStatus(); } else driverStatus.fault = true;
   if (encoder->errorThresholdExceeded()) driverStatus.fault = true;
   if (safetyShutdown) driverStatus.fault = true;
   return driverStatus;
