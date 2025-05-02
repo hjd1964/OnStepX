@@ -23,15 +23,15 @@ void requestKTechServoAxis7() { ktechServoInstance[6]->requestStatus(); }
 void requestKTechServoAxis8() { ktechServoInstance[7]->requestStatus(); }
 void requestKTechServoAxis9() { ktechServoInstance[8]->requestStatus(); }
 
-void statusKTechServoAxis1(uint8_t data[8]) { ktechServoInstance[0]->updateStatusCallback(data); }
-void statusKTechServoAxis2(uint8_t data[8]) { ktechServoInstance[1]->updateStatusCallback(data); }
-void statusKTechServoAxis3(uint8_t data[8]) { ktechServoInstance[2]->updateStatusCallback(data); }
-void statusKTechServoAxis4(uint8_t data[8]) { ktechServoInstance[3]->updateStatusCallback(data); }
-void statusKTechServoAxis5(uint8_t data[8]) { ktechServoInstance[4]->updateStatusCallback(data); }
-void statusKTechServoAxis6(uint8_t data[8]) { ktechServoInstance[5]->updateStatusCallback(data); }
-void statusKTechServoAxis7(uint8_t data[8]) { ktechServoInstance[6]->updateStatusCallback(data); }
-void statusKTechServoAxis8(uint8_t data[8]) { ktechServoInstance[7]->updateStatusCallback(data); }
-void statusKTechServoAxis9(uint8_t data[8]) { ktechServoInstance[8]->updateStatusCallback(data); }
+void statusKTechServoAxis1(uint8_t data[8]) { ktechServoInstance[0]->requestStatusCallback(data); }
+void statusKTechServoAxis2(uint8_t data[8]) { ktechServoInstance[1]->requestStatusCallback(data); }
+void statusKTechServoAxis3(uint8_t data[8]) { ktechServoInstance[2]->requestStatusCallback(data); }
+void statusKTechServoAxis4(uint8_t data[8]) { ktechServoInstance[3]->requestStatusCallback(data); }
+void statusKTechServoAxis5(uint8_t data[8]) { ktechServoInstance[4]->requestStatusCallback(data); }
+void statusKTechServoAxis6(uint8_t data[8]) { ktechServoInstance[5]->requestStatusCallback(data); }
+void statusKTechServoAxis7(uint8_t data[8]) { ktechServoInstance[6]->requestStatusCallback(data); }
+void statusKTechServoAxis8(uint8_t data[8]) { ktechServoInstance[7]->requestStatusCallback(data); }
+void statusKTechServoAxis9(uint8_t data[8]) { ktechServoInstance[8]->requestStatusCallback(data); }
 
 ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettings) {
   if (axisNumber < 1 || axisNumber > 9) return;
@@ -173,7 +173,7 @@ void ServoKTech::updateStatus() {
 }
 
 // update the associated driver status from CAN
-void ServoKTech::updateStatusCallback(uint8_t data[8]) {
+void ServoKTech::requestStatusCallback(uint8_t data[8]) {
   if (statusMode == OFF) return;
 
   uint8_t errorState = data[7];

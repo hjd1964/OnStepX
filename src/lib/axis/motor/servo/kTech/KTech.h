@@ -45,8 +45,8 @@ class ServoKTech : public ServoDriver {
     // request driver status from CAN
     void requestStatus();
 
-    // update the associated driver status from CAN
-    void updateStatusCallback(uint8_t data[8]);
+    // read the associated driver status from CAN
+    void requestStatusCallback(uint8_t data[8]);
 
     const ServoKTechSettings *Settings;
 
