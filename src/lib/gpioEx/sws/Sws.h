@@ -27,8 +27,17 @@ class GpioSws : public Gpio {
     // one eight channel SWS GPIO is supported
     void analogWrite(int pin, int value);
 
+    // monitor SWS presence
+    void poll();
+
   private:
+
     bool found = false;
+    bool active = false;
+    bool readyStage1 = false;
+    bool readyStage2 = false;
+    unsigned long startTimeMs = 0;
+    unsigned long lastActiveTimeMs = 0;
 
     bool virtualRead[8] = {false, false, false, false, false, false, false, false};
     int virtualWrite[8] = {false, false, false, false, false, false, false, false};

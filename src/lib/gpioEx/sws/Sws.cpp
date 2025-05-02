@@ -8,25 +8,30 @@
 #include "../../tasks/OnTask.h"
 #include "../../../libApp/commands/ProcessCmds.h"
 
+void swsGpioWrapper() { gpio.poll(); }
+
 // check for SWS device
 bool GpioSws::init() {
-  static bool initialized = false;
-  if (initialized) return found;
+  if (found) return true;
+
+  VF("MSG: GPIO, start SwsGpio monitor task (rate 1000ms priority 7)... ");
+  if (tasks.add(1000, 0, true, 7, swsGpioWrapper, "SwsGpio")) { VLF("success"); } else { VLF("FAILED!"); return false; }
 
   found = true;
-
-  return found;
+  return true;
 }
 
 // no command processing
 bool GpioSws::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-
   if (command[0] == 'G') {
     if (command[1] == 'X' && parameter[2] == 0)  {
       // :GXGA#     Get Gpio presence
       //            Returns: 8# on success or 0 (error) if not present
       if (parameter[0] == 'G' && parameter[1] == 'A') {
         strcpy(reply, "8");
+
+        active = true;
+        lastActiveTimeMs = millis();
         *numericReply = false;
       } else
 
@@ -52,6 +57,9 @@ bool GpioSws::command(char *reply, char *command, char *parameter, bool *supress
 
           reply[i + 1] = 0;
         }
+
+        active = true;
+        lastActiveTimeMs = millis();
         *numericReply = false;
       } else return false;
     } else return false;
@@ -70,6 +78,9 @@ bool GpioSws::command(char *reply, char *command, char *parameter, bool *supress
         if (v == 0 || v == 1) {
           virtualRead[i] = v;
         } else *commandError = CE_PARAM_RANGE;
+
+        active = true;
+        lastActiveTimeMs = millis();
       } else return false;
     } else return false;
   } else return false;
@@ -79,7 +90,7 @@ bool GpioSws::command(char *reply, char *command, char *parameter, bool *supress
 
 // set GPIO pin (0 to 7) mode for INPUT, INPUT_PULLUP, or OUTPUT
 void GpioSws::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 7) {
+  if (pin >= 0 && pin <= 7) {
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
@@ -89,7 +100,7 @@ void GpioSws::pinMode(int pin, int mode) {
 
 // one four channel SWS GPIO is supported, this gets the last set value
 int GpioSws::digitalRead(int pin) {
-  if (found && pin >= 0 && pin <= 7) {
+  if (readyStage2 && pin >= 0 && pin <= 7) {
     if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
       return virtualRead[pin];
     } else return state[pin]; 
@@ -98,7 +109,7 @@ int GpioSws::digitalRead(int pin) {
 
 // one four channel SWS GPIO is supported, this sets each output on or off
 void GpioSws::digitalWrite(int pin, int value) {
-  if (found && pin >= 0 && pin <= 7) {
+  if (pin >= 0 && pin <= 7) {
     state[pin] = value;
     virtualWrite[pin] = value;
   } else return;
@@ -107,10 +118,25 @@ void GpioSws::digitalWrite(int pin, int value) {
 // one four channel SWS GPIO is supported
 void GpioSws::analogWrite(int pin, int value) {
   value = (value*127)/ANALOG_WRITE_RANGE + 2;
-  if (found && pin >= 0 && pin <= 7 && value >= 2 && value <= 129) {
+  if (pin >= 0 && pin <= 7 && value >= 2 && value <= 129) {
     state[pin] = value;
     virtualWrite[pin] = value;
   } else return;
+}
+
+// monitor SWS presence
+void GpioSws::poll() {
+  // init wait for indication of SWS presence
+  if (active && !readyStage1) { startTimeMs = millis(); readyStage1 = true; VLF("MSG: GpioSws, active"); }
+
+  // init delay for synchronization
+  if (readyStage1 && !readyStage2) { if ((long)(millis() - startTimeMs) > 2000) { readyStage2 = true; VLF("MSG: GpioSws, ready"); } }
+
+  // init timeout
+  if (!readyStage2 && (long)(millis() - startTimeMs) > 60000) { lateInitError = true; return false; DLF("ERR: GpioSws, connection failed");  }
+
+  // running timeout
+  if (readyStage2 && (long)(millis() - lastActiveTimeMs) > 5000) { startTimeMs = millis(); lastActiveTimeMs = millis(); active = false; readyStage1 = false; readyStage2 = false; DLF("WRN: GpioSws, connection restart"); }
 }
 
 GpioSws gpio;
