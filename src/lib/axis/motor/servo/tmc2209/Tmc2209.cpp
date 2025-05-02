@@ -142,13 +142,6 @@ bool ServoTmc2209::init() {
   // automatically set fault status for known drivers
   status.active = statusMode == ON;
 
-  // set fault pin mode
-  if (statusMode == LOW) pinModeEx(faultPin, INPUT_PULLUP);
-  #ifdef PULLDOWN
-    if (statusMode == HIGH) pinModeEx(faultPin, INPUT_PULLDOWN);
-  #else
-    if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
-  #endif
 
   return true;
 }
