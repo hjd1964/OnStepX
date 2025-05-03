@@ -433,11 +433,7 @@ void Limits::poll() {
         lastError.limit.axis1.min != error.limit.axis1.min ||
         lastError.limit.axis1.max != error.limit.axis1.max ||
         lastError.limit.axis2.min != error.limit.axis2.min ||
-        lastError.limit.axis2.max != error.limit.axis2.max ||
-        lastError.limitSense.axis1.min != error.limitSense.axis1.min ||
-        lastError.limitSense.axis1.max != error.limitSense.axis1.max ||
-        lastError.limitSense.axis2.min != error.limitSense.axis2.min ||
-        lastError.limitSense.axis2.max != error.limitSense.axis2.max) {
+        lastError.limit.axis2.max != error.limit.axis2.max) {
       V(errPre);
       V(error.altitude.min?         "Alt-< " :"Alt-  ");
       V(error.altitude.max?         "Alt+< " :"Alt+  ");
@@ -447,10 +443,6 @@ void Limits::poll() {
       V(error.limit.axis1.max?      "A1L+< " :"A1L+  ");
       V(error.limit.axis2.min?      "A2L-< " :"A2L-  ");
       V(error.limit.axis2.max?      "A2L+< " :"A2L+  ");
-      V(error.limitSense.axis1.min? "A1S-< " :"A1S-  ");
-      V(error.limitSense.axis1.max? "A1S+< " :"A1S+  ");
-      V(error.limitSense.axis2.min? "A2S-< " :"A2S-  ");
-      VL(error.limitSense.axis2.max?"A2S+<"  :"A2S+"  );
     }
   #endif
 

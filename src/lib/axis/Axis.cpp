@@ -438,11 +438,22 @@ void Axis::poll() {
 
   // let the user know if the associated senses change state
   #if DEBUG == VERBOSE
-    if (sense.changed(minSenseHandle) || sense.changed(homeSenseHandle) || sense.changed(maxSenseHandle)) {
-      VF("MSG:"); V(axisPrefix); VF("sense state: ");
-      if (sense.isOn(minSenseHandle)) { VF("Min< "); } else { VF("Min  "); }
-      if (sense.isOn(homeSenseHandle)) { VF("Home< "); } else { VF("Home  "); }
-      if (sense.isOn(maxSenseHandle)) { VLF("Max< "); } else { VLF("Max  "); }
+    bool senseMin = sense.isOn(minSenseHandle);
+    bool senseMax = sense.isOn(maxSenseHandle);
+    if (lastSenseMin != senseMin || lastSenseMax != senseMax) {
+      VF("MSG:"); V(axisPrefix); VF("error state: ");
+      V("A"); V(axisNumber); V("S-");
+      if (senseMin) VF("< "); else VF("  ");
+      V("A"); V(axisNumber); V("S+");
+      if (senseMax) VLF("< "); else VLF("  ");
+      lastSenseMin = senseMin;
+      lastSenseMax = senseMax;
+    }
+    bool senseHome = sense.isOn(homeSenseHandle);
+    if (lastSenseHome != senseHome) {
+      VF("MSG:"); V(axisPrefix); VF("home state: ");
+      if (senseHome) VLF("ON"); else VLF("OFF");
+      lastSenseHome = senseHome;
     }
   #endif
 

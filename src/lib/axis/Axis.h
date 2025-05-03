@@ -412,6 +412,12 @@ class Axis {
     uint8_t minSenseHandle = 0;          // min sensor handle
     uint8_t maxSenseHandle = 0;          // max sensor handle
 
+    #if DEBUG == VERBOSE
+      bool lastSenseMin = false;
+      bool lastSenseMax = false;
+      bool lastSenseHome = false;
+    #endif
+
     uint16_t backlashStepsStore;
     volatile uint16_t backlashSteps = 0;
     volatile uint16_t backlashAmountSteps = 0;
