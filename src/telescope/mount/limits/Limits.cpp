@@ -425,7 +425,7 @@ void Limits::poll() {
   }
 
   #if DEBUG == VERBOSE
-    const char* errPre = "MSG: Mount, error state: ";
+    const char* errPre = "MSG: Mount, limit state: ";
     if (lastError.altitude.min != error.altitude.min ||
         lastError.altitude.max != error.altitude.max ||
         lastError.meridian.east != error.meridian.east ||

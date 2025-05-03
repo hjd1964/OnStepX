@@ -441,7 +441,7 @@ void Axis::poll() {
     bool senseMin = sense.isOn(minSenseHandle);
     bool senseMax = sense.isOn(maxSenseHandle);
     if (lastSenseMin != senseMin || lastSenseMax != senseMax) {
-      VF("MSG:"); V(axisPrefix); VF("error state: ");
+      VF("MSG:"); V(axisPrefix); VF("limit sense state: ");
       V("A"); V(axisNumber); V("S-");
       if (senseMin) VF("< "); else VF("  ");
       V("A"); V(axisNumber); V("S+");
@@ -451,7 +451,7 @@ void Axis::poll() {
     }
     bool senseHome = sense.isOn(homeSenseHandle);
     if (lastSenseHome != senseHome) {
-      VF("MSG:"); V(axisPrefix); VF("home state: ");
+      VF("MSG:"); V(axisPrefix); VF("home sense state: ");
       if (senseHome) VLF("ON"); else VLF("OFF");
       lastSenseHome = senseHome;
     }
