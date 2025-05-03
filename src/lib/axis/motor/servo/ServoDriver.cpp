@@ -40,72 +40,72 @@ bool ServoDriver::init() {
       #ifdef AXIS1_DRIVER_RSENSE
         user_rSense = AXIS1_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS1_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS1_DRIVER_CURRENT_MAX;
+      #ifdef AXIS1_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS1_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 2:
       #ifdef AXIS2_DRIVER_RSENSE
         user_rSense = AXIS2_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS2_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS2_DRIVER_CURRENT_MAX;
+      #ifdef AXIS2_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS2_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 3:
       #ifdef AXIS3_DRIVER_RSENSE
         user_rSense = AXIS3_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS3_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS3_DRIVER_CURRENT_MAX;
+      #ifdef AXIS3_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS3_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 4:
       #ifdef AXIS4_DRIVER_RSENSE
         user_rSense = AXIS4_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS4_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS4_DRIVER_CURRENT_MAX;
+      #ifdef AXIS4_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS4_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 5:
       #ifdef AXIS5_DRIVER_RSENSE
         user_rSense = AXIS5_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS5_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS5_DRIVER_CURRENT_MAX;
+      #ifdef AXIS5_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS5_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 6:
       #ifdef AXIS6_DRIVER_RSENSE
         user_rSense = AXIS6_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS6_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS6_DRIVER_CURRENT_MAX;
+      #ifdef AXIS6_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS6_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 7:
       #ifdef AXIS7_DRIVER_RSENSE
         user_rSense = AXIS7_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS7_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS7_DRIVER_CURRENT_MAX;
+      #ifdef AXIS7_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS7_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 8:
       #ifdef AXIS8_DRIVER_RSENSE
         user_rSense = AXIS8_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS8_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS8_DRIVER_CURRENT_MAX;
+      #ifdef AXIS8_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS8_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     case 9:
       #ifdef AXIS9_DRIVER_RSENSE
         user_rSense = AXIS9_DRIVER_RSENSE;
       #endif
-      #ifdef AXIS9_DRIVER_CURRENT_MAX
-        user_currentMax = AXIS9_DRIVER_CURRENT_MAX;
+      #ifdef AXIS9_DRIVER_MAX_CURRENT_MA
+        user_currentMax = AXIS9_DRIVER_MAX_CURRENT_MA;
       #endif
     break;
     default:
