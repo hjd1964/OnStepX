@@ -19,10 +19,8 @@
 StepDirTmcSPI::StepDirTmcSPI(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
 
-  strcpy(axisPrefix, "MSG: Axis_StepDirTmcSPI, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_StepDirTmcSPI, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_StepDirTmcSPI, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   this->Pins = Pins;
   settings = *Settings;
@@ -44,9 +42,9 @@ bool StepDirTmcSPI::init() {
   }
 
   if (settings.currentRun == OFF) {
-    VF(axisPrefix); VLF("current control OFF (set by Vref)");
+    VF("MSG:"); V(axisPrefix); VLF("current control OFF (set by Vref)");
   } else {
-    VF(axisPrefix);
+    VF("MSG:"); V(axisPrefix);
     VF("Ihold="); V(settings.currentHold); VF("mA, ");
     VF("Irun="); V(settings.currentRun); VF("mA, ");
     VF("Igoto="); V(settings.currentGoto); VL("mA");
@@ -115,12 +113,12 @@ bool StepDirTmcSPI::init() {
     modeMicrostepTracking();
     ((TMC5161Stepper*)driver)->en_pwm_mode(false);
   } else {
-    DF(axisPrefixWarn); DLF("unknown driver model!");
+    DF("ERR:"); D(axisPrefix); DLF("unknown driver model exiting!");
     return false;
   }
 
   // show the selected Rsense
-  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+  VF("MSG:"); V(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
 
   current(settings.currentRun, (float)settings.currentHold/settings.currentRun);
 
@@ -128,15 +126,18 @@ bool StepDirTmcSPI::init() {
   status.active = settings.status != OFF;
 
   // if we can, check to see if the driver is there
-  #ifdef DRIVER_TMC_STEPPER_HW_SPI
-    readStatus();
-    if (!status.standstill || status.overTemperature) return false;
-  #else
-    if (Pins->miso != OFF) {
-      readStatus();
-      if (!status.standstill || status.overTemperature) return false;
-    }
+  // check to see if the driver is there and ok
+  #ifndef DRIVER_TMC_STEPPER_HW_SPI
+    if (Pins->miso != OFF)
   #endif
+  {
+    readStatus();
+    if (!status.standstill || status.overTemperature) {
+      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+      return false;
+    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  }
+
 
   // set fault pin mode
   if (settings.status == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);
@@ -164,7 +165,7 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   if (settings.model == TMC5160) currentMax = TMC5160_MAX_CURRENT_MA; else
   if (settings.model == TMC5161) currentMax = TMC5161_MAX_CURRENT_MA; else
   {
-    DF(axisPrefixWarn); DLF("unknown driver model!");
+    DF("WRN:"); D(axisPrefix); DLF("unknown driver model!");
     return false;
   }
 
@@ -177,17 +178,17 @@ bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3,
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current hold="); D(currentHold); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current hold="); D(currentHold); DLF("mA");
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current run="); D(currentRun); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current run="); D(currentRun); DLF("mA");
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current goto="); D(currentGoto); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current goto="); D(currentGoto); DLF("mA");
     return false;
   }
 
@@ -274,7 +275,7 @@ bool StepDirTmcSPI::enable(bool state) {
 // calibrate the motor driver if required
 void StepDirTmcSPI::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
-    VF(axisPrefix); VL("standstill automatic current calibration");
+    VF("MSG:"); V(axisPrefix); VL("standstill automatic current calibration");
     current(settings.currentRun, 1.0F);
     if (settings.model == TMC2130) {
       ((TMC2130Stepper*)driver)->pwm_autoscale(true);

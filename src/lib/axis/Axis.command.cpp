@@ -207,22 +207,22 @@ bool Axis::validateAxisSettings(int axisNum, AxisStoredSettings a) {
   }
 
   if (a.stepsPerMeasure < stepsLimitL || a.stepsPerMeasure > stepsLimitH) {
-    DF("ERR: Axis::validateAxisSettings(), Axis"); D(axisNum); DF(" bad stepsPerMeasure="); DL(a.stepsPerMeasure);
+    DF("ERR:"); D(axisPrefix); DF("validate setting stepsPerMeasure="); D(a.stepsPerMeasure); DLF("failed");
     return false;
   }
 
   if (a.reverse != OFF && a.reverse != ON) {
-    DF("ERR: Axis::validateAxisSettings(), Axis"); D(axisNum+1); DF(" bad reverse="); DL(a.reverse);
+    DF("ERR:"); D(axisPrefix); DF("validate setting reverse="); D(a.reverse); DLF("failed");
     return false;
   }
 
   if (a.limits.min < minLimitL || a.limits.min > minLimitH) {
-    DF("ERR: Axis::validateAxisSettings(), Axis"); D(axisNum); DF(" bad min="); DL(a.limits.min);
+    DF("ERR:"); D(axisPrefix); DF("validate setting min="); D(a.limits.min); DLF("failed");
     return false;
   }
 
   if (a.limits.max < maxLimitL || a.limits.max > maxLimitH) {
-    DF("ERR: Axis::validateAxisSettings(), Axis"); D(axisNum); DF(" bad max="); DL(a.limits.max); 
+    DF("ERR:"); D(axisPrefix); DF("validate setting max="); D(a.limits.max); DLF("failed");
     return false;
   }
 

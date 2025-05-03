@@ -161,8 +161,7 @@ class Motor {
     void enableBacklash();
 
     volatile uint8_t axisNumber = 0;           // axis number for this motor (1 to 9 in OnStepX)
-    char axisPrefix[24];                       // prefix for debug messages
-    char axisPrefixWarn[24];                   // additional prefix for debug messages
+    char axisPrefix[32];                       // prefix for debug messages
 
     volatile bool sync = true;                 // locks movement of axis target with timer rate
     bool limitsCheck = true;                   // enable/disable numeric range limits (doesn't apply to limit switches)

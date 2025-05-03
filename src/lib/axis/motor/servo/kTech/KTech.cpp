@@ -37,10 +37,8 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettin
   if (axisNumber < 1 || axisNumber > 9) return;
   this->axisNumber = axisNumber;
 
-  strcpy(axisPrefix, "MSG: Axis_ServoKTech, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_ServoKTech, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_ServoKTech, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   // the motor CAN ID is the axis number!
   canID = 0x140 + axisNumber;
@@ -88,12 +86,12 @@ bool ServoKTech::init() {
       case 9: canPlus.callbackRegisterMessage(canID, 0x9a, statusKTechServoAxis9); break;
     }
 
-    VF(axisPrefix); VF("start callback status request task (rate "); V(KTECH_STATUS_MS); VF("ms priority 7)... ");
+    VF("MSG:"); V(axisPrefix); VF("start callback status request task (rate "); V(KTECH_STATUS_MS); VF("ms priority 7)... ");
     char name[] = "Ax_StaK";
     name[2] = axisNumber + '0';
     if (tasks.add(KTECH_STATUS_MS, 0, true, 7, callback, name)) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
-    VF(axisPrefix); VLF("no driver status");
+    VF("MSG:"); V(axisPrefix); VLF("no driver status");
   }
 
   return true;
@@ -101,7 +99,7 @@ bool ServoKTech::init() {
 
 // enable or disable the driver using the enable pin or other method
 void ServoKTech::enable(bool state) {
-  VF(axisPrefix); VF("powered ");
+  VF("MSG:"); V(axisPrefix); VF("powered ");
 
   uint8_t cmd[] = "\xa2\x00\x00\x00\x00\x00\x00\x00";
   canPlus.writePacket(canID, cmd, 8);

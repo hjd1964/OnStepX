@@ -17,10 +17,8 @@
 StepDirTmcUART::StepDirTmcUART(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
 
-  strcpy(axisPrefix, "MSG: Axis_StepDirTmcUART legacy, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_StepDirTmcUART legacy, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_StepDirTmcUART legacy, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   this->Pins = Pins;
   settings = *Settings;
@@ -41,9 +39,9 @@ bool StepDirTmcUART::init() {
   }
 
   if (settings.currentRun == OFF) {
-    VF(axisPrefix); VLF("current control OFF (300mA)");
+    VF("MSG:"); V(axisPrefix); VLF("current control OFF (300mA)");
   } else {
-    VF(axisPrefix);
+    VF("MSG:"); V(axisPrefix);
     VF("Ihold="); V(settings.currentHold); VF("mA, ");
     VF("Irun="); V(settings.currentRun); VF("mA, ");
     VF("Igoto="); V(settings.currentGoto); VL("mA");
@@ -51,10 +49,10 @@ bool StepDirTmcUART::init() {
 
   if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2209_RSENSE;
   if (fabs(rSense - 0.11F) > 0.0001) {
-    DF(axisPrefixWarn); VLF("driver supports Rsense=0.11ohms only!");
+    DF("WRN:"); D(axisPrefix); VLF("driver supports Rsense=0.11ohms only!");
     return false;
   }
-  VF(axisPrefix); VLF("Rsense=0.11ohms (only)");
+  VF("MSG:"); V(axisPrefix); VLF("Rsense=0.11ohms (only)");
 
   // get TMC UART driver ready
   pinModeEx(Pins->m0, OUTPUT);
@@ -78,7 +76,7 @@ bool StepDirTmcUART::init() {
       digitalWriteEx(Pins->m1, HIGH);
     #endif
 
-    VF(axisPrefix);
+    VF("MSG:"); V(axisPrefix);
     VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     #if SERIAL_TMC_INVERT == ON
       driver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), SERIAL_TMC_RX, SERIAL_TMC_TX, true);
@@ -94,14 +92,19 @@ bool StepDirTmcUART::init() {
     #if SERIAL_TMC_RX_DISABLE == true
       rxPin = OFF;
     #endif
-    VF(axisPrefix);
+    VF("MSG:"); V(axisPrefix);
     VF("SW UART driver pins rx="); V(rxPin); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
     driver->setup(SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), rxPin, Pins->tx);
   #endif
 
   // this driver automatically switches to one-way communications, even if a RX pin is set
   // so the following only returns false if communications are "half working"
-  if (rxPin != OFF && !driver->isSetupAndCommunicating()) return false;
+  if (rxPin != OFF) {
+    if (!driver->isSetupAndCommunicating()) {
+      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+      return false;
+    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  }
 
   driver->useExternalSenseResistors();
   driver->enableAnalogCurrentScaling();
@@ -112,7 +115,7 @@ bool StepDirTmcUART::init() {
   driver->setPwmGradient(pc_pwm_grad);
   if (pc_pwm_auto) driver->enableAutomaticCurrentScaling();
   if (!settings.intpol) {
-    VF(axisPrefix); VLF("driver interpolation control not supported");
+    VF("MSG:"); V(axisPrefix); VLF("driver interpolation control not supported");
   }
   modeMicrostepTracking();
   driver->setRunCurrent(settings.currentRun/25); // current in %
@@ -144,7 +147,7 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
 
   if (settings.model == TMC2209) currentMax = TMC2209_MAX_CURRENT_MA; else // both TMC2209 and TMC2226
   {
-    DF(axisPrefixWarn); DLF("unknown driver model!");
+    DF("WRN:"); D(axisPrefix); DLF("unknown driver model!");
     return false;
   }
 
@@ -157,17 +160,17 @@ bool StepDirTmcUART::validateParameters(float param1, float param2, float param3
   UNUSED(param6);
 
   if (currentHold != OFF && (currentHold < 0 || currentHold > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current hold="); D(currentHold); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current hold="); D(currentHold); DLF("mA");
     return false;
   }
 
   if (currentRun != OFF && (currentRun < 0 || currentRun > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current run="); D(currentRun); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current run="); D(currentRun); DLF("mA");
     return false;
   }
 
   if (currentGoto != OFF && (currentGoto < 0 || currentGoto > currentMax)) {
-    DF(axisPrefixWarn); DF("bad current goto="); D(currentGoto); DLF("mA");
+    DF("WRN:"); D(axisPrefix); DF("bad current goto="); D(currentGoto); DLF("mA");
     return false;
   }
 

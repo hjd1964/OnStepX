@@ -17,10 +17,8 @@
 ServoDcTmcSPI::ServoDcTmcSPI(uint8_t axisNumber, const ServoDcTmcSpiPins *Pins, const ServoDcTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 
-  strcpy(axisPrefix, "MSG: Axis_ServoTmcDC, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_ServoTmcDC, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_ServoTmcDC, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   this->Pins = Pins;
   enablePin = Pins->enable;
@@ -50,10 +48,10 @@ bool ServoDcTmcSPI::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
-  VF(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
+  VF("MSG:"); V(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF("% power, Acceleration="); V(Settings->acceleration); VLF("%/s");
+  VF("MSG:"); V(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF("%/s/fs");
 
-  VF(axisPrefix); VLF("TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
+  VF("MSG:"); V(axisPrefix); VLF("TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
 
   if (model == SERVO_TMC2130_DC) {
     driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
@@ -88,15 +86,13 @@ bool ServoDcTmcSPI::init() {
   status.active = statusMode == ON;
 
   // check to see if the driver is there and ok
-  #ifdef DRIVER_TMC_STEPPER_HW_SPI
-    readStatus();
-    if (!status.standstill || status.overTemperature) return false;
-  #else
-    if (Pins->miso != OFF) {
-      readStatus();
-      if (!status.standstill || status.overTemperature) return false;
-    }
+  #ifndef DRIVER_TMC_STEPPER_HW_SPI
+    if (Pins->miso != OFF)
   #endif
+  {
+    readStatus();
+    if (!status.standstill || status.overTemperature) { DF("ERR:"); D(axisPrefix); DLF("no driver detected!"); return false; }
+  }
 
   return true;
 }
@@ -105,7 +101,7 @@ bool ServoDcTmcSPI::init() {
 void ServoDcTmcSPI::enable(bool state) {
   enabled = state;
 
-  VF(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
+  VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
 
   if (state) { driver->ihold(31); } else { driver->ihold(0); }
 

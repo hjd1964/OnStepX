@@ -74,7 +74,7 @@ void Motor::setInstrumentCoordinateParkSteps(long value, int modulo) {
     for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
     indexSteps = steps;
   } else setInstrumentCoordinateSteps(value);
-  V(axisPrefix); VF("setInstrumentCoordinateParkSteps at "); V(indexSteps); VF(" (was "); V(value - motorSteps); VL(")");
+  VF("MSG:"); V(axisPrefix); VF("setInstrumentCoordinateParkSteps at "); V(indexSteps); VF(" (was "); V(value - motorSteps); VL(")");
 }
 
 // get target coordinate (with index), in steps
@@ -103,7 +103,7 @@ void Motor::setTargetCoordinateParkSteps(long value, int modulo) {
     targetSteps = steps;
     interrupts();
   } else setTargetCoordinateSteps(value);
-  V(axisPrefix); VF("setTargetCoordinateParkSteps at "); V(targetSteps); VF(" (was "); V(value - indexSteps); VL(")");
+  VF("MSG:"); V(axisPrefix); VF("setTargetCoordinateParkSteps at "); V(targetSteps); VF(" (was "); V(value - indexSteps); VL(")");
 }
 
 // get backlash amount in steps

@@ -36,10 +36,8 @@ KTechMotor::KTechMotor(uint8_t axisNumber, const KTechDriverSettings *Settings, 
 
   driverType = ODRIVER;
 
-  strcpy(axisPrefix, "MSG: Axis_KTech, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_KTech, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_KTech, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   // the motor CAN ID is the axis number!
   canID = 0x140 + axisNumber;
@@ -68,7 +66,7 @@ bool KTechMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
 
   if (!canPlus.ready) {
-    VF(axisPrefixWarn); VLF("No CAN interface!");
+    V("ERR:"); V(axisPrefix); VLF("No CAN interface!");
     return false;
   }
 
@@ -78,7 +76,7 @@ bool KTechMotor::init() {
   enable(false);
 
   // start the motion timer
-  V(axisPrefix); VF("start task to track motion... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to track motion... ");
   char timerName[] = "Ax_KTec";
   timerName[2] = axisNumber + '0';
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
@@ -144,7 +142,7 @@ void KTechMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   if (state == ON) {
-    VF(axisPrefixWarn); VLF("axis reversal must be accomplished with hardware or KTech setup!");
+    V("WRN:"); V(axisPrefix); VLF("axis reversal must be accomplished with hardware or KTech setup!");
   }
 }
 
@@ -152,7 +150,7 @@ void KTechMotor::setReverse(int8_t state) {
 void KTechMotor::enable(bool state) {
   if (!ready) return;
 
-  V(axisPrefix);
+  VF("MSG:"); V(axisPrefix);
   if (state) {
     uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";
     canPlus.writePacket(canID, cmd, 8);

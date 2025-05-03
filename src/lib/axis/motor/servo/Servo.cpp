@@ -30,10 +30,8 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
   driverType = SERVO;
 
   this->axisNumber = axisNumber;
-  strcpy(axisPrefix, "MSG: Axis_Servo, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_Servo, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_Servo, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   this->filter = filter;
   this->encoder = encoder;
@@ -73,11 +71,11 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
 
-  if (!encoder->init()) { DLF("ERR: ServoMotor::init(); no encoder detected exiting!"); return false; }
+  if (!encoder->init()) { DF("ERR:"); D(axisPrefix); DLF("no encoder!"); return false; }
 
   encoder->setOrigin(encoderOrigin);
 
-  if (!driver->init()) { DLF("ERR: ServoMotor::init(); no motor driver detected exiting!"); return false; }
+  if (!driver->init()) { DF("ERR:"); D(axisPrefix); DLF("no motor driver!"); return false; }
 
   driver->enable(false);
   feedback->reset();
@@ -89,8 +87,7 @@ bool ServoMotor::init() {
   trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
   // start the motion timer
-  V(axisPrefix);
-  VF("start task to track motion... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to track motion... ");
   char timerName[] = "Ax_Svo";
   timerName[2] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
@@ -160,8 +157,7 @@ void ServoMotor::resetPositionSteps(long value) {
   if (syncThreshold == OFF) {
     encoder->write(value);
   } else {
-    V(axisPrefix);
-    VL("absolute encoder ignored reset position");
+    VF("MSG:"); V(axisPrefix); VL("absolute encoder ignored reset position");
   }
 }
 
@@ -188,7 +184,7 @@ void ServoMotor::setInstrumentCoordinateSteps(long value) {
     if (abs(originIndexSteps - i) < syncThreshold) {
       indexSteps = i;
     } else {
-      V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
+      VF("MSG:"); V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
     }
   }
 }
@@ -420,17 +416,17 @@ void ServoMotor::poll() {
     #ifndef SERVO_SAFETY_DISABLE
       // if above SERVO_SAFETY_STALL_POWER (33% default) and we're not moving something is seriously wrong, so shut it down
       if (labs(encoderCounts - lastEncoderCounts) < 10 && abs(velocityPercent) >= SERVO_SAFETY_STALL_POWER) {
-        D(axisPrefixWarn);
-        D("stall detected!"); D(" control->in = "); D(control->in); D(", control->set = "); D(control->set);
-        D(", control->out = "); D(control->out); D(", velocity % = "); DL(velocityPercent);
+        DF("WRN:"); D(axisPrefix); DF("stall detected!");
+        DF(" control->in = "); D(control->in); DF(", control->set = "); D(control->set);
+        DF(", control->out = "); D(control->out); DF(", velocity % = "); DL(velocityPercent);
         enable(false);
         safetyShutdown = true;
       }
 
       // if above 90% power and we're moving away from the target something is seriously wrong, so shut it down
       if (labs(encoderCounts - lastEncoderCounts) > lastTargetDistance && abs(velocityPercent) >= 90) {
-        D(axisPrefixWarn);
-        DL("runaway detected, > 90% power while moving away from the target!");
+        DF("WRN:"); D(axisPrefix); DF("runaway detected!");
+        DLF(" > 90% power while moving away from the target!");
         enable(false);
         safetyShutdown = true;
       }
@@ -438,8 +434,8 @@ void ServoMotor::poll() {
 
       // if we were below -33% and above 33% power in a one second period something is seriously wrong, so shut it down
       if (wasBelow33 && wasAbove33) {
-        D(axisPrefixWarn);
-        DL("oscillation detected, below -33% and above 33% power in a 2 second period!");
+        DF("WRN:"); D(axisPrefix); DF("oscillation detected!");
+        DLF(" below -33% and above 33% power in a 2 second period!");
         enable(false);
         safetyShutdown = true;
       }

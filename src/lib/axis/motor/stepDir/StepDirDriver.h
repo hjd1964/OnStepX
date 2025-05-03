@@ -139,9 +139,7 @@ class StepDirDriver {
     virtual void readStatus();
 
     uint8_t axisNumber;
-
-    char axisPrefix[36]; // prefix for debug messages
-    char axisPrefixWarn[36]; // additional prefix for debug messages
+    char axisPrefix[32]; // prefix for debug messages
 
     int16_t currentMax = 0;
     float rSense = 0.11F;

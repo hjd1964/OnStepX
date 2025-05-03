@@ -145,9 +145,7 @@ class ServoDriver {
     virtual void readStatus() {}
     
     int axisNumber;
-
-    char axisPrefix[36]; // prefix for debug messages
-    char axisPrefixWarn[36]; // additional prefix for debug messages
+    char axisPrefix[32]; // prefix for debug messages
 
     int16_t user_currentMax = 0;
     float user_rSense = 0.0F;

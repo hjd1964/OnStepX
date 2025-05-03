@@ -182,7 +182,7 @@ bool StepDirDriver::setParameters(float param1, float param2, float param3, floa
   if (settings.decay == OFF) settings.decay = STEALTHCHOP;
   if (settings.decaySlewing == OFF) settings.decaySlewing = SPREADCYCLE;
 
-  VF(axisPrefix); V(DRIVER_NAME[settings.model]);
+  VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[settings.model]);
   VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF (assuming 1X)"); settings.microsteps = 1; } else { V(settings.microsteps); VF("X"); }
   VF(" (goto mode "); if (settings.microstepsSlewing == OFF) { VLF("OFF)"); } else { V(settings.microstepsSlewing); VL("X)"); }
 
@@ -205,11 +205,11 @@ bool StepDirDriver::validateParameters(float param1, float param2, float param3,
     if (axisNumber > 2) pulseWidth = 2000;
 
     if (DriverPulseWidth[settings.model] == OFF) {
-      VF(axisPrefix); V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
+      VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
     }
 
     if (DriverPulseWidth[settings.model] > pulseWidth) {
-      DF(axisPrefixWarn); D(DRIVER_NAME[settings.model]);
+      DF("WRN:"); D(axisPrefix); D(DRIVER_NAME[settings.model]);
       DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
       D(pulseWidth); DLF("ns");
       return false;
@@ -224,22 +224,22 @@ bool StepDirDriver::validateParameters(float param1, float param2, float param3,
   UNUSED(param6);
 
   if (subdivisions == OFF) {
-    VF(axisPrefixWarn); VLF("subdivisions OFF (assuming 1X)");
+    V("WRN:"); V(axisPrefix); VLF("subdivisions OFF (assuming 1X)");
     subdivisions = 1;
   }
 
   if (subdivisions <= subdivisionsGoto) {
-    DF(axisPrefixWarn); DLF("subdivisions must be > subdivisionsGoto");
+    DF("WRN:"); D(axisPrefix); DLF("subdivisions must be > subdivisionsGoto");
     return false;
   }
 
   if (subdivisions != OFF && (subdivisionsToCode(subdivisions) == OFF)) {
-    DF(axisPrefixWarn); DF("bad subdivisions="); DL(subdivisions);
+    DF("WRN:"); D(axisPrefix); DF("bad subdivisions="); DL(subdivisions);
     return false;
   }
 
   if (subdivisionsGoto != OFF && (subdivisionsToCode(subdivisionsGoto) == OFF)) {
-    DF(axisPrefixWarn); DF("bad subdivisionsGoto="); DL(subdivisionsGoto);
+    DF("WRN:"); D(axisPrefix); DF("bad subdivisionsGoto="); DL(subdivisionsGoto);
     return false;
   }
 
@@ -293,7 +293,7 @@ void StepDirDriver::updateStatus() {
         (status.overTemperature           != lastStatus.overTemperature) ||
 //      (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
-      VF(axisPrefix);
+      VF("MSG:"); V(axisPrefix);
       VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
       VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". "); 
       VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". "); 

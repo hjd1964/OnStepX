@@ -33,10 +33,8 @@ ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Setting
     this->axisNumber = axisNumber;
   #endif
 
-  strcpy(axisPrefix, "MSG: Axis_ODrive, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_ODrive, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_ODrive, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   if (axisNumber > 2) useFastHardwareTimers = false;
   this->useFastHardwareTimers = useFastHardwareTimers;
@@ -67,17 +65,17 @@ bool ODriveMotor::init() {
     
     #if ODRIVE_COMM_MODE == OD_UART
       ODRIVE_SERIAL.begin(ODRIVE_SERIAL_BAUD);
-      VF(axisPrefix); VLF("SERIAL channel init");
+      VF("MSG:"); V(axisPrefix); VLF("SERIAL channel init");
     #elif ODRIVE_COMM_MODE == OD_CAN
       // .begin is done by the constructor
-      VF(axisPrefix); VLF("CAN channel init");
+      VF("MSG:"); V(axisPrefix); VLF("CAN channel init");
     #endif
   }
 
   enable(false);
 
   // start the motor timer
-  V(axisPrefix); VF("start task to move motor... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to move motor... ");
   char timerName[] = "Target_";
   timerName[6] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
@@ -120,7 +118,7 @@ void ODriveMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   if (state == ON) {
-    VF(axisPrefix); VLF("axis reversal must be accomplished with hardware or ODrive setup!");
+    VF("MSG:"); V(axisPrefix); VLF("axis reversal must be accomplished with hardware or ODrive setup!");
   }
 }
 
@@ -128,7 +126,7 @@ void ODriveMotor::setReverse(int8_t state) {
 void ODriveMotor::enable(bool state) {
   if (!ready) return;
 
-  V(axisPrefix); VF("driver powered "); if (state) { VLF("up"); } else { VLF("down"); }
+  VF("MSG:"); V(axisPrefix); VF("driver powered "); if (state) { VLF("up"); } else { VLF("down"); }
 
   int requestedState = AXIS_STATE_IDLE;
   if (state) requestedState = AXIS_STATE_CLOSED_LOOP_CONTROL;
@@ -136,17 +134,17 @@ void ODriveMotor::enable(bool state) {
   #if ODRIVE_COMM_MODE == OD_UART 
   float timeout = 0.5;                        
     if(!_oDriveDriver->run_state(axisNumber - 1, requestedState, false, timeout)) {
-      VF(axisPrefix); VLF(" Power, closed loop control - command timeout!");
+      VF("MSG:"); V(axisPrefix); VLF(" Power, closed loop control - command timeout!");
       return;
     }
   #elif ODRIVE_COMM_MODE == OD_CAN
     if(!_oDriveDriver->RunState(axisNumber - 1, requestedState)) { //currently, always returns true...need to add timeout
-      VF(axisPrefix); VLF(" Power, closed loop control - command timeout!");
+      VF("MSG:"); V(axisPrefix); VLF(" Power, closed loop control - command timeout!");
       return;
     }
   #endif
 
-  V(axisPrefix); VF("closed loop control - "); if (state) { VLF("Active"); } else { VLF("Idle"); }
+  VF("MSG:"); V(axisPrefix); VF("closed loop control - "); if (state) { VLF("Active"); } else { VLF("Idle"); }
 
   enabled = state;
 }

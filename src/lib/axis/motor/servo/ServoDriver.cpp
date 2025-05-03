@@ -27,8 +27,8 @@
 
 bool ServoDriver::init() {
   #if DEBUG == VERBOSE
-    VF(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
-    VF(axisPrefix); VF("en=");
+    VF("MSG:"); V(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
+    VF("MSG:"); V(axisPrefix); VF("en=");
     if (enablePin == OFF) { VLF("OFF"); } else
     if (enablePin == SHARED) { VLF("SHARED"); } else { VL(enablePin); }
   #endif
@@ -149,7 +149,7 @@ void ServoDriver::updateStatus() {
         (status.overTemperature           != lastStatus.overTemperature) ||
         (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
-      VF(axisPrefix); VF("status change ");
+      VF("MSG:"); V(axisPrefix); VF("status change ");
       VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
       VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". "); 
       VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". "); 

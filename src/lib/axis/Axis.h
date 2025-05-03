@@ -400,7 +400,7 @@ class Axis {
     bool lastErrorResult = false;
 
     uint8_t axisNumber = 0;
-    char axisPrefix[13] = "MSG: Axis_, ";
+    char axisPrefix[9] = " Axis_, ";
 
     char unitsStr[5] = "?";
     bool unitsRadians = false;

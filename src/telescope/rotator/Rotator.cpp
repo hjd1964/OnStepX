@@ -29,7 +29,7 @@ void Rotator::init() {
   readSettings();
 
   VLF("MSG: Rotator, init (Axis3)");
-  if (!axis3.init(&motor3)) { initError.driver = true; DLF("ERR: Axis3, no motion controller!"); }
+  if (!axis3.init(&motor3)) { initError.driver = true; DLF("ERR: Rotator::init(), no motion controller for Axis3!"); }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_BASE_DESIRED*2.0F);

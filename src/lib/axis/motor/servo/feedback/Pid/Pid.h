@@ -66,14 +66,14 @@ class Pid : public Feedback {
   private:
     QuickPID *pid;
 
+    char axisPrefix[24] = "Axis_ServoFeedbackPID, "; // prefix for debug messages
+
     float p, i, d, c, sensitivity;
     float lastP = 0;
     float lastI = 0;
     float lastD = 0;
 
-    unsigned long timeSinceLastUpdate = 0;     // for varaible pid update
-
-    char axisPrefix[32] = "MSG: Axis_ServoFeedbackPID, "; // prefix for debug messages
+    unsigned long timeSinceLastUpdate = 0; // for varaible pid update
 
     int parameterSelectPercent = 0;
     bool trackingSelected = true;

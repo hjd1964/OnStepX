@@ -72,8 +72,7 @@ void ServoMotor::calibrate(float value)
   case 1: // start [R]ecording
     calibrating = true;
     calibrationClear();
-    V(axisPrefix);
-    VLF("started recording encoder delta");
+    VF("MSG:"); V(axisPrefix); VLF("started recording encoder delta");
     calibrateMode = CM_RECORDING;
     velocityOverride = -(AXIS1_SERVO_VELOCITY_TRACKING * AXIS1_SERVO_VELOCITY_CALIBRATION) * SIDEREAL_RATIO;
     startCount = encoder->count;
@@ -99,12 +98,10 @@ void ServoMotor::calibrate(float value)
     // check to see if we need a timer to move the motor
     if (handle == 0) {
       // create a h/w timer to move the motor at tracking speed
-      V(axisPrefix);
-      VLF("starting fixed rate step/dir based tracking");
+      VF("MSG:"); V(axisPrefix); VLF("starting fixed rate step/dir based tracking");
       handle = tasks.add(0, 0, true, 0, _calibrateMoveAxis, "eCal");
       if (!tasks.requestHardwareTimer(handle, 0)) {
-        V(axisPrefix);
-        VLF("failed to get a hardware timer");
+        VF("MSG:"); V(axisPrefix); VLF("failed to get a hardware timer");
       };
     }
     tasks.setPeriodSubMicros(handle, round(8000000.0F/abs(velocityOverride)));
@@ -139,12 +136,10 @@ void ServoMotor::calibrate(float value)
     // check to see if we need a timer to move the motor
     if (handle == 0) {
       // create a h/w timer to move the motor at tracking speed
-      V(axisPrefix);
-      VLF("starting fixed rate step/dir based tracking");
+      VF("MSG:"); V(axisPrefix); VLF("starting fixed rate step/dir based tracking");
       handle = tasks.add(0, 0, true, 0, _calibrateMoveAxis, "eCal");
       if (!tasks.requestHardwareTimer(handle, 0)) {
-        V(axisPrefix);
-        VLF("failed to get a hardware timer");
+        VF("MSG:"); V(axisPrefix); VLF("failed to get a hardware timer");
       };
     }
     tasks.setPeriodSubMicros(handle, round(8000000.0F/abs(velocityOverride)));
@@ -244,10 +239,7 @@ bool ServoMotor::calibrationRead(const char *fileName)
       return false;
     }
 
-    V(axisPrefix);
-    VF("buffer read ");
-    V(fileName);
-    VLF(" file");
+    VF("MSG:"); V(axisPrefix); VF("buffer read "); V(fileName); VLF(" file");
     if (!file.read((uint8_t *)encoderCorrectionBuffer, ENCODER_ECM_BUFFER_SIZE * sizeof(encoderCorrectionBuffer[0])))
     {
       DL("WRN: ServoMotor::calibrationRead(), read buffer failed!");
@@ -294,10 +286,7 @@ bool ServoMotor::calibrationWrite(const char *fileName)
   }
   else
   {
-    V(axisPrefix);
-    VF("buffer wrote ");
-    V(fileName);
-    VLF(" file");
+    VF("MSG:"); V(axisPrefix); VF("buffer wrote "); V(fileName); VLF(" file");
   }
 
   file.close();
@@ -326,8 +315,7 @@ bool ServoMotor::calibrationAveragingWrite()
   File file = LittleFS.open("/encoder.dat", FILE_READ);
   if (!file)
   {
-    V(axisPrefix);
-    VLF("buffer creating encoder data file");
+    VF("MSG:"); V(axisPrefix); VLF("buffer creating encoder data file");
 
     file = LittleFS.open("/encoder.dat", FILE_WRITE);
     if (!file)
@@ -387,8 +375,7 @@ bool ServoMotor::calibrationAveragingWrite()
   }
   else
   {
-    V(axisPrefix);
-    VLF("buffer wrote encoder.dat file");
+    VF("MSG:"); V(axisPrefix); VLF("buffer wrote encoder.dat file");
   }
 
   file.close();
@@ -408,8 +395,7 @@ void ServoMotor::calibrationClear()
 
   for (int i = 0; i < ENCODER_ECM_BUFFER_SIZE; i++)
     encoderCorrectionBuffer[i] = ECB_NO_DATA;
-  V(axisPrefix);
-  VLF("buffer cleared");
+  VF("MSG:"); V(axisPrefix); VLF("buffer cleared");
 }
 
 void ServoMotor::calibrationErase()
@@ -640,8 +626,7 @@ bool ServoMotor::calibrationLinearRegression()
   if (endIndex > ENCODER_ECM_BUFFER_SIZE - 1) endIndex = ENCODER_ECM_BUFFER_SIZE - 1;
   if (endIndex < startIndex) return false;
 
-  V(axisPrefix);
-  VLF("buffer applying linear regression:");
+  VF("MSG:"); V(axisPrefix); VLF("buffer applying linear regression:");
   int16_t startValue = ecbn(encoderCorrectionBuffer[startIndex]);
   D("Start Value =");
   D(startValue);
@@ -685,8 +670,7 @@ bool ServoMotor::calibrationLowPass()
     return false;
   }
 
-  V(axisPrefix);
-  VLF("buffer applying low pass filter:");
+  VF("MSG:"); V(axisPrefix); VLF("buffer applying low pass filter:");
   int j, J1, J4, J9, J17;
   for (int i = 3; i < ENCODER_ECM_BUFFER_SIZE + 3; i++)
   {
@@ -719,8 +703,7 @@ void ServoMotor::calibrationPrint()
     return;
   }
 
-  V(axisPrefix);
-  VLF("buffer contents (index, correction):");
+  VF("MSG:"); V(axisPrefix); VLF("buffer contents (index, correction):");
   for (int i = 0; i < ENCODER_ECM_BUFFER_SIZE; i++)
   {
     V(i);

@@ -24,10 +24,8 @@
 ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoTmcPins *Pins, const ServoTmcSettings *TmcSettings) {
   this->axisNumber = axisNumber;
 
-  strcpy(axisPrefix, "MSG: Axis_ServoTmc2209, ");
-  axisPrefix[9] = '0' + axisNumber;
-  strcpy(axisPrefixWarn, "WRN: Axis_ServoTmc2209, ");
-  axisPrefixWarn[9] = '0' + axisNumber;
+  strcpy(axisPrefix, " Axis_ServoTmc2209, ");
+  axisPrefix[5] = '0' + axisNumber;
 
   this->Pins = Pins;
   enablePin = Pins->enable;
@@ -67,11 +65,11 @@ bool ServoTmc2209::init() {
   digitalWriteEx(Pins->dir, LOW);
 
   // show velocity control settings
-  VF(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
-  VF(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
+  VF("MSG:"); V(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
+  VF("MSG:"); V(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // initialize the serial port
-  VF(axisPrefix); VF("TMC ");
+  VF("MSG:"); V(axisPrefix); VF("TMC ");
   #if defined(SERIAL_TMC_HARDWARE_UART)
     #if defined(DEDICATED_MODE_PINS)
       // program the device address 0,1,2,3 since M0 and M1 are all unique
@@ -106,7 +104,7 @@ bool ServoTmc2209::init() {
   #endif
 
   if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2209_RSENSE;
-  VF(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
+  VF("MSG:"); V(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
 
   #if defined(SERIAL_TMC_HARDWARE_UART)
     driver = new TMC2209Stepper(&SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
@@ -117,11 +115,11 @@ bool ServoTmc2209::init() {
   driver->intpol(true);
 
   if (decay == STEALTHCHOP && decaySlewing == SPREADCYCLE && velocityThrs > 0) {
-    VF(axisPrefix); VF("TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
+    VF("MSG:"); V(axisPrefix); VF("TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
     driver->TPWMTHRS(velocityThrs/0.715F);
   }
 
-  VF(axisPrefix); VF("TMC u-step mode ");
+  VF("MSG:"); V(axisPrefix); VF("TMC u-step mode ");
   if (Settings->microsteps == OFF) {
     VLF("OFF (assuming 1X)");
     driver->microsteps(1);
@@ -132,18 +130,18 @@ bool ServoTmc2209::init() {
 
   currentRms = Settings->current*0.7071F;
   if (Settings->current == OFF) {
-    VF(axisPrefix); VLF("TMC current control OFF setting 300mA");
+    VF("MSG:"); V(axisPrefix); VLF("TMC current control OFF setting 300mA");
     currentRms = 300*0.7071F;
   }
 
   if (currentRms < 0 || currentRms > currentMax*0.7071F) {
-    DF(axisPrefixWarn); DF("bad current setting="); DL(currentRms);
+    DF("ERR:"); D(axisPrefix); DF("bad current setting="); DL(currentRms);
     return false;
   }
 
   driver->hold_multiplier(1.0F);
 
-  VF(axisPrefix); VF("Irun="); V(currentRms/0.7071F); VLF("mA");
+  VF("MSG:"); V(axisPrefix); VF("Irun="); V(currentRms/0.7071F); VLF("mA");
   driver->rms_current(currentRms);
 
   driver->en_spreadCycle(true);
@@ -153,7 +151,10 @@ bool ServoTmc2209::init() {
 
   // check to see if the driver is there and ok
   readStatus();
-  if (!status.standstill || status.overTemperature) return false;
+  if (!status.standstill || status.overTemperature) {
+    DF("ERR:"); D(axisPrefix); DLF("no driver detected!");
+    return false;
+  } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
 
   return true;
 }
@@ -168,7 +169,7 @@ void ServoTmc2209::alternateMode(bool state) {
 void ServoTmc2209::enable(bool state) {
   enabled = state;
   if (enablePin == SHARED) {
-    VF(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
+    VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
     if (state) {
       driver->en_spreadCycle(!stealthChop());
       driver->rms_current(currentRms);
@@ -177,7 +178,7 @@ void ServoTmc2209::enable(bool state) {
       driver->ihold(0);
     }
   } else {
-    VF(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
+    VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using enable pin");
     if (!enabled) { digitalWriteF(enablePin, !enabledState); } else { digitalWriteF(enablePin, enabledState); }
   }
 
@@ -229,7 +230,7 @@ void ServoTmc2209::readStatus() {
 // calibrate the motor driver if required
 void ServoTmc2209::calibrateDriver() {
   if (stealthChop()) {
-    VF(axisPrefix); VL("TMC standstill automatic current calibration");
+    VF("MSG:"); V(axisPrefix); VL("TMC standstill automatic current calibration");
     driver->rms_current(currentRms);
     ((TMC2209Stepper*)driver)->pwm_autograd(DRIVER_TMC_STEPPER_AUTOGRAD);
     ((TMC2209Stepper*)driver)->pwm_autoscale(true);
