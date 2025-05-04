@@ -150,8 +150,9 @@
 #define NV_24128                    7  // 16KB I2C EEPROM AT DEFAULT ADDRESS 0x50
 #define NV_24256                    8  // 32KB I2C EEPROM AT DEFAULT ADDRESS 0x50
 #define NV_AT24C32                  9  // 4KB I2C EEPROM AT DEFAULT ADDRESS 0x57 (ZS042 module for instance)
-#define NV_MB85RC64                10  // 8KB I2C FRAM AT DEFAULT ADDRESS 0x50
-#define NV_MB85RC256               11  // 32KB I2C FRAM AT DEFAULT ADDRESS 0x50
+#define NV_MB85RC32                10  // 4KB I2C FRAM AT DEFAULT ADDRESS 0x50
+#define NV_MB85RC64                11  // 8KB I2C FRAM AT DEFAULT ADDRESS 0x50
+#define NV_MB85RC256               12  // 32KB I2C FRAM AT DEFAULT ADDRESS 0x50
 
 #define NVE_LOW                     0   // low (< 100K writes)
 #define NVE_MID                     1   // mid (~ 100K writes)

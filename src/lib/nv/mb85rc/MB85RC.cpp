@@ -3,7 +3,7 @@
 
 #include "MB85RC.h"
 
-#if defined(NV_DRIVER) && (NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256)
+#if defined(NV_DRIVER) && (NV_DRIVER == NV_MB85RC32 || NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256)
 
 #define MSB(i) (i >> 8)
 #define LSB(i) (i & 0xFF)

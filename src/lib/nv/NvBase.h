@@ -21,6 +21,8 @@
     #define E2END 16383
   #elif NV_DRIVER == NV_24256
     #define E2END 32767
+  #elif NV_DRIVER == NV_MB85RC32
+    #define E2END 4095
   #elif NV_DRIVER == NV_MB85RC64
     #define E2END 8191
   #elif NV_DRIVER == NV_MB85RC256
@@ -85,7 +87,7 @@
     #define NV_ENDURANCE NVE_HIGH
   #endif
 
-#elif NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256
+#elif NV_DRIVER == NV_MB85RC32 || NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256
   #ifndef NV_CACHED
     #define NV_CACHED true
   #endif

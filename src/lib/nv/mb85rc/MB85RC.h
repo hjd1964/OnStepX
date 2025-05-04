@@ -5,7 +5,7 @@
 
 #include "../NvBase.h"
 
-#if defined(NV_DRIVER) && (NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256)
+#if defined(NV_DRIVER) && (NV_DRIVER == NV_MB85RC32 || NV_DRIVER == NV_MB85RC64 || NV_DRIVER == NV_MB85RC256)
 
 class NonVolatileStorageMB85RC : public NonVolatileStorage {
   public:
