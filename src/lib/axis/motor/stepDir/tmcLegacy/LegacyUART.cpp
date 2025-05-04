@@ -13,6 +13,8 @@
 #define rx m3
 #define tx m2
 
+#define CurrentToPercent(current) ((current/1000.0)/(0.325/(rSense + 0.02)))*100.0
+
 // constructor
 StepDirTmcUART::StepDirTmcUART(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
   this->axisNumber = axisNumber;
@@ -48,11 +50,7 @@ bool StepDirTmcUART::init() {
   }
 
   if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2209_RSENSE;
-  if (fabs(rSense - 0.11F) > 0.0001) {
-    DF("WRN:"); D(axisPrefix); VLF("driver supports Rsense=0.11ohms only!");
-    return false;
-  }
-  VF("MSG:"); V(axisPrefix); VLF("Rsense=0.11ohms (only)");
+  VF("MSG:"); V(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
 
   // get TMC UART driver ready
   pinModeEx(Pins->m0, OUTPUT);
@@ -117,9 +115,10 @@ bool StepDirTmcUART::init() {
   if (!settings.intpol) {
     VF("MSG:"); V(axisPrefix); VLF("driver interpolation control not supported");
   }
+
   modeMicrostepTracking();
-  driver->setRunCurrent(settings.currentRun/25); // current in %
-  driver->setHoldCurrent(settings.currentHold/25); // current in %
+  driver->setRunCurrent(CurrentToPercent(settings.currentRun));
+  driver->setHoldCurrent(CurrentToPercent(settings.currentHold));
   driver->disableStealthChop();
 
   // automatically set fault status for known drivers
@@ -190,16 +189,16 @@ int StepDirTmcUART::modeMicrostepSlewing() {
 
 void StepDirTmcUART::modeDecayTracking() {
   if (settings.decay == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
-  driver->setRunCurrent(settings.currentRun/25); // current in %
-  driver->setHoldCurrent(settings.currentHold/25); // current in %
+  driver->setRunCurrent(CurrentToPercent(settings.currentRun));
+  driver->setHoldCurrent(CurrentToPercent(settings.currentHold));
 }  
 
 void StepDirTmcUART::modeDecaySlewing() {
   int IGOTO = settings.currentGoto;
   if (IGOTO == OFF) IGOTO = settings.currentRun;
   if (settings.decaySlewing == SPREADCYCLE) driver->disableStealthChop(); else driver->enableStealthChop();
-  driver->setRunCurrent(IGOTO/25); // current in %
-  driver->setHoldCurrent(settings.currentHold/25); // current in %
+  driver->setRunCurrent(CurrentToPercent(IGOTO));
+  driver->setHoldCurrent(CurrentToPercent(settings.currentHold));
 }
 
 void StepDirTmcUART::readStatus() {
@@ -229,12 +228,12 @@ bool StepDirTmcUART::enable(bool state) {
 void StepDirTmcUART::calibrateDriver() {
   if (settings.decay == STEALTHCHOP || settings.decaySlewing == STEALTHCHOP) {
     VF("MSG: StepDirDriver"); V(axisNumber); VL(", TMC standstill automatic current calibration");
-    driver->setRunCurrent(settings.currentRun/25); // current in %
-    driver->setHoldCurrent(settings.currentRun/25); // current in %
+    driver->setRunCurrent(CurrentToPercent(settings.currentRun));
+    driver->setHoldCurrent(CurrentToPercent(settings.currentRun));
     driver->enableStealthChop();
     delay(1000);
-    driver->setRunCurrent(settings.currentRun/25); // current in %
-    driver->setHoldCurrent(settings.currentHold/25); // current in %
+    driver->setRunCurrent(CurrentToPercent(settings.currentRun));
+    driver->setHoldCurrent(CurrentToPercent(settings.currentHold));
     driver->disableStealthChop();
   }
 }
