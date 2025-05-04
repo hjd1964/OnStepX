@@ -35,14 +35,16 @@ bool TmcSPI::mode(bool intpol, int decay_mode, byte micro_step_code, int irun, i
   // IHOLD,      default=16, range 0 to 31 (Standstill current 0=1/32... 31=32/32)
   // IRUN,       default=31, range 0 to 31 (Run current 0=1/32... 31=32/32)
   // IHOLDDELAY, default=4,  range 0 to 15 (Delay per current reduction step in x 2^18 clocks)
+
   float Ifs = 0.325/rsense;
+  if (model == TMC2130) Ifs = 0.325/(rsense + 0.02);
+
   long IHOLD = round(( (ihold/1000.0)/Ifs)*32.0)-1;
   long IRUN  = round(( (irun/1000.0)/Ifs)*32.0)-1;
   if (IHOLD < 0) IHOLD = 0;
   if (IHOLD > 31) IHOLD = 31;
   if (IRUN < 0) IRUN = 0;
   if (IRUN > 31) IRUN = 31;
-  if (IHOLD == OFF) IHOLD = IRUN/2;
 
   //          IHOLD       +  IRUN       +  IHOLDDELAY
   data_out = (IHOLD << 0) + (IRUN << 8) + (4UL << 16);

@@ -54,7 +54,7 @@ bool StepDirTmcSPI::init() {
     if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC5160_RSENSE;
   } else
   if (settings.model == TMC2130) {
-    if (user_rSense > 0.0F) rSense = user_rSense + 0.02; else rSense = TMC2130_RSENSE + 0.02;
+    if (user_rSense > 0.0F) rSense = user_rSense; else rSense = TMC2130_RSENSE;
   }
   VF("MSG:"); V(axisPrefix); VF("Rsense="); V(rSense); VL("ohms");
 
