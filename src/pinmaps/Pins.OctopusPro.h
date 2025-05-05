@@ -5,7 +5,7 @@
 #if defined(STM32H723xx)
 
 // Serial: Built in USB (not TTL)
-// Serial2: RX2 Pin PD5, TX2 Pin PD6
+// Serial2: RX2 Pin PD6, TX2 Pin PD5
 // Serial3: RX3 Pin PD9, TX3 Pin PD8
 
 #if SERIAL_A_BAUD_DEFAULT != OFF
