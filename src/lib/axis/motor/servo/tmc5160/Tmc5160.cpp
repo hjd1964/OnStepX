@@ -42,7 +42,7 @@ bool ServoTmc5160::init() {
   ServoDriver::init();
 
   // override max current with user setting
-  if (user_currentMax > 0) currentMax = user_currentMax; else currentMax = TMC5160_MAX_CURRENT_MA;
+  if (user_currentMax > 0) currentMax = user_currentMax; else currentMax = TMC5160_MAX_CURRENT;
 
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;

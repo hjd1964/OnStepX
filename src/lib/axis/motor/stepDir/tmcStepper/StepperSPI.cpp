@@ -159,11 +159,11 @@ bool StepDirTmcSPI::init() {
 bool StepDirTmcSPI::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   if (!StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6)) return false;
 
-  if (settings.model == TMC2130) currentMax = TMC2130_MAX_CURRENT_MA; else
-  if (settings.model == TMC2160) currentMax = TMC2160_MAX_CURRENT_MA; else
-  if (settings.model == TMC2660) currentMax = TMC2660_MAX_CURRENT_MA; else
-  if (settings.model == TMC5160) currentMax = TMC5160_MAX_CURRENT_MA; else
-  if (settings.model == TMC5161) currentMax = TMC5161_MAX_CURRENT_MA; else
+  if (settings.model == TMC2130) currentMax = TMC2130_MAX_CURRENT; else
+  if (settings.model == TMC2160) currentMax = TMC2160_MAX_CURRENT; else
+  if (settings.model == TMC2660) currentMax = TMC2660_MAX_CURRENT; else
+  if (settings.model == TMC5160) currentMax = TMC5160_MAX_CURRENT; else
+  if (settings.model == TMC5161) currentMax = TMC5161_MAX_CURRENT; else
   {
     DF("WRN:"); D(axisPrefix); DLF("unknown driver model!");
     return false;

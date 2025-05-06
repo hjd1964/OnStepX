@@ -17,8 +17,8 @@
   #define TMC2209_RSENSE 0.11F
 #endif
 
-#ifndef TMC2209_MAX_CURRENT_MA
-  #define TMC2209_MAX_CURRENT_MA (2820*0.8)          // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
+#ifndef TMC2209_MAX_CURRENT
+  #define TMC2209_MAX_CURRENT (2820*0.8)             // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
 #endif
 
 // default settings for any TMC UART drivers that may be present

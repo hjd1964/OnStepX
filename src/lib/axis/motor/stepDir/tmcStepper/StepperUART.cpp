@@ -158,8 +158,8 @@ bool StepDirTmcUART::init() {
 bool StepDirTmcUART::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
   if (!StepDirDriver::validateParameters(param1, param2, param3, param4, param5, param6)) return false;
 
-  if (settings.model == TMC2208) currentMax = TMC2208_MAX_CURRENT_MA; else
-  if (settings.model == TMC2209) currentMax = TMC2209_MAX_CURRENT_MA; else // both TMC2209 and TMC2226
+  if (settings.model == TMC2208) currentMax = TMC2208_MAX_CURRENT; else
+  if (settings.model == TMC2209) currentMax = TMC2209_MAX_CURRENT; else // both TMC2209 and TMC2226
   {
     DF("WRN:"); D(axisPrefix); DLF("unknown driver model!");
     return false;

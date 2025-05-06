@@ -36,50 +36,50 @@ typedef struct StepDirDriverSettings {
 #ifndef TMC2130_RSENSE
 #define TMC2130_RSENSE 0.11F
 #endif
-#ifndef TMC2130_MAX_CURRENT_MA
-#define TMC2130_MAX_CURRENT_MA (1700*0.8) // chip typically rated at 1.2A RMS, downrated to 80% due to typical step-stick form
+#ifndef TMC2130_MAX_CURRENT
+#define TMC2130_MAX_CURRENT (1700*0.8) // chip typically rated at 1.2A RMS, downrated to 80% due to typical step-stick form
 #endif
 
 #ifndef TMC2160_RSENSE
 #define TMC2160_RSENSE 0.075F
 #endif
-#ifndef TMC2160_MAX_CURRENT_MA
-#define TMC2160_MAX_CURRENT_MA 4230       // module typically rated at 3.0A RMS
+#ifndef TMC2160_MAX_CURRENT
+#define TMC2160_MAX_CURRENT 4230       // module typically rated at 3.0A RMS
 #endif
 
 #ifndef TMC2208_RSENSE
 #define TMC2208_RSENSE 0.11F
 #endif
-#ifndef TMC2208_MAX_CURRENT_MA
-#define TMC2208_MAX_CURRENT_MA (1974*0.8) // chip rated at 1.4A RMS, downrated to 80% due to typical step-stick form
+#ifndef TMC2208_MAX_CURRENT
+#define TMC2208_MAX_CURRENT (1974*0.8) // chip rated at 1.4A RMS, downrated to 80% due to typical step-stick form
 #endif
 
 #ifndef TMC2209_RSENSE
 #define TMC2209_RSENSE 0.11F
 #endif
-#ifndef TMC2209_MAX_CURRENT_MA
-#define TMC2209_MAX_CURRENT_MA (2820*0.8) // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
+#ifndef TMC2209_MAX_CURRENT
+#define TMC2209_MAX_CURRENT (2820*0.8) // chip rated at 2.0A RMS, downrated to 80% due to typical step-stick form
 #endif
 
 #ifndef TMC2660_RSENSE
 #define TMC2660_RSENSE 0.075F
 #endif
-#ifndef TMC2660_MAX_CURRENT_MA
-#define TMC2660_MAX_CURRENT_MA 2820       // module/chip rated at 2.0A RMS
+#ifndef TMC2660_MAX_CURRENT
+#define TMC2660_MAX_CURRENT 2820       // module/chip rated at 2.0A RMS
 #endif
 
 #ifndef TMC5160_RSENSE
 #define TMC5160_RSENSE 0.075F
 #endif
-#ifndef TMC5160_MAX_CURRENT_MA
-#define TMC5160_MAX_CURRENT_MA 4230       // typical module rated at 3.0A RMS
+#ifndef TMC5160_MAX_CURRENT
+#define TMC5160_MAX_CURRENT 4230       // typical module rated at 3.0A RMS
 #endif
 
 #ifndef TMC5161_RSENSE
 #define TMC5161_RSENSE 0.075F
 #endif
-#ifndef TMC5161_MAX_CURRENT_MA
-#define TMC5161_MAX_CURRENT_MA (4935*0.8) // chip rated at 3.5A RMS, downrated to 80% due to typical step-stick form
+#ifndef TMC5161_MAX_CURRENT
+#define TMC5161_MAX_CURRENT (4935*0.8) // chip rated at 3.5A RMS, downrated to 80% due to typical step-stick form
 #endif
 
 class StepDirDriver {

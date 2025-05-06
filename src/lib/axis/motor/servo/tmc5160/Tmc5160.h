@@ -17,8 +17,8 @@
   #define TMC5160_RSENSE 0.075F
 #endif
 
-#ifndef TMC5160_MAX_CURRENT_MA
-  #define TMC5160_MAX_CURRENT_MA 4230       // typical module rated at 3.0A RMS
+#ifndef TMC5160_MAX_CURRENT
+  #define TMC5160_MAX_CURRENT 4230 // typical module rated at 3.0A RMS
 #endif
 
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
