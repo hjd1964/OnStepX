@@ -12,16 +12,14 @@
   #define SERIAL_A              Serial
 #endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
-  #define SERIAL_B              Serial3
-//  #define SERIAL_B              HardSerial
-//  #define SERIAL_B_RX           PD9
-//  #define SERIAL_B_TX           PD8
+  #define SERIAL_B              HardSerial
+  #define SERIAL_B_RX           PD9
+  #define SERIAL_B_TX           PD8
 #endif
 #if SERIAL_C_BAUD_DEFAULT != OFF
-  #define SERIAL_C              Serial2
-//  #define SERIAL_C              HardSerial
-//  #define SERIAL_C_RX           PD6
-//  #define SERIAL_C_TX           PD5
+  #define SERIAL_C              HardSerial
+  #define SERIAL_C_RX           PD6
+  #define SERIAL_C_TX           PD5
 #endif
 
 // Connector Labeled I2C uses PB8 (SCL) and PB9 (SDA) which are forced in the HAL
