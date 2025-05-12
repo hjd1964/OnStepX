@@ -62,7 +62,6 @@ bool StepDirTmcSPI::init() {
   driver.init(settings.model, Pins->m0, Pins->m1, Pins->m2, Pins->m3, axisNumber);
 
   // get driver ready and check to see if it's there (if possible)
-  
   if (!driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense)) {
     DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
     return false;
