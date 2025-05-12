@@ -19,7 +19,7 @@ StepDirGeneric::StepDirGeneric(uint8_t axisNumber, const StepDirDriverPins *Pins
 }
 
 // setup driver
-void StepDirGeneric::init() {
+bool StepDirGeneric::init() {
 
   m0Pin = Pins->m0;
   m1Pin = Pins->m1;
@@ -62,9 +62,10 @@ void StepDirGeneric::init() {
   pinModeEx(m2Pin, OUTPUT);
   digitalWriteEx(m2Pin, microstepBitCodeM2);
 
-  // automatically set fault status for known drivers
+  // get status detection ready
   status.active = settings.status != OFF;
 
+  // automatically set fault status for known drivers
   if (settings.status == ON) {
     switch (settings.model) {
       case DRV8825: settings.status = LOW; break;
@@ -81,10 +82,21 @@ void StepDirGeneric::init() {
     if (settings.status == HIGH) pinModeEx(Pins->fault, INPUT);
   #endif
 
+  // check to see if the driver is ok if possible
+  if (settings.status == LOW || settings.status == HIGH) {
+    status.fault = digitalReadEx(Pins->fault) == settings.status;
+    if (status.fault) {
+      DF("ERR:"); D(axisPrefix); DLF("motor driver device fault!");
+      return false;
+    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device ok"); }
+  }
+
   // set mode switching support flags
   // use low speed mode switch for TMC drivers or high speed otherwise
   modeSwitchAllowed = false;
   modeSwitchFastAllowed = microstepRatio != 1;
+
+  return true;
 }
 
 IRAM_ATTR void StepDirGeneric::modeMicrostepTracking() {
@@ -112,10 +124,6 @@ void StepDirGeneric::modeDecaySlewing() {
   if (settings.decaySlewing == OFF) return;
   int8_t state = getDecayPinState(settings.decaySlewing);
   if (state != OFF) digitalWriteEx(decayPin, state);
-}
-
-void StepDirGeneric::readStatus() {
-  status.sr = 0;
 }
 
 int8_t StepDirGeneric::getDecayPinState(int8_t decay) {

@@ -19,7 +19,7 @@ class StepDirGeneric : StepDirDriver {
     inline char getParameterTypeCode() { return 'S'; }
 
     // setup driver
-    void init();
+    bool init();
 
     // set microstep mode for tracking
     void modeMicrostepTracking();
@@ -33,9 +33,10 @@ class StepDirGeneric : StepDirDriver {
     // set decay mode for slewing
     void modeDecaySlewing();
 
-  private:
     // read status info. from driver
-    void readStatus();
+    inline void readStatus() {};
+
+  private:
 
     // checks if decay pin should be HIGH/LOW for a given decay setting
     int8_t getDecayPinState(int8_t decay);
