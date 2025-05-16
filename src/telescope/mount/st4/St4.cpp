@@ -130,78 +130,96 @@
       // if the alternate mode is allowed & selected & hasn't timed out, handle it
       if ( (altModeA || altModeB) && (st4Axis2Fwd.timeUp() < Shed_ms || st4Axis2Rev.timeUp() < Shed_ms || st4Axis1Rev.timeUp() < Shed_ms || st4Axis1Fwd.timeUp() < Shed_ms) ) {
 
-        // make sure no cmdSend() is being processed
-        //if (!cmdWaiting())
-        {
-          if (altModeA) {
-            int r = (int)guide.settings.axis1RateSelect;
-            if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
-              #if GOTO_FEATURE == ON
-                if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B+#"); else { if (r >= 7) r=8; else if (r >= 5) r=7; else if (r >= 2) r=5; else if (r < 2) r=2; }
-              #else
-                SERIAL_LOCAL.transmit(":B+#");
-              #endif
-              mountStatus.soundClick();
+        if (altModeA) {
+
+          // adjust guide rate
+          uint8_t r = ((uint8_t)guide.settings.axis1RateSelect) & 0b11111110;
+          if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
+            if (!mount.isTracking()) { SERIAL_LOCAL.transmit(":B+#"); mountStatus.soundClick(); } else {
+              if (r <= (GOTO_FEATURE == ON ? 6 : 4)) { r += 2; mountStatus.soundClick(); }
             }
-            if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
-              #if GOTO_FEATURE == ON
-                if (goTo.state == GS_NONE) SERIAL_LOCAL.transmit(":B-#"); else { if (r <= 5) r=2; else if (r <= 7) r=5; else if (r <= 8) r=7; else if (r > 8) r=8; }
-              #else
-                SERIAL_LOCAL.transmit(":B-#");
-              #endif
-              mountStatus.soundClick();
-            }
-            if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
-              #if GOTO_FEATURE == ON
-                if (goTo.alignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
-              #else
-                SERIAL_LOCAL.transmit(":CS#");
-              #endif
-              mountStatus.soundClick();
-            }
-            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { mount.tracking(!mount.isTracking()); mountStatus.soundClick(); }
-            guide.settings.axis1RateSelect = (GuideRateSelect)r;
-            guide.settings.axis2RateSelect = (GuideRateSelect)r;
-            if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
           }
-          if (altModeB) {
-            #if ST4_HAND_CONTROL_FOCUSER == ON
-              static int fs = 0;
-              static int fn = 0;
-              if (!fn && !fs) {
-                if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":F2#"); mountStatus.soundClick(); }
-                if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":F1#"); mountStatus.soundClick(); }
-              }
-              if (!fn) {
-                if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) {
-                  if (fs == 0) { SERIAL_LOCAL.transmit(":FS#"); fs++; } else
-                  if (fs == 1) { SERIAL_LOCAL.transmit(":F-#"); fs++; } else
-                  if (fs == 2 && st4Axis2Rev.timeDown() > 4000) { SERIAL_LOCAL.transmit(":FF#"); fs++; } else
-                  if (fs == 3) { SERIAL_LOCAL.transmit(":F-#"); fs++; }
-                }
-                if (st4Axis2Rev.isUp()) { if (fs > 0) { SERIAL_LOCAL.transmit(":FQ#"); fs = 0; } }
-              }
-              if (!fs) {
-                if (st4Axis2Fwd.isDown() && st4Axis2Rev.isUp()) {
-                  if (fn == 0) { SERIAL_LOCAL.transmit(":FS#"); fn++; } else
-                  if (fn == 1) { SERIAL_LOCAL.transmit(":F+#"); fn++; } else
-                  if (fn == 2 && st4Axis2Fwd.timeDown() > 4000) { SERIAL_LOCAL.transmit(":FF#"); fn++; } else
-                  if (fn == 3) { SERIAL_LOCAL.transmit(":F+#"); fn++; }
-                }
-                if (st4Axis2Fwd.isUp()) { if (fn > 0) { SERIAL_LOCAL.transmit(":FQ#"); fn = 0; } }
-              }
+          if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
+            if (!mount.isTracking()) { SERIAL_LOCAL.transmit(":B-#"); mountStatus.soundClick(); } else {
+              if (r >= 2) { r -= 2; mountStatus.soundClick(); }
+            }
+          }
+          guide.settings.axis1RateSelect = (GuideRateSelect)r;
+          guide.settings.axis2RateSelect = (GuideRateSelect)r;
+          if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
+
+          // tracking on/off
+          if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) {
+            mount.tracking(!mount.isTracking());
+            mountStatus.soundClick();
+          }
+
+          // sync or accept align
+          if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) {
+            #if GOTO_FEATURE == ON
+              if (goTo.alignDone()) SERIAL_LOCAL.transmit(":CS#"); else goTo.alignAddStar();
             #else
-              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); mountStatus.soundClick(); }
-              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); mountStatus.soundClick(); }
-              if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); mountStatus.soundClick(); }
-              if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { mountStatus.soundClick(); mountStatus.soundToggleEnable(); mountStatus.soundClick(); }
+              SERIAL_LOCAL.transmit(":CS#");
             #endif
+            mountStatus.soundClick();
           }
         }
-      } else {
-        if (altModeA || altModeB) { 
+
+        if (altModeB) {
           #if ST4_HAND_CONTROL_FOCUSER == ON
-            SERIAL_LOCAL.transmit(":FQ#");
+            const char moveSlow[2][8] = {":F12#", ":F22#"};
+            const char moveFast[2][8] = {":F14#", ":F24#"};
+            const char moveIn[2][8]   = {":F1-#", ":F2-#"};
+            const char moveOut[2][8]  = {":F1+#", ":F2+#"};
+            static int fs = 0;
+            static int fn = 0;
+            static int focuserNumber = 0;
+
+            // select focuser 1 or 2
+            if (!fn && !fs) {
+              if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { focuserNumber = 1; mountStatus.soundClick(); }
+              if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { focuserNumber = 0; mountStatus.soundClick(); }
+            }
+
+            // move selected focuser out
+            if (!fn) {
+              if (st4Axis2Rev.isDown() && st4Axis2Fwd.isUp()) {
+                if (fs == 0) { SERIAL_LOCAL.transmit(moveSlow[focuserNumber]); fs++; } else
+                if (fs == 1) { SERIAL_LOCAL.transmit(moveIn[focuserNumber]); fs++; } else
+                if (fs == 2 && st4Axis2Rev.timeDown() > 4000) { SERIAL_LOCAL.transmit(moveFast[focuserNumber]); fs++; } else
+                if (fs == 3) { SERIAL_LOCAL.transmit(moveIn[focuserNumber]); fs++; }
+              }
+              if (st4Axis2Rev.isUp()) { if (fs > 0) { SERIAL_LOCAL.transmit(":F1Q#:F2Q#"); fs = 0; } }
+            }
+
+            // move selected focuser in
+            if (!fs) {
+              if (st4Axis2Fwd.isDown() && st4Axis2Rev.isUp()) {
+                if (fn == 0) { SERIAL_LOCAL.transmit(moveSlow[focuserNumber]); fn++; } else
+                if (fn == 1) { SERIAL_LOCAL.transmit(moveOut[focuserNumber]); fn++; } else
+                if (fn == 2 && st4Axis2Fwd.timeDown() > 4000) { SERIAL_LOCAL.transmit(moveFast[focuserNumber]); fn++; } else
+                if (fn == 3) { SERIAL_LOCAL.transmit(moveOut[focuserNumber]); fn++; }
+              }
+              if (st4Axis2Fwd.isUp()) { if (fn > 0) { SERIAL_LOCAL.transmit(":F1Q#:F2Q#"); fn = 0; } }
+            }
+          #else
+            // select next user catalog item
+            if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LN#"); mountStatus.soundClick(); }
+
+            // select previous user catalog item
+            if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) { SERIAL_LOCAL.transmit(":LB#"); mountStatus.soundClick(); }
+
+            // goto user catalog item
+            if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) { SERIAL_LOCAL.transmit(":LIG#"); mountStatus.soundClick(); }
+
+            // turn sound on/off
+            if (st4Axis2Rev.wasPressed() && !st4Axis2Fwd.wasPressed()) { mountStatus.soundClick(); mountStatus.soundToggleEnable(); mountStatus.soundClick(); }
+          #endif
+        }
+      } else {
+        if (altModeA || altModeB) {
+          #if ST4_HAND_CONTROL_FOCUSER == ON
+            SERIAL_LOCAL.transmit(":F1Q#:F2Q#");
           #endif
           altModeA = false;
           altModeB = false;
