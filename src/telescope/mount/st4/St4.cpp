@@ -131,22 +131,30 @@
       if ( (altModeA || altModeB) && (st4Axis2Fwd.timeUp() < Shed_ms || st4Axis2Rev.timeUp() < Shed_ms || st4Axis1Rev.timeUp() < Shed_ms || st4Axis1Fwd.timeUp() < Shed_ms) ) {
 
         if (altModeA) {
+          uint8_t currentRateSelect = ((uint8_t)guide.settings.axis1RateSelect) & 0b11111110;
 
-          // adjust guide rate
-          uint8_t r = ((uint8_t)guide.settings.axis1RateSelect) & 0b11111110;
+          // adjust guide rate faster
           if (st4Axis1Fwd.wasPressed() && !st4Axis1Rev.wasPressed()) {
             if (!mount.isTracking()) { SERIAL_LOCAL.transmit(":B+#"); mountStatus.soundClick(); } else {
-              if (r <= (GOTO_FEATURE == ON ? 6 : 4)) { r += 2; mountStatus.soundClick(); }
+              if (currentRateSelect <= (GOTO_FEATURE == ON ? 6 : 4)) {
+                  guide.settings.axis1RateSelect = (GuideRateSelect)(currentRateSelect + 2);
+                  guide.settings.axis2RateSelect = (GuideRateSelect)(currentRateSelect + 2);
+                  if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
+                  mountStatus.soundClick();
+                }
             }
           }
+
+          // adjust guide rate slower
           if (st4Axis1Rev.wasPressed() && !st4Axis1Fwd.wasPressed()) {
             if (!mount.isTracking()) { SERIAL_LOCAL.transmit(":B-#"); mountStatus.soundClick(); } else {
-              if (r >= 2) { r -= 2; mountStatus.soundClick(); }
+              if (currentRateSelect >= 2) {
+                guide.settings.axis1RateSelect = (GuideRateSelect)(currentRateSelect - 2);
+                guide.settings.axis2RateSelect = (GuideRateSelect)(currentRateSelect - 2);
+                if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
+                mountStatus.soundClick(); }
             }
           }
-          guide.settings.axis1RateSelect = (GuideRateSelect)r;
-          guide.settings.axis2RateSelect = (GuideRateSelect)r;
-          if (GUIDE_SEPARATE_PULSE_RATE == ON && guide.settings.axis1RateSelect <= GR_1X) guide.settings.pulseRateSelect = guide.settings.axis1RateSelect;
 
           // tracking on/off
           if (st4Axis2Fwd.wasPressed() && !st4Axis2Rev.wasPressed()) {
