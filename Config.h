@@ -131,6 +131,9 @@
                                           //         ALTAZM      Altitude/Azimuth Mount, Dobsonians, etc.
                                           //         ALTAZM_UNL  ALTAZM w/unlimited Azimuth motion
 
+#define MOUNT_ALTERNATE_ORIENTATION   OFF //    OFF, ON Enables Meridian Flips for FORK mounts and passing through the        Option
+                                          //         Zenith for ALTAZM mounts.  GEM mode ignores this setting.
+                                          
 #define MOUNT_COORDS          TOPOCENTRIC // ...RIC, Applies refraction to coordinates to/from OnStep, except exactly         Infreq
                                           //              at the poles. Use TOPO_STRICT to apply refraction even in that case.
                                           //              Use OBSERVED_PLACE for no refraction.
