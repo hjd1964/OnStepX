@@ -69,6 +69,7 @@ void Motor::setInstrumentCoordinateSteps(long value) {
 // should only be called when the axis is not moving
 void Motor::setInstrumentCoordinateParkSteps(long value, int modulo) {
   if (driverType == STEP_DIR) {
+    if (modulo == OFF) modulo = 1;
     long steps = value - motorSteps;
     steps -= modulo*2L;
     for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
@@ -96,6 +97,7 @@ void Motor::setTargetCoordinateSteps(long value) {
 // should only be called when the axis is not moving
 void Motor::setTargetCoordinateParkSteps(long value, int modulo) {
   if (driverType == STEP_DIR) {
+    if (modulo == OFF) modulo = 1;
     long steps = value - indexSteps;
     steps -= modulo*2L;
     for (int l = 0; l < modulo*4; l++) { if (steps % (modulo*4L) == 0) break; steps++; }
