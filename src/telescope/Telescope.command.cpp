@@ -122,6 +122,8 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (command[1] == 'C') {
       // spaces are encoded as '_'
       for (unsigned int i = 0; i < strlen(parameter); i++) if (parameter[i] == '_') parameter[i] = ' ';
+      // prefix with "REM> "
+      D("REM> ");
       // a newline is encoded as '&' in the last char of message
       int l = strlen(parameter);
       if (l > 0 && parameter[l - 1] == '&') { parameter[l - 1] = 0; DL(parameter); } else { D(parameter); }
