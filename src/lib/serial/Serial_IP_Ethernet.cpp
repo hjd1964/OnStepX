@@ -18,7 +18,7 @@
 
     if (!ethernetManager.init()) {
       DLF("WRN: IPSerial, failed to start Ethernet");
-      return false;
+      return;
     }
 
     cmdSvr = new EthernetServer(port);
