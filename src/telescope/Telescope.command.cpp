@@ -123,7 +123,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       // spaces are encoded as '_'
       for (unsigned int i = 0; i < strlen(parameter); i++) if (parameter[i] == '_') parameter[i] = ' ';
       // prefix with "REM> "
-      D("REM> ");
+      if (strstr(parameter, "ERR:") == 0 || strstr(parameter, "WRN:") == 0 || strstr(parameter, "MSG:") == 0) D("REM> ");
       // a newline is encoded as '&' in the last char of message
       int l = strlen(parameter);
       if (l > 0 && parameter[l - 1] == '&') { parameter[l - 1] = 0; DL(parameter); } else { D(parameter); }
