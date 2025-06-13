@@ -29,7 +29,7 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (isAnalogThreshold || isAnalogValue) {
     if (analogCompareValue > ANALOG_READ_RANGE) {
       analogCompareValue = ANALOG_READ_RANGE;
-      DF("WRN: Button::Button(), AnalogCompareValue for pin "); D(pin); DF(" is above analog range setting to "); DL(threshold);
+      DF("WRN: Button::Button(), AnalogCompareValue for pin "); D(pin); DF(" is above analog range setting to "); DL(analogCompareValue);
     }
 	  if (analogCompareValue - hysteresis < 0) {
       hysteresis = analogCompareValue;
