@@ -127,17 +127,18 @@ bool StepDirTmcSPI::init() {
 
   // if we can, check to see if the driver is there
   // check to see if the driver is there and ok
-  #ifndef DRIVER_TMC_STEPPER_HW_SPI
-    if (Pins->miso != OFF)
+  #ifdef MOTOR_DRIVER_DETECT
+    #ifndef DRIVER_TMC_STEPPER_HW_SPI
+      if (Pins->miso != OFF)
+    #endif
+    {
+      readStatus();
+      if (!status.standstill || status.overTemperature) {
+        DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+        return false;
+      } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+    }
   #endif
-  {
-    readStatus();
-    if (!status.standstill || status.overTemperature) {
-      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
-      return false;
-    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
-  }
-
 
   // set fault pin mode
   if (settings.status == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);

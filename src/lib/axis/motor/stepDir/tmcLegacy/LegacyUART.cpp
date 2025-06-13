@@ -97,12 +97,14 @@ bool StepDirTmcUART::init() {
 
   // this driver automatically switches to one-way communications, even if a RX pin is set
   // so the following only returns false if communications are "half working"
-  if (rxPin != OFF) {
-    if (!driver->isSetupAndCommunicating()) {
-      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
-      return false;
-    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
-  }
+  #ifdef MOTOR_DRIVER_DETECT
+    if (rxPin != OFF) {
+      if (!driver->isSetupAndCommunicating()) {
+        DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+        return false;
+      } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+    }
+  #endif
 
   driver->useExternalSenseResistors();
   driver->enableAnalogCurrentScaling();

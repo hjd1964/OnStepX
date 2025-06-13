@@ -132,11 +132,13 @@ bool StepDirTmcUART::init() {
   status.active = settings.status != OFF;
 
   // check to see if the driver is there and ok
-  readStatus();
-  if (!status.standstill || status.overTemperature) {
-    DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
-    return false;
-  } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  #ifdef MOTOR_DRIVER_DETECT
+    readStatus();
+    if (!status.standstill || status.overTemperature) {
+      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+      return false;
+    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  #endif
 
   // set fault pin mode
   if (settings.status == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);

@@ -5,58 +5,99 @@
 
 #if defined(GPIO_DEVICE) && GPIO_DEVICE == X8575
 
-#ifndef GPIO_PCF8575_I2C_ADDRESS
-  #define GPIO_PCF8575_I2C_ADDRESS 0x20
-#endif
-
-#include <PCF8575.h> // https://www.arduino.cc/reference/en/libraries/pcf8575/
-
-PCF8575 pcf(GPIO_PCF8575_I2C_ADDRESS, &HAL_WIRE); // might need to change this I2C Address?
-
-// check for PCF8575 device on the I2C bus
+// check for up to two PCF8575 devices on the I2C bus
 bool GpioPcf8575::init() {
   static bool initialized = false;
   if (initialized) return found;
 
-  if (pcf.begin()) {
-    found = true;
-  } else { found = false; DF("WRN: Gpio.init(), PCF8575 (I2C 0x"); if (DEBUG != OFF) SERIAL_DEBUG.print(GPIO_PCF8575_I2C_ADDRESS, HEX); DLF(") not found"); }
+  for (int i = 0; i < 32; i++) mode[i] = -1;
+
+  HAL_WIRE.begin();
   HAL_WIRE_SET_CLOCK();
 
+  // check to be sure we find all devices
+  for (int i = 0; i < GPIO_PCF8575_I2C_NUM_DEVICES; i++) {
+    HAL_WIRE.beginTransmission(iicAddress[i]);
+    uint8_t error = HAL_WIRE.endTransmission();
+    if (error) {
+      // try again
+      HAL_WIRE.beginTransmission(iicAddress[i]);
+      uint8_t error = HAL_WIRE.endTransmission();
+      if (error) {
+        if (DEBUG != OFF) { DF("WRN: Gpio.init(), PCF8575 (I2C 0x"); SERIAL_DEBUG.print(iicAddress[i], HEX); DLF(") not found"); }
+        found = false;
+        return false;
+      }
+    }
+  }
+
+  found = true;
   return found;
 }
 
-// set GPIO pin (0 to 15) mode for INPUT, INPUT_PULLUP, or OUTPUT
+// set GPIO pin (0 to 31) mode for INPUT or OUTPUT
 void GpioPcf8575::pinMode(int pin, int mode) {
-  if (found && pin >= 0 && pin <= 15) {
+  if (found && pin >= 0 && pin <= GPIO_PCF8575_I2C_NUM_DEVICES*16 - 1) {
+    uint8_t device = pin >> 4;
+    uint8_t devicePin = pin & 0b01111;
+
     #ifdef INPUT_PULLDOWN
       if (mode == INPUT_PULLDOWN) mode = INPUT;
     #endif
     if (mode == INPUT_PULLUP) mode = INPUT;
-    // no pinMode() seems to exist for the PCF8575, I assume reading sets input mode and writing sets output mode automatically
-    this->mode[pin] = mode;
+    if (mode != INPUT && mode != OUTPUT) return;
+
+    if (this->mode[pin] != mode) {
+      bitWrite(state[device], devicePin, (mode == INPUT) ? 1 : 0);
+
+      HAL_WIRE.beginTransmission(iicAddress[device]);
+      HAL_WIRE.write(state[device]);
+      HAL_WIRE.endTransmission();
+
+      this->mode[pin] = mode;
+    }
   }
 }
 
-// one sixteen channel Pcf8575 GPIO is supported, this gets the last set value
+// get GPIO pin (0 to 31) state
 int GpioPcf8575::digitalRead(int pin) {
-  if (found && pin >= 0 && pin <= 15) {
-    if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
-      return pcf.read(pin);
-    } else return state[pin];
-  } else return 0;
+  if (found && pin >= 0 && pin <= GPIO_PCF8575_I2C_NUM_DEVICES*16 - 1 && mode[pin] > 0) {
+    uint8_t device = pin >> 4;
+    uint8_t devicePin = pin & 0b01111;
+
+    if (mode[pin] == INPUT) {
+
+      HAL_WIRE.requestFrom(iicAddress[device], (uint8_t)2);
+
+      unsigned long timeout = millis() + 1000UL;
+      do { if ((long)(timeout - millis()) < 0) return 0; } while (Wire.available() < 2);
+
+      uint16_t data = HAL_WIRE.read();
+      data |= HAL_WIRE.read() << 8;
+
+      return bitRead(data, devicePin);
+    } else
+      return bitRead(state[device], devicePin);
+  }
+
+  return 0;
 }
 
-// one sixteen channel Pcf8575 GPIO is supported, this sets each output on or off
+// set GPIO pin (0 to 31) state
 void GpioPcf8575::digitalWrite(int pin, int value) {
-  if (found && pin >= 0 && pin <= 15) {
-    state[pin] = value;
+  if (found && pin >= 0 && pin <= GPIO_PCF8575_I2C_NUM_DEVICES*16 - 1 && mode[pin] > 0) {
     if (mode[pin] == OUTPUT) {
-      pcf.write(pin, value);
-    } else {
-      if (value == HIGH) pinMode(pin, INPUT_PULLUP); else pinMode(pin, INPUT);
+      uint8_t device = pin >> 4;
+      uint8_t devicePin = pin & 0b01111;
+
+      bitWrite(state[device], devicePin, (value == 0) ? 0 : 1);
+
+      HAL_WIRE.beginTransmission(iicAddress[device]);
+      HAL_WIRE.write(state[device] & 0x000FF);
+      HAL_WIRE.write((state[device] & 0x0FF00) >> 8);
+      HAL_WIRE.endTransmission();
     }
-  } else return;
+  }
 }
 
 GpioPcf8575 gpio;

@@ -150,11 +150,13 @@ bool ServoTmc2209::init() {
   status.active = statusMode == ON;
 
   // check to see if the driver is there and ok
-  readStatus();
-  if (!status.standstill || status.overTemperature) {
-    DF("ERR:"); D(axisPrefix); DLF("no driver detected!");
-    return false;
-  } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  #ifdef MOTOR_DRIVER_DETECT
+    readStatus();
+    if (!status.standstill || status.overTemperature) {
+      DF("ERR:"); D(axisPrefix); DLF("no driver detected!");
+      return false;
+    } else { VF("MSG:"); V(axisPrefix); VLF("motor driver device detected"); }
+  #endif
 
   return true;
 }

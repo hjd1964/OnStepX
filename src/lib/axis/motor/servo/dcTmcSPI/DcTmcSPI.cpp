@@ -86,13 +86,15 @@ bool ServoDcTmcSPI::init() {
   status.active = statusMode == ON;
 
   // check to see if the driver is there and ok
-  #ifndef DRIVER_TMC_STEPPER_HW_SPI
-    if (Pins->miso != OFF)
+  #ifdef MOTOR_DRIVER_DETECT
+    #ifndef DRIVER_TMC_STEPPER_HW_SPI
+      if (Pins->miso != OFF)
+    #endif
+    {
+      readStatus();
+      if (!status.standstill || status.overTemperature) { DF("ERR:"); D(axisPrefix); DLF("no driver detected!"); return false; }
+    }
   #endif
-  {
-    readStatus();
-    if (!status.standstill || status.overTemperature) { DF("ERR:"); D(axisPrefix); DLF("no driver detected!"); return false; }
-  }
 
   return true;
 }
