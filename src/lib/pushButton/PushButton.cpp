@@ -12,32 +12,32 @@
 Button::Button(int pin, int initState, int32_t trigger) {
   this->pin = pin;
 
-  long activeState = (trigger & 0b0000000000000000000001);
-  threshold        = (trigger & 0b0000000000011111111110) >> 1;
-  hysteresis       = (trigger & 0b0111111111100000000000) >> 11;
+  long activeState             = (trigger & 0b00000000000000000000000000000001);
+  int16_t analogThresholdValue = (trigger & 0b00000000000000000000011111111110) >> 1;
+  int16_t analogDownValue      = (trigger & 0b01111111111000000000000000000000) >> 21;
+  hysteresis                   = (trigger & 0b00000000000111111111100000000000) >> 11;
 
-  isAnalog = threshold != 0;
-  if (isAnalog) debounceMs = 30; else debounceMs = hysteresis;
+  isAnalogThreshold = analogThresholdValue != 0;
+  isAnalogValue = analogDownValue != 0;
+
+  if (isAnalogThreshold) { analogCompareValue = analogThresholdValue; debounceMs = 30; } else
+  if (isAnalogValue) { analogCompareValue = analogDownValue; debounceMs = 30; } else debounceMs = hysteresis;
 
   if (activeState == LOW) { UP = HIGH; DOWN = LOW; } else
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
-  if (isAnalog) {
-    if (threshold < 0) {
-      threshold = 0;
-      DF("WRN: Button::Button(), Threshold for pin "); D(pin); DF(" is below Analog range setting to "); DL(threshold);
-    } else
-    if (threshold > ANALOG_READ_RANGE) {
-      threshold = ANALOG_READ_RANGE;
-      DF("WRN: Button::Button(), Threshold for pin "); D(pin); DF(" is above Analog range setting to "); DL(threshold);
+  if (isAnalogThreshold || isAnalogValue) {
+    if (analogCompareValue > ANALOG_READ_RANGE) {
+      analogCompareValue = ANALOG_READ_RANGE;
+      DF("WRN: Button::Button(), AnalogCompareValue for pin "); D(pin); DF(" is above analog range setting to "); DL(threshold);
     }
-	  if (threshold - hysteresis < 0) {
-      hysteresis = threshold;
-      DF("WRN: Button::Button(), Threshold - Hysteresis for pin "); D(pin); DF(" is below Analog range setting Hysteresis to "); DL(hysteresis);
+	  if (analogCompareValue - hysteresis < 0) {
+      hysteresis = analogCompareValue;
+      DF("WRN: Button::Button(), AnalogCompareValue - hysteresis for pin "); D(pin); DF(" is below analog range setting Hysteresis to "); DL(hysteresis);
     } else
-  	if (threshold + hysteresis > ANALOG_READ_RANGE) {
-      hysteresis = ANALOG_READ_RANGE - threshold;
-      DF("WRN: Button::Button(), Threshold + Hysteresis for pin "); D(pin); DF(" is above Analog range setting Hysteresis to "); DL(hysteresis);
+  	if (analogCompareValue + hysteresis > ANALOG_READ_RANGE) {
+      hysteresis = ANALOG_READ_RANGE - analogCompareValue;
+      DF("WRN: Button::Button(), AnalogCompareValue + Hysteresis for pin "); D(pin); DF(" is above analog range setting Hysteresis to "); DL(hysteresis);
     }
   }
 
@@ -46,19 +46,20 @@ Button::Button(int pin, int initState, int32_t trigger) {
 
 void Button::poll() {
   int lastState = state;
-  if (isAnalog) {
+  if (isAnalogThreshold || isAnalogValue) {
     #ifdef ESP32
       int analogValue = round((analogReadMilliVolts(pin)/3300.0F)*(float)ANALOG_READ_RANGE);
     #else
       int analogValue = analogRead(pin);
     #endif
 
-    if (DOWN == HIGH) {
-      if (analogValue >= threshold + hysteresis) state = HIGH; else state = LOW;
-    }
+    if (isAnalogThreshold) {
+      if (DOWN == HIGH) { if (analogValue >= analogCompareValue + hysteresis) state = HIGH; else state = LOW; }
+      if (DOWN == LOW) { if (analogValue <= analogCompareValue - hysteresis) state = LOW; else state = HIGH; }
+    } else
 
-    if (DOWN == LOW) {
-      if (analogValue <= threshold - hysteresis) state = LOW; else state = HIGH;
+    if (isAnalogValue) {
+      if (analogValue >= analogCompareValue - hysteresis && analogValue <= analogCompareValue + hysteresis) state = DOWN; else state = UP;
     }
 
   } else state = digitalReadEx(pin);
@@ -71,7 +72,7 @@ void Button::poll() {
     avgPulseDuration = ((avgPulseDuration*4.0) + 2000.0)/5.0;
   }
   if (stableMs > debounceMs) {
-    if (lastStableState == UP && state == DOWN) { 
+    if (lastStableState == UP && state == DOWN) {
       static unsigned long lastPressTime = 0;
       if (pressed && millis() - lastPressTime < 500) doublePressed = true;
       pressed = true;
