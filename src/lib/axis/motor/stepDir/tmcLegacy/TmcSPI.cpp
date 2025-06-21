@@ -55,17 +55,19 @@ bool TmcSPI::mode(bool intpol, int decay_mode, byte micro_step_code, int irun, i
   }
 
   // if we can, check if the driver is there
-  if (!softSpi.outOnly()) {
-    // check for standstill status flag
-    bool standstill = statusFlag & 0b00001000;
-    // check for fault status flag
-    bool fault = statusFlag & 0b00000010;
-    if (!standstill || fault) {
-      softSpi.end();
-      active = false;
-      return false;
+  #ifdef MOTOR_DRIVER_DETECT
+    if (!softSpi.outOnly()) {
+      // check for standstill status flag
+      bool standstill = statusFlag & 0b00001000;
+      // check for fault status flag
+      bool fault = statusFlag & 0b00000010;
+      if (!standstill || fault) {
+        softSpi.end();
+        active = false;
+        return false;
+      }
     }
-  }
+  #endif
 
   // TPOWERDOWN, default=127, range 0 to 255 (Delay after standstill for motor current power down, about 0 to 4 seconds)
   data_out = (tpd_value << 0);

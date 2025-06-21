@@ -63,16 +63,12 @@ bool StepDirTmcSPI::init() {
 
   // get driver ready and check to see if it's there (if possible)
   if (!driver.mode(settings.intpol, settings.decay, microstepCode, settings.currentRun, settings.currentHold, rSense)) {
-    #ifdef MOTOR_DRIVER_DETECT
-      DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
-      return false;
-    #endif
+    DF("ERR:"); D(axisPrefix); DLF("no motor driver device detected!");
+    return false;
   } else {
-    #ifdef MOTOR_DRIVER_DETECT
-      if (Pins->m3 != OFF) {
-        VF("MSG:"); V(axisPrefix); VLF("motor driver device detected");
-      }
-    #endif
+    if (Pins->m3 != OFF) {
+      VF("MSG:"); V(axisPrefix); VLF("motor driver device detected");
+    }
   }
 
   // automatically set fault status for known drivers
