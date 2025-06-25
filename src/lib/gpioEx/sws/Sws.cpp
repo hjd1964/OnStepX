@@ -98,7 +98,7 @@ void GpioSws::pinMode(int pin, int mode) {
   }
 }
 
-// one four channel SWS GPIO is supported, this gets the last set value
+// one eight channel SWS GPIO is supported, this gets the last set value
 int GpioSws::digitalRead(int pin) {
   if (readyStage2 && pin >= 0 && pin <= 7) {
     if (mode[pin] == INPUT || mode[pin] == INPUT_PULLUP) {
@@ -107,7 +107,7 @@ int GpioSws::digitalRead(int pin) {
   } else return 0;
 }
 
-// one four channel SWS GPIO is supported, this sets each output on or off
+// one eight channel SWS GPIO is supported, this sets each output on or off
 void GpioSws::digitalWrite(int pin, int value) {
   if (pin >= 0 && pin <= 7) {
     state[pin] = value;
@@ -115,7 +115,7 @@ void GpioSws::digitalWrite(int pin, int value) {
   } else return;
 }
 
-// one four channel SWS GPIO is supported
+// one eight channel SWS GPIO is supported
 void GpioSws::analogWrite(int pin, int value) {
   value = (value*127)/ANALOG_WRITE_RANGE + 2;
   if (pin >= 0 && pin <= 7 && value >= 2 && value <= 129) {
