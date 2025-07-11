@@ -166,7 +166,7 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   stateA = digitalReadF(pin);
 
   uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
-  static int16_t dir;
+  int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
     case 0b0001: dir = -1; break;
@@ -195,7 +195,7 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   stateB = digitalReadF(pin);
 
   uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
-  static int16_t dir;
+  int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break;
     case 0b0001: dir = -1; break;
