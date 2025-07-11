@@ -96,7 +96,7 @@ class Encoder {
     bool isVirtual = false;
 
     // raw position count (as last read)
-    int32_t count = 0;
+    volatile int32_t count = 0;
 
     // raw position offset count (as last set)
     int32_t offset = 0;
