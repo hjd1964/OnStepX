@@ -17,7 +17,6 @@ Jtw26::Jtw26(int16_t maPin, int16_t sloPin, int16_t axis) {
 // get encoder count relative to origin
 IRAM_ATTR bool Jtw26::getCount(uint32_t &count) {
 
-  readError = false;
   bool foundAck = false;
   bool foundStart = false;
   bool foundCds = false;
