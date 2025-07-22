@@ -286,7 +286,7 @@ uint32_t ServoMotor::encoderZero() {
   if (!ready) return 0;
 
   encoder->origin = 0;
-  encoder->offset = 0;
+  encoder->index = 0;
 
   uint32_t zero = (uint32_t)(-encoder->read());
   encoder->origin = zero;
