@@ -11,8 +11,8 @@
       LikaAsc85(int16_t maPin, int16_t sloPin, int16_t axis);
 
     private:
-      // read encoder position
-      bool readEnc(uint32_t &position);
+      // get encoder count relative to origin
+      bool getCount(uint32_t &count);
 
       // BiSS-C 6-bit CRC of 27 bit data (25 position + 2 err/wrn)
       uint8_t crc6(uint64_t data);

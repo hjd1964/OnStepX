@@ -38,11 +38,13 @@ KTechIME::KTechIME(int16_t axis) {
   if (axis < 1 || axis > 9) return;
   
   this->axis = axis;
+  axis_index = axis - 1;
 
   // the motor CAN ID is the axis number!
-  canID = 0x140 + this->axis;
+  canID = 0x140 + axis;
 
-  ktechEncoderInstance[this->axis - 1] = this;
+  ktechEncoderInstance[axis_index] = this;
+
   switch (this->axis) {
     case 1: callback = requestKTechEncoderAxis1; break;
     case 2: callback = requestKTechEncoderAxis2; break;
@@ -88,12 +90,14 @@ bool KTechIME::init() {
 
 int32_t KTechIME::read() {
   if (!ready) return 0;
-  return count + origin;
+
+  return count + index;
 }
 
-void KTechIME::write(int32_t count) {
+void KTechIME::write(int32_t position) {
   if (!ready) return;
-  origin = count - this->count;
+
+  index = position - count;
 }
 
 void KTechIME::requestPosition() {

@@ -8,13 +8,15 @@
 As37h39bb::As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
+  this->axis = axis;
+
   this->maPin = maPin;
   this->sloPin = sloPin;
-  this->axis = axis;
 }
 
-// read encoder count
-IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
+// get encoder count relative to origin
+IRAM_ATTR bool As37h39bb::getCount(uint32_t &count) {
+
   bool foundAck = false;
   bool foundStart = false;
   bool foundCds = false;
@@ -26,7 +28,7 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
   uint32_t encTurns = 0;
 
   // prepare for a reading
-  position = 0;
+  count = 0;
 
   // bit delay in nanoseconds
   int rate = lround(500000.0/BISSC_CLOCK_RATE_KHZ);
@@ -82,7 +84,7 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
         // the next 23 bits are the encoder absolute count
         for (int i = 0; i < 23; i++) {
           digitalWriteF(maPin, LOW_MA);
-          if (digitalReadF(sloPin) == HIGH_SLO) bitSet(position, 22 - i);
+          if (digitalReadF(sloPin) == HIGH_SLO) bitSet(count, 22 - i);
           delayNanoseconds(rate);
           digitalWriteF(maPin, HIGH_MA);
           delayNanoseconds(rate);
@@ -127,40 +129,43 @@ IRAM_ATTR bool As37h39bb::readEnc(uint32_t &position) {
 
   // trap errors
   int16_t errors = 0;
-  UNUSED(encWrn);
 
-  uint64_t encData = (uint64_t)position | ((uint64_t)encTurns << 23);
+  uint64_t encData = (uint64_t)count | ((uint64_t)encTurns << 23);
   encData = (encData << 1) | encErr;
   encData = (encData << 1) | encWrn;
 
+  if (!encWrn)     { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Warn bit set"); warn++; }
+
+  if (!foundAck)   { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Ack bit invalid"); errors++; } else
+  if (!foundStart) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Start bit invalid"); errors++; } else
+  if (!foundCds)   { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Cds bit invalid"); errors++; } else
+  if (encErr)      { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Error bit set"); errors++; } else
   if (crc6(encData) != as37Crc) {
-    bad++;
-    DF("WRN: Encoder AS37_H39B_B"); D(axis); DF(", Crc invalid (overall "); D(((float)bad/good)*100.0F); D("%"); DLF(")"); errors++;
-  } else {
-    good++;
-    if (!foundAck) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Ack bit invalid"); errors++; } else
-    if (!foundStart) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Start bit invalid"); errors++; } else
-    if (!foundCds) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Cds bit invalid"); errors++; } else
-    if (encErr) { DF("WRN: Encoder AS37_H39B_B"); D(axis); DLF(", Error bit set"); errors++; } else errors = 0;
+    DF("WRN: Encoder AS37_H39B_B"); D(axis); DF(", Crc invalid (overall "); D(((float)(++bad)/good)*100.0F); D("%"); DLF(")");
+    errors++;
+  } else good++;
+
+  if (errors > 0) {
+    error++;
+    return false;
   }
-  if (errors > 0) { error++; return false; }
 
   #if BISSC_SINGLE_TURN == ON
     // extend negative to 32 bits
-    if (bitRead(position, 23)) { position |= 0b11111111100000000000000000000000; }
+    if (bitRead(count, 23)) { count |= 0b11111111100000000000000000000000; }
   #else
     // combine absolute and 9 low order bits of multi-turn count for a 32 bit count
-    position = position | ((encTurns & 0b0111111111) << 23);
+    count = count | ((encTurns & 0b0111111111) << 23);
   #endif
 
-  position += origin;
+  count += origin;
 
   #if BISSC_SINGLE_TURN == ON
-    if ((int32_t)position >= 8388608) position -= 8388608;
-    if ((int32_t)position < 0) position += 8388608;
+    if ((int32_t)count >= 8388608) count -= 8388608;
+    if ((int32_t)count < 0) count += 8388608;
   #endif
 
-  position -= 4194304;
+  count -= 4194304;
 
   return true;
 }

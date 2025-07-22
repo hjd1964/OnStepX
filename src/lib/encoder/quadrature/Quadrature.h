@@ -26,7 +26,9 @@ class Quadrature : public Encoder {
     void B(const int16_t pin);
 
   private:
-    int16_t axis;
+    int16_t axis_index;
+
+    volatile int32_t quadratureCount = 0;
 
     int16_t APin = OFF;
     int16_t BPin = OFF;

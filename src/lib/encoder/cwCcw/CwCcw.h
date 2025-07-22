@@ -16,7 +16,10 @@ class CwCcw : public Encoder {
     void write(int32_t count);
 
   private:
-    int16_t cwPin, ccwPin;
+    int16_t axis_index;
+
+    int16_t CwPin, CcwPin;
+
 };
 
 #endif

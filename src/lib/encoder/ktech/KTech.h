@@ -27,6 +27,8 @@ class KTechIME : public Encoder {
     void updatePositionCallback(uint8_t data[8]);
 
   private:
+    int16_t axis_index;
+
     int canID = 0;
     void (*callback)() = NULL;
     uint32_t lastCountSingleTurn = 0;

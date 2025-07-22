@@ -16,7 +16,9 @@ class PulseDir : public Encoder {
     void write(int32_t count);
 
   private:
-    int16_t pulsePin, dirPin;
+    int16_t axis_index;
+
+    int16_t PulsePin, DirPin;
 };
 
 #endif

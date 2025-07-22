@@ -8,55 +8,56 @@
 
 #include "../../tasks/OnTask.h"
 
-float _pulse_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-float _direction[9];
-float _increment[9];
+float _virtual_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+float _virtual_direction[9];
+float _virtual_increment[9];
 
 #if AXIS1_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis1() { _pulse_count[0] += _direction[0] * _increment[0]; }
+  IRAM_ATTR void pulse_A_Axis1() { _virtual_count[0] += _virtual_direction[0] * _virtual_increment[0]; }
 #endif
 
 #if AXIS2_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis2() { _pulse_count[1] += _direction[1] * _increment[1]; }
+  IRAM_ATTR void pulse_A_Axis2() { _virtual_count[1] += _virtual_direction[1] * _virtual_increment[1]; }
 #endif
 
 #if AXIS3_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis3() { _pulse_count[2] += _direction[2] * _increment[2]; }
+  IRAM_ATTR void pulse_A_Axis3() { _virtual_count[2] += _virtual_direction[2] * _virtual_increment[2]; }
 #endif
 
 #if AXIS4_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis4() { _pulse_count[3] += _direction[3] * _increment[3]; }
+  IRAM_ATTR void pulse_A_Axis4() { _virtual_count[3] += _virtual_direction[3] * _virtual_increment[3]; }
 #endif
 
 #if AXIS5_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis5() { _pulse_count[4] += _direction[4] * _increment[4]; }
+  IRAM_ATTR void pulse_A_Axis5() { _virtual_count[4] += _virtual_direction[4] * _virtual_increment[4]; }
 #endif
 
 #if AXIS6_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis6() { _pulse_count[5] += _direction[5] * _increment[5]; }
+  IRAM_ATTR void pulse_A_Axis6() { _virtual_count[5] += _virtual_direction[5] * _virtual_increment[5]; }
 #endif
 
 #if AXIS7_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis7() { _pulse_count[6] += _direction[6] * _increment[6]; }
+  IRAM_ATTR void pulse_A_Axis7() { _virtual_count[6] += _virtual_direction[6] * _virtual_increment[6]; }
 #endif
 
 #if AXIS8_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis8() { _pulse_count[7] += _direction[7] * _increment[7]; }
+  IRAM_ATTR void pulse_A_Axis8() { _virtual_count[7] += _virtual_direction[7] * _virtual_increment[7]; }
 #endif
 
 #if AXIS9_ENCODER == VIRTUAL
-  IRAM_ATTR void pulse_A_Axis9() { _pulse_count[8] += _direction[8] * _increment[8]; }
+  IRAM_ATTR void pulse_A_Axis9() { _virtual_count[8] += _virtual_direction[8] * _virtual_increment[8]; }
 #endif
 
 VirtualEnc::VirtualEnc(int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
-  this->axis = axis - 1;
+  this->axis = axis;
+  axis_index = axis - 1;
 
   this->countsPerSec = countsPerSec;
 
-  _direction[this->axis] = 1; 
-  _increment[this->axis] = 0.0F;
+  _virtual_direction[axis_index] = 1; 
+  _virtual_increment[axis_index] = 0.0F;
 
   isVirtual = true;
 }
@@ -64,51 +65,60 @@ VirtualEnc::VirtualEnc(int16_t axis) {
 bool VirtualEnc::init() {
   if (ready) return true;
 
-  #if AXIS1_ENCODER == VIRTUAL
-    if (axis == 0) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis1, "venc1");
-    }
-  #endif
-  #if AXIS2_ENCODER == VIRTUAL
-    if (axis == 1) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis2, "venc2");
-    }
-  #endif
-  #if AXIS3_ENCODER == VIRTUAL
-    if (axis == 2) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis3, "venc3");
-    }
-  #endif
-  #if AXIS4_ENCODER == VIRTUAL
-    if (axis == 3) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis4, "venc4");
-    }
-  #endif
-  #if AXIS5_ENCODER == VIRTUAL
-    if (axis == 4) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis5, "venc5");
-    }
-  #endif
-  #if AXIS6_ENCODER == VIRTUAL
-    if (axis == 5) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis6, "venc6");
-    }
-  #endif
-  #if AXIS7_ENCODER == VIRTUAL
-    if (axis == 6) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis7, "venc7");
-    }
-  #endif
-  #if AXIS8_ENCODER == VIRTUAL
-    if (axis == 7) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis8, "venc8");
-    }
-  #endif
-  #if AXIS9_ENCODER == VIRTUAL
-    if (axis == 8) {
-      virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis9, "venc9");
-    }
-  #endif
+  virtualEncoderHandle = 0;
+
+  switch (axis) {
+    #if AXIS1_ENCODER == VIRTUAL
+      case 1:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis1, "venc1");
+      break;
+    #endif
+    #if AXIS2_ENCODER == VIRTUAL
+      case 2:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis2, "venc2");
+      break;
+    #endif
+    #if AXIS3_ENCODER == VIRTUAL
+      case 3:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis3, "venc3");
+      break;
+    #endif
+    #if AXIS4_ENCODER == VIRTUAL
+      case 4:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis4, "venc4");
+      break;
+    #endif
+    #if AXIS5_ENCODER == VIRTUAL
+      case 5:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis5, "venc5");
+      break;
+    #endif
+    #if AXIS6_ENCODER == VIRTUAL
+      case 6:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis6, "venc6");
+      break;
+    #endif
+    #if AXIS7_ENCODER == VIRTUAL
+      case 7:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis7, "venc7");
+      break;
+    #endif
+    #if AXIS8_ENCODER == VIRTUAL
+      case 8:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis8, "venc8");
+      break;
+    #endif
+    #if AXIS9_ENCODER == VIRTUAL
+      case 9:
+        virtualEncoderHandle = tasks.add(timerRateMs, 0, true, 3, pulse_A_Axis9, "venc9");
+      break;
+    #endif
+  }
+
+  if (!virtualEncoderHandle) {
+    DF("ERR: Encoder Virtual"); D(axis); DLF(" init(), couldn't get task!"); 
+    return false;
+  }
 
   ready = true;
   return true;
@@ -118,29 +128,27 @@ int32_t VirtualEnc::read() {
   if (!ready) return 0;
 
   noInterrupts();
-  int32_t count = _pulse_count[axis];
+  count = _virtual_count[axis_index];
   interrupts();
 
-  return count + origin;
+  return count + index;
 }
 
-void VirtualEnc::write(int32_t count) {
+void VirtualEnc::write(int32_t position) {
   if (!ready) return;
-
-  count -= origin;
-
+  
   noInterrupts();
-  _pulse_count[axis] = count;
+  index = position - _virtual_count[axis_index];
   interrupts();
 }
 
 void VirtualEnc::setVelocity(float countsPerSec) {
   if (!ready) { DF("WRN: Encoder Virtual"); D(axis); DLF(" setVelocity(), not ready!"); return; }
-  _increment[axis] = (countsPerSec)*(timerRateMs/1000.0F);
+  _virtual_increment[axis_index] = (countsPerSec)*(timerRateMs/1000.0F);
 }
 
 void VirtualEnc::setDirection(volatile int8_t *direction) {
-  _direction[axis] = *direction;
+  _virtual_direction[axis_index] = *direction;
 }
 
 #endif

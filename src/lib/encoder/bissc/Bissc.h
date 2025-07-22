@@ -39,18 +39,19 @@
       // set encoder origin
       void setOrigin(uint32_t count);
 
-      // read encoder count
+      // read encoder position
       int32_t read();
 
       // write encoder position
-      void write(int32_t count);
+      void write(int32_t position);
 
     protected:
-      // read encoder position with error recovery
-      bool readEncLatest(uint32_t &position);
+      // read encoder count with 1 second error recovery
+      // returns encoder count or INT32_MAX on error
+      uint32_t getCountWithErrorRecovery(bool now = false);
 
-      // read encoder position
-      virtual bool readEnc(uint32_t &position);
+      // read encoder count
+      virtual bool getCount(uint32_t &count);
 
       uint32_t good = 0;
       uint32_t bad = 0;
@@ -61,7 +62,7 @@
       int16_t sloPin;
 
       uint32_t lastValidTime = 0;
-      uint32_t lastValidPosition = 0;
+      uint32_t lastValidCount = 0;
   };
 
 #endif

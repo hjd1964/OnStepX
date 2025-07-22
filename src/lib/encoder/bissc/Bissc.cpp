@@ -13,10 +13,10 @@ bool Bissc::init() {
   pinMode(sloPin, INPUT_PULLUP);
 
   // see if the encoder is there
-  uint32_t count;
-  if (!readEnc(count))
-    if (!readEnc(count))
-      if (!readEnc(count)) return false;
+  uint32_t temp;
+  if (!getCount(temp))
+    if (!getCount(temp))
+      if (!getCount(temp)) return false;
 
   ready = true;
   return true;
@@ -26,8 +26,8 @@ bool Bissc::init() {
 void Bissc::setOrigin(uint32_t count) {
   if (!ready) { DF("WRN: Encoder BiSS-C"); D(axis); DLF(" setOrigin(), failed"); return; }
 
-  long temp = offset;
-  offset = 0;
+  long temp = index;
+  index = 0;
   origin = 0;
 
   VLF("----------------------------------------------------------------------------------------");
@@ -35,56 +35,51 @@ void Bissc::setOrigin(uint32_t count) {
   VF("MSG: Encoder BiSS-C"); V(axis); VF(", if used AXIS"); V(axis); VF("_ENCODER_OFFSET in counts should be set to "); VL(uint32_t(-read()));
   origin = count;
   uint32_t current;
-  readEnc(current);
+  getCount(current);
   VF("MSG: Encoder BiSS-C"); V(axis); VF(", counts at home should be 0 and currently are "); VL((int32_t)current);
   VLF("----------------------------------------------------------------------------------------");
 
-  offset = temp;
+  index = temp;
 }
 
-// read encoder count
+// read encoder position
 int32_t Bissc::read() {
   if (!ready) return 0;
 
-  uint32_t temp;
-  if (readEncLatest(temp)) {
-    count = (int32_t)temp;
-    return count + offset;
-  } else return INT32_MAX;
+  int32_t newCount = getCountWithErrorRecovery();
+  if (newCount != INT32_MAX) return newCount + index; else return INT32_MAX;
 }
 
-// write encoder count
-void Bissc::write(int32_t count) {
+// write encoder position
+void Bissc::write(int32_t position) {
   if (!ready) return;
 
-  if (count != INT32_MAX) {
-    uint32_t temp;
-    if (readEncLatest(temp)) {
-      offset = count - (int32_t)temp;
+  if (position != INT32_MAX) {
+    int32_t newCount;
+    newCount = getCountWithErrorRecovery(true);
+    if (newCount == INT32_MAX) {
+      error = ENCODER_ERROR_COUNT_THRESHOLD + 1;
+      return;
     }
+    
+    index = position - newCount;
   }
 }
 
-// read encoder count with (1 second) error recovery
-bool Bissc::readEncLatest(uint32_t &position) {
-  if ((long)(millis() - lastValidTime) < 2) {
-    position = lastValidPosition;
-    return true;
+// read encoder count with 1 second error recovery
+// returns encoder count or INT32_MAX on error
+int32_t Bissc::getCountWithErrorRecovery(bool now) {
+  if (now || (long)(millis() - lastValidTime) > 2) {
+    int32_t newCount = 0;
+    if (getCount(newCount)) {
+      lastValidTime = millis();
+      lastValidCount = newCount;
+    } else {
+      if ((long)(millis() - lastValidTime) > 1000) lastValidCount = INT32_MAX;
+    }
   }
 
-  uint32_t temp = position;
-  bool success = readEnc(temp);
-
-  if (success) {
-    lastValidTime = millis();
-    lastValidPosition = temp;
-    position = temp;
-    return true;
-  } else {
-    if ((long)(millis() - lastValidTime) > 1000) return false;
-    position = lastValidPosition;
-    return true;
-  }
+  return lastValidCount;
 }
 
 #endif

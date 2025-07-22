@@ -11,6 +11,9 @@
 
 QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
+
+  this->axis = axis;
+
   this->APin = APin;
   this->BPin = BPin;
 }
@@ -25,6 +28,12 @@ bool QuadratureEsp32::init() {
   }
 
   ab->attachFullQuad(APin, BPin);
+  if (!ab->isAttached()) {
+    DF("ERR: Encoder QuadratureEsp32"); D(axis); DLF(" init(), couldn't attach interrupts!"); 
+    delete ab;
+    return false;
+  }
+
   ab->setCount(0);
 
   ready = true;
@@ -36,15 +45,13 @@ int32_t QuadratureEsp32::read() {
 
   count = (int32_t)ab->getCount();
 
-  return count + origin;
+  return count + index;
 }
 
-void QuadratureEsp32::write(int32_t count) {
+void QuadratureEsp32::write(int32_t position) {
   if (!ready) return;
 
-  count -= origin;
-
-  ab->setCount(count);
+  index = position - (int32_t)ab->getCount();
 }
 
 #endif

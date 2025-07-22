@@ -17,31 +17,32 @@ bool _serial_bridge_initialized = false;
 
 SerialBridge::SerialBridge(int16_t axis) {
   if (axis < 1 || axis > 9) return;
-  ready = true;
   
   this->axis = axis;
-  axis--;
-  this->channel[0] = '1' + axis;
+
+  this->channel[0] = '0' + axis;
+
+  ready = true;
 }
 
 int32_t SerialBridge::read() {
   if (!ready) return 0;
 
   if (millis() - lastReadMillis > 10) {
-    count = raw();
+    count = getCount();
     lastReadMillis = millis();
   }
 
-  return count + offset;
+  return count + index;
 }
 
-void SerialBridge::write(int32_t count) {
+void SerialBridge::write(int32_t position) {
   if (!ready) return;
 
-  offset = count - raw();
+  index = position - getCount();
 }
 
-int32_t SerialBridge::raw() {
+int32_t SerialBridge::getCount() {
   if (!_serial_bridge_initialized) {
     #if defined(SERIAL_ENCODER_RX) && defined(SERIAL_ENCODER_TX) && !defined(SERIAL_ENCODER_RXTX_SET)
       SERIAL_ENCODER.begin(SERIAL_ENCODER_BAUD, SERIAL_8N1, SERIAL_ENCODER_RX, SERIAL_ENCODER_TX);
@@ -54,27 +55,27 @@ int32_t SerialBridge::raw() {
 
   SERIAL_ENCODER.print(channel);
   
-  char c;
   char result[32] = "";
-  int index = 0;
-  unsigned long start = millis();
+  char c;
+  int i = 0;
   errorDetected = false;
+  unsigned long start = millis();
   do {
     if (SERIAL_ENCODER.available()) c = SERIAL_ENCODER.read(); else c = 'x';
     if ((c >= '0' && c <= '9') || c == '-') {
-      result[index++] = c;
-      result[index] = 0;
+      result[i++] = c;
+      result[i] = 0;
     }
     if (c == 'E') errorDetected = true;
-  } while (c != 13 && (millis() - start) < 4 && index < 16);
+  } while (c != 13 && (millis() - start) < 4 && i < 16);
 
   if (strlen(result) > 0) {
     return atoi(result) + origin;
   } else {
-    DLF("WRN: SerialBridge raw(), timed out!");
+    DLF("WRN: SerialBridge getCount(), timed out!");
     error++;
     return 0  + origin;
   }
-} 
+}
 
 #endif

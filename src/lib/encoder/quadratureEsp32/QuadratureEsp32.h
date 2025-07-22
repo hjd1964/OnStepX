@@ -27,8 +27,6 @@ class QuadratureEsp32 : public Encoder {
     ESP32Encoder *ab;
 
   private:
-    int16_t axis;
-
     int16_t APin = OFF;
     int16_t BPin = OFF;
 };

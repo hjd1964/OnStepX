@@ -53,16 +53,15 @@ Quadrature *quadratureInstance[9];
   IRAM_ATTR void quadrature_B_Axis9() { quadratureInstance[8]->B(AXIS9_ENCODER_B_PIN); }
 #endif
 
-// for example:
-// Quadrature encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
-
 Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
+  this->axis = axis;
+  axis_index = axis - 1;
+
   this->APin = APin;
   this->BPin = BPin;
-  this->axis = axis;
-  quadratureInstance[this->axis - 1] = this;
+  quadratureInstance[axis_index] = this;
 }
 
 bool Quadrature::init() {
@@ -76,59 +75,67 @@ bool Quadrature::init() {
   stateB = digitalRead(BPin);
   lastB = stateB;
 
+  int aPin = digitalPinToInterrupt(APin);
+  int bPin = digitalPinToInterrupt(BPin);
+
+  if (aPin < 0 || bPin < 0) {
+    DF("ERR: Encoder Quadrature"); D(axis); DLF(" init(), couldn't attach interrupt!"); 
+    return false;
+  }
+
   switch (axis) {
     #if AXIS1_ENCODER == AB
       case 1:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis1, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis1, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis1, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis1, CHANGE);
       break;
     #endif
     #if AXIS2_ENCODER == AB
       case 2:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis2, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis2, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis2, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis2, CHANGE);
       break;
     #endif
     #if AXIS3_ENCODER == AB
       case 3:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis3, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis3, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis3, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis3, CHANGE);
       break;
     #endif
     #if AXIS4_ENCODER == AB
       case 4:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis4, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis4, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis4, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis4, CHANGE);
       break;
     #endif
     #if AXIS5_ENCODER == AB
       case 5:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis5, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis5, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis5, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis5, CHANGE);
       break;
     #endif
     #if AXIS6_ENCODER == AB
       case 6:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis6, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis6, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis6, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis6, CHANGE);
       break;
     #endif
     #if AXIS7_ENCODER == AB
       case 7:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis7, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis7, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis7, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis7, CHANGE);
       break;
     #endif
     #if AXIS8_ENCODER == AB
       case 8:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis8, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis8, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis8, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis8, CHANGE);
       break;
     #endif
     #if AXIS9_ENCODER == AB
       case 9:
-        attachInterrupt(digitalPinToInterrupt(APin), quadrature_A_Axis9, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(BPin), quadrature_B_Axis9, CHANGE);
+        attachInterrupt(aPin, quadrature_A_Axis9, CHANGE);
+        attachInterrupt(bPin, quadrature_B_Axis9, CHANGE);
       break;
     #endif
   }
@@ -140,21 +147,18 @@ bool Quadrature::init() {
 int32_t Quadrature::read() {
   if (!ready) return 0;
 
-  int32_t count = 0;
   noInterrupts();
-  count = this->count;
+  count = quadratureCount;
   interrupts();
 
-  return count + origin;
+  return count + index;
 }
 
-void Quadrature::write(int32_t count) {
+void Quadrature::write(int32_t position) {
   if (!ready) return;
 
-  count -= origin;
-
   noInterrupts();
-  this->count = count;
+  index = position - quadratureCount;
   interrupts();
 }
 
@@ -165,7 +169,7 @@ void Quadrature::write(int32_t count) {
 ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   stateA = digitalReadF(pin);
 
-  uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
+  uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
   static int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
@@ -185,7 +189,7 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
     case 0b1110: dir = -1; break;
     case 0b1111: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
   }
-  count += dir;
+  quadratureCount += dir;
   
   lastA = stateA;
   lastB = stateB;
@@ -194,7 +198,7 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   stateB = digitalReadF(pin);
 
-  uint8_t v = stateA*8 + stateB*4 + lastA*2 + lastB;
+  uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
   static int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break;
@@ -214,7 +218,7 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
     case 0b1110: dir = -1; break;
     case 0b1111: dir = 0; error++; break;
   }
-  count += dir;
+  quadratureCount += dir;
   
   lastA = stateA;
   lastB = stateB;

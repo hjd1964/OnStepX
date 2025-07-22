@@ -8,14 +8,16 @@
 Jtw26::Jtw26(int16_t maPin, int16_t sloPin, int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
+  this->axis = axis;
+
   this->maPin = maPin;
   this->sloPin = sloPin;
-  this->axis = axis;
 }
 
-// read encoder count
-IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
+// get encoder count relative to origin
+IRAM_ATTR bool Jtw26::getCount(uint32_t &count) {
 
+  readError = false;
   bool foundAck = false;
   bool foundStart = false;
   bool foundCds = false;
@@ -25,7 +27,7 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
   uint8_t  encCrc = 0;
 
   // prepare for a reading
-  position = 0;
+  count = 0;
 
   // bit delay in nanoseconds
   int rate = lround(500000.0/BISSC_CLOCK_RATE_KHZ);
@@ -72,7 +74,7 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
         // the first 26 bits are the encoder absolute count
         for (int i = 0; i < 26; i++) {
           digitalWriteF(maPin, LOW_MA);
-          if (digitalReadF(sloPin) == HIGH_SLO) bitSet(position, 25 - i);
+          if (digitalReadF(sloPin) == HIGH_SLO) bitSet(count, 25 - i);
           delayNanoseconds(rate);
           digitalWriteF(maPin, HIGH_MA);
           delayNanoseconds(rate);
@@ -119,39 +121,42 @@ IRAM_ATTR bool Jtw26::readEnc(uint32_t &position) {
   int16_t errors = 0;
   UNUSED(encWrn);
 
-  uint64_t encData = (uint64_t)position;
+  uint64_t encData = (uint64_t)count;
   encData = (encData << 1) | encErr;
   encData = (encData << 1) | encWrn;
+
+  if (!encWrn)     { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Warn bit set"); warn++; }
 
   if (!foundAck)   { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Ack bit invalid"); errors++; } else
   if (!foundStart) { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Start bit invalid"); errors++; } else
   if (!foundCds)   { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Cds bit invalid"); errors++; } else
   if (!encErr)     { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Error bit set"); errors++; } else
-  if (!encWrn)     { DF("WRN: Encoder JTW_26BIT"); D(axis); DLF(", Warn bit set"); warn++; } else errors = 0;
-  if (errors > 0) { error++; return false; }
-
   if (crc6(encData) != encCrc) {
-    bad++;
-    DF("WRN: Encoder JTW_26BIT"); D(axis); DF(", Crc failed ("); D(((float)bad/good)*100.0F); DLF("%)"); 
-    return false;
+    DF("WRN: Encoder JTW_26BIT"); D(axis); DF(", Crc failed ("); D(((float)(++bad)/good)*100.0F); DLF("%)"); 
+    errors++;
   } else good++;
 
+  if (errors > 0) {
+    error++;
+    return false;
+  }
+
   // extend negative to 32 bits
-  if (bitRead(position, 26)) { position |= 0b11111100000000000000000000000000; }
+  if (bitRead(count, 26)) { count |= 0b11111100000000000000000000000000; }
 
   #ifdef JTW_26BIT_AS_24BIT
-    position += origin*4L;
+    count += origin*4L;
   #else
-    position += origin;
+    count += origin;
   #endif
 
-  if ((int32_t)position >= 67108864) position -= 67108864;
-  if ((int32_t)position < 0) position += 67108864;
+  if ((int32_t)count >= 67108864) count -= 67108864;
+  if ((int32_t)count < 0) count += 67108864;
 
-  position -= 33554432;
+  count -= 33554432;
 
   #ifdef JTW_26BIT_AS_24BIT
-    position = (int32_t)position/4L;
+    count = (int32_t)count/4L;
   #endif
 
   return true;

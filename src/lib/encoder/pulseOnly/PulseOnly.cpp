@@ -45,62 +45,75 @@ volatile int8_t *_pulse_direction[9];
   IRAM_ATTR void pulse_A_Axis9() { _pulse_count[8] += *_pulse_direction[8]; }
 #endif
 
-PulseOnly::PulseOnly(int16_t pulsePin, int16_t axis) {
+PulseOnly::PulseOnly(int16_t pulsePin, volatile int8_t *direction, int16_t axis) {
   if (axis < 1 || axis > 9) return;
 
-  this->pulsePin = pulsePin;
-  this->axis = axis - 1;
+  this->axis = axis;
+  axis_index = axis - 1;
+
+  PulsePin = pulsePin;
+  _pulse_direction[axis_index] = direction;
 }
 
 bool PulseOnly::init() {
   if (ready) return true;
 
   pinMode(pulsePin, INPUT_PULLUP);
-  #if AXIS1_ENCODER == PULSE_ONLY
-    if (axis == 0) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis1, CHANGE);
-    }
-  #endif
-  #if AXIS2_ENCODER == PULSE_ONLY
-    if (axis == 1) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis2, CHANGE);
-    }
-  #endif
-  #if AXIS3_ENCODER == PULSE_ONLY
-    if (axis == 2) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis3, CHANGE);
-    }
-  #endif
-  #if AXIS4_ENCODER == PULSE_ONLY
-    if (axis == 3) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis4, CHANGE);
-    }
-  #endif
-  #if AXIS5_ENCODER == PULSE_ONLY
-    if (axis == 4) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis5, CHANGE);
-    }
-  #endif
-  #if AXIS6_ENCODER == PULSE_ONLY
-    if (axis == 5) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis6, CHANGE);
-    }
-  #endif
-  #if AXIS7_ENCODER == PULSE_ONLY
-    if (axis == 6) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis7, CHANGE);
-    }
-  #endif
-  #if AXIS8_ENCODER == PULSE_ONLY
-    if (axis == 7) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis8, CHANGE);
-    }
-  #endif
-  #if AXIS9_ENCODER == PULSE_ONLY
-    if (axis == 8) {
-      attachInterrupt(digitalPinToInterrupt(pulsePin), pulse_A_Axis9, CHANGE);
-    }
-  #endif
+
+  int pulsePin = digitalPinToInterrupt(PulsePin);
+
+  if (pulsePin < 0) {
+    DF("ERR: Encoder PulseOnly"); D(axis); DLF(" init(), couldn't attach interrupt!"); 
+    return false;
+  }
+
+  switch (axis) {
+    #if AXIS1_ENCODER == PULSE_ONLY
+      case 1:
+        attachInterrupt(pulsePin, pulse_A_Axis1, CHANGE);
+      break;
+    #endif
+    #if AXIS2_ENCODER == PULSE_ONLY
+      case 2:
+        attachInterrupt(pulsePin, pulse_A_Axis2, CHANGE);
+      break;
+    #endif
+    #if AXIS3_ENCODER == PULSE_ONLY
+      case 3:
+        attachInterrupt(pulsePin, pulse_A_Axis3, CHANGE);
+      break;
+    #endif
+    #if AXIS4_ENCODER == PULSE_ONLY
+      case 4:
+        attachInterrupt(pulsePin, pulse_A_Axis4, CHANGE);
+      break;
+    #endif
+    #if AXIS5_ENCODER == PULSE_ONLY
+      case 5:
+        attachInterrupt(pulsePin, pulse_A_Axis5, CHANGE);
+      break;
+    #endif
+    #if AXIS6_ENCODER == PULSE_ONLY
+      case 6:
+        attachInterrupt(pulsePin, pulse_A_Axis6, CHANGE);
+      break;
+    #endif
+    #if AXIS7_ENCODER == PULSE_ONLY
+      case 7:
+        attachInterrupt(pulsePin, pulse_A_Axis7, CHANGE);
+      break;
+    #endif
+    #if AXIS8_ENCODER == PULSE_ONLY
+      case 8:
+        attachInterrupt(pulsePin, pulse_A_Axis8, CHANGE);
+      break;
+    #endif
+    #if AXIS9_ENCODER == PULSE_ONLY
+      case 9:
+        attachInterrupt(pulsePin, pulse_A_Axis9, CHANGE);
+      break;
+    #endif
+  }
 
   ready = true;
 }
@@ -109,26 +122,24 @@ int32_t PulseOnly::read() {
   if (!ready) return 0;
 
   noInterrupts();
-  int32 count = _pulse_count[axis];
+  count = _pulse_count[axis_index];
   interrupts();
 
-  return count + origin;
+  return count + index;
 }
 
-void PulseOnly::write(int32_t count) {
+void PulseOnly::write(int32_t position) {
   if (!ready) return;
-
-  count -= origin;
 
   noInterrupts();
-  _pulse_count[axis] = count;
+  index = position - _pulse_count[axis_index];
   interrupts();
 }
 
-void PulseOnly::setDirection(int8_t *direction) {
+void PulseOnly::setDirection(volatile int8_t *direction) {
   if (!ready) return;
 
-  _pulse_direction[axis] = direction;
+  _pulse_direction[axis_index] = direction;
 }
 
 #endif
