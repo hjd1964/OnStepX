@@ -167,7 +167,13 @@ void Quadrature::write(int32_t position) {
 // ...00 01 11 10 00 01 11 10 00 01 11 10...
 
 ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
-  stateA = digitalReadF(pin);
+  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
+    #if ENCODER_FILTER != ON
+      delayNanoseconds(ENCODER_FILTER);
+    #endif
+    stateA = digitalReadF(pin);
+    if (stateA == lastA) return;
+  #endif
 
   uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
   static int16_t dir;
@@ -196,7 +202,13 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
 }
 
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
-  stateB = digitalReadF(pin);
+  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
+    #if ENCODER_FILTER != ON
+      delayNanoseconds(ENCODER_FILTER);
+    #endif
+    stateB = digitalReadF(pin);
+    if (stateB == lastB) return;
+  #endif
 
   uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
   static int16_t dir;
