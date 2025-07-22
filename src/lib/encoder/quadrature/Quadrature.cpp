@@ -171,7 +171,9 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
     #if ENCODER_FILTER != ON
       delayNanoseconds(ENCODER_FILTER);
     #endif
-    stateA = digitalReadF(pin);
+  #endif
+  stateA = digitalReadF(pin);
+  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
     if (stateA == lastA) return;
   #endif
 
@@ -206,7 +208,9 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
     #if ENCODER_FILTER != ON
       delayNanoseconds(ENCODER_FILTER);
     #endif
-    stateB = digitalReadF(pin);
+  #endif
+  stateB = digitalReadF(pin);
+  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
     if (stateB == lastB) return;
   #endif
 
