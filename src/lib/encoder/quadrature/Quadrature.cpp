@@ -169,6 +169,7 @@ void Quadrature::write(int32_t position) {
 ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
     #if ENCODER_FILTER != ON
+      // note that very short delays here might be ok for some platforms
       delayNanoseconds(ENCODER_FILTER);
     #endif
   #endif
@@ -206,6 +207,7 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
     #if ENCODER_FILTER != ON
+      // note that very short delays here might be ok for some platforms
       delayNanoseconds(ENCODER_FILTER);
     #endif
   #endif
