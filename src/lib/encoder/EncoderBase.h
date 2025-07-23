@@ -57,7 +57,7 @@
 #endif
 
 // OFF is disabled, ON disregards unexpected quadrature encoder signals, or 
-// a value > 0 (nanoseconds) disregards signal events for that timer period  
+// a value > 0 (nanoseconds) disregards repeat signal events for that timer period  
 #ifndef ENCODER_FILTER
   #define ENCODER_FILTER OFF
 #endif
