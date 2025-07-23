@@ -67,11 +67,13 @@
   // once a signal state changes don't allow the ISR to run again for ENCODER_FILTER nanoseconds
   // it would be even better to create a low-res millis counter outside of this routine and just access the variable here
   #define ENCODER_FILTER_UNTIL(n) \
-    static uint32_t nextNanos = 0;  \
-    static uint32_t nanosInvalidTime = 0; \
-    if ((long)(millis() - nanosInvalidTime) < 0 && (long)(nanoseconds() - nextNanos) < 0) return; \
-    nextNanos = nanoseconds() + n; \
-    nanosInvalidTime = millis() + 1000;
+    static uint32_t nsNext = 0;  \
+    static uint32_t nsInvalidMillis = 0; \
+    uint32_t nsNow = nanoseconds(); \
+    uint32_t msNow = millis(); \
+    if ((long)(msNow - nsInvalidMillis) < 0 && (long)(nsNow - nsNext) < 0) return; \
+    nsNext = nsNow + n; \
+    nsInvalidMillis = msNow + 1000;
 
   // or, a less optimal alternative when a reasonably functional delayNanoseconds() is available...
   // once a signal state changes wait in the ISR for ENCODER_FILTER nanoseconds to let the signal stabalize
