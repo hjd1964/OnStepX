@@ -16,9 +16,6 @@
 #ifndef AXIS1_SERVO_VELOCITY_TRACKING
 #define AXIS1_SERVO_VELOCITY_TRACKING 0
 #endif
-#ifndef AXIS1_SERVO_VELOCITY_CALIBRATION
-#define AXIS1_SERVO_VELOCITY_CALIBRATION 1
-#endif
 
 volatile long _calibrateStepPosition = 0;
 int _calStep;
