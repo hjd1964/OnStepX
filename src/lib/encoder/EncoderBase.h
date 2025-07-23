@@ -127,10 +127,6 @@ class Encoder {
     uint32_t origin = 0;
 
   protected:
-    // current nanoseconds, rolls over about every 4.3 seconds
-    // supported on the ESP32-S, Teensy4.0, and Teensy4.1 only
-    uint32_t nanoseconds();
-
     // axis number from 1 to 9
     int16_t axis = 0;
 

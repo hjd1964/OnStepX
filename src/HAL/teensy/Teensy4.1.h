@@ -72,3 +72,6 @@
 
 // a really short fixed delay
 #define HAL_DELAY_25NS() delayNanoseconds(20)
+
+// current nanoseconds, rolls over about every 4.3 seconds
+#define nanoseconds() ((unsigned long)((unsigned long long)(ARM_DWT_CYCCNT)*(1E9/F_CPU)))

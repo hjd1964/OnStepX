@@ -92,8 +92,12 @@
 #ifdef CONFIG_IDF_TARGET_ESP32C3
   // stand-in for delayNanoseconds(), assumes 80MHz clock
   #define delayNanoseconds(ns) { unsigned int c = ESP.getCycleCount() + ns/12.5F; do {} while ((int)(ESP.getCycleCount() - c) < 0); }
+  // current nanoseconds, rolls over about every 4.3 seconds
+  #define nanoseconds() ((unsigned long)((unsigned long long)(ESP.getCycleCount())*4))
 #else
   // stand-in for delayNanoseconds(), assumes 240MHz clock
   #include "xtensa/core-macros.h"
   #define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }
+  // current nanoseconds, rolls over about every 4.3 seconds
+  #define nanoseconds() ((unsigned long)((unsigned long long)(xthal_get_ccount())*4))
 #endif

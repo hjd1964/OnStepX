@@ -58,14 +58,4 @@ bool Encoder::errorThresholdExceeded() {
    return errorState;
 }
 
-IRAM_ATTR uint32_t Encoder::nanoseconds() {
-  int64_t ns = 0;
-  #if defined(CONFIG_IDF_TARGET_ESP32S)
-    ns = (unsigned long long)(xthal_get_ccount())*4;
-  #elif defined(ARDUINO_TEENSY40) || defined(ARDUINO_TEENSY41)
-    ns = (unsigned long long)(ARM_DWT_CYCCNT)*(1E9/F_CPU);
-  #endif
-  return ns & 0x00000000FFFFFFFF;
-}
-
 #endif
