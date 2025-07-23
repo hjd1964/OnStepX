@@ -72,47 +72,47 @@ bool PulseDir::init() {
   switch (axis) {
     #if AXIS1_ENCODER == PULSE_DIR
       case 1:
-        attachInterrupt(pulsePin, pulseDir_A_Axis1, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis1, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS2_ENCODER == PULSE_DIR
       case 2:
-        attachInterrupt(pulsePin, pulseDir_A_Axis2, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis2, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS3_ENCODER == PULSE_DIR
       case 3:
-        attachInterrupt(pulsePin, pulseDir_A_Axis3, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis3, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS4_ENCODER == PULSE_DIR
       case 4:
-        attachInterrupt(pulsePin, pulseDir_A_Axis4, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis4, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS5_ENCODER == PULSE_DIR
       case 5:
-        attachInterrupt(pulsePin, pulseDir_A_Axis5, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis5, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS6_ENCODER == PULSE_DIR
       case 6:
-        attachInterrupt(pulsePin, pulseDir_A_Axis6, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis6, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS7_ENCODER == PULSE_DIR
       case 7:
-        attachInterrupt(pulsePin, pulseDir_A_Axis7, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis7, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS8_ENCODER == PULSE_DIR
       case 8:
-        attachInterrupt(pulsePin, pulseDir_A_Axis8, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis8, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS9_ENCODER == PULSE_DIR
       case 9:
-        attachInterrupt(pulsePin, pulseDir_A_Axis9, CHANGE);
+        attachInterrupt(pulsePin, pulseDir_A_Axis9, ENCODER_SIGNAL_MODE);
       break;
     #endif
   }

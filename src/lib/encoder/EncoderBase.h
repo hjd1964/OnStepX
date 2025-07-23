@@ -80,6 +80,12 @@
   // #define ENCODER_FILTER_UNTIL(n) delayNanoseconds(n);
 #endif
 
+// signal mode for pulse and cw/ccw encoders, default CHANGE or RISING or FALLING
+// quadrature encoders
+#ifndef ENCODER_SIGNAL_MODE
+  #define ENCODER_SIGNAL_MODE CHANGE
+#endif
+
 #if AXIS1_ENCODER != OFF || AXIS2_ENCODER != OFF || AXIS3_ENCODER != OFF || \
     AXIS4_ENCODER != OFF || AXIS5_ENCODER != OFF || AXIS6_ENCODER != OFF || \
     AXIS7_ENCODER != OFF || AXIS8_ENCODER != OFF || AXIS9_ENCODER != OFF

@@ -82,56 +82,56 @@ bool CwCcw::init() {
   switch (axis) {
     #if AXIS1_ENCODER == CW_CCW
       case 1:
-        attachInterrupt(cwPin, cwCcw_A_Axis1, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis1, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis1, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis1, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS2_ENCODER == CW_CCW
       case 2:
-        attachInterrupt(cwPin, cwCcw_A_Axis2, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis2, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis2, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis2, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS3_ENCODER == CW_CCW
       case 3:
-        attachInterrupt(cwPin, cwCcw_A_Axis3, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis3, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis3, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis3, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS4_ENCODER == CW_CCW
       case 4:
-        attachInterrupt(cwPin, cwCcw_A_Axis4, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis4, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis4, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis4, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS5_ENCODER == CW_CCW
       case 5:
-        attachInterrupt(cwPin, cwCcw_A_Axis5, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis5, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis5, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis5, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS6_ENCODER == CW_CCW
       case 6:
-        attachInterrupt(cwPin, cwCcw_A_Axis6, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis6, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis6, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis6, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS7_ENCODER == CW_CCW
       case 7:
-        attachInterrupt(cwPin, cwCcw_A_Axis7, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis7, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis7, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis7, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS8_ENCODER == CW_CCW
       case 8:
-        attachInterrupt(cwPin, cwCcw_A_Axis8, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis8, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis8, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis8, ENCODER_SIGNAL_MODE);
       break;
     #endif
     #if AXIS9_ENCODER == CW_CCW
       case 9:
-        attachInterrupt(cwPin, cwCcw_A_Axis9, CHANGE);
-        attachInterrupt(ccwPin, cwCcw_B_Axis9, CHANGE);
+        attachInterrupt(cwPin, cwCcw_A_Axis9, ENCODER_SIGNAL_MODE);
+        attachInterrupt(ccwPin, cwCcw_B_Axis9, ENCODER_SIGNAL_MODE);
       break;
     #endif
   }
