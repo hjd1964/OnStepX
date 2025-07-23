@@ -85,7 +85,7 @@
   // stand-in for delayNanoseconds(), assumes 80MHz clock
   #define delayNanoseconds(ns) { unsigned int c = ESP.getCycleCount() + ns/12.5F; do {} while ((int)(ESP.getCycleCount() - c) < 0); }
   // current nanoseconds, rolls over about every 4.3 seconds
-  #define nanoseconds() ((unsigned long)((unsigned long long)(ESP.getCycleCount())*4))
+  #define nanoseconds() ((unsigned long)((unsigned long long)(ESP.getCycleCount())*13))
 #else
   // stand-in for delayNanoseconds(), assumes 240MHz clock
   #include "xtensa/core-macros.h"
