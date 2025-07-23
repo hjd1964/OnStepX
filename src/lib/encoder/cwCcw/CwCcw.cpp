@@ -6,51 +6,51 @@
     AXIS4_ENCODER == CW_CCW || AXIS5_ENCODER == CW_CCW || AXIS6_ENCODER == CW_CCW || \
     AXIS7_ENCODER == CW_CCW || AXIS8_ENCODER == CW_CCW || AXIS9_ENCODER == CW_CCW
 
-volatile int32_t _cw_ccw_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+CwCcw *cwCcwInstance[9];
 
 #if AXIS1_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis1() { _cw_ccw_count[0]++; }
-  IRAM_ATTR void cwCcw_B_Axis1() { _cw_ccw_count[0]--; }
+  IRAM_ATTR void cwCcw_A_Axis1() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis1() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS2_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis2() { _cw_ccw_count[1]++; }
-  IRAM_ATTR void cwCcw_B_Axis2() { _cw_ccw_count[1]--; }
+  IRAM_ATTR void cwCcw_A_Axis2() { cwCcwInstance->cw();}
+  IRAM_ATTR void cwCcw_B_Axis2() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS3_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis3() { _cw_ccw_count[2]++; }
-  IRAM_ATTR void cwCcw_B_Axis3() { _cw_ccw_count[2]--;}
+  IRAM_ATTR void cwCcw_A_Axis3() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis3() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS4_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis4() { _cw_ccw_count[3]++; }
-  IRAM_ATTR void cwCcw_B_Axis4() { _cw_ccw_count[3]--; }
+  IRAM_ATTR void cwCcw_A_Axis4() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis4() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS5_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis5() { _cw_ccw_count[4]++; }
-  IRAM_ATTR void cwCcw_B_Axis5() { _cw_ccw_count[4]--; }
+  IRAM_ATTR void cwCcw_A_Axis5() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis5() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS6_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis6() { _cw_ccw_count[5]++; }
-  IRAM_ATTR void cwCcw_B_Axis6() { _cw_ccw_count[5]--; }
+  IRAM_ATTR void cwCcw_A_Axis6() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis6() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS7_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis7() { _cw_ccw_count[6]++; }
-  IRAM_ATTR void cwCcw_B_Axis7() { _cw_ccw_count[6]--; }
+  IRAM_ATTR void cwCcw_A_Axis7() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis7() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS8_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis8() { _cw_ccw_count[7]++; }
-  IRAM_ATTR void cwCcw_B_Axis8() { _cw_ccw_count[7]--; }
+  IRAM_ATTR void cwCcw_A_Axis8() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis8() { cwCcwInstance->ccw(); }
 #endif
 
 #if AXIS9_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis9() { _cw_ccw_count[8]++; }
-  IRAM_ATTR void cwCcw_B_Axis9() { _cw_ccw_count[8]--; }
+  IRAM_ATTR void cwCcw_A_Axis9() { cwCcwInstance->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis9() { cwCcwInstance->ccw(); }
 #endif
 
 CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
@@ -61,6 +61,8 @@ CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
 
   CwPin = cwPin;
   CcwPin = ccwPin;
+
+  cwCcwInstance[axis_index] = this;
 }
 
 bool CwCcw::init() {
@@ -142,7 +144,7 @@ int32_t CwCcw::read() {
   if (!ready) return 0;
   
   noInterrupts();
-  count = _cw_ccw_count[axis_index];
+  count = cwCcwCount;
   interrupts();
 
   return count + index;
@@ -152,8 +154,22 @@ void CwCcw::write(int32_t position) {
   if (!ready) return;
 
   noInterrupts();
-  index = position - _cw_ccw_count[axis_index];
+  index = position - cwCcwCount;
   interrupts();
+}
+
+IRAM_ATTR void CwCcw::cw() {
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+  #endif
+  cwCcwCount++;
+}
+
+IRAM_ATTR void CwCcw::ccw() {
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+  #endif
+  cwCcwCount--;
 }
 
 #endif

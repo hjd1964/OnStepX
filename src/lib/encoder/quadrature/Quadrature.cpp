@@ -167,18 +167,15 @@ void Quadrature::write(int32_t position) {
 // ...00 01 11 10 00 01 11 10 00 01 11 10...
 
 ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
-  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
-    #if ENCODER_FILTER != ON
-      // note that very short delays here might be ok for some platforms
-      delayNanoseconds(ENCODER_FILTER);
-    #endif
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
   #endif
   stateA = digitalReadF(pin);
   #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
-    if (stateA == lastA) return;
+    if (stateA == lastA) { warn++; return; }
   #endif
 
-  uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
+  uint8_t v = (stateA<<3) + (stateB<<2) + (lastA<<1) + lastB;
   static int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break; // skipped pulse use last dir (way too fast if this is happening)
@@ -205,18 +202,16 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
 }
 
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
-  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
-    #if ENCODER_FILTER != ON
-      // note that very short delays here might be ok for some platforms
-      delayNanoseconds(ENCODER_FILTER);
-    #endif
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
   #endif
   stateB = digitalReadF(pin);
-  #if defined(ENCODER_FILTER) && ENCODER_FILTER != OFF
-    if (stateB == lastB) return;
+  #if ENCODER_FILTER != OFF
+    // stateB should NEVER be the same as lastB, else the interrupt wouldn't have occured
+    if (stateB == lastB) { warn++; return; }
   #endif
 
-  uint8_t v = stateA<<3 + stateB<<2 + lastA<<1 + lastB;
+  uint8_t v = (stateA<<3) + (stateB<<2) + (lastA<<1) + lastB;
   static int16_t dir;
   switch (v) {
     case 0b0000: dir = 0; error++; break;

@@ -15,10 +15,14 @@ class PulseDir : public Encoder {
     int32_t read();
     void write(int32_t count);
 
+    void pulse(const int16_t dirPin);
+
   private:
     int16_t axis_index;
 
-    int16_t PulsePin, DirPin;
+    int16_t PulsePin
+    volatile int16_t DirPin;
+    volatile int32_t pulseDirCount;
 };
 
 #endif

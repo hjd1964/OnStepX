@@ -6,43 +6,42 @@
     AXIS4_ENCODER == PULSE_DIR || AXIS5_ENCODER == PULSE_DIR || AXIS6_ENCODER == PULSE_DIR || \
     AXIS7_ENCODER == PULSE_DIR || AXIS8_ENCODER == PULSE_DIR || AXIS9_ENCODER == PULSE_DIR
 
-volatile int32_t _pulse_dir_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-volatile int16_t _pulse_dir_dirPin[9];
+PulseDir *pulseDirInstance[9];
 
 #if AXIS1_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis1() { if (digitalReadF(_pulse_dir_dirPin[0])) _pulse_dir_count[0]--; else _pulse_dir_count[0]++; }
+  IRAM_ATTR void pulseDir_A_Axis1() { pulseDirInstance[0]->pulse(AXIS1_ENCODER_B_PIN); }
 #endif
 
 #if AXIS2_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis2() { if (digitalReadF(_pulse_dir_dirPin[1])) _pulse_dir_count[1]--; else _pulse_dir_count[1]++; }
+  IRAM_ATTR void pulseDir_A_Axis2() { pulseDirInstance[1]->pulse(AXIS2_ENCODER_B_PIN); }
 #endif
 
 #if AXIS3_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis3() { if (digitalReadF(_pulse_dir_dirPin[2])) _pulse_dir_count[2]--; else _pulse_dir_count[2]++; }
+  IRAM_ATTR void pulseDir_A_Axis3() { pulseDirInstance[2]->pulse(AXIS3_ENCODER_B_PIN); }
 #endif
 
 #if AXIS4_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis4() { if (digitalReadF(_pulse_dir_dirPin[3])) _pulse_dir_count[3]--; else _pulse_dir_count[3]++; }
+  IRAM_ATTR void pulseDir_A_Axis4() { pulseDirInstance[3]->pulse(AXIS4_ENCODER_B_PIN); }
 #endif
 
 #if AXIS5_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis5() { if (digitalReadF(_pulse_dir_dirPin[4])) _pulse_dir_count[4]--; else _pulse_dir_count[4]++; }
+  IRAM_ATTR void pulseDir_A_Axis5() { pulseDirInstance[4]->pulse(AXIS5_ENCODER_B_PIN); }
 #endif
 
 #if AXIS6_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis6() { if (digitalReadF(_pulse_dir_dirPin[5])) _pulse_dir_count[5]--; else _pulse_dir_count[5]++; }
+  IRAM_ATTR void pulseDir_A_Axis6() { pulseDirInstance[5]->pulse(AXIS6_ENCODER_B_PIN); }
 #endif
 
 #if AXIS7_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis7() { if (digitalReadF(_pulse_dir_dirPin[6])) _pulse_dir_count[6]--; else _pulse_dir_count[6]++; }
+  IRAM_ATTR void pulseDir_A_Axis7() { pulseDirInstance[6]->pulse(AXIS7_ENCODER_B_PIN); }
 #endif
 
 #if AXIS8_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis8() { if (digitalReadF(_pulse_dir_dirPin[7])) _pulse_dir_count[7]--; else _pulse_dir_count[7]++; }
+  IRAM_ATTR void pulseDir_A_Axis8() { pulseDirInstance[7]->pulse(AXIS8_ENCODER_B_PIN); }
 #endif
 
 #if AXIS9_ENCODER == PULSE_DIR
-  IRAM_ATTR void pulseDir_A_Axis9() { if (digitalReadF(_pulse_dir_dirPin[8])) _pulse_dir_count[8]--; else _pulse_dir_count[8]++; }
+  IRAM_ATTR void pulseDir_A_Axis9() { pulseDirInstance[8]->pulse(AXIS9_ENCODER_B_PIN); }
 #endif
 
 PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
@@ -53,7 +52,8 @@ PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
 
   PulsePin = pulsePin;
   DirPin = dirPin;
-  _pulse_dir_dirPin[axis_index] = DirPin;
+
+  pulseDirInstance[axis_index] = this;
 }
 
 bool PulseDir::init() {
@@ -125,7 +125,7 @@ int32_t PulseDir::read() {
   if (!ready) return 0;
 
   noInterrupts();
-  count = _pulse_dir_count[axis_index];
+  count = pulseDirCount;
   interrupts();
 
   return count + index;
@@ -135,8 +135,15 @@ void PulseDir::write(int32_t position) {
   if (!ready) return;
 
   noInterrupts();
-  index = position - _pulse_dir_count[axis_index];
+  index = position - pulseDirCount;
   interrupts();
+}
+
+IRAM_ATTR PulseDir::pulse(const int16_t dirPin) {
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+  #endif
+  if (digitalReadF(dirPin)) pulseDirCount--; else pulseDirCount++;
 }
 
 #endif

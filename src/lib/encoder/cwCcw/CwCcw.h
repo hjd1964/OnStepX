@@ -15,11 +15,16 @@ class CwCcw : public Encoder {
     int32_t read();
     void write(int32_t count);
 
+    void cw();
+    void ccw();
+
   private:
     int16_t axis_index;
 
-    int16_t CwPin, CcwPin;
+    int16_t CwPin;
+    int16_t CcwPin;
 
+    volatile int32_t cwCcwCount;
 };
 
 #endif

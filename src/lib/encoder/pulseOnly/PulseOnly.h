@@ -17,10 +17,14 @@ class PulseOnly : public Encoder {
 
     void setDirection(volatile int8_t *direction);
 
+    void pulse();
+
   private:
     int16_t axis_index;
 
     int16_t PulsePin;
+    volatile int32_t pulseCount;
+    volatile int8_t *pulseDirection;
 };
 
 #endif

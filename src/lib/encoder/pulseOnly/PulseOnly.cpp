@@ -6,43 +6,42 @@
     AXIS4_ENCODER == PULSE_ONLY || AXIS5_ENCODER == PULSE_ONLY || AXIS6_ENCODER == PULSE_ONLY || \
     AXIS7_ENCODER == PULSE_ONLY || AXIS8_ENCODER == PULSE_ONLY || AXIS9_ENCODER == PULSE_ONLY
 
-volatile int32_t _pulse_count[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-volatile int8_t *_pulse_direction[9];
+PulseOnly *pulseOnlyInstance[9];
 
 #if AXIS1_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis1() { _pulse_count[0] += *_pulse_direction[0]; }
+  IRAM_ATTR void pulse_A_Axis1() { pulseOnlyInstance[0]->pulse();  }
 #endif
 
 #if AXIS2_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis2() { _pulse_count[1] += *_pulse_direction[1]; }
+  IRAM_ATTR void pulse_A_Axis2() { pulseOnlyInstance[1]->pulse();  }
 #endif
 
 #if AXIS3_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis3() { _pulse_count[2] += *_pulse_direction[2]; }
+  IRAM_ATTR void pulse_A_Axis3() { pulseOnlyInstance[2]->pulse();  }
 #endif
 
 #if AXIS4_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis4() { _pulse_count[3] += *_pulse_direction[3]; }
+  IRAM_ATTR void pulse_A_Axis4() { pulseOnlyInstance[3]->pulse();  }
 #endif
 
 #if AXIS5_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis5() { _pulse_count[4] += *_pulse_direction[4]; }
+  IRAM_ATTR void pulse_A_Axis5() { pulseOnlyInstance[4]->pulse(); }
 #endif
 
 #if AXIS6_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis6() { _pulse_count[5] += *_pulse_direction[5]; }
+  IRAM_ATTR void pulse_A_Axis6() { pulseOnlyInstance[5]->pulse(); }
 #endif
 
 #if AXIS7_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis7() { _pulse_count[6] += *_pulse_direction[6]; }
+  IRAM_ATTR void pulse_A_Axis7() { pulseOnlyInstance[6]->pulse(); }
 #endif
 
 #if AXIS8_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis8() { _pulse_count[7] += *_pulse_direction[7]; }
+  IRAM_ATTR void pulse_A_Axis8() { pulseOnlyInstance[7]->pulse(); }
 #endif
 
 #if AXIS9_ENCODER == PULSE_ONLY
-  IRAM_ATTR void pulse_A_Axis9() { _pulse_count[8] += *_pulse_direction[8]; }
+  IRAM_ATTR void pulse_A_Axis9() { pulseOnlyInstance[8]->pulse(); }
 #endif
 
 PulseOnly::PulseOnly(int16_t pulsePin, volatile int8_t *direction, int16_t axis) {
@@ -52,7 +51,9 @@ PulseOnly::PulseOnly(int16_t pulsePin, volatile int8_t *direction, int16_t axis)
   axis_index = axis - 1;
 
   PulsePin = pulsePin;
-  _pulse_direction[axis_index] = direction;
+  pulseDirection = direction;
+
+  pulseOnlyInstance[axis_index] = this;
 }
 
 bool PulseOnly::init() {
@@ -122,7 +123,7 @@ int32_t PulseOnly::read() {
   if (!ready) return 0;
 
   noInterrupts();
-  count = _pulse_count[axis_index];
+  count = pulseCount;
   interrupts();
 
   return count + index;
@@ -132,14 +133,21 @@ void PulseOnly::write(int32_t position) {
   if (!ready) return;
 
   noInterrupts();
-  index = position - _pulse_count[axis_index];
+  index = position - pulseCount;
   interrupts();
 }
 
 void PulseOnly::setDirection(volatile int8_t *direction) {
   if (!ready) return;
 
-  _pulse_direction[axis_index] = direction;
+  pulseDirection = direction;
+}
+
+IRAM_ATTR void PulseOnly::pulse() {
+  #if ENCODER_FILTER > 0
+    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+  #endif
+  pulseCount += *pulseDirection; 
 }
 
 #endif

@@ -56,6 +56,28 @@
   #define HAS_BISS_C
 #endif
 
+// OFF is disabled, ON disregards unexpected quadrature encoder signals, or 
+// a value > 0 (nanoseconds) disregards signal events for that timer period  
+#ifndef ENCODER_FILTER
+  #define ENCODER_FILTER OFF
+#endif
+
+// these should allow time for an encoder signal to stabalize
+#if ENCODER_FILTER > 0
+  // once a signal state changes don't allow the ISR to run again for ENCODER_FILTER nanoseconds
+  // it would be even better to create a low-res millis counter outside of this routine and just access the variable here
+  #define ENCODER_FILTER_UNTIL(n) \
+    static uint32_t nextNanos = 0;  \
+    static uint32_t nanosInvalidTime = 0; \
+    if ((long)(millis() - nanosInvalidTime) < 0 && (long)(nanoseconds() - nextNanos) < 0) return; \
+    nextNanos = nanoseconds() + n; \
+    nanosInvalidTime = millis() + 1000;
+
+  // or, a less optimal alternative when a reasonably functional delayNanoseconds() is available...
+  // once a signal state changes wait in the ISR for ENCODER_FILTER nanoseconds to let the signal stabalize
+  // #define ENCODER_FILTER_UNTIL(n) delayNanoseconds(n);
+#endif
+
 #if AXIS1_ENCODER != OFF || AXIS2_ENCODER != OFF || AXIS3_ENCODER != OFF || \
     AXIS4_ENCODER != OFF || AXIS5_ENCODER != OFF || AXIS6_ENCODER != OFF || \
     AXIS7_ENCODER != OFF || AXIS8_ENCODER != OFF || AXIS9_ENCODER != OFF
@@ -105,6 +127,11 @@ class Encoder {
     uint32_t origin = 0;
 
   protected:
+    // current nanoseconds, rolls over about every 4.3 seconds
+    // supported on the ESP32-S, Teensy4.0, and Teensy4.1 only
+    uint32_t nanoseconds();
+
+    // axis number from 1 to 9
     int16_t axis = 0;
 
     // accumulator for warning detection
