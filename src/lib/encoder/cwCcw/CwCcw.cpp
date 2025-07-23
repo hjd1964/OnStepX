@@ -9,48 +9,48 @@
 CwCcw *cwCcwInstance[9];
 
 #if AXIS1_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis1() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis1() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis1() { cwCcwInstance[0]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis1() { cwCcwInstance[0]->ccw(); }
 #endif
 
 #if AXIS2_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis2() { cwCcwInstance->cw();}
-  IRAM_ATTR void cwCcw_B_Axis2() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis2() { cwCcwInstance[1]->cw();}
+  IRAM_ATTR void cwCcw_B_Axis2() { cwCcwInstance[1]->ccw(); }
 #endif
 
 #if AXIS3_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis3() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis3() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis3() { cwCcwInstance[2]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis3() { cwCcwInstance[2]->ccw(); }
 #endif
 
 #if AXIS4_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis4() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis4() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis4() { cwCcwInstance[3]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis4() { cwCcwInstance[3]->ccw(); }
 #endif
 
 #if AXIS5_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis5() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis5() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis5() { cwCcwInstance[4]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis5() { cwCcwInstance[4]->ccw(); }
 #endif
 
 #if AXIS6_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis6() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis6() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis6() { cwCcwInstance[5]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis6() { cwCcwInstance[5]->ccw(); }
 #endif
 
 #if AXIS7_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis7() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis7() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis7() { cwCcwInstance[6]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis7() { cwCcwInstance[6]->ccw(); }
 #endif
 
 #if AXIS8_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis8() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis8() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis8() { cwCcwInstance[7]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis8() { cwCcwInstance[7]->ccw(); }
 #endif
 
 #if AXIS9_ENCODER == CW_CCW
-  IRAM_ATTR void cwCcw_A_Axis9() { cwCcwInstance->cw(); }
-  IRAM_ATTR void cwCcw_B_Axis9() { cwCcwInstance->ccw(); }
+  IRAM_ATTR void cwCcw_A_Axis9() { cwCcwInstance[8]->cw(); }
+  IRAM_ATTR void cwCcw_B_Axis9() { cwCcwInstance[8]->ccw(); }
 #endif
 
 CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
