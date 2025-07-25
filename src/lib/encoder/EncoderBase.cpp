@@ -76,11 +76,11 @@ void Encoder::poll() {
   msNow += 250;
   interrupts();
 
-  // run once every 5 seconds
   static uint16_t tick = UINT16_MAX;
+  static int16_t index = 0;
+
+  // run once every 5 seconds
   if (tick++ % 20 == 0) {
-    static int index = 0;
-    if (index++ > 11) index = 0;
 
     totalErrorCount += error;
     uint32_t errors = error;
@@ -96,7 +96,7 @@ void Encoder::poll() {
     // VF("MSG: Encoder"); V(axis); VF(" status, errors="); V(totalErrorCount); VF(" warnings="); VL(totalWarningCount);
 
     if (errors > UINT16_MAX) errors = UINT16_MAX;
-    errorCount[index] = errors;
+    errorCount[index++ % 12] = errors;
 
     // sum the errors and set the error flag as required
     errors = 0;
