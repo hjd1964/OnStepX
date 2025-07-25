@@ -90,6 +90,11 @@ bool Encoder::errorThresholdExceeded() {
 
 // update encoder status
 void Encoder::poll() {
+  uint32_t ms = millis();
+  noInterrupts();
+  msNow = ms;
+  interrupts();
+
   // run once every 5 seconds
   static uint16_t tick = UINT16_MAX;
   if (tick++ % 20 == 0) {

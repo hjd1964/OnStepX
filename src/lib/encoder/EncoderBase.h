@@ -70,7 +70,6 @@
     static uint32_t nsNext = 0;  \
     static uint32_t nsInvalidMillis = 0; \
     uint32_t nsNow = nanoseconds(); \
-    uint32_t msNow = millis(); \
     if ((long)(msNow - nsInvalidMillis) < 0 && (long)(nsNow - nsNext) < 0) return; \
     nsNext = nsNow + n; \
     nsInvalidMillis = msNow + 1000;
