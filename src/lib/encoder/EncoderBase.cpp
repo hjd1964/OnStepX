@@ -96,7 +96,7 @@ void Encoder::poll() {
     // VF("MSG: Encoder"); V(axis); VF(" status, errors="); V(totalErrorCount); VF(" warnings="); VL(totalWarningCount);
 
     if (errors > UINT16_MAX) errors = UINT16_MAX;
-    errorCount[index] += errors;
+    errorCount[index] = errors;
 
     // sum the errors and set the error flag as required
     errors = 0;
