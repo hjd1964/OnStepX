@@ -72,9 +72,11 @@ void Encoder::setOrigin(uint32_t count) {
 
 // update encoder status
 void Encoder::poll() {
-  noInterrupts();
-  msNow += 250;
-  interrupts();
+  #if ENCODER_FILTER > 0
+    noInterrupts();
+    msNow += 250;
+    interrupts();
+  #endif
 
   // run once every 5 seconds
   if (tick++ % 20 == 0) {
