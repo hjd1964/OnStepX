@@ -152,6 +152,8 @@ class Encoder {
     // keep track of the error state
     bool errorState = false;
     bool lastErrorState = false;
+    uint16_t tick = UINT16_MAX;
+    uint16_t index = UINT16_MAX;
 
     // approximate time keeping for filtering
     volatile uint32_t msNow = 0; 
