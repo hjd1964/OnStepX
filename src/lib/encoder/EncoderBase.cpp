@@ -80,7 +80,7 @@ void Encoder::poll() {
   static uint16_t tick = UINT16_MAX;
   if (tick++ % 20 == 0) {
     static int index = 0;
-    if (index++ > 9) index = 0;
+    if (index++ > 11) index = 0;
 
     totalErrorCount += error;
     uint32_t errors = error;
