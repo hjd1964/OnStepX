@@ -77,7 +77,7 @@ void Encoder::poll() {
   interrupts();
 
   static uint16_t tick = UINT16_MAX;
-  static uint16_t index = 0;
+  static uint16_t index = UINT16_MAX;
 
   // run once every 5 seconds
   if (tick++ % 20 == 0) {
