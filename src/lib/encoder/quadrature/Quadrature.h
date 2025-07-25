@@ -38,7 +38,6 @@ class Quadrature : public Encoder {
     volatile int16_t lastA;
     volatile int16_t lastB;
     volatile int16_t dir;
-
 };
 
 #endif
