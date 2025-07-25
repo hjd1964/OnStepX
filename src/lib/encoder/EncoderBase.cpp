@@ -71,7 +71,7 @@ void Encoder::setOrigin(uint32_t count) {
 }
 
 bool Encoder::errorThresholdExceeded() {
-  int32_t errors = 0;
+  uint32_t errors = 0;
   for (int i = 0; i < 12; i++) { errors += errorCount[i]; }
 
   bool errorState = errors > ENCODER_ERROR_COUNT_THRESHOLD;
@@ -102,7 +102,7 @@ void Encoder::poll() {
     if (index++ > 9) index = 0;
 
     totalErrorCount += error;
-    int32_t errors = error;
+    uint32_t errors = error;
     #ifdef ENCODER_WARN_AS_ERROR
       errors += warn;
     #endif
