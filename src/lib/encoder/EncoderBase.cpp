@@ -70,24 +70,6 @@ void Encoder::setOrigin(uint32_t count) {
   origin = count;
 }
 
-bool Encoder::errorThresholdExceeded() {
-  uint32_t errors = 0;
-  for (int i = 0; i < 12; i++) { errors += errorCount[i]; }
-
-  bool errorState = errors > ENCODER_ERROR_COUNT_THRESHOLD;
-
-  if (errorState != lastErrorState) {
-    if (errorState) {
-      DF("WRN: Encoder"); D(axis); DF(" errors, exceeded threshold/minute at "); DL(errors);
-    } else {
-      VF("MSG: Encoder"); V(axis); VF(" errors, cleared");
-    }
-    lastErrorState = errorState;
-  }
-
-  return errorState;
-}
-
 // update encoder status
 void Encoder::poll() {
   uint32_t ms = millis();
@@ -116,6 +98,21 @@ void Encoder::poll() {
 
     if (errors > UINT16_MAX) errors = UINT16_MAX;
     errorCount[index] += errors;
+
+    // sum the errors and set the error flag as required
+    errors = 0;
+    for (int i = 0; i < 12; i++) { errors += errorCount[i]; }
+
+    errorState = errors > ENCODER_ERROR_COUNT_THRESHOLD;
+
+    if (errorState != lastErrorState) {
+      if (errorState) {
+        DF("WRN: Encoder"); D(axis); DF(" errors, exceeded threshold/minute at "); DL(errors);
+      } else {
+        DF("MSG: Encoder"); D(axis); DF(" errors, within threshold/minute at "); DL(errors);
+      }
+      lastErrorState = errorState;
+    }
   }
 }
 

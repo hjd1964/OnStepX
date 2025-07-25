@@ -109,8 +109,8 @@ class Encoder {
     // set the virtual encoder direction (-1 is reverse, 1 is forward)
     virtual void setDirection(volatile int8_t *direction) { UNUSED(direction); }
 
-    // check for error state
-    virtual bool errorThresholdExceeded();
+    // check error state
+    virtual bool errorThresholdExceeded() { return errorState; }
 
     // update encoder status
     void poll();
@@ -149,9 +149,9 @@ class Encoder {
     // number of errors over the last minute
     uint16_t errorCount[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    // keep track of when the error state changes
+    // keep track of the error state
+    bool errorState = false;
     bool lastErrorState = false;
-    unsigned long lastMinute = 0;
 
     // approximate time keeping for filtering
     volatile uint32_t msNow = 0; 
