@@ -198,7 +198,6 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   quadratureCount += dir;
   
   lastA = stateA;
-  lastB = stateB;
 }
 
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
@@ -232,7 +231,6 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   }
   quadratureCount += dir;
 
-  lastA = stateA;
   lastB = stateB;
 }
 
