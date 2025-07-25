@@ -175,22 +175,22 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
 
   uint8_t v = (stateA<<3) + (stateB<<2) + (lastA<<1) + lastB;
   switch (v) {
-    case 0b0000: QUAD_F2; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b0000: QUAD_F2; break; // skipped pulse (invalid A state, valid B state)
     case 0b0001: dir = -1; break;
     case 0b0010: dir = 1; break;
-    case 0b0011: QUAD_F1; break; // skipped pulse use last dir
+    case 0b0011: QUAD_F1; break; // skipped pulse (valid A state, impossible B state)
     case 0b0100: dir = 1; break;
-    case 0b0101: QUAD_F2; break; // skipped pulse use last dir (way too fast if this is happening)
-    case 0b0110: QUAD_F1; break; // skipped pulse use last dir
+    case 0b0101: QUAD_F2; break; // skipped pulse (invalid A state, valid B state)
+    case 0b0110: QUAD_F1; break; // skipped pulse (valid A state, impossible B state)
     case 0b0111: dir = -1; break;
     case 0b1000: dir = -1; break;
-    case 0b1001: QUAD_F1; break; // skipped pulse use last dir
-    case 0b1010: QUAD_F2; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b1001: QUAD_F1; break; // skipped pulse (valid A state, impossible B state)
+    case 0b1010: QUAD_F2; break; // skipped pulse (invalid A state, valid B state)
     case 0b1011: dir = 1; break;
-    case 0b1100: QUAD_F1; break; // skipped pulse use last dir
+    case 0b1100: QUAD_F1; break; // skipped pulse (valid A state, impossible B state)
     case 0b1101: dir = 1; break;
     case 0b1110: dir = -1; break;
-    case 0b1111: QUAD_F2; break; // skipped pulse use last dir (way too fast if this is happening)
+    case 0b1111: QUAD_F2; break; // skipped pulse (invalid A state, valid B state)
   }
   quadratureCount += dir;
   
@@ -205,22 +205,22 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
 
   uint8_t v = (stateA<<3) + (stateB<<2) + (lastA<<1) + lastB;
   switch (v) {
-    case 0b0000: QUAD_F2; break;
+    case 0b0000: QUAD_F2; break;  // skipped pulse (valid A state, invalid B state)
     case 0b0001: dir = -1; break;
     case 0b0010: dir = 1; break;
-    case 0b0011: QUAD_F1; break;
+    case 0b0011: QUAD_F1; break;  // skipped pulse (impossible A state, valid B state)
     case 0b0100: dir = 1; break;
-    case 0b0101: QUAD_F2; break;
-    case 0b0110: QUAD_F1; break;
+    case 0b0101: QUAD_F2; break;  // skipped pulse (valid A state, invalid B state)
+    case 0b0110: QUAD_F1; break;  // skipped pulse (impossible A state, valid B state)
     case 0b0111: dir = -1; break;
     case 0b1000: dir = -1; break;
-    case 0b1001: QUAD_F1; break;
-    case 0b1010: QUAD_F2; break;
+    case 0b1001: QUAD_F1; break;  // skipped pulse (impossible A state, valid B state)
+    case 0b1010: QUAD_F2; break;  // skipped pulse (valid A state, invalid B state)
     case 0b1011: dir = 1; break;
-    case 0b1100: QUAD_F1; break;
+    case 0b1100: QUAD_F1; break;  // skipped pulse (impossible A state, valid B state)
     case 0b1101: dir = 1; break;
     case 0b1110: dir = -1; break;
-    case 0b1111: QUAD_F2; break;
+    case 0b1111: QUAD_F2; break;  // skipped pulse (valid A state, invalid B state)
   }
   quadratureCount += dir;
 
