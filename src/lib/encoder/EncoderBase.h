@@ -151,7 +151,7 @@ class Encoder {
     bool errorState = false;
     bool lastErrorState = false;
     uint16_t tick = UINT16_MAX;
-    uint16_t index = UINT16_MAX;
+    uint16_t errorCountIndex = UINT16_MAX;
 
     #if ENCODER_FILTER > 0
       // approximate time keeping for filtering
