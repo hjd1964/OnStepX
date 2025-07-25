@@ -72,9 +72,8 @@ void Encoder::setOrigin(uint32_t count) {
 
 // update encoder status
 void Encoder::poll() {
-  uint32_t ms = millis();
   noInterrupts();
-  msNow = ms;
+  msNow += 250;
   interrupts();
 
   // run once every 5 seconds
