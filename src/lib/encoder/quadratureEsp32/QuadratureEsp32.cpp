@@ -20,6 +20,7 @@ QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
 
 bool QuadratureEsp32::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   ab = new ESP32Encoder;
   if (ab == NULL) {

@@ -60,6 +60,7 @@ KTechIME::KTechIME(int16_t axis) {
 
 bool KTechIME::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   if (!canPlus.ready) {
     DLF("WRN: Encoder KTech_IME"); D(axis); DLF(", no CAN interface!");

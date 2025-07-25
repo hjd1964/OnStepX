@@ -58,6 +58,7 @@ PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
 
 bool PulseDir::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   pinMode(PulsePin, INPUT_PULLUP);
   pinMode(DirPin, INPUT_PULLUP);

@@ -132,7 +132,7 @@
 // --------------------------------------------------------------------------------------------------------------------------
 
 // task manager
-#define TASKS_MAX                   52     // up to 52 tasks
+#define TASKS_MAX                   60     // up to 60 tasks
 #define TASKS_SKIP_MISSED                  // just skip missed tasks if too late
 #ifdef ESP32
   #define TASKS_HWTIMERS             4     // up to 4 hardware timers

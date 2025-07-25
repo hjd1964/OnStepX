@@ -58,6 +58,7 @@ PulseOnly::PulseOnly(int16_t pulsePin, volatile int8_t *direction, int16_t axis)
 
 bool PulseOnly::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   pinMode(pulsePin, INPUT_PULLUP);
 

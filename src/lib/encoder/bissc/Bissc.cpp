@@ -7,6 +7,7 @@
 // get device ready for use
 bool Bissc::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   pinMode(maPin, OUTPUT);
   digitalWriteF(maPin, LOW);

@@ -64,6 +64,7 @@ VirtualEnc::VirtualEnc(int16_t axis) {
 
 bool VirtualEnc::init() {
   if (ready) return true;
+  Encoder::init();
 
   virtualEncoderHandle = 0;
 

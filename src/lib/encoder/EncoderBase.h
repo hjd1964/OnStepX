@@ -113,11 +113,14 @@ class Encoder {
     // check for error state
     virtual bool errorThresholdExceeded();
 
+    // update encoder status
+    void poll();
+
     // total number of errors
-    int32_t totalErrorCount = 0;
+    uint32_t totalErrorCount = 0;
 
     // total number of warnings
-    int32_t totalWarningCount = 0;
+    uint32_t totalWarningCount = 0;
 
     // true if encoder count is ready
     bool ready = false;
@@ -139,17 +142,20 @@ class Encoder {
     int16_t axis = 0;
 
     // accumulator for warning detection
-    volatile int32_t warn = 0;
+    volatile uint32_t warn = 0;
 
     // accumulator for error detection
-    volatile int32_t error = 0;
+    volatile uint32_t error = 0;
 
-    // number of errors (resets once a minute)
-    int32_t errorCount = 0;
+    // number of errors over the last minute
+    uint16_t errorCount[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // keep track of when the error state changes
     bool lastErrorState = false;
     unsigned long lastMinute = 0;
+
+    // approximate time keeping for filtering
+    volatile uint32_t msNow = 0; 
 };
 
 #endif

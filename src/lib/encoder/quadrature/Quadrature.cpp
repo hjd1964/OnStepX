@@ -66,6 +66,7 @@ Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
 
 bool Quadrature::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   pinMode(APin, INPUT_PULLUP);
   pinMode(BPin, INPUT_PULLUP);

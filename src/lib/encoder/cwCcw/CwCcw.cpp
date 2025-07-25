@@ -67,6 +67,7 @@ CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
 
 bool CwCcw::init() {
   if (ready) return true;
+  if (!Encoder::init()) return false;
 
   pinMode(CwPin, INPUT_PULLUP);
   pinMode(CcwPin, INPUT_PULLUP);
