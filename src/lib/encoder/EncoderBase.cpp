@@ -7,7 +7,7 @@
     AXIS7_ENCODER != OFF || AXIS8_ENCODER != OFF || AXIS9_ENCODER != OFF
 
 #include "Arduino.h"
-#include "..\tasks\OnTask.h"
+#include "../tasks/OnTask.h"
 
 Encoder *encoder[9];
 
