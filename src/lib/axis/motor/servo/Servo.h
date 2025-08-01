@@ -8,7 +8,10 @@
 #include "../../../encoder/Encoder.h"
 #include "filter/Filter.h"
 #include "feedback/Feedback.h"
-#include "calibration/TrackingVelocity.h"
+
+#ifdef CALIBRATE_SERVO_DC
+  #include "calibration/TrackingVelocity.h"
+#endif
 
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
@@ -88,7 +91,7 @@ class ServoMotor : public Motor {
     // get the associated motor driver status
     DriverStatus getDriverStatus();
 
-    // resets motor and target angular position in steps, also zeros backlash and index 
+    // resets motor and target angular position in steps, also zeros backlash and index
     void resetPositionSteps(long value);
 
     // get instrument coordinate, in steps
@@ -136,7 +139,7 @@ class ServoMotor : public Motor {
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
-    
+
     // servo motor driver
     ServoDriver *driver;
 
@@ -186,7 +189,7 @@ class ServoMotor : public Motor {
     volatile bool takeStep = false;     // should we take a step
     float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
 
-    float currentFrequency = 0.0F;      // last frequency set 
+    float currentFrequency = 0.0F;      // last frequency set
     float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
     long syncThreshold = OFF;           // sync threshold in counts (for absolute encoders) or OFF
