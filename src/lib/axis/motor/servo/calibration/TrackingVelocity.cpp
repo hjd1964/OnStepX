@@ -137,8 +137,9 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       if (unsignedVelocity < 0.1f) {
         calibrationPwm *= 2.0f;
 
-        if (calibrationPwm > 100.0f) {
-          VF("MSG:"); V(axisPrefix); VL("FWD Max Stiction not found");
+        if (calibrationPwm >= SERVO_CALIBRATION_PWM_MAX) {
+          VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction not found below ");
+          V(SERVO_CALIBRATION_PWM_MAX); VLF("% PWM");
           calibrationState = CALIBRATION_IDLE;
           experimentMode = false;
           setExperimentPwm(0);
@@ -532,6 +533,13 @@ void ServoCalibrateTrackingVelocity::setExperimentPwm(float pwm) {
 
 void ServoCalibrateTrackingVelocity::printReport() {
   VF("=== Calibration Report for"); V(axisPrefix); VLF(" ===");
+
+  if (trackingPwmFwd >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VLF("WARNING: FWD calibration reached maximum PWM limit");
+  }
+  if (trackingPwmRev >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VLF("WARNING: REV calibration reached maximum PWM limit");
+  }
 
   VF("Stiction Break (FWD): Max = "); V(stictionBreakMaxFwd); VF("%, Min = "); V(stictionBreakMinFwd); VLF("%");
   VF("Tracking PWM (FWD): "); V(trackingPwmFwd); VLF("%");
