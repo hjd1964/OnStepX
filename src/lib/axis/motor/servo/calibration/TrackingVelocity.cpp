@@ -31,12 +31,18 @@
 //    - This PWM will also serve as a kickstarter during the next phase.
 //
 // 3) Velocity Tracking Calibration:
+//    - This was an experiment and might be removed in the future. The idea was to check
+//      whether if we kick-start the motor with the min breaking stiction PWM if we can lower gradually
+//      the needed PWM duty cycle to keep the motor going. If this was the case we could have the motor
+//      rotating closer to the sidereal rotation.
 //    - Starting from stictionBreakMin, a binary search is used to find the lowest
 //      PWM that maintains continuous rotation after kickstarting the motor.
 //    - The motor is kicked using stictionBreakMin before attempting a lower PWM.
 //    - If the motor stalls or fails to rotate, PWM is increased again.
 //    - The result is the trackingPwmFwd or trackingPwmRev, representing the duty
 //      cycle needed to maintain sidereal tracking velocity with minimal power.
+//
+//    At least in my mesu-200 maxon 353611 motors this completely fails.
 //
 // After both directions are calibrated, an imbalance check is performed.
 // If the forward/reverse duty cycles differ significantly, a warning is logged.
