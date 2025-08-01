@@ -9,13 +9,14 @@
 
 #include "../ServoDriver.h"
 
-#define SERVO_CALIBRATION_TIME_PERIOD 1000              // Seconds per test
-#define SERVO_CALIBRATION_ERROR_THRESHOLD 0.5           // Max error percentage
-#define SERVO_CALIBRATION_START_DUTY_CYCLE 0.001        // Starting duty cycle 0.001%
-#define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 1.0 // Max imbalance percentage
-#define SERVO_CALIBRATION_STICTION_REFINE_STEP 0.1      // 0.1% PWM refinement step
-#define SERVO_CALIBRATION_STICTION_SETTLE_TIME 1000     // 1 seconds to settle after movement
-#define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.25 // Search between stiction/4 and stiction
+#define SERVO_CALIBRATION_TIME_PERIOD 1000                // Seconds per test
+#define SERVO_CALIBRATION_ERROR_THRESHOLD 0.5             // Max error percentage
+#define SERVO_CALIBRATION_START_DUTY_CYCLE 0.001          // Starting duty cycle 0.001%
+#define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 1.0   // Max imbalance percentage
+#define SERVO_CALIBRATION_STICTION_REFINE_STEP 0.1        // 0.1% PWM refinement step
+#define SERVO_CALIBRATION_STICTION_SETTLE_TIME 1000       // seconds to settle after movement
+#define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.25 // Search between stiction * SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR and stiction
+#define SERVO_CALIBRATION_PWM_MAX 10.0                    // or any value in [0.0 - 100.0]
 
 class ServoCalibrateTrackingVelocity {
   public:

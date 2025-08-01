@@ -464,7 +464,7 @@ float ServoCalibrateTrackingVelocity::getTrackingPwm(bool forward) {
 }
 
 void ServoCalibrateTrackingVelocity::setExperimentPwm(float pwm) {
-  experimentPwm = constrain(pwm, -100.0, 100.0);
+  experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
 }
 
 #endif
