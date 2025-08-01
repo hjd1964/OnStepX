@@ -38,6 +38,9 @@ class ServoCalibrateTrackingVelocity {
     float getStictionBreakMin(bool forward);
     float getTrackingPwm(bool forward);
 
+    // print the report
+    void printReport();
+
   private:
     // set experiment PWM value (bypasses PID)
     void setExperimentPwm(float pwm);

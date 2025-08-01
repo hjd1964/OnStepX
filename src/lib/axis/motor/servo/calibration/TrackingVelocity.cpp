@@ -446,6 +446,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
 
       experimentMode = false;
       setExperimentPwm(0);
+      printReport();  // print report
       calibrationState = CALIBRATION_IDLE;
       break;
   }
@@ -465,6 +466,29 @@ float ServoCalibrateTrackingVelocity::getTrackingPwm(bool forward) {
 
 void ServoCalibrateTrackingVelocity::setExperimentPwm(float pwm) {
   experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
+}
+
+void ServoCalibrateTrackingVelocity::printReport() {
+  VF("=== Calibration Report for"); V(axisPrefix); VLF(" ===");
+
+  VF("Stiction Break (FWD): Max = "); V(stictionBreakMaxFwd); VF("%, Min = "); V(stictionBreakMinFwd); VLF("%");
+  VF("Tracking PWM (FWD): "); V(trackingPwmFwd); VLF("%");
+
+  VF("Stiction Break (REV): Max = "); V(stictionBreakMaxRev); VF("%, Min = "); V(stictionBreakMinRev); VLF("%");
+  VF("Tracking PWM (REV): "); V(trackingPwmRev); VLF("%");
+
+  float stictionImbalance = fabs(stictionBreakMinFwd - stictionBreakMinRev);
+  float trackingImbalance = fabs(trackingPwmFwd - trackingPwmRev);
+
+  VF("Stiction Min Imbalance: "); V(stictionImbalance); VLF("%");
+  VF("Tracking PWM Imbalance: "); V(trackingImbalance); VLF("%");
+
+  float pwmUsed = max(trackingPwmFwd, trackingPwmRev);
+  if (pwmUsed >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VF("WARNING: PWM hit calibration limit ("); V(SERVO_CALIBRATION_PWM_MAX); VLF("%)");
+  }
+
+  VLF("=== End of Report ===");
 }
 
 #endif
