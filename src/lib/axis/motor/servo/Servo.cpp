@@ -382,6 +382,7 @@ void ServoMotor::poll() {
 
   control->set = motorCounts;
   control->in = encoderCounts;
+  if (enabled) feedback->poll();
 
   // these are used for calibration of dc pwm duty cycle when CALIBRATE_SERVO_DC
   bool experimentMode = false;
