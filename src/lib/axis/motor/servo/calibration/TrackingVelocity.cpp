@@ -50,6 +50,7 @@
 #if defined(SERVO_MOTOR_PRESENT) && defined(CALIBRATE_SERVO_DC)
 
 ServoCalibrateTrackingVelocity::ServoCalibrateTrackingVelocity(uint8_t axisNumber) {
+  this->axisNumber = axisNumber;
   strcpy(axisPrefix, " Axis_VelocityCalibrate, ");
   axisPrefix[5] = '0' + axisNumber;
 }
@@ -78,6 +79,12 @@ void ServoCalibrateTrackingVelocity::init() {
 }
 
 void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrumentCoordinateSteps) {
+  // Check if calibration is enabled for this axis
+  if (!(CALIBRATE_SERVO_AXIS_SELECT & (1 << (axisNumber - 1)))) {
+    VF("MSG:"); V(axisPrefix); VLF("Calibration skipped for this axis");
+    return;
+  }
+
   VF("MSG:"); V(axisPrefix); VL("Starting 3-phase bidirectional calibration");
 
   calibrationState = CALIBRATION_STICTION_BREAK_MAX_FWD;
