@@ -8,6 +8,7 @@
 #include "../../../encoder/Encoder.h"
 #include "filter/Filter.h"
 #include "feedback/Feedback.h"
+#include "calibration/TrackingVelocity.h"
 
 #include "dc/Dc.h"
 #include "tmc2209/Tmc2209.h"
@@ -202,6 +203,9 @@ class ServoMotor : public Motor {
 
     Feedback *feedback;
     ServoControl *control;
+    #ifdef CALIBRATE_SERVO_DC
+      ServoCalibrateTrackingVelocity *calibrateVelocity;
+    #endif
 
     bool useFastHardwareTimers = true;
     bool slewing = false;

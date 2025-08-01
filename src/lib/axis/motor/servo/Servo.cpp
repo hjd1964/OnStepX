@@ -71,6 +71,10 @@ ServoMotor::ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, 
 bool ServoMotor::init() {
   if (axisNumber < 1 || axisNumber > 9) return false;
 
+  #ifdef CALIBRATE_SERVO_DC
+    calibrateVelocity = new ServoCalibrateTrackingVelocity(axisNumber);
+  #endif
+
   if (!encoder->init()) { DF("ERR:"); D(axisPrefix); DLF("no encoder!"); return false; }
 
   encoder->setOrigin(encoderOrigin);
@@ -136,6 +140,10 @@ void ServoMotor::enable(bool state) {
   driver->enable(state);
   if (state == false) feedback->reset(); else safetyShutdown = false;
   enabled = state;
+
+  #ifdef CALIBRATE_SERVO_DC
+    if (enabled && !encoder->isVirtual) calibrateVelocity->start(trackingFrequency, getInstrumentCoordinateSteps());
+  #endif
 }
 
 // get the associated motor driver status
@@ -340,6 +348,10 @@ int32_t ServoMotor::encoderRead() {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
+  #ifdef CALIBRATE_SERVO_DC
+    calibrateVelocity->updateState(getInstrumentCoordinateSteps());
+  #endif
+  
   long encoderCounts = encoderRead();
 
   long encoderCountsOrig = encoderCounts;
@@ -383,7 +395,24 @@ void ServoMotor::poll() {
         calibrateRecord(velocity, motorCounts, encoderCounts);
       }
     }
+  bool experimentMode = false;
+  float experimentPwm = 0;
+  #ifdef CALIBRATE_SERVO_DC
+    experimentMode = calibrateVelocity->experimentMode;
+    experimentPwm = calibrateVelocity->experimentPwm;
   #endif
+  #endif
+
+  if (enabled && !experimentMode) feedback->poll();
+
+  float velocity;
+  if (experimentMode && enabled) {
+    // directly use fixed PWM value
+    velocity = experimentPwm * driver->getMotorControlRange() / 100.0F;
+  } else {
+    velocity = velocityEstimate + control->out;
+  }
+  if (!enabled) velocity = 0.0F;
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
