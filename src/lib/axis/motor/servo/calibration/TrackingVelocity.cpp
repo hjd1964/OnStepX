@@ -233,13 +233,12 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
                 VF("MSG:"); V(axisPrefix); VL("FWD Motor won't move with stictionBreakMin");
                 VF("MSG:"); V(axisPrefix); VL("Skipping FWD velocity search — switching to REV");
 
-                trackingPwmFwd = 0.0f;
-                calibrationState = CALIBRATION_STICTION_BREAK_MAX_REV;
-                calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
-                setExperimentPwm(calibrationPwm);
-                calibrationStartTime = millis();
-                calibrationStartTicks = instrumentCoordinateSteps;
-                calibrationPhaseCount = 0;
+                // Instead of jumping directly to REV, insert settling first:
+                trackingPwmFwd = calibrationPwm;
+                calibrationState = CALIBRATION_PREP_REV;
+                settleStartTime = millis();
+                waitingForSettle = true;
+                setExperimentPwm(0);  // Actively stop motor
                 break;
             }
 
@@ -300,48 +299,62 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
         break;
     }
 
-    case CALIBRATION_STICTION_BREAK_MAX_REV:
-      if (unsignedVelocity < 0.1f) {
-        calibrationPwm *= 2.0f;
-
-        if (calibrationPwm < -100.0f) {
-          VF("MSG:"); V(axisPrefix); VL("REV Max Stiction not found");
-          calibrationState = CALIBRATION_IDLE;
-          experimentMode = false;
-          setExperimentPwm(0);
-        } else {
-          setExperimentPwm(calibrationPwm);
-          calibrationStartTime = currentTime;
-          calibrationStartTicks = currentTicks;
-          calibrationPhaseCount++;
-
-          VF("MSG:"); V(axisPrefix); VF("REV Max Stiction Phase ");
-          V(calibrationPhaseCount); V(": PWM=");
-          V(calibrationPwm); VLF("% - No movement");
-        }
-      } else {
-        stictionBreakMaxRev = fabs(calibrationPwm);
-        calibrationState = CALIBRATION_STICTION_REFINE_MIN_REV;
-        calibrationPwm = -stictionBreakMaxRev * 0.5f;
+    case CALIBRATION_PREP_REV:
+      if (millis() - settleStartTime >= SERVO_CALIBRATION_STICTION_SETTLE_TIME) {
+        calibrationState = CALIBRATION_STICTION_BREAK_MAX_REV;
+        calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
+        setExperimentPwm(calibrationPwm);
+        calibrationStartTime = millis();
+        calibrationStartTicks = instrumentCoordinateSteps;
         calibrationPhaseCount = 0;
-
-        // wait the motor to settle after previous pwm - set it to 0
-        settleStartTime = currentTime;
-        waitingForSettle = true;
-        stictionTestPwm = calibrationPwm;
-
-        // Set binary search bounds for min stiction
-        calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxFwd;
-        calibrationMaxPwm = stictionBreakMaxFwd;
-        calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
-
-        setExperimentPwm(0);
-
-        VF("MSG:"); V(axisPrefix); VF("REV Max Stiction at ");
-        V(stictionBreakMaxRev); V("% PWM"); V("% - Movement: ");
-        V(unsignedVelocity); VLF(" steps/sec");;
       }
       break;
+
+    case CALIBRATION_STICTION_BREAK_MAX_REV:
+    if (unsignedVelocity < 0.1f) {
+      calibrationPwm *= 2.0f;
+
+      if (calibrationPwm < -SERVO_CALIBRATION_PWM_MAX) {
+        VF("MSG:"); V(axisPrefix); VL("REV Max Stiction not found");
+        stictionBreakMaxRev = 0.0f;
+        stictionBreakMinRev = 0.0f;
+
+        // Skip to balance check (continue calibration)
+        calibrationState = CALIBRATION_CHECK_IMBALANCE;
+        experimentMode = false;
+        setExperimentPwm(0);
+      } else {
+        setExperimentPwm(calibrationPwm);
+        calibrationStartTime = currentTime;
+        calibrationStartTicks = currentTicks;
+        calibrationPhaseCount++;
+
+        VF("MSG:"); V(axisPrefix); VF("REV Max Stiction Phase ");
+        V(calibrationPhaseCount); VF(": PWM=");
+        V(calibrationPwm); VLF("% - No movement");
+      }
+    } else {
+      stictionBreakMaxRev = fabs(calibrationPwm);
+      calibrationState = CALIBRATION_STICTION_REFINE_MIN_REV;
+      calibrationPhaseCount = 0;
+
+      // Set binary search bounds for min stiction
+      calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxRev;
+      calibrationMaxPwm = stictionBreakMaxRev;
+      calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+      // Wait motor to settle before applying new PWM
+      settleStartTime = currentTime;
+      waitingForSettle = true;
+      stictionTestPwm = -calibrationPwm;  // Make sure it's negative
+
+      setExperimentPwm(0);
+
+      VF("MSG:"); V(axisPrefix); VF("REV Max Stiction at ");
+      V(stictionBreakMaxRev); VF("% PWM - Movement: ");
+      V(unsignedVelocity); VLF(" steps/sec");
+    }
+    break;
 
     case CALIBRATION_STICTION_REFINE_MIN_REV:
       if (unsignedVelocity < 0.1f) {
