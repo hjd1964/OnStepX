@@ -13,18 +13,18 @@
   #define CALIBRATE_SERVO_AXIS_SELECT 3  // 0 None, 1 for RA, 2 for DEC, 3 for all
 #endif
 
-#define SERVO_CALIBRATION_TIME_PERIOD 1000                // Seconds per test
+#define SERVO_CALIBRATION_TIME_PERIOD 5000                // Seconds per test
 #define SERVO_CALIBRATION_ERROR_THRESHOLD 0.5             // Max error percentage
 #define SERVO_CALIBRATION_START_DUTY_CYCLE 0.001          // Starting duty cycle 0.001%
 #define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 1.0   // Max imbalance percentage
 #define SERVO_CALIBRATION_STICTION_REFINE_STEP 0.1        // 0.1% PWM refinement step
-#define SERVO_CALIBRATION_STICTION_SETTLE_TIME 1000       // seconds to settle after movement
+#define SERVO_CALIBRATION_STICTION_SETTLE_TIME 5000       // seconds to settle after movement
 #define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.1 // Search between stiction * SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR and stiction
 #define SERVO_CALIBRATION_PWM_MAX 10.0                    // max value for PWM [0.0 - 100.0]. BE CAUTIOUS!!!
 
 // How much to drop the PWM from the stiction break minimum when starting velocity search.
 // For example, 0.8 means start at 80% of the stictionBreakMin after kickstarting.
-#define SERVO_CALIBRATION_KICKSTART_DROP_FACTOR 0.8f
+#define SERVO_CALIBRATION_KICKSTART_DROP_FACTOR 1.0f
 
 class ServoCalibrateTrackingVelocity {
   public:

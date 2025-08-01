@@ -152,9 +152,16 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
         calibrationPwm = stictionBreakMaxFwd * 0.5f;
         calibrationPhaseCount = 0;
 
+        // wait the motor to settle after previous pwm - set it to 0
         settleStartTime = currentTime;
         waitingForSettle = true;
         stictionTestPwm = calibrationPwm;
+
+        // Set binary search bounds for min stiction
+        calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxFwd;
+        calibrationMaxPwm = stictionBreakMaxFwd;
+        calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
         setExperimentPwm(0);
 
         VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction at ");
@@ -190,6 +197,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       // Continue binary search
       calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
+      // wait the motor to settle after previous pwm - set it to 0
       settleStartTime = currentTime;
       waitingForSettle = true;
       stictionTestPwm = calibrationPwm;
@@ -310,9 +318,16 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
         calibrationPwm = -stictionBreakMaxRev * 0.5f;
         calibrationPhaseCount = 0;
 
+        // wait the motor to settle after previous pwm - set it to 0
         settleStartTime = currentTime;
         waitingForSettle = true;
         stictionTestPwm = calibrationPwm;
+
+        // Set binary search bounds for min stiction
+        calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxFwd;
+        calibrationMaxPwm = stictionBreakMaxFwd;
+        calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
         setExperimentPwm(0);
 
         VF("MSG:"); V(axisPrefix); VF("REV Max Stiction at ");
@@ -348,6 +363,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       // Continue binary search
       calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
+      // wait the motor to settle after previous pwm - set it to 0
       settleStartTime = currentTime;
       waitingForSettle = true;
       stictionTestPwm = calibrationPwm;
