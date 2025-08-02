@@ -25,7 +25,7 @@
 //      and stictionBreakMax.
 //    - This identifies the lowest PWM that reliably causes movement.
 //    - Between each test step, the motor is stopped for
-//      SERVO_CALIBRATION_STICTION_SETTLE_TIME to ensure clean restarts
+//      SERVO_CALIBRATION_MOTOR_SETTLE_TIME to ensure clean restarts
 //      and avoid carry-over motion.
 //    - The final result is stored in stictionBreakMinFwd or stictionBreakMinRev.
 //    - This PWM will also serve as a kickstarter during the next phase.
@@ -81,7 +81,8 @@ void ServoCalibrateTrackingVelocity::init() {
   calibrationPhaseCount = 0;
   settleStartTime = 0;
   waitingForSettle = false;
-  stictionTestPwm = 0;
+  currentTime = 0;
+  currentTicks = 0;
 }
 
 void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrumentCoordinateSteps) {
@@ -109,18 +110,12 @@ void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrum
 void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps) {
   if (calibrationState == CALIBRATION_IDLE) return;
 
-  unsigned long currentTime = millis();
-  long currentTicks = instrumentCoordinateSteps;
+  currentTime = millis();
+  currentTicks = instrumentCoordinateSteps;
 
   // Handle settling period
-  if (waitingForSettle) {
-    if (currentTime - settleStartTime >= SERVO_CALIBRATION_STICTION_SETTLE_TIME) {
-      waitingForSettle = false;
-      calibrationStartTime = currentTime;
-      calibrationStartTicks = currentTicks;
-      setExperimentPwm(stictionTestPwm);
-    }
-    return;
+  if (!motorSettled()) {
+      return;
   }
 
   // Skip if calibration period not completed
@@ -133,6 +128,9 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
   float unsignedVelocity = fabs(actualVelocity);
 
   switch (calibrationState) {
+    case CALIBRATION_IDLE:
+      break;
+
     case CALIBRATION_STICTION_BREAK_MAX_FWD:
       if (unsignedVelocity < 0.1f) {
         calibrationPwm *= 2.0f;
@@ -160,16 +158,12 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
         calibrationPhaseCount = 0;
 
         // wait the motor to settle after previous pwm - set it to 0
-        settleStartTime = currentTime;
-        waitingForSettle = true;
-        stictionTestPwm = calibrationPwm;
+        setExperimentPwmAndSettleMotor(0);
 
         // Set binary search bounds for min stiction
         calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxFwd;
         calibrationMaxPwm = stictionBreakMaxFwd;
         calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
-
-        setExperimentPwm(0);
 
         VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction at ");
         V(stictionBreakMaxFwd); V("% PWM"); V("% - Movement: ");
@@ -206,10 +200,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
       // wait the motor to settle after previous pwm - set it to 0
-      settleStartTime = currentTime;
-      waitingForSettle = true;
-      stictionTestPwm = calibrationPwm;
-      setExperimentPwm(0);
+      setExperimentPwmAndSettleMotor(0);
 
       VF("MSG:"); V(axisPrefix); VF("FWD Min Stiction Phase ");
       V(calibrationPhaseCount); VF(": PWM=");
@@ -242,10 +233,8 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
 
                 // Instead of jumping directly to REV, insert settling first:
                 trackingPwmFwd = calibrationPwm;
+                setExperimentPwmAndSettleMotor(0);  // Actively stop motor
                 calibrationState = CALIBRATION_PREP_REV;
-                settleStartTime = millis();
-                waitingForSettle = true;
-                setExperimentPwm(0);  // Actively stop motor
                 break;
             }
 
@@ -307,7 +296,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
     }
 
     case CALIBRATION_PREP_REV:
-      if (millis() - settleStartTime >= SERVO_CALIBRATION_STICTION_SETTLE_TIME) {
+      if (millis() - settleStartTime >= SERVO_CALIBRATION_MOTOR_SETTLE_TIME) {
         calibrationState = CALIBRATION_STICTION_BREAK_MAX_REV;
         calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
         setExperimentPwm(calibrationPwm);
@@ -350,12 +339,8 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       calibrationMaxPwm = stictionBreakMaxRev;
       calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
-      // Wait motor to settle before applying new PWM
-      settleStartTime = currentTime;
-      waitingForSettle = true;
-      stictionTestPwm = -calibrationPwm;  // Make sure it's negative
-
-      setExperimentPwm(0);
+      // wait the motor to settle after previous pwm - set it to 0
+      setExperimentPwmAndSettleMotor(0);
 
       VF("MSG:"); V(axisPrefix); VF("REV Max Stiction at ");
       V(stictionBreakMaxRev); VF("% PWM - Movement: ");
@@ -392,10 +377,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
       // wait the motor to settle after previous pwm - set it to 0
-      settleStartTime = currentTime;
-      waitingForSettle = true;
-      stictionTestPwm = calibrationPwm;
-      setExperimentPwm(0);
+      setExperimentPwmAndSettleMotor(0);
 
       VF("MSG:"); V(axisPrefix); VF("REV Min Stiction Phase ");
       V(calibrationPhaseCount); VF(": PWM=");
@@ -512,6 +494,7 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       printReport();  // print report
       calibrationState = CALIBRATION_IDLE;
       break;
+
   }
 }
 
@@ -529,6 +512,27 @@ float ServoCalibrateTrackingVelocity::getTrackingPwm(bool forward) {
 
 void ServoCalibrateTrackingVelocity::setExperimentPwm(float pwm) {
   experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
+}
+
+void ServoCalibrateTrackingVelocity::setExperimentPwmAndSettleMotor(float pwm) {
+  experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
+  // wait the motor to settle after previous pwm - set it to 0
+  settleStartTime = currentTime;
+  waitingForSettle = true;
+}
+
+bool ServoCalibrateTrackingVelocity::motorSettled(void) {
+    // Handle settling period
+  if (waitingForSettle) {
+    if (currentTime - settleStartTime >= SERVO_CALIBRATION_MOTOR_SETTLE_TIME) {
+      waitingForSettle = false;
+      calibrationStartTime = currentTime;
+      calibrationStartTicks = currentTicks;
+      return true;
+    }
+  }
+  return false;
+
 }
 
 void ServoCalibrateTrackingVelocity::printReport() {

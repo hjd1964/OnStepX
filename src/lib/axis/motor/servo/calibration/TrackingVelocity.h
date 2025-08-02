@@ -18,7 +18,7 @@
 #define SERVO_CALIBRATION_START_DUTY_CYCLE 0.001          // Starting duty cycle 0.001%
 #define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 1.0   // Max imbalance percentage
 #define SERVO_CALIBRATION_STICTION_REFINE_STEP 0.1        // 0.1% PWM refinement step
-#define SERVO_CALIBRATION_STICTION_SETTLE_TIME 3000       // seconds to settle after movement
+#define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 3000          // seconds to settle after movement
 #define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.1 // Search between stiction * SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR and stiction
 #define SERVO_CALIBRATION_PWM_MAX 10.0                    // max value for PWM [0.0 - 100.0]. BE CAUTIOUS!!!
 
@@ -38,6 +38,9 @@ class ServoCalibrateTrackingVelocity {
     // handle calibration state machine
     void updateState(long instrumentCoordinateSteps);
 
+    // has motor settled?
+    bool motorSettled();
+
     bool experimentMode = false;
     float experimentPwm = 0.0F;
 
@@ -52,6 +55,9 @@ class ServoCalibrateTrackingVelocity {
   private:
     // set experiment PWM value (bypasses PID)
     void setExperimentPwm(float pwm);
+
+    // set experiment PWM and wait the motor to settle
+    void setExperimentPwmAndSettleMotor(float pwm);
 
     char axisPrefix[32];
 
@@ -70,6 +76,8 @@ class ServoCalibrateTrackingVelocity {
     CalibrationState calibrationState;
 
     uint8_t axisNumber;
+
+    unsigned long currentTime;
 
     // Calibration parameters
     float calibrationPwm;
@@ -90,7 +98,7 @@ class ServoCalibrateTrackingVelocity {
     // Stiction refinement variables
     unsigned long settleStartTime;
     bool waitingForSettle;
-    float stictionTestPwm;
+    long currentTicks;
 };
 
 #endif
