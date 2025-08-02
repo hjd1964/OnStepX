@@ -1,57 +1,105 @@
 // -----------------------------------------------------------------------------------
 // calibrate servo tracking velocity
 
+// -----------------------------------------------------------------------------------
+// Servo Tracking Velocity Calibration - Overview
+//
+// This routine performs a 3-phase, bidirectional calibration to determine the
+// PWM duty cycles needed to reliably track at sidereal velocity with a DC servo motor.
+// The process measures the minimum and maximum duty cycles needed to overcome
+// static friction (stiction) and identifies the lowest sustained PWM values
+// required for continuous motion.
+//
+// Calibration logic (per direction) proceeds in 3 main steps:
+//
+// 1) Stiction Break Max (stictionBreakMax):
+//    - Use exponential search (doubling the PWM value starting from
+//      SERVO_CALIBRATION_START_DUTY_CYCLE) to find a PWM that initiates
+//      any movement.
+//    - This gives the upper bound for the motor's stiction threshold.
+//    - Result is stored in stictionBreakMaxFwd or stictionBreakMaxRev.
+//
+// 2) Stiction Break Min (stictionBreakMin):
+//    - Refine the result using a binary search between
+//      SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMax
+//      and stictionBreakMax.
+//    - This identifies the lowest PWM that reliably causes movement.
+//    - Between each test step, the motor is stopped for
+//      SERVO_CALIBRATION_MOTOR_SETTLE_TIME to ensure clean restarts
+//      and avoid carry-over motion.
+//    - The final result is stored in stictionBreakMinFwd or stictionBreakMinRev.
+//    - This PWM will also serve as a kickstarter during the next phase.
+//
+// 3) Velocity Tracking Calibration:
+//    - This was an experiment and might be removed in the future. The idea was to check
+//      whether if we kick-start the motor with the min breaking stiction PWM if we can lower gradually
+//      the needed PWM duty cycle to keep the motor going. If this was the case we could have the motor
+//      rotating closer to the sidereal rotation.
+//    - Starting from stictionBreakMin, a binary search is used to find the lowest
+//      PWM that maintains continuous rotation after kickstarting the motor.
+//    - The motor is kicked using stictionBreakMin before attempting a lower PWM.
+//    - If the motor stalls or fails to rotate, PWM is increased again.
+//    - The result is the trackingPwmFwd or trackingPwmRev, representing the duty
+//      cycle needed to maintain sidereal tracking velocity with minimal power.
+//
+//    At least in my mesu-200 maxon 353611 motors this completely fails.
+//
+// After both directions are calibrated, an imbalance check is performed.
+// If the forward/reverse duty cycles differ significantly, a warning is logged.
+// This can indicate mount imbalance or frictional asymmetry.
+//
+// The result is a robust and safe calibration of tracking PWM duty cycles
+// customized per motor and mechanical setup and telescope load.
+
 #include "TrackingVelocity.h"
 
 #if defined(SERVO_MOTOR_PRESENT) && defined(CALIBRATE_SERVO_DC)
 
 ServoCalibrateTrackingVelocity::ServoCalibrateTrackingVelocity(uint8_t axisNumber) {
+  this->axisNumber = axisNumber;
   strcpy(axisPrefix, " Axis_VelocityCalibrate, ");
   axisPrefix[5] = '0' + axisNumber;
 }
 
 void ServoCalibrateTrackingVelocity::init() {
-  // initialize experiment mode variables
   experimentPwm = 0.0F;
   experimentMode = false;
 
   calibrationState = CALIBRATION_IDLE;
   calibrationPwm = 0;
-  stictionBreakPwmFwd = 0;
-  stictionBreakPwmRev = 0;
-  targetVelocityPwmFwd = 0;
-  targetVelocityPwmRev = 0;
+  stictionBreakMaxFwd = 0;
+  stictionBreakMinFwd = 0;
+  trackingPwmFwd = 0;
+  stictionBreakMaxRev = 0;
+  stictionBreakMinRev = 0;
+  trackingPwmRev = 0;
   calibrationStartTime = 0;
   calibrationStartTicks = 0;
   calibrationMinPwm = 0;
   calibrationMaxPwm = 0;
   targetVelocity = 0;
   calibrationPhaseCount = 0;
+  settleStartTime = 0;
+  waitingForSettle = false;
+  currentTime = 0;
+  currentTicks = 0;
 }
 
-// start calibration (check if enabled before calling this)
 void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrumentCoordinateSteps) {
+  // Check if calibration is enabled for this axis
+  if (!(CALIBRATE_SERVO_AXIS_SELECT & (1 << (axisNumber - 1)))) {
+    VF("MSG:"); V(axisPrefix); VLF("Calibration skipped for this axis");
+    return;
+  }
 
-  // record starting position and time
+  VF("MSG:"); V(axisPrefix); VL("Starting 3-phase bidirectional calibration");
+
+  calibrationState = CALIBRATION_STICTION_BREAK_MAX_FWD;
+  calibrationPwm = SERVO_CALIBRATION_START_DUTY_CYCLE;
   calibrationStartTicks = instrumentCoordinateSteps;
   calibrationStartTime = millis();
-  
-  VF("MSG:"); V(axisPrefix); VL("Starting bidirectional calibration");
-
-  calibrationState = CALIBRATION_STICTION_SEARCH_FWD;
-  calibrationPwm = SERVO_CALIBRATION_START_DUTY_CYCLE;  // Start with forward direction
-  stictionBreakPwmFwd = 0;
-  stictionBreakPwmRev = 0;
-  targetVelocityPwmFwd = 0;
-  targetVelocityPwmRev = 0;
-  calibrationMinPwm = 0;
-  calibrationMaxPwm = 0;
-  calibrationPhaseCount = 0;
-
-  // set target velocity based on tracking frequency
   targetVelocity = trackingFrequency;
 
-  // enable experiment mode to bypass PID
   experimentMode = true;
   setExperimentPwm(calibrationPwm);
 
@@ -59,35 +107,37 @@ void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrum
   V(calibrationPwm); VLF("%");
 }
 
-// handle calibration state machine
 void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps) {
-
   if (calibrationState == CALIBRATION_IDLE) return;
 
-  long currentTicks = instrumentCoordinateSteps;
-  unsigned long currentTime = millis();
+  currentTime = millis();
+  currentTicks = instrumentCoordinateSteps;
 
-  // skip if calibration period not completed
-  if (currentTime - calibrationStartTime < (SERVO_CALIBRATION_TIME_PERIOD * 1000)) return;
+  // Handle settling period
+  if (!motorSettled()) {
+      return;
+  }
 
-  // calculate actual velocity with sign
+  // Skip if calibration period not completed
+  if (currentTime - calibrationStartTime < (SERVO_CALIBRATION_TIME_PERIOD)) {
+    return;
+  }
+
   float elapsedSec = (currentTime - calibrationStartTime) / 1000.0f;
   float actualVelocity = (currentTicks - calibrationStartTicks) / elapsedSec;
-
-  // determine direction and unsigned velocity
-  bool forwardDirection = calibrationPwm > 0;
   float unsignedVelocity = fabs(actualVelocity);
 
   switch (calibrationState) {
-    // forward Stiction Search
-    case CALIBRATION_STICTION_SEARCH_FWD:
-      // no movement
-      if (unsignedVelocity < 0.1f) {
-        calibrationPwm *= 2.0f; // double PWM
+    case CALIBRATION_IDLE:
+      break;
 
-        if (calibrationPwm > 100.0f) {
-          VF("MSG:"); V(axisPrefix);
-          VL("Stiction break not found in FWD (max PWM reached)");
+    case CALIBRATION_STICTION_BREAK_MAX_FWD:
+      if (unsignedVelocity < 0.1f) {
+        calibrationPwm *= 2.0f;
+
+        if (calibrationPwm >= SERVO_CALIBRATION_PWM_MAX) {
+          VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction not found below ");
+          V(SERVO_CALIBRATION_PWM_MAX); VLF("% PWM");
           calibrationState = CALIBRATION_IDLE;
           experimentMode = false;
           setExperimentPwm(0);
@@ -97,236 +147,422 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
           calibrationStartTicks = currentTicks;
           calibrationPhaseCount++;
 
-          VF("MSG:"); V(axisPrefix); VF("FWD Phase ");
+          VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction Phase ");
           V(calibrationPhaseCount); VF(": PWM=");
           V(calibrationPwm); VLF("% - No movement");
         }
-      } else
-      // Movement detected
-      {
-        stictionBreakPwmFwd = calibrationPwm;
-        calibrationState = CALIBRATION_VELOCITY_SEARCH_FWD;
-        calibrationMinPwm = stictionBreakPwmFwd;
-        calibrationMaxPwm = stictionBreakPwmFwd;
-        calibrationPwm = calibrationMinPwm; // start from stiction value
+      } else {
+        stictionBreakMaxFwd = calibrationPwm;
+        calibrationState = CALIBRATION_STICTION_REFINE_MIN_FWD;
+        calibrationPwm = stictionBreakMaxFwd * 0.5f;
         calibrationPhaseCount = 0;
+
+        // wait the motor to settle after previous pwm - set it to 0
+        setExperimentPwmAndSettleMotor(0);
+
+        // Set binary search bounds for min stiction
+        calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxFwd;
+        calibrationMaxPwm = stictionBreakMaxFwd;
+        calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+        VF("MSG:"); V(axisPrefix); VF("FWD Max Stiction at ");
+        V(stictionBreakMaxFwd); V("% PWM"); V("% - Movement: ");
+        V(unsignedVelocity); VLF(" steps/sec");
+      }
+      break;
+
+    case CALIBRATION_STICTION_REFINE_MIN_FWD:
+      if (unsignedVelocity < 0.1f) {
+        // No movement: too weak → increase lower bound
+        calibrationMinPwm = calibrationPwm;
+      } else {
+        // Movement detected → PWM is sufficient → tighten upper bound
+        calibrationMaxPwm = calibrationPwm;
+      }
+
+      // Stop condition: bounds close enough
+      if (fabs(calibrationMaxPwm - calibrationMinPwm) <= SERVO_CALIBRATION_STICTION_REFINE_STEP) {
+        stictionBreakMinFwd = calibrationMaxPwm;
+        calibrationState = CALIBRATION_VELOCITY_SEARCH_FWD;
+        calibrationPwm = stictionBreakMinFwd * SERVO_CALIBRATION_KICKSTART_DROP_FACTOR;
+        calibrationPhaseCount = 0;
+
+        VF("MSG:"); V(axisPrefix); VF("FWD Min Stiction found at ");
+        V(stictionBreakMinFwd); VLF("% PWM");
 
         setExperimentPwm(calibrationPwm);
         calibrationStartTime = currentTime;
         calibrationStartTicks = currentTicks;
-
-        VF("MSG:"); V(axisPrefix); VF("FWD Stiction break at ");
-        V(stictionBreakPwmFwd); VLF("% PWM");
-        VF("MSG:"); V(axisPrefix); VF("FWD Target velocity: ");
-        V(targetVelocity); VLF(" steps/sec");
+        break;
       }
+
+      // Continue binary search
+      calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+      // wait the motor to settle after previous pwm - set it to 0
+      setExperimentPwmAndSettleMotor(0);
+
+      VF("MSG:"); V(axisPrefix); VF("FWD Min Stiction Phase ");
+      V(calibrationPhaseCount); VF(": PWM=");
+      V(calibrationPwm); V("% - Movement: ");
+      V(unsignedVelocity); VLF(" steps/sec");
+
+      calibrationPhaseCount++;
       break;
 
-    // forward Velocity Search
     case CALIBRATION_VELOCITY_SEARCH_FWD: {
-      float velocityError = actualVelocity - targetVelocity;
-      float absError = fabs(velocityError);
-      float relError = (absError / targetVelocity) * 100.0f;
+        // If motor isn't moving, kickstart with stictionBreakMin and try again
+        if (fabs(actualVelocity) < 0.1f) {
+            VF("MSG:"); V(axisPrefix); VF("FWD Motor stopped at PWM=");
+            V(calibrationPwm); VL("% - Applying stictionBreakMin");
 
-      VF("MSG:"); V(axisPrefix); VF("FWD Phase ");
-      V(calibrationPhaseCount); VF(": PWM=");
-      V(calibrationPwm); VF("% → ");
-      V(actualVelocity); VF(" steps/sec (err=");
-      V(relError); VLF("%)");
+            // Try to kickstart with stictionBreakMin
+            setExperimentPwm(stictionBreakMinFwd);
+            delay(SERVO_CALIBRATION_TIME_PERIOD);
 
-      if (relError <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
-        targetVelocityPwmFwd = calibrationPwm;
-        VF("MSG:"); V(axisPrefix); VF("FWD SUCCESS at ");
-        V(targetVelocityPwmFwd); VLF("% PWM");
+            // Check if motor moves with stictionBreakMin
+            long checkStartTicks = instrumentCoordinateSteps;
+            unsigned long checkStartTime = millis();
+            delay(SERVO_CALIBRATION_TIME_PERIOD);
+            float checkVelocity = (instrumentCoordinateSteps - checkStartTicks) / ((millis() - checkStartTime) / 1000.0f);
 
-        // Switch to reverse stiction search
-        calibrationState = CALIBRATION_STICTION_SEARCH_REV;
+            if (fabs(checkVelocity) < 0.1f) {
+                // Motor didn't move even with stictionBreakMin - abort calibration
+                VF("MSG:"); V(axisPrefix); VL("FWD Motor won't move with stictionBreakMin");
+                VF("MSG:"); V(axisPrefix); VL("Skipping FWD velocity search — switching to REV");
+
+                // Instead of jumping directly to REV, insert settling first:
+                trackingPwmFwd = calibrationPwm;
+                setExperimentPwmAndSettleMotor(0);  // Actively stop motor
+                calibrationState = CALIBRATION_PREP_REV;
+                break;
+            }
+
+            // Motor moved with stictionBreakMin - continue binary search with higher PWM
+            calibrationMinPwm = stictionBreakMinFwd;
+            calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+            setExperimentPwm(calibrationPwm);
+            calibrationStartTime = millis();
+            calibrationStartTicks = instrumentCoordinateSteps;
+            calibrationPhaseCount++;
+            break;
+        }
+
+        float velocityError = actualVelocity - targetVelocity;
+        float relError = fabs(velocityError / targetVelocity) * 100.0f;
+
+        VF("MSG:"); V(axisPrefix); VF("FWD Velocity Phase ");
+        V(calibrationPhaseCount); VF(": PWM=");
+        V(calibrationPwm); VF("% → ");
+        V(actualVelocity); VF(" steps/sec (err=");
+        V(relError); VLF("%)");
+
+        if (relError <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
+            trackingPwmFwd = calibrationPwm;
+            VF("MSG:"); V(axisPrefix); VF("FWD Tracking at ");
+            V(trackingPwmFwd); VLF("% PWM");
+
+            calibrationState = CALIBRATION_STICTION_BREAK_MAX_REV;
+            calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
+            setExperimentPwm(calibrationPwm);
+            calibrationStartTime = millis();
+            calibrationStartTicks = instrumentCoordinateSteps;
+            calibrationPhaseCount = 0;
+        } else {
+            // Binary search update
+            if (velocityError < 0) {
+                // Too slow - need higher PWM
+                calibrationMinPwm = calibrationPwm;
+            } else {
+                // Too fast - need lower PWM
+                calibrationMaxPwm = calibrationPwm;
+            }
+
+            // Calculate new PWM value
+            calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+            // Ensure we stay within reasonable bounds
+            calibrationPwm = constrain(calibrationPwm,
+                SERVO_CALIBRATION_START_DUTY_CYCLE,
+                stictionBreakMaxFwd);
+
+            setExperimentPwm(calibrationPwm);
+            calibrationStartTime = millis();
+            calibrationStartTicks = instrumentCoordinateSteps;
+            calibrationPhaseCount++;
+        }
+        break;
+    }
+
+    case CALIBRATION_PREP_REV:
+      if (millis() - settleStartTime >= SERVO_CALIBRATION_MOTOR_SETTLE_TIME) {
+        calibrationState = CALIBRATION_STICTION_BREAK_MAX_REV;
         calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
         setExperimentPwm(calibrationPwm);
-        calibrationStartTime = currentTime;
-        calibrationStartTicks = currentTicks;
+        calibrationStartTime = millis();
+        calibrationStartTicks = instrumentCoordinateSteps;
         calibrationPhaseCount = 0;
-
-        VF("MSG:"); V(axisPrefix); VLF("Starting REV calibration");
-        VF("MSG:"); V(axisPrefix); VF("Testing REV PWM=");
-        V(calibrationPwm); VLF("%");
-      } else {
-        // binary search adjustment
-        if (velocityError < 0) {
-          // too slow
-          calibrationMinPwm = calibrationPwm;
-        } else {
-          // too fast
-          calibrationMaxPwm = calibrationPwm;
-        }
-
-        // check convergence
-        if (calibrationMaxPwm - calibrationMinPwm < 0.1f) {
-          targetVelocityPwmFwd = calibrationPwm;
-          VF("MSG:"); V(axisPrefix); VF("FWD CONVERGED at ");
-          V(targetVelocityPwmFwd); VLF("% PWM");
-
-          // switch to reverse stiction search
-          calibrationState = CALIBRATION_STICTION_SEARCH_REV;
-          calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
-          setExperimentPwm(calibrationPwm);
-          calibrationStartTime = currentTime;
-          calibrationStartTicks = currentTicks;
-          calibrationPhaseCount = 0;
-
-          VF("MSG:"); V(axisPrefix); VLF("Starting REV calibration");
-          VF("MSG:"); V(axisPrefix); VF("Testing REV PWM=");
-          V(calibrationPwm); VLF("%");
-        } else {
-          // new test point
-          calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
-          setExperimentPwm(calibrationPwm);
-          calibrationStartTime = currentTime;
-          calibrationStartTicks = currentTicks;
-          calibrationPhaseCount++;
-        }
       }
       break;
+
+    case CALIBRATION_STICTION_BREAK_MAX_REV:
+    if (unsignedVelocity < 0.1f) {
+      calibrationPwm *= 2.0f;
+
+      if (calibrationPwm < -SERVO_CALIBRATION_PWM_MAX) {
+        VF("MSG:"); V(axisPrefix); VL("REV Max Stiction not found");
+        stictionBreakMaxRev = 0.0f;
+        stictionBreakMinRev = 0.0f;
+
+        // Skip to balance check (continue calibration)
+        calibrationState = CALIBRATION_CHECK_IMBALANCE;
+        experimentMode = false;
+        setExperimentPwm(0);
+      } else {
+        setExperimentPwm(calibrationPwm);
+        calibrationStartTime = currentTime;
+        calibrationStartTicks = currentTicks;
+        calibrationPhaseCount++;
+
+        VF("MSG:"); V(axisPrefix); VF("REV Max Stiction Phase ");
+        V(calibrationPhaseCount); VF(": PWM=");
+        V(calibrationPwm); VLF("% - No movement");
+      }
+    } else {
+      stictionBreakMaxRev = fabs(calibrationPwm);
+      calibrationState = CALIBRATION_STICTION_REFINE_MIN_REV;
+      calibrationPhaseCount = 0;
+
+      // Set binary search bounds for min stiction
+      calibrationMinPwm = SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR * stictionBreakMaxRev;
+      calibrationMaxPwm = stictionBreakMaxRev;
+      calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+      // wait the motor to settle after previous pwm - set it to 0
+      setExperimentPwmAndSettleMotor(0);
+
+      VF("MSG:"); V(axisPrefix); VF("REV Max Stiction at ");
+      V(stictionBreakMaxRev); VF("% PWM - Movement: ");
+      V(unsignedVelocity); VLF(" steps/sec");
     }
+    break;
 
-    // reverse Stiction Search
-    case CALIBRATION_STICTION_SEARCH_REV:
-      // no movement
+    case CALIBRATION_STICTION_REFINE_MIN_REV:
       if (unsignedVelocity < 0.1f) {
-        calibrationPwm *= 2.0f; // double PWM magnitude
+        // No movement: update min bound (motor too weak)
+        calibrationMinPwm = calibrationPwm;
+      } else {
+        // Movement: update max bound (PWM sufficient)
+        calibrationMaxPwm = calibrationPwm;
+      }
 
-        if (calibrationPwm < -100.0f) {
-          VF("MSG:"); V(axisPrefix);
-          VL("Stiction break not found in REV (max PWM reached)");
-          calibrationState = CALIBRATION_CHECK_IMBALANCE;
-        } else {
-          setExperimentPwm(calibrationPwm);
-          calibrationStartTime = currentTime;
-          calibrationStartTicks = currentTicks;
-          calibrationPhaseCount++;
-
-          VF("MSG:"); V(axisPrefix); VF("REV Phase ");
-          V(calibrationPhaseCount); VF(": PWM=");
-          V(calibrationPwm); VLF("% - No movement");
-        }
-      } else
-      // movement detected
-      {
-        stictionBreakPwmRev = fabs(calibrationPwm);
+      // Stop condition: bounds are close enough
+      if (fabs(calibrationMaxPwm - calibrationMinPwm) <= SERVO_CALIBRATION_STICTION_REFINE_STEP) {
+        stictionBreakMinRev = fabs(calibrationMaxPwm);
         calibrationState = CALIBRATION_VELOCITY_SEARCH_REV;
-        calibrationMinPwm = -stictionBreakPwmRev; // negative value
-        calibrationMaxPwm = -100.0f;
-        calibrationPwm = calibrationMinPwm; // start from stiction value
+        calibrationPwm = -stictionBreakMinRev * SERVO_CALIBRATION_KICKSTART_DROP_FACTOR;
         calibrationPhaseCount = 0;
+
+        VF("MSG:"); V(axisPrefix); V("REV Min Stiction found at ");
+        V(stictionBreakMinRev); VLF("% PWM");
 
         setExperimentPwm(calibrationPwm);
         calibrationStartTime = currentTime;
         calibrationStartTicks = currentTicks;
-
-        VF("MSG:"); V(axisPrefix); VF("REV Stiction break at ");
-        V(calibrationPwm); VLF("% PWM");
-        VF("MSG:"); V(axisPrefix); VF("REV Target velocity: ");
-        V(-targetVelocity); VLF(" steps/sec");
+        break;
       }
-      break;
 
-    // reverse Velocity Search
-    case CALIBRATION_VELOCITY_SEARCH_REV: {
-      // use negative target velocity for reverse direction
-      float velocityError = actualVelocity - (-targetVelocity);
-      float absError = fabs(velocityError);
-      float relError = (absError / targetVelocity) * 100.0f;
+      // Continue binary search
+      calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
 
-      VF("MSG:"); V(axisPrefix); VF("REV Phase ");
+      // wait the motor to settle after previous pwm - set it to 0
+      setExperimentPwmAndSettleMotor(0);
+
+      VF("MSG:"); V(axisPrefix); VF("REV Min Stiction Phase ");
       V(calibrationPhaseCount); VF(": PWM=");
-      V(calibrationPwm); VF("% → ");
-      V(actualVelocity); VF(" steps/sec (err=");
-      V(relError); VLF("%)");
+      V(calibrationPwm); VF("% - Movement: ");
+      V(unsignedVelocity); VLF(" steps/sec");
 
-      if (relError <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
-        targetVelocityPwmRev = fabs(calibrationPwm);
-        VF("MSG:"); V(axisPrefix); VF("REV SUCCESS at ");
-        V(targetVelocityPwmRev); VLF("% PWM");
-        calibrationState = CALIBRATION_CHECK_IMBALANCE;
-      } else {
-        // binary search adjustment
-        if (velocityError < 0) {
-          // too slow (less negative than target)
-          calibrationMinPwm = calibrationPwm;  // more negative
-        } else {
-          // too fast
-          calibrationMaxPwm = calibrationPwm;  // less negative
-        }
-
-        // check convergence
-        if (fabs(calibrationMaxPwm - calibrationMinPwm) < 0.1f) {
-          targetVelocityPwmRev = fabs(calibrationPwm);
-          VF("MSG:"); V(axisPrefix); VF("REV CONVERGED at ");
-          V(targetVelocityPwmRev); VLF("% PWM");
-          calibrationState = CALIBRATION_CHECK_IMBALANCE;
-        } else {
-          // new test point
-          calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
-          setExperimentPwm(calibrationPwm);
-          calibrationStartTime = currentTime;
-          calibrationStartTicks = currentTicks;
-          calibrationPhaseCount++;
-        }
-      }
+      calibrationPhaseCount++;
       break;
+
+    case CALIBRATION_VELOCITY_SEARCH_REV: {
+        // If motor isn't moving, kickstart with stictionBreakMin and try again
+        if (fabs(actualVelocity) < 0.1f) {
+            VF("MSG:"); V(axisPrefix); VF("REV Motor stopped at PWM=");
+            V(calibrationPwm); VL("% - Applying stictionBreakMin");
+
+            // Try to kickstart with stictionBreakMin (negative value for reverse)
+            setExperimentPwm(-stictionBreakMinRev);
+            delay(SERVO_CALIBRATION_TIME_PERIOD);
+
+            // Check if motor moves with stictionBreakMin
+            long checkStartTicks = instrumentCoordinateSteps;
+            unsigned long checkStartTime = millis();
+            delay(SERVO_CALIBRATION_TIME_PERIOD);
+            float checkVelocity = (instrumentCoordinateSteps - checkStartTicks) / ((millis() - checkStartTime) / 1000.0f);
+
+            if (fabs(checkVelocity) < 0.1f) {
+                // Motor didn't move even with stictionBreakMin - abort calibration
+                VF("MSG:"); V(axisPrefix); VL("REV Motor won't move with stictionBreakMin - aborting calibration");
+                VF("MSG:"); V(axisPrefix); VL("Skipping REV velocity search — switching to BALANCE");
+
+                trackingPwmFwd = 0.0f;
+                calibrationState = CALIBRATION_CHECK_IMBALANCE;
+                calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
+                setExperimentPwm(calibrationPwm);
+                calibrationStartTime = millis();
+                calibrationStartTicks = instrumentCoordinateSteps;
+                calibrationPhaseCount = 0;
+                break;
+            }
+
+            // Motor moved with stictionBreakMin - continue binary search with higher PWM (more negative)
+            calibrationMaxPwm = -stictionBreakMinRev;
+            calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+            setExperimentPwm(calibrationPwm);
+            calibrationStartTime = millis();
+            calibrationStartTicks = instrumentCoordinateSteps;
+            calibrationPhaseCount++;
+            break;
+        }
+
+        float velocityError = actualVelocity - (-targetVelocity); // Note negative target for reverse
+        float relError = fabs(velocityError / targetVelocity) * 100.0f;
+
+        VF("MSG:"); V(axisPrefix); VF("REV Velocity Phase ");
+        V(calibrationPhaseCount); VF(": PWM=");
+        V(calibrationPwm); VF("% → ");
+        V(actualVelocity); VF(" steps/sec (err=");
+        V(relError); VLF("%)");
+
+        if (relError <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
+            trackingPwmRev = fabs(calibrationPwm);
+            VF("MSG:"); V(axisPrefix); VF("REV Tracking at ");
+            V(trackingPwmRev); VLF("% PWM");
+
+            calibrationState = CALIBRATION_CHECK_IMBALANCE;
+            setExperimentPwm(0);
+        } else {
+            // Binary search update
+            if (velocityError < 0) {
+                // Too slow (not enough reverse) - need more negative PWM
+                calibrationMaxPwm = calibrationPwm;
+            } else {
+                // Too fast (too much reverse) - need less negative PWM
+                calibrationMinPwm = calibrationPwm;
+            }
+
+            // Calculate new PWM value
+            calibrationPwm = (calibrationMinPwm + calibrationMaxPwm) / 2.0f;
+
+            // Ensure we stay within reasonable bounds
+            calibrationPwm = constrain(calibrationPwm,
+                -SERVO_CALIBRATION_START_DUTY_CYCLE,
+                -stictionBreakMinRev);
+
+            setExperimentPwm(calibrationPwm);
+            calibrationStartTime = millis();
+            calibrationStartTicks = instrumentCoordinateSteps;
+            calibrationPhaseCount++;
+        }
+        break;
     }
 
-    // imbalance check
     case CALIBRATION_CHECK_IMBALANCE:
-      VF("MSG:"); V(axisPrefix); VF("FWD: Stiction=");
-      V(stictionBreakPwmFwd); VF("%, Velocity=");
-      V(targetVelocityPwmFwd); VLF("%");
+      VF("MSG:"); V(axisPrefix); VF("FWD: StictionMax=");
+      V(stictionBreakMaxFwd); VF("%, StictionMin=");
+      V(stictionBreakMinFwd); VF("%, Tracking=");
+      V(trackingPwmFwd); VLF("%");
 
-      VF("MSG:"); V(axisPrefix); VF("REV: Stiction=");
-      V(stictionBreakPwmRev); VF("%, Velocity=");
-      V(targetVelocityPwmRev); VLF("%");
+      VF("MSG:"); V(axisPrefix); VF("REV: StictionMax=");
+      V(stictionBreakMaxRev); VF("%, StictionMin=");
+      V(stictionBreakMinRev); VF("%, Tracking=");
+      V(trackingPwmRev); VLF("%");
 
-      // calculate imbalance percentages
-      float stictionImbalance = fabs(stictionBreakPwmFwd - stictionBreakPwmRev);
-      float velocityImbalance = fabs(targetVelocityPwmFwd - targetVelocityPwmRev);
-
-      VF("MSG:"); V(axisPrefix); VF("Stiction imbalance: ");
-      V(stictionImbalance); VLF("%");
-      VF("MSG:"); V(axisPrefix); VF("Velocity imbalance: ");
-      V(velocityImbalance); VLF("%");
-
-      // check against threshold
-      if (stictionImbalance > SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD ||
-          velocityImbalance > SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD) {
-        VF("WRN:"); V(axisPrefix);
-        VL("Significant imbalance detected! Check telescope balance.");
+      // Check for significant imbalance between directions
+      float imbalance = fabs(trackingPwmFwd - trackingPwmRev) / ((trackingPwmFwd + trackingPwmRev)/2.0f) * 100.0f;
+      if (imbalance > SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD) {
+          VF("MSG:"); V(axisPrefix); VF("WARNING: Significant imbalance between directions: ");
+          V(imbalance); VLF("%");
       }
 
-      // finalize calibration
       experimentMode = false;
       setExperimentPwm(0);
+      printReport();  // print report
       calibrationState = CALIBRATION_IDLE;
       break;
+
   }
 }
 
-// get stiction break PWM value
-float ServoCalibrateTrackingVelocity::getStictionBreakPwm(bool forward) {
-  return forward ? stictionBreakPwmFwd : stictionBreakPwmRev;
+float ServoCalibrateTrackingVelocity::getStictionBreakMax(bool forward) {
+  return forward ? stictionBreakMaxFwd : stictionBreakMaxRev;
 }
 
-float ServoCalibrateTrackingVelocity::getTargetVelocityPwm(bool forward) {
-  return forward ? targetVelocityPwmFwd : targetVelocityPwmRev;
+float ServoCalibrateTrackingVelocity::getStictionBreakMin(bool forward) {
+  return forward ? stictionBreakMinFwd : stictionBreakMinRev;
 }
 
-// set experiment PWM value
+float ServoCalibrateTrackingVelocity::getTrackingPwm(bool forward) {
+  return forward ? trackingPwmFwd : trackingPwmRev;
+}
+
 void ServoCalibrateTrackingVelocity::setExperimentPwm(float pwm) {
-  experimentPwm = constrain(pwm, -100.0, 100.0);
+  experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
 }
 
-// set experiment mode state
-void ServoCalibrateTrackingVelocity::setExperimentMode(bool state) {
-  experimentMode = state;
+void ServoCalibrateTrackingVelocity::setExperimentPwmAndSettleMotor(float pwm) {
+  experimentPwm = constrain(pwm, -SERVO_CALIBRATION_PWM_MAX, SERVO_CALIBRATION_PWM_MAX);
+  // wait the motor to settle after previous pwm - set it to 0
+  settleStartTime = currentTime;
+  waitingForSettle = true;
+}
+
+bool ServoCalibrateTrackingVelocity::motorSettled(void) {
+    // Handle settling period
+  if (waitingForSettle) {
+    if (currentTime - settleStartTime >= SERVO_CALIBRATION_MOTOR_SETTLE_TIME) {
+      waitingForSettle = false;
+      calibrationStartTime = currentTime;
+      calibrationStartTicks = currentTicks;
+      return true;
+    }
+  }
+  return false;
+
+}
+
+void ServoCalibrateTrackingVelocity::printReport() {
+  VF("=== Calibration Report for"); V(axisPrefix); VLF(" ===");
+
+  if (trackingPwmFwd >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VLF("WARNING: FWD calibration reached maximum PWM limit");
+  }
+  if (trackingPwmRev >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VLF("WARNING: REV calibration reached maximum PWM limit");
+  }
+
+  VF("Stiction Break (FWD): Max = "); V(stictionBreakMaxFwd); VF("%, Min = "); V(stictionBreakMinFwd); VLF("%");
+  VF("Tracking PWM (FWD): "); V(trackingPwmFwd); VLF("%");
+
+  VF("Stiction Break (REV): Max = "); V(stictionBreakMaxRev); VF("%, Min = "); V(stictionBreakMinRev); VLF("%");
+  VF("Tracking PWM (REV): "); V(trackingPwmRev); VLF("%");
+
+  float stictionImbalance = fabs(stictionBreakMinFwd - stictionBreakMinRev);
+  float trackingImbalance = fabs(trackingPwmFwd - trackingPwmRev);
+
+  VF("Stiction Min Imbalance: "); V(stictionImbalance); VLF("%");
+  VF("Tracking PWM Imbalance: "); V(trackingImbalance); VLF("%");
+
+  float pwmUsed = max(trackingPwmFwd, trackingPwmRev);
+  if (pwmUsed >= SERVO_CALIBRATION_PWM_MAX - 0.1f) {
+    VF("WARNING: PWM hit calibration limit ("); V(SERVO_CALIBRATION_PWM_MAX); VLF("%)");
+  }
+
+  VLF("=== End of Report ===");
 }
 
 #endif

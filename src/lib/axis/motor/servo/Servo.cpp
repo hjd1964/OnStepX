@@ -130,7 +130,7 @@ void ServoMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   feedback->setControlDirection(state);
-  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault;
 }
 
 // sets motor enable on/off (if possible)
@@ -329,10 +329,10 @@ int32_t ServoMotor::encoderRead() {
 
           if (frac < 0) {
             encoderCorrection = round(encoderCorrection * (frac + 1.0)); // frac at -1 = 0 and at 0 = 1
-            encoderCorrection += round(ecb * abs(frac));                 // frac at -1 = 1 and at 0 = 0 
+            encoderCorrection += round(ecb * abs(frac));                 // frac at -1 = 1 and at 0 = 0
           } else {
             encoderCorrection = round(encoderCorrection * (1.0 - frac)); // frac at 1 = 0 and at 0 = 1
-            encoderCorrection += round(eca * abs(frac));                 // frac at 1 = 1 and at 0 = 0 
+            encoderCorrection += round(eca * abs(frac));                 // frac at 1 = 1 and at 0 = 0
           }
 
         } else encoderCorrection = 0;
@@ -351,7 +351,7 @@ void ServoMotor::poll() {
   #ifdef CALIBRATE_SERVO_DC
     calibrateVelocity->updateState(getInstrumentCoordinateSteps());
   #endif
-  
+
   long encoderCounts = encoderRead();
 
   long encoderCountsOrig = encoderCounts;
@@ -384,8 +384,25 @@ void ServoMotor::poll() {
   control->in = encoderCounts;
   if (enabled) feedback->poll();
 
-  float velocity = velocityEstimate + control->out;
-  if (!enabled) velocity = 0.0F;
+  // these are used for calibration of dc pwm duty cycle when CALIBRATE_SERVO_DC
+  bool experimentMode = false;
+  float experimentPwm = 0;
+
+  #ifdef CALIBRATE_SERVO_DC
+    experimentMode = calibrateVelocity->experimentMode;
+    experimentPwm = calibrateVelocity->experimentPwm;
+  #endif
+
+  float velocity;
+  // if CALIBRATE_SERVO_DC
+  if (experimentMode && enabled) {
+    // directly use fixed PWM value
+    velocity = experimentPwm * driver->getMotorControlRange() / 100.0F;
+  } else if(enabled) {
+    velocity = velocityEstimate + control->out;
+  } else {
+    velocity = 0.0F;
+  }
 
   #ifdef ABSOLUTE_ENCODER_CALIBRATION
     if (axisNumber == 1) {
@@ -395,24 +412,8 @@ void ServoMotor::poll() {
         calibrateRecord(velocity, motorCounts, encoderCounts);
       }
     }
-  bool experimentMode = false;
-  float experimentPwm = 0;
-  #ifdef CALIBRATE_SERVO_DC
-    experimentMode = calibrateVelocity->experimentMode;
-    experimentPwm = calibrateVelocity->experimentPwm;
-  #endif
-  #endif
 
-  if (enabled && !experimentMode) feedback->poll();
-
-  float velocity;
-  if (experimentMode && enabled) {
-    // directly use fixed PWM value
-    velocity = experimentPwm * driver->getMotorControlRange() / 100.0F;
-  } else {
-    velocity = velocityEstimate + control->out;
-  }
-  if (!enabled) velocity = 0.0F;
+  #endif
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
@@ -432,7 +433,7 @@ void ServoMotor::poll() {
     } else {
       lastSlewingTime = millis();
       feedback->selectSlewingParameters();
-    } 
+    }
   } else {
     feedback->variableParameters(fabs(velocityPercent));
   }
