@@ -64,12 +64,7 @@ void ServoCalibrateTrackingVelocity::init() {
   motorState = MOTOR_STOPPED;
 
   // Reset calibration values
-  stictionCeilingFwd = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  stictionFloorFwd = 0.0f;
-  trackingPwmFwd = 0.0f;
-  stictionCeilingRev = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  stictionFloorRev = 0.0f;
-  trackingPwmRev = 0.0f;
+  resetCalibrationValues();
 
   lastStateChangeTime = 0;
   calibrationStepStartTime = 0;
@@ -82,6 +77,21 @@ void ServoCalibrateTrackingVelocity::init() {
   enabled = false;
   everMovedFwd = false;
   everMovedRev = false;
+
+  velIters = 0;
+  bestVelSearchPwmAbs = 0.0f;
+  bestVelSearchErr = 1e9f; // sentinel "worst" error
+
+  refineIters = 0;
+
+  // setup the queue
+  hasQueuedTest = false;
+  queuedState = CALIBRATION_IDLE;
+  queuedPwm = 0.0f;
+
+  // stop the motor
+  setPwm(0);
+  startSettling();
 }
 
 void ServoCalibrateTrackingVelocity::start(float trackingFrequency, long instrumentCoordinateSteps) {
@@ -139,6 +149,10 @@ void ServoCalibrateTrackingVelocity::updateState(long instrumentCoordinateSteps)
       processStictionFloor();
       break;
 
+    case CALIBRATION_VELOCITY_SEARCH:
+      processVelocitySearch();
+      break;
+
     case CALIBRATION_CHECK_IMBALANCE:
       processImbalanceCheck();
       break;
@@ -159,16 +173,26 @@ void ServoCalibrateTrackingVelocity::handleMotorState() {
       if (currentTime - settleStartTime >= SERVO_CALIBRATION_MOTOR_SETTLE_TIME) {
         motorState = MOTOR_STOPPED;
         V(axisPrefix); VF(": Motor settled to STOPPED_STATE"); VF(" Vel="); V(currentVelocity); VL(" steps/s");
+
+        // NOW safe to start the next test, if any
+        if (hasQueuedTest) {
+          // if we were kicking the motor
+          kickToFloorPWM = false;
+          calibrationState = queuedState;
+          hasQueuedTest = false;
+          startTest(queuedPwm);
+        }
       }
       lastVelocityMeasurement = currentVelocity;
       lastVelocityTime = currentTime;
+
       break;
 
     case MOTOR_ACCELERATING:
       // Check if motor has reached steady state
       if (currentTime - lastVelocityTime >= SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL) {
         currentVelocity = calculateInstantaneousVelocity();
-        float velocityChange = fabs(currentVelocity - lastVelocityMeasurement);
+        float velocityChange = fabsf(currentVelocity - lastVelocityMeasurement);
 
         if (fabsf(currentVelocity) > SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY && fabsf(velocityChange) < SERVO_CALIBRATION_VELOCITY_STABILITY_THRESHOLD) {
           motorState = MOTOR_RUNNING_STEADY;
@@ -185,6 +209,15 @@ void ServoCalibrateTrackingVelocity::handleMotorState() {
 
         lastVelocityMeasurement = currentVelocity;
         lastVelocityTime = currentTime;
+
+        // NOW safe to start the next test, if any
+        if (hasQueuedTest) {
+          // if we were kicking the motor
+          kickToFloorPWM = false;
+          calibrationState = queuedState;
+          hasQueuedTest = false;
+          startTest(queuedPwm);
+        }
       }
       break;
 
@@ -299,6 +332,8 @@ void ServoCalibrateTrackingVelocity::transitionToRefine() {
   float mid = 0.5f * (calibrationMinPwm + calibrationMaxPwm);
   calibrationPwm = calibrationDirectionIsForward ? mid : -mid;
 
+  refineIters = 0;
+
   // Start the first refine test at the midpoint PWM
   startTest(calibrationPwm);
 }
@@ -339,33 +374,43 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
     // Conservative pick: the smallest PWM known to MOVE
     const float resultMin = calibrationMaxPwm;
 
+    // Store floor for reporting
     float& stictionMin = calibrationDirectionIsForward ? stictionFloorFwd : stictionFloorRev;
-    float& trackingPwm  = calibrationDirectionIsForward ? trackingPwmFwd   : trackingPwmRev;
-
     stictionMin = resultMin;
-    trackingPwm = resultMin * SERVO_CALIBRATION_KICKSTART_DROP_FACTOR;
 
-    V(axisPrefix);
-    if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
-    VF(" MinStiction="); V(resultMin);
-    VF("% → Tracking PWM="); V(trackingPwm); VL("%");
-
-    // Stop & settle before switching direction / next phase
-    setPwm(0);
-    startSettling();
-
-    if (calibrationDirectionIsForward) {
-      // Switch to reverse direction and restart at ceiling search
-      calibrationDirectionIsForward = false;
-      calibrationState = CALIBRATION_STICTION_CEILING;
-      calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
-      startTest(calibrationPwm);
-    } else {
-      // Proceed to imbalance check
-      calibrationState = CALIBRATION_CHECK_IMBALANCE;
-      processImbalanceCheck();
+    // Prepare velocity search bounds:
+    // - lower bound: stiction floor (guaranteed motion)
+    // - upper bound: grow to either 2x floor or PWM_MAX, whichever is smaller
+    calibrationMinPwm = resultMin;
+    calibrationMaxPwm = fminf(resultMin * 2.0f, SERVO_CALIBRATION_STOP_DUTY_CYCLE);
+    if (calibrationMaxPwm < calibrationMinPwm + SERVO_CALIBRATION_STICTION_REFINE_STEP) {
+      // Not enough headroom; just accept floor as tracking PWM
+      float& trackingPwm = calibrationDirectionIsForward ? trackingPwmFwd : trackingPwmRev;
+      trackingPwm = resultMin;
+      V(axisPrefix); VF(calibrationDirectionIsForward ? " FWD" : " REV");
+      VF(" floor used as tracking PWM="); V(trackingPwm); VLF("% (no headroom)");
+      // Move on like before
+      setPwm(0);
+      startSettling();
+      if (calibrationDirectionIsForward) {
+        calibrationDirectionIsForward = false;
+        // Queue the next test, since we first have to make sure the motor are stopped
+        queueNextTest(CALIBRATION_STICTION_CEILING, -SERVO_CALIBRATION_START_DUTY_CYCLE);
+      } else {
+        calibrationState = CALIBRATION_CHECK_IMBALANCE;
+        processImbalanceCheck();
+      }
+      return;
     }
-    return;
+
+    // Enter velocity search
+    velIters = 0;
+    bestVelSearchErr = 1e9f;
+    bestVelSearchPwmAbs = calibrationMinPwm;
+    calibrationState = CALIBRATION_VELOCITY_SEARCH;
+    float mid = 0.5f * (calibrationMinPwm + calibrationMaxPwm);
+    calibrationPwm = calibrationDirectionIsForward ? mid : -mid;
+    startTest(calibrationPwm);
   }
 
   // Continue binary search: midpoint of [min, max]
@@ -376,6 +421,114 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
   startTest(calibrationPwm);
 }
 
+void ServoCalibrateTrackingVelocity::processVelocitySearch() {
+  // Only act when either the motor is steady (to evaluate) or stopped (treat as too low).
+  if (motorState != MOTOR_RUNNING_STEADY && motorState != MOTOR_STOPPED) return;
+
+  const float sign = calibrationDirectionIsForward ? 1.0f : -1.0f;
+  const float pwmAbs = fabsf(calibrationPwm);
+
+  // If stalled at test PWM, raise the lower bound and try again.
+  if (motorState == MOTOR_STOPPED) {
+    calibrationMinPwm = fmaxf(calibrationMinPwm, pwmAbs);
+  } else {
+    // Running steady; wait long enough to get a meaningful average velocity.
+    const unsigned long dt_ms = currentTime - calibrationStepStartTime;
+    if (dt_ms < SERVO_CALIBRATION_VELOCITY_MEASURE_WINDOW_MS) return;
+
+    const float elapsedSec = dt_ms / 1000.0f;
+    const long  dCounts    = currentTicks - calibrationStepStartTicks;
+    const float avgVel     = (float)dCounts / elapsedSec; // steps/sec (signed)
+
+    // Compare by magnitude (direction set by 'sign')
+    const float targetMag = fabsf(targetVelocity);
+    const float actualMag = fabsf(avgVel);
+    if (targetMag <= 0.0f) {
+      // Degenerate: no valid target; accept current PWM and exit this phase
+      float& trackingPwm = calibrationDirectionIsForward ? trackingPwmFwd : trackingPwmRev;
+      trackingPwm = pwmAbs;
+      V(axisPrefix); VLF(": velocity search skipped (target=0)");
+      goto velocity_search_done;
+    }
+
+    const float errPct = fabsf(actualMag - targetMag) / targetMag * 100.0f;
+
+    // Track best-so-far for graceful bailout
+    if (errPct < bestVelSearchErr) {
+      bestVelSearchErr   = errPct;
+      bestVelSearchPwmAbs = pwmAbs;
+    }
+
+    // Decide next bounds from whether we're too slow/fast
+    if (actualMag < targetMag) {
+      // Too slow → need more PWM
+      calibrationMinPwm = fmaxf(calibrationMinPwm, pwmAbs);
+    } else {
+      // Too fast → need less PWM
+      calibrationMaxPwm = fminf(calibrationMaxPwm, pwmAbs);
+    }
+
+    // Success?
+    if (errPct <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
+      float& trackingPwm = calibrationDirectionIsForward ? trackingPwmFwd : trackingPwmRev;
+      trackingPwm = pwmAbs;
+      VF("MSG: "); V(axisPrefix);
+      VF(calibrationDirectionIsForward ? " FWD" : " REV");
+      VF(" velocity OK: PWM="); V(trackingPwm);
+      VF("%, v="); V(avgVel); VF(" steps/s, err="); V(errPct); VLF("%");
+      goto velocity_search_done;
+    }
+
+    // Convergence or iteration cap?
+    if ((calibrationMaxPwm - calibrationMinPwm) <= SERVO_CALIBRATION_STICTION_REFINE_STEP || ++velIters > SERVO_CALIBRATION_REFINE_MAX_ITERATIONS) {
+      float& trackingPwm = calibrationDirectionIsForward ? trackingPwmFwd : trackingPwmRev;
+      trackingPwm = bestVelSearchPwmAbs; // best-so-far
+      VF("WARN: "); V(axisPrefix);
+      VF(calibrationDirectionIsForward ? " FWD" : " REV");
+      VF(" velocity search stop: using best PWM="); V(trackingPwm);
+      VF("%, best err="); V(bestVelSearchErr); VLF("%");
+      goto velocity_search_done;
+    }
+  }
+
+  // Continue search with midpoint
+  {
+    const float mid = 0.5f * (calibrationMinPwm + calibrationMaxPwm);
+    calibrationPwm = sign * constrain(mid, 0.0f, SERVO_CALIBRATION_STOP_DUTY_CYCLE);
+
+    // we are coming from a previous failed test
+    if(!kickToFloorPWM) {
+      // Kick the motor to the floor PWM
+      kickToFloorPWM = true;
+      setPwm(sign * (calibrationDirectionIsForward ? stictionFloorFwd : stictionFloorRev));
+      // Queue the next test, since we first have to make sure the motor are stopped
+      queueNextTest(CALIBRATION_VELOCITY_SEARCH, calibrationPwm);
+
+      return;
+    }
+    // Start the test
+    startTest(calibrationPwm);
+    return;
+  }
+
+velocity_search_done:
+  // Stop & settle, then proceed to next direction/phase
+  setPwm(0);
+  startSettling();
+
+  if (calibrationDirectionIsForward) {
+    // Switch to reverse direction starting again from stiction ceiling
+    calibrationDirectionIsForward = false;
+    calibrationState = CALIBRATION_STICTION_CEILING;
+    calibrationPwm = -SERVO_CALIBRATION_START_DUTY_CYCLE;
+    // Queue the next test, since we first have to make sure the motor are stopped
+    queueNextTest(CALIBRATION_STICTION_CEILING, -SERVO_CALIBRATION_START_DUTY_CYCLE);
+  } else {
+    calibrationState = CALIBRATION_CHECK_IMBALANCE;
+    processImbalanceCheck();
+  }
+}
+
 void ServoCalibrateTrackingVelocity::processImbalanceCheck() {
   // Print calibration report
   printReport();
@@ -383,7 +536,7 @@ void ServoCalibrateTrackingVelocity::processImbalanceCheck() {
   // Check for significant imbalance
   if (trackingPwmFwd > 0 && trackingPwmRev > 0) {
     float avgTracking = (trackingPwmFwd + trackingPwmRev) / 2.0f;
-    float imbalance = fabs(trackingPwmFwd - trackingPwmRev) / avgTracking * 100.0f;
+    float imbalance = fabsf(trackingPwmFwd - trackingPwmRev) / avgTracking * 100.0f;
 
     if (imbalance > SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD) {
       VF("WARN: "); V(axisPrefix);
@@ -407,12 +560,9 @@ void ServoCalibrateTrackingVelocity::handleCalibrationFailure() {
   setPwm(0);
 
   // Set default values
-  stictionCeilingFwd = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  stictionFloorFwd = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  trackingPwmFwd = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  stictionCeilingRev = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  stictionFloorRev = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
-  trackingPwmRev = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
+  resetCalibrationValues();
+
+  hasQueuedTest = false; // cancel any queued action
 }
 
 void ServoCalibrateTrackingVelocity::startSettling() {
@@ -465,8 +615,8 @@ void ServoCalibrateTrackingVelocity::printReport() {
 
   VF("Tracking PWM REV: "); V(trackingPwmRev); VL("%\n");
 
-  float stictionImbalance = fabs(stictionFloorFwd - stictionFloorRev);
-  float trackingImbalance = fabs(trackingPwmFwd - trackingPwmRev);
+  float stictionImbalance = fabsf(stictionFloorFwd - stictionFloorRev);
+  float trackingImbalance = fabsf(trackingPwmFwd - trackingPwmRev);
 
   VF("Stiction Min Imbalance: "); V(stictionImbalance); VL("%");
   VF("Tracking PWM Imbalance: "); V(trackingImbalance); VL("%\n");
@@ -479,6 +629,15 @@ void ServoCalibrateTrackingVelocity::printReport() {
   }
 
   VF("=== End Report ===\n");
+}
+
+void ServoCalibrateTrackingVelocity::resetCalibrationValues(void) {
+  stictionCeilingFwd = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
+  stictionFloorFwd = 0.0f;
+  trackingPwmFwd = 0.0f;
+  stictionCeilingRev = SERVO_CALIBRATION_STOP_DUTY_CYCLE;
+  stictionFloorRev = 0.0f;
+  trackingPwmRev = 0.0f;
 }
 
 #endif
