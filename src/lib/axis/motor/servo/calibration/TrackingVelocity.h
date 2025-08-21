@@ -20,20 +20,24 @@
 
 #define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 1000              // ms to wait after stopping motor
 #define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 300  // ms between velocity checks
-#define SERVO_CALIBRATION_TIMEOUT 30000                       // ms before calibration fails
+#define SERVO_CALIBRATION_TIMEOUT 1000000                     // ms before calibration fails
 
-#define SERVO_CALIBRATION_STICTION_REFINE_STEP 0.5f           // PWM % precision for min stiction
-#define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS 10            // Iterations in PWM floor exploration
+#define SERVO_CALIBRATION_STICTION_REFINE_ABS 0.05f           // %PWM
+#define SERVO_CALIBRATION_STICTION_REFINE_REL 0.10f           // 10% of stiction ceiling
+#define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS 40            // Iterations in PWM floor exploration and tracking velocity search
 #define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.5f     // Min stiction as % of max stiction
-#define SERVO_CALIBRATION_VELOCITY_STABILITY_THRESHOLD 10.0f  // steps/sec^2 for steady state
+#define SERVO_CALIBRATION_VELOCITY_STABILITY_THRESHOLD 50.0f  // steps/sec^2 for steady state
 
 #define SERVO_CALIBRATION_KICKSTART_DROP_FACTOR 0.9f          // Tracking PWM as % of min stiction
 #define SERVO_CALIBRATION_ERROR_THRESHOLD 5.0f                // Velocity error % for success
 
 #define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 2.0f      // Fwd/Rev imbalance warning threshold
 
+#define SERVO_CALIBRATION_VELOCITY_MEASURE_WINDOW_MS 1500     // Measure tracking velocity on a bigger window
+
 #define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY 0.1f        // steps/sec minimum movement threshold
-#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS  80                       // short debounce to avoid a single noisy read
+#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS  80     // short debounce to avoid a single noisy read
+
 
 // Calibration states
 enum CalibrationState {
@@ -86,6 +90,7 @@ private:
   void startTest(float pwm);
   void setPwm(float pwm);
   void transitionToRefine();
+  void resetCalibrationValues();
 
   // Configuration
   uint8_t axisNumber;
@@ -104,7 +109,6 @@ private:
   unsigned long lastVelocityTime;
   long currentTicks;
   long calibrationStepStartTicks;
-  float lastActualVelocity;
   float lastVelocityMeasurement;
 
   // Calibration parameters
@@ -127,6 +131,26 @@ private:
   bool everMovedFwd;
   bool everMovedRev;
   int refineIters;  // guard against infinite loops
+
+  // Velocity search bookkeeping
+  int   velIters;
+  float bestVelSearchPwmAbs;
+  float bestVelSearchErr;
+  bool kickToFloorPWM;
+
+  bool refineSawMove;
+
+  // A tiny queue for kickstarting / settling the motor before a test
+  bool hasQueuedTest = false;
+  CalibrationState queuedState = CALIBRATION_IDLE;
+  float queuedPwm = 0.0f;
+
+  inline void queueNextTest(CalibrationState st, float pwm) {
+  queuedState = st;
+  queuedPwm = pwm;
+  hasQueuedTest = true;
+}
+
 };
 
 #endif
