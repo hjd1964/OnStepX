@@ -38,7 +38,9 @@
 #define JTWSTM                      21     // JTW Astronomy JTWSTM telescope mount controller Rev 2.1
 #define MANTICORE                   22     // JTW Astronomy MANTICORE telescope mount controller Rev 1.0
 
-#define PINMAP_LAST                 22
+#define SAL_XB1                     23     // SAL-XB1 telescope mount controller
+
+#define PINMAP_LAST                 23
 
 // WEATHER sensors (temperature, pressure, and humidity)
 #define WEATHER_FIRST               1
