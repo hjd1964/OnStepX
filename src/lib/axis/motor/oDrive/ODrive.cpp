@@ -78,8 +78,8 @@ bool ODriveMotor::init() {
 
   enable(false);
 
-  // start the motor timer
-  VF("MSG:"); V(axisPrefix); VF("start task to move motor... ");
+  // start the motion timer
+  VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
   char timerName[] = "Target_";
   timerName[6] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);

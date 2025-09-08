@@ -73,7 +73,7 @@ bool KTechMotor::init() {
   enable(false);
 
   // start the motion timer
-  VF("MSG:"); V(axisPrefix); VF("start task to track motion... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
   char timerName[] = "Ax_KTec";
   timerName[2] = axisNumber + '0';
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);

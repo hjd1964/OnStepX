@@ -85,7 +85,7 @@ bool ServoMotor::init() {
   trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
   // start the motion timer
-  VF("MSG:"); V(axisPrefix); VF("start task to track motion... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
   char timerName[] = "Ax_Svo";
   timerName[2] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
