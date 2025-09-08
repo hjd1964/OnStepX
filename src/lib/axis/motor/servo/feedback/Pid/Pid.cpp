@@ -9,13 +9,10 @@
     AXIS4_SERVO_FEEDBACK == PID || AXIS5_SERVO_FEEDBACK == PID || AXIS6_SERVO_FEEDBACK == PID || \
     AXIS7_SERVO_FEEDBACK == PID || AXIS8_SERVO_FEEDBACK == PID || AXIS9_SERVO_FEEDBACK == PID
 
-Pid::Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity) {
+Pid::Pid(const float P, const float I, const float D) {
   trackingP.valueDefault = P;
   trackingI.valueDefault = I;
   trackingD.valueDefault = D;
-
-  autoScaleParameters = (sensitivity == 0);
-  if (autoScaleParameters) this->sensitivity = 100; else this->sensitivity = sensitivity;
 }
 
 // initialize PID control and parameters
@@ -25,7 +22,6 @@ void DualPid::init(uint8_t axisNumber, ServoControl *control, float controlRange
   axisPrefix[5] = '0' + axisNumber;
 
   VF("MSG:"); V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
-  VF("MSG:"); V(axisPrefix); if (autoScaleParameters) { VL("using auto parameter scaling"); } else { VL("using manual parameter scaling"); } 
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
                      0, 0, 0,
@@ -35,8 +31,6 @@ void DualPid::init(uint8_t axisNumber, ServoControl *control, float controlRange
   pid->SetOutputLimits(-controlRange, controlRange);
   pid->Initialize();
   pid->SetMode(QuickPID::Control::automatic);
-
-  autoScaleParameters = false;
 }
 
 // reset feedback control and parameters

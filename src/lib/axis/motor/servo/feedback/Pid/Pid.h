@@ -28,7 +28,7 @@
 
 class Pid : public Feedback {
   public:
-    Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity = 0);
+    Pid(const float P, const float I, const float D);
 
     // initialize PID control and parameters
     void init(uint8_t axisNumber, ServoControl *control, float controlRange);
