@@ -70,7 +70,7 @@ class Feedback {
 
     virtual void poll();
 
-    bool autoScaleParameters = true;
+    bool manuallySwitchParameters = true;
 
   protected:
     uint8_t axisNumber = 0;

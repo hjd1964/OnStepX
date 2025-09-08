@@ -18,8 +18,8 @@ DualPid::DualPid(const float P, const float I, const float D, const float P_goto
   slewingI.valueDefault = I_goto;
   slewingD.valueDefault = D_goto;
 
-  autoScaleParameters = (sensitivity == 0);
-  if (autoScaleParameters) this->sensitivity = 100; else this->sensitivity = sensitivity;
+  manuallySwitchParameters = (sensitivity == 0);
+  if (manuallySwitchParameters) this->sensitivity = 100; else this->sensitivity = sensitivity;
 }
 
 // initialize PID control and parameters
@@ -29,7 +29,7 @@ void DualPid::init(uint8_t axisNumber, ServoControl *control, float controlRange
   axisPrefix[5] = '0' + axisNumber;
 
   VF("MSG:"); V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
-  VF("MSG:"); V(axisPrefix); if (autoScaleParameters) { VL("using auto parameter scaling"); } else { VL("using manual parameter scaling"); } 
+  VF("MSG:"); V(axisPrefix); if (manuallySwitchParameters) { VL("using manual parameter switching"); } else { VL("using auto parameter scaling"); } 
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
                      0, 0, 0,

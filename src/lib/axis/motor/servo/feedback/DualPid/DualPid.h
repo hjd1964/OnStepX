@@ -60,7 +60,7 @@ class DualPid : public Feedback {
     inline void poll() {
       pid->Compute();
 
-      if (autoScaleParameters) {
+      if (manuallySwitchParameters) {
         if ((long)(millis() - nextSelectIncrementTime) > 0) {
           if (trackingSelected) parameterSelectPercent--;
           if (parameterSelectPercent < 0) parameterSelectPercent = 0;
