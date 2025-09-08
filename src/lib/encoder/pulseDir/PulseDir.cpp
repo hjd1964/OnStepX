@@ -44,7 +44,7 @@ PulseDir *pulseDirInstance[9];
   IRAM_ATTR void pulseDir_A_Axis9() { pulseDirInstance[8]->pulse(AXIS9_ENCODER_B_PIN); }
 #endif
 
-PulseDir::PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis) {
+PulseDir::PulseDir(int16_t axis, int16_t pulsePin, int16_t dirPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

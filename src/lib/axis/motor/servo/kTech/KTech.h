@@ -18,26 +18,22 @@
   #define KTECH_STATUS_MS 1000
 #endif
 
-typedef struct ServoKTechSettings {
-  int16_t model;
-  int8_t  status;
-  int32_t velocityMax;   // maximum velocity in steps/second
-  int32_t acceleration;  // acceleration steps/second/second
-} ServoKTechSettings;
-
 class ServoKTech : public ServoDriver {
   public:
     // constructor
-    ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettings);
+    ServoKTech(uint8_t axisNumber, const ServoSettings *Settings, float countsToDegreesRatio);
 
     // decodes driver model and sets up the pin modes
-    bool init();
+    bool init(bool reverse);
 
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
-    // power level to the motor
-    float setMotorVelocity(float power);
+    // set motor velocity
+    // \param velocity as needed to reach the target position, in encoder counts per second
+    // \param velocityTarget is the desired instantanous velocity at this moment, in encoder counts per second
+    // \returns velocity in effect, in encoder counts per second
+    float setMotorVelocity(float velocity);
 
     // request driver status from CAN
     void requestStatus();
@@ -45,7 +41,8 @@ class ServoKTech : public ServoDriver {
     // read the associated driver status from CAN
     void requestStatusCallback(uint8_t data[8]);
 
-    const ServoKTechSettings *Settings;
+    // get the driver name
+    const char* name() { return "KTECH"; }
 
   private:
     // read status info. from driver
@@ -57,14 +54,13 @@ class ServoKTech : public ServoDriver {
 
     void (*callback)() = NULL;
 
-    bool powered = false;
-    bool sdMode = false;
-    float currentVelocity = 0.0F;
-    float acceleration;
-    float accelerationFs;
-    bool statusRequestSent = false;
+    // regulate velocity changes
+    float velocityRamp = 0;
+    int32_t velocityLast = 0;
 
-    long lastV = 0;
+    // for conversion from counts per second to ketch motor "steps" per second
+    // where one "step" is 1/100 of a degree
+    float countsToStepsRatio = 0;
 };
 
 #endif

@@ -5,7 +5,7 @@
 #ifdef HAS_AS37_H39B_B
 
 // initialize BiSS-C encoder
-As37h39bb::As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis) {
+As37h39bb::As37h39bb(int16_t axis, int16_t maPin, int16_t sloPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

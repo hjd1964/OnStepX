@@ -70,11 +70,11 @@ int32_t SerialBridge::getCount() {
   } while (c != 13 && (millis() - start) < 4 && i < 16);
 
   if (strlen(result) > 0) {
-    return atoi(result) + origin;
+    return atoi(result);
   } else {
     DLF("WRN: SerialBridge getCount(), timed out!");
     error++;
-    return 0  + origin;
+    return 0;
   }
 }
 

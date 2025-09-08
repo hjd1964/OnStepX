@@ -15,11 +15,14 @@ class StepDirGeneric : StepDirDriver {
     // constructor
     StepDirGeneric(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings);
 
-    // get driver type code
-    inline char getParameterTypeCode() { return 'S'; }
-
     // setup driver
     bool init();
+
+    // returns the number of axis parameters
+    uint8_t getParameterCount() { return numParameters; }
+
+    // returns the specified axis parameter
+    AxisParameter* getParameter(uint8_t number) { if (number > numParameters) return &invalid; else return parameter[number]; }
 
     // set microstep mode for tracking
     void modeMicrostepTracking();
@@ -56,6 +59,10 @@ class StepDirGeneric : StepDirDriver {
     int16_t m1Pin                  = OFF;
     int16_t m2Pin                  = OFF;
     int16_t decayPin               = OFF;
+
+    // runtime adjustable settings
+    const int numParameters = 2;
+    AxisParameter* parameter[3] = {&invalid, &microsteps, &microstepsSlewing};
 };
 
 #endif

@@ -33,9 +33,9 @@ void statusKTechServoAxis7(uint8_t data[8]) { ktechServoInstance[6]->requestStat
 void statusKTechServoAxis8(uint8_t data[8]) { ktechServoInstance[7]->requestStatusCallback(data); }
 void statusKTechServoAxis9(uint8_t data[8]) { ktechServoInstance[8]->requestStatusCallback(data); }
 
-ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettings) {
+ServoKTech::ServoKTech(uint8_t axisNumber, const ServoSettings *Settings, float countsToStepsRatio)
+                       :ServoDriver(axisNumber, NULL, Settings) {
   if (axisNumber < 1 || axisNumber > 9) return;
-  this->axisNumber = axisNumber;
 
   strcpy(axisPrefix, " Axis_ServoKTech, ");
   axisPrefix[5] = '0' + axisNumber;
@@ -43,12 +43,11 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettin
   // the motor CAN ID is the axis number!
   canID = 0x140 + axisNumber;
 
-  this->Settings = KTechSettings;
-  model = KTechSettings->model;
-  statusMode = KTechSettings->status;
-  velocityMax = KTechSettings->velocityMax;
-  acceleration = (KTechSettings->acceleration/100.0F)*velocityMax;
+  velocityMax = Settings->velocityMax;
+  acceleration = (Settings->acceleration/100.0F)*velocityMax;
   accelerationFs = acceleration/FRACTIONAL_SEC;
+
+  this->countsToStepsRatio = countsToStepsRatio;
 
   ktechServoInstance[this->axisNumber - 1] = this;
   switch (this->axisNumber) {
@@ -64,9 +63,8 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoKTechSettings *KTechSettin
   }
 }
 
-bool ServoKTech::init() {
-  if (axisNumber < 1 || axisNumber > 9) return;
-  ServoDriver::init();
+bool ServoKTech::init(bool reverse) {
+  if (!ServoDriver::init(reverse)) return false;
 
   // automatically set fault status for known drivers
   status.active = statusMode != OFF;
@@ -115,40 +113,38 @@ void ServoKTech::enable(bool state) {
   } 
   
   enabled = state;
-  currentVelocity = 0.0F;
+  velocityRamp = 0.0F;
 }
 
-// set motor velocity (in ktech motor counts/s)
 float ServoKTech::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
+
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
 
-  if (velocity > currentVelocity) {
-    currentVelocity += accelerationFs;
-    if (currentVelocity > velocity) currentVelocity = velocity;
+  if (velocity > velocityRamp) {
+    velocityRamp += accelerationFs;
+    if (velocityRamp > velocity) velocityRamp = velocity;
   } else
-  if (velocity < currentVelocity) {
-    currentVelocity -= accelerationFs;
-    if (currentVelocity < velocity) currentVelocity = velocity;
+  if (velocity < velocityRamp) {
+    velocityRamp -= accelerationFs;
+    if (velocityRamp < velocity) velocityRamp = velocity;
   }
 
-  if (currentVelocity >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
+  if (velocityRamp >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
 
-  long v = round(currentVelocity);
-
-  if (lastV != v && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
+  if (velocityLast != lround(velocityRamp) && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
     uint8_t cmd[] = "\xa2\x00\x00\x00";
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
-    canPlus.write((uint8_t*)&v, 4);
+    velocityLast = lround(velocityRamp*countsToStepsRatio);
+    if (reversed) velocityLast = -velocityLast;
+    canPlus.write((uint8_t*)&velocityLast, 4);
     canPlus.endPacket();
     lastVelocityUpdateTime = millis();
   }
 
-  lastV = v;
-
-  return currentVelocity;
+  return velocityRamp;
 }
 
 // request driver status from CAN

@@ -8,7 +8,7 @@
   class As37h39bb : public Bissc {
     public:
       // initialize BiSS-C encoder
-      As37h39bb(int16_t maPin, int16_t sloPin, int16_t axis);
+      As37h39bb(int16_t axis, int16_t maPin, int16_t sloPin);
 
     private:
       // get encoder count relative to origin

@@ -9,7 +9,7 @@
 
 class CwCcw : public Encoder {
   public:
-    CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis);
+    CwCcw(int16_t axis, int16_t cwPin, int16_t ccwPin);
     bool init();
 
     int32_t read();

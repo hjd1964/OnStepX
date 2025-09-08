@@ -272,16 +272,6 @@
 #if AXIS1_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS1_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS1_STEP_DIR_PRESENT
 
-  #if AXIS1_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS1_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS1_STEP_DIR_TMC_UART
-    #else
-      #define AXIS1_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS1_STEP_DIR_LEGACY
-  #endif
-
   #ifndef AXIS1_STEP_STATE
   #define AXIS1_STEP_STATE              HIGH                      // default signal transition state for a step
   #endif
@@ -327,12 +317,11 @@
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
-  #ifdef AXIS1_SERVO_VELOCITY_MAX_DPS
-  #define AXIS1_SERVO_VELOCITY_MAX      lround(AXIS1_SERVO_VELOCITY_MAX_DPS*AXIS1_MOTOR_STEPS_PER_DEGREE)
+  #ifndef AXIS1_SERVO_VELOCITY_MAX                                // max velocity in degrees per second
+  #define AXIS1_SERVO_VELOCITY_MAX      SLEW_RATE_BASE_DESIRED*2.0F
   #endif
-  #ifndef AXIS1_SERVO_VELOCITY_MAX
-  #define AXIS1_SERVO_VELOCITY_MAX      100                       // max velocity, in % for DC motors, in steps/s for stepper motors
-  #endif
+  #define AXIS1_SERVO_VELOCITY_MAX_CPS  lround(AXIS1_SERVO_VELOCITY_MAX*AXIS1_STEPS_PER_DEGREE)
+
   #ifndef AXIS1_SERVO_VELOCITY_FACTOR
   #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
   #endif
@@ -340,10 +329,10 @@
   #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // spreadCycle mode, should happen just above the 2x sidereal rate
   #endif                                                          // for TMC2209 or TMC5160 only
   #ifndef AXIS1_SERVO_ACCELERATION
-  #define AXIS1_SERVO_ACCELERATION      20                        // acceleration, in %/s
+  #define AXIS1_SERVO_ACCELERATION      500                       // acceleration, in %/s
   #endif
   #ifndef AXIS1_SERVO_FEEDBACK
-  #define AXIS1_SERVO_FEEDBACK          FB_PID                    // type of feedback: FB_PID
+  #define AXIS1_SERVO_FEEDBACK          DUAL_PID                  // type of feedback: DUAL_PID
   #endif
 
   #ifndef AXIS1_SERVO_FLTR
@@ -382,6 +371,7 @@
   #define AXIS1_ENCODER_REVERSE         OFF                       // reverse count direction of encoder
   #endif
 #endif
+
 #if AXIS1_DRIVER_MODEL == ODRIVE
   #define AXIS1_ODRIVE_PRESENT
   #ifndef AXIS1_ODRIVE_P
@@ -394,6 +384,7 @@
   #define AXIS1_ODRIVE_D                1.0                       // D = derivative
   #endif
 #endif
+
 #if AXIS1_DRIVER_MODEL == KTECH
   #define AXIS1_KTECH_PRESENT
 #endif
@@ -449,17 +440,9 @@
 #ifndef AXIS2_SENSE_LIMIT_INIT
 #define AXIS2_SENSE_LIMIT_INIT        LIMIT_SENSE_INIT            // pin mode for limit sensing
 #endif
+
 #if AXIS2_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS2_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS2_STEP_DIR_PRESENT
-  #if AXIS2_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS2_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS2_STEP_DIR_TMC_UART
-    #else
-      #define AXIS2_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS2_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS2_STEP_STATE
   #define AXIS2_STEP_STATE              HIGH
@@ -506,23 +489,19 @@
   #define AXIS2_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifdef AXIS2_SERVO_VELOCITY_MAX_DPS
-  #define AXIS2_SERVO_VELOCITY_MAX      lround(AXIS2_SERVO_VELOCITY_MAX_DPS*AXIS2_MOTOR_STEPS_PER_DEGREE)
-  #endif
   #ifndef AXIS2_SERVO_VELOCITY_MAX
-  #define AXIS2_SERVO_VELOCITY_MAX      100
+  #define AXIS2_SERVO_VELOCITY_MAX      SLEW_RATE_BASE_DESIRED*2.0F
   #endif
-  #ifndef AXIS2_SERVO_VELOCITY_FACTOR
-  #define AXIS2_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS2_SERVO_VELOCITY_MAX_CPS  lround(AXIS2_SERVO_VELOCITY_MAX*AXIS2_STEPS_PER_DEGREE)
+
   #ifndef AXIS2_SERVO_VELOCITY_PWMTHRS
   #define AXIS2_SERVO_VELOCITY_PWMTHRS  OFF
   #endif
   #ifndef AXIS2_SERVO_ACCELERATION
-  #define AXIS2_SERVO_ACCELERATION      20
+  #define AXIS2_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS2_SERVO_FEEDBACK
-  #define AXIS2_SERVO_FEEDBACK          FB_PID
+  #define AXIS2_SERVO_FEEDBACK          DUAL_PID
   #endif
 
   #ifndef AXIS2_SERVO_FLTR
@@ -561,6 +540,7 @@
   #define AXIS2_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS2_DRIVER_MODEL == ODRIVE
   #define AXIS2_ODRIVE_PRESENT
   #ifndef AXIS2_ODRIVE_P
@@ -573,6 +553,7 @@
   #define AXIS2_ODRIVE_D                 1.0                       // D = derivative
   #endif
 #endif
+
 #if AXIS2_DRIVER_MODEL == KTECH
   #define AXIS2_KTECH_PRESENT
 #endif
@@ -954,15 +935,6 @@
 #endif
 #if AXIS3_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS3_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS3_STEP_DIR_PRESENT
-  #if AXIS3_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS3_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS3_STEP_DIR_TMC_UART
-    #else
-      #define AXIS3_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS3_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS3_STEP_STATE
   #define AXIS3_STEP_STATE              HIGH
@@ -1009,20 +981,16 @@
   #define AXIS3_SERVO_PH2_STATE         LOW
   #endif
 
-  #ifdef AXIS3_SERVO_VELOCITY_MAX_DPS
-  #define AXIS3_SERVO_VELOCITY_MAX      lround(AXIS3_SERVO_VELOCITY_MAX_DPS*AXIS3_MOTOR_STEPS_PER_DEGREE)
-  #endif
   #ifndef AXIS3_SERVO_VELOCITY_MAX
-  #define AXIS3_SERVO_VELOCITY_MAX      100
+  #define AXIS3_SERVO_VELOCITY_MAX      AXIS3_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS3_SERVO_VELOCITY_FACTOR
-  #define AXIS3_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS3_SERVO_VELOCITY_MAX_CPS  lround(AXIS3_SERVO_VELOCITY_MAX*AXIS3_STEPS_PER_DEGREE)
+
   #ifndef AXIS3_SERVO_ACCELERATION
-  #define AXIS3_SERVO_ACCELERATION      20
+  #define AXIS3_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS3_SERVO_FEEDBACK
-  #define AXIS3_SERVO_FEEDBACK          FB_PID
+  #define AXIS3_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS3_SERVO_FLTR
@@ -1061,6 +1029,7 @@
   #define AXIS3_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS3_DRIVER_MODEL == KTECH
   #define AXIS3_KTECH_PRESENT
 #endif
@@ -1155,17 +1124,9 @@
 #ifndef AXIS4_SENSE_LIMIT_INIT
 #define AXIS4_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+
 #if AXIS4_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS4_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS4_STEP_DIR_PRESENT
-  #if AXIS4_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS4_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS4_STEP_DIR_TMC_UART
-    #else
-      #define AXIS4_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS4_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS4_STEP_STATE
   #define AXIS4_STEP_STATE              HIGH
@@ -1213,16 +1174,15 @@
   #endif
 
   #ifndef AXIS4_SERVO_VELOCITY_MAX
-  #define AXIS4_SERVO_VELOCITY_MAX      100
+  #define AXIS4_SERVO_VELOCITY_MAX      AXIS4_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS4_SERVO_VELOCITY_FACTOR
-  #define AXIS4_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS4_SERVO_VELOCITY_MAX_CPS  lround(AXIS4_SERVO_VELOCITY_MAX*AXIS4_STEPS_PER_MICRON)
+
   #ifndef AXIS4_SERVO_ACCELERATION
-  #define AXIS4_SERVO_ACCELERATION      20
+  #define AXIS4_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS4_SERVO_FEEDBACK
-  #define AXIS4_SERVO_FEEDBACK          FB_PID
+  #define AXIS4_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS4_SERVO_FLTR
@@ -1261,6 +1221,7 @@
   #define AXIS4_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS4_DRIVER_MODEL == KTECH
   #define AXIS4_KTECH_PRESENT
 #endif
@@ -1332,18 +1293,10 @@
 #ifndef AXIS5_SENSE_LIMIT_INIT
 #define AXIS5_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+
 #if AXIS5_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS5_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS5_STEP_DIR_PRESENT
-  #if AXIS5_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS5_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS5_STEP_DIR_TMC_UART
-    #else
-      #define AXIS5_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS5_STEP_DIR_LEGACY
-  #endif
-
+  
   #ifndef AXIS5_STEP_STATE
   #define AXIS5_STEP_STATE              HIGH
   #endif
@@ -1390,16 +1343,15 @@
   #endif
 
   #ifndef AXIS5_SERVO_VELOCITY_MAX
-  #define AXIS5_SERVO_VELOCITY_MAX      100
+  #define AXIS5_SERVO_VELOCITY_MAX      AXIS5_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS5_SERVO_VELOCITY_FACTOR
-  #define AXIS5_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS5_SERVO_VELOCITY_MAX_CPS  lround(AXIS5_SERVO_VELOCITY_MAX*AXIS5_STEPS_PER_MICRON)
+
   #ifndef AXIS5_SERVO_ACCELERATION
-  #define AXIS5_SERVO_ACCELERATION      20
+  #define AXIS5_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS5_SERVO_FEEDBACK
-  #define AXIS5_SERVO_FEEDBACK          FB_PID
+  #define AXIS5_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS5_SERVO_FLTR
@@ -1438,6 +1390,7 @@
   #define AXIS5_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS5_DRIVER_MODEL == KTECH
   #define AXIS5_KTECH_PRESENT
 #endif
@@ -1509,17 +1462,9 @@
 #ifndef AXIS6_SENSE_LIMIT_INIT
 #define AXIS6_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+
 #if AXIS6_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS6_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS6_STEP_DIR_PRESENT
-  #if AXIS6_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS6_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS6_STEP_DIR_TMC_UART
-    #else
-      #define AXIS6_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS6_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS6_STEP_STATE
   #define AXIS6_STEP_STATE              HIGH
@@ -1567,16 +1512,15 @@
   #endif
 
   #ifndef AXIS6_SERVO_VELOCITY_MAX
-  #define AXIS6_SERVO_VELOCITY_MAX      100
+  #define AXIS6_SERVO_VELOCITY_MAX      AXIS6_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS6_SERVO_VELOCITY_FACTOR
-  #define AXIS6_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS6_SERVO_VELOCITY_MAX_CPS  lround(AXIS6_SERVO_VELOCITY_MAX*AXIS6_STEPS_PER_MICRON)
+
   #ifndef AXIS6_SERVO_ACCELERATION
-  #define AXIS6_SERVO_ACCELERATION      20
+  #define AXIS6_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS6_SERVO_FEEDBACK
-  #define AXIS6_SERVO_FEEDBACK          FB_PID
+  #define AXIS6_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS6_SERVO_FLTR
@@ -1615,6 +1559,7 @@
   #define AXIS6_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS6_DRIVER_MODEL == KTECH
   #define AXIS6_KTECH_PRESENT
 #endif
@@ -1688,15 +1633,6 @@
 #endif
 #if AXIS7_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS7_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS7_STEP_DIR_PRESENT
-  #if AXIS7_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS7_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS7_STEP_DIR_TMC_UART
-    #else
-      #define AXIS7_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS7_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS7_STEP_STATE
   #define AXIS7_STEP_STATE              HIGH
@@ -1744,16 +1680,15 @@
   #endif
 
   #ifndef AXIS7_SERVO_VELOCITY_MAX
-  #define AXIS7_SERVO_VELOCITY_MAX      100
+  #define AXIS7_SERVO_VELOCITY_MAX      AXIS7_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS7_SERVO_VELOCITY_FACTOR
-  #define AXIS7_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS7_SERVO_VELOCITY_MAX_CPS  lround(AXIS7_SERVO_VELOCITY_MAX*AXIS7_STEPS_PER_MICRON)
+
   #ifndef AXIS7_SERVO_ACCELERATION
-  #define AXIS7_SERVO_ACCELERATION      20
+  #define AXIS7_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS7_SERVO_FEEDBACK
-  #define AXIS7_SERVO_FEEDBACK          FB_PID
+  #define AXIS7_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS7_SERVO_FLTR
@@ -1792,6 +1727,7 @@
   #define AXIS7_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS7_DRIVER_MODEL == KTECH
   #define AXIS7_KTECH_PRESENT
 #endif
@@ -1863,17 +1799,9 @@
 #ifndef AXIS8_SENSE_LIMIT_INIT
 #define AXIS8_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+
 #if AXIS8_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS8_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS8_STEP_DIR_PRESENT
-  #if AXIS8_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS8_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS8_STEP_DIR_TMC_UART
-    #else
-      #define AXIS8_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS8_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS8_STEP_STATE
   #define AXIS8_STEP_STATE              HIGH
@@ -1921,16 +1849,15 @@
   #endif
 
   #ifndef AXIS8_SERVO_VELOCITY_MAX
-  #define AXIS8_SERVO_VELOCITY_MAX      100
+  #define AXIS8_SERVO_VELOCITY_MAX      AXIS8_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS8_SERVO_VELOCITY_FACTOR
-  #define AXIS8_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS8_SERVO_VELOCITY_MAX_CPS  lround(AXIS8_SERVO_VELOCITY_MAX*AXIS8_STEPS_PER_MICRON)
+
   #ifndef AXIS8_SERVO_ACCELERATION
-  #define AXIS8_SERVO_ACCELERATION      20
+  #define AXIS8_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS8_SERVO_FEEDBACK
-  #define AXIS8_SERVO_FEEDBACK          FB_PID
+  #define AXIS8_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS8_SERVO_FLTR
@@ -1969,6 +1896,7 @@
   #define AXIS8_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS8_DRIVER_MODEL == KTECH
   #define AXIS8_KTECH_PRESENT
 #endif
@@ -2040,17 +1968,9 @@
 #ifndef AXIS9_SENSE_LIMIT_INIT
 #define AXIS9_SENSE_LIMIT_INIT        INPUT_PULLUP
 #endif
+
 #if AXIS9_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS9_DRIVER_MODEL <= STEP_DIR_DRIVER_LAST
   #define AXIS9_STEP_DIR_PRESENT
-  #if AXIS9_DRIVER_MODEL >= TMC_DRIVER_FIRST
-    #if AXIS9_DRIVER_MODEL >= TMC_UART_DRIVER_FIRST 
-      #define AXIS9_STEP_DIR_TMC_UART
-    #else
-      #define AXIS9_STEP_DIR_TMC_SPI
-    #endif
-  #else
-    #define AXIS9_STEP_DIR_LEGACY
-  #endif
 
   #ifndef AXIS9_STEP_STATE
   #define AXIS9_STEP_STATE              HIGH
@@ -2098,16 +2018,15 @@
   #endif
 
   #ifndef AXIS9_SERVO_VELOCITY_MAX
-  #define AXIS9_SERVO_VELOCITY_MAX      100
+  #define AXIS9_SERVO_VELOCITY_MAX      AXIS9_SLEW_RATE_BASE_DESIRED*2.0
   #endif
-  #ifndef AXIS9_SERVO_VELOCITY_FACTOR
-  #define AXIS9_SERVO_VELOCITY_FACTOR   frequency*0
-  #endif
+  #define AXIS9_SERVO_VELOCITY_MAX_CPS  lround(AXIS9_SERVO_VELOCITY_MAX*AXIS9_STEPS_PER_MICRON)
+
   #ifndef AXIS9_SERVO_ACCELERATION
-  #define AXIS9_SERVO_ACCELERATION      20
+  #define AXIS9_SERVO_ACCELERATION      500
   #endif
   #ifndef AXIS9_SERVO_FEEDBACK
-  #define AXIS9_SERVO_FEEDBACK          FB_PID
+  #define AXIS9_SERVO_FEEDBACK          PID
   #endif
 
   #ifndef AXIS9_SERVO_FLTR
@@ -2146,25 +2065,66 @@
   #define AXIS9_ENCODER_REVERSE         OFF
   #endif
 #endif
+
 #if AXIS9_DRIVER_MODEL == KTECH
   #define AXIS9_KTECH_PRESENT
 #endif
 
-#if defined(AXIS1_STEP_DIR_LEGACY) || defined(AXIS2_STEP_DIR_LEGACY) || defined(AXIS3_STEP_DIR_LEGACY) || \
-    defined(AXIS4_STEP_DIR_LEGACY) || defined(AXIS5_STEP_DIR_LEGACY) || defined(AXIS6_STEP_DIR_LEGACY) || \
-    defined(AXIS7_STEP_DIR_LEGACY) || defined(AXIS8_STEP_DIR_LEGACY) || defined(AXIS9_STEP_DIR_LEGACY)
+// -----------------------------------------------------------------------------------
+// helper for checking driver presence
+#define DRIVER_CHECK(model) \
+    AXIS1_DRIVER_MODEL == model || \
+    AXIS2_DRIVER_MODEL == model || \
+    AXIS3_DRIVER_MODEL == model || \
+    AXIS4_DRIVER_MODEL == model || \
+    AXIS5_DRIVER_MODEL == model || \
+    AXIS6_DRIVER_MODEL == model || \
+    AXIS7_DRIVER_MODEL == model || \
+    AXIS8_DRIVER_MODEL == model || \
+    AXIS9_DRIVER_MODEL == model
+
+// flag presence of step/dir legacy drivers
+#if AXIS1_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS1_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS2_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS2_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS3_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS3_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS4_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS4_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS5_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS5_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS6_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS6_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS7_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS7_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS8_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS8_DRIVER_MODEL < TMC_DRIVER_FIRST && \
+    AXIS9_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS9_DRIVER_MODEL < TMC_DRIVER_FIRST
   #define STEP_DIR_LEGACY_PRESENT
 #endif
 
-#if defined(AXIS1_STEP_DIR_TMC_SPI) || defined(AXIS2_STEP_DIR_TMC_SPI) || defined(AXIS3_STEP_DIR_TMC_SPI) || \
-    defined(AXIS4_STEP_DIR_TMC_SPI) || defined(AXIS5_STEP_DIR_TMC_SPI) || defined(AXIS6_STEP_DIR_TMC_SPI) || \
-    defined(AXIS7_STEP_DIR_TMC_SPI) || defined(AXIS8_STEP_DIR_TMC_SPI) || defined(AXIS9_STEP_DIR_TMC_SPI)
+// flag presence of Step/Dir TMC UART and SPI drivers
+#if DRIVER_CHECK(TMC2130)
+  #define TMC2130_PRESENT
+#endif
+#if DRIVER_CHECK(TMC2160)
+  #define TMC2160_PRESENT
+#endif
+#if DRIVER_CHECK(TMC2208)
+  #define TMC2208_PRESENT
+#endif
+#if DRIVER_CHECK(TMC2209)
+  #define TMC2209_PRESENT
+#endif
+#if DRIVER_CHECK(TMC2660)
+  #define TMC2660_PRESENT
+#endif
+#if DRIVER_CHECK(TMC5160)
+  #define TMC5160_PRESENT
+#endif
+#if DRIVER_CHECK(TMC5161)
+  #define TMC5161_PRESENT
+#endif
+
+#if defined(TMC2130_PRESENT) || defined(TMC2160_PRESENT) || defined(TMC2660_PRESENT) || \
+    defined(TMC5160_PRESENT) || defined(TMC5161_PRESENT)
   #define STEP_DIR_TMC_SPI_PRESENT
 #endif
 
-#if defined(AXIS1_STEP_DIR_TMC_UART) || defined(AXIS2_STEP_DIR_TMC_UART) || defined(AXIS3_STEP_DIR_TMC_UART) || \
-    defined(AXIS4_STEP_DIR_TMC_UART) || defined(AXIS5_STEP_DIR_TMC_UART) || defined(AXIS6_STEP_DIR_TMC_UART) || \
-    defined(AXIS7_STEP_DIR_TMC_UART) || defined(AXIS8_STEP_DIR_TMC_UART) || defined(AXIS9_STEP_DIR_TMC_UART)
+#if defined(TMC2208_PRESENT) || defined(TMC2209_PRESENT)
   #define STEP_DIR_TMC_UART_PRESENT
 #endif
 
@@ -2172,115 +2132,46 @@
   #define STEP_DIR_MOTOR_PRESENT
 #endif
 
-// flag presence of servo motors
-#if AXIS1_DRIVER_MODEL == SERVO_PE || AXIS1_DRIVER_MODEL == SERVO_EE || \
-    AXIS2_DRIVER_MODEL == SERVO_PE || AXIS2_DRIVER_MODEL == SERVO_EE || \
-    AXIS3_DRIVER_MODEL == SERVO_PE || AXIS3_DRIVER_MODEL == SERVO_EE || \
-    AXIS4_DRIVER_MODEL == SERVO_PE || AXIS4_DRIVER_MODEL == SERVO_EE || \
-    AXIS5_DRIVER_MODEL == SERVO_PE || AXIS5_DRIVER_MODEL == SERVO_EE || \
-    AXIS6_DRIVER_MODEL == SERVO_PE || AXIS6_DRIVER_MODEL == SERVO_EE || \
-    AXIS7_DRIVER_MODEL == SERVO_PE || AXIS7_DRIVER_MODEL == SERVO_EE || \
-    AXIS8_DRIVER_MODEL == SERVO_PE || AXIS8_DRIVER_MODEL == SERVO_EE || \
-    AXIS9_DRIVER_MODEL == SERVO_PE || AXIS9_DRIVER_MODEL == SERVO_EE
-  #define SERVO_DC_PRESENT
+// flag presence of Servo motors
+#if DRIVER_CHECK(SERVO_PE)
+  #define SERVO_PE_PRESENT
 #endif
-
-#if AXIS1_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS1_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS2_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS2_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS3_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS3_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS4_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS4_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS5_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS5_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS6_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS6_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS7_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS7_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS8_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS8_DRIVER_MODEL == SERVO_TMC5160_DC || \
-    AXIS9_DRIVER_MODEL == SERVO_TMC2130_DC || AXIS9_DRIVER_MODEL == SERVO_TMC5160_DC
-  #define SERVO_DC_TMC_SPI_PRESENT
+#if DRIVER_CHECK(SERVO_EE)
+  #define SERVO_EE_PRESENT
 #endif
-
-#if AXIS1_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS2_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS3_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS4_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS5_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS6_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS7_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS8_DRIVER_MODEL == SERVO_TMC2209 || \
-    AXIS9_DRIVER_MODEL == SERVO_TMC2209
+#if DRIVER_CHECK(SERVO_TMC2130_DC)
+  #define SERVO_TMC2130_DC_PRESENT
+#endif
+#if DRIVER_CHECK(SERVO_TMC5160_DC)
+  #define SERVO_TMC5160_DC_PRESENT
+#endif
+#if DRIVER_CHECK(SERVO_TMC2209)
   #define SERVO_TMC2209_PRESENT
 #endif
-
-#if AXIS1_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS2_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS3_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS4_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS5_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS6_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS7_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS8_DRIVER_MODEL == SERVO_TMC5160 || \
-    AXIS9_DRIVER_MODEL == SERVO_TMC5160
+#if DRIVER_CHECK(SERVO_TMC5160)
   #define SERVO_TMC5160_PRESENT
 #endif
-
-#if AXIS1_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS2_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS3_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS4_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS5_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS6_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS7_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS8_DRIVER_MODEL == SERVO_KTECH || \
-    AXIS9_DRIVER_MODEL == SERVO_KTECH
+#if DRIVER_CHECK(SERVO_KTECH)
   #define SERVO_KTECH_PRESENT
 #endif
 
-#if defined(SERVO_DC_PRESENT) || defined(SERVO_DC_TMC_SPI_PRESENT) || \
-    defined(SERVO_TMC2209_PRESENT) || defined(SERVO_TMC5160_PRESENT) || defined(SERVO_KTECH_PRESENT)
+#if defined(SERVO_PE_PRESENT) || defined(SERVO_EE_PRESENT) || defined(SERVO_TMC2130_DC_PRESENT) || \
+    defined(SERVO_TMC5160_DC_PRESENT) || defined(SERVO_TMC2209_PRESENT) || defined(SERVO_TMC5160_PRESENT) || \
+    defined(SERVO_KTECH_PRESENT)
   #define SERVO_MOTOR_PRESENT
 #endif
 
+// flag presence of ODRIVE motors
 #if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)
   #define ODRIVE_MOTOR_PRESENT
-
-  #ifndef ODRIVE_COMM_MODE
-  #define ODRIVE_COMM_MODE              OD_CAN                    // Use OD_UART or OD_CAN...I2C may be added later
-  #endif
-  #ifndef ODRIVE_SERIAL
-  #define ODRIVE_SERIAL                 Serial3                   // Teensy HW Serial3 (if used,) for example
-  #endif
-  #ifndef ODRIVE_SERIAL_BAUD
-  #define ODRIVE_SERIAL_BAUD            115200                    // 115200 baud default
-  #endif
-  #ifndef ODRIVE_UPDATE_MS
-  #define ODRIVE_UPDATE_MS              100                       // 10 HZ update rate
-  #endif
-  #ifndef ODRIVE_SWAP_AXES
-  #define ODRIVE_SWAP_AXES              ON                        // ODrive axis 0 = OnStep Axis2 = DEC or ALT
-  #endif                                                          // ODrive axis 1 = OnStep Axis1 = RA or AZM
-  #ifndef ODRIVE_SLEW_DIRECT
-  #define ODRIVE_SLEW_DIRECT            OFF                       // ON=using ODrive trapezoidal move profile. OFF=using OnStep move profile
-  #endif
-  #ifndef ODRIVE_ABSOLUTE
-  #define ODRIVE_ABSOLUTE               ON                        // using absolute encoders
-  #endif
-  #ifndef ODRIVE_SYNC_LIMIT
-  #define ODRIVE_SYNC_LIMIT             80                        // in arc seconds..one encoder tick
-  #endif                                                          // encoder resolution=2^14=16380; 16380/360=45.5 ticks/deg 
-                                                                  // 45.5/60=0.7583 ticks/min; 0.7583/60 = .00126 ticks/sec
-                                                                  // or 1/0.7583 = 1.32 arc-min/tick;  1.32*60 sec = 79.2 arc sec per encoder tick
 #endif
 
-#if defined(AXIS1_KTECH_PRESENT) || \
-    defined(AXIS2_KTECH_PRESENT) || \
-    defined(AXIS3_KTECH_PRESENT) || \
-    defined(AXIS4_KTECH_PRESENT) || \
-    defined(AXIS5_KTECH_PRESENT) || \
-    defined(AXIS6_KTECH_PRESENT) || \
-    defined(AXIS7_KTECH_PRESENT) || \
-    defined(AXIS8_KTECH_PRESENT) || \
-    defined(AXIS9_KTECH_PRESENT)
+// flag presence of KTECH motors
+#if DRIVER_CHECK(KTECH)
   #define KTECH_MOTOR_PRESENT
 #endif
 
+// flag to indicate if any motor is present
 #if defined(SERVO_MOTOR_PRESENT) || defined(STEP_DIR_MOTOR_PRESENT) || defined(ODRIVE_MOTOR_PRESENT) || defined(KTECH_MOTOR_PRESENT)
   #define MOTOR_PRESENT
 #endif

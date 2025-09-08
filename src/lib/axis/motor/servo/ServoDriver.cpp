@@ -25,100 +25,56 @@
   };
 #endif
 
-bool ServoDriver::init() {
+ServoDriver::ServoDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings) {
+  if (axisNumber < 1 || axisNumber > 9) return;
+
+  this->axisNumber = axisNumber;
+
+  this->Pins = Pins;
+  if (Pins != NULL) {
+    enablePin = Pins->enable;
+    enabledState = Pins->enabledState;
+    faultPin = Pins->fault;
+  }
+
+  this->Settings = Settings;
+  driverModel = Settings->model;
+  statusMode = Settings->status;
+
+  velocityMax = Settings->velocityMax;
+  acceleration = (Settings->acceleration/100.0F)*velocityMax;
+  accelerationFs = acceleration/FRACTIONAL_SEC;
+}
+
+bool ServoDriver::init(bool reverse) {
   #if DEBUG == VERBOSE
-    VF("MSG:"); V(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[model - SERVO_DRIVER_FIRST]);
+    VF("MSG:"); V(axisPrefix); VF("init model "); VL(SERVO_DRIVER_NAME[driverModel - SERVO_DRIVER_FIRST]);
     VF("MSG:"); V(axisPrefix); VF("en=");
     if (enablePin == OFF) { VLF("OFF"); } else
     if (enablePin == SHARED) { VLF("SHARED"); } else { VL(enablePin); }
   #endif
 
-  // get the maximum current and Rsense for this axis
-  user_currentMax = 0;
-  switch (axisNumber) {
-    case 1:
-      #ifdef AXIS1_DRIVER_RSENSE
-        user_rSense = AXIS1_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS1_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS1_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 2:
-      #ifdef AXIS2_DRIVER_RSENSE
-        user_rSense = AXIS2_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS2_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS2_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 3:
-      #ifdef AXIS3_DRIVER_RSENSE
-        user_rSense = AXIS3_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS3_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS3_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 4:
-      #ifdef AXIS4_DRIVER_RSENSE
-        user_rSense = AXIS4_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS4_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS4_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 5:
-      #ifdef AXIS5_DRIVER_RSENSE
-        user_rSense = AXIS5_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS5_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS5_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 6:
-      #ifdef AXIS6_DRIVER_RSENSE
-        user_rSense = AXIS6_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS6_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS6_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 7:
-      #ifdef AXIS7_DRIVER_RSENSE
-        user_rSense = AXIS7_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS7_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS7_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 8:
-      #ifdef AXIS8_DRIVER_RSENSE
-        user_rSense = AXIS8_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS8_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS8_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 9:
-      #ifdef AXIS9_DRIVER_RSENSE
-        user_rSense = AXIS9_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS9_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS9_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    default:
-      user_rSense = 0;
-      user_currentMax = 0;
-    break;
-  }
+  // show velocity control settings
+  VF("MSG:"); V(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
+  VF("MSG:"); V(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // init default driver control pins
   if (enablePin != SHARED) {
     pinModeEx(enablePin, OUTPUT);
     digitalWriteEx(enablePin, !enabledState);
   }
+
+  // automatically set fault status for known drivers
+  status.active = statusMode != OFF;
+  if (statusMode == ON) statusMode = LOW;
+  if (statusMode == LOW) pinModeEx(faultPin, INPUT_PULLUP);
+  #ifdef PULLDOWN
+    if (statusMode == HIGH) pinModeEx(faultPin, INPUT_PULLDOWN);
+  #else
+    if (statusMode == HIGH) pinModeEx(faultPin, INPUT);
+  #endif
+
+  reversed = reverse;
 
   return true;
 }

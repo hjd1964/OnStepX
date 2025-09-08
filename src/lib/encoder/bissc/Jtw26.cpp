@@ -5,7 +5,7 @@
 #ifdef HAS_JTW_26BIT
 
 // initialize BiSS-C encoder
-Jtw26::Jtw26(int16_t maPin, int16_t sloPin, int16_t axis) {
+Jtw26::Jtw26(int16_t axis, int16_t maPin, int16_t sloPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

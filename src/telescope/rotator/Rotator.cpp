@@ -263,7 +263,7 @@ void Rotator::monitor() {
       #endif
 
       if (homing) {
-        axis3.resetPosition((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
+        axis3.resetPosition((axis3.getLimitMax() + axis3.getLimitMin())/2.0F);
         axis3.setBacklashSteps(getBacklash());
         homing = false;
       }

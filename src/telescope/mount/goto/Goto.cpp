@@ -95,16 +95,16 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     #if AXIS1_SECTOR_GEAR == ON
       transform.mountToInstrument(&target, &a1, &a2);
       a1 = a1 - axis1.getIndexPosition();
-      if (a1 < axis1.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (a1 > axis1.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 < axis1.getLimitMin()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 > axis1.getLimitMax()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     #endif
 
     // handle special case of a tangent arm Dec
     #if AXIS2_TANGENT_ARM == ON
       transform.mountToInstrument(&target, &a1, &a2);
       a2 = a2 - axis2.getIndexPosition();
-      if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 < axis2.getLimitMin()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 > axis2.getLimitMax()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     #endif
   #endif
 

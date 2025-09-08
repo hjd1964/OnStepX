@@ -33,7 +33,7 @@
 
 class Quadrature : public Encoder {
   public:
-    Quadrature(int16_t APin, int16_t BPin, int16_t axis);
+    Quadrature(int16_t axis, int16_t APin, int16_t BPin);
     bool init();
 
     int32_t read();

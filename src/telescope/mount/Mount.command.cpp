@@ -291,69 +291,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
             axis2.setInstrumentCoordinate(encoderAxis2);
           break; }
 
-          #ifdef ABSOLUTE_ENCODER_CALIBRATION
-            // :SX4E,[option]# Calibrate encoder
-            //              Return: 0 on failure
-            //                      1 on success
-            case 'E':
-              if (parameter[4] == 0) {
-                switch (parameter[3]) {
-                  case 'W': // stop and [W]rite data                   :SX4E,W#
-                    axis1.motor->calibrate(0);
-                    tracking(false);
-                  break;
-                  case 'R': // start [R]ecording                       :SX4E,R#
-                    if (limits.isEnabled() && isTracking()) {
-                      axis1.motor->calibrate(1);
-                    } else {
-                      if (!limits.isEnabled()) { DL("NOT ENABLED!"); }
-                      if (!isTracking()) { DL("NOT TRACKING!"); }
-                      *commandError = CE_SLEW_ERR_UNSPECIFIED;
-                    }
-                  break;
-                  case 'T': // [T]rack normally                        :SX4E,T#
-                    axis1.motor->calibrate(2);
-                  break;
-                  case 'F': // [F]ixed rate tracking (enc corrected)   :SX4E,F#
-                    if (limits.isEnabled() && isTracking()) {
-                      axis1.motor->calibrate(3);
-                    } else {
-                      *commandError = CE_SLEW_ERR_UNSPECIFIED;
-                    }
-                  break;
-                  case '!': // [!] erase buffer and any recorded data  :SX4E,!#
-                    axis1.motor->calibrate(4);
-                  break;
-                  case 'H': // Apply [H]igh pass filter to buffer      :SX4E,H#
-                    axis1.motor->calibrate(5);
-                  break;
-                  case 'A': // [A]pply low pass filter to buffer       :SX4E,A#
-                    axis1.motor->calibrate(12);
-                  break;
-                  case 'C': // [C]lear buffer (only)                   :SX4E,C#
-                    axis1.motor->calibrate(6);
-                  break;
-                  case 'L': // [L]oad                                  :SX4E,L#
-                    axis1.motor->calibrate(7);
-                  break;
-                  case 'S': // [S]ave                                  :SX4E,S#
-                    axis1.motor->calibrate(8);
-                  break;
-                  case 'P': // [P]rint buffer                          :SX4E,P#
-                    axis1.motor->calibrate(9);
-                  break;
-                  case 'B': // save buffer to [B]ackup file            :SX4E,B#
-                    axis1.motor->calibrate(10);
-                  break;
-                  case 'V': // reco[V]er from backup file              :SX4E,V#
-                    axis1.motor->calibrate(11);
-                  break;
-                  default: *commandError = CE_CMD_UNKNOWN; break;
-                }
-              }
-            break;
-          #endif
-
           default: *commandError = CE_CMD_UNKNOWN; break;
         }
       } else

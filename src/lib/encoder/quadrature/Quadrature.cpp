@@ -53,7 +53,7 @@ Quadrature *quadratureInstance[9];
   IRAM_ATTR void quadrature_B_Axis9() { quadratureInstance[8]->B(AXIS9_ENCODER_B_PIN); }
 #endif
 
-Quadrature::Quadrature(int16_t APin, int16_t BPin, int16_t axis) {
+Quadrature::Quadrature(int16_t axis, int16_t APin, int16_t BPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

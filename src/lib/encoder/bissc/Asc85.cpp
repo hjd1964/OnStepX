@@ -5,7 +5,7 @@
 #ifdef HAS_LIKA_ASC85
 
 // initialize BiSS-C encoder
-LikaAsc85::LikaAsc85(int16_t maPin, int16_t sloPin, int16_t axis) {
+LikaAsc85::LikaAsc85(int16_t axis, int16_t maPin, int16_t sloPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

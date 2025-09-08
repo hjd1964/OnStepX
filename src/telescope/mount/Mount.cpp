@@ -87,8 +87,8 @@ void Mount::begin() {
 
   if (AXIS1_WRAP == ON) {
     axis1.coordinateWrap(Deg360);
-    axis1.settings.limits.min = -Deg360;
-    axis1.settings.limits.max = Deg360;
+    axis1.setLimitMin(-Deg360);
+    axis1.setLimitMax(Deg360);
   }
 
   goTo.init();

@@ -79,6 +79,9 @@ class Convert {
     // string to double with error checking
     bool atof2(char *a, double *d, bool sign = true);
 
+    // removes unnecessary digits from floating point numeric string
+    void stripNumericStr(char* s, bool trailingDecimal = false);
+
     PrecisionMode precision = PM_HIGH;
 
   private:
