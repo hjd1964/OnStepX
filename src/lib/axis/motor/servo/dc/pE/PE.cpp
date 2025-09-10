@@ -32,8 +32,8 @@
   #define analogWritePin38(x) _pwm38_period = x
 #endif
 
-ServoPE::ServoPE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings)
-                 :ServoDcDriver(axisNumber, Pins, Settings) {
+ServoPE::ServoPE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum)
+                 :ServoDcDriver(axisNumber, Pins, Settings, pwmMinimum, pwmMaximum) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   strcpy(axisPrefix, " Axis_ServoPE, ");
@@ -84,12 +84,12 @@ bool ServoPE::init(bool reverse) {
 
 // enable or disable the driver using the enable pin or other method
 void ServoPE::enable(bool state) {
-  int32_t power = 0;
-
   enabled = state;
 
   VF("MSG:"); V(axisPrefix);
   if (!enabled) {
+    int32_t power = 0;
+
     VF("PE outputs off");
     digitalWriteF(Pins->ph1, Pins->ph1State);
     if (Pins->ph2State == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
@@ -109,6 +109,8 @@ void ServoPE::enable(bool state) {
       digitalWriteF(enablePin, enabledState);
     }
   }
+
+  velocityRamp = 0.0F;
 
   ServoDriver::updateStatus();
 }

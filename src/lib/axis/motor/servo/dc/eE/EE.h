@@ -12,7 +12,7 @@
 class ServoEE : public DcServoDriver {
   public:
     // constructor
-    ServoEE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings);
+    ServoEE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum);
 
     // decodes driver model and sets up the pin modes
     bool init(bool reverse);
@@ -34,9 +34,6 @@ class ServoEE : public DcServoDriver {
     // motor control pwm update
     // \param power in SERVO_ANALOG_WRITE_RANGE units
     void pwmUpdate(long power);
-
-    // regulate velocity changes
-    float velocityRamp = 0;
 };
 
 #endif

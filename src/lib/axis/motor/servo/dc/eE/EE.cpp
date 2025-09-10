@@ -7,8 +7,8 @@
 
 #include "../../../../../gpioEx/GpioEx.h"
 
-ServoEE::ServoEE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings)
-                 :ServoDcDriver(axisNumber, Pins, Settings) {
+ServoEE::ServoEE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum)
+                 :ServoDcDriver(axisNumber, Pins, Settings, pwmMinimum, pwmMaximum) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   strcpy(axisPrefix, " Axis_ServoEE, ");
@@ -47,8 +47,6 @@ bool ServoEE::init(bool reverse) {
 
 // enable or disable the driver using the enable pin or other method
 void ServoEE::enable(bool state) {
-  int32_t power = 0;
-
   enabled = state;
 
   VF("MSG:"); V(axisPrefix);
@@ -68,6 +66,8 @@ void ServoEE::enable(bool state) {
       digitalWriteF(enablePin, enabledState);
     }
   }
+
+  velocityRamp = 0.0F;
 
   ServoDriver::updateStatus();
 }

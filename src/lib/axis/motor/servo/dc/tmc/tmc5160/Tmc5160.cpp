@@ -14,8 +14,8 @@
 #define cs   m2
 #define miso m3
 
-ServoTmc5160DC::ServoTmc5160DC(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings)
-                               :ServoDcDriver(axisNumber, Pins, Settings) {
+ServoTmc5160DC::ServoTmc5160DC(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum)
+                               :ServoDcDriver(axisNumber, Pins, Settings, pwmMinimum, pwmMaximum) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
   strcpy(axisPrefix, " Axis_ServoTmc5160DC, ");

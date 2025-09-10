@@ -27,8 +27,8 @@ typedef struct ServoPins {
 typedef struct ServoSettings {
   int16_t model;
   int8_t  status;
-  int32_t velocityMax;   // maximum velocity in encoder counts/second
-  int32_t acceleration;  // acceleration steps/second/second
+  int32_t velocityMax;   // maximum velocity in encoder counts/s
+  int32_t acceleration;  // acceleration in encoder %/s/s
 } ServoSettings;
 
 class ServoDriver {
@@ -39,10 +39,10 @@ class ServoDriver {
     virtual bool init(bool reverse);
 
     // returns the number of axis parameters
-    virtual uint8_t getParameterCount() { return 0; }
+    virtual uint8_t getParameterCount() { return numParameters; }
 
     // returns the specified axis parameter
-    virtual AxisParameter* getParameter(uint8_t number) { return &invalid; }
+    virtual AxisParameter* getParameter(uint8_t number) { if (number > numParameters) return &invalid; else return parameter[number]; }
 
     // check if axis parameter is valid
     virtual bool parameterIsValid(AxisParameter* parameter, bool next = false) { return true; }
@@ -55,12 +55,12 @@ class ServoDriver {
 
     // get the control range to the motor (-velocityMax to velocityMax) defaults to ANALOG_WRITE_RANGE
     // must be ready at object creation!
-    virtual float getMotorControlRange() { return velocityMax; }
+    virtual float getMotorControlRange() { return velocityMax.value; }
 
     // set motor velocity
     // \param velocity as needed to reach the target position, in encoder counts per second
     // \returns velocity in effect, in encoder counts per second
-    virtual float setMotorVelocity(float velocity) { return 0; }
+    virtual float setMotorVelocity(float velocity);
 
     // returns motor direction (DIR_FORWARD or DIR_REVERSE)
     Direction getMotorDirection() { return motorDirection; };
@@ -94,10 +94,9 @@ class ServoDriver {
     #endif
     unsigned long timeLastStatusUpdate = 0;
 
-    float velocityMax; // maximum velocity in encoder counts/second
-
-    float acceleration;
-    float accelerationFs;
+    float normalizedAcceleration; // in encoder counts/s/s
+    float accelerationFs;         // in encoder counts/s/fs
+    float velocityRamp = 0;       // regulate velocity changes
 
     Direction motorDirection = DIR_FORWARD;
     bool reversed = false;
@@ -112,6 +111,11 @@ class ServoDriver {
 
     // runtime adjustable settings
     AxisParameter invalid = {NAN, NAN, NAN, NAN, NAN, AXP_INVALID, ""};
+    AxisParameter velocityMax = {NAN, NAN, NAN, 0, 1000000, AXP_INTEGER, "v-Max, counts/s"};
+    AxisParameter acceleration = {NAN, NAN, NAN, 0, 100000, AXP_FLOAT, "a-Max, %/s/s"};
+
+    const int numParameters = 3;
+    AxisParameter* parameter[3] = {&invalid, &velocityMax, &acceleration};
 };
 
 #endif

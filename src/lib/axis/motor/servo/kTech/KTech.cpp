@@ -43,11 +43,7 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoSettings *Settings, float 
   // the motor CAN ID is the axis number!
   canID = 0x140 + axisNumber;
 
-  velocityMax = Settings->velocityMax;
-  acceleration = (Settings->acceleration/100.0F)*velocityMax;
-  accelerationFs = acceleration/FRACTIONAL_SEC;
-
-  this->countsToStepsRatio = countsToStepsRatio;
+  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
 
   ktechServoInstance[this->axisNumber - 1] = this;
   switch (this->axisNumber) {
@@ -97,6 +93,8 @@ bool ServoKTech::init(bool reverse) {
 
 // enable or disable the driver using the enable pin or other method
 void ServoKTech::enable(bool state) {
+  enabled = state;
+
   VF("MSG:"); V(axisPrefix); VF("powered ");
 
   uint8_t cmd[] = "\xa2\x00\x00\x00\x00\x00\x00\x00";
@@ -112,39 +110,24 @@ void ServoKTech::enable(bool state) {
     VLF("down");
   } 
   
-  enabled = state;
   velocityRamp = 0.0F;
 }
 
 float ServoKTech::setMotorVelocity(float velocity) {
-  if (!enabled) velocity = 0.0F;
+  velocity = ServoDriver::setMotorVelocity(velocity);
 
-  if (velocity > velocityMax) velocity = velocityMax; else
-  if (velocity < -velocityMax) velocity = -velocityMax;
-
-  if (velocity > velocityRamp) {
-    velocityRamp += accelerationFs;
-    if (velocityRamp > velocity) velocityRamp = velocity;
-  } else
-  if (velocity < velocityRamp) {
-    velocityRamp -= accelerationFs;
-    if (velocityRamp < velocity) velocityRamp = velocity;
-  }
-
-  if (velocityRamp >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
-
-  if (velocityLast != lround(velocityRamp) && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
+  if (velocityLast != lround(velocity) && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
     uint8_t cmd[] = "\xa2\x00\x00\x00";
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
-    velocityLast = lround(velocityRamp*countsToStepsRatio);
+    velocityLast = lround(velocity*countsToStepsRatio.value);
     if (reversed) velocityLast = -velocityLast;
     canPlus.write((uint8_t*)&velocityLast, 4);
     canPlus.endPacket();
     lastVelocityUpdateTime = millis();
   }
 
-  return velocityRamp;
+  return velocity;
 }
 
 // request driver status from CAN

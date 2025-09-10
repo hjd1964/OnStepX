@@ -14,7 +14,7 @@
 class ServoTmc2130DC : public ServoDcDriver {
   public:
     // constructor
-    ServoTmc2130DC(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings);
+    ServoTmc2130DC(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum);
 
     // decodes driver model and sets up the pin modes
     bool init(bool reverse);
@@ -34,9 +34,6 @@ class ServoTmc2130DC : public ServoDcDriver {
     void readStatus();
 
     TMC2130Stepper *driver;
-
-    // regulate velocity changes
-    float velocityRamp = 0;
 };
 
 #endif

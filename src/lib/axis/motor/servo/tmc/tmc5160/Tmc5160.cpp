@@ -23,7 +23,7 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoPins *Pins, const Serv
   axisPrefix[5] = '0' + axisNumber;
 
   this->velocityThrs = velocityThrs;
-  this->countsToStepsRatio = countsToStepsRatio;
+  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
 }
 
 bool ServoTmc5160::init(bool reverse) {
@@ -81,6 +81,7 @@ bool ServoTmc5160::init(bool reverse) {
 // enable or disable the driver using the enable pin or other method
 void ServoTmc5160::enable(bool state) {
   enabled = state;
+
   if (enablePin == SHARED) {
     VF("MSG:"); V(axisPrefix); VF(", powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
     if (state) {
@@ -101,31 +102,12 @@ void ServoTmc5160::enable(bool state) {
 }
 
 float ServoTmc5160::setMotorVelocity(float velocity) {
-  if (!enabled) velocity = 0.0F;
+  velocity = ServoDriver::setMotorVelocity(velocity);
 
-  if (velocity > velocityMax) velocity = velocityMax; else
-  if (velocity < -velocityMax) velocity = -velocityMax;
+  if (motorDirection = DIR_FORWARD) driver->shaft(reversed ? true : false); else driver->shaft(reversed ? false : true);
+  driver->VMAX(fabs((velocity/0.715F)*countsToStepsRatio.value));
 
-  if (velocity > velocityRamp) {
-    velocityRamp += accelerationFs;
-    if (velocityRamp > velocity) velocityRamp = velocity;
-  } else
-  if (velocity < velocityRamp) {
-    velocityRamp -= accelerationFs;
-    if (velocityRamp < velocity) velocityRamp = velocity;
-  }
-
-  if (velocityRamp >= 0.0F) {
-    driver->shaft(reversed ? true : false);
-    motorDirection = DIR_FORWARD;
-  } else {
-    driver->shaft(reversed ? false : true);
-    motorDirection = DIR_REVERSE;
-  }
-
-  driver->VMAX(fabs((velocityRamp/0.715F)*countsToStepsRatio));
-
-  return velocityRamp;
+  return velocity;
 }
 
 // read status info. from driver

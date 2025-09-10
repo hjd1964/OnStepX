@@ -53,18 +53,15 @@ class TmcServoDriver : public ServoDriver {
     int16_t normalizedDecay;
     int16_t normalizedDecaySlewing;
 
-    // for conversion from counts per second to stepper motor steps per second
-    float countsToStepsRatio = 0;
-
     // runtime adjustable settings
-    AxisParameter invalid      = {NAN, NAN, NAN, NAN, NAN, AXP_INVALID, ""};
-    AxisParameter currentHold  = {NAN, NAN, NAN, -1, 20000, AXP_INTEGER, AXPN_CURRENT_HOLD};
-    AxisParameter currentRun   = {NAN, NAN, NAN, -1, 20000, AXP_INTEGER, AXPN_CURRENT_RUN};
-    AxisParameter decay        = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE};
-    AxisParameter decaySlewing = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE_GOTO};
+    AxisParameter countsToStepsRatio = {NAN, NAN, NAN, -1, 20000, AXP_FLOAT, "Steps/count ratio"};
+    AxisParameter currentHold   = {NAN, NAN, NAN, -1, 20000, AXP_INTEGER, AXPN_CURRENT_HOLD};
+    AxisParameter currentRun    = {NAN, NAN, NAN, -1, 20000, AXP_INTEGER, AXPN_CURRENT_RUN};
+    AxisParameter decay         = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE};
+    AxisParameter decaySlewing  = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE_GOTO};
 
-    const int numParameters = 4;
-    AxisParameter* parameter[5] = {&invalid, &currentHold, &currentRun, &decay, &decaySlewing};
+    const int numParameters = 7;
+    AxisParameter* parameter[8] = {&invalid, &velocityMax, &acceleration, &countsToStepsRatio, &currentHold, &currentRun, &decay, &decaySlewing};
 };
 
 #endif

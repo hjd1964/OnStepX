@@ -30,7 +30,7 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoPins *Pins, const Serv
   axisPrefix[5] = '0' + axisNumber;
 
   this->velocityThrs = velocityThrs;
-  this->countsToStepsRatio = countsToStepsRatio;
+  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
 }
 
 bool ServoTmc2209::init(bool reverse) {
@@ -119,15 +119,10 @@ bool ServoTmc2209::init(bool reverse) {
   return true;
 }
 
-// move using step/dir signals
-void ServoTmc2209::alternateMode(bool state) {
-  sdMode = state;
-  if (sdMode) driver->VACTUAL(0);
-}
-
 // enable or disable the driver using the enable pin or other method
 void ServoTmc2209::enable(bool state) {
   enabled = state;
+
   if (enablePin == SHARED) {
     VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using UART");
     if (state) {
@@ -150,26 +145,11 @@ void ServoTmc2209::enable(bool state) {
 }
 
 float ServoTmc2209::setMotorVelocity(float velocity) {
-  if (sdMode) return velocity;
+  velocity = ServoDriver::setMotorVelocity(velocity);
 
-  if (!enabled) velocity = 0.0F;
-  if (velocity > velocityMax) velocity = velocityMax; else
-  if (velocity < -velocityMax) velocity = -velocityMax;
+  driver->VACTUAL(reversed ? -(velocity/0.715F)*countsToStepsRatio.value : (velocity/0.715F)*countsToStepsRatio.value);
 
-  if (velocity > velocityRamp) {
-    velocityRamp += accelerationFs;
-    if (velocityRamp > velocity) velocityRamp = velocity;
-  } else
-  if (velocity < velocityRamp) {
-    velocityRamp -= accelerationFs;
-    if (velocityRamp < velocity) velocityRamp = velocity;
-  }
-
-  if (velocityRamp >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
-
-  driver->VACTUAL(reversed ? -(velocityRamp/0.715F)*countsToStepsRatio : (velocityRamp/0.715F)*countsToStepsRatio);
-
-  return velocityRamp;
+  return velocity;
 }
 
 void ServoTmc2209::readStatus() {

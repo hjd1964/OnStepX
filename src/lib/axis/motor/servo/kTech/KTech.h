@@ -26,6 +26,12 @@ class ServoKTech : public ServoDriver {
     // decodes driver model and sets up the pin modes
     bool init(bool reverse);
 
+    // returns the number of axis parameters
+    uint8_t getParameterCount() { return numParameters; }
+
+    // returns the specified axis parameter
+    AxisParameter* getParameter(uint8_t number) { if (number > numParameters) return &invalid; else return parameter[number]; }
+
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
@@ -55,12 +61,14 @@ class ServoKTech : public ServoDriver {
     void (*callback)() = NULL;
 
     // regulate velocity changes
-    float velocityRamp = 0;
     int32_t velocityLast = 0;
 
-    // for conversion from counts per second to ketch motor "steps" per second
-    // where one "step" is 1/100 of a degree
-    float countsToStepsRatio = 0;
+    // runtime adjustable settings
+    AxisParameter countsToStepsRatio = {NAN, NAN, NAN, -1, 20000, AXP_FLOAT, "Count/Step ratio"};
+
+    const int numParameters = 3;
+    AxisParameter* parameter[4] = {&invalid, &velocityMax, &acceleration, &countsToStepsRatio};
+
 };
 
 #endif

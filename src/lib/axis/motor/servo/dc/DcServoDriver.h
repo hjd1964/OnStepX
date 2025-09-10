@@ -16,68 +16,10 @@
 
 #include "../ServoDriver.h"
 
-// allow velocity in encoder CPS to scale analogWrite()
-// pwm values so the resulting slew rate is more accurate
-#ifndef AXIS1_ANALOG_WRITE_MIN
-#define AXIS1_ANALOG_WRITE_MIN 0.0F // in percent
-#endif
-#ifndef AXIS2_ANALOG_WRITE_MIN
-#define AXIS2_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS3_ANALOG_WRITE_MIN
-#define AXIS3_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS4_ANALOG_WRITE_MIN
-#define AXIS4_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS5_ANALOG_WRITE_MIN
-#define AXIS5_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS6_ANALOG_WRITE_MIN
-#define AXIS6_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS7_ANALOG_WRITE_MIN
-#define AXIS7_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS8_ANALOG_WRITE_MIN
-#define AXIS8_ANALOG_WRITE_MIN 0.0F
-#endif
-#ifndef AXIS9_ANALOG_WRITE_MIN
-#define AXIS9_ANALOG_WRITE_MIN 0.0F
-#endif
-
-#ifndef AXIS1_ANALOG_WRITE_MAX
-#define AXIS1_ANALOG_WRITE_MAX 100.0F // in percent
-#endif
-#ifndef AXIS2_ANALOG_WRITE_MAX
-#define AXIS2_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS3_ANALOG_WRITE_MAX
-#define AXIS3_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS4_ANALOG_WRITE_MAX
-#define AXIS4_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS5_ANALOG_WRITE_MAX
-#define AXIS5_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS6_ANALOG_WRITE_MAX
-#define AXIS6_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS7_ANALOG_WRITE_MAX
-#define AXIS7_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS8_ANALOG_WRITE_MAX
-#define AXIS8_ANALOG_WRITE_MAX 100.0F
-#endif
-#ifndef AXIS9_ANALOG_WRITE_MAX
-#define AXIS9_ANALOG_WRITE_MAX 100.0F
-#endif
-
 class ServoDcDriver : public ServoDriver {
   public:
     // constructor
-    ServoDcDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings);
+    ServoDcDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum);
 
     // returns the number of axis parameters
     uint8_t getParameterCount() { return numParameters; }
@@ -101,7 +43,7 @@ class ServoDcDriver : public ServoDriver {
   
       long power = 0;
       if (velocity != 0.0F) {
-        power = lround(((float)velocity/velocityMax)*(analogWriteRange - 1));
+        power = lround(((float)velocity/velocityMax.value)*(analogWriteRange - 1));
         long pwmMin = lround(pwmMinimum.value/100.0F*(analogWriteRange - 1));
         long pwmMax = lround(pwmMaximum.value/100.0F*(analogWriteRange - 1));
 
@@ -114,17 +56,14 @@ class ServoDcDriver : public ServoDriver {
     // motor control update
     virtual void pwmUpdate(long power) { }
 
-    // regulate velocity changes
-    float velocityRamp = 0;
-
     long analogWriteRange = SERVO_ANALOG_WRITE_RANGE;
 
     // runtime adjustable settings
-    AxisParameter pwmMinimum = {NAN, NAN, NAN, 0.0, 25.0, AXP_FLOAT_IMMEDIATE, "Min power, in %"};
-    AxisParameter pwmMaximum = {NAN, NAN, NAN, 25.0, 100.0, AXP_FLOAT_IMMEDIATE, "Max power, in %"};
+    AxisParameter pwmMinimum = {NAN, NAN, NAN, 0.0, 25.0, AXP_FLOAT_IMMEDIATE, "Min power, %"};
+    AxisParameter pwmMaximum = {NAN, NAN, NAN, 25.0, 100.0, AXP_FLOAT_IMMEDIATE, "Max power, %"};
 
-    const int numParameters = 2;
-    AxisParameter* parameter[3] = {&invalid, &pwmMinimum, &pwmMaximum};
+    const int numParameters = 4;
+    AxisParameter* parameter[5] = {&invalid, &velocityMax, &acceleration, &pwmMinimum, &pwmMaximum};
 };
 
 #endif

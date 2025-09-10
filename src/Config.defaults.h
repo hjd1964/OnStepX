@@ -317,28 +317,31 @@
   #define AXIS1_SERVO_PH2_STATE         LOW                       // default (inactive) motor driver state, IN2 or ENABLE (pwm) pin
   #endif
 
-  #ifndef AXIS1_SERVO_VELOCITY_MAX                                // max velocity in degrees per second
-  #define AXIS1_SERVO_VELOCITY_MAX      SLEW_RATE_BASE_DESIRED*2.0F
+  #ifndef AXIS1_SERVO_VELOCITY_MAX
+  #define AXIS1_SERVO_VELOCITY_MAX      lround(SLEW_RATE_BASE_DESIRED*2.0F*AXIS1_STEPS_PER_DEGREE) // max velocity in counts/s
   #endif
-  #define AXIS1_SERVO_VELOCITY_MAX_CPS  lround(AXIS1_SERVO_VELOCITY_MAX*AXIS1_STEPS_PER_DEGREE)
-
-  #ifndef AXIS1_SERVO_VELOCITY_FACTOR
-  #define AXIS1_SERVO_VELOCITY_FACTOR   frequency*0               // converts frequency (counts per second) to velocity (in steps per second or DC motor PWM ADU range)
-  #endif
-  #ifndef AXIS1_SERVO_VELOCITY_PWMTHRS                            // velocity (in steps per second) to switch from stealthChop to
-  #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // spreadCycle mode, should happen just above the 2x sidereal rate
-  #endif                                                          // for TMC2209 or TMC5160 only
   #ifndef AXIS1_SERVO_ACCELERATION
-  #define AXIS1_SERVO_ACCELERATION      500                       // acceleration, in %/s
+  #define AXIS1_SERVO_ACCELERATION      100                       // acceleration limit, in %/s
   #endif
+  #ifndef AXIS1_SERVO_VELOCITY_PWMTHRS
+  #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // velocity (in steps/s) to switch from stealthChop to spreadCycle
+  #endif                                                          // should happen at the 2x sidereal rate, for TMC2209/TMC5160 only
+  #ifndef AXIS1_MOTOR_STEPS_PER_DEGREE
+  #define AXIS1_MOTOR_STEPS_PER_DEGREE  AXIS1_STEPS_PER_DEGREE    // for calculating ratio of encoder counts/deg to motor steps/deg
+  #endif                                                          // for TMC stepper motors only
+  #ifndef AXIS1_SERVO_DC_PWR_MIN                          
+  #define AXIS1_SERVO_DC_PWR_MIN        0.0F                      // minimum power just below where axis motion starts, in %
+  #endif                                                          // approximate, for DC motors only
+  #ifndef AXIS1_SERVO_DC_PWR_MAX
+  #define AXIS1_SERVO_DC_PWR_MAX        100.0F                    // power required for AXIS1_SERVO_VELOCITY_MAX rate, in %
+  #endif                                                          // approximate, for DC motors only
+
   #ifndef AXIS1_SERVO_FEEDBACK
   #define AXIS1_SERVO_FEEDBACK          DUAL_PID                  // type of feedback: DUAL_PID
   #endif
-
-  #ifndef AXIS1_SERVO_FLTR
-  #define AXIS1_SERVO_FLTR              OFF                       // servo encoder filter: OFF
+  #ifndef AXIS1_PID_SENSITIVITY
+  #define AXIS1_PID_SENSITIVITY         0                         // 0 to use slewing state, or % power for 100% pid set two (_GOTO)
   #endif
-
   #ifndef AXIS1_PID_P
   #define AXIS1_PID_P                   2.0                       // P = proportional
   #endif
@@ -357,10 +360,10 @@
   #ifndef AXIS1_PID_D_GOTO
   #define AXIS1_PID_D_GOTO              AXIS1_PID_D               // D = derivative
   #endif
-  #ifndef AXIS1_PID_SENSITIVITY
-  #define AXIS1_PID_SENSITIVITY         0                         // 0 to use slewing state, or % power for 100% pid set two (_GOTO)
-  #endif
 
+  #ifndef AXIS1_SERVO_FLTR
+  #define AXIS1_SERVO_FLTR              OFF                       // servo encoder filter: OFF
+  #endif
   #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER                 AB                        // type of encoder: AB, CW_CCW, PULSE_DIR, PULSE_ONLY, SERIAL_BRIDGE
   #endif
@@ -490,24 +493,30 @@
   #endif
 
   #ifndef AXIS2_SERVO_VELOCITY_MAX
-  #define AXIS2_SERVO_VELOCITY_MAX      SLEW_RATE_BASE_DESIRED*2.0F
+  #define AXIS2_SERVO_VELOCITY_MAX      lround(SLEW_RATE_BASE_DESIRED*2.0F*AXIS2_STEPS_PER_DEGREE)
   #endif
-  #define AXIS2_SERVO_VELOCITY_MAX_CPS  lround(AXIS2_SERVO_VELOCITY_MAX*AXIS2_STEPS_PER_DEGREE)
-
+  #ifndef AXIS2_SERVO_ACCELERATION
+  #define AXIS2_SERVO_ACCELERATION      100
+  #endif
   #ifndef AXIS2_SERVO_VELOCITY_PWMTHRS
   #define AXIS2_SERVO_VELOCITY_PWMTHRS  OFF
   #endif
-  #ifndef AXIS2_SERVO_ACCELERATION
-  #define AXIS2_SERVO_ACCELERATION      500
+  #ifndef AXIS2_MOTOR_STEPS_PER_DEGREE
+  #define AXIS2_MOTOR_STEPS_PER_DEGREE  AXIS2_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS2_SERVO_DC_PWR_MIN
+  #define AXIS2_SERVO_DC_PWR_MIN        0.0F
   #endif
+  #ifndef AXIS2_SERVO_DC_PWR_MAX
+  #define AXIS2_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS2_SERVO_FEEDBACK
   #define AXIS2_SERVO_FEEDBACK          DUAL_PID
   #endif
-
-  #ifndef AXIS2_SERVO_FLTR
-  #define AXIS2_SERVO_FLTR              OFF
+  #ifndef AXIS2_PID_SENSITIVITY
+  #define AXIS2_PID_SENSITIVITY         0
   #endif
-
   #ifndef AXIS2_PID_P
   #define AXIS2_PID_P                   2.0
   #endif
@@ -526,10 +535,10 @@
   #ifndef AXIS2_PID_D_GOTO
   #define AXIS2_PID_D_GOTO              AXIS2_PID_D
   #endif
-  #ifndef AXIS2_PID_SENSITIVITY
-  #define AXIS2_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS2_SERVO_FLTR
+  #define AXIS2_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS2_ENCODER
   #define AXIS2_ENCODER                 AB
   #endif
@@ -982,21 +991,27 @@
   #endif
 
   #ifndef AXIS3_SERVO_VELOCITY_MAX
-  #define AXIS3_SERVO_VELOCITY_MAX      AXIS3_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS3_SERVO_VELOCITY_MAX      lround(AXIS3_SLEW_RATE_BASE_DESIRED*2.0*AXIS3_STEPS_PER_DEGREE)
   #endif
-  #define AXIS3_SERVO_VELOCITY_MAX_CPS  lround(AXIS3_SERVO_VELOCITY_MAX*AXIS3_STEPS_PER_DEGREE)
-
   #ifndef AXIS3_SERVO_ACCELERATION
-  #define AXIS3_SERVO_ACCELERATION      500
+  #define AXIS3_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS3_SERVO_VELOCITY_PWMTHRS
+  #define AXIS3_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS3_MOTOR_STEPS_PER_DEGREE
+  #define AXIS3_MOTOR_STEPS_PER_DEGREE  AXIS3_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS3_SERVO_DC_PWR_MIN
+  #define AXIS3_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS3_SERVO_DC_PWR_MAX
+  #define AXIS3_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS3_SERVO_FEEDBACK
   #define AXIS3_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS3_SERVO_FLTR
-  #define AXIS3_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS3_PID_P
   #define AXIS3_PID_P                   2.0
   #endif
@@ -1006,19 +1021,10 @@
   #ifndef AXIS3_PID_D
   #define AXIS3_PID_D                   1.0
   #endif
-  #ifndef AXIS3_PID_P_GOTO
-  #define AXIS3_PID_P_GOTO              AXIS3_PID_P
-  #endif
-  #ifndef AXIS3_PID_I_GOTO
-  #define AXIS3_PID_I_GOTO              AXIS3_PID_I
-  #endif
-  #ifndef AXIS3_PID_D_GOTO
-  #define AXIS3_PID_D_GOTO              AXIS3_PID_D
-  #endif
-  #ifndef AXIS3_PID_SENSITIVITY
-  #define AXIS3_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS3_SERVO_FLTR
+  #define AXIS3_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS3_ENCODER
   #define AXIS3_ENCODER                 AB
   #endif
@@ -1174,43 +1180,40 @@
   #endif
 
   #ifndef AXIS4_SERVO_VELOCITY_MAX
-  #define AXIS4_SERVO_VELOCITY_MAX      AXIS4_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS4_SERVO_VELOCITY_MAX      lround(AXIS4_SLEW_RATE_BASE_DESIRED*2.0*AXIS4_STEPS_PER_MICRON)
   #endif
-  #define AXIS4_SERVO_VELOCITY_MAX_CPS  lround(AXIS4_SERVO_VELOCITY_MAX*AXIS4_STEPS_PER_MICRON)
-
   #ifndef AXIS4_SERVO_ACCELERATION
-  #define AXIS4_SERVO_ACCELERATION      500
+  #define AXIS4_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS4_SERVO_VELOCITY_PWMTHRS
+  #define AXIS4_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS4_MOTOR_STEPS_PER_DEGREE
+  #define AXIS4_MOTOR_STEPS_PER_DEGREE  AXIS4_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS4_SERVO_DC_PWR_MIN
+  #define AXIS4_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS4_SERVO_DC_PWR_MAX
+  #define AXIS4_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS4_SERVO_FEEDBACK
   #define AXIS4_SERVO_FEEDBACK          PID
+  #endif
+  #ifndef AXIS4_PID_P
+  #define AXIS4_PID_P                   2.0
+  #endif
+  #ifndef AXIS4_PID_I
+  #define AXIS4_PID_I                   5.0
+  #endif
+  #ifndef AXIS4_PID_D
+  #define AXIS4_PID_D                   1.0
   #endif
 
   #ifndef AXIS4_SERVO_FLTR
   #define AXIS4_SERVO_FLTR              OFF
   #endif
-
-  #ifndef AXIS4_PID_P
-  #define AXIS4_PID_P                 2.0
-  #endif
-  #ifndef AXIS4_PID_I
-  #define AXIS4_PID_I                 5.0
-  #endif
-  #ifndef AXIS4_PID_D
-  #define AXIS4_PID_D                 1.0
-  #endif
-  #ifndef AXIS4_PID_P_GOTO
-  #define AXIS4_PID_P_GOTO            AXIS4_PID_P
-  #endif
-  #ifndef AXIS4_PID_I_GOTO
-  #define AXIS4_PID_I_GOTO            AXIS4_PID_I
-  #endif
-  #ifndef AXIS4_PID_D_GOTO
-  #define AXIS4_PID_D_GOTO            AXIS4_PID_D
-  #endif
-  #ifndef AXIS4_PID_SENSITIVITY
-  #define AXIS4_PID_SENSITIVITY         0
-  #endif
-
   #ifndef AXIS4_ENCODER
   #define AXIS4_ENCODER                 AB
   #endif
@@ -1343,21 +1346,27 @@
   #endif
 
   #ifndef AXIS5_SERVO_VELOCITY_MAX
-  #define AXIS5_SERVO_VELOCITY_MAX      AXIS5_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS5_SERVO_VELOCITY_MAX      lround(AXIS5_SLEW_RATE_BASE_DESIRED*2.0*AXIS5_STEPS_PER_MICRON)
   #endif
-  #define AXIS5_SERVO_VELOCITY_MAX_CPS  lround(AXIS5_SERVO_VELOCITY_MAX*AXIS5_STEPS_PER_MICRON)
-
   #ifndef AXIS5_SERVO_ACCELERATION
-  #define AXIS5_SERVO_ACCELERATION      500
+  #define AXIS5_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS5_SERVO_VELOCITY_PWMTHRS
+  #define AXIS5_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS5_MOTOR_STEPS_PER_DEGREE
+  #define AXIS5_MOTOR_STEPS_PER_DEGREE  AXIS5_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS5_SERVO_DC_PWR_MIN
+  #define AXIS5_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS5_SERVO_DC_PWR_MAX
+  #define AXIS5_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS5_SERVO_FEEDBACK
   #define AXIS5_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS5_SERVO_FLTR
-  #define AXIS5_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS5_PID_P
   #define AXIS5_PID_P                   2.0
   #endif
@@ -1376,10 +1385,10 @@
   #ifndef AXIS5_PID_D_GOTO
   #define AXIS5_PID_D_GOTO              AXIS5_PID_D
   #endif
-  #ifndef AXIS5_PID_SENSITIVITY
-  #define AXIS5_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS5_SERVO_FLTR
+  #define AXIS5_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS5_ENCODER
   #define AXIS5_ENCODER                 AB
   #endif
@@ -1512,21 +1521,27 @@
   #endif
 
   #ifndef AXIS6_SERVO_VELOCITY_MAX
-  #define AXIS6_SERVO_VELOCITY_MAX      AXIS6_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS6_SERVO_VELOCITY_MAX      lround(AXIS6_SLEW_RATE_BASE_DESIRED*2.0*AXIS6_STEPS_PER_MICRON)
   #endif
-  #define AXIS6_SERVO_VELOCITY_MAX_CPS  lround(AXIS6_SERVO_VELOCITY_MAX*AXIS6_STEPS_PER_MICRON)
-
   #ifndef AXIS6_SERVO_ACCELERATION
-  #define AXIS6_SERVO_ACCELERATION      500
+  #define AXIS6_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS6_SERVO_VELOCITY_PWMTHRS
+  #define AXIS6_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS6_MOTOR_STEPS_PER_DEGREE
+  #define AXIS6_MOTOR_STEPS_PER_DEGREE  AXIS6_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS6_SERVO_DC_PWR_MIN
+  #define AXIS6_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS6_SERVO_DC_PWR_MAX
+  #define AXIS6_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS6_SERVO_FEEDBACK
   #define AXIS6_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS6_SERVO_FLTR
-  #define AXIS6_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS6_PID_P
   #define AXIS6_PID_P                   2.0
   #endif
@@ -1536,19 +1551,10 @@
   #ifndef AXIS6_PID_D
   #define AXIS6_PID_D                   1.0
   #endif
-  #ifndef AXIS6_PID_P_GOTO
-  #define AXIS6_PID_P_GOTO              AXIS6_PID_P
-  #endif
-  #ifndef AXIS6_PID_I_GOTO
-  #define AXIS6_PID_I_GOTO              AXIS6_PID_I
-  #endif
-  #ifndef AXIS6_PID_D_GOTO
-  #define AXIS6_PID_D_GOTO              AXIS6_PID_D
-  #endif
-  #ifndef AXIS6_PID_SENSITIVITY
-  #define AXIS6_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS6_SERVO_FLTR
+  #define AXIS6_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS6_ENCODER
   #define AXIS6_ENCODER                 AB
   #endif
@@ -1680,21 +1686,27 @@
   #endif
 
   #ifndef AXIS7_SERVO_VELOCITY_MAX
-  #define AXIS7_SERVO_VELOCITY_MAX      AXIS7_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS7_SERVO_VELOCITY_MAX      lround(AXIS7_SLEW_RATE_BASE_DESIRED*2.0*AXIS7_STEPS_PER_MICRON)
   #endif
-  #define AXIS7_SERVO_VELOCITY_MAX_CPS  lround(AXIS7_SERVO_VELOCITY_MAX*AXIS7_STEPS_PER_MICRON)
-
   #ifndef AXIS7_SERVO_ACCELERATION
-  #define AXIS7_SERVO_ACCELERATION      500
+  #define AXIS7_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS7_SERVO_VELOCITY_PWMTHRS
+  #define AXIS7_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS7_MOTOR_STEPS_PER_DEGREE
+  #define AXIS7_MOTOR_STEPS_PER_DEGREE  AXIS7_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS7_SERVO_DC_PWR_MIN
+  #define AXIS7_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS7_SERVO_DC_PWR_MAX
+  #define AXIS7_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS7_SERVO_FEEDBACK
   #define AXIS7_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS7_SERVO_FLTR
-  #define AXIS7_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS7_PID_P
   #define AXIS7_PID_P                   2.0
   #endif
@@ -1704,19 +1716,10 @@
   #ifndef AXIS7_PID_D
   #define AXIS7_PID_D                   1.0
   #endif
-  #ifndef AXIS7_PID_P_GOTO
-  #define AXIS7_PID_P_GOTO              AXIS7_PID_P
-  #endif
-  #ifndef AXIS7_PID_I_GOTO
-  #define AXIS7_PID_I_GOTO              AXIS7_PID_I
-  #endif
-  #ifndef AXIS7_PID_D_GOTO
-  #define AXIS7_PID_D_GOTO              AXIS7_PID_D
-  #endif
-  #ifndef AXIS7_PID_SENSITIVITY
-  #define AXIS7_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS7_SERVO_FLTR
+  #define AXIS7_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS7_ENCODER
   #define AXIS7_ENCODER                 AB
   #endif
@@ -1849,21 +1852,27 @@
   #endif
 
   #ifndef AXIS8_SERVO_VELOCITY_MAX
-  #define AXIS8_SERVO_VELOCITY_MAX      AXIS8_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS8_SERVO_VELOCITY_MAX      lround(AXIS8_SLEW_RATE_BASE_DESIRED*2.0*AXIS8_STEPS_PER_MICRON)
   #endif
-  #define AXIS8_SERVO_VELOCITY_MAX_CPS  lround(AXIS8_SERVO_VELOCITY_MAX*AXIS8_STEPS_PER_MICRON)
-
   #ifndef AXIS8_SERVO_ACCELERATION
-  #define AXIS8_SERVO_ACCELERATION      500
+  #define AXIS8_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS8_SERVO_VELOCITY_PWMTHRS
+  #define AXIS8_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS8_MOTOR_STEPS_PER_DEGREE
+  #define AXIS8_MOTOR_STEPS_PER_DEGREE  AXIS8_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS8_SERVO_DC_PWR_MIN
+  #define AXIS8_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS8_SERVO_DC_PWR_MAX
+  #define AXIS8_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS8_SERVO_FEEDBACK
   #define AXIS8_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS8_SERVO_FLTR
-  #define AXIS8_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS8_PID_P
   #define AXIS8_PID_P                   2.0
   #endif
@@ -1873,19 +1882,10 @@
   #ifndef AXIS8_PID_D
   #define AXIS8_PID_D                   1.0
   #endif
-  #ifndef AXIS8_PID_P_GOTO
-  #define AXIS8_PID_P_GOTO              AXIS8_PID_P
-  #endif
-  #ifndef AXIS8_PID_I_GOTO
-  #define AXIS8_PID_I_GOTO              AXIS8_PID_I
-  #endif
-  #ifndef AXIS8_PID_D_GOTO
-  #define AXIS8_PID_D_GOTO              AXIS8_PID_D
-  #endif
-  #ifndef AXIS8_PID_SENSITIVITY
-  #define AXIS8_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS8_SERVO_FLTR
+  #define AXIS8_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS8_ENCODER
   #define AXIS8_ENCODER                 AB
   #endif
@@ -2018,21 +2018,27 @@
   #endif
 
   #ifndef AXIS9_SERVO_VELOCITY_MAX
-  #define AXIS9_SERVO_VELOCITY_MAX      AXIS9_SLEW_RATE_BASE_DESIRED*2.0
+  #define AXIS9_SERVO_VELOCITY_MAX      lround(AXIS9_SLEW_RATE_BASE_DESIRED*2.0*AXIS9_STEPS_PER_MICRON)
   #endif
-  #define AXIS9_SERVO_VELOCITY_MAX_CPS  lround(AXIS9_SERVO_VELOCITY_MAX*AXIS9_STEPS_PER_MICRON)
-
   #ifndef AXIS9_SERVO_ACCELERATION
-  #define AXIS9_SERVO_ACCELERATION      500
+  #define AXIS9_SERVO_ACCELERATION      100
   #endif
+  #ifndef AXIS9_SERVO_VELOCITY_PWMTHRS
+  #define AXIS9_SERVO_VELOCITY_PWMTHRS  OFF
+  #endif                            
+  #ifndef AXIS9_MOTOR_STEPS_PER_DEGREE
+  #define AXIS9_MOTOR_STEPS_PER_DEGREE  AXIS9_STEPS_PER_DEGREE
+  #endif   
+  #ifndef AXIS9_SERVO_DC_PWR_MIN
+  #define AXIS9_SERVO_DC_PWR_MIN        0.0F
+  #endif
+  #ifndef AXIS9_SERVO_DC_PWR_MAX
+  #define AXIS9_SERVO_DC_PWR_MAX        100.0F
+  #endif
+
   #ifndef AXIS9_SERVO_FEEDBACK
   #define AXIS9_SERVO_FEEDBACK          PID
   #endif
-
-  #ifndef AXIS9_SERVO_FLTR
-  #define AXIS9_SERVO_FLTR              OFF
-  #endif
-
   #ifndef AXIS9_PID_P
   #define AXIS9_PID_P                   2.0
   #endif
@@ -2042,19 +2048,10 @@
   #ifndef AXIS9_PID_D
   #define AXIS9_PID_D                   1.0
   #endif
-  #ifndef AXIS9_PID_P_GOTO
-  #define AXIS9_PID_P_GOTO              AXIS9_PID_P
-  #endif
-  #ifndef AXIS9_PID_I_GOTO
-  #define AXIS9_PID_I_GOTO              AXIS9_PID_I
-  #endif
-  #ifndef AXIS9_PID_D_GOTO
-  #define AXIS9_PID_D_GOTO              AXIS9_PID_D
-  #endif
-  #ifndef AXIS9_PID_SENSITIVITY
-  #define AXIS9_PID_SENSITIVITY         0
-  #endif
 
+  #ifndef AXIS9_SERVO_FLTR
+  #define AXIS9_SERVO_FLTR              OFF
+  #endif
   #ifndef AXIS9_ENCODER
   #define AXIS9_ENCODER                 AB
   #endif

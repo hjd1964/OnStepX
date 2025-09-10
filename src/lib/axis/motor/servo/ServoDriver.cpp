@@ -41,9 +41,8 @@ ServoDriver::ServoDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoS
   driverModel = Settings->model;
   statusMode = Settings->status;
 
-  velocityMax = Settings->velocityMax;
-  acceleration = (Settings->acceleration/100.0F)*velocityMax;
-  accelerationFs = acceleration/FRACTIONAL_SEC;
+  velocityMax.valueDefault = Settings->velocityMax;
+  acceleration.valueDefault = Settings->acceleration;
 }
 
 bool ServoDriver::init(bool reverse) {
@@ -54,8 +53,11 @@ bool ServoDriver::init(bool reverse) {
     if (enablePin == SHARED) { VLF("SHARED"); } else { VL(enablePin); }
   #endif
 
+  normalizedAcceleration = (acceleration.value/100.0F)*velocityMax.value;
+  accelerationFs = normalizedAcceleration/FRACTIONAL_SEC;
+
   // show velocity control settings
-  VF("MSG:"); V(axisPrefix); VF("Vmax="); V(Settings->velocityMax); VF(" steps/s, Acceleration="); V(Settings->acceleration); VLF(" %/s/s");
+  VF("MSG:"); V(axisPrefix); VF("Vmax="); V(velocityMax.value); VF(" steps/s, Acceleration="); V(acceleration.value); VLF(" %/s/s");
   VF("MSG:"); V(axisPrefix); VF("AccelerationFS="); V(accelerationFs); VLF(" steps/s/fs");
 
   // init default driver control pins
@@ -77,6 +79,26 @@ bool ServoDriver::init(bool reverse) {
   reversed = reverse;
 
   return true;
+}
+
+float ServoDriver::setMotorVelocity(float velocity) {
+  if (!enabled) velocity = 0.0F;
+
+  if (velocity > velocityMax.value) velocity = velocityMax.value; else
+  if (velocity < -velocityMax.value) velocity = -velocityMax.value;
+
+  if (velocity > velocityRamp) {
+    velocityRamp += accelerationFs;
+    if (velocityRamp > velocity) velocityRamp = velocity;
+  } else
+  if (velocity < velocityRamp) {
+    velocityRamp -= accelerationFs;
+    if (velocityRamp < velocity) velocityRamp = velocity;
+  }
+
+  if (velocityRamp >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
+
+  return velocityRamp;
 }
 
 // update status info. for driver

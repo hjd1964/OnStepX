@@ -43,9 +43,6 @@ class ServoTmc5160 : public TmcServoDriver {
 
     // for switching to/from spreadCycle
     int16_t velocityThrs;
-
-    // regulate velocity changes
-    float velocityRamp = 0;
 };
 
 #endif

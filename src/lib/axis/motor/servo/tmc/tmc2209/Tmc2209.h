@@ -56,9 +56,6 @@ class ServoTmc2209 : public TmcServoDriver {
     // decodes driver model and sets up the pin modes
     bool init(bool reverse);
 
-    // move using step/dir signals
-    void alternateMode(bool state);
-
     // enable or disable the driver using the enable pin or other method
     void enable(bool state);
 
@@ -89,9 +86,6 @@ class ServoTmc2209 : public TmcServoDriver {
 
     // for switching to/from spreadCycle
     int16_t velocityThrs;
-
-    // regulate velocity changes
-    float velocityRamp = 0;
 };
 
 #endif

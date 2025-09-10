@@ -48,16 +48,16 @@
     #endif
 
     const ServoPins DriverPinsAxis4 = {AXIS4_SERVO_PH1_PIN, AXIS4_SERVO_PH1_STATE, AXIS4_SERVO_PH2_PIN, AXIS4_SERVO_PH2_STATE, AXIS4_ENABLE_PIN, AXIS4_ENABLE_STATE, AXIS4_M0_PIN, AXIS4_M1_PIN, AXIS1_M2_PIN, AXIS4_M3_PIN, AXIS4_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS, AXIS4_SERVO_VELOCITY_MAX_CPS, AXIS4_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS, AXIS4_SERVO_VELOCITY_MAX, AXIS4_SERVO_ACCELERATION};
 
     #if AXIS4_DRIVER_MODEL == SERVO_EE
-      ServoEE driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4);
+      ServoEE driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4, AXIS4_SERVO_DC_PWR_MIN, AXIS4_SERVO_DC_PWR_MAX);
     #elif AXIS4_DRIVER_MODEL == SERVO_PE
-      ServoPE driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4);
+      ServoPE driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4, AXIS4_SERVO_DC_PWR_MIN, AXIS4_SERVO_DC_PWR_MAX);
     #elif AXIS4_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4);
+      ServoTmc2130DC driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4, AXIS4_SERVO_DC_PWR_MIN, AXIS4_SERVO_DC_PWR_MAX);
     #elif AXIS4_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4);
+      ServoTmc5160DC driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4, AXIS4_SERVO_DC_PWR_MIN, AXIS4_SERVO_DC_PWR_MAX);
     #elif AXIS4_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver4(4, &DriverPinsAxis4, &DriverSettingsAxis4, AXIS4_MOTOR_STEPS_PER_MICRON/AXIS4_STEPS_PER_MICRON, AXIS4_DRIVER_MICROSTEPS, AXIS4_DRIVER_IRUN, AXIS4_DRIVER_DECAY, AXIS4_DRIVER_DECAY_GOTO);
     #elif AXIS4_DRIVER_MODEL == SERVO_TMC5160
@@ -142,16 +142,16 @@
     #endif
 
     const ServoPins DriverPinsAxis5 = {AXIS5_SERVO_PH1_PIN, AXIS5_SERVO_PH1_STATE, AXIS5_SERVO_PH2_PIN, AXIS5_SERVO_PH2_STATE, AXIS5_ENABLE_PIN, AXIS5_ENABLE_STATE, AXIS5_M0_PIN, AXIS4_M1_PIN, AXIS1_M2_PIN, AXIS4_M3_PIN, AXIS4_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS, AXIS5_SERVO_VELOCITY_MAX_CPS, AXIS5_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS, AXIS5_SERVO_VELOCITY_MAX, AXIS5_SERVO_ACCELERATION};
 
     #if AXIS5_DRIVER_MODEL == SERVO_EE
-      ServoEE driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5);
+      ServoEE driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5, AXIS5_SERVO_DC_PWR_MIN, AXIS5_SERVO_DC_PWR_MAX);
     #elif AXIS5_DRIVER_MODEL == SERVO_PE
-      ServoPE driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5);
+      ServoPE driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5, AXIS5_SERVO_DC_PWR_MIN, AXIS5_SERVO_DC_PWR_MAX);
     #elif AXIS5_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5);
+      ServoTmc2130DC driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5, AXIS5_SERVO_DC_PWR_MIN, AXIS5_SERVO_DC_PWR_MAX);
     #elif AXIS5_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5);
+      ServoTmc5160DC driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5, AXIS5_SERVO_DC_PWR_MIN, AXIS5_SERVO_DC_PWR_MAX);
     #elif AXIS5_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver5(5, &DriverPinsAxis5, &DriverSettingsAxis5, AXIS5_MOTOR_STEPS_PER_MICRON/AXIS5_STEPS_PER_MICRON, AXIS5_DRIVER_MICROSTEPS, AXIS5_DRIVER_IRUN, AXIS5_DRIVER_DECAY, AXIS5_DRIVER_DECAY_GOTO);
     #elif AXIS5_DRIVER_MODEL == SERVO_TMC5160
@@ -236,16 +236,16 @@
     #endif
 
     const ServoPins DriverPinsAxis6 = {AXIS6_SERVO_PH1_PIN, AXIS6_SERVO_PH1_STATE, AXIS6_SERVO_PH2_PIN, AXIS6_SERVO_PH2_STATE, AXIS6_ENABLE_PIN, AXIS6_ENABLE_STATE, AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS1_M2_PIN, AXIS6_M3_PIN, AXIS6_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS, AXIS6_SERVO_VELOCITY_MAX_CPS, AXIS6_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS, AXIS6_SERVO_VELOCITY_MAX, AXIS6_SERVO_ACCELERATION};
 
     #if AXIS6_DRIVER_MODEL == SERVO_EE
-      ServoEE driver6(6, &DriverPinsAxis6, &DriverSettingsAxis6);
+      ServoEE driver6(6, &DriverPinsAxis6, &DriverSettingsAxis6, AXIS6_SERVO_DC_PWR_MIN, AXIS6_SERVO_DC_PWR_MAX);
     #elif AXIS6_DRIVER_MODEL == SERVO_PE
-      ServoPE driver6(6, &DriverPinsAxis6, &DriverSettingsAxis6);
+      ServoPE driver6(6, &DriverPinsAxis6, &DriverSettingsAxis6, AXIS6_SERVO_DC_PWR_MIN, AXIS6_SERVO_DC_PWR_MAX);
     #elif AXIS6_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver6(6, &DriverPinsAxis5, &DriverSettingsAxis6);
+      ServoTmc2130DC driver6(6, &DriverPinsAxis5, &DriverSettingsAxis6, AXIS6_SERVO_DC_PWR_MIN, AXIS6_SERVO_DC_PWR_MAX);
     #elif AXIS6_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver6(6, &DriverPinsAxis5, &DriverSettingsAxis6);
+      ServoTmc5160DC driver6(6, &DriverPinsAxis5, &DriverSettingsAxis6, AXIS6_SERVO_DC_PWR_MIN, AXIS6_SERVO_DC_PWR_MAX);
     #elif AXIS6_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver6(6, &DriverPinsAxis6, &DriverSettingsAxis6, AXIS6_MOTOR_STEPS_PER_MICRON/AXIS6_STEPS_PER_MICRON, AXIS6_DRIVER_MICROSTEPS, AXIS6_DRIVER_IRUN, AXIS6_DRIVER_DECAY, AXIS6_DRIVER_DECAY_GOTO);
     #elif AXIS6_DRIVER_MODEL == SERVO_TMC5160
@@ -330,16 +330,16 @@
     #endif
 
     const ServoPins DriverPinsAxis7 = {AXIS7_SERVO_PH1_PIN, AXIS7_SERVO_PH1_STATE, AXIS7_SERVO_PH2_PIN, AXIS7_SERVO_PH2_STATE, AXIS7_ENABLE_PIN, AXIS7_ENABLE_STATE, AXIS7_M0_PIN, AXIS7_M1_PIN, AXIS1_M2_PIN, AXIS7_M3_PIN, AXIS7_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS, AXIS7_SERVO_VELOCITY_MAX_CPS, AXIS7_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS, AXIS7_SERVO_VELOCITY_MAX, AXIS7_SERVO_ACCELERATION};
 
     #if AXIS7_DRIVER_MODEL == SERVO_EE
-      ServoEE driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7);
+      ServoEE driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7, AXIS7_SERVO_DC_PWR_MIN, AXIS7_SERVO_DC_PWR_MAX);
     #elif AXIS7_DRIVER_MODEL == SERVO_PE
-      ServoPE driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7);
+      ServoPE driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7, AXIS7_SERVO_DC_PWR_MIN, AXIS7_SERVO_DC_PWR_MAX);
     #elif AXIS7_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7);
+      ServoTmc2130DC driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7, AXIS7_SERVO_DC_PWR_MIN, AXIS7_SERVO_DC_PWR_MAX);
     #elif AXIS7_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7);
+      ServoTmc5160DC driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7, AXIS7_SERVO_DC_PWR_MIN, AXIS7_SERVO_DC_PWR_MAX);
     #elif AXIS7_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver7(7, &DriverPinsAxis7, &DriverSettingsAxis7, AXIS7_MOTOR_STEPS_PER_MICRON/AXIS7_STEPS_PER_MICRON, AXIS7_DRIVER_MICROSTEPS, AXIS7_DRIVER_IRUN, AXIS7_DRIVER_DECAY, AXIS7_DRIVER_DECAY_GOTO);
     #elif AXIS7_DRIVER_MODEL == SERVO_TMC5160
@@ -424,16 +424,16 @@
     #endif
 
     const ServoPins DriverPinsAxis8 = {AXIS8_SERVO_PH1_PIN, AXIS8_SERVO_PH1_STATE, AXIS8_SERVO_PH2_PIN, AXIS8_SERVO_PH2_STATE, AXIS8_ENABLE_PIN, AXIS8_ENABLE_STATE, AXIS8_M0_PIN, AXIS8_M1_PIN, AXIS1_M2_PIN, AXIS8_M3_PIN, AXIS8_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS, AXIS8_SERVO_VELOCITY_MAX_CPS, AXIS8_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS, AXIS8_SERVO_VELOCITY_MAX, AXIS8_SERVO_ACCELERATION};
 
     #if AXIS8_DRIVER_MODEL == SERVO_EE
-      ServoEE driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8);
+      ServoEE driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8, AXIS8_SERVO_DC_PWR_MIN, AXIS8_SERVO_DC_PWR_MAX);
     #elif AXIS8_DRIVER_MODEL == SERVO_PE
-      ServoPE driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8);
+      ServoPE driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8, AXIS8_SERVO_DC_PWR_MIN, AXIS8_SERVO_DC_PWR_MAX);
     #elif AXIS8_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8);
+      ServoTmc2130DC driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8, AXIS8_SERVO_DC_PWR_MIN, AXIS8_SERVO_DC_PWR_MAX);
     #elif AXIS8_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8);
+      ServoTmc5160DC driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8, AXIS8_SERVO_DC_PWR_MIN, AXIS8_SERVO_DC_PWR_MAX);
     #elif AXIS8_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver8(8, &DriverPinsAxis8, &DriverSettingsAxis8, AXIS8_MOTOR_STEPS_PER_MICRON/AXIS8_STEPS_PER_MICRON, AXIS8_DRIVER_MICROSTEPS, AXIS8_DRIVER_IRUN, AXIS8_DRIVER_DECAY, AXIS8_DRIVER_DECAY_GOTO);
     #elif AXIS8_DRIVER_MODEL == SERVO_TMC5160
@@ -518,16 +518,16 @@
     #endif
 
     const ServoPins DriverPinsAxis9 = {AXIS9_SERVO_PH1_PIN, AXIS9_SERVO_PH1_STATE, AXIS9_SERVO_PH2_PIN, AXIS9_SERVO_PH2_STATE, AXIS9_ENABLE_PIN, AXIS9_ENABLE_STATE, AXIS9_M0_PIN, AXIS9_M1_PIN, AXIS1_M2_PIN, AXIS9_M3_PIN, AXIS9_FAULT_PIN};
-    const ServoSettings DriverSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS, AXIS9_SERVO_VELOCITY_MAX_CPS, AXIS9_SERVO_ACCELERATION};
+    const ServoSettings DriverSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS, AXIS9_SERVO_VELOCITY_MAX, AXIS9_SERVO_ACCELERATION};
 
     #if AXIS9_DRIVER_MODEL == SERVO_EE
-      ServoEE driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9);
+      ServoEE driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9, AXIS9_SERVO_DC_PWR_MIN, AXIS9_SERVO_DC_PWR_MAX);
     #elif AXIS9_DRIVER_MODEL == SERVO_PE
-      ServoPE driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9);
+      ServoPE driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9, AXIS9_SERVO_DC_PWR_MIN, AXIS9_SERVO_DC_PWR_MAX);
     #elif AXIS9_DRIVER_MODEL == SERVO_TMC2130_DC
-      ServoTmc2130DC driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9);
+      ServoTmc2130DC driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9, AXIS9_SERVO_DC_PWR_MIN, AXIS9_SERVO_DC_PWR_MAX);
     #elif AXIS9_DRIVER_MODEL == SERVO_TMC5160_DC
-      ServoTmc5160DC driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9);
+      ServoTmc5160DC driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9, AXIS9_SERVO_DC_PWR_MIN, AXIS9_SERVO_DC_PWR_MAX);
     #elif AXIS9_DRIVER_MODEL == SERVO_TMC2209
       ServoTmc2209 driver9(9, &DriverPinsAxis9, &DriverSettingsAxis9, AXIS9_MOTOR_STEPS_PER_MICRON/AXIS9_STEPS_PER_MICRON, AXIS9_DRIVER_MICROSTEPS, AXIS9_DRIVER_IRUN, AXIS9_DRIVER_DECAY, AXIS9_DRIVER_DECAY_GOTO);
     #elif AXIS9_DRIVER_MODEL == SERVO_TMC5160
