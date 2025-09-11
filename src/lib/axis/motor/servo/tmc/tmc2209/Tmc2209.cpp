@@ -89,7 +89,7 @@ bool ServoTmc2209::init(bool reverse) {
   driver->begin();
   driver->intpol(true);
 
-  if (normalizedDecay == STEALTHCHOP && normalizedDecaySlewing == SPREADCYCLE && velocityThrs > 0) {
+  if (decay.value == STEALTHCHOP && decaySlewing.value == SPREADCYCLE && velocityThrs > 0) {
     VF("MSG:"); V(axisPrefix); VF("TMC decay mode velocity threshold "); V(velocityThrs); VLF(" sps");
     driver->TPWMTHRS(velocityThrs/0.715F);
   }
