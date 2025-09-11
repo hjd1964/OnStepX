@@ -30,7 +30,7 @@ ServoTmc2209::ServoTmc2209(uint8_t axisNumber, const ServoPins *Pins, const Serv
   axisPrefix[5] = '0' + axisNumber;
 
   this->velocityThrs = velocityThrs;
-  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
+  this->countsToStepsRatio.valueDefault = countsToStepsRatio;
 }
 
 bool ServoTmc2209::init(bool reverse) {

@@ -23,7 +23,7 @@ ServoTmc5160::ServoTmc5160(uint8_t axisNumber, const ServoPins *Pins, const Serv
   axisPrefix[5] = '0' + axisNumber;
 
   this->velocityThrs = velocityThrs;
-  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
+  this->countsToStepsRatio.valueDefault = countsToStepsRatio;
 }
 
 bool ServoTmc5160::init(bool reverse) {

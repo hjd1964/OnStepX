@@ -43,7 +43,7 @@ ServoKTech::ServoKTech(uint8_t axisNumber, const ServoSettings *Settings, float 
   // the motor CAN ID is the axis number!
   canID = 0x140 + axisNumber;
 
-  this->countsToStepsRatio.defaultValue = countsToStepsRatio;
+  this->countsToStepsRatio.valueDefault = countsToStepsRatio;
 
   ktechServoInstance[this->axisNumber - 1] = this;
   switch (this->axisNumber) {
