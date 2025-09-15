@@ -84,8 +84,9 @@ bool Axis::init(Motor *motor) {
   nvAxisSettings.stepsPerMeasure = stepsPerMeasureDefault;
   for (int i = 1; i <= getParameterCount(); i++) {
     #if DEBUG != OFF
-      const char* axpn[22] = {AXPN_1, AXPN_2, AXPN_3, AXPN_4, AXPN_5, AXPN_6, AXPN_7, AXPN_8, AXPN_9, AXPN_10,
-      AXPN_11, AXPN_12, AXPN_13, AXPN_14, AXPN_15, AXPN_16, AXPN_17, AXPN_18, AXPN_19, AXPN_20, AXPN_21, AXPN_22};
+      const char* axpn[26] = {AXPN_1, AXPN_2, AXPN_3, AXPN_4, AXPN_5, AXPN_6, AXPN_7, AXPN_8, AXPN_9, AXPN_10,
+      AXPN_11, AXPN_12, AXPN_13, AXPN_14, AXPN_15, AXPN_16, AXPN_17, AXPN_18, AXPN_19, AXPN_20, AXPN_21, AXPN_22,
+      AXPN_23, AXPN_24, AXPN_25, AXPN_26};
       VF("MSG:"); V(axisPrefix); VF("found parameter \"");
       if (getParameter(i)->name[0] == '$') {
         char number[3] = "";
@@ -640,6 +641,7 @@ void Axis::setFrequencyMin(float frequency) {
 
 void Axis::setFrequencyMax(float frequency) {
   maxFreq = frequency;
+  motor->setFrequencyMax(frequency*stepsPerMeasure->value);
 }
 
 void Axis::setFrequencySlew(float frequency) {

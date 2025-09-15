@@ -81,6 +81,14 @@ class ServoMotor : public Motor {
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return 64; }
 
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in steps (counts) per second
+    void setFrequencyMax(float frequency) {
+      velocityMax = frequency;
+      driver->setFrequencyMax(frequency);
+      feedback->setControlRange(frequency);
+    }
+
     // get movement frequency in steps per second
     float getFrequencySteps();
 
@@ -126,38 +134,6 @@ class ServoMotor : public Motor {
   private:
     Filter *filter;
 
-    float velocityEstimate = 0.0F;
-    float velocityOverride = 0.0F;
-
-    uint8_t servoMonitorHandle = 0;
-    uint8_t taskHandle = 0;
-    float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
-
-    int  stepSize = 1;                  // step size
-    volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
-    volatile bool takeStep = false;     // should we take a step
-    float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
-
-    float currentDirection = 0.0F;      // last direction
-    float currentFrequency = 0.0F;      // last frequency set in encoder counts per second
-    float lastFrequency = 0.0F;         // last frequency requested
-    unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
-    long syncThreshold = OFF;           // sync threshold in counts (for absolute encoders) or OFF
-
-    long lastRawEncoderCounts = 0;      // the last encoder position for velocity calculation
-    unsigned long lastEncoderReadUs = 0;
-    unsigned long lastEncoderReadMs = 0;
-    
-    long lastEncoderCounts = 0;         // the last encoder position for stall check
-    long lastDelta = 0;                 // the last distance from target for runaway check
-    long movingAwaySeconds = 0;         // amount of time for runaway check
-    unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
-    unsigned long startTime = 0;        // time at start of servo polling
-    unsigned long lastSlewingTime = 0;  // time when last slewing
-
-    volatile int absStep = 1;           // absolute step size (unsigned)
-    volatile long originIndexSteps = 0; // for absolute motor position to axis position at coordinate origin
-
     void (*callback)() = NULL;
 
     Feedback *feedback;
@@ -166,17 +142,47 @@ class ServoMotor : public Motor {
       ServoCalibrateTrackingVelocity *calibrateVelocity;
     #endif
 
+    uint8_t servoMonitorHandle = 0;
+    uint8_t taskHandle = 0;
+
+    float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
     bool useFastHardwareTimers = true;
-    bool slewing = false;
-    bool motorStepsInitDone = false;
-    bool homeSet = false;
-    uint32_t encoderOrigin = 0;
+
     bool encoderReverse = false;
     bool encoderReverseDefault = false;
-    bool wasAbove33 = false;
-    bool wasBelow33 = false;
+
+    // for absolute encoders
+    bool motorStepsInitDone = false;    // help determing when ready to set position
+    bool homeSet = false;               // help determing when ready to set position
+    uint32_t encoderOrigin = 0;         // the starting position
+    long syncThreshold = OFF;           // sync threshold in counts, or OFF
+
+    int stepSize = 1;                   // step size
+    volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
+    volatile bool takeStep = false;     // should we take a step
+    float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
+    bool slewing = false;
+
+    float currentDirection = 0.0F;      // last direction
+    float currentFrequency = 0.0F;      // last frequency set in encoder counts per second
+    float lastFrequency = 0.0F;         // last frequency requested
+    unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
+    float velocityMax = 0.0F;           // the maximum velocity allowed
+
+    volatile int absStep = 1;           // absolute step size (unsigned)
+    volatile long originIndexSteps = 0; // for absolute motor position to axis position at coordinate origin
+
+    // servo safety checks
+    unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
+    unsigned long startTime = 0;        // time at start of servo polling
+    unsigned long lastSlewingTime = 0;  // time when last slewing
+    long lastEncoderCounts = 0;         // the last encoder position for stall check
+    long movingAwaySeconds = 0;         // amount of time for runaway check
+    long lastTargetDistance = 0;        // check if moving away from target for runaway check
+    long lastDelta = 0;                 // the last distance from target for runaway check
+    bool wasAbove33 = false;            // check for oscillation
+    bool wasBelow33 = false;            // check for oscillation
     bool safetyShutdown = false;
-    long lastTargetDistance = 0;
 };
 
 #endif

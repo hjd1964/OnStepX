@@ -41,13 +41,17 @@ typedef struct DriverStatus {
 #define AXPN_PID_SLEWING_I "$20"
 #define AXPN_PID_SLEWING_D "$21"
 #define AXPN_RADS_PER_COUNT "$22"
+#define AXPN_STEPS_TO_COUNTS "$23"
+#define AXPN_MAX_ACCEL "$24"
+#define AXPN_MIN_PWR "$25"
+#define AXPN_MAX_PWR "$26"
 
 #define AXPN_1 "Steps/degree"
-#define AXPN_2 "Min. limit degs"
-#define AXPN_3 "Max. limit degs"
+#define AXPN_2 "Min limit, degs"
+#define AXPN_3 "Max limit, degs"
 #define AXPN_4 "Steps/um"
-#define AXPN_5 "Min. limit um"
-#define AXPN_6 "Max. limit um"
+#define AXPN_5 "Min limit, um"
+#define AXPN_6 "Max limit, um"
 #define AXPN_7 "Reverse"
 #define AXPN_8 "Microsteps"
 #define AXPN_9 "Microsteps Goto"
@@ -64,6 +68,10 @@ typedef struct DriverStatus {
 #define AXPN_20 "I slewing"
 #define AXPN_21 "D slewing"
 #define AXPN_22 "Rads/count"
+#define AXPN_23 "Steps/count ratio"
+#define AXPN_24 "Max accel, %/s/s"
+#define AXPN_25 "Min power, %"
+#define AXPN_26 "Max power, %"
 
 // AXP_FLOAT_RAD and AXP_FLOAT_RAD_INV automatically translate to/from AXP_FLOAT (in degrees) for commands
 enum AxisParameterType: uint8_t {AXP_INVALID,

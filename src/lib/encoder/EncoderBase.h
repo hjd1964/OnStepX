@@ -105,10 +105,10 @@ class Encoder {
     virtual void setOrigin(uint32_t count);
 
     // get current position
-    virtual int32_t read();
+    virtual int32_t read() { return 0; }
 
     // set current position
-    virtual void write(int32_t position);
+    virtual void write(int32_t position) { UNUSED(position); }
 
     // set the virtual encoder velocity in counts per second
     virtual void setVelocity(float countsPerSec) { UNUSED(countsPerSec); }

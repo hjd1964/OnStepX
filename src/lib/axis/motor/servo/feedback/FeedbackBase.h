@@ -44,8 +44,8 @@ typedef struct ServoControl {
 
 class Feedback {
   public:
-    // initialize feedback control and parameters, controlRange is +/- 255 default
-    virtual void init(uint8_t axisNumber, ServoControl *control, float controlRange = 255);
+    // initialize feedback control and parameters
+    virtual void init(uint8_t axisNumber, ServoControl *control);
 
     // reset feedback control and parameters
     virtual void reset();
@@ -68,9 +68,15 @@ class Feedback {
     // set feedback control direction
     virtual void setControlDirection(int8_t state);
 
+    // set feedback control range controlRange, +/- the maximum encoder counts/s
+    virtual void setControlRange(float controlRange);
+
     virtual void poll();
 
     bool manuallySwitchParameters = true;
+
+    // true if the feedback instance is ready to use
+    bool ready = false;
 
   protected:
     uint8_t axisNumber = 0;

@@ -27,7 +27,6 @@ typedef struct ServoPins {
 typedef struct ServoSettings {
   int16_t model;
   int8_t  status;
-  int32_t velocityMax;   // maximum velocity in encoder counts/s
   int32_t acceleration;  // acceleration in encoder %/s/s
 } ServoSettings;
 
@@ -53,9 +52,9 @@ class ServoDriver {
     // enable or disable the driver using the enable pin or other method
     virtual void enable(bool state) { UNUSED(state); }
 
-    // get the control range to the motor (-velocityMax to velocityMax) defaults to ANALOG_WRITE_RANGE
-    // must be ready at object creation!
-    virtual float getMotorControlRange() { return velocityMax.value; }
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in steps (counts) per second
+    void setFrequencyMax(float frequency);
 
     // set motor velocity
     // \param velocity as needed to reach the target position, in encoder counts per second
@@ -96,7 +95,8 @@ class ServoDriver {
 
     float normalizedAcceleration; // in encoder counts/s/s
     float accelerationFs;         // in encoder counts/s/fs
-    float velocityRamp = 0;       // regulate velocity changes
+    float velocityRamp = 0.0F;    // regulate velocity changes
+    float velocityMax = 0.0F;     // in encoder counts/s
 
     Direction motorDirection = DIR_FORWARD;
     bool reversed = false;
@@ -111,11 +111,10 @@ class ServoDriver {
 
     // runtime adjustable settings
     AxisParameter invalid = {NAN, NAN, NAN, NAN, NAN, AXP_INVALID, ""};
-    AxisParameter velocityMax = {NAN, NAN, NAN, 0, 1000000, AXP_INTEGER, "v-Max, counts/s"};
-    AxisParameter acceleration = {NAN, NAN, NAN, 0, 100000, AXP_FLOAT, "a-Max, %/s/s"};
+    AxisParameter acceleration = {NAN, NAN, NAN, 0, 100000, AXP_FLOAT, AXPN_MAX_ACCEL};
 
-    const int numParameters = 3;
-    AxisParameter* parameter[3] = {&invalid, &velocityMax, &acceleration};
+    const int numParameters = 2;
+    AxisParameter* parameter[2] = {&invalid, &acceleration};
 };
 
 #endif

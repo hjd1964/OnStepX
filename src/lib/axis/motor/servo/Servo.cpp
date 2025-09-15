@@ -79,7 +79,7 @@ bool ServoMotor::init() {
   driver->enable(false);
   
   // get the feedback control loop ready
-  feedback->init(axisNumber, control, driver->getMotorControlRange());
+  feedback->init(axisNumber, control);
   feedback->reset();
 
   trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
@@ -312,7 +312,7 @@ void ServoMotor::poll() {
 
     // directly use fixed PWM value during calibration
     #ifdef CALIBRATE_SERVO_DC
-      velocity = calibrateVelocity->experimentMode ? calibrateVelocity->experimentPwm * driver->getMotorControlRange() / 100.0F : control->out;
+      velocity = calibrateVelocity->experimentMode ? calibrateVelocity->experimentPwm*velocityMax / 100.0F : control->out;
     #else
       velocity = control->out + currentDirection*currentFrequency;
     #endif
@@ -326,8 +326,7 @@ void ServoMotor::poll() {
     encoder->setDirection(&dir);
   }
 
-  delta = motorCounts - encoderCounts;
-  velocityPercent = (driver->setMotorVelocity(velocity)/driver->getMotorControlRange()) * 100.0F;
+  velocityPercent = (driver->setMotorVelocity(velocity)/velocityMax) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
   if (feedback->manuallySwitchParameters) {
@@ -345,6 +344,7 @@ void ServoMotor::poll() {
   if (velocityPercent > 33) wasAbove33 = true;
 
   if (millis() - lastCheckTime > 1000) {
+    delta = motorCounts - encoderCounts;
 
     #ifndef SERVO_SAFETY_DISABLE
       // if above SERVO_SAFETY_STALL_POWER (33% default) and we're not moving something is seriously wrong, so shut it down

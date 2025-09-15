@@ -43,7 +43,7 @@ class ServoDcDriver : public ServoDriver {
   
       long power = 0;
       if (velocity != 0.0F) {
-        power = lround(((float)velocity/velocityMax.value)*(analogWriteRange - 1));
+        power = lround(((float)velocity/velocityMax)*(analogWriteRange - 1));
         long pwmMin = lround(pwmMinimum.value/100.0F*(analogWriteRange - 1));
         long pwmMax = lround(pwmMaximum.value/100.0F*(analogWriteRange - 1));
 
@@ -59,11 +59,11 @@ class ServoDcDriver : public ServoDriver {
     long analogWriteRange = SERVO_ANALOG_WRITE_RANGE;
 
     // runtime adjustable settings
-    AxisParameter pwmMinimum = {NAN, NAN, NAN, 0.0, 25.0, AXP_FLOAT_IMMEDIATE, "Min power, %"};
-    AxisParameter pwmMaximum = {NAN, NAN, NAN, 25.0, 100.0, AXP_FLOAT_IMMEDIATE, "Max power, %"};
+    AxisParameter pwmMinimum = {NAN, NAN, NAN, 0.0, 25.0, AXP_FLOAT_IMMEDIATE, AXPN_MIN_PWR};
+    AxisParameter pwmMaximum = {NAN, NAN, NAN, 25.0, 100.0, AXP_FLOAT_IMMEDIATE, AXPN_MAX_PWR};
 
-    const int numParameters = 4;
-    AxisParameter* parameter[5] = {&invalid, &velocityMax, &acceleration, &pwmMinimum, &pwmMaximum};
+    const int numParameters = 3;
+    AxisParameter* parameter[4] = {&invalid, &acceleration, &pwmMinimum, &pwmMaximum};
 };
 
 #endif

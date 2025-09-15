@@ -31,7 +31,7 @@ class Pid : public Feedback {
     Pid(const float P, const float I, const float D);
 
     // initialize PID control and parameters
-    void init(uint8_t axisNumber, ServoControl *control, float controlRange);
+    void init(uint8_t axisNumber, ServoControl *control);
 
     // reset feedback control and parameters
     void reset();
@@ -44,6 +44,9 @@ class Pid : public Feedback {
 
     // set feedback control direction
     void setControlDirection(int8_t state);
+
+    // set feedback control range
+    void setControlRange(float controlRange);
 
     // select PID param set for tracking
     void selectTrackingParameters();

@@ -93,6 +93,10 @@ class Motor {
     // returns 1 if distance to origin is closer else -1 if target is closer
     int getRampDirection();
 
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in steps per second
+    virtual void setFrequencyMax(float frequency) { UNUSED(frequency); }
+
     // get movement frequency in steps per second
     virtual float getFrequencySteps() { return 0; }
 

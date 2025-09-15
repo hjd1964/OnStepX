@@ -52,13 +52,13 @@ class TmcServoDriver : public ServoDriver {
     int16_t normalizedMicrosteps = 256;
 
     // runtime adjustable settings
-    AxisParameter countsToStepsRatio = {NAN, NAN, NAN, 0, 20000, AXP_FLOAT, "Steps/count ratio"};
+    AxisParameter countsToStepsRatio = {NAN, NAN, NAN, 0, 20000, AXP_FLOAT, AXPN_STEPS_TO_COUNTS};
     AxisParameter currentRun    = {NAN, NAN, NAN, 0, 20000, AXP_INTEGER, AXPN_CURRENT_RUN};
     AxisParameter decay         = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE};
     AxisParameter decaySlewing  = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE_GOTO};
 
-    const int numParameters = 6;
-    AxisParameter* parameter[7] = {&invalid, &velocityMax, &acceleration, &countsToStepsRatio, &currentRun, &decay, &decaySlewing};
+    const int numParameters = 5;
+    AxisParameter* parameter[6] = {&invalid, &acceleration, &countsToStepsRatio, &currentRun, &decay, &decaySlewing};
 };
 
 #endif

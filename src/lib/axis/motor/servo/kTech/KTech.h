@@ -66,8 +66,8 @@ class ServoKTech : public ServoDriver {
     // runtime adjustable settings
     AxisParameter countsToStepsRatio = {NAN, NAN, NAN, -1, 20000, AXP_FLOAT, "Count/Step ratio"};
 
-    const int numParameters = 3;
-    AxisParameter* parameter[4] = {&invalid, &velocityMax, &acceleration, &countsToStepsRatio};
+    const int numParameters = 2;
+    AxisParameter* parameter[3] = {&invalid, &acceleration, &countsToStepsRatio};
 
 };
 

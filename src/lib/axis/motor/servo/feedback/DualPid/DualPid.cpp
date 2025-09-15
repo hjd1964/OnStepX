@@ -23,12 +23,13 @@ DualPid::DualPid(const float P, const float I, const float D, const float P_goto
 }
 
 // initialize PID control and parameters
-void DualPid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
+void DualPid::init(uint8_t axisNumber, ServoControl *control) {
+  if (ready) return;
+
   Feedback::init(axisNumber, control);
 
   axisPrefix[5] = '0' + axisNumber;
 
-  VF("MSG:"); V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
   VF("MSG:"); V(axisPrefix); if (manuallySwitchParameters) { VL("using manual parameter switching"); } else { VL("using auto parameter scaling"); } 
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
@@ -36,7 +37,6 @@ void DualPid::init(uint8_t axisNumber, ServoControl *control, float controlRange
                      QuickPID::pMode::PID_PMODE, QuickPID::dMode::PID_DMODE, QuickPID::iAwMode::PID_IMODE,
                      QuickPID::Action::direct);
   pid->SetSampleTimeUs(PID_SAMPLE_TIME_US);
-  pid->SetOutputLimits(-controlRange, controlRange);
   pid->Initialize();
   pid->SetMode(QuickPID::Control::automatic);
 }
@@ -53,6 +53,11 @@ void DualPid::reset() {
 
 void DualPid::setControlDirection(int8_t state) {
   if (state == ON) pid->SetControllerDirection(QuickPID::Action::reverse); else pid->SetControllerDirection(QuickPID::Action::direct);
+}
+
+void DualPid::setControlRange(float controlRange) {
+  VF("MSG:"); V(axisPrefix); VF("setting feedback range +/-"); VL(controlRange);
+  pid->SetOutputLimits(-controlRange, controlRange);
 }
 
 // select PID param set for slewing
