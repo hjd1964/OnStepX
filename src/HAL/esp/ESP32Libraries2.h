@@ -65,11 +65,11 @@
   #define SERIAL_BT_BEGIN()
 #endif
 
-#ifdef SERVO_ANALOG_WRITE_FREQUENCY
+#ifdef ANALOG_WRITE_FREQUENCY
   #define HAL_INIT() { \
     analogReadResolution((int)log2(ANALOG_READ_RANGE + 1)); \
     analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
-    analogWriteFrequency(SERVO_ANALOG_WRITE_FREQUENCY); \
+    analogWriteFrequency(ANALOG_WRITE_FREQUENCY); \
     SERIAL_BT_BEGIN(); \
   }
 #else
