@@ -340,13 +340,13 @@
   #define AXIS1_PID_SENSITIVITY         0                         // 0 to use slewing state, or % power for 100% pid set two (_GOTO)
   #endif
   #ifndef AXIS1_PID_P
-  #define AXIS1_PID_P                   2.0                       // P = proportional
+  #define AXIS1_PID_P                   0.0                       // P = proportional
   #endif
   #ifndef AXIS1_PID_I
-  #define AXIS1_PID_I                   5.0                       // I = integral
+  #define AXIS1_PID_I                   0.0                       // I = integral
   #endif
   #ifndef AXIS1_PID_D
-  #define AXIS1_PID_D                   1.0                       // D = derivative
+  #define AXIS1_PID_D                   0.0                       // D = derivative
   #endif
   #ifndef AXIS1_PID_P_GOTO
   #define AXIS1_PID_P_GOTO              AXIS1_PID_P               // P = proportional
@@ -512,13 +512,13 @@
   #define AXIS2_PID_SENSITIVITY         0
   #endif
   #ifndef AXIS2_PID_P
-  #define AXIS2_PID_P                   2.0
+  #define AXIS2_PID_P                   0.0
   #endif
   #ifndef AXIS2_PID_I
-  #define AXIS2_PID_I                   5.0
+  #define AXIS2_PID_I                   0.0
   #endif
   #ifndef AXIS2_PID_D
-  #define AXIS2_PID_D                   1.0
+  #define AXIS2_PID_D                   0.0
   #endif
   #ifndef AXIS2_PID_P_GOTO
   #define AXIS2_PID_P_GOTO              AXIS2_PID_P
@@ -1004,13 +1004,13 @@
   #define AXIS3_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS3_PID_P
-  #define AXIS3_PID_P                   2.0
+  #define AXIS3_PID_P                   0.0
   #endif
   #ifndef AXIS3_PID_I
-  #define AXIS3_PID_I                   5.0
+  #define AXIS3_PID_I                   0.0
   #endif
   #ifndef AXIS3_PID_D
-  #define AXIS3_PID_D                   1.0
+  #define AXIS3_PID_D                   0.0
   #endif
 
   #ifndef AXIS3_SERVO_FLTR
@@ -1190,13 +1190,13 @@
   #define AXIS4_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS4_PID_P
-  #define AXIS4_PID_P                   2.0
+  #define AXIS4_PID_P                   0.0
   #endif
   #ifndef AXIS4_PID_I
-  #define AXIS4_PID_I                   5.0
+  #define AXIS4_PID_I                   0.0
   #endif
   #ifndef AXIS4_PID_D
-  #define AXIS4_PID_D                   1.0
+  #define AXIS4_PID_D                   0.0
   #endif
 
   #ifndef AXIS4_SERVO_FLTR
@@ -1353,13 +1353,13 @@
   #define AXIS5_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS5_PID_P
-  #define AXIS5_PID_P                   2.0
+  #define AXIS5_PID_P                   0.0
   #endif
   #ifndef AXIS5_PID_I
-  #define AXIS5_PID_I                   5.0
+  #define AXIS5_PID_I                   0.0
   #endif
   #ifndef AXIS5_PID_D
-  #define AXIS5_PID_D                   1.0
+  #define AXIS5_PID_D                   0.0
   #endif
   #ifndef AXIS5_PID_P_GOTO
   #define AXIS5_PID_P_GOTO              AXIS5_PID_P
@@ -1525,13 +1525,13 @@
   #define AXIS6_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS6_PID_P
-  #define AXIS6_PID_P                   2.0
+  #define AXIS6_PID_P                   0.0
   #endif
   #ifndef AXIS6_PID_I
-  #define AXIS6_PID_I                   5.0
+  #define AXIS6_PID_I                   0.0
   #endif
   #ifndef AXIS6_PID_D
-  #define AXIS6_PID_D                   1.0
+  #define AXIS6_PID_D                   0.0
   #endif
 
   #ifndef AXIS6_SERVO_FLTR
@@ -1687,13 +1687,13 @@
   #define AXIS7_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS7_PID_P
-  #define AXIS7_PID_P                   2.0
+  #define AXIS7_PID_P                   0.0
   #endif
   #ifndef AXIS7_PID_I
-  #define AXIS7_PID_I                   5.0
+  #define AXIS7_PID_I                   0.0
   #endif
   #ifndef AXIS7_PID_D
-  #define AXIS7_PID_D                   1.0
+  #define AXIS7_PID_D                   0.0
   #endif
 
   #ifndef AXIS7_SERVO_FLTR
@@ -1850,13 +1850,13 @@
   #define AXIS8_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS8_PID_P
-  #define AXIS8_PID_P                   2.0
+  #define AXIS8_PID_P                   0.0
   #endif
   #ifndef AXIS8_PID_I
-  #define AXIS8_PID_I                   5.0
+  #define AXIS8_PID_I                   0.0
   #endif
   #ifndef AXIS8_PID_D
-  #define AXIS8_PID_D                   1.0
+  #define AXIS8_PID_D                   0.0
   #endif
 
   #ifndef AXIS8_SERVO_FLTR
@@ -2013,13 +2013,13 @@
   #define AXIS9_SERVO_FEEDBACK          PID
   #endif
   #ifndef AXIS9_PID_P
-  #define AXIS9_PID_P                   2.0
+  #define AXIS9_PID_P                   0.0
   #endif
   #ifndef AXIS9_PID_I
-  #define AXIS9_PID_I                   5.0
+  #define AXIS9_PID_I                   0.0
   #endif
   #ifndef AXIS9_PID_D
-  #define AXIS9_PID_D                   1.0
+  #define AXIS9_PID_D                   0.0
   #endif
 
   #ifndef AXIS9_SERVO_FLTR
