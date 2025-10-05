@@ -119,7 +119,7 @@ bool TmcServoDriver::init(bool reverse) {
   VF("MSG:"); V(axisPrefix); VF("Rsense="); V(rSense); VL("Ohms");
   VF("MSG:"); V(axisPrefix); VF("max current="); V(currentMax); VL("mA");
 
-  iRun = this->currentRun.valueDefault;
+  iRun = this->currentRun.value;
   iHold = iRun;
   iHoldRatio = (float)1.0F;
 
