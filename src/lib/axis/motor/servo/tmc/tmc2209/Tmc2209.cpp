@@ -99,8 +99,7 @@ bool ServoTmc2209::init(bool reverse) {
   driver->hold_multiplier(iHoldRatio);
 
   VF("MSG:"); V(axisPrefix); VF("Irun="); V(lround(iRun)); VLF("mA");
-
-  driver->rms_current(lround(iRun*0.7071));
+  driver->rms_current(iRun*0.7071);
 
   driver->en_spreadCycle(true);
 
