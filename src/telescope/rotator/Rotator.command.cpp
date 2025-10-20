@@ -14,6 +14,8 @@ extern Axis axis3;
 bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
+  if (!ready) return false;
+
   // process any rotator axis commands
   if (axis3.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
 
