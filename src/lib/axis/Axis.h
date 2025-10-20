@@ -519,11 +519,11 @@ private:
 
   void (*volatile callback)() = NULL;
 
-  AxisParameter stepsPerDegree = {NAN, NAN, NAN, 300.0, 360000.0, AXP_FLOAT, AXPN_STEPS_PER_DEG};
+  AxisParameter stepsPerDegree = {NAN, NAN, NAN, 1.0, 360000.0, AXP_FLOAT, AXPN_STEPS_PER_DEG};
   AxisParameter minDegrees     = {NAN, NAN, NAN, -360.0, 360.0, AXP_FLOAT, AXPN_LIMIT_DEGS_MIN};
   AxisParameter maxDegrees     = {NAN, NAN, NAN, -360.0, 360.0, AXP_FLOAT, AXPN_LIMIT_DEGS_MAX};
 
-  AxisParameter stepsPerRadian = {NAN, NAN, NAN, radToDegF(300.0), radToDegF(360000.0), AXP_FLOAT_RAD_INV, AXPN_STEPS_PER_DEG};
+  AxisParameter stepsPerRadian = {NAN, NAN, NAN, radToDegF(1.0), radToDegF(360000.0), AXP_FLOAT_RAD_INV, AXPN_STEPS_PER_DEG};
   AxisParameter minRadians     = {NAN, NAN, NAN, -Deg360, Deg360, AXP_FLOAT_RAD, AXPN_LIMIT_DEGS_MIN};
   AxisParameter maxRadians     = {NAN, NAN, NAN, -Deg360, Deg360, AXP_FLOAT_RAD, AXPN_LIMIT_DEGS_MAX};
 
