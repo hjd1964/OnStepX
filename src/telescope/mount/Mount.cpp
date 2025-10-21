@@ -218,6 +218,21 @@ void Mount::tracking(bool state) {
   if (state == true) {
     enable(state);
     if (isEnabled()) trackingState = TS_SIDEREAL;
+
+    // When tracking is (re)enabled (at boot or by user),
+    // constrain the corrective authority to the tracking limits (deg/s)
+    // so the PID/feedback loop doesn't have "slew-sized" authority.
+    // This applies to all motor types via Axis::setFrequencyMax().
+    #if defined(AXIS1_TRACK_CORR_MAX_DEG_S)
+      if (AXIS1_TRACK_CORR_MAX_DEG_S > 0.0F) {
+        axis1.setFrequencyMax(AXIS1_TRACK_CORR_MAX_DEG_S);
+      }
+    #endif
+    #if defined(AXIS2_TRACK_CORR_MAX_DEG_S)
+      if (AXIS2_TRACK_CORR_MAX_DEG_S > 0.0F) {
+        axis2.setFrequencyMax(AXIS2_TRACK_CORR_MAX_DEG_S);
+      }
+    #endif
   } else
 
   if (state == false) {
@@ -435,7 +450,7 @@ void Mount::poll() {
   if (altitude > Deg90 - DegenerateRange) {
 //    if (transform.isEquatorial()) trackingRateAxis1 = ztr(current.a); else
 //    if (transform.mountType == ALTALT) trackingRateAxis1 = ztr(current.a); else
-    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F; 
+    if (transform.mountType == ALTAZM) trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
   }
 

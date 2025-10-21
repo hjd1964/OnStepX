@@ -125,7 +125,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   slewDestinationDistDec = 0.0;
   if ((encodersPresent || (park.state != PS_PARKING && home.state != HS_HOMING))) {
     nearDestinationRefineStages = GOTO_REFINE_STAGES;
-    if (transform.isEquatorial()) { 
+    if (transform.isEquatorial()) {
       slewDestinationDistHA = degToRad(GOTO_OFFSET);
       slewDestinationDistDec = degToRad(GOTO_OFFSET);
       if (target.pierSide == PIER_SIDE_WEST) slewDestinationDistDec = -slewDestinationDistDec;
@@ -192,7 +192,7 @@ CommandError Goto::requestSync() {
 
 // sync to equatorial position (Native or Mount coordinate system)
 CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
-  
+
   if (native) {
     coords.pierSide = PIER_SIDE_NONE;
     transform.nativeToMount(&coords);
@@ -200,7 +200,7 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
   CommandError e = setTarget(&coords, pierSideSelect, false);
   if (e != CE_NONE) return e;
-  
+
   if (mount.isHome()) mount.tracking(true);
 
   double a1, a2;
@@ -302,7 +302,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
     if (westReachable && !eastReachable) target.pierSide = PIER_SIDE_WEST; else
     if (isGoto && westReachable && pierSideBest && westDistance < eastDistance) {
       VLF("MSG: Mount, set-target destination in alternate (W) orientation is closer");
-      target.pierSide = PIER_SIDE_WEST; 
+      target.pierSide = PIER_SIDE_WEST;
     } else
     if (eastReachable) target.pierSide = PIER_SIDE_EAST;
   } else
@@ -372,9 +372,9 @@ CommandError Goto::alignAddStar(bool sync) {
 
   CommandError e = CE_NONE;
 
-  // first star, get ready for a new pointing model, init/sync then call gta.addStar 
+  // first star, get ready for a new pointing model, init/sync then call gta.addStar
   if (alignState.currentStar == 1) {
-    #if ALIGN_MAX_NUM_STARS > 1  
+    #if ALIGN_MAX_NUM_STARS > 1
       transform.align.init(transform.mountType, site.location.latitude);
     #endif
     e = requestSync(gotoTarget, PSS_SAME_ONLY);
@@ -532,6 +532,20 @@ void Goto::poll() {
       state = GS_NONE;
       mount.update();
 
+      // Tracking mode begins here: shrink the corrective authority
+      // to tracking-specific caps (deg/s) if configured.
+      // This keeps PID/feedback gains sane and reduces saturation.
+      #if defined(AXIS1_TRACK_CORR_MAX_DEG_S)
+        if (AXIS1_TRACK_CORR_MAX_DEG_S > 0.0F) {
+          axis1.setFrequencyMax(AXIS1_TRACK_CORR_MAX_DEG_S);
+        }
+      #endif
+      #if defined(AXIS2_TRACK_CORR_MAX_DEG_S)
+        if (AXIS2_TRACK_CORR_MAX_DEG_S > 0.0F) {
+          axis2.setFrequencyMax(AXIS2_TRACK_CORR_MAX_DEG_S);
+        }
+      #endif
+
       // back to normal motor frequencies
       axis1.setFrequencyScale(1.0F);
       axis2.setFrequencyScale(1.0F);
@@ -645,6 +659,20 @@ CommandError Goto::startAutoSlew() {
   double a1, a2;
   transform.mountToInstrument(&destination, &a1, &a2);
 
+  // Restore large corrective caps for the GoTo itself (full authority).
+  // Compute from current usPerStepBase so it respects platform/timer limits.
+  // Units: deg/s, Axis converts to steps/s internally.
+  {
+    const float degPerS_A1 = ((1000000.0F / usPerStepBase) / (float)axis1.getStepsPerMeasure()) * 2.0F;
+    const float degPerS_A2 = ((1000000.0F / usPerStepBase) / (float)axis2.getStepsPerMeasure()) * 2.0F;
+    if (degPerS_A1 > 0.0F) {
+      axis1.setFrequencyMax(degPerS_A1);
+    }
+    if (degPerS_A2 > 0.0F) {
+      axis2.setFrequencyMax(degPerS_A2);
+    }
+  }
+
   if (stage == GG_DESTINATION && park.state == PS_PARKING) {
     axis1.setTargetCoordinatePark(a1 + destination.a1Correction);
     axis2.setTargetCoordinatePark(a2);
@@ -685,7 +713,7 @@ void Goto::updateAccelerationRates() {
 float Goto::usPerStepLowerLimit() {
   // basis is platform/clock-rate specific (for square wave)
   float r_us = HAL_MAXRATE_LOWER_LIMIT;
-  
+
   // higher speed ISR code path?
   #if STEP_WAVE_FORM == PULSE || STEP_WAVE_FORM == DEDGE
     r_us /= 1.6F;
