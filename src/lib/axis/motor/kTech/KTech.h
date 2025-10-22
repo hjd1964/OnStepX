@@ -57,7 +57,7 @@ class KTechMotor : public Motor {
     void resetPositionSteps(long value);
 
     // get tracking mode steps per slewing mode step
-    inline int getStepsPerStepSlewing() { return 64; }
+    inline int getStepsPerStepSlewing() { return 256; }
 
     // get movement frequency in steps per second
     float getFrequencySteps();
