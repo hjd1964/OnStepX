@@ -79,7 +79,7 @@ class ServoMotor : public Motor {
     long getTargetDistanceSteps();
 
     // get tracking mode steps per slewing mode step
-    inline int getStepsPerStepSlewing() { return 64; }
+    inline int getStepsPerStepSlewing() { return 256; }
 
     // sets overall maximum frequency
     // \param frequency: rate of motion in steps (counts) per second
