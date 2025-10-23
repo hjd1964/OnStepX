@@ -57,7 +57,7 @@ bool ServoPE::init(bool reverse) {
 
   // if this is a T4.1 and we're using a PE driver and ph2 == 38, assume its a MaxPCB4 and make our own PWM on that pin
   #ifdef analogWritePin38
-    if (model == SERVO_PE && Pins->ph2 == 38) {
+    if (driverModel == SERVO_PE && Pins->ph2 == 38) {
       itimer4.priority(0);
       itimer4.begin(PWM38_HWTIMER, 100);
       VF("MSG: ServoDriver"); V(axisNumber); VLF(", emulating PWM on pin 38");
@@ -92,7 +92,7 @@ void ServoPE::enable(bool state) {
 
     VF("PE outputs off");
     digitalWriteF(Pins->ph1, Pins->ph1State);
-    if (Pins->ph2State == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
+    if (Pins->ph2State == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0;
     #ifdef analogWritePin38
       if (Pins->ph2 == 38) analogWritePin38(round(power)); else
     #endif
