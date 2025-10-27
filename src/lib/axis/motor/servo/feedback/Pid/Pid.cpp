@@ -51,7 +51,7 @@ void Pid::setControlRange(float controlRange) {
   pid->SetOutputLimits(-controlRange, controlRange);
 }
 
-// select PID param set for slewing
+// select PID param set for tracking
 void Pid::selectTrackingParameters() {
   if (!trackingSelected) {
     VF("MSG:"); V(axisPrefix); VL("tracking selected");
