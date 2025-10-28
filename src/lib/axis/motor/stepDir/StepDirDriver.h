@@ -8,7 +8,6 @@
 #ifdef STEP_DIR_MOTOR_PRESENT
 
 #include "../Drivers.h"
-#include "StepDirDriver.h"
 
 typedef struct StepDirDriverPins {
   int16_t m0;
