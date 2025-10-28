@@ -39,7 +39,7 @@ bool ServoEE::init(bool reverse) {
   // set PWM bits
   #ifdef SERVO_ANALOG_WRITE_RESOLUTION
     VF("MSG:"); V(axisPrefix); VF("setting control pins analog bits "); VL(SERVO_ANALOG_WRITE_RESOLUTION);
-    analogWriteResolution(Pins->ph2, SERVO_ANALOG_WRITE_RESOLUTION);
+    analogWriteResolution(SERVO_ANALOG_WRITE_RESOLUTION);
   #endif
 
   return true;
