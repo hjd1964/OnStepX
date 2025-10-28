@@ -66,16 +66,21 @@ bool ServoPE::init(bool reverse) {
 
   // set PWM frequency
   #ifdef SERVO_ANALOG_WRITE_FREQUENCY
-    VF("MSG:"); V(axisPrefix); VF("setting control pins analog frequency "); VL(SERVO_ANALOG_WRITE_FREQUENCY);
-    #ifndef analogWritePin38
-      analogWriteFrequency(Pins->ph1, SERVO_ANALOG_WRITE_FREQUENCY);
-    #endif
-    analogWriteFrequency(Pins->ph2, SERVO_ANALOG_WRITE_FREQUENCY);
+    VF("MSG:"); V(axisPrefix); VF("setting ph2 PWM frequency "); VL(SERVO_ANALOG_WRITE_FREQUENCY);
+    // ph1 is a digital direction pin; no need to set an analog/PWM frequency on it.
+    // Only set frequency on ph2
+    #ifdef analogWritePin38
+      // skip if we emulate PWM on T4.1 pin 38.
+      if (Pins->ph2 != 38) {
+        analogWriteFrequency(Pins->ph2, SERVO_ANALOG_WRITE_FREQUENCY);
+      }
+    #else
+      analogWriteFrequency(Pins->ph2, SERVO_ANALOG_WRITE_FREQUENCY);
   #endif
 
   // set PWM bits
   #ifdef SERVO_ANALOG_WRITE_RESOLUTION
-    VF("MSG:"); V(axisPrefix); VF("setting control pins analog bits "); VL(SERVO_ANALOG_WRITE_RESOLUTION);
+    VF("MSG:"); V(axisPrefix); VF("setting ph2 PWM resolution analog bits "); VL(SERVO_ANALOG_WRITE_RESOLUTION);
     analogWriteResolution(Pins->ph2, SERVO_ANALOG_WRITE_RESOLUTION);
   #endif
 
@@ -92,7 +97,7 @@ void ServoPE::enable(bool state) {
 
     VF("PE outputs off");
     digitalWriteF(Pins->ph1, Pins->ph1State);
-    if (Pins->ph2State == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0; 
+    if (Pins->ph2State == HIGH) power = SERVO_ANALOG_WRITE_RANGE; else power = 0;
     #ifdef analogWritePin38
       if (Pins->ph2 == 38) analogWritePin38(round(power)); else
     #endif
