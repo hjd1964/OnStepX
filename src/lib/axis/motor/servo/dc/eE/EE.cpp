@@ -36,8 +36,8 @@ bool ServoEE::init(bool reverse) {
     analogWriteFrequency(Pins->ph2, SERVO_ANALOG_WRITE_FREQUENCY);
   #endif
 
-  // set PWM bits
-  #ifdef SERVO_ANALOG_WRITE_RESOLUTION
+  // set PWM bits per pin for ESP32
+  #if defined(SERVO_ANALOG_WRITE_RESOLUTION) && defined(ESP32)
     VF("MSG:"); V(axisPrefix); VF("setting control pins analog bits "); VL(SERVO_ANALOG_WRITE_RESOLUTION);
     analogWriteResolution(Pins->ph2, SERVO_ANALOG_WRITE_RESOLUTION);
   #endif
