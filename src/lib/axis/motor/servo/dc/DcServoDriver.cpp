@@ -10,15 +10,16 @@
 ServoDcDriver::ServoDcDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum)
                             :ServoDriver(axisNumber, Pins, Settings) {
   if (axisNumber < 1 || axisNumber > 9) return;
-
   this->pwmMinimum.valueDefault = pwmMinimum;
   this->pwmMaximum.valueDefault = pwmMaximum;
+  // initialize caches up front
+  recomputeScalingIfNeeded();
 }
 
 float ServoDcDriver::setMotorVelocity(float velocity)  {
   velocity = ServoDriver::setMotorVelocity(velocity);
 
-  pwmUpdate(fabs(toAnalogRange(velocity)));
+  pwmUpdate(labs(toAnalogRange(velocity)));
 
   return velocity;
 }
