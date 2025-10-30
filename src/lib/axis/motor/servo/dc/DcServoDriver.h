@@ -116,6 +116,8 @@ class ServoDcDriver : public ServoDriver {
     #endif
 
     // Enforce minimum only for non-zero outputs
+    // !TODO have to check with the calibration code whether the stiction breaking power can be reduced
+    // after the motor is moving
     if (power > 0 && power < countsMinCached) power = countsMinCached;
 
     // Safety clamp to max
