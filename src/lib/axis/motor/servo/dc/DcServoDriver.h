@@ -26,6 +26,9 @@
   #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
 #endif
 
+ifdef SERVO_SIGMA_DELTA_DITHERING
+  #include "SigmaDeltaDither.h"
+#endif
 
 #include "../ServoDriver.h"
 
@@ -64,6 +67,10 @@ class ServoDcDriver : public ServoDriver {
         zeroHoldSign = 0; // ensure immediate exit and clear latch on exact zero
       #endif
 
+      #ifdef SERVO_SIGMA_DELTA_DITHERING
+        sigmaDelta.reset(); // reset dithering residue when output is zero
+      #endif
+
       return 0; // early out
     }
 
@@ -81,7 +88,13 @@ class ServoDcDriver : public ServoDriver {
         zeroHoldSign = (sign >= 0) ? 1 : -1; // latch direction
       } else {
         // currently moving: if we drop below exit threshold, snap back to zero
-        if (vAbs < SERVO_HYST_EXIT_CPS) { zeroHoldSign = 0; return 0; }
+        if (vAbs < SERVO_HYST_EXIT_CPS) {
+          zeroHoldSign = 0;
+          #ifdef SERVO_SIGMA_DELTA_DITHERING
+            sigmaDelta.reset(); // also reset when snapping back to zero
+          #endif
+          return 0;
+        }
         // allow direction change if command flips while above thresholds
         if ((sign >= 0 ? 1 : -1) != zeroHoldSign) zeroHoldSign = (sign >= 0) ? 1 : -1;
       }
@@ -93,8 +106,13 @@ class ServoDcDriver : public ServoDriver {
     // fmaf keeps one rounding and is very fast on some FPUS(M7).
     float countsF = fmaf(vAbs, velToCountsGain, (float)countsMinCached);
 
-    // Single float→int rounding at the end
-    long power = (long)lroundf(countsF);
+    #ifdef SERVO_SIGMA_DELTA_DITHERING
+      // Dither the floating counts to an integer so the time-average equals countsF
+      int32_t power = sigmaDelta.dither_counts(countsF, countsMinCached, countsMaxCached);
+    #else
+      // Single float→int rounding at the end
+      long power = (long)lroundf(countsF);
+    #endif
 
     return power * sign;
   }

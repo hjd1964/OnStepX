@@ -10,6 +10,10 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
+#ifdef SERVO_SIGMA_DELTA_DITHERING
+  #include "dc/SigmaDeltaDither.h"
+#endif
+
 typedef struct ServoPins {
   int16_t ph1; // step
   int16_t ph1State;
@@ -71,7 +75,7 @@ class ServoDriver {
     // get status info.
     // this is a required method for the Axis class
     DriverStatus getStatus() { return status; }
-   
+
     // calibrate the motor if required
     virtual void calibrateDriver() {}
 
@@ -80,7 +84,7 @@ class ServoDriver {
 
   protected:
     virtual void readStatus() {}
-    
+
     int axisNumber;
     char axisPrefix[32]; // prefix for debug messages
 
@@ -115,6 +119,11 @@ class ServoDriver {
 
     const int numParameters = 2;
     AxisParameter* parameter[2] = {&invalid, &acceleration};
+
+    #ifdef SERVO_SIGMA_DELTA_DITHERING
+      SigmaDeltaDither sigmaDelta;  // carries fractional residue between ticks
+    #endif
+
 };
 
 #endif
