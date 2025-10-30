@@ -15,6 +15,18 @@
   #define SERVO_ANALOG_WRITE_RANGE ANALOG_WRITE_RANGE
 #endif
 
+// Enable to apply hysteresis around zero velocity
+#define SERVO_HYSTERESIS_ENABLE
+
+// Thresholds in encoder counts/sec
+#ifndef SERVO_HYST_ENTER_CPS
+  #define SERVO_HYST_ENTER_CPS 1.2f   // must exceed this to LEAVE zero
+#endif
+#ifndef SERVO_HYST_EXIT_CPS
+  #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
+#endif
+
+
 #include "../ServoDriver.h"
 
 class ServoDcDriver : public ServoDriver {
@@ -38,34 +50,54 @@ class ServoDcDriver : public ServoDriver {
     // we expect a linear scaling for the motors (maybe in the future we can be smarter?)
     // uses cached min/max counts and a precomputed gain
     // only float ops since usually there is no double FPU
-    long toAnalogRange(float velocity) {
-      // Update caches only if inputs changed
-      recomputeScalingIfNeeded();
+  long toAnalogRange(float velocity) {
+    // Update caches only if inputs changed
+    recomputeScalingIfNeeded();
 
-      // Extract sign and work with magnitude
-      int sign = 1;
-      if (velocity < 0.0F) { velocity = -velocity; sign = -1; }
+    // Extract sign and work with magnitude
+    int sign = 1;
+    if (velocity < 0.0F) { velocity = -velocity; sign = -1; }
 
-      if (velocity == 0.0F || velocityMaxCached <= 0.0f) {
-        return 0; // early outvelocityMaxCached
-      }
+    if (velocity == 0.0F || velocityMaxCached <= 0.0f) {
 
-      // Clamp to velocityMax to avoid over-range math.
-      float vAbs = velocity;
-      if (vAbs > velocityMaxCached) vAbs = velocityMaxCached;
+      #ifdef SERVO_HYSTERESIS_ENABLE
+        zeroHoldSign = 0; // ensure immediate exit and clear latch on exact zero
+      #endif
 
-      // Linear map: counts = countsMin + vAbs * gain
-      // fmaf keeps one rounding and is very fast on some FPUS(M7).
-      // Currenty we always set the power to overcome static friction to the min counts
-      // even for near zero velocity where the PID jitters around zero
-      // TODO! Consider deadband handling here
-      float countsF = fmaf(vAbs, velToCountsGain, (float)countsMinCached);
-
-      // Single float→int rounding at the end
-      long power = (long)lroundf(countsF);
-
-      return power * sign;
+      return 0; // early out
     }
+
+    // Clamp to velocityMax to avoid over-range math.
+    float vAbs = velocity; // already absolute
+    if (vAbs > velocityMaxCached) vAbs = velocityMaxCached;
+
+    #ifdef SERVO_HYSTERESIS_ENABLE
+      // Hysteresis around zero: require a larger enter threshold to leave zero,
+      // and a smaller "exit" threshold to return to zero. This prevents chatter
+      // when the PID jitters around zero
+      if (zeroHoldSign == 0) {
+        // currently at zero: must exceed enter threshold to start moving
+        if (vAbs < SERVO_HYST_ENTER_CPS) return 0;
+        zeroHoldSign = (sign >= 0) ? 1 : -1; // latch direction
+      } else {
+        // currently moving: if we drop below exit threshold, snap back to zero
+        if (vAbs < SERVO_HYST_EXIT_CPS) { zeroHoldSign = 0; return 0; }
+        // allow direction change if command flips while above thresholds
+        if ((sign >= 0 ? 1 : -1) != zeroHoldSign) zeroHoldSign = (sign >= 0) ? 1 : -1;
+      }
+      // use latched direction while moving
+      sign = (zeroHoldSign < 0) ? -1 : 1;
+    #endif
+
+    // Linear map: counts = countsMin + vAbs * gain
+    // fmaf keeps one rounding and is very fast on some FPUS(M7).
+    float countsF = fmaf(vAbs, velToCountsGain, (float)countsMinCached);
+
+    // Single float→int rounding at the end
+    long power = (long)lroundf(countsF);
+
+    return power * sign;
+  }
 
     // motor control update
     virtual void pwmUpdate(long power) { }
@@ -117,6 +149,11 @@ class ServoDcDriver : public ServoDriver {
         velToCountsGain = (velocityMaxCached > 0.0f) ? ((float)span / velocityMaxCached) : 0.0f;
       }
     }
+
+    #ifdef SERVO_HYSTERESIS_ENABLE
+      int8_t zeroHoldSign = 0; // 0: at zero; +1 / -1: direction while "moving"
+    #endif
+
 };
 
 #endif
