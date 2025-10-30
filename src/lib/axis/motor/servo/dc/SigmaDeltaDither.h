@@ -24,7 +24,7 @@ struct SigmaDeltaDither {
 
     // convert a floating desired count into an integer count for this tick,
     // such that the time-average of outputs equals the floating target
-    inline int32_t dither_counts(float desiredCounts,
+    inline int32_t ditherCounts(float desiredCounts,
                                     int32_t minCount,
                                     int32_t maxCount)
     {

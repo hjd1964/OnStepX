@@ -109,7 +109,7 @@ class ServoDcDriver : public ServoDriver {
       // Dither the floating counts to an integer so the time-average equals countsF.
       // Use 0..countsMaxCached as the dither bounds (not countsMinCached),
       // then apply the minimum kick below.
-      int32_t power = sigmaDelta.dither_counts(countsF, 0, countsMaxCached);
+      int32_t power = sigmaDelta.ditherCounts(countsF, 0, countsMaxCached);
     #else
       // Single float→int rounding at the end
       long power = (long)lroundf(countsF);
