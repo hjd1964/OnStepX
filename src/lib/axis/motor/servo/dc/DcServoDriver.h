@@ -19,10 +19,10 @@
 #ifdef SERVO_HYSTERESIS_ENABLE
   // Thresholds in encoder counts/sec
   #ifndef SERVO_HYST_ENTER_CPS
-    #define SERVO_HYST_ENTER_CPS 1.2f   // must exceed this to LEAVE zero
+    #define SERVO_HYST_ENTER_CPS 20.0f   // must exceed this to LEAVE zero (1/10 of sidereal speed of 92 counts / sec)
   #endif
   #ifndef SERVO_HYST_EXIT_CPS
-    #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
+    #define SERVO_HYST_EXIT_CPS 10.0f    // drop below this to RETURN to zero (half of the above)
   #endif
 
   #ifdef SERVO_SIGMA_DELTA_DITHERING
@@ -155,6 +155,11 @@ class ServoDcDriver : public ServoDriver {
         velocityMaxCached = velocityMax;
         analogMaxCached   = analogMaxNow;
 
+        VF("MSG:"); V(axisPrefix); VF("pwmMin="); V(pwmMinPctCached); VLF(" %");
+        VF("MSG:"); V(axisPrefix); VF("pwmMax="); V(pwmMaxPctCached); VLF(" %");
+        VF("MSG:"); V(axisPrefix); VF("Vmax="); V(velocityMaxCached); VLF(" steps/s");
+        VF("MSG:"); V(axisPrefix); VF("pwm units="); V(analogMaxCached); VLF(" pwm Units");
+
         // Convert % to float counts once, then round once.
         const float minCountsF = (pwmMinPctCached * 0.01f) * (float)analogMaxCached;
         const float maxCountsF = (pwmMaxPctCached * 0.01f) * (float)analogMaxCached;
@@ -165,6 +170,7 @@ class ServoDcDriver : public ServoDriver {
 
         const int span = (int)(countsMaxCached - countsMinCached);
         velToCountsGain = (velocityMaxCached > 0.0f) ? ((float)span / velocityMaxCached) : 0.0f;
+        VF("MSG:"); V(axisPrefix); VF("velToCountsGain="); V(velToCountsGain); VLF(" from velocity -> pwm units");
       }
     }
 
