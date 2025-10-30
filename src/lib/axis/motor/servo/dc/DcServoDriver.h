@@ -19,7 +19,7 @@
 #ifdef SERVO_HYSTERESIS_ENABLE
   // Thresholds in encoder counts/sec
   #ifndef SERVO_HYST_ENTER_CPS
-    #define SERVO_HYST_ENTER_CPS 20.0f   // must exceed this to LEAVE zero (1/10 of sidereal speed of 92 counts / sec)
+    #define SERVO_HYST_ENTER_CPS 20.0f   // must exceed this to LEAVE zero (~1/5 of sidereal speed of 92 counts / sec)
   #endif
   #ifndef SERVO_HYST_EXIT_CPS
     #define SERVO_HYST_EXIT_CPS 10.0f    // drop below this to RETURN to zero (half of the above)
