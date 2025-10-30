@@ -102,17 +102,24 @@ class ServoDcDriver : public ServoDriver {
       sign = (zeroHoldSign < 0) ? -1 : 1;
     #endif
 
-    // Linear map: counts = countsMin + vAbs * gain
-    // fmaf keeps one rounding and is very fast on some FPUS(M7).
-    float countsF = fmaf(vAbs, velToCountsGain, (float)countsMinCached);
+    // Linear map WITHOUT offset
+    float countsF = vAbs * velToCountsGain; // target in [0 .. countsMaxCached]
 
     #ifdef SERVO_SIGMA_DELTA_DITHERING
-      // Dither the floating counts to an integer so the time-average equals countsF
-      int32_t power = sigmaDelta.dither_counts(countsF, countsMinCached, countsMaxCached);
+      // Dither the floating counts to an integer so the time-average equals countsF.
+      // Use 0..countsMaxCached as the dither bounds (not countsMinCached),
+      // then apply the minimum kick below.
+      int32_t power = sigmaDelta.dither_counts(countsF, 0, countsMaxCached);
     #else
       // Single float→int rounding at the end
       long power = (long)lroundf(countsF);
     #endif
+
+    // Enforce minimum only for non-zero outputs
+    if (power > 0 && power < countsMinCached) power = countsMinCached;
+
+    // Safety clamp to max
+    if (power > countsMaxCached) power = countsMaxCached;
 
     return power * sign;
   }
@@ -168,9 +175,9 @@ class ServoDcDriver : public ServoDriver {
         countsMaxCached = (int32_t)lroundf(maxCountsF);
         if (countsMaxCached < countsMinCached) countsMaxCached = countsMinCached; // safety
 
-        const int span = (int)(countsMaxCached - countsMinCached);
-        velToCountsGain = (velocityMaxCached > 0.0f) ? ((float)span / velocityMaxCached) : 0.0f;
-        VF("MSG:"); V(axisPrefix); VF("velToCountsGain="); V(velToCountsGain); VLF(" from velocity -> pwm units");
+        // gain: map velocity 0..Vmax → counts 0..countsMaxCached (no offset here)
+        velToCountsGain = (velocityMaxCached > 0.0f) ? ((float)countsMaxCached / velocityMaxCached) : 0.0f;
+        VF("MSG:"); V(axisPrefix); VF("velToCountsGain="); V(velToCountsGain); VLF(" (0..Vmax -> 0..pwm units)");
       }
     }
 
