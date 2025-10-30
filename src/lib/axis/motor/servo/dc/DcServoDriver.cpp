@@ -14,6 +14,19 @@ ServoDcDriver::ServoDcDriver(uint8_t axisNumber, const ServoPins *Pins, const Se
   this->pwmMaximum.valueDefault = pwmMaximum;
   // initialize caches up front
   recomputeScalingIfNeeded();
+
+  #ifdef SERVO_HYSTERESIS_ENABLE
+    VF("MSG:"); V(axisPrefix); VF("Hysteresis Enabled ENTER="); V((float)SERVO_HYST_ENTER_CPS);
+    VF(" cps, EXIT="); V((float)SERVO_HYST_EXIT_CPS); VLF(" cps");
+  #else
+    VF("MSG:"); V(axisPrefix); VLF("Hysteresis Disabled");
+  #endif
+
+  #ifdef SERVO_SIGMA_DELTA_DITHERING
+    VF("MSG:"); V(axisPrefix); VLF("Sigma-Delta dither: enabled");
+  #else
+    VF("MSG:"); V(axisPrefix); VLF("Sigma-Delta dither: disabled");
+  #endif
 }
 
 float ServoDcDriver::setMotorVelocity(float velocity)  {
