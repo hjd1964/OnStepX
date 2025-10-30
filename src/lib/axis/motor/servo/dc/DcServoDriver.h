@@ -25,7 +25,7 @@
     #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
   #endif
 
-  ifdef SERVO_SIGMA_DELTA_DITHERING
+  #ifdef SERVO_SIGMA_DELTA_DITHERING
     #include "SigmaDeltaDither.h"
   #endif
 #endif

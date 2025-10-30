@@ -9,6 +9,8 @@
 //   overflows because it only carries the fractional residual in [0,1).
 // -----------------------------------------------------------------------------
 
+#pragma once
+
 #ifdef SERVO_SIGMA_DELTA_DITHERING
 
 // Lightweight state holder for first-order sigma–delta dithering
