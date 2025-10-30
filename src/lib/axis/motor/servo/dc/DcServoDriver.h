@@ -16,18 +16,18 @@
 #endif
 
 // Enable to apply hysteresis around zero velocity
-#define SERVO_HYSTERESIS_ENABLE
+#ifdef SERVO_HYSTERESIS_ENABLE
+  // Thresholds in encoder counts/sec
+  #ifndef SERVO_HYST_ENTER_CPS
+    #define SERVO_HYST_ENTER_CPS 1.2f   // must exceed this to LEAVE zero
+  #endif
+  #ifndef SERVO_HYST_EXIT_CPS
+    #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
+  #endif
 
-// Thresholds in encoder counts/sec
-#ifndef SERVO_HYST_ENTER_CPS
-  #define SERVO_HYST_ENTER_CPS 1.2f   // must exceed this to LEAVE zero
-#endif
-#ifndef SERVO_HYST_EXIT_CPS
-  #define SERVO_HYST_EXIT_CPS 0.6f    // drop below this to RETURN to zero
-#endif
-
-ifdef SERVO_SIGMA_DELTA_DITHERING
-  #include "SigmaDeltaDither.h"
+  ifdef SERVO_SIGMA_DELTA_DITHERING
+    #include "SigmaDeltaDither.h"
+  #endif
 #endif
 
 #include "../ServoDriver.h"
