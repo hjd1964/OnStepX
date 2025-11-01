@@ -13,7 +13,7 @@
 // Phase 1: LLHH LLHH
 // Phase 2: LHHL LHHL
 // ...00 01 11 10 00 01 11 10 00 01 11 10...
-// 
+//
 
 // quadrature encoder behavior for invalid signal state
 
@@ -22,9 +22,9 @@
 #endif
 
 #if ENCODER_AB_STRICT == OFF
-  // current A and/or B signal didn't toggle, just assume it happened and use last dir state
-  #define QUAD_F1 warn++
-  #define QUAD_F2 warn++
+  // current A and/or B signal didn't toggle, skip counting and flag warning
+  #define QUAD_F1 dir = 0; warn++
+  #define QUAD_F2 dir = 0; warn++
 #else
   // current A and/or B signal didn't toggle, skip counting and flag error
   #define QUAD_F1 dir = 0; error++
