@@ -56,6 +56,9 @@ class ServoDriver {
     // enable or disable the driver using the enable pin or other method
     virtual void enable(bool state) { UNUSED(state); }
 
+    // let the driver know whether it is tracking or not
+    virtual void setTrackingMode(bool state) { UNUSED(state); }
+
     // sets overall maximum frequency
     // \param frequency: rate of motion in steps (counts) per second
     void setFrequencyMax(float frequency);
