@@ -134,14 +134,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FI#       Get full in position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'I') {
-      sprintf(reply,"%ld",(long)round(axes[index]->settings.limits.min*MicronsToUnits));
+      sprintf(reply,"%ld",(long)round(axes[index]->getLimitMin()*MicronsToUnits));
       *numericReply = false;
     } else
 
     // :FM#       Get max position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'M') {
-      sprintf(reply,"%ld",(long)round(axes[index]->settings.limits.max*MicronsToUnits));
+      sprintf(reply,"%ld",(long)round(axes[index]->getLimitMax()*MicronsToUnits));
       *numericReply = false;
     } else
 

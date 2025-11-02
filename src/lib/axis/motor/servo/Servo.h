@@ -8,16 +8,15 @@
 #include "../../../encoder/Encoder.h"
 #include "filter/Filter.h"
 #include "feedback/Feedback.h"
+#include "calibration/TrackingVelocity.h"
 
-#ifdef CALIBRATE_SERVO_DC
-  #include "calibration/TrackingVelocity.h"
-#endif
-
-#include "dc/Dc.h"
-#include "tmc2209/Tmc2209.h"
-#include "tmc5160/Tmc5160.h"
-#include "dcTmcSPI/DcTmcSPI.h"
+#include "dc/eE/EE.h"
+#include "dc/pE/PE.h"
+#include "dc/tmc/tmc2130/Tmc2130.h"
+#include "dc/tmc/tmc5160/Tmc5160.h"
 #include "kTech/KTech.h"
+#include "tmc/tmc2209/Tmc2209.h"
+#include "tmc/tmc5160/Tmc5160.h"
 
 #ifndef SERVO_SLEW_DIRECT
   #define SERVO_SLEW_DIRECT OFF
@@ -35,54 +34,30 @@
   #define AXIS1_SERVO_VELOCITY_CALIBRATION 1
 #endif
 
-#ifdef ABSOLUTE_ENCODER_CALIBRATION
-  #ifndef ENCODER_ECM_BUFFER_SIZE
-    #define ENCODER_ECM_BUFFER_SIZE 16384
-  #endif
-
-  #ifndef ENCODER_ECM_BUFFER_RESOLUTION
-    #define ENCODER_ECM_BUFFER_RESOLUTION 512
-  #endif
-
-  #ifndef ENCODER_ECM_HIGH_PASS_ORDER
-    #define ENCODER_ECM_HIGH_PASS_ORDER 2
-  #endif
-
-  #ifndef ENCODER_ECM_HIGH_PASS_POINTS
-    #define ENCODER_ECM_HIGH_PASS_POINTS 10
-  #endif
-
-  #ifndef ENCODER_ECM_LOW_PASS_ORDER
-    #define ENCODER_ECM_LOW_PASS_ORDER 5
-  #endif
-
-  #ifndef ENCODER_ECM_LOW_PASS_POINTS
-    #define ENCODER_ECM_LOW_PASS_POINTS 10
-  #endif
-
-  #define ECB_NO_DATA -32768
-
-  enum CalibrateMode {CM_NONE, CM_RECORDING, CM_FIXED_RATE};
-#endif
-
 class ServoMotor : public Motor {
   public:
     // constructor
-    ServoMotor(uint8_t axisNumber, ServoDriver *Driver, Filter *filter, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
+    ServoMotor(uint8_t axisNumber, int8_t reverse, ServoDriver *Driver, Filter *filter, Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse, Feedback *feedback, ServoControl *control, long syncThreshold, bool useFastHardwareTimers = true);
 
     // sets up the servo motor
     bool init();
 
-    // get driver type code
-    inline char getParameterTypeCode() { return feedback->getParameterTypeCode(); }
+    // returns the number of parameters from the motor/driver
+    uint8_t getParameterCount() { return Motor::getParameterCount() + driver->getParameterCount() + feedback->getParameterCount(); }
 
-    // set motor parameters
-    bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+    // returns the specified axis parameter
+    AxisParameter* getParameter(uint8_t number) {
+      if (number > Motor::getParameterCount() + driver->getParameterCount()) return feedback->getParameter(number - (Motor::getParameterCount() + driver->getParameterCount())); else
+      if (number > Motor::getParameterCount()) return driver->getParameter(number - Motor::getParameterCount()); else
+      if (number >= 1 && number <= Motor::getParameterCount()) return Motor::getParameter(number); else
+      return &invalid;
+    }
 
-    // validate motor parameters
-    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
-
-    // set motor reverse state
+    // check if parameter is valid
+    bool parameterIsValid(AxisParameter* parameter, bool next = false) { if (!Motor::parameterIsValid(parameter, next)) return false; else return driver->parameterIsValid(parameter, next); }
+    
+    // sets reversal of axis directions
+    // \param state: true reverses the direction behavior specified in settings
     void setReverse(int8_t state);
 
     // sets motor enable on/off (if possible)
@@ -91,7 +66,7 @@ class ServoMotor : public Motor {
     // get the associated motor driver status
     DriverStatus getDriverStatus();
 
-    // resets motor and target angular position in steps, also zeros backlash and index
+    // resets motor and target angular position in steps, also zeros backlash and index 
     void resetPositionSteps(long value);
 
     // get instrument coordinate, in steps
@@ -104,7 +79,15 @@ class ServoMotor : public Motor {
     long getTargetDistanceSteps();
 
     // get tracking mode steps per slewing mode step
-    inline int getStepsPerStepSlewing() { return 64; }
+    inline int getStepsPerStepSlewing() { return 256; }
+
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in steps (counts) per second
+    void setFrequencyMax(float frequency) {
+      velocityMax = frequency;
+      driver->setFrequencyMax(frequency);
+      feedback->setControlRange(frequency);
+    }
 
     // get movement frequency in steps per second
     float getFrequencySteps();
@@ -114,10 +97,6 @@ class ServoMotor : public Motor {
 
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
-
-    #ifdef ABSOLUTE_ENCODER_CALIBRATION
-      void calibrate(float value);
-    #endif
 
     // calibrate the motor driver
     void calibrateDriver() { if (ready) driver->calibrateDriver(); }
@@ -134,12 +113,15 @@ class ServoMotor : public Motor {
     // read encoder
     int32_t encoderRead();
 
+    // get the motor name
+    const char* name() { strcpy(nameStr, "Servo, "); strcat(nameStr, driver->name()); return nameStr; }
+
     // updates PID and sets servo motor power/direction
     void poll();
 
     // sets dir as required and moves coord toward target at setFrequencySteps() rate
     void move();
-
+    
     // servo motor driver
     ServoDriver *driver;
 
@@ -150,57 +132,7 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
-
-  #ifdef ABSOLUTE_ENCODER_CALIBRATION
-    void calibrateRecord(float &velocity, long &motorCounts, long &encoderCounts);
-    bool calibrationRead(const char *fileName);
-    bool calibrationWrite(const char *fileName);
-    bool calibrationAveragingWrite();
-    void calibrationClear();
-    void calibrationErase();
-    bool calibrationHighPass();
-    bool calibrationLowPass();
-    bool calibrationLinearRegression();
-    void calibrationPrint();
-    inline int16_t ecbn(int16_t value) { if (value == ECB_NO_DATA) return 0; else return value; };
-
-    int16_t *encoderCorrectionBuffer = NULL;
-    int32_t encoderCorrection = 0;
-    int32_t startCount = 0;
-    int32_t endCount = 0;
-    uint8_t handle = 0;
-
-    CalibrateMode calibrateMode = CM_NONE;
-
-    int32_t encoderIndex(int32_t offset = 0);
-  #endif
-
     Filter *filter;
-
-    float velocityEstimate = 0.0F;
-    float velocityOverride = 0.0F;
-
-    uint8_t servoMonitorHandle = 0;
-    uint8_t taskHandle = 0;
-    float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
-
-    int  stepSize = 1;                  // step size
-    volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
-    volatile bool takeStep = false;     // should we take a step
-    float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
-
-    float currentFrequency = 0.0F;      // last frequency set
-    float lastFrequency = 0.0F;         // last frequency requested
-    unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
-    long syncThreshold = OFF;           // sync threshold in counts (for absolute encoders) or OFF
-
-    long lastEncoderCounts = 0;         // the last encoder position for stall check
-    unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
-    unsigned long startTime = 0;        // time at start of servo polling
-    unsigned long lastSlewingTime = 0;  // time when last slewing
-
-    volatile int absStep = 1;           // absolute step size (unsigned)
-    volatile long originIndexSteps = 0; // for absolute motor position to axis position at coordinate origin
 
     void (*callback)() = NULL;
 
@@ -210,17 +142,47 @@ class ServoMotor : public Motor {
       ServoCalibrateTrackingVelocity *calibrateVelocity;
     #endif
 
+    uint8_t servoMonitorHandle = 0;
+    uint8_t taskHandle = 0;
+
+    float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
     bool useFastHardwareTimers = true;
-    bool slewing = false;
-    bool motorStepsInitDone = false;
-    bool homeSet = false;
-    uint32_t encoderOrigin = 0;
+
     bool encoderReverse = false;
     bool encoderReverseDefault = false;
-    bool wasAbove33 = false;
-    bool wasBelow33 = false;
+
+    // for absolute encoders
+    bool motorStepsInitDone = false;    // help determing when ready to set position
+    bool homeSet = false;               // help determing when ready to set position
+    uint32_t encoderOrigin = 0;         // the starting position
+    long syncThreshold = OFF;           // sync threshold in counts, or OFF
+
+    int stepSize = 1;                   // step size
+    volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
+    volatile bool takeStep = false;     // should we take a step
+    float trackingFrequency = 0;        // help figure out if equatorial mount is tracking
+    bool slewing = false;
+
+    float currentDirection = 0.0F;      // last direction
+    float currentFrequency = 0.0F;      // last frequency set in encoder counts per second
+    float lastFrequency = 0.0F;         // last frequency requested
+    unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
+    float velocityMax = 0.0F;           // the maximum velocity allowed
+
+    volatile int absStep = 1;           // absolute step size (unsigned)
+    volatile long originIndexSteps = 0; // for absolute motor position to axis position at coordinate origin
+
+    // servo safety checks
+    unsigned long lastCheckTime = 0;    // time since the last encoder position was checked
+    unsigned long startTime = 0;        // time at start of servo polling
+    unsigned long lastSlewingTime = 0;  // time when last slewing
+    long lastEncoderCounts = 0;         // the last encoder position for stall check
+    long movingAwaySeconds = 0;         // amount of time for runaway check
+    long lastTargetDistance = 0;        // check if moving away from target for runaway check
+    long lastDelta = 0;                 // the last distance from target for runaway check
+    bool wasAbove33 = false;            // check for oscillation
+    bool wasBelow33 = false;            // check for oscillation
     bool safetyShutdown = false;
-    long lastTargetDistance = 0;
 };
 
 #endif

@@ -60,6 +60,9 @@ void Goto::init() {
   if (settings.usPerStepCurrent < usPerStepBase/2.0F) settings.usPerStepCurrent = usPerStepBase/2.0F;
   if (settings.usPerStepCurrent > usPerStepBase*2.0F) settings.usPerStepCurrent = usPerStepBase*2.0F;
 
+  axis1.setFrequencyMax(((1000000.0F/usPerStepBase)/axis1.getStepsPerMeasure())*2.0F);
+  axis2.setFrequencyMax(((1000000.0F/usPerStepBase)/axis2.getStepsPerMeasure())*2.0F);
+
   if (AXIS1_SYNC_THRESHOLD != OFF || AXIS2_SYNC_THRESHOLD != OFF) absoluteEncodersPresent = true;
   if (AXIS1_HOME_TOLERANCE != 0.0F || AXIS2_HOME_TOLERANCE != 0.0F ||
       AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || absoluteEncodersPresent) encodersPresent = true;
@@ -95,16 +98,16 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     #if AXIS1_SECTOR_GEAR == ON
       transform.mountToInstrument(&target, &a1, &a2);
       a1 = a1 - axis1.getIndexPosition();
-      if (a1 < axis1.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (a1 > axis1.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 < axis1.getLimitMin()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a1 > axis1.getLimitMax()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     #endif
 
     // handle special case of a tangent arm Dec
     #if AXIS2_TANGENT_ARM == ON
       transform.mountToInstrument(&target, &a1, &a2);
       a2 = a2 - axis2.getIndexPosition();
-      if (a2 < axis2.settings.limits.min) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-      if (a2 > axis2.settings.limits.max) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 < axis2.getLimitMin()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+      if (a2 > axis2.getLimitMax()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     #endif
   #endif
 

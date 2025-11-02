@@ -9,7 +9,7 @@
 // for example:
 // QuadratureEsp32 encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
 
-QuadratureEsp32::QuadratureEsp32(int16_t APin, int16_t BPin, int16_t axis) {
+QuadratureEsp32::QuadratureEsp32(int16_t axis, int16_t APin, int16_t BPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

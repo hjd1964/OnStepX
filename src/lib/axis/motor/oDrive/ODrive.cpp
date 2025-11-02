@@ -22,7 +22,8 @@ IRAM_ATTR void moveODriveMotorAxis2() { odriveMotorInstance[1]->move(); }
 #endif
 
 // constructor
-ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Settings, bool useFastHardwareTimers) {
+ODriveMotor::ODriveMotor(uint8_t axisNumber, int8_t reverse, const ODriveDriverSettings *Settings, float radsPerCount, bool useFastHardwareTimers)
+                         :Motor(axisNumber, reverse) {
   if (axisNumber < 1 || axisNumber > 2) return;
 
   driverType = ODRIVER;
@@ -47,6 +48,9 @@ ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Setting
     #endif
   }
 
+  // set parameter default values during object creation
+  radsPerCount.valueDefualt = radsPerCount;
+
   // attach the function pointers to the callbacks
   odriveMotorInstance[this->axisNumber - 1] = this;
   switch (this->axisNumber) {
@@ -56,7 +60,7 @@ ODriveMotor::ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Setting
 }
 
 bool ODriveMotor::init() {
-  if (axisNumber < 1 || axisNumber > 2) return false;
+  if (!Motor::init()) return false;
 
   if (axisNumber == 1) {
     pinModeEx(ODRIVE_RST_PIN, OUTPUT);
@@ -74,8 +78,8 @@ bool ODriveMotor::init() {
 
   enable(false);
 
-  // start the motor timer
-  VF("MSG:"); V(axisPrefix); VF("start task to move motor... ");
+  // start the motion timer
+  VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
   char timerName[] = "Target_";
   timerName[6] = '0' + axisNumber;
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
@@ -88,28 +92,6 @@ bool ODriveMotor::init() {
   }
 
   ready = true;
-  return true;
-}
-
-// set motor parameters
-bool ODriveMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
-  UNUSED(param2);
-  UNUSED(param3);
-  UNUSED(param4);
-  UNUSED(param5);
-  stepsPerMeasure = param6;
-  return true;
-}
-
-// validate motor parameters
-bool ODriveMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  UNUSED(param1);
-  UNUSED(param2);
-  UNUSED(param3);
-  UNUSED(param4);
-  UNUSED(param5);
-  UNUSED(param6);
   return true;
 }
 
@@ -156,7 +138,7 @@ void ODriveMotor::setInstrumentCoordinateSteps(long value) {
     noInterrupts();
     long index = value - motorSteps;
     interrupts();
-    float indexDeg = index/stepsPerMeasure;
+    float indexDeg = index/radsPerCount.value;
     if (indexDeg >= -degToRadF(ODRIVE_SYNC_LIMIT/3600.0F) && indexDeg <= degToRadF(ODRIVE_SYNC_LIMIT/3600.0F))
   #endif
   Motor::setInstrumentCoordinateSteps(value);
@@ -176,9 +158,9 @@ void ODriveMotor::resetPositionSteps(long value) {
 
   // get ODrive position in fractionial Turns
   #if ODRIVE_COMM_MODE == OD_UART
-    oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
+    oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*radsPerCount.value; // axis1/2 are in steps per radian
   #elif ODRIVE_COMM_MODE == OD_CAN
-    oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*stepsPerMeasure; // axis1/2 are in steps per radian
+    oPosition = _oDriveDriver->GetPosition(axisNumber - 1)*TWO_PI*radsPerCount.value; // axis1/2 are in steps per radian
   #endif
 
   noInterrupts();
@@ -270,9 +252,9 @@ void ODriveMotor::poll() {
   #endif
   interrupts();
   #if ODRIVE_COMM_MODE == OD_UART
-    setPosition(axisNumber -1, target/(TWO_PI*stepsPerMeasure));
+    setPosition(axisNumber -1, target/(TWO_PI*radsPerCount.value));
   #elif ODRIVE_COMM_MODE == OD_CAN
-    _oDriveDriver->SetPosition(axisNumber -1, target/(TWO_PI*stepsPerMeasure));
+    _oDriveDriver->SetPosition(axisNumber -1, target/(TWO_PI*radsPerCount.value));
   #endif
 }
 

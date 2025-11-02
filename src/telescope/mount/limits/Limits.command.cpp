@@ -36,13 +36,13 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *supressF
     if (command[1] == 'X' && parameter[0] == 'E' && parameter[2] == 0) {
       *numericReply = false;
       switch (parameter[1]) {
-        case '9': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianE)*4.0F)); break;     // minutes past meridianE
-        case 'A': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianW)*4.0F)); break;     // minutes past meridianW
-        case 'e': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.min))); break;       // RA east or -Az limit, in degrees
-        case 'w': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max))); break;       // RA west or +Az limit, in degrees
-        case 'B': sprintf(reply,"%ld",lroundf(radToDegF(axis1.settings.limits.max)/15.0F)); break; // RA west or +Az limit, in hours
-        case 'C': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.min))); break;       // Dec south or -Alt limit, in degrees
-        case 'D': sprintf(reply,"%ld",lroundf(radToDegF(axis2.settings.limits.max))); break;       // Dec north or +Alt limit, in degrees
+        case '9': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianE)*4.0F)); break; // minutes past meridianE
+        case 'A': sprintf(reply,"%ld",lroundf(radToDegF(settings.pastMeridianW)*4.0F)); break; // minutes past meridianW
+        case 'e': sprintf(reply,"%ld",lroundf(radToDegF(axis1.getLimitMin()))); break;         // RA east or -Az limit, in degrees
+        case 'w': sprintf(reply,"%ld",lroundf(radToDegF(axis1.getLimitMax()))); break;         // RA west or +Az limit, in degrees
+        case 'B': sprintf(reply,"%ld",lroundf(radToDegF(axis1.getLimitMax())/15.0F)); break;   // RA west or +Az limit, in hours
+        case 'C': sprintf(reply,"%ld",lroundf(radToDegF(axis2.getLimitMin()))); break;         // Dec south or -Alt limit, in degrees
+        case 'D': sprintf(reply,"%ld",lroundf(radToDegF(axis2.getLimitMax()))); break;         // Dec north or +Alt limit, in degrees
         default: return false;
       }
     } else return false;

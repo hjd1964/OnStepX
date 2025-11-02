@@ -77,10 +77,10 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
   transform.mountToInstrument(coords, &a1w, &a2w);
   coords->pierSide = lastPierSide;
 
-  float eastLimitMin = axis1.settings.limits.min;
-  float eastLimitMax = axis1.settings.limits.max;
-  float westLimitMin = axis1.settings.limits.min;
-  float westLimitMax = axis1.settings.limits.max;
+  float eastLimitMin = axis1.getLimitMin();
+  float eastLimitMax = axis1.getLimitMax();
+  float westLimitMin = axis1.getLimitMin();
+  float westLimitMax = axis1.getLimitMax();
 
   if (AXIS1_SECTOR_GEAR == ON) {
     if (isGoto) {
@@ -170,14 +170,14 @@ CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, boo
 
   #if AXIS2_TANGENT_ARM == OFF
     if (transform.isEquatorial()) {
-      if (flt(coords->d, axis2.settings.limits.min)) {
+      if (flt(coords->d, axis2.getLimitMin())) {
         VF("MSG: Mount, validate failed Dec past min limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.min)*3600.0); VLF(" arc-secs");
+        V(radToDeg(coords->d - axis2.getLimitMin())*3600.0); VLF(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;
       }
-      if (fgt(coords->d, axis2.settings.limits.max)) {
+      if (fgt(coords->d, axis2.getLimitMax())) {
         VF("MSG: Mount, validate failed Dec past max limit by ");
-        V(radToDeg(coords->d - axis2.settings.limits.max)*3600.0); VLF(" arc-secs");
+        V(radToDeg(coords->d - axis2.getLimitMax())*3600.0); VLF(" arc-secs");
         return CE_SLEW_ERR_OUTSIDE_LIMITS;
       }
     }
@@ -334,12 +334,12 @@ void Limits::poll() {
     #endif
 
     // min and max limits
-    if (flt(current.a1, axis1.settings.limits.min)) {
+    if (flt(current.a1, axis1.getLimitMin())) {
       stopAxis1(GA_REVERSE);
       error.limit.axis1.min = true;
       // ---------------------------------------------------------
       if (lastError.limit.axis1.min != error.limit.axis1.min) {
-        D("WRN: Mount, limits min axis1 "); D(radToDeg(current.a1)); D(" > "); D(radToDeg(axis1.settings.limits.min));
+        D("WRN: Mount, limits min axis1 "); D(radToDeg(current.a1)); D(" > "); D(radToDeg(axis1.getLimitMin()));
         D(" ("); D(current.pierSide == PIER_SIDE_WEST ? "W" : "E"); D(")");
         DLF(" FAILED");
         V("MSG: Mount, axis1 = "); VL(degToRad(axis1.getInstrumentCoordinate()));
@@ -347,7 +347,7 @@ void Limits::poll() {
       // ---------------------------------------------------------
     } else error.limit.axis1.min = false;
 
-    if (fgt(current.a1, axis1.settings.limits.max) && autoFlipDelayCycles == 0) {
+    if (fgt(current.a1, axis1.getLimitMax()) && autoFlipDelayCycles == 0) {
       #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           // disable this limit for a second to allow goto to exit the out of limits region
@@ -367,7 +367,7 @@ void Limits::poll() {
         error.limit.axis1.max = true;
         // -------------------------------------------------------------
         if (lastError.limit.axis1.max != error.limit.axis1.max) {
-          D("WRN: Mount, limits max axis1 "); D(radToDeg(current.a1)); D(" < "); D(radToDeg(axis1.settings.limits.max));
+          D("WRN: Mount, limits max axis1 "); D(radToDeg(current.a1)); D(" < "); D(radToDeg(axis1.getLimitMax()));
           DLF(" FAILED");
         }
         // -------------------------------------------------------------
@@ -380,12 +380,12 @@ void Limits::poll() {
       current.a2 = axis2.getMotorPosition();
     #endif
 
-    if (flt(current.a2, axis2.settings.limits.min)) {
+    if (flt(current.a2, axis2.getLimitMin())) {
       stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
       error.limit.axis2.min = true;
     } else error.limit.axis2.min = false;
 
-    if (fgt(current.a2, axis2.settings.limits.max)) {
+    if (fgt(current.a2, axis2.getLimitMax())) {
       stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
       error.limit.axis2.max = true;
     } else error.limit.axis2.max = false;

@@ -8,7 +8,7 @@
   class Jtw26 : public Bissc {
     public:
       // initialize BiSS-C encoder
-      Jtw26(int16_t maPin, int16_t sloPin, int16_t axis);
+      Jtw26(int16_t axis, int16_t maPin, int16_t sloPin);
 
     private:
       // get encoder count relative to origin

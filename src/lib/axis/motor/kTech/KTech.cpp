@@ -30,9 +30,9 @@ void statusKTechMotorAxis8(uint8_t data[8]) { ktechMotorInstance[7]->requestStat
 void statusKTechMotorAxis9(uint8_t data[8]) { ktechMotorInstance[8]->requestStatusCallback(data); }
 
 // constructor
-KTechMotor::KTechMotor(uint8_t axisNumber, const KTechDriverSettings *Settings, bool useFastHardwareTimers) {
+KTechMotor::KTechMotor(uint8_t axisNumber, int8_t reverse, const KTechDriverSettings *Settings, bool useFastHardwareTimers)
+                       :Motor(axisNumber, reverse) {
   if (axisNumber < 1 || axisNumber > 9) return;
-  this->axisNumber = axisNumber;
 
   driverType = ODRIVER;
 
@@ -63,20 +63,17 @@ KTechMotor::KTechMotor(uint8_t axisNumber, const KTechDriverSettings *Settings, 
 }
 
 bool KTechMotor::init() {
-  if (axisNumber < 1 || axisNumber > 9) return false;
+  if (!Motor::init()) return false;
 
   if (!canPlus.ready) {
     V("ERR:"); V(axisPrefix); VLF("No CAN interface!");
     return false;
   }
 
-  // automatically set fault status for known drivers
-  status.active = statusMode != OFF;
-
   enable(false);
 
   // start the motion timer
-  VF("MSG:"); V(axisPrefix); VF("start task to track motion... ");
+  VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
   char timerName[] = "Ax_KTec";
   timerName[2] = axisNumber + '0';
   taskHandle = tasks.add(0, 0, true, 0, callback, timerName);
@@ -114,28 +111,6 @@ bool KTechMotor::init() {
   return true;
 }
 
-// set motor parameters
-bool KTechMotor::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  UNUSED(param1); // general purpose settings defined in Extended.config.h and stored in NV, they can be modified at runtime
-  UNUSED(param2);
-  UNUSED(param3);
-  UNUSED(param4);
-  UNUSED(param5);
-  stepsPerMeasure = param6;
-  return true;
-}
-
-// validate motor parameters
-bool KTechMotor::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  UNUSED(param1);
-  UNUSED(param2);
-  UNUSED(param3);
-  UNUSED(param4);
-  UNUSED(param5);
-  UNUSED(param6);
-  return true;
-}
-
 // low level reversal of axis directions
 // \param state: OFF normal or ON to reverse
 void KTechMotor::setReverse(int8_t state) {
@@ -160,7 +135,7 @@ void KTechMotor::enable(bool state) {
     canPlus.writePacket(canID, cmd, 8);
     VLF("powered down");
   } 
-  
+
   enabled = state;
 }
 

@@ -12,55 +12,72 @@
 bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
-  if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {
-    // :GXA[n]#   Get axis/driver configuration
-    //            Returns: Value
-    if (parameter[0] == 'A') {
-      int index = parameter[1] - '1';
-      if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
-      if (index + 1 != axisNumber) return false; // command wasn't processed
+  if (command[0] == 'G' && command[1] == 'X') {
+
+    // :GXA[n],[p]# Get axis/motor/driver parameter
+    //              Returns: Value
+    if (parameter[0] == 'A' && parameter[1] >= '1' && parameter[1] <= '9' && parameter[2] == ',') {
+
+      if (parameter[1] - '0' != axisNumber) return false;
+
+      // return motor/driver name
+      if (parameter[3] == 'M' && parameter[4] == 0) {
+        strcpy(reply, motor->name());
+        *numericReply = false;
+        return true;
+      }
+
+      int parameterNumber = atoi(&parameter[3]);
+      if (parameterNumber < 0 || parameterNumber > getParameterCount()) { *commandError = CE_PARAM_RANGE; return true; }
+
       uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
 
       // check that all axes are not set to revert
-      if (axesToRevert & 1) {
-        // check that this axis is not set to revert
-        if (!(axesToRevert & (1 << axisNumber))) {
-          AxisStoredSettings thisAxis;
-          nv.readBytes(NV_AXIS_SETTINGS_BASE + index*AxisStoredSettingsSize, &thisAxis, sizeof(AxisStoredSettings));
-          if (axisNumber <= 2) {
-            // convert axis1 and axis2 into degrees
-            thisAxis.stepsPerMeasure /= RAD_DEG_RATIO;
-            thisAxis.limits.min = radToDegF(thisAxis.limits.min);
-            thisAxis.limits.max = radToDegF(thisAxis.limits.max);
-          } else
-          if (axisNumber > 3) {
-            // convert axis > 3 min/max into mm
-            thisAxis.limits.min = thisAxis.limits.min/1000.0F;
-            thisAxis.limits.max = thisAxis.limits.max/1000.0F;
-          }
-          char spm[40]; sprintF(spm, "%1.3f", thisAxis.stepsPerMeasure);
-          char ps1[40]; sprintF(ps1, "%1.3f", thisAxis.param1);
-          char ps2[40]; sprintF(ps2, "%1.3f", thisAxis.param2);
-          char ps3[40]; sprintF(ps3, "%1.3f", thisAxis.param3);
-          char ps4[40]; sprintF(ps4, "%1.3f", thisAxis.param4);
-          char ps5[40]; sprintF(ps5, "%1.3f", thisAxis.param5);
-          char ps6[40]; sprintF(ps6, "%1.3f", thisAxis.param6);
-          sprintf(reply,"%s,%d,%d,%d,%s,%s,%s,%s,%s,%s,%c",
-            spm,
-            (int)thisAxis.reverse,
-            (int)round(thisAxis.limits.min),
-            (int)round(thisAxis.limits.max),
-            ps1, ps2, ps3, ps4, ps5, ps6,
-            motor->getParameterTypeCode());
-          *numericReply = false;
-        } else *commandError = CE_0;
-      } else *commandError = CE_0;
-    } else
+      if (bitRead(axesToRevert, 0) == AP_DEFAULTS) { *commandError = CE_0; return true; }
+
+      // check that this axis is not set to revert
+      if (bitRead(axesToRevert, axisNumber)) { *commandError = CE_0; return true; }
+
+      // requesting parameter 0 returns the parameter count
+      if (parameterNumber == 0) {
+        sprintf(reply, "%d", (int)getParameterCount());
+        *numericReply = false;
+        return true;
+      }
+
+      // get parameter values
+      double value = ((parameterNumber == 1) ? stepsPerMeasureValueNv : getParameter(parameterNumber)->valueNv);
+      float min = getParameter(parameterNumber)->min;
+      float max = getParameter(parameterNumber)->max;
+      AxisParameterType type = getParameter(parameterNumber)->type;
+
+      // convert to degrees if necessary
+      if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD) {
+        value = radToDeg(value);
+        min = radToDeg(min);
+        max = radToDeg(max);
+        type = AXP_FLOAT;
+      }
+      if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD_INV) {
+        value = degToRad(value);
+        min = degToRad(min);
+        max = degToRad(max);
+        type = AXP_FLOAT;
+      }
+
+      char valueStr[24];
+      sprintF(valueStr, "%1.3f", value);
+      convert.stripNumericStr(valueStr);
+
+      sprintf(reply, "%s,%ld,%ld,%d,%s", valueStr, lround(min), lround(max), (int)type, getParameter(parameterNumber)->name);
+
+      *numericReply = false;
+    }
 
     #ifdef SERVO_MOTOR_PRESENT
       // :GXS[n]#   Get axis servo delta (in counts) and velocity
       //            Returns: Values
-      if (parameter[0] == 'S') {
+      if (parameter[0] == 'S' && parameter[2] == 0) {
         int index = parameter[1] - '1';
         if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
         if (index + 1 != axisNumber) return false; // command wasn't processed
@@ -75,7 +92,7 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
 
     // :GXU[n]#   Get stepper driver statUs for axis [n]
     //            Returns: Value
-    if (parameter[0] == 'U') {
+    if (parameter[0] == 'U' && parameter[2] == 0) {
       int index = parameter[1] - '1';
       if (index > 8) { *commandError = CE_PARAM_RANGE; return true; }
       if (index + 1 != axisNumber) return false; // command wasn't processed
@@ -94,139 +111,62 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *supressFra
     } else return false;
   } else
 
-  // :SXA[n]#   Set axis/driver configuration
+  // :SXA[n],R#           Revert axis/motor/driver parameters to default
+  // :SXA[n],[p],nnnn.n#  Set axis/motor/driver parameter value
   if (command[0] == 'S' && command[1] == 'X' && parameter[0] == 'A' && parameter[2] == ',') {
     uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
 
     // check for a valid axisNumber
     int index = parameter[1] - '1';
     if (index + 1 != axisNumber) return false;
-    // check that all axes are not set to revert
-    if (axesToRevert & 1) {
-      // check that this axis is not set to revert
-      if (!(axesToRevert & (1 << axisNumber))) {
-        if (parameter[3] == 'R' && parameter[4] == 0) {
-          // :SXA[n],R# reverts this axis to defaults
-          bitSet(axesToRevert, axisNumber);
-          nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-        } else {
-          // :SXA[n],[sssss...]#
-          AxisStoredSettings thisAxis = settings;
-          if (decodeAxisSettings(&parameter[3], thisAxis)) {
-            // convert axis1, 2 into radians
-            if (axisNumber <= 2) {
-              thisAxis.stepsPerMeasure *= RAD_DEG_RATIO;
-              thisAxis.limits.min = degToRadF(thisAxis.limits.min);
-              thisAxis.limits.max = degToRadF(thisAxis.limits.max);
-            } else
-            // convert axis > 3 min/max into microns
-            if (axisNumber > 3) {
-              thisAxis.limits.min = thisAxis.limits.min*1000.0F;
-              thisAxis.limits.max = thisAxis.limits.max*1000.0F;
-            }
-            // save the settings to NV, and update axis immediately if supported
-            if (validateAxisSettings(axisNumber, thisAxis)) {
-              nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize, &thisAxis, sizeof(AxisStoredSettings));
-              if (motor->driverType == SERVO) motor->setParameters(thisAxis.param1, thisAxis.param2, thisAxis.param3, thisAxis.param4, thisAxis.param5, thisAxis.param6);
-            } else *commandError = CE_PARAM_FORM;
-          } else *commandError = CE_PARAM_FORM;
-        }
-      } else *commandError = CE_0;
-    } else *commandError = CE_0;
-  } else return false;
 
-  return true;
-}
+    // check if all axes are set to revert
+    if (bitRead(axesToRevert, 0) == AP_DEFAULTS) { *commandError = CE_0; return true; }
 
-// convert axis settings string into numeric form
-bool Axis::decodeAxisSettings(char *s, AxisStoredSettings &a) {
-  if (strcmp(s, "0") != 0) {
-    char *ws = s;
-    char *conv_end; 
-    double f = strtod(ws, &conv_end);
-    if (&s[0] != conv_end) a.stepsPerMeasure = f; else return false;
-    ws = strchr(ws, ','); if (ws != NULL) {
-      ws++; a.reverse = atol(ws);
-      ws = strchr(ws, ','); if (ws != NULL) {
-        ws++; a.limits.min = atol(ws);
-        ws = strchr(ws, ','); if (ws != NULL) {
-          ws++; a.limits.max = atol(ws);
-          ws = strchr(ws, ','); if (ws != NULL) {
-            ws++; a.param1 = atof(ws);
-            ws = strchr(ws, ','); if (ws != NULL) {
-              ws++; a.param2 = atof(ws);
-              ws = strchr(ws, ','); if (ws != NULL) {
-                ws++; a.param3 = atof(ws);
-                ws = strchr(ws, ','); if (ws != NULL) {
-                  ws++; a.param4 = atof(ws);
-                  ws = strchr(ws, ','); if (ws != NULL) {
-                    ws++; a.param5 = atof(ws);
-                    ws = strchr(ws, ','); if (ws != NULL) {
-                      ws++; a.param6 = atof(ws);
-                      return true;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    // check if this axis is set to revert
+    if (bitRead(axesToRevert, axisNumber)) { *commandError = CE_0; return true; }
+
+    // :SXA[n],R# reverts this axis to defaults
+    if (parameter[3] == 'R' && parameter[4] == 0) {
+      bitSet(axesToRevert, axisNumber);
+      nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
+      return true;
     }
-  }
-  return false;
-}
 
-// convert axis settings string into numeric form
-bool Axis::validateAxisSettings(int axisNum, AxisStoredSettings a) {
-  if (!motor->validateParameters(a.param1, a.param2, a.param3, a.param4, a.param5, a.param6)) return false;
+    // :SXA[n],[p],nnn.n#  Set axis/motor/driver parameter value
+    // :SXA[n],[p],nnn.n#  :SXA1,14,12.5#
+    int parameterNumber = atoi(&parameter[3]);
+    char* valueStr = strchr(&parameter[3], ',');
+    if (valueStr == NULL) { *commandError = CE_PARAM_FORM; return true; }
+    char* conv_end;
+    double value = strtod(++valueStr, &conv_end);
+    if (&valueStr[0] == conv_end) { *commandError = CE_PARAM_FORM; return true; }
 
-  int minLimitL, minLimitH, maxLimitL, maxLimitH;
-  float stepsLimitL, stepsLimitH;
+    // convert to radians if necessary
+    if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD) value = degToRad(value);
+    if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD_INV) value = radToDeg(value);
 
-  if (unitsStr[0] == 'u') {
-    minLimitL = 0;
-    minLimitH = 500000;
-    maxLimitL = 0;
-    maxLimitH = 500000;
-    stepsLimitL = 0.001;
-    stepsLimitH = 1000.0;
-  } else {
-    minLimitL = -360;
-    minLimitH = 360;
-    maxLimitL = -360;
-    maxLimitH = 360;
-    stepsLimitL = 1.0;
-    stepsLimitH = 360000.0;
-  }
+    if (parameterIsValid(getParameter(parameterNumber), value, true)) {
+      // save parameter values
+      getParameter(parameterNumber)->valueNv = value;
+      if (parameterNumber == 1) stepsPerMeasureValueNv = value;
 
-  if (unitsRadians) {
-    a.stepsPerMeasure /= RAD_DEG_RATIO;
-    a.limits.min = radToDegF(a.limits.min);
-    a.limits.max = radToDegF(a.limits.max);
-  }
+      // get ready to write to NV
+      AxisStoredSettings nvAxisSettings;
+      nvAxisSettings.stepsPerMeasure = stepsPerMeasureValueNv;
+      for (int i = 1; i <= getParameterCount(); i++) nvAxisSettings.value[i - 1] = getParameter(i)->valueNv;
 
-  if (a.stepsPerMeasure < stepsLimitL || a.stepsPerMeasure > stepsLimitH) {
-    DF("ERR:"); D(axisPrefix); DF("validate setting stepsPerMeasure="); D(a.stepsPerMeasure); DLF("failed");
-    return false;
-  }
+      // write the settings to NV
+      nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize, &nvAxisSettings, sizeof(AxisStoredSettings));
 
-  if (a.reverse != OFF && a.reverse != ON) {
-    DF("ERR:"); D(axisPrefix); DF("validate setting reverse="); D(a.reverse); DLF("failed");
-    return false;
-  }
+      // update immediate parameters now
+      AxisParameterType type = getParameter(parameterNumber)->type;
+      if (type == AXP_BOOLEAN_IMMEDIATE || type == AXP_INTEGER_IMMEDIATE || type == AXP_FLOAT_IMMEDIATE) {
+        getParameter(parameterNumber)->value = value;
+      }
 
-  if (a.limits.min < minLimitL || a.limits.min > minLimitH) {
-    DF("ERR:"); D(axisPrefix); DF("validate setting min="); D(a.limits.min); DLF("failed");
-    return false;
-  }
-
-  if (a.limits.max < maxLimitL || a.limits.max > maxLimitH) {
-    DF("ERR:"); D(axisPrefix); DF("validate setting max="); D(a.limits.max); DLF("failed");
-    return false;
-  }
-
-  UNUSED(axisNum);
+    } else *commandError = CE_PARAM_RANGE;
+  } else return false;
 
   return true;
 }

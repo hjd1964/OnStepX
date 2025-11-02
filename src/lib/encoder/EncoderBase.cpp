@@ -28,7 +28,7 @@ bool Encoder::init() {
   encoder[axis - 1] = this;
 
   uint8_t taskHandle = 0;
-  VF("MSG:"); VF("Encoder"); V(axis); VF(", start status monitor task... ");
+  VF("MSG: Encoder"); V(axis); VF(", start status monitor task... ");
 
   switch (axis) {
     case 1:
@@ -77,6 +77,20 @@ void Encoder::poll() {
     msNow += 250;
     interrupts();
   #endif
+
+  // calculate the velocity in counts per second
+  if (tick++ % ENCODER_VELOCITY_WINDOW == 0) {
+    unsigned long now = millis();
+
+    if (count != lastCount) {
+      int32_t counts = count - lastCount;
+      long period = (long)(now - lastVelocityCheckTimeMs);
+      velocity = counts/(period/1000.0F);
+      lastCount = count;
+    } else velocity = 0;
+
+    lastVelocityCheckTimeMs = now;
+  }
 
   // run once every 5 seconds
   if (tick++ % 20 == 0) {

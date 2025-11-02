@@ -29,7 +29,11 @@ void Rotator::init() {
   readSettings();
 
   VLF("MSG: Rotator, init (Axis3)");
-  if (!axis3.init(&motor3)) { initError.driver = true; DLF("ERR: Rotator::init(), no motion controller for Axis3!"); }
+  if (!axis3.init(&motor3)) {
+    initError.driver = true;
+    DLF("ERR: Rotator::init(), no motion controller for Axis3!");
+    return;
+  }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
   axis3.setFrequencyMax(AXIS3_SLEW_RATE_BASE_DESIRED*2.0F);
@@ -38,16 +42,20 @@ void Rotator::init() {
   axis3.setSlewAccelerationTime(AXIS3_ACCELERATION_TIME);
   axis3.setSlewAccelerationTimeAbort(AXIS3_RAPID_STOP_TIME);
   if (AXIS3_POWER_DOWN == ON) axis3.setPowerDownTime(AXIS3_POWER_DOWN_TIME);
+
+  ready = true;
 }
 
 void Rotator::begin() {
-  axis3.calibrateDriver();
+  if (ready) {
+    axis3.calibrateDriver();
 
-  // start monitor task
-  VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
-  if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
+    // start monitor task
+    VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
+    if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
 
-  unpark();
+    unpark();
+  }
 }
 
 // get backlash in steps
@@ -263,12 +271,12 @@ void Rotator::monitor() {
       #endif
 
       if (homing) {
-        axis3.resetPosition((axis3.settings.limits.max + axis3.settings.limits.min)/2.0F);
+        axis3.resetPosition((axis3.getLimitMax() + axis3.getLimitMin())/2.0F);
         axis3.setBacklashSteps(getBacklash());
         homing = false;
       }
 
-      // delayed write of focuser position
+      // delayed write of rotator position
       if (ROTATOR_WRITE_DELAY != 0) {
         if (secs > writeTime) {
           settings.position = axis3.getInstrumentCoordinate();

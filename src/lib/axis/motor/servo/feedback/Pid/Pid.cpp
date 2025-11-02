@@ -5,105 +5,77 @@
 
 #ifdef SERVO_MOTOR_PRESENT
 
-Pid::Pid(const float P, const float I, const float D, const float P_goto, const float I_goto, const float D_goto, const float sensitivity) {
-  setDefaultParameters(P, I, D, P_goto, I_goto, D_goto);
-  autoScaleParameters = (sensitivity == 0);
-  if (autoScaleParameters) this->sensitivity = 100; else this->sensitivity = sensitivity;
+#if AXIS1_SERVO_FEEDBACK == PID || AXIS2_SERVO_FEEDBACK == PID || AXIS3_SERVO_FEEDBACK == PID || \
+    AXIS4_SERVO_FEEDBACK == PID || AXIS5_SERVO_FEEDBACK == PID || AXIS6_SERVO_FEEDBACK == PID || \
+    AXIS7_SERVO_FEEDBACK == PID || AXIS8_SERVO_FEEDBACK == PID || AXIS9_SERVO_FEEDBACK == PID
+
+Pid::Pid(const float P, const float I, const float D) {
+  trackingP.valueDefault = P;
+  trackingI.valueDefault = I;
+  trackingD.valueDefault = D;
 }
 
 // initialize PID control and parameters
-void Pid::init(uint8_t axisNumber, ServoControl *control, float controlRange) {
+void DualPid::init(uint8_t axisNumber, ServoControl *control) {
+  if (ready) return;
+
   Feedback::init(axisNumber, control);
 
-  axisPrefix[9] = '0' + axisNumber;
-
-  p = param1;
-  i = param2;
-  d = param3;
-  c = controlRange;
-
-  VF("MSG:"); V(axisPrefix); VF("setting feedback with range +/-"); VL(controlRange);
-  VF("MSG:"); V(axisPrefix); if (autoScaleParameters) { VL("using auto parameter scaling"); } else { VL("using manual parameter scaling"); } 
+  axisPrefix[5] = '0' + axisNumber;
 
   pid = new QuickPID(&control->in, &control->out, &control->set,
                      0, 0, 0,
                      QuickPID::pMode::PID_PMODE, QuickPID::dMode::PID_DMODE, QuickPID::iAwMode::PID_IMODE,
                      QuickPID::Action::direct);
   pid->SetSampleTimeUs(PID_SAMPLE_TIME_US);
-  pid->SetOutputLimits(-controlRange, controlRange);
+  pid->Initialize();
   pid->SetMode(QuickPID::Control::automatic);
 }
 
 // reset feedback control and parameters
 void Pid::reset() {
   VF("MSG:"); V(axisPrefix); VLF("reset");
-  pid->SetMode(QuickPID::Control::manual);
   control->in = 0;
   control->set = 0;
   control->out = 0;
-  pid->SetMode(QuickPID::Control::automatic);
-  pid->SetMode(QuickPID::Control::manual);
-  pid->SetMode(QuickPID::Control::automatic);
   trackingSelected = false;
-  parameterSelectPercent = 100;
-  p = param4;
-  i = param5;
-  d = param6;
-  pid->SetTunings(p, i, d);
-  lastP = p;
-  lastI = i;
-  lastD = d;
+  selectTrackingParameters();
 }
 
-void Pid::setControlDirection(int8_t state) {
+void DualPid::setControlDirection(int8_t state) {
   if (state == ON) pid->SetControllerDirection(QuickPID::Action::reverse); else pid->SetControllerDirection(QuickPID::Action::direct);
 }
 
-// select PID param set for slewing
+void Pid::setControlRange(float controlRange) {
+  VF("MSG:"); V(axisPrefix); VF("setting feedback range +/-"); VL(controlRange);
+  pid->SetOutputLimits(-controlRange, controlRange);
+}
+
+// select PID param set for tracking
 void Pid::selectTrackingParameters() {
   if (!trackingSelected) {
-    pid->SetMode(QuickPID::Control::manual);
-    pid->SetMode(QuickPID::Control::automatic);
     VF("MSG:"); V(axisPrefix); VL("tracking selected");
     trackingSelected = true;
+    pid->Reset();
+    pid->SetTunings(P.value, I.value, D.value);
   }
 }
 
 // select PID param set for slewing
 void Pid::selectSlewingParameters() {
   if (trackingSelected) {
-    pid->SetMode(QuickPID::Control::manual);
-    pid->SetMode(QuickPID::Control::automatic);
     VF("MSG:"); V(axisPrefix); VL("slewing selected");
     trackingSelected = false;
-    parameterSelectPercent = 100;
-    p = param4;
-    i = param5;
-    d = param6;
-    pid->SetTunings(p, i, d);
-    lastP = p;
-    lastI = i;
-    lastD = d;
+    pid->Reset();
+    pid->SetTunings(P.value, I.value, D.value);
   }
 }
 
-// manage feedback, variable PID params
+// variable PID params isn't used
 void Pid::variableParameters(float percent) {
-  float s = percent/sensitivity;
-  if (s < 0.0F) s = 0.0F;
-  if (s > 1.0F) s = 1.0F;
-  p = param1 + (param4 - param1)*s;
-  i = param2 + (param5 - param2)*s;
-  d = param3 + (param6 - param3)*s;
-  if (lastP != p || lastI != i || lastD != d) {
-//    VF("MSG:"); V(axisPrefix);
-//    V("variable parameters");
-//    V(" P="); V(p); V(", I="); V(i); V(", D="); VL(d);
-    pid->SetTunings(p, i, d);
-    lastP = p;
-    lastI = i;
-    lastD = d;
-  }
+  UNUSED(percent);
 }
+
+#endif
 
 #endif

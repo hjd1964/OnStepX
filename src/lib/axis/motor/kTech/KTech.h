@@ -35,19 +35,10 @@ typedef struct KTechDriverSettings {
 class KTechMotor : public Motor {
   public:
     // constructor
-    KTechMotor(uint8_t axisNumber, const KTechDriverSettings *Settings, bool useFastHardwareTimers = true);
+    KTechMotor(uint8_t axisNumber, int8_t reverse, const KTechDriverSettings *Settings, bool useFastHardwareTimers = true);
 
     // sets up the ktech motor
     bool init();
-
-    // get motor type code
-    inline char getParameterTypeCode() { return 'O'; }  // codes used so far are S(tep/dir), T(mc), P(id), and O(Drive)
-
-    // set motor parameters
-    bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
-
-    // validate motor parameters
-    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
 
     // low level reversal of axis directions
     // \param state: OFF normal or ON to reverse
@@ -66,7 +57,7 @@ class KTechMotor : public Motor {
     void resetPositionSteps(long value);
 
     // get tracking mode steps per slewing mode step
-    inline int getStepsPerStepSlewing() { return 64; }
+    inline int getStepsPerStepSlewing() { return 256; }
 
     // get movement frequency in steps per second
     float getFrequencySteps();
@@ -88,6 +79,9 @@ class KTechMotor : public Motor {
 
     // update the associated driver status from CAN
     void requestStatusCallback(uint8_t data[8]);
+
+    // get the motor name
+    const char* name() { return "KTECH"; }
 
   private:
     int canID;

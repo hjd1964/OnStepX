@@ -3,11 +3,6 @@
 
 #include "../../Common.h"
 
-// allow up to 20 errors per minute
-#ifndef ENCODER_ERROR_COUNT_THRESHOLD
-  #define ENCODER_ERROR_COUNT_THRESHOLD 20
-#endif
-
 #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER OFF
 #endif
@@ -56,8 +51,22 @@
   #define HAS_BISS_C
 #endif
 
+// allow up to 20 errors per minute
+#ifndef ENCODER_ERROR_COUNT_THRESHOLD
+  #define ENCODER_ERROR_COUNT_THRESHOLD 20
+#endif
+
+// the time window within which encoder counts are converted to velocity
+// in 250ms units so a value of 4 (the defualt) is one second
+// too short a window and the velocity will be inaccurate
+// too long a window and the velocity will be unresponsive
+// this is used for the servo velocity control loop and very high resolution encoders
+#ifndef ENCODER_VELOCITY_WINDOW
+  #define ENCODER_VELOCITY_WINDOW 4
+#endif
+
 // OFF is disabled, ON disregards unexpected quadrature encoder signals, or 
-// a value > 0 (nanoseconds) disregards repeat signal events for that timer period  
+// a value > 0 (nanoseconds) disregards repeat signal events for that timer period
 #ifndef ENCODER_FILTER
   #define ENCODER_FILTER OFF
 #endif
@@ -96,10 +105,10 @@ class Encoder {
     virtual void setOrigin(uint32_t count);
 
     // get current position
-    virtual int32_t read();
+    virtual int32_t read() { return 0; }
 
     // set current position
-    virtual void write(int32_t position);
+    virtual void write(int32_t position) { UNUSED(position); }
 
     // set the virtual encoder velocity in counts per second
     virtual void setVelocity(float countsPerSec) { UNUSED(countsPerSec); }
@@ -134,9 +143,16 @@ class Encoder {
     // raw origin as last set (for absolute encoders)
     uint32_t origin = 0;
 
+    // encoder velocity in counts per second
+    float velocity = 0.0F;
+
   protected:
     // axis number from 1 to 9
     int16_t axis = 0;
+
+    // keep track of velocity
+    int32_t lastCount = 0;
+    unsigned long lastVelocityCheckTimeMs = 0;
 
     // accumulator for warning detection
     volatile uint32_t warn = 0;

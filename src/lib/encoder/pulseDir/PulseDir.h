@@ -9,7 +9,7 @@
 
 class PulseDir : public Encoder {
   public:
-    PulseDir(int16_t pulsePin, int16_t dirPin, int16_t axis);
+    PulseDir(int16_t axis, int16_t pulsePin, int16_t dirPin);
     bool init();
 
     int32_t read();

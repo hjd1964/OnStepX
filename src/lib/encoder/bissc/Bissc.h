@@ -55,7 +55,6 @@
 
       uint32_t good = 0;
       uint32_t bad = 0;
-      int16_t axis;
       uint16_t nvAddress = 0;
 
       int16_t maPin;

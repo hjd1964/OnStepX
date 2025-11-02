@@ -135,14 +135,14 @@ void Focuser::init() {
         // TCF defaults to disabled at startup
         settings[index].tcf.enabled = false;
 
-        if (settings[index].position < axes[index]->settings.limits.min) {
-          settings[index].position = axes[index]->settings.limits.min;
+        if (settings[index].position < axes[index]->getLimitMin()) {
+          settings[index].position = axes[index]->getLimitMin();
           initError.value = true;
           DLF("ERR: Focuser.init(), bad NV park pos < _LIMIT_MIN (set to _LIMIT_MIN)");
         }
 
-        if (settings[index].position > axes[index]->settings.limits.max) {
-          settings[index].position = axes[index]->settings.limits.max;
+        if (settings[index].position > axes[index]->getLimitMax()) {
+          settings[index].position = axes[index]->getLimitMax();
           initError.value = true;
           DLF("ERR: Focuser.init(), bad NV park pos > _LIMIT_MAX steps (set to _LIMIT_MAX)");
         }
@@ -306,12 +306,12 @@ float Focuser::getHomePosition(int index) {
   
   switch (configuration[index].homeDefault) {
     case MAXIMUM:
-      return lround(axes[index]->settings.limits.max);
+      return lround(axes[index]->getLimitMax());
     case MIDDLE:
-      return lround((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F);
+      return lround((axes[index]->getLimitMax() + axes[index]->getLimitMin())/2.0F);
     case MINIMUM:
     default:
-      return lround(axes[index]->settings.limits.min);
+      return lround(axes[index]->getLimitMin());
   }
 }
 
@@ -575,7 +575,7 @@ void Focuser::monitor() {
           } else tcfSteps[index] = 0;
 
           if (homing[index]) {
-            long p = round((axes[index]->settings.limits.max + axes[index]->settings.limits.min)/2.0F)*axes[index]->getStepsPerMeasure();
+            long p = round((axes[index]->getLimitMax() + axes[index]->getLimitMin())/2.0F)*axes[index]->getStepsPerMeasure();
             axes[index]->resetPositionSteps(p);
             axes[index]->setBacklash(getBacklash(index));
             homing[index] = false;

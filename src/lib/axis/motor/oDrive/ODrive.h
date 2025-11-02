@@ -11,35 +11,51 @@
 // the following would be in the pinmap normally and should trigger #error on compile here when not present
 // for now, they fit your hardware as best as I can tell...
 #ifndef ODRIVE_SERIAL
-  #define ODRIVE_SERIAL      Serial3 
+  #define ODRIVE_SERIAL      Serial3  // Teensy HW Serial3 (if used,) for example
 #endif
 #ifndef ODRIVE_SERIAL_BAUD
-  #define ODRIVE_SERIAL_BAUD 19200
+  #define ODRIVE_SERIAL_BAUD 115200   // was 19200
 #endif
+
 #ifndef ODRIVE_RST_PIN
   #define ODRIVE_RST_PIN     3
 #endif
 
 // odrive update rate default 10Hz
 #ifndef ODRIVE_UPDATE_MS
-  #define ODRIVE_UPDATE_MS   3000
+  #define ODRIVE_UPDATE_MS   100      // was 3000
 #endif
 
 // odrive direct slewing ON or OFF (ODrive handles acceleration)
+// ON to use ODrive trapezoidal move profile, OFF for OnStep move profile
 #ifndef ODRIVE_SLEW_DIRECT
   #define ODRIVE_SLEW_DIRECT OFF
 #endif
 
 // odrive if using absolute encoders set to ON
 #ifndef ODRIVE_ABSOLUTE
-  #define ODRIVE_ABSOLUTE    OFF
+  #define ODRIVE_ABSOLUTE    ON       // was OFF
 #endif
 
 // odrive sync limit (for absolute encoders) OFF or specify the sync limit in arc-seconds
 // this should, I hope, allow you to limit just how far from the encoders you can sync. (+/-) to fine-tune the origin
 // with absolute encoders this protects you from exceeding the software min/max limits by > the amount specified
+// in arc seconds..one encoder tick encoder resolution = 2^14 = 16380
+// 16380/360=45.5 ticks/deg; 45.5/60=0.7583 ticks/min; 0.7583/60 = .00126 ticks/sec
+// or 1/0.7583 = 1.32 arc-min/tick; 1.32*60 sec = 79.2 arc sec per encoder tick
 #ifndef ODRIVE_SYNC_LIMIT
-  #define ODRIVE_SYNC_LIMIT  OFF
+  #define ODRIVE_SYNC_LIMIT  80       // was OFF
+#endif
+
+// Use OD_UART or OD_CAN...I2C may be added later
+#ifndef ODRIVE_COMM_MODE
+  #define ODRIVE_COMM_MODE   OD_CAN
+#endif
+
+// ODrive axis 0 = OnStep Axis2 = DEC or ALT
+// ODrive axis 1 = OnStep Axis1 = RA or AZM
+#ifndef ODRIVE_SWAP_AXES
+  #define ODRIVE_SWAP_AXES   ON
 #endif
 
 #if ODRIVE_COMM_MODE == OD_UART
@@ -61,19 +77,20 @@ typedef struct ODriveDriverSettings {
 class ODriveMotor : public Motor {
   public:
     // constructor
-    ODriveMotor(uint8_t axisNumber, const ODriveDriverSettings *Settings, bool useFastHardwareTimers = true);
+    ODriveMotor(uint8_t axisNumber, int8_t reverse, const ODriveDriverSettings *Settings, float radsPerCount, bool useFastHardwareTimers = true);
 
     // sets up the odrive motor
     bool init();
 
-    // get motor type code
-    inline char getParameterTypeCode() { return 'O'; }  // codes used so far are S(tep/dir), T(mc), P(id), and O(Drive)
+    // returns the number of parameters from the motor
+    uint8_t getParameterCount() { return Motor::getParameterCount() + numParameters; }
 
-    // set motor parameters
-    bool setParameters(float param1, float param2, float param3, float param4, float param5, float param6);
-
-    // validate motor parameters
-    bool validateParameters(float param1, float param2, float param3, float param4, float param5, float param6);
+    // returns the specified axis parameter
+    AxisParameter* getParameter(uint8_t number) {
+      if (number == Motor::getParameterCount() + 1) return &radsPerCount; else
+      if (number >= 1 && number <= Motor::getParameterCount()) return Motor::getParameter(number); else
+      return &invalid;
+    }
 
     // set motor reverse state
     void setReverse(int8_t state);
@@ -101,6 +118,9 @@ class ODriveMotor : public Motor {
 
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
+
+    // get the motor name
+    const char* name() { return "ODRIVE"; }
 
     // updates PID and sets servo motor power/direction
     void poll();
@@ -146,7 +166,12 @@ class ODriveMotor : public Motor {
     bool isSlewing = false;
 
     DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
-    float stepsPerMeasure = 0.0F;
+
+    // runtime adjustable settings
+    AxisParameter radsPerCount = {NAN, NAN, NAN, degToRadF(300.0), degToRadF(360000.0), AXP_FLOAT, AXPN_RADS_PER_COUNT};
+
+    const int numParameters = 1;
+    AxisParameter* parameter[2] = {&invalid, &radsPerCount};
 };
 
 #endif

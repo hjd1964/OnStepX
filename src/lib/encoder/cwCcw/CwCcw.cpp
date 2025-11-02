@@ -53,7 +53,7 @@ CwCcw *cwCcwInstance[9];
   IRAM_ATTR void cwCcw_B_Axis9() { cwCcwInstance[8]->ccw(); }
 #endif
 
-CwCcw::CwCcw(int16_t cwPin, int16_t ccwPin, int16_t axis) {
+CwCcw::CwCcw(int16_t axis, int16_t cwPin, int16_t ccwPin) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;

@@ -8,7 +8,7 @@
 #include "../../../gpioEx/GpioEx.h"
 
 // the various microsteps for different driver models, with the bit modes for each
-#define DRIVER_MODEL_COUNT 19
+#define DRIVER_MODEL_COUNT 22
 
 const static int8_t steps[DRIVER_MODEL_COUNT][9] =
 //  1   2   4   8  16  32  64 128 256x
@@ -24,7 +24,8 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
   {  0,  1,  2,OFF,  3,OFF,OFF,OFF,OFF},   // TMC2130S
   {OFF,  1,  2,  0,  3,OFF,OFF,OFF,OFF},   // TMC2208S
   {OFF,OFF,  0,  1,  2,  3,OFF,OFF,OFF},   // TMC2225S
-  {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S/TMC2226S
+  {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2209S
+  {OFF,OFF,OFF,  0,  3,  1,  2,OFF,OFF},   // TMC2226S
 
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2130
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2160
@@ -32,8 +33,10 @@ const static int8_t steps[DRIVER_MODEL_COUNT][9] =
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5160
   {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC5161
 
-  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2208/TMC2225
-  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209/TMC2226
+  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2208
+  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2225
+  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2209
+  {  8,  7,  6,  5,  4,  3,  2,  1,  0},   // TMC2226
 };
 
 const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
@@ -50,7 +53,8 @@ const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC2130S
   103,   // TMC2208S
   103,   // TMC2225S
-  103,   // TMC2209S/TMC2226S
+  103,   // TMC2209S
+  103,   // TMC2226S
 
   103,   // TMC2130
   103,   // TMC2160
@@ -58,197 +62,181 @@ const static int16_t DriverPulseWidth[DRIVER_MODEL_COUNT] =
   103,   // TMC5160
   103,   // TMC5161
 
-  103,   // TMC2208/TMC2225
-  103,   // TMC2209/TMC2226
+  103,   // TMC2208
+  103,   // TMC2225
+  103,   // TMC2209
+  103,   // TMC2226
 };
 
-#if DEBUG != OFF
-  const char* DRIVER_NAME[DRIVER_MODEL_COUNT] =
-  { 
-    "A4988",
-    "DRV8825",
-    "GENERIC",
-    "LV8729",
-    "RAPS128",
-    "S109",
-    "ST820",
-    "TMC2100",
-    "TMC2130",
-    "TMC2208",
-    "TMC2225",
-    "TMC2209/TMC2226",
+const char* DRIVER_NAME[DRIVER_MODEL_COUNT] = { 
+  "A4988",
+  "DRV8825",
+  "GENERIC",
+  "LV8729",
+  "RAPS128",
+  "S109",
+  "ST820",
+  "TMC2100",
+  "TMC2130",
+  "TMC2208",
+  "TMC2225",
+  "TMC2209",
+  "TMC2226",
 
-    "TMC2130 (SPI)",
-    "TMC2160 (SPI)",
-    "TMC2660 (SPI)",
-    "TMC5160 (SPI)",
-    "TMC5161 (SPI)",
+  "TMC2130 (SPI)",
+  "TMC2160 (SPI)",
+  "TMC2660 (SPI)",
+  "TMC5160 (SPI)",
+  "TMC5161 (SPI)",
 
-    "TMC2208/TMC2225 (UART)",
-    "TMC2209/TMC2226 (UART)",
-  };
-#endif
+  "TMC2208 (UART)",
+  "TMC2225 (UART)",
+  "TMC2209 (UART)",
+  "TMC2226 (UART)",
+};
 
-// set up driver and parameters: microsteps, microsteps goto, hold current, run current, goto current, unused
-bool StepDirDriver::setParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
+StepDirDriver::StepDirDriver(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings) {
+  this->axisNumber = axisNumber;
 
-  // get the maximum current and Rsense for this axis
-  user_rSense = 0;
-  user_currentMax = 0;
-  switch (axisNumber) {
-    case 1:
-      #ifdef AXIS1_DRIVER_RSENSE
-        user_rSense = AXIS1_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS1_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS1_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 2:
-      #ifdef AXIS2_DRIVER_RSENSE
-        user_rSense = AXIS2_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS2_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS2_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 3:
-      #ifdef AXIS3_DRIVER_RSENSE
-        user_rSense = AXIS3_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS3_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS3_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 4:
-      #ifdef AXIS4_DRIVER_RSENSE
-        user_rSense = AXIS4_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS4_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS4_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 5:
-      #ifdef AXIS5_DRIVER_RSENSE
-        user_rSense = AXIS5_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS5_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS5_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 6:
-      #ifdef AXIS6_DRIVER_RSENSE
-        user_rSense = AXIS6_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS6_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS6_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 7:
-      #ifdef AXIS7_DRIVER_RSENSE
-        user_rSense = AXIS7_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS7_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS7_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 8:
-      #ifdef AXIS8_DRIVER_RSENSE
-        user_rSense = AXIS8_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS8_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS8_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-    case 9:
-      #ifdef AXIS9_DRIVER_RSENSE
-        user_rSense = AXIS9_DRIVER_RSENSE;
-      #endif
-      #ifdef AXIS9_DRIVER_MAX_CURRENT
-        user_currentMax = AXIS9_DRIVER_MAX_CURRENT;
-      #endif
-    break;
-  }
+  this->Pins = Pins;
 
-  // remember the settings
-  settings.microsteps = round(param1);
-  settings.microstepsSlewing = round(param2);
-  settings.currentHold = round(param3);
-  settings.currentRun  = round(param4);
-  settings.currentGoto = round(param5);
-  UNUSED(param6);
+  driverModel = Settings->model;
+  statusMode = Settings->status;
 
-  if (settings.intpol == ON) settings.intpol = true; else settings.intpol = false;
-  if (settings.decay == OFF) settings.decay = STEALTHCHOP;
-  if (settings.decaySlewing == OFF) settings.decaySlewing = SPREADCYCLE;
+  microsteps.valueDefault = Settings->microsteps;
+  microstepsSlewing.valueDefault = Settings->microstepsSlewing;
 
-  VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[settings.model]);
-  VF(" u-step mode "); if (settings.microsteps == OFF) { VF("OFF (assuming 1X)"); settings.microsteps = 1; } else { V(settings.microsteps); VF("X"); }
-  VF(" (goto mode "); if (settings.microstepsSlewing == OFF) { VLF("OFF)"); } else { V(settings.microstepsSlewing); VL("X)"); }
+  if (microsteps.valueDefault == OFF) microsteps.valueDefault = 1.0F;
+  if (microstepsSlewing.valueDefault == OFF) microstepsSlewing.valueDefault = microsteps.valueDefault;
 
-  if (settings.microstepsSlewing == OFF) settings.microstepsSlewing = settings.microsteps;
-  microstepCode = subdivisionsToCode(settings.microsteps);
-  microstepCodeSlewing = subdivisionsToCode(settings.microstepsSlewing);
-  microstepRatio = settings.microsteps/settings.microstepsSlewing;
-
-  return true;
+  decay.valueDefault = Settings->decay;
+  decaySlewing.valueDefault = Settings->decaySlewing;
 }
 
-// validate driver parameters
-bool StepDirDriver::validateParameters(float param1, float param2, float param3, float param4, float param5, float param6) {
-  int index = axisNumber - 1;
-  if (index > 3) index = 3;
+bool StepDirDriver::init() {
+  VF("MSG:"); V(axisPrefix); VL(name());
 
+  // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
   #if STEP_WAVE_FORM == PULSE
-    // check if platform pulse width (ns) is ok for this stepper driver timing in PULSE mode
     long pulseWidth = HAL_PULSE_WIDTH;
     if (axisNumber > 2) pulseWidth = 2000;
 
-    if (DriverPulseWidth[settings.model] == OFF) {
-      VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[settings.model]); VF(" min. pulse width unknown!");
+    if (DriverPulseWidth[driverModel] == OFF) {
+      VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[driverModel]); VF(" min. pulse width unknown!");
     }
 
-    if (DriverPulseWidth[settings.model] > pulseWidth) {
-      DF("WRN:"); D(axisPrefix); D(DRIVER_NAME[settings.model]);
-      DF(" min. pulse width "); D(DriverPulseWidth[settings.model]); DF("ns > platform at ");
-      D(pulseWidth); DLF("ns");
+    if (DriverPulseWidth[driverModel] > pulseWidth) {
+      DF("WRN:"); D(axisPrefix); D(DRIVER_NAME[driverModel]);
+      DF(" min. pulse width "); D(DriverPulseWidth[driverModel]); DF("ns > platform at "); D(pulseWidth); DLF("ns");
       return false;
     }
   #endif
 
-  long subdivisions = round(param1);
-  long subdivisionsGoto = round(param2);
-  UNUSED(param3);
-  UNUSED(param4);
-  UNUSED(param5);
-  UNUSED(param6);
+  normalizedMicrosteps = lround(microsteps.value);
+  normalizedMicrostepsSlewing = lround(microstepsSlewing.value);
+  VF("MSG:"); V(axisPrefix); VF("microstep mode "); V(microsteps.value); VF("X");
+  VF(" (goto mode "); V(microstepsSlewing.value); VL("X)");
 
-  if (subdivisions == OFF) {
-    V("WRN:"); V(axisPrefix); VLF("subdivisions OFF (assuming 1X)");
-    subdivisions = 1;
+  // set parmeter min/max to cover range of available microsteps for this driver
+  int microstep[9] = {1, 2, 4, 8, 16, 32, 64, 128, 256};
+  int lowestMode = 256;
+  int highestMode = 1;
+  for (int i = 0; i < 9; i++) {
+    if (subdivisionsToCode(microstep[i]) != OFF) {
+      if (microstep[i] < lowestMode) lowestMode = microstep[i];
+      if (microstep[i] > highestMode) highestMode = microstep[i];
+    }
   }
+  microsteps.min = lowestMode;
+  microstepsSlewing.min = lowestMode;
+  microsteps.max = highestMode;
+  microstepsSlewing.max = highestMode;
 
-  if (subdivisions <= subdivisionsGoto) {
-    DF("WRN:"); D(axisPrefix); DLF("subdivisions must be > subdivisionsGoto");
+  microstepCode = subdivisionsToCode(normalizedMicrosteps);
+  microstepCodeSlewing = subdivisionsToCode(normalizedMicrostepsSlewing);
+
+  if (microstepCode == OFF || microstepCodeSlewing == OFF) {
+    DF("MSG:"); D(axisPrefix); DF("invalid microstep mode for this driver.");
     return false;
   }
 
-  if (subdivisions != OFF && (subdivisionsToCode(subdivisions) == OFF)) {
-    DF("WRN:"); D(axisPrefix); DF("bad subdivisions="); DL(subdivisions);
-    return false;
+  microstepRatio = normalizedMicrosteps/normalizedMicrostepsSlewing;
+
+  normalizedDecay = lround(decay.value);
+  normalizedDecaySlewing = lround(decaySlewing.value);
+
+  // automatically set fault status for known drivers
+  if (statusMode == ON) {
+    switch (driverModel) {
+      case DRV8825: statusMode = LOW; break;
+      case ST820:   statusMode = LOW; break;
+      default: break;
+    }
   }
 
-  if (subdivisionsGoto != OFF && (subdivisionsToCode(subdivisionsGoto) == OFF)) {
-    DF("WRN:"); D(axisPrefix); DF("bad subdivisionsGoto="); DL(subdivisionsGoto);
-    return false;
+  // disable certain status modes if the fault pin isn't defined
+  if ((statusMode == LOW || statusMode == HIGH) && Pins->fault == OFF) {
+    statusMode = OFF;
   }
 
+  // flag status as active or not
+  status.active = statusMode != OFF;
+
+  // set fault pin mode
+  if (statusMode == LOW) pinModeEx(Pins->fault, INPUT_PULLUP);
+  #ifdef PULLDOWN
+    if (statusMode == HIGH) pinModeEx(Pins->fault, INPUT_PULLDOWN);
+  #else
+    if (statusMode == HIGH) pinModeEx(Pins->fault, INPUT);
+  #endif
+
+  // check to see if the driver is ok if we're using a fault pin
+  if (statusMode == LOW || statusMode == HIGH) {
+    status.fault = digitalReadEx(Pins->fault) == statusMode;
+    if (status.fault) {
+      DF("ERR:"); D(axisPrefix); DLF("motor driver device fault!");
+      return false;
+    } else {
+      VF("MSG:"); V(axisPrefix); VLF("motor driver device ok");
+    }
+  }
+
+  return true;
+}
+
+bool StepDirDriver::parameterIsValid(AxisParameter* parameter, bool next) {
+  if (parameter == &microsteps || parameter == &microstepsSlewing) {
+
+    int microstepsValue, microstepsSlewingValue;
+    if (next) {
+      microstepsValue = lround(microsteps.valueNv);
+      microstepsSlewingValue = lround(microstepsSlewing.valueNv);
+    } else {
+      microstepsValue = lround(microsteps.value);
+      microstepsSlewingValue = lround(microstepsSlewing.value);
+    }
+
+    if (subdivisionsToCode(microstepsValue) == OFF) {
+      DF("WRN:"); D(axisPrefix); DLF("unsupported microsteps value");
+      return false;
+    }
+    if (subdivisionsToCode(microstepsSlewingValue) == OFF) {
+      DF("WRN:"); D(axisPrefix); DLF("unsupported microsteps slewing value");
+      return false;
+    }
+    if (microstepsValue < microstepsSlewingValue) {
+      DF("WRN:"); D(axisPrefix);
+      DF("bad microsteps "); D(microstepsValue);
+      DF(" must be >= microstepsGoto "); DL(microstepsSlewingValue);
+      return false;
+    }
+  }
   return true;
 }
 
 // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
 long StepDirDriver::getPulseWidth() {
-  long ns = DriverPulseWidth[settings.model];
+  long ns = DriverPulseWidth[driverModel];
   if (ns < 0) ns = 2000;
   return ns;
 }
@@ -258,30 +246,35 @@ long StepDirDriver::getPulseWidth() {
 // returns bit code (0 to 7) or OFF if microsteps is not supported or unknown
 int StepDirDriver::subdivisionsToCode(long microsteps) {
   int allowed[9] = {1,2,4,8,16,32,64,128,256};
-  if (settings.model >= DRIVER_MODEL_COUNT) return OFF;
+  if (driverModel >= DRIVER_MODEL_COUNT) return OFF;
   for (int i = 0; i < 9; i++) {
-    if (microsteps == allowed[i]) return steps[settings.model][i];
+    if (microsteps == allowed[i]) return steps[driverModel][i];
   }
   return OFF;
 }
 
+// get the driver name
+const char* StepDirDriver::name() {
+  return DRIVER_NAME[driverModel];
+}
+
 // update status info. for driver
 void StepDirDriver::updateStatus() {
-  if (settings.status == ON) {
+  if (statusMode == ON) {
     if ((long)(millis() - timeLastStatusUpdate) > 200) {
       readStatus();
 
       // open load indication is not reliable in standstill
-      if (status.outputA.shortToGround ||
-          status.outputB.shortToGround ||
-          status.overTemperatureWarning ||
-          status.overTemperature) status.fault = true; else status.fault = false;
+      status.fault = status.outputA.shortToGround ||
+                     status.outputB.shortToGround ||
+                     status.overTemperatureWarning ||
+                     status.overTemperature;
 
       timeLastStatusUpdate = millis();
     }
   } else
-  if (settings.status == LOW || settings.status == HIGH) {
-    status.fault = digitalReadEx(Pins->fault) == settings.status;
+  if (statusMode == LOW || statusMode == HIGH) {
+    status.fault = digitalReadEx(Pins->fault) == statusMode;
   }
 
   #if DEBUG == VERBOSE

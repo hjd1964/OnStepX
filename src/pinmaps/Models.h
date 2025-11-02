@@ -87,6 +87,10 @@
   #define PINMAP_STR "MaxSTM v3"
   #include "Pins.MaxSTM.h"
 #endif
+#if PINMAP == SAL_XB1
+  #define PINMAP_STR "SAL-XB1"
+  #include "Pins.SAL_XB1.h"
+#endif
 #ifndef PINMAP_STR
   #define PINMAP_STR "Unknown"
 #endif
