@@ -77,7 +77,7 @@ bool ServoMotor::init() {
   if (!driver->init(normalizedReverse)) { DF("ERR:"); D(axisPrefix); DLF("no motor driver!"); return false; }
 
   driver->enable(false);
-  
+
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
   feedback->reset();
@@ -112,7 +112,7 @@ void ServoMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   feedback->setControlDirection(state);
-  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault;
 }
 
 void ServoMotor::enable(bool state) {
@@ -312,7 +312,13 @@ void ServoMotor::poll() {
 
     // directly use fixed PWM value during calibration
     #ifdef CALIBRATE_SERVO_DC
-      velocity = calibrateVelocity->experimentMode ? calibrateVelocity->experimentPwm*velocityMax / 100.0F : control->out;
+      if (calibrateVelocity->experimentMode) {
+        // experimentVel is in PERCENT of max velocity, convert to cps
+        velocity = (calibrateVelocity->experimentVelocity / 100.0F) * velocityMax;
+      } else {
+        // your normal control path; keep whatever you used before
+        velocity = control->out + currentDirection*currentFrequency;
+      }
     #else
       velocity = control->out + currentDirection*currentFrequency;
     #endif
