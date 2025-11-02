@@ -17,9 +17,9 @@
 // Configuration constants
 
 #define SERVO_CALIBRATION_START_VELOCITY_PERCENT 0.01f        // Initial percentage for stiction search (based on max velocity)
-#define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT 5.0f          // Maximum allowed percentage of velocity to reach
-#define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 1000              // ms to wait after stopping motor
-#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 300  // ms between velocity checks
+#define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT 12.0f         // Maximum allowed percentage of velocity to reach
+#define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 2000              // ms to wait after stopping motor
+#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 2000 // ms between velocity checks
 #define SERVO_CALIBRATION_TIMEOUT 1000000                     // ms before calibration fails
 
 #define SERVO_CALIBRATION_STICTION_REFINE_ABS 0.01f           // % velocity
@@ -36,7 +36,7 @@
 #define SERVO_CALIBRATION_VELOCITY_MEASURE_WINDOW_MS 1500     // Measure tracking velocity on a bigger window
 
 #define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY 0.01f       // steps/sec minimum movement threshold
-#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS  80     // short debounce to avoid a single noisy read
+#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS  1000   // short debounce to avoid a single noisy read
 
 
 // Calibration states
