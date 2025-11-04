@@ -227,7 +227,7 @@ void ServoCalibrateTrackingVelocity::handleMotorState() {
 
           V(axisPrefix);
           if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
-          VF(": STEADY_STATE  @ VelocityPercent="); V(calibrationVelocity); VF("%");
+          VF(": STEADY_STATE  @vel="); V(calibrationVelocity); VF("%");
           VF(" Vel="); V(currentVelocity); VL(" steps/s");
 
           // NOW safe to start the next test, if any
@@ -247,7 +247,7 @@ void ServoCalibrateTrackingVelocity::handleMotorState() {
 
           V(axisPrefix);
           if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
-          VF(": STOPPED_STATE  @ Velocity (%)="); V(calibrationVelocity); VF("%");
+          VF(": STOPPED_STATE  @vel="); V(calibrationVelocity); VF("%");
           VF(" Vel="); V(currentVelocity); VL(" steps/s");
         }
 
@@ -281,7 +281,7 @@ float ServoCalibrateTrackingVelocity::calculateInstantaneousVelocity() {
   float velocity = dCounts / elapsed; // steps/sec
 
 #ifdef SERVO_CAL_DEBUG
-  VF("DBG: "); V(axisPrefix);VF(" Velocity (%) ="); V(calibrationVelocity);
+  VF("DBG: "); V(axisPrefix);VF(" vel (%) ="); V(calibrationVelocity);
   VF(" dTicks="); V(dCounts);
   VF(" dt(ms)=");V(currentTime - lastCheckTime);
   VF(" Vel="); V(velocity); VL(" steps/s");
@@ -337,7 +337,7 @@ void ServoCalibrateTrackingVelocity::processStictionCeiling() {
       // Treat as no sustained motion → exponential step up (with clamp)
       V(axisPrefix);
       if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
-      VF(" break: NO SUSTAINED MOVE @ Velocity % ="); V(calibrationVelocity);
+      VF(" break: NO SUSTAINED MOVE @vel="); V(calibrationVelocity);
       VF(" avgVel="); V(avgVel); VL(" steps/s");
 
       calibrationVelocity = copysignf(
@@ -382,8 +382,8 @@ void ServoCalibrateTrackingVelocity::processStictionCeiling() {
 
     V(axisPrefix);
     if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
-    VF(" break: NO MOVE @ Velocity % ="); V(calibrationVelocity);
-    VF(" Vel="); V(velocity); VL(" steps/s");
+    VF(" break: NO MOVE @vel % ="); V(calibrationVelocity);
+    VF(" vel="); V(velocity); VL(" steps/s");
 
     calibrationVelocity = copysignf(
       fminf(fabsf(calibrationVelocity) * 2.0f, SERVO_CALIBRATION_STOP_VELOCITY_PERCENT),
@@ -675,13 +675,13 @@ void ServoCalibrateTrackingVelocity::processVelocitySearch() {
     if (trackingVelocity < floorAbs - tol) {
       VF("MSG: "); V(axisPrefix);
       VF(calibrationDirectionIsForward ? " FWD" : " REV");
-      VF(" velocity search: below-floor VELOCITY="); V(trackingVelocity); VLF("%");
+      VF(" velocity search: below-floor vel="); V(trackingVelocity); VLF("%");
     } else {
       // worst-case: use the floor
       trackingVelocity = floorAbs;
       VF("MSG: "); V(axisPrefix);
       VF(calibrationDirectionIsForward ? " FWD" : " REV");
-      VF(" velocity search: using floor VELOCITY="); V(trackingVelocity); VLF("%");
+      VF(" velocity search: using floor vel="); V(trackingVelocity); VLF("%");
     }
     goto velocity_search_done;
   }
@@ -770,7 +770,7 @@ void ServoCalibrateTrackingVelocity::startTest(float velocity) {
 
   V(axisPrefix);
   if (calibrationDirectionIsForward) {VF(" FWD");} else {VF(" REV");}
-  VF(" Starting test at VELOCITY="); V(velocity); VL("%");
+  VF(" Starting test at vel="); V(velocity); VL("%");
 }
 
 void ServoCalibrateTrackingVelocity::setVelocity(float velocityPercent) {
