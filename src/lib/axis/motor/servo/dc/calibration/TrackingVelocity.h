@@ -113,8 +113,10 @@ private:
   long calibrationStepStartTicks;
   float lastVelocityMeasurement;
 
-  // NEW: keep last delta counts from instant velocity calc (for reporting)
+  // NEW: capture instant counts for velocity calc, and steady window anchors
   long lastDeltaCounts;
+  unsigned long steadySinceMs;
+  long steadyStartTicks;
 
   // Calibration parameters
   float calibrationVelocity;
@@ -130,7 +132,7 @@ private:
   float stictionFloorRev;
   float trackingVelocityRev;
 
-  // NEW: measured velocities (steps/s, signed) & counts used for those measurements
+  // Measured velocities (steps/s) & counts captured for report
   float stictionCeilingVelFwd;
   float stictionFloorVelFwd;
   float trackingVelocityMeasuredFwd;
