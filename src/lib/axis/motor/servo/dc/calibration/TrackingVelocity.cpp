@@ -52,6 +52,19 @@
 
 #if defined(SERVO_MOTOR_PRESENT) && defined(CALIBRATE_SERVO_DC)
 
+// Make sure we are dealing with just the motors and no algorithms (plain linear mapping to PWM)
+#ifdef SERVO_HYSTERESIS_ENABLE
+  #undef SERVO_HYSTERESIS_ENABLE
+#endif
+
+#ifdef SERVO_STICTION_KICK
+  #undef SERVO_STICTION_KICK
+#endif
+
+#ifdef SERVO_NONLINEAR_ENABLE
+  #undef SERVO_NONLINEAR_ENABLE
+#endif
+
 ServoCalibrateTrackingVelocity::ServoCalibrateTrackingVelocity(uint8_t axisNumber) {
   this->axisNumber = axisNumber;
   snprintf(axisPrefix, sizeof(axisPrefix), "Axis%d ServoCalibration", axisNumber);
