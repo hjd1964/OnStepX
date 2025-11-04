@@ -19,7 +19,7 @@
 #define SERVO_CALIBRATION_START_VELOCITY_PERCENT 0.01f        // Initial percentage for stiction search (based on max velocity)
 #define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT 12.0f         // Maximum allowed percentage of velocity to reach
 #define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 2000              // ms to wait after stopping motor
-#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 2000 // ms between velocity checks
+#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 200  // ms between velocity checks
 #define SERVO_CALIBRATION_TIMEOUT 1000000                     // ms before calibration fails
 
 #define SERVO_CALIBRATION_STICTION_REFINE_ABS 0.01f           // % velocity
@@ -113,6 +113,9 @@ private:
   long calibrationStepStartTicks;
   float lastVelocityMeasurement;
 
+  // NEW: keep last delta counts from instant velocity calc (for reporting)
+  long lastDeltaCounts;
+
   // Calibration parameters
   float calibrationVelocity;
   float calibrationMinVelocity;
@@ -126,6 +129,25 @@ private:
   float stictionCeilingRev;
   float stictionFloorRev;
   float trackingVelocityRev;
+
+  // NEW: measured velocities (steps/s, signed) & counts used for those measurements
+  float stictionCeilingVelFwd;
+  float stictionFloorVelFwd;
+  float trackingVelocityMeasuredFwd;
+  long  stictionCeilingCountsFwd;
+  long  stictionFloorCountsFwd;
+  long  trackingCountsFwd;
+
+  float stictionCeilingVelRev;
+  float stictionFloorVelRev;
+  float trackingVelocityMeasuredRev;
+  long  stictionCeilingCountsRev;
+  long  stictionFloorCountsRev;
+  long  trackingCountsRev;
+
+  // Bookkeeping for best samples
+  float velSearchBestAvgVel;
+  long  velSearchBestCounts;
 
   long lastTicks;
   unsigned long lastCheckTime;
@@ -148,11 +170,10 @@ private:
   float queuedVelocity = 0.0f;
 
   inline void queueNextTest(CalibrationState st, float velocity) {
-  queuedState = st;
-  queuedVelocity = velocity;
-  hasQueuedTest = true;
-}
-
+    queuedState = st;
+    queuedVelocity = velocity;
+    hasQueuedTest = true;
+  }
 };
 
 #endif

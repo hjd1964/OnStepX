@@ -87,6 +87,8 @@ void ServoCalibrateTrackingVelocity::init() {
 
   lastTicks = 0;
   lastCheckTime = 0;
+  lastDeltaCounts = 0;
+
   enabled = false;
   everMovedFwd = false;
   everMovedRev = false;
@@ -94,6 +96,8 @@ void ServoCalibrateTrackingVelocity::init() {
   velIters = 0;
   bestLowVelocitySearchAbs = 0.0f;
   bestVelSearchErr = 1e9f; // sentinel "worst" error
+  velSearchBestAvgVel = 0.0f;
+  velSearchBestCounts = 0;
 
   refineIters = 0;
 
@@ -259,23 +263,25 @@ float ServoCalibrateTrackingVelocity::calculateInstantaneousVelocity() {
   if (lastCheckTime == 0) {
     lastCheckTime = currentTime;
     lastTicks = currentTicks;
+    lastDeltaCounts = 0;
     return 0.0f;
   }
 
-
   float elapsed = (currentTime - lastCheckTime) / 1000.0f;
   if (elapsed <= 0) return 0.0f;
-  float velocity = (currentTicks - lastTicks) / elapsed;
+  long dCounts = (currentTicks - lastTicks);
+  float velocity = dCounts / elapsed; // steps/sec
 
 #ifdef SERVO_CAL_DEBUG
   VF("DBG: "); V(axisPrefix);VF(" Velocity (%) ="); V(calibrationVelocity);
-  VF(" dTicks="); V(currentTicks - lastTicks);
+  VF(" dTicks="); V(dCounts);
   VF(" dt(ms)=");V(currentTime - lastCheckTime);
   VF(" Vel="); V(velocity); VL(" steps/s");
 #endif
 
   lastTicks = currentTicks;
   lastCheckTime = currentTime;
+  lastDeltaCounts = dCounts; // NEW: cache raw counts used for this instant velocity
 
   return velocity;
 }
@@ -293,7 +299,15 @@ void ServoCalibrateTrackingVelocity::processStictionCeiling() {
     // motion detected at this velocity
     float absVelocity = fabsf(calibrationVelocity);
     float& stictionMax = calibrationDirectionIsForward ? stictionCeilingFwd : stictionCeilingRev;
-    if (calibrationDirectionIsForward) everMovedFwd = true; else everMovedRev = true;
+    if (calibrationDirectionIsForward) {
+      everMovedFwd = true;
+      stictionCeilingVelFwd = velocity;        // signed (FWD positive)
+      stictionCeilingCountsFwd = lastDeltaCounts;
+    } else {
+      everMovedRev = true;
+      stictionCeilingVelRev = velocity;        // signed (REV negative)
+      stictionCeilingCountsRev = lastDeltaCounts;
+    }
     stictionMax = absVelocity;
 
     V(axisPrefix);
@@ -381,7 +395,6 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
   }
 
   // We only evaluate after a test has resolved to a steady state or stop.
-  // (updateState() already guards for this; keeping a safety check here too.)
   if (motorState != MOTOR_RUNNING_STEADY && motorState != MOTOR_STOPPED) return;
 
   const bool moved = (motorState == MOTOR_RUNNING_STEADY);
@@ -397,6 +410,15 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
     // Movement → lower the upper bound
     calibrationMaxVelocity = fabsf(calibrationVelocity);
     refineSawMove = true;
+
+    // Record measured velocity and counts for the last MOVE
+    if (calibrationDirectionIsForward) {
+      stictionFloorVelFwd   = lastVelocityMeasurement;
+      stictionFloorCountsFwd = lastDeltaCounts;
+    } else {
+      stictionFloorVelRev   = lastVelocityMeasurement;
+      stictionFloorCountsRev = lastDeltaCounts;
+    }
 
     V(axisPrefix);
     if (calibrationDirectionIsForward) { VF(" FWD"); } else { VF(" REV"); }
@@ -422,6 +444,16 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
     if (resultMin - lastNoMoveAbs <= tol) {
       float& trackingVelocity = calibrationDirectionIsForward ? trackingVelocityFwd : trackingVelocityRev;
       trackingVelocity = resultMin;
+
+      // If tracking = floor, reuse floor's measured values
+      if (calibrationDirectionIsForward) {
+        trackingVelocityMeasuredFwd = stictionFloorVelFwd;
+        trackingCountsFwd = stictionFloorCountsFwd;
+      } else {
+        trackingVelocityMeasuredRev = stictionFloorVelRev;
+        trackingCountsRev = stictionFloorCountsRev;
+      }
+
       V(axisPrefix); VF(calibrationDirectionIsForward ? " FWD" : " REV");
       VF(" floor used as minimum after stiction broken VELOCITY="); V(trackingVelocity); VLF("% (no headroom)");
       setVelocity(0); startSettling();
@@ -438,24 +470,25 @@ void ServoCalibrateTrackingVelocity::processStictionFloor() {
     // ---- Enter velocity search (always below the floor) ----
     velIters = 0;
     bestVelSearchErr = 1e9f;
-    bestLowVelocitySearchAbs = resultMin;                 // worst-case is the floor
+    bestLowVelocitySearchAbs = resultMin;  // worst-case is the floor
+    velSearchBestAvgVel = 0.0f;
+    velSearchBestCounts = 0;
     calibrationState = CALIBRATION_VELOCITY_SEARCH;
 
     const float floorAbs = resultMin;
-    calibrationMinVelocity = lastNoMoveAbs;          // <-- start from the highest known stall
-    calibrationMaxVelocity = floorAbs;               // <-- up to the floor
+    calibrationMinVelocity = lastNoMoveAbs;  // start from highest known stall
+    calibrationMaxVelocity = floorAbs;       // up to the floor
 
     // first probe strictly below floor
     float mid = 0.5f * (calibrationMinVelocity + calibrationMaxVelocity);
     calibrationVelocity = (calibrationDirectionIsForward ? +mid : -mid);
 
     // prime a kick at floor, then run the queued test at "mid"
-    // (apply kick and mark as accelerating so state machine advances)
     const float sign = calibrationDirectionIsForward ? 1.0f : -1.0f;
     queueNextTest(CALIBRATION_VELOCITY_SEARCH, calibrationVelocity);
 
-    setVelocity(sign * floorAbs);                         // kick at floor
-    motorState = MOTOR_ACCELERATING;                 // important for state handling
+    setVelocity(sign * floorAbs); // kick at floor
+    motorState = MOTOR_ACCELERATING;
     lastStateChangeTime = currentTime;
     lastVelocityTime = currentTime;
     lastVelocityMeasurement = 0;
@@ -485,11 +518,20 @@ void ServoCalibrateTrackingVelocity::processVelocitySearch() {
   const float tolRel = SERVO_CALIBRATION_STICTION_REFINE_REL * floorAbs;
   const float tol    = fmaxf(tolAbs, tolRel);
 
-  // If our lower bound is already at (or within tol of) the floor,
-  // the best we can do is the floor; accept and exit.
+  // If our lower bound is already at (or within tol of) the floor, use floor
   if (calibrationMinVelocity >= floorAbs - tol) {
     float& trackingVelocity = calibrationDirectionIsForward ? trackingVelocityFwd : trackingVelocityRev;
     trackingVelocity = floorAbs;
+
+    // measured velocity & counts: prefer best search sample, fallback to floor sample
+    if (calibrationDirectionIsForward) {
+      trackingVelocityMeasuredFwd = (velSearchBestAvgVel != 0.0f) ? velSearchBestAvgVel : stictionFloorVelFwd;
+      trackingCountsFwd           = (velSearchBestCounts   != 0  ) ? velSearchBestCounts   : stictionFloorCountsFwd;
+    } else {
+      trackingVelocityMeasuredRev = (velSearchBestAvgVel != 0.0f) ? velSearchBestAvgVel : stictionFloorVelRev;
+      trackingCountsRev           = (velSearchBestCounts   != 0  ) ? velSearchBestCounts   : stictionFloorCountsRev;
+    }
+
     VF("MSG: "); V(axisPrefix);
     VF(calibrationDirectionIsForward ? " FWD" : " REV");
     VF(" velocity search: pinned at floor, using VELOCITY="); V(trackingVelocity); VLF("%");
@@ -516,6 +558,13 @@ void ServoCalibrateTrackingVelocity::processVelocitySearch() {
     if (targetMag <= 0.0f) {
       float& trackingVelocity = calibrationDirectionIsForward ? trackingVelocityFwd : trackingVelocityRev;
       trackingVelocity = velocityAbs; // degenerate case
+      if (calibrationDirectionIsForward) {
+        trackingVelocityMeasuredFwd = avgVel;
+        trackingCountsFwd = dCounts;
+      } else {
+        trackingVelocityMeasuredRev = avgVel;
+        trackingCountsRev = dCounts;
+      }
       V(axisPrefix); VLF(": velocity search skipped (target=0)");
       goto velocity_search_done;
     }
@@ -523,22 +572,31 @@ void ServoCalibrateTrackingVelocity::processVelocitySearch() {
     // Track best-so-far for graceful bailout
     const float errPct = fabsf(actualMag - targetMag) / targetMag * 100.0f;
     if (errPct < bestVelSearchErr) {
-      bestVelSearchErr    = errPct;
+      bestVelSearchErr       = errPct;
       bestLowVelocitySearchAbs = velocityAbs;
+      velSearchBestAvgVel    = avgVel;
+      velSearchBestCounts    = dCounts;
     }
     // Decide next bounds from whether we're too slow/fast
     if (actualMag < targetMag) {
-      // too slow -> we need more velocity (move upward but never above floor)
       calibrationMinVelocity = fminf(floorAbs, fmaxf(calibrationMinVelocity, velocityAbs));
     } else {
-      // too fast -> we can try lower velocity
       calibrationMaxVelocity = fminf(floorAbs, fmaxf(0.0f, fminf(calibrationMaxVelocity, velocityAbs)));
     }
 
-    //Success??
+    // Success?
     if (errPct <= SERVO_CALIBRATION_ERROR_THRESHOLD) {
       float& trackingVelocity = calibrationDirectionIsForward ? trackingVelocityFwd : trackingVelocityRev;
       trackingVelocity = velocityAbs;
+
+      if (calibrationDirectionIsForward) {
+        trackingVelocityMeasuredFwd = avgVel;
+        trackingCountsFwd = dCounts;
+      } else {
+        trackingVelocityMeasuredRev = avgVel;
+        trackingCountsRev = dCounts;
+      }
+
       VF("MSG: "); V(axisPrefix);
       VF(calibrationDirectionIsForward ? " FWD" : " REV");
       VF(" velocity OK: Velocity ="); V(trackingVelocity);VLF("%");
@@ -551,8 +609,17 @@ void ServoCalibrateTrackingVelocity::processVelocitySearch() {
   if ((calibrationMaxVelocity - calibrationMinVelocity) <= tol || ++velIters > SERVO_CALIBRATION_REFINE_MAX_ITERATIONS) {
     float& trackingVelocity = calibrationDirectionIsForward ? trackingVelocityFwd : trackingVelocityRev;
     trackingVelocity = calibrationMaxVelocity;                  // <= floorAbs
+
+    // measured velocity: prefer best measured avg, otherwise fallback to floor measurement
+    if (calibrationDirectionIsForward) {
+      trackingVelocityMeasuredFwd = (velSearchBestAvgVel != 0.0f) ? velSearchBestAvgVel : stictionFloorVelFwd;
+      trackingCountsFwd           = (velSearchBestCounts   != 0  ) ? velSearchBestCounts   : stictionFloorCountsFwd;
+    } else {
+      trackingVelocityMeasuredRev = (velSearchBestAvgVel != 0.0f) ? velSearchBestAvgVel : stictionFloorVelRev;
+      trackingCountsRev           = (velSearchBestCounts   != 0  ) ? velSearchBestCounts   : stictionFloorCountsRev;
+    }
+
     if (trackingVelocity < floorAbs - tol) {
-      // found sustainable below-floor
       VF("MSG: "); V(axisPrefix);
       VF(calibrationDirectionIsForward ? " FWD" : " REV");
       VF(" velocity search: below-floor VELOCITY="); V(trackingVelocity); VLF("%");
@@ -675,24 +742,39 @@ float ServoCalibrateTrackingVelocity::getTrackingVelocity(bool forward) {
   return forward ? trackingVelocityFwd : trackingVelocityRev;
 }
 
+// --- Compact report helpers
+static inline void prDirHeader(const char* dir) {
+  VF(dir); VF("  | ");
+}
+static inline void prPctVelCnt(float pct, float vel, long cnt) {
+  VF("pct "); V(pct); VF("%, v "); V(vel); VF(" steps/s, cnt "); V(cnt);
+}
+
 void ServoCalibrateTrackingVelocity::printReport() {
   VF("\n=== Calibration Report: "); V(axisPrefix); VLF(" ===");
 
-  VF("Stiction Velocity Ceiling at FWD: Max="); V(stictionCeilingFwd);
-  VF("%, Floor="); V(stictionFloorFwd); VL("%");
+  // Header
+  VLF("Dir  | Ceiling                         | Floor                           | Tracking");
+  VLF("-----+---------------------------------+---------------------------------+---------------------------------");
 
-  VF("After stiction Velocity FWD: "); V(trackingVelocityFwd); VL("%\n");
+  // FWD row
+  prDirHeader("FWD");
+  prPctVelCnt(stictionCeilingFwd, stictionCeilingVelFwd, stictionCeilingCountsFwd); VF("  | ");
+  prPctVelCnt(stictionFloorFwd,   stictionFloorVelFwd,   stictionFloorCountsFwd);   VF("  | ");
+  prPctVelCnt(trackingVelocityFwd, trackingVelocityMeasuredFwd, trackingCountsFwd); VL("");
 
-  VF("Stiction Ceiling at REV: Max="); V(stictionCeilingRev);
-  VF("%, Floor="); V(stictionFloorRev); VL("%");
+  // REV row
+  prDirHeader("REV");
+  prPctVelCnt(stictionCeilingRev, stictionCeilingVelRev, stictionCeilingCountsRev); VF("  | ");
+  prPctVelCnt(stictionFloorRev,   stictionFloorVelRev,   stictionFloorCountsRev);   VF("  | ");
+  prPctVelCnt(trackingVelocityRev, trackingVelocityMeasuredRev, trackingCountsRev); VL("");
 
-  VF("After stiction Velocity REV: "); V(trackingVelocityRev); VL("%\n");
-
+  // Imbalance (use magnitudes of % tracking/floor)
   float stictionImbalance = fabsf(stictionFloorFwd - stictionFloorRev);
   float trackingImbalance = fabsf(trackingVelocityFwd - trackingVelocityRev);
 
-  VF("Stiction Min Imbalance: "); V(stictionImbalance); VL("%");
-  VF("After stiction Velocity Imbalance: "); V(trackingImbalance); VL("%\n");
+  VF("Δ Stiction Floor: "); V(stictionImbalance); VF("%, ");
+  VF("Δ Tracking: "); V(trackingImbalance); VLF("%");
 
   if (trackingVelocityFwd >= SERVO_CALIBRATION_STOP_VELOCITY_PERCENT - 0.1f) {
     VLF("WARN: FWD velocity at calibration limit");
@@ -711,6 +793,21 @@ void ServoCalibrateTrackingVelocity::resetCalibrationValues(void) {
   stictionCeilingRev = SERVO_CALIBRATION_STOP_VELOCITY_PERCENT;
   stictionFloorRev = 0.0f;
   trackingVelocityRev = 0.0f;
+
+  // Measured velocities (steps/s) and counts
+  stictionCeilingVelFwd = 0.0f;
+  stictionFloorVelFwd   = 0.0f;
+  trackingVelocityMeasuredFwd = 0.0f;
+  stictionCeilingCountsFwd = 0;
+  stictionFloorCountsFwd   = 0;
+  trackingCountsFwd        = 0;
+
+  stictionCeilingVelRev = 0.0f;
+  stictionFloorVelRev   = 0.0f;
+  trackingVelocityMeasuredRev = 0.0f;
+  stictionCeilingCountsRev = 0;
+  stictionFloorCountsRev   = 0;
+  trackingCountsRev        = 0;
 }
 
 #endif
