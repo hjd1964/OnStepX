@@ -1,5 +1,7 @@
 // -----------------------------------------------------------------------------------
-// calibrate servo tracking velocity
+// Servo Tracking Velocity Calibration - Overview
+// [Header comments remain the same...]
+
 #pragma once
 
 #include <Arduino.h>
@@ -7,45 +9,41 @@
 
 #if defined(SERVO_MOTOR_PRESENT) && defined(CALIBRATE_SERVO_DC)
 
-//#include "../ServoDriver.h"
 #include "../DcServoDriver.h"
 
 #ifndef CALIBRATE_SERVO_AXIS_SELECT
-  #define CALIBRATE_SERVO_AXIS_SELECT 3  // 0 None, 1 for RA, 2 for DEC, 3 for all
+  #define CALIBRATE_SERVO_AXIS_SELECT 3
 #endif
 
 // Configuration constants
+#define SERVO_CALIBRATION_START_VELOCITY_PERCENT 2.5f
+#define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT 12.0f
+#define SERVO_CALIBRATION_STAIRCASE_STEP_PERCENT 0.05f
+#define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 1000
+#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 1000
+#define SERVO_CALIBRATION_TIMEOUT 10000000
+#define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS 200
+#define SERVO_CALIBRATION_VELOCITY_STABILITY_THRESHOLD 50.0f
+#define SERVO_CALIBRATION_ERROR_THRESHOLD 5.0f
+#define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 2.0f
+#define SERVO_CALIBRATION_VELOCITY_MEASURE_WINDOW_MS 1500
+#define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY 0.01f
+#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS 1000
+#define SERVO_CALIBRATION_KICK_DURATION_MS 500
 
-#define SERVO_CALIBRATION_START_VELOCITY_PERCENT 0.01f        // Initial percentage for stiction search (based on max velocity)
-#define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT 12.0f         // Maximum allowed percentage of velocity to reach
-#define SERVO_CALIBRATION_MOTOR_SETTLE_TIME 2000              // ms to wait after stopping motor
-#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 200  // ms between velocity checks
-#define SERVO_CALIBRATION_TIMEOUT 1000000                     // ms before calibration fails
-
-#define SERVO_CALIBRATION_STICTION_REFINE_ABS 0.01f           // % velocity
-#define SERVO_CALIBRATION_STICTION_REFINE_REL 0.10f           // 10% of stiction ceiling
-#define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS 40            // Iterations in PWM floor exploration and tracking velocity search
-#define SERVO_CALIBRATION_VELOCITY_SEARCH_MIN_FACTOR 0.5f     // Min stiction as % of max stiction
-#define SERVO_CALIBRATION_VELOCITY_STABILITY_THRESHOLD 50.0f  // steps/sec^2 for steady state
-
-#define SERVO_CALIBRATION_KICKSTART_DROP_FACTOR 0.9f          // Tracking velocity percentage as % of min stiction
-#define SERVO_CALIBRATION_ERROR_THRESHOLD 5.0f                // Velocity error % for success
-
-#define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD 2.0f      // Fwd/Rev imbalance warning threshold
-
-#define SERVO_CALIBRATION_VELOCITY_MEASURE_WINDOW_MS 1500     // Measure tracking velocity on a bigger window
-
-#define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY 0.01f       // steps/sec minimum movement threshold
-#define SERVO_CALIBRATION_STICTION_SAMPLE_INTERVAL_MS  1000   // short debounce to avoid a single noisy read
-
-
-// Calibration states
 enum CalibrationState {
   CALIBRATION_IDLE,
-  CALIBRATION_STICTION_CEILING,
-  CALIBRATION_STICTION_FLOOR,
-  CALIBRATION_VELOCITY_SEARCH,
+  CALIBRATION_U_BREAK,
+  CALIBRATION_U_HOLD,
   CALIBRATION_CHECK_IMBALANCE
+};
+
+enum MotorState {
+  MOTOR_STOPPED,
+  MOTOR_SETTLING,
+  MOTOR_KICKING,
+  MOTOR_HOLDING,
+  MOTOR_RUNNING_STEADY
 };
 
 class ServoCalibrateTrackingVelocity {
@@ -55,50 +53,51 @@ public:
   void start(float trackingFrequency, long instrumentCoordinateSteps);
   void updateState(long instrumentCoordinateSteps);
 
-  // Getters for calibration results
-  float getStictionCeiling(bool forward); // steps/sec
-  float getStictionFloor(bool forward);
-  float getTrackingVelocity(bool forward);
+  float getU_break(bool forward);
+  float getU_hold(bool forward);
 
   bool experimentMode;
   float experimentVelocity;
   bool enabled;
 
-  // Debug/status
   void printReport();
 
 private:
-  // Motor control states
-  enum MotorState {
-    MOTOR_STOPPED,
-    MOTOR_SETTLING,
-    MOTOR_ACCELERATING,
-    MOTOR_RUNNING_STEADY
+  // Consolidated direction data structure
+  struct DirectionData {
+    float u_break = 0.0f;
+    float u_hold = 0.0f;
+    float breakVel = 0.0f;
+    float holdVel = 0.0f;
+    long breakCounts = 0;
+    long holdCounts = 0;
+    bool everMoved = false;
   };
 
-  // Core methods
   void handleMotorState();
-  void processStictionCeiling();
-  void processStictionFloor();
-  void processVelocitySearch();
+  void processUBreak();
+  void processUHold();
   void processImbalanceCheck();
   void handleCalibrationFailure();
-
-  // Helper methods
   float calculateInstantaneousVelocity();
   void startSettling();
   void startTest(float velocityPercent);
   void setVelocity(float velocityPercent);
-  void transitionToRefine();
   void resetCalibrationValues();
+  void proceedToUHold();
+  void finishUHold();
+  void switchDirectionOrComplete();
 
-  // Configuration
+  // Helper methods for repeated patterns
+  DirectionData& currentDirectionData();
+  const DirectionData& currentDirectionData() const;
+  void recordMovementData(float velocity, long counts);
+  void logTestResult(const char* phase, bool moved);
+
   ServoDcDriver* driver = nullptr;
-
   uint8_t axisNumber;
-  char axisPrefix[16]; // For logging
+  char axisPrefix[16];
 
-  // State tracking
   CalibrationState calibrationState;
   MotorState motorState;
   bool calibrationDirectionIsForward;
@@ -109,69 +108,34 @@ private:
   unsigned long settleStartTime;
   unsigned long calibrationStepStartTime;
   unsigned long lastVelocityTime;
+  unsigned long kickStartTime;
   long currentTicks;
   long calibrationStepStartTicks;
   float lastVelocityMeasurement;
 
-  // NEW: capture instant counts for velocity calc, and steady window anchors
   long lastDeltaCounts;
   unsigned long steadySinceMs;
   long steadyStartTicks;
 
-  // Calibration parameters
   float calibrationVelocity;
-  float calibrationMinVelocity;
-  float calibrationMaxVelocity;
-  float targetVelocity; // magnitude of desired tracking (counts/sec)
+  float targetVelocity;
 
-  // Results (magnitudes, counts/sec)
-  float stictionCeilingFwd;
-  float stictionFloorFwd;
-  float trackingVelocityFwd;
-  float stictionCeilingRev;
-  float stictionFloorRev;
-  float trackingVelocityRev;
+  // Consolidated direction data
+  DirectionData fwdData;
+  DirectionData revData;
 
-  // Measured velocities (steps/s) & counts captured for report
-  float stictionCeilingVelFwd;
-  float stictionFloorVelFwd;
-  float trackingVelocityMeasuredFwd;
-  long  stictionCeilingCountsFwd;
-  long  stictionFloorCountsFwd;
-  long  trackingCountsFwd;
-
-  float stictionCeilingVelRev;
-  float stictionFloorVelRev;
-  float trackingVelocityMeasuredRev;
-  long  stictionCeilingCountsRev;
-  long  stictionFloorCountsRev;
-  long  trackingCountsRev;
-
-  // Bookkeeping for best samples
-  float velSearchBestAvgVel;
-  long  velSearchBestCounts;
+  int staircaseIters;
+  float currentSearchVelocity;
+  bool foundValidMotion;
 
   long lastTicks;
   unsigned long lastCheckTime;
 
-  bool everMovedFwd;
-  bool everMovedRev;
-  int refineIters;  // guard against infinite loops
-
-  // Lowest velocity keeping the motor moving after stiction braking search bookkeeping
-  int   velIters;
-  float bestLowVelocitySearchAbs;
-  float bestVelSearchErr;
-  bool kickToFloorVelocity;
-
-  bool refineSawMove;
-
-  // A tiny queue for kickstarting / settling the motor before a test
   bool hasQueuedTest = false;
   CalibrationState queuedState = CALIBRATION_IDLE;
   float queuedVelocity = 0.0f;
 
-  inline void queueNextTest(CalibrationState st, float velocity) {
+  void queueNextTest(CalibrationState st, float velocity) {
     queuedState = st;
     queuedVelocity = velocity;
     hasQueuedTest = true;
