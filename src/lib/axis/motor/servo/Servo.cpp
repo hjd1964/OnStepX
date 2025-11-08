@@ -276,6 +276,9 @@ int32_t ServoMotor::encoderRead() {
 void ServoMotor::poll() {
   #ifdef CALIBRATE_SERVO_DC
     calibrateVelocity->updateState(getInstrumentCoordinateSteps());
+    driver->setTrackingMode(false);
+    currentFrequency = 0.0f;                    // no trajectory input
+    slewing = false;
   #endif
 
   long encoderCounts = encoderRead();
@@ -315,6 +318,8 @@ void ServoMotor::poll() {
       if (calibrateVelocity->experimentMode) {
         // experimentVel is in PERCENT of max velocity, convert to cps
         velocity = (calibrateVelocity->experimentVelocity / 100.0F) * velocityMax;
+        // disable the PID                        // or feedback->zeroOutputs()
+        control->out = 0.0f;                      // ensure PID output doesn't leak in
       } else {
         // your normal control path; keep whatever you used before
         velocity = control->out + currentDirection*currentFrequency;
