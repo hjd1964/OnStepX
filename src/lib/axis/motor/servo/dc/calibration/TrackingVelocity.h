@@ -31,7 +31,7 @@
 #define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 100     // ms between HOLD samples
 #define SERVO_CALIBRATION_REQUIRED_MOVING_SAMPLES        1      // need this many consecutive moving samples to accept
 #define SERVO_CALIBRATION_MIN_COUNTS_PER_SAMPLE          2L     // min raw encoder/step counts per sample to accept "moving" (tune for encoder)
-#define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY        1.0f   // steps/s—below this we treat as "not moving"
+#define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY        0.1f   // steps/s—below this we treat as "not moving"
 #define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS          200    // Max steps per phase (u_break/u_hold) to avoid endless loops
 #define SERVO_CALIBRATION_KICK_DURATION_MS               300    // ms to apply kick at u_break before HOLD
 #define SERVO_CALIBRATION_IMBALANCE_ERROR_THRESHOLD      2.0f   // % threshold (vs. avg) to warn about FWD/REV imbalance
