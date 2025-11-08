@@ -3,15 +3,17 @@
 // Servo Tracking Velocity Calibration — Overview
 //
 // Goal
-//   Calibrate, per direction, the minimum PWM duty (%) that:
+//   Calibrate, per direction, the minimum open-loop *driver command percent* (“u”, % of
+//   the driver’s velocity range) that:
 //     • breaks stiction from rest (u_break)
 //     • sustains motion after a short kick (u_hold)
 //
 // Mode (Open-loop)
-//   While calibration is active (experimentMode=true) the axis is run open-loop:
+//   While calibration is active (experimentMode=true) the axis runs open-loop:
 //     • Tracking/PID/hysteresis/nonlinear helpers are disabled in this TU
-//     • The driver receives a fixed % command (experimentVelocity)
-//     • “Velocity” below means encoder-derived steps/s (not a PID setpoint)
+//     • The driver is fed a fixed *command %* (experimentVelocity), interpreted as a
+//       fraction of the driver’s max velocity capability (not a PWM duty cycle)
+//     • “Velocity” in the logs means encoder-derived steps/s (not a PID setpoint)
 //
 // Per-direction phases
 //   1) Stiction Break (u_break)
@@ -21,7 +23,7 @@
 //        (SERVO_CALIBRATION_REQUIRED_MOVING_SAMPLES). UB additionally enforces a hard
 //        per-candidate sample cap (SERVO_CAL_UB_MAX_SAMPLES) to avoid indefinite waiting.
 //   2) Velocity Hold (u_hold)
-//      - From u_break, staircase downward to find the minimum % that keeps moving.
+//      - From u_break, staircase downward to find the minimum command % that keeps moving.
 //      - Each candidate is kick-started at u_break, then held at the candidate %.
 //      - Acceptance rule: SAME consecutive-moving requirement. Any failed sample
 //        immediately stalls the candidate.
