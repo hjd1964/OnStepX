@@ -28,9 +28,9 @@
 #define SERVO_CALIBRATION_STOP_VELOCITY_PERCENT          12.0f  // Safety cap for commanded % during tests
 #define SERVO_CALIBRATION_STAIRCASE_STEP_PERCENT         0.1f  // Step size for staircase up/down
 #define SERVO_CALIBRATION_MOTOR_SETTLE_TIME              300    // ms to wait after STOP to remove transients
-#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 300    // ms between HOLD samples
+#define SERVO_CALIBRATION_VELOCITY_SETTLE_CHECK_INTERVAL 100     // ms between HOLD samples
 #define SERVO_CALIBRATION_REQUIRED_MOVING_SAMPLES        1      // need this many consecutive moving samples to accept
-#define SERVO_CALIBRATION_MIN_COUNTS_PER_SAMPLE          4L     // min raw encoder/step counts per sample to accept "moving" (tune for encoder)
+#define SERVO_CALIBRATION_MIN_COUNTS_PER_SAMPLE          2L     // min raw encoder/step counts per sample to accept "moving" (tune for encoder)
 #define SERVO_CALIBRATION_MIN_DETECTABLE_VELOCITY        1.0f   // steps/s—below this we treat as "not moving"
 #define SERVO_CALIBRATION_REFINE_MAX_ITERATIONS          200    // Max steps per phase (u_break/u_hold) to avoid endless loops
 #define SERVO_CALIBRATION_KICK_DURATION_MS               300    // ms to apply kick at u_break before HOLD
