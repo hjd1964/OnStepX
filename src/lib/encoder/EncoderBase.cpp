@@ -78,8 +78,10 @@ void Encoder::poll() {
     interrupts();
   #endif
 
+  tick++;  // increment exactly once
+
   // calculate the velocity in counts per second
-  if (tick++ % ENCODER_VELOCITY_WINDOW == 0) {
+  if (tick % ENCODER_VELOCITY_WINDOW == 0) {
     unsigned long now = millis();
 
     if (count != lastCount) {
@@ -93,7 +95,7 @@ void Encoder::poll() {
   }
 
   // run once every 5 seconds
-  if (tick++ % 20 == 0) {
+  if (tick % 20 == 0) {
 
     totalErrorCount += error;
     uint32_t errors = error;
