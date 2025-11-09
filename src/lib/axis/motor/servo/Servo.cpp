@@ -68,6 +68,10 @@ bool ServoMotor::init() {
 
   #ifdef CALIBRATE_SERVO_DC
     calibrateVelocity = new ServoCalibrateTrackingVelocity(axisNumber);
+    driver->setTrackingMode(false);
+    driver->setBypassAccelOnTracking(true);
+    currentFrequency = 0.0f;                    // no trajectory input
+    slewing = false;
   #endif
 
   if (!encoder->init()) { DF("ERR:"); D(axisPrefix); DLF("no encoder!"); return false; }
@@ -274,13 +278,6 @@ int32_t ServoMotor::encoderRead() {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
-  #ifdef CALIBRATE_SERVO_DC
-    calibrateVelocity->updateState(getInstrumentCoordinateSteps());
-    driver->setTrackingMode(false);
-    currentFrequency = 0.0f;                    // no trajectory input
-    slewing = false;
-  #endif
-
   long encoderCounts = encoderRead();
 
   // for absolute encoders initialize the motor position at startup
@@ -311,11 +308,11 @@ void ServoMotor::poll() {
   control->in = encoderCounts;
   float velocity;
   if (enabled) {
-    feedback->poll();
-
     // directly use fixed PWM value during calibration
     #ifdef CALIBRATE_SERVO_DC
       if (calibrateVelocity->experimentMode) {
+        // Get unfiltered counts
+        calibrateVelocity->updateState(unfilteredEncoderCounts);
         // experimentVel is in PERCENT of max velocity, convert to cps
         velocity = (calibrateVelocity->experimentVelocity / 100.0F) * velocityMax;
         // disable the PID                        // or feedback->zeroOutputs()
@@ -325,6 +322,7 @@ void ServoMotor::poll() {
         velocity = control->out + currentDirection*currentFrequency;
       }
     #else
+      feedback->poll();
       velocity = control->out + currentDirection*currentFrequency;
     #endif
 
