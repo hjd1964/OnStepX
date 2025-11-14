@@ -90,13 +90,18 @@ float ServoDriver::setMotorVelocity(float velocity) {
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
 
-  if (velocity > velocityRamp) {
-    velocityRamp += accelerationFs;
-    if (velocityRamp > velocity) velocityRamp = velocity;
-  } else
-  if (velocity < velocityRamp) {
-    velocityRamp -= accelerationFs;
-    if (velocityRamp < velocity) velocityRamp = velocity;
+  if(bypassAccelOnTracking)
+    velocityRamp = velocity;
+  else {
+    // ramp velocity
+    if (velocity > velocityRamp) {
+      velocityRamp += accelerationFs;
+      if (velocityRamp > velocity) velocityRamp = velocity;
+    } else
+    if (velocity < velocityRamp) {
+      velocityRamp -= accelerationFs;
+      if (velocityRamp < velocity) velocityRamp = velocity;
+    }
   }
 
   if (velocityRamp >= 0.0F) motorDirection = DIR_FORWARD; else motorDirection = DIR_REVERSE;
@@ -131,14 +136,14 @@ void ServoDriver::updateStatus() {
         (status.standstill                != lastStatus.standstill) ||
         (status.fault                     != lastStatus.fault)) {
       VF("MSG:"); V(axisPrefix); VF("status change ");
-      VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". "); 
-      VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". "); 
-      VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". "); 
-      VF("OLB"); if (status.outputB.openLoad) VF("< "); else VF(". "); 
-      VF("OTP"); if (status.overTemperatureWarning) VF("< "); else VF(". "); 
-      VF("OTE"); if (status.overTemperature) VF("< "); else VF(". "); 
-      VF("SST"); if (status.standstill) VF("< "); else VF(". "); 
-      VF("FLT"); if (status.fault) VLF("<"); else VLF("."); 
+      VF("SGA"); if (status.outputA.shortToGround) VF("< "); else VF(". ");
+      VF("OLA"); if (status.outputA.openLoad) VF("< "); else VF(". ");
+      VF("SGB"); if (status.outputB.shortToGround) VF("< "); else VF(". ");
+      VF("OLB"); if (status.outputB.openLoad) VF("< "); else VF(". ");
+      VF("OTP"); if (status.overTemperatureWarning) VF("< "); else VF(". ");
+      VF("OTE"); if (status.overTemperature) VF("< "); else VF(". ");
+      VF("SST"); if (status.standstill) VF("< "); else VF(". ");
+      VF("FLT"); if (status.fault) VLF("<"); else VLF(".");
     }
     lastStatus = status;
   #endif

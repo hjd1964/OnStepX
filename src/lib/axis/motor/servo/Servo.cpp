@@ -68,6 +68,9 @@ bool ServoMotor::init() {
 
   #ifdef CALIBRATE_SERVO_DC
     calibrateVelocity = new ServoCalibrateTrackingVelocity(axisNumber);
+    driver->setTrackingMode(true);
+    driver->setBypassAccelOnTracking(true);
+    slewing = false;
   #endif
 
   if (!encoder->init()) { DF("ERR:"); D(axisPrefix); DLF("no encoder!"); return false; }
@@ -77,7 +80,7 @@ bool ServoMotor::init() {
   if (!driver->init(normalizedReverse)) { DF("ERR:"); D(axisPrefix); DLF("no motor driver!"); return false; }
 
   driver->enable(false);
-  
+
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
   feedback->reset();
@@ -112,7 +115,7 @@ void ServoMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   feedback->setControlDirection(state);
-  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault;
 }
 
 void ServoMotor::enable(bool state) {
@@ -274,10 +277,6 @@ int32_t ServoMotor::encoderRead() {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
-  #ifdef CALIBRATE_SERVO_DC
-    calibrateVelocity->updateState(getInstrumentCoordinateSteps());
-  #endif
-
   long encoderCounts = encoderRead();
 
   // for absolute encoders initialize the motor position at startup
@@ -308,12 +307,21 @@ void ServoMotor::poll() {
   control->in = encoderCounts;
   float velocity;
   if (enabled) {
-    feedback->poll();
-
     // directly use fixed PWM value during calibration
     #ifdef CALIBRATE_SERVO_DC
-      velocity = calibrateVelocity->experimentMode ? calibrateVelocity->experimentPwm*velocityMax / 100.0F : control->out;
+      if (calibrateVelocity->experimentMode) {
+        // Get unfiltered counts
+        calibrateVelocity->updateState(unfilteredEncoderCounts);
+        // experimentVel is in PERCENT of max velocity, convert to cps
+        velocity = (calibrateVelocity->experimentVelocity / 100.0F) * velocityMax;
+        // disable the PID                        // or feedback->zeroOutputs()
+        control->out = 0.0f;                      // ensure PID output doesn't leak in
+      } else {
+        // your normal control path; keep whatever you used before
+        velocity = control->out + currentDirection*currentFrequency;
+      }
     #else
+      feedback->poll();
       velocity = control->out + currentDirection*currentFrequency;
     #endif
 
@@ -398,7 +406,8 @@ void ServoMotor::poll() {
 //      sprintf(s, "Ax%dSvo: Delta %6ld, Motor %6ld, Encoder %6ld, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
 //      sprintf(s, "Ax%dSvo: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);
 //      sprintf(s, "Ax%dSvo: Delta %0.2f\r\n", (int)axisNumber, (motorCounts - (long)encoderCounts)/12.9425);
-      sprintf(s, "Ax%dSvo: DeltaASf: %0.2f, DeltaAS: %0.2f, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - unfilteredEncoderCounts)/spas, (int)axisNumber, velocityPercent);
+//      sprintf(s, "Ax%dSvo: DeltaASf: %0.2f, DeltaAS: %0.2f, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts)/spas, (motorCounts - unfilteredEncoderCounts)/spas, (int)axisNumber, velocityPercent);
+        sprintf(s, "%0.2f, %6.3f%%\r\n", (motorCounts - unfilteredEncoderCounts)/spas, velocityPercent);
 
         D(s);
         UNUSED(spas);
