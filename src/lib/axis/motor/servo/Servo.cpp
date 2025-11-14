@@ -77,7 +77,7 @@ bool ServoMotor::init() {
   if (!driver->init(normalizedReverse)) { DF("ERR:"); D(axisPrefix); DLF("no motor driver!"); return false; }
 
   driver->enable(false);
-  
+
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
   feedback->reset();
@@ -112,7 +112,7 @@ void ServoMotor::setReverse(int8_t state) {
   if (!ready) return;
 
   feedback->setControlDirection(state);
-  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault; 
+  if (state == ON) encoderReverse = encoderReverseDefault; else encoderReverse = !encoderReverseDefault;
 }
 
 void ServoMotor::enable(bool state) {
@@ -301,6 +301,7 @@ void ServoMotor::poll() {
   long unfilteredEncoderCounts = encoderCounts;
   UNUSED(unfilteredEncoderCounts);
   bool isTracking = (abs(currentFrequency - trackingFrequency) < trackingFrequency/10.0F);
+  driver->setTrackingMode(isTracking);
 
   encoderCounts = filter->update(encoderCounts, motorCounts, isTracking);
 
