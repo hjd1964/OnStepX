@@ -8,7 +8,7 @@
 #include "../../../encoder/Encoder.h"
 #include "filter/Filter.h"
 #include "feedback/Feedback.h"
-#include "calibration/TrackingVelocity.h"
+#include "dc/calibration/TrackingVelocity.h"
 
 #include "dc/eE/EE.h"
 #include "dc/pE/PE.h"
