@@ -19,23 +19,19 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 #if defined(TASKS_HWTIMER1_ENABLE) || defined(TASKS_HWTIMER2_ENABLE) || defined(TASKS_HWTIMER3_ENABLE) || defined(TASKS_HWTIMER4_ENABLE)
   // prepare hw timer for interval in sub-microseconds (1/16us)
   volatile uint32_t _nextPeriod1 = 16000, _nextPeriod2 = 16000, _nextPeriod3 = 16000, _nextPeriod4 = 16000;
-  volatile uint16_t _nextRep1 = 0, _nextRep2 = 0, _nextRep3 = 0, _nextRep4 = 0;
   void HAL_HWTIMER_PREPARE_PERIOD(uint8_t num, unsigned long period) {
-    // maximum time is about 134 seconds for this design
-    uint32_t counts, reps = 0;
-    if (period != 0 && period <= 2144000000) {
-      if (period < 16) period = 16;   // minimum time is 1us
-      period /= TIMER_RATE_16MHZ_TICKS;
-      reps    = period/4194304UL + 1;
-      counts  = period/reps;
-    } else counts = 16000;            // set for a 1ms period, stopped
-  
+    if (period == 0) period = 16000UL; // set for a 1ms period, stopped
+    if (period < 16) period = 16UL;    // minimum time is 1us
+
+    // maximum time is about 268 seconds for this design
+    period /= TIMER_RATE_16MHZ_TICKS;
+ 
     noInterrupts();
     switch (num) {
-      case 1: _nextPeriod1 = counts; _nextRep1 = reps; break;
-      case 2: _nextPeriod2 = counts; _nextRep2 = reps; break;
-      case 3: _nextPeriod3 = counts; _nextRep3 = reps; break;
-      case 4: _nextPeriod4 = counts; _nextRep4 = reps; break;
+      case 1: _nextPeriod1 = period; break;
+      case 2: _nextPeriod2 = period; break;
+      case 3: _nextPeriod3 = period; break;
+      case 4: _nextPeriod4 = period; break;
     }
     interrupts();
   }
@@ -68,11 +64,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   IRAM_ATTR void HAL_HWTIMER1_WRAPPER() {
     portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER1_PROFILER_PREFIX;
-    static uint16_t count = 0;
-    if (_nextRep1 > 1) { count++; if (count % _nextRep1 != 0) goto done; }
-    if (_nextRep1) HAL_HWTIMER1_FUN();
+    if (HAL_HWTIMER1_FUN) HAL_HWTIMER1_FUN();
     HAL_HWTIMER1_SET_PERIOD();
-    done: {}
     TASKS_HWTIMER1_PROFILER_SUFFIX;
     portEXIT_CRITICAL_ISR ( &timerMux );
   }
@@ -103,11 +96,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   IRAM_ATTR void HAL_HWTIMER2_WRAPPER() {
     portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER2_PROFILER_PREFIX;
-    static uint16_t count = 0;
-    if (_nextRep2 > 1) { count++; if (count % _nextRep2 != 0) goto done; }
-    if (_nextRep2) HAL_HWTIMER2_FUN();
+    if (HAL_HWTIMER2_FUN) HAL_HWTIMER2_FUN();
     HAL_HWTIMER2_SET_PERIOD();
-    done: {}
     TASKS_HWTIMER2_PROFILER_SUFFIX;
     portEXIT_CRITICAL_ISR ( &timerMux );
   }
@@ -138,11 +128,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   IRAM_ATTR void HAL_HWTIMER3_WRAPPER() {
     portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER3_PROFILER_PREFIX;
-    static uint16_t count = 0;
-    if (_nextRep3 > 1) { count++; if (count % _nextRep3 != 0) goto done; }
-    if (_nextRep3) HAL_HWTIMER3_FUN();
+    if (HAL_HWTIMER3_FUN) HAL_HWTIMER3_FUN();
     HAL_HWTIMER3_SET_PERIOD();
-    done: {}
     TASKS_HWTIMER3_PROFILER_SUFFIX;
     portEXIT_CRITICAL_ISR ( &timerMux );
   }
@@ -173,11 +160,8 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
   IRAM_ATTR void HAL_HWTIMER4_WRAPPER() {
     portENTER_CRITICAL_ISR(&timerMux);
     TASKS_HWTIMER4_PROFILER_PREFIX;
-    static uint16_t count = 0;
-    if (_nextRep4 > 1) { count++; if (count % _nextRep4 != 0) goto done; }
-    if (_nextRep4) HAL_HWTIMER4_FUN();
+    if (HAL_HWTIMER4_FUN) HAL_HWTIMER4_FUN();
     HAL_HWTIMER4_SET_PERIOD();
-    done: {}
     TASKS_HWTIMER4_PROFILER_SUFFIX;
     portEXIT_CRITICAL_ISR ( &timerMux );
   }
