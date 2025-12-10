@@ -8,7 +8,8 @@
     void debugPrint(const char* s) {
       char s1[255];
       strcpy(s1, s);
-      for (unsigned int i = 0; i < strlen(s1); i++) if (s1[i] == ' ') s1[i] = '_';
+      int length = strlen(s1);
+      for (unsigned int i = 0; i < length; i++) if (s1[i] == ' ') s1[i] = '_';
       SERIAL_ONSTEP.print(s1);
     }
   #endif
@@ -20,10 +21,12 @@
     #define PROFILER_VT100 ON
     
     char scale_unit(double *d) {
-      if (labs(lround(*d)) > 999) { *d /= 1000.0; return 'm'; } else
-        if (labs(lround(*d)) > 999) { *d /= 1000.0; return ' '; } else return 'u';
+      long v = labs(lround(*d));
+      if (v > 999999) { *d /= 1000000.0; return 's'; }   // s
+      if (v > 999)    { *d /= 1000.0;    return 'm'; }   // ms
+      return 'u';                                        // us
     }
-    
+
     void profiler() {
       char s[120];
       char aau = 'u'; char axu = 'u'; char rtu = 'u'; char rau = 'u'; char rxu = 'u';
