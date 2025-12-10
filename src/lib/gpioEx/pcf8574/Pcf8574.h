@@ -39,7 +39,7 @@ class GpioPcf8574 : public Gpio {
 
     uint8_t iicAddress[4] = {GPIO_PCF8574_I2C_ADDRESS1, GPIO_PCF8574_I2C_ADDRESS2, GPIO_PCF8574_I2C_ADDRESS3, GPIO_PCF8574_I2C_ADDRESS4};
 
-    int mode[32];
+    int8_t mode[32];
     uint8_t state[4] = {0, 0, 0, 0};
 };
 

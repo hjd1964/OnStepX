@@ -32,7 +32,7 @@ class GpioDs2413 : public Gpio {
 
     uint8_t address[DS2413_MAX_DEVICES][8];
 
-    int mode[DS2413_MAX_DEVICES] = {INPUT, INPUT};
+    int8_t mode[DS2413_MAX_DEVICES] = {INPUT, INPUT};
     uint8_t state[DS2413_MAX_DEVICES*2] = {false, false, false, false};
     int16_t lastState[DS2413_MAX_DEVICES*2] = {INVALID, INVALID, INVALID, INVALID};
 

@@ -22,7 +22,7 @@ class GpioMcp23017 : public Gpio {
   private:
     bool found = false;
 
-    int mode[16] = { INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT };
+    int8_t mode[16] = { INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT, INPUT };
     bool state[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
 };
 

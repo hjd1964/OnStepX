@@ -40,11 +40,11 @@ class GpioSws : public Gpio {
     unsigned long lastActiveTimeMs = 0;
 
     bool virtualRead[8] = {false, false, false, false, false, false, false, false};
-    int virtualWrite[8] = {false, false, false, false, false, false, false, false};
+    uint8_t virtualWrite[8] = {false, false, false, false, false, false, false, false};
     char virtualMode[8] = {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' };
 
-    int mode[8] = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
-    int state[8] = {false, false, false, false, false, false, false, false};
+    int8_t mode[8] = {OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF};
+    bool state[8] = {false, false, false, false, false, false, false, false};
 };
 
 extern GpioSws gpio;

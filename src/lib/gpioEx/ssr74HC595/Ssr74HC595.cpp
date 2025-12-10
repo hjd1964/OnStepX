@@ -40,7 +40,7 @@
 #endif
 
 // designed for a 20MHz max bit rate
-IRAM_ATTR void shiftOut20MHz(uint32_t val) {
+IRAM_ATTR void shiftOut20MHz(uint8_t val) {
   if ((val & 0b10000000) == 0) { GPIO_SSR74HC595_DATA_LOW(); } else { GPIO_SSR74HC595_DATA_HIGH(); }
   GPIO_SSR74HC595_CLOCK_HIGH();
   GPIO_SSR74HC595_CLOCK_LOW();
