@@ -281,13 +281,13 @@ IRAM_ATTR void shcTone() {
   if (tone_state) { 
     tone_state = false;
     digitalWrite(ST4_TONE_PIN, HIGH); 
-    if ((long)(millis() - SerialST4.lastTimeInMilliseconds) > 2000L) {
+    if (millis() - SerialST4.lastTimeInMilliseconds > 2000U) {
       digitalWrite(ST4_DATA_OUT_PIN, HIGH);
     }
   } else  {
     tone_state = true;
     digitalWrite(ST4_TONE_PIN, LOW);
-    if ((long)(millis() - SerialST4.lastTimeInMilliseconds) > 2000L) {
+    if (millis() - SerialST4.lastTimeInMilliseconds > 2000U) {
       digitalWrite(ST4_DATA_OUT_PIN, LOW); 
     }
   }

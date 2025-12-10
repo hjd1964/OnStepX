@@ -28,9 +28,10 @@ SerialBridge::SerialBridge(int16_t axis) {
 int32_t SerialBridge::read() {
   if (!ready) return 0;
 
-  if (millis() - lastReadMillis > 10) {
+  const unsigned long now = millis();
+  if (now - lastReadMillis > 10U) {
     count = getCount();
-    lastReadMillis = millis();
+    lastReadMillis = now;
   }
 
   return count + index;
@@ -67,7 +68,7 @@ int32_t SerialBridge::getCount() {
       result[i] = 0;
     }
     if (c == 'E') errorDetected = true;
-  } while (c != 13 && (millis() - start) < 4 && i < 16);
+  } while (c != 13 && i < 16 && (millis() - start < 4U);
 
   if (strlen(result) > 0) {
     return atoi(result);

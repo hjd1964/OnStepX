@@ -459,17 +459,19 @@ void Goto::poll() {
     axis2.autoSlewAbort();
   }
 
+  const unsigned long now = millis();
+
   // abort any goto that might hang!
   if (axis1.isSlewing()) {
-    if (!axis1.nearTarget()) nearTargetTimeoutAxis1 = millis();
-    if ((long)(millis() - nearTargetTimeoutAxis1) > 15000) {
+    if (!axis1.nearTarget()) nearTargetTimeoutAxis1 = now;
+    if (now - nearTargetTimeoutAxis1 > 15000U) {
       DLF("WRN: Mount, goto axis1 timed out aborting slew!");
       axis1.autoSlewAbort();
     }
   }
   if (axis2.isSlewing()) {
-    if (!axis2.nearTarget()) nearTargetTimeoutAxis2 = millis();
-    if ((long)(millis() - nearTargetTimeoutAxis2) > 15000) {
+    if (!axis2.nearTarget()) nearTargetTimeoutAxis2 = now;
+    if (now - nearTargetTimeoutAxis2 > 15000U) {
       DLF("WRN: Mount, goto axis2 timed out aborting slew!");
       axis2.autoSlewAbort();
     }
@@ -497,13 +499,13 @@ void Goto::poll() {
     if (stage == GG_NEAR_DESTINATION_START) {
       if (nearDestinationRefineStages >= 1) {
         VLF("MSG: Mount, goto near destination wait started");
-        nearDestinationTimeout = millis() + GOTO_SETTLE_TIME;
+        nearDestinationTimeout = now + GOTO_SETTLE_TIME;
         stage = GG_NEAR_DESTINATION_WAIT;
       } else stage = GG_NEAR_DESTINATION;
     } else
 
     if (stage == GG_NEAR_DESTINATION_WAIT) {
-      if ((long)(millis() - nearDestinationTimeout) > 0) {
+      if ((long)(now - nearDestinationTimeout) > 0) {
         VLF("MSG: Mount, goto near destination wait done");
         stage = GG_NEAR_DESTINATION;
       }
@@ -612,7 +614,7 @@ void Goto::poll() {
     target.d += siderealToRad(mount.trackingRateOffsetDec)/FRACTIONAL_SEC;
     transform.rightAscensionToHourAngle(&target, false);
     if (stage >= GG_NEAR_DESTINATION_START) {
-      if (millis() - nearTargetTimeout < 5000) {
+      if (millis() - nearTargetTimeout < 5000U) {
         Coordinate nearTarget = target;
         nearTarget.h -= slewDestinationDistHA;
         nearTarget.d -= slewDestinationDistDec;
@@ -634,8 +636,9 @@ void Goto::poll() {
 CommandError Goto::startAutoSlew() {
   CommandError e;
 
-  nearTargetTimeoutAxis1 = millis();
-  nearTargetTimeoutAxis2 = millis();
+  const unsigned long now = millis();
+  nearTargetTimeoutAxis1 = now;
+  nearTargetTimeoutAxis2 = now;
 
   if (stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION) {
     destination.h -= slewDestinationDistHA;

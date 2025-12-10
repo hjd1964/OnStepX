@@ -43,7 +43,7 @@ extern HardwareSerial HWSerialB;
     VLF("MSG: AddonFlasher, activating serial passthrough...");
 
     // so we have a total of 1.5 minutes to start the upload
-    unsigned long lastRead = millis() + 85000;
+    unsigned long lastRead = millis() + 85000U;
     while (true) {
       // read from port 1, send to port 0:
       if (SERIAL_PASSTHROUGH.available()) {
@@ -59,12 +59,12 @@ extern HardwareSerial HWSerialB;
         delayMicroseconds(5);
         SERIAL_PASSTHROUGH.write(inByte);
         delayMicroseconds(5);
-        if (millis() > lastRead) lastRead = millis();
+        if ((long)(millis() - lastRead > 0)) lastRead = millis();
       }
       //tasks.yield();
 
       // wait 5 seconds w/no traffic before resuming normal operation
-      if (timeout && (long)(millis() - lastRead) > 5000) break;
+      if (timeout && (millis() - lastRead > 5000U) break;
     }
     VLF("MSG: AddonFlasher, serial passthrough deactivated");
 
@@ -118,11 +118,11 @@ extern HardwareSerial HWSerialB;
 
   void AddonFlasher::reset() {
     // reset LOW (active) HIGH (inactive)
-    tasks.yield(20);
+    tasks.yield(200);
     digitalWriteEx(ADDON_RESET_PIN, LOW);
-    tasks.yield(20);
+    tasks.yield(200);
     digitalWriteEx(ADDON_RESET_PIN, HIGH);
-    tasks.yield(20);
+    tasks.yield(200);
   }
 
   void AddonFlasher::poll() {

@@ -655,12 +655,14 @@ void Axis::setFrequencySlew(float frequency) {
 }
 
 void Axis::setFrequency(float frequency) {
+  const unsigned long now = millis();
+
   frequency *= scaleFreq;
   if (powerDownStandstill && frequency == 0.0F && baseFreq == 0.0F) {
     if (!poweredDown) {
-      if (!powerDownOverride || (long)(millis() - powerDownOverrideEnds) > 0) {
+      if (!powerDownOverride || (long)(now - powerDownOverrideEnds) > 0) {
         powerDownOverride = false;
-        if ((long)(millis() - powerDownTime) > 0) {
+        if ((long)(now - powerDownTime) > 0) {
           poweredDown = true;
           motor->enable(false);
         }
@@ -671,7 +673,7 @@ void Axis::setFrequency(float frequency) {
       poweredDown = false;
       motor->enable(true);
     }
-    powerDownTime = millis() + powerDownDelay;
+    powerDownTime = now + powerDownDelay;
   }
 
   if (frequency != 0.0F) {

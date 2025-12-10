@@ -337,11 +337,13 @@ void ServoMotor::poll() {
   velocityPercent = (driver->setMotorVelocity(velocity)/velocityMax) * 100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
+  const unsigned long now = millis();
+
   if (feedback->manuallySwitchParameters) {
     if (!slewing && enabled) {
-      if ((long)(millis() - lastSlewingTime) > SERVO_SLEWING_TO_TRACKING_DELAY) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
+      if (now - lastSlewingTime >= SERVO_SLEWING_TO_TRACKING_DELAY) feedback->selectTrackingParameters(); else feedback->selectSlewingParameters();
     } else {
-      lastSlewingTime = millis();
+      lastSlewingTime = now;
       feedback->selectSlewingParameters();
     }
   } else {
@@ -351,7 +353,7 @@ void ServoMotor::poll() {
   if (velocityPercent < -33) wasBelow33 = true;
   if (velocityPercent > 33) wasAbove33 = true;
 
-  if (millis() - lastCheckTime > 1000) {
+  if (now - lastCheckTime >= 1000U) {
     delta = motorCounts - encoderCounts;
 
     #ifndef SERVO_SAFETY_DISABLE
@@ -390,7 +392,7 @@ void ServoMotor::poll() {
     wasBelow33 = false;
     lastEncoderCounts = encoderCounts;
     lastDelta = delta;
-    lastCheckTime = millis();
+    lastCheckTime = now;
   }
 
   #if DEBUG != OFF && defined(DEBUG_SERVO) && DEBUG_SERVO != OFF

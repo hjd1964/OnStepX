@@ -17,16 +17,18 @@
   }
 
   void CmdServer::handleClient() {
+    const unsigned long now = millis();
+
     // disconnect client
     if (cmdSvrClient && !cmdSvrClient.connected()) cmdSvrClient.stop();
-    if (cmdSvrClient && (long)(clientEndTimeMs - millis()) < 0) cmdSvrClient.stop();
+    if (cmdSvrClient && (long)(now - clientEndTimeMs) > 0) cmdSvrClient.stop();
 
     // new client
     if (!cmdSvrClient) {
       cmdSvrClient = cmdSvr->available();
       if (cmdSvrClient) {
         // find free/disconnected spot
-        clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
+        clientEndTimeMs = now + clientTimeoutMs;
       }
     }
 
@@ -36,7 +38,7 @@
       static int cmdBufferPos = 0;
 
       // still active? push back disconnect
-      if (persist) clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
+      if (persist) clientEndTimeMs = now + clientTimeoutMs;
 
       // get the data
       byte b = cmdSvrClient.read();

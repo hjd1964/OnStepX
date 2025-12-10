@@ -118,13 +118,15 @@ float ServoKTech::setMotorVelocity(float velocity) {
 
   if (velocityLast != lround(velocity) && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
     uint8_t cmd[] = "\xa2\x00\x00\x00";
+  const unsigned long now = millis();
+  if (velocityLast != velocityNext && (now - lastVelocityUpdateTime >= CAN_SEND_RATE_MS)) {
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
     velocityLast = lround(velocity*countsToStepsRatio.value);
     if (reversed) velocityLast = -velocityLast;
     canPlus.write((uint8_t*)&velocityLast, 4);
     canPlus.endPacket();
-    lastVelocityUpdateTime = millis();
+    lastVelocityUpdateTime = now;
   }
 
   return velocity;

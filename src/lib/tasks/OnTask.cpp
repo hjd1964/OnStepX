@@ -86,8 +86,8 @@ bool Task::requestHardwareTimer(uint8_t num, uint8_t hwPriority) {
 
   unsigned long hardware_timer_period = period;
   if (period_units == PU_NONE) hardware_timer_period = 0; else
-  if (period_units == PU_MILLIS) hardware_timer_period *= 16000UL; else
-  if (period_units == PU_MICROS) hardware_timer_period *= 16UL;
+  if (period_units == PU_MILLIS) hardware_timer_period *= 16000U; else
+  if (period_units == PU_MICROS) hardware_timer_period *= 16U;
 
   HAL_HWTIMER_PREPARE_PERIOD(num, roundPeriod((double)hardware_timer_period*_task_masterFrequencyRatio));
 

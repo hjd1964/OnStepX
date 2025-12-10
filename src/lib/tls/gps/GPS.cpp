@@ -82,7 +82,7 @@ bool TlsGPS::init() {
     DLF("WRN: TLS, GPS serial RX interface is quiet!");
     return false;
   } else {
-    unsigned long timeout = millis() + 1000UL;
+    unsigned long timeout = millis() + 1000U;
     while (SERIAL_GPS.available() > 0) {
       if (gps.encode(SERIAL_GPS.read())) break;
       if ((long)(millis() - timeout) > 0) {

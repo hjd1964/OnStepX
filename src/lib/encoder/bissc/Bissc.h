@@ -48,7 +48,7 @@
     protected:
       // read encoder count with 1 second error recovery
       // returns encoder count or INT32_MAX on error
-      uint32_t getCountWithErrorRecovery(bool now = false);
+      uint32_t getCountWithErrorRecovery(bool immediate = false);
 
       // read encoder count
       virtual bool getCount(uint32_t &count);

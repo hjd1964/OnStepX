@@ -190,7 +190,7 @@ void StepDirMotor::setFrequencySteps(float frequency) {
   #if DEBUG != OFF && defined(DEBUG_STEPDIR_ACCEL)
     if (axisNumber == DEBUG_STEPDIR_ACCEL) {
       static unsigned long t = 0;
-      if ((long)(millis() - t) > 100) {
+      if (millis() - t >= 100U) {
         DF("Axis"); D(axisNumber);
         D(" step frequency "); D(frequency); DL("Hz");
         t = millis();
@@ -202,7 +202,7 @@ void StepDirMotor::setFrequencySteps(float frequency) {
   #if DEBUG != OFF && defined(DEBUG_STEPDIR_POSITION)
     if (axisNumber == DEBUG_STEPDIR_POSITION) {
       static unsigned long t = 0;
-      if ((long)(millis() - t) > 100) {
+      if (millis() - t >= 100U) {
         DF("Axis"); D(axisNumber);
         D(" motor step position "); D(motorSteps);
         D(" motor target position "); DL(targetSteps);

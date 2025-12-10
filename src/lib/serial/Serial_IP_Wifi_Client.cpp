@@ -108,7 +108,7 @@
   }
 
   void IPSerialClient::poll() {
-    if ((long)(millis() - lastActivityTimeMs) > clientTimeoutMs && cmdSvrClient.connected()) cmdSvrClient.stop();
+    if (millis() - lastActivityTimeMs > clientTimeoutMs && cmdSvrClient.connected()) cmdSvrClient.stop();
   }
 
   IPSerialClient SerialIPClient;

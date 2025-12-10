@@ -82,7 +82,7 @@ void Encoder::poll() {
 
   // calculate the velocity in counts per second
   if (tick % ENCODER_VELOCITY_WINDOW == 0) {
-    unsigned long now = millis();
+    const unsigned long now = millis();
 
     if (count != lastCount) {
       int32_t counts = count - lastCount;

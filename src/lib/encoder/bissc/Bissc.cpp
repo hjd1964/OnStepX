@@ -69,14 +69,15 @@ void Bissc::write(int32_t position) {
 
 // read encoder count with 1 second error recovery
 // returns encoder count or INT32_MAX on error
-uint32_t Bissc::getCountWithErrorRecovery(bool now) {
-  if (now || (long)(millis() - lastValidTime) > 2) {
+uint32_t Bissc::getCountWithErrorRecovery(bool immediate) {
+  const unsigned long now = millis();
+  if (immediate || now - lastValidTime > 2) {
     uint32_t newCount = 0;
     if (getCount(newCount)) {
-      lastValidTime = millis();
+      lastValidTime = now;
       lastValidCount = newCount;
     } else {
-      if ((long)(millis() - lastValidTime) > 1000) lastValidCount = INT32_MAX;
+      if (now - lastValidTime > 1000U) lastValidCount = INT32_MAX;
     }
   }
 

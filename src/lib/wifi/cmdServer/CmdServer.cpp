@@ -27,7 +27,7 @@
     if (!cmdSvrClient && cmdSvr->hasClient()) {
       // find free/disconnected spot
       cmdSvrClient = cmdSvr->available();
-      clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
+      clientEndTimeMs = millis() + clientTimeoutMs;
     }
 
     // check clients for data, if found get the command, pass to OnStep and pickup the response, then return the response to client
@@ -36,7 +36,7 @@
       static int cmdBufferPos = 0;
 
       // still active? push back disconnect
-      if (persist) clientEndTimeMs = millis() + (unsigned long)clientTimeoutMs;
+      if (persist) clientEndTimeMs = millis() + clientTimeoutMs;
 
       // get the data
       byte b = cmdSvrClient.read();

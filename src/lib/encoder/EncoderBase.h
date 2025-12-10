@@ -76,8 +76,8 @@
   // once a signal state changes don't allow the ISR to run again for ENCODER_FILTER nanoseconds
   // it would be even better to create a low-res millis counter outside of this routine and just access the variable here
   #define ENCODER_FILTER_UNTIL(n) \
-    uint32_t nsNow = nanoseconds(); \
-    if ((long)(msNow - nsInvalidMillis) < 0 && (long)(nsNow - nsNext) < 0) return; \
+    const unsigned long nsNow = nanoseconds(); \
+    if ((long)(msNow - nsInvalidMillis) < 0 && (long)(nsNow - nsNext < 0) return; \
     nsNext = nsNow + n; \
     nsInvalidMillis = msNow + 1000;
 
@@ -171,9 +171,9 @@ class Encoder {
 
     #if ENCODER_FILTER > 0
       // approximate time keeping for filtering
-      volatile uint32_t msNow = 0;
-      volatile uint32_t nsNext = 0;
-      volatile uint32_t nsInvalidMillis = 0;
+      volatile unsigned long msNow = 0;
+      volatile unsigned long nsNext = 0;
+      volatile unsigned long nsInvalidMillis = 0;
     #endif
 };
 

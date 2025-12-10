@@ -112,7 +112,9 @@ float ServoDriver::setMotorVelocity(float velocity) {
 // update status info. for driver
 void ServoDriver::updateStatus() {
   if (statusMode == ON) {
-    if ((long)(millis() - timeLastStatusUpdate) > 200) {
+    const unsigned long now = millis();
+
+    if ((long)(now - timeLastStatusUpdate) > 200U) {
       readStatus();
 
       // open load indication is not reliable in standstill
@@ -121,7 +123,7 @@ void ServoDriver::updateStatus() {
           status.overTemperatureWarning ||
           status.overTemperature) status.fault = true; else status.fault = false;
 
-      timeLastStatusUpdate = millis();
+      timeLastStatusUpdate = now;
     }
   }
 
