@@ -51,8 +51,15 @@ Task::Task(uint32_t period, uint32_t duration, bool repeat, uint8_t priority, vo
   if (!repeat) immediate = false;
   this->priority = priority;
   this->callback = callback;
-  start_time     = millis();
-  next_task_time = start_time + period;
+
+  start_time = millis();
+  uint32_t spread_phase = 0;
+  if (repeat && period >= 4) {
+    uint32_t h = (uint32_t)(uintptr_t)callback ^ ((uint32_t)(uintptr_t)this >> 4) ^ start_time;
+    spread_phase = h % period;
+  }
+  next_task_time = start_time + spread_phase;
+
   strcpy(processName, "");
 }
 
@@ -261,7 +268,7 @@ void Task::setRepeat(bool repeat) {
   this->repeat = repeat;
 }
 
-void Task::setPriority(bool priority) {
+void Task::setPriority(uint8_t priority) {
   if (hardware_timer) return;
   this->priority = priority;
 }
@@ -521,12 +528,13 @@ uint8_t Tasks::getFirstHandle() {
 }
 
 uint8_t Tasks::getNextHandle(uint8_t handle) {
+  if (handle > highest_task) return 0;
   do {
     if (allocated[handle]) {
       return handle + 1;
     }
-  } while (++handle < highest_task);
-  return false;
+  } while (++handle <= highest_task);
+  return 0;
 }
 
 uint8_t Tasks::getHandleByName(const char name[]) {
@@ -630,8 +638,10 @@ void Tasks::updatePriorityRange() {
   // scan for highest priority
   highest_priority = 0;
   for (uint8_t e = 0; e <= highest_task; e++) {
-    uint8_t p = task[e]->getPriority();
-    if (p > highest_priority) highest_priority = p;
+    if (allocated[e]) {
+      uint8_t p = task[e]->getPriority();
+      if (p > highest_priority) highest_priority = p;
+    }
   }
 }
 

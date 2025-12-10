@@ -125,7 +125,7 @@ class Task {
 
     void setRepeat(bool repeat);
 
-    void setPriority(bool priority);
+    void setPriority(uint8_t priority);
     uint8_t getPriority();
 
     void setNameStr(const char name[]);
