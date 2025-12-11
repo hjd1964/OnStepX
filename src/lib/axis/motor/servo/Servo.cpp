@@ -8,7 +8,7 @@
 #include "../../../tasks/OnTask.h"
 #include "../Motor.h"
 
-ServoMotor *servoMotorInstance[9];
+static ServoMotor *servoMotorInstance[9];
 IRAM_ATTR void moveServoMotorAxis1() { servoMotorInstance[0]->move(); }
 IRAM_ATTR void moveServoMotorAxis2() { servoMotorInstance[1]->move(); }
 IRAM_ATTR void moveServoMotorAxis3() { servoMotorInstance[2]->move(); }
@@ -73,6 +73,8 @@ bool ServoMotor::init() {
     slewing = false;
   #endif
 
+  if (encoder->supportsTimeAlignedMotorSteps()) { encoder->setMotorStepsPtr(&motorSteps); }
+
   if (!encoder->init()) { DF("ERR:"); D(axisPrefix); DLF("no encoder!"); return false; }
 
   encoder->setOrigin(encoderOrigin);
@@ -84,7 +86,6 @@ bool ServoMotor::init() {
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
   feedback->reset();
-
   trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
   // start the motion timer
@@ -119,14 +120,29 @@ void ServoMotor::setReverse(int8_t state) {
 }
 
 void ServoMotor::enable(bool state) {
-  if (!ready) return;
+  if (!ready || state == enabled) return;
 
-  driver->enable(state);
-  if (state == false) feedback->reset(); else safetyShutdown = false;
-  enabled = state;
+  if (state) {
+    driver->enable(true);         // power up first
+    feedback->reset();            // clean start (PID state)
+    safetyShutdown = false;
+
+    stopSyntheticMotion();        // stop ISR/task
+    resetToTrackingBaseline();    // clear backlash/step state
+    enabled = true;
+  } else {
+    enabled = false;              // close window
+    stopSyntheticMotion();        // stop ISR/task
+    resetToTrackingBaseline();    // clear backlash/step state
+
+    feedback->reset();            // clear PID state
+    driver->enable(false);        // then power down
+  }
 
   #ifdef CALIBRATE_SERVO_DC
-    if (enabled && !encoder->isVirtual) calibrateVelocity->start(trackingFrequency, getInstrumentCoordinateSteps());
+    if (enabled && !encoder->isVirtual) {
+      calibrateVelocity->start(trackingFrequency, getInstrumentCoordinateSteps());
+    }
   #endif
 }
 
@@ -194,6 +210,8 @@ long ServoMotor::getTargetDistanceSteps() {
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void ServoMotor::setFrequencySteps(float frequency) {
   if (!ready) return;
+
+  if (!enabled) { stopSyntheticMotion(); return; }
 
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
@@ -277,7 +295,8 @@ int32_t ServoMotor::encoderRead() {
 
 // updates PID and sets servo motor power/direction
 void ServoMotor::poll() {
-  long encoderCounts = encoderRead();
+  int32_t encoderCounts = encoder->read();
+  if (encoderReverse) encoderCounts = -encoderCounts;
 
   // for absolute encoders initialize the motor position at startup
   if (syncThreshold != OFF) {
@@ -291,15 +310,18 @@ void ServoMotor::poll() {
     }
   }
 
-  long motorCounts = 0;
-
-  noInterrupts();
-  motorCounts = motorSteps;
-  interrupts();
+  long motorCounts;
+  if (encoder->hasMotorStepsAtLastRead()) {
+    motorCounts = encoder->motorStepsAtLastRead();
+  } else {
+    noInterrupts();
+    motorCounts = motorSteps;
+    interrupts();
+  }
 
   long unfilteredEncoderCounts = encoderCounts;
   UNUSED(unfilteredEncoderCounts);
-  bool isTracking = (abs(currentFrequency - trackingFrequency) < trackingFrequency/10.0F);
+  bool isTracking = (axisNumber == 1) && (fabsf(currentFrequency - trackingFrequency) < trackingFrequency*0.1F);
 
   encoderCounts = filter->update(encoderCounts, motorCounts, isTracking);
 
@@ -329,9 +351,9 @@ void ServoMotor::poll() {
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
+    encoderDirection = velocity < 0.0F ? 1 : -1;
     encoder->setVelocity(abs(velocity));
-    volatile int8_t dir = velocity < 0.0F ? 1 : -1;
-    encoder->setDirection(&dir);
+    encoder->setDirection(&encoderDirection);
   }
 
   velocityPercent = (driver->setMotorVelocity(velocity)/velocityMax) * 100.0F;
@@ -416,6 +438,32 @@ void ServoMotor::poll() {
       }
     }
   #endif
+}
+
+void ServoMotor::stopSyntheticMotion() {
+  if (lastPeriod == 0 && step == 0 && absStep == 0) return;
+  currentFrequency = 0.0F;
+  currentDirection = 0;
+  lastPeriod = 0;
+
+  noInterrupts();
+  step = 0;
+  absStep = 0;
+  interrupts();
+  if (taskHandle) tasks.setPeriodSubMicros(taskHandle, 0);
+}
+
+void ServoMotor::resetToTrackingBaseline() {
+  noInterrupts();
+  step = 0;
+  absStep = 0;
+  inBacklash = false;
+  backlashSteps = 0;
+  interrupts();
+
+  currentFrequency = 0.0F;
+  currentDirection = 0;
+  lastPeriod = 0;
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate

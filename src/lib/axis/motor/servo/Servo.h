@@ -132,6 +132,9 @@ class ServoMotor : public Motor {
     long delta = 0;
 
   private:
+    void stopSyntheticMotion();
+    void resetToTrackingBaseline();
+
     Filter *filter;
 
     void (*callback)() = NULL;
@@ -150,6 +153,7 @@ class ServoMotor : public Motor {
 
     bool encoderReverse = false;
     bool encoderReverseDefault = false;
+    volatile int8_t encoderDirection = 0;
 
     // for absolute encoders
     bool motorStepsInitDone = false;    // help determing when ready to set position
