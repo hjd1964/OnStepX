@@ -97,15 +97,15 @@ void ServoKTech::enable(bool state) {
 
   VF("MSG:"); V(axisPrefix); VF("powered ");
 
-  uint8_t cmd[] = "\xa2\x00\x00\x00\x00\x00\x00\x00";
+  static const uint8_t cmd[] = "\xa2\x00\x00\x00\x00\x00\x00\x00";
   canPlus.writePacket(canID, cmd, 8);
 
   if (state) {
-    uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";
+    static const uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";
     canPlus.writePacket(canID, cmd, 8);
     VLF("up");
   } else {
-    uint8_t cmd[] = "\x80\x00\x00\x00\x00\x00\x00\x00";
+    static const uint8_t cmd[] = "\x80\x00\x00\x00\x00\x00\x00\x00";
     canPlus.writePacket(canID, cmd, 8);
     VLF("down");
   } 
@@ -116,17 +116,18 @@ void ServoKTech::enable(bool state) {
 float ServoKTech::setMotorVelocity(float velocity) {
   velocity = ServoDriver::setMotorVelocity(velocity);
 
-  if (velocityLast != lround(velocity) && ((long)(millis() - lastVelocityUpdateTime) > CAN_SEND_RATE_MS)) {
-    uint8_t cmd[] = "\xa2\x00\x00\x00";
+  int32_t velocityNext = lroundf(velocity*countsToStepsRatio.value);
+  if (reversed) velocityNext = -velocityNext;
+
   const unsigned long now = millis();
   if (velocityLast != velocityNext && (now - lastVelocityUpdateTime >= CAN_SEND_RATE_MS)) {
+    static const uint8_t cmd[] = "\xa2\x00\x00\x00";
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
-    velocityLast = lround(velocity*countsToStepsRatio.value);
-    if (reversed) velocityLast = -velocityLast;
-    canPlus.write((uint8_t*)&velocityLast, 4);
+    canPlus.write((uint8_t*)&velocityNext, 4);
     canPlus.endPacket();
     lastVelocityUpdateTime = now;
+    velocityLast = velocityNext;
   }
 
   return velocity;
@@ -134,14 +135,14 @@ float ServoKTech::setMotorVelocity(float velocity) {
 
 // request driver status from CAN
 void ServoKTech::requestStatus() {
-  uint8_t cmd[] = "\x9a\x00\x00\x00\x00\x00\x00\x00";
+  static const uint8_t cmd[] = "\x9a\x00\x00\x00\x00\x00\x00\x00";
   canPlus.writePacket(canID, cmd, 8);
 }
 
 void ServoKTech::readStatus() {
   if (statusMode == OFF) return;
 
-  if ((long)(millis() - lastStatusUpdateTime) > (KTECH_STATUS_MS*4)) {
+  if (millis() - lastStatusUpdateTime >= KTECH_STATUS_MS*4U) {
     status.outputA.shortToGround  = true;
     status.outputA.openLoad       = true;
     status.outputB.shortToGround  = true;
@@ -149,7 +150,7 @@ void ServoKTech::readStatus() {
     status.overTemperatureWarning = true;
     status.overTemperature        = true;
     status.standstill             = true;
-    status.fault                  = false;
+    status.fault                  = true;
   }
 }
 
