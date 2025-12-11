@@ -50,7 +50,7 @@ class ServoDriver {
     virtual void alternateMode(bool state) { UNUSED(state); }
 
     // enable or disable the driver using the enable pin or other method
-    virtual void enable(bool state) { UNUSED(state); }
+    virtual void enable(bool state);
 
     // sets overall maximum frequency
     // \param frequency: rate of motion in steps (counts) per second
