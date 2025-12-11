@@ -26,14 +26,16 @@ class ServoEE : public DcServoDriver {
     // get the driver name
     const char* name() {
       if (driverModel == SERVO_EE) return "DC Enable/Enable"; else
-      if (driverModel == SERVO_PE) return "DC Phase/Enable" ; else
       return "?";
     }
 
   private:
     // motor control pwm update
     // \param power in SERVO_ANALOG_WRITE_RANGE units
-    void pwmUpdate(long power);
+    void pwmUpdate(float duty01) override;
+
+    inline float off1() { return (Pins->ph1State == HIGH) ? 1.0F : 0.0F; }
+    inline float off2() { return (Pins->ph2State == HIGH) ? 1.0F : 0.0F; }
 };
 
 #endif

@@ -20,10 +20,7 @@ ServoTmc5160DC::ServoTmc5160DC(uint8_t axisNumber, const ServoPins *Pins, const 
 
   strcpy(axisPrefix, " Axis_ServoTmc5160DC, ");
   axisPrefix[5] = '0' + axisNumber;
-
-  analogWriteRange = 255;
-  accelerationFs = acceleration/FRACTIONAL_SEC;
-}
+ }
 
 bool ServoTmc5160DC::init(bool reverse) {
   if (!ServoDcDriver::init(reverse)) return false;
@@ -45,10 +42,10 @@ bool ServoTmc5160DC::init(bool reverse) {
   driver->pwm_autoscale(false);
   driver->pwm_ofs(255);
   driver->pwm_grad(4);
-  driver->ihold(31);
+  driver->ihold(0);
   driver->irun(31);
   driver->toff(5);
-  digitalWriteF(enablePin, enabledState);
+
   driver->XTARGET((uint32_t)(lround(0) & 0b111111111));
 
   // check to see if the driver is there and ok
@@ -67,22 +64,30 @@ bool ServoTmc5160DC::init(bool reverse) {
 
 // enable or disable the driver using the enable pin or other method
 void ServoTmc5160DC::enable(bool state) {
-  enabled = state;
+  ServoDriver::enable(state);
 
   VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
 
   if (state) { driver->ihold(31); } else { driver->ihold(0); }
 
-  velocityRamp = 0.0F;
-
   ServoDriver::updateStatus();
 }
 
 // motor control pwm update
-// \param power in SERVO_ANALOG_WRITE_RANGE units
-void ServoTmc5160DC::pwmUpdate(long power) {
-  if (reversed) power = -power;
-  driver->XTARGET((uint32_t)(power & 0b111111111));
+// \param power in 0.0 to 1.0 units
+void ServoTmc5160DC::pwmUpdate(float duty01) {
+  clamp01(duty01);
+
+  // signed 9-bit value: -255..+255 (avoid -256)
+  int32_t mag = (int32_t)lroundf(duty01 * 255.0F);
+  if (mag > 255) mag = 255;
+
+  int32_t power = 0;
+  if (motorDirection == (reversed ? DIR_REVERSE : DIR_FORWARD)) power = mag;
+  else if (motorDirection == (reversed ? DIR_FORWARD : DIR_REVERSE)) power = -mag;
+  else power = 0;
+
+  driver->XTARGET((uint32_t)(power & 0x1FF)); // 9-bit two's complement
 }
 
 // read status info. from driver

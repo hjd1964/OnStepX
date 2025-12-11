@@ -10,9 +10,6 @@
 #ifndef ANALOG_WRITE_RANGE
   #define ANALOG_WRITE_RANGE 255
 #endif
-#ifndef SERVO_ANALOG_WRITE_RANGE
-  #define SERVO_ANALOG_WRITE_RANGE ANALOG_WRITE_RANGE
-#endif
 
 #include "../ServoDriver.h"
 
@@ -33,37 +30,43 @@ class ServoDcDriver : public ServoDriver {
     float setMotorVelocity(float velocity);
 
   protected:
-    // convert from encoder counts per second to analogWriteRange units to roughly match velocity
-    long toAnalogRange(float velocity) {
-      long sign = 1;
-      if (velocity < 0.0F) {
-        velocity = -velocity;
-        sign = -1;
-      }
-  
-      long power = 0;
-      if (velocity != 0.0F) {
-        power = lround(((float)velocity/velocityMax)*(analogWriteRange - 1));
-        long pwmMin = lround(pwmMinimum.value/100.0F*(analogWriteRange - 1));
-        long pwmMax = lround(pwmMaximum.value/100.0F*(analogWriteRange - 1));
+    // convert from encoder counts/sec to normalized duty 0..1
+    float toDuty01(float velocity) {
+      if (velocity == 0.0F) return 0.0F;
+      if (velocity < 0.0F) velocity = -velocity;
 
-        power = map(power, 0, analogWriteRange - 1, pwmMin, pwmMax);
-      }
+      float d = velocity/velocityMax;
+      if (isinf(d)) return 0.0F;
+      clamp01(d);
 
-      return power*sign;
+      // apply min/max % limits
+      float dMin = pwmMinimum.value/100.0F;
+      float dMax = pwmMaximum.value/100.0F;
+      if (dMax < dMin) { float t = dMax; dMax = dMin; dMin = t; }
+
+      return dMin + d*(dMax - dMin);
     }
 
-    // motor control update
-    virtual void pwmUpdate(long power) { }
+    // motor control update (normalized duty)
+    virtual void pwmUpdate(float duty01) { }
 
-    long analogWriteRange = SERVO_ANALOG_WRITE_RANGE;
+    static inline void clamp01(float &x) {
+      if (isnan(x) || isinf(x)) { x = 0.0F; return; }
+      if (x < 0.0F) { x = 0.0F; return; }
+      if (x > 1.0F) { x = 1.0F; return; }
+    }
 
     // runtime adjustable settings
     AxisParameter pwmMinimum = {NAN, NAN, NAN, 0.0, 100.0, AXP_FLOAT_IMMEDIATE, AXPN_MIN_PWR};
     AxisParameter pwmMaximum = {NAN, NAN, NAN, 0.0, 100.0, AXP_FLOAT_IMMEDIATE, AXPN_MAX_PWR};
+    AxisParameter dirDeadTimeMs = {NAN, NAN, NAN, 0.0, 50.0, AXP_FLOAT_IMMEDIATE, "Deadtime, ms"};
 
-    const int numParameters = 3;
-    AxisParameter* parameter[4] = {&invalid, &acceleration, &pwmMinimum, &pwmMaximum};
+    const int numParameters = 5;
+    AxisParameter* parameter[6] = {&invalid, &acceleration, &zeroDeadband, &pwmMinimum, &pwmMaximum, &dirDeadTimeMs};
+
+  private:
+    uint32_t dirHoldUntilMs = 0;
+    int8_t lastEffectiveDirection = 0; // -1,0,+1
 };
 
 #endif

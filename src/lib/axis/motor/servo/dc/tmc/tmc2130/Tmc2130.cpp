@@ -20,9 +20,6 @@ ServoTmc2130DC::ServoTmc2130DC(uint8_t axisNumber, const ServoPins *Pins, const 
 
   strcpy(axisPrefix, " Axis_ServoTmc2130DC, ");
   axisPrefix[5] = '0' + axisNumber;
-
-  analogWriteRange = 255;
-  accelerationFs = acceleration/FRACTIONAL_SEC;
 }
 
 bool ServoTmc2130DC::init(bool reverse) {
@@ -38,18 +35,18 @@ bool ServoTmc2130DC::init(bool reverse) {
 
   VF("MSG:"); V(axisPrefix); VLF("TMC current control at max (IHOLD, IRUN, and IGOTO ignored)");
 
-    driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
-    driver->begin();
-    driver->direct_mode(true);
-    driver->en_pwm_mode(true);
-    driver->pwm_autoscale(false);
-    driver->pwm_ampl(255);
-    driver->pwm_grad(4);
-    driver->ihold(31);
-    driver->irun(31);
-    driver->toff(5);
-    digitalWriteF(enablePin, enabledState);
-    driver->XDIRECT((uint32_t)(lround(0) & 0b111111111));
+  driver = new TMC2130Stepper(Pins->cs, Pins->mosi, Pins->miso, Pins->sck);
+  driver->begin();
+  driver->direct_mode(true);
+  driver->en_pwm_mode(true);
+  driver->pwm_autoscale(false);
+  driver->pwm_ampl(255);
+  driver->pwm_grad(4);
+  driver->ihold(0);
+  driver->irun(31);
+  driver->toff(5);
+
+  driver->XDIRECT((uint32_t)(lround(0) & 0b111111111));
 
   // check to see if the driver is there and ok
   #ifdef MOTOR_DRIVER_DETECT
@@ -67,22 +64,30 @@ bool ServoTmc2130DC::init(bool reverse) {
 
 // enable or disable the driver using the enable pin or other method
 void ServoTmc2130DC::enable(bool state) {
-  enabled = state;
+  ServoDriver::enable(state);
 
   VF("MSG:"); V(axisPrefix); VF("powered "); if (state) { VF("up"); } else { VF("down"); } VLF(" using SPI");
 
   if (state) { driver->ihold(31); } else { driver->ihold(0); }
 
-  velocityRamp = 0.0F;
-
   ServoDriver::updateStatus();
 }
 
 // motor control pwm update
-// \param power in SERVO_ANALOG_WRITE_RANGE units
-void ServoTmc2130DC::pwmUpdate(long power) {
-  if (reversed) power = -power;
-  driver->XDIRECT((uint32_t)(power & 0b111111111));
+// \param power in 0.0 to 1.0 units
+void ServoTmc2130DC::pwmUpdate(float duty01) {
+  clamp01(duty01);
+
+  // signed 9-bit value: -255..+255 (avoid -256)
+  int32_t mag = (int32_t)lroundf(duty01 * 255.0F);
+  if (mag > 255) mag = 255;
+
+  int32_t power = 0;
+  if (motorDirection == (reversed ? DIR_REVERSE : DIR_FORWARD)) power = mag;
+  else if (motorDirection == (reversed ? DIR_FORWARD : DIR_REVERSE)) power = -mag;
+  else power = 0;
+
+  driver->XDIRECT((uint32_t)(power & 0x1FF)); // 9-bit two's complement
 }
 
 // read status info. from driver
@@ -90,8 +95,7 @@ void ServoTmc2130DC::readStatus() {
   TMC2130_n::DRV_STATUS_t status_result;
   status_result.sr = 0;
 
-  if (driverModel == SERVO_TMC2130_DC) { status_result.sr = ((TMC2130Stepper*)driver)->DRV_STATUS(); } else
-  if (driverModel == SERVO_TMC5160_DC) { status_result.sr = ((TMC5160Stepper*)driver)->DRV_STATUS(); }
+  status_result.sr = driver->DRV_STATUS();
 
   status.outputA.shortToGround = status_result.s2ga;
   status.outputA.openLoad      = status_result.ola;
