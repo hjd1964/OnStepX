@@ -66,6 +66,38 @@
   #define INPUT_PULLDOWN INPUT
 #endif
 
+// Atomic helpers for single ISR-shared scalars.
+// Use for single reads/writes/RMW only. For multi-variable invariants, keep cli/sei blocks.
+#if defined(__GNUC__) || defined(__clang__)
+
+  #define ATOMIC_LOAD(var)        (__atomic_load_n(&(var), __ATOMIC_ACQUIRE))
+  #define ATOMIC_STORE(var, val)  (__atomic_store_n(&(var), (val), __ATOMIC_RELEASE))
+  #define ATOMIC_XCHG(var, val)   (__atomic_exchange_n(&(var), (val), __ATOMIC_ACQ_REL))
+
+  // Read/Modify/Write bit ops (return previous value)
+  #define ATOMIC_OR(var, mask)    (__atomic_fetch_or(&(var), (mask), __ATOMIC_ACQ_REL))
+  #define ATOMIC_AND(var, mask)   (__atomic_fetch_and(&(var), (mask), __ATOMIC_ACQ_REL))
+
+#else
+
+  #define ATOMIC_LOAD(var) \
+    ({ __typeof__(var) _v; noInterrupts(); _v = (var); interrupts(); _v; })
+
+  #define ATOMIC_STORE(var, val) \
+    do { noInterrupts(); (var) = (val); interrupts(); } while (0)
+
+  #define ATOMIC_XCHG(var, val) \
+    ({ __typeof__(var) _old; noInterrupts(); _old = (var); (var) = (val); interrupts(); _old; })
+
+  // Read/Modify/Write bit ops (return previous value)
+  #define ATOMIC_OR(var, mask) \
+    ({ __typeof__(var) _old; noInterrupts(); _old = (var); (var) = (__typeof__(var))(_old | (__typeof__(var))(mask)); interrupts(); _old; })
+
+  #define ATOMIC_AND(var, mask) \
+    ({ __typeof__(var) _old; noInterrupts(); _old = (var); (var) = (__typeof__(var))(_old & (__typeof__(var))(mask)); interrupts(); _old; })
+
+#endif
+
 // automatically use fast I/O if available
 #ifndef digitalReadF
   #ifdef HAL_HAS_DIGITAL_FAST
