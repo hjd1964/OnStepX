@@ -92,7 +92,12 @@ bool KTechIME::init() {
 int32_t KTechIME::read() {
   if (!ready) return 0;
 
-  return count + index;
+  noInterrupts();
+  int32_t result = count + index;
+  motorStepsAtLastReadValue = motorStepsAtLastUpdate;
+  interrupts();
+
+  return result;
 }
 
 void KTechIME::write(int32_t position) {
@@ -102,17 +107,27 @@ void KTechIME::write(int32_t position) {
 }
 
 void KTechIME::requestPosition() {
-  uint8_t cmd[] = "\x90\x00\x00\x00\x00\x00\x00\x00";
+  static const uint8_t cmd[] = "\x90\x00\x00\x00\x00\x00\x00\x00";
   canPlus.writePacket(canID, cmd, 8);
 }
 
 IRAM_ATTR void KTechIME::updatePositionCallback(uint8_t data[8]) {
-  uint16_t countSingleTurn;
-  memcpy(&countSingleTurn, &data[2], 2);
+  if (motorStepsPtr) {
+    motorStepsAtLastUpdate = *motorStepsPtr;
+    hasMotorStepsAtLastReadValue = true;
+  }
+
+  uint16_t countSingleTurn = (uint16_t)data[2] | ((uint16_t)data[3] << 8);
+
+  static constexpr uint16_t high = (KTECH_SINGLE_TURN*3)/4;
+  static constexpr uint16_t low = (KTECH_SINGLE_TURN*1)/4;
 
   // count wraps forward and reverse
-  if (lastCountSingleTurn > KTECH_SINGLE_TURN*0.75 && countSingleTurn < KTECH_SINGLE_TURN*0.25) countTurns++;
-  if (lastCountSingleTurn < KTECH_SINGLE_TURN*0.25 && countSingleTurn > KTECH_SINGLE_TURN*0.75) countTurns--;
+  if (!firstCall) {
+    if (lastCountSingleTurn > high && countSingleTurn < low) countTurns++;
+    if (lastCountSingleTurn < low && countSingleTurn > high) countTurns--;
+  }
+  firstCall = false;
 
   lastCountSingleTurn = countSingleTurn;
   count = countSingleTurn + countTurns*KTECH_SINGLE_TURN;

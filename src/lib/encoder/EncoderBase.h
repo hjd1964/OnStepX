@@ -135,16 +135,22 @@ class Encoder {
     bool isVirtual = false;
 
     // raw count as last read (includes origin for absolute encoders)
-    int32_t count = 0;
+    volatile int32_t count = 0;
 
     // raw index as last set
-    int32_t index = 0;
+    volatile int32_t index = 0;
 
     // raw origin as last set (for absolute encoders)
     uint32_t origin = 0;
 
     // encoder velocity in counts per second
     float velocity = 0.0F;
+
+    // for encoders with slow readout, available before init()/ready()/hardware detection
+    virtual bool supportsTimeAlignedMotorSteps() const { return false; }
+    inline bool hasMotorStepsAtLastRead() const { return hasMotorStepsAtLastReadValue; }
+    inline long motorStepsAtLastRead() const { return motorStepsAtLastReadValue; }
+    inline void setMotorStepsPtr(volatile long* p) { motorStepsPtr = p; }
 
   protected:
     // axis number from 1 to 9
@@ -175,6 +181,11 @@ class Encoder {
       volatile unsigned long nsNext = 0;
       volatile unsigned long nsInvalidMillis = 0;
     #endif
+
+    // for encoders with slow readout
+    volatile bool hasMotorStepsAtLastReadValue = false;
+    volatile long motorStepsAtLastReadValue = 0;
+    volatile long * volatile motorStepsPtr = nullptr;
 };
 
 #endif

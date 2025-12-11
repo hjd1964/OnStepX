@@ -26,13 +26,20 @@ class KTechIME : public Encoder {
     void requestPosition();
     void updatePositionCallback(uint8_t data[8]);
 
+    bool supportsTimeAlignedMotorSteps() const { return true; }
+
   private:
-    int16_t axis_index;
+    int16_t axis_index = 0;
+
+    bool firstCall = true;
 
     int canID = 0;
     void (*callback)() = NULL;
-    uint32_t lastCountSingleTurn = 0;
-    int32_t countTurns = 0;
+
+    volatile uint16_t lastCountSingleTurn = 0;
+    volatile long countTurns = 0;
+
+    volatile long motorStepsAtLastUpdate = 0;
 };
 
 #endif

@@ -84,6 +84,9 @@ bool Quadrature::init() {
     return false;
   }
 
+  VF("ERR: Encoder Quadrature"); V(axis); VF(" init(), attaching interrupts to ");
+  VF("APin="); V(APin); VF(" and BPin="); VL(BPin);
+
   switch (axis) {
     #if AXIS1_ENCODER == AB
       case 1:
