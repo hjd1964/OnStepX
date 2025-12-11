@@ -66,6 +66,15 @@
   #define INPUT_PULLDOWN INPUT
 #endif
 
+#define RANGE_FROM_BITS(bits) ((1 << (bits)) - 1)
+
+#define BITS_FROM_RANGE(R) ( \
+  (R)<=1?1 : (R)<=3?2 : (R)<=7?3 : (R)<=15?4 : (R)<=31?5 : (R)<=63?6 : \
+  (R)<=127?7 : (R)<=255?8 : (R)<=511?9 : (R)<=1023?10 : (R)<=2047?11 : \
+  (R)<=4095?12 : (R)<=8191?13 : (R)<=16383?14 : (R)<=32767?15 : 16 )
+
+#define IS_POW2_MINUS1(R) ((R) > 0 && (R) < 0xFFFFFFFFU && (((R) + 1) & (R)) == 0)
+
 // Atomic helpers for single ISR-shared scalars.
 // Use for single reads/writes/RMW only. For multi-variable invariants, keep cli/sei blocks.
 #if defined(__GNUC__) || defined(__clang__)
