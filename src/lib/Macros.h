@@ -149,16 +149,16 @@
 // automatically use fast I/O if available
 #ifndef digitalReadF
   #ifdef HAL_HAS_DIGITAL_FAST
-    #define digitalReadF(pin)           ( digitalReadFast(pin) )
+    #define digitalReadF(pin) ( digitalReadFast(pin) )
   #else
-    #define digitalReadF(pin)           ( digitalRead(pin) )
+    #define digitalReadF(pin) ( digitalRead(pin) )
   #endif
 #endif
 #ifndef digitalWriteF
   #ifdef HAL_HAS_DIGITAL_FAST
-    #define digitalWriteF(pin,value)   { digitalWriteFast(pin,value); }
+    #define digitalWriteF(pin,value) { digitalWriteFast(pin,value); }
   #else
-    #define digitalWriteF(pin,value)   { digitalWrite(pin,value); }
+    #define digitalWriteF(pin,value) { digitalWrite(pin,value); }
   #endif
 #endif
 
