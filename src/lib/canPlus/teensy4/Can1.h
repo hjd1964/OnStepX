@@ -22,7 +22,8 @@ class CanPlus1Teesny4 : public CanPlus {
   public:
     CanPlus1Teesny4();
     void init();
-    int writePacket(int id, uint8_t *buffer, size_t size);
+    int writePacket(int id, const uint8_t *buffer, size_t size);
+    int writePacketRtr(int id, size_t dlc);
     void poll(const CAN_message_t &msg);
     void events();
 

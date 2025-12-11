@@ -27,7 +27,7 @@ void CanPlus2Teesny4::init() {
 
   if (ready) {
     VLF("success");
-    
+
     VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS); VF("ms priority 3)... ");
     if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canT4Poll2, "SysCan2")) { VLF("success"); } else { VLF("FAILED!"); }
   } else {
@@ -35,33 +35,50 @@ void CanPlus2Teesny4::init() {
   }
 }
 
-int CanPlus2Teesny4::writePacket(int id, uint8_t *buffer, size_t size) {
+int CanPlus2Teesny4::writePacket(int id, const uint8_t *buffer, size_t size) {
   if (!ready) return 0;
-  if (size < 1 || size > 8) return 0;
+  if (size > 8) return 0;
+  if (size > 0 && buffer == nullptr) return 0;
 
-  CAN_message_t msg;
+  CAN_message_t msg{};
+  msg.id = id & 0x7FF;
+  msg.len = (uint8_t)size;
+  msg.flags.remote = 0;
+  msg.flags.extended = 0;
 
-  msg.id = id;
-  msg.len = 8;
-  for (int i = 0; i < msg.len; i++) msg.buf[i] = buffer[i];
-  can2.write(msg);
+  for (uint8_t i = 0; i < msg.len; i++) msg.buf[i] = buffer[i];
 
-  return 1;
+  bool ok = can2.write(msg);
+  if (ok) tx_ok++; else tx_fail++;
+  return ok ? 1 : 0;
+}
+
+int CanPlus2Teesny4::writePacketRtr(int id, size_t dlc) {
+  if (!ready) return 0;
+  if (dlc > 8) return 0;             // DLC may be 0..8
+
+  CAN_message_t msg{};
+  msg.id = id & 0x7FF;
+  msg.len = (uint8_t)dlc;
+  msg.flags.remote = 1;
+  msg.flags.extended = 0;
+
+  bool ok = can2.write(msg);
+  if (ok) tx_ok++; else tx_fail++;
+  return ok ? 1 : 0;
 }
 
 void CanPlus2Teesny4::poll(const CAN_message_t &msg) {
   if (!ready) return;
 
-  if (msg.flags.overrun) return;
-  // extend Id not supported
-  if (msg.flags.extended) return;
-  // mesage lengths other than 8 not supported
-  if (msg.len != 8) return;
+  if (msg.flags.overrun) { rx_drop_len++; return; }
+  if (msg.flags.extended) { rx_drop_ext++; return; }
+  if (msg.flags.remote) { rx_drop_rtr++; return; }
 
-  uint8_t buffer[8];
-  for (int i = 0; i < msg.len; i++) buffer[i] = msg.buf[i];
+  if (msg.len < 1 || msg.len > 8) { rx_drop_len++; return; }
 
-  callbackProcess(msg.id, buffer, msg.len);
+  rx_ok++;
+  callbackProcess(msg.id & 0x7FF, (uint8_t*)msg.buf, msg.len);
 }
 
 void CanPlus2Teesny4::events() {

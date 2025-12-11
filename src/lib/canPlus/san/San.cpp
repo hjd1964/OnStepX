@@ -7,12 +7,20 @@
 
 #include <CAN.h> // https://github.com/sandeepmistry/arduino-CAN
 
+// Pick the right oscillator value for your module:
+// - Most shields/modules are 16MHz
+// - Some are 8MHz
+#ifndef CAN_SAN_CLOCK
+  #define CAN_SAN_CLOCK 16000000UL   // or 8000000UL for 8MHz modules
+#endif
+
 IRAM_ATTR void onReceive(int packetSize) { canPlus.poll(packetSize); }
 
 CanPlusSan::CanPlusSan() {
 }
 
 void CanPlusSan::init() {
+  CAN.setClockFrequency(CAN_SAN_CLOCK); 
   CAN.setPins(CAN_RX_PIN, CAN_TX_PIN);
   VF("MSG: CanPlus, CAN Start... ");
   ready = CAN.begin(CAN_BAUD);
@@ -22,7 +30,7 @@ void CanPlusSan::init() {
 
 int CanPlusSan::beginPacket(int id) {
   if (!ready) return 0;
-  return CAN.beginPacket(id);
+  return CAN.beginPacket(id & 0x7FF);
 }
 
 int CanPlusSan::endPacket() {
@@ -35,54 +43,80 @@ int CanPlusSan::write(uint8_t byte) {
   return CAN.write(byte);
 }
 
-int CanPlusSan::write(uint8_t *buffer, size_t size) {
+int CanPlusSan::write(const uint8_t *buffer, size_t size) {
   if (!ready) return 0;
   return CAN.write(buffer, size);
 }
 
-int CanPlusSan::writePacket(int id, uint8_t *buffer, size_t size) {
+int CanPlusSan::writePacket(int id, const uint8_t *buffer, size_t size) {
   if (!ready) return 0;
-  if (CAN.beginPacket(id)) {
-    int written = CAN.write(buffer, size);
-    if (CAN.endPacket()) {
-      return written;
-    } else return 0;
-  } else return 0;
+  if (size > 8) return 0;
+  if (size > 0 && buffer == nullptr) return 0;
+
+  const uint16_t sid = (uint16_t)id & 0x7FF;
+  if (!CAN.beginPacket(sid)) { tx_fail++; return 0; }
+
+  int written = 0;
+
+  if (size > 0) {
+    if (!buffer) { (void)CAN.endPacket(); tx_fail++; return 0; }
+
+    written = CAN.write((uint8_t*)buffer, size);  // only if API requires non-const
+    if (written != (int)size) {
+      (void)CAN.endPacket();
+      tx_fail++;
+      return 0;
+    }
+  }
+
+  bool ok = CAN.endPacket();
+  if (ok) tx_ok++; else tx_fail++;
+  return ok ? 1 : 0;
 }
 
-int CanPlusSan::registerIdCallback(int id, void (*callback)(uint8_t data[8])) {
-  if (id < 0 || id > 0x7FF || idCallbackCount >= CAN_MAX_CALLBACKS) return 0;
-  idCallback[idCallbackCount] = callback;
-  idCallBackId[idCallbackCount] = id;
-  idCallbackCount++;
-  return 1;
-}
+int CanPlusSan::writePacketRtr(int id, size_t dlc) {
+  if (!ready) return 0;
+  if (dlc > 8) return 0;
 
-int CanPlusSan::callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8_t data[8])) {
-  if (id < 0 || id > 0x7FF || msgCallbackCount >= CAN_MAX_CALLBACKS) return 0;
-  msgCallback[msgCallbackCount] = callback;
-  msgCallBackId[msgCallbackCount] = id;
-  msgCallBackMsg[msgCallbackCount] = msg;
-  msgCallbackCount++;
-  return 1;
+  // arduino-CAN supports beginPacket(id, dlc, rtr) in most versions
+  if (!CAN.beginPacket(id & 0x7FF, (int)dlc, true)) { tx_fail++; return 0; }
+
+  bool ok = CAN.endPacket();
+  if (ok) tx_ok++; else tx_fail++;
+  return ok ? 1 : 0;
 }
 
 IRAM_ATTR void CanPlusSan::poll(int packetSize) {
   if (!ready) return;
 
-  // extend Id not supported
-  if (CAN.packetExtended()) return;
-  // remote request not supported
-  if (CAN.packetRtr()) return;
-  // mesage lengths other than 8 not supported
-  if (packetSize != 8) return;
+  bool ext = CAN.packetExtended();
+  bool rtr = CAN.packetRtr();
+  int  packetId = CAN.packetId() & 0x7FF;
 
-  int packetId = CAN.packetId();
+  if (ext) { rx_drop_ext++; while (CAN.available()) (void)CAN.read(); return; }
 
-  uint8_t buffer[8];
-  for (int i = 0; i < packetSize; i++) { buffer[i] = CAN.read(); }
+  // Handle RTR early; DLC may legitimately be 0
+  if (rtr) {
+    rx_drop_rtr++;
+    while (CAN.available()) (void)CAN.read();
+    return;
+  }
 
-  callbackProcess(packetId, buffer, packetSize);
+  if (packetSize < 1 || packetSize > 8) {
+    rx_drop_len++;
+    while (CAN.available()) (void)CAN.read();
+    return;
+  }
+
+  uint8_t buffer[8] = {0};
+  for (int i = 0; i < packetSize; i++) {
+    int b = CAN.read();
+    buffer[i] = (b < 0) ? 0 : (uint8_t)b;
+  }
+  while (CAN.available()) (void)CAN.read();
+
+  rx_ok++;
+  callbackProcess(packetId, buffer, (size_t)packetSize);
 }
 
 CanPlusSan canPlus;

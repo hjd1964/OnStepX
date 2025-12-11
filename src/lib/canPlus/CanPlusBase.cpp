@@ -25,9 +25,10 @@ int CanPlus::write(uint8_t byte) {
   return 1;
 }
 
-int CanPlus::write(uint8_t *buffer, size_t size) {
+int CanPlus::write(const uint8_t *buffer, size_t size) {
   if (!ready) return 0;
-  if (sendCount < 0 || size < 1 || size > 8) return 0;
+  if (sendCount < 0 || size < 1 || sendCount + size > 8) return 0;
+
   for (unsigned int i = 0; i < size; i++) { if (!write(buffer[i])) return 0; }
   return size;
 }
@@ -55,15 +56,25 @@ int CanPlus::callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8
 
 // run id/msg based callbacks
 int CanPlus::callbackProcess(int id, uint8_t *buffer, size_t size) {
+  uint8_t paddedBuffer[8] = {0};
+
+  if (buffer && size) {
+    if (size > 8) size = 8;
+    memcpy(paddedBuffer, buffer, size);
+  } else {
+    size = 0;
+  }
+
   for (int i = 0; i < idCallbackCount; i++) {
     if (id == idCallBackId[i]) {
-      idCallback[i](buffer);
+      idCallback[i](paddedBuffer);
       return 1;
     }
   }
   for (int i = 0; i < msgCallbackCount; i++) {
-    if (id == msgCallBackId[i] && buffer[0] == msgCallBackMsg[i]) {
-      msgCallback[i](buffer);
+    // perhaps size should be >= 8 but leaving at 1 for now
+    if (size >= 1 && id == msgCallBackId[i] && paddedBuffer[0] == msgCallBackMsg[i]) {
+      msgCallback[i](paddedBuffer);
       return 1;
     }
   }

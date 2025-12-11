@@ -15,8 +15,9 @@ class CanPlusSan : public CanPlus {
     int beginPacket(int id);
     int endPacket();
     int write(uint8_t byte);
-    int write(uint8_t *buffer, size_t size);
-    int writePacket(int id, uint8_t *buffer, size_t size);
+    int write(const uint8_t *buffer, size_t size);
+    int writePacket(int id, const uint8_t *buffer, size_t size);
+    int writePacketRtr(int id, size_t dlc);
     void poll(int packetSize);
 
   private:
