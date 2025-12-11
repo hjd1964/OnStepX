@@ -40,7 +40,7 @@ typedef struct DriverStatus {
 #define AXPN_PID_SLEWING_P "$19"
 #define AXPN_PID_SLEWING_I "$20"
 #define AXPN_PID_SLEWING_D "$21"
-#define AXPN_RADS_PER_COUNT "$22"
+#define AXPN_COUNTS_PER_RAD "$22"
 #define AXPN_STEPS_TO_COUNTS "$23"
 #define AXPN_MAX_ACCEL "$24"
 #define AXPN_MIN_PWR "$25"
