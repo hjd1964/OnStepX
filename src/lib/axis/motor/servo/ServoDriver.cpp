@@ -73,6 +73,18 @@ bool ServoDriver::init(bool reverse) {
   return true;
 }
 
+void ServoDriver::enable(bool state) {
+  enabled = state;
+
+  // Only touch a real, dedicated enable pin
+  if (enablePin != OFF && enablePin != SHARED) {
+    digitalWriteEx(enablePin, state ? enabledState : !enabledState);
+  }
+
+  // Default behavior: if disabled, force ramp to 0 so outputs converge quickly
+  if (!state) velocityRamp = 0.0F;
+}
+
 void ServoDriver::setFrequencyMax(float frequency) {
   velocityMax = frequency;
 
