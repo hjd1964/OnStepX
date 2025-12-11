@@ -50,13 +50,16 @@ bool ODriveMotor::init() {
     digitalWriteEx(ODRIVE_RST_PIN, LOW);
     tasks.yield(10);
     digitalWriteEx(ODRIVE_RST_PIN, HIGH);
+
     // allow time for boot
     tasks.yield(1000);
   }
 
   if (!odriveCan.init(oDriveNode)) return false;
-  odriveCan.requestVersion(oDriveNode);
 
+  // request version info and
+  // let CAN poll task (priority 3) run to deliver the reply
+  odriveCan.requestVersion(oDriveNode);
   const uint32_t t0 = millis();
   while (!odriveCan.hasFreshVersion(oDriveNode, 1000) && (uint32_t)(millis() - t0) < 1000U) { tasks.yield(10); }
 
@@ -83,15 +86,17 @@ bool ODriveMotor::init() {
     }
   }
 
+  // idle the ODrive
   odriveCan.setAxisState(oDriveNode, AXIS_STATE_IDLE);
 
-  // request an encoder position update
-  odriveCan.requestEncoder(oDriveNode);
+  // request an encoder position update and
+  // let CAN poll task (priority 3) run to deliver the reply
+  odriveCan.requestTurns(oDriveNode);
   lastEncoderUpdateRequestTime = millis();
-  // let CAN poll task (prio 3) run and deliver the reply
   tasks.yield(250);
+
   // require an encoder sample
-  if (!odriveCan.hasFreshEncoder(oDriveNode, 250)) {
+  if (!odriveCan.hasFreshTurns(oDriveNode, 250)) {
     VF("MSG:"); V(axisPrefix); VLF("no encoder reply at startup");
     ready = false;
     return false;
@@ -192,9 +197,9 @@ void ODriveMotor::resetPositionSteps(long value) {
   if (!ready) return;
 
   // make sure we have a recent encoder reading
-  if (!odriveCan.hasFreshEncoder(oDriveNode, 250)) {
+  if (!odriveCan.hasFreshTurns(oDriveNode, 250)) {
     status.fault = true;
-    odriveCan.requestEncoder(oDriveNode);
+    odriveCan.requestTurns(oDriveNode);
     return;
   } else {
     status.fault = false;
@@ -297,7 +302,7 @@ void ODriveMotor::poll() {
 
   // grab a new encoder position update at 10Hz
   if ((uint32_t)(now - lastEncoderUpdateRequestTime) >= 100U) {
-    odriveCan.requestEncoder(oDriveNode);
+    odriveCan.requestTurns(oDriveNode);
     lastEncoderUpdateRequestTime = now;
   }
 
@@ -310,7 +315,7 @@ void ODriveMotor::poll() {
     const uint32_t err = odriveCan.lastError(oDriveNode);
 
     // hard faults during transition: lose heartbeat or error latched
-    if (!odriveCan.isAlive(oDriveNode, 250) || (err != 0)) {
+    if (!odriveCan.hasHeartbeat(oDriveNode, 250) || (err != 0)) {
       enabled = false;
       enablePending = false;
       stopSyntheticMotion();
@@ -348,7 +353,7 @@ void ODriveMotor::poll() {
 
   // fail closed if we lose comms or an error appears while running
   // (no encoder freshness requirement in this variant)
-  if (!odriveCan.isAlive(oDriveNode, 250) || (odriveCan.lastError(oDriveNode) != 0)) {
+  if (!odriveCan.hasHeartbeat(oDriveNode, 250) || (odriveCan.lastError(oDriveNode) != 0)) {
     enabled = false;
     enablePending = false;
     stopSyntheticMotion();
