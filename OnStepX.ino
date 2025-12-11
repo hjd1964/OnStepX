@@ -50,6 +50,7 @@
 #include "src/Common.h"
 #include "src/Validate.h"
 #include "src/lib/nv/Nv.h"
+#include "src/lib/analog/Analog.h"
 #include "src/lib/sense/Sense.h"
 #include "src/lib/tasks/OnTask.h"
 
@@ -85,6 +86,8 @@ void setup() {
   #ifdef PIN_INIT
     PIN_INIT();
   #endif
+
+  analog.begin();
 
   // say hello
   VLF("");

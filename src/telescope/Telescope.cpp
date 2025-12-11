@@ -6,6 +6,7 @@
 #include "../lib/tasks/OnTask.h"
 #include "../lib/gpioEx/GpioEx.h"
 #include "../lib/nv/Nv.h"
+#include "../lib/analog/Analog.h"
 #include "../lib/convert/Convert.h"
 #include "../lib/canPlus/CanPlus.h"
 
@@ -130,6 +131,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
       DLF("WRN: NV, can't be accessed skipping verification!");
     }
   } else { VLF("MSG: NV, correct key found"); }
+
+  #if RETICLE_LED_DEFAULT >= 0 && RETICLE_LED_PIN != OFF
+    analog.pwmInit(RETICLE_LED_DEFAULT);
+  #endif
 
   #ifdef USES_HW_SPI
     SPI.begin();

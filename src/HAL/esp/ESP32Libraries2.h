@@ -18,9 +18,19 @@
   #define ANALOG_WRITE_RANGE 255 // always use 2^n - 1, within the platform's limits
 #endif
 
+// ESP32 (original ESP32): use LEDC -> per-pin bits+freq are real.
+#define HAL_HAS_PER_PIN_PWM_RESOLUTION 1
+#define HAL_HAS_PER_PIN_PWM_FREQUENCY 1
+
+// ADC: treat as fixed-ish (don’t pretend per-pin ADC bits exist)
+#define HAL_HAS_GLOBAL_ADC_RESOLUTION 0
+
+#define HAL_PWM_BITS_MAX 16
+#define HAL_ADC_BITS_MAX 12   // classic ESP32 ADC width
+
 // Lower limit (fastest) step rate in us for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 40
-#define HAL_PULSE_WIDTH 200 // in ns, measured 1/18/22 (ESP32 v2.0.0)
+#define HAL_PULSE_WIDTH 300 // in ns, measured 12/5/25 (ESP32 v2.0.17)
 
 // New symbol for the default I2C port -------------------------------------------------------------
 #include <Wire.h>
@@ -67,15 +77,10 @@
 
 #ifdef ANALOG_WRITE_FREQUENCY
   #define HAL_INIT() { \
-    analogReadResolution((int)log2(ANALOG_READ_RANGE + 1)); \
-    analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
-    analogWriteFrequency(ANALOG_WRITE_FREQUENCY); \
     SERIAL_BT_BEGIN(); \
   }
 #else
   #define HAL_INIT() { \
-    analogReadResolution((int)log2(ANALOG_READ_RANGE + 1)); \
-    analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
     SERIAL_BT_BEGIN(); \
   }
 #endif

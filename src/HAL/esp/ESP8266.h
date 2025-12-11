@@ -43,7 +43,8 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#define HAL_INIT() { analogWriteRange((int)log2(ANALOG_WRITE_RANGE + 1)); }
+#define HAL_INIT() { \
+}
 
 //-----------------------------------------------------------------------------------------------------
 // Misc. includes and defines to support this processor's operation

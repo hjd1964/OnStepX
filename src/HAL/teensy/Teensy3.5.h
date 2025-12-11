@@ -25,6 +25,14 @@
   #define ANALOG_WRITE_RANGE 255
 #endif
 
+// analog read/write capabilities
+#define HAL_HAS_PER_PIN_PWM_RESOLUTION 0
+#define HAL_HAS_PER_PIN_PWM_FREQUENCY 1
+#define HAL_HAS_GLOBAL_PWM_RESOLUTION 1
+#define HAL_HAS_GLOBAL_PWM_FREQUENCY 0
+#define HAL_PWM_BITS_MAX 16
+#define HAL_PWM_HZ_MAX 200000U
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 12
 #define HAL_PULSE_WIDTH 400  // in ns, measured 1/18/22
@@ -48,13 +56,11 @@
 //--------------------------------------------------------------------------------------------------
 // Internal MCU temperature (in degrees C)
 #define _Tpin 70
-#define HAL_TEMP() ( (-((analogRead(_Tpin)/1024.0)*3.3-0.719)/0.001715)+25.0 )
+#define HAL_TEMP() ( (-(analog.readV(_Tpin)-0.719F)/0.001715F)+25.0F )
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
 #define HAL_INIT() { \
-  analogReadResolution((int)log2(ANALOG_READ_RANGE + 1)); \
-  analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
 }
 
 #define HAL_RESET() { \

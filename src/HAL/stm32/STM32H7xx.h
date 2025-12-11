@@ -20,6 +20,19 @@
   #define ANALOG_WRITE_RANGE 255
 #endif
 
+// STM32 Arduino cores (F4 + H7):
+// assume global resolution functions exist; per-pin freq/res is not generic.
+#define HAL_HAS_GLOBAL_PWM_RESOLUTION 1
+#define HAL_HAS_GLOBAL_ADC_RESOLUTION 1
+
+#define HAL_PWM_BITS_MAX 16
+
+// F4 ADC is 12-bit; H7 can be higher, but core support varies.
+// Default to 12 and let advanced HAL override to 16 for known-good H7 setup.
+#ifndef HAL_ADC_BITS_MAX
+  #define HAL_ADC_BITS_MAX 12
+#endif
+
 // Lower limit (fastest) step rate in uS for this platform (in SQW mode) and width of step pulse
 #define HAL_MAXRATE_LOWER_LIMIT 1.5
 #define HAL_PULSE_WIDTH 0  // effectively disable pulse mode
@@ -55,7 +68,6 @@
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
 #define HAL_INIT() { \
-  analogWriteResolution((int)log2(ANALOG_WRITE_RANGE + 1)); \
 }
 
 //---------------------------------------------------------------------------------------------------
