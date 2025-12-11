@@ -8,7 +8,7 @@
 #include "../../../tasks/OnTask.h"
 #include "../../../canPlus/CanPlus.h"
 
-KTechMotor *ktechMotorInstance[9];
+static KTechMotor *ktechMotorInstance[9];
 IRAM_ATTR void moveKTechMotorAxis1() { ktechMotorInstance[0]->move(); }
 IRAM_ATTR void moveKTechMotorAxis2() { ktechMotorInstance[1]->move(); }
 IRAM_ATTR void moveKTechMotorAxis3() { ktechMotorInstance[2]->move(); }
@@ -70,6 +70,7 @@ bool KTechMotor::init() {
     return false;
   }
 
+  ready = true;
   enable(false);
 
   // start the motion timer
@@ -89,8 +90,11 @@ bool KTechMotor::init() {
     VLF("");
   } else {
     VLF("FAILED!");
+    ready = false;
     return false;
   }
+ 
+  stopSyntheticMotion();
 
   // get ready for status messages
   if (statusMode == ON) {
@@ -107,7 +111,6 @@ bool KTechMotor::init() {
     }
   }
 
-  ready = true;
   return true;
 }
 
@@ -123,20 +126,25 @@ void KTechMotor::setReverse(int8_t state) {
 
 // sets motor enable on/off (if possible)
 void KTechMotor::enable(bool state) {
-  if (!ready) return;
+  if (!ready || state == enabled) return;
 
-  VF("MSG:"); V(axisPrefix);
+  if (!state) enabled = false;
+
+  stopSyntheticMotion();
+  resetToTrackingBaseline();
+
+  VF("MSG:"); V(axisPrefix); VF("driver powered "); VLF(state ? "up" : "down");
+
+  // best-effort command (no ACK assumed)
   if (state) {
-    uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";
-    canPlus.writePacket(canID, cmd, 8);
-    VLF("powered up");
+    static const uint8_t cmdOn[]  = "\x88\x00\x00\x00\x00\x00\x00\x00";
+    canPlus.writePacket(canID, cmdOn, 8);
+    enabled = true;   // open window only if we intend to be enabled
   } else {
-    uint8_t cmd[] = "\x80\x00\x00\x00\x00\x00\x00\x00";
-    canPlus.writePacket(canID, cmd, 8);
-    VLF("powered down");
-  } 
-
-  enabled = state;
+    static const uint8_t cmdOff[] = "\x80\x00\x00\x00\x00\x00\x00\x00";
+    canPlus.writePacket(canID, cmdOff, 8);
+    // enabled already false
+  }
 }
 
 void KTechMotor::setInstrumentCoordinateSteps(long value) {
@@ -147,7 +155,7 @@ void KTechMotor::setInstrumentCoordinateSteps(long value) {
 void KTechMotor::resetPositionSteps(long value) {
   if (!ready) return;
 
-  uint8_t cmd[] = "\x95\x00\x00\x00";
+  static const uint8_t cmd[] = "\x95\x00\x00\x00";
   canPlus.beginPacket(canID);
   canPlus.write(cmd, 4);
   canPlus.write((uint8_t*)&value, 4);
@@ -164,13 +172,14 @@ void KTechMotor::resetPositionSteps(long value) {
 void KTechMotor::setFrequencySteps(float frequency) {
   if (!ready) return;
 
+  if (!enabled) { stopSyntheticMotion(); return; }
+
   // negative frequency, convert to positive and reverse the direction
   int dir = 0;
   if (frequency > 0.0F) dir = 1; else if (frequency < 0.0F) { frequency = -frequency; dir = -1; }
 
   // if in backlash override the frequency
-  if (inBacklash)
-    frequency = backlashFrequency;
+  if (inBacklash) frequency = backlashFrequency;
 
   if (frequency != currentFrequency) {
     // compensate for performace limitations by taking larger steps as needed
@@ -207,7 +216,7 @@ void KTechMotor::setFrequencySteps(float frequency) {
 
   noInterrupts();
   step = dir * stepSize;
-  absStep = abs(step);
+  absStep = (int)labs(step); 
   interrupts();
 }
 
@@ -227,15 +236,18 @@ void KTechMotor::setSlewing(bool state) {
 
 // updates PID and sets ktech position
 void KTechMotor::poll() {
-  if (statusMode == ON && (long)(millis() - lastStatusRequestTime) > KTECH_STATUS_MS) {
-    lastStatusRequestTime = millis();
-    uint8_t cmd[] = "\x9a\x00\x00\x00\x00\x00\x00\x00";
+  const unsigned long now = millis();
+
+  if (statusMode == ON && (now - lastStatusRequestTime) >= KTECH_STATUS_MS) {
+    lastStatusRequestTime = now;
+    static const uint8_t cmd[] = "\x9a\x00\x00\x00\x00\x00\x00\x00";
     canPlus.writePacket(canID, cmd, 8);
-    return;
   }
 
-  if ((long)(millis() - lastSetPositionTime) < CAN_SEND_RATE_MS) return;
-  lastSetPositionTime = millis();
+  if (!enabled) return;
+
+  if (now - lastSetPositionTime < CAN_SEND_RATE_MS) return;
+  lastSetPositionTime = now;
 
   noInterrupts();
   #if KTECH_SLEW_DIRECT == ON
@@ -246,13 +258,40 @@ void KTechMotor::poll() {
   interrupts();
 
   if (lastTarget != target) {
-    uint8_t cmd[] = "\xa3\x00\x00\x00\x00\x00\x00\x00";
+    static const uint8_t cmd[] = "\xa3\x00\x00\x00";
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
     canPlus.write((uint8_t*)&target, 4);
     canPlus.endPacket();
     lastTarget = target;
   }
+}
+
+void KTechMotor::stopSyntheticMotion() {
+  if (lastPeriod == 0 && step == 0 && absStep == 0) return;
+  currentFrequency = 0.0F;
+  lastPeriod = 0;
+  noInterrupts();
+  step = 0;
+  absStep = 0;
+  interrupts();
+  if (taskHandle) tasks.setPeriodSubMicros(taskHandle, 0);
+}
+
+void KTechMotor::resetToTrackingBaseline() {
+  noInterrupts();
+  step = 0;
+  absStep = 0;
+  inBacklash = false;
+  backlashSteps = 0;
+  interrupts();
+
+  currentFrequency = 0.0F;
+  lastPeriod = 0;
+  stepSize = 1;
+
+  // force next poll() to send target
+  lastTarget = LONG_MIN;
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate
@@ -282,7 +321,7 @@ IRAM_ATTR void KTechMotor::move() {
 
 void KTechMotor::updateStatus() {
   if (statusMode == OFF) return;
-  if ((long)(millis() - lastStatusUpdateTime) > (KTECH_STATUS_MS*4)) {
+  if (millis() - lastStatusUpdateTime >= KTECH_STATUS_MS*4U) {
     status.outputA.shortToGround  = true;
     status.outputA.openLoad       = true;
     status.outputB.shortToGround  = true;
@@ -290,7 +329,7 @@ void KTechMotor::updateStatus() {
     status.overTemperatureWarning = true;
     status.overTemperature        = true;
     status.standstill             = true;
-    status.fault                  = false;
+    status.fault                  = true;
   }
 }
 

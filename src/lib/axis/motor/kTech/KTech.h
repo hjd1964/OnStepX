@@ -84,6 +84,9 @@ class KTechMotor : public Motor {
     const char* name() { return "KTECH"; }
 
   private:
+    void stopSyntheticMotion();
+    void resetToTrackingBaseline();
+
     int canID;
 
     unsigned long lastSetPositionTime = 0;
@@ -93,16 +96,13 @@ class KTechMotor : public Motor {
     uint8_t taskHandle = 0;
 
     int  stepSize = 1;                  // step size
-    volatile int  homeSteps = 1;        // step count for microstep sequence between home positions (driver indexer)
     volatile bool takeStep = false;     // should we take a step
     long lastTarget = 0;
 
-    float currentFrequency = 0.0F;      // last frequency set 
-    float lastFrequency = 0.0F;         // last frequency requested
     unsigned long lastPeriod = 0;       // last timer period (in sub-micros)
     float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
 
-    volatile int absStep = 1;           // absolute step size (unsigned)
+    volatile int absStep = 0;           // absolute step size (unsigned)
 
     void (*callback)() = NULL;
 
