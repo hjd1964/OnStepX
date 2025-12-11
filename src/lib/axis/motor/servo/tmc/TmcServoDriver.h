@@ -57,8 +57,8 @@ class TmcServoDriver : public ServoDriver {
     AxisParameter decay         = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE};
     AxisParameter decaySlewing  = {NAN, NAN, NAN, SPREADCYCLE, STEALTHCHOP, AXP_DECAY, AXPN_DECAY_MODE_GOTO};
 
-    const int numParameters = 5;
-    AxisParameter* parameter[6] = {&invalid, &acceleration, &countsToStepsRatio, &currentRun, &decay, &decaySlewing};
+    const int numParameters = 6;
+    AxisParameter* parameter[7] = {&invalid, &acceleration, &zeroDeadband, &countsToStepsRatio, &currentRun, &decay, &decaySlewing};
 };
 
 #endif

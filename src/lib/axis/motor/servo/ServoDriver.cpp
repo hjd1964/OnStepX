@@ -42,6 +42,7 @@ ServoDriver::ServoDriver(uint8_t axisNumber, const ServoPins *Pins, const ServoS
   statusMode = Settings->status;
 
   acceleration.valueDefault = Settings->acceleration;
+  zeroDeadband.valueDefault = 0.0F;
 }
 
 bool ServoDriver::init(bool reverse) {
@@ -99,6 +100,8 @@ void ServoDriver::setFrequencyMax(float frequency) {
 float ServoDriver::setMotorVelocity(float velocity) {
   if (!enabled) velocity = 0.0F;
 
+  if (zeroDeadband.value > 0.0F && fabsf(velocity) < zeroDeadband.value) velocity = 0.0F;
+
   if (velocity > velocityMax) velocity = velocityMax; else
   if (velocity < -velocityMax) velocity = -velocityMax;
 
@@ -126,7 +129,7 @@ void ServoDriver::updateStatus() {
   if (statusMode == ON) {
     const unsigned long now = millis();
 
-    if ((long)(now - timeLastStatusUpdate) > 200U) {
+    if ((long)(now - timeLastStatusUpdate) > 200L) {
       readStatus();
 
       // open load indication is not reliable in standstill

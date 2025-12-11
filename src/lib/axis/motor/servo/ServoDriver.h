@@ -116,9 +116,11 @@ class ServoDriver {
     // runtime adjustable settings
     AxisParameter invalid = {NAN, NAN, NAN, NAN, NAN, AXP_INVALID, ""};
     AxisParameter acceleration = {NAN, NAN, NAN, 0, 100000, AXP_FLOAT, AXPN_MAX_ACCEL};
+    AxisParameter zeroDeadband = {NAN, NAN, NAN, 0.0, 500.0, AXP_FLOAT_IMMEDIATE, "Deadband, cps"};
 
+    // this array list isn't used if overridden, just a place holder!
     const int numParameters = 2;
-    AxisParameter* parameter[2] = {&invalid, &acceleration};
+    AxisParameter* parameter[3] = {&invalid, &acceleration, &zeroDeadband};
 };
 
 #endif
