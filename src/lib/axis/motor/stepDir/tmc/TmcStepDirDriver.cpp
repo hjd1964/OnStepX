@@ -206,6 +206,11 @@ bool TmcStepDirDriver::init() {
   modeSwitchAllowed = microstepRatio != 1;
   modeSwitchFastAllowed = false;
 
+  VF("MSG:"); V(axisPrefix);
+  if (modeSwitchAllowed) { VLF("ModeSwitch Allowed"); }else { VLF("ModeSwitch Disabled"); }
+  VF("MSG:"); V(axisPrefix);
+  if (modeSwitchFastAllowed) { VLF("ModeSwitchFast Allowed"); } else { VLF("ModeSwitchFast Disabled"); }
+
   return true;
 }
 

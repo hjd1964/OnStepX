@@ -134,8 +134,10 @@ bool StepDirMotor::init() {
   digitalWriteF(Pins->step, stepClr);
 
   // init default driver enable pin
-  pinModeEx(Pins->enable, OUTPUT);
-  digitalWriteEx(Pins->enable, !Pins->enabledState)
+  if (Pins->enable != SHARED) {
+    pinModeEx(Pins->enable, OUTPUT);
+    digitalWriteEx(Pins->enable, !Pins->enabledState);
+  }
 
   // start the driver
   if (!driver->init()) { DF("ERR:"); D(axisPrefix); DLF("no motor driver!"); return false; }
@@ -171,7 +173,7 @@ void StepDirMotor::setReverse(bool state) {
 void StepDirMotor::enable(bool state) {
   if (!ready) return;
 
-  VF("MSG:"); V(axisPrefix); VF("driver powered "); if (state) { VF("up"); } else { VF("down"); }
+  VF("MSG:"); V(axisPrefix); VF("driver powered "); VF(state ? "up" : "down");
 
   if (Pins->enable != OFF && Pins->enable != SHARED) {
     VF(" using pin "); VL(Pins->enable);
