@@ -7,7 +7,7 @@
 
 #include "../../../tasks/OnTask.h"
 
-StepDirMotor *stepDirMotorInstance[9];
+static StepDirMotor *stepDirMotorInstance[9];
 
 #ifndef AXIS1_STEP_PIN
   #define AXIS1_STEP_PIN stepDirMotorInstance[0]->Pins->step
@@ -26,9 +26,9 @@ IRAM_ATTR void moveStepDirMotorFRAxis2() { stepDirMotorInstance[1]->moveFR(AXIS2
 #ifndef AXIS3_STEP_PIN
   #define AXIS3_STEP_PIN stepDirMotorInstance[2]->Pins->step
 #endif
-void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
-void moveStepDirMotorFFAxis3() { stepDirMotorInstance[2]->moveFF(AXIS3_STEP_PIN); }
-void moveStepDirMotorFRAxis3() { stepDirMotorInstance[2]->moveFR(AXIS3_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorAxis3() { stepDirMotorInstance[2]->move(AXIS3_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFFAxis3() { stepDirMotorInstance[2]->moveFF(AXIS3_STEP_PIN); }
+IRAM_ATTR void moveStepDirMotorFRAxis3() { stepDirMotorInstance[2]->moveFR(AXIS3_STEP_PIN); }
 
 #ifndef AXIS4_STEP_PIN
   #define AXIS4_STEP_PIN stepDirMotorInstance[3]->Pins->step
@@ -171,22 +171,33 @@ void StepDirMotor::setReverse(bool state) {
 }
 
 void StepDirMotor::enable(bool state) {
-  if (!ready) return;
+  if (!ready || state == enabled) return;
+
+  if (!state) enabled = false;
+
+  stopStepTimerAndClearPulse();
+  resetToTrackingBaseline();
 
   VF("MSG:"); V(axisPrefix); VF("driver powered "); VF(state ? "up" : "down");
+
+  bool ok = true;
 
   if (Pins->enable != OFF && Pins->enable != SHARED) {
     VF(" using pin "); VL(Pins->enable);
     digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
-    if (driver->enable(state)) { VLF(" using secondary method"); } else { VLF(" skipped no control available"); }
+    ok = driver->enable(state);
+    if (ok) VLF(" using secondary method"); else VLF(" skipped/no control available (or failed)");
   }
-  enabled = state;
+
+  enabled = (state && ok);
 }
 
 // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
 void StepDirMotor::setFrequencySteps(float frequency) {
   if (!ready) return;
+
+  if (!enabled) { stopStepTimerAndClearPulse(); return; }
 
   // chart acceleration
   #if DEBUG != OFF && defined(DEBUG_STEPDIR_ACCEL)
@@ -339,6 +350,61 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
     VF("MSG:"); V(axisPrefix); VF("high speed ISR swapped out at "); V(lastFrequency); VL(" steps/sec.");
   }
   return true;
+}
+
+// gard local guarantee: stop the step generator and force STEP inactive.
+void StepDirMotor::stopStepTimerAndClearPulse() {
+  // already stopped?
+  if (lastPeriod == 0 && lastPeriodSet == 0 && step == 0 && !takeStep) {
+    digitalWriteF(Pins->step, stepClr);
+    takeStep = false;
+    return;
+  }
+
+  // stop task first
+  if (taskHandle) tasks.setPeriodSubMicros(taskHandle, 0);
+
+  // clear bookkeeping
+  lastPeriod = 0;
+  lastPeriodSet = 0;
+  currentFrequency = 0.0F;
+  lastFrequency = 0.0F;
+
+  noInterrupts();
+  step = 0;
+  takeStep = false;
+  interrupts();
+
+  // force STEP low so we don't leave a high level latched
+  digitalWriteF(Pins->step, stepClr);
+}
+
+// clears backlash/state, sets microstep tracking, etc.
+void StepDirMotor::resetToTrackingBaseline() {
+  if (taskHandle) tasks.setCallback(taskHandle, callback);
+
+  noInterrupts();
+  // clear any pending synthetic motion state
+  step = 0;
+  takeStep = false;
+
+  // clear backlash state so next start is “clean”
+  inBacklash = false;
+  backlashSteps = 0;
+
+  interrupts();
+
+  microstepModeControl = MMC_TRACKING;
+  stepSize = 1;
+
+  #if defined(GPIO_DIRECTION_PINS)
+    if (direction > DirNone) updateMotorDirection();
+  #endif
+
+  if (driver->modeSwitchAllowed || driver->modeSwitchFastAllowed) driver->modeMicrostepTracking();
+
+  // force STEP low so we don't leave a high level latched
+  digitalWriteF(Pins->step, stepClr);
 }
 
 #if defined(GPIO_DIRECTION_PINS)

@@ -128,6 +128,10 @@ class StepDirMotor : public Motor {
     // swaps in/out fast unidirectional ISR for slewing 
     bool enableMoveFast(const bool state);
 
+    void stopStepTimerAndClearPulse();
+
+    void resetToTrackingBaseline();
+
     uint8_t taskHandle = 0;
 
     #ifdef DRIVER_STEP_DEFAULTS
