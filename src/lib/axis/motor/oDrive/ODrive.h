@@ -1,8 +1,9 @@
 // -----------------------------------------------------------------------------------
-// axis odrive servo motor
+// axis oDrive servo motor
 #pragma once
 #include "../../../../Common.h"
 
+#ifndef ODRIVE_NEW_MOTOR_PRESENT
 #ifdef ODRIVE_MOTOR_PRESENT
 
 #include "../Motor.h"
@@ -174,4 +175,5 @@ class ODriveMotor : public Motor {
     AxisParameter* parameter[2] = {&invalid, &radsPerCount};
 };
 
+#endif
 #endif

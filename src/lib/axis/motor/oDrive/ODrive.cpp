@@ -3,6 +3,7 @@
 
 #include "ODrive.h"
 
+#ifndef ODRIVE_NEW_MOTOR_PRESENT
 #ifdef ODRIVE_MOTOR_PRESENT
 
 #include "../../../tasks/OnTask.h"
@@ -283,4 +284,5 @@ IRAM_ATTR void ODriveMotor::move() {
   }
 }
 
+#endif
 #endif
