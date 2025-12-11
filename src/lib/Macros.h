@@ -98,6 +98,45 @@
 
 #endif
 
+// Fast GPIO read/write for Arduino-ESP32 cores 2.x / 3.x
+// Works across ESP32 / ESP32-S2 / ESP32-S3 / ESP32-C3
+#ifdef ESP32
+  #include "soc/gpio_struct.h"
+
+  // SOC_GPIO_PIN_COUNT exists in ESP-IDF-based cores; core 1.x may be missing it.
+  #if defined(__has_include)
+    #if __has_include("soc/soc_caps.h")
+      #include "soc/soc_caps.h"
+    #endif
+  #endif
+
+  static inline IRAM_ATTR void gpioWriteFast(uint32_t pin, uint32_t level) {
+    if (pin >= (uint32_t)SOC_GPIO_PIN_COUNT) return;
+    uint32_t mask = 1UL << (pin & 31U);
+    if (pin < 32U) { if (level) GPIO.out_w1ts = mask; else GPIO.out_w1tc = mask; }
+    #if SOC_GPIO_PIN_COUNT > 32
+      else { if (level) GPIO.out1_w1ts.val = mask; else GPIO.out1_w1tc.val = mask; }
+    #endif
+  }
+  #ifndef digitalWriteF
+    #define digitalWriteF(pin,value) gpioWriteFast((uint32_t)(pin), (uint32_t)(value))
+  #endif
+
+  static inline IRAM_ATTR uint32_t gpioReadFast(uint32_t pin) {
+    if (pin >= (uint32_t)SOC_GPIO_PIN_COUNT) return 0;
+    uint32_t mask = 1UL << (pin & 31U);
+    if (pin < 32U) { return (GPIO.in & mask) ? 1U : 0U; }
+    #if SOC_GPIO_PIN_COUNT > 32
+      else { return (GPIO.in1.data & mask) ? 1U : 0U; }
+    #else
+      return 0;
+    #endif
+  }
+  #ifndef digitalReadF
+    #define digitalReadF(pin) gpioReadFast((uint32_t)(pin))
+  #endif
+#endif
+
 // automatically use fast I/O if available
 #ifndef digitalReadF
   #ifdef HAL_HAS_DIGITAL_FAST
