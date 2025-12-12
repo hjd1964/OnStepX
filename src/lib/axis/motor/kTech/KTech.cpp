@@ -244,6 +244,16 @@ void KTechMotor::poll() {
     canPlus.writePacket(canID, cmd, 8);
   }
 
+  // hard faults on loss of comms during motion
+  if (statusMode == ON) {
+    if (!hasHeartbeat(KTECH_STATUS_MS * 4U) || status.fault) {
+      enabled = false;
+      stopSyntheticMotion();
+      resetToTrackingBaseline();
+      return;
+    }
+  }
+
   if (!enabled) return;
 
   if (now - lastSetPositionTime < CAN_SEND_RATE_MS) return;
@@ -330,6 +340,7 @@ void KTechMotor::updateStatus() {
     status.overTemperature        = true;
     status.standstill             = true;
     status.fault                  = true;
+    statusValid                   = false;
   }
 }
 
@@ -347,6 +358,16 @@ void KTechMotor::requestStatusCallback(uint8_t data[8]) {
   status.standstill             = false;
   status.fault                  = bitRead(errorState, 0) || bitRead(errorState, 3);
   lastStatusUpdateTime          = millis();
+  statusValid                   = true;
+}
+
+bool KTechMotor::hasHeartbeat(uint32_t maxAgeMs) const {
+  if (!ready || statusMode == OFF) return false;
+
+  const unsigned long now = millis();
+  const unsigned long age = now - lastStatusUpdateTime;
+
+  return statusValid && (age < maxAgeMs);
 }
 
 #endif
