@@ -69,7 +69,8 @@ class StepDirDriver {
     inline DriverStatus getStatus() { return status; }
 
     // secondary way to power down not using the enable pin
-    virtual bool enable(bool state) { UNUSED(state); return false; }
+    // default assume the driver is always enabled, i.e. no control
+    virtual bool enable(bool state) { UNUSED(state); return true; }
 
     // calibrate the motor driver if required
     virtual void calibrateDriver() {}

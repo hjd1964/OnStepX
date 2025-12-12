@@ -187,7 +187,7 @@ void StepDirMotor::enable(bool state) {
     digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
     ok = driver->enable(state);
-    if (ok) VLF(" using secondary method"); else VLF(" skipped/no control available (or failed)");
+    if (ok) VLF(" using secondary method (if available)"); else VLF(" using secondary method failed");
   }
 
   enabled = (state && ok);
