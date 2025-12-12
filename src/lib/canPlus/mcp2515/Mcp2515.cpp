@@ -93,8 +93,7 @@ int CanPlusMCP2515::writePacketRtr(int id, size_t dlc) {
 void CanPlusMCP2515::poll() {
   if (!ready) return;
 
-  for (int n = 0; n < 16; n++) {
-
+  for (int n = 0; n < 8; n++) {
     #if CAN_INT_PIN != OFF
       if (digitalRead(CAN_INT_PIN)) break;
     #endif

@@ -14,10 +14,10 @@
 #define CAN_BAUD                      500000                    // 500000 baud default
 #endif
 #ifndef CAN_SEND_RATE_MS
-#define CAN_SEND_RATE_MS              25                        // 40 Hz CAN controller send message processing rate
+#define CAN_SEND_RATE_MS              100                       // 10 Hz CAN controller send message processing rate
 #endif
 #ifndef CAN_RECV_RATE_MS
-#define CAN_RECV_RATE_MS              5                         // 200 Hz CAN controller recv. message processing rate
+#define CAN_RECV_RATE_MS              100                       // 10 Hz CAN controller recv. message processing rate
 #endif
 #ifndef CAN_RX_PIN
 #define CAN_RX_PIN                    OFF                       // for ESP32 CAN interface
