@@ -5,6 +5,8 @@
 
 #if defined(CAN_PLUS) && CAN_PLUS != OFF
 
+#include "../tasks/OnTask.h"
+
 int CanPlus::beginPacket(int id) {
   if (!ready) return 0;
   sendId = id;
@@ -57,7 +59,6 @@ int CanPlus::callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8
 // run id/msg based callbacks
 int CanPlus::callbackProcess(int id, uint8_t *buffer, size_t size) {
   uint8_t paddedBuffer[8] = {0};
-
   if (buffer && size) {
     if (size > 8) size = 8;
     memcpy(paddedBuffer, buffer, size);
@@ -65,20 +66,36 @@ int CanPlus::callbackProcess(int id, uint8_t *buffer, size_t size) {
     size = 0;
   }
 
+  int called = 0;
+
   for (int i = 0; i < idCallbackCount; i++) {
     if (id == idCallBackId[i]) {
       idCallback[i](paddedBuffer);
-      return 1;
+      called++;
     }
   }
+
   for (int i = 0; i < msgCallbackCount; i++) {
-    // perhaps size should be >= 8 but leaving at 1 for now
     if (size >= 1 && id == msgCallBackId[i] && paddedBuffer[0] == msgCallBackMsg[i]) {
       msgCallback[i](paddedBuffer);
-      return 1;
+      called++;
     }
   }
-  return 0;
+
+  return called ? 1 : 0;
+}
+
+bool CanPlus::txTryLock(uint32_t minGapUs) {
+  uint32_t now = micros();
+  if ((uint32_t)(now - lastTxUs) < minGapUs) return false;
+  lastTxUs = now;
+  return true;
+}
+
+void CanPlus::txWait(uint32_t minGapUs) {
+  while (!txTryLock(minGapUs)) {
+    tasks.yield(minGapUs/1000UL);
+  }
 }
 
 #endif

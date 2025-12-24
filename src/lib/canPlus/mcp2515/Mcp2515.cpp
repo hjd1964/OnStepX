@@ -54,8 +54,13 @@ void CanPlusMCP2515::init() {
     VLF("success");
     VF("MSG: CanPlus, start callback monitor task (rate "); V(CAN_RECV_RATE_MS);
     VF("ms priority 3)... ");
-    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canMcp2515Monitor, "SysCanM")) VLF("success");
-    else VLF("FAILED!");
+    if (tasks.add(CAN_RECV_RATE_MS, 0, true, 3, canMcp2515Monitor, "Can2515")) {
+      VLF("success");
+
+      // setup the burst task disabled (period 0) and so it only runs once
+      burst = tasks.add(0, 0, true, 3, canEsp32Monitor, "CanBrst");
+
+    } else VLF("FAILED!");
   } else {
     VLF("FAILED!");
   }
@@ -90,10 +95,34 @@ int CanPlusMCP2515::writePacketRtr(int id, size_t dlc) {
   return (err == MCP2515::ERROR_OK) ? 1 : 0;
 }
 
+void CanPlusESP32::rxBrust(uint32_t periodUs) {
+  const uint32_t now = micros();
+  const uint32_t until = now + periodUs;
+
+  if (!burstEnabled) {
+    burstEnabled = true;
+    burstUntilUs = until;
+    tasks.setPeriod(burst, 1);
+  } else {
+    if ((int32_t)(until - burstUntilUs) > 0) burstUntilUs = until;
+  }
+}
+
 void CanPlusMCP2515::poll() {
   if (!ready) return;
 
-  for (int n = 0; n < 8; n++) {
+  if (burstEnabled && (int32_t)(micros() - burstUntilUs) >= 0) {
+    tasks.setPeriod(burst, 0);
+    burstEnabled = false;
+  }
+
+  const uint32_t start = micros();
+
+  // shorten workload during busts
+  const int frames = burstEnabled ? (maxFrames >> 1) : maxFrames;
+
+  // drain up to N frames per poll so we don't monopolize the CPU
+  for (int n = 0; n < frames; n++) {
     #if CAN_INT_PIN != OFF
       if (digitalRead(CAN_INT_PIN)) break;
     #endif
@@ -112,6 +141,8 @@ void CanPlusMCP2515::poll() {
 
     rx_ok++;
     callbackProcess((int)(frame.can_id & CAN_SFF_MASK), frame.data, dlc);
+
+    if ((uint32_t)(micros() - start) > budgetUs) break;
   }
 }
 

@@ -6,18 +6,18 @@
 
 #if defined(CAN_PLUS) && CAN_PLUS != OFF
 
-#ifndef CAN_MAX_CALLBACKS
-  #define CAN_MAX_CALLBACKS           16
+#ifndef DEBUG_CAN
+#define DEBUG_CAN                     OFF
 #endif
 
 #ifndef CAN_BAUD
-#define CAN_BAUD                      500000                    // 500000 baud default
+#define CAN_BAUD                      1000000                   // 1000000 baud default
 #endif
 #ifndef CAN_SEND_RATE_MS
-#define CAN_SEND_RATE_MS              100                       // 10 Hz CAN controller send message processing rate
+#define CAN_SEND_RATE_MS              10                        // 100 Hz CAN controller send message processing rate
 #endif
 #ifndef CAN_RECV_RATE_MS
-#define CAN_RECV_RATE_MS              100                       // 10 Hz CAN controller recv. message processing rate
+#define CAN_RECV_RATE_MS              2                         // 500 Hz CAN controller recv. message processing rate
 #endif
 #ifndef CAN_RX_PIN
 #define CAN_RX_PIN                    OFF                       // for ESP32 CAN interface
@@ -30,6 +30,14 @@
 #endif
 #ifndef CAN_INT_PIN
 #define CAN_INT_PIN                   OFF                       // for MCP2515 SPI CAN controller
+#endif
+
+#ifndef CAN_BURST_WINDOW_US
+#define CAN_BURST_WINDOW_US           1000                      // for polling recv. how long to wait during a burst
+#endif
+
+#ifndef CAN_MAX_CALLBACKS
+  #define CAN_MAX_CALLBACKS           16
 #endif
 
 class CanPlus {
@@ -45,6 +53,18 @@ class CanPlus {
     virtual int callbackRegisterId(int id, void (*callback)(uint8_t data[8]));
     virtual int callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8_t data[8]));
     virtual int callbackProcess(int id, uint8_t *buffer, size_t size);
+
+    // send pacing, non-blocking
+    bool txTryLock(uint32_t minGapUs = defaultPacingUs());
+
+    // send pacing, blocking
+    void txWait(uint32_t minGapUs = defaultPacingUs());
+
+    // allow any polling recv that may be present to happen quickly for a short period of time
+    // this increases the polling rate to 1ms for the specified period in microseconds
+    virtual void rxBrust(uint32_t periodUs = 2000) { UNUSED(periodUs); }
+
+    static inline uint32_t defaultPacingUs() { return (uint32_t)CAN_SEND_RATE_MS*1000UL; }
 
     bool ready = false;
 
@@ -79,6 +99,12 @@ class CanPlus {
     int msgCallBackId[CAN_MAX_CALLBACKS] = {0};
     int msgCallBackMsg[CAN_MAX_CALLBACKS] = {0};
     void (*msgCallback[CAN_MAX_CALLBACKS])(uint8_t data[8]) = {nullptr};
+
+    uint32_t lastTxUs = 0;
+    
+    // for recv. path loops if present
+    const uint32_t budgetUs = 200;  // tune ~ 100–300us
+    const int maxFrames = 8;        // cap frames that are processed per CAN_RECV_RATE_MS, must be >= 2
 };
 
 #endif
