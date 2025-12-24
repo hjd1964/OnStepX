@@ -108,9 +108,9 @@ bool StepDirMotor::init() {
   if (!Motor::init()) return false;
 
   #if DEBUG == VERBOSE
-    VF("MSG:"); V(axisPrefix); V("pins step="); if (Pins->step == OFF) VF("OFF"); else V(Pins->step);
-    VF(", dir="); if (Pins->dir == OFF) VF("OFF"); else V(Pins->dir);
-    VF(", en="); if (Pins->enable == OFF) VLF("OFF"); else if (Pins->enable == SHARED) VLF("SHARED"); else VL(Pins->enable);
+    VF("MSG:"); V(axisPrefix); V("pins step="); if (Pins->step == OFF) { VF("OFF"); } else { V(Pins->step); }
+    VF(", dir="); if (Pins->dir == OFF) { VF("OFF"); } else { V(Pins->dir); }
+    VF(", en="); if (Pins->enable == OFF) { VLF("OFF"); } else if (Pins->enable == SHARED) { VLF("SHARED"); } else { VL(Pins->enable); }
   #endif
 
   // this driver requires available pins to function
@@ -187,7 +187,7 @@ void StepDirMotor::enable(bool state) {
     digitalWriteEx(Pins->enable, state ? Pins->enabledState : !Pins->enabledState);
   } else {
     ok = driver->enable(state);
-    if (ok) VLF(" using secondary method (if available)"); else VLF(" using secondary method failed");
+    if (ok) { VLF(" using secondary method (if available)"); } else { VLF(" using secondary method failed"); }
   }
 
   enabled = (state && ok);
