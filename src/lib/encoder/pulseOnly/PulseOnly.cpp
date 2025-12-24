@@ -44,7 +44,7 @@ PulseOnly *pulseOnlyInstance[9];
   IRAM_ATTR void pulse_A_Axis9() { pulseOnlyInstance[8]->pulse(); }
 #endif
 
-PulseOnly::PulseOnly(int16_t pulsePin, volatile int8_t *direction, int16_t axis) {
+PulseOnly::PulseOnly(int16_t axis, int16_t pulsePin, volatile int8_t *direction) {
   if (axis < 1 || axis > 9) return;
 
   this->axis = axis;
@@ -124,7 +124,7 @@ int32_t PulseOnly::read() {
   if (!ready) return 0;
 
   noInterrupts();
-  count = pulseCount;
+  count = count;
   interrupts();
 
   return count + index;
@@ -134,7 +134,7 @@ void PulseOnly::write(int32_t position) {
   if (!ready) return;
 
   noInterrupts();
-  index = position - pulseCount;
+  index = position - count;
   interrupts();
 }
 
@@ -146,9 +146,13 @@ void PulseOnly::setDirection(volatile int8_t *direction) {
 
 IRAM_ATTR void PulseOnly::pulse() {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
-  pulseCount += *pulseDirection; 
+  count += *pulseDirection;
+
+  #if ENCODER_VELOCITY == ON
+    velNoteEdge(*pulseDirection);
+  #endif
 }
 
 #endif

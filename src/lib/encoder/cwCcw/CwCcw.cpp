@@ -144,33 +144,37 @@ bool CwCcw::init() {
 int32_t CwCcw::read() {
   if (!ready) return 0;
   
-  noInterrupts();
-  count = cwCcwCount;
-  interrupts();
-
-  return count + index;
+  return ATOMIC_LOAD(count) + index;
 }
 
 void CwCcw::write(int32_t position) {
   if (!ready) return;
 
-  noInterrupts();
-  index = position - cwCcwCount;
-  interrupts();
+  index = position - ATOMIC_LOAD(count);
 }
 
 IRAM_ATTR void CwCcw::cw() {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
-  cwCcwCount++;
+
+  count++;
+
+  #ifdef ENCODER_VELOCITY == ON
+    velNoteEdge(+1);
+  #endif
 }
 
 IRAM_ATTR void CwCcw::ccw() {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
-  cwCcwCount--;
+
+  count--;
+
+  #if ENCODER_VELOCITY == ON
+    velNoteEdge(-1);
+  #endif
 }
 
 #endif

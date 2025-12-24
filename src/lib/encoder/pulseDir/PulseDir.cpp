@@ -125,26 +125,35 @@ bool PulseDir::init() {
 int32_t PulseDir::read() {
   if (!ready) return 0;
 
-  noInterrupts();
-  count = pulseDirCount;
-  interrupts();
-
-  return count + index;
+  return ATOMIC_LOAD(count) + index;
 }
 
 void PulseDir::write(int32_t position) {
   if (!ready) return;
 
-  noInterrupts();
-  index = position - pulseDirCount;
-  interrupts();
+  index = position - ATOMIC_LOAD(count);
 }
 
-IRAM_ATTR PulseDir::pulse(const int16_t dirPin) {
+void IRAM_ATTR PulseDir::pulse(const int16_t dirPin) {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
-  if (digitalReadF(dirPin)) pulseDirCount--; else pulseDirCount++;
+
+  if (digitalReadF(dirPin)) {
+    count--;
+
+    #if ENCODER_VELOCITY == ON
+      velNoteEdge(-1);
+    #endif
+
+  } else {
+    count++;
+
+    #if ENCODER_VELOCITY == ON
+      velNoteEdge(+1);
+    #endif
+
+  }
 }
 
 #endif

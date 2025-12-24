@@ -80,11 +80,11 @@ bool Quadrature::init() {
   int bPin = digitalPinToInterrupt(BPin);
 
   if (aPin < 0 || bPin < 0) {
-    DF("ERR: Encoder Quadrature"); D(axis); DLF(" init(), couldn't attach interrupt!"); 
+    DF("MSG: Encoder Quadrature"); D(axis); DLF(" init(), couldn't attach interrupt!"); 
     return false;
   }
 
-  VF("ERR: Encoder Quadrature"); V(axis); VF(" init(), attaching interrupts to ");
+  VF("MSG: Encoder Quadrature"); V(axis); VF(" init(), attaching interrupts to ");
   VF("APin="); V(APin); VF(" and BPin="); VL(BPin);
 
   switch (axis) {
@@ -151,19 +151,13 @@ bool Quadrature::init() {
 int32_t Quadrature::read() {
   if (!ready) return 0;
 
-  noInterrupts();
-  count = quadratureCount;
-  interrupts();
-
-  return count + index;
+  return ATOMIC_LOAD(count) + index;
 }
 
 void Quadrature::write(int32_t position) {
   if (!ready) return;
 
-  noInterrupts();
-  index = position - quadratureCount;
-  interrupts();
+  index = position - ATOMIC_LOAD(count);
 }
 
 // Phase 1: LLHH LLHH
@@ -172,7 +166,7 @@ void Quadrature::write(int32_t position) {
 
 ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
   stateA = digitalReadF(pin);
 
@@ -195,14 +189,18 @@ ICACHE_RAM_ATTR void Quadrature::A(const int16_t pin) {
     case 0b1110: dir = -1; break;
     case 0b1111: QUAD_F2; break; // skipped pulse (invalid A state, valid B state)
   }
-  quadratureCount += dir;
+  count += dir;
+
+  #if ENCODER_VELOCITY == ON
+    if (dir) { velNoteEdge(dir); }
+  #endif
   
   lastA = stateA;
 }
 
 ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
   #if ENCODER_FILTER > 0
-    ENCODER_FILTER_UNTIL(ENCODER_FILTER);
+    ENCODER_FILTER_UNTIL();
   #endif
   stateB = digitalReadF(pin);
 
@@ -225,7 +223,11 @@ ICACHE_RAM_ATTR void Quadrature::B(const int16_t pin) {
     case 0b1110: dir = -1; break;
     case 0b1111: QUAD_F2; break;  // skipped pulse (valid A state, invalid B state)
   }
-  quadratureCount += dir;
+  count += dir;
+
+  #if ENCODER_VELOCITY == ON
+    if (dir) { velNoteEdge(dir); }
+  #endif
 
   lastB = stateB;
 }

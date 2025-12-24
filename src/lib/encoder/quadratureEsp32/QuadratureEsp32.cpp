@@ -32,6 +32,7 @@ bool QuadratureEsp32::init() {
   if (!ab->isAttached()) {
     DF("ERR: Encoder QuadratureEsp32"); D(axis); DLF(" init(), couldn't attach interrupts!"); 
     delete ab;
+    ab = nullptr;
     return false;
   }
 
@@ -45,6 +46,10 @@ int32_t QuadratureEsp32::read() {
   if (!ready) return 0;
 
   count = (int32_t)ab->getCount();
+  
+  #if ENCODER_VELOCITY == ON
+    velNoteSampledCount(count);
+  #endif
 
   return count + index;
 }

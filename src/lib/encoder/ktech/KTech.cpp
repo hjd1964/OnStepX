@@ -1,4 +1,4 @@
-// KTech in motor encoder
+// KTech in motor encoder (designed for the MS4010v3 with 16bit encoder)
 
 #include "KTech.h"
 
@@ -33,6 +33,16 @@ void positionKTechEncoderAxis6(uint8_t data[8]) { ktechEncoderInstance[5]->updat
 void positionKTechEncoderAxis7(uint8_t data[8]) { ktechEncoderInstance[6]->updatePositionCallback(data); }
 void positionKTechEncoderAxis8(uint8_t data[8]) { ktechEncoderInstance[7]->updatePositionCallback(data); }
 void positionKTechEncoderAxis9(uint8_t data[8]) { ktechEncoderInstance[8]->updatePositionCallback(data); }
+
+void velocityKTechEncoderAxis1(uint8_t data[8]) { ktechEncoderInstance[0]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis2(uint8_t data[8]) { ktechEncoderInstance[1]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis3(uint8_t data[8]) { ktechEncoderInstance[2]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis4(uint8_t data[8]) { ktechEncoderInstance[3]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis5(uint8_t data[8]) { ktechEncoderInstance[4]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis6(uint8_t data[8]) { ktechEncoderInstance[5]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis7(uint8_t data[8]) { ktechEncoderInstance[6]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis8(uint8_t data[8]) { ktechEncoderInstance[7]->updateVelocityCallback(data); }
+void velocityKTechEncoderAxis9(uint8_t data[8]) { ktechEncoderInstance[8]->updateVelocityCallback(data); }
 
 KTechIME::KTechIME(int16_t axis) {
   if (axis < 1 || axis > 9) return;
@@ -69,21 +79,48 @@ bool KTechIME::init() {
   }
 
   switch (this->axis) {
-    case 1: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis1); break;
-    case 2: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis2); break;
-    case 3: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis3); break;
-    case 4: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis4); break;
-    case 5: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis5); break;
-    case 6: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis6); break;
-    case 7: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis7); break;
-    case 8: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis8); break;
-    case 9: canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis9); break;
+    case 1:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis1);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis1);
+    break;
+    case 2:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis2);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis2);
+    break;
+    case 3:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis3);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis3);
+    break;
+    case 4:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis4);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis4);
+    break;
+    case 5:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis5);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis5);
+    break;
+    case 6:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis6);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis6);
+    break;
+    case 7:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis7);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis7);
+    break;
+    case 8:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis8);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis8);
+    break;
+    case 9:
+      canPlus.callbackRegisterMessage(canID, 0x90, positionKTechEncoderAxis9);
+      canPlus.callbackRegisterMessage(canID, 0xA2, velocityKTechEncoderAxis9);
+    break;
   }
 
-  VF("MSG: Encoder KTech_IME"); V(axis); VF(", start callback monitor task (rate "); V(CAN_SEND_RATE_MS); VF("ms priority 6)... ");
+  VF("MSG: Encoder KTech_IME"); V(axis); VF(", start request position task (rate 500ms priority 6)... ");
   char name[] = "SysEnK_";
   name[6] = axis + '0';
-  if (tasks.add(CAN_SEND_RATE_MS, 0, true, 6, callback, name)) { VLF("success"); } else { VLF("FAILED!"); }
+  if (tasks.add(500, 0, true, 6, callback, name)) { VLF("success"); } else { VLF("FAILED!"); }
 
   ready = true;
   return true;
@@ -92,10 +129,12 @@ bool KTechIME::init() {
 int32_t KTechIME::read() {
   if (!ready) return 0;
 
-  noInterrupts();
-  int32_t result = count + index;
+  int32_t result = ATOMIC_LOAD(count) + index;
   motorStepsAtLastReadValue = motorStepsAtLastUpdate;
-  interrupts();
+
+  #if ENCODER_VELOCITY == ON
+    velNoteSampledCount(ATOMIC_LOAD(count));
+  #endif
 
   return result;
 }
@@ -103,15 +142,24 @@ int32_t KTechIME::read() {
 void KTechIME::write(int32_t position) {
   if (!ready) return;
 
-  index = position - count;
+  index = position - ATOMIC_LOAD(count);
 }
 
 void KTechIME::requestPosition() {
+  uint32_t now = millis();
+
+  if ((uint32_t)(now - lastUpdateByPositionCommand) > 1000UL &&
+      (uint32_t)(now - lastUpdateByVelocityCommand) > 1000UL) error++;
+
+  if ((uint32_t)(now - lastUpdateByVelocityCommand) < 500UL) return;
+
   static const uint8_t cmd[] = "\x90\x00\x00\x00\x00\x00\x00\x00";
-  canPlus.writePacket(canID, cmd, 8);
+  if (canPlus.txTryLock()) canPlus.writePacket(canID, cmd, 8);
 }
 
 IRAM_ATTR void KTechIME::updatePositionCallback(uint8_t data[8]) {
+  lastUpdateByPositionCommand = millis();
+
   if (motorStepsPtr) {
     motorStepsAtLastUpdate = *motorStepsPtr;
     hasMotorStepsAtLastReadValue = true;
@@ -126,6 +174,29 @@ IRAM_ATTR void KTechIME::updatePositionCallback(uint8_t data[8]) {
   if (!firstCall) {
     if (lastCountSingleTurn > high && countSingleTurn < low) countTurns++;
     if (lastCountSingleTurn < low && countSingleTurn > high) countTurns--;
+  }
+  firstCall = false;
+
+  lastCountSingleTurn = countSingleTurn;
+  count = countSingleTurn + countTurns*KTECH_SINGLE_TURN;
+}
+
+IRAM_ATTR void KTechIME::updateVelocityCallback(uint8_t data[8]) {
+  lastUpdateByVelocityCommand = millis();
+
+  if (motorStepsPtr) {
+    motorStepsAtLastUpdate = *motorStepsPtr;
+    hasMotorStepsAtLastReadValue = true;
+  }
+
+  uint16_t countSingleTurn = (uint16_t)data[6] | ((uint16_t)data[7] << 8);
+
+  static constexpr uint16_t high = (KTECH_SINGLE_TURN*3)/4;
+  static constexpr uint16_t low  = (KTECH_SINGLE_TURN*1)/4;
+
+  if (!firstCall) {
+    if (lastCountSingleTurn > high && countSingleTurn < low) countTurns++;
+    if (lastCountSingleTurn < low  && countSingleTurn > high) countTurns--;
   }
   firstCall = false;
 

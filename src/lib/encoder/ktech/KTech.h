@@ -1,4 +1,4 @@
-// KTech in motor encoder
+// KTech in motor encoder (designed for the MS4010v3 with 16bit encoder)
 #pragma once
 
 #include "../EncoderBase.h"
@@ -7,9 +7,8 @@
   #define KTECH_SINGLE_TURN 65536
 #endif
 
-#ifndef KTECH_SLEW_DIRECT
-  #define KTECH_SLEW_DIRECT OFF // ON for KTECH trapezoidal move profile or OFF for OnStep move profile
-#endif
+// for example:
+// KTechIME encoder1(1);
 
 #if AXIS1_ENCODER == KTECH_IME || AXIS2_ENCODER == KTECH_IME || AXIS3_ENCODER == KTECH_IME || \
     AXIS4_ENCODER == KTECH_IME || AXIS5_ENCODER == KTECH_IME || AXIS6_ENCODER == KTECH_IME || \
@@ -21,12 +20,13 @@ class KTechIME : public Encoder {
     bool init();
 
     int32_t read();
-    void write(int32_t count);
-
-    void requestPosition();
-    void updatePositionCallback(uint8_t data[8]);
+    void write(int32_t position);
 
     bool supportsTimeAlignedMotorSteps() const { return true; }
+    void updatePositionCallback(uint8_t data[8]);
+    void updateVelocityCallback(uint8_t data[8]);
+
+    void requestPosition();
 
   private:
     int16_t axis_index = 0;
@@ -40,6 +40,9 @@ class KTechIME : public Encoder {
     volatile long countTurns = 0;
 
     volatile long motorStepsAtLastUpdate = 0;
+
+    uint32_t lastUpdateByPositionCommand = 0;
+    uint32_t lastUpdateByVelocityCommand = 0;
 };
 
 #endif

@@ -3,6 +3,82 @@
 
 #include "../../Common.h"
 
+#include <stdint.h>
+
+// --------------------------------------------------------------------------------------------------------
+
+#ifndef ENCODER_VELOCITY
+  #define ENCODER_VELOCITY OFF
+#endif
+
+#if ENCODER_VELOCITY == ON
+
+  // ENCODER_VEL_WINDOW_US:
+  //   Window length for dc/dt estimate (microseconds). Smaller = more responsive/noisier
+  //   larger = smoother/more lag. Typical: 5000–20000 us for 100–1000 Hz control loops
+  #ifndef ENCODER_VEL_WINDOW_US
+    #define ENCODER_VEL_WINDOW_US 10000UL  // default 10ms (10000UL)
+  #endif
+
+  // ENCODER_VEL_STOP_US:
+  //   If no new edges/deltas occur for this long, velocity is forced to 0
+  //   If velocity drops to 0 at very slow tracking/creep speeds, increase this
+  //   Typical: 300000 us (0.3s) up to 2000000 us (2s) for very low counts/sec systems
+  #ifndef ENCODER_VEL_STOP_US
+    #define ENCODER_VEL_STOP_US 300000UL  // 0.3s (300000UL)
+  #endif
+
+  // ENCODER_VEL_BLEND_COUNTS:
+  //   Blend point between period (t/d) and windowed (d/t) estimates
+  //   Larger values favor period estimate longer (better at low counts/sec)
+  //   Typical: 4–12 counts
+  #ifndef ENCODER_VEL_BLEND_COUNTS
+    #define ENCODER_VEL_BLEND_COUNTS 4.0F // 4 counts (4.0F)
+  #endif
+
+  // --------------------------------------------------------------------------
+  // An example for very low count systems (copy/paste into your Config.h to override):
+  //
+  //   #define ENCODER_VEL_WINDOW_US      20000UL   // 20ms smoother
+  //   #define ENCODER_VEL_STOP_US      1000000UL   // 1.0s avoid false “stops”
+  //   #define ENCODER_VEL_BLEND_COUNTS     8.0F    // rely on period estimate longer
+  // --------------------------------------------------------------------------
+
+#endif
+
+// ENCODER_ERROR_COUNT_THRESHOLD:
+// allow up to 20 errors per minute before throwing a fault
+#ifndef ENCODER_ERROR_COUNT_THRESHOLD
+  #define ENCODER_ERROR_COUNT_THRESHOLD 20 // 20 errors (20)
+#endif
+
+// OFF is disabled, ON disregards unexpected quadrature encoder signals, or 
+// a value > 0 (nanoseconds) disregards repeat signal events for that timer period
+#ifndef ENCODER_FILTER
+  #define ENCODER_FILTER OFF
+#endif
+
+// these should allow time for an encoder signal to stabalize
+#if ENCODER_FILTER > 0
+  // once a signal state changes don't allow the ISR to run again for ENCODER_FILTER nanoseconds
+  #define ENCODER_FILTER_UNTIL() do {                                   \
+    const uint32_t _msNow = (uint32_t)msNow;                            \
+    if ((int32_t)(_msNow - ticksInvalidMillis) >= 0) { ticksNext = 0; } \
+    const uint32_t _ticksNow = HAL_FAST_TICKS();                        \
+    if (ticksNext && (int32_t)(_ticksNow - ticksNext) < 0) return;      \
+    ticksNext = _ticksNow + ticksToWait;                                \
+    ticksInvalidMillis = _msNow + 2000U;                                \
+  } while (0)
+#endif
+
+// signal mode for pulse and cw/ccw encoders, default RISING or CHANGE or FALLING
+// quadrature encoders ignore this and use CHANGE
+#ifndef ENCODER_SIGNAL_MODE
+  #define ENCODER_SIGNAL_MODE RISING
+#endif
+
+// --------------------------------------------------------------------------------------------------------
+
 #ifndef AXIS1_ENCODER
   #define AXIS1_ENCODER OFF
 #endif
@@ -51,58 +127,17 @@
   #define HAS_BISS_C
 #endif
 
-// allow up to 20 errors per minute
-#ifndef ENCODER_ERROR_COUNT_THRESHOLD
-  #define ENCODER_ERROR_COUNT_THRESHOLD 20
-#endif
-
-// the time window within which encoder counts are converted to velocity
-// in 250ms units so a value of 4 (the defualt) is one second
-// too short a window and the velocity will be inaccurate
-// too long a window and the velocity will be unresponsive
-// this is used for the servo velocity control loop and very high resolution encoders
-#ifndef ENCODER_VELOCITY_WINDOW
-  #define ENCODER_VELOCITY_WINDOW 4
-#endif
-
-// OFF is disabled, ON disregards unexpected quadrature encoder signals, or 
-// a value > 0 (nanoseconds) disregards repeat signal events for that timer period
-#ifndef ENCODER_FILTER
-  #define ENCODER_FILTER OFF
-#endif
-
-// these should allow time for an encoder signal to stabalize
-#if ENCODER_FILTER > 0
-  // once a signal state changes don't allow the ISR to run again for ENCODER_FILTER nanoseconds
-  // it would be even better to create a low-res millis counter outside of this routine and just access the variable here
-  #define ENCODER_FILTER_UNTIL(n) \
-    const unsigned long nsNow = nanoseconds(); \
-    if ((long)(msNow - nsInvalidMillis) < 0 && (long)(nsNow - nsNext < 0) return; \
-    nsNext = nsNow + n; \
-    nsInvalidMillis = msNow + 1000;
-
-  // or, a less optimal alternative when a reasonably functional delayNanoseconds() is available...
-  // once a signal state changes wait in the ISR for ENCODER_FILTER nanoseconds to let the signal stabalize
-  // #define ENCODER_FILTER_UNTIL(n) delayNanoseconds(n);
-#endif
-
-// signal mode for pulse and cw/ccw encoders, default CHANGE or RISING or FALLING
-// quadrature encoders
-#ifndef ENCODER_SIGNAL_MODE
-  #define ENCODER_SIGNAL_MODE CHANGE
-#endif
-
 #if AXIS1_ENCODER != OFF || AXIS2_ENCODER != OFF || AXIS3_ENCODER != OFF || \
     AXIS4_ENCODER != OFF || AXIS5_ENCODER != OFF || AXIS6_ENCODER != OFF || \
     AXIS7_ENCODER != OFF || AXIS8_ENCODER != OFF || AXIS9_ENCODER != OFF
-    
+
 class Encoder {
   public:
     // get device ready for use
     virtual bool init();
 
     // set encoder origin
-    virtual void setOrigin(uint32_t count);
+    virtual void setOrigin(int32_t counts) { origin = counts; }
 
     // get current position
     virtual int32_t read() { return 0; }
@@ -112,6 +147,9 @@ class Encoder {
 
     // set the virtual encoder velocity in counts per second
     virtual void setVelocity(float countsPerSec) { UNUSED(countsPerSec); }
+
+    // fast, control-grade velocity
+    virtual float readVelocityCps();
 
     // set the virtual encoder direction (-1 is reverse, 1 is forward)
     virtual void setDirection(volatile int8_t *direction) { UNUSED(direction); }
@@ -143,9 +181,6 @@ class Encoder {
     // raw origin as last set (for absolute encoders)
     uint32_t origin = 0;
 
-    // encoder velocity in counts per second
-    float velocity = 0.0F;
-
     // for encoders with slow readout, available before init()/ready()/hardware detection
     virtual bool supportsTimeAlignedMotorSteps() const { return false; }
     inline bool hasMotorStepsAtLastRead() const { return hasMotorStepsAtLastReadValue; }
@@ -153,12 +188,74 @@ class Encoder {
     inline void setMotorStepsPtr(volatile long* p) { motorStepsPtr = p; }
 
   protected:
+    #if ENCODER_VELOCITY == ON
+      inline void IRAM_ATTR velNoteEdge(int8_t dir) {
+        const uint32_t now = HAL_FAST_TICKS();
+        const uint32_t prev = velLastEdgeTicks;
+        velLastEdgeTicks = now;
+        velLastDir = dir;
+        if (prev != 0) velLastPeriodTicks = now - prev;
+      }
+
+      inline void velNoteDelta(int32_t dc, uint32_t dtUs) {
+        if (dc == 0 || dtUs == 0) return;
+
+        const uint32_t nowTicks = HAL_FAST_TICKS();
+        const uint32_t tps = velTicksPerSec;
+        const uint32_t absdc = (dc > 0) ? (uint32_t)dc : (uint32_t)(-dc);
+
+        uint64_t dtTicks = (uint64_t)dtUs * (uint64_t)tps;
+        dtTicks = (dtTicks + 500000ULL) / 1000000ULL;
+
+        uint32_t perTicks = (uint32_t)((dtTicks + (absdc/2)) / absdc);
+        if (perTicks == 0) perTicks = 1;
+
+        noInterrupts();
+        velLastEdgeTicks   = nowTicks;
+        velLastPeriodTicks = perTicks;
+        velLastDir         = (dc > 0) ? 1 : -1;
+        interrupts();
+      }
+
+      // Feed velocity estimator from sampled count reads (for devices without edge ISR info)
+      // Note: pass raw encoder count (pre-index) to avoid velocity spikes on write()/index changes
+      inline void velNoteSampledCount(int32_t rawCount) {
+        const uint32_t nowUs = micros();
+
+        if (!velSampleInit) {
+          velSampleInit = true;
+          velSampleLastCount = rawCount;
+          velSampleLastUs  = nowUs;
+          return;
+        }
+
+        const uint32_t dtUs = nowUs - velSampleLastUs;
+        const int32_t  dc   = rawCount - velSampleLastCount;
+
+        velSampleLastCount = rawCount;
+        velSampleLastUs  = nowUs;
+
+        if (dc != 0 && dtUs != 0) velNoteDelta(dc, dtUs);
+      }
+
+      bool     velHasEstimate     = false;
+      bool     velSampleInit      = false;
+      int32_t  velSampleLastCount = 0;
+      uint32_t velSampleLastUs    = 0;
+      uint32_t velStopTicks       = 0;
+
+      volatile uint32_t velLastEdgeTicks   = 0;
+      volatile uint32_t velLastPeriodTicks = 0;
+      volatile int8_t   velLastDir         = 0;
+      uint32_t          velTicksPerSec     = 1000000UL;
+
+      int32_t  velWinLastCount = 0;
+      uint32_t velWinLastUs    = 0;
+      float    velBlendCps     = 0.0F;
+    #endif
+
     // axis number from 1 to 9
     int16_t axis = 0;
-
-    // keep track of velocity
-    int32_t lastCount = 0;
-    unsigned long lastVelocityCheckTimeMs = 0;
 
     // accumulator for warning detection
     volatile uint32_t warn = 0;
@@ -177,9 +274,10 @@ class Encoder {
 
     #if ENCODER_FILTER > 0
       // approximate time keeping for filtering
-      volatile unsigned long msNow = 0;
-      volatile unsigned long nsNext = 0;
-      volatile unsigned long nsInvalidMillis = 0;
+      volatile uint32_t msNow = 0;
+      volatile uint32_t ticksNext = 0;
+      volatile uint32_t ticksToWait = 0;
+      volatile uint32_t ticksInvalidMillis = 0;
     #endif
 
     // for encoders with slow readout

@@ -31,6 +31,11 @@ int32_t SerialBridge::read() {
   const unsigned long now = millis();
   if (now - lastReadMillis > 10U) {
     count = getCount();
+
+    #if ENCODER_VELOCITY == ON
+      velNoteSampledCount(count);
+    #endif
+
     lastReadMillis = now;
   }
 

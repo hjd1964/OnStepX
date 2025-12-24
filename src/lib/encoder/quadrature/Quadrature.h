@@ -8,7 +8,7 @@
     AXIS7_ENCODER == AB || AXIS8_ENCODER == AB || AXIS9_ENCODER == AB
 
 // for example:
-// Quadrature encoder1(AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN, 1);
+// Quadrature encoder1(1, AXIS1_ENCODER_A_PIN, AXIS1_ENCODER_B_PIN);
 
 // Phase 1: LLHH LLHH
 // Phase 2: LHHL LHHL
@@ -37,15 +37,13 @@ class Quadrature : public Encoder {
     bool init();
 
     int32_t read();
-    void write(int32_t count);
+    void write(int32_t position);
 
     void A(const int16_t pin);
     void B(const int16_t pin);
 
   private:
     int16_t axis_index;
-
-    volatile int32_t quadratureCount = 0;
 
     int16_t APin = OFF;
     int16_t BPin = OFF;
@@ -56,5 +54,6 @@ class Quadrature : public Encoder {
     volatile int16_t lastB;
     volatile int16_t dir;
 };
+
 
 #endif
