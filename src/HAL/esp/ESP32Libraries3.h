@@ -75,7 +75,7 @@
 #endif
 #if SERIAL_BT_MODE == SLAVE
   #ifdef SERIAL_BT_PASSKEY
-    #define SERIAL_BT_BEGIN() if (strlen(SERIAL_BT_PASSKEY) != 0) SERIAL_BT.setPin(SERIAL_BT_PASSKEY); SERIAL_BT.begin(SERIAL_BT_NAME)
+    #define SERIAL_BT_BEGIN() if (strlen(SERIAL_BT_PASSKEY) != 0) SERIAL_BT.setPin(SERIAL_BT_PASSKEY, strlen(SERIAL_BT_PASSKEY)); SERIAL_BT.begin(SERIAL_BT_NAME)
   #else
     #define SERIAL_BT_BEGIN() SERIAL_BT.begin(SERIAL_BT_NAME)
   #endif
