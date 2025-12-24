@@ -87,8 +87,6 @@ void setup() {
     PIN_INIT();
   #endif
 
-  analog.begin();
-
   // say hello
   VLF("");
   VF("MSG: OnStepX, version "); V(FirmwareVersionMajor); V("."); V(FirmwareVersionMinor); VL(FirmwareVersionPatch);
@@ -99,6 +97,8 @@ void setup() {
   VLF("MSG: System, HAL initialize");
   HAL_INIT();
   WIRE_INIT();
+
+  analog.begin();
 
   if (!nv.init()) {
     DLF("ERR: Setup, NV (EEPROM/FRAM/Flash/etc.) device not found!");
