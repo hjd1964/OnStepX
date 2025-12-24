@@ -220,6 +220,7 @@ void Task::setPeriod(unsigned long period, PeriodUnits units) {
       this->period = period;
       period_units = units;
       next_period_units = PU_NONE;
+      if (period_units == PU_MICROS) next_task_time = micros() + period; else next_task_time = millis() + period;
     } else {
       idle = false;
       next_period = period;
