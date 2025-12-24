@@ -8,6 +8,20 @@
 
 #include "../guide/Guide.h"
 
+// Limit defaults
+#ifndef LIMIT_HORIZON
+#define LIMIT_HORIZON -10.0F
+#endif
+#ifndef LIMIT_OVERHEAD
+#define LIMIT_OVERHEAD 80.0F
+#endif
+#ifndef LIMIT_MERIDIAN_EAST
+#define LIMIT_MERIDIAN_EAST 15.0F
+#endif
+#ifndef LIMIT_MERIDIAN_WEST
+#define LIMIT_MERIDIAN_WEST 15.0F
+#endif
+
 #pragma pack(1)
 typedef struct AltitudeLimits {
   float min;
@@ -77,7 +91,7 @@ class Limits {
 
     void poll();
 
-    LimitSettings settings = { { degToRadF(-10.0F), degToRadF(80.0F) }, degToRadF(15.0F), degToRadF(15.0F) };
+    LimitSettings settings = { { degToRadF(LIMIT_HORIZON), degToRadF(LIMIT_OVERHEAD) }, degToRadF(LIMIT_MERIDIAN_EAST), degToRadF(LIMIT_MERIDIAN_WEST) };
 
   private:
     void stop();
