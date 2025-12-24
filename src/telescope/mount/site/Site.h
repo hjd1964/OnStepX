@@ -11,6 +11,10 @@
 #include "../../../lib/calendars/Calendars.h"
 #include "../../../lib/tls/Tls.h"
 
+#ifndef SITE_MIN_PPS_SUB_MICRO
+  #define SITE_MIN_PPS_SUB_MICRO 4
+#endif
+
 extern volatile unsigned long fracLAST;
 
 typedef struct LatitudeExtras {

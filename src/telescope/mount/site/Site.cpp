@@ -113,7 +113,7 @@ IRAM_ATTR void clockTickWrapper() { fracLAST++; }
     // DF("MSG: Site,"); D(syncc); DF("sub-micro delta="); D((long)pps.averageSubMicros - 16000000L); DF("us, pps="); D(p/1000L); DF("ms, time.sec="); D(s/1000L); DF("ms, delta="); D(delta/1000); DLF("ms");
 
     if (abs(deltaAvg) < 3000L) return;
-    pps.averageSubMicrosSkew = (-deltaAvg*HAL_MIN_PPS_SUB_MICRO)/2000L;
+    pps.averageSubMicrosSkew = (-deltaAvg*SITE_MIN_PPS_SUB_MICRO)/2000L;
     if (pps.averageSubMicrosSkew < -128) pps.averageSubMicrosSkew = -128; else
     if (pps.averageSubMicrosSkew > 128) pps.averageSubMicrosSkew = 128;
   }
