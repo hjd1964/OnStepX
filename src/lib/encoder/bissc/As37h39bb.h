@@ -11,8 +11,6 @@
       As37h39bb(int16_t axis, int16_t maPin, int16_t sloPin);
 
     private:
-      // get encoder count relative to origin
-      bool getCount(uint32_t &count);
 
       // BiSS-C 6-bit CRC of 41 bit data (16 multi-turn + 23 position + 2 err/wrn)
       uint8_t crc6(uint64_t data);

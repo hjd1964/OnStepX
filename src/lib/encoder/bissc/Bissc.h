@@ -17,6 +17,19 @@
     #define BISSC_SINGLE_TURN ON
   #endif
 
+  // default sync phase
+  #ifndef BISSC_SYNC_PHASE
+    #define BISSC_SYNC_PHASE 20
+  #endif
+
+  // default ack phase
+  #ifndef BISSC_ACK_PHASE
+    #define BISSC_ACK_PHASE 20
+  #endif
+
+  // resolution adjustment use 2, 4, or 8 (example:)
+  //#define BISSC_RESOLUTION_DIVISOR 4
+
   // allow for inverting the signal state to fix incorrect wiring if needed
   #ifndef HIGH_SLO
   #define HIGH_SLO HIGH
@@ -37,7 +50,7 @@
       bool init();
 
       // set encoder origin
-      void setOrigin(uint32_t count);
+      void setOrigin(int32_t counts);
 
       // read encoder position
       int32_t read();
@@ -48,20 +61,50 @@
     protected:
       // read encoder count with 1 second error recovery
       // returns encoder count or INT32_MAX on error
-      uint32_t getCountWithErrorRecovery(bool immediate = false);
+      int32_t getCountWithErrorRecovery(bool immediate = false);
 
       // read encoder count
-      virtual bool getCount(uint32_t &count);
+      bool getCount(uint32_t &count);
+
+      // low level bitbang read encoder count
+      IRAM_ATTR void getCountBitBang(uint32_t &count);
+
+      // the custom crc routine
+      virtual uint8_t crc6(uint64_t data) = 0;
+
+      bool foundAck = false;
+      bool foundStart = false;
+      bool foundCds = false;
+
+      uint8_t  nErr = 1;
+      uint8_t  nWrn = 1;
+      uint8_t  frameCrc = 0;
+
+      uint32_t turns = 0;
+
+      // this design allows for 8 to 31 bit encoders
+      char encoderName[16] = {0};
+      uint8_t encoderBits = 0;
+      uint32_t encoderCounts = 0;
+      int32_t encoderHalfCounts = 0;
+      uint8_t encoderMultiTurnBits = 0;
+      uint32_t encoderMultiTurnMask = 0;
+      bool encoderWrnInvert = true;
+      bool encoderErrInvert = true;
 
       uint32_t good = 0;
       uint32_t bad = 0;
       uint16_t nvAddress = 0;
 
+      // bit delay in nanoseconds
+      const uint32_t rate = 500000/BISSC_CLOCK_RATE_KHZ;
+      const uint32_t tSample = (500000/BISSC_CLOCK_RATE_KHZ) >> 2;
+
       int16_t maPin;
       int16_t sloPin;
 
       uint32_t lastValidTime = 0;
-      uint32_t lastValidCount = 0;
+      int32_t lastValidCount = 0;
   };
 
 #endif
