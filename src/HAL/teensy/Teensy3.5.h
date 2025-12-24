@@ -60,7 +60,9 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
+
 #define HAL_INIT() { \
+  HAL_FAST_TICKS_INIT(); \
 }
 
 #define HAL_RESET() { \
@@ -70,6 +72,3 @@
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
-
-// a really short fixed delay (none needed)
-#define HAL_DELAY_25NS()

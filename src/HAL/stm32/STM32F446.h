@@ -84,9 +84,3 @@
 
 // MCU reset
 #define HAL_RESET() NVIC_SystemReset()
-
-// a really short fixed delay (none needed)
-#define HAL_DELAY_25NS()
-
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))

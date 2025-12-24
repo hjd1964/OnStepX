@@ -40,8 +40,8 @@
   } while (0)
 #endif
 
-// Track actual global resolution when platform only supports global reconfig.
-// Keeps behavior honest (no "virtual range trick").
+// track actual global resolution when platform only supports global reconfig.
+// keeps behavior honest (no "virtual range trick").
 static uint16_t gPwmBits = (uint16_t)BITS_FROM_RANGE(ANALOG_WRITE_RANGE);
 static uint16_t gAdcBits = (uint16_t)BITS_FROM_RANGE(ANALOG_READ_RANGE);
 static volatile bool ready = false;
@@ -89,48 +89,46 @@ int AnalogClass::adcIndex(int16_t pin) const {
 // prepare global adc read resolution and global pwm write resolution/frequency
 void AnalogClass::begin() {
   if (ready) return;
-  ready = true;
+
+  VLF("MSG: Analog, begin");
 
   // ADC global default
   (void)gAdcBits;
   #if HAL_HAS_GLOBAL_ADC_RESOLUTION
     const uint16_t adcBits = (uint16_t)BITS_FROM_RANGE(ANALOG_READ_RANGE);
-    #ifdef analogReadResolution
-      analogReadResolution(adcBits);
-      gAdcBits = adcBits;
-    #endif
+    analogReadResolution(adcBits);
+    gAdcBits = adcBits;
   #endif
 
   // PWM global default (ONLY if your platform truly uses a global resolution)
   (void)gPwmBits;
   #if HAL_HAS_GLOBAL_PWM_RESOLUTION && !HAL_HAS_PER_PIN_PWM_RESOLUTION
-    #ifdef analogWriteResolution
-      const uint16_t pwmBits = (uint16_t)BITS_FROM_RANGE(ANALOG_WRITE_RANGE);
-      analogWriteResolution(pwmBits);
-      gPwmBits = pwmBits;
-    #endif
+    const uint16_t pwmBits = (uint16_t)BITS_FROM_RANGE(ANALOG_WRITE_RANGE);
+    analogWriteResolution(pwmBits);
+    gPwmBits = pwmBits;
+    VF("MSG: Analog, pwmInit global PWM resolution changed to bits="); VL(pwmBits);
   #endif
 
   // PWM global freq (again: only if global is real on that platform)
   #if defined(ANALOG_WRITE_FREQUENCY) && HAL_HAS_GLOBAL_PWM_FREQUENCY
-    #ifdef analogWriteFrequency
-      analogWriteFrequency(ANALOG_WRITE_FREQUENCY);
-    #endif
+    analogWriteFrequency(ANALOG_WRITE_FREQUENCY);
+    VF("MSG: Analog, pwmInit global PWM freq changed to hz="); VL(ANALOG_WRITE_FREQUENCY);
   #endif
 
-  VF("MSG: Analog begin"); VL("");
+  ready = true;
 }
 
 // ---------------- PWM ----------------
+
 bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    DF("ERR: Analog pwmInit invalid pin="); DL(pin);
+    DF("ERR: Analog, pwmInit invalid pin="); DL(pin);
     return false;
   }
 
   const int idx = pwmIndex(pin);
-  if (idx < 0) { DF("ERR: Analog pwmInit table full pin="); DL(pin); return false; }
+  if (idx < 0) { DF("ERR: Analog, pwmInit table full pin="); DL(pin); return false; }
   const uint32_t defRange = (uint32_t)ANALOG_WRITE_RANGE;
   uint16_t reqBits  = cfg.bits;
   uint32_t reqRange = cfg.range;
@@ -139,10 +137,11 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
   // if this is a T4.1 allow one extra custom PWM pin
   #ifdef HAS_CUSTOM_PIN
     if (pin == PWM_CUSTOM_PIN) {
+      pinMode(PWM_CUSTOM_PIN, OUTPUT);
       pwm_[idx].custom = true;
       itimer4.priority(0);
       itimer4.begin(PWM_CUSTOM_HWTIMER, 100);
-      VF("MSG: Analog emulating PWM using Teensy4.1 iTimer4 on pin"); VL(pin);
+      VF("MSG: Analog, pwmInit emulating PWM using Teensy4.1 iTimer4 on pin"); VL(pin);
       reqBits = BITS_FROM_RANGE(PWM_CUSTOM_ANALOG_WRITE_RANGE);
       reqRange = PWM_CUSTOM_ANALOG_WRITE_RANGE;
       reqHz = PWM_CUSTOM_ANALOG_WRITE_FREQUENCY;
@@ -151,15 +150,15 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
 
   if (!pwm_[idx].custom) {
 
-    // Derive bits from range if only range provided (range must be 2^n-1)
+    // derive bits from range if only range provided (range must be 2^n-1)
     if (reqBits == 0 && reqRange != 0) {
       if (reqRange == 0xFFFFFFFFu) {
-        DF("ERR: Analog pwmInit range wrap pin="); D(pin); DF(" range="); DL(reqRange);
+        DF("ERR: Analog, pwmInit range wrap pin="); D(pin); DF(" range="); DL(reqRange);
         return false;
       }
       uint32_t r = reqRange + 1;
       if ((r & (r - 1)) != 0) {
-        DF("ERR: Analog pwmInit range not 2^n-1 pin="); D(pin); DF(" range="); DL(reqRange);
+        DF("ERR: Analog, pwmInit range not 2^n-1 pin="); D(pin); DF(" range="); DL(reqRange);
         return false;
       }
       uint16_t b = 0;
@@ -167,112 +166,86 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
       reqBits = b;
     }
 
-    // Derive range from bits or default
+    // derive range from bits or default
     if (reqBits == 0 && reqRange == 0) {
       reqRange = defRange;
     } else if (reqRange == 0 && reqBits != 0) {
       reqRange = rangeFromBits(reqBits);
     }
 
-    // Bounds
+    // bounds
     if (reqBits) {
       if (reqBits < HAL_PWM_BITS_MIN || reqBits > HAL_PWM_BITS_MAX) {
-        DF("ERR: Analog pwmInit bits out of bounds pin="); D(pin);
+        DF("ERR: Analog, pwmInit bits out of bounds pin="); D(pin);
         DF(" bits="); D(reqBits); DF(" ("); D(HAL_PWM_BITS_MIN); DF(".."); D(HAL_PWM_BITS_MAX); DLF(")");
         return false;
       }
     }
     if (reqHz) {
       if (reqHz < HAL_PWM_HZ_MIN || reqHz > HAL_PWM_HZ_MAX) {
-        DF("ERR: Analog pwmInit hz out of bounds pin="); D(pin);
+        DF("ERR: Analog, pwmInit hz out of bounds pin="); D(pin);
         DF(" hz="); D(reqHz); DF(" ("); D(HAL_PWM_HZ_MIN); DF(".."); D(HAL_PWM_HZ_MAX); DLF(")");
         return false;
       }
     }
 
-    // --- APPLY (best-effort, but no silent global stomping unless allowed) ---
+    // --- APPLY (best-effort) ---
 
-    // warn ESP32 LEDC note: "per-pin resolutions/frequencies" can still affect other pins if the core
-    // maps channels to shared LEDC timers. This may interfere with tone() or other PWM users.
+    // warn generally the "per-pin resolutions/frequencies" can still affect other pins if the core
+    // maps channels to shared timers. This may interfere with tone() or other PWM users.
     static bool warned = false;
     (void)warned;
 
     // Frequency
     if (reqHz) {
-      if (HAL_HAS_PER_PIN_PWM_FREQUENCY) {
-        #ifdef analogWriteFrequency
-          analogWriteFrequency(p, reqHz);
-          #if defined(ESP32)
-            if (!warned) {
-              warned = true;
-              VLF("WRN: Adding new ESP32 LEDC PWM resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
-            }
-          #endif
-        #else
-          DF("ERR: Analog pwmInit analogWriteFrequency missing pin="); DL(pin);
-          return false;
-        #endif
-      } else if (HAL_HAS_GLOBAL_PWM_FREQUENCY) {
+      #if HAL_HAS_PER_PIN_PWM_FREQUENCY
+        analogWriteFrequency(p, reqHz);
+        if (!warned) {
+          warned = true;
+          VLF("WRN:Analog, adding new resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
+        }
+      #elif HAL_HAS_GLOBAL_PWM_FREQUENCY
         if (!HAL_ALLOW_GLOBAL_PWM_RECONFIG) {
-          DF("ERR: Analog pwmInit global PWM freq reconfig disallowed pin="); DL(pin);
+          DF("ERR: Analog, pwmInit global PWM freq reconfig disallowed pin="); DL(pin);
           return false;
         }
-        #ifdef analogWriteFrequency
-          // NOTE: some platforms treat this as per-pin anyway (e.g. Teensy)
-          analogWriteFrequency(p, reqHz);
-          VF("WRN: Analog pwmInit global PWM freq changed pin="); V(pin); VF(" hz="); VL(reqHz);
-        #else
-          DF("ERR: Analog pwmInit analogWriteFrequency missing pin="); DL(pin);
-          return false;
-        #endif
-      } else {
-        DF("ERR: Analog pwmInit no PWM frequency control pin="); DL(pin);
+        analogWriteFrequency(reqHz);
+        VF("WRN: Analog, pwmInit global PWM freq changed hz="); VL(reqHz);
+      #else
+        DF("ERR: Analog, pwmInit no PWM frequency control pin="); DL(pin);
         return false;
-      }
+      #endif
     }
 
-    // Resolution
+    // resolution
     if (reqBits) {
-      if (HAL_HAS_PER_PIN_PWM_RESOLUTION) {
-        #ifdef analogWriteResolution
-          analogWriteResolution(p, reqBits);
-          #if defined(ESP32)
-            if (!warned) {
-              warned = true;
-              VLF("WRN: Adding new ESP32 LEDC PWM resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
-            }
-          #endif
-        #else
-          DF("ERR: Analog pwmInit analogWriteResolution missing pin="); DL(pin);
-          return false;
-        #endif
-      } else if (HAL_HAS_GLOBAL_PWM_RESOLUTION) {
+      #if HAL_HAS_PER_PIN_PWM_RESOLUTION
+        analogWriteResolution(p, reqBits);
+        if (!warned) {
+          warned = true;
+          VLF("WRN: Analog, adding new resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
+        }
+      #elif HAL_HAS_GLOBAL_PWM_RESOLUTION
         if (!HAL_ALLOW_GLOBAL_PWM_RECONFIG) {
-          DF("ERR: Analog pwmInit global PWM resolution reconfig disallowed pin="); DL(pin);
+          DF("ERR: Analog, pwmInit global PWM resolution reconfig disallowed pin="); DL(pin);
           return false;
         }
-        #ifdef analogWriteResolution
-          analogWriteResolution(reqBits);
-          gPwmBits = reqBits; // reflect actual global state
-          VF("WRN: Analog pwmInit global PWM bits set bits="); VL(reqBits);
-        #else
-          DF("ERR: Analog pwmInit analogWriteResolution missing (global) pin="); DL(pin);
-          return false;
-        #endif
-      } else {
-        DF("ERR: Analog pwmInit no PWM resolution control pin="); DL(pin);
+        analogWriteResolution(reqBits);
+        gPwmBits = reqBits; // reflect actual global state
+        VF("WRN: Analog, pwmInit global PWM bits set bits="); VL(reqBits);
+      #else
+        DF("ERR: Analog, pwmInit no PWM resolution control pin="); DL(pin);
         return false;
-      }
-    }
+      #endif
+    } else reqBits = gPwmBits;
   }
 
-  // --- COMMIT ONLY ON SUCCESS ---
   pwm_[idx].pin   = pin;
   pwm_[idx].bits  = reqBits;
   pwm_[idx].hz    = reqHz;
   pwm_[idx].range = reqRange ? reqRange : defRange;
 
-  VF("MSG: Analog pwmInit ok pin="); V(pin);
+  VF("MSG: Analog, pwmInit ok pin="); V(pin);
   VF(" bits="); V(reqBits);
   VF(" hz="); V(reqHz);
   VF(" range="); VL(pwm_[idx].range);
@@ -295,7 +268,7 @@ AnalogPwmHandle AnalogClass::pwmInitHandle(int16_t pin, const AnalogPwmConfig& c
     return h;
   }
 
-  // Find the committed slot for this pin (no allocation now, should hit first loop)
+  // find the committed slot for this pin (no allocation now, should hit first loop)
   int idx = -1;
   for (int i = 0; i < MAX_TRACKED; i++) if (pwm_[i].pin == pin) { idx = i; break; }
   if (idx < 0 || idx > 0xFE) {
@@ -319,7 +292,7 @@ uint32_t AnalogClass::pwmRange(int16_t pin) const {
     }
   #endif
 
-  // If only global PWM resolution exists, report the true global range
+  // if only global PWM resolution exists, report the true global range
   #if HAL_HAS_GLOBAL_PWM_RESOLUTION && !HAL_HAS_PER_PIN_PWM_RESOLUTION
     return rangeFromBits(gPwmBits);
   #endif
@@ -466,7 +439,7 @@ bool AnalogClass::adcInit(int16_t pin, const AnalogAdcConfig& cfg) {
   uint16_t reqBits  = cfg.bits;
   uint32_t reqRange = cfg.range;
 
-  // Derive bits from range if needed (range must be 2^n-1)
+  // derive bits from range if needed (range must be 2^n-1)
   if (reqBits == 0 && reqRange != 0) {
     if (!IS_POW2_MINUS1(reqRange)) {
       DF("ERR: Analog adcInit range not 2^n-1 pin="); D(pin); DF(" range="); DL(reqRange);
@@ -475,57 +448,46 @@ bool AnalogClass::adcInit(int16_t pin, const AnalogAdcConfig& cfg) {
     reqBits = (uint16_t)BITS_FROM_RANGE(reqRange);
   }
 
-  // Derive range from bits or default
+  // derive range from bits or default
   if (reqBits == 0 && reqRange == 0) {
     reqRange = defRange;
   } else if (reqRange == 0 && reqBits != 0) {
     reqRange = rangeFromBits(reqBits);
   }
 
-  // Bounds
+  // bounds
   if (reqBits) {
     if (reqBits < HAL_ADC_BITS_MIN || reqBits > HAL_ADC_BITS_MAX) {
-      DF("ERR: Analog adcInit bits out of bounds pin="); D(pin);
+      DF("ERR: Analog, adcInit bits out of bounds pin="); D(pin);
       DF(" bits="); D(reqBits); DF(" ("); D(HAL_ADC_BITS_MIN); DF(".."); D(HAL_ADC_BITS_MAX); DLF(")");
       return false;
     }
   }
 
-  // Apply resolution only if allowed
+  // apply resolution only if allowed
   if (reqBits) {
-    if (HAL_HAS_PER_PIN_ADC_RESOLUTION) {
-      #ifdef analogReadResolution
-        analogReadResolution(p, reqBits);
-      #else
-        DF("ERR: Analog adcInit analogReadResolution missing (per-pin) pin="); DL(pin);
-        return false;
-      #endif
-    } else if (HAL_HAS_GLOBAL_ADC_RESOLUTION) {
+    #if HAL_HAS_PER_PIN_ADC_RESOLUTION
+      analogReadResolution(p, reqBits);
+    #elif HAL_HAS_GLOBAL_ADC_RESOLUTION
       if (!HAL_ALLOW_GLOBAL_ADC_RECONFIG) {
-        DF("ERR: Analog adcInit global ADC reconfig disallowed pin="); DL(pin);
+        DF("ERR: Analog, adcInit global ADC reconfig disallowed pin="); DL(pin);
         return false;
       }
-      #ifdef analogReadResolution
-        analogReadResolution(reqBits);
-        gAdcBits = reqBits; // reflect actual global state
-        VF("WRN: Analog adcInit global ADC bits set bits="); VL(reqBits);
-      #else
-        DF("ERR: Analog adcInit analogReadResolution missing (global) pin="); DL(pin);
-        return false;
-      #endif
-    } else {
-      DF("ERR: Analog adcInit no ADC resolution control pin="); DL(pin);
+      analogReadResolution(reqBits);
+      gAdcBits = reqBits; // reflect actual global state
+      VF("WRN: Analog, adcInit global ADC bits set bits="); VL(reqBits);
+    #else
+      DF("ERR: Analog, adcInit no ADC resolution control pin="); DL(pin);
       return false;
-    }
+    #endif
   }
 
-  // commit
   adc_[idx].pin        = pin;
   adc_[idx].bits       = reqBits;
   adc_[idx].range      = reqRange ? reqRange : defRange;
   adc_[idx].oversample = cfg.oversample ? cfg.oversample : 1;
 
-  VF("MSG: Analog adcInit ok pin="); V(pin);
+  VF("MSG: Analog, adcInit ok pin="); V(pin);
   VF(" bits="); V(reqBits);
   VF(" range="); V(adc_[idx].range);
   VF(" os="); VL(adc_[idx].oversample);
@@ -541,7 +503,7 @@ AnalogAdcHandle AnalogClass::adcInitHandle(int16_t pin, const AnalogAdcConfig& c
 
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    DF("ERR: Analog adcInitHandle invalid pin="); DL(pin);
+    DF("ERR: Analog, adcInitHandle invalid pin="); DL(pin);
     return h;
   }
   if (!adcInit(pin, cfg)) {
@@ -552,7 +514,7 @@ AnalogAdcHandle AnalogClass::adcInitHandle(int16_t pin, const AnalogAdcConfig& c
   int idx = -1;
   for (int i = 0; i < MAX_TRACKED; i++) if (adc_[i].pin == pin) { idx = i; break; }
   if (idx < 0 || idx > 0xFE) {
-    DF("ERR: Analog adcInitHandle slot not found pin="); DL(pin);
+    DF("ERR: Analog, adcInitHandle slot not found pin="); DL(pin);
     return h;
   }
 
@@ -580,7 +542,7 @@ uint32_t AnalogClass::adcRange(int16_t pin) const {
 uint32_t AnalogClass::read(int16_t pin) {
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    VF("WRN: Analog read invalid pin="); VL(pin);
+    VF("WRN: Analog, read invalid pin="); VL(pin);
     return 0;
   }
 
@@ -599,7 +561,7 @@ uint32_t AnalogClass::read(int16_t pin) {
 float AnalogClass::readf(int16_t pin) {
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    VF("WRN: Analog readf invalid pin="); VL(pin);
+    VF("WRN: Analog, readf invalid pin="); VL(pin);
     return 0.0f;
   }
   (void)p;
@@ -613,7 +575,7 @@ float AnalogClass::readf(int16_t pin) {
 float AnalogClass::readV(int16_t pin) {
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    VF("WRN: Analog readV invalid pin="); VL(pin);
+    VF("WRN: Analog, readV invalid pin="); VL(pin);
     return 0.0f;
   }
 
@@ -622,7 +584,7 @@ float AnalogClass::readV(int16_t pin) {
 #else
   const uint32_t r = adcRange(pin);
   if (r == 0) return 0.0F;
-  const int raw = analogRead(p);
+  const uint32_t raw = read(pin);
   return (float)raw * (HAL_VCC / (float)r);
 #endif
 }
@@ -630,7 +592,7 @@ float AnalogClass::readV(int16_t pin) {
 uint16_t AnalogClass::readQ16(int16_t pin) {
   uint8_t p;
   if (!toCorePin(pin, p)) {
-    VF("WRN: Analog readQ16 invalid pin="); VL(pin);
+    VF("WRN: Analog, readQ16 invalid pin="); VL(pin);
     return 0;
   }
   (void)p;

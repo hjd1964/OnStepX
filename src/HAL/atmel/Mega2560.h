@@ -52,6 +52,7 @@
 
 #define HAL_INIT() { \
   analogReference(DEFAULT); \
+  HAL_FAST_TICKS_INIT(); \
 }
 
 #define HAL_RESET() mega2560restart();
@@ -65,6 +66,3 @@
 // Misc. includes to support this processor's operation
 
 #define strtof strtod // there is no strtof defined for the AVR platform
-
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))

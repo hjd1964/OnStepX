@@ -56,10 +56,8 @@
 
 #define HAL_INIT() { \
   analogReference(DEFAULT); \
+  HAL_FAST_TICKS_INIT(); \
 }
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
-
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))

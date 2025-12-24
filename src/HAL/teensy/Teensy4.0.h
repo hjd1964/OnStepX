@@ -56,9 +56,9 @@
 
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
-#include "imxrt.h"
 
 #define HAL_INIT() { \
+  HAL_FAST_TICKS_INIT(); \
 }
 
 #define HAL_RESET() { \
@@ -75,9 +75,3 @@
 #define EmptyStr "\1"
 
 #define CAT_ATTR PROGMEM
-
-// a really short fixed delay
-#define HAL_DELAY_25NS() delayNanoseconds(20)
-
-// current nanoseconds, rolls over about every 4.3 seconds
-#define nanoseconds() ((unsigned long)((unsigned long long)(ARM_DWT_CYCCNT)*(1E9/F_CPU)))

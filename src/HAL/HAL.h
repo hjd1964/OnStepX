@@ -16,6 +16,21 @@
  */
 #pragma once
 
+// null decoration for non-ESP processors
+#ifndef IRAM_ATTR
+  #define IRAM_ATTR
+#endif
+
+#ifndef ICACHE_RAM_ATTR
+  #define ICACHE_RAM_ATTR
+#endif
+
+#ifndef FPSTR
+  #define FPSTR
+#endif
+
+#include "HAL_FAST_TICKS.h"
+
 #if defined(__AVR_ATmega328P__)
   #define MCU_STR "AtMega328"
   #include "atmel/Mega328.h"
@@ -150,111 +165,27 @@
   #include "default/Default.h"
 #endif
 
-// create null decoration for non-ESP processors
-#ifndef IRAM_ATTR
-  #define IRAM_ATTR
+#include "HAL_ANALOG.h"
+
+#ifndef HAL_INIT
+  #define HAL_INIT() do { HAL_FAST_TICKS_INIT(); } while (0)
 #endif
 
-#ifndef ICACHE_RAM_ATTR
-  #define ICACHE_RAM_ATTR
-#endif
-
-#ifndef FPSTR
-  #define FPSTR
-#endif
-
+// baseline critical task timing
 #ifdef HAL_FRACTIONAL_SEC
   #define FRACTIONAL_SEC  HAL_FRACTIONAL_SEC
 #else
   #define FRACTIONAL_SEC  100.0F
 #endif
 
-#ifndef HAL_MIN_PPS_SUB_MICRO
-  #define HAL_MIN_PPS_SUB_MICRO 4
-#endif
-
+// progmem standin for platforms that don't have it
 #ifndef CAT_ATTR
   #define CAT_ATTR
 #endif
 
+// default I2C interface
 #if defined(HAL_WIRE_CLOCK)
   #define HAL_WIRE_SET_CLOCK() HAL_WIRE.setClock(HAL_WIRE_CLOCK)
 #else
   #define HAL_WIRE_SET_CLOCK()
 #endif
-
-// ===== Analog HAL capabilities (defaults) =====
-
-// Defaults: no per-pin control, no global reconfig (safe)
-#ifndef HAL_HAS_PER_PIN_PWM_RESOLUTION
-  #define HAL_HAS_PER_PIN_PWM_RESOLUTION 0
-#endif
-#ifndef HAL_HAS_PER_PIN_PWM_FREQUENCY
-  #define HAL_HAS_PER_PIN_PWM_FREQUENCY 0
-#endif
-#ifndef HAL_HAS_GLOBAL_PWM_RESOLUTION
-  #define HAL_HAS_GLOBAL_PWM_RESOLUTION 0
-#endif
-#ifndef HAL_HAS_GLOBAL_PWM_FREQUENCY
-  #define HAL_HAS_GLOBAL_PWM_FREQUENCY 0
-#endif
-
-#ifndef HAL_HAS_PER_PIN_ADC_RESOLUTION
-  #define HAL_HAS_PER_PIN_ADC_RESOLUTION 0
-#endif
-#ifndef HAL_HAS_GLOBAL_ADC_RESOLUTION
-  #define HAL_HAS_GLOBAL_ADC_RESOLUTION 0
-#endif
-
-#ifndef HAL_ALLOW_GLOBAL_PWM_RECONFIG
-  #define HAL_ALLOW_GLOBAL_PWM_RECONFIG 0
-#endif
-#ifndef HAL_ALLOW_GLOBAL_ADC_RECONFIG
-  #define HAL_ALLOW_GLOBAL_ADC_RECONFIG 0
-#endif
-
-// Reasonable bounds (overridden per platform below)
-#ifndef HAL_PWM_BITS_MIN
-  #define HAL_PWM_BITS_MIN 1
-#endif
-#ifndef HAL_PWM_BITS_MAX
-  #define HAL_PWM_BITS_MAX 16
-#endif
-#ifndef HAL_ADC_BITS_MIN
-  #define HAL_ADC_BITS_MIN 1
-#endif
-#ifndef HAL_ADC_BITS_MAX
-  #define HAL_ADC_BITS_MAX 12
-#endif
-#ifndef HAL_PWM_HZ_MIN
-  #define HAL_PWM_HZ_MIN 1U
-#endif
-#ifndef HAL_PWM_HZ_MAX
-  #define HAL_PWM_HZ_MAX 40000U
-#endif
-#ifndef HAL_PWM_DEFAULT_HZ
-  #define HAL_PWM_DEFAULT_HZ 20000U
-#endif
-
-// Some validation
-#if HAL_PWM_BITS_MIN < 1 || HAL_PWM_BITS_MIN > 32
-  #error "Error: HAL_PWM_BITS_MIN outside of 1 to 32 range."
-#endif
-#if HAL_PWM_BITS_MAX < 1 || HAL_PWM_BITS_MAX > 32
-  #error "Error: HAL_PWM_BITS_MAX outside of 1 to 32 range."
-#endif
-#if HAL_ADC_BITS_MIN < 1 || HAL_ADC_BITS_MIN > 32
-  #error "Error: HAL_ADC_BITS_MIN outside of 1 to 32 range."
-#endif
-#if HAL_ADC_BITS_MAX < 1 || HAL_ADC_BITS_MAX > 32
-  #error "Error: HAL_ADC_BITS_MAX outside of 1 to 32 range."
-#endif
-
-// Global default ranges
-#ifndef ANALOG_READ_RANGE
-  #define ANALOG_READ_RANGE 1023U  // 2^n - 1
-#endif
-#ifndef ANALOG_WRITE_RANGE
-  #define ANALOG_WRITE_RANGE 25U   // 2^n - 1
-#endif
-

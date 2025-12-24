@@ -45,14 +45,8 @@
 //--------------------------------------------------------------------------------------------------
 // General purpose initialize for HAL
 
-#define HAL_INIT() { \
-}
-
 // MCU reset
 #define HAL_RESET() (*((volatile uint32_t*)(PPB_BASE + 0x0ED0C))) = 0x5FA0004;
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation
-
-// stand-in for delayNanoseconds()
-#define delayNanoseconds(ns) delayMicroseconds(ceilf(ns/1000.0F))

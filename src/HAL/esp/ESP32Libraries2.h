@@ -18,18 +18,24 @@
   #define ANALOG_WRITE_RANGE 255 // always use 2^n - 1, within the platform's limits
 #endif
 
-// ESP32 (original ESP32): use LEDC -> per-pin bits+freq are real.
-#define HAL_HAS_PER_PIN_PWM_RESOLUTION 1
-#define HAL_HAS_PER_PIN_PWM_FREQUENCY 1
+// analog read/write capabilities
+#define HAL_HAS_PER_PIN_PWM_RESOLUTION 0
+#define HAL_HAS_PER_PIN_PWM_FREQUENCY 0
+#define HAL_HAS_GLOBAL_PWM_RESOLUTION 1
+#define HAL_HAS_GLOBAL_PWM_FREQUENCY 1
+#define HAL_PWM_HZ_MAX 200000U
 
-// ADC: treat as fixed-ish (don’t pretend per-pin ADC bits exist)
-#define HAL_HAS_GLOBAL_ADC_RESOLUTION 0
+#define HAL_HAS_GLOBAL_ADC_RESOLUTION 1
 
 #define HAL_PWM_BITS_MAX 16
-#define HAL_ADC_BITS_MAX 12   // classic ESP32 ADC width
+#define HAL_ADC_BITS_MAX 12
 
 // Lower limit (fastest) step rate in us for this platform (in SQW mode) and width of step pulse
-#define HAL_MAXRATE_LOWER_LIMIT 40
+#if CAN_PLUS != OFF
+  #define HAL_MAXRATE_LOWER_LIMIT 60
+#else
+  #define HAL_MAXRATE_LOWER_LIMIT 40
+#endif
 #define HAL_PULSE_WIDTH 300 // in ns, measured 12/5/25 (ESP32 v2.0.17)
 
 // New symbol for the default I2C port -------------------------------------------------------------
@@ -75,34 +81,16 @@
   #define SERIAL_BT_BEGIN()
 #endif
 
-#ifdef ANALOG_WRITE_FREQUENCY
-  #define HAL_INIT() { \
-    SERIAL_BT_BEGIN(); \
-  }
-#else
-  #define HAL_INIT() { \
-    SERIAL_BT_BEGIN(); \
-  }
-#endif
+//--------------------------------------------------------------------------------------------------
+// General purpose initialize for HAL
 
-//---------------------------------------------------------------------------------------------------
-// Misc. includes to support this processor's operation
+#define HAL_INIT() { \
+  SERIAL_BT_BEGIN(); \
+  HAL_FAST_TICKS_INIT(); \
+}
 
 // MCU reset
 #define HAL_RESET() ESP.restart()
 
-// a really short fixed delay (none needed)
-#define HAL_DELAY_25NS()
-
-#ifdef CONFIG_IDF_TARGET_ESP32C3
-  // stand-in for delayNanoseconds(), assumes 80MHz clock
-  #define delayNanoseconds(ns) { unsigned int c = ESP.getCycleCount() + ns/12.5F; do {} while ((int)(ESP.getCycleCount() - c) < 0); }
-  // current nanoseconds, rolls over about every 4.3 seconds
-  #define nanoseconds() ((unsigned long)((unsigned long long)(ESP.getCycleCount())*13))
-#else
-  // stand-in for delayNanoseconds(), assumes 240MHz clock
-  #include "xtensa/core-macros.h"
-  #define delayNanoseconds(ns) { unsigned int c = xthal_get_ccount() + ns/4.166F; do {} while ((int)(xthal_get_ccount() - c) < 0); }
-  // current nanoseconds, rolls over about every 4.3 seconds
-  #define nanoseconds() ((unsigned long)((unsigned long long)(xthal_get_ccount())*4))
-#endif
+//---------------------------------------------------------------------------------------------------
+// Misc. includes to support this processor's operation
