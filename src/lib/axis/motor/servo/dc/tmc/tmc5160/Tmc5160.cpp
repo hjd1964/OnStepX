@@ -73,19 +73,13 @@ void ServoTmc5160DC::enable(bool state) {
   ServoDriver::updateStatus();
 }
 
-// motor control pwm update
-// \param power in 0.0 to 1.0 units
-void ServoTmc5160DC::pwmUpdate(float duty01) {
-  clamp01(duty01);
+void ServoTmc5160DC::pwmUpdate(float power01) {
 
-  // signed 9-bit value: -255..+255 (avoid -256)
-  int32_t mag = (int32_t)lroundf(duty01 * 255.0F);
-  if (mag > 255) mag = 255;
-
-  int32_t power = 0;
-  if (motorDirection == (reversed ? DIR_REVERSE : DIR_FORWARD)) power = mag;
-  else if (motorDirection == (reversed ? DIR_FORWARD : DIR_REVERSE)) power = -mag;
-  else power = 0;
+  // signed 9-bit value: -255..+255
+  int32_t power = (int32_t)lroundf(power01 * 255.0F);
+  if (power > 255) power = 255; else
+  if (power < -255) power = -255;
+  if (reversed) power = -power;
 
   driver->XTARGET((uint32_t)(power & 0x1FF)); // 9-bit two's complement
 }

@@ -26,17 +26,30 @@ AxisParameter* Motor::getParameterByName(const char* name) {
 
 // check if parameter is valid
 bool Motor::parameterIsValid(AxisParameter* parameter, bool next) {
-  float value;
-  if (next) value = parameter->valueNv; else value = parameter->value;
-  if (value < parameter->min) return false;
-  if (value > parameter->max) return false;
+  const float value = next ? parameter->valueNv : parameter->value;
+
+  if (isnan(value) || isinf(value)) return false;
+
+  // reject nonsense bounds
+  const float pmin = parameter->min;
+  const float pmax = parameter->max;
+  if (isnan(pmin) || isnan(pmax) || isinf(pmin) || isinf(pmax) || (pmax < pmin)) return false;
+
+  if (value < pmin) return false;
+  if (value > pmax) return false;
+
   if (parameter->type == AXP_POW2) {
-    if (value != 1.0F && value != 2.0F && value != 4.0F &&
-        value != 8.0F && value != 16.0F && value != 32.0F &&
-        value != 64.0F && value != 128.0F && value != 256.0F) {
-      return false;
-    }
+    static constexpr float kIntEps = 1E-3F;
+
+    // Value must be effectively integral
+    const float vf = value;
+    const int32_t vi = (int32_t)lroundf(vf);
+    if (fabsf(vf - (float)vi) > kIntEps) return false;
+
+    if (vi < 1 || vi > 256) return false;
+    if ((vi & (vi - 1)) != 0) return false; // power of two check
   }
+
   return true;
 }
 

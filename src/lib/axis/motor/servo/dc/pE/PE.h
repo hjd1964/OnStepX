@@ -31,8 +31,8 @@ class ServoPE : public ServoDcDriver {
 
   private:
     // motor control pwm update
-    // \param power in analog write range units
-    void pwmUpdate(float duty01) override;
+    // \param power01 -1.0 to 1.0
+    void pwmUpdate(float power01) override;
 
     inline float off2() { return (Pins->ph2State == HIGH) ? 1.0F : 0.0F; }
 };

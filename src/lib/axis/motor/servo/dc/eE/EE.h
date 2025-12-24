@@ -9,7 +9,7 @@
 
 #include "../DcServoDriver.h"
 
-class ServoEE : public DcServoDriver {
+class ServoEE : public ServoDcDriver {
   public:
     // constructor
     ServoEE(uint8_t axisNumber, const ServoPins *Pins, const ServoSettings *Settings, float pwmMinimum, float pwmMaximum);
@@ -31,8 +31,8 @@ class ServoEE : public DcServoDriver {
 
   private:
     // motor control pwm update
-    // \param power in SERVO_ANALOG_WRITE_RANGE units
-    void pwmUpdate(float duty01) override;
+    // \param power01 in -1.0 to 1.0 units
+    void pwmUpdate(float power01) override;
 
     inline float off1() { return (Pins->ph1State == HIGH) ? 1.0F : 0.0F; }
     inline float off2() { return (Pins->ph2State == HIGH) ? 1.0F : 0.0F; }

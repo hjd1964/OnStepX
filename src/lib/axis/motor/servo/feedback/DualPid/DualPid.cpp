@@ -43,6 +43,8 @@ void DualPid::init(uint8_t axisNumber, ServoControl *control) {
 
 // reset feedback control and parameters
 void DualPid::reset() {
+  if (!ready) return;
+
   VF("MSG:"); V(axisPrefix); VLF("reset");
   control->in = 0;
   control->set = 0;
@@ -52,10 +54,14 @@ void DualPid::reset() {
 }
 
 void DualPid::setControlDirection(int8_t state) {
+  if (!ready) return;
+
   if (state == ON) pid->SetControllerDirection(QuickPID::Action::reverse); else pid->SetControllerDirection(QuickPID::Action::direct);
 }
 
 void DualPid::setControlRange(float controlRange) {
+  if (!ready) return;
+
   VF("MSG:"); V(axisPrefix); VF("setting feedback range +/-"); VL(controlRange);
   pid->SetOutputLimits(-controlRange, controlRange);
 }

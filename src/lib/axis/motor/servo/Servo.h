@@ -81,12 +81,13 @@ class ServoMotor : public Motor {
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return 256; }
 
-    // sets overall maximum frequency
+    // sets overall maximum frequency (also allows for 10% over)
     // \param frequency: rate of motion in steps (counts) per second
     void setFrequencyMax(float frequency) {
       velocityMax = frequency;
-      driver->setFrequencyMax(frequency);
-      feedback->setControlRange(frequency);
+      if (velocityMax < 1.0F) velocityMax = 1.0F;
+      driver->setFrequencyMax(frequency*1.1F);
+      feedback->setControlRange(frequency*1.1F);
     }
 
     // get movement frequency in steps per second
@@ -149,11 +150,14 @@ class ServoMotor : public Motor {
     uint8_t taskHandle = 0;
 
     float maxFrequency = HAL_FRACTIONAL_SEC; // fastest timer rate
+    float maxFrequency2, maxFrequency4, maxFrequency8, maxFrequency16, maxFrequency32, maxFrequency64, maxFrequency128;
     bool useFastHardwareTimers = true;
 
     bool encoderReverse = false;
     bool encoderReverseDefault = false;
     volatile int8_t encoderDirection = 0;
+    int32_t lastEnc = 0;
+    uint32_t lastUs = 0;
 
     // for absolute encoders
     bool motorStepsInitDone = false;    // help determing when ready to set position

@@ -232,7 +232,7 @@ void ServoMotor::setFrequencySteps(float frequency) {
     if (frequency < maxFrequency*128) stepSize = 128; else stepSize = 256;
 
     // timer period in microseconds
-    float period = 1000000.0F / (frequency/stepSize);
+    float period = (1000000.0F*stepSize)/frequency;
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
@@ -321,6 +321,27 @@ void ServoMotor::poll() {
 
   long unfilteredEncoderCounts = encoderCounts;
   UNUSED(unfilteredEncoderCounts);
+
+  // find encoder velocity
+  float encoderVelocity = encoder->readVelocityCps();
+  if (encoderReverse) encoderVelocity = -encoderVelocity;
+  if (isnan(encoderVelocity)) {
+    const uint32_t nowUs = micros();
+
+    if (lastUs == 0) {
+      lastUs = nowUs;
+      lastEnc = unfilteredEncoderCounts;
+      encoderVelocity = 0.0F;
+    } else {
+      uint32_t dtUs = nowUs - lastUs;
+      if (dtUs == 0) dtUs = 1;
+      encoderVelocity = (unfilteredEncoderCounts - lastEnc)*(1000000.0F/(float)dtUs);
+      lastEnc = unfilteredEncoderCounts;
+      lastUs = nowUs;
+    }
+  }
+
+  // Eq mount tracking?
   bool isTracking = (axisNumber == 1) && (fabsf(currentFrequency - trackingFrequency) < trackingFrequency*0.1F);
 
   encoderCounts = filter->update(encoderCounts, motorCounts, isTracking);
@@ -335,7 +356,7 @@ void ServoMotor::poll() {
         // Get unfiltered counts
         calibrateVelocity->updateState(unfilteredEncoderCounts);
         // experimentVel is in PERCENT of max velocity, convert to cps
-        velocity = (calibrateVelocity->experimentVelocity / 100.0F) * velocityMax;
+        velocity = (calibrateVelocity->experimentVelocity/100.0F)*velocityMax;
         // disable the PID                        // or feedback->zeroOutputs()
         control->out = 0.0f;                      // ensure PID output doesn't leak in
       } else {
@@ -351,12 +372,15 @@ void ServoMotor::poll() {
 
   // for virtual encoders set the velocity and direction
   if (encoder->isVirtual) {
-    encoderDirection = velocity < 0.0F ? 1 : -1;
+    encoderDirection = velocity < 0.0F ? -1 : 1;
     encoder->setVelocity(abs(velocity));
     encoder->setDirection(&encoderDirection);
   }
 
-  velocityPercent = (driver->setMotorVelocity(velocity)/velocityMax) * 100.0F;
+//  const float vmax = velocityMax;
+//  v_eff = driver->setMotorVelocity(velocity, encoderVelocity)*100.0F;
+//  velocityPercent = (vmax > 0.0F) ? (v_eff/vmax)*100.0F : 0.0F;
+  velocityPercent = (driver->setMotorVelocity(velocity, encoderVelocity)/velocityMax)*100.0F;
   if (driver->getMotorDirection() == DIR_FORWARD) control->directionHint = 1; else control->directionHint = -1;
 
   const unsigned long now = millis();
@@ -464,6 +488,9 @@ void ServoMotor::resetToTrackingBaseline() {
   currentFrequency = 0.0F;
   currentDirection = 0;
   lastPeriod = 0;
+
+  lastEnc = 0;
+  lastUs = 0;
 }
 
 // sets dir as required and moves coord toward target at setFrequencySteps() rate

@@ -88,6 +88,7 @@ void ServoDriver::enable(bool state) {
 
 void ServoDriver::setFrequencyMax(float frequency) {
   velocityMax = frequency;
+  InvVelocityMax = 1.0F/frequency;
 
   normalizedAcceleration = (acceleration.value/100.0F)*velocityMax;
   accelerationFs = normalizedAcceleration/FRACTIONAL_SEC;

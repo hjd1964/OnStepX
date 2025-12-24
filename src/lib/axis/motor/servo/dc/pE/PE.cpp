@@ -73,19 +73,13 @@ void ServoPE::enable(bool state) {
   ServoDriver::updateStatus();
 }
 
-void ServoPE::pwmUpdate(float duty01) {
+void ServoPE::pwmUpdate(float power01) {
   if (!enabled) return;
-  clamp01(duty01);
 
-  if (motorDirection == (reversed ? DIR_REVERSE : DIR_FORWARD)) {
-    digitalWriteF(Pins->ph1, Pins->ph1State);
-  } else
-  if (motorDirection == (reversed ? DIR_FORWARD : DIR_REVERSE)) {
-    digitalWriteF(Pins->ph1, !Pins->ph1State);
-  } else {
-    digitalWriteF(Pins->ph1, Pins->ph1State);
-    duty01 = 0.0F;
-  }
+  if (reversed) power01 = -power01;
+  float duty01 = fabsf(power01);
+
+  digitalWriteF(Pins->ph1, power01 >= 0.0F ? Pins->ph1State : !Pins->ph1State);
 
   if (Pins->ph2State == HIGH) duty01 = 1.0F - duty01;
   analog.write(Pins->ph2, duty01);

@@ -65,23 +65,19 @@ void ServoEE::enable(bool state) {
   ServoDriver::updateStatus();
 }
 
-void ServoEE::pwmUpdate(float duty01) {
+void ServoEE::pwmUpdate(float power01) {
   if (!enabled) return;
-  clamp01(duty01);
 
-  if (motorDirection == (reversed ? DIR_REVERSE : DIR_FORWARD)) {
+  if (reversed) power01 = -power01;
+  float duty01 = fabsf(power01);
+
+  if (power01 >= 0.0F) {
+    if (Pins->ph2State == HIGH) duty01 = 1.0F - duty01;
     analog.write(Pins->ph1, off1());
-    float d = duty01;
-    if (Pins->ph2State == HIGH) d = 1.0F - d;
-    analog.write(Pins->ph2, d);
-  } else
-  if (motorDirection == (reversed ? DIR_FORWARD : DIR_REVERSE)) {
-    float d = duty01;
-    if (Pins->ph1State == HIGH) d = 1.0F - d;
-    analog.write(Pins->ph1, d);
-    analog.write(Pins->ph2, off2());
+    analog.write(Pins->ph2, duty01);
   } else {
-    analog.write(Pins->ph1, off1());
+    if (Pins->ph1State == HIGH) duty01 = 1.0F - duty01;
+    analog.write(Pins->ph1, duty01);
     analog.write(Pins->ph2, off2());
   }
 }

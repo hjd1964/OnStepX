@@ -52,15 +52,23 @@ class ServoDriver {
     // enable or disable the driver using the enable pin or other method
     virtual void enable(bool state);
 
-    // sets overall maximum frequency
+    // sets frequency corrosponding to the fastest allowed slew rate
     // \param frequency: rate of motion in steps (counts) per second
     void setFrequencyMax(float frequency);
 
     // set motor velocity
-    // \param velocity as needed to reach the target position, in encoder counts per second
-    // \returns velocity in effect, in encoder counts per second
+    // \param velocity as needed to reach the target position, in signed encoder counts per second
     virtual float setMotorVelocity(float velocity);
 
+    // set motor velocity
+    // \param velocity as needed to reach the target position, in signed encoder counts per second
+    // \param encoderVelocity in signed encoder counts per second
+    // \returns velocity in effect, in signed encoder counts per second
+    virtual float setMotorVelocity(float velocity, float encoderVelocity) {
+      UNUSED(encoderVelocity);
+      return setMotorVelocity(velocity);
+    }
+    
     // returns motor direction (DIR_FORWARD or DIR_REVERSE)
     Direction getMotorDirection() { return motorDirection; };
 
@@ -98,8 +106,9 @@ class ServoDriver {
 
     float normalizedAcceleration; // in encoder counts/s/s
     float accelerationFs;         // in encoder counts/s/fs
-    float velocityRamp = 0.0F;    // regulate velocity changes
-    float velocityMax = 0.0F;     // in encoder counts/s
+    float velocityRamp = 1.0F;    // regulate velocity changes
+    float velocityMax = 1.0F;     // frequency corrosponding to the fastest allowed slew rate, in encoder counts/s
+    float InvVelocityMax = 1.0F;
 
     Direction motorDirection = DIR_FORWARD;
     bool reversed = false;
