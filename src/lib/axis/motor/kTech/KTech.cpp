@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis ktech servo motor
+// axis ktech servo motor (designed for the MS4010v3)
 
 #include "KTech.h"
 
@@ -156,6 +156,7 @@ void KTechMotor::resetPositionSteps(long value) {
   if (!ready) return;
 
   static const uint8_t cmd[] = "\x95\x00\x00\x00";
+  canPlus.txWait();
   canPlus.beginPacket(canID);
   canPlus.write(cmd, 4);
   canPlus.write((uint8_t*)&value, 4);
@@ -193,7 +194,7 @@ void KTechMotor::setFrequencySteps(float frequency) {
     if (frequency < maxFrequency*128) stepSize = 128; else stepSize = 256;
 
     // timer period in microseconds
-    float period = 1000000.0F / (frequency/stepSize);
+    float period = (1000000.0F*stepSize)/frequency;
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
@@ -269,6 +270,7 @@ void KTechMotor::poll() {
 
   if (lastTarget != target) {
     static const uint8_t cmd[] = "\xa3\x00\x00\x00";
+    canPlus.txWait();
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
     canPlus.write((uint8_t*)&target, 4);

@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis ktech servo motor
+// axis ktech servo motor (designed for the MS4010v3)
 #pragma once
 #include "../../../../Common.h"
 
@@ -12,9 +12,9 @@
 #include "../Motor.h"
 #include "../../../convert/Convert.h"
 
-// KTECH status rate default 2Hz
+// KTECH status rate default 1Hz
 #ifndef KTECH_STATUS_MS
-  #define KTECH_STATUS_MS 500
+  #define KTECH_STATUS_MS 1000
 #endif
 
 // KTECH direct slewing ON or OFF (KTech handles acceleration)

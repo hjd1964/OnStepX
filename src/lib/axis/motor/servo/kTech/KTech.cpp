@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis servo KTech motor driver
+// axis servo KTech motor driver (designed for the MS4010v3 with 16bit encoder)
 
 #include "KTech.h"
 
@@ -98,14 +98,17 @@ void ServoKTech::enable(bool state) {
   VF("MSG:"); V(axisPrefix); VF("powered ");
 
   static const uint8_t cmd[] = "\xa2\x00\x00\x00\x00\x00\x00\x00";
+  canPlus.txWait();
   canPlus.writePacket(canID, cmd, 8);
 
   if (state) {
     static const uint8_t cmd[] = "\x88\x00\x00\x00\x00\x00\x00\x00";
+    canPlus.txWait();
     canPlus.writePacket(canID, cmd, 8);
     VLF("up");
   } else {
     static const uint8_t cmd[] = "\x80\x00\x00\x00\x00\x00\x00\x00";
+    canPlus.txWait();
     canPlus.writePacket(canID, cmd, 8);
     VLF("down");
   } 
@@ -113,21 +116,22 @@ void ServoKTech::enable(bool state) {
   velocityRamp = 0.0F;
 }
 
+// velocity is in units of 0.01 deg/s
+// so with an encoder of 65536 counts per turn into 360:1 reduction (65536 counts per degree) = a velocity of 36000 motor "steps"/s
 float ServoKTech::setMotorVelocity(float velocity) {
   velocity = ServoDriver::setMotorVelocity(velocity);
 
   int32_t velocityNext = lroundf(velocity*countsToStepsRatio.value);
   if (reversed) velocityNext = -velocityNext;
 
-  const unsigned long now = millis();
-  if (velocityLast != velocityNext && (now - lastVelocityUpdateTime >= CAN_SEND_RATE_MS)) {
+  if (canPlus.txTryLock()) {
     static const uint8_t cmd[] = "\xa2\x00\x00\x00";
     canPlus.beginPacket(canID);
     canPlus.write(cmd, 4);
     canPlus.write((uint8_t*)&velocityNext, 4);
     canPlus.endPacket();
-    lastVelocityUpdateTime = now;
     velocityLast = velocityNext;
+    canPlus.rxBrust(1000);
   }
 
   return velocity;
@@ -136,7 +140,7 @@ float ServoKTech::setMotorVelocity(float velocity) {
 // request driver status from CAN
 void ServoKTech::requestStatus() {
   static const uint8_t cmd[] = "\x9a\x00\x00\x00\x00\x00\x00\x00";
-  canPlus.writePacket(canID, cmd, 8);
+  if (canPlus.txTryLock()) canPlus.writePacket(canID, cmd, 8);
 }
 
 void ServoKTech::readStatus() {

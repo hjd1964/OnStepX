@@ -79,6 +79,7 @@ bool ODriveCanPlus::setAxisState(uint8_t node, uint32_t requested_state) {
   uint8_t d[8] = {0};
   put_le32(&d[0], requested_state);
 
+  canPlus.txWait();
   return canPlus.writePacket(makeId(node, CMD_SET_AXIS_STATE), d, 8) == 1;
 }
 
@@ -101,8 +102,10 @@ void ODriveCanPlus::setInputPos(uint8_t node, float pos_turns, float vel_ff_turn
   put_f32(&d[0], pos_turns);
   put_le16(&d[4], clamp_i16(vel_i));
   put_le16(&d[6], clamp_i16(tq_i));
-
-  canPlus.writePacket(makeId(node, CMD_SET_INPUT_POS), d, 8);
+  
+  if (canPlus.txTryLock()) {
+    canPlus.writePacket(makeId(node, CMD_SET_INPUT_POS), d, 8);
+  }
 }
 
 float ODriveCanPlus::getPosTurns(uint8_t node) const {

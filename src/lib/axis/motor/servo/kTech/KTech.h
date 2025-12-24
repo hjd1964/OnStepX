@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// axis servo KTech motor driver
+// axis servo KTech motor driver (designed for the MS4010v3 with 16bit encoder)
 #pragma once
 
 #include <Arduino.h>
@@ -55,7 +55,6 @@ class ServoKTech : public ServoDriver {
     void readStatus();
 
     int canID;
-    unsigned long lastVelocityUpdateTime = 0;
     unsigned long lastStatusUpdateTime = 0;
 
     void (*callback)() = NULL;

@@ -249,7 +249,7 @@ void ODriveMotor::setFrequencySteps(float frequency) {
     if (frequency < maxFrequency*128) stepSize = 128; else stepSize = 256;
 
     // timer period in microseconds
-    float period = 1000000.0F / (frequency/stepSize);
+    float period = (1000000.0F*stepSize)/frequency;
 
     // range is 0 to 134 seconds/step
     if (!isnan(period) && period <= 130000000.0F) {
