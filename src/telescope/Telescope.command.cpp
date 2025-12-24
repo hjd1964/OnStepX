@@ -108,9 +108,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (command[1] == '+') reticleBrightness -= scale;
       if (reticleBrightness < 0) reticleBrightness = 0;
 
-      float duty = (float)b*(1.0F/255.0F);
+      float duty = (float)reticleBrightness*(1.0F/255.0F);
       analog.write(RETICLE_LED_PIN, RETICLE_LED_INVERT == ON ? duty : 1.0F - duty);
-      
+
       #if RETICLE_LED_MEMORY == ON
         nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
       #endif
