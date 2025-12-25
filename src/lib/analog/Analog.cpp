@@ -196,7 +196,7 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
     static bool warned = false;
     (void)warned;
 
-    // Frequency
+    // frequency
     if (reqHz) {
       #if HAL_HAS_PER_PIN_PWM_FREQUENCY
         analogWriteFrequency(p, reqHz);

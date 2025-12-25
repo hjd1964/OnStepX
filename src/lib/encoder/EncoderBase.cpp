@@ -95,7 +95,7 @@ float Encoder::readVelocityCps() {
     return NAN;
   #else
 
-  // Snapshot state (safe if velLast* can be updated from ISR).
+  // snapshot state (safe if velLast* can be updated from ISR)
   uint32_t lastEdgeTicks, lastPeriodTicks;
   int8_t   dirSnap;
   int32_t  countSnap;
@@ -107,7 +107,7 @@ float Encoder::readVelocityCps() {
   countSnap       = count;
   interrupts();
 
-  // Cached stop timeout (ticks) computed once in init()
+  // cached stop timeout (ticks) computed once in init()
   const uint32_t nowTicks  = HAL_FAST_TICKS();
   const uint32_t stopTicks = velStopTicks;
 
@@ -126,14 +126,14 @@ float Encoder::readVelocityCps() {
     velWinLastUs    = nowUs;
     velWinLastCount = countSnap;
 
-    // If we already have a period estimate, expose it immediately (low-speed friendly).
+    // if we already have a period estimate, expose it immediately (low-speed friendly)
     if (!isnan(v_per)) {
       velBlendCps    = v_per;
       velHasEstimate = true;
       return velBlendCps;
     }
 
-    // Otherwise: no usable estimate yet.
+    // otherwise: no usable estimate yet.
     return NAN;
   }
 
@@ -143,7 +143,7 @@ float Encoder::readVelocityCps() {
   if (dtUs >= (uint32_t)ENCODER_VEL_WINDOW_US) {
     const float v_cnt = (dtUs != 0) ? (dc*(1000000.0F/(float)dtUs)) : 0.0F;
 
-    // Fix #1: if period estimate is unavailable, do NOT bias toward 0; use v_cnt directly.
+    // if period estimate is unavailable, do NOT bias toward 0; use v_cnt directly
     if (isnan(v_per)) {
       velBlendCps = v_cnt;
     } else {
@@ -155,17 +155,17 @@ float Encoder::readVelocityCps() {
 
     velHasEstimate = true;
 
-    // Reset window
+    // reset window
     velWinLastUs    = nowUs;
     velWinLastCount = countSnap;
   } else {
-    // Before we've ever produced an estimate, allow v_per to seed velBlendCps.
+    // before we've ever produced an estimate, allow v_per to seed velBlendCps
     if (!velHasEstimate && !isnan(v_per)) {
       velBlendCps    = v_per;
       velHasEstimate = true;
     }
 
-    // Fix #2: stop timeout means stop timeout (once we have any estimate).
+    // stop timeout means stop timeout (once we have any estimate)
     if (velHasEstimate && stale) {
       velBlendCps = 0.0F;
     }
