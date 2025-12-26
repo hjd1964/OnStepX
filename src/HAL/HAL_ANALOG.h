@@ -49,9 +49,6 @@
 #ifndef HAL_PWM_HZ_MAX
   #define HAL_PWM_HZ_MAX 40000U
 #endif
-#ifndef HAL_PWM_DEFAULT_HZ
-  #define HAL_PWM_DEFAULT_HZ 20000U
-#endif
 
 // some validation
 #if HAL_PWM_BITS_MIN < 1 || HAL_PWM_BITS_MIN > 32
