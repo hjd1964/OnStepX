@@ -173,6 +173,12 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
       reqRange = rangeFromBits(reqBits);
     }
 
+    #ifdef ANALOG_WRITE_FREQUENCY
+      if (reqHz == 0) {
+        reqHz = ANALOG_WRITE_FREQUENCY;
+      }
+    #endif
+
     // bounds
     if (reqBits) {
       if (reqBits < HAL_PWM_BITS_MIN || reqBits > HAL_PWM_BITS_MAX) {
@@ -202,7 +208,7 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
         analogWriteFrequency(p, reqHz);
         if (!warned) {
           warned = true;
-          VLF("WRN:Analog, adding new resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
+          VLF("WRN: Analog, adding new resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
         }
       #elif HAL_HAS_GLOBAL_PWM_FREQUENCY
         if (!HAL_ALLOW_GLOBAL_PWM_RECONFIG) {
