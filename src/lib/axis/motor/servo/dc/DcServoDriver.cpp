@@ -19,9 +19,9 @@ ServoDcDriver::ServoDcDriver(uint8_t axisNumber, const ServoPins *Pins, const Se
 
   dirDeadTimeMs.valueDefault = 0.0F;
   #if SERVO_DC_VPID == ON
-    velKp.valueDefault   = 0.0F;
-    velKi.valueDefault   = 0.0F;
-    velIMax.valueDefault = 0.0F;
+    velKp.valueDefault   = 0.2F;
+    velKi.valueDefault   = 0.5F;
+    velIMax.valueDefault = 0.2F;
   #endif
 }
 
