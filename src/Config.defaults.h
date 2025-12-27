@@ -389,6 +389,10 @@
   #define AXIS1_KTECH_PRESENT
 #endif
 
+#if AXIS1_DRIVER_MODEL == MKS42D
+  #define AXIS1_MKS42D_PRESENT
+#endif
+
 #ifndef AXIS2_DRIVER_MODEL
 #define AXIS2_DRIVER_MODEL            OFF                         // specify a driver to enable
 #endif
@@ -559,6 +563,10 @@
 
 #if AXIS2_DRIVER_MODEL == KTECH
   #define AXIS2_KTECH_PRESENT
+#endif
+
+#if AXIS2_DRIVER_MODEL == MKS42D
+  #define AXIS2_MKS42D_PRESENT
 #endif
 
 // decode internal mount type, tangent arm, azm wrap
@@ -1031,6 +1039,10 @@
   #define AXIS3_KTECH_PRESENT
 #endif
 
+#if AXIS3_DRIVER_MODEL == MKS42D
+  #define AXIS3_MKS42D_PRESENT
+#endif
+
 // -----------------------------------------------------------------------------------
 // focuser settings, all
 
@@ -1217,6 +1229,10 @@
   #define AXIS4_KTECH_PRESENT
 #endif
 
+#if AXIS4_DRIVER_MODEL == MKS42D
+  #define AXIS4_MKS42D_PRESENT
+#endif
+
 // focuser settings, FOCUSER2
 #ifndef AXIS5_DRIVER_MODEL
 #define AXIS5_DRIVER_MODEL            OFF
@@ -1389,6 +1405,10 @@
   #define AXIS5_KTECH_PRESENT
 #endif
 
+#if AXIS5_DRIVER_MODEL == MKS42D
+  #define AXIS5_MKS42D_PRESENT
+#endif
+
 // focuser settings, FOCUSER3
 #ifndef AXIS6_DRIVER_MODEL
 #define AXIS6_DRIVER_MODEL            OFF
@@ -1552,6 +1572,10 @@
   #define AXIS6_KTECH_PRESENT
 #endif
 
+#if AXIS6_DRIVER_MODEL == MKS42D
+  #define AXIS6_MKS42D_PRESENT
+#endif
+
 // focuser settings, FOCUSER4
 #ifndef AXIS7_DRIVER_MODEL
 #define AXIS7_DRIVER_MODEL            OFF
@@ -1712,6 +1736,10 @@
 
 #if AXIS7_DRIVER_MODEL == KTECH
   #define AXIS7_KTECH_PRESENT
+#endif
+
+#if AXIS7_DRIVER_MODEL == MKS42D
+  #define AXIS7_MKS42D_PRESENT
 #endif
 
 // focuser settings, FOCUSER5
@@ -1877,6 +1905,10 @@
   #define AXIS8_KTECH_PRESENT
 #endif
 
+#if AXIS8_DRIVER_MODEL == MKS42D
+  #define AXIS8_MKS42D_PRESENT
+#endif
+
 // focuser settings, FOCUSER6
 #ifndef AXIS9_DRIVER_MODEL
 #define AXIS9_DRIVER_MODEL            OFF
@@ -2040,6 +2072,10 @@
   #define AXIS9_KTECH_PRESENT
 #endif
 
+#if AXIS9_DRIVER_MODEL == MKS42D
+  #define AXIS9_MKS42D_PRESENT
+#endif
+
 // -----------------------------------------------------------------------------------
 // helper for checking driver presence
 #define DRIVER_CHECK(model) \
@@ -2142,6 +2178,11 @@
 // flag presence of KTECH motors
 #if DRIVER_CHECK(KTECH)
   #define KTECH_MOTOR_PRESENT
+#endif
+
+// flag presence of MKS SERVO42D/57D motors
+#if DRIVER_CHECK(MKS42D)
+  #define MKS42D_MOTOR_PRESENT
 #endif
 
 // flag to indicate if any motor is present
