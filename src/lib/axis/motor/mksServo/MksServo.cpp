@@ -21,6 +21,17 @@ IRAM_ATTR void moveMksAxis7() { mksMotorInstance[6]->move(); }
 IRAM_ATTR void moveMksAxis8() { mksMotorInstance[7]->move(); }
 IRAM_ATTR void moveMksAxis9() { mksMotorInstance[8]->move(); }
 
+// Status callbacks (0xF1 and 0x3E both funnel into requestStatusCallback)
+static void statusMksAxis1(uint8_t data[8]) { if (mksMotorInstance[0]) mksMotorInstance[0]->requestStatusCallback(data); }
+static void statusMksAxis2(uint8_t data[8]) { if (mksMotorInstance[1]) mksMotorInstance[1]->requestStatusCallback(data); }
+static void statusMksAxis3(uint8_t data[8]) { if (mksMotorInstance[2]) mksMotorInstance[2]->requestStatusCallback(data); }
+static void statusMksAxis4(uint8_t data[8]) { if (mksMotorInstance[3]) mksMotorInstance[3]->requestStatusCallback(data); }
+static void statusMksAxis5(uint8_t data[8]) { if (mksMotorInstance[4]) mksMotorInstance[4]->requestStatusCallback(data); }
+static void statusMksAxis6(uint8_t data[8]) { if (mksMotorInstance[5]) mksMotorInstance[5]->requestStatusCallback(data); }
+static void statusMksAxis7(uint8_t data[8]) { if (mksMotorInstance[6]) mksMotorInstance[6]->requestStatusCallback(data); }
+static void statusMksAxis8(uint8_t data[8]) { if (mksMotorInstance[7]) mksMotorInstance[7]->requestStatusCallback(data); }
+static void statusMksAxis9(uint8_t data[8]) { if (mksMotorInstance[8]) mksMotorInstance[8]->requestStatusCallback(data); }
+
 Mks42DMotor::Mks42DMotor(uint8_t axisNumber,
                          int8_t reverse,
                          const MksDriverSettings *Settings,
@@ -102,6 +113,56 @@ bool Mks42DMotor::init() {
 
   stopSyntheticMotion();
   resetToTrackingBaseline();
+
+  // Always-on heartbeat + protect polling (RX callbacks)
+  if (statusMode == ON) {
+    switch (axisNumber) {
+      case 1:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis1);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis1);
+        break;
+      case 2:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis2);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis2);
+        break;
+      case 3:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis3);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis3);
+        break;
+      case 4:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis4);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis4);
+        break;
+      case 5:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis5);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis5);
+        break;
+      case 6:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis6);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis6);
+        break;
+      case 7:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis7);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis7);
+        break;
+      case 8:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis8);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis8);
+        break;
+      case 9:
+        canPlus.callbackRegisterMessage(canID, 0xF1, statusMksAxis9);
+        canPlus.callbackRegisterMessage(canID, 0x3E, statusMksAxis9);
+        break;
+    }
+
+    statusValid = false;
+    protectActive = false;
+    status.fault = false;
+    lastStatusUpdateTime = 0;
+    lastStatusRequestTime = 0;
+    lastProtectRequestTime = 0;
+  }
+
   return true;
 }
 
@@ -113,8 +174,6 @@ void Mks42DMotor::setReverse(int8_t state) {
 }
 
 void Mks42DMotor::setReverse(bool state) {
-  // If someone tries to reverse in software, warn and still set the logical flag
-  // (so behavior is consistent), but user should do it in driver or wiring.
   if (state) {
     V("WRN:"); V(axisPrefix); VLF("software reverse requested; prefer MKS setup or wiring!");
   }
@@ -134,7 +193,15 @@ void Mks42DMotor::enable(bool state) {
   canPlus.txWait();
   sendF3(state);
 
-  if (state) enabled = true;
+  if (state) {
+    enabled = true;
+    lastEnableTime = millis();
+
+    // clear latched faults on enable attempt (simple policy for v1)
+    status.fault = false;
+    protectActive = false;
+    // statusValid remains as-is; always-on polling will refresh it soon
+  }
 
   // force next poll() to send target
   lastTarget = LONG_MIN;
@@ -242,11 +309,71 @@ inline void Mks42DMotor::sendFE(int32_t pos, uint16_t speed) {
   sendWithCrc(payload, 7);
 }
 
+// Always-on polling commands
+inline void Mks42DMotor::sendF1() { const uint8_t p[1] = { 0xF1 }; sendWithCrc(p, 1); }
+inline void Mks42DMotor::send3E() { const uint8_t p[1] = { 0x3E }; sendWithCrc(p, 1); }
+
+// RX: treat 0xF1 and 0x3E as heartbeat sources; latch fault on protect active.
+void Mks42DMotor::requestStatusCallback(uint8_t data[8]) {
+  if (statusMode == OFF) return;
+
+  const uint8_t code = data[0];
+  if (code != 0xF1 && code != 0x3E) return;
+
+  lastStatusUpdateTime = millis();
+  statusValid = true;
+
+  if (code == 0x3E) {
+    protectActive = (data[1] != 0);
+    if (protectActive) status.fault = true; // latch
+  }
+
+  // Optional extension hook: decode 0xF1 state from data[1] later if desired.
+}
+
+bool Mks42DMotor::hasHeartbeat(uint32_t maxAgeMs) const {
+  if (!ready || statusMode == OFF) return false;
+  if (!statusValid) return false;
+
+  const unsigned long now = millis();
+  return (now - lastStatusUpdateTime) < maxAgeMs;
+}
+
 // Absolute position streaming (simple/robust):
 // - Stream 0xFE target position
 // - Use a fixed speed cap (maxRpm) rather than a dynamic feed-forward mapping
 void Mks42DMotor::poll() {
   if (!ready) return;
+
+  const unsigned long now = millis();
+
+  // Always-on heartbeat + protect polling
+  if (statusMode == ON) {
+    if ((now - lastStatusRequestTime) >= MKS_STATUS_MS) {
+      lastStatusRequestTime = now;
+      if (canPlus.txTryLock()) sendF1(); // best-effort, non-blocking
+    }
+
+    if ((now - lastProtectRequestTime) >= MKS_PROTECT_MS) {
+      lastProtectRequestTime = now;
+      if (canPlus.txTryLock()) send3E(); // best-effort, non-blocking
+    }
+
+    // Hard faults only when enabled, with grace window after enabling
+    if (enabled) {
+      const bool inGrace = (now - lastEnableTime) < (unsigned long)MKS_HEARTBEAT_GRACE_MS;
+
+      const bool ok = statusValid ? hasHeartbeat(MKS_STATUS_MS * 4U) : inGrace;
+
+      if (!ok || status.fault) {
+        enabled = false;
+        stopSyntheticMotion();
+        resetToTrackingBaseline();
+        return;
+      }
+    }
+  }
+
   if (!enabled) return;
 
   noInterrupts();

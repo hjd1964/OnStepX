@@ -1,6 +1,5 @@
 // -----------------------------------------------------------------------------------
 // axis MKS SERVO42D/57D motor driver via CAN, using 0xFE absolute position updates
-// EXPERIMENTAL!!!
 
 #pragma once
 #include "../../../../Common.h"
@@ -21,9 +20,24 @@
   #define MKS_FE_ACCEL_CONST 10
 #endif
 
+// always-on status request (0xF1) rate
+#ifndef MKS_STATUS_MS
+  #define MKS_STATUS_MS 250
+#endif
+
+// always-on protect-state request (0x3E) rate
+#ifndef MKS_PROTECT_MS
+  #define MKS_PROTECT_MS 1000
+#endif
+
+// grace period after enabling before enforcing heartbeat
+#ifndef MKS_HEARTBEAT_GRACE_MS
+  #define MKS_HEARTBEAT_GRACE_MS 1500
+#endif
+
 typedef struct MksDriverSettings {
   int16_t model;
-  int8_t  status;     // ON/OFF (reserved for future status/heartbeat support)
+  int8_t  status;     // ON/OFF (enables always-on heartbeat + protect polling)
 } MksDriverSettings;
 
 class Mks42DMotor : public Motor {
@@ -71,6 +85,15 @@ class Mks42DMotor : public Motor {
     // ISR uses this; not a Motor virtual
     void move();
 
+    // minimal heartbeat API (updated by 0xF1 or 0x3E callbacks)
+    bool hasHeartbeat(uint32_t maxAgeMs) const;
+
+    // driver status (minimal; only "fault" is currently meaningful)
+    DriverStatus getDriverStatus() { return ready ? status : errorStatus; }
+
+    // RX callback (wired via CanPlus callbackRegisterMessage)
+    void requestStatusCallback(uint8_t data[8]);
+
   private:
     static inline uint8_t crc8(uint16_t id11, const uint8_t *data, size_t n) {
       uint32_t sum = (uint32_t)(id11 & 0x7FF);
@@ -110,6 +133,10 @@ class Mks42DMotor : public Motor {
     inline void sendF3(bool en);
     inline void sendFE(int32_t pos, uint16_t speed);
 
+    // Always-on polling helpers
+    inline void sendF1();   // queryStatus (0xF1)
+    inline void send3E();   // readProtectState (0x3E)
+
     void stopSyntheticMotion();
     void resetToTrackingBaseline();
 
@@ -134,6 +161,18 @@ class Mks42DMotor : public Motor {
     bool isSlewing = false;
 
     long lastTarget = LONG_MIN;
+
+    // --- always-on heartbeat / protect state ---
+    unsigned long lastStatusRequestTime = 0;
+    unsigned long lastProtectRequestTime = 0;
+    unsigned long lastStatusUpdateTime = 0;
+    unsigned long lastEnableTime = 0;
+    bool statusValid = false;
+
+    bool protectActive = false; // latched via 0x3E
+
+    // Minimal status model: only "fault" is currently meaningful
+    DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
 
     // runtime adjustable settings
     AxisParameter stepsPerSecondToRpm = {NAN, NAN, NAN, 0.0F, 10000.0F, AXP_FLOAT,   "Steps/s to RPM"};
