@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------
 // axis MKS SERVO42D/57D motor driver via CAN, using 0xFE absolute position updates
-
+// EXPERIMENTAL!!!
 #pragma once
 #include "../../../../Common.h"
 
