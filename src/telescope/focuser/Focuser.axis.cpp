@@ -12,6 +12,11 @@
     KTechMotor motor4(4, AXIS4_REVERSE, &DriverSettingsAxis4);
   #endif
 
+  #ifdef AXIS4_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis4 = {AXIS4_DRIVER_MODEL, AXIS4_DRIVER_STATUS};
+    Mks42DMotor motor4(4, AXIS4_REVERSE, &DriverSettingsAxis4, AXIS4_STEPS_PER_DEGREE);
+  #endif
+
   #ifdef AXIS4_SERVO_PRESENT
     ServoControl servoControlAxis4;
 
@@ -104,6 +109,11 @@
   #ifdef AXIS5_KTECH_PRESENT
     const KTechDriverSettings DriverSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS};
     KTechMotor motor5(5, AXIS5_REVERSE, &DriverSettingsAxis5);
+  #endif
+
+  #ifdef AXIS5_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis5 = {AXIS5_DRIVER_MODEL, AXIS5_DRIVER_STATUS};
+    Mks42DMotor motor5(5, AXIS5_REVERSE, &DriverSettingsAxis5, AXIS5_STEPS_PER_DEGREE);
   #endif
 
   #ifdef AXIS5_SERVO_PRESENT
@@ -200,6 +210,11 @@
     KTechMotor motor6(6, AXIS6_REVERSE, &DriverSettingsAxis6);
   #endif
 
+  #ifdef AXIS6_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis6 = {AXIS6_DRIVER_MODEL, AXIS6_DRIVER_STATUS};
+    Mks42DMotor motor6(6, AXIS6_REVERSE, &DriverSettingsAxis6, AXIS6_STEPS_PER_DEGREE);
+  #endif
+
   #ifdef AXIS6_SERVO_PRESENT
     ServoControl servoControlAxis6;
 
@@ -292,6 +307,11 @@
   #ifdef AXIS7_KTECH_PRESENT
     const KTechDriverSettings DriverSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS};
     KTechMotor motor7(7, AXIS7_REVERSE, &DriverSettingsAxis7);
+  #endif
+
+  #ifdef AXIS7_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis7 = {AXIS7_DRIVER_MODEL, AXIS7_DRIVER_STATUS};
+    Mks42DMotor motor7(7, AXIS7_REVERSE, &DriverSettingsAxis7, AXIS7_STEPS_PER_DEGREE);
   #endif
 
   #ifdef AXIS7_SERVO_PRESENT
@@ -388,6 +408,11 @@
     KTechMotor motor8(8, AXIS8_REVERSE, &DriverSettingsAxis8);
   #endif
 
+  #ifdef AXIS8_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis8 = {AXIS8_DRIVER_MODEL, AXIS8_DRIVER_STATUS};
+    Mks42DMotor motor8(8, AXIS8_REVERSE, &DriverSettingsAxis8, AXIS8_STEPS_PER_DEGREE);
+  #endif
+
   #ifdef AXIS8_SERVO_PRESENT
     ServoControl servoControlAxis8;
 
@@ -480,6 +505,11 @@
   #ifdef AXIS9_KTECH_PRESENT
     const KTechDriverSettings DriverSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS};
     KTechMotor motor9(9, AXIS9_REVERSE, &DriverSettingsAxis9);
+  #endif
+
+  #ifdef AXIS9_MKS42D_PRESENT
+    const MksDriverSettings DriverSettingsAxis9 = {AXIS9_DRIVER_MODEL, AXIS9_DRIVER_STATUS};
+    Mks42DMotor motor9(9, AXIS9_REVERSE, &DriverSettingsAxis9, AXIS9_STEPS_PER_DEGREE);
   #endif
 
   #ifdef AXIS9_SERVO_PRESENT

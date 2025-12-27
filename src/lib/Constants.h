@@ -98,9 +98,11 @@
 
 // integrated motor drivers
 #define MOTOR_DRIVER_FIRST          200
-#define ODRIVE                      200    // First generation ODrive (axis 1 and 2 only)
-#define KTECH                       201    // KTech CAN driver (axis 1 and 2 only)
-#define MOTOR_DRIVER_LAST           201
+#define ODRIVE                      200    // First generation ODrive (axis 1 and 2 only), EXPERIMENTAL!
+#define KTECH                       201    // KTech CAN driver
+#define MKS42D                      202    // MKS SERVO 42D, EXPERIMENTAL!
+#define MKS57D                      202    // MKS SERVO 57D, EXPERIMENTAL!
+#define MOTOR_DRIVER_LAST           202
 
 // servo encoder (must match Encoder library)
 #define ENC_FIRST                   1

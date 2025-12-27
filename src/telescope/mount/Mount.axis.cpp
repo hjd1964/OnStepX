@@ -15,6 +15,11 @@
   KTechMotor motor1(1, AXIS1_REVERSE, &DriverSettingsAxis1, AXIS1_STEPS_PER_DEGREE);
 #endif
 
+#ifdef AXIS1_MKS42D_PRESENT
+  const MksDriverSettings DriverSettingsAxis1 = {AXIS1_DRIVER_MODEL, AXIS1_DRIVER_STATUS};
+  Mks42DMotor motor1(1, AXIS1_REVERSE, &DriverSettingsAxis1, AXIS1_STEPS_PER_DEGREE);
+#endif
+
 #ifdef AXIS1_SERVO_PRESENT
   ServoControl servoControlAxis1;
 
@@ -121,6 +126,11 @@ Axis axis1(1, &PinsAxis1, &SettingsAxis1, AXIS_MEASURE_RADIANS, arcsecToRad(AXIS
 #ifdef AXIS2_KTECH_PRESENT
   const KTechDriverSettings DriverSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS};
   KTechMotor motor2(2, AXIS2_REVERSE, &DriverSettingsAxis2);
+#endif
+
+#ifdef AXIS2_MKS42D_PRESENT
+  const MksDriverSettings DriverSettingsAxis2 = {AXIS2_DRIVER_MODEL, AXIS2_DRIVER_STATUS};
+  Mks42DMotor motor2(2, AXIS2_REVERSE, &DriverSettingsAxis2, AXIS2_STEPS_PER_DEGREE);
 #endif
 
 #ifdef AXIS2_SERVO_PRESENT

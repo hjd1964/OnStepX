@@ -10,6 +10,11 @@
   KTechMotor motor3(3, AXIS3_REVERSE, &DriverSettingsAxis3);
 #endif
 
+#ifdef AXIS3_MKS42D_PRESENT
+  const MksDriverSettings DriverSettingsAxis3 = {AXIS3_DRIVER_MODEL, AXIS3_DRIVER_STATUS};
+  Mks42DMotor motor3(3, AXIS3_REVERSE, &DriverSettingsAxis3, AXIS3_STEPS_PER_DEGREE);
+#endif
+
 #ifdef AXIS3_SERVO_PRESENT
   ServoControl servoControlAxis3;
 
