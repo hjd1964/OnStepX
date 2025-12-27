@@ -13,7 +13,6 @@
 void canEsp32Monitor() { canPlus.poll(); }
 
 static bool twaiReady = false;
-static volatile uint32_t lastTxUs = 0;
 
 CanPlusESP32::CanPlusESP32() {}
 
@@ -95,8 +94,6 @@ int CanPlusESP32::writePacket(int id, const uint8_t *buffer, size_t size) {
   msg.rtr  = 0;
   msg.data_length_code = (uint8_t)size;
   if (size) memcpy(msg.data, buffer, size);
-
-  lastTxUs = micros();
 
   // Zero timeout: do not block the caller; return failure if TX queue is full or bus is off.
   esp_err_t err = twai_transmit(&msg, 0);
