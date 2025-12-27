@@ -63,9 +63,9 @@ bool StepDirGeneric::init() {
   modeSwitchAllowed = false;
   modeSwitchFastAllowed = microstepRatio != 1;
   VF("MSG: StepDirDriver"); V(axisNumber);
-  if (modeSwitchAllowed) { VLF("ModeSwitch Allowed"); }else { VLF("ModeSwitch Disabled"); }
+  if (modeSwitchAllowed) { VLF(", ModeSwitch Allowed"); }else { VLF(", ModeSwitch Disabled"); }
   VF("MSG: StepDirDriver"); V(axisNumber);
-  if (modeSwitchFastAllowed) { VLF("ModeSwitchFast Allowed"); } else { VLF("ModeSwitchFast Disabled"); }
+  if (modeSwitchFastAllowed) { VLF(", ModeSwitchFast Allowed"); } else { VLF(", ModeSwitchFast Disabled"); }
 
   return true;
 }
