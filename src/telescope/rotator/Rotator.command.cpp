@@ -7,7 +7,7 @@
 #include "../mount/Mount.h"
 #include "Rotator.h"
 
-#if AXIS3_DRIVER_MODEL != OFF
+#ifdef ROTATOR_PRESENT
 
 extern Axis axis3;
 
