@@ -244,7 +244,9 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     #endif
 
     pinMode(RETICLE_LED_PIN, OUTPUT);
-    analogWrite(RETICLE_LED_PIN, analog8BitToAnalogRange(reticleBrightness));
+
+    float duty = (float)reticleBrightness*(1.0F/255.0F);
+    analog.write(RETICLE_LED_PIN, RETICLE_LED_INVERT == ON ? duty : 1.0F - duty);
   #endif
 
   // bring up status LED and flash error codes

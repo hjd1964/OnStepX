@@ -8,6 +8,7 @@
 #include "../lib/tasks/OnTask.h"
 #include "../lib/gpioEx/GpioEx.h"
 #include "../lib/nv/Nv.h"
+#include "../lib/analog/Analog.h"
 #include "../lib/convert/Convert.h"
 
 #include "../libApp/commands/ProcessCmds.h"
