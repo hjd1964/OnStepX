@@ -54,7 +54,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure (no focusers)
     //                    1 to 6 on success
     if (parameter[0] == 0) {
-      if (axes[active] == NULL) { *commandError = CE_0; return true; }
+      if (active < 0 || axes[active] == NULL) { *commandError = CE_0; return true; }
       sprintf(reply, "%d", active + 1);
       *numericReply = false;
       *supressFrame = true;
@@ -65,7 +65,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //                    1 on success
     if (parameter[1] == 0) {
       int i = parameter[0] - '1';
-      if (i >= 0 && i < FOCUSER_MAX) active = i; else *commandError = CE_PARAM_RANGE;
+      if (i >= 0 && i < FOCUSER_MAX && axes[i] != NULL) active = i; else *commandError = CE_PARAM_RANGE;
     } else return false;
   } else
 
@@ -169,7 +169,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FB#       Get focuser backlash amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'B' && parameter[0] == 0) {
-      sprintf(reply,"%ld",(long)round(getBacklash(index)*StepsToUnits));
+      sprintf(reply,"%ld",(long)round(getBacklashSteps(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -177,7 +177,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'B') {
-      *commandError = setBacklash(index, round(atol(parameter)*UnitsToSteps));
+      *commandError = setBacklashSteps(index, round(atol(parameter)*UnitsToSteps));
     } else
 
     // :FC#       Get focuser temperature compensation coefficient in microns per °C)

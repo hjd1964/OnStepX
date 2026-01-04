@@ -48,6 +48,11 @@
   #endif
 #endif
 
+// switch to allow backlash to be slaved
+#ifndef FOCUSER_SLAVE_BACKLASH
+  #define FOCUSER_SLAVE_BACKLASH OFF
+#endif
+
 #pragma pack(1)
 typedef struct Tcf {
   bool enabled;
@@ -82,6 +87,8 @@ class Focuser {
     #endif
 
   private:
+    // make sure our index is valid for this focuser
+    bool validIndex(int index);
 
     // get focuser temperature in deg. C
     float getTemperature();
@@ -122,11 +129,11 @@ class Focuser {
     // get home position in microns
     float getHomePosition(int index);
 
-    // get backlash in microns
-    int getBacklash(int index);
+    // get backlash in steps
+    int getBacklashSteps(int index);
 
-    // set backlash in microns
-    CommandError setBacklash(int index, int value);
+    // set backlash in steps
+    CommandError setBacklashSteps(int index, int value);
 
     // set move rate
     void setMoveRate(int index, int value);
@@ -158,6 +165,9 @@ class Focuser {
     void readSettings(int index);
     void writeSettings(int index);
 
+    int slavedFocuserIndex(int masterIndex, int candidateIndex);
+    bool hasSlaveCycle(int candidateIndex);
+
     int moveRate[FOCUSER_MAX];
     long tcfSteps[FOCUSER_MAX];
 
@@ -183,68 +193,32 @@ class Focuser {
 };
 
 #if AXIS4_DRIVER_MODEL != OFF
-  #ifdef AXIS4_STEP_DIR_PRESENT
-    extern StepDirMotor motor4;
-  #elif defined(AXIS4_SERVO_PRESENT)
-    extern ServoMotor motor4;
-  #elif defined(AXIS4_KTECH_PRESENT)
-    extern KTechMotor motor4;
-  #endif
+  extern Motor& motor4;
   extern Axis axis4;
 #endif
 
 #if AXIS5_DRIVER_MODEL != OFF
-  #ifdef AXIS5_STEP_DIR_PRESENT
-    extern StepDirMotor motor5;
-  #elif defined(AXIS5_SERVO_PRESENT)
-    extern ServoMotor motor5;
-  #elif defined(AXIS5_KTECH_PRESENT)
-    extern KTechMotor motor5;
-  #endif
+  extern Motor& motor5;
   extern Axis axis5;
 #endif
 
 #if AXIS6_DRIVER_MODEL != OFF
-  #ifdef AXIS6_STEP_DIR_PRESENT
-    extern StepDirMotor motor6;
-  #elif defined(AXIS6_SERVO_PRESENT)
-    extern ServoMotor motor6;
-  #elif defined(AXIS6_KTECH_PRESENT)
-    extern KTechMotor motor6;
-  #endif
+  extern Motor& motor6;
   extern Axis axis6;
 #endif
 
 #if AXIS7_DRIVER_MODEL != OFF
-  #ifdef AXIS7_STEP_DIR_PRESENT
-    extern StepDirMotor motor7;
-  #elif defined(AXIS7_SERVO_PRESENT)
-    extern ServoMotor motor7;
-  #elif defined(AXIS7_KTECH_PRESENT)
-    extern KTechMotor motor7;
-  #endif
+  extern Motor& motor7;
   extern Axis axis7;
 #endif
 
 #if AXIS8_DRIVER_MODEL != OFF
-  #ifdef AXIS8_STEP_DIR_PRESENT
-    extern StepDirMotor motor8;
-  #elif defined(AXIS8_SERVO_PRESENT)
-    extern ServoMotor motor8;
-  #elif defined(AXIS8_KTECH_PRESENT)
-    extern KTechMotor motor8;
-  #endif
+  extern Motor& motor8;
   extern Axis axis8;
 #endif
 
 #if AXIS9_DRIVER_MODEL != OFF
-  #ifdef AXIS9_STEP_DIR_PRESENT
-    extern StepDirMotor motor9;
-  #elif defined(AXIS9_SERVO_PRESENT)
-    extern ServoMotor motor9;
-  #elif defined(AXIS9_KTECH_PRESENT)
-    extern KTechMotor motor9;
-  #endif
+  extern Motor& motor9;
   extern Axis axis9;
 #endif
 

@@ -25,7 +25,7 @@ typedef struct FocuserConfiguration {
   uint8_t  slavedToFocuser;
 } FocuserConfiguration;
 
-const FocuserConfiguration configuration[] = {
+static const FocuserConfiguration configuration[] = {
 #if FOCUSER_MAX >= 1
   {AXIS4_DRIVER_MODEL != OFF, AXIS4_HOME_DEFAULT, AXIS4_SLEW_RATE_BASE_DESIRED, AXIS4_SLEW_RATE_MINIMUM, AXIS4_ACCELERATION_TIME, AXIS4_RAPID_STOP_TIME, AXIS4_POWER_DOWN == ON, AXIS4_POWER_DOWN_TIME, AXIS4_SLAVED_TO_FOCUSER},
 #endif
@@ -46,10 +46,12 @@ const FocuserConfiguration configuration[] = {
 #endif
 };
 
-void focWrapper() { focuser.monitor(); }
+static int slavedToFocuser[6] = {-1, -1, -1, -1, -1, -1};
+
+static void focWrapper() { focuser.monitor(); }
 
 #if FOCUSER_BUTTON_SENSE_IN != OFF && FOCUSER_BUTTON_SENSE_OUT != OFF
-void focButtonsWrapper() { focuser.buttons(); }
+static void focButtonsWrapper() { focuser.buttons(); }
 #endif
 
 // setup arrays for easy access to focuser axes
@@ -108,7 +110,7 @@ void Focuser::init() {
       settings[index].tcf.deadband = 1;
       settings[index].tcf.t0 = 0.0F;
       settings[index].parkState = PS_UNPARKED;
-      settings[index].backlash = 0.0F;
+      settings[index].backlash = 0;
       settings[index].position = 0.0F;
       settings[index].gotoRate = configuration[index].slewRateDesired;
       nv.updateBytes(nvFocuserSettingsBase, &settings[index], sizeof(FocuserSettings));
@@ -127,44 +129,51 @@ void Focuser::init() {
     parkHandle[index] = 0;
     homing[index] = false;
 
-    if (configuration[index].present) {
-      if (axes[index] != NULL) {
+    if (validIndex(index)) {
+      if (active == -1) active = index;
 
-        if (active == -1) active = index;
+      // TCF defaults to disabled at startup
+      settings[index].tcf.enabled = false;
 
-        // TCF defaults to disabled at startup
-        settings[index].tcf.enabled = false;
-
-        if (settings[index].position < axes[index]->getLimitMin()) {
-          settings[index].position = axes[index]->getLimitMin();
-          initError.value = true;
-          DLF("ERR: Focuser.init(), bad NV park pos < _LIMIT_MIN (set to _LIMIT_MIN)");
-        }
-
-        if (settings[index].position > axes[index]->getLimitMax()) {
-          settings[index].position = axes[index]->getLimitMax();
-          initError.value = true;
-          DLF("ERR: Focuser.init(), bad NV park pos > _LIMIT_MAX steps (set to _LIMIT_MAX)");
-        }
-
-        axes[index]->resetPositionSteps(0);
-        axes[index]->setBacklashSteps(settings[index].backlash);
-        axes[index]->setFrequencyMax(configuration[index].slewRateDesired*2.0F);
-        axes[index]->setFrequencyMin(configuration[index].slewRateMinimum);
-        axes[index]->setFrequencySlew(configuration[index].slewRateDesired);
-        axes[index]->setSlewAccelerationTime(configuration[index].accelerationTime);
-        axes[index]->setSlewAccelerationTimeAbort(configuration[index].rapidStopTime);
-        if (configuration[index].powerDown) axes[index]->setPowerDownTime(configuration[index].powerDownTime);
+      if (settings[index].position < axes[index]->getLimitMin()) {
+        settings[index].position = axes[index]->getLimitMin();
+        initError.value = true;
+        DLF("ERR: Focuser.init(), bad NV park pos < _LIMIT_MIN (set to _LIMIT_MIN)");
       }
+
+      if (settings[index].position > axes[index]->getLimitMax()) {
+        settings[index].position = axes[index]->getLimitMax();
+        initError.value = true;
+        DLF("ERR: Focuser.init(), bad NV park pos > _LIMIT_MAX steps (set to _LIMIT_MAX)");
+      }
+
+      axes[index]->resetPositionSteps(0);
+      axes[index]->setBacklashSteps(settings[index].backlash);
+      axes[index]->setFrequencyMax(configuration[index].slewRateDesired*2.0F);
+      axes[index]->setFrequencyMin(configuration[index].slewRateMinimum);
+      axes[index]->setFrequencySlew(configuration[index].slewRateDesired);
+      axes[index]->setSlewAccelerationTime(configuration[index].accelerationTime);
+      axes[index]->setSlewAccelerationTimeAbort(configuration[index].rapidStopTime);
+      if (configuration[index].powerDown) axes[index]->setPowerDownTime(configuration[index].powerDownTime);
+      slavedToFocuser[index] = configuration[index].slavedToFocuser - 1;
+      if (slavedToFocuser[index] < -1 || slavedToFocuser[index] >= FOCUSER_MAX) slavedToFocuser[index] = -1;
     }
   }
 
+  // some final initialization
+  bool recursionDetected = false;
+  for (int index = 0; index < FOCUSER_MAX; index++) {
+    if (validIndex(index) && hasSlaveCycle(index)) { recursionDetected = true; break; }
+  }
+  if (recursionDetected) {
+    for (int index = 0; index < FOCUSER_MAX; index++) slavedToFocuser[index] = -1;
+    DLF("WRN: Focusers, slaved focusers have recurse on themselves and are disabled!");
+  }
 }
 
 void Focuser::begin() {
-  for (int index = 0; index < FOCUSER_MAX; index++) {
-    if (configuration[index].present && axes[index] != NULL) axes[index]->calibrateDriver();
-  }
+  // some final initialization
+  for (int index = 0; index < FOCUSER_MAX; index++) { if (validIndex(index)) axes[index]->calibrateDriver(); }
 
   // start task for temperature compensated focusing
   VF("MSG: Focusers, starting TCF task (rate 1s priority 6)... ");
@@ -193,6 +202,13 @@ void Focuser::begin() {
   }
 }
 
+bool Focuser::validIndex(int index) {
+  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!configuration[index].present) return false;
+  if (axes[index] == nullptr) return false;
+  return true;
+}
+
 // get focuser temperature in deg. C
 float Focuser::getTemperature() {
   float t = temperature.getChannel(0);
@@ -201,35 +217,36 @@ float Focuser::getTemperature() {
 
 // check for DC motor focuser
 bool Focuser::isDC(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   return false;
 }
 
 // get DC power in %
 int Focuser::getDcPower(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0;
+  if (!validIndex(index)) return 0;
   return 0;
 }
 
 // set DC power in %
 bool Focuser::setDcPower(int index, int value) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   if (value < 0 || value > 100) return false;
   return true;
 }
 
 // get TCF enable
 bool Focuser::getTcfEnable(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   if (isnan(getTemperature())) setTcfEnable(index, false);
   return settings[index].tcf.enabled;
 }
 
 // set TCF enable
 CommandError Focuser::setTcfEnable(int index, bool value) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setTcfEnable(configuration[i].slavedToFocuser, value); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfEnable(si, value); }
 
   if (isnan(getTemperature())) value = false;
   settings[index].tcf.enabled = value;
@@ -245,15 +262,16 @@ CommandError Focuser::setTcfEnable(int index, bool value) {
 
 // get TCF coefficient, in microns per deg. C
 float Focuser::getTcfCoef(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0.0F;
+  if (!validIndex(index)) return 0.0F;
   return settings[index].tcf.coef;
 }
 
 // set TCF coefficient, in microns per deg. C
 bool Focuser::setTcfCoef(int index, float value) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   if (fabs(value) >= 1000.0F) return false;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setTcfCoef(configuration[i].slavedToFocuser, value); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfCoef(si, value); }
 
   settings[index].tcf.coef = value;
   writeSettings(index);
@@ -262,15 +280,16 @@ bool Focuser::setTcfCoef(int index, float value) {
 
 // get TCF deadband, in steps
 int Focuser::getTcfDeadband(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0;
+  if (!validIndex(index)) return 0;
   return settings[index].tcf.deadband;
 }
 
 // set TCF deadband, in steps
 bool Focuser::setTcfDeadband(int index, int value) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   if (value < 1 || value > 10000) return false;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setTcfDeadband(configuration[i].slavedToFocuser, value); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfDeadband(si, value); }
 
   settings[index].tcf.deadband = value;
   writeSettings(index);
@@ -279,15 +298,16 @@ bool Focuser::setTcfDeadband(int index, int value) {
 
 // get TCF T0, in deg. C
 float Focuser::getTcfT0(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0.0F;
+  if (!validIndex(index)) return 0.0F;
   return settings[index].tcf.t0;
 }
 
 // set TCF T0, in deg. C
 bool Focuser::setTcfT0(int index, float value) {
-  if (index < 0 || index >= FOCUSER_MAX) return false;
+  if (!validIndex(index)) return false;
   if (fabs(value) > 60.0F) return false;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setTcfT0(configuration[i].slavedToFocuser, value); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfT0(si, value); }
 
   settings[index].tcf.t0 = value;
   writeSettings(index);
@@ -296,11 +316,10 @@ bool Focuser::setTcfT0(int index, float value) {
 
 // get home position in microns
 float Focuser::getHomePosition(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0;
+  if (!validIndex(index)) return 0;
   
-  if (configuration[index].slavedToFocuser > 0) {
-    return axes[configuration[index].slavedToFocuser - 1]->getInstrumentCoordinate();
-  }
+  int mi = slavedToFocuser[index];
+  if (mi >= 0 && mi < FOCUSER_MAX && axes[mi] != NULL) { return axes[mi]->getInstrumentCoordinate(); }
 
   if (configuration[index].homeDefault >= 0 && configuration[index].homeDefault <= 500000) return configuration[index].homeDefault;
   
@@ -316,27 +335,33 @@ float Focuser::getHomePosition(int index) {
 }
 
 // get backlash in steps
-int Focuser::getBacklash(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return 0;
+int Focuser::getBacklashSteps(int index) {
+  if (!validIndex(index)) return 0;
   return settings[index].backlash;
 }
 
 // set backlash in steps
-CommandError Focuser::setBacklash(int index, int value) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
+CommandError Focuser::setBacklashSteps(int index, int value) {
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (value < 0 || value > 10000) return CE_PARAM_RANGE;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setBacklash(configuration[i].slavedToFocuser, value); }
+
+  #if FOCUSER_SLAVE_BACKLASH == ON
+    for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setBacklashSteps(si, value); }
+  #endif
 
   settings[index].backlash = value;
   writeSettings(index);
-  axes[index]->setBacklash(getBacklash(index));
+  axes[index]->setBacklashSteps(getBacklashSteps(index));
   return CE_NONE;
 }
 
 // set move rate, 1 for 1um/sec slew, 2 for 10um/sec, 3 for 100um/sec, 4 for 0.5x goto rate
 void Focuser::setMoveRate(int index, int value) {
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setMoveRate(configuration[i].slavedToFocuser, value); }
+  if (!validIndex(index)) return;
+  if (value < 1 || value > 4) return;
+  
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setMoveRate(si, value); }
 
   switch (value) {
     case 1: moveRate[index] = 1; break;
@@ -349,10 +374,10 @@ void Focuser::setMoveRate(int index, int value) {
 
 // start move in the specified direction
 CommandError Focuser::move(int index, Direction dir) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
-  if (axes[index] == NULL) return CE_PARAM_RANGE;
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) move(configuration[i].slavedToFocuser, dir); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) move(si, dir); }
 
   if (!axes[index]->isSlewing()) {
     axes[index]->setSynchronizedFrequency(0.0F);
@@ -363,10 +388,9 @@ CommandError Focuser::move(int index, Direction dir) {
 
 // start move to the home position
 CommandError Focuser::moveHome(int index) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
-  if (axes[index] == NULL) return CE_PARAM_RANGE;
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) moveHome(configuration[i].slavedToFocuser); }
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) moveHome(si); }
 
   axes[index]->setFrequencySlew(settings[index].gotoRate);
   CommandError e = axes[index]->autoSlewHome();
@@ -377,6 +401,8 @@ CommandError Focuser::moveHome(int index) {
 
 // get goto rate, 1 for 0.5x base, 2 for 0.75x base, 3 for base, 4 for 1.5x base, 5 for 2x base
 int Focuser::getGotoRate(int index) {
+  if (!validIndex(index)) return 1;
+
   if (settings[index].gotoRate < configuration[index].slewRateDesired/1.75) return 1;
   if (settings[index].gotoRate < configuration[index].slewRateDesired/1.25) return 2;
   if (settings[index].gotoRate < configuration[index].slewRateDesired*1.25) return 3;
@@ -385,7 +411,10 @@ int Focuser::getGotoRate(int index) {
 
 // set goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
 void Focuser::setGotoRate(int index, int value) {
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) setGotoRate(configuration[i].slavedToFocuser, value); }
+  if (!validIndex(index)) return;
+  if (value < 1 || value > 5) value = 1;
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setGotoRate(si, value); }
 
   switch (value) {
     case 1: settings[index].gotoRate = configuration[index].slewRateDesired/2.0; break;
@@ -400,10 +429,10 @@ void Focuser::setGotoRate(int index, int value) {
 
 // move focuser to a specific location (in steps)
 CommandError Focuser::gotoTarget(int index, long target) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
-  if (axes[index] == NULL) return CE_PARAM_RANGE;
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) gotoTarget(configuration[i].slavedToFocuser, target); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) gotoTarget(si, target); }
 
   VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
   VF("MSG: Focuser"); V(index + 1); VLF(", attempting goto");
@@ -418,15 +447,15 @@ CommandError Focuser::gotoTarget(int index, long target) {
 
 // reset focuser to a specific location (in steps)
 CommandError Focuser::resetTarget(int index, long target) {
-  if (index < 0 || index >= FOCUSER_MAX) return CE_CMD_UNKNOWN;
-  if (axes[index] == NULL) return CE_PARAM_RANGE;
+  if (!validIndex(index)) return CE_CMD_UNKNOWN;
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) resetTarget(configuration[i].slavedToFocuser, target); }
+
+  for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) resetTarget(si, target); }
 
   VF("MSG: Focuser"); V(index + 1); VF(", reset target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
 
   CommandError e = axes[index]->resetPositionSteps(target);
-  axes[index]->setBacklash(getBacklash(index));
+  axes[index]->setBacklashSteps(getBacklashSteps(index));
 
   if (e != CE_NONE) { VF("MSG: Focuser"); V(index + 1); VLF(", reset failed"); }
 
@@ -435,18 +464,16 @@ CommandError Focuser::resetTarget(int index, long target) {
 
 // park focuser at its current location
 CommandError Focuser::park(int index) {
-  if (index < 0 || index >= FOCUSER_MAX)           return CE_PARAM_RANGE;
-  if (axes[index] == NULL)                         return CE_NONE;
+  if (!validIndex(index))           return CE_PARAM_RANGE;
   if (settings[index].parkState == PS_PARKED)      return CE_NONE;
   if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) park(configuration[i].slavedToFocuser); }
 
   setTcfEnable(index, false);
 
   VF("MSG: Focuser"); V(index + 1); VLF(", parking");
-  axes[index]->setBacklash(0.0F);
+  axes[index]->setBacklashSteps(0);
   float targetMicrons = axes[index]->getInstrumentCoordinate();
   axes[index]->setTargetCoordinatePark(targetMicrons);
 
@@ -463,12 +490,10 @@ CommandError Focuser::park(int index) {
 
 // unpark focuser
 CommandError Focuser::unpark(int index) {
-  if (index < 0 || index >= FOCUSER_MAX)           return CE_PARAM_RANGE;
-  if (axes[index] == NULL)                         return CE_NONE;
+  if (!validIndex(index))           return CE_PARAM_RANGE;
   if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
-  for (int i = 0; i < FOCUSER_MAX; i++) { if (configuration[i].slavedToFocuser == index + 1) unpark(configuration[i].slavedToFocuser); }
 
   // setting write delay to 0 disables on-the-fly position writes and forces strict parking
   if (FOCUSER_WRITE_DELAY == 0) {
@@ -486,10 +511,10 @@ CommandError Focuser::unpark(int index) {
     return CE_NONE;
   }
 
-  axes[index]->setBacklash(0.0F);
+  axes[index]->setBacklashSteps(0);
   axes[index]->setInstrumentCoordinatePark(settings[index].position);
 
-  axes[index]->setBacklash(settings[index].backlash);
+  axes[index]->setBacklashSteps(settings[index].backlash);
   axes[index]->setTargetCoordinate(settings[index].position);
 
   CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
@@ -577,7 +602,7 @@ void Focuser::monitor() {
           if (homing[index]) {
             long p = round((axes[index]->getLimitMax() + axes[index]->getLimitMin())/2.0F)*axes[index]->getStepsPerMeasure();
             axes[index]->resetPositionSteps(p);
-            axes[index]->setBacklash(getBacklash(index));
+            axes[index]->setBacklashSteps(getBacklashSteps(index));
             homing[index] = false;
           }
 
@@ -593,6 +618,37 @@ void Focuser::monitor() {
         }
       }
     }
+  }
+}
+
+int Focuser::slavedFocuserIndex(int masterIndex, int candidateIndex) {
+  if (candidateIndex < 0 || candidateIndex >= FOCUSER_MAX) return -1;
+
+  if (configuration[candidateIndex].present &&
+      axes[candidateIndex] != NULL &&
+      slavedToFocuser[candidateIndex] == masterIndex) {
+    return candidateIndex;
+  }
+
+  return -1;
+}
+
+bool Focuser::hasSlaveCycle(int candidateIndex) {
+  bool seen[FOCUSER_MAX] = {false};
+  int i = candidateIndex;
+
+  while (true) {
+    int mi = slavedToFocuser[i];
+
+    // no master => chain ends cleanly
+    if (mi < 0 || mi >= FOCUSER_MAX) return false;
+
+    // broken chain => treat as invalid (block)
+    if (!configuration[mi].present || axes[mi] == NULL) return true;
+
+    if (mi == i || seen[mi]) return true;
+    seen[mi] = true;
+    i = mi;
   }
 }
 
