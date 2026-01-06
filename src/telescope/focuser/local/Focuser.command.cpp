@@ -5,16 +5,20 @@
 
 #ifdef FOCUSER_PRESENT
 
-#include "../../lib/convert/Convert.h"
-#include "../../lib/axis/Axis.h"
+#include "../../../lib/convert/Convert.h"
+#include "../../../lib/axis/Axis.h"
 
 extern Axis *axes[6];
 
+// by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
+// return true if the command has been completely handled and no further command() will be called, or false if not
+// for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
+// note the default numericReply == true overides supressFrame so it's false (0 or 1 is returned)
 bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   static int index = 0;
   *supressFrame = false;
 
-  // process any focuser axis commands
+  // process any focuser axis commands (this doesn't apply to CAN)
   for (int index = 0; index < FOCUSER_MAX; index++) {
     if (axes[index] != NULL) {
       if (axes[index]->command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;

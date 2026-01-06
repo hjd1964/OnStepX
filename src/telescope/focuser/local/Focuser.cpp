@@ -5,13 +5,13 @@
 
 #ifdef FOCUSER_PRESENT
 
-#include "../../lib/tasks/OnTask.h"
-#include "../../lib/sense/Sense.h"
+#include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/sense/Sense.h"
 
-#include "../../libApp/weather/Weather.h"
-#include "../../libApp/temperature/Temperature.h"
+#include "../../../libApp/weather/Weather.h"
+#include "../../../libApp/temperature/Temperature.h"
 
-#include "../Telescope.h"
+#include "../../Telescope.h"
 
 typedef struct FocuserConfiguration {
   bool present;
@@ -54,10 +54,23 @@ static void focWrapper() { focuser.monitor(); }
 static void focButtonsWrapper() { focuser.buttons(); }
 #endif
 
+#if defined(FOCUSER_CAN_SERVER_PRESENT)
+// 1 Hz heartbeat TX for this remote focuser node
+static void focHeartbeatWrapper() {
+  if (!canPlus.ready) return;
+  const uint16_t hbId = (uint16_t)(CAN_FOCUSER_HB_ID_BASE + (CAN_FOCUSER_NUMBER - 1));
+  const uint8_t b = 0; // payload reserved; currently unused
+  canPlus.writePacket((int)hbId, &b, 1);
+}
+#endif
+
 // setup arrays for easy access to focuser axes
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 
 void Focuser::init() {
+  #if defined(FOCUSER_CAN_SERVER_PRESENT)
+    CanTransportServer::init(true, 2);
+  #endif
 
   // get the motion controllers ready
   #if AXIS4_DRIVER_MODEL != OFF
@@ -195,6 +208,11 @@ void Focuser::begin() {
       inButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_IN_PIN, FOCUSER_BUTTON_SENSE_INIT, FOCUSER_BUTTON_SENSE_IN);
       outButtonHandle = sense.add(FOCUSER_BUTTON_SENSE_OUT_PIN, FOCUSER_BUTTON_SENSE_INIT, FOCUSER_BUTTON_SENSE_OUT);
     } else { VLF("FAILED!"); }
+  #endif
+
+  #if defined(FOCUSER_CAN_SERVER_PRESENT)
+    VF("MSG: Focusers, starting CAN heartbeat task (rate 1s priority 6)... ");
+    if (tasks.add(1000, 0, true, 6, focHeartbeatWrapper, "FocHB")) { VLF("success"); } else { VLF("FAILED!"); }
   #endif
 
   for (int index = 0; index < FOCUSER_MAX; index++) {

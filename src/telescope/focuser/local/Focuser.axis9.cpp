@@ -6,7 +6,7 @@
 // note there is a prototype file that should be copy/pasted to build files
 // for axes 4 to 9 by replacing all occurances of '@' with the axis number
 
-#if FOCUSER_PRESENT
+#if AXIS9_DRIVER_MODEL != OFF
 
   namespace {
 
