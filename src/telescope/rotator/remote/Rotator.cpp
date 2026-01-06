@@ -5,6 +5,15 @@
 
 #ifdef ROTATOR_CAN_CLIENT_PRESENT
 
+// --------------------------------------------------------------------------
+// Heartbeat RX (local node): update last-heard timestamp for rotator
+// --------------------------------------------------------------------------
+static void rotHb(uint8_t data[8], uint8_t len) { (void)data; (void)len; rotator.heartbeat(); }
+
+void Rotator::begin() {
+  canPlus.callbackRegisterId((int)(CAN_ROTATOR_HB_ID_BASE), rotHb);
+}
+
 // by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
 // return true if the command has been completely handled and no further command() will be called, or false if not
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
@@ -13,10 +22,6 @@ bool Rotator::command(char *reply, char *command, char *parameter,
                       bool *supressFrame, bool *numericReply, CommandError *commandError) {
   if (!canPlus.ready) return false;
 
-  uint8_t opcode = 0, tidop = 0;
-  uint8_t req[8] = {0};
-  uint8_t reqLen = 0;
-
   // --------------------------------------------------------------------------
   // r?, hP, hR, GX98 - rotator commands only
   // --------------------------------------------------------------------------
@@ -24,6 +29,13 @@ bool Rotator::command(char *reply, char *command, char *parameter,
       !(command[0] == 'h' && command[1] == 'P') &&
       !(command[0] == 'h' && command[1] == 'R') &&
       !(command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8')) return false;
+
+  // Presence gate, just act as though there is no rotator present
+  if (!heartbeatFresh()) { return false; }
+
+  uint8_t opcode = 0, tidop = 0;
+  uint8_t req[8] = {0};
+  uint8_t reqLen = 0;
 
   if (!encodeRequest(opcode, tidop, req, reqLen, command, parameter)) return false;
 

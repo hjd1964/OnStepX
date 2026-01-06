@@ -14,6 +14,10 @@
   #define CAN_ROTATOR_RSP_ID (CAN_ROTATOR_REQ_ID + 0x10)
 #endif
 
+#ifndef CAN_ROTATOR_HB_ID_BASE
+  #define CAN_ROTATOR_HB_ID_BASE (CAN_ROTATOR_REQ_ID + 0x20)
+#endif
+
 // -----------------------------------------------------------------------------
 // CAN_ROTATOR role selection
 //   OFF    : no CAN rotator support

@@ -13,6 +13,16 @@
 
 void rotWrapper() { rotator.monitor(); }
 
+#if defined(ROTATOR_CAN_SERVER_PRESENT)
+// 1 Hz heartbeat TX for this remote rotator node
+static void rotHeartbeatWrapper() {
+  if (!canPlus.ready) return;
+  const uint16_t hbId = (uint16_t)(CAN_ROTATOR_HB_ID_BASE);
+  const uint8_t b = 0; // payload reserved; currently unused
+  canPlus.writePacket((int)hbId, &b, 1);
+}
+#endif
+
 // initialize rotator
 void Rotator::init() {
   #if defined(ROTATOR_CAN_SERVER_PRESENT)
@@ -57,6 +67,12 @@ void Rotator::begin() {
     // start monitor task
     VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
     if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
+
+    // start heartbeat task
+    #if defined(ROTATOR_CAN_SERVER_PRESENT)
+      VF("MSG: Rotator, starting CAN heartbeat task (rate 1s priority 6)... ");
+ //     if (tasks.add(1000, 0, true, 6, rotHeartbeatWrapper, "RotHB")) { VLF("success"); } else { VLF("FAILED!"); }
+    #endif
 
     unpark();
   }
