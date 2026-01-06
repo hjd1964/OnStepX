@@ -729,6 +729,12 @@
 #ifndef LIMIT_STRICT
 #define LIMIT_STRICT                  ON                          // ON enables Mount limits at startup if date/time are set
 #endif
+#ifndef LIMIT_RECOVERY
+#define LIMIT_RECOVERY                OFF                         // ON allows 1s for gotos away from horizon, meridian w, and axis1 max limits
+#endif
+#ifndef LIMIT_RECOVERY_WITH_TRACKING
+#define LIMIT_RECOVERY_WITH_TRACKING  OFF                         // ON to automatically enable tracking on limit recovery
+#endif
 
 // st4
 #ifndef ST4_INTERFACE
