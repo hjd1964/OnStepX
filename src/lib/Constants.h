@@ -75,15 +75,6 @@
 #define TMC2226                     21     // uses TMC software UART comms  for 1x,2x...,256x  (UART sets spreadCycle/stealthChop etc, dedicated RX/TX UART to each driver using index 0)
 #define STEP_DIR_DRIVER_LAST        21
 
-// driver (step/dir) decay mode
-#define DRIVER_DECAY_MODE_FIRST     1
-#define MIXED                       1
-#define FAST                        2
-#define SLOW                        3
-#define SPREADCYCLE                 4
-#define STEALTHCHOP                 5
-#define DRIVER_DECAY_MODE_LAST      6
-
 // servo driver (usually for DC motors equipped with encoders)
 // changes here must be reflected in the ServoDriver.cpp file, etc.
 #define SERVO_DRIVER_FIRST          100
@@ -103,6 +94,15 @@
 #define MKS42D                      202    // MKS SERVO 42D, EXPERIMENTAL!
 #define MKS57D                      202    // MKS SERVO 57D, EXPERIMENTAL!
 #define MOTOR_DRIVER_LAST           202
+
+// driver (step/dir) decay mode
+#define DRIVER_DECAY_MODE_FIRST     1
+#define MIXED                       1
+#define FAST                        2
+#define SLOW                        3
+#define SPREADCYCLE                 4
+#define STEALTHCHOP                 5
+#define DRIVER_DECAY_MODE_LAST      6
 
 // servo encoder (must match Encoder library)
 #define ENC_FIRST                   1
