@@ -1,16 +1,20 @@
 //--------------------------------------------------------------------------------------------------
-// telescope rotator control, commands
+// local telescope rotator control, commands
 
-#include "../../lib/convert/Convert.h"
-#include "../../lib/axis/Axis.h"
-
-#include "../mount/Mount.h"
 #include "Rotator.h"
 
 #ifdef ROTATOR_PRESENT
 
+#include "../../../lib/convert/Convert.h"
+#include "../../../lib/axis/Axis.h"
+#include "../../mount/Mount.h"
+
 extern Axis axis3;
 
+// by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
+// return true if the command has been completely handled and no further command() will be called, or false if not
+// for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
+// note the default numericReply == true overides supressFrame so it's false (0 or 1 is returned)
 bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
   *supressFrame = false;
 
@@ -147,7 +151,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
     } else
 
     // :rG#       Get rotator current angle
-    //            Returns: sDD*MM#
+    //            Returns: sDDD*MM#
     if (command[1] == 'G') {
       convert.doubleToDms(reply, axis3.getInstrumentCoordinate(), true, true, PM_LOW);
       *numericReply = false;
@@ -255,12 +259,10 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *supress
   //                     N# for none
   if (command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8' && parameter[2] == 0) {
     *numericReply = false;
-    if (AXIS3_DRIVER_MODEL != OFF) {
-      #if defined(MOUNT_PRESENT)
-        if (transform.mountType == ALTAZM) strcpy(reply, "D"); else
-      #endif
-      strcpy(reply, "R");
-    } else strcpy(reply, "N");
+    #if defined(MOUNT_PRESENT)
+      if (transform.mountType == ALTAZM) strcpy(reply, "D"); else
+    #endif
+    strcpy(reply, "R");
   } else return false;
 
   return true;

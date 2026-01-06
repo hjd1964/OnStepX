@@ -1,20 +1,24 @@
 //--------------------------------------------------------------------------------------------------
-// telescope rotator control
+// local telescope rotator control
 
 #include "Rotator.h"
 
 #ifdef ROTATOR_PRESENT
 
-#include "../../lib/tasks/OnTask.h"
+#include "../../../lib/tasks/OnTask.h"
 
-#include "../Telescope.h"
-#include "../mount/Mount.h"
-#include "../mount/site/Site.h"
+#include "../../Telescope.h"
+#include "../../mount/Mount.h"
+#include "../../mount/site/Site.h"
 
 void rotWrapper() { rotator.monitor(); }
 
 // initialize rotator
 void Rotator::init() {
+  #if defined(ROTATOR_CAN_SERVER_PRESENT)
+    CanTransportServer::init(true, 2);
+  #endif
+
   // wait a moment for any background processing that may be needed
   delay(1000);
 

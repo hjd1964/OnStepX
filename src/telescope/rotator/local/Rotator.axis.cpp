@@ -1,21 +1,21 @@
 //--------------------------------------------------------------------------------------------------
-// telescope rotator control, axis instance
+// local telescope rotator control, axis3
 
 #include "Rotator.h"
 
 #ifdef ROTATOR_PRESENT
 
-#ifdef AXIS3_KTECH_PRESENT
+namespace {
+
+#if defined(AXIS3_KTECH_PRESENT)
   const KTechDriverSettings DriverSettingsAxis3 = {AXIS3_DRIVER_MODEL, AXIS3_DRIVER_STATUS};
-  KTechMotor motor3(3, AXIS3_REVERSE, &DriverSettingsAxis3);
-#endif
+  KTechMotor motor_3(3, AXIS3_REVERSE, &DriverSettingsAxis3);
 
-#ifdef AXIS3_MKS42D_PRESENT
+#elif defined(AXIS3_MKS42D_PRESENT)
   const MksDriverSettings DriverSettingsAxis3 = {AXIS3_DRIVER_MODEL, AXIS3_DRIVER_STATUS};
-  Mks42DMotor motor3(3, AXIS3_REVERSE, &DriverSettingsAxis3, AXIS3_STEPS_PER_DEGREE);
-#endif
+  Mks42DMotor motor_3(3, AXIS3_REVERSE, &DriverSettingsAxis3, AXIS3_STEPS_PER_DEGREE);
 
-#ifdef AXIS3_SERVO_PRESENT
+#elif defined(AXIS3_SERVO_PRESENT)
   ServoControl servoControlAxis3;
 
   #if AXIS3_ENCODER == AB
@@ -69,10 +69,9 @@
     ServoKTech driver3(3, &DriverSettingsAxis3, AXIS3_MOTOR_STEPS_PER_DEGREE/AXIS3_STEPS_PER_DEGREE);
   #endif
 
-  ServoMotor motor3(3, AXIS3_REVERSE, ((ServoDriver*)&driver3), &filterAxis3, &encAxis3, AXIS3_ENCODER_ORIGIN, AXIS3_ENCODER_REVERSE == ON, &feedbackAxis3, &servoControlAxis3, AXIS3_SYNC_THRESHOLD);
-#endif
+  ServoMotor motor_3(3, AXIS3_REVERSE, ((ServoDriver*)&driver3), &filterAxis3, &encAxis3, AXIS3_ENCODER_ORIGIN, AXIS3_ENCODER_REVERSE == ON, &feedbackAxis3, &servoControlAxis3, AXIS3_SYNC_THRESHOLD);
 
-#ifdef AXIS3_STEP_DIR_PRESENT
+#elif defined(AXIS3_STEP_DIR_PRESENT)
   const StepDirDriverPins DriverPinsAxis3 = {AXIS3_M0_PIN, AXIS3_M1_PIN, AXIS3_M2_PIN, AXIS3_M2_ON_STATE, AXIS3_M3_PIN, AXIS3_DECAY_PIN, AXIS3_FAULT_PIN};
   const StepDirDriverSettings DriverSettingsAxis3 = {AXIS3_DRIVER_MODEL, AXIS3_DRIVER_STATUS, AXIS3_DRIVER_MICROSTEPS, AXIS3_DRIVER_MICROSTEPS_GOTO, AXIS3_DRIVER_DECAY, AXIS3_DRIVER_DECAY_GOTO};
   #if AXIS3_DRIVER_MODEL >= STEP_DIR_DRIVER_FIRST && AXIS3_DRIVER_MODEL < TMC_DRIVER_FIRST
@@ -94,11 +93,18 @@
   #endif
 
   const StepDirPins StepDirPinsAxis3 = {AXIS3_STEP_PIN, AXIS3_STEP_STATE, AXIS3_DIR_PIN, AXIS3_ENABLE_PIN, AXIS3_ENABLE_STATE};
-  StepDirMotor motor3(3, AXIS3_REVERSE, &StepDirPinsAxis3, ((StepDirDriver*)&driver3));
+  StepDirMotor motor_3(3, AXIS3_REVERSE, &StepDirPinsAxis3, ((StepDirDriver*)&driver3));
+
+#else
+  #error "Configuration (Config.h): ROTATOR_PRESENT without AXIS3_DRIVER_MODEL should never happen!"
 #endif
 
 const AxisPins PinsAxis3 = {AXIS3_SENSE_LIMIT_MIN_PIN, AXIS3_SENSE_HOME_PIN, AXIS3_SENSE_LIMIT_MAX_PIN, {AXIS3_SENSE_HOME, AXIS3_SENSE_HOME_INIT, AXIS3_SENSE_HOME_DIST_LIMIT, AXIS3_SENSE_LIMIT_MIN, AXIS3_SENSE_LIMIT_MAX, AXIS3_SENSE_LIMIT_INIT}};
 const AxisSettings SettingsAxis3 = {AXIS3_STEPS_PER_DEGREE, {AXIS3_LIMIT_MIN, AXIS3_LIMIT_MAX}, AXIS3_BACKLASH_RATE};
+}
+
+Motor& motor3 = motor_3;
+
 Axis axis3(3, &PinsAxis3, &SettingsAxis3, AXIS_MEASURE_DEGREES);
 
 #endif
