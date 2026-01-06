@@ -50,8 +50,13 @@ class CanPlus {
     virtual int writePacket(int id, const uint8_t *buffer, size_t size);
     // RTR policy: supports sending RTR, but drops on receive
     virtual int writePacketRtr(int id, size_t dlc) { UNUSED(id); UNUSED(dlc); return 0; }
+
     virtual int callbackRegisterId(int id, void (*callback)(uint8_t data[8]));
     virtual int callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8_t data[8]));
+
+    virtual int callbackRegisterId(int id, void (*callback)(uint8_t data[8], uint8_t len));
+    virtual int callbackRegisterMessage(int id, uint8_t msg, void (*callback)(uint8_t data[8], uint8_t len));
+
     virtual int callbackProcess(int id, uint8_t *buffer, size_t size);
 
     // send pacing, non-blocking
@@ -94,11 +99,13 @@ class CanPlus {
     int idCallbackCount = 0;
     int idCallBackId[CAN_MAX_CALLBACKS] = {0};
     void (*idCallback[CAN_MAX_CALLBACKS])(uint8_t data[8]) = {nullptr};
+    void (*idCallbackEx[CAN_MAX_CALLBACKS])(uint8_t data[8], uint8_t len) = {nullptr};
 
     int msgCallbackCount = 0;
     int msgCallBackId[CAN_MAX_CALLBACKS] = {0};
     int msgCallBackMsg[CAN_MAX_CALLBACKS] = {0};
     void (*msgCallback[CAN_MAX_CALLBACKS])(uint8_t data[8]) = {nullptr};
+    void (*msgCallbackEx[CAN_MAX_CALLBACKS])(uint8_t data[8], uint8_t len) = {nullptr};
 
     uint32_t lastTxUs = 0;
     

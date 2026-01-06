@@ -16,6 +16,8 @@ class CanPlusMCP2515 : public CanPlus {
     int writePacket(int id, const uint8_t *buffer, size_t size) override;
     int writePacketRtr(int id, size_t dlc) override;
 
+    void rxBrust(uint32_t periodUs = 2000);
+
     void poll();
 
   private:
