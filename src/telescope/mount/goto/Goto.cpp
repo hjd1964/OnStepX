@@ -145,6 +145,14 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     waypoint(&current);
   }
 
+  // allow goto and enable tracking after meridian limit west is exceeded
+  #if LIMIT_STRICT == OFF
+    if (limits.isPastMeridianW()) {
+      limits.meridianLimitsDisablePeriod(1.0F);
+      if (home.state != HS_HOMING && park.state != PS_PARKING) mount.tracking(true);
+    }
+  #endif
+
   // start the goto monitor
   if (taskHandle != 0) tasks.remove(taskHandle);
   taskHandle = tasks.add(0, 0, true, 3, gotoWrapper, "MntGoto");

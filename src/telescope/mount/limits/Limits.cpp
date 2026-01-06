@@ -271,8 +271,7 @@ void Limits::stopAxis2(GuideAction stopDirection) {
 }
 
 void Limits::poll() {
-  static int autoFlipDelayCycles = 0;
-  if (autoFlipDelayCycles > 0) autoFlipDelayCycles--;
+  if (meridianLimitsDisablePeriodDs > 0) meridianLimitsDisablePeriodDs--;
 
   LimitsError lastError = error;
 
@@ -301,11 +300,10 @@ void Limits::poll() {
     } else error.meridian.east = false;
 
     if (transform.mountType == GEM && current.pierSide == PIER_SIDE_WEST) {
-      if (current.h > settings.pastMeridianW && autoFlipDelayCycles == 0) {
+      if (current.h > settings.pastMeridianW && meridianLimitsDisablePeriodDs == 0) {
         #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
           if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
-            // disable this limit for a second to allow goto to exit the out of limits region
-            autoFlipDelayCycles = 10;
+            meridianLimitsDisablePeriod(1.0F);
             VLF("MSG: Mount, start automatic meridian flip");
             Coordinate target = mount.getMountPosition();
             CommandError e = goTo.request(target, PSS_EAST_ONLY, false);
@@ -347,11 +345,10 @@ void Limits::poll() {
       // ---------------------------------------------------------
     } else error.limit.axis1.min = false;
 
-    if (fgt(current.a1, axis1.getLimitMax()) && autoFlipDelayCycles == 0) {
+    if (fgt(current.a1, axis1.getLimitMax()) && meridianLimitsDisablePeriodDs == 0) {
       #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
-          // disable this limit for a second to allow goto to exit the out of limits region
-          autoFlipDelayCycles = 10;
+          meridianLimitsDisablePeriod(1.0F);
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
           CommandError e = goTo.request(target, PSS_WEST_ONLY, false);
