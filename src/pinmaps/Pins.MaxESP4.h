@@ -21,7 +21,9 @@
   #define SERIAL_TMC            Serial1          // Use a single hardware serial port to up to four drivers
   #define SERIAL_TMC_BAUD       460800           // Baud rate
   #define SERIAL_TMC_RX         39               // Recieving data
-  #define SERIAL_TMC_TX         4                // Transmit data
+  #ifndef SERIAL_TMC_TX
+    #define SERIAL_TMC_TX       4                // Transmit data
+  #endif
   #define SERIAL_TMC_ADDRESS_MAP(x) ((x==4)?2 : x) // Axis1(0) is 0, Axis2(1) is 1, Axis3(2) is 2, Axis4(3) is 3, Axis5(4) is 2
 #endif
 
@@ -79,7 +81,9 @@
 #endif
 
 #define SHARED_DIRECTION_PINS                    // Hint that the direction pins are shared
-#define SHARED_ENABLE_PIN       5                // Hint that the enable pins are shared
+#ifndef SHARED_ENABLE_PIN
+  #define SHARED_ENABLE_PIN     5                // Hint that the enable pins are shared
+#endif
 
 // Axis1 RA/Azm step/dir driver
 #define AXIS1_ENABLE_PIN        SHARED           // Enable pin control
