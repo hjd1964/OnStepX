@@ -186,11 +186,11 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     mountStatus.init();
   #endif
 
-  #ifdef ROTATOR_PRESENT
+  #if defined(ROTATOR_PRESENT) || defined(ROTATOR_CLIENT_PRESENT)
     rotator.init();
   #endif
 
-  #ifdef FOCUSER_PRESENT
+  #if defined(FOCUSER_PRESENT) || defined(FOCUSER_CLIENT_PRESENT)
     focuser.init();
   #endif
 
@@ -210,11 +210,11 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     mount.begin();
   #endif
 
-  #ifdef ROTATOR_PRESENT
+  #if defined(ROTATOR_PRESENT) || defined(ROTATOR_CLIENT_PRESENT)
     rotator.begin();
   #endif
 
-  #ifdef FOCUSER_PRESENT
+  #if defined(FOCUSER_PRESENT) || defined(FOCUSER_CLIENT_PRESENT)
     focuser.begin();
   #endif
 

@@ -80,11 +80,11 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
-  #ifdef ROTATOR_PRESENT
+  #if defined(ROTATOR_PRESENT) || defined(ROTATOR_CLIENT_PRESENT)
     if (rotator.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
-  #ifdef FOCUSER_PRESENT
+  #if defined(FOCUSER_PRESENT) || defined(FOCUSER_CLIENT_PRESENT)
     if (focuser.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
   #endif
 
