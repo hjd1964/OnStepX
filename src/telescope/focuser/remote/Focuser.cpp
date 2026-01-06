@@ -43,7 +43,7 @@ bool Focuser::command(char *reply, char *command, char *parameter,
     bool anySent = false;
     CommandError worst = CE_NONE;
 
-    for (uint8_t focuserIdx = 0; focuserIdx <= 5; focuserIdx++) {
+    for (uint8_t focuserIdx = 0; focuserIdx < 6; focuserIdx++) {
       if (!heartbeatFresh(focuserIdx)) continue;
       anySent = true;
 
@@ -73,9 +73,18 @@ bool Focuser::command(char *reply, char *command, char *parameter,
   }
 
   // --------------------------------------------------------------------------
-  // F - focuser commands (mirror your local order/behavior)
+  // F - focuser commands only
   // --------------------------------------------------------------------------
   if (command[0] != 'F') return false;
+
+  // find the default focuser if the current one isn't active
+  // if the current focuser is unassigned (-1) or disappears scan again
+  if (!heartbeatFresh(active)) {
+    active = -1;
+    for (int focuserIdx = 0; focuserIdx < 6; focuserIdx++) {
+      if (heartbeatFresh(focuserIdx)) { active = focuserIdx; break; }
+    }
+  }
 
   // --------------------------------------------------------------------------
   // :FA# / :FA[n]# active focuser return / selection
