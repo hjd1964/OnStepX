@@ -71,7 +71,7 @@ void Rotator::begin() {
     // start heartbeat task
     #if defined(ROTATOR_CAN_SERVER_PRESENT)
       VF("MSG: Rotator, starting CAN heartbeat task (rate 1s priority 6)... ");
- //     if (tasks.add(1000, 0, true, 6, rotHeartbeatWrapper, "RotHB")) { VLF("success"); } else { VLF("FAILED!"); }
+      if (tasks.add(1000, 0, true, 6, rotHeartbeatWrapper, "RotHB")) { VLF("success"); } else { VLF("FAILED!"); }
     #endif
 
     unpark();
