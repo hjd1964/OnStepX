@@ -194,6 +194,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     focuser.init();
   #endif
 
+  #if defined(FEATURES_PRESENT) || defined(FEATURES_CLIENT_PRESENT)
+    features.init();
+  #endif
+
   delay(1000);
 
   #ifdef SHARED_ENABLE_PIN
@@ -218,8 +222,8 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     focuser.begin();
   #endif
 
-  #ifdef FEATURES_PRESENT
-    features.init();
+  #if defined(FEATURES_PRESENT) || defined(FEATURES_CLIENT_PRESENT)
+    features.begin();
   #endif
 
   // write the default settings to NV

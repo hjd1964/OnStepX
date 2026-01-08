@@ -5,17 +5,19 @@
 
 #ifdef FEATURES_PRESENT
 
-#include "../../lib/convert/Convert.h"
-#include "../../libApp/weather/Weather.h"
-#include "../../telescope/Telescope.h"
+#include "../../../lib/convert/Convert.h"
+#include "../../../libApp/weather/Weather.h"
+#include "../../../telescope/Telescope.h"
 
-// process auxiliary feature commands
+// by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
+// return true if the command has been completely handled and no further command() will be called, or false if not
+// for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
+// numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 bool Features::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
 
   // get auXiliary feature
   if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {
-    // :GXXn#
+    // :GXX[n]#
     if (parameter[0] == 'X') { 
       int i = parameter[1] - '1';
       if (i < 0 || i > 7)  { *commandError = CE_PARAM_FORM; return true; }
