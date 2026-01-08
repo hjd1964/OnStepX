@@ -14,6 +14,7 @@
 #include "../../../libApp/temperature/Temperature.h"
 #include "../dewHeater/DewHeater.h"
 #include "../intervalometer/Intervalometer.h"
+#include "../powerMonitor/PowerMonitor.h"
 
 #ifdef COVER_SWITCH_SERVO_PRESENT
   #ifdef ESP32
@@ -83,6 +84,8 @@ public:
     inline void deviceOff(int index) { device[index].value = 0; digitalWriteEx(device[index].pin, LOW); }
  
   private:
+    void strCatPower(char *reply, int index);
+
     int16_t auxPins[8] = { AUX1_PIN, AUX2_PIN, AUX3_PIN, AUX4_PIN, AUX5_PIN, AUX6_PIN, AUX7_PIN, AUX8_PIN };
     Device device[8] = {
       { FEATURE1_NAME, FEATURE1_PURPOSE, FEATURE1_TEMP, FEATURE1_PIN, FEATURE1_VALUE_DEFAULT, FEATURE1_ON_STATE, FEATURE1_VALUE_MEMORY, NULL, NULL },

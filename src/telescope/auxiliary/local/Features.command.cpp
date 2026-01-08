@@ -9,6 +9,30 @@
 #include "../../../libApp/weather/Weather.h"
 #include "../../../telescope/Telescope.h"
 
+void Features::strCatPower(char *reply, int index) {
+  #ifdef POWER_MONITOR_PRESENT
+    // get voltage V and current I for channel [n]
+    // later for CAN these don't need to cover a very large range or precision so a fixed point 16bit
+    // representation will do (CanPayload.h has this format but perhaps add int16_t max to represent NAN)
+    // for example :GXV1# returns 12.3,0.5,PCvVT# or, if the channel doesn't exist NAN,NAN,!!!!!#
+    if (index < 0 || index > 7) return;
+
+    char s[40];
+    if (powerMonitor.hasVoltage(index)) sprintF(s, ",%1.1f", powerMonitor.getVoltage(index)); else strcpy(s, ",NAN");
+    strcat(reply, s);
+    if (powerMonitor.hasCurrent(index)) sprintF(s, ",%1.1f", powerMonitor.getCurrent(index)); else strcpy(s, ",NAN");
+    strcat(reply, s);
+    if (powerMonitor.hasChannel(index)) strcat(reply, ",P"); else strcat(reply, ",!");
+    if (!powerMonitor.errOverCurrent(index)) strcat(reply, "C"); else strcat(reply, "!");
+    if (!powerMonitor.errUnderVoltage(index)) strcat(reply, "v"); else strcat(reply, "!");
+    if (!powerMonitor.errOverVoltage(index)) strcat(reply, "V"); else strcat(reply, "!");
+    if (!powerMonitor.errOverTemperature(index)) strcat(reply, "T"); else strcat(reply, "!");
+  #else
+    UNUSED(reply);
+    UNUSED(index);
+  #endif
+}
+
 // by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
 // return true if the command has been completely handled and no further command() will be called, or false if not
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
@@ -26,11 +50,13 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
       if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == COVER_SWITCH) {
         sprintf(s, "%d", device[i].value);
         strcat(reply, s);
+        strCatPower(reply, i);
       } else
 
       if (device[i].purpose == ANALOG_OUTPUT) {
         sprintf(s, "%d", device[i].value);
         strcat(reply, s);
+        strCatPower(reply, i);
       } else
 
       if (device[i].purpose == DEW_HEATER) {
@@ -48,6 +74,8 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
 
         sprintF(s, "%3.1f", temperature.getChannel(i + 1) - weather.getDewPoint());
         strcat(reply, s);
+
+        strCatPower(reply, i);
       } else
 
       if (device[i].purpose == INTERVALOMETER) {
@@ -107,6 +135,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *supres
 
       *numericReply = false;
     } else return false;
+
   } else
 
   // set auXiliary feature

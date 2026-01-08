@@ -2402,3 +2402,10 @@
 #ifndef THERMISTOR2_RSERIES
 #define THERMISTOR2_RSERIES           4700                        // series resistor value (Ohms)
 #endif
+
+// power monitor detection
+#if (defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)) || \
+    (defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)) || \
+    defined(FAN_PIN)
+  #define POWER_MONITOR_PRESENT
+#endif

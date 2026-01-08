@@ -24,8 +24,13 @@ static void auxHeartbeatWrapper() {
 #endif
 
 void Features::init() {
+
   #if defined(FEATURES_CAN_SERVER_PRESENT)
     CanTransportServer::init(true, 2);
+  #endif
+
+  #ifdef POWER_MONITOR_PRESENT
+    powerMonitor.init();
   #endif
 
   for (int i = 0; i < 8; i++) {
