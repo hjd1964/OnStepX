@@ -38,6 +38,12 @@ class CanTransportClient {
                   const uint8_t *requestPayload, uint8_t requestLen,
                   uint8_t responsePayload[8], uint8_t &responseLen);
 
+    // Send request and wait for two correlated responses (tidop and tidop + 1 match).
+    // Returns true if a response was received (not if the command succeeded).
+    bool transact2(uint8_t expectedTidOp,
+                    const uint8_t *requestPayload, uint8_t requestLen,
+                    uint8_t responsePayload[14], uint8_t &responseLen);
+
     inline uint16_t requestCanId() const { return reqId; }
     inline uint16_t responseCanId() const { return rspId; }
 
@@ -88,11 +94,21 @@ class CanTransportClient {
 
     uint16_t timeoutMs = 1000;
 
-    // 1 in-flight request correlation
+    // in-flight request correlation mode
+    // 0=idle, 1=single, 2=double
+    volatile uint8_t rspMode = 0;
+
+    // first in-flight request correlation
     volatile bool    rspReady = false;
     volatile uint8_t rspLenLatched = 0;
-    volatile uint8_t expectedTidOpLatched = 0;
+    volatile uint8_t rspTidOpLatched = 0;
     uint8_t rspBuf[8] = {0};
+
+    // second in-flight request correlation
+    volatile bool    rsp1Ready = false;
+    volatile uint8_t rsp1LenLatched = 0;
+    volatile uint8_t rsp1TidOpLatched = 0;
+    uint8_t rsp1Buf[8] = {0};
 };
 
 #endif

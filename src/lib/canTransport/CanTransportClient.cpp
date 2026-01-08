@@ -36,33 +36,82 @@ bool CanTransportClient::transact(uint8_t expectedTidOp,
   if (!responsePayload) return false;
 
   // Arm correlation before TX
+  rspMode = 1;
   rspReady = false;
   rspLenLatched = 0;
-  expectedTidOpLatched = expectedTidOp;
+  rspTidOpLatched = expectedTidOp;
 
   canPlus.txWait();
-  if (!canPlus.writePacket((int)requestCanId(), requestPayload, requestLen)) return false;
+  if (!canPlus.writePacket((int)requestCanId(), requestPayload, requestLen)) { rspMode = 0; return false; }
 
   const uint32_t startUs   = micros();
   const uint32_t timeoutUs = (uint32_t)timeoutMs * 1000UL;
 
   while (!rspReady) {
     canPlus.rxBrust();
-    if ((uint32_t)(micros() - startUs) > timeoutUs) return false;
+    if ((uint32_t)(micros() - startUs) > timeoutUs) { rspMode = 0; return false; }
     tasks.yield();
   }
 
-  uint8_t gotLen = 0;
-
-  // Atomic snapshot of the response + clear "ready"
-  noInterrupts();
-  gotLen = rspLenLatched;
-  if (gotLen > 8) gotLen = 8;
-  for (uint8_t i = 0; i < gotLen; i++) responsePayload[i] = rspBuf[i];
+  responseLen = rspLenLatched;
+  for (uint8_t i = 0; i < rspLenLatched; i++) responsePayload[i] = rspBuf[i];
   rspReady = false;
-  interrupts();
 
-  responseLen = gotLen;
+  rspMode = 0;
+
+  return (responseLen >= 2);
+}
+
+bool CanTransportClient::transact2(uint8_t expectedTidOp,
+                                   const uint8_t *requestPayload, uint8_t requestLen,
+                                   uint8_t responsePayload[14], uint8_t &responseLen) {
+  responseLen = 0;
+  if (!canPlus.ready) return false;
+  if (!requestPayload || requestLen < 1 || requestLen > 8) return false;
+  if (!responsePayload) return false;
+
+  // Arm correlation before TX
+  rspMode = 2;
+  rspReady = false;
+  rspLenLatched = 0;
+  rspTidOpLatched = expectedTidOp;
+
+  // Arm correlation before TX (for second frame) 
+  rsp1Ready = false;
+  rsp1LenLatched = 0;
+  rsp1TidOpLatched = ((expectedTidOp & 0b11100000) + 0b00100000) | (expectedTidOp & 0b00011111);
+
+  canPlus.txWait();
+  if (!canPlus.writePacket((int)requestCanId(), requestPayload, requestLen)) { rspMode = 0; return false; }
+
+  const uint32_t startUs   = micros();
+  const uint32_t timeoutUs = (uint32_t)timeoutMs * 1000UL;
+
+  while (!(rspReady && rsp1Ready)) {
+    canPlus.rxBrust();
+    if ((uint32_t)(micros() - startUs) > timeoutUs) { rspMode = 0; return false; }
+    tasks.yield();
+  }
+
+  // Pack the first frame into the caller's 14-byte output
+  if (rspLenLatched >= 2 && rspLenLatched <= 8) {
+    for (uint8_t i = 0; i < rspLenLatched; i++) responsePayload[i] = rspBuf[i];
+    responseLen = rspLenLatched;
+
+    // Pack the second frame into the caller's 14-byte output (if it has any data content)
+    if (responseLen == 8 && rsp1LenLatched > 2 && rsp1LenLatched <= 8) {
+      uint8_t rsp1DataLength = (uint8_t)(rsp1LenLatched - 2);
+      for (uint8_t i = 0; i < rsp1DataLength; i++) responsePayload[8 + i] = rsp1Buf[i + 2];
+      responseLen = 8 + rsp1DataLength;
+    }
+
+  } else responseLen = 0;
+
+  rspReady = false;
+  rsp1Ready = false;
+
+  rspMode = 0;
+
   return (responseLen >= 2);
 }
 
@@ -70,12 +119,19 @@ void CanTransportClient::onResponse(const uint8_t data[8], uint8_t len) {
   if (len > 8) len = 8;
   if (len < 2) return;
 
-  // Correlate on tidop (byte 0 of response)
-  if (data[0] != expectedTidOpLatched) return;
+  // Correlate on tidop (byte 1 of response)
+  if (!rspReady && rspMode > 0 && data[0] == rspTidOpLatched) {
+    for (uint8_t i = 0; i < len; i++) rspBuf[i] = data[i];
+    rspLenLatched = len;
+    rspReady = true;
+  }
 
-  for (uint8_t i = 0; i < len; i++) rspBuf[i] = data[i];
-  rspLenLatched = len;
-  rspReady = true;
+  // Correlate on tidop (optional byte 2 of response)
+  if (!rsp1Ready && rspMode > 1 && data[0] == rsp1TidOpLatched) {
+    for (uint8_t i = 0; i < len; i++) rsp1Buf[i] = data[i];
+    rsp1LenLatched = len;
+    rsp1Ready = true;
+  }
 }
 
 // -------------------- slot allocation --------------------
