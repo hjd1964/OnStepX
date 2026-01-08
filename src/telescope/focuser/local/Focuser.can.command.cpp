@@ -11,6 +11,9 @@
 extern Axis axis4;
 #define FOCUSER_CAN_INDEX 0 // for the first focuser at axis 4
 
+// default command semantics (mirrors the common command contract):
+// handled=true, numericReply=true, suppressFrame=false, commandError=CE_NONE
+// numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
   if (len < 2) return; // need tidop + ctrl
 
@@ -31,8 +34,8 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
   uint8_t payloadLen = 0;
 
   bool handled        = true;
-  bool numericReply   = true;   // default: boolean 1/0 behavior
-  bool suppressFrame  = true;   // not used on CAN wire, but keep contract
+  bool numericReply   = true;
+  bool suppressFrame  = false;
   CommandError commandError = CE_NONE;
 
   // Unit conversions (apply ONLY to I/M/G/R/S/B/D)
@@ -73,7 +76,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       payload[payloadLen++] = axis4.isSlewing() ? (uint8_t)'M' : (uint8_t)'S';
       payload[payloadLen++] = (uint8_t)('0' + getGotoRate(FOCUSER_CAN_INDEX)); // 1..5 in your local code
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     // :Fp# -> status-only boolean (matches local: CE_0 if not DC)
@@ -90,7 +92,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       outp.writeI32LE(out);
       payloadLen = outp.offset();
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     // :FM# -> i32 units
@@ -101,7 +102,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       outp.writeI32LE(out);
       payloadLen = outp.offset();
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     // :Fe# -> f32 (deg C)
@@ -112,7 +112,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       outp.writeF32LE(diff);
       payloadLen = outp.offset();
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     // :Ft# -> f32 (deg C)
@@ -121,8 +120,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload outp(payload, sizeof(payload));
       outp.writeF32LE(t);
       payloadLen = outp.offset();
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :Fu# -> f32 (microns per step)
@@ -131,8 +129,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload outp(payload, sizeof(payload));
       outp.writeF32LE(umPerStep);
       payloadLen = outp.offset();
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :FB# (get) or :FB[n]# (set) -> values in units (microns or steps)
@@ -142,8 +139,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
         CanPayload outp(payload, sizeof(payload));
         outp.writeI32LE(vUnits);
         payloadLen = outp.offset();
-        numericReply  = false;
-        suppressFrame = false;
+        numericReply = false;
       } else {
         int32_t vUnits = 0;
         if (!args.readI32LE(vUnits)) { commandError = CE_PARAM_FORM; break; }
@@ -161,7 +157,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
         outp.writeF32LE(c);
         payloadLen = outp.offset();
         numericReply  = false;
-        suppressFrame = false;
       } else {
         float v = 0.0f;
         if (!args.readF32LE(v)) { commandError = CE_PARAM_FORM; break; }
@@ -178,7 +173,6 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
         if (!args.readU8(en)) { commandError = CE_PARAM_FORM; break; }
         commandError = setTcfEnable(FOCUSER_CAN_INDEX, en != 0);
       }
-      // numericReply stays true; no payload
     } break;
 
     // :FD# (get) or :FD[n]# (set) -> values in units
@@ -188,8 +182,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
         CanPayload outp(payload, sizeof(payload));
         outp.writeI32LE(vUnits);
         payloadLen = outp.offset();
-        numericReply  = false;
-        suppressFrame = false;
+        numericReply = false;
       } else {
         int32_t vUnits = 0;
         if (!args.readI32LE(vUnits)) { commandError = CE_PARAM_FORM; break; }
@@ -206,8 +199,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
         CanPayload outp(payload, sizeof(payload));
         outp.writeU8(pwr);
         payloadLen = outp.offset();
-        numericReply  = false;
-        suppressFrame = false;
+        numericReply = false;
       } else {
         uint8_t pwr = 0;
         if (!args.readU8(pwr)) { commandError = CE_PARAM_FORM; break; }
@@ -237,8 +229,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload outp(payload, sizeof(payload));
       outp.writeI32LE(umps);
       payloadLen = outp.offset();
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :F+# / :F-# -> no reply text
@@ -260,8 +251,7 @@ void Focuser::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload outp(payload, sizeof(payload));
       outp.writeI32LE(posUnits);
       payloadLen = outp.offset();
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :FR[sn]# -> no reply text (relative)

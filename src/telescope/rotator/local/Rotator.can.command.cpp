@@ -13,6 +13,9 @@
 
 extern Axis axis3;
 
+// default command semantics (mirrors the common command contract):
+// handled=true, numericReply=true, suppressFrame=false, commandError=CE_NONE
+// numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
   const uint8_t tidop = data[0];
   const uint8_t op    = (uint8_t)(tidop & 0x1F);
@@ -25,7 +28,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
 
   bool handled        = true;
   bool numericReply   = true;
-  bool suppressFrame  = true;
+  bool suppressFrame  = false;
   CommandError commandError = CE_NONE;
 
   switch (op) {
@@ -34,20 +37,17 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     case ROT_OP_PARK_HP: {
       CommandError e = park();
       commandError = (e == CE_NONE) ? CE_1 : e;
-      // numericReply=true, suppressFrame=true (defaults)
     } break;
 
     // :hR#
     case ROT_OP_UNPARK_HR: {
       CommandError e = unpark();
       commandError = (e == CE_NONE) ? CE_1 : e;
-      // numericReply=true, suppressFrame=true (defaults)
     } break;
 
     // :rA#
     case ROT_OP_ACTIVE_RA: {
       commandError = CE_1;
-      // numericReply=true, suppressFrame=true (defaults)
     } break;
 
     // :rT#
@@ -60,8 +60,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       }
       payload[payloadLen++] = (uint8_t)('0' + getGotoRate());
 
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :rI#
@@ -70,8 +69,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload out(payload, sizeof(payload));
       out.writeI32LE(deg);
       payloadLen = out.offset(); // 4
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :rM#
@@ -80,8 +78,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload out(payload, sizeof(payload));
       out.writeI32LE(deg);
       payloadLen = out.offset(); // 4
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :rD#
@@ -90,8 +87,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload out(payload, sizeof(payload));
       out.writeF32LE(degPerStep);
       payloadLen = out.offset(); // 4
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :rb# or :rb[n]#
@@ -102,14 +98,12 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
         CanPayload out(payload, sizeof(payload));
         out.writeI16LE(steps);
         payloadLen = out.offset(); // 2
-        numericReply  = false;
-        suppressFrame = false;
+        numericReply = false;
       } else {
         int16_t steps = 0;
         if (!args.readI16LE(steps)) { commandError = CE_PARAM_FORM; break; }
         CommandError e = setBacklash((long)steps);
         commandError = (e == CE_NONE) ? CE_1 : e;
-        // numericReply=true, suppressFrame=true (defaults)
       }
     } break;
 
@@ -136,8 +130,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       CanPayload out(payload, sizeof(payload));
       out.writeF32LE(dps);
       payloadLen = out.offset(); // 4
-      numericReply  = false;
-      suppressFrame = false;
+      numericReply = false;
     } break;
 
     // :rc# (ignored/no-op)
@@ -164,7 +157,6 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       out.writeF32LE(deg);
       payloadLen = out.offset(); // 4
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     // :rr[deg]#
@@ -181,7 +173,6 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       float deg = 0.0F;
       if (!args.readF32LE(deg)) { commandError = CE_PARAM_FORM; break; }
       commandError = gotoTarget(deg);
-      // numericReply=true, suppressFrame=true (defaults) for CE_1 style response if you set it elsewhere
     } break;
 
     // :rZ#
@@ -261,7 +252,6 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
 
       payload[payloadLen++] = c;
       numericReply  = false;
-      suppressFrame = false;
     } break;
 
     default:
