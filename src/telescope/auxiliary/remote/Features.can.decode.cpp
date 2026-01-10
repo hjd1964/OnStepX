@@ -7,22 +7,12 @@
 
 #include "../FeaturesBase.h"
 #include "../../../lib/convert/Convert.h"
-#include "../../../lib/canTransport/CanPayload.h"
 
 // ---------- helpers ----------
-
-static inline uint16_t readU16LE(const uint8_t *p) {
-  return (uint16_t)((uint16_t)p[0] | ((uint16_t)p[1] << 8));
-}
 
 // Dew heater: -5.0..+20.0C encoded as 0..250 in 0.1C steps (one byte).
 static inline float unpackDew01C(uint8_t enc) {
   return ((float)enc / 10.0f) - 5.0f;
-}
-
-// Intervalometer: seconds encoded as 0.1s units in u16.
-static inline float unpack01s(uint16_t enc) {
-  return (float)enc / 10.0f;
 }
 
 static inline void fmtSeconds(char *out, float v, bool isExposure) {
@@ -43,148 +33,130 @@ static inline void fmtSeconds(char *out, float v, bool isExposure) {
   dtostrf(v, 0, d, out);
 }
 
-bool Features::decodeResponse(char *reply,
-                             uint8_t opcode,
-                             const uint8_t responsePayload[8], uint8_t responseLen,
-                             bool &supressFrame, bool &numericReply) {
-  (void)supressFrame;
-  (void)numericReply;
-
+bool Features::decodeResponse(char *reply) {
   if (!reply) return false;
   reply[0] = 0;
 
-  // Must have at least [tidop,status]
-  if (responseLen < 2) return false;
-
-  // In transact2(), the first 8 bytes are the first CAN frame,
-  // and any bytes beyond 8 are the *data bytes only* from frame 2 (status/tidop stripped).
-  const bool hasSecond = (responseLen > 8);
-  const uint8_t firstFrameLen = (responseLen >= 8) ? 8 : responseLen;
-
-  const uint8_t dataLen0 = (firstFrameLen >= 2) ? (uint8_t)(firstFrameLen - 2) : 0;
-  const uint8_t *data0   = (dataLen0 ? &responsePayload[2] : nullptr);
-
-  const uint8_t dataLen1 = hasSecond ? (uint8_t)(responseLen - 8) : 0;
-  const uint8_t *data1   = hasSecond ? (const uint8_t*)(&responsePayload[8]) : nullptr;
-
-  switch (opcode) {
+  switch (opCode()) {
 
     // :GXY0# -> "01010101" (8 chars, no terminator transmitted on CAN; we add it locally)
     case FEAT_OP_GET_ACTIVE_Y0: {
-      if (dataLen0 < 1) return false;
-      const uint8_t bitmap = data0[0];
+      uint8_t bitmap = 0;
+      if (!readU8(bitmap)) return false;
 
-      for (uint8_t i = 0; i < 8; i++) {
-        reply[i] = (bitmap & (1U << i)) ? '1' : '0';
-      }
+      for (uint8_t i = 0; i < 8; i++) { reply[i] = (bitmap & (1U << i)) ? '1' : '0'; }
       reply[8] = 0;
-      return true;
-    }
+    } break;
 
     // :GXYn# -> "NAME,PURPOSE" (NAME up to 10 chars; PURPOSE numeric)
     // Wire:
     //   frame0 data: [purpose][name0..name4]
     //   frame1 data: [name5..name10] (up to 6 bytes)
     case FEAT_OP_GET_INFO_Yn: {
-      if (dataLen0 < 1) return false;
+      uint8_t purpose = 0;
+      if (!readU8(purpose)) return false;
 
-      const uint8_t purpose = data0[0];
+      char name[14];
+      int len = readRemainingBytes((uint8_t*)name);
+      name[len] = 0;
 
-      char name[11];
-      uint8_t n = 0;
+      sprintf(reply, "%s,%u", name, (unsigned)purpose);
+    } break;
 
-      // Take up to 5 bytes from frame0 after purpose
-      for (uint8_t i = 1; i < dataLen0 && n < 10; i++) {
-        name[n++] = (char)data0[i];
-      }
-
-      // Then up to 6 bytes from frame1 (already data-only)
-      for (uint8_t i = 0; i < dataLen1 && n < 10; i++) {
-        name[n++] = (char)data1[i];
-      }
-
-      name[n] = 0;
-
-      // Build "name,purpose"
-      char pbuf[8];
-      snprintf(pbuf, sizeof(pbuf), "%u", (unsigned)purpose);
-
-      strcpy(reply, name);
-      strcat(reply, ",");
-      strcat(reply, pbuf);
-      return true;
-    }
-
-    // :GXXn# -> per-purpose value reply, rendered as original comma-separated ASCII where applicable.
+    // :GXXn# -> per-purpose value reply, rendered as original comma-separated ASCII,
+    // with optional power monitor telemetry appended (matches Features::strCatPower()).
     //
-    // We decode by payload size (since purpose is not carried on-wire here):
-    //   1 byte  => switch or analog output: "v"
-    //   4 bytes => dew heater: "en,zero,span,delta"
-    //   6 bytes => intervalometer: "cur,exp,delay,count"
+    // Wire (frame0 data is always 6 bytes; purpose is included):
+    //   frame0 data: [purpose][value bytes...]
+    //   frame1 data: optional [intervalometerCount] + optional [V i16 0.1][I i16 0.1][flags]
+    //
+    // Voltage/current fixed-point: enc = round(x * 10), int16 LE; 0x8000 => NAN.
+    // Flags: FEAT_POWER_FLAGS_PRESENT + FEAT_POWER_FAULT_* (see FeaturesBase.h).
     case FEAT_OP_GET_VALUE_Xn: {
-      if (dataLen0 == 0) return false;
+      uint8_t purpose = 0;
+      if (!readU8(purpose)) return false;
 
-      if (dataLen0 == 1) {
-        // SWITCH / ANALOG_OUTPUT
-        char s[8];
-        snprintf(s, sizeof(s), "%u", (unsigned)data0[0]);
-        strcpy(reply, s);
-        return true;
-      }
+      // -------- value decode --------
+      if (purpose == SWITCH || purpose == MOMENTARY_SWITCH || purpose == COVER_SWITCH) {
+        uint8_t v = 0;
+        if (!readU8(v)) return false;
+        sprintf(reply, "%u", (unsigned)v);
+      } else
 
-      if (dataLen0 == 4) {
-        // DEW_HEATER
-        const uint8_t en   = data0[0];
-        const float zero   = unpackDew01C(data0[1]);
-        const float span   = unpackDew01C(data0[2]);
-        const int8_t denc  = (int8_t)data0[3];
-        const float delta  = ((float)denc) / 2.0f; // 0.5C steps
+      if (purpose == ANALOG_OUTPUT) {
+        uint8_t v = 0;
+        if (!readU8(v)) return false;
+        sprintf(reply, "%u", (unsigned)v);
+      } else
 
-        char s0[8], s1[16], s2[16], s3[16];
-        snprintf(s0, sizeof(s0), "%u", (unsigned)en);
+      if (purpose == DEW_HEATER) {
+        uint8_t en = 0;
+        uint8_t zEnc = 0;
+        uint8_t sEnc = 0;
+        float delta = 0;
+        if (!readU8(en) || !readU8(zEnc) || !readU8(sEnc) || !readFixedI16(delta, 10)) return false;
+
+        const float zero = unpackDew01C(zEnc);
+        const float span = unpackDew01C(sEnc);
+
+        char s1[16], s2[16], s3[16];
         dtostrf(zero, 0, 1, s1);
         dtostrf(span, 0, 1, s2);
-        dtostrf(delta, 0, 1, s3);
+        if (isnan(delta)) strcpy(s3, "NAN"); else dtostrf(delta, 0, 1, s3);
+        sprintf(reply, "%u,%s,%s,%s", (unsigned)en, s1, s2, s3);
+      } else
 
-        strcpy(reply, s0);
-        strcat(reply, ",");
-        strcat(reply, s1);
-        strcat(reply, ",");
-        strcat(reply, s2);
-        strcat(reply, ",");
-        strcat(reply, s3);
-        return true;
-      }
+      if (purpose == INTERVALOMETER) {
+        uint8_t cur = 0;
+        uint8_t expB = 0;
+        uint8_t delB = 0;
+        uint8_t count = 0;
 
-      if (dataLen0 == 6) {
-        // INTERVALOMETER (fixed 6 bytes)
-        const uint8_t cur = data0[0];
-        const float exposure = unpack01s(readU16LE(&data0[1]));
-        const float delay    = unpack01s(readU16LE(&data0[3]));
-        const uint8_t count  = data0[5];
+        if (!readU8(cur) || !readU8(expB) || !readU8(delB) || !readU8(count)) return false;
 
-        char sCur[8], sExp[20], sDel[20], sCnt[8];
-        snprintf(sCur, sizeof(sCur), "%u", (unsigned)cur);
+        const float exposure = convert.unpackSeconds(expB);
+        const float delay    = convert.unpackSeconds(delB);
+
+        char sExp[20], sDel[20];
         fmtSeconds(sExp, exposure, true);
         fmtSeconds(sDel, delay, false);
-        snprintf(sCnt, sizeof(sCnt), "%u", (unsigned)count);
-
-        strcpy(reply, sCur);
-        strcat(reply, ",");
-        strcat(reply, sExp);
-        strcat(reply, ",");
-        strcat(reply, sDel);
-        strcat(reply, ",");
-        strcat(reply, sCnt);
-        return true;
+        sprintf(reply, "%u,%s,%s,%u", (unsigned)cur, sExp, sDel, (unsigned)count);
+      } else {
+        // Unknown purpose; return first value byte as integer
+        uint8_t v = 0;
+        if (!readU8(v)) return false;
+        sprintf(reply, "%u", (unsigned)v);
       }
 
-      // Fallback: return first byte as integer
-      char s[8];
-      snprintf(s, sizeof(s), "%u", (unsigned)data0[0]);
-      strcpy(reply, s);
-      return true;
-    }
+      // optional power telemetry append
+      if (remaining() == 5) {
+        float volts = NAN;
+        float amps  = NAN;
+        uint8_t flags = 0;
+
+        if (!readFixedI16(volts, 10) || !readFixedI16(amps, 10) || !readU8(flags)) return false;
+
+        const bool present = ((flags & FEAT_POWER_FLAGS_PRESENT) != 0);
+
+        if (!present) { strcat(reply, ",NAN,NAN,!!!!!"); return true; }
+
+        if (isnan(volts)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", volts); strcat(reply, s); }
+
+        if (isnan(amps)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", amps); strcat(reply, s); }
+
+        // Flags string: ",P" + (C/v/V/T or !)
+        char fs[8];
+        fs[0] = ',';
+        fs[1] = 'P';
+        fs[2] = (flags & FEAT_POWER_FAULT_OC) ? '!' : 'C';
+        fs[3] = (flags & FEAT_POWER_FAULT_UV) ? '!' : 'v';
+        fs[4] = (flags & FEAT_POWER_FAULT_OV) ? '!' : 'V';
+        fs[5] = (flags & FEAT_POWER_FAULT_OT) ? '!' : 'T';
+        fs[6] = 0;
+        strcat(reply, fs);
+      }
+
+    } break;
 
     // SET op is normally numericReply=true (so decodeResponse won't be called),
     // but keep it harmless if it is.
@@ -192,7 +164,10 @@ bool Features::decodeResponse(char *reply,
     default:
       reply[0] = 0;
       return true;
+    break;
   }
+
+  return true;
 }
 
 #endif

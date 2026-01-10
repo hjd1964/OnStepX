@@ -11,10 +11,6 @@
 
 void Features::strCatPower(char *reply, int index) {
   #ifdef POWER_MONITOR_PRESENT
-    // get voltage V and current I for channel [n]
-    // later for CAN these don't need to cover a very large range or precision so a fixed point 16bit
-    // representation will do (CanPayload.h has this format but perhaps add int16_t max to represent NAN)
-    // for example :GXV1# returns 12.3,0.5,PCvVT# or, if the channel doesn't exist NAN,NAN,!!!!!#
     if (index < 0 || index > 7) return;
 
     char s[40];
@@ -38,6 +34,7 @@ void Features::strCatPower(char *reply, int index) {
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 bool Features::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  if (!ready) return false;
 
   // get auXiliary feature
   if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {
@@ -72,7 +69,8 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
         strcat(reply, s);
         strcat(reply, ",");
 
-        sprintF(s, "%3.1f", temperature.getChannel(i + 1) - weather.getDewPoint());
+        float deltaT = temperature.getChannel(i + 1) - weather.getDewPoint();
+        if (isnan(deltaT)) strcpy(s,"NAN"); else sprintF(s, "%3.1f", deltaT);
         strcat(reply, s);
 
         strCatPower(reply, i);
@@ -100,6 +98,40 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
         sprintf(s, "%d", (int)device[i].intervalometer->getCount());
         strcat(reply, s);
       } else { *commandError = CE_CMD_UNKNOWN; return true; }
+      
+      // optional power telemetry append
+      #ifdef POWER_MONITOR_PRESENT
+        uint8_t flags = 0;
+        const bool present = powerMonitor.hasChannel(i);
+        if (present) flags |= FEAT_POWER_FLAGS_PRESENT;
+        if (powerMonitor.errOverCurrent(i))      flags |= FEAT_POWER_FAULT_OC;
+        if (powerMonitor.errUnderVoltage(i))     flags |= FEAT_POWER_FAULT_UV;
+        if (powerMonitor.errOverVoltage(i))      flags |= FEAT_POWER_FAULT_OV;
+        if (powerMonitor.errOverTemperature(i))  flags |= FEAT_POWER_FAULT_OT;
+
+        float v = NAN;
+        float i = NAN;
+        if (powerMonitor.hasVoltage(i)) v = powerMonitor.getVoltage(i);
+        if (powerMonitor.hasCurrent(i)) i = powerMonitor.getCurrent(i);
+
+        if (!present) { strcat(reply, ",NAN,NAN,!!!!!"); return true; }
+
+        if (isnan(volts)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", volts); strcat(reply, s); }
+
+        if (isnan(amps)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", amps); strcat(reply, s); }
+
+        // Flags string: ",P" + (C/v/V/T or !)
+        char fs[8];
+        fs[0] = ',';
+        fs[1] = 'P';
+        fs[2] = (flags & FEAT_POWER_FAULT_OC) ? '!' : 'C';
+        fs[3] = (flags & FEAT_POWER_FAULT_UV) ? '!' : 'v';
+        fs[4] = (flags & FEAT_POWER_FAULT_OV) ? '!' : 'V';
+        fs[5] = (flags & FEAT_POWER_FAULT_OT) ? '!' : 'T';
+        fs[6] = 0;
+        strcat(reply, fs);
+      #endif
+
       *numericReply = false;
     } else
 

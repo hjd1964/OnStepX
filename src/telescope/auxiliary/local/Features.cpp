@@ -23,10 +23,10 @@ static void auxHeartbeatWrapper() {
 }
 #endif
 
-void Features::init() {
+bool Features::init() {
 
   #if defined(FEATURES_CAN_SERVER_PRESENT)
-    CanTransportServer::init(true, 2);
+    if (!CanTransportServer::init(true, 2)) return false;
   #endif
 
   #ifdef POWER_MONITOR_PRESENT
@@ -87,10 +87,16 @@ void Features::init() {
   }
 
   VF("MSG: Auxiliary, start feature monitor task (rate 20ms priority 6)... ");
-  if (tasks.add(20, 0, true, 6, featuresPollWrapper, "AuxPoll")) { VLF("success"); } else { VLF("FAILED!"); }
+  if (tasks.add(20, 0, true, 6, featuresPollWrapper, "AuxPoll")) { VLF("success"); } else { VLF("FAILED!"); return false; }
+
+  ready = true;
+
+  return true;
 }
 
 void Features::begin() {
+  if (!ready) return;
+
   // start heartbeat task
   #if defined(FEATURES_CAN_SERVER_PRESENT)
     VF("MSG: Auxiliary, starting CAN heartbeat task (rate 1s priority 6)... ");

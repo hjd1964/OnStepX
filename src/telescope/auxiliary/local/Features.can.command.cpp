@@ -1,39 +1,22 @@
 //--------------------------------------------------------------------------------------------------
-// local auxiliary features control, using the CANbus interface
+// local auxiliary features control, using the CANbus interface (CAN server)
 
 #include "Features.h"
 
-#ifdef FEATURES_CAN_SERVER_PRESENT
+#if defined(FEATURES_CAN_SERVER_PRESENT)
 
+#include "../FeaturesBase.h"
 #include "../../../lib/convert/Convert.h"
 #include "../../../libApp/weather/Weather.h"
 #include "../../../telescope/Telescope.h"
-
-// ---------- helpers ----------
-
-static inline uint8_t tidopPlus1(uint8_t tidop) {
-  const uint8_t op  = (uint8_t)(tidop & 0x1F);
-  const uint8_t tid = (uint8_t)((tidop >> 5) & 0x07);
-  const uint8_t tid1 = (uint8_t)((tid + 1) & 0x07);
-  return (uint8_t)((tid1 << 5) | op);
-}
-
-static inline uint16_t readU16LE(const uint8_t *p) {
-  return (uint16_t)((uint16_t)p[0] | ((uint16_t)p[1] << 8));
-}
-
-static inline void writeU16LE(uint8_t *p, uint16_t v) {
-  p[0] = (uint8_t)(v & 0xFF);
-  p[1] = (uint8_t)((v >> 8) & 0xFF);
-}
 
 // Dew heater: -5.0..+20.0C encoded as 0..250 in 0.1C steps (one byte).
 static inline uint8_t packDew01C(float v) {
   if (v < -5.0f) v = -5.0f;
   if (v > 20.0f) v = 20.0f;
-  const int enc = (int)lroundf((v + 5.0f) * 10.0f);
-  if (enc < 0) return 0;
-  if (enc > 250) return 250;
+  long enc = lroundf((v + 5.0f) * 10.0f);
+  if (enc < 0) enc = 0;
+  if (enc > 250) enc = 250;
   return (uint8_t)enc;
 }
 
@@ -41,341 +24,233 @@ static inline float unpackDew01C(uint8_t enc) {
   return ((float)enc / 10.0f) - 5.0f;
 }
 
-// Intervalometer: seconds encoded as 0.1s units in u16.
-static inline uint16_t pack01s(float sec) {
-  if (sec < 0.0f) sec = 0.0f;
-  if (sec > 6553.5f) sec = 6553.5f;
-  const int v = (int)lroundf(sec * 10.0f);
-  if (v < 0) return 0;
-  if (v > 65535) return 65535;
-  return (uint16_t)v;
-}
+void Features::processCommand() {
 
-static inline float unpack01s(uint16_t enc) {
-  return (float)enc / 10.0f;
-}
-
-// ---------- command processor ----------
-//
-// Request frames: [ tidop, ...args ]
-//
-// Args (after tidop):
-//   FEAT_OP_GET_ACTIVE_Y0: (none)
-//   FEAT_OP_GET_INFO_Yn  : [ idx ]      idx 0..7
-//   FEAT_OP_GET_VALUE_Xn : [ idx ]      idx 0..7
-//   FEAT_OP_SET_VALUE_Xn : [ idx, sub, data... ]
-//     sub: 'V','Z','S','E','D','C' (aligned to Features.command.cpp)
-//
-// Responses:
-//   Single: [ tidop, status, payload... ]   (payload 0..6 bytes)
-//   Two-frame (GET_INFO only):
-//     frame0 tidop:   payload = [purpose, name_part0...]  (purpose + up to 5 chars)
-//     frame1 tidop+1: payload = [name_part1...]           (up to 6 chars)
-//   No terminators transmitted; DLC is authoritative.
-
-// default command semantics (mirrors the common command contract):
-// handled=true, numericReply=true, suppressFrame=false, commandError=CE_NONE
-// numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
-void Features::processCommand(const uint8_t data[8], uint8_t len) {
-  if (len < 1) return;
-
-  const uint8_t tidop = data[0];
-  const uint8_t op    = (uint8_t)(tidop & 0x1F);
-
-  const uint8_t *args = (len > 1) ? &data[1] : nullptr;
-  const uint8_t  argLen = (len > 1) ? (uint8_t)(len - 1) : 0;
-
-  uint8_t payload[6] = {0};
-  uint8_t payloadLen = 0;
-
-  // Standard defaults
   bool handled        = true;
   bool numericReply   = true;
   bool suppressFrame  = false;
   CommandError commandError = CE_NONE;
 
-  auto send1 = [&](uint8_t rspTidOp, const uint8_t *pl, uint8_t plLen) {
-    const uint8_t status = packStatus(handled, numericReply, suppressFrame, commandError);
-    sendResponse(rspTidOp, status, (plLen ? pl : nullptr), plLen);
-  };
+  switch (opCode()) {
 
-  auto sendErr = [&](CommandError ce) {
-    commandError = ce;
-    send1(tidop, nullptr, 0);
-  };
-
-  auto parseIdx = [&](int &idx) -> bool {
-    if (argLen < 1) return false;
-    idx = (int)args[0];
-    return (idx >= 0 && idx <= 7);
-  };
-
-  switch (op) {
-
-    // :GXY0# -> bitmap of active features (bit i => device[i].purpose != OFF)
+    // ------------------------------------------------------------
+    // :GXY0#  -> bitmap of active features (8 bits)
+    // Payload: [u8 bitmap]
+    // ------------------------------------------------------------
     case FEAT_OP_GET_ACTIVE_Y0: {
-      numericReply = false;
-
       uint8_t bitmap = 0;
       for (uint8_t i = 0; i < 8; i++) {
         if (device[i].purpose != OFF) bitmap |= (uint8_t)(1U << i);
       }
-      payload[payloadLen++] = bitmap;
+      writeU8(bitmap);
+      numericReply = false;
+    } break;
 
-      send1(tidop, payload, payloadLen);
-
-      return;
-    }
-
-    // :GXYn# -> purpose + short name (two-frame)
+    // ------------------------------------------------------------
+    // :GXYn#  (wire: idx 0..7) -> purpose + short name
+    // Payload: [u8 purpose][name bytes... up to 10]
+    // (No terminator; client adds it.)
+    // ------------------------------------------------------------
     case FEAT_OP_GET_INFO_Yn: {
-      numericReply = false;
+      uint8_t idx = 0;
+      if (!readU8(idx)) { commandError = CE_PARAM_FORM; break; }
+      if (idx > 7)      { commandError = CE_PARAM_RANGE; break; }
 
-      int idx = 0;
-      if (!parseIdx(idx)) { sendErr(CE_PARAM_RANGE); return; }
-      if (device[idx].purpose == OFF) { sendErr(CE_0); return; }
+      const int pRaw = device[idx].purpose;
+      if (pRaw == OFF) { commandError = CE_0; break; }
 
-      // Normalize purpose for MOMENTARY/COVER as SWITCH (matches LX200 handler)
-      int purpose = device[idx].purpose;
-      if (purpose == MOMENTARY_SWITCH || purpose == COVER_SWITCH) purpose = SWITCH;
+      // Match Features.command.cpp: report MOMENTARY/COVER as SWITCH in purpose field.
+      int p = pRaw;
+      if (p == MOMENTARY_SWITCH || p == COVER_SWITCH) p = SWITCH;
 
-      // Keep name short. Local LX200 truncates to 10; we follow that.
-      const char *nm = device[idx].name ? device[idx].name : "";
+      writeU8((uint8_t)p);
+
       char name10[10];
-      uint8_t nlen = 0;
-      while (nlen < 10 && nm[nlen] != 0) { name10[nlen] = nm[nlen]; nlen++; }
+      memset(name10, 0, sizeof(name10));
+      strncpy(name10, device[idx].name, 10);
 
-      // Frame 0 MUST be a full 6-byte payload so the client transact2() will
-      // reliably append frame1 data when present.
-      uint8_t p0[6] = {0};
-      p0[0] = (uint8_t)purpose;
+      const uint8_t n = (uint8_t)strnlen(name10, 10);
+      if (n > 0) writeBytes((const uint8_t*)name10, n);
 
-      const uint8_t n0 = (nlen > 5) ? 5 : nlen;
-      for (uint8_t i = 0; i < n0; i++) p0[1 + i] = (uint8_t)name10[i];
-      const uint8_t p0Len = 6;
-
-      // Frame 1: remainder up to 6 bytes
-      uint8_t p1[6] = {0};
-      uint8_t p1Len = 0;
-      const uint8_t rem = (nlen > n0) ? (uint8_t)(nlen - n0) : 0;
-      const uint8_t n1  = (rem > 6) ? 6 : rem;
-      for (uint8_t i = 0; i < n1; i++) p1[p1Len++] = (uint8_t)name10[n0 + i];
-
-      // Always send both frames (client transact2 waits for both)
-      send1(tidop, p0, p0Len);
-      send1(tidopPlus1(tidop), p1, p1Len);
-
-      return;
-    }
-
-    // :GXXn# -> get value (packed by purpose)
-    case FEAT_OP_GET_VALUE_Xn: {
+      // payload <= 11 bytes -> fits dual (12 max)
       numericReply = false;
+    } break;
 
-      int idx = 0;
-      if (!parseIdx(idx)) { sendErr(CE_PARAM_RANGE); return; }
-      if (device[idx].purpose == OFF) { sendErr(CE_CMD_UNKNOWN); return; }
+    // ------------------------------------------------------------
+    // :GXXn#  (wire: idx 0..7) -> per-purpose packed values
+    // Payload always begins with [u8 purpose]
+    // Then purpose-specific bytes:
+    //   SWITCH/ANALOG:        [u8 value]
+    //   DEW_HEATER:           [u8 en][u8 zEnc][u8 sEnc][u8 dEnc(0.5C int8 as u8)]
+    //   INTERVALOMETER:       [u8 cur][u8 expB][u8 delB][u8 count]
+    // Optional (when POWER_MONITOR_PRESENT): append 5 bytes:
+    //   [i16 volts_q0.1][i16 amps_q0.1][u8 flags]
+    // Total stays <= 12.
+    // ------------------------------------------------------------
+    case FEAT_OP_GET_VALUE_Xn: {
+      uint8_t idx = 0;
+      if (!readU8(idx)) { commandError = CE_PARAM_FORM; break; }
+      if (idx > 7)      { commandError = CE_PARAM_RANGE; break; }
 
-      const int purpose = device[idx].purpose;
+      const int p = device[idx].purpose;
+      if (p == OFF) { commandError = CE_CMD_UNKNOWN; break; }
 
-      if (purpose == SWITCH || purpose == MOMENTARY_SWITCH || purpose == COVER_SWITCH) {
-        payload[payloadLen++] = (uint8_t)((device[idx].value != 0) ? 1 : 0);
+      writeU8((uint8_t)p);
 
+      if (p == SWITCH || p == MOMENTARY_SWITCH || p == COVER_SWITCH) {
+        writeU8((uint8_t)device[idx].value);
       } else
 
-      if (purpose == ANALOG_OUTPUT) {
-        numericReply = false;
-
-        payload[payloadLen++] = (uint8_t)device[idx].value; // 0..255
-
+      if (p == ANALOG_OUTPUT) {
+        writeU8((uint8_t)device[idx].value);
       } else
 
-      if (purpose == DEW_HEATER) {
-        numericReply = false;
+      if (p == DEW_HEATER) {
+        const uint8_t en   = (uint8_t)(device[idx].dewHeater->isEnabled() ? 1 : 0);
+        const uint8_t zEnc = packDew01C(device[idx].dewHeater->getZero());
+        const uint8_t sEnc = packDew01C(device[idx].dewHeater->getSpan());
+        const float delta = (float)(temperature.getChannel((int)idx + 1) - weather.getDewPoint());
 
-        if (!device[idx].dewHeater) { sendErr(CE_REPLY_UNKNOWN); return; }
-
-        payload[payloadLen++] = (uint8_t)(device[idx].dewHeater->isEnabled() ? 1 : 0);
-        payload[payloadLen++] = packDew01C(device[idx].dewHeater->getZero());
-        payload[payloadLen++] = packDew01C(device[idx].dewHeater->getSpan());
-
-        // delta = temp(channel) - dewpoint packed as int8 in 0.5C steps
-        const float delta = temperature.getChannel(idx + 1) - weather.getDewPoint();
-        int d = (int)lroundf(delta * 2.0f);
-        if (d < -128) d = -128;
-        if (d >  127) d =  127;
-        payload[payloadLen++] = (uint8_t)(int8_t)d;
-
+        writeU8(en);
+        writeU8(zEnc);
+        writeU8(sEnc);
+        writeFixedI16(delta, 10);
       } else
 
-      if (purpose == INTERVALOMETER) {
-        numericReply = false;
+      if (p == INTERVALOMETER) {
+        const uint8_t cur   = (uint8_t)device[idx].intervalometer->getCurrentCount();
+        const uint8_t expB  = (uint8_t)convert.packSeconds(device[idx].intervalometer->getExposure());
+        const uint8_t delB  = (uint8_t)convert.packSeconds(device[idx].intervalometer->getDelay());
+        const uint8_t count = (uint8_t)device[idx].intervalometer->getCount();
 
-        if (!device[idx].intervalometer) { sendErr(CE_REPLY_UNKNOWN); return; }
-
-        // 6-byte fixed payload:
-        // [currentCount][exposure u16 0.1s][delay u16 0.1s][count]
-        payload[payloadLen++] = (uint8_t)device[idx].intervalometer->getCurrentCount();
-
-        const uint16_t e = pack01s(device[idx].intervalometer->getExposure());
-        const uint16_t d = pack01s(device[idx].intervalometer->getDelay());
-
-        writeU16LE(&payload[payloadLen], e); payloadLen += 2;
-        writeU16LE(&payload[payloadLen], d); payloadLen += 2;
-
-        payload[payloadLen++] = (uint8_t)device[idx].intervalometer->getCount();
-
+        writeU8(cur);
+        writeU8(expB);
+        writeU8(delB);
+        writeU8(count);
       } else {
-        sendErr(CE_CMD_UNKNOWN);
-        return;
+        // Unknown purpose: return stored value byte
+        writeU8((uint8_t)device[idx].value);
       }
 
-      if (payloadLen > 6) payloadLen = 6;
+      // Power telemetry: always append when compiled in so client sees remaining()==5.
+      #ifdef POWER_MONITOR_PRESENT
+        uint8_t flags = 0;
 
-      send1(tidop, payload, payloadLen);
-      return;
-    }
+        const bool present = powerMonitor.hasChannel((int)idx);
+        if (present) flags |= FEAT_POWER_FLAGS_PRESENT;
 
-    // :SXXn,* -> set value/params (status-only ack)
+        if (powerMonitor.errOverCurrent((int)idx))     flags |= FEAT_POWER_FAULT_OC;
+        if (powerMonitor.errUnderVoltage((int)idx))    flags |= FEAT_POWER_FAULT_UV;
+        if (powerMonitor.errOverVoltage((int)idx))     flags |= FEAT_POWER_FAULT_OV;
+        if (powerMonitor.errOverTemperature((int)idx)) flags |= FEAT_POWER_FAULT_OT;
+
+        float volts = NAN;
+        float amps  = NAN;
+        if (powerMonitor.hasVoltage((int)idx)) volts = powerMonitor.getVoltage((int)idx);
+        if (powerMonitor.hasCurrent((int)idx)) amps  = powerMonitor.getCurrent((int)idx);
+
+        // Exactly 5 bytes appended
+        writeFixedI16(volts, 10);
+        writeFixedI16(amps,  10);
+        writeU8(flags);
+      #endif
+
+      numericReply = false;
+    } break;
+
+    // ------------------------------------------------------------
+    // :SXXn,...  (wire: [idx1 1..8][sub][u8 payload])
+    // Response is numeric-only (numericReply=true). Success = CE_NONE.
+    // ------------------------------------------------------------
     case FEAT_OP_SET_VALUE_Xn: {
-      if (argLen < 2) { sendErr(CE_PARAM_FORM); return; }
+      uint8_t idx1 = 0;
+      uint8_t sub  = 0;
+      if (!readU8(idx1) || !readU8(sub)) { commandError = CE_PARAM_FORM; break; }
+      if (idx1 < 1 || idx1 > 8)          { commandError = CE_PARAM_RANGE; break; }
 
-      const int idx = (int)args[0];
-      if (idx < 0 || idx > 7) { sendErr(CE_PARAM_RANGE); return; }
-      if (device[idx].purpose == OFF) { sendErr(CE_CMD_UNKNOWN); return; }
+      const uint8_t idx = (uint8_t)(idx1 - 1);
+      const int p = device[idx].purpose;
+      if (p == OFF) { commandError = CE_CMD_UNKNOWN; break; }
 
-      const uint8_t sub = args[1];
-      const int purpose = device[idx].purpose;
-
-      auto need = [&](uint8_t n) -> bool { return argLen >= (uint8_t)(2 + n); };
-
-      // 'V' shared across multiple purposes
       if (sub == (uint8_t)'V') {
-        if (!need(1)) { sendErr(CE_PARAM_FORM); return; }
-        const uint8_t v = args[2];
+        uint8_t v = 0;
+        if (!readU8(v)) { commandError = CE_PARAM_FORM; break; }
+        device[idx].value = (long)v;
 
-        if (purpose == SWITCH || purpose == MOMENTARY_SWITCH || purpose == COVER_SWITCH) {
-          if (v > 1) { sendErr(CE_PARAM_RANGE); return; }
-          device[idx].value = v;
+        if (p == SWITCH || p == MOMENTARY_SWITCH || p == COVER_SWITCH) {
+          if (v > 1) { commandError = CE_PARAM_RANGE; break; }
 
           #ifdef COVER_SWITCH_SERVO_PRESENT
-          if (purpose == COVER_SWITCH) {
-            // match LX200 handler: 0=open, 1=closed
+          if (p == COVER_SWITCH) {
             if (v == 0) cover[idx].target = COVER_SWITCH_SERVO_OPEN_DEG;
             else        cover[idx].target = COVER_SWITCH_SERVO_CLOSED_DEG;
           } else
           #endif
           {
-            digitalWriteEx(device[idx].pin, v == device[idx].active);
-            if (purpose == MOMENTARY_SWITCH && v) momentarySwitchTime[idx] = 50;
+            digitalWriteEx(device[idx].pin, (v != 0) == device[idx].active);
+            if (p == MOMENTARY_SWITCH && device[idx].value) momentarySwitchTime[idx] = 50;
           }
+        } else
 
-          commandError = CE_1; // success ack
-          send1(tidop, nullptr, 0);
-          return;
-        }
-
-        if (purpose == ANALOG_OUTPUT) {
-          device[idx].value = v;
+        if (p == ANALOG_OUTPUT) {
           analogWriteEx(device[idx].pin, analog8BitToAnalogRange(v));
+        } else
 
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
+        if (p == DEW_HEATER) {
+          if (v > 1) { commandError = CE_PARAM_RANGE; break; }
+          device[idx].dewHeater->enable(v != 0);
+        } else
+
+        if (p == INTERVALOMETER) {
+          if (v > 1) { commandError = CE_PARAM_RANGE; break; }
+          device[idx].intervalometer->enable(v != 0);
         }
 
-        if (purpose == DEW_HEATER) {
-          if (!device[idx].dewHeater) { sendErr(CE_REPLY_UNKNOWN); return; }
-          if (v > 1) { sendErr(CE_PARAM_RANGE); return; }
-          device[idx].value = v;
-          device[idx].dewHeater->enable(v ? true : false);
+      } else
 
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
+      if (sub == (uint8_t)'Z' || sub == (uint8_t)'S') {
+        uint8_t enc = 0;
+        if (!readU8(enc)) { commandError = CE_PARAM_FORM; break; }
+        if (p != DEW_HEATER) { commandError = CE_CMD_UNKNOWN; break; }
 
-        if (purpose == INTERVALOMETER) {
-          if (!device[idx].intervalometer) { sendErr(CE_REPLY_UNKNOWN); return; }
-          if (v > 1) { sendErr(CE_PARAM_RANGE); return; }
-          device[idx].value = v;
-          device[idx].intervalometer->enable(v ? true : false);
+        const float f = unpackDew01C(enc);
+        if (sub == (uint8_t)'Z') device[idx].dewHeater->setZero(f);
+        else                     device[idx].dewHeater->setSpan(f);
 
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
+      } else
 
-        sendErr(CE_CMD_UNKNOWN);
-        return;
+      if (sub == (uint8_t)'E' || sub == (uint8_t)'D') {
+        uint8_t tb = 0;
+        if (!readU8(tb)) { commandError = CE_PARAM_FORM; break; }
+        if (p != INTERVALOMETER) { commandError = CE_CMD_UNKNOWN; break; }
+
+        const float sec = convert.unpackSeconds(tb);
+        if (sub == (uint8_t)'E') device[idx].intervalometer->setExposure(sec);
+        else                     device[idx].intervalometer->setDelay(sec);
+
+      } else
+
+      if (sub == (uint8_t)'C') {
+        uint8_t c = 0;
+        if (!readU8(c)) { commandError = CE_PARAM_FORM; break; }
+        if (p != INTERVALOMETER) { commandError = CE_CMD_UNKNOWN; break; }
+
+        device[idx].intervalometer->setCount((float)c);
+
+      } else {
+        commandError = CE_PARAM_FORM;
       }
 
-      // Dew heater parameters: 'Z' and 'S' are 1 byte each (0.1C steps)
-      if (purpose == DEW_HEATER) {
-        if (!device[idx].dewHeater) { sendErr(CE_REPLY_UNKNOWN); return; }
-
-        if (sub == (uint8_t)'Z') {
-          if (!need(1)) { sendErr(CE_PARAM_FORM); return; }
-          device[idx].dewHeater->setZero(unpackDew01C(args[2]));
-
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
-
-        if (sub == (uint8_t)'S') {
-          if (!need(1)) { sendErr(CE_PARAM_FORM); return; }
-          device[idx].dewHeater->setSpan(unpackDew01C(args[2]));
-
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
-      }
-
-      // Intervalometer parameters:
-      // 'E' exposure u16 0.1s, 'D' delay u16 0.1s, 'C' count u8
-      if (purpose == INTERVALOMETER) {
-        if (!device[idx].intervalometer) { sendErr(CE_REPLY_UNKNOWN); return; }
-
-        if (sub == (uint8_t)'E') {
-          if (!need(2)) { sendErr(CE_PARAM_FORM); return; }
-          device[idx].intervalometer->setExposure(unpack01s(readU16LE(&args[2])));
-
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
-
-        if (sub == (uint8_t)'D') {
-          if (!need(2)) { sendErr(CE_PARAM_FORM); return; }
-          device[idx].intervalometer->setDelay(unpack01s(readU16LE(&args[2])));
-
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
-
-        if (sub == (uint8_t)'C') {
-          if (!need(1)) { sendErr(CE_PARAM_FORM); return; }
-          device[idx].intervalometer->setCount((float)args[2]);
-
-          commandError = CE_1;
-          send1(tidop, nullptr, 0);
-          return;
-        }
-      }
-
-      sendErr(CE_PARAM_FORM);
-      return;
-    }
+      // numericReply stays true
+    } break;
 
     default:
       handled = false;
       commandError = CE_CMD_UNKNOWN;
-      send1(tidop, nullptr, 0);
-      return;
+    break;
   }
+
+  sendResponse(handled, suppressFrame, numericReply, commandError);
 }
 
 #endif

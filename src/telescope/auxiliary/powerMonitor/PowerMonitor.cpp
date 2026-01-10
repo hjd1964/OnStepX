@@ -28,12 +28,20 @@ void PowerMonitor::poll() {
   float v = 0.0F;
   bool disableFeatures = false;
 
+  // Clear fault flags; they are re-asserted on each poll if the condition is present
+  for (int j = 0; j < 8; j++) {
+    ocFault[j] = false;
+    uvFault[j] = false;
+    ovFault[j] = false;
+    otFault[j] = false;
+  }
+
   #if defined(I_SENSE_CHANNEL_MAX) && (I_SENSE_COMBINED_MAX)
     float currentSenseTotal = 0.0F;
   #endif
 
   // ---------------- Voltage sampling ----------------
-  #if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+  #if defined(POWER_MONITOR_VOLTAGE_PRESENT)
     const int voltageSensePin[8] = V_SENSE_PINS;
 
     for (int j = 0; j < 8; j++) {
@@ -52,6 +60,8 @@ void PowerMonitor::poll() {
           if (j != V_SENSE_LIMIT_EXCLUDE &&
               (voltageV[j] < V_SENSE_LIMIT_LOW || voltageV[j] > V_SENSE_LIMIT_HIGH)) {
             VLF("MSG: PowerMonitor, OV/UV");
+            if (voltageV[j] < V_SENSE_LIMIT_LOW) uvFault[j] = true;
+            if (voltageV[j] > V_SENSE_LIMIT_HIGH) ovFault[j] = true;
             disableFeatures = true;
           }
         #endif
@@ -62,7 +72,7 @@ void PowerMonitor::poll() {
   Y;
 
   // ---------------- Current sampling ----------------
-  #if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+  #if defined(POWER_MONITOR_CURRENT_PRESENT)
     const int currentSensePin[8] = I_SENSE_PINS;
 
     for (int j = 0; j < 8; j++) {
@@ -83,6 +93,7 @@ void PowerMonitor::poll() {
           if (fabsf(currentA[j]) > currentSenseMax[j]) {
             VF("MSG: PowerMonitor, OC channel"); V(j);
             VF(" current="); V(currentA[j]); VLF("A");
+            ocFault[j] = true;
             features.deviceOff(j);
           }
 
@@ -91,6 +102,7 @@ void PowerMonitor::poll() {
             if (currentSenseTotal > I_SENSE_COMBINED_MAX) {
               VF("MSG: PowerMonitor, OC combined");
               VF(" current="); V(currentSenseTotal); VLF("A");
+              for (int k = 0; k < 8; k++) ocFault[k] = true;
               disableFeatures = true;
             }
           #endif
@@ -111,6 +123,7 @@ void PowerMonitor::poll() {
       #if defined(FAN_THRESHOLD_OT)
         if (telescope.mcuTemperature > FAN_THRESHOLD_OT) {
           VLF("MSG: PowerMonitor, MCU OT");
+          for (int k = 0; k < 8; k++) otFault[k] = true;
           disableFeatures = true;
         }
       #endif
@@ -153,14 +166,6 @@ void PowerMonitor::poll() {
     }
 
     if (lastFanMode != fanMode) nextFanModeChangeTime = millis() + 30000UL;
-  #endif
-
-  // ---------------- Global disable ----------------
-  #if (defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)) || (defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA))
-    if (disableFeatures) {
-      VLF("MSG: PowerMonitor, disable all features");
-      for (int j = 0; j < 8; j++) features.deviceOff(j);
-    }
   #endif
 }
 

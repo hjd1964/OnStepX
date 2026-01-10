@@ -65,20 +65,19 @@ typedef struct Device {
 #include "../../../lib/canTransport/CanTransportServer.h"
 class Features : public CanTransportServer {
 private:
-  void processCommand(const uint8_t data[8], uint8_t len) override;
+  void processCommand() override;
 public:
-  Features() : CanTransportServer((uint16_t)(CAN_FEATURES_REQ_ID), (uint16_t)(CAN_FEATURES_RSP_ID)) {}
+  Features() : CanTransportServer((uint16_t)(CAN_FEATURES_REQ_ID), (uint16_t)(CAN_FEATURES_RSP_ID), 0x1E) {}
 #else
 class Features {
 public:
 #endif
 
     // initialize the aux features
-    void init();
     bool init();
     void begin();
 
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     void poll();
 
@@ -86,6 +85,8 @@ public:
  
   private:
     void strCatPower(char *reply, int index);
+
+    bool ready = false;
 
     int16_t auxPins[8] = { AUX1_PIN, AUX2_PIN, AUX3_PIN, AUX4_PIN, AUX5_PIN, AUX6_PIN, AUX7_PIN, AUX8_PIN };
     Device device[8] = {
