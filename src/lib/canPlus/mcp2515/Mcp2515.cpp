@@ -95,7 +95,7 @@ int CanPlusMCP2515::writePacketRtr(int id, size_t dlc) {
   return (err == MCP2515::ERROR_OK) ? 1 : 0;
 }
 
-void CanPlusMCP2515::rxBrust(uint32_t periodUs) {
+void CanPlusMCP2515::rxBurst(uint32_t periodUs) {
   const uint32_t now = micros();
   const uint32_t until = now + periodUs;
 

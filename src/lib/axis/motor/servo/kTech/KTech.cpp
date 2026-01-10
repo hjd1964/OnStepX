@@ -131,7 +131,7 @@ float ServoKTech::setMotorVelocity(float velocity) {
     canPlus.write((uint8_t*)&velocityNext, 4);
     canPlus.endPacket();
     velocityLast = velocityNext;
-    canPlus.rxBrust(1000);
+    canPlus.rxBurst(1000);
   }
 
   return velocity;

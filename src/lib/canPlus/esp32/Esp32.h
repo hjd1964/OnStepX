@@ -23,7 +23,7 @@ class CanPlusESP32 : public CanPlus {
     int writePacket(int id, const uint8_t *buffer, size_t size);
     int writePacketRtr(int id, size_t dlc);
 
-    void rxBrust(uint32_t periodUs = 2000);
+    void rxBurst(uint32_t periodUs = 2000);
 
     void debugStatus();
 

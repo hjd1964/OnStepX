@@ -126,7 +126,7 @@ int CanPlusESP32::writePacketRtr(int id, size_t dlc) {
   return 0;
 }
 
-void CanPlusESP32::rxBrust(uint32_t periodUs) {
+void CanPlusESP32::rxBurst(uint32_t periodUs) {
   const uint32_t now = micros();
   const uint32_t until = now + periodUs;
 

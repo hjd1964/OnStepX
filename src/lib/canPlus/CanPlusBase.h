@@ -67,7 +67,7 @@ class CanPlus {
 
     // allow any polling recv that may be present to happen quickly for a short period of time
     // this increases the polling rate to 1ms for the specified period in microseconds
-    virtual void rxBrust(uint32_t periodUs = 2000) { UNUSED(periodUs); }
+    virtual void rxBurst(uint32_t periodUs = 2000) { UNUSED(periodUs); }
 
     static inline uint32_t defaultPacingUs() { return (uint32_t)CAN_SEND_RATE_MS*1000UL; }
 
