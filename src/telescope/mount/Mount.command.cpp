@@ -15,7 +15,7 @@
 #include "limits/Limits.h"
 #include "park/Park.h"
 
-bool Mount::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Mount::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   char *conv_end;
   PrecisionMode precisionMode = PM_HIGH;
 
@@ -103,7 +103,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *supressFr
         switch (parameter[1]) {
           case '4': sprintf(reply, "%ld", lround(axis1.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
           case '5': sprintf(reply, "%ld", lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
-          case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *supressFrame = true; *numericReply = false; break;
+          case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *suppressFrame = true; *numericReply = false; break;
           case 'F': if (AXIS2_TANGENT_ARM != ON) *commandError = CE_0; break;
           case 'G': if (AXIS1_SECTOR_GEAR != ON) *commandError = CE_0; break;
           case 'M':

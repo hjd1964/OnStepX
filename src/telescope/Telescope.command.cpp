@@ -35,61 +35,61 @@
   HAL_RESET_FUNC;
 #endif
 
-bool Telescope::command(char reply[], char command[], char parameter[], bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Telescope::command(char reply[], char command[], char parameter[], bool *suppressFrame, bool *numericReply, CommandError *commandError) {
 
   #if PLUGIN1 != OFF && PLUGIN1_COMMAND_PROCESSING == ON
-    if (PLUGIN1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN1.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN2 != OFF && PLUGIN2_COMMAND_PROCESSING == ON
-    if (PLUGIN2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN2.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN3 != OFF && PLUGIN3_COMMAND_PROCESSING == ON
-    if (PLUGIN3.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN3.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN4 != OFF && PLUGIN4_COMMAND_PROCESSING == ON
-    if (PLUGIN4.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN4.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN5 != OFF && PLUGIN5_COMMAND_PROCESSING == ON
-    if (PLUGIN5.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN5.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN6 != OFF && PLUGIN6_COMMAND_PROCESSING == ON
-    if (PLUGIN6.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN6.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN7 != OFF && PLUGIN7_COMMAND_PROCESSING == ON
-    if (PLUGIN7.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN7.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
   #if PLUGIN8 != OFF && PLUGIN8_COMMAND_PROCESSING == ON
-    if (PLUGIN8.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (PLUGIN8.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
 
   #ifdef MOUNT_PRESENT
-    if (mount.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (guide.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (mount.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (guide.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
     #if GPIO_DEVICE != OFF
-      if (gpio.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+      if (gpio.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
     #endif
-    if (mountStatus.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (goTo.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (park.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (library.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (site.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (limits.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (home.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (pec.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (axis1.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
-    if (axis2.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (mountStatus.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (goTo.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (park.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (library.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (site.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (limits.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (home.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (pec.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (axis1.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
+    if (axis2.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
 
   #if defined(ROTATOR_PRESENT) || defined(ROTATOR_CLIENT_PRESENT)
-    if (rotator.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (rotator.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
 
   #if defined(FOCUSER_PRESENT) || defined(FOCUSER_CLIENT_PRESENT)
-    if (focuser.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (focuser.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
 
    #if defined(FEATURES_PRESENT) || defined(FEATURES_CLIENT_PRESENT)
-    if (features.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+    if (features.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
   #endif
 
   //  B - Reticle/Accessory Control

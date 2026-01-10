@@ -19,7 +19,7 @@ class Rotator : public CanTransportClient {
     void begin();
 
     bool command(char *reply, char *command, char *parameter,
-                 bool *supressFrame, bool *numericReply, CommandError *commandError);
+                 bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // Heartbeat event
     inline void heartbeat() { lastHeartbeatMs = hb_stamp_2ms_odd(); }

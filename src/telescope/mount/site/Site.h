@@ -44,7 +44,7 @@ class Site {
   public:
     void init();
     
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // update/apply the site latitude and longitude, necessary for LAST calculations etc.
     void updateLocation();

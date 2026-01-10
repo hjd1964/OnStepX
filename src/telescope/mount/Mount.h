@@ -47,7 +47,7 @@ class Mount {
     void init();
     void begin();
 
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // get current equatorial position (Native coordinate system)
     Coordinate getPosition(CoordReturn coordReturn = CR_MOUNT_EQU);

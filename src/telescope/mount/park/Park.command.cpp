@@ -5,9 +5,9 @@
 
 #if defined(MOUNT_PRESENT)
 
-bool Park::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Park::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
-  UNUSED(supressFrame);
+  UNUSED(suppressFrame);
   UNUSED(numericReply);
   if (command[0] == 'h') {
     // :hP#       Moves mount to the park position

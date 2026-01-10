@@ -18,8 +18,8 @@
 #include "../limits/Limits.h"
 #include "../status/Status.h"
 
-bool Status::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  UNUSED(supressFrame);
+bool Status::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  UNUSED(suppressFrame);
 
   if (command[0] == 'G') {
     // :Gm#       Gets the meridian pier-side

@@ -19,8 +19,8 @@ class Features : public CanTransportClient {
     // initialize the aux features
     void begin();
 
-    bool command(char *reply, char *command, char *parameter,
-                 bool *supressFrame, bool *numericReply, CommandError *commandError);
+  bool command(char *reply, char *command, char *parameter,
+               bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // Heartbeat event
     inline void heartbeat() { lastHeartbeatMs = hb_stamp_2ms_odd(); }

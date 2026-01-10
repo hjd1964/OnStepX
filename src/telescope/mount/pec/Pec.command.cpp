@@ -10,8 +10,8 @@
 
 #include "../site/Site.h"
 
-bool Pec::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
+bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  *suppressFrame = false;
   *commandError = CE_NONE;
 
   if (command[0] == 'G' && command[1] == 'X' && parameter[2] == 0) {

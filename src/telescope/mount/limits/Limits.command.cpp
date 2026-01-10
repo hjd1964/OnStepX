@@ -12,8 +12,8 @@
 #include "../Mount.h"
 #include "../site/Site.h"
 
-bool Limits::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
+bool Limits::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  *suppressFrame = false;
   
   if (command[0] == 'G') {
     // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon

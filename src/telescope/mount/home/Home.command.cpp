@@ -11,9 +11,9 @@
 #include "../park/Park.h"
 #include "../site/Site.h"
 
-bool Home::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Home::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
-  UNUSED(supressFrame);
+  UNUSED(suppressFrame);
   if (command[0] == 'h') {
     // :h?#       Get home status - has sense, auto home enabled, offset axis1, offset axis2 (in arcseconds.)
     //            Returns: n,n,n,n#

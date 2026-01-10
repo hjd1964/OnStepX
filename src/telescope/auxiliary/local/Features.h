@@ -75,6 +75,7 @@ public:
 
     // initialize the aux features
     void init();
+    bool init();
     void begin();
 
     bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);

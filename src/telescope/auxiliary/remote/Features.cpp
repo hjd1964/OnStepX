@@ -17,7 +17,7 @@ void Features::begin() {
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 bool Features::command(char *reply, char *command, char *parameter,
-                       bool *supressFrame, bool *numericReply, CommandError *commandError) {
+                      bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   if (!canPlus.ready) return false;
 
   // Only handle Aux Feature command family:

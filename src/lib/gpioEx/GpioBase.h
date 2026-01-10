@@ -11,7 +11,7 @@
   class Gpio {
     public:
       virtual bool init();
-      virtual bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+      virtual bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
       virtual void pinMode(int pin, int mode);
       virtual int digitalRead(int pin);
       virtual void digitalWrite(int pin, int value);

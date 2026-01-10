@@ -9,8 +9,8 @@
 
 #include "../convert/Convert.h"
 
-bool Axis::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
+bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  *suppressFrame = false;
 
   if (command[0] == 'G' && command[1] == 'X') {
 

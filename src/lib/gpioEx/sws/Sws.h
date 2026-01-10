@@ -14,7 +14,7 @@ class GpioSws : public Gpio {
     bool init();
 
     // process any gpio commands
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     void pinMode(int pin, int mode);
 

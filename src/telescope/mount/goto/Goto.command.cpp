@@ -15,7 +15,7 @@
 #include "../limits/Limits.h"
 #include "../status/Status.h"
 
-bool Goto::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;
 
   if (command[0] == 'A') {
@@ -131,7 +131,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
     } else {
       reply[0] = '#';
       reply[1] = 0;
-      *supressFrame = true;
+      *suppressFrame = true;
     }
     *numericReply = false;
   } else
@@ -250,7 +250,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) reply[0] = '0';
       *numericReply = false;
-      *supressFrame = true;
+      *suppressFrame = true;
       *commandError = e;
     } else
 
@@ -268,7 +268,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       if (e == CE_NONE && target.pierSide == PIER_SIDE_EAST) reply[0] = '0';
       if (e == CE_NONE && target.pierSide == PIER_SIDE_WEST) reply[0] = '1';
       *numericReply = false;
-      *supressFrame = true;
+      *suppressFrame = true;
       *commandError = e;
     } else
 
@@ -297,7 +297,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
           if (e == CE_NONE) reply[0] = '0';
           reply[1] = 0;
           *numericReply = false;
-          *supressFrame = true;
+          *suppressFrame = true;
         }
         *commandError = e;
       } else *commandError = CE_CMD_UNKNOWN;
@@ -321,7 +321,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
         if (e == CE_NONE) reply[0] = '0';
         reply[1] = 0;
         *numericReply = false;
-        *supressFrame = true;
+        *suppressFrame = true;
         *commandError = e;
       } else *commandError = CE_CMD_UNKNOWN;
     } else
@@ -344,7 +344,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *supressFra
       if (e >= CE_SLEW_ERR_BELOW_HORIZON && e <= CE_SLEW_ERR_UNSPECIFIED) reply[0] = (char)(e - CE_SLEW_ERR_BELOW_HORIZON) + '1';
       if (e == CE_NONE) reply[0] = '0';
       *numericReply = false;
-      *supressFrame = true;
+      *suppressFrame = true;
       *commandError = e;
     } else return false;
   } else

@@ -19,7 +19,7 @@ class Focuser : public CanTransportClient {
     void begin();
 
     bool command(char *reply, char *command, char *parameter,
-                 bool *supressFrame, bool *numericReply, CommandError *commandError);
+                 bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // Heartbeat event, indexed by focuser 1..6 => focuserIdx 0..5
     inline void heartbeat(uint8_t focuserIdx) { lastHeartbeatMs[focuserIdx] = hb_stamp_2ms_odd(); }

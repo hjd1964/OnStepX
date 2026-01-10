@@ -11,15 +11,15 @@
 
 extern Axis axis3;
 
-// by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
+// by default reply[80] == "", suppressFrame == false, numericReply == true, and commandError == CE_NONE
 // return true if the command has been completely handled and no further command() will be called, or false if not
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
-bool Rotator::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Rotator::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   if (!ready) return false;
 
   // process any rotator axis commands
-  if (axis3.command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+  if (axis3.command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
 
   if (command[0] == 'h') {
     // :hP#       Moves rotator to the park position

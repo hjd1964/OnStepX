@@ -39,7 +39,7 @@ class Goto {
   public:
     void init();
 
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // goto to equatorial target position (Native coordinate system) using the defaut preferredPierSide
     CommandError request();

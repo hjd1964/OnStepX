@@ -33,7 +33,7 @@ class Guide {
   public:
     void init();
 
-    bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+    bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // start guide at a given direction and rate on Axis1
     CommandError startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit);

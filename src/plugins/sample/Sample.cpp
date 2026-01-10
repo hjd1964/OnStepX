@@ -31,11 +31,11 @@ void Sample::loop() {
 }
 
 // no command processing in this example, so just return false (not handled)
-bool Sample::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Sample::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(*reply);
   UNUSED(*command);
   UNUSED(*parameter);
-  UNUSED(*supressFrame);
+  UNUSED(*suppressFrame);
   UNUSED(*numericReply);
   UNUSED(*commandError);
   return false;

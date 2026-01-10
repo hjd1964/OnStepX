@@ -13,8 +13,8 @@
 #include "../home/Home.h"
 #include "../Mount.h"
 
-bool Site::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
+bool Site::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  *suppressFrame = false;
   PrecisionMode precisionMode = convert.precision;
 
   if (command[0] == 'G') {

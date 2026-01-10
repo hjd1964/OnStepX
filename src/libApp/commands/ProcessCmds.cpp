@@ -117,21 +117,21 @@ void CommandProcessor::poll() {
   if (buffer.ready()) {
     char reply[80] = "";
     bool numericReply = true;
-    bool supressFrame = false;
+    bool suppressFrame = false;
 
-    commandError = command(reply, buffer.getCmd(), buffer.getParameter(), &supressFrame, &numericReply);
+    commandError = command(reply, buffer.getCmd(), buffer.getParameter(), &suppressFrame, &numericReply);
 
     if (numericReply) {
       if (commandError != CE_NONE && commandError != CE_1) strcpy(reply,"0"); else strcpy(reply,"1");
-      supressFrame = true;
+      suppressFrame = true;
     }
     if (strlen(reply) > 0 || buffer.checksum) {
       if (buffer.checksum) {
         appendChecksum(reply);
         strcat(reply, buffer.getSeq());
-        supressFrame = false;
+        suppressFrame = false;
       }
-      if (!supressFrame) strcat(reply,"#");
+      if (!suppressFrame) strcat(reply,"#");
       SerialPort.write(reply);
     }
 
@@ -161,11 +161,11 @@ void CommandProcessor::poll() {
   }
 }
 
-CommandError CommandProcessor::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply) {
+CommandError CommandProcessor::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply) {
   commandError = CE_NONE;
 
   // handle telescope commands
-  if (telescope.command(reply, command, parameter, supressFrame, numericReply, &commandError)) return commandError;
+  if (telescope.command(reply, command, parameter, suppressFrame, numericReply, &commandError)) return commandError;
 
   // silent bool "errors" allow processing commands more than once
   if (commandError == CE_0 || commandError == CE_1) return commandError;
@@ -178,7 +178,7 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
     } else {
       reply[0] = command[1];
       reply[1] = 0;             // Equatorial or Horizon mode, A or P
-      *supressFrame = true;
+      *suppressFrame = true;
     }
     *numericReply = false;
     return commandError;

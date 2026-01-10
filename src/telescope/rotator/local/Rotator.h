@@ -52,7 +52,7 @@ public:
   void begin();
 
   // process rotator commands
-  bool command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError);
+  bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
   // poll rotator to handle parking and derotation
   void monitor();

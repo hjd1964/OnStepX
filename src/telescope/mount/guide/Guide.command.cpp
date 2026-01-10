@@ -11,8 +11,8 @@
 #include "../site/Site.h"
 #include "../goto/Goto.h"
 
-bool Guide::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
-  *supressFrame = false;
+bool Guide::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  *suppressFrame = false;
   
   // :GX90#     Get setting pulse guide rate
   //            Returns: n.nn#

@@ -22,7 +22,7 @@ bool GpioSws::init() {
 }
 
 // no command processing
-bool GpioSws::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool GpioSws::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   if (command[0] == 'G') {
     if (command[1] == 'X' && parameter[2] == 0)  {
       // :GXGA#     Get Gpio presence
