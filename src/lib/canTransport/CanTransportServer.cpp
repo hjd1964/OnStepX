@@ -1,119 +1,108 @@
 // -----------------------------------------------------------------------------------
 // CAN transport - Server
+// -----------------------------------------------------------------------------------
 
 #include "CanTransportServer.h"
 
 #if defined(CAN_PLUS) && CAN_PLUS != OFF
 
-CanTransportServer* CanTransportServer::s_instances[TRANSPORT_CAN_MAX_INSTANCES] = {nullptr};
-
-CanTransportServer::CanTransportServer(uint16_t requestId, uint16_t responseId)
-  : reqId(requestId), rspId(responseId) {}
-
 bool CanTransportServer::init(bool startTask, uint16_t processPeriodMs) {
-  if (!canPlus.ready) return false;
+  if (!CanTransport::init()) return false;
 
-  if (slot < 0) slot = allocSlot(this);
-  if (slot < 0) return false;
-
-  if (!canPlus.callbackRegisterId((int)reqId, thunkForSlot(slot))) return false;
+  // Register request callback for this CAN ID; thunk routes to onFrame()
+  if (!canPlus.callbackRegisterId((int)requestCanId(), thunkForSlot(slot))) return false;
 
   if (startTask) {
-    taskHandle = tasks.add(processPeriodMs, 0, true, 5, &CanTransportServer::taskThunk, "CanTrS");
-    if (!taskHandle) return false;
+    if (!tasks.add(processPeriodMs, 0, true, 5, &CanTransport::taskThunk, "CanTrS")) return false;
   }
 
   return true;
 }
 
-void CanTransportServer::taskThunk() {
-  // Run all instances (cheap); instances with empty queues return quickly.
-  canPlus.rxBrust();
-  for (int i = 0; i < (int)TRANSPORT_CAN_MAX_INSTANCES; i++) {
-    if (s_instances[i]) s_instances[i]->process();
-  }
+void CanTransportServer::onFrame(const uint8_t data[8], uint8_t len) {
+  enqueueFromCallback(data, len);
 }
 
 void CanTransportServer::process() {
   Frame f;
   while (dequeue(f)) {
-    processCommand(f.data, f.len);
+    if (f.len < 1) continue;
+
+    // Bind RX (copies into base rxBuf, sets tidop/opcode, sets rxPos=1)
+    beginNewRequest(f.data, f.len);
+
+    // Fresh TX response (txPos=0)
+    beginNewResponse();
+
+    // Execute command in non-ISR context
+    processCommand();
   }
 }
 
-void CanTransportServer::sendResponse(uint8_t tidop, uint8_t status,
-                                      const uint8_t *payload, uint8_t payloadLen) {
-  // response = [tidop, status, payload...]
-  uint8_t out[8] = {0};
-  uint8_t outLen = 0;
+void CanTransportServer::sendResponse(bool handled, bool suppressFrame, bool numericReply, CommandError commandError) {
+  const uint8_t status = packStatus(handled, suppressFrame, numericReply, commandError);
 
-  out[outLen++] = tidop;
-  out[outLen++] = status;
+  // Payload bytes written so far (cap at txMax == 12)
+  uint8_t plen = txPos;
+  if (plen > txMax) plen = txMax;
 
-  if (payload && payloadLen) {
-    if (payloadLen > 6) payloadLen = 6;
-    for (uint8_t i = 0; i < payloadLen; i++) out[outLen++] = payload[i];
-  }
+  const bool dual = (opcode >= opDualResponse);
 
+  // Single-frame mode: clamp payload to 6
+  if (!dual && plen > 6) plen = 6;
+
+  // ---------------- frame 0 ----------------
+  uint8_t out0[8] = {0};
+  out0[0] = tidop;
+  out0[1] = status;
+
+  const uint8_t n0 = (plen > 6) ? 6 : plen;        // 0..6
+  for (uint8_t i = 0; i < n0; ++i) out0[2 + i] = txBuf[i];
+
+  const uint8_t out0Len = (uint8_t)(2 + n0);       // 2..8
   canPlus.txWait();
-  (void)canPlus.writePacket((int)rspId, out, outLen);
+  (void)canPlus.writePacket((int)responseCanId(), out0, out0Len);
+
+  // ---------------- optional frame 1 ----------------
+  if (dual) {
+    const uint8_t tidop1 = tidopPlus1(tidop);
+
+    uint8_t out1[8] = {0};
+    out1[0] = tidop1;
+    out1[1] = status;
+
+    const uint8_t rem = (plen > 6) ? (uint8_t)(plen - 6) : 0; // 0..6
+    const uint8_t n1  = (rem > 6) ? 6 : rem;                 // 0..6
+
+    for (uint8_t i = 0; i < n1; ++i) out1[2 + i] = txBuf[6 + i];
+
+    const uint8_t out1Len = (uint8_t)(2 + n1);               // 2..8 (may be 2)
+    canPlus.txWait();
+    (void)canPlus.writePacket((int)responseCanId(), out1, out1Len);
+  }
 }
 
 void CanTransportServer::enqueueFromCallback(const uint8_t data[8], uint8_t len) {
   if (len > 8) len = 8;
   if (len < 1) return;
 
-  uint8_t next = (uint8_t)((qHead + 1) % TRANSPORT_CAN_SERVER_RXQ);
+  const uint8_t head = qHead;
+  const uint8_t next = (uint8_t)((head + 1u) % (uint8_t)TRANSPORT_CAN_SERVER_RXQ);
   if (next == qTail) return; // full, drop
 
-  q[qHead].len = len;
-  for (uint8_t i = 0; i < len; i++) q[qHead].data[i] = data[i];
+  q[head].len = len;
+  for (uint8_t i = 0; i < len; i++) q[head].data[i] = data[i];
+
   qHead = next;
 }
 
 bool CanTransportServer::dequeue(Frame &out) {
-  if (qTail == qHead) return false;
-  out = q[qTail];
-  qTail = (uint8_t)((qTail + 1) % TRANSPORT_CAN_SERVER_RXQ);
+  const uint8_t tail = qTail;
+  if (tail == qHead) return false;
+
+  out = q[tail];
+  qTail = (uint8_t)((tail + 1u) % (uint8_t)TRANSPORT_CAN_SERVER_RXQ);
   return true;
 }
-
-int8_t CanTransportServer::allocSlot(CanTransportServer *p) {
-  for (int8_t i = 0; i < (int8_t)TRANSPORT_CAN_MAX_INSTANCES; i++) {
-    if (s_instances[i] == nullptr) { s_instances[i] = p; return i; }
-  }
-  return -1;
-}
-
-CanTransportServer::ThunkFn CanTransportServer::thunkForSlot(int8_t s) {
-  switch (s) {
-    default: return &CanTransportServer::onThunk0;
-    case 0:  return &CanTransportServer::onThunk0;
-    case 1:  return &CanTransportServer::onThunk1;
-    case 2:  return &CanTransportServer::onThunk2;
-    case 3:  return &CanTransportServer::onThunk3;
-    case 4:  return &CanTransportServer::onThunk4;
-    case 5:  return &CanTransportServer::onThunk5;
-    case 6:  return &CanTransportServer::onThunk6;
-    case 7:  return &CanTransportServer::onThunk7;
-  }
-}
-
-#define TRANSPORT_CAN_SERVER_THUNK(N) \
-  void CanTransportServer::onThunk##N(uint8_t data[8], uint8_t len) { \
-    CanTransportServer *p = s_instances[N]; \
-    if (p) p->enqueueFromCallback((const uint8_t*)data, len); \
-  }
-
-TRANSPORT_CAN_SERVER_THUNK(0)
-TRANSPORT_CAN_SERVER_THUNK(1)
-TRANSPORT_CAN_SERVER_THUNK(2)
-TRANSPORT_CAN_SERVER_THUNK(3)
-TRANSPORT_CAN_SERVER_THUNK(4)
-TRANSPORT_CAN_SERVER_THUNK(5)
-TRANSPORT_CAN_SERVER_THUNK(6)
-TRANSPORT_CAN_SERVER_THUNK(7)
-
-#undef TRANSPORT_CAN_SERVER_THUNK
 
 #endif

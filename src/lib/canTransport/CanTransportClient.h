@@ -1,14 +1,6 @@
 // -----------------------------------------------------------------------------------
-// CAN transport - Client (single-frame request/response, 1 in-flight per instance)
-//
-// Wire format:
-//   Request:  [ tidop, args... ]                   (1..8 bytes)
-//   Response: [ tidop, status, payload... ]        (2..8 bytes)
-//     status: [7 handled][6 numericReply][5 suppressFrame][4..0 commandError]
-//
-// Notes:
-// - Uses global canPlus (single CAN interface typical on Arduino-class targets).
-// - Supports multiple logical instances by slot/thunk dispatch on response CAN ID.
+// CAN transport - Client (single/dual-frame request/response, 1 in-flight per instance)
+// -----------------------------------------------------------------------------------
 
 #pragma once
 
@@ -18,97 +10,74 @@
 
 #include "../tasks/OnTask.h"
 #include "../canPlus/CanPlus.h"
+#include "CanTransportBase.h"
 
-#ifndef TRANSPORT_CAN_MAX_INSTANCES
-  #define TRANSPORT_CAN_MAX_INSTANCES 8
-#endif
+class CanTransportClient : public CanTransport {
+public:
+  CanTransportClient(uint16_t requestId, uint16_t responseId, uint8_t dualFrameOpcodeStart = 32)
+    : CanTransport(requestId, responseId, dualFrameOpcodeStart) {}
 
-class CanTransportClient {
-  public:
-    CanTransportClient(uint16_t requestId, uint16_t responseId);
+  bool init();
 
-    void init();   // registers response callback
-    void begin() {} // symmetry; no-op
+  void setTimeoutMs(uint16_t ms) { timeoutMs = ms; }
 
-    void setTimeoutMs(uint16_t ms) { timeoutMs = ms; }
+protected:
+  // Clients do NOT treat inbound frames as requests; they treat them as responses.
+  void onFrame(const uint8_t data[8], uint8_t len) override { onResponse(data, len); }
 
-    // Send request and wait for correlated response (tidop match).
-    // Returns true if a response was received (not if the command succeeded).
-    bool transact(uint8_t expectedTidOp,
-                  const uint8_t *requestPayload, uint8_t requestLen,
-                  uint8_t responsePayload[8], uint8_t &responseLen);
+  // Start building a request frame using opCode (0..31).
+  // Resets TX cursor and writes tidop as the first byte.
+  bool beginNewRequest(uint8_t opCode);
 
-    // Send request and wait for two correlated responses (tidop and tidop + 1 match).
-    // Returns true if a response was received (not if the command succeeded).
-    bool transact2(uint8_t expectedTidOp,
-                    const uint8_t *requestPayload, uint8_t requestLen,
-                    uint8_t responsePayload[14], uint8_t &responseLen);
+  // Sends the request and waits for the reply.
+  // Auto-selects single/dual based on opcode >= opDualResponse.
+  // On success:
+  //   rxLen/rxPos updated; rxPos=2 (payload start after tidop/status)
+  //   readXXX() helpers read from rxBuf via rxPos
+  bool transactRequest(bool &handled, bool &suppressFrame, bool &numericReply, CommandError &commandError);
 
-    inline uint16_t requestCanId() const { return reqId; }
-    inline uint16_t responseCanId() const { return rspId; }
+private:
+  // Response callback invoked via onFrame().
+  void onResponse(const uint8_t data[8], uint8_t len) override;
 
-    // Status helpers (shared contract)
-    static inline uint8_t packStatus(bool handled, bool numericReply, bool suppressFrame, uint8_t commandError) {
-      return (uint8_t)((handled ? 0x80 : 0x00) |
-                       (numericReply ? 0x40 : 0x00) |
-                       (suppressFrame ? 0x20 : 0x00) |
-                       (commandError & 0x1F));
-    }
+  // Send request and wait for correlated response (tidop match).
+  bool transact(uint8_t expectedTidOp,
+                const uint8_t *requestPayload, uint8_t requestLen,
+                uint8_t responsePayload[8], uint8_t &responseLen);
 
-    static inline void unpackStatus(uint8_t status, bool &handled, bool &numericReply, bool &suppressFrame, uint8_t &commandError) {
-      handled       = (status & 0x80) != 0;
-      numericReply  = (status & 0x40) != 0;
-      suppressFrame = (status & 0x20) != 0;
-      commandError  = (uint8_t)(status & 0x1F);
-    }
+  // Send request and wait for two correlated responses (tidop and tidop+1 match).
+  bool transact2(uint8_t expectedTidOp,
+                 const uint8_t *requestPayload, uint8_t requestLen,
+                 uint8_t responsePayload[14], uint8_t &responseLen);
 
-    static inline uint8_t packTidOp(uint8_t tid, uint8_t op) { return (uint8_t)(((tid & 0x07) << 5) | (op & 0x1F)); }
-    static inline uint8_t unpackTid(uint8_t tidop) { return (uint8_t)((tidop >> 5) & 0x07); }
-    static inline uint8_t unpackOp(uint8_t tidop)  { return (uint8_t)(tidop & 0x1F); }
+  static inline uint8_t tidopPlus1(uint8_t tidop) {
+    const uint8_t op  = (uint8_t)(tidop & 0x1F);
+    const uint8_t tid = (uint8_t)((tidop >> 5) & 0x07);
+    const uint8_t tid1 = (uint8_t)((tid + 1) & 0x07);
+    return (uint8_t)((tid1 << 5) | op);
+  }
 
-  private:
-    void onResponse(const uint8_t data[8], uint8_t len);
+  uint16_t timeoutMs = 1000;
 
-    // Slot/thunk dispatch (supports multiple instances, no global self)
-    int8_t slot = -1;
-    static CanTransportClient* s_instances[TRANSPORT_CAN_MAX_INSTANCES];
+  // Per-instance TID (3 bits). No global coupling.
+  uint8_t tid = 0;
 
-    static int8_t allocSlot(CanTransportClient *p);
+  bool callbackRegistered = false;
 
-    static void onThunk0(uint8_t data[8], uint8_t len);
-    static void onThunk1(uint8_t data[8], uint8_t len);
-    static void onThunk2(uint8_t data[8], uint8_t len);
-    static void onThunk3(uint8_t data[8], uint8_t len);
-    static void onThunk4(uint8_t data[8], uint8_t len);
-    static void onThunk5(uint8_t data[8], uint8_t len);
-    static void onThunk6(uint8_t data[8], uint8_t len);
-    static void onThunk7(uint8_t data[8], uint8_t len);
+  // in-flight request correlation mode: 0=idle, 1=single, 2=dual
+  volatile uint8_t rspMode = 0;
 
-    typedef void (*ThunkFn)(uint8_t data[8], uint8_t len);
-    static ThunkFn thunkForSlot(int8_t s);
+  // first in-flight response correlation
+  volatile bool    rspReady = false;
+  volatile uint8_t rspLenLatched = 0;
+  volatile uint8_t rspTidOpLatched = 0;
+  uint8_t rspBuf[8] = {0};
 
-    bool callbackRegistered = false;
-
-    const uint16_t reqId;
-    const uint16_t rspId;
-
-    uint16_t timeoutMs = 1000;
-
-    // in-flight request correlation mode
-    // 0=idle, 1=single, 2=double
-    volatile uint8_t rspMode = 0;
-
-    // first in-flight request correlation
-    volatile bool    rspReady = false;
-    volatile uint8_t rspLenLatched = 0;
-    volatile uint8_t rspTidOpLatched = 0;
-    uint8_t rspBuf[8] = {0};
-
-    // second in-flight request correlation
-    volatile bool    rsp1Ready = false;
-    volatile uint8_t rsp1LenLatched = 0;
-    volatile uint8_t rsp1TidOpLatched = 0;
-    uint8_t rsp1Buf[8] = {0};
+  // second in-flight response correlation
+  volatile bool    rsp1Ready = false;
+  volatile uint8_t rsp1LenLatched = 0;
+  volatile uint8_t rsp1TidOpLatched = 0;
+  uint8_t rsp1Buf[8] = {0};
 };
 
 #endif
