@@ -2404,8 +2404,15 @@
 #endif
 
 // power monitor detection
-#if (defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)) || \
-    (defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)) || \
-    defined(FAN_PIN)
+#if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+  #define POWER_MONITOR_VOLTAGE_PRESENT
+#endif
+#if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+  #define POWER_MONITOR_CURRENT_PRESENT
+#endif
+#if defined(FAN_PIN)
+  #define POWER_MONITOR_FAN_PRESENT
+#endif
+#if defined(POWER_MONITOR_VOLTAGE_PRESENT) && defined(POWER_MONITOR_CURRENT_PRESENT)
   #define POWER_MONITOR_PRESENT
 #endif
