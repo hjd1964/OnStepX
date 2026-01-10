@@ -70,6 +70,12 @@ class Convert {
     // sDD:MM:SS.SSS   PM_HIGHEST
     void doubleToDms(char *reply, double value, bool fullRange, bool signPresent, PrecisionMode p);
 
+    // convert seconds with range from 1/16s to an hour into a packed byte
+    uint8_t packSeconds(float t);
+
+    // convert a packed byte into seconds with range from 1/16s to an hour
+    float unpackSeconds(uint8_t b);
+
     // string to int with error checking
     bool atoi2(char *a, int16_t *i, bool sign = true);
 

@@ -74,9 +74,35 @@
 
 // Suggested v1 set (keep lean; expand as needed):
 #define FEAT_OP_GET_ACTIVE_Y0    0x01  // :GXY0#  -> RX: bitmap of active features (8 bits)
-#define FEAT_OP_GET_INFO_Yn      0x02  // :GXYn#  -> RX: purpose + short name (may be 2-frame)
-#define FEAT_OP_GET_VALUE_Xn     0x03  // :GXXn#  -> RX: per-purpose packed values (single frame)
-#define FEAT_OP_SET_VALUE_Xn     0x04  // :SXXn,* -> RX: status only (single frame)
+#define FEAT_OP_SET_VALUE_Xn     0x02  // :SXXn,* -> RX: status only (single frame)
+#define FEAT_OP_GET_INFO_Yn      0x1E  // :GXYn#  -> RX: purpose + short name (2-frame)
+#define FEAT_OP_GET_VALUE_Xn     0x1F  // :GXXn#  -> RX: per-purpose packed values (2-frame)
+
+// -----------------------------------------------------------------------------
+// Power telemetry packing (appended to :GXXn# replies when POWER_MONITOR_PRESENT)
+// -----------------------------------------------------------------------------
+// Encoding matches the LX200 :GXXn# ASCII additions from Features::strCatPower():
+//   ,<V>,<I>,<flags>
+// where <V>/<I> are formatted as %1.1f or "NAN" and <flags> is 5 chars:
+//   P (present) or !, then C/v/V/T each replaced by ! on fault.
+//
+// On-wire, we use signed int16 fixed-point with 0.1 units (LE), and a flags bitfield.
+//
+// Voltage/current encoding:
+//   enc = round(value * 10)
+//   enc = FEAT_POWER_NAN_I16 (0x8000) means NAN
+//
+// Flags bitfield (fault bits are 1 when faulted):
+//   bit0: present (P)
+//   bit1: over-current fault      (C -> !)
+//   bit2: under-voltage fault     (v -> !)
+//   bit3: over-voltage fault      (V -> !)
+//   bit4: over-temperature fault  (T -> !)
+#define FEAT_POWER_NAN_I16        0x8000
+#define FEAT_POWER_FLAGS_PRESENT  0x01
+#define FEAT_POWER_FAULT_OC       0x02
+#define FEAT_POWER_FAULT_UV       0x04
+#define FEAT_POWER_FAULT_OV       0x08
+#define FEAT_POWER_FAULT_OT       0x10
 
 // (Reserve additional opcodes here for future AF expansions.)
-

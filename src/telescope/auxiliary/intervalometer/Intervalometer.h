@@ -34,8 +34,6 @@ class Intervalometer {
     bool isOn();
 
   private:
-    uint8_t timeToByte(float t);
-    float byteToTime(uint8_t b);
 
     enum Pressed { P_STANDBY, P_EXP_START, P_EXP_START_PHASE2, P_EXP_DONE, P_EXP_DONE_PHASE2, P_WAIT };
 
