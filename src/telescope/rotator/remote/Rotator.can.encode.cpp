@@ -166,12 +166,15 @@ bool Rotator::encodeRequest(char *command, char *parameter) {
     return true;
   } else
 
-  // --------------------------------------------------------------------------
-  // :GX98#  Get rotator availability
-  // --------------------------------------------------------------------------
   if (command[0] == 'G' && command[1] == 'X') {
+    // :GX98#  Get rotator availability
     if (parameter[0] == '9' && parameter[1] == '8' && parameter[2] == 0) {
       if (!beginNewRequest(ROT_OP_AVAIL_GX98)) return false;
+    } else
+
+    // :GXU3#  Get rotator driver status
+    if (parameter[0] == 'U' && parameter[1] == '3' && parameter[2] == 0) {
+      if (!beginNewRequest(ROT_OP_DRIVER_STATUS)) return false;
     } else
       return false;
     

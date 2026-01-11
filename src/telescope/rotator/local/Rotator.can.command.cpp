@@ -175,6 +175,7 @@ void Rotator::processCommand() {
     case ROT_OP_HALFTARGET_C: {
       if (AXIS3_SENSE_HOME != OFF) {
         if (settings.parkState == PS_UNPARKED) {
+          axis3.enable(true);
           axis3.setFrequencySlew(settings.gotoRate);
           commandError = axis3.autoSlewHome();
           if (commandError == CE_NONE) homing = true;
@@ -231,6 +232,24 @@ void Rotator::processCommand() {
       #endif
       writeU8(c);
       numericReply = false;
+    } break;
+
+    // :GXU3#
+    case ROT_OP_DRIVER_STATUS: {
+      DriverStatus status = axis3.motor->getDriverStatus();
+      if (status.active) {
+        uint8_t packedStatus = 0;
+        packedStatus |= (status.standstill ? 1: 0);
+        packedStatus |= (status.outputA.openLoad ? 1 : 0) << 1;
+        packedStatus |= (status.outputB.openLoad ? 1 : 0) << 2;
+        packedStatus |= (status.outputA.shortToGround ? 1 : 0) << 3;
+        packedStatus |= (status.outputB.shortToGround ? 1 : 0) << 4;
+        packedStatus |= (status.overTemperature ? 1 : 0) << 5;
+        packedStatus |= (status.overTemperatureWarning ? 1 : 0) << 6;
+        packedStatus |= (status.fault ? 1 : 0) << 7;
+        writeU8(packedStatus);
+        numericReply = false;
+      } else commandError = CE_0;
     } break;
 
     default:

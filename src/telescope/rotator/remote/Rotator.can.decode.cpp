@@ -68,7 +68,21 @@ bool Rotator::decodeResponse(char *reply) {
       if (!readU8(c)) return false;
       reply[0] = (char)c;
       reply[1] = 0;
-    }
+    } break;
+
+    // :GXU3# -> RX u8 packed status
+    case ROT_OP_DRIVER_STATUS: {
+      uint8_t packedStatus;
+      readU8(packedStatus);
+      strcat(reply, ( packedStatus       & 1) ? "ST," : ",");
+      strcat(reply, ((packedStatus << 1) & 1) ? "OA," : ",");
+      strcat(reply, ((packedStatus << 2) & 1) ? "OB," : ",");
+      strcat(reply, ((packedStatus << 3) & 1) ? "GA," : ",");
+      strcat(reply, ((packedStatus << 4) & 1) ? "GB," : ",");
+      strcat(reply, ((packedStatus << 5) & 1) ? "OT," : ","); // > 150C
+      strcat(reply, ((packedStatus << 6) & 1) ? "PW," : ","); // > 120C
+      strcat(reply, ((packedStatus << 7) & 1) ? "GF" : "");
+    } break;
 
     default:
       // Most ops are "no reply payload"; empty reply is fine

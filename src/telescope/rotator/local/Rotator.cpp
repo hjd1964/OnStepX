@@ -143,6 +143,7 @@ CommandError Rotator::move(Direction dir) {
   
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
+  axis3.enable(true);
   axis3.setSynchronizedFrequency(0.0F);
 
   return axis3.autoSlew(dir, moveRate);
@@ -178,6 +179,7 @@ CommandError Rotator::gotoTarget(float target) {
   VF("MSG: Rotator, goto target coordinate set ("); V(target); VL(" deg)");
   VLF("MSG: Rotator, attempting goto");
 
+  axis3.enable(true);
   axis3.setSynchronizedFrequency(0.0F);
   axis3.setTargetCoordinate(target);
 
@@ -199,6 +201,8 @@ CommandError Rotator::park() {
   derotatorEnabled = false;
 
   VLF("MSG: Rotator, parking");
+
+  axis3.enable(true);
   axis3.setBacklash(0.0F);
   settings.position = axis3.getInstrumentCoordinate();
   axis3.setTargetCoordinatePark(settings.position);

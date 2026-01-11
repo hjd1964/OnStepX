@@ -41,15 +41,15 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *suppres
     } else return false;
   } else
 
-  // :rA#    rotator Active?
-  //            Return: 0 on failure (no rotator)
-  //                    1 on success
-  if (command[0] == 'r' && command[1] == 'A' && parameter[0] == 0) {
-    // empty command for success response 1
-  } else
-
   // r - rotator Commands
   if (command[0] == 'r') {
+
+    // :rA#    rotator Active?
+    //            Return: 0 on failure (no rotator)
+    //                    1 on success
+    if (command[1] == 'A' && parameter[0] == 0) {
+      // empty command for success response 1
+    } else
 
     // :rT#       Get rotator sTatus
     //            Returns: s#
@@ -201,6 +201,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *suppres
     if (command[1] == 'C') {
       if (AXIS3_SENSE_HOME != OFF) {
         if (settings.parkState == PS_UNPARKED) {
+          axis3.enable(true);
           axis3.setFrequencySlew(settings.gotoRate);
           *commandError = axis3.autoSlewHome();
           if (*commandError == CE_NONE) {
