@@ -40,7 +40,7 @@ KTechMotor::KTechMotor(uint8_t axisNumber, int8_t reverse, const KTechDriverSett
   axisPrefix[5] = '0' + axisNumber;
 
   // the motor CAN ID is the axis number!
-  canID = 0x140 + axisNumber;
+  canID = 0x140 + 1;
 
   statusMode = Settings->status;
 
@@ -342,7 +342,7 @@ void KTechMotor::updateStatus() {
     status.overTemperature        = true;
     status.standstill             = true;
     status.fault                  = true;
-    statusValid                   = false;
+    status.active                 = true;
   }
 }
 
@@ -359,6 +359,8 @@ void KTechMotor::requestStatusCallback(uint8_t data[8]) {
   status.overTemperature        = bitRead(errorState, 3);
   status.standstill             = false;
   status.fault                  = bitRead(errorState, 0) || bitRead(errorState, 3);
+  status.active                 = true;
+
   lastStatusUpdateTime          = millis();
   statusValid                   = true;
 }
