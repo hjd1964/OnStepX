@@ -18,49 +18,49 @@ bool Rotator::decodeResponse(char *reply) {
     case ROT_OP_GET_STATUS_T: {
       int16_t dataLen = readRemainingBytes((uint8_t*)reply);
       reply[dataLen] = 0;
-    }
+    } break;
 
-    // :rG# -> RX: f32LE degrees; convert to DMS string for LX200 output
+    // :rG# -> RX: f32 degrees; convert to DMS string for LX200 output
     case ROT_OP_GET_ANGLE_G: {
       float deg = 0.0f;
       if (!readF32(deg)) return false;
       convert.doubleToDms(reply, (double)deg, true, true, PM_LOW);
-    }
+    } break;
 
-    // :rI# -> RX: i32LE degrees (rounded)
+    // :rI# -> RX: i32 degrees (rounded)
     case ROT_OP_GET_MIN_I: {
       int32_t deg = 0;
       if (!readI32(deg)) return false;
       sprintf(reply, "%ld", (long)deg);
-    }
+    } break;
 
-    // :rM# -> RX: i32LE degrees (rounded)
+    // :rM# -> RX: i32 degrees (rounded)
     case ROT_OP_GET_MAX_M: {
       int32_t deg = 0;
       if (!readI32(deg)) return false;
       sprintf(reply, "%ld", (long)deg);
-    }
+    } break;
 
-    // :rD# -> RX: f32LE deg_per_step
+    // :rD# -> RX: f32 deg_per_step
     case ROT_OP_GET_DEG_PERSTEP_D: {
       float dps = 0.0f;
       if (!readF32(dps)) return false;
       sprintF(reply, "%7.5f", dps);
-    }
+    } break;
 
-    // :rb# -> RX: i16LE steps (read mode) OR no payload (write mode)
+    // :rb# -> RX: i16 steps (read mode) OR no payload (write mode)
     case ROT_OP_BACKLASH_b: {
       int16_t steps = 0;
       if (!readI16(steps)) return false;
       sprintf(reply, "%ld", (long)steps);
-    }
+    } break;
 
-    // :rW# -> RX: f32LE deg_per_sec (settings.gotoRate)
+    // :rW# -> RX: f32 deg_per_sec (settings.gotoRate)
     case ROT_OP_GET_WORKRATE_W: {
       float dps = 0.0f;
       if (!readF32(dps)) return false;
       sprintF(reply, "%0.1f", dps);
-    }
+    } break;
 
     // :GX98# -> RX: u8 ASCII 'D'/'R'/'N'
     case ROT_OP_AVAIL_GX98: {

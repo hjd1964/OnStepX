@@ -23,10 +23,10 @@ bool Rotator::command(char *reply, char *command, char *parameter,
   if (!canPlus.ready) return false;
 
   // r?, hP, hR, GX98 - rotator commands only
-  if (!(command[0] == 'r') ||
-      !(command[0] == 'h' && command[1] == 'P') ||
-      !(command[0] == 'h' && command[1] == 'R') ||
-      !(command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8')) return false;
+  if (!(command[0] == 'r') &&
+      !(command[0] == 'h' && command[1] == 'P') &&
+      !(command[0] == 'h' && command[1] == 'R') &&
+      !(command[0] == 'G' && command[1] == 'X' && (parameter[0] == '9' && parameter[0] == 'U'))) return false;
 
   // Presence gate
   if (!heartbeatFresh()) return false;
