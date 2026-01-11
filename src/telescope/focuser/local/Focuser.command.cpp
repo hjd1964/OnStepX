@@ -10,17 +10,19 @@
 
 extern Axis *axes[6];
 
-// by default reply[80] == "", supressFrame == false, numericReply == true, and commandError == CE_NONE
+// by default reply[80] == "", suppressFrame == false, numericReply == true, and commandError == CE_NONE
 // return true if the command has been completely handled and no further command() will be called, or false if not
 // for commands that are handled repeatedly commandError might contain CE_NONE or CE_1 to indicate success
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
-bool Focuser::command(char *reply, char *command, char *parameter, bool *supressFrame, bool *numericReply, CommandError *commandError) {
+bool Focuser::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
+  if (!ready) return false;
+  
   static int index = 0;
 
-  // process any focuser axis commands (this doesn't apply to CAN)
+  // process any focuser axis commands
   for (int index = 0; index < FOCUSER_MAX; index++) {
     if (axes[index] != NULL) {
-      if (axes[index]->command(reply, command, parameter, supressFrame, numericReply, commandError)) return true;
+      if (axes[index]->command(reply, command, parameter, suppressFrame, numericReply, commandError)) return true;
     }
   }
 
@@ -60,7 +62,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       if (active < 0 || axes[active] == NULL) { *commandError = CE_0; return true; }
       sprintf(reply, "%d", active + 1);
       *numericReply = false;
-      *supressFrame = true;
+      *suppressFrame = true;
     } else
 
     // :FA[n]#    Select focuser where [n] = 1 to 6
@@ -101,11 +103,11 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
 
     // get ready for commands that convert to microns or steps (these commands are upper-case for microns OR lower-case for steps)
     const float MicronsToSteps = axes[index]->getStepsPerMeasure();
-    const float StepsToMicrons = 1.0F/MicronsToSteps;
+    const float StepsToMicrons = MicronsToSteps != 0.0F ? (1.0F / MicronsToSteps) : 0.0F;
     float MicronsToUnits = 1.0F;
     float StepsToUnits  = StepsToMicrons;
     float UnitsToSteps  = MicronsToSteps;
-    if (strchr("bdgimrs",command[1])) {
+    if (strchr("bdgimrs", command[1])) {
       MicronsToUnits = MicronsToSteps;
       StepsToUnits = 1.0F;
       UnitsToSteps = 1.0F;
@@ -137,14 +139,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FI#       Get full in position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'I') {
-      sprintf(reply,"%ld",(long)round(axes[index]->getLimitMin()*MicronsToUnits));
+      sprintf(reply,"%ld", lround(axes[index]->getLimitMin()*MicronsToUnits));
       *numericReply = false;
     } else
 
     // :FM#       Get max position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'M') {
-      sprintf(reply,"%ld",(long)round(axes[index]->getLimitMax()*MicronsToUnits));
+      sprintf(reply,"%ld", lround(axes[index]->getLimitMax()*MicronsToUnits));
       *numericReply = false;
     } else
 
@@ -165,14 +167,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :Fu#       Get focuser microns per step
     //            Returns: n.n#
     if (command[1] == 'u') {
-      sprintF(reply, "%7.5f", 1.0/axes[index]->getStepsPerMeasure());
+      sprintF(reply, "%7.5f", (MicronsToSteps != 0.0F) ? (1.0F/MicronsToSteps) : 0.0F);
       *numericReply = false;
     } else
 
     // :FB#       Get focuser backlash amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'B' && parameter[0] == 0) {
-      sprintf(reply,"%ld",(long)round(getBacklashSteps(index)*StepsToUnits));
+      sprintf(reply,"%ld", lround(getBacklashSteps(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -180,7 +182,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'B') {
-      *commandError = setBacklashSteps(index, round(atol(parameter)*UnitsToSteps));
+      *commandError = setBacklashSteps(index, lround(atol(parameter)*UnitsToSteps));
     } else
 
     // :FC#       Get focuser temperature compensation coefficient in microns per °C)
@@ -215,7 +217,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FD#       Get focuser temperature compensation deadband amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'D' && parameter[0] == 0) {
-      sprintf(reply,"%ld",(long)round(getTcfDeadband(index)*StepsToUnits));
+      sprintf(reply,"%ld", lround(getTcfDeadband(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -223,7 +225,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     //            Return: 0 on failure
     //                    1 on success
     if (toupper(command[1]) == 'D') {
-      if (!setTcfDeadband(index, round(atol(parameter)*UnitsToSteps))) *commandError = CE_PARAM_RANGE;
+      if (!setTcfDeadband(index, lround(atol(parameter)*UnitsToSteps))) *commandError = CE_PARAM_RANGE;
     } else
 
     // :FP#       Get focuser DC Motor Power Level (in %)
@@ -288,7 +290,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FG#       Get focuser current position (in microns or steps)
     //            Returns: sn#
     if (toupper(command[1]) == 'G') {
-      sprintf(reply,"%ld",(long)round((axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
+      sprintf(reply,"%ld", lround((axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -316,7 +318,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
     // :FH#       Set focuser position as home
     //            Returns: Nothing
     if (command[1] == 'H') {
-      *commandError = resetTarget(index, (long)round(getHomePosition(index)*MicronsToSteps));
+      *commandError = resetTarget(index, lround(getHomePosition(index)*MicronsToSteps));
       *numericReply = false;
     } else
 
@@ -326,7 +328,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *supress
       if (axes[index]->hasHomeSense()) {
         *commandError = moveHome(index);
       } else {
-        *commandError = gotoTarget(index, (long)round(getHomePosition(index)*MicronsToSteps));
+        *commandError = gotoTarget(index, lround(getHomePosition(index)*MicronsToSteps));
       }
       *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;

@@ -67,51 +67,51 @@ static void focHeartbeatWrapper() {
 // setup arrays for easy access to focuser axes
 Axis *axes[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 
-void Focuser::init() {
+bool Focuser::init() {
   #if defined(FOCUSER_CAN_SERVER_PRESENT)
-    CanTransportServer::init(true, 2);
+    if (!CanTransportServer::init(true, 2)) return false;
   #endif
 
   // get the motion controllers ready
   #if AXIS4_DRIVER_MODEL != OFF
-    if (!axis4.init(&motor4)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis4!"); } else {
+    if (!axis4.init(&motor4)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis4!"); return false; } else {
       VLF("MSG: Focuser1, init (Axis4)");
       axes[0] = &axis4;
     }
   #endif
   #if AXIS5_DRIVER_MODEL != OFF
-    if (!axis5.init(&motor5)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis5!"); } else {
+    if (!axis5.init(&motor5)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis5!"); return false; } else {
       VLF("MSG: Focuser2, init (Axis5)");
       axes[1] = &axis5;
     }
   #endif
   #if AXIS6_DRIVER_MODEL != OFF
-    if (!axis6.init(&motor6)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis6!"); } else {
+    if (!axis6.init(&motor6)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis6!"); return false; } else {
       VLF("MSG: Focuser3, init (Axis6)");
       axes[2] = &axis6;
     }
   #endif
   #if AXIS7_DRIVER_MODEL != OFF
-    if (!axis7.init(&motor7)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis7!"); } else {
+    if (!axis7.init(&motor7)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis7!"); return false; } else {
       VLF("MSG: Focuser4, init (Axis7)");
       axes[3] = &axis7;
     }
   #endif
   #if AXIS8_DRIVER_MODEL != OFF
-    if (!axis8.init(&motor8)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis8!"); } else {
+    if (!axis8.init(&motor8)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis8!"); return false; } else {
       VLF("MSG: Focuser5, init (Axis8)");
       axes[4] = &axis8;
     }
   #endif
   #if AXIS9_DRIVER_MODEL != OFF
-    if (!axis9.init(&motor9)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis9!"); } else {
+    if (!axis9.init(&motor9)) { initError.driver = true; DLF("ERR: Focuser::init(), no motion controller for Axis9!"); return false; } else {
       VLF("MSG: Focuser6, init (Axis9)");
       axes[5] = &axis9;
     }
   #endif
 
   // confirm the data structure size
-  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); }
+  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); return false; }
 
   // init settings stored in NV
   for (int index = 0; index < FOCUSER_MAX; index++) {
@@ -182,9 +182,14 @@ void Focuser::init() {
     for (int index = 0; index < FOCUSER_MAX; index++) slavedToFocuser[index] = -1;
     DLF("WRN: Focusers, slaved focusers have recurse on themselves and are disabled!");
   }
+
+  ready = true;
+  return true;
 }
 
 void Focuser::begin() {
+  if (!ready) return;
+
   // some final initialization
   for (int index = 0; index < FOCUSER_MAX; index++) { if (validIndex(index)) axes[index]->calibrateDriver(); }
 
@@ -235,19 +240,16 @@ float Focuser::getTemperature() {
 
 // check for DC motor focuser
 bool Focuser::isDC(int index) {
-  if (!validIndex(index)) return false;
   return false;
 }
 
 // get DC power in %
 int Focuser::getDcPower(int index) {
-  if (!validIndex(index)) return 0;
   return 0;
 }
 
 // set DC power in %
 bool Focuser::setDcPower(int index, int value) {
-  if (!validIndex(index)) return false;
   if (value < 0 || value > 100) return false;
   return true;
 }
@@ -508,7 +510,7 @@ CommandError Focuser::park(int index) {
 
 // unpark focuser
 CommandError Focuser::unpark(int index) {
-  if (!validIndex(index))           return CE_PARAM_RANGE;
+  if (!validIndex(index))                          return CE_PARAM_RANGE;
   if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
