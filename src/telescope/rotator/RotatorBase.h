@@ -107,3 +107,4 @@
 
 #define ROT_OP_AVAIL_GX98       0x19  // :GX98#        | TX: none                         -> RX: u8 ASCII 'D'/'R'/'N'  (numericReply=0)
 
+#define ROT_OP_DRIVER_STATUS    0x20  // :GXU3#        | TX: none                         -> RX: u8 packedStatus
