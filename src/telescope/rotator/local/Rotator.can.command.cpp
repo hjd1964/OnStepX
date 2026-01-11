@@ -6,7 +6,6 @@
 #ifdef ROTATOR_CAN_SERVER_PRESENT
 
 #include "../../../lib/convert/Convert.h"
-#include "../../../lib/canTransport/CanPayload.h"
 #include "../../../lib/axis/Axis.h"
 
 #include "../../mount/Mount.h"
@@ -16,22 +15,15 @@ extern Axis axis3;
 // default command semantics (mirrors the common command contract):
 // handled=true, numericReply=true, suppressFrame=false, commandError=CE_NONE
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
-void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
-  const uint8_t tidop = data[0];
-  const uint8_t op    = (uint8_t)(tidop & 0x1F);
-
-  uint8_t payload[6] = {0};
-  uint8_t payloadLen = 0;
-
-  const uint8_t argLen = (len > 1) ? (uint8_t)(len - 1) : 0;
-  CanPayload args(&data[1], argLen);
+void Rotator::processCommand() {
+  if (!ready) return;
 
   bool handled        = true;
   bool numericReply   = true;
   bool suppressFrame  = false;
   CommandError commandError = CE_NONE;
 
-  switch (op) {
+  switch (opCode()) {
 
     // :hP#
     case ROT_OP_PARK_HP: {
@@ -53,55 +45,46 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     // :rT#
     case ROT_OP_GET_STATUS_T: {
       // "M" or "S" + optional "D" + optional "R" + rateDigit
-      payload[payloadLen++] = axis3.isSlewing() ? (uint8_t)'M' : (uint8_t)'S';
+      writeU8(axis3.isSlewing() ? (uint8_t)'M' : (uint8_t)'S');
       if (!axis3.isSlewing()) {
-        if (derotatorEnabled) payload[payloadLen++] = (uint8_t)'D';
-        if (derotatorReverse) payload[payloadLen++] = (uint8_t)'R';
+        if (derotatorEnabled) writeU8((uint8_t)'D');
+        if (derotatorReverse) writeU8((uint8_t)'R');
       }
-      payload[payloadLen++] = (uint8_t)('0' + getGotoRate());
-
+      writeU8((uint8_t)('0' + getGotoRate()));
       numericReply = false;
     } break;
 
     // :rI#
     case ROT_OP_GET_MIN_I: {
       const int32_t deg = (int32_t)lround(axis3.getLimitMin());
-      CanPayload out(payload, sizeof(payload));
-      out.writeI32LE(deg);
-      payloadLen = out.offset(); // 4
+      writeI32(deg);
       numericReply = false;
     } break;
 
     // :rM#
     case ROT_OP_GET_MAX_M: {
       const int32_t deg = (int32_t)lround(axis3.getLimitMax());
-      CanPayload out(payload, sizeof(payload));
-      out.writeI32LE(deg);
-      payloadLen = out.offset(); // 4
+      writeI32(deg);
       numericReply = false;
     } break;
 
     // :rD#
     case ROT_OP_GET_DEG_PERSTEP_D: {
       const float degPerStep = (float)(1.0 / axis3.getStepsPerMeasure());
-      CanPayload out(payload, sizeof(payload));
-      out.writeF32LE(degPerStep);
-      payloadLen = out.offset(); // 4
+      writeF32(degPerStep);
       numericReply = false;
     } break;
 
     // :rb# or :rb[n]#
     case ROT_OP_BACKLASH_b: {
-      // If a payload is present, this is a set; otherwise it's a get.
-      if (argLen == 0) {
+      // If args present, this is a set; otherwise it's a get.
+      if (remaining() == 0) {
         const int16_t steps = (int16_t)lround(getBacklash());
-        CanPayload out(payload, sizeof(payload));
-        out.writeI16LE(steps);
-        payloadLen = out.offset(); // 2
+        writeI16(steps);
         numericReply = false;
       } else {
         int16_t steps = 0;
-        if (!args.readI16LE(steps)) { commandError = CE_PARAM_FORM; break; }
+        if (!readI16(steps)) { commandError = CE_PARAM_FORM; break; }
         CommandError e = setBacklash((long)steps);
         commandError = (e == CE_NONE) ? CE_1 : e;
       }
@@ -117,7 +100,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     // :r[1..9]#
     case ROT_OP_SET_RATE_1_9: {
       uint8_t digit = 0;
-      if (!args.readU8(digit)) { commandError = CE_PARAM_FORM; break; }
+      if (!readU8(digit)) { commandError = CE_PARAM_FORM; break; }
       if (digit < 1 || digit > 9) { commandError = CE_PARAM_RANGE; break; }
       if (digit < 5) setMoveRate((int)digit);
       else setGotoRate((int)digit - 4);
@@ -127,9 +110,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     // :rW#
     case ROT_OP_GET_WORKRATE_W: {
       const float dps = (float)settings.gotoRate;
-      CanPayload out(payload, sizeof(payload));
-      out.writeF32LE(dps);
-      payloadLen = out.offset(); // 4
+      writeF32(dps);
       numericReply = false;
     } break;
 
@@ -153,16 +134,14 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     // :rG#
     case ROT_OP_GET_ANGLE_G: {
       const float deg = (float)axis3.getInstrumentCoordinate();
-      CanPayload out(payload, sizeof(payload));
-      out.writeF32LE(deg);
-      payloadLen = out.offset(); // 4
-      numericReply  = false;
+      writeF32(deg);
+      numericReply = false;
     } break;
 
     // :rr[deg]#
     case ROT_OP_GOTO_REL_rr: {
       float rel = 0.0F;
-      if (!args.readF32LE(rel)) { commandError = CE_PARAM_FORM; break; }
+      if (!readF32(rel)) { commandError = CE_PARAM_FORM; break; }
       const double t = axis3.getTargetCoordinate();
       commandError = gotoTarget((double)t + (double)rel);
       numericReply = false;
@@ -171,8 +150,9 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     // :rS[deg]#
     case ROT_OP_GOTO_S: {
       float deg = 0.0F;
-      if (!args.readF32LE(deg)) { commandError = CE_PARAM_FORM; break; }
+      if (!readF32(deg)) { commandError = CE_PARAM_FORM; break; }
       commandError = gotoTarget(deg);
+      // numericReply left as default (true)
     } break;
 
     // :rZ#
@@ -249,9 +229,8 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
       #else
         c = (uint8_t)'R';
       #endif
-
-      payload[payloadLen++] = c;
-      numericReply  = false;
+      writeU8(c);
+      numericReply = false;
     } break;
 
     default:
@@ -260,8 +239,7 @@ void Rotator::processCommand(const uint8_t data[8], uint8_t len) {
     break;
   }
 
-  const uint8_t status = packStatus(handled, numericReply, suppressFrame, commandError);
-  sendResponse(tidop, status, payloadLen ? payload : nullptr, payloadLen);
+  sendResponse(handled, suppressFrame, numericReply, commandError);
 }
 
 #endif

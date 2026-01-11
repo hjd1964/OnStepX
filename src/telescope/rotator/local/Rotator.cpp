@@ -24,16 +24,19 @@ static void rotHeartbeatWrapper() {
 #endif
 
 // initialize rotator
-void Rotator::init() {
+bool Rotator::init() {
   #if defined(ROTATOR_CAN_SERVER_PRESENT)
-    CanTransportServer::init(true, 2);
+    if (!CanTransportServer::init(true, 2)) return false;
   #endif
 
   // wait a moment for any background processing that may be needed
   delay(1000);
 
   // confirm the data structure size
-  if (RotatorSettingsSize < sizeof(RotatorSettings)) { nv.initError = true; DL("ERR: Rotator::init(), RotatorSettingsSize error"); }
+  if (RotatorSettingsSize < sizeof(RotatorSettings)) {
+    nv.initError = true;
+    DL("ERR: Rotator::init(), RotatorSettingsSize error"); return false;
+  }
 
   // get settings stored in NV ready
   if (!nv.hasValidKey()) {
@@ -46,7 +49,7 @@ void Rotator::init() {
   if (!axis3.init(&motor3)) {
     initError.driver = true;
     DLF("ERR: Rotator::init(), no motion controller for Axis3!");
-    return;
+    return false;
   }
   axis3.resetPositionSteps(0);
   axis3.setBacklashSteps(settings.backlash);
@@ -58,24 +61,26 @@ void Rotator::init() {
   if (AXIS3_POWER_DOWN == ON) axis3.setPowerDownTime(AXIS3_POWER_DOWN_TIME);
 
   ready = true;
+
+  return true;
 }
 
 void Rotator::begin() {
-  if (ready) {
-    axis3.calibrateDriver();
+  if (!ready) return;
 
-    // start monitor task
-    VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
-    if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
+  axis3.calibrateDriver();
 
-    // start heartbeat task
-    #if defined(ROTATOR_CAN_SERVER_PRESENT)
-      VF("MSG: Rotator, starting CAN heartbeat task (rate 1s priority 6)... ");
-      if (tasks.add(1000, 0, true, 6, rotHeartbeatWrapper, "RotHB")) { VLF("success"); } else { VLF("FAILED!"); }
-    #endif
+  // start monitor task
+  VF("MSG: Rotator, start derotation task (rate 1s priority 6)... ");
+  if (tasks.add(1000, 0, true, 6, rotWrapper, "RotMon")) { VLF("success"); } else { VLF("FAILED!"); }
 
-    unpark();
-  }
+  // start heartbeat task
+  #if defined(ROTATOR_CAN_SERVER_PRESENT)
+    VF("MSG: Rotator, starting CAN heartbeat task (rate 1s priority 6)... ");
+    if (tasks.add(1000, 0, true, 6, rotHeartbeatWrapper, "RotHB")) { VLF("success"); } else { VLF("FAILED!"); }
+  #endif
+
+  unpark();
 }
 
 // get backlash in steps
@@ -85,6 +90,8 @@ int Rotator::getBacklash() {
 
 // set backlash in steps
 CommandError Rotator::setBacklash(int value) {
+  if (!ready) return CE_CMD_UNKNOWN;
+  
   if (value < 0 || value > 10000) return CE_PARAM_RANGE;
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
@@ -118,6 +125,8 @@ CommandError Rotator::setBacklash(int value) {
 
 // set move rate, 1 for 0.01 deg/sec slew, 2 for 0.1 deg/sec, 3 for 1 deg/sec, 4 for 0.5x goto rate
 void Rotator::setMoveRate(int value) {
+  if (!ready) return;
+  
   switch (value) {
     case 1: moveRate = 0.01F; break;
     case 2: moveRate = 0.1F; break;
@@ -130,6 +139,8 @@ void Rotator::setMoveRate(int value) {
 
 // start slew in the specified direction
 CommandError Rotator::move(Direction dir) {
+  if (!ready) return CE_CMD_UNKNOWN;
+  
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   axis3.setSynchronizedFrequency(0.0F);
@@ -160,6 +171,8 @@ void Rotator::setGotoRate(int value) {
 
 // move rotator to a specific location
 CommandError Rotator::gotoTarget(float target) {
+  if (!ready) return CE_CMD_UNKNOWN;
+
   if (settings.parkState >= PS_PARKED) return CE_PARKED;
 
   VF("MSG: Rotator, goto target coordinate set ("); V(target); VL(" deg)");
@@ -176,6 +189,8 @@ CommandError Rotator::gotoTarget(float target) {
 
 // parks rotator at current position
 CommandError Rotator::park() {
+  if (!ready) return CE_CMD_UNKNOWN;
+  
   if (settings.parkState == PS_PARKED)      return CE_NONE;
   if (settings.parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings.parkState == PS_UNPARKING)   return CE_PARK_FAILED;
@@ -200,6 +215,8 @@ CommandError Rotator::park() {
 
 // unparks rotator
 CommandError Rotator::unpark() {
+  if (!ready) return CE_CMD_UNKNOWN;
+  
   if (settings.parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings.parkState == PS_UNPARKING)   return CE_PARK_FAILED;
   if (settings.parkState == PS_PARK_FAILED) return CE_PARK_FAILED;

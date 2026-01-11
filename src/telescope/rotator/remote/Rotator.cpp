@@ -22,54 +22,40 @@ bool Rotator::command(char *reply, char *command, char *parameter,
                       bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   if (!canPlus.ready) return false;
 
-  // --------------------------------------------------------------------------
   // r?, hP, hR, GX98 - rotator commands only
-  // --------------------------------------------------------------------------
   if (!(command[0] == 'r') &&
       !(command[0] == 'h' && command[1] == 'P') &&
       !(command[0] == 'h' && command[1] == 'R') &&
       !(command[0] == 'G' && command[1] == 'X' && parameter[0] == '9' && parameter[1] == '8')) return false;
 
-  // Presence gate, just act as though there is no rotator present
-  if (!heartbeatFresh()) { return false; }
+  // Presence gate
+  if (!heartbeatFresh()) return false;
 
-  uint8_t opcode = 0, tidop = 0;
-  uint8_t req[8] = {0};
-  uint8_t reqLen = 0;
+  // Build CAN request (also sets opCode()/tidop internally per your new design)
+  if (!encodeRequest(command, parameter)) return false;
 
-  if (!encodeRequest(opcode, tidop, req, reqLen, command, parameter)) return false;
+  // Transport failure => reply unknown
+  bool handled = false;
+  if (!transactRequest(handled, *suppressFrame, *numericReply, *commandError)) { *commandError  = CE_REPLY_UNKNOWN; return true; }
 
-  uint8_t rsp[8] = {0};
-  uint8_t rspLen = 0;
-
-  // Combined validation: transact + minimum payload + strong correlation
-  if (!transact(tidop, req, reqLen, rsp, rspLen) || rspLen < 2 || rsp[0] != tidop) {
-    *commandError = CE_REPLY_UNKNOWN;
-    return true; // numeric 0 via defaults
-  }
-
-  bool handled = false, nr = true, sf = false;
-  uint8_t ce = 0;
-  unpackStatus(rsp[1], handled, nr, sf, ce);
-
+  // Remote explicitly did not recognize/handle the command
   if (!handled) {
-    *commandError = CE_CMD_UNKNOWN;
-    return true; // numeric 0 via defaults
+    *commandError  = CE_CMD_UNKNOWN;
+    *numericReply  = true;
+    *suppressFrame = false;
+    reply[0] = 0;
+    return true;
   }
 
-  // remote owns policy (even for CE_NONE / CE_1 / CE_0)
-  *numericReply = nr;
-  *supressFrame = sf;
-  *commandError = (CommandError)ce;
+  // Numeric reply: nothing to decode; caller will render numeric based on commandError
+  if (*numericReply) return true;
 
-  // if this isn't a numeric reply decode it
-  if (!*numericReply) {
-    if (!decodeResponse(reply, opcode, rsp, rspLen, *supressFrame, *numericReply)) {
-      // force failure numeric code 0 if decode fails
-      *commandError = CE_REPLY_UNKNOWN;
-      *numericReply = true;
-      reply[0] = 0;
-    }
+  // Payload reply: decode into reply buffer; decode failure => reply unknown
+  if (!decodeResponse(reply)) {
+    *commandError  = CE_REPLY_UNKNOWN;
+    *numericReply  = true;
+    *suppressFrame = false;
+    reply[0] = 0;
   }
 
   return true;
