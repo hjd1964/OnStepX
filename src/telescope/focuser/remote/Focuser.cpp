@@ -73,15 +73,10 @@ bool Focuser::command(char *reply, char *command, char *parameter,
   }
 
   // --------------------------------------------------------------------------
-  // F - focuser commands only
-  // --------------------------------------------------------------------------
-  if (command[0] != 'F') return false;
-
-  // --------------------------------------------------------------------------
   // active focuser return / selection
   // --------------------------------------------------------------------------
 
-  if (command[1] == 'A') {
+  if (command[0] == 'F' && command[1] == 'A') {
 
     // :FA#    Focuser Active?
     //            Return: 0 on failure (no focusers)
@@ -112,19 +107,26 @@ bool Focuser::command(char *reply, char *command, char *parameter,
   // :Fa#       Focuser presence detection
   //            Returns: 1 true if present
   // --------------------------------------------------------------------------
-  if (command[1] == 'a' && parameter[0] == 0) {
+  if (command[0] && command[1] == 'a' && parameter[0] == 0) {
     const int i = parameter[0] - '1';
     if (i < 0 || i > 5 || !heartbeatFresh(i)) { *commandError = CE_PARAM_RANGE; return true; }
     return true;
   }
 
   // :F[n]a#    Focuser presence detection
-  if ((command[1] >= '1' && command[1] <= '6' && parameter[0] == 'a' && parameter[1] == 0)) {
+  if ((command[0] == 'F' && command[1] >= '1' && command[1] <= '6' && parameter[0] == 'a' && parameter[1] == 0)) {
     sprintf(reply, "%u", heartbeatFresh((int)(command[1] - '1')) ? 1u : 0u);
     *numericReply = false;
     *suppressFrame = true;
     *commandError = CE_NONE;
-  } else
+    return true;
+  }
+
+  // --------------------------------------------------------------------------
+  // F - focuser commands only
+  // --------------------------------------------------------------------------
+  if (!(command[0] == 'F') &&
+      !(command[0] == 'G' && command[1] == 'X' && parameter[0] == 'U')) return false;
 
   // --------------------------------------------------------------------------
   // Generic CAN request/response path

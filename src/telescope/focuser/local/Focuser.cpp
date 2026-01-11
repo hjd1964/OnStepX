@@ -399,6 +399,7 @@ CommandError Focuser::move(int index, Direction dir) {
 
   for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) move(si, dir); }
 
+  axes[index]->enable(true);
   if (!axes[index]->isSlewing()) {
     axes[index]->setSynchronizedFrequency(0.0F);
     axes[index]->resetTargetToMotorPosition();
@@ -412,6 +413,7 @@ CommandError Focuser::moveHome(int index) {
   if (settings[index].parkState >= PS_PARKED) return CE_PARKED;
   for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) moveHome(si); }
 
+  axes[index]->enable(true);
   axes[index]->setFrequencySlew(settings[index].gotoRate);
   CommandError e = axes[index]->autoSlewHome();
   if (e == CE_NONE) homing[index] = true;
@@ -457,6 +459,7 @@ CommandError Focuser::gotoTarget(int index, long target) {
   VF("MSG: Focuser"); V(index + 1); VF(", goto target coordinate set ("); V(target/axes[index]->getStepsPerMeasure()); VLF("um)");
   VF("MSG: Focuser"); V(index + 1); VLF(", attempting goto");
 
+  axes[index]->enable(true);
   axes[index]->setSynchronizedFrequency(0.0F);
   axes[index]->setTargetCoordinateSteps(target + tcfSteps[index]);
   CommandError e = axes[index]->autoGoto(settings[index].gotoRate);
@@ -484,7 +487,7 @@ CommandError Focuser::resetTarget(int index, long target) {
 
 // park focuser at its current location
 CommandError Focuser::park(int index) {
-  if (!validIndex(index))           return CE_PARAM_RANGE;
+  if (!validIndex(index))                          return CE_PARAM_RANGE;
   if (settings[index].parkState == PS_PARKED)      return CE_NONE;
   if (settings[index].parkState == PS_PARKING)     return CE_PARK_FAILED;
   if (settings[index].parkState == PS_UNPARKING)   return CE_PARK_FAILED;
@@ -492,6 +495,7 @@ CommandError Focuser::park(int index) {
 
   setTcfEnable(index, false);
 
+  axes[index]->enable(true);
   VF("MSG: Focuser"); V(index + 1); VLF(", parking");
   axes[index]->setBacklashSteps(0);
   float targetMicrons = axes[index]->getInstrumentCoordinate();

@@ -110,3 +110,5 @@
 #define FOC_OP_ZERO_Z             0x16
 #define FOC_OP_SET_HOME_H         0x17
 #define FOC_OP_GOTO_HOME_h        0x18
+
+#define FOC_OP_DRIVER_STATUS      0x19  // :GXU[n]#
