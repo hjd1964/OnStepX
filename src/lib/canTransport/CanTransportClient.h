@@ -19,6 +19,7 @@ public:
 
   bool init();
 
+  // Changes timeout, default is 10ms
   void setTimeoutMs(uint16_t ms) { timeoutMs = ms; }
 
 protected:
@@ -57,7 +58,7 @@ private:
     return (uint8_t)((tid1 << 5) | op);
   }
 
-  uint16_t timeoutMs = 1000;
+  uint16_t timeoutMs = 50;
 
   // Per-instance TID (3 bits). No global coupling.
   uint8_t tid = 0;
