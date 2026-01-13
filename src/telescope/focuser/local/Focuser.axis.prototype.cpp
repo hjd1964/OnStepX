@@ -85,7 +85,7 @@
       StepDirTmc2160 driver@(@, &DriverPinsAxis@, &DriverSettingsAxis@, AXIS@_DRIVER_IHOLD, AXIS@_DRIVER_IRUN, AXIS@_DRIVER_IGOTO, AXIS@_DRIVER_INTPOL);
     #elif AXIS@_DRIVER_MODEL == TMC2208
       StepDirTmc2208 driver@(@, &DriverPinsAxis@, &DriverSettingsAxis@, AXIS@_DRIVER_IHOLD, AXIS@_DRIVER_IRUN, AXIS@_DRIVER_IGOTO, AXIS@_DRIVER_INTPOL);
-    #elif AXIS@_DRIVER_MODEL == TMC2209
+    #elif AXIS@_DRIVER_MODEL == TMC2209 || AXIS@_DRIVER_MODEL == TMC2226
       StepDirTmc2209 driver@(@, &DriverPinsAxis@, &DriverSettingsAxis@, AXIS@_DRIVER_IHOLD, AXIS@_DRIVER_IRUN, AXIS@_DRIVER_IGOTO, AXIS@_DRIVER_INTPOL);
     #elif AXIS@_DRIVER_MODEL == TMC2660
       StepDirTmc2660 driver@(@, &DriverPinsAxis@, &DriverSettingsAxis@, AXIS@_DRIVER_IHOLD, AXIS@_DRIVER_IRUN, AXIS@_DRIVER_IGOTO, AXIS@_DRIVER_INTPOL);
