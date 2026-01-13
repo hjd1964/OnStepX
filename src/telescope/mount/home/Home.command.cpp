@@ -41,7 +41,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
       *numericReply = false;
     } else
 
-    // :hC1,n#    Set home sense direction and home offset for axis1 arcseconds.
+    // :hC1,n#    Set home sense direction and home offset for axis1 arcseconds
     //            Returns: Nothing
     if (command[1] == 'C' && parameter[0] == '1' && parameter[1] == ',') {
       if (parameter[2] == 'R' && parameter[3] == 0) {
@@ -58,7 +58,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
       *numericReply = false;
     } else
 
-    // :hC2,n#    Set home sense direction and home offset for axis2 arcseconds.
+    // :hC2,n#    Set home sense direction and home offset for axis2 arcseconds
     //            Returns: Nothing
     if (command[1] == 'C' && parameter[0] == '2' && parameter[1] == ',') {
       if (parameter[2] == 'R' && parameter[3] == 0) {
