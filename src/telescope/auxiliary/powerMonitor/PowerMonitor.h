@@ -5,7 +5,6 @@
 //   - Applies safety shutoffs to Features (per-channel OC, combined OC, OV/UV, MCU OT)
 //   - Optional fan control based on telescope.mcuTemperature (NAN => unavailable)
 //
-// Intended to be scheduled periodically (e.g. tasks.add(200, 0, true, 7, ...)).
 
 #pragma once
 
@@ -21,30 +20,29 @@ class Telescope;
 
 class PowerMonitor {
 public:
-  void init();
+  bool init();
 
-  // Scheduled poll (called by tasks)
-  void poll();
+  // telemetry access (NAN if never sampled / pin not present)
+  float getVoltage(uint8_t ch) const { return (ch < 8) ? averagedVoltage[ch] : NAN; }
+  float getCurrent(uint8_t ch) const { return (ch < 8) ? averagedCurrent[ch] : NAN; }
 
-  // Telemetry access (NAN if never sampled / pin not present).
-  float getVoltage(uint8_t ch) const { return (ch < 8) ? voltageV[ch] : NAN; }
-  float getCurrent(uint8_t ch) const { return (ch < 8) ? currentA[ch] : NAN; }
+  bool hasVoltage(uint8_t ch) const { return (ch < 8) && !isnan(averagedVoltage[ch]); }
+  bool hasCurrent(uint8_t ch) const { return (ch < 8) && !isnan(averagedCurrent[ch]); }
 
-  bool hasVoltage(uint8_t ch) const { return (ch < 8) && !isnan(voltageV[ch]); }
-  bool hasCurrent(uint8_t ch) const { return (ch < 8) && !isnan(currentA[ch]); }
-
-  // Channel exists if any telemetry is available.
+  // channel exists if any telemetry is available
   bool hasChannel(uint8_t ch) const { return hasVoltage(ch) || hasCurrent(ch); }
 
-  // Fault flags (best-effort; cleared each poll unless fault re-triggers)
+  // fault flags (best-effort; cleared each poll unless fault re-triggers)
   bool errOverCurrent(uint8_t ch) const { return (ch < 8) ? ocFault[ch] : false; }
   bool errUnderVoltage(uint8_t ch) const { return (ch < 8) ? uvFault[ch] : false; }
   bool errOverVoltage(uint8_t ch) const { return (ch < 8) ? ovFault[ch] : false; }
   bool errOverTemperature(uint8_t ch) const { return (ch < 8) ? otFault[ch] : false; }
 
+  void poll();
+
 private:
-  float voltageV[8] = {NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN};
-  float currentA[8] = {NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN};
+  float averagedVoltage[8] = {NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN};
+  float averagedCurrent[8] = {NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN};
 
   bool ocFault[8] = {false, false, false, false, false, false, false, false};
   bool uvFault[8] = {false, false, false, false, false, false, false, false};
