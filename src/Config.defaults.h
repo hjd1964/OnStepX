@@ -800,22 +800,22 @@
 
 // tracking
 #ifndef TRACK_AUTOSTART
-#define TRACK_AUTOSTART               OFF                         // begin tracking at startup
+#define TRACK_AUTOSTART               OFF                         // automatically begins tracking at startup
 #endif
 #ifndef TRACK_WITHOUT_LIMITS
-#define TRACK_WITHOUT_LIMITS          OFF                         // allow tracking even if limits are disabled
+#define TRACK_WITHOUT_LIMITS          OFF                         // allows tracking even if limits are disabled
 #endif
 #ifndef TRACK_COMPENSATION_DEFAULT
-#define TRACK_COMPENSATION_DEFAULT    OFF
+#define TRACK_COMPENSATION_DEFAULT    OFF                         // use OFF, REFRACTION, REFRACTION_DUAL, MODEL, MODEL_DUAL
 #endif
 #ifndef TRACK_COMPENSATION_MEMORY
-#define TRACK_COMPENSATION_MEMORY     OFF
+#define TRACK_COMPENSATION_MEMORY     OFF                         // remembers the last runtime tracking compensation setting
 #endif
 #ifndef TRACK_BACKLASH_RATE
-#define TRACK_BACKLASH_RATE           25
-#endif
+#define TRACK_BACKLASH_RATE           25                          // the backlash takeup rate in x the sidereal rate
+#endif                                                            // this must be within stepper motors torque limits (no acceleration)
 #ifndef TRACKING_RATE_DEFAULT_HZ
-  #define TRACKING_RATE_DEFAULT_HZ    SIDEREAL_RATE_HZ
+  #define TRACKING_RATE_DEFAULT_HZ    SIDEREAL_RATE_HZ            // the normal sidereal tracking rate
 #endif
 
 // slewing
