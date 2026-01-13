@@ -2375,8 +2375,82 @@
 #define FEATURE8_ON_STATE             HIGH
 #endif
 
-// thermistor configuration settings to support two types
+// auxiliary feature power monitor configuration
 
+// fan control
+#ifndef FAN_PIN
+#define FAN_PIN                       OFF                           // PWM capable pin to run a small fan to help cool the controller
+#endif
+#ifndef FAN_THRESHOLD_LOW
+#define FAN_THRESHOLD_LOW             35                            // Deg. C
+#endif
+#ifndef FAN_POWER_LOW
+#define FAN_POWER_LOW                 60                            // %
+#endif
+#ifndef FAN_THRESHOLD_MID
+#define FAN_THRESHOLD_MID             45                            // Deg. C
+#endif
+#ifndef FAN_POWER_MID
+#define FAN_POWER_MID                 80                            // %
+#endif
+#ifndef FAN_THRESHOLD_HIGH
+#define FAN_THRESHOLD_HIGH            50                            // Deg. C
+#endif
+#ifndef FAN_POWER_HIGH
+#define FAN_POWER_HIGH                100                           // %
+#endif
+#ifndef FAN_THRESHOLD_OT
+#define FAN_THRESHOLD_OT              60                            // turn off all channels if MCU temperature exceeds this (Deg. C)
+#endif
+#if defined(FAN_PIN)
+  #define POWER_MONITOR_FAN_PRESENT
+#endif
+
+// voltage sensing
+#ifndef V_SENSE_PINS
+#define V_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}              // an array of pin#'s corresponding to auxiliary features 1..8
+#endif
+#ifndef V_SENSE_FORMULA
+#define V_SENSE_FORMULA               (v*18.405)                    // scales up typical 0..3.3V to actual V (47k/2.7k resistor voltage divider)
+#endif
+#ifndef V_SENSE_LIMIT_LOW
+#define V_SENSE_LIMIT_LOW             10.5                          // 12V nominal, low limit below this all channels are turned OFF
+#endif
+#ifndef V_SENSE_LIMIT_HIGH
+#define V_SENSE_LIMIT_HIGH            13.8                          // 12V nominal, high limit above this all channels are turned OFF
+#endif
+#ifndef V_SENSE_LIMIT_EXCLUDE
+#define V_SENSE_LIMIT_EXCLUDE         OFF                           // allow excluding pin# from the checks (variable voltage output)
+#endif
+#if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
+  #define POWER_MONITOR_VOLTAGE_PRESENT
+#endif
+
+// current sensing
+#ifndef I_SENSE_PINS
+#define I_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}              // an array of pin#'s corresponding to auxiliary features 1..8
+#endif
+#ifndef I_SENSE_FORMULA
+#define I_SENSE_FORMULA               (-((v-1.65)/0.09))            // nominal 3.3V Vcc/2 (at 0A) with scaling (down) at 0.09V/Amp
+#endif
+#ifndef I_SENSE_CHANNEL_MAX
+#define I_SENSE_CHANNEL_MAX {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}       // turn off individual channel (1..8) if current exceeds this (Amps)
+#endif
+#ifndef I_SENSE_COMBINED_MAX
+#define I_SENSE_COMBINED_MAX          12                            // turn off all channels if combined current exceeds this (Amps)
+#endif
+#if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
+  #define POWER_MONITOR_CURRENT_PRESENT
+#endif
+
+#if defined(POWER_MONITOR_VOLTAGE_PRESENT) && defined(POWER_MONITOR_CURRENT_PRESENT)
+  #define POWER_MONITOR_PRESENT
+#endif
+
+// -----------------------------------------------------------------------------------
+// thermistor configuration settings
+
+// type 1
 #ifndef THERMISTOR1_TNOM
 #define THERMISTOR1_TNOM              25                          // nominal temperature (Celsius)
 #endif
@@ -2390,6 +2464,7 @@
 #define THERMISTOR1_RSERIES           4700                        // series resistor value (Ohms)
 #endif
 
+// type 2
 #ifndef THERMISTOR2_TNOM
 #define THERMISTOR2_TNOM              25                          // nominal temperature (Celsius)
 #endif
@@ -2403,16 +2478,3 @@
 #define THERMISTOR2_RSERIES           4700                        // series resistor value (Ohms)
 #endif
 
-// power monitor detection
-#if defined(V_SENSE_PINS) && defined(V_SENSE_FORMULA)
-  #define POWER_MONITOR_VOLTAGE_PRESENT
-#endif
-#if defined(I_SENSE_PINS) && defined(I_SENSE_FORMULA)
-  #define POWER_MONITOR_CURRENT_PRESENT
-#endif
-#if defined(FAN_PIN)
-  #define POWER_MONITOR_FAN_PRESENT
-#endif
-#if defined(POWER_MONITOR_VOLTAGE_PRESENT) && defined(POWER_MONITOR_CURRENT_PRESENT)
-  #define POWER_MONITOR_PRESENT
-#endif
