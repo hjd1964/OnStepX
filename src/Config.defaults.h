@@ -2407,9 +2407,7 @@
 #endif
 
 // voltage sensing
-#ifndef V_SENSE_PINS
-#define V_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}              // an array of pin#'s corresponding to auxiliary features 1..8
-#endif
+//#define V_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}            // an array of pin#'s corresponding to auxiliary features 1..8
 #ifndef V_SENSE_FORMULA
 #define V_SENSE_FORMULA               (v*18.405)                    // scales up typical 0..3.3V to actual V (47k/2.7k resistor voltage divider)
 #endif
@@ -2427,9 +2425,7 @@
 #endif
 
 // current sensing
-#ifndef I_SENSE_PINS
-#define I_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}              // an array of pin#'s corresponding to auxiliary features 1..8
-#endif
+//#define I_SENSE_PINS {OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF}            // an array of pin#'s corresponding to auxiliary features 1..8
 #ifndef I_SENSE_FORMULA
 #define I_SENSE_FORMULA               (-((v-1.65)/0.09))            // nominal 3.3V Vcc/2 (at 0A) with scaling (down) at 0.09V/Amp
 #endif
