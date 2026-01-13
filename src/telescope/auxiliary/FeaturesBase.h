@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 
 #ifndef CAN_FEATURES_REQ_ID
-  #define CAN_FEATURES_REQ_ID (0x00 + 0x0F)
+  #define CAN_FEATURES_REQ_ID (0x0F + 0x00)
 #endif
 
 #ifndef CAN_FEATURES_RSP_ID
