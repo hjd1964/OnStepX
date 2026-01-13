@@ -14,15 +14,15 @@ void Features::strCatPower(char *reply, int index) {
     if (index < 0 || index > 7) return;
 
     char s[40];
-    if (powerMonitor.hasVoltage(index)) sprintF(s, ",%1.1f", powerMonitor.getVoltage(index)); else strcpy(s, ",NAN");
+    if (powerMonitor.hasVoltage(index)) sprintF(s, ";%1.1f", powerMonitor.getVoltage(index)); else strcpy(s, ";NAN");
     strcat(reply, s);
     if (powerMonitor.hasCurrent(index)) sprintF(s, ",%1.1f", powerMonitor.getCurrent(index)); else strcpy(s, ",NAN");
     strcat(reply, s);
-    if (powerMonitor.hasChannel(index)) strcat(reply, ",P"); else strcat(reply, ",!");
-    if (!powerMonitor.errOverCurrent(index)) strcat(reply, "C"); else strcat(reply, "!");
-    if (!powerMonitor.errUnderVoltage(index)) strcat(reply, "v"); else strcat(reply, "!");
-    if (!powerMonitor.errOverVoltage(index)) strcat(reply, "V"); else strcat(reply, "!");
-    if (!powerMonitor.errOverTemperature(index)) strcat(reply, "T"); else strcat(reply, "!");
+    if (!powerMonitor.hasChannel(index)) strcat(reply, ",P"); else strcat(reply, ",!");
+    if (powerMonitor.errOverCurrent(index)) strcat(reply, "C"); else strcat(reply, "!");
+    if (powerMonitor.errUnderVoltage(index)) strcat(reply, "U"); else strcat(reply, "!");
+    if (powerMonitor.errOverVoltage(index)) strcat(reply, "V"); else strcat(reply, "!");
+    if (powerMonitor.errOverTemperature(index)) strcat(reply, "T"); else strcat(reply, "!");
   #else
     UNUSED(reply);
     UNUSED(index);
@@ -98,39 +98,6 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
         sprintf(s, "%d", (int)device[i].intervalometer->getCount());
         strcat(reply, s);
       } else { *commandError = CE_CMD_UNKNOWN; return true; }
-      
-      // optional power telemetry append
-      #ifdef POWER_MONITOR_PRESENT
-        uint8_t flags = 0;
-        const bool present = powerMonitor.hasChannel(i);
-        if (present) flags |= FEAT_POWER_FLAGS_PRESENT;
-        if (powerMonitor.errOverCurrent(i))      flags |= FEAT_POWER_FAULT_OC;
-        if (powerMonitor.errUnderVoltage(i))     flags |= FEAT_POWER_FAULT_UV;
-        if (powerMonitor.errOverVoltage(i))      flags |= FEAT_POWER_FAULT_OV;
-        if (powerMonitor.errOverTemperature(i))  flags |= FEAT_POWER_FAULT_OT;
-
-        float v = NAN;
-        float i = NAN;
-        if (powerMonitor.hasVoltage(i)) v = powerMonitor.getVoltage(i);
-        if (powerMonitor.hasCurrent(i)) i = powerMonitor.getCurrent(i);
-
-        if (!present) { strcat(reply, ",NAN,NAN,!!!!!"); return true; }
-
-        if (isnan(volts)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", volts); strcat(reply, s); }
-
-        if (isnan(amps)) { strcat(reply, ",NAN"); } else { char s[24]; sprintF(s, ",%1.1f", amps); strcat(reply, s); }
-
-        // Flags string: ",P" + (C/v/V/T or !)
-        char fs[8];
-        fs[0] = ',';
-        fs[1] = 'P';
-        fs[2] = (flags & FEAT_POWER_FAULT_OC) ? '!' : 'C';
-        fs[3] = (flags & FEAT_POWER_FAULT_UV) ? '!' : 'v';
-        fs[4] = (flags & FEAT_POWER_FAULT_OV) ? '!' : 'V';
-        fs[5] = (flags & FEAT_POWER_FAULT_OT) ? '!' : 'T';
-        fs[6] = 0;
-        strcat(reply, fs);
-      #endif
 
       *numericReply = false;
     } else
