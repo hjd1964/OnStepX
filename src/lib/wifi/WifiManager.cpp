@@ -32,6 +32,11 @@ bool WifiManager::init() {
       WiFi.hostname(name);
     #endif
 
+    if (settings.accessPointEnabled == false && settings.stationEnabled == false) {
+      VF("MSG: WiFi, re-enabling access point mode to prevent lock-out!");
+      settings.accessPointEnabled = true;
+    }
+
   TryAgain:
     if (settings.accessPointEnabled && !settings.stationEnabled) {
       VF("MSG: WiFi, starting Soft AP for SSID "); V(settings.ap.ssid); V(" PWD "); V(settings.ap.pwd); V(" CH "); VL(settings.ap.channel);
