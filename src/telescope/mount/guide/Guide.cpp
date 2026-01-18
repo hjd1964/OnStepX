@@ -64,7 +64,8 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     axis1.setPowerDownOverrideTime(300000UL);
     axis2.setPowerDownOverrideTime(300000UL);
   }
-  if (rate <= 2 && rateSelect != GR_CUSTOM) {
+
+  if (limits.isEnabled() && rate <= 2 && rateSelect != GR_CUSTOM) {
     backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
@@ -123,7 +124,8 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     axis1.setPowerDownOverrideTime(300000UL);
     axis2.setPowerDownOverrideTime(300000UL);
   }
-  if (rate <= 2 && rateSelect != GR_CUSTOM) {
+
+  if (limits.isEnabled() && rate <= 2 && rateSelect != GR_CUSTOM) {
     state = GU_PULSE_GUIDE;
     backlashEnableControl(false);
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
@@ -332,7 +334,11 @@ bool Guide::validAxis2(GuideAction guideAction) {
 
 // general validation of guide request
 CommandError Guide::validate(int axis, GuideAction guideAction) {
-  if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+  if (!mount.isEnabled()) {
+    mount.enable(true);
+    if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+  }
+
   if ((guideAction == GA_SPIRAL || guideAction == GA_HOME) && mount.isSlewing()) return CE_SLEW_IN_MOTION;
 
   #if GOTO_FEATURE == ON
