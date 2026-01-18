@@ -235,7 +235,7 @@
         }
     #endif
 
-    if (axis1.isEnabled()) {
+    if (mount.isEnabled()) {
       // guide E/W
       bool pulseGuiding = GUIDE_SEPARATE_PULSE_RATE == ON && ST4_HAND_CONTROL != ON;
       GuideAction st4GuideActionAxis1 = GA_BREAK;
