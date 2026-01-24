@@ -160,7 +160,7 @@ IRAM_ATTR void CwCcw::cw() {
 
   count++;
 
-  #ifdef ENCODER_VELOCITY == ON
+  #if ENCODER_VELOCITY == ON
     velNoteEdge(+1);
   #endif
 }
