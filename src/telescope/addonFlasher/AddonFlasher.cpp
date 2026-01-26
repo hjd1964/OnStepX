@@ -64,7 +64,7 @@ extern HardwareSerial HWSerialB;
       //tasks.yield();
 
       // wait 5 seconds w/no traffic before resuming normal operation
-      if (timeout && (millis() - lastRead > 5000U) break;
+      if (timeout && (millis() - lastRead > 5000U)) break;
     }
     VLF("MSG: AddonFlasher, serial passthrough deactivated");
 
