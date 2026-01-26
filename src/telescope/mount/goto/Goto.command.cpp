@@ -227,7 +227,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
           // autoMeridianFlip
           case '5': sprintf(reply, "%d", (int)isAutoFlipEnabled()); break;
           // preferred pier side
-          case '6': reply[0] = transform.meridianFlips ? "EWB"[settings.preferredPierSide - 1] : 'E'; reply[1] = 0; break;
+          case '6': reply[0] = transform.meridianFlips ? "EWBA"[settings.preferredPierSide - 1] : 'E'; reply[1] = 0; break;
           // current step rate in deg/s
           case '7': sprintF(reply, "%0.1f", (1000000.0F/settings.usPerStepCurrent)/degToRadF(axis1.getStepsPerMeasure())); break;
           // fastest step rate in us/step
@@ -540,6 +540,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
                 case 'E': settings.preferredPierSide = PSS_EAST; break;
                 case 'W': settings.preferredPierSide = PSS_WEST; break;
                 case 'B': settings.preferredPierSide = PSS_BEST; break;
+                case 'A': settings.preferredPierSide = PSS_AUTO; break;
                 default: *commandError = CE_PARAM_RANGE;
               }
               #if PIER_SIDE_PREFERRED_MEMORY == ON

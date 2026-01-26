@@ -13,7 +13,7 @@ enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
 enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
 enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
-enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
+enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_AUTO, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
 typedef struct MeridianFlipHome {
   bool paused;

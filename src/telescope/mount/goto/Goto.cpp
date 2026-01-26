@@ -254,6 +254,11 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (!transform.meridianFlips) pierSideSelect = PSS_EAST_ONLY;
 
   bool pierSideBest = false;
+  if (pierSideSelect == PSS_AUTO) {
+    if (transform.mountType != ALTAZM && transform.mountType != ALTALT) {
+      if (isGoto && (current.h < -Deg90 || current.h > Deg90)) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
+    } else pierSideSelect = PSS_BEST;
+  }
   if (pierSideSelect == PSS_BEST) {
     if (current.pierSide == PIER_SIDE_WEST) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
     pierSideBest = true;

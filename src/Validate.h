@@ -486,7 +486,7 @@
 #endif
 
 #if PIER_SIDE_PREFERRED_DEFAULT < PIER_SIDE_FIRST && PIER_SIDE_PREFERRED_DEFAULT > PIER_SIDE_LAST
-  #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_DEFAULT unknown, use EAST or WEST or BEST."
+  #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_DEFAULT unknown, use EAST or WEST or BEST or AUTOMATIC."
 #endif
 
 #if PIER_SIDE_PREFERRED_MEMORY != OFF && PIER_SIDE_PREFERRED_MEMORY != ON

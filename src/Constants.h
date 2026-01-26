@@ -100,7 +100,8 @@
 #define EAST                        1      // same as PSS_EAST
 #define WEST                        2      // same as PSS_WEST
 #define BEST                        3      // same as PSS_BEST
-#define PIER_SIDE_LAST              3
+#define AUTOMATIC                   4      // same as PSS_AUTO
+#define PIER_SIDE_LAST              4
 
 // COMPENSATED TRACKING
 #define COMPENSATED_TRACKING_FIRST  1
