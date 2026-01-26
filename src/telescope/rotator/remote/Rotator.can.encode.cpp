@@ -73,7 +73,7 @@ bool Rotator::encodeRequest(char *command, char *parameter) {
     // :rQ#
     if (command[1] == 'Q' && parameter[0] == 0) {
       if (!beginNewRequest(ROT_OP_STOP_Q)) return false;
-    }
+    } else
 
     // :r[1..9]#  (no parameter allowed)
     if (command[1] >= '1' && command[1] <= '9') {

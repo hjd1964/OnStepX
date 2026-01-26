@@ -26,12 +26,12 @@ bool Rotator::command(char *reply, char *command, char *parameter,
   if (!(command[0] == 'r') &&
       !(command[0] == 'h' && command[1] == 'P') &&
       !(command[0] == 'h' && command[1] == 'R') &&
-      !(command[0] == 'G' && command[1] == 'X' && (parameter[0] == '9' && parameter[0] == 'U'))) return false;
+      !(command[0] == 'G' && command[1] == 'X' && (parameter[0] == '9' || parameter[0] == 'U'))) return false;
 
   // Presence gate
   if (!heartbeatFresh()) return false;
 
-  // Build CAN request (also sets opCode()/tidop internally per your new design)
+  // Build CAN request
   if (!encodeRequest(command, parameter)) return false;
 
   // Transport failure => reply unknown
