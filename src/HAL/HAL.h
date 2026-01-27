@@ -53,16 +53,15 @@
   #define MCU_STR "ARDUINO M0"
   #include "HAL_ZERO.h"
 
-#elif defined(ESP32)
-  // ESP32
+#elif defined(ESP32) && ESP_ARDUINO_VERSION >= 0x30000
+  // ESP32 w/libraries 3.x
   #define MCU_STR "ESP32"
-  #if ESP_ARDUINO_VERSION >= 0x30000
-    #include "esp/ESP32Libraries3.h"
-  #elif ESP_ARDUINO_VERSION >= 0x20000 + 3
-    #include "esp/ESP32Libraries2.h"
-  #else
-    #include "esp/ESP32Libraries1.h"
-  #endif
+  #include "esp/ESP32Libraries3.h"
+
+#elif defined(ESP32) && ESP_ARDUINO_VERSION >= 0x20000
+  // ESP32 w/libraries 2.x
+  #define MCU_STR "ESP32"
+  #include "esp/ESP32Libraries2.h"
 
 #elif defined(ESP8266)
   // ESP8266
