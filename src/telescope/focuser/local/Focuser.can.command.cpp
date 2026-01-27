@@ -34,9 +34,7 @@ void Focuser::processCommand() {
   const bool UseMicrons = (ctrl & FOC_CTRL_UNIT_MICRONS) != 0;
 
   // Gate: make sure we're ready and only answer requests meant for this node
-  if (!ready || FocuserNumber != (uint8_t)CAN_FOCUSER_NUMBER || FocuserNumber == 0) {
-    sendResponse(handled, suppressFrame, numericReply, commandError);
-  }
+  if (!ready || FocuserNumber != (uint8_t)CAN_FOCUSER_NUMBER) return;
 
   // Unit conversions (apply ONLY to I/M/G/R/S/B/D)
   const float MicronsToSteps = axis4.getStepsPerMeasure(); // steps per micron
