@@ -2,6 +2,7 @@
 #pragma once
 
 // conversion math
+#define degToArcsecF(x)             ((x)/3600.0F)
 #define degToRad(x)                 ((x)/(double)RAD_DEG_RATIO)
 #define degToRadF(x)                ((x)/(double)RAD_DEG_RATIO_F)
 #define radToDeg(x)                 ((x)*(double)RAD_DEG_RATIO)
