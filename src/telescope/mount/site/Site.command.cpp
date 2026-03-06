@@ -30,7 +30,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     //            Returns: MM/DD/YY#
     if (command[1] == 'C' && parameter[0] == 0) {
       GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
-      sprintf(reply,"%02d/%02d/%02d", (int)local.month, (int)local.day, (int)local.year % 100);
+      sprintf(reply, "%02d/%02d/%02d", (int)local.month, (int)local.day, (int)local.year % 100);
       *numericReply = false;
     } else
 
@@ -75,11 +75,12 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     //            Returns: s#
     if ((command[1] == 'M' || command[1] == 'N' || command[1] == 'O' || command[1] == 'P') && parameter[0] == 0)  {
       Location tempLocation;
+      tempLocation.name[0] = 0;
       uint8_t locationNumber = command[1] - 'M';
-      nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+      if (locationNumber <= 3) { nv().kv().get(nvKey[locationNumber], tempLocation); }
       strcpy(reply, tempLocation.name);
       if (reply[0] == 0) { strcat(reply,"None"); }
-      *numericReply = false; 
+      *numericReply = false;
     } else
 
     // :GS#       Get the Sidereal Time as sexagesimal value in 24 hour format
@@ -125,7 +126,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
         while (hour >= 24.0) { hour -= 24.0; julianDay.day += 1.0; }
         if    (hour < 0.0)   { hour += 24.0; julianDay.day -= 1.0; }
         GregorianDate date = calendars.julianDayToGregorian(julianDay);
-        sprintf(reply,"%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year % 100);
+        sprintf(reply, "%02d/%02d/%02d", (int)date.month, (int)date.day, (int)date.year % 100);
         *numericReply = false;
       } else
 
@@ -159,7 +160,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
       if (convert.tzToDouble(&hour, parameter)) {
         if (hour >= -13.75 || hour <= 12.0) {
           location.timezone = hour;
-          nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
+          nv().kv().put(nvKey[locationNumber], location);
         } else *commandError = CE_PARAM_RANGE;
       } else *commandError = CE_PARAM_FORM;
     } else
@@ -177,7 +178,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
           location.longitude = degToRad(degs);
           if (parameter[0] == '-') location.longitude = -location.longitude;
           updateLocation();
-          nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
+          nv().kv().put(nvKey[locationNumber], location);
         } else *commandError = CE_PARAM_RANGE;
       } else *commandError = CE_PARAM_FORM;
     } else
@@ -199,13 +200,17 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     //            Return: 0 on failure
     //                    1 on success
     if ((command[1] == 'M' || command[1] == 'N' || command[1] == 'O' || command[1] == 'P')) {
-      uint8_t locationNumber = command[1] - 'M';
+      uint8_t tempLocationNumber = command[1] - 'M';
       if (strlen(parameter) <= 15) {
         Location tempLocation;
-        nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
+        tempLocation.latitude = 0.0;
+        tempLocation.longitude = 0.0;
+        tempLocation.timezone = 0.0;
+        tempLocation.elevation = 100.0;
+        nv().kv().get(nvKey[tempLocationNumber], tempLocation);
         strcpy(tempLocation.name, parameter);
-        nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &tempLocation, LocationSize);
-        strcpy(location.name, parameter);
+        nv().kv().put(nvKey[tempLocationNumber], tempLocation);
+        if (locationNumber == tempLocationNumber) strcpy(location.name, parameter);
       } else *commandError = CE_PARAM_RANGE;
     } else
 
@@ -217,7 +222,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
       if (convert.dmsToDouble(&degs, parameter, true)) {
         location.latitude = degToRad(degs);
         updateLocation();
-        nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
+        nv().kv().put(nvKey[locationNumber], location);
         if (mount.isHome()) home.init();
       } else *commandError = CE_PARAM_FORM;
     } else 
@@ -248,7 +253,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
       float f = strtod(&parameter[0], &conv_end);
       if (&parameter[0] == conv_end) f = NAN;
       if (!setElevation(f)) *commandError = CE_PARAM_RANGE;
-      nv.updateBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
+      nv().kv().put(nvKey[locationNumber], location);
     } else return false;
   } else
 
@@ -257,7 +262,6 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     //            Returns: Nothing
     if ((command[1] >= '0' && command[1] <= '3') && parameter[0] == 0) {
       locationNumber = command[1] - '0';
-      nv.update(NV_SITE_NUMBER, locationNumber);
       readLocation(locationNumber);
       updateLocation();
       if (mount.isHome()) home.init();
@@ -267,7 +271,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     // :W?#       Queries current site
     //            Returns: n#
     if (command[1] == '?' && parameter[0] == 0) {
-      sprintf(reply, "%d", (int)nv.read(NV_SITE_NUMBER));
+      sprintf(reply, "%d", (int)locationNumber);
       *numericReply = false;
     } else return false;
   } else return false;

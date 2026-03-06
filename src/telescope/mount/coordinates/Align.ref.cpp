@@ -35,9 +35,8 @@ void GeoAlign::init(int8_t mountType, float latitude) {
 }
 
 void GeoAlign::modelRead() {
-  // get misc settings from NV
-  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::readModel(), AlignModelSize error"); }
-  nv.readBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
+  if (!nv().kv().getOrInit("ALIGN_MODEL", model)) { DLF("WRN: Nv, init failed for ALIGN_MODEL"); }
+ 
   if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
   if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
   if (model.dfCor  <    -256 || model.dfCor  >    256) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
@@ -53,8 +52,7 @@ void GeoAlign::modelRead() {
 }
 
 void GeoAlign::modelWrite() {
-  if (AlignModelSize < sizeof(AlignModel)) { nv.initError = true; DL("ERR: GeoAlign::writeModel(), AlignModelSize error"); }
-  nv.updateBytes(NV_ALIGN_MODEL_BASE, &model, AlignModelSize);
+  nv().kv().put("ALIGN_MODEL", model);
 }
 
 void GeoAlign::modelClear() {

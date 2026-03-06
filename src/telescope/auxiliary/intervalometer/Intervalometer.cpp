@@ -6,22 +6,19 @@
 #ifdef FEATURES_PRESENT
 
 #include "../../../lib/nv/Nv.h"
-#include "../../../lib/convert/Convert.h"
 
-void Intervalometer::init(int index) {
+void Intervalometer::init(uint8_t index) {
+  if (index > 7) return;
   this->index = index;
 
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VF("MSG: Intervalometer/Feature"); V(index + 1); VLF(", writing defaults to NV");
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, convert.packSeconds(expTime));
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, convert.packSeconds(expDelay));
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 2, (uint8_t)expCount);
-  }
+  char keyStr[26];
+  snprintf(keyStr, sizeof(keyStr), "FEATURE%u_INTV_SETTINGS", index);
+  nvKey = nv().kv().computeKey(keyStr);
 
-  expTime = convert.unpackSeconds(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5));
-  expDelay = convert.unpackSeconds(nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5 + 1));
-  expCount = nv.readUC(NV_FEATURE_SETTINGS_BASE + index*5 + 2);
+  if (!nv().kv().getOrInit(nvKey, settings)) { DF("WRN: Nv, init failed for "); VL(keyStr); }
+  settings.expCount = constrain(settings.expCount, 0, 255);
+  settings.expDelay = constrain(settings.expDelay, 1, 3600);
+  settings.expTime = constrain(settings.expTime, 0, 3600);
 }
 
 void Intervalometer::poll() {
@@ -57,8 +54,8 @@ float Intervalometer::getExposure() {
 
 void Intervalometer::setExposure(float t) {
   if (pressed == P_STANDBY && t >= 0 && t <= 3600) {
-    expTime = t;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5, convert.packSeconds(expTime));
+    settings.expTime = t;
+    nv().kv().put(nvKey, settings);
   }
 }
 
@@ -68,8 +65,8 @@ float Intervalometer::getDelay() {
 
 void Intervalometer::setDelay(float t) {
   if (pressed == P_STANDBY && t >= 1 && t <= 3600) {
-    expDelay = t;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 1, convert.packSeconds(expDelay));
+    settings.expDelay = t;
+    nv().kv().put(nvKey, settings);
   }
 }
 
@@ -78,13 +75,13 @@ float Intervalometer::getCurrentCount() {
 }
 
 float Intervalometer::getCount() {
-  return expCount;
+  return settings.expCount;
 }
 
-void Intervalometer::setCount(float c) {
+void Intervalometer::setCount(float count) {
+  long c = lroundf(count);
   if (pressed == P_STANDBY && c >= 0 && c <= 255) {
-    expCount = c;
-    nv.write(NV_FEATURE_SETTINGS_BASE + index*5 + 2, (uint8_t)expCount);
+    settings.expCount = c;
   }
 }
 
@@ -94,7 +91,13 @@ bool Intervalometer::isEnabled() {
 
 void Intervalometer::enable(bool state) {
   enabled = state;
-  if (enabled) { thisCount = expCount; pressed = P_EXP_START; } else { thisCount=0; pressed = P_STANDBY; }
+  if (enabled) {
+    thisCount = expCount;
+    pressed = P_EXP_START;
+  } else {
+    thisCount = 0;
+    pressed = P_STANDBY;
+  }
 }
 
 bool Intervalometer::isOn() {

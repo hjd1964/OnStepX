@@ -176,7 +176,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
       case '0': case '1':
         sound.enabled = parameter[3] - '0';
         #if STATUS_BUZZER_MEMORY == ON
-          nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
+          settings.soundEnabled = sound.enabled;
+          nv().kv().put("STATUS_SETTINGS", settings);
         #endif
       break;
       case '2':

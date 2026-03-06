@@ -132,6 +132,12 @@
 #define STA_ENABLED true
 #endif
 
+#if OPERATIONAL_MODE == WIFI
+#ifndef NV_WIFI_SETTINGS
+#define NV_WIFI_SETTINGS                                          // allow NV storage of WiFi settings
+#endif
+#endif
+
 #ifndef STA_AP_FALLBACK
 #define STA_AP_FALLBACK               true                        // activate SoftAP if station fails to connect
 #endif

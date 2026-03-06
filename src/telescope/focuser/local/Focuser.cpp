@@ -7,6 +7,7 @@
 
 #include "../../../lib/tasks/OnTask.h"
 #include "../../../lib/sense/Sense.h"
+#include "../../../lib/nv/Nv.h"
 
 #include "../../../libApp/weather/Weather.h"
 #include "../../../libApp/temperature/Temperature.h"
@@ -110,31 +111,40 @@ bool Focuser::init() {
     }
   #endif
 
-  // confirm the data structure size
-  if (FocuserSettingsSize < sizeof(FocuserSettings)) { nv.initError = true; DL("ERR: Focuser::init(); FocuserSettingsSize error"); return false; }
+  // time to wait before writing position to nv after last movement of focuser
+  if (nv().device().endurance() == NvDevice::Endurance::Mid) writeDelay = 60; else
+  if (nv().device().endurance() == NvDevice::Endurance::High) writeDelay = 5;
 
   // init settings stored in NV
-  for (int index = 0; index < FOCUSER_MAX; index++) {
-    uint16_t nvFocuserSettingsBase = NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize;
-    if (!nv.hasValidKey() || nv.isNull(nvFocuserSettingsBase, sizeof(FocuserSettings))) {
-      VF("MSG: Focuser"); V(index + 1); VLF(", writing defaults to NV");
-      settings[index].tcf.enabled = false;
-      settings[index].tcf.coef = 0.0F;
-      settings[index].tcf.deadband = 1;
-      settings[index].tcf.t0 = 0.0F;
-      settings[index].parkState = PS_UNPARKED;
-      settings[index].backlash = 0;
-      settings[index].position = 0.0F;
-      settings[index].gotoRate = configuration[index].slewRateDesired;
-      nv.updateBytes(nvFocuserSettingsBase, &settings[index], sizeof(FocuserSettings));
-    }
+  for (uint8_t index = 0; index < FOCUSER_MAX; index++) {
+    // make sure defaults are set
+    settings[index].tcf.enabled = false;
+    settings[index].tcf.coef = 0.0F;
+    settings[index].tcf.deadband = 1;
+    settings[index].tcf.t0 = 0.0F;
+    settings[index].parkState = PS_UNPARKED;
+    settings[index].backlash = 0;
+    settings[index].position = 0.0F;
+    settings[index].gotoRate = configuration[index].slewRateDesired;
+
+    // create a nvKey to hold this focusers settings
+    char keyStr[26];
+    snprintf(keyStr, sizeof(keyStr), "FOCUSER%u_SETTINGS", index);
+    nvKey[index] = nv().kv().computeKey(keyStr);
+
+    if (!nv().kv().getOrInit(nvKey[index], settings[index])) { DF("WRN: Nv, init failed for "); VL(keyStr[index]); }
+    settings[index].tcf.enabled  = constrain(settings[index].tcf.enabled, false, true);
+    settings[index].tcf.coef     = constrain(settings[index].tcf.coef, 0, 999);
+    settings[index].tcf.deadband = constrain(settings[index].tcf.deadband, 1, 10000);
+    settings[index].tcf.t0       = constrain(settings[index].tcf.t0, -60, 60);
+    settings[index].parkState    = constrain(settings[index].parkState, PS_UNPARKED, PS_UNPARKING);
+    settings[index].backlash     = constrain(settings[index].backlash, 0, 10000);
+    settings[index].position     = constrain(settings[index].position, axes[index]->getLimitMin(), axes[index]->getLimitMax());
+    settings[index].gotoRate     = constrain(settings[index].gotoRate, configuration[index].slewRateDesired/2.0, configuration[index].slewRateDesired*2.0);
   }
 
   // get settings
   for (int index = 0; index < FOCUSER_MAX; index++) {
-    readSettings(index);
-
-    // init. some defaults
     moveRate[index] = 100;
     tcfSteps[index] = 0;
     target[index] = 0;
@@ -276,7 +286,7 @@ CommandError Focuser::setTcfEnable(int index, bool value) {
      target[index] += tcfSteps[index];
      tcfSteps[index] = 0;
    }
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
   return CE_NONE;
 }
 
@@ -294,7 +304,7 @@ bool Focuser::setTcfCoef(int index, float value) {
   for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfCoef(si, value); }
 
   settings[index].tcf.coef = value;
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
   return true;
 }
 
@@ -312,7 +322,7 @@ bool Focuser::setTcfDeadband(int index, int value) {
   for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfDeadband(si, value); }
 
   settings[index].tcf.deadband = value;
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
   return true;
 }
 
@@ -330,7 +340,7 @@ bool Focuser::setTcfT0(int index, float value) {
   for (int i = 0; i < FOCUSER_MAX; i++) { int si = slavedFocuserIndex(index, i); if (si >= 0) setTcfT0(si, value); }
 
   settings[index].tcf.t0 = value;
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
   return true;
 }
 
@@ -371,7 +381,7 @@ CommandError Focuser::setBacklashSteps(int index, int value) {
   #endif
 
   settings[index].backlash = value;
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
   axes[index]->setBacklashSteps(getBacklashSteps(index));
   return CE_NONE;
 }
@@ -421,7 +431,7 @@ CommandError Focuser::moveHome(int index) {
   return e;
 }
 
-// get goto rate, 1 for 0.5x base, 2 for 0.75x base, 3 for base, 4 for 1.5x base, 5 for 2x base
+// get goto rate, 1 for 0.5x base, 2 for 0.66x base, 3 for base, 4 for 1.5x base, 5 for 2x base
 int Focuser::getGotoRate(int index) {
   if (!validIndex(index)) return 1;
 
@@ -446,7 +456,7 @@ void Focuser::setGotoRate(int index, int value) {
     case 5: settings[index].gotoRate = configuration[index].slewRateDesired*2.0; break;
     default: settings[index].gotoRate = configuration[index].slewRateDesired; break;
   }
-  writeSettings(index);
+  nv().kv().put(nvKey[index], settings[index]);
 }
 
 // move focuser to a specific location (in steps)
@@ -506,7 +516,7 @@ CommandError Focuser::park(int index) {
   if (e == CE_NONE) {
     settings[index].position = targetMicrons;
     settings[index].parkState = PS_PARKING;
-    writeSettings(index);
+    nv().kv().put(nvKey[index], settings[index]);
   }
 
   return e;
@@ -520,7 +530,7 @@ CommandError Focuser::unpark(int index) {
   if (settings[index].parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   // setting write delay to 0 disables on-the-fly position writes and forces strict parking
-  if (FOCUSER_WRITE_DELAY == 0) {
+  if (writeDelay == 0) {
     if (settings[index].parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
@@ -531,7 +541,7 @@ CommandError Focuser::unpark(int index) {
   if (settings[index].parkState == PS_UNPARKED) {
     axes[index]->setInstrumentCoordinate(settings[index].position);
     target[index] = lround(settings[index].position*axes[index]->getStepsPerMeasure()) - tcfSteps[index];
-    writeSettings(index);
+    nv().kv().put(nvKey[index], settings[index]);
     return CE_NONE;
   }
 
@@ -546,24 +556,10 @@ CommandError Focuser::unpark(int index) {
   if (e == CE_NONE) {
     settings[index].parkState = PS_UNPARKING;
     target[index] = lround(settings[index].position*axes[index]->getStepsPerMeasure()) - tcfSteps[index];
-    writeSettings(index);
+    nv().kv().put(nvKey[index], settings[index]);
   }
 
   return e;
-}
-
-void Focuser::readSettings(int index) {
-  nv.readBytes(NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize, &settings[index], sizeof(FocuserSettings));
-  if (fabs(settings[index].tcf.coef) > 999.0F) { settings[index].tcf.coef = 0.0F;  initError.value = true; DLF("ERR: Focuser.init(), bad NV |tcf.coef| > 999.0 um/deg. C (set to 0.0)"); }
-  if (settings[index].tcf.deadband < 1 )       { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR: Focuser.init(), bad NV tcf.deadband < 1 steps (set to 1)"); }
-  if (settings[index].tcf.deadband > 10000 )   { settings[index].tcf.deadband = 1; initError.value = true; DLF("ERR: Focuser.init(), bad NV tcf.deadband > 10000 steps (set to 1)"); }
-  if (fabs(settings[index].tcf.t0) > 60.0F)    { settings[index].tcf.t0 = 10.0F;   initError.value = true; DLF("ERR: Focuser.init(), bad NV |tcf.t0| > 60.0 deg. C (set to 10.0)"); }
-  if (settings[index].backlash < 0)            { settings[index].backlash = 0;     initError.value = true; DLF("ERR: Focuser.init(), bad NV backlash < 0 steps (set to 0)"); }
-  if (settings[index].backlash > 10000)        { settings[index].backlash = 0;     initError.value = true; DLF("ERR: Focuser.init(), bad NV backlash > 10000 steps (set to 0)"); }
-}
-
-void Focuser::writeSettings(int index) {
-  nv.updateBytes(NV_FOCUSER_SETTINGS_BASE + index*FocuserSettingsSize, &settings[index], sizeof(FocuserSettings));
 }
 
 // poll focusers to handle parking and TCF
@@ -577,7 +573,7 @@ void Focuser::monitor() {
       target[index] = axes[index]->getTargetCoordinateSteps() - tcfSteps[index];
       float targetMicrons = target[index]/axes[index]->getStepsPerMeasure();
 
-      if (axes[index]->isSlewing() || settings[index].position == targetMicrons) writeTime[index] = secs + FOCUSER_WRITE_DELAY;
+      if (axes[index]->isSlewing() || settings[index].position == targetMicrons) writeTime[index] = secs + writeDelay;
 
       if (!axes[index]->isSlewing()) {
 
@@ -585,7 +581,7 @@ void Focuser::monitor() {
           if (axes[index]->atTarget()) {
             axes[index]->enable(false);
             settings[index].parkState = PS_PARKED;
-            writeSettings(index);
+            nv().kv().put(nvKey[index], settings[index]);
             #if DEBUG == VERBOSE
               long offset = axes[index]->getInstrumentCoordinateSteps() - axes[index]->getMotorPositionSteps();
               VF("MSG: Focuser"); V(index + 1); VF(", park motor target   "); VL(axes[index]->getTargetCoordinateSteps() - offset);
@@ -597,7 +593,7 @@ void Focuser::monitor() {
         if (settings[index].parkState == PS_UNPARKING) {
           if (axes[index]->atTarget()) {
             settings[index].parkState = PS_UNPARKED;
-            writeSettings(index);
+            nv().kv().put(nvKey[index], settings[index]);
           }
         } else
 
@@ -631,10 +627,10 @@ void Focuser::monitor() {
           }
 
           // delayed write of focuser position
-          if (FOCUSER_WRITE_DELAY != 0) {
+          if (writeDelay != 0) {
             if (secs > writeTime[index]) {
               settings[index].position = targetMicrons;
-              writeSettings(index);
+              nv().kv().put(nvKey[index], settings[index]);
               VF("MSG: Focuser"); V(index + 1); VF(", writing position ("); V(targetMicrons); VLF("um) to NV"); 
             }
           }

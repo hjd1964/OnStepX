@@ -8,23 +8,21 @@
 #include "../../../lib/tasks/OnTask.h"
 #include "../../../lib/nv/Nv.h"
 
+#include "../../Telescope.h"
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
 
 // init the home position (according to settings and mount type)
 void Home::init() {
-  // confirm the data structure size
-  if (SettingsSize < sizeof(Settings)) { nv.initError = true; DL("ERR: Home::init(), SettingsSize error"); }
+  nvKey = nv().kv().computeKey("HOME_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for HOME_SETTINGS"); }
 
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Mount, home writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
-  }
-
-  // get settings from NV
-  nv.readBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+  settings.automaticAtBoot = constrain(settings.automaticAtBoot, false, true);
+  settings.axis1.senseOffset = constrain(settings.axis1.senseOffset, degToArcsecF(-180), degToArcsecF(180)); 
+  settings.axis1.senseReverse = constrain(settings.axis1.senseReverse, false, true);
+  settings.axis2.senseOffset = constrain(settings.axis2.senseOffset, degToArcsecF(-180), degToArcsecF(180));
+  settings.axis2.senseReverse = constrain(settings.axis2.senseReverse, false, true);
 
   #ifndef AXIS1_HOME_DEFAULT
     if (transform.mountType == GEM) position.h = Deg90; else { position.h = 0.0L; position.z = 0.0L; position.aa1 = 0.0L; }
@@ -32,6 +30,7 @@ void Home::init() {
     if (transform.mountType == ALTAZM) position.z = degToRad(AXIS1_HOME_DEFAULT); else
     if (transform.mountType == ALTALT) position.aa1 = degToRad(AXIS1_HOME_DEFAULT); else position.h = degToRad(AXIS1_HOME_DEFAULT);
   #endif
+
   #ifndef AXIS2_HOME_DEFAULT
     if (transform.mountType == ALTAZM) position.a = 0.0; else
     if (transform.mountType == ALTALT) position.aa2 = 0.0; else position.d = site.locationEx.latitude.sign*Deg90;

@@ -24,27 +24,8 @@ extern volatile unsigned long fracLAST;
   }
 #endif
 
-void Transform::init() {
-  // NV_AXIS_SETTINGS_REVERT bit 0 = settings at compile (0) or run time (1), bits 1 to 9 = reset axis n on next boot
-  bool revert = !(nv.readUI(NV_AXIS_SETTINGS_REVERT) & 1);
-
-  // write axis settings to NV
-  if (!nv.hasValidKey() || revert) {
-    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_SUBTYPE);
-  }
-  mountType = nv.readUC(NV_MOUNT_TYPE_BASE);
-  if (mountType == 0) {
-    mountType = MOUNT_SUBTYPE;
-    nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)MOUNT_SUBTYPE);
-    VLF("MSG: Transform, revert mount type to default");
-  } else
-  if (mountType < MOUNT_SUBTYPE_FIRST || mountType > MOUNT_SUBTYPE_LAST) {
-    mountType = MOUNT_SUBTYPE;
-    initError.value = true;
-    VLF("WRN: Transform, unknown mount type reverting to default");
-  }
-
-  if (MOUNT_TYPE == ALTALT) mountType = MOUNT_SUBTYPE;
+void Transform::init(uint8_t mountType) {
+  this->mountType = mountType;
 
   #if DEBUG == VERBOSE
     const char* MountTypeStr[5] = {"", "GEM", "FORK", "ALTAZM", "ALTALT"};
@@ -162,7 +143,7 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
 }
 
 Coordinate Transform::instrumentToMount(double a1, double a2) {
-  Coordinate mount;
+  Coordinate mount = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
     a2 = TANGENT_ARM_INSTRUMENT_TO_MOUNT(a2)

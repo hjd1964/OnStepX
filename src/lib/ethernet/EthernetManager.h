@@ -28,16 +28,18 @@
   #endif
 #endif
 
+#ifndef EthernetStationCount
+  // number of ethernet stations supported, between 1 and 6
+  #define EthernetStationCount 1
+#endif
+
+#define EthernetStationSize 36
 typedef struct EthernetStationSettings {
   char host[32];
   uint8_t target[4];
 } EthernetStationSettings;
 
-#ifndef EthernetStationCount
-  // number of ethernet stations supported, between 1 and 6
-  #define EthernetStationCount 1
-#endif
-#define EthernetSettingsSize (72 + 36*EthernetStationCount)
+#define EthernetSettingsSize 72
 typedef struct EthernetSettings {
   char masterPassword[32];
 
@@ -45,7 +47,6 @@ typedef struct EthernetSettings {
   bool dhcpEnabled;
   IPAddress ip, dns, gw, sn;
 
-  EthernetStationSettings station[EthernetStationCount];
 } EthernetSettings;
 
 class EthernetManager {
@@ -60,7 +61,7 @@ class EthernetManager {
     void disconnect();
 
     // set the currently active station
-    // \param number from 1 to WifiStationCount
+    // \param number from 1 to EthernetStationCount
     void setStation(int number);
 
     void readSettings();
@@ -79,8 +80,14 @@ class EthernetManager {
       PASSWORD_DEFAULT,
       MAC,
       STA_DHCP_ENABLED,
-      STA_IP_ADDR, STA_GW_ADDR, STA_GW_ADDR, STA_SN_MASK,
-      {
+      STA_IP_ADDR, STA_GW_ADDR, STA_GW_ADDR, STA_SN_MASK
+    };
+
+    bool active = false;
+    bool settingsReady = false;
+  private:
+
+    EthernetStationSettings station[EthernetStationCount] = {
       #if EthernetStationCount > 0
         {STA1_HOST_NAME, STA1_TARGET_IP_ADDR},
       #endif
@@ -99,12 +106,7 @@ class EthernetManager {
       #if EthernetStationCount > 5
         {STA6_HOST_NAME, STA6_TARGET_IP_ADDR},
       #endif
-      }
     };
-
-    bool active = false;
-    bool settingsReady = false;
-  private:
 };
 
 extern EthernetManager ethernetManager;

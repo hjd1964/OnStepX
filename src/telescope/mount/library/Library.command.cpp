@@ -158,7 +158,7 @@ bool Library::command(char *reply, char *command, char *parameter, bool *suppres
       // :L?#       Get library free records (all catalogs)
       //            Returns: n#
       if (command[1] == '?' && parameter[0] == 0) { 
-        sprintf(reply, "%ld", recFreeAll());
+        sprintf(reply, "%u", recFreeAll());
         *numericReply = false;
       } else 
 

@@ -38,7 +38,17 @@ typedef struct Backlash {
 typedef struct MountSettings {
   RateCompensation rc;
   Backlash backlash;
+  uint8_t mountType;
 } MountSettings;
+
+typedef struct MountPositionMemory {
+  float a1;
+  float a2;
+  uint8_t mountType:4;
+  uint8_t seq:2;
+  uint8_t reserved:2;
+} MountPositionMemory;
+
 #pragma pack()
 
 extern Axis axis1;
@@ -102,7 +112,7 @@ class Mount {
     float trackingRateOffsetRA = 0.0F;
     float trackingRateOffsetDec = 0.0F;
 
-    MountSettings settings = {RC_DEFAULT, { 0, 0 }};
+    MountSettings settings = {RC_DEFAULT, { 0, 0 }, MOUNT_SUBTYPE};
 
   private:
     // alternate tracking rate calculation method
@@ -117,6 +127,13 @@ class Mount {
     Coordinate current;
 
     TrackingState trackingState = TS_NONE;
+
+    uint32_t nvKey;
+
+    #if MOUNT_COORDS_MEMORY == ON
+      uint32_t nvKeyLastA, nvKeyLastB;
+      MountPositionMemory lastPosition;
+    #endif
 };
 
 extern Motor& motor1;

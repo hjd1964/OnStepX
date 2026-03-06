@@ -22,21 +22,13 @@
 inline void guideWrapper() { guide.poll(); }
 
 void Guide::init() {
-  // confirm the data structure size
-  if (GuideSettingsSize < sizeof(GuideSettings)) { nv.initError = true; DL("ERR: Guide::init(), GuideSettingsSize error"); }
 
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Mount, guide writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
-  }
+  nvKey = nv().kv().computeKey("GUIDE_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings.pulseRateSelect)) { DLF("WRN: Nv, init failed for GUIDE_SETTINGS"); }
 
-  // read the settings
-  nv.readBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
-
-  // reset default guide rate to 20X, value stored in NV isn't used
   settings.axis1RateSelect = GR_20X;
   settings.axis2RateSelect = GR_20X;
+  settings.pulseRateSelect = constrain(settings.pulseRateSelect, GR_QUARTER, GR_1X);
 
   // start guide monitor task
   VF("MSG: Mount, start guide monitor task (rate "); V(FRACTIONAL_SEC_US/2); VF("us priority 3)... ");

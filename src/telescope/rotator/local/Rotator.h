@@ -14,17 +14,6 @@
 #include "../../Telescope.h"
 #include "../../mount/coordinates/Transform.h"
 
-// time to write position to nv after last movement of Rotator
-#ifndef ROTATOR_WRITE_DELAY
-  #if NV_ENDURANCE == NVE_VHIGH
-    #define ROTATOR_WRITE_DELAY 5
-  #elif NV_ENDURANCE == NVE_HIGH
-    #define ROTATOR_WRITE_DELAY 60
-  #else
-    #define ROTATOR_WRITE_DELAY 300
-  #endif
-#endif
-
 #pragma pack(1)
 #define RotatorSettingsSize 11
 typedef struct RotatorSettings {
@@ -93,9 +82,6 @@ private:
   // unparks rotator
   CommandError unpark();
 
-  void readSettings();
-  void writeSettings();
-
   float moveRate = 0.1;  // in degs/sec
 
   RotatorSettings settings = {PS_UNPARKED, 0, 0.0F, AXIS3_SLEW_RATE_BASE_DESIRED};
@@ -110,6 +96,9 @@ private:
   unsigned long secs = 0;
 
   uint8_t parkHandle = 0;
+
+  uint16_t writeDelay = 600; // time in seconds
+  uint32_t nvKey;
 };
 
 extern Motor& motor3;

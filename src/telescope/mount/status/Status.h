@@ -12,6 +12,10 @@
 #define SF_STOPPED 0
 #define SF_SLEWING 1
 
+typedef struct StatusSettings {
+ bool soundEnabled;
+} StatusSettings;
+
 class Status {
   public:
     // get mount status ready
@@ -36,6 +40,7 @@ class Status {
   private:
     uint8_t statusTaskHandle = 0;
     Sound sound;
+    StatusSettings settings = {false};
 };
 
 extern Status mountStatus;

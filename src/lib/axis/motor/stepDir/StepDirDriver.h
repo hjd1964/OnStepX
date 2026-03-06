@@ -42,7 +42,7 @@ class StepDirDriver {
     virtual uint8_t getParameterCount() { return 0; }
 
     // returns the specified axis parameter
-    virtual AxisParameter* getParameter(uint8_t number) { return &invalid; }
+    virtual AxisParameter* getParameter(uint8_t number) { UNUSED(number); return &invalid; }
 
     // check if axis parameter is valid
     virtual bool parameterIsValid(AxisParameter* parameter, bool next = false);

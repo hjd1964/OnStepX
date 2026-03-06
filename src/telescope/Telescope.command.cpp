@@ -114,7 +114,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       analog.write(RETICLE_LED_PIN, RETICLE_LED_INVERT == ON ? duty : 1.0F - duty);
 
       #if RETICLE_LED_MEMORY == ON
-        nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
+        nv().kv().put("TELESCOPE_SETTINGS", reticleBrightness);
       #endif
     #endif
     *numericReply = false;
@@ -138,17 +138,23 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     // :ERESET#   Reset the MCU
     //            Returns: Nothing
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
+
       #ifdef HAL_RESET
-        nv.wait();
+        VLF("MSG: Mount, resetting OnStep...");
+        if (nv().device().hasCommit()) { nv().device().commit(); }
+        const uint32_t startMs = millis();
+        const uint32_t timeoutMs = 30000;
+        while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1000); }
         tasks.yield(1000);
         HAL_RESET();
       #endif
+
       *numericReply = false;
     } else
 
     // :ENVRESET# Wipe flash
     if (command[1] == 'N' && parameter[0] == 'V' && parameter[1] == 'R' && parameter[2] == 'E' && parameter[3] == 'S' && parameter[4] == 'E' && parameter[5] == 'T' && parameter[6] == 0) {
-      nv.writeKey(0);
+      nv().volume().invalidateNextMount();
       strcpy(reply, "NV memory will be cleared on the next boot.");
       *numericReply = false;
     } else
@@ -244,15 +250,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
             *commandError = CE_0;
           }
         } else return false;
-      } else
-
-      if (parameter[0] == 'A') {
-        // :GXA0#     Get axis/driver revert all state
-        //            Returns: Value
-        if (parameter[1] == '0') {
-          uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-          if (!(axesToRevert & 1)) *commandError = CE_0;
-        } else return false;
       } else return false;
 
     } else return false;
@@ -281,25 +278,6 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (parameter[1] == 'C') {
         if (!weather.setHumidity(f)) *commandError = CE_PARAM_RANGE;
       } else return false;
-    } else
-
-    if (parameter[0] == 'A') {
-      // :SXAC,0#   for run-time NV (EEPROM) axis settings
-      // :SXAC,1#   for compile-time Config.h axis settings
-      //            Return: 0 failure, 1 success
-      if (parameter[1] == 'C' && parameter[4] == 0) {
-        if (parameter[3] == '0' || parameter[3] == '1') {
-          uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-          if (parameter[3] == '0') {
-             VLF("MSG: Using Axes settings from NV (EEPROM)");
-             bitSet(axesToRevert, 0);
-           } else {
-             VLF("MSG: Using Axes settings from Config.h");
-             bitClear(axesToRevert, 0);
-           }
-          nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-        } else *commandError = CE_PARAM_RANGE;
-      }
     } else return false;
   } else return false;
 

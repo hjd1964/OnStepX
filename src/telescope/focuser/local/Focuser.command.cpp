@@ -139,14 +139,14 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *suppres
     // :FI#       Get full in position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'I') {
-      sprintf(reply,"%ld", lround(axes[index]->getLimitMin()*MicronsToUnits));
+      sprintf(reply, "%ld", lround(axes[index]->getLimitMin()*MicronsToUnits));
       *numericReply = false;
     } else
 
     // :FM#       Get max position (in microns or steps)
     //            Returns: n#
     if (toupper(command[1]) == 'M') {
-      sprintf(reply,"%ld", lround(axes[index]->getLimitMax()*MicronsToUnits));
+      sprintf(reply, "%ld", lround(axes[index]->getLimitMax()*MicronsToUnits));
       *numericReply = false;
     } else
 
@@ -174,7 +174,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *suppres
     // :FB#       Get focuser backlash amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'B' && parameter[0] == 0) {
-      sprintf(reply,"%ld", lround(getBacklashSteps(index)*StepsToUnits));
+      sprintf(reply, "%ld", lround(getBacklashSteps(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -217,7 +217,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *suppres
     // :FD#       Get focuser temperature compensation deadband amount (in steps or microns)
     //            Return: n#
     if (toupper(command[1]) == 'D' && parameter[0] == 0) {
-      sprintf(reply,"%ld", lround(getTcfDeadband(index)*StepsToUnits));
+      sprintf(reply, "%ld", lround(getTcfDeadband(index)*StepsToUnits));
       *numericReply = false;
     } else
 
@@ -236,7 +236,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *suppres
     if (command[1] == 'P') {
       if (isDC(index)) {
         if (parameter[0] == 0) {
-          sprintf(reply,"%d",(int)getDcPower(index)); *numericReply = false; 
+          sprintf(reply, "%d",(int)getDcPower(index)); *numericReply = false; 
         } else {
           if (!setDcPower(index, atol(parameter))) *commandError = CE_PARAM_RANGE; 
         }
@@ -290,7 +290,7 @@ bool Focuser::command(char *reply, char *command, char *parameter, bool *suppres
     // :FG#       Get focuser current position (in microns or steps)
     //            Returns: sn#
     if (toupper(command[1]) == 'G') {
-      sprintf(reply,"%ld", lround((axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
+      sprintf(reply, "%ld", lround((axes[index]->getInstrumentCoordinateSteps() - tcfSteps[index])*StepsToUnits));
       *numericReply = false;
     } else
 

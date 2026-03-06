@@ -12,6 +12,12 @@
 
 #ifdef FEATURES_PRESENT
 
+typedef struct FeatureIntervalometerSettings {
+  float expTime;
+  float expDelay;
+  uint8_t expCount;
+} FeatureIntervalometerSettings;
+
 class Intervalometer {
   public:
     void init(int index);
@@ -34,20 +40,19 @@ class Intervalometer {
     bool isOn();
 
   private:
-
     enum Pressed { P_STANDBY, P_EXP_START, P_EXP_START_PHASE2, P_EXP_DONE, P_EXP_DONE_PHASE2, P_WAIT };
 
     Pressed pressed = P_STANDBY;
     bool enabled = false;
 
-    float expTime = 0.0F;
-    float expDelay = 0.0F;
-    int expCount = 0;
-    int thisCount = 0;
+    FeatureIntervalometerSettings settings = {0.0F, 0.0F, 0};
+    uint8_t thisCount = 0;
 
     unsigned long expDone = 0;
     unsigned long waitDone = 0;
 
-    int index = 0;
+    uint8_t index = 0;
+
+    int16_t nvKey;
 };
 #endif

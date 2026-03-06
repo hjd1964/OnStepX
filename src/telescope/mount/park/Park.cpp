@@ -6,6 +6,7 @@
 #if defined(MOUNT_PRESENT)
 
 #include "../../../lib/tasks/OnTask.h"
+#include "../../../lib/nv/Nv.h"
 
 #include "../../Telescope.h"
 #include "../Mount.h"
@@ -18,21 +19,10 @@
 void parkSignalWrapper() { park.signal(); }
 
 void Park::init() {
-  // confirm the data structure size
-  if (ParkSettingsSize < sizeof(ParkSettings)) { nv.initError = true; DL("ERR: Park::Init(), ParkSettingsSize error"); }
-
-  // write the default settings to NV
-  if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_PARK_BASE, sizeof(ParkSettings))) {
-    VLF("MSG: Mount, park writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
-    // set the initial park position at home
-    state = settings.state;
-    set();
-  }
-
-  // read the settings
-  nv.readBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  nvKey = nv().kv().computeKey("PARK_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for PARK_SETTINGS"); }
   state = settings.state;
+  if (!settings.saved) set();
 
   // configure any associated sense/signal pins
   #if (PARK_SENSE) != OFF && (PARK_SENSE_PIN) != OFF
@@ -76,7 +66,7 @@ CommandError Park::set() {
     } else settings.position.pierSide = PIER_SIDE_EAST;
   }
   settings.saved = true;
-  nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  nv().kv().put(nvKey, settings);
 
   #if ALIGN_MAX_NUM_STARS > 1
     transform.align.modelWrite();
@@ -121,7 +111,7 @@ CommandError Park::request() {
     // update state to parking
     state = PS_PARKING;
     settings.state = state;
-    nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+    nv().kv().put(nvKey, settings);
 
     // get the park coordinate ready
     axis1.setBacklash(0.0L);
@@ -143,7 +133,7 @@ CommandError Park::request() {
 
       state = priorParkState;
       settings.state = state;
-      nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+      nv().kv().put(nvKey, settings);
 
       VF(": Mount::parkGoto(), Failed to start goto (CE "); V(e); VL(")");
       return e;
@@ -155,7 +145,7 @@ CommandError Park::request() {
 void Park::requestAborted() {
   state = PS_UNPARKED;
   settings.state = state;
-  nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+  nv().kv().put(nvKey, settings);
   
   // restore backlash settings
   axis1.setBacklash(mount.settings.backlash.axis1);
@@ -189,7 +179,7 @@ void Park::requestDone() {
     // save the axis state
     state = PS_PARKED;
     settings.state = state;
-    nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+    nv().kv().put(nvKey, settings);
 
     #if ALIGN_MAX_NUM_STARS > 1  
       transform.align.modelWrite();
@@ -276,7 +266,7 @@ CommandError Park::restore(bool withTrackingOn) {
   if (withTrackingOn) {
     state = PS_UNPARKED;
     settings.state = state;
-    nv.updateBytes(NV_MOUNT_PARK_BASE, &settings, sizeof(ParkSettings));
+    nv().kv().put(nvKey, settings);
     mount.tracking(true);
     VLF("MSG: Mount, unparking done");
   } else {
@@ -284,6 +274,11 @@ CommandError Park::restore(bool withTrackingOn) {
   }
 
   return CE_NONE;
+}
+
+void Park::reset() {
+  state = PS_UNPARKED;
+  nv().kv().put(nvKey, settings);
 }
 
 // check input pin to initiate a park operation, if allowed

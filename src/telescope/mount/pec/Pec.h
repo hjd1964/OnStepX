@@ -6,13 +6,14 @@
 
 #ifdef MOUNT_PRESENT
 
-#include "../Mount.h"
-
-#if PEC_STEPS_PER_WORM_ROTATION == 0
+#if PEC_BUFFER_SIZE_LIMIT == 0 || PEC_STEPS_PER_WORM_ROTATION == 0 
   #define AXIS1_PEC OFF
 #else
   #define AXIS1_PEC ON
 #endif
+
+#include "../../../lib/nv/NvIvPartition.h"
+#include "../Mount.h"
 
 enum PecState: uint8_t {PEC_NONE, PEC_READY_PLAY, PEC_PLAY, PEC_READY_RECORD, PEC_RECORD};
 
@@ -73,6 +74,9 @@ class Pec {
       long     bufferIndex              = 0;      // index into the pec buffer
       int8_t*  buffer;
     #endif
+
+    IvPartition nvIv;
+    uint32_t nvKey;
 };
 
 extern Pec pec;

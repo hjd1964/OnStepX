@@ -17,43 +17,18 @@
 inline void limitsWrapper() { limits.poll(); }
 
 void Limits::init() {
-  // confirm the data structure size
-  if (LimitSettingsSize < sizeof(LimitSettings)) { nv.initError = true; DL("ERR: Limits::init(), LimitSettingsSize error"); }
 
-  // write the default settings to NV
-  if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_LIMITS_BASE, sizeof(LimitSettings))) {
-    VLF("MSG: Mount, limits writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
-  }
+  nvKey = nv().kv().computeKey("LIMIT_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for LIMIT_SETTINGS"); }
 
-  // get settings from NV
-  nv.readBytes(NV_MOUNT_LIMITS_BASE, &settings, sizeof(LimitSettings));
-
-  constrainMeridianLimits();
+  settings.altitude.min = constrain(settings.altitude.min, degToRadF(-30), degToRadF(30));
+  settings.altitude.max = constrain(settings.altitude.max, degToRadF(60), degToRadF(90));
+  settings.pastMeridianE = constrain(settings.pastMeridianE, degToRadF(-360), degToRadF(360));
+  settings.pastMeridianW = constrain(settings.pastMeridianW, degToRadF(-360), degToRadF(360));
 
   // start limit monitor task
   VF("MSG: Mount, start limits monitor task (rate 100ms priority 2)... ");
   if (tasks.add(100, 0, true, 2, limitsWrapper, "MtLimit")) { VLF("success"); } else { VLF("FAILED!"); }
-}
-
-// constrain meridian limits to the allowed range
-void Limits::constrainMeridianLimits() {
-  if (settings.pastMeridianE > Deg360) {
-    settings.pastMeridianE = Deg360;
-    DLF("WRN: Limits::init(), pastMeridianE > 360 deg setting to 360 deg");
-  }
-  if (settings.pastMeridianE < -Deg360) {
-    settings.pastMeridianE = -Deg360;
-    DLF("WRN: Limits::init(), pastMeridianE < -360 deg setting to -360 deg");
-  }
-  if (settings.pastMeridianW > Deg360) {
-    settings.pastMeridianW = Deg360;
-    DLF("WRN: Limits::init(), pastMeridianW > 360 deg setting to 360 deg");
-  }
-  if (settings.pastMeridianW < -Deg360) {
-    settings.pastMeridianW = -Deg360;
-    DLF("WRN: Limits::init(), pastMeridianW < -360 deg setting to -360 deg");
-  }
 }
 
 // target coordinate check ahead of sync, goto, etc.

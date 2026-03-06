@@ -16,9 +16,14 @@
   #define DEW_HEATER_PULSE_WIDTH_MS 2000
 #endif
 
+typedef struct FeatureDewSettings {
+  float zero;
+  float span;
+} FeatureDewSettings;
+
 class DewHeater {
   public:
-    void init(int index);
+    void init(uint8_t index);
 
     void poll(float deltaAboveDewPointC);
 
@@ -40,10 +45,11 @@ class DewHeater {
     bool heaterOn = false;
     bool enabled = false;
 
-    float zero = -5.0F;
-    float span = 15.0F;
+    FeatureDewSettings settings = {-5.0F, 15.0F};
 
-    int index = 0;
+    uint8_t index = 0;
+
+    uint32_t nvKey;
 };
 
 #endif

@@ -30,7 +30,8 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
         case '1': settings.automaticAtBoot = true; break;
         default: *commandError = CE_PARAM_RANGE; break;
       }
-      nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+      nv().kv().put(nvKey, settings);
+
       *numericReply = false;
     } else
 
@@ -54,7 +55,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
           settings.axis1.senseOffset = l;
         } else *commandError = CE_PARAM_RANGE;
       }
-      nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+      nv().kv().put(nvKey, settings);
       *numericReply = false;
     } else
 
@@ -71,7 +72,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
           settings.axis2.senseOffset = l;
         } else *commandError = CE_PARAM_RANGE;
       }
-      nv.writeBytes(NV_MOUNT_HOME_BASE, &settings, sizeof(Settings));
+      nv().kv().put(nvKey, settings);
       *numericReply = false;
     } else
 

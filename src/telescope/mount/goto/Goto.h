@@ -161,6 +161,8 @@ class Goto {
     double slewDestinationDistDec = 0.0;
 
     GotoSettings settings = {MFLIP_AUTOMATIC_DEFAULT == ON, MFLIP_PAUSE_HOME_DEFAULT == ON, (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT, 1000001.0F};
+
+    uint32_t nvKey;
 };
 
 extern Goto goTo;

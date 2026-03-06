@@ -33,7 +33,7 @@ bool Features::init() {
     if (!powerMonitor.init()) return false;
   #endif
 
-  for (int i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < 8; i++) {
     if (device[i].pin == AUX) device[i].pin = auxPins[i];
 
     if (device[i].value == ON) device[i].value = 1; else
@@ -43,7 +43,12 @@ bool Features::init() {
       if (device[i].purpose == SWITCH ||
           device[i].purpose == ANALOG_OUTPUT ||
           device[i].purpose == DEW_HEATER) {
-        device[i].value = nv.readI(NV_FEATURE_SETTINGS_BASE + i*5 + 3);
+
+        char keyStr[26];
+        snprintf(keyStr, "FEATURE%u_VALUE", i);
+        nvKey[i] = nv().kv().computeKey(keyStr);
+
+        if (!nv().kv().getOrInit(nvKey[i], device[i].value)) { DF("WRN: Nv, init failed for "); VL(keyStr); }
       }
     }
 
@@ -107,10 +112,13 @@ void Features::begin() {
 void Features::poll() {
   for (int i = 0; i < 8; i++) {
     if (device[i].memory == ON) {
-      if (device[i].purpose == SWITCH ||
-          device[i].purpose == ANALOG_OUTPUT ||
-          device[i].purpose == DEW_HEATER) {
-          nv.write(NV_FEATURE_SETTINGS_BASE + i*5 + 3, (int16_t)device[i].value);
+      if (device[i].value != lastValue[i]) {
+        if (device[i].purpose == SWITCH ||
+            device[i].purpose == ANALOG_OUTPUT ||
+            device[i].purpose == DEW_HEATER) {
+            nv().kv().put(nvKey[i], device[i].value);
+        }
+        lastValue[i] = device[i].value;
       }
     }
 

@@ -34,9 +34,9 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
     // :GXE7#     Get PEC worm rotation steps (from NV)
     //            Returns: n#
     if (parameter[0] == 'E' && parameter[1] == '7') {
-      PecSettings temp;
-      nv.readBytes(NV_MOUNT_PEC_BASE, &temp, sizeof(PecSettings));
-      sprintf(reply, "%ld", temp.wormRotationSteps);
+      PecSettings nextSettings = { false, PEC_NONE, PEC_STEPS_PER_WORM_ROTATION };
+      nv().kv().get(nvKey, nextSettings);
+      sprintf(reply, "%ld", nextSettings.wormRotationSteps);
       *numericReply = false;
     } else
 
@@ -56,9 +56,9 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
       if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; } 
       long l = atol(&parameter[3]);
       if (l >= 0 && l < 129600000) {
-        PecSettings temp = settings;
-        temp.wormRotationSteps = l;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &temp, sizeof(PecSettings));
+        PecSettings nextSettings = settings;
+        nextSettings.wormRotationSteps = l;
+        nv().kv().put(nvKey, nextSettings);
       } else *commandError = CE_PARAM_RANGE;
     } else
   #endif
@@ -72,7 +72,7 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
         long s = lroundf(wormSenseSteps/stepsPerSiderealSecond);
         while (s > wormRotationSeconds) s -= wormRotationSeconds;
         while (s < 0) s += wormRotationSeconds;
-        sprintf(reply,"%05ld",s);
+        sprintf(reply, "%05ld",s);
         *numericReply = false;
       } else
 
@@ -91,10 +91,10 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
               if (i < 0) i += wormRotationSeconds;
               if (i >= wormRotationSeconds) i -= wormRotationSeconds;
               j = buffer[i];
-              sprintf(reply,"%+04i,%03i", j, i);
+              sprintf(reply, "%+04i,%03i", j, i);
             } else {
               j = buffer[i];
-              sprintf(reply,"%+04i", j);
+              sprintf(reply, "%+04i", j);
             }
           } else *commandError = CE_PARAM_RANGE;
         } else *commandError = CE_PARAM_FORM;
@@ -113,7 +113,7 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
             char s[3] = "  ";
             for (j = 0; j < 10; j++) {
               if (i + j < bufferSize) b = (int)buffer[i + j] + 128; else b = 128;
-              sprintf(s, "%02X", b);
+              snprintf(s, sizeof(s), "%02X", b);
               strcat(reply, s);
             }
           } else *commandError = CE_PARAM_RANGE;
@@ -197,20 +197,20 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
       //            Returns: nothing
       if (parameter[1] == '+') {
         if (settings.state == PEC_NONE && settings.recorded) settings.state = PEC_READY_PLAY; else *commandError = CE_0;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+        nv().kv().put(nvKey, settings);
       } else
       // :$QZ-#     Disable RA PEC Compensation
       //            Returns: nothing
       if (parameter[1] == '-') {
         settings.state = PEC_NONE;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+        nv().kv().put(nvKey, settings);
       } else
       // :$QZ/#     Ready Record PEC
       //            Returns: nothing
       if (parameter[1] == '/') {
         if (settings.state == PEC_NONE && mount.isTracking()) {
           settings.state = PEC_READY_RECORD;
-          nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+          nv().kv().put(nvKey, settings);
         } else *commandError = CE_0;
       } else
       // :$QZZ#     Clear the PEC data buffer
@@ -219,14 +219,14 @@ bool Pec::command(char *reply, char *command, char *parameter, bool *suppressFra
         for (int i = 0; i < bufferSize; i++) buffer[i] = 0;
         settings.state = PEC_NONE;
         settings.recorded = false;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+        nv().kv().put("PEC_SETTINGS", settings);
       } else
       // :$QZ!#     Write PEC data to NV
       //            Returns: nothing
       if (parameter[1] == '!') {
         settings.recorded = true;
-        nv.updateBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
-        for (int i = 0; i < bufferSize; i++) nv.update(NV_PEC_BUFFER_BASE + i, buffer[i]);
+        nv().kv().put("PEC_SETTINGS", settings);
+        nvIv.writeBytes(0, buffer, bufferSize);
       } else
     #endif
     // :$QZ?#     Get PEC status

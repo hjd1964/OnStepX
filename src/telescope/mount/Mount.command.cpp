@@ -99,18 +99,13 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
       // :GXE[m]#   Get mount setting
       //            Returns: n#
       if (parameter[0] == 'E')  {
-        uint16_t axesToRevert;
         switch (parameter[1]) {
           case '4': sprintf(reply, "%ld", lround(axis1.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
           case '5': sprintf(reply, "%ld", lround(axis2.getStepsPerMeasure()/RAD_DEG_RATIO)); *numericReply = false; break;
           case 'E': reply[0] = '0' + (MOUNT_COORDS - 1); *suppressFrame = true; *numericReply = false; break;
           case 'F': if (AXIS2_TANGENT_ARM != ON) *commandError = CE_0; break;
           case 'G': if (AXIS1_SECTOR_GEAR != ON) *commandError = CE_0; break;
-          case 'M':
-            axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-            if (axesToRevert & 1) sprintf(reply, "%d", (int)nv.readUC(NV_MOUNT_TYPE_BASE)); else strcpy(reply, "0");
-            *numericReply = false;
-          break;
+          case 'M': sprintf(reply, "%d", (int)settings.mountType); *numericReply = false; break;
         default:
           return false;
         }
@@ -203,17 +198,20 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             #else
               uint32_t zero = (uint32_t)axis1.motor->encoderZero();
               V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-              nv.write(NV_AXIS_ENCODER_ZERO_BASE, zero);
+              nv().kv().put("AXIS1_ENCODER_ORIGIN", zero);
+
               zero = (uint32_t)axis2.motor->encoderZero();
               V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-              nv.write(NV_AXIS_ENCODER_ZERO_BASE + 4, zero);
+              nv().kv().put("AXIS2_ENCODER_ORIGIN", zero);
             #endif
 
             #ifdef HAL_RESET
-              delay(100);
               enable(false);
               VLF("MSG: Mount, resetting OnStep...");
-              nv.wait();
+              if (nv().device().hasCommit()) { nv().device().commit(); }
+              const uint32_t startMs = millis();
+              const uint32_t timeoutMs = 5000;
+              while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
               tasks.yield(1000);
               HAL_RESET();
             #endif
@@ -299,12 +297,13 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
       //              Return: 0 on failure
       //                      1 on success
       if (parameter[0] == 'E' && parameter[1] == 'M') {
-        long l = atol(&parameter[3]);
-        if (l == 0 ||
-            (l == GEM && AXIS1_WRAP == OFF) ||
-            (l == FORK && AXIS1_WRAP == OFF) ||
-            (l == ALTAZM && AXIS2_TANGENT_ARM == OFF)) {
-          nv.write(NV_MOUNT_TYPE_BASE, (uint8_t)l);
+        long mountType = atol(&parameter[3]);
+        if (mountType == 0 ||
+            (mountType == GEM && AXIS1_WRAP == OFF) ||
+            (mountType == FORK && AXIS1_WRAP == OFF) ||
+            (mountType == ALTAZM && AXIS2_TANGENT_ARM == OFF)) {
+          settings.mountType = mountType;
+          nv().kv().put(nvKey, settings);
         } else *commandError = CE_PARAM_RANGE;
       } else
 
@@ -392,7 +391,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
     if (*commandError == CE_NONE) {
       switch (command[1]) { case 'S': case 'K': case 'L': case 'Q': case '+': case '-': case 'R': *numericReply = false; }
       switch (command[1]) { case 'o': case 'r': case 'n': trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); }
-      nv.updateBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
+      nv().kv().put(nvKey, settings);
       update();
     }
   } else
@@ -412,12 +411,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
         if (parameter[0] == 'D') {
           settings.backlash.axis2 = arcsecToRad(arcSecs);
           axis2.setBacklash(settings.backlash.axis2);
-          nv.updateBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
+          nv().kv().put(nvKey, settings);
         } else
         if (parameter[0] == 'R') {
           settings.backlash.axis1 = arcsecToRad(arcSecs);
           axis1.setBacklash(settings.backlash.axis1);
-          nv.updateBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
+          nv().kv().put(nvKey, settings);
         } else *commandError = CE_CMD_UNKNOWN;
       } else *commandError = CE_PARAM_RANGE;
     } else *commandError = CE_PARAM_FORM;
@@ -433,14 +432,14 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
         int arcSec = round(radToArcsec(settings.backlash.axis2));
         if (arcSec < 0) arcSec = 0;
         if (arcSec > 3600) arcSec = 3600;
-        sprintf(reply,"%d", arcSec);
+        sprintf(reply, "%d", arcSec);
         *numericReply = false;
     } else
     if (parameter[0] == 'R') {
         int arcSec = round(radToArcsec(settings.backlash.axis1));
         if (arcSec < 0) arcSec = 0;
         if (arcSec > 3600) arcSec = 3600;
-        sprintf(reply,"%d", arcSec);
+        sprintf(reply, "%d", arcSec);
         *numericReply = false;
     } else *commandError = CE_CMD_UNKNOWN;
   } else return false;

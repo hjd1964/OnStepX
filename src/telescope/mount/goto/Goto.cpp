@@ -22,17 +22,13 @@ inline void gotoWrapper() { goTo.poll(); }
 #endif
 
 void Goto::init() {
-  // confirm the data structure size
-  if (GotoSettingsSize < sizeof(GotoSettings)) { nv.initError = true; DLF("ERR: Goto::init(), GotoSettingsSize error"); }
 
-  // write the default settings to NV
-  if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_GOTO_BASE, sizeof(GotoSettings))) {
-    VLF("MSG: Mount, goto writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
-  }
+  nvKey = nv().kv().computeKey("GOTO_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for GOTO_SETTINGS"); }
 
-  // read the settings
-  nv.readBytes(NV_MOUNT_GOTO_BASE, &settings, sizeof(GotoSettings));
+  settings.meridianFlipAuto = constrain(settings.meridianFlipAuto, false, true);
+  settings.meridianFlipPause = constrain(settings.meridianFlipPause, false, true);
+  settings.preferredPierSide = constrain(settings.preferredPierSide, PSS_NONE, PSS_SAME_ONLY);
 
   // force defaults if needed
   #if MFLIP_PAUSE_HOME_MEMORY != ON
@@ -55,6 +51,8 @@ void Goto::init() {
     usPerStepBase = 1000000.0F/((axis1.getStepsPerMeasure()/RAD_DEG_RATIO)*1.0F);
     settings.usPerStepCurrent = usPerStepBase;
   #endif
+
+  settings.usPerStepCurrent = constrain(settings.usPerStepCurrent, usPerStepBase/2.0F, usPerStepBase*2.0F);
   if (usPerStepBase < usPerStepLowerLimit()) usPerStepBase = usPerStepLowerLimit()*2.0F;
   if (settings.usPerStepCurrent > 1000000.0F) settings.usPerStepCurrent = usPerStepBase;
   if (settings.usPerStepCurrent < usPerStepBase/2.0F) settings.usPerStepCurrent = usPerStepBase/2.0F;
@@ -468,7 +466,9 @@ void Goto::waypoint(Coordinate *current) {
 
 // monitor goto
 void Goto::poll() {
-  if (stage == GG_READY_ABORT) {
+  // abort if either axis encounters a limit
+  if (stage != GG_ABORT &&
+      (stage == GG_READY_ABORT || axis1.motionError(DIR_BOTH) || axis2.motionError(DIR_BOTH))) {
     VLF("MSG: Mount, goto abort requested");
     stage = GG_ABORT;
     meridianFlipHome.paused = false;

@@ -26,6 +26,29 @@
   #error "Configuration (Config.h): No Wifi support is present for this device"
 #endif
 
+#ifndef WifiStationCount
+  // number of wifi stations supported, between 1 and 6
+  #define WifiStationCount 1
+#endif
+
+#pragma pack(1)
+
+#define WifiStationPasswordSize 64
+typedef struct StationPassword {
+  char password[64];
+} StationPassword;
+
+#define WifiStationSize 82
+typedef struct StationSettings {
+  char ssid[33];
+  bool dhcpEnabled;
+  uint8_t ip[4];
+  uint8_t gw[4];
+  uint8_t sn[4];
+  char host[32];
+  uint8_t target[4];
+} StationSettings;
+
 typedef struct AccessPointSettings {
   char ssid[32];
   char pwd[32];
@@ -35,22 +58,7 @@ typedef struct AccessPointSettings {
   uint8_t sn[4];
 } AccessPointSettings;
 
-typedef struct StationSettings {
-  char ssid[33];
-  char pwd[64];
-  bool dhcpEnabled;
-  uint8_t ip[4];
-  uint8_t gw[4];
-  uint8_t sn[4];
-  char host[32];
-  uint8_t target[4];
-} StationSettings;
-
-#ifndef WifiStationCount
-  // number of wifi stations supported, between 1 and 6
-  #define WifiStationCount 1
-#endif
-#define WifiSettingsSize (112 + WifiStationCount*146)
+#define WifiSettingsSize 112
 typedef struct WifiSettings {
   char masterPassword[32];
 
@@ -59,9 +67,9 @@ typedef struct WifiSettings {
 
   bool stationEnabled;
   bool stationApFallback;
-  StationSettings station[WifiStationCount];
-
 } WifiSettings;
+
+#pragma pack()
 
 class WifiManager {
   public:
@@ -88,6 +96,9 @@ class WifiManager {
     // currently selected station
     StationSettings *sta;
 
+    // currently selected station password
+    StationPassword *staPwd;
+
     // currently selected station number
     int stationNumber = 1;
 
@@ -108,32 +119,54 @@ class WifiManager {
 
       STA_ENABLED,
       STA_AP_FALLBACK,
-
-      {
-        #if WifiStationCount > 0
-        {STA1_SSID, STA1_PASSWORD, STA1_DHCP_ENABLED, STA1_IP_ADDR, STA1_GW_ADDR, STA1_SN_MASK, STA1_HOST_NAME, STA1_TARGET_IP_ADDR},
-        #endif
-        #if WifiStationCount > 1
-        {STA2_SSID, STA2_PASSWORD, STA2_DHCP_ENABLED, STA2_IP_ADDR, STA2_GW_ADDR, STA2_SN_MASK, STA2_HOST_NAME, STA2_TARGET_IP_ADDR},
-        #endif
-        #if WifiStationCount > 2
-        {STA3_SSID, STA3_PASSWORD, STA3_DHCP_ENABLED, STA3_IP_ADDR, STA3_GW_ADDR, STA3_SN_MASK, STA3_HOST_NAME, STA3_TARGET_IP_ADDR},
-        #endif
-        #if WifiStationCount > 3
-        {STA4_SSID, STA4_PASSWORD, STA4_DHCP_ENABLED, STA4_IP_ADDR, STA4_GW_ADDR, STA4_SN_MASK, STA4_HOST_NAME, STA4_TARGET_IP_ADDR},
-        #endif
-        #if WifiStationCount > 4
-        {STA5_SSID, STA5_PASSWORD, STA5_DHCP_ENABLED, STA5_IP_ADDR, STA5_GW_ADDR, STA5_SN_MASK, STA5_HOST_NAME, STA5_TARGET_IP_ADDR},
-        #endif
-        #if WifiStationCount > 5
-        {STA6_SSID, STA6_PASSWORD, STA6_DHCP_ENABLED, STA6_IP_ADDR, STA6_GW_ADDR, STA6_SN_MASK, STA6_HOST_NAME, STA6_TARGET_IP_ADDR},
-        #endif
-
-      }
     };
 
   private:
     bool settingsReady = false;
+
+    StationPassword stationPassword[WifiStationCount] =
+    {
+      #if WifiStationCount > 0
+      {STA1_PASSWORD},
+      #endif
+      #if WifiStationCount > 1
+      {STA2_PASSWORD},
+      #endif
+      #if WifiStationCount > 2
+      {STA3_PASSWORD},
+      #endif
+      #if WifiStationCount > 3
+      {STA4_PASSWORD},
+      #endif
+      #if WifiStationCount > 4
+      {STA5_PASSWORD},
+      #endif
+      #if WifiStationCount > 5
+      {STA6_PASSWORD},
+      #endif
+    };
+
+    StationSettings station[WifiStationCount] =
+    {
+      #if WifiStationCount > 0
+      {STA1_SSID, STA1_DHCP_ENABLED, STA1_IP_ADDR, STA1_GW_ADDR, STA1_SN_MASK, STA1_HOST_NAME, STA1_TARGET_IP_ADDR},
+      #endif
+      #if WifiStationCount > 1
+      {STA2_SSID, STA2_DHCP_ENABLED, STA2_IP_ADDR, STA2_GW_ADDR, STA2_SN_MASK, STA2_HOST_NAME, STA2_TARGET_IP_ADDR},
+      #endif
+      #if WifiStationCount > 2
+      {STA3_SSID, STA3_DHCP_ENABLED, STA3_IP_ADDR, STA3_GW_ADDR, STA3_SN_MASK, STA3_HOST_NAME, STA3_TARGET_IP_ADDR},
+      #endif
+      #if WifiStationCount > 3
+      {STA4_SSID, STA4_DHCP_ENABLED, STA4_IP_ADDR, STA4_GW_ADDR, STA4_SN_MASK, STA4_HOST_NAME, STA4_TARGET_IP_ADDR},
+      #endif
+      #if WifiStationCount > 4
+      {STA5_SSID, STA5_DHCP_ENABLED, STA5_IP_ADDR, STA5_GW_ADDR, STA5_SN_MASK, STA5_HOST_NAME, STA5_TARGET_IP_ADDR},
+      #endif
+      #if WifiStationCount > 5
+      {STA6_SSID, STA6_DHCP_ENABLED, STA6_IP_ADDR, STA6_GW_ADDR, STA6_SN_MASK, STA6_HOST_NAME, STA6_TARGET_IP_ADDR},
+      #endif
+    };
 };
 
 extern WifiManager wifiManager;

@@ -26,7 +26,7 @@ enum CoordReturn: uint8_t {CR_MOUNT, CR_MOUNT_EQU, CR_MOUNT_ALT, CR_MOUNT_HOR, C
 class Transform {
   public:
     // setup for coordinate transformation
-    void init();
+    void init(uint8_t mountType);
 
     #if DEBUG != OFF
       // prints a coordinate to the debug serial port

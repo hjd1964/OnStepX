@@ -24,15 +24,15 @@
 
 #pragma pack(1)
 typedef struct AltitudeLimits {
-  float min;
-  float max;
+  float min; // in radians
+  float max; // in radians
 } AltitudeLimits;
 
 #define LimitSettingsSize 16
 typedef struct LimitSettings {
   AltitudeLimits altitude;
-  float pastMeridianE;
-  float pastMeridianW;
+  float pastMeridianE; // in radians
+  float pastMeridianW; // in radians
 } LimitSettings;
 #pragma pack()
 
@@ -63,9 +63,6 @@ class Limits {
     void init();
 
     bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
-
-    // constrain meridian limits to the allowed range
-    void constrainMeridianLimits();
 
     // target coordinate check ahead of sync, goto, etc.
     CommandError validateTarget(Coordinate *coords, bool isGoto);
@@ -116,6 +113,8 @@ class Limits {
     LimitsError error;
 
     int limitsDisablePeriodDs = 0; // in deciseconds (0.1s)
+
+    uint32_t nvKey;
 };
 
 extern Limits limits;

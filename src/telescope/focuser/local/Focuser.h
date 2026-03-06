@@ -39,17 +39,6 @@
   #endif
 #endif
 
-// time to write position to nv after last movement of Focuser
-#ifndef FOCUSER_WRITE_DELAY
-  #if NV_ENDURANCE == NVE_VHIGH
-    #define FOCUSER_WRITE_DELAY 5
-  #elif NV_ENDURANCE == NVE_HIGH
-    #define FOCUSER_WRITE_DELAY 60
-  #else
-    #define FOCUSER_WRITE_DELAY 300
-  #endif
-#endif
-
 // switch to allow backlash to be slaved
 #ifndef FOCUSER_SLAVE_BACKLASH
   #define FOCUSER_SLAVE_BACKLASH OFF
@@ -174,9 +163,6 @@ public:
     // unpark focuser
     CommandError unpark(int index);
 
-    void readSettings(int index);
-    void writeSettings(int index);
-
     int slavedFocuserIndex(int masterIndex, int candidateIndex);
     bool hasSlaveCycle(int candidateIndex);
 
@@ -204,6 +190,9 @@ public:
       uint8_t inButtonHandle = 0;
       uint8_t outButtonHandle = 0;
     #endif
+
+    uint16_t writeDelay = 300;
+    uint16_t nvKey[6];
 };
 
 #if AXIS4_DRIVER_MODEL != OFF

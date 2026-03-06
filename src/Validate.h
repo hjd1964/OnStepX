@@ -417,8 +417,8 @@
   #error "Configuration (Config.h): Setting PEC_SENSE unknown, use OFF or HIGH/LOW and HYST() and/or THLD() as described in comments."
 #endif
 
-#if PEC_BUFFER_SIZE_LIMIT < 0 || PEC_BUFFER_SIZE_LIMIT > 30000
-  #error "Configuration (Config.h): Setting PEC_BUFFER_SIZE_LIMIT unknown, use the value 0 to disable or 1 to 30000 (seconds.)"
+#if (PEC_BUFFER_SIZE_LIMIT != 0) && (PEC_BUFFER_SIZE_LIMIT < 61 && PEC_BUFFER_SIZE_LIMIT > 30000)
+  #error "Configuration (Config.h): Setting PEC_BUFFER_SIZE_LIMIT unknown, use the value 0 to disable or 61 to 30000 (seconds.)"
 #endif
 
 // SLEWING BEHAVIOUR

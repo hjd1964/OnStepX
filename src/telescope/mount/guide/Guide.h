@@ -127,6 +127,7 @@ class Guide {
     unsigned long guideFinishTimeAxis1 = 0;
     unsigned long guideFinishTimeAxis2 = 0;
 
+    uint32_t nvKey;
 };
 
 extern Guide guide;

@@ -24,17 +24,26 @@
   inline void pecWrapper() { pec.poll(); }
 
   void Pec::init() {
-    // confirm the data structure size
-    if (PecSettingsSize < sizeof(PecSettings)) { nv.initError = true; DL("ERR: Pec::init(), PecSettingsSize error"); }
+    nvKey = nv().kv().computeKey("PEC_SETTINGS");
+    if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for PEC_SETTINGS"); }
 
-    // write the default settings to NV
-    if (!nv.hasValidKey() || nv.isNull(NV_MOUNT_PEC_BASE, sizeof(PecSettings))) {
-      VLF("MSG: Mount, PEC writing defaults to NV");
-      nv.writeBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+    settings.recorded = constrain(settings.recorded, false, true);
+    settings.state = constrain(settings.state, PEC_NONE, PEC_RECORD);
+    settings.wormRotationSteps = constrain(settings.wormRotationSteps, 0, 129600000);
+
+    NvVolume& nvVolume = nv().volume();
+    if (!nvVolume.isMounted()) {
+      DLF("WRN: Pec::init(); NV volume not mounted");
+      return;
     }
 
-    // read the settings
-    nv.readBytes(NV_MOUNT_PEC_BASE, &settings, sizeof(PecSettings));
+    // Bind IvPartition to the PEC partition by name.
+    if (nvIv.init(nvVolume, "PEC")) {
+      VLF("MSG: Nv, partition 'PEC' mounted");
+    } else {
+      DLF("WRN: Pec::init(); can't find PEC partition!");
+      return;
+    }
 
     stepsPerSiderealSecond = (axis1.getStepsPerMeasure()/RAD_DEG_RATIO)/240.0L;
     stepsPerSiderealSecondI = lroundf(stepsPerSiderealSecond);
@@ -45,14 +54,14 @@
 
     if (bufferSize > 0) {
       if (bufferSize < 61) {
+        DLF("WRN: Pec::init(), invalid bufferSize (minimum worm rotation 61 seconds)");
         bufferSize = 0;
         initError.value = true;
-        DLF("WRN: Pec::init(), invalid bufferSize - PEC disabled");
       } else
-      if (bufferSize + NV_PEC_BUFFER_BASE >= nv.size - 1) {
+      if (bufferSize > nvIv.sizeBytes()) {
+        DLF("WRN: Pec::init(), bufferSize exceeds PEC partition size - PEC disabled");
         bufferSize = 0;
         initError.value = true;
-        DLF("WRN: Pec::init(), bufferSize exceeds available NV - PEC disabled");
       } else {
         buffer = (int8_t*)malloc(bufferSize * sizeof(*buffer));
         if (buffer == NULL) {
@@ -63,11 +72,12 @@
           VF("MSG: Mount, PEC allocated buffer "); V(bufferSize * (long)sizeof(*buffer)); VLF(" bytes");
 
           bool bufferNeedsInit = true;
-          for (int i = 0; i < bufferSize; i++) {
-            buffer[i] = nv.read(NV_PEC_BUFFER_BASE + i);
-            if (buffer[i] != 0) bufferNeedsInit = false;
+          nvIv.readBytes(0, buffer, bufferSize);
+          for (int i = 0; i < bufferSize; i++) { if (buffer[i] != 0) bufferNeedsInit = false; }
+          if (bufferNeedsInit) {
+            for (int i = 0; i < bufferSize; i++) buffer[i] = 0; 
+            nvIv.writeBytes(0, buffer, bufferSize);
           }
-          if (bufferNeedsInit) for (int i = 0; i < bufferSize; i++) nv.write(NV_PEC_BUFFER_BASE + i, (int8_t)0);
 
           if (settings.state > PEC_RECORD) {
             settings.state = PEC_NONE;

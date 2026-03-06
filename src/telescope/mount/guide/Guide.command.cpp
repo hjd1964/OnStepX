@@ -183,7 +183,7 @@ bool Guide::command(char *reply, char *command, char *parameter, bool *suppressF
         VF("MSG: Guide rate "); V(r); VLF(" selected");
         if (GUIDE_SEPARATE_PULSE_RATE == ON && (GuideRateSelect)r <= GR_1X) {
           settings.pulseRateSelect = (GuideRateSelect)r;
-          nv.updateBytes(NV_MOUNT_GUIDE_BASE, &settings, sizeof(GuideSettings));
+          nv().kv().put(nvKey, settings);
         }
       } else *commandError = CE_PARAM_RANGE;
       *numericReply = false; 

@@ -72,6 +72,7 @@ class Home {
     bool wasTracking = false;
     Coordinate position;
 
+    uint32_t nvKey;
 };
 
 extern Home home;

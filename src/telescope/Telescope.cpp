@@ -123,14 +123,81 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
   sstrcpy(firmware.date, __DATE__);
   sstrcpy(firmware.time, __TIME__);
 
-  if (!nv.isKeyValid(INIT_NV_KEY)) {
-    if (!nv.initError) {
-      VF("MSG: NV, invalid key wipe "); V(nv.size); VLF(" bytes");
-      if (nv.verify()) { VLF("MSG: NV, ready for reset to defaults"); }
+  // --------------------------------------------------------------------------------------------------
+  // start the NV/EEPROM subsystem for settings storage
+  initError.nv = false;
+  initError.value = false;
+  bool success = nv().init();
+  NvVolume &nvVolume = nv().volume();
+
+  success = success && (nvVolume.mount("OnStepX", NV_VOLUME_SIGNATURE) == NvVolume::Status::Ok);
+  VF("MSG: Nv, volume ");
+  if (success) { VLF("'OnStepX' mounted"); } else { VLF("invalid/unformatted"); }
+
+  if (!success) {
+
+    // automatic kv partition sizing
+    uint32_t vSize = nvVolume.byteCount() - 32;
+    uint32_t kvSize = vSize;
+    if (vSize > 1039) {
+
+      // start the volume format
+      success = nvVolume.formatBegin("OnStepX", NV_VOLUME_SIGNATURE) == NvVolume::Status::Ok;
+      if (success) { VF("MSG: Nv, volume 'OnStepX' format started ("); V(vSize); VLF(" bytes)"); }
+
+      // first add the KV partition
+           if (vSize < 1536) kvSize = 1040;     // 1080 class (no PEC/Lib)
+      else if (vSize < 3072) kvSize = 1536;     // 2KB class (~0.5K for Lib)
+      else if (vSize < 6144) kvSize = 2048;     // 4KB class (~2K for PEC/Lib)
+      else if (vSize < 16384) kvSize = 3072;    // 8KB class (~5K for PEC/Lib)
+      else kvSize = 4080;                       // and up
+
+      success = success && nvVolume.formatAddPartition("KV", kvSize);
+      if (success) { VF("MSG: Nv, volume format added 'KV' partition ("); V(kvSize); VLF(" bytes)"); }
+
+      // next any PEC partition
+      uint32_t pecSize = 0;
+      #if AXIS1_PEC != OFF
+        pecSize = ((PEC_BUFFER_SIZE_LIMIT) >> 4) << 4;
+        if (kvSize + pecSize > vSize) { pecSize = 0; }
+
+        if (pecSize > 15) {
+          success = success && nvVolume.formatAddPartition("PEC", pecSize);
+          if (success) { VF("MSG: Nv, volume format added 'PEC' partition ("); V(pecSize); VLF(" bytes)"); }
+        }
+      #endif
+
+      // next any Library partition
+      uint32_t libSize = vSize - pecSize - kvSize;
+      if (libSize >= 16) {
+        success = success && nvVolume.formatAddPartition("LIBRARY", 0);
+        if (success) { VF("MSG: Nv, volume format added 'LIBRARY' partition ("); V(libSize); VLF(" bytes)"); }
+      }
+
+      // finally commit the volume format
+      success = success && (nvVolume.formatCommit() == NvVolume::Status::Ok);
+      if (success) { VLF("MSG: Nv, volume format done"); }
+
+      // try to mount the volume again
+      success = success && (nvVolume.mount("OnStepX", NV_VOLUME_SIGNATURE) == NvVolume::Status::Ok);
+      if (success) { VLF("MSG: Nv, volume 'OnStepX' mounted"); } else { DLF("WRN: Nv, volume 'OnStepX' mount FAILED!"); }
+
     } else {
-      DLF("WRN: NV, can't be accessed skipping verification!");
+      DLF("WRN: Nv, volume compatible storage device NOT FOUND!");
+      success = false;
     }
-  } else { VLF("MSG: NV, correct key found"); }
+  }
+
+  // Bind global KV instance to the KV partition index
+  success = success && (nv().kv().init(nvVolume, "KV") == KvPartition::Status::Ok);
+  if (success) { VLF("MSG: Nv, partition 'KV' mounted"); } else { DLF("WRN: Nv, partition 'KV' mount FAILED!"); }
+
+  if (!success) {
+    VLF("WRN: Nv, init FAILED!");
+    initError.nv = true;
+  }
+  nv().kv().resetInitErrorFlag();
+  // --------------------------------------------------------------------------------------------------
 
   #if RETICLE_LED_DEFAULT >= 0 && RETICLE_LED_PIN != OFF
     analog.pwmInit(RETICLE_LED_DEFAULT);
@@ -226,25 +293,10 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     features.begin();
   #endif
 
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Telescope, writing defaults to NV");
-    nv.write(NV_TELESCOPE_SETTINGS_BASE, reticleBrightness);
-  }
-
-  // init is done, write the NV key if necessary
-  if (!nv.hasValidKey()) {
-    nv.writeKey((uint32_t)INIT_NV_KEY);
-    nv.wait();
-    if (!nv.isKeyValid(INIT_NV_KEY)) { DLF("ERR: NV, failed to read back key!"); } else { VLF("MSG: NV, reset complete"); }
-  }
-
-  initError.nv = nv.initError;
-
   #if RETICLE_LED_DEFAULT != OFF && RETICLE_LED_PIN != OFF
     #if RETICLE_LED_MEMORY == ON
-      reticleBrightness = nv.readI(NV_TELESCOPE_SETTINGS_BASE);
-      if (reticleBrightness < 0) reticleBrightness = RETICLE_LED_DEFAULT;
+      if (!nv().kv().getOrInit("TELESCOPE_SETTINGS", reticleBrightness)) { DLF("WRN: Nv, init failed for TELESCOPE_SETTINGS"); }
+      reticleBrightness = constrain(reticleBrightness, 0, 255);
     #endif
 
     pinMode(RETICLE_LED_PIN, OUTPUT);
@@ -260,6 +312,23 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
     VF("MSG: Telescope, start status LED task (rate 500ms priority 4)... ");
     if (tasks.add(500, 0, true, 4, statusFlash, "StaLed")) { VLF("success"); } else { VLF("FAILED!"); }
   #endif
+
+  // --------------------------------------------------------------------------------------------------
+  // init is done let the user see what's in the KV
+  #if DEBUG != OFF
+    KvPartition::Stats stats;
+    if (success && nv().kv().stats(stats) == KvPartition::Status::Ok) {
+      VF("MSG: Nv, partition 'KV' data blocks used = ");
+      V(stats.dataBlocksTotal - stats.dataBlocksFree); VF(" (of "); V(stats.dataBlocksTotal); VF(")");
+      VF(" key slots used = ");
+      V(stats.slotsTotal - stats.slotsFree); VF(" (of "); V(stats.slotsTotal); VLF(")");
+    }
+  #endif
+
+  // and capture any errors
+  if (nv().kv().getInitErrorFlag()) initError.nv = true;
+  // --------------------------------------------------------------------------------------------------
+
 }
 
 Telescope telescope;

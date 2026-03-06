@@ -153,31 +153,6 @@
 #define SERIAL_ST4_SERVER_PRESENT
 
 // NV -------------------------------------------------------------------------------------------------------------------
-#define INIT_NV_KEY                 583928945UL
 
-#define NV_KEY                      0      // bytes: 4   , 4
-#define NV_SITE_NUMBER              4      // bytes: 1   , 1
-#define NV_SITE_BASE                5      // bytes: 40*4, 160
-#define NV_SITE_JD_BASE             165    // bytes: 16  , 16
-
-#define NV_MOUNT_SETTINGS_BASE      181    // bytes: 9   , 9
-#define NV_MOUNT_TYPE_BASE          190    // bytes: 1   , 1
-#define NV_MOUNT_GOTO_BASE          191    // bytes: 6   , 6
-#define NV_MOUNT_GUIDE_BASE         197    // bytes: 3   , 3
-#define NV_MOUNT_LIMITS_BASE        200    // bytes: 16  , 16
-#define NV_MOUNT_HOME_BASE          216    // bytes: 11 ,  11
-#define NV_MOUNT_PARK_BASE          227    // bytes: 15  , 15
-#define NV_MOUNT_PEC_BASE           242    // bytes: 6   , 6
-#define NV_MOUNT_STATUS_BASE        248    // bytes: 1   , 1
-#define NV_MOUNT_LAST_POSITION      249    // bytes: 9   , 9
-
-#define NV_ALIGN_MODEL_BASE         258    // bytes: 48  , 48
-#define NV_AXIS_SETTINGS_REVERT     306    // bytes: 2   , 2
-#define NV_AXIS_SETTINGS_BASE       308    // bytes: 76*9, 684
-#define NV_AXIS_ENCODER_ZERO_BASE   992    // bytes: 4 *2, 8
-#define NV_FOCUSER_SETTINGS_BASE    1000   // bytes: 20*6, 120
-#define NV_ROTATOR_SETTINGS_BASE    1003   // bytes: 11  , 11
-#define NV_FEATURE_SETTINGS_BASE    1014   // bytes: 5 *8, 40
-#define NV_TELESCOPE_SETTINGS_BASE  1054   // bytes: 2   , 2
-
-#define NV_LAST                     1055
+// unique volume signature for this volume/partition layout
+#define NV_VOLUME_SIGNATURE         0x0001u

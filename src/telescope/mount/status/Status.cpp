@@ -30,13 +30,9 @@ void generalWrapper() { mountStatus.general(); }
 
 // get mount status ready
 void Status::init() {
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Mount, status writing defaults to NV");
-    nv.write(NV_MOUNT_STATUS_BASE, (uint8_t)sound.enabled);
-  }
-
   #if STATUS_BUZZER_MEMORY == ON
-    sound.enabled = nv.read(NV_MOUNT_STATUS_BASE);
+    if (!nv().kv().getOrInit("STATUS_SETTINGS", settings)) { DLF("WRN: Nv, init failed for STATUS_SETTINGS"); }
+    sound.enabled = settings.soundEnabled;
   #endif
 
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF

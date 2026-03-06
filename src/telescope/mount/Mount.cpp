@@ -21,7 +21,7 @@
 #include "st4/St4.h"
 #include "status/Status.h"
 
-#if MOUNT_COORDS_MEMORY == ON && NV_ENDURANCE < NVE_VHIGH
+#if MOUNT_COORDS_MEMORY == ON && (NV_DRIVER != NV_MB85RC32 && NV_DRIVER != NV_MB85RC64 && NV_DRIVER != NV_MB85RC256)
   #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY requires a NV storage device with very high write endurance (FRAM)"
 #endif
 
@@ -29,17 +29,9 @@ inline void mountWrapper() { mount.poll(); }
 inline void autostartWrapper() { mount.autostartPostponed(); }
 
 void Mount::init() {
-  // confirm the data structure size
-  if (MountSettingsSize < sizeof(MountSettings)) { nv.initError = true; DL("ERR: Mount::init(), MountSettingsSize error"); }
 
-  // write the default settings to NV
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Mount, writing defaults to NV");
-    nv.writeBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
-  }
-
-  // read the settings
-  nv.readBytes(NV_MOUNT_SETTINGS_BASE, &settings, sizeof(MountSettings));
+  nvKey = nv().kv().computeKey("MOUNT_SETTINGS");
+  if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for MOUNT_SETTINGS"); }
 
   // get the main axes ready
   delay(100);
@@ -48,7 +40,9 @@ void Mount::init() {
     axis1.setMotionLimitsCheck(false);
     if (AXIS1_POWER_DOWN == ON) axis1.setPowerDownTime(AXIS1_POWER_DOWN_TIME);
     #ifdef AXIS1_ENCODER_ORIGIN
-      if (AXIS1_ENCODER_ORIGIN == 0) axis1.motor->encoderSetOrigin(nv.readUL(NV_AXIS_ENCODER_ZERO_BASE));
+      uint32_t origin = 0;
+      nv().kv().get("AXIS1_ENCODER_ORIGIN", origin);
+      if (AXIS1_ENCODER_ORIGIN == 0) axis1.motor->encoderSetOrigin(origin);
     #endif
   }
 
@@ -58,7 +52,9 @@ void Mount::init() {
     axis2.setMotionLimitsCheck(false);
     if (AXIS2_POWER_DOWN == ON) axis2.setPowerDownTime(AXIS2_POWER_DOWN_TIME);
     #ifdef AXIS2_ENCODER_ORIGIN
-      if (AXIS2_ENCODER_ORIGIN == 0) axis2.motor->encoderSetOrigin(nv.readUL(NV_AXIS_ENCODER_ZERO_BASE + 4));
+      uint32_t origin = 0;
+      nv().kv().get("AXIS2_ENCODER_ORIGIN", origin);
+      if (AXIS2_ENCODER_ORIGIN == 0) axis2.motor->encoderSetOrigin(origin);
     #endif
   }
 }
@@ -71,7 +67,16 @@ void Mount::begin() {
 
   // initialize the critical subsystems
   site.init();
-  transform.init();
+
+  // invalid mount type, set default
+  if (settings.mountType < MOUNT_SUBTYPE_FIRST || settings.mountType > MOUNT_SUBTYPE_LAST) {
+    settings.mountType = MOUNT_SUBTYPE;
+    nv().kv().put(nvKey, settings);
+    VLF("MSG: Transform, revert mount type to default");
+  }
+
+  if (MOUNT_TYPE == ALTALT) settings.mountType = MOUNT_SUBTYPE;
+  transform.init(settings.mountType);
 
   // setup compensated tracking as configured
   if (TRACK_COMPENSATION_MEMORY == OFF) settings.rc = RC_DEFAULT;
@@ -107,15 +112,39 @@ void Mount::begin() {
 
   // restore where we were pointing
   #if MOUNT_COORDS_MEMORY == ON
+    lastPosition.a1 = (float)axis1.getInstrumentCoordinate();
+    lastPosition.a2 = (float)axis2.getInstrumentCoordinate();
+    lastPosition.mountType = (uint8_t)(transform.mountType & 0x0Fu);
+    lastPosition.seq = 0;
+
+    nvKeyLastA = nv().kv().computeKey("MOUNT_LAST_POS_A");
+    nvKeyLastB = nv().kv().computeKey("MOUNT_LAST_POS_B");
+
     if (!goTo.absoluteEncodersPresent && park.state != PS_PARKED) {
-      int8_t lastMountType = nv.readC(NV_MOUNT_LAST_POSITION);
-      if (transform.mountType == lastMountType) {
-        VLF("MSG: Mount, reading last position");
-        float a1 = nv.readF(NV_MOUNT_LAST_POSITION + 1);
-        float a2 = nv.readF(NV_MOUNT_LAST_POSITION + 5);
-        axis1.setInstrumentCoordinate(a1);
-        axis2.setInstrumentCoordinate(a2);
-        if (!goTo.absoluteEncodersPresent) mount.syncFromOnStepToEncoders = true;
+
+      MountPositionMemory a{}, b{};
+      const bool foundA = (nv().kv().get(nvKeyLastA, a) == KvPartition::Status::Ok);
+      const bool foundB = (nv().kv().get(nvKeyLastB, b) == KvPartition::Status::Ok);
+
+      const bool va = foundA && (a.mountType == (uint8_t)(transform.mountType & 0x0Fu));
+      const bool vb = foundB && (b.mountType == (uint8_t)(transform.mountType & 0x0Fu));
+
+      const MountPositionMemory* best = nullptr;
+
+      if (va && vb) {
+        const uint8_t d = (uint8_t)((a.seq - b.seq) & 3u);
+        best = (d == 1u) ? &a : (d == 3u) ? &b : &a;
+      } else if (va) {
+        best = &a;
+      } else if (vb) {
+        best = &b;
+      }
+
+      if (best) {
+        lastPosition = *best;
+        axis1.setInstrumentCoordinate(lastPosition.a1);
+        axis2.setInstrumentCoordinate(lastPosition.a2);
+        mount.syncFromOnStepToEncoders = true;
       }
     }
   #endif
@@ -264,7 +293,9 @@ void Mount::update() {
     float f1 = 0, f2 = 0;
     if (!guide.activeAxis1() || guide.state == GU_PULSE_GUIDE) {
       f1 = trackingRateAxis1;
-      if (transform.mountType != ALTAZM && transform.mountType != ALTALT)  f1 += guide.rateAxis1 + pec.rate;
+      #if AXIS1_PEC != OFF
+        if (transform.mountType != ALTAZM && transform.mountType != ALTALT)  f1 += guide.rateAxis1 + pec.rate;
+      #endif
       axis1.setSynchronizedFrequency(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
@@ -312,11 +343,13 @@ void Mount::poll() {
   // keep track of where we are pointing
   #if MOUNT_COORDS_MEMORY == ON
     if (!goTo.absoluteEncodersPresent) {
-      nv.ignoreCache(true);
-      nv.write(NV_MOUNT_LAST_POSITION, transform.mountType);
-      nv.write(NV_MOUNT_LAST_POSITION + 1, (float)axis1.getInstrumentCoordinate());
-      nv.write(NV_MOUNT_LAST_POSITION + 5, (float)axis2.getInstrumentCoordinate());
-      nv.ignoreCache(false);
+      if (nv().device().endurance() == NvDevice::Endurance::High) {
+        lastPosition.a1 = (float)axis1.getInstrumentCoordinate();
+        lastPosition.a2 = (float)axis2.getInstrumentCoordinate();
+        lastPosition.mountType = (uint8_t)(transform.mountType & 0x0Fu);
+        if (lastPosition.seq == 3) lastPosition.seq = 0; else lastPosition.seq++;
+        nv().kv().put((lastPosition.seq & 1)? nvKeyLastA : nvKeyLastB, lastPosition);
+      }
     }
   #endif
 

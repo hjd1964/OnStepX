@@ -32,9 +32,9 @@ typedef struct LocationExtras {
 #pragma pack(1)
 #define LocationSize 40
 typedef struct Location {
-  double latitude;
-  double longitude;
-  float  elevation;
+  double latitude;  // in radians
+  double longitude; // in radians
+  float  elevation; // in meters
   float  timezone;
   char   name[16];
 } Location;
@@ -76,9 +76,6 @@ class Site {
     // gets sidereal ratio
     // slower rates are < 1.0, faster rates are > 1.0
     inline float getSiderealRatio() { return (float)SIDEREAL_PERIOD/siderealPeriod; }
-
-    // callback to tick the fracsec sidereal frac
-    void tick();
 
     Location location;
     LocationExtras locationEx;
@@ -151,6 +148,9 @@ class Site {
 
     // site number 0..3
     uint8_t locationNumber = 0;
+
+    // site nv keys
+    uint16_t nvKey[4];
 };
 
 extern Site site;

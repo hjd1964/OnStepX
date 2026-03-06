@@ -7,6 +7,7 @@
 #if defined(MOUNT_PRESENT)
 
 #include "../../../lib/convert/Convert.h"
+#include "../../../lib/nv/NvIvPartition.h"
 #include "../../../libApp/commands/ProcessCmds.h"
 
 #if AXIS1_PEC == ON
@@ -33,7 +34,7 @@ typedef union {
 class Library
 {
   public:
-    void init();
+    bool init();
 
     bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
@@ -70,13 +71,13 @@ class Library
     bool nextRec();
 
     // move to the specified record (of this catalog), if it exists
-    bool gotoRec(long num);
+    bool gotoRec(uint16_t num);
 
     // actual number of records for this catalog
-    long recCount();
+    uint16_t recCount();
 
     // actual number of records for this library
-    long recCountAll();
+    uint16_t recCountAll();
 
     // clears this record
     void clearCurrentRec();
@@ -88,27 +89,29 @@ class Library
     void clearAll();
 
     // number records available for this library
-    long recFreeAll();
+    uint16_t recFreeAll();
 
   private:
+    // flag for successful initialization
+    bool ready = false;
+
     // currently selected record#   
-    long recPos;            
+    uint16_t recPos;            
 
     // last record#
-    long recMax;            
+    uint16_t recMax;            
 
     // 16 byte record
     libRec_t list;
 
-    libRec_t readRec(long address);
-    void writeRec(long address, libRec_t data);
-    void clearRec(long address);
+    libRec_t readRec(uint16_t address);
+    void writeRec(uint16_t address, libRec_t data);
+    void clearRec(uint16_t address);
     inline double degRange(double d) { while (d >= 360.0) d -= 360.0; while (d < 0.0)  d += 360.0; return d; }
 
     int catalog;
 
-    long byteMin;
-    long byteMax;
+    IvPartition nvIv;
 };
 
 extern Library library;

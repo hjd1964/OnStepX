@@ -265,8 +265,9 @@ void Site::setDateTime(JulianDate julianDate) {
   ut1 = julianDate;
   setSiderealTime(julianDate);
 
-  if (writeTime) nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  if (NV_ENDURANCE < NVE_MID) writeTime = false;
+  if (writeTime) nv().kv().put("DATE_TIME", ut1);
+  
+  if (nv().device().endurance() < NvDevice::Endurance::Mid) writeTime = false;
 
   #if LIMIT_STRICT == ON
     limits.enabled(isDateTimeReady());
@@ -356,36 +357,35 @@ double Site::julianDateToGAST(JulianDate julianDate) {
 
 // reads the julian date information from NV
 void Site::readJD() {
-  if (JulianDateSize < sizeof(ut1)) { nv.initError = true; DL("ERR: Site::readJD(), JulianDateSize error"); }
+  ut1.day = 2451544.5;
+  ut1.hour = 0.0;
 
-  if (!nv.hasValidKey() || nv.isNull(NV_SITE_JD_BASE, JulianDateSize)) {
-    VLF("MSG: Mount, site writing default date/time to NV");
-    ut1.day = 2451544.5;
-    ut1.hour = 0.0;
-    nv.updateBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  }
-  nv.readBytes(NV_SITE_JD_BASE, &ut1, JulianDateSize);
-  if (ut1.day < 2451544.5 || ut1.day > 2816787.5) { ut1.day = 2451544.5; initError.value = true; DLF("ERR: Site::readJD(), bad NV julian date (day)"); }
-  if (ut1.hour < 0.0 || ut1.hour > 24.0)  { ut1.hour = 0.0; initError.value = true; DLF("ERR: Site::readJD(), bad NV julian date (hour)"); }
+  if (!nv().kv().getOrInit("DATE_TIME", ut1)) { DLF("WRN: Nv, init failed for DATE_TIME"); }
+  ut1.day = constrain(ut1.day, 2451544.5, 2816787.5);
+  ut1.hour = constrain(ut1.hour, 0, 24);
 }
 
 // reads the location information from NV
 // locationNumber can be 0..3
-void Site::readLocation(uint8_t number) {
-  if (LocationSize < sizeof(Location)) { nv.initError = true; DL("ERR: Site::readLocation(), LocationSize error"); }
-  if (!nv.hasValidKey()) {
-    VLF("MSG: Mount, site writing default sites 0-3 to NV");
-    location.latitude = 0.0;
-    location.longitude = 0.0;
-    location.timezone = 0.0;
-    strcpy(location.name, "");
-    for (uint8_t l = 0; l < 4; l++) nv.updateBytes(NV_SITE_BASE + l*LocationSize, &location, LocationSize);
-  }
-  locationNumber = number;
-  nv.readBytes(NV_SITE_BASE + locationNumber*LocationSize, &location, LocationSize);
-  if (location.latitude < -Deg90 || location.latitude > Deg90) { location.latitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV latitude"); }
-  if (location.longitude < -Deg360 || location.longitude > Deg360) { location.longitude = 0.0; initError.value = true; DLF("ERR: Site::readSite, bad NV longitude"); }
-  if (location.timezone < -14 || location.timezone > 12) { location.timezone = 0.0; initError.value = true; DLF("ERR: Site::readSite,  bad NV timeZone"); }
+void Site::readLocation(uint8_t n) {
+  if (n > 3) return;
+
+  locationNumber = n;
+  location.latitude = 0.0;
+  location.longitude = 0.0;
+  location.timezone = 0.0;
+  location.elevation = 100.0;
+  strcpy(location.name, "");
+
+  char keyStr[26];
+  snprintf(keyStr, sizeof(keyStr), "LOCATION%u_SETTINGS", locationNumber);
+  nvKey[locationNumber] = nv().kv().computeKey(keyStr);
+  if (!nv().kv().getOrInit(nvKey[locationNumber], location)) { DF("WRN: Nv, init failed for "); VL(keyStr); }
+
+  location.latitude = constrain(location.latitude, -Deg90, Deg90);
+  location.longitude = constrain(location.longitude, -Deg360, Deg360);
+  location.elevation = constrain(location.elevation, -418, 8848); // in meters
+  location.timezone = constrain(location.timezone, -14, 12);
 }
 
 // sets the site altitude in meters
