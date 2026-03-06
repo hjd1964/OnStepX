@@ -127,7 +127,7 @@ bool StepDirDriver::init() {
     if (axisNumber > 2) pulseWidth = 2000;
 
     if (DriverPulseWidth[driverModel] == OFF) {
-      VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[driverModel]); VF(" min. pulse width unknown!");
+      VF("MSG:"); V(axisPrefix); V(DRIVER_NAME[driverModel]); VLF(" min. pulse width unknown!");
     }
 
     if (DriverPulseWidth[driverModel] > pulseWidth) {
@@ -161,7 +161,7 @@ bool StepDirDriver::init() {
   microstepCodeSlewing = subdivisionsToCode(normalizedMicrostepsSlewing);
 
   if (microstepCode == OFF || microstepCodeSlewing == OFF) {
-    DF("MSG:"); D(axisPrefix); DF("invalid microstep mode for this driver.");
+    DF("MSG:"); D(axisPrefix); DLF("invalid microstep mode for this driver.");
     return false;
   }
 
