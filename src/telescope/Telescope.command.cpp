@@ -198,7 +198,7 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       if (parameter[0] == 'N') sprintf(reply, "%i.%02i%s", firmware.version.major, firmware.version.minor, firmware.version.patch); else
       if (parameter[0] == 'P') strcpy(reply, firmware.name); else
       if (parameter[0] == 'T') strcpy(reply, firmware.time); else
-      if (parameter[0] == 'C') { sstrcpy(reply, PRODUCT_DESCRIPTION, 40); } else
+      if (parameter[0] == 'C') { strncpy(reply, PRODUCT_DESCRIPTION, 40); } else
       if (parameter[0] == 'H') strcpy(reply, PINMAP_STR); else *commandError = CE_CMD_UNKNOWN;
       *numericReply = false;
     } else
