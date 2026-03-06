@@ -41,7 +41,7 @@
 #elif defined(_mk20dx128_h_) || defined(__MK20DX128__) || \
       defined(__MK20DX256__) || defined(__MK64FX512__) || \
       defined(__MK66FX1M0__) || defined(__IMXRT1052__) || \
-      defined(__IMXRT1062__)  
+      defined(__IMXRT1062__)
   #include "HAL_TEENSY_HWTIMER.h"
 #elif defined(ESP32)
   #if ESP_ARDUINO_VERSION >= 0x30000
