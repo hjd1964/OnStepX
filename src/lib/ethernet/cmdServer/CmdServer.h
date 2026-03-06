@@ -16,8 +16,11 @@
       EthernetServer *cmdSvr;
       EthernetClient cmdSvrClient;
 
+      char cmdBuffer[40];
+      int cmdBufferPos;
+
       unsigned long clientTimeoutMs;
-      unsigned long clientEndTimeMs = 0;
+      unsigned long clientEndTimeMs;
       bool persist;
   };
 
