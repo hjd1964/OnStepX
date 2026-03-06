@@ -18,7 +18,7 @@
 // constructor
 StepDirTmc5160::StepDirTmc5160(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t intpol)
-                               :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
+                               :TmcStepDirDriverNSG(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc5160StepDir legacy, ");
   axisPrefix[5] = '0' + axisNumber;
 }

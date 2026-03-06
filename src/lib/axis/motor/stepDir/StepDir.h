@@ -47,6 +47,9 @@ class StepDirMotor : public Motor {
     // sets up the driver step/dir/enable pins
     bool init();
 
+    // revert settings to defaults
+    void useDefaults() { driver->useDefaults(); }
+
     // returns the number of parameters from the motor/driver
     uint8_t getParameterCount() { return Motor::getParameterCount() + driver->getParameterCount(); }
 
@@ -78,6 +81,12 @@ class StepDirMotor : public Motor {
     // set frequency (+/-) in steps per second negative frequencies move reverse in direction (0 stops motion)
     void setFrequencySteps(float frequency);
 
+    // sets overall maximum frequency
+    // \param frequency: rate of motion in steps (counts) per second
+    void setFrequencyMax(float frequency) {
+      driver->setFrequencyMax(frequency);
+    }
+
     // get tracking mode steps per slewing mode step
     inline int getStepsPerStepSlewing() { return driver->getMicrostepRatio(); }
 
@@ -86,6 +95,9 @@ class StepDirMotor : public Motor {
 
     // set slewing state (hint that we are about to slew or are done slewing)
     void setSlewing(bool state);
+
+    // signal that the motor load has exceeded its threshold
+    bool isStalled();
 
     // calibrate stealthChop then return to tracking mode
     void calibrateDriver() {
@@ -146,11 +158,11 @@ class StepDirMotor : public Motor {
     volatile uint8_t direction = LOW;    // current direction in use
     volatile uint32_t pulseWidth = 2000; // step/dir driver pulse width in nanoseconds
 
-    volatile int16_t stepSize = 1;       // step size during slews (for micro-step mode switching)
+    volatile int16_t stepSize = 1;       // step size during slews (for microstep mode switching)
     volatile bool takeStep = false;      // should we take a step
 
     float currentFrequency = 0.0F;       // last frequency set 
-    float lastFrequency = 0.0F;          // last frequency requested
+    float lastFrequency = 0.0F;          // last frequency requested in tracking mode microsteps per second
     unsigned long lastPeriod = 0;        // last timer period (in sub-micros)
     unsigned long lastPeriodSet = 0;     // last timer period actually set (in sub-micros)
     unsigned long switchStartTimeMs;     // log time to switch microstep mode and do ISR swap

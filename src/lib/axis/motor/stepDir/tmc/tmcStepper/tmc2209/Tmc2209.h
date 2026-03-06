@@ -10,9 +10,9 @@
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
 
 #include "../../../../Drivers.h"
-#include "../../TmcStepDirDriver.h"
+#include "../../TmcStepDirDriverSG.h"
 
-class StepDirTmc2209 : public TmcStepDirDriver {
+class StepDirTmc2209 : public TmcStepDirDriverSG {
   public:
     // constructor
     StepDirTmc2209(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol);
@@ -37,6 +37,21 @@ class StepDirTmc2209 : public TmcStepDirDriver {
 
     // secondary way to power down not using the enable pin
     bool enable(bool state);
+
+    // read the 32bit stallguard register
+    uint32_t readSgRegister() override { return (uint32_t)(driver->SG_RESULT() & 0x03FF); }
+
+    // SG only meaningful in stealthChop (not spreadCycle)
+    // and SG is only active while slewing so we assume this is representative of the state
+    bool stallGuardModeActive() const override { return decaySlewing.value == STEALTHCHOP; }
+
+    // apply normalized sensitivity percent (0..100) to the concrete chip register
+    // (e.g., 2209: SGTHRS, 2130: SGT). Called only when % changes.
+    void applySgSensitivityPercent(uint8_t pct) override {
+      uint8_t sgthrs = (uint8_t)(((int)pct * 255 + 50) / 100);
+      driver->SGTHRS(sgthrs);
+      sgAppliedReg = (int16_t)sgthrs;
+    }
 
     // calibrate the motor driver if required
     void calibrateDriver();

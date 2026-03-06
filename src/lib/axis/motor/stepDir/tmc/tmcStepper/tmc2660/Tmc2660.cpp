@@ -3,7 +3,7 @@
 
 #include "Tmc2660.h"
  
-#if defined(DRIVER_TMC_STEPPER) && defined(TMC2260_PRESENT)
+#if defined(DRIVER_TMC_STEPPER) && defined(TMC2660_PRESENT)
 
 #include "../../../../../../gpioEx/GpioEx.h"
 
@@ -14,8 +14,8 @@
 #define miso m3
 
 // constructor
-StepDirTmc2260::
-StepDirTmc2260(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
+StepDirTmc2660::
+StepDirTmc2660(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol)
                :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc2660StepDir, ");
@@ -23,7 +23,7 @@ StepDirTmc2260(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirD
 }
 
 // setup driver
-bool StepDirTmc2260::init() {
+bool StepDirTmc2660::init() {
   if (!TmcStepDirDriver::init()) return false;
 
   #ifdef DRIVER_TMC_STEPPER_HW_SPI
@@ -35,6 +35,7 @@ bool StepDirTmc2260::init() {
   driver->toff(5);
   driver->intpol(intpol.value == ON);
   modeMicrostepTracking();
+
   current(iRun);
 
   // if we can, check to see if the driver is there
@@ -55,27 +56,26 @@ bool StepDirTmc2260::init() {
   return true;
 }
 
-void StepDirTmc2260::modeMicrostepTracking() {
-  int16_t microsteps = 0;
+void StepDirTmc2660::modeMicrostepTracking() {
   driver->microsteps(normalizedMicrosteps);
 }
 
-int StepDirTmc2260::modeMicrostepSlewing() {
+int StepDirTmc2660::modeMicrostepSlewing() {
   if (microstepRatio > 1) {
     driver->microsteps(normalizedMicrostepsSlewing);
   }
   return microstepRatio;
 }
 
-void StepDirTmc2260::modeDecayTracking() {
+void StepDirTmc2660::modeDecayTracking() {
   current(iRun);
 }
 
-void StepDirTmc2260::modeDecaySlewing() {
+void StepDirTmc2660::modeDecaySlewing() {
   current(iGoto);
 }
 
-void StepDirTmc2260::readStatus() {
+void StepDirTmc2660::readStatus() {
   TMC2130_n::DRV_STATUS_t status_result;
   status_result.sr = driver->DRV_STATUS();
 
@@ -89,7 +89,7 @@ void StepDirTmc2260::readStatus() {
 }
 
 // secondary way to power down not using the enable pin
-bool StepDirTmc2260::enable(bool state) {
+bool StepDirTmc2660::enable(bool state) {
   if (state) {
     modeDecayTracking();
   } else {

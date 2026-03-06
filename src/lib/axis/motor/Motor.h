@@ -131,6 +131,9 @@ class Motor {
     // set slewing state (hint that we are about to slew or are done slewing)
     virtual void setSlewing(bool state) {}
 
+    // signal that the motor load has exceeded its threshold
+    virtual bool isStalled() { return false; }
+
     // calibrate the motor if required
     virtual void calibrate(float value) { UNUSED(value); }
 

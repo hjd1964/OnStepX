@@ -10,13 +10,13 @@
 #include <TMCStepper.h> // https://github.com/teemuatlut/TMCStepper
 
 #include "../../../../Drivers.h"
-#include "../../TmcStepDirDriver.h"
+#include "../../TmcStepDirDriverNSG.h"
 
 #if SERIAL_TMC == SoftSerial
   #include <SoftwareSerial.h> // must be built into the board libraries
 #endif
 
-class StepDirTmc2208 : public TmcStepDirDriver {
+class StepDirTmc2208 : public TmcStepDirDriverNSG {
   public:
     // constructor
     StepDirTmc2208(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol);

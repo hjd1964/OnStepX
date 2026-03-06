@@ -7,7 +7,7 @@
 
 #if !defined(DRIVER_TMC_STEPPER) && defined(TMC2209_PRESENT)
 
-#include "../../TmcStepDirDriver.h"
+#include "../../TmcStepDirDriverNSG.h"
 
 // default settings for any TMC UART drivers that may be present
 #ifndef SERIAL_TMC
@@ -34,7 +34,7 @@
 #define TMC2209_DEBUG false
 #include <TMC2209.h> // https://github.com/hjd1964/TMC2209
 
-class StepDirTmc2209 : public TmcStepDirDriver {
+class StepDirTmc2209 : public TmcStepDirDriverNSG {
   public:
     // constructor
     StepDirTmc2209(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t intpol);

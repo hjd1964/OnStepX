@@ -17,14 +17,14 @@
 StepDirTmc2130::
 StepDirTmc2130(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol)
-               :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
+               :TmcStepDirDriverSG(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc2130StepDir, ");
   axisPrefix[5] = '0' + axisNumber;
 }
 
 // setup driver
 bool StepDirTmc2130::init() {
-  if (!TmcStepDirDriver::init()) return false;
+  if (!TmcStepDirDriverSG::init()) return false;
 
   #ifdef DRIVER_TMC_STEPPER_HW_SPI
     driver = new TMC2130Stepper(Pins->cs, rSense);
@@ -37,6 +37,14 @@ bool StepDirTmc2130::init() {
   driver->en_pwm_mode(false);
 
   current(iRun, iHoldRatio);
+
+  // enable StallGuard / CoolStep speed threshold gating
+  // common "don't-care yet" value: always enable while moving
+  driver->TCOOLTHRS(0xFFFFF); // width depends on part; library handles masking
+
+  // if you are NOT using CoolStep current scaling, keep it off
+  // disable CoolStep
+  driver->semin(0);
 
   // if we can, check to see if the driver is there
   // check to see if the driver is there and ok
@@ -57,7 +65,6 @@ bool StepDirTmc2130::init() {
 }
 
 void StepDirTmc2130::modeMicrostepTracking() {
-  int16_t microsteps = 0;
   driver->microsteps(normalizedMicrosteps);
 }
 

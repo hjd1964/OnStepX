@@ -9,6 +9,8 @@
 
 #include "../convert/Convert.h"
 
+extern AxesRevert revert;
+
 bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   *suppressFrame = false;
 
@@ -29,13 +31,11 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFr
       int parameterNumber = atoi(&parameter[3]);
       if (parameterNumber < 0 || parameterNumber > getParameterCount()) { *commandError = CE_PARAM_RANGE; return true; }
 
-      uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+      // check if all axes are set to revert
+      if (revert.all) { *commandError = CE_0; return true; }
 
-      // check that all axes are not set to revert
-      if (bitRead(axesToRevert, 0) == AP_DEFAULTS) { *commandError = CE_0; return true; }
-
-      // check that this axis is not set to revert
-      if (bitRead(axesToRevert, axisNumber)) { *commandError = CE_0; return true; }
+      // check if this axis is set to revert
+      if (getAxisRevert()) { *commandError = CE_0; return true; }
 
       // requesting parameter 0 returns the parameter count
       if (parameterNumber == 0) {
@@ -110,61 +110,83 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFr
     } else return false;
   } else
 
-  // :SXA[n],R#           Revert axis/motor/driver parameters to default
-  // :SXA[n],[p],nnnn.n#  Set axis/motor/driver parameter value
-  if (command[0] == 'S' && command[1] == 'X' && parameter[0] == 'A' && parameter[2] == ',') {
-    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
+  if (command[0] == 'S' && command[1] == 'X') {
 
-    // check for a valid axisNumber
-    int index = parameter[1] - '1';
-    if (index + 1 != axisNumber) return false;
+    // :SXA[n],R#           Revert axis/motor/driver parameters to default
+    // :SXA[n],[p],nnnn.n#  Set axis/motor/driver parameter value
+    if (parameter[0] == 'A' && parameter[2] == ',') {
 
-    // check if all axes are set to revert
-    if (bitRead(axesToRevert, 0) == AP_DEFAULTS) { *commandError = CE_0; return true; }
+      // check for axis settings enable/disable
+      // :SXAC,0#   for run-time NV (EEPROM) axis settings
+      // :SXAC,1#   for compile-time Config.h axis settings
+      //            Return: 0 failure, 1 success
+      if (parameter[1] == 'C') {
+        if ((parameter[3] == '0' || parameter[3] == '1') && parameter[4] == 0) {
 
-    // check if this axis is set to revert
-    if (bitRead(axesToRevert, axisNumber)) { *commandError = CE_0; return true; }
+          if (parameter[3] == '0') {
+            VLF("MSG: Using Axes settings from NV (EEPROM)");
+            revert.all = false;
+          } else {
+            VLF("MSG: Using Axes settings from Config.h");
+            revert.all = true;
+          }
+          nv().kv().put(nvRevertKey, revert);
 
-    // :SXA[n],R# reverts this axis to defaults
-    if (parameter[3] == 'R' && parameter[4] == 0) {
-      bitSet(axesToRevert, axisNumber);
-      nv.update(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-      return true;
-    }
-
-    // :SXA[n],[p],nnn.n#  Set axis/motor/driver parameter value
-    // :SXA[n],[p],nnn.n#  :SXA1,14,12.5#
-    int parameterNumber = atoi(&parameter[3]);
-    char* valueStr = strchr(&parameter[3], ',');
-    if (valueStr == NULL) { *commandError = CE_PARAM_FORM; return true; }
-    char* conv_end;
-    double value = strtod(++valueStr, &conv_end);
-    if (&valueStr[0] == conv_end) { *commandError = CE_PARAM_FORM; return true; }
-
-    // convert to radians if necessary
-    if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD) value = degToRad(value);
-    if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD_INV) value = radToDeg(value);
-
-    if (parameterIsValid(getParameter(parameterNumber), value, true)) {
-      // save parameter values
-      getParameter(parameterNumber)->valueNv = value;
-      if (parameterNumber == 1) stepsPerMeasureValueNv = value;
-
-      // get ready to write to NV
-      AxisStoredSettings nvAxisSettings;
-      nvAxisSettings.stepsPerMeasure = stepsPerMeasureValueNv;
-      for (int i = 1; i <= getParameterCount(); i++) nvAxisSettings.value[i - 1] = getParameter(i)->valueNv;
-
-      // write the settings to NV
-      nv.updateBytes(NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize, &nvAxisSettings, sizeof(AxisStoredSettings));
-
-      // update immediate parameters now
-      AxisParameterType type = getParameter(parameterNumber)->type;
-      if (type == AXP_BOOLEAN_IMMEDIATE || type == AXP_INTEGER_IMMEDIATE || type == AXP_FLOAT_IMMEDIATE) {
-        getParameter(parameterNumber)->value = value;
+          return true;
+        } else { *commandError = CE_PARAM_RANGE; return false; }
       }
 
-    } else *commandError = CE_PARAM_RANGE;
+      // check for a valid axisNumber
+      int index = parameter[1] - '1';
+      if (index + 1 != axisNumber) return false;
+
+      // check if all axes are set to revert
+      if (revert.all) { *commandError = CE_0; return true; }
+
+      // check if this axis is set to revert
+      if (getAxisRevert()) { *commandError = CE_0; return true; }
+
+      // :SXA[n],R# reverts this axis to defaults on next boot
+      if (parameter[3] == 'R' && parameter[4] == 0) {
+        setAxisRevert(true);
+        nv().kv().put(nvRevertKey, revert);
+        return true;
+      }
+
+      // :SXA[n],[p],nnn.n#  Set axis/motor/driver parameter value
+      // :SXA[n],[p],nnn.n#  :SXA1,14,12.5#
+      int parameterNumber = atoi(&parameter[3]);
+      char* valueStr = strchr(&parameter[3], ',');
+      if (valueStr == NULL) { *commandError = CE_PARAM_FORM; return true; }
+      char* conv_end;
+      double value = strtod(++valueStr, &conv_end);
+      if (&valueStr[0] == conv_end) { *commandError = CE_PARAM_FORM; return true; }
+
+      // convert to radians if necessary
+      if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD) value = degToRad(value);
+      if (getParameter(parameterNumber)->type == AXP_FLOAT_RAD_INV) value = radToDeg(value);
+
+      if (parameterIsValid(getParameter(parameterNumber), value, true)) {
+        // save parameter values
+        getParameter(parameterNumber)->valueNv = value;
+        if (parameterNumber == 1) stepsPerMeasureValueNv = value;
+
+        // get ready to write to NV
+        AxisStoredSettings nvAxisSettings;
+        nvAxisSettings.stepsPerMeasure = stepsPerMeasureValueNv;
+        for (int i = 1; i <= getParameterCount(); i++) nvAxisSettings.value[i - 1] = getParameter(i)->valueNv;
+
+        // write the settings to NV
+        nv().kv().put(nvKey, nvAxisSettings);
+
+        // update immediate parameters now
+        AxisParameterType type = getParameter(parameterNumber)->type;
+        if (type == AXP_BOOLEAN_IMMEDIATE || type == AXP_INTEGER_IMMEDIATE || type == AXP_FLOAT_IMMEDIATE) {
+          getParameter(parameterNumber)->value = value;
+        }
+
+      } else *commandError = CE_PARAM_RANGE;
+    } else return false;
   } else return false;
 
   return true;

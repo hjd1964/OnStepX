@@ -24,14 +24,14 @@
 StepDirTmc2209::
 StepDirTmc2209(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t intpol)
-               :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
+               :TmcStepDirDriverSG(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc2209StepDir, ");
   axisPrefix[5] = '0' + axisNumber;
 }
 
 // setup driver
 bool StepDirTmc2209::init() {
-  if (!TmcStepDirDriver::init()) return false;
+  if (!TmcStepDirDriverSG::init()) return false;
 
   // get TMC UART driver address select pins ready
   pinModeEx(Pins->m0, OUTPUT);
@@ -57,6 +57,7 @@ bool StepDirTmc2209::init() {
       VF("MSG:"); V(axisPrefix);
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
         VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
+        pinModeEx(SERIAL_TMC_RX, INPUT_PULLUP);
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
       #else
         VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
@@ -80,10 +81,24 @@ bool StepDirTmc2209::init() {
     driver = new TMC2209Stepper(SerialTMC, rSense, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1));
   #endif
   driver->begin();
+
+  driver->pdn_disable(true);
+  driver->mstep_reg_select(true);
+  driver->toff(3);
+  driver->blank_time(24);
+
   driver->intpol(intpol.value == ON);
   modeMicrostepTracking();
   current(iRun, iHoldRatio);
   driver->en_spreadCycle(true);
+
+  // enable StallGuard / CoolStep speed threshold gating
+  // common "don't-care yet" value: always enable while moving
+  driver->TCOOLTHRS(0xFFFFF); // width depends on part; library handles masking
+
+  // if you are NOT using CoolStep current scaling, keep it off
+  // disable CoolStep
+  driver->semin(0);
 
   // check to see if the driver is there and ok
   #ifdef MOTOR_DRIVER_DETECT
@@ -126,10 +141,7 @@ void StepDirTmc2209::setDecayMode(int decayMode) {
 void StepDirTmc2209::readStatus() {
   TMC2208_n::DRV_STATUS_t status_result;
   status_result.sr = driver->DRV_STATUS();
-  if (driver->CRCerror) {
-    VF("WRN:"); V(axisPrefix); DLF("CRC Error detected!");
-    status_result.sr = 0xFFFFFFFF;
-  }
+  if (driver->CRCerror) { status_result.sr = 0xFFFFFFFF; }
 
   status.outputA.shortToGround  = status_result.s2ga;
   status.outputA.openLoad       = status_result.ola;

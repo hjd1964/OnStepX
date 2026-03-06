@@ -17,14 +17,14 @@
 StepDirTmc2160::
 StepDirTmc2160(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol)
-               :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
+               :TmcStepDirDriverSG(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc2160StepDir, ");
   axisPrefix[5] = '0' + axisNumber;
 }
 
 // setup driver
 bool Tmc2160StepDirDriver::init() {
-  if (!TmcStepDirDriver::init()) return false;
+  if (!TmcStepDirDriverSG::init()) return false;
 
   #ifdef TMC2160_RSENSE_KRAKEN
     if (axisNumber <= 4) rSense = TMC2160_RSENSE_KRAKEN;
@@ -40,6 +40,14 @@ bool Tmc2160StepDirDriver::init() {
   driver->en_pwm_mode(false);
 
   current(iRun, iHoldRatio);
+
+  // enable StallGuard / CoolStep speed threshold gating
+  // common "don't-care yet" value: always enable while moving
+  driver->TCOOLTHRS(0xFFFFF); // width depends on part; library handles masking
+
+  // if you are NOT using CoolStep current scaling, keep it off
+  // disable CoolStep
+  driver->semin(0);
 
   // if we can, check to see if the driver is there
   // check to see if the driver is there and ok

@@ -35,6 +35,9 @@ class StepDirDriver {
     // set up driver
     virtual bool init();
 
+    // revert settings to defaults
+    virtual void useDefaults() { return; }
+
     // returns the number of axis parameters
     virtual uint8_t getParameterCount() { return 0; }
 
@@ -72,8 +75,21 @@ class StepDirDriver {
     // default assume the driver is always enabled, i.e. no control
     virtual bool enable(bool state) { UNUSED(state); return true; }
 
+    // sets frequency corrosponding to the fastest allowed slew rate
+    // \param frequency: rate of motion in steps per second
+    void setFrequencyMax(float frequency) { velocityMax = frequency; }
+
     // calibrate the motor driver if required
     virtual void calibrateDriver() {}
+
+    // determine if this motor can detect a stall
+    virtual bool hasStallDetect() const { return false; }
+
+    // check to if the motor is stalled
+    virtual bool isStalled(float stepsPerSec) { (void)stepsPerSec; return false; }
+
+    // reset any internal stall-detect state (baseline, latch, etc.)
+    virtual void stallDetectReset() {}
 
     // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
     long getPulseWidth();
@@ -116,6 +132,8 @@ class StepDirDriver {
     int16_t microstepRatio = 1;
     int16_t microstepCode = OFF;
     int16_t microstepCodeSlewing = OFF;
+
+    float velocityMax = 1.0F; // frequency corrosponding to the fastest allowed slew rate, in microsteps/s
 
     // runtime adjustable settings
     AxisParameter invalid           = {NAN, NAN, NAN, NAN, NAN, AXP_INVALID, ""};

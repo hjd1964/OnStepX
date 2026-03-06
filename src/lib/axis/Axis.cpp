@@ -8,6 +8,8 @@
 
 #ifdef MOTOR_PRESENT
 
+AxesRevert revert = {true, false, false, false, false, false, false, false, false, false, false};
+
 Axis *axisWrapper[9];
 IRAM_ATTR void axisWrapper1() { axisWrapper[0]->poll(); }
 IRAM_ATTR void axisWrapper2() { axisWrapper[1]->poll(); }
@@ -81,9 +83,10 @@ bool Axis::init(Motor *motor) {
 
   // get default parameter values
   AxisStoredSettings nvAxisSettings;
+  nvAxisSettings.revert = true;
   nvAxisSettings.stepsPerMeasure = stepsPerMeasureDefault;
   for (int i = 1; i <= getParameterCount(); i++) {
-    #if DEBUG != OFF
+    #if DEBUG == VERBOSE
       const char* axpn[26] = {AXPN_1, AXPN_2, AXPN_3, AXPN_4, AXPN_5, AXPN_6, AXPN_7, AXPN_8, AXPN_9, AXPN_10,
       AXPN_11, AXPN_12, AXPN_13, AXPN_14, AXPN_15, AXPN_16, AXPN_17, AXPN_18, AXPN_19, AXPN_20, AXPN_21, AXPN_22,
       AXPN_23, AXPN_24, AXPN_25, AXPN_26};
@@ -110,33 +113,32 @@ bool Axis::init(Motor *motor) {
     }
   }
 
-  // check for reverting axis settings in NV
-  if (!nv.hasValidKey()) {
-    VF("MSG:"); V(axisPrefix); VLF("writing default parameters to NV");
-    uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-    bitSet(axesToRevert, axisNumber);
-    nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
+  // prepare the revert key
+  nvRevertKey = nv().kv().computeKey("AXIS_SETTINGS_REVERT");
+
+  // get the revert setting
+  if (!nv().kv().getOrInit(nvRevertKey, revert)) { DLF("WRN: init failed for AXIS_SETTINGS_REVERT"); };
+
+  // prepare the axis settings key for this axis
+  char keyStr[26];
+  snprintf(keyStr, sizeof(keyStr), "AXIS%u_SETTINGS", (unsigned)axisNumber);
+  nvKey = nv().kv().computeKey(keyStr);
+
+  // read axis settings from NV, unless we are reverting to defaults
+  if (!revert.all) {
+    if (getAxisRevert()) {
+       VF("MSG:"); V(axisPrefix); VLF("reverting settings on NV");
+       nv().kv().put(nvKey, nvAxisSettings);
+       setAxisRevert(false);
+       nv().kv().put(nvRevertKey, revert);
+     } else {
+       VF("MSG:"); V(axisPrefix); VLF("reading settings from NV");
+       if (!nv().kv().getOrInit(nvKey, nvAxisSettings)) { DF("WRN: init failed for "); DL(keyStr); }
+     }
+  } else {
+    nv().kv().del(nvKey);
+    VF("MSG:"); V(axisPrefix); VLF("revert all ignoring settings on NV");
   }
-
-  // write axis settings to NV
-  // NV_AXIS_SETTINGS_REVERT bit 0 = settings at compile (0) or run time (1), bits 1 to 9 = reset axis n on next boot
-  if (AxisStoredSettingsSize < sizeof(AxisStoredSettings)) { nv.initError = true; DF("ERR:"); D(axisPrefix); DLF("AxisStoredSettingsSize error"); return false; }
-
-  // revert this axis as needed
-  uint16_t axesToRevert = nv.readUI(NV_AXIS_SETTINGS_REVERT);
-  if (bitRead(axesToRevert, 0) == AP_DEFAULTS) bitSet(axesToRevert, axisNumber);
-
-  uint16_t nvAxisSettingsBase = NV_AXIS_SETTINGS_BASE + (axisNumber - 1)*AxisStoredSettingsSize;
-  if (bitRead(axesToRevert, axisNumber) || nv.isNull(nvAxisSettingsBase, sizeof(AxisStoredSettings))) {
-    VF("MSG:"); V(axisPrefix); VLF("reverting parameters to Config.h defaults");
-    nv.updateBytes(nvAxisSettingsBase, &nvAxisSettings, sizeof(AxisStoredSettings));
-  }
-
-  bitClear(axesToRevert, axisNumber);
-  nv.write(NV_AXIS_SETTINGS_REVERT, axesToRevert);
-
-  // read axis settings from NV
-  nv.readBytes(nvAxisSettingsBase, &nvAxisSettings, sizeof(AxisStoredSettings));
 
   // move NV stepsPerMeasure into parameter (special case of using a double)
   stepsPerMeasureValue = nvAxisSettings.stepsPerMeasure;
@@ -717,6 +719,8 @@ void Axis::setMotionLimitsCheck(bool state) {
 bool Axis::motionError(Direction direction) {
   bool result = false;
 
+  if (motor->isStalled()) return true;
+
   if (direction == DIR_FORWARD || direction == DIR_BOTH) {
     result = getInstrumentCoordinateSteps() > lroundf(0.9F*INT32_MAX) ||
              (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() > maxMeasure->value + 1.0F/stepsPerMeasureValue) ||
@@ -739,6 +743,23 @@ bool Axis::motionError(Direction direction) {
 bool Axis::motionErrorSensed(Direction direction) {
   if ((direction == DIR_REVERSE || direction == DIR_BOTH) && errors.minLimitSensed) return true; else
   if ((direction == DIR_FORWARD || direction == DIR_BOTH) && errors.maxLimitSensed) return true; else return false;
+}
+
+void Axis::setAxisRevert(bool state) {
+  switch (axisNumber) {
+    case 1: revert.axis1 = state; break; case 2: revert.axis2 = state; break; case 3: revert.axis3 = state; break;
+    case 4: revert.axis4 = state; break; case 5: revert.axis5 = state; break; case 6: revert.axis6 = state; break;
+    case 7: revert.axis7 = state; break; case 8: revert.axis8 = state; break; case 9: revert.axis9 = state; break;
+  }
+}
+
+bool Axis::getAxisRevert() {
+  switch (axisNumber) {
+    case 1: return revert.axis1; case 2: return revert.axis2; case 3: return revert.axis3;
+    case 4: return revert.axis4; case 5: return revert.axis5; case 6: return revert.axis6;
+    case 7: return revert.axis7; case 8: return revert.axis8; case 9: return revert.axis9;
+    default: return false;
+  }
 }
 
 #endif

@@ -32,12 +32,6 @@ class TmcStepDirDriver : public StepDirDriver {
     // set up driver
     virtual bool init();
 
-    // returns the number of axis parameters
-    uint8_t getParameterCount() { return numParameters; }
-
-    // returns the specified axis parameter
-    AxisParameter* getParameter(uint8_t number) { if (number > numParameters) return &invalid; else return parameter[number]; }
-
     // check if axis parameter is valid
     bool parameterIsValid(AxisParameter* parameter, bool next = false);
 
@@ -53,9 +47,6 @@ class TmcStepDirDriver : public StepDirDriver {
     AxisParameter currentRun     = {NAN, NAN, NAN, 0, 20000, AXP_INTEGER, AXPN_CURRENT_RUN};
     AxisParameter currentSlewing = {NAN, NAN, NAN, 0, 20000, AXP_INTEGER, AXPN_CURRENT_GOTO};
     AxisParameter intpol         = {NAN, NAN, NAN, -2, -1, AXP_BOOLEAN, AXPN_INTERPOLATE};
-
-    const int numParameters = 8;
-    AxisParameter* parameter[9] = {&invalid, &microsteps, &microstepsSlewing, &currentHold, &currentRun, &currentSlewing, &decay, &decaySlewing, &intpol};
 };
 
 #endif

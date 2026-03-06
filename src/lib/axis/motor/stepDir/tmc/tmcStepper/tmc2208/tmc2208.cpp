@@ -45,6 +45,7 @@ bool StepDirTmc2208::init() {
       VF("MSG:"); V(axisPrefix);
       #if defined(SERIAL_TMC_RX) && defined(SERIAL_TMC_TX) && !defined(SERIAL_TMC_RXTX_SET)
         VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
+        pinModeEx(SERIAL_TMC_RX, INPUT_PULLUP);
         SerialTMC.begin(SERIAL_TMC_BAUD, SERIAL_8N1, SERIAL_TMC_RX, SERIAL_TMC_TX);
       #else
         VF("HW UART driver pins on port default"); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
@@ -54,6 +55,7 @@ bool StepDirTmc2208::init() {
     }
   #else
     VF("SW UART driver pins rx="); V(Pins->rx); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
+    pinModeEx(Pins->rx, INPUT_PULLUP);
     SerialTMC = new SoftwareSerial(Pins->rx, Pins->tx);
     SerialTMC->begin(SERIAL_TMC_BAUD);
   #endif

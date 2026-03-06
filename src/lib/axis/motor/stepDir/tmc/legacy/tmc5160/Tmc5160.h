@@ -8,9 +8,9 @@
 #if !defined(DRIVER_TMC_STEPPER) && defined(TMC5160_PRESENT)
 
 #include "../TmcSPI.h"
-#include "../../TmcStepDirDriver.h"
+#include "../../TmcStepDirDriverNSG.h"
 
-class StepDirTmc5160 : public TmcStepDirDriver {
+class StepDirTmc5160 : public TmcStepDirDriverNSG {
   public:
     // constructor
     StepDirTmc5160(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings, int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t  intpol);

@@ -18,7 +18,7 @@
 // constructor
 StepDirTmc2209::StepDirTmc2209(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                                int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t intpol)
-                               :TmcStepDirDriver(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
+                               :TmcStepDirDriverNSG(axisNumber, Pins, Settings, currentHold, currentRun, currentSlewing, intpol) {
   strcpy(axisPrefix, " Axis_Tmc2209StepDir legacy, ");
   axisPrefix[5] = '0' + axisNumber;
 }
@@ -51,6 +51,7 @@ bool StepDirTmc2209::init() {
 
     VF("MSG:"); V(axisPrefix);
     VF("HW UART driver pins rx="); V(SERIAL_TMC_RX); VF(", tx="); V(SERIAL_TMC_TX); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
+    pinModeEx(SERIAL_TMC_RX, INPUT_PULLUP);
     #if SERIAL_TMC_INVERT == ON
       driver->setup(SERIAL_TMC, SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), SERIAL_TMC_RX, SERIAL_TMC_TX, true);
     #else
@@ -67,6 +68,7 @@ bool StepDirTmc2209::init() {
     #endif
     VF("MSG:"); V(axisPrefix);
     VF("SW UART driver pins rx="); V(rxPin); VF(", tx="); V(Pins->tx); VF(", baud="); V(SERIAL_TMC_BAUD); VLF(" bps");
+    pinModeEx(rxPin, INPUT_PULLUP);
     driver->setup(SERIAL_TMC_BAUD, SERIAL_TMC_ADDRESS_MAP(axisNumber - 1), rxPin, Pins->tx);
   #endif
 

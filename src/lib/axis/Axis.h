@@ -12,18 +12,6 @@
 #define AXIS_HARDWARE_TIMER_BASE 1
 #endif
 
-// default location of settings in NV
-#ifndef NV_AXIS_SETTINGS_REVERT
-#define NV_AXIS_SETTINGS_REVERT 100 // bytes: 2   , addr:  100.. 101
-#endif
-#ifndef NV_AXIS_SETTINGS_BASE
-#define NV_AXIS_SETTINGS_BASE 102 // bytes: 25  , addr:  102.. 224 (for 9 axes)
-#endif
-
-// axis parameter source
-#define AP_DEFAULTS 0
-#define AP_RUNTIME 1
-
 // polling frequency for monitoring axis motion (default 100X/second)
 #ifndef FRACTIONAL_SEC
 #define FRACTIONAL_SEC 100.0F
@@ -49,6 +37,22 @@
 #include "motor/kTech/KTech.h"
 
 #pragma pack(1)
+
+typedef struct AxesRevert
+{
+  uint16_t all      : 1;
+  uint16_t axis1    : 1;
+  uint16_t axis2    : 1;
+  uint16_t axis3    : 1;
+  uint16_t axis4    : 1;
+  uint16_t axis5    : 1;
+  uint16_t axis6    : 1;
+  uint16_t axis7    : 1;
+  uint16_t axis8    : 1;
+  uint16_t axis9    : 1;
+  uint16_t reserved : 5;
+} AxesRevert;
+
 typedef struct AxisLimits
 {
   float min; // unit (radians, microns, etc.) depends on axis settings
@@ -63,11 +67,12 @@ typedef struct AxisSettings
 } AxisSettings;
 
 // axis parameters
-#define MOTOR_PARAMETER_MAX_COUNT 17
+#define MOTOR_PARAMETER_MAX_COUNT 20
 
-#define AxisStoredSettingsSize 76
+#define AxisStoredSettingsSize 89
 typedef struct AxisStoredSettings
 {
+  bool revert;
   double stepsPerMeasure; // unit (radians, microns, etc.) depends on axis settings
   float value[MOTOR_PARAMETER_MAX_COUNT];
 } AxisStoredSettings;
@@ -449,6 +454,10 @@ private:
   // nearest the instrument coordinate
   double unwrapNearest(double value);
 
+  // get or set the axis revert flags
+  void setAxisRevert(bool state);
+  bool getAxisRevert();
+
   AxisErrors errors;
   bool lastErrorResult = false;
 
@@ -519,6 +528,8 @@ private:
   const AxisPins *pins;
 
   void (*volatile callback)() = NULL;
+
+  uint16_t nvKey, nvRevertKey;
 
   AxisParameter stepsPerDegree = {NAN, NAN, NAN, 1.0, 360000.0, AXP_FLOAT, AXPN_STEPS_PER_DEG};
   AxisParameter minDegrees     = {NAN, NAN, NAN, -360.0, 360.0, AXP_FLOAT, AXPN_LIMIT_DEGS_MIN};

@@ -335,6 +335,13 @@ void StepDirMotor::setSlewing(bool state) {
   if (state == true) driver->modeDecaySlewing(); else driver->modeDecayTracking();
 }
 
+bool StepDirMotor::isStalled() {
+  if (!ready || !enabled || !driver) return false;
+  if (!driver->hasStallDetect()) return false;
+//  if (microstepModeControl != MMC_SLEWING) return false;
+  return driver->isStalled(step >= 0 ? lastFrequency : -lastFrequency);
+}
+
 // swaps in/out fast unidirectional ISR for slewing 
 bool StepDirMotor::enableMoveFast(const bool fast) {
   if (fast) {
@@ -354,6 +361,10 @@ bool StepDirMotor::enableMoveFast(const bool fast) {
 
 // gard local guarantee: stop the step generator and force STEP inactive.
 void StepDirMotor::stopStepTimerAndClearPulse() {
+
+  // clear any previously latched stall state now that we're "stopped"
+  if (driver->hasStallDetect()) driver->stallDetectReset();
+  
   // already stopped?
   if (lastPeriod == 0 && lastPeriodSet == 0 && step == 0 && !takeStep) {
     digitalWriteF(Pins->step, stepClr);
