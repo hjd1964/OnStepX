@@ -36,7 +36,7 @@ KTechMotor::KTechMotor(uint8_t axisNumber, int8_t reverse, const KTechDriverSett
 
   driverType = ODRIVER;
 
-  strcpy(axisPrefix, " Axis_KTech, ");
+  strcpy(axisPrefix, " Axis_KTech, ";
   axisPrefix[5] = '0' + axisNumber;
 
   // the motor CAN ID is the axis number!
