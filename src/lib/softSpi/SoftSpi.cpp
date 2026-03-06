@@ -27,7 +27,7 @@ void SoftSpi::begin() {
   delayMicroseconds(1);
   pinMode(sck, OUTPUT);
   digitalWriteF(sck, HIGH);
-  pinModeEx(miso, INPUT);
+  pinModeEx(miso, INPUT_PULLUP);
   pinMode(mosi, OUTPUT);
   delayMicroseconds(1);
   digitalWriteEx(cs, LOW);
