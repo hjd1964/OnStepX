@@ -29,10 +29,12 @@ enum TrackingState: uint8_t    {TS_NONE, TS_SIDEREAL};
 
 #pragma pack(1)
 #define MountSettingsSize 9
+
 typedef struct Backlash {
   float axis1;
   float axis2;
 } Backlash;
+
 typedef struct MountSettings {
   RateCompensation rc;
   Backlash backlash;

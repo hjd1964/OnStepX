@@ -66,14 +66,14 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *suppres
     // :rI#       Get rotator mInimum position (in degrees)
     //            Returns: n#
     if (command[1] == 'I') {
-      sprintf(reply,"%ld",(long)round(axis3.getLimitMin()));
+      sprintf(reply, "%ld",(long)round(axis3.getLimitMin()));
       *numericReply = false;
     } else
 
     // :rM#       Get rotator Max position (in degrees)
     //            Returns: n#
     if (command[1] == 'M') {
-      sprintf(reply,"%ld",(long)round(axis3.getLimitMax()));
+      sprintf(reply, "%ld",(long)round(axis3.getLimitMax()));
       *numericReply = false;
     } else
 
@@ -87,7 +87,7 @@ bool Rotator::command(char *reply, char *command, char *parameter, bool *suppres
     // :rb#       Get rotator Backlash amount (in steps)
     //            Return: n#
     if (command[1] == 'b' && parameter[0] == 0) {
-      sprintf(reply,"%ld",(long)round(getBacklash()));
+      sprintf(reply, "%ld",(long)round(getBacklash()));
       *numericReply = false;
     } else
 

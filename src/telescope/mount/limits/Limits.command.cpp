@@ -19,7 +19,7 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *suppress
     // :Gh#       Get Horizon Limit, the minimum elevation of the mount relative to the horizon
     //            Returns: sDD*#
     if (command[1] == 'h' && parameter[0] == 0) {
-      sprintf(reply,"%+02ld*", lroundf(radToDegF(settings.altitude.min)));
+      sprintf(reply, "%+02ld*", lroundf(radToDegF(settings.altitude.min)));
       *numericReply = false;
     } else
 
@@ -27,7 +27,7 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *suppress
     //            Returns: DD*#
     //            The highest elevation above the horizon that the telescope will goto
     if (command[1] == 'o' && parameter[0] == 0) {
-      sprintf(reply,"%02ld*", lroundf(radToDegF(settings.altitude.max)));
+      sprintf(reply, "%02ld*", lroundf(radToDegF(settings.altitude.max)));
       *numericReply=false;
     } else
 

@@ -95,6 +95,7 @@ class Transform {
     #if ALIGN_MAX_NUM_STARS > 1  
       GeoAlign align;
     #endif
+
     int8_t mountType = MOUNT_SUBTYPE;
     bool meridianFlips;
  

@@ -195,7 +195,7 @@ void Convert::doubleToHms(char *reply, double value, bool signPresent, Precision
 
   // setup formatting, handle adding the sign
   if (signPresent) {
-    if (value < 0) { value = -value; strcpy(sign,"-"); } else strcpy(sign,"+");
+    if (value < 0) { value = -value; strcpy(sign, "-"); } else strcpy(sign, "+");
   }
   
   // round to 0.00005 second or 0.5 second, depending on precision mode
@@ -231,7 +231,7 @@ void Convert::doubleToDms(char *reply, double value, bool fullRange, bool signPr
 
   // setup formatting, handle adding the sign
   if (signPresent) {
-    if (value < 0) { value = -value; strcpy(sign,"-"); } else strcpy(sign,"+");
+    if (value < 0) { value = -value; strcpy(sign, "-"); } else strcpy(sign, "+");
   }
 
   // round to 0.0005 arc-second or 0.5 arc-second, depending on precision mode

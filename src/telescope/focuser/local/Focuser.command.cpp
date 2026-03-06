@@ -16,7 +16,7 @@ extern Axis *axes[6];
 // numericReply=true means boolean/numeric-style responses (e.g., CE_1/CE_0/errors) rather than a payload
 bool Focuser::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   if (!ready) return false;
-  
+
   static int index = 0;
 
   // process any focuser axis commands
