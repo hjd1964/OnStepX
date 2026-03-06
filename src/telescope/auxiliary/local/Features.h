@@ -105,7 +105,7 @@ public:
       };
     #endif
     uint8_t momentarySwitchTime[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    uint16_t lastValue[8] = {
+    int16_t lastValue[8] = {
       FEATURE1_VALUE_DEFAULT, FEATURE2_VALUE_DEFAULT, FEATURE3_VALUE_DEFAULT, FEATURE4_VALUE_DEFAULT,
       FEATURE5_VALUE_DEFAULT, FEATURE6_VALUE_DEFAULT, FEATURE7_VALUE_DEFAULT, FEATURE8_VALUE_DEFAULT
     };

@@ -31,14 +31,14 @@ void Intervalometer::poll() {
 
     // start a new exposure
     pressed = P_EXP_DONE;
-    expDone = millis() + (unsigned long)(expTime*1000.0); // set exposure time in ms
+    expDone = millis() + (unsigned long)(settings.expTime*1000.0); // set exposure time in ms
   } else 
 
   // wait until exposure is done
   if (pressed == P_EXP_DONE && (long)(millis() - expDone) > 0) {
     // finish an exposure
     pressed = P_WAIT;
-    waitDone = millis() + (unsigned long)(expDelay*1000.0); // set wait time in ms
+    waitDone = millis() + (unsigned long)(settings.expDelay*1000.0); // set wait time in ms
   } else
 
   // wait until pause between exposures is done
@@ -49,7 +49,7 @@ void Intervalometer::poll() {
 }
 
 float Intervalometer::getExposure() {
-  return expTime;
+  return settings.expTime;
 }
 
 void Intervalometer::setExposure(float t) {
@@ -60,7 +60,7 @@ void Intervalometer::setExposure(float t) {
 }
 
 float Intervalometer::getDelay() {
-  return expDelay;
+  return settings.expDelay;
 }
 
 void Intervalometer::setDelay(float t) {
@@ -92,7 +92,7 @@ bool Intervalometer::isEnabled() {
 void Intervalometer::enable(bool state) {
   enabled = state;
   if (enabled) {
-    thisCount = expCount;
+    thisCount = settings.expCount;
     pressed = P_EXP_START;
   } else {
     thisCount = 0;

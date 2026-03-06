@@ -45,7 +45,7 @@ bool Features::init() {
           device[i].purpose == DEW_HEATER) {
 
         char keyStr[26];
-        snprintf(keyStr, "FEATURE%u_VALUE", i);
+        snprintf(keyStr, sizeof(keyStr), "FEATURE%u_VALUE", i);
         nvKey[i] = nv().kv().computeKey(keyStr);
 
         if (!nv().kv().getOrInit(nvKey[i], device[i].value)) { DF("WRN: Nv, init failed for "); VL(keyStr); }

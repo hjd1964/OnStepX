@@ -20,7 +20,7 @@ typedef struct FeatureIntervalometerSettings {
 
 class Intervalometer {
   public:
-    void init(int index);
+    void init(uint8_t index);
 
     void poll();
 
