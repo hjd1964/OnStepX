@@ -441,8 +441,8 @@ void ServoMotor::poll() {
     lastCheckTime = now;
   }
 
-  #if DEBUG != OFF && defined(DEBUG_SERVO) && DEBUG_SERVO != OFF
-    if (axisNumber == DEBUG_SERVO) {
+  #if DEBUG != OFF && defined(DEBUG_AXIS) && DEBUG_AXIS != OFF
+    if (axisNumber == DEBUG_AXIS) {
       static uint16_t count = 0;
       count++;
       if (count % 10 == 0) {
