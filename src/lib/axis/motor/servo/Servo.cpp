@@ -446,7 +446,7 @@ void ServoMotor::poll() {
       static uint16_t count = 0;
       count++;
       if (count % 10 == 0) {
-        char s[800];
+        char s[256];
 
         float spas = 0;
         if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
