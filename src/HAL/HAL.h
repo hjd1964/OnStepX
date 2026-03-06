@@ -51,7 +51,7 @@
 #elif defined(ARDUINO_ARCH_SAMD)
   // ARDUINO M0
   #define MCU_STR "ARDUINO M0"
-  #include "HAL_ZERO.h"
+  #include "arduinoM0/ArduinoM0.h"
 
 #elif defined(ESP32) && ESP_ARDUINO_VERSION >= 0x30000
   // ESP32 w/libraries 3.x
