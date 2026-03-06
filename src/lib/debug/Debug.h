@@ -24,8 +24,8 @@
     #define DL(x)    SERIAL_DEBUG.println(x)
     #define DLF(x)   SERIAL_DEBUG.println(F(x))
   #endif
-  #define D1(x) { static long t = 0; if (millis() > t + 1000L) { D(x); t = millis(); } }
-  #define DL1(x) { static long t = 0; if (millis() > t + 1000L) { DL(x); t = millis(); } }
+  #define D1(x) { static uint32_t t = 0; if (millis() > t + 1000UL) { D(x); t = millis(); } }
+  #define DL1(x) { static uint32_t t = 0; if (millis() > t + 1000UL) { DL(x); t = millis(); } }
 #else
   #define D(x)
   #define DF(x)
@@ -37,6 +37,7 @@
 
 #if (defined(VERBOSE) && DEBUG == VERBOSE) || (defined(REMOTE) && DEBUG == REMOTE)
   #define V(x)       D(x)
+  #define V1(x)      D1(x)
   #define VF(x)      DF(x)
   #define VL(x)      DL(x)
   #define VL1(x)     DL1(x)
