@@ -18,6 +18,7 @@ extern volatile unsigned long fracLAST;
 
 #if DEBUG != OFF
   void Transform::print(Coordinate *coord) {
+    UNUSED(coord);
     VF("(a="); V(radToDeg(coord->a)); VF(", z="); V(radToDeg(coord->z));
     VF("), (r="); V(radToDeg(coord->r)); VF(", h="); V(radToDeg(coord->h)); VF(", d="); V(radToDeg(coord->d));
     VF("), pierSide="); VL(coord->pierSide);

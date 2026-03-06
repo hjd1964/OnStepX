@@ -225,7 +225,7 @@ CommandError Rotator::unpark() {
   if (settings.parkState == PS_PARK_FAILED) return CE_PARK_FAILED;
 
   // setting write delay to 0 disables on-the-fly position writes and forces strict parking
-  if (ROTATOR_WRITE_DELAY == 0) {
+  if (writeDelay == 0) {
     if (settings.parkState != PS_PARKED) return CE_NOT_PARKED;
   }
 
@@ -259,7 +259,7 @@ CommandError Rotator::unpark() {
 void Rotator::monitor() {
   secs++;
 
-  if (axis3.isSlewing() || settings.position == axis3.getInstrumentCoordinate()) writeTime = secs + ROTATOR_WRITE_DELAY;
+  if (axis3.isSlewing() || settings.position == axis3.getInstrumentCoordinate()) writeTime = secs + writeDelay;
 
   if (!axis3.isSlewing()) {
 
@@ -303,7 +303,7 @@ void Rotator::monitor() {
       }
 
       // delayed write of rotator position
-      if (ROTATOR_WRITE_DELAY != 0) {
+      if (writeDelay != 0) {
         if (secs > writeTime) {
           settings.position = axis3.getInstrumentCoordinate();
           nv().kv().put(nvKey, settings);

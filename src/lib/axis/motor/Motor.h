@@ -129,7 +129,7 @@ class Motor {
     int getSequencerSteps() { return 1; };
 
     // set slewing state (hint that we are about to slew or are done slewing)
-    virtual void setSlewing(bool state) {}
+    virtual void setSlewing(bool state) { UNUSED(state); }
 
     // signal that the motor load has exceeded its threshold
     virtual bool isStalled() { return false; }
