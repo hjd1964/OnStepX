@@ -13,7 +13,6 @@ typedef struct GregorianDate {
   uint8_t  month;
   uint8_t  day;
   double   hour;
-  bool     valid;
 } GregorianDate;
 
 #define JulianDateSize 16
