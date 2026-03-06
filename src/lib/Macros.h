@@ -27,7 +27,26 @@
 #define strequ(str1, str2) (strlen(str1) != strlen(str2) ? 0 : strstr(str1, str2))
 
 // safe string copy from (char*)source to (char *)dest for a destination array of size bytes 
-#define sstrcpy(dest, source, size) for (int i = 0; source[i] && i < size - 1; i++) { dest[i] = source[i]; dest[i + 1] = 0; }
+#define sstrcpy(dest, source) do {                                     \
+  int16_t _cap = sizeof(dest);                                         \
+  if (_cap) {                                                          \
+    int16_t _i = 0;                                                    \
+    for (; _i + 1 < _cap && (source)[_i]; ++_i) {                      \
+      (dest)[_i] = (source)[_i];                                       \
+    }                                                                  \
+    (dest)[_i] = '\0';                                                 \
+  }                                                                    \
+} while (0)
+
+#define sstrcpyex(dest, source, cap) do {                              \
+  if (cap) {                                                           \
+    int16_t _i = 0;                                                    \
+    for (; _i + 1 < cap && (source)[_i]; ++_i) {                       \
+      (dest)[_i] = (source)[_i];                                       \
+    }                                                                  \
+    (dest)[_i] = '\0';                                                 \
+  }                                                                    \
+} while (0)
 
 // convert string to lower case
 #define strtolower(source) for (int i = 0; source[i]; i++) source[i] = tolower(source[i])
