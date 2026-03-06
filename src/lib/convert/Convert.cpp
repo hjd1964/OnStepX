@@ -4,11 +4,6 @@
 #include "../../Common.h"
 #include "Convert.h"
 
-void strncpyex(char *result, const char *source, size_t length) {
-  strncpy(result, source, length);
-  result[length - 1] = 0;
-}
-
 #if defined(ARDUINO_ARDUINO_NANO33BLE) || \
     defined(__TEENSYDUINO__) || \
     defined(ARDUINO_ARCH_SAMD) || \

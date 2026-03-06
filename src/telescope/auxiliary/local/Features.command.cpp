@@ -45,19 +45,19 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
 
       char s[255];
       if (device[i].purpose == SWITCH || device[i].purpose == MOMENTARY_SWITCH || device[i].purpose == COVER_SWITCH) {
-        sprintf(s, "%d", device[i].value);
+        snprintf(s, sizeof(s), "%d", device[i].value);
         strcat(reply, s);
         strCatPower(reply, i);
       } else
 
       if (device[i].purpose == ANALOG_OUTPUT) {
-        sprintf(s, "%d", device[i].value);
+        snprintf(s, sizeof(s), "%d", device[i].value);
         strcat(reply, s);
         strCatPower(reply, i);
       } else
 
       if (device[i].purpose == DEW_HEATER) {
-        sprintf(s, "%d", (int)device[i].dewHeater->isEnabled());
+        snprintf(s, sizeof(s), "%d", (int)device[i].dewHeater->isEnabled());
         strcat(reply, s);
         strcat(reply, ",");
 
@@ -77,7 +77,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
       } else
 
       if (device[i].purpose == INTERVALOMETER) {
-        sprintf(s, "%d", (int)device[i].intervalometer->getCurrentCount());
+        snprintf(s, sizeof(s), "%d", (int)device[i].intervalometer->getCurrentCount());
         strcat(reply, s);
         strcat(reply, ",");
 
@@ -95,7 +95,7 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
         strcat(reply, s);
         strcat(reply, ",");
 
-        sprintf(s, "%d", (int)device[i].intervalometer->getCount());
+        snprintf(s, sizeof(s), "%d", (int)device[i].intervalometer->getCount());
         strcat(reply, s);
       } else { *commandError = CE_CMD_UNKNOWN; return true; }
 
@@ -122,14 +122,14 @@ bool Features::command(char *reply, char *command, char *parameter, bool *suppre
       if (device[i].purpose == OFF) { *commandError = CE_0; return true; }
 
       char s[255];
-      strcpy(s, device[i].name);
+      sstrcpy(s, device[i].name);
       if (strlen(s) > 10) s[10] = 0;
       strcpy(reply, s);
       strcat(reply, ",");
 
       int p = device[i].purpose;
       if (p == MOMENTARY_SWITCH || p == COVER_SWITCH) p = SWITCH;
-      sprintf(s, "%d", p);
+      snprintf(s, sizeof(s), "%d", p);
       strcat(reply, s);
 
       *numericReply = false;

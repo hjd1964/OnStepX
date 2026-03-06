@@ -102,7 +102,7 @@ bool WifiManager::init() {
       VLF("MSG: WiFi, started");
 
       #if MDNS_SERVER == ON && !defined(ESP8266)
-        sstrcpy(name, MDNS_NAME, 32);
+        sstrcpy(name, MDNS_NAME);
         strtohostname2(name);
         if (MDNS.begin(name)) { VF("MSG: WiFi, mDNS started for "); VL(name); } else { DF("WRN: WiFi, mDNS start FAILED for "); DL(name); }
       #endif

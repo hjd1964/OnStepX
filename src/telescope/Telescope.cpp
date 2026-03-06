@@ -115,13 +115,13 @@ Telescope::Telescope() {
 }
 
 void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *fwPatch, int fwConfig) {
-  strcpy(firmware.name, fwName);
+  sstrcpy(firmware.name, fwName);
   firmware.version.major = fwMajor;
   firmware.version.minor = fwMinor;
-  strcpy(firmware.version.patch, fwPatch);
+  sstrcpy(firmware.version.patch, fwPatch);
   firmware.version.config = fwConfig;
-  strcpy(firmware.date, __DATE__);
-  strcpy(firmware.time, __TIME__);
+  sstrcpy(firmware.date, __DATE__);
+  sstrcpy(firmware.time, __TIME__);
 
   if (!nv.isKeyValid(INIT_NV_KEY)) {
     if (!nv.initError) {

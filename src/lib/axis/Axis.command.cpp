@@ -17,12 +17,11 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFr
     // :GXA[n],[p]# Get axis/motor/driver parameter
     //              Returns: Value
     if (parameter[0] == 'A' && parameter[1] >= '1' && parameter[1] <= '9' && parameter[2] == ',') {
-
       if (parameter[1] - '0' != axisNumber) return false;
 
       // return motor/driver name
       if (parameter[3] == 'M' && parameter[4] == 0) {
-        strcpy(reply, motor->name());
+        strncpy(reply, motor->name(), 40);
         *numericReply = false;
         return true;
       }

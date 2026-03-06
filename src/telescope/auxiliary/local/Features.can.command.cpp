@@ -67,7 +67,7 @@ void Features::processCommand() {
 
       char name10[10];
       memset(name10, 0, sizeof(name10));
-      strncpy(name10, device[idx].name, 10);
+      sstrcpy(name10, device[idx].name);
 
       const uint8_t n = (uint8_t)strnlen(name10, 10);
       if (n > 0) writeBytes((const uint8_t*)name10, n);
