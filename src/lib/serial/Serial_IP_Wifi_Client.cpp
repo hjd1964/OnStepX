@@ -57,6 +57,7 @@
   }
 
   bool IPSerialClient::isConnected() {
+    lastActivityTimeMs = millis();
     if (WiFi.status() == WL_CONNECTED) {
       if (!cmdSvrClient.connected()) {
         cmdSvrClient.stop();
