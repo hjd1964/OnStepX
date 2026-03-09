@@ -732,22 +732,6 @@ When power monitoring is compiled in, the local ASCII implementation appends:
 
 Where flags are a five-character string using `P`, `C`, `U`, `V`, `T` or `!`.
 
-## CAN Remote-Node Variants
-
-The following files implement the same logical command families over packed CAN messages rather than the ASCII LX200-style transport:
-
-- `src/telescope/focuser/local/Focuser.can.command.cpp`
-- `src/telescope/rotator/local/Rotator.can.command.cpp`
-- `src/telescope/auxiliary/local/Features.can.command.cpp`
-
-These are not separate end-user command names. They are binary transport implementations of the same focuser, rotator, and auxiliary-feature command sets above.
-
-Notable transport differences:
-
-- CAN replies are binary-packed, not ASCII text.
-- `:GXY0#` for CAN features returns a single bitmask byte rather than an eight-character ASCII bitmap.
-- CAN focuser/rotator driver-status replies are packed bitfields rather than comma-separated text flags.
-
 ## Axis / Motor / Driver Service Commands
 
 Axis service commands are implemented by `Axis.command.cpp`. For the main telescope/mount build these are reachable for axis 1 and axis 2, if present. The rotator exposes axis3, if present. The focuser(s) expose any of axis 4 to axis 9, if present.
@@ -831,6 +815,22 @@ Locale-backed axis parameter name tokens currently used by firmware:
 | `$24` | Max accel, %/s/s |
 | `$25` | Min power, % |
 | `$26` | Max power, % |
+
+## CAN Remote-Node Variants
+
+The following files implement the same logical command families over packed CAN messages rather than the ASCII LX200-style transport:
+
+- `src/telescope/focuser/local/Focuser.can.command.cpp`
+- `src/telescope/rotator/local/Rotator.can.command.cpp`
+- `src/telescope/auxiliary/local/Features.can.command.cpp`
+
+These are not separate end-user command names. They are binary transport implementations of the same focuser, rotator, and auxiliary-feature command sets above.
+
+Notable transport differences:
+
+- CAN replies are binary-packed, not ASCII text.
+- `:GXY0#` for CAN features returns a single bitmask byte rather than an eight-character ASCII bitmap.
+- CAN focuser/rotator driver-status replies are packed bitfields rather than comma-separated text flags.
 
 ## Source Coverage
 
