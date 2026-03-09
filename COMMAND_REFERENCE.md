@@ -587,6 +587,38 @@ Where:
 - `min` and `max` are the documented range
 - `type` is the internal axis parameter type code
 - `name` is the parameter name from the axis parameter table
+- some `name` values are locale tokens such as `$1` or `$12` rather than literal English labels
+
+Locale-backed axis parameter name tokens currently used by firmware:
+
+| Token | Meaning |
+| --- | --- |
+| `$1` | Steps/degree |
+| `$2` | Min limit, degs |
+| `$3` | Max limit, degs |
+| `$4` | Steps/um |
+| `$5` | Min limit, um |
+| `$6` | Max limit, um |
+| `$7` | Reverse |
+| `$8` | Microsteps |
+| `$9` | Microsteps Goto |
+| `$10` | Decay mode |
+| `$11` | Decay mode Goto |
+| `$12` | mA Hold |
+| `$13` | mA Run |
+| `$14` | mA Goto |
+| `$15` | 256x Interpolate |
+| `$16` | P tracking |
+| `$17` | I tracking |
+| `$18` | D tracking |
+| `$19` | P slewing |
+| `$20` | I slewing |
+| `$21` | D slewing |
+| `$22` | Rads/count |
+| `$23` | Steps/count ratio |
+| `$24` | Max accel, %/s/s |
+| `$25` | Min power, % |
+| `$26` | Max power, % |
 
 ### `:GXUa#` Driver Status Flags
 
