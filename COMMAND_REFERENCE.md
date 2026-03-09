@@ -750,7 +750,7 @@ Notable transport differences:
 
 ## Axis / Motor / Driver Service Commands
 
-Axis service commands are implemented by `Axis.command.cpp`. For the main telescope build these are reachable for axis 1 and axis 2. Additional local subsystem builds may expose the same patterns on other axes.
+Axis service commands are implemented by `Axis.command.cpp`. For the main telescope/mount build these are reachable for axis 1 and axis 2, if present. The telescope/rotator exposes axis3, if present. The focuser(s) expose any of axis 4 to axis 9, if present.
 
 | Command | Reply | Description |
 | --- | --- | --- |
