@@ -559,67 +559,6 @@ PEC status characters from `:$QZ?#`:
 | `R` | Recording |
 | `.` | Index detected this second |
 
-## Axis / Motor / Driver Service Commands
-
-Axis service commands are implemented by `Axis.command.cpp`. For the main telescope build these are reachable for axis 1 and axis 2. Additional local subsystem builds may expose the same patterns on other axes.
-
-| Command | Reply | Description |
-| --- | --- | --- |
-| `:GXAa,p#` | `value,min,max,type,name#` | Get axis parameter `p` for axis `a` (`1..9`) |
-| `:GXAa,M#` | `name#` | Motor/driver name for axis `a` |
-| `:GXAa,0#` | `n#` | Parameter count for axis `a` |
-| `:GXSa#` | `delta,velocity#` | Servo-only delta and velocity for axis `a` |
-| `:GXUa#` | `flags#` | Stepper driver status for axis `a` |
-| `:SXAC,0#` | `0/1` | Use runtime NV axis settings |
-| `:SXAC,1#` | `0/1` | Use compile-time `Config.h` axis settings |
-| `:SXAa,R#` | `0/1` | Revert axis `a` settings to defaults on next boot |
-| `:SXAa,p,value#` | `0/1` | Set axis parameter `p` for axis `a` |
-
-### `:GXAa,p#` Reply Format
-
-The reply is:
-
-`value,min,max,type,name#`
-
-Where:
-
-- `value` is the current NV value
-- `min` and `max` are the documented range
-- `type` is the internal axis parameter type code
-- `name` is the parameter name from the axis parameter table
-- some `name` values are locale tokens such as `$1` or `$12` rather than literal English labels
-
-Locale-backed axis parameter name tokens currently used by firmware:
-
-| Token | Meaning |
-| --- | --- |
-| `$1` | Steps/degree |
-| `$2` | Min limit, degs |
-| `$3` | Max limit, degs |
-| `$4` | Steps/um |
-| `$5` | Min limit, um |
-| `$6` | Max limit, um |
-| `$7` | Reverse |
-| `$8` | Microsteps |
-| `$9` | Microsteps Goto |
-| `$10` | Decay mode |
-| `$11` | Decay mode Goto |
-| `$12` | mA Hold |
-| `$13` | mA Run |
-| `$14` | mA Goto |
-| `$15` | 256x Interpolate |
-| `$16` | P tracking |
-| `$17` | I tracking |
-| `$18` | D tracking |
-| `$19` | P slewing |
-| `$20` | I slewing |
-| `$21` | D slewing |
-| `$22` | Rads/count |
-| `$23` | Steps/count ratio |
-| `$24` | Max accel, %/s/s |
-| `$25` | Min power, % |
-| `$26` | Max power, % |
-
 ### `:GXUa#` Driver Status Flags
 
 Local ASCII replies are comma-separated flag mnemonics:
@@ -808,6 +747,89 @@ Notable transport differences:
 - CAN replies are binary-packed, not ASCII text.
 - `:GXY0#` for CAN features returns a single bitmask byte rather than an eight-character ASCII bitmap.
 - CAN focuser/rotator driver-status replies are packed bitfields rather than comma-separated text flags.
+
+## Axis / Motor / Driver Service Commands
+
+Axis service commands are implemented by `Axis.command.cpp`. For the main telescope build these are reachable for axis 1 and axis 2. Additional local subsystem builds may expose the same patterns on other axes.
+
+| Command | Reply | Description |
+| --- | --- | --- |
+| `:GXAa,p#` | `value,min,max,type,name#` | Get axis parameter `p` for axis `a` (`1..9`) |
+| `:GXAa,M#` | `name#` | Motor/driver name for axis `a` |
+| `:GXAa,0#` | `n#` | Parameter count for axis `a` |
+| `:GXSa#` | `delta,velocity#` | Servo-only delta and velocity for axis `a` |
+| `:GXUa#` | `flags#` | Stepper driver status for axis `a` |
+| `:SXAC,0#` | `0/1` | Use runtime NV axis settings |
+| `:SXAC,1#` | `0/1` | Use compile-time `Config.h` axis settings |
+| `:SXAa,R#` | `0/1` | Revert axis `a` settings to defaults on next boot |
+| `:SXAa,p,value#` | `0/1` | Set axis parameter `p` for axis `a` |
+
+### `:GXAa,p#` Reply Format
+
+The reply is:
+
+`value,min,max,type,name#`
+
+Where:
+
+- `value` is the current NV value
+- `min` and `max` are the documented range
+- `type` is the axis parameter type code returned by firmware
+- `name` is the parameter name from the axis parameter table
+- some `name` values are locale tokens such as `$1` or `$12` rather than literal English labels
+
+Axis parameter type codes:
+
+| Code | Symbol | Meaning |
+| --- | --- | --- |
+| `0` | `AXP_INVALID` | Invalid / placeholder entry |
+| `1` | `AXP_BOOLEAN` | Boolean value stored in NV and applied on restart/reinit |
+| `2` | `AXP_BOOLEAN_IMMEDIATE` | Boolean value applied immediately when set |
+| `3` | `AXP_INTEGER` | Integer value stored in NV and applied on restart/reinit |
+| `4` | `AXP_INTEGER_IMMEDIATE` | Integer value applied immediately when set |
+| `5` | `AXP_FLOAT` | Floating-point value stored in NV and reported as a plain numeric field |
+| `6` | `AXP_FLOAT_IMMEDIATE` | Floating-point value applied immediately when set |
+| `7` | `AXP_FLOAT_RAD` | Angular float stored internally in radians |
+| `8` | `AXP_FLOAT_RAD_INV` | Inverse angular float stored internally with radian/degree conversion |
+| `9` | `AXP_POW2` | Power-of-two constrained integer-like value |
+| `10` | `AXP_DECAY` | Driver decay-mode selector |
+
+Protocol note:
+
+- `:GXAa,p#` normalizes `AXP_FLOAT_RAD` and `AXP_FLOAT_RAD_INV` to reply type code `5` and converts the value/range to degree-based units for transport.
+- Axis parameter values are float-backed in firmware; values are always float even when the logical type is boolean or integer so the UI can show the appropriate controls.
+- Boolean parameters: some use logical `0`/`1`, while others use the firmware constants `OFF = -1` and `ON = -2`; so any UI can show 'True'/'False' or 'On'/'Off'.
+
+Locale-backed axis parameter name tokens currently used by firmware:
+
+| Token | Meaning |
+| --- | --- |
+| `$1` | Steps/degree |
+| `$2` | Min limit, degs |
+| `$3` | Max limit, degs |
+| `$4` | Steps/um |
+| `$5` | Min limit, um |
+| `$6` | Max limit, um |
+| `$7` | Reverse |
+| `$8` | Microsteps |
+| `$9` | Microsteps Goto |
+| `$10` | Decay mode |
+| `$11` | Decay mode Goto |
+| `$12` | mA Hold |
+| `$13` | mA Run |
+| `$14` | mA Goto |
+| `$15` | 256x Interpolate |
+| `$16` | P tracking |
+| `$17` | I tracking |
+| `$18` | D tracking |
+| `$19` | P slewing |
+| `$20` | I slewing |
+| `$21` | D slewing |
+| `$22` | Rads/count |
+| `$23` | Steps/count ratio |
+| `$24` | Max accel, %/s/s |
+| `$25` | Min power, % |
+| `$26` | Max power, % |
 
 ## Source Coverage
 
