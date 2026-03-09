@@ -750,7 +750,7 @@ Notable transport differences:
 
 ## Axis / Motor / Driver Service Commands
 
-Axis service commands are implemented by `Axis.command.cpp`. For the main telescope/mount build these are reachable for axis 1 and axis 2, if present. The telescope/rotator exposes axis3, if present. The focuser(s) expose any of axis 4 to axis 9, if present.
+Axis service commands are implemented by `Axis.command.cpp`. For the main telescope/mount build these are reachable for axis 1 and axis 2, if present. The rotator exposes axis3, if present. The focuser(s) expose any of axis 4 to axis 9, if present.
 
 | Command | Reply | Description |
 | --- | --- | --- |
@@ -799,6 +799,7 @@ Protocol note:
 - `:GXAa,p#` normalizes `AXP_FLOAT_RAD` and `AXP_FLOAT_RAD_INV` to reply type code `5` and converts the value/range to degree-based units for transport.
 - Axis parameter values are float-backed in firmware; values are always float even when the logical type is boolean or integer so the UI can show the appropriate controls.
 - Boolean parameters: some use logical `0`/`1`, while others use the firmware constants `OFF = -1` and `ON = -2`; so any UI can show 'True'/'False' or 'On'/'Off'.
+- For `AXP_DECAY`, the UI shows the matching decay-mode text for the numeric value `1=MIXED`, `2=FAST`, `3=SLOW`, `4=SPREADCYCLE`, `5=STEALTHCHOP`.
 
 Locale-backed axis parameter name tokens currently used by firmware:
 
