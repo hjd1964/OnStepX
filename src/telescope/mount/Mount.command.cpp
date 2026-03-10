@@ -265,7 +265,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
           // allow sws to control sync mode
           case '3': syncFromOnStepToEncoders = false; break;
 
-          // set and sync encoder Axis1 and Axis2 values
+          // set and sync from encoder Axis1 and Axis2 values
           case '4': {
             d = strtod(&parameter[3], &conv_end);
             if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; }
