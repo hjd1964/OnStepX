@@ -363,9 +363,9 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
       if (settings.rc == RC_REFRACTION) settings.rc = RC_REFRACTION_DUAL; else
       if (settings.rc == RC_MODEL) settings.rc = RC_MODEL_DUAL;
     } else
-    if (command[1] == 'S') { settings.rc = RC_NONE; trackingRate = hzToSidereal(SOLAR_RATE_HZ); } else
-    if (command[1] == 'K') { settings.rc = RC_NONE; trackingRate = hzToSidereal(KING_RATE_HZ); } else
-    if (command[1] == 'L') { settings.rc = RC_NONE; trackingRate = hzToSidereal(LUNAR_RATE_HZ); } else
+    if (command[1] == 'S') { trackingRate = hzToSidereal(SOLAR_RATE_HZ); } else
+    if (command[1] == 'K') { trackingRate = hzToSidereal(KING_RATE_HZ); } else
+    if (command[1] == 'L') { trackingRate = hzToSidereal(LUNAR_RATE_HZ); } else
     if (command[1] == 'Q') { trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); } else
     if (command[1] == '+') { site.setSiderealPeriod(site.getSiderealPeriod() - hzToSubMicros(0.02F)); } else
     if (command[1] == '-') { site.setSiderealPeriod(site.getSiderealPeriod() + hzToSubMicros(0.02F)); } else
@@ -390,7 +390,6 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
 
     if (*commandError == CE_NONE) {
       switch (command[1]) { case 'S': case 'K': case 'L': case 'Q': case '+': case '-': case 'R': *numericReply = false; }
-      switch (command[1]) { case 'o': case 'r': case 'n': trackingRate = hzToSidereal(SIDEREAL_RATE_HZ); }
       nv().kv().put(nvKey, settings);
       update();
     }
