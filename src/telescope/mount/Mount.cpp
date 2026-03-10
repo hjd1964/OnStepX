@@ -382,9 +382,10 @@ void Mount::poll() {
 
   Coordinate ahead = current;
   Coordinate behind = current;
+  double trackingRange = DiffRange*trackingRate;
   Y;
-  ahead.h += DiffRange;
-  behind.h -= DiffRange;
+  ahead.h += trackingRange;
+  behind.h -= trackingRange;
 
   // create horizon coordinates that would exist ahead and behind the current position
   if (transform.mountType == ALTAZM) { transform.equToHor(&ahead); transform.equToHor(&behind); Y; } else
