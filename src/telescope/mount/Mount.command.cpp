@@ -237,19 +237,19 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
 
         switch (parameter[1]) {
 
-          // set encoder Axis1 value
+          // stage encoder Axis1 value (depreciated)
           case '0':
             d = strtod(&parameter[3], &conv_end);
             if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; *commandError = CE_PARAM_RANGE; }
           break;
 
-          // set encoder Axis2 value
+          // stage encoder Axis2 value (depreciated)
           case '1':
             d = strtod(&parameter[3], &conv_end);
             if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis2 = degToRad(d); } else { encoderAxis2 = NAN; *commandError = CE_PARAM_RANGE; }
           break;
 
-          // sync from encoder values
+          // sync from encoder values (depreciated)
           case '2':
             if (parameter[3] == '1' && parameter[4] == 0) {
               #if GOTO_FEATURE == ON
