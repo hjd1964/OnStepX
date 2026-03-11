@@ -247,9 +247,6 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
-#ifdef AXIS1_SYNC_THRESHOLD_DEGREES                               // maximum sync delta in degrees
-#define AXIS1_SYNC_THRESHOLD AXIS1_SYNC_THRESHOLD_DEGREES
-#endif
 #ifndef AXIS1_SYNC_THRESHOLD
 #define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
 #endif
@@ -422,9 +419,6 @@
 #endif
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
-#endif
-#ifdef AXIS2_SYNC_THRESHOLD_DEGREES                               // maximum sync delta in degrees
-#define AXIS2_SYNC_THRESHOLD AXIS2_SYNC_THRESHOLD_DEGREES
 #endif
 #ifndef AXIS2_SYNC_THRESHOLD
 #define AXIS2_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
