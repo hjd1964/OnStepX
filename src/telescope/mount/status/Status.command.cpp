@@ -89,7 +89,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
       reply[i++]='0' + guide.settings.pulseRateSelect;                             // Provide pulse-guide rate
       reply[i++]='0' + guide.settings.axis1RateSelect;                             // Provide guide rate
 
-      reply[i++]='0' + limits.errorCode();                                         // Provide general error code
+      reply[i++]='0' + mountStatus.errorCode();                                    // Provide general error code
       reply[i++]=0;
 
       *numericReply = false;
@@ -146,7 +146,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
       reply[5] = (int)park.state|0b10000000;                                       // Park state: 0 not parked, 1 parking in-progress, 2 parked, 3 park failed
       reply[6] = (int)guide.settings.pulseRateSelect|0b10000000;                   // Pulse-guide selection
       reply[7] = (int)guide.settings.axis1RateSelect|0b10000000;                   // Guide selection
-      reply[8] = limits.errorCode()|0b10000000;                                    // General error
+      reply[8] = mountStatus.errorCode()|0b10000000;                               // General error
       reply[9] = 0;
       *numericReply = false;
     } else
