@@ -49,6 +49,109 @@
   }                                                                    \
 } while (0)
 
+// safe string append from (char*)source to (char*)dest for a destination array of size bytes
+#define sstrcat(dest, source) do {                                     \
+  int16_t _cap = sizeof(dest);                                         \
+  if (_cap) {                                                          \
+    int16_t _i = 0;                                                    \
+    while (_i < _cap && (dest)[_i]) ++_i;                              \
+    if (_i >= _cap) {                                                  \
+      (dest)[_cap - 1] = '\0';                                         \
+    } else {                                                           \
+      int16_t _j = 0;                                                  \
+      for (; _i + 1 < _cap && (source)[_j]; ++_i, ++_j) {              \
+        (dest)[_i] = (source)[_j];                                     \
+      }                                                                \
+      (dest)[_i] = '\0';                                               \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
+#define sstrcatex(dest, source, cap) do {                              \
+  int16_t _cap = (cap);                                                \
+  if (_cap) {                                                          \
+    int16_t _i = 0;                                                    \
+    while (_i < _cap && (dest)[_i]) ++_i;                              \
+    if (_i >= _cap) {                                                  \
+      (dest)[_cap - 1] = '\0';                                         \
+    } else {                                                           \
+      int16_t _j = 0;                                                  \
+      for (; _i + 1 < _cap && (source)[_j]; ++_i, ++_j) {              \
+        (dest)[_i] = (source)[_j];                                     \
+      }                                                                \
+      (dest)[_i] = '\0';                                               \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
+// safe single-character append for a destination array of size bytes
+#define sstrcatc(dest, value) do {                                     \
+  int16_t _cap = sizeof(dest);                                         \
+  if (_cap) {                                                          \
+    int16_t _i = 0;                                                    \
+    while (_i < _cap && (dest)[_i]) ++_i;                              \
+    if (_i >= _cap) {                                                  \
+      (dest)[_cap - 1] = '\0';                                         \
+    } else if (_i + 1 < _cap) {                                        \
+      (dest)[_i] = (value);                                            \
+      (dest)[_i + 1] = '\0';                                           \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
+#define sstrcatcex(dest, value, cap) do {                              \
+  int16_t _cap = (cap);                                                \
+  if (_cap) {                                                          \
+    int16_t _i = 0;                                                    \
+    while (_i < _cap && (dest)[_i]) ++_i;                              \
+    if (_i >= _cap) {                                                  \
+      (dest)[_cap - 1] = '\0';                                         \
+    } else if (_i + 1 < _cap) {                                        \
+      (dest)[_i] = (value);                                            \
+      (dest)[_i + 1] = '\0';                                           \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
+// truncate a string so there is room for reserve bytes plus the null terminator
+#define sstrreserve(dest, reserve) do {                                \
+  int16_t _cap = sizeof(dest);                                         \
+  int16_t _reserve = (reserve);                                        \
+  if (_cap) {                                                          \
+    if (_reserve >= _cap) {                                            \
+      (dest)[0] = '\0';                                                \
+    } else {                                                           \
+      int16_t _max = _cap - _reserve - 1;                              \
+      int16_t _i = 0;                                                  \
+      while (_i < _cap && (dest)[_i]) ++_i;                            \
+      if (_i >= _cap) {                                                \
+        (dest)[_cap - 1] = '\0';                                       \
+        _i = _cap - 1;                                                 \
+      }                                                                \
+      if (_i > _max) (dest)[_max] = '\0';                              \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
+#define sstrreserveex(dest, reserve, cap) do {                         \
+  int16_t _cap = (cap);                                                \
+  int16_t _reserve = (reserve);                                        \
+  if (_cap) {                                                          \
+    if (_reserve >= _cap) {                                            \
+      (dest)[0] = '\0';                                                \
+    } else {                                                           \
+      int16_t _max = _cap - _reserve - 1;                              \
+      int16_t _i = 0;                                                  \
+      while (_i < _cap && (dest)[_i]) ++_i;                            \
+      if (_i >= _cap) {                                                \
+        (dest)[_cap - 1] = '\0';                                       \
+        _i = _cap - 1;                                                 \
+      }                                                                \
+      if (_i > _max) (dest)[_max] = '\0';                              \
+    }                                                                  \
+  }                                                                    \
+} while (0)
+
 // convert string to lower case
 #define strtolower(source) for (int i = 0; source[i]; i++) source[i] = tolower(source[i])
 
