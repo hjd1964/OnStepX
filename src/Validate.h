@@ -522,6 +522,10 @@
   #error "Configuration (Config.h): Setting PIER_SIDE_SYNC_CHANGE_SIDES unknown, use OFF or ON."
 #endif
 
+#if (AXIS1_SYNC_THRESHOLD != OFF || AXIS2_SYNC_THRESHOLD != OFF) && PIER_SIDE_SYNC_CHANGE_SIDES == ON
+  #error "Configuration (Config.h): Enabling AXIS1_SYNC_THRESHOLD or AXIS2_SYNC_THRESHOLD requires PIER_SIDE_SYNC_CHANGE_SIDES to be OFF."
+#endif
+
 #if PIER_SIDE_PREFERRED_DEFAULT < PIER_SIDE_FIRST && PIER_SIDE_PREFERRED_DEFAULT > PIER_SIDE_LAST
   #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_DEFAULT unknown, use EAST or WEST or BEST or AUTOMATIC."
 #endif
