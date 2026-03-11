@@ -159,7 +159,7 @@ void EthernetManager::writeSettings() {
 
   #ifdef NV_ETHERNET_SETTINGS
     VLF("MSG: Ethernet, writing settings to NV");
-    nv().kv().set("ETHERNET_SETTINGS", settings);
+    nv().kv().put("ETHERNET_SETTINGS", settings);
 
     for (int i = 1; i <= EthernetStationCount; i++) {
       char keyStr[24];
