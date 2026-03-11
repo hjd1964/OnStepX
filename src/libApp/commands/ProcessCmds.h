@@ -21,7 +21,7 @@ class CommandProcessor {
 
   private:
     void logErrors(char *cmd, char *param, char *reply, CommandError e);
-    void appendChecksum(char *s);
+    void appendChecksum(char *s, size_t capacity);
 
     CommandError commandError      = CE_NONE;
     CommandError lastCommandError  = CE_NONE;

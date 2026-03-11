@@ -116,6 +116,7 @@ void CommandProcessor::poll() {
 
   if (buffer.ready()) {
     char reply[80] = "";
+    constexpr size_t replyCapacity = sizeof(reply);
     bool numericReply = true;
     bool suppressFrame = false;
 
@@ -127,11 +128,15 @@ void CommandProcessor::poll() {
     }
     if (strlen(reply) > 0 || buffer.checksum) {
       if (buffer.checksum) {
-        appendChecksum(reply);
-        strcat(reply, buffer.getSeq());
+        sstrreserveex(reply, 4, replyCapacity);
+        appendChecksum(reply, replyCapacity);
+        sstrcatcex(reply, buffer.getSeq()[0], replyCapacity);
         suppressFrame = false;
       }
-      if (!suppressFrame) strcat(reply,"#");
+      if (!suppressFrame) {
+        sstrreserveex(reply, 1, replyCapacity);
+        sstrcatcex(reply, '#', replyCapacity);
+      }
       SerialPort.write(reply);
     }
 
@@ -222,11 +227,11 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   return CE_CMD_UNKNOWN;
 }
 
-void CommandProcessor::appendChecksum(char *s) {
+void CommandProcessor::appendChecksum(char *s, size_t capacity) {
   char HEXS[3] = "";
   uint8_t cks = 0; for (unsigned int cksCount0 = 0; cksCount0 < strlen(s); cksCount0++) { cks += s[cksCount0]; }
   snprintf(HEXS, sizeof(HEXS), "%02X", cks);
-  strcat(s, HEXS);
+  sstrcatex(s, HEXS, capacity);
 }
 
 void commandChannelInit() {

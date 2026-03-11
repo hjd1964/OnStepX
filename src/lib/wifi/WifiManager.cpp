@@ -110,7 +110,7 @@ bool WifiManager::init() {
       if (staNameLookup && strlen(wifiManager.sta->host) > 0) {
         IPAddress ip;
         char name[32] = "";
-        strcpy(name, wifiManager.sta->host);
+        sstrcpy(name, wifiManager.sta->host);
         strtohostname(name);
 
         if (WiFi.hostByName(name, ip)) {
