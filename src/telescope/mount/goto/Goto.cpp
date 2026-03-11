@@ -61,7 +61,7 @@ void Goto::init() {
   axis1.setFrequencyMax(((1000000.0F/usPerStepBase)/axis1.getStepsPerMeasure())*2.0F);
   axis2.setFrequencyMax(((1000000.0F/usPerStepBase)/axis2.getStepsPerMeasure())*2.0F);
 
-  if (AXIS1_SYNC_THRESHOLD != OFF || AXIS2_SYNC_THRESHOLD != OFF) absoluteEncodersPresent = true;
+  absoluteEncodersPresent = axis1.motor->hasAbsoluteEncoder() || axis2.motor->hasAbsoluteEncoder();
   if (AXIS1_HOME_TOLERANCE != 0.0F || AXIS2_HOME_TOLERANCE != 0.0F ||
       AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || absoluteEncodersPresent) encodersPresent = true;
 
@@ -216,9 +216,15 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
   double a1, a2;
   transform.mountToInstrument(&target, &a1, &a2);
+  a1 += target.a1Correction;
 
-  axis1.setInstrumentCoordinate(a1 + target.a1Correction);
-  axis2.setInstrumentCoordinate(a2);
+  e = limits.validateInstrumentCoordinate(1, a1);
+  if (e != CE_NONE) return e;
+  e = limits.validateInstrumentCoordinate(2, a2);
+  if (e != CE_NONE) return e;
+  e = limits.setInstrumentCoordinate(1, a1, true);
+  if (e == CE_NONE) e = limits.setInstrumentCoordinate(2, a2, true);
+  if (e != CE_NONE) return e;
 
   limits.enabled(true);
   mount.syncFromOnStepToEncoders = true;

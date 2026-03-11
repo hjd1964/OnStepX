@@ -99,6 +99,8 @@ class ODriveMotor : public Motor {
     // sets motor enable on/off (if possible)
     void enable(bool value);
 
+    bool hasAbsoluteEncoder() const override { return ODRIVE_ABSOLUTE == ON; }
+
     // set instrument coordinate, in steps
     void setInstrumentCoordinateSteps(long value);
 

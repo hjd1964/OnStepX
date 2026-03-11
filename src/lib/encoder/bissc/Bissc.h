@@ -49,6 +49,8 @@
       // get device ready for use
       bool init();
 
+      bool isAbsolute() const override { return true; }
+
       // set encoder origin
       void setOrigin(int32_t counts);
 

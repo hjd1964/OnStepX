@@ -136,6 +136,9 @@ class Encoder {
     // get device ready for use
     virtual bool init();
 
+    // true when this encoder can report absolute position after boot
+    virtual bool isAbsolute() const { return false; }
+
     // set encoder origin
     virtual void setOrigin(int32_t counts) { origin = counts; }
 

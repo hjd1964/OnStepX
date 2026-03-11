@@ -47,7 +47,7 @@ class Home {
     void requestDone();
 
     // reset mount at home
-    CommandError reset(bool fullReset = true);
+    CommandError reset(bool fullReset = true, bool authoritative = false);
 
     // get the home position (Mount coordinate system)
     Coordinate getPosition(CoordReturn coordReturn = CR_MOUNT_EQU);

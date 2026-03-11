@@ -72,7 +72,7 @@
       ServoKTech driver9(9, &DriverSettingsAxis9, AXIS9_MOTOR_STEPS_PER_MICRON/AXIS9_STEPS_PER_MICRON);
     #endif
 
-    ServoMotor motor_9(9, AXIS9_REVERSE, ((ServoDriver*)&driver9), &filterAxis9, &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &feedbackAxis9, &servoControlAxis9, AXIS9_SYNC_THRESHOLD);
+    ServoMotor motor_9(9, AXIS9_REVERSE, ((ServoDriver*)&driver9), &filterAxis9, &encAxis9, AXIS9_ENCODER_ORIGIN, AXIS9_ENCODER_REVERSE == ON, &feedbackAxis9, &servoControlAxis9);
 
   #elif defined(AXIS9_STEP_DIR_PRESENT)
     const StepDirDriverPins DriverPinsAxis9 = {AXIS9_M0_PIN, AXIS9_M1_PIN, AXIS9_M2_PIN, AXIS9_M2_ON_STATE, AXIS9_M3_PIN, AXIS9_DECAY_PIN, AXIS9_FAULT_PIN};

@@ -72,7 +72,7 @@
       ServoKTech driver5(5, &DriverSettingsAxis5, AXIS5_MOTOR_STEPS_PER_MICRON/AXIS5_STEPS_PER_MICRON);
     #endif
 
-    ServoMotor motor_5(5, AXIS5_REVERSE, ((ServoDriver*)&driver5), &filterAxis5, &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &feedbackAxis5, &servoControlAxis5, AXIS5_SYNC_THRESHOLD);
+    ServoMotor motor_5(5, AXIS5_REVERSE, ((ServoDriver*)&driver5), &filterAxis5, &encAxis5, AXIS5_ENCODER_ORIGIN, AXIS5_ENCODER_REVERSE == ON, &feedbackAxis5, &servoControlAxis5);
 
   #elif defined(AXIS5_STEP_DIR_PRESENT)
     const StepDirDriverPins DriverPinsAxis5 = {AXIS5_M0_PIN, AXIS5_M1_PIN, AXIS5_M2_PIN, AXIS5_M2_ON_STATE, AXIS5_M3_PIN, AXIS5_DECAY_PIN, AXIS5_FAULT_PIN};

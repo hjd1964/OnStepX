@@ -247,11 +247,11 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
-#ifdef AXIS1_SYNC_THRESHOLD_DEGREES                               // maximum distance from absolute encoder pos in degrees for syncs
-#define AXIS1_SYNC_THRESHOLD lround(AXIS1_SYNC_THRESHOLD_DEGREES*AXIS1_STEPS_PER_DEGREE)
+#ifdef AXIS1_SYNC_THRESHOLD_DEGREES                               // maximum sync delta in degrees
+#define AXIS1_SYNC_THRESHOLD AXIS1_SYNC_THRESHOLD_DEGREES
 #endif
 #ifndef AXIS1_SYNC_THRESHOLD
-#define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in counts (required for absolute encoders) or OFF
+#define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
 #endif
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
@@ -423,11 +423,11 @@
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
-#ifdef AXIS2_SYNC_THRESHOLD_DEGREES
-#define AXIS2_SYNC_THRESHOLD lround(AXIS2_SYNC_THRESHOLD_DEGREES*AXIS2_STEPS_PER_DEGREE)
+#ifdef AXIS2_SYNC_THRESHOLD_DEGREES                               // maximum sync delta in degrees
+#define AXIS2_SYNC_THRESHOLD AXIS2_SYNC_THRESHOLD_DEGREES
 #endif
 #ifndef AXIS2_SYNC_THRESHOLD
-#define AXIS2_SYNC_THRESHOLD          OFF
+#define AXIS2_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
@@ -935,9 +935,6 @@
 #ifndef AXIS3_LIMIT_MAX
 #define AXIS3_LIMIT_MAX               180                         // in degrees
 #endif
-#ifndef AXIS3_SYNC_THRESHOLD
-#define AXIS3_SYNC_THRESHOLD          OFF
-#endif
 #ifndef AXIS3_SENSE_HOME
 #define AXIS3_SENSE_HOME              OFF
 #endif
@@ -1121,9 +1118,6 @@
 #ifndef AXIS4_LIMIT_MAX
 #define AXIS4_LIMIT_MAX               50                          // in mm
 #endif
-#ifndef AXIS4_SYNC_THRESHOLD
-#define AXIS4_SYNC_THRESHOLD          OFF
-#endif
 #ifndef AXIS4_HOME_DEFAULT
 #define AXIS4_HOME_DEFAULT            MIDDLE                      // use MINIMUM (zero), MIDDLE (half travel), MAXIMUM (full travel), or a position in microns
 #endif
@@ -1287,9 +1281,6 @@
 #endif
 #ifndef AXIS5_LIMIT_MAX
 #define AXIS5_LIMIT_MAX               50
-#endif
-#ifndef AXIS5_SYNC_THRESHOLD
-#define AXIS5_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS5_HOME_DEFAULT
 #define AXIS5_HOME_DEFAULT            MIDDLE
@@ -1464,9 +1455,6 @@
 #ifndef AXIS6_LIMIT_MAX
 #define AXIS6_LIMIT_MAX               50
 #endif
-#ifndef AXIS6_SYNC_THRESHOLD
-#define AXIS6_SYNC_THRESHOLD          OFF
-#endif
 #ifndef AXIS6_HOME_DEFAULT
 #define AXIS6_HOME_DEFAULT            MIDDLE
 #endif
@@ -1631,9 +1619,6 @@
 #ifndef AXIS7_LIMIT_MAX
 #define AXIS7_LIMIT_MAX               50
 #endif
-#ifndef AXIS7_SYNC_THRESHOLD
-#define AXIS7_SYNC_THRESHOLD          OFF
-#endif
 #ifndef AXIS7_HOME_DEFAULT
 #define AXIS7_HOME_DEFAULT            MIDDLE
 #endif
@@ -1796,9 +1781,6 @@
 #endif
 #ifndef AXIS8_LIMIT_MAX
 #define AXIS8_LIMIT_MAX               50
-#endif
-#ifndef AXIS8_SYNC_THRESHOLD
-#define AXIS8_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS8_HOME_DEFAULT
 #define AXIS8_HOME_DEFAULT            MIDDLE
@@ -1963,9 +1945,6 @@
 #endif
 #ifndef AXIS9_LIMIT_MAX
 #define AXIS9_LIMIT_MAX               50
-#endif
-#ifndef AXIS9_SYNC_THRESHOLD
-#define AXIS9_SYNC_THRESHOLD          OFF
 #endif
 #ifndef AXIS9_HOME_DEFAULT
 #define AXIS9_HOME_DEFAULT            MIDDLE

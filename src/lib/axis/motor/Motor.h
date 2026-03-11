@@ -149,6 +149,9 @@ class Motor {
     // set origin of absolute encoders
     virtual void encoderSetOrigin(uint32_t origin) { UNUSED(origin); }
 
+    // true when this motor has an absolute position source after boot
+    virtual bool hasAbsoluteEncoder() const { return false; }
+
     // get the motor name
     virtual const char* name() { return NULL; }
 

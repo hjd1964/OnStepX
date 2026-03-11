@@ -69,7 +69,7 @@ namespace {
     ServoKTech driver3(3, &DriverSettingsAxis3, AXIS3_MOTOR_STEPS_PER_DEGREE/AXIS3_STEPS_PER_DEGREE);
   #endif
 
-  ServoMotor motor_3(3, AXIS3_REVERSE, ((ServoDriver*)&driver3), &filterAxis3, &encAxis3, AXIS3_ENCODER_ORIGIN, AXIS3_ENCODER_REVERSE == ON, &feedbackAxis3, &servoControlAxis3, AXIS3_SYNC_THRESHOLD);
+  ServoMotor motor_3(3, AXIS3_REVERSE, ((ServoDriver*)&driver3), &filterAxis3, &encAxis3, AXIS3_ENCODER_ORIGIN, AXIS3_ENCODER_REVERSE == ON, &feedbackAxis3, &servoControlAxis3);
 
 #elif defined(AXIS3_STEP_DIR_PRESENT)
   const StepDirDriverPins DriverPinsAxis3 = {AXIS3_M0_PIN, AXIS3_M1_PIN, AXIS3_M2_PIN, AXIS3_M2_ON_STATE, AXIS3_M3_PIN, AXIS3_DECAY_PIN, AXIS3_FAULT_PIN};

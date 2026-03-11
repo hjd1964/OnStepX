@@ -24,7 +24,7 @@ ServoMotor::ServoMotor(uint8_t axisNumber, int8_t reverse,
                        ServoDriver *Driver, Filter *filter,
                        Encoder *encoder, uint32_t encoderOrigin, bool encoderReverse,
                        Feedback *feedback, ServoControl *control,
-                       long syncThreshold, bool useFastHardwareTimers)
+                       bool useFastHardwareTimers)
                        :Motor(axisNumber, reverse) {
   if (axisNumber < 1 || axisNumber > 9) return;
 
@@ -37,7 +37,6 @@ ServoMotor::ServoMotor(uint8_t axisNumber, int8_t reverse,
   this->encoder = encoder;
   this->feedback = feedback;
   this->control = control;
-  this->syncThreshold = syncThreshold;
 
   if (axisNumber > 2) useFastHardwareTimers = false;
   this->useFastHardwareTimers = useFastHardwareTimers;
@@ -161,7 +160,7 @@ void ServoMotor::resetPositionSteps(long value) {
   if (!ready) return;
 
   Motor::resetPositionSteps(value);
-  if (syncThreshold == OFF) {
+  if (!encoder->isAbsolute()) {
     encoder->write(value);
   } else {
     VF("MSG:"); V(axisPrefix); VL("absolute encoder ignored reset position");
@@ -177,23 +176,13 @@ long ServoMotor::getInstrumentCoordinateSteps() {
 
 // set instrument coordinate, in steps
 void ServoMotor::setInstrumentCoordinateSteps(long value) {
+  bool startupOriginState = indexSteps == 0 && motorSteps == 0 && targetSteps == 0 && backlashSteps == 0;
+
   noInterrupts();
-  long i = value - motorSteps;
+  indexSteps = value - motorSteps;
   interrupts();
 
-  bool atHome = indexSteps == 0 && motorSteps == 0 && targetSteps == 0 && backlashSteps == 0;
-
-  if (syncThreshold == OFF || atHome) {
-    indexSteps = i;
-    originIndexSteps = i;
-    if (atHome) homeSet = true;
-  } else {
-    if (abs(originIndexSteps - i) < syncThreshold) {
-      indexSteps = i;
-    } else {
-      VF("MSG:"); V(axisPrefix); VL("absolute encoder ignored sync exceeds threshold");
-    }
-  }
+  if (encoder->isAbsolute() && startupOriginState) homeSet = true;
 }
 
 // distance to target in steps (+/-)
@@ -299,7 +288,7 @@ void ServoMotor::poll() {
   if (encoderReverse) encoderCounts = -encoderCounts;
 
   // for absolute encoders initialize the motor position at startup
-  if (syncThreshold != OFF) {
+  if (encoder->isAbsolute()) {
     if (!motorStepsInitDone && homeSet) {
       noInterrupts();
       motorSteps = encoderCounts;

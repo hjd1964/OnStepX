@@ -183,45 +183,64 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
       } else *commandError = CE_PARAM_RANGE;
     } else
 
-    //  :SEO#         Set encoder origin (for Encoder Bridge) also resets OnStep
+    //  :SEO#         Set coordinate origin for absolute encoders or mount coordinate memory
     //                Return: 0 on failure
     //                        1 on success
     if (command[1] == 'E' && parameter[0] == 'O' && parameter[1] == 0) {
-      #ifdef SERVO_MOTOR_PRESENT
-        #if AXIS1_ENCODER != OFF && AXIS2_ENCODER != OFF
+      if (park.state == PS_PARKED) { *commandError = CE_PARKED; return true; }
+      if (!mount.isTracking() && !mount.isSlewing()) {
+        bool handled = false;
 
-          if (!mount.isTracking() && !mount.isSlewing()) {
-            VLF("MSG: Mount, setting absolute encoder origin");
+        #ifdef HAS_ABSOLUTE_ENCODER_SERVO
+          handled = true;
+          VLF("MSG: Mount, setting absolute encoder origin");
 
-            #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
-              SERIAL_ENCODER.print(":SO#");
-            #else
-              uint32_t zero = (uint32_t)axis1.motor->encoderZero();
-              V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-              nv().kv().put("AXIS1_ENCODER_ORIGIN", zero);
+          #if AXIS1_ENCODER == SERIAL_BRIDGE && AXIS2_ENCODER == SERIAL_BRIDGE && defined(SERIAL_ENCODER)
+            SERIAL_ENCODER.print(":SO#");
+          #else
+            uint32_t zero = (uint32_t)axis1.motor->encoderZero();
+            V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+            nv().kv().put("AXIS1_ENCODER_ORIGIN", zero);
 
-              zero = (uint32_t)axis2.motor->encoderZero();
-              V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-              nv().kv().put("AXIS2_ENCODER_ORIGIN", zero);
-            #endif
+            zero = (uint32_t)axis2.motor->encoderZero();
+            V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+            nv().kv().put("AXIS2_ENCODER_ORIGIN", zero);
+          #endif
 
-            #ifdef HAL_RESET
-              enable(false);
-              VLF("MSG: Mount, resetting OnStep...");
-              if (nv().device().hasCommit()) { nv().device().commit(); }
-              const uint32_t startMs = millis();
-              const uint32_t timeoutMs = 5000;
-              while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
-              tasks.yield(1000);
-              HAL_RESET();
-            #endif
+          #ifdef HAL_RESET
+            enable(false);
+            VLF("MSG: Mount, resetting OnStep...");
+            if (nv().device().hasCommit()) { nv().device().commit(); }
+            const uint32_t startMs = millis();
+            const uint32_t timeoutMs = 5000;
+            while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
+            tasks.yield(1000);
+            HAL_RESET();
+          #endif
+        #endif
 
-          } else {
-            *commandError = CE_0;
-            DLF("MSG: Mount, setting absolute encoder origin failed; the mount is in motion!");
+        #if MOUNT_COORDS_MEMORY == ON
+          if (!handled && !goTo.absoluteEncodersPresent) {
+            CommandError e = home.reset(true, true);
+            if (e != CE_NONE) { *commandError = e; return true; }
+
+            limits.enabled(site.isDateTimeReady());
+
+            syncFromOnStepToEncoders = true;
+            handled = true;
+
+            VLF("MSG: Mount, setting mount coordinate memory origin");
           }
         #endif
-      #endif
+
+        if (!handled) {
+          *commandError = CE_0;
+          DLF("MSG: Mount, setting coordinate origin failed; feature unavailable");
+        }
+      } else {
+        *commandError = CE_0;
+        DLF("MSG: Mount, setting coordinate origin failed; the mount is in motion!");
+      }
     } else
 
     if (command[1] == 'X') {
@@ -257,8 +276,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
                 if (e != CE_NONE) { *commandError = e; return true; }
               #endif
               if (isnan(encoderAxis1) || isnan(encoderAxis2) || syncFromOnStepToEncoders) { *commandError = CE_0; return true; }
-              axis1.setInstrumentCoordinate(encoderAxis1);
-              axis2.setInstrumentCoordinate(encoderAxis2);
+              *commandError = limits.validateInstrumentCoordinate(1, encoderAxis1, true);
+              if (*commandError == CE_NONE) *commandError = limits.validateInstrumentCoordinate(2, encoderAxis2, true);
+              if (*commandError != CE_NONE) return true;
+              *commandError = limits.setInstrumentCoordinate(1, encoderAxis1, true);
+              if (*commandError == CE_NONE) *commandError = limits.setInstrumentCoordinate(2, encoderAxis2, true);
+              if (*commandError != CE_NONE) return true;
             }
           break;
 
@@ -285,8 +308,12 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
                  (goTo.state != GS_NONE && goTo.stage != GG_NEAR_DESTINATION_WAIT) ||
                  guide.state != GU_NONE) { *commandError = CE_0; return true; }
 
-            axis1.setInstrumentCoordinate(encoderAxis1);
-            axis2.setInstrumentCoordinate(encoderAxis2);
+            *commandError = limits.validateInstrumentCoordinate(1, encoderAxis1, true);
+            if (*commandError == CE_NONE) *commandError = limits.validateInstrumentCoordinate(2, encoderAxis2, true);
+            if (*commandError != CE_NONE) return true;
+            *commandError = limits.setInstrumentCoordinate(1, encoderAxis1, true);
+            if (*commandError == CE_NONE) *commandError = limits.setInstrumentCoordinate(2, encoderAxis2, true);
+            if (*commandError != CE_NONE) return true;
           break; }
 
           default: *commandError = CE_CMD_UNKNOWN; break;

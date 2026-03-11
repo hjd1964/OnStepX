@@ -72,7 +72,7 @@
       ServoKTech driver6(6, &DriverSettingsAxis6, AXIS6_MOTOR_STEPS_PER_MICRON/AXIS6_STEPS_PER_MICRON);
     #endif
 
-    ServoMotor motor_6(6, AXIS6_REVERSE, ((ServoDriver*)&driver6), &filterAxis6, &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &feedbackAxis6, &servoControlAxis6, AXIS6_SYNC_THRESHOLD);
+    ServoMotor motor_6(6, AXIS6_REVERSE, ((ServoDriver*)&driver6), &filterAxis6, &encAxis6, AXIS6_ENCODER_ORIGIN, AXIS6_ENCODER_REVERSE == ON, &feedbackAxis6, &servoControlAxis6);
 
   #elif defined(AXIS6_STEP_DIR_PRESENT)
     const StepDirDriverPins DriverPinsAxis6 = {AXIS6_M0_PIN, AXIS6_M1_PIN, AXIS6_M2_PIN, AXIS6_M2_ON_STATE, AXIS6_M3_PIN, AXIS6_DECAY_PIN, AXIS6_FAULT_PIN};

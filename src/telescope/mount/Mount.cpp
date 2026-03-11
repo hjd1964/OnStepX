@@ -86,7 +86,9 @@ void Mount::begin() {
   }
 
   // initialize the other subsystems
-  home.reset();
+  // At startup, absolute axis encoders are authoritative for establishing the
+  // initial coordinate basis, so allow reset() to bypass sync-threshold checks.
+  home.reset(true, axis1.motor->hasAbsoluteEncoder() || axis2.motor->hasAbsoluteEncoder());
   limits.init();
   guide.init();
 
@@ -142,9 +144,14 @@ void Mount::begin() {
 
       if (best) {
         lastPosition = *best;
-        axis1.setInstrumentCoordinate(lastPosition.a1);
-        axis2.setInstrumentCoordinate(lastPosition.a2);
-        mount.syncFromOnStepToEncoders = true;
+        if (limits.validateInstrumentCoordinate(1, lastPosition.a1, true) == CE_NONE &&
+            limits.validateInstrumentCoordinate(2, lastPosition.a2, true) == CE_NONE) {
+          CommandError e = limits.setInstrumentCoordinate(1, lastPosition.a1, true);
+          if (e == CE_NONE) e = limits.setInstrumentCoordinate(2, lastPosition.a2, true);
+          if (e == CE_NONE) mount.syncFromOnStepToEncoders = true; else DLF("WRN: Mount, coordinate memory restore failed");
+        } else {
+          DLF("WRN: Mount, coordinate memory restore failed");
+        }
       }
     }
   #endif
@@ -380,10 +387,10 @@ void Mount::poll() {
     if (transform.mountType == ALTALT) transform.aaToEqu(&current);
   #endif
 
+  Y;
   Coordinate ahead = current;
   Coordinate behind = current;
   double trackingRange = DiffRange*trackingRate;
-  Y;
   ahead.h += trackingRange;
   behind.h -= trackingRange;
 

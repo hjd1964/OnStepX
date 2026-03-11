@@ -38,6 +38,70 @@ CommandError Limits::validateTarget(Coordinate *coords, bool isGoto) {
   return validateTarget(coords, &eastReachable, &westReachable, &eastCorrection, &westCorrection, isGoto);
 }
 
+CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass) {
+  if (bypass) return CE_NONE;
+  if (!limitsEnabled) return CE_NONE;
+
+  #if AXIS1_WRAP == ON
+    return CE_NONE;
+  #else
+    #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == ON
+      return CE_NONE;
+    #endif
+
+    double current;
+    double threshold;
+    const char *axisLabel;
+
+    switch (axisNumber) {
+      case 1:
+        current = axis1.getInstrumentCoordinate();
+        threshold = (AXIS1_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS1_SYNC_THRESHOLD);
+        axisLabel = "axis1";
+      break;
+      case 2:
+        current = axis2.getInstrumentCoordinate();
+        threshold = (AXIS2_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS2_SYNC_THRESHOLD);
+        axisLabel = "axis2";
+      break;
+      default:
+        return CE_PARAM_RANGE;
+    }
+
+    if (threshold == OFF) return CE_NONE;
+
+    const double delta = fabs(value - current);
+    if (delta > threshold) {
+      VF("MSG: Mount, ");
+      V(axisLabel);
+      VF(" instrument coordinate update rejected, delta ");
+      V(radToDeg(delta));
+      VLF(" deg");
+      return CE_SLEW_ERR_OUTSIDE_LIMITS;
+    }
+
+    return CE_NONE;
+  #endif
+}
+
+CommandError Limits::setInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass) {
+  CommandError e = validateInstrumentCoordinate(axisNumber, value, bypass);
+  if (e != CE_NONE) return e;
+
+  switch (axisNumber) {
+    case 1:
+      axis1.setInstrumentCoordinate(value);
+    break;
+    case 2:
+      axis2.setInstrumentCoordinate(value);
+    break;
+    default:
+      return CE_PARAM_RANGE;
+  }
+
+  return CE_NONE;
+}
+
 // target coordinate check ahead of sync, goto, etc.
 CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto) {
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;

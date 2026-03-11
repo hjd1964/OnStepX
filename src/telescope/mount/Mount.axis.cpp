@@ -87,7 +87,7 @@ namespace {
     ServoKTech driver1(1, &DriverSettingsAxis1, AXIS1_MOTOR_STEPS_PER_DEGREE/AXIS1_STEPS_PER_DEGREE);
   #endif
 
-  ServoMotor motor_1(1, AXIS1_REVERSE, ((ServoDriver*)&driver1), &filterAxis1, &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &feedbackAxis1, &servoControlAxis1, AXIS1_SYNC_THRESHOLD);
+  ServoMotor motor_1(1, AXIS1_REVERSE, ((ServoDriver*)&driver1), &filterAxis1, &encAxis1, AXIS1_ENCODER_ORIGIN, AXIS1_ENCODER_REVERSE == ON, &feedbackAxis1, &servoControlAxis1);
 
 #elif defined(AXIS1_STEP_DIR_PRESENT)
   const StepDirDriverPins DriverPinsAxis1 = {AXIS1_M0_PIN, AXIS1_M1_PIN, AXIS1_M2_PIN, AXIS1_M2_ON_STATE, AXIS1_M3_PIN, AXIS1_DECAY_PIN, AXIS1_FAULT_PIN};
@@ -205,7 +205,7 @@ namespace {
     ServoKTech driver2(2, &DriverSettingsAxis2, AXIS2_MOTOR_STEPS_PER_DEGREE/AXIS2_STEPS_PER_DEGREE);
   #endif
 
-  ServoMotor motor_2(2, AXIS2_REVERSE, ((ServoDriver*)&driver2), &filterAxis2, &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &feedbackAxis2, &servoControlAxis2, AXIS2_SYNC_THRESHOLD);
+  ServoMotor motor_2(2, AXIS2_REVERSE, ((ServoDriver*)&driver2), &filterAxis2, &encAxis2, AXIS2_ENCODER_ORIGIN, AXIS2_ENCODER_REVERSE == ON, &feedbackAxis2, &servoControlAxis2);
 
 #elif defined(AXIS2_STEP_DIR_PRESENT)
   const StepDirDriverPins DriverPinsAxis2 = {AXIS2_M0_PIN, AXIS2_M1_PIN, AXIS2_M2_PIN, AXIS2_M2_ON_STATE, AXIS2_M3_PIN, AXIS2_DECAY_PIN, AXIS2_FAULT_PIN};

@@ -68,6 +68,10 @@ class Limits {
     CommandError validateTarget(Coordinate *coords, bool isGoto);
     CommandError validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto);
 
+    // validate and apply an instrument coordinate change for a mount axis
+    CommandError validateInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass = false);
+    CommandError setInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass = false);
+
     // true if an limit related error is exists
     bool isError();
 
