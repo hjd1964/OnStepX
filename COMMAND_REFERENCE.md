@@ -215,7 +215,7 @@ Available when `MOUNT_PRESENT` is enabled.
 | `:GXFF#` | `n.nnnnnn#` | Axis1 index position |
 | `:GXFG#` | `n.nnnnnn#` | Axis2 index position |
 | `:STn.n#` | `0/1` | Set tracking rate in Hz. `0` stops tracking. |
-| `:SEO#` | `0/1` | Save absolute encoder origin and reset, when supported |
+| `:SEO#` | `0/1` | Save absolute encoder origin, or initialize mount coordinate memory at home, when supported |
 | `:SX40,n#` | `0/1` | Stage encoder axis1 angle in degrees |
 | `:SX41,n#` | `0/1` | Stage encoder axis2 angle in degrees |
 | `:SX42,1#` | `0/1` | Sync mount from staged encoder axis values |
