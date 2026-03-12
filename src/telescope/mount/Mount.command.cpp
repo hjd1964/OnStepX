@@ -289,13 +289,19 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
           case '3': syncFromOnStepToEncoders = false; break;
 
           // set and sync from encoder Axis1 and Axis2 values
+          // append 'a' if both SWS encoder values are absolute and trusted
           case '4': {
+            bool absoluteAuthority = false;
             d = strtod(&parameter[3], &conv_end);
             if (&parameter[3] != conv_end && fabs(d) <= 360.0L) { encoderAxis1 = degToRad(d); } else { encoderAxis1 = NAN; }
 
             char *parameter2 = strchr(&parameter[3], ','); parameter2++;
             d = strtod(parameter2, &conv_end);
-            if (parameter2 != conv_end && fabs(d) <= 360.0L) { encoderAxis2 = degToRad(d); } else { encoderAxis2 = NAN; }
+            if (parameter2 != conv_end && fabs(d) <= 360.0L) {
+              encoderAxis2 = degToRad(d);
+              if (conv_end[0] == 'a' && conv_end[1] == 0) absoluteAuthority = true; else
+              if (conv_end[0] != 0) encoderAxis2 = NAN;
+            } else { encoderAxis2 = NAN; }
 
             #if GOTO_FEATURE == ON
               CommandError e = goTo.validate();              
@@ -314,6 +320,13 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             *commandError = limits.setInstrumentCoordinate(1, encoderAxis1, true);
             if (*commandError == CE_NONE) *commandError = limits.setInstrumentCoordinate(2, encoderAxis2, true);
             if (*commandError != CE_NONE) return true;
+            if (absoluteAuthority) {
+              captureNominalIndexPositions();
+              setStartupAuthorityTrusted(true);
+              goTo.absoluteEncodersPresent = true;
+              goTo.encodersPresent = true;
+              VLF("MSG: Mount, sync from trusted paired absolute SWS encoders");
+            }
           break; }
 
           default: *commandError = CE_CMD_UNKNOWN; break;
