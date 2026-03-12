@@ -530,6 +530,12 @@
   #error "Configuration (Config.h): Setting PIER_SIDE_SYNC_CHANGE_SIDES unknown, use OFF or ON."
 #endif
 
+static_assert(AXIS1_LIMIT_SYNC == OFF || (AXIS1_LIMIT_SYNC >= 0 && AXIS1_LIMIT_SYNC <= 90),
+  "Configuration (Config.h): Setting AXIS1_LIMIT_SYNC unknown, use OFF or value in the range 0 to 90.");
+
+static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_SYNC <= 90),
+  "Configuration (Config.h): Setting AXIS2_LIMIT_SYNC unknown, use OFF or value in the range 0 to 90.");
+
 #if PIER_SIDE_SYNC_CHANGE_SIDES == ON
   static_assert(AXIS1_LIMIT_SYNC == OFF && AXIS2_LIMIT_SYNC == OFF,
     "Configuration (Config.h): Enabling AXIS1_LIMIT_SYNC or AXIS2_LIMIT_SYNC requires PIER_SIDE_SYNC_CHANGE_SIDES to be OFF.");
