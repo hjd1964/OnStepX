@@ -34,7 +34,8 @@ The simplest mental model is:
 
 Examples:
 
-- home code asks whether the home sense is ON
+- home code asks whether home sense is active/ON according to its configured
+  `HIGH`/`LOW` meaning
 - limit code asks whether the min/max sense is ON
 - PEC asks whether the worm index sense is ON
 
