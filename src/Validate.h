@@ -369,6 +369,10 @@
   #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY unknown, use ON or OFF"
 #endif
 
+#if MOUNT_STARTUP_MODE < SA_STRICT || MOUNT_STARTUP_MODE > SA_PERMISSIVE
+  #error "Configuration (Config.h): Setting MOUNT_STARTUP_MODE unknown, use SA_STRICT, SA_AUTO, or SA_PERMISSIVE"
+#endif
+
 #if NV_INIT_ERROR_REVOKES_AUTHORITY != ON && NV_INIT_ERROR_REVOKES_AUTHORITY != OFF
   #error "Configuration (Config.h): Setting NV_INIT_ERROR_REVOKES_AUTHORITY unknown, use OFF or ON."
 #endif

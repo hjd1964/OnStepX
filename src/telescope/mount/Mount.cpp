@@ -93,9 +93,10 @@ void Mount::begin() {
   }
 
   // initialize the other subsystems
-  // At startup, absolute axis encoders are authoritative for establishing the
-  // initial coordinate basis, so allow reset() to bypass sync-threshold checks.
-  const bool absoluteAxisAuthority = axis1.motor->hasAbsoluteEncoder() || axis2.motor->hasAbsoluteEncoder();
+  // Paired mount-axis absolute position sources can establish the initial
+  // coordinate basis at startup, so allow reset() to bypass sync-threshold
+  // checks only in that case.
+  const bool absoluteAxisAuthority = axis1.motor->hasAbsoluteEncoder() && axis2.motor->hasAbsoluteEncoder();
   home.reset(true, absoluteAxisAuthority && absoluteCoordinateOriginsEstablished);
   limits.init();
   guide.init();
@@ -171,6 +172,16 @@ void Mount::begin() {
 
   #if ALIGN_MAX_NUM_STARS > 1 && ALIGN_MODEL_MEMORY == ON
     transform.align.modelRead();
+  #endif
+
+  #if MOUNT_STARTUP_MODE == SA_PERMISSIVE
+    setStartupAuthorityTrusted(true);
+  #elif MOUNT_STARTUP_MODE == SA_AUTO
+    #if MOUNT_COORDS_MEMORY == OFF
+      if (!axis1.motor->hasAbsoluteEncoder() && !axis2.motor->hasAbsoluteEncoder()) {
+        setStartupAuthorityTrusted(true);
+      }
+    #endif
   #endif
 
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");

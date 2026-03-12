@@ -2,13 +2,15 @@ Startup Authority And Coordinate Trust Notes
 
 Purpose
 
-These notes capture the current design intent behind startup authority,
-coordinate trust, and the related safety behavior added around mount startup,
-homing, coordinate memory, and absolute encoders.
+These notes describe how startup authority and coordinate trust currently work
+for the mount, and how that affects automatic motion such as goto, sync,
+park/unpark, and home/return.
 
 Core idea
 
-The mount now tracks a runtime startup authority trust state.
+The mount tracks a runtime trust state whose only question is:
+"Do we trust the current coordinate basis enough for coordinate-based
+automatic motion?"
 
 If trust is true:
 - coordinate-based automatic operations are allowed
@@ -16,35 +18,63 @@ If trust is true:
 If trust is false:
 - coordinate-based automatic operations are blocked
 - manual guide recovery is still allowed
+- plain sidereal tracking is still allowed
 
-This is meant to answer one simple question:
-"Do we trust the current coordinate basis enough for automatic motion?"
+Two useful distinctions
 
-What establishes trust
+1. Immediate startup authority
+- trust is available immediately at boot from an already-available authority
+  source
 
-Trust can be established by authoritative sources/actions:
-- valid absolute encoder startup, with origin established
+2. Deferred startup authority
+- boot starts untrusted
+- an authoritative startup-time action later establishes trust
+
+Date/time readiness is separate from both of the above.
+
+What currently establishes trust
+
+Trust can currently come from either immediate startup authority sources or
+later authoritative actions.
+
+Immediate startup authority sources:
+- paired mount-axis absolute position sources at boot, with origin(s)
+  established
 - trusted mount coordinate memory restore
-- authoritative home/reset
-- successful sensed home with switches
-- :SEO# when used to establish origin / perform an authoritative reset
+
+Boot policy is selected by MOUNT_STARTUP_MODE.
+Default:
+- SA_AUTO
+
+Modes:
+- SA_STRICT:
+  boot stays untrusted unless an immediate startup authority source succeeds
+- SA_AUTO:
+  if neither mount axis has an absolute position source and mount coordinate
+  memory is OFF, boot grants legacy session trust automatically
+- SA_PERMISSIVE:
+  boot grants session trust automatically even when stricter authority sources
+  exist
+
+Later authoritative actions:
+- authoritative set-origin at a known home position
+- authoritative reset at a known home position
+- successful switch-based home
 
 Ordinary sync is not used to restore trust.
 
-What revokes trust
+What currently revokes trust
 
 Trust is revoked conservatively when the system can no longer honestly assume
 the coordinate basis is valid.
 
 Currently implemented:
 - motor/encoder fault
-- NV fault when NV_INIT_ERROR_REVOKES_AUTHORITY is ON
+- NV fault (default behavior, because NV_INIT_ERROR_REVOKES_AUTHORITY defaults to ON)
 
-Intended interpretation:
-- if position may be wrong, revoke trust
-- if motion meaning may be wrong (steps/degree, microstep mode, limits, etc.),
-  revoke trust
-- do not silently recover trust from defaults alone
+Important non-revocation note:
+- a motion stop caused by limits or StallGuard is not, by itself, a trust
+  revocation event
 
 What is blocked while untrusted
 
@@ -54,28 +84,40 @@ Blocked:
 - park
 - unpark
 - normal sync
-- home/return unless home switches are present
+- home/return unless switch-based home is available
 
 Allowed:
 - manual guide
 - plain sidereal tracking
 
-This preserves "power up and track" while protecting coordinate-based motion.
+Workflow 1: Boot With Immediate Startup Authority
 
-Recovery model
+This is the cleanest startup path.
 
-If trust is lost:
-1. user manually guides to a known place if needed
-2. user performs an authoritative action:
-   - home/reset
-   - sensed home
-   - :SEO#
-   - valid absolute startup on reboot
-3. trust becomes true again
+On these mounts, trust can be granted automatically at boot because the mount
+already has an authoritative coordinate basis before any manual recovery is
+needed.
 
-Absolute encoder notes
+Current immediate startup authority sources are:
+- paired mount-axis absolute position sources
+- trusted mount coordinate memory
 
-Absolute encoder startup trust is only granted if origin is established.
+Workflow 1a: Boot With Paired Mount-Axis Absolute Coordinate Authority
+
+This applies when:
+- both mount axes report absolute position at startup
+- the required encoder origin(s) are already established
+- startup reset is therefore allowed to treat the mount-axis absolute readings
+  as authoritative for the initial coordinate basis
+
+This is intentionally stricter than "one axis happens to be absolute."
+For the mount axes, absolute coordinate authority is only valid as a paired
+startup basis.
+
+In practice this covers the supported mount-axis absolute-authority cases,
+including:
+- paired servo absolute encoders
+- paired ODrive absolute-authority configuration
 
 For runtime/NV origin storage:
 - UINT32_MAX is used as the "origin not established" sentinel
@@ -83,10 +125,17 @@ For runtime/NV origin storage:
 Compile-time configured nonzero AXIS*_ENCODER_ORIGIN values are treated as
 already established by configuration.
 
-The code intentionally does not try to over-generalize ODrive handling. ODrive
-is treated as its own authority domain for now.
+Workflow 1b: Boot With Trusted Mount Coordinate Memory
 
-Coordinate memory notes
+Mount coordinate memory acts much like an "effective absolute startup source"
+in the trust model:
+- it can re-establish a coordinate basis at boot
+- but only if the saved record is marked trusted
+
+Important assumption:
+- this depends on the mount being moved only by the drive system
+- if clutches are present, they must not slip and must not be disengaged while
+  coordinate memory is being relied on as a startup authority source
 
 Mount coordinate memory already uses:
 - alternating A/B records
@@ -99,6 +148,74 @@ It now also uses a trust bit:
 This separates:
 - storage validity
 - semantic trust
+
+So coordinate memory is not just "last known position storage." It is also a
+startup authority source when, and only when, the saved record is trusted.
+
+Workflow 2: Boot Without Immediate Startup Authority
+
+What happens here depends on MOUNT_STARTUP_MODE.
+
+In SA_STRICT:
+- if the mount has neither:
+  - paired mount-axis absolute position sources
+  - trusted mount coordinate memory
+- trust is not granted automatically at startup
+
+In SA_AUTO:
+- if the mount has neither:
+  - paired mount-axis absolute position sources
+  - mount coordinate memory enabled
+- boot grants legacy session trust automatically
+- this preserves the long-standing "power up and goto" workflow on simpler
+  mounts
+
+If mount coordinate memory is configured but the saved record is missing or
+untrusted, SA_AUTO does not silently fall back to permissive trust. In that
+case the system stays untrusted until an authoritative action succeeds.
+
+In SA_PERMISSIVE:
+- boot grants session trust automatically regardless of startup authority
+  sources
+
+Current recovery model:
+1. user manually guides to a known place if needed
+2. user performs an authoritative action:
+   - set origin
+   - authoritative reset at a known home position
+   - successful switch-based home
+   - reboot with a valid startup authority source
+3. trust becomes true again
+
+Important practical consequence:
+- the default SA_AUTO mode preserves permissive startup for simple mounts with
+  neither paired absolute position sources nor coordinate memory enabled
+- SA_STRICT remains available for observatory and interlock-sensitive installs
+
+Workflow 3: Boot Untrusted, Then Establish Trust With Auto-Home
+
+Auto-home with switches is best thought of as deferred startup authority.
+
+It is not an immediate startup authority source.
+Instead:
+- boot begins untrusted
+- switch-based home runs
+- if successful, trust is established afterward
+
+Switch-based home and auto-home-at-boot share the same sensed-home path.
+
+Success:
+- successful sensed home leads to authoritative reset
+- trust is restored
+
+Failure:
+- coordinates are still reset for consistency
+- failure is latched
+- trust is not restored
+- auto-home at boot does not continue as if homing succeeded
+
+This behavior is intentionally consistent with normal switch-based return/home,
+not just boot homing.
 
 Coordinate memory during homing
 
@@ -115,24 +232,57 @@ restore candidate:
 So if power is lost mid-home:
 - the mount will come up with coordinate memory present but untrusted
 - automatic coordinate-based motion will remain blocked
-- the user can press home/return, regain trust, and continue
+- the user can home/reset again, regain trust, and continue
 
-Home / auto-home behavior
+Workflow 4: Date/Time Not Ready
 
-Switch-based home and auto-home-at-boot share the same sensed-home path.
+Date/time readiness and startup trust are related but not the same thing.
 
-Success:
-- successful sensed home leads to authoritative reset
-- trust is restored
+Trust answers:
+- "Do we believe the coordinate basis is valid?"
 
-Failure:
-- coordinates are still reset for consistency
-- failure is latched
-- trust is not restored
-- auto-home at boot does not continue as if homing succeeded
+Date/time answers:
+- "Can we safely/usefully perform sky-referenced operations right now?"
 
-This behavior is intentionally consistent with normal switch-based return/home,
-not just boot homing.
+So a mount may have trust while date/time is still not ready.
+
+In that state:
+- the coordinate basis may still be considered authoritative
+- but some operations may remain postponed or blocked until date/time is ready
+
+Example:
+- unpark recovery may wait for the normal site/time flow even when trust is
+  already valid
+
+Workflow 5: Losing Trust During Runtime
+
+If trust is lost after startup:
+- coordinate-based automatic motion stops being allowed
+- manual guide recovery remains available
+- sidereal tracking remains allowed
+
+The guiding rule is:
+- if the system knows where it is, coordinate-based automatic motion is allowed
+- if it does not know where it is, coordinate-based automatic motion is blocked
+- guide-based manual recovery remains available
+
+Important startup workflows to remember
+
+1. Basic mount with clutches, no absolute encoders, no coordinate memory:
+- common user workflow is manually place at home, power on, then goto/sync
+- SA_AUTO preserves this by granting session trust at boot
+- SA_STRICT intentionally blocks this until an authoritative action succeeds
+
+2. Mount without coordinate memory and without clutches:
+- mount may power up far from home
+- user must guide back to home
+- then perform an authoritative home/reset action
+- then begin normal operation
+- current model fits this workflow well
+
+3. User wants only sidereal tracking at startup:
+- trust does not gate sidereal tracking
+- this is intentional and should remain so
 
 NV policy
 
@@ -156,26 +306,6 @@ status calls.
 Longer term, a small circular event log is probably a better place to record
 why trust changed than trying to pack too much into live status.
 
-Important startup workflows to remember
-
-1. Basic mount with clutches, no absolute encoders, no coordinate memory:
-- common user workflow is manually place at home, power on, then goto/sync
-- current strict model is too harsh for this case
-- likely future refinement:
-  if there is no stronger authority source at all, boot reset/home may need to
-  establish session trust
-
-2. Mount without coordinate memory and without clutches:
-- mount may power up far from home
-- user must guide back to home
-- then home/reset
-- then begin normal operation
-- current model fits this workflow well
-
-3. User wants only sidereal tracking at startup:
-- trust does not gate sidereal tracking
-- this is intentional and should remain so
-
 Open future work
 
 - circular timestamped event log for trust loss/recovery reasons
@@ -184,10 +314,3 @@ Open future work
 - refine the basic clutch/manual-home startup case so normal users are not
   surprised while still preserving the stricter safety model for systems with
   stronger authority sources
-
-Bottom line
-
-The guiding rule is:
-- if the system knows where it is, coordinate-based automatic motion is allowed
-- if it does not know where it is, coordinate-based automatic motion is blocked
-- guide-based manual recovery remains available

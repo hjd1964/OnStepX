@@ -85,6 +85,11 @@
 #define ASTROMETRIC_J2000           4
 #define MOUNT_COORDS_LAST           4
 
+// STARTUP AUTHORITY MODE
+#define SA_STRICT                   1
+#define SA_AUTO                     2
+#define SA_PERMISSIVE               3
+
 // TIME LOCATION SOURCE devices supported
 #define TLS_FIRST                   1
 #define DS3231                      1      // DS3231 RTC on I2C
