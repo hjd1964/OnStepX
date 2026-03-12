@@ -273,8 +273,15 @@ CommandError Home::reset(bool fullReset, bool authoritative) {
       }
     #endif
 
-    CommandError e = limits.validateInstrumentCoordinate(1, homePosition.a1, authoritative);
-    if (e == CE_NONE) e = limits.validateInstrumentCoordinate(2, homePosition.a2, authoritative);
+    bool bypassCoordinateLimit = authoritative;
+    #if MOUNT_STARTUP_MODE == SA_AUTO && MOUNT_COORDS_MEMORY == OFF
+      if (!bypassCoordinateLimit && !axis1.motor->hasAbsoluteEncoder() && !axis2.motor->hasAbsoluteEncoder()) {
+        bypassCoordinateLimit = true;
+      }
+    #endif
+
+    CommandError e = limits.validateInstrumentCoordinate(1, homePosition.a1, bypassCoordinateLimit);
+    if (e == CE_NONE) e = limits.validateInstrumentCoordinate(2, homePosition.a2, bypassCoordinateLimit);
     if (e != CE_NONE) {
       DLF("WRN: Home::reset(), coordinate reset rejected by sync threshold");
       if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
