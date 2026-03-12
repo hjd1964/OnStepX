@@ -49,19 +49,25 @@ CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double val
       return CE_NONE;
     #endif
 
-    double current;
     double threshold;
+    double delta;
     const char *axisLabel;
+    long proposedIndexSteps;
+    long nominalIndexSteps;
 
     switch (axisNumber) {
       case 1:
-        current = axis1.getInstrumentCoordinate();
         threshold = (AXIS1_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS1_SYNC_THRESHOLD);
+        proposedIndexSteps = lround(value*axis1.getStepsPerMeasure()) - (axis1.getInstrumentCoordinateSteps() - axis1.getIndexPositionSteps());
+        nominalIndexSteps = mount.getNominalIndexPositionSteps(1);
+        delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis1.getStepsPerMeasure();
         axisLabel = "axis1";
       break;
       case 2:
-        current = axis2.getInstrumentCoordinate();
         threshold = (AXIS2_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS2_SYNC_THRESHOLD);
+        proposedIndexSteps = lround(value*axis2.getStepsPerMeasure()) - (axis2.getInstrumentCoordinateSteps() - axis2.getIndexPositionSteps());
+        nominalIndexSteps = mount.getNominalIndexPositionSteps(2);
+        delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis2.getStepsPerMeasure();
         axisLabel = "axis2";
       break;
       default:
@@ -70,13 +76,8 @@ CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double val
 
     if (threshold == OFF) return CE_NONE;
 
-    const double delta = fabs(value - current);
     if (delta > threshold) {
-      VF("MSG: Mount, ");
-      V(axisLabel);
-      VF(" instrument coordinate update rejected, delta ");
-      V(radToDeg(delta));
-      VLF(" deg");
+      VF("MSG: Mount, sync "); V(axisLabel); VLF(" rejected (exceeds threshold)");
       return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
 
