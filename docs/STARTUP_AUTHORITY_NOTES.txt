@@ -90,6 +90,32 @@ Allowed:
 - manual guide
 - plain sidereal tracking
 
+Parking workflow
+
+Parking is part of the same trust model because park/set-park/unpark all depend
+on the mount coordinate basis being believable.
+
+While untrusted:
+- set park is blocked
+- park is blocked
+- unpark/restore is blocked
+
+Why:
+- set park stores a coordinate-based reference that should not be accepted if
+  the current coordinate basis is already in doubt
+- park and unpark are automatic coordinate-based motions, so they should follow
+  the same trust rules as goto
+
+Operationally this means:
+- a parked state is only useful if it was established from a trusted coordinate
+  basis
+- unpark/restore is allowed when resuming from previously trusted parked state
+- unpark/restore should not be thought of as a way to recover trust from unknown
+  state
+- the legacy "unpark from home" exception is only allowed on simpler mounts; it
+  is disabled for SA_STRICT, for mounts using coordinate memory, and for mounts
+  with absolute position sources
+
 Workflow 1: Boot With Immediate Startup Authority
 
 This is the cleanest startup path.
