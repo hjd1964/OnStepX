@@ -369,6 +369,10 @@
   #error "Configuration (Config.h): Setting MOUNT_COORDS_MEMORY unknown, use ON or OFF"
 #endif
 
+#if NV_INIT_ERROR_REVOKES_AUTHORITY != ON && NV_INIT_ERROR_REVOKES_AUTHORITY != OFF
+  #error "Configuration (Config.h): Setting NV_INIT_ERROR_REVOKES_AUTHORITY unknown, use OFF or ON."
+#endif
+
 #if MOUNT_ENABLE_IN_STANDBY != ON && MOUNT_ENABLE_IN_STANDBY != OFF
   #error "Configuration (Config.h): Setting MOUNT_ENABLE_IN_STANDBY unknown, use ON or OFF"
 #endif

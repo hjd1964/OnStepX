@@ -46,7 +46,8 @@ typedef struct MountPositionMemory {
   float a2;
   uint8_t mountType:4;
   uint8_t seq:2;
-  uint8_t reserved:2;
+  uint8_t untrusted:1;
+  uint8_t reserved:1;
 } MountPositionMemory;
 
 #pragma pack()
@@ -99,6 +100,15 @@ class Mount {
     // true if syncing only from OnStep to the Encoders
     bool syncFromOnStepToEncoders = false;
 
+    inline bool startupAuthorityTrusted() const { return startupAuthorityTrustedValue; }
+    void setStartupAuthorityTrusted(bool state);
+    void captureNominalIndexPositions();
+    long getNominalIndexPositionSteps(uint8_t axisNumber) const;
+
+    #if MOUNT_COORDS_MEMORY == ON
+      void saveCoordinateMemory(bool trusted);
+    #endif
+
     // updates the tracking rates, etc. as appropriate for the mount state
     // called once a second by poll() but available here for immediate action
     void update();
@@ -134,6 +144,12 @@ class Mount {
       uint32_t nvKeyLastA, nvKeyLastB;
       MountPositionMemory lastPosition;
     #endif
+
+    long nominalIndexAxis1Steps = 0;
+    long nominalIndexAxis2Steps = 0;
+
+    bool absoluteCoordinateOriginsEstablished = true;
+    bool startupAuthorityTrustedValue = false;
 };
 
 extern Motor& motor1;

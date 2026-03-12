@@ -620,6 +620,9 @@
 #ifndef MOUNT_COORDS_MEMORY
 #define MOUNT_COORDS_MEMORY           OFF                         // ON Enables mount position memory
 #endif
+#ifndef NV_INIT_ERROR_REVOKES_AUTHORITY
+#define NV_INIT_ERROR_REVOKES_AUTHORITY ON                        // ON revokes startup authority trust if NV reports an init/read fault
+#endif
 #ifndef MOUNT_ENABLE_IN_STANDBY
 #define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
 #endif

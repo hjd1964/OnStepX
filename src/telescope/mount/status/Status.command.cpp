@@ -119,6 +119,7 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
 
       if (mount.syncFromOnStepToEncoders)          reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.active())                          reply[1]|=0b10001000;           // Guide active
+      if (mountStatus.startupAuthorityTrusted())   reply[1]|=0b10010000;           // Startup authority trusted
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing home
       if (home.settings.automaticAtBoot)           reply[2]|=0b11000000;           // Auto home at boot

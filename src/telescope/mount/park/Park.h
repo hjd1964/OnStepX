@@ -32,7 +32,7 @@ class Park {
     bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // sets a park position
-    CommandError set();
+    CommandError set(bool ignoreTrust = false);
 
     // move the mount to the park position
     CommandError request();

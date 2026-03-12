@@ -65,6 +65,7 @@ class Home {
     Settings settings = {MOUNT_AUTO_HOME_DEFAULT == ON, {AXIS1_SENSE_HOME_OFFSET, false}, {AXIS2_SENSE_HOME_OFFSET, false}};
 
     bool isRequestWithReset = false;
+    bool failed = false;
 
     HomeState state;
 

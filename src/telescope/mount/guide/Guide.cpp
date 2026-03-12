@@ -209,6 +209,9 @@ CommandError Guide::startHome() {
     guideActionAxis2 = GA_HOME;
     axis2.setFrequencySlew(goTo.rate*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
     axis2.autoSlewHome();
+  #else
+    DLF("WRN: Mount, sensed home rejected because goto is disabled");
+    return CE_SLEW_ERR_UNSPECIFIED;
   #endif
   return CE_NONE;
 }

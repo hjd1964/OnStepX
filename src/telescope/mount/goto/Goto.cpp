@@ -77,6 +77,10 @@ CommandError Goto::request() {
 
 // goto equatorial position (Native or Mount coordinate system)
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
+  if (!mount.startupAuthorityTrusted()) {
+    DLF("WRN: Mount, goto rejected because startup authority is not trusted");
+    return CE_SLEW_ERR_UNSPECIFIED;
+  }
 
   if (native) {
     coords.pierSide = PIER_SIDE_NONE;
@@ -184,15 +188,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
   mountStatus.soundAlert();
 
-  CommandError result = requestSync(coords, pierSideSelect, native);
-
-  // check if parking and mark as finished or unparked as needed
-  if (park.state == PS_PARKING) park.requestDone();
-
-  // check if homing
-  if (home.state == HS_HOMING) home.requestDone();
-
-  return result;
+  return requestSync(coords, pierSideSelect, native);
 }
 #endif
 
@@ -203,6 +199,10 @@ CommandError Goto::requestSync() {
 
 // sync to equatorial position (Native or Mount coordinate system)
 CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
+  if (!mount.startupAuthorityTrusted()) {
+    DLF("WRN: Mount, sync rejected because startup authority is not trusted");
+    return CE_SLEW_ERR_UNSPECIFIED;
+  }
   
   if (native) {
     coords.pierSide = PIER_SIDE_NONE;

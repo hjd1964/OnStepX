@@ -22,7 +22,7 @@ void Park::init() {
   nvKey = nv().kv().computeKey("PARK_SETTINGS");
   if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for PARK_SETTINGS"); }
   state = settings.state;
-  if (!settings.saved) set();
+  if (!settings.saved) set(true);
 
   // configure any associated sense/signal pins
   #if (PARK_SENSE) != OFF && (PARK_SENSE_PIN) != OFF
@@ -40,12 +40,16 @@ void Park::init() {
 }
 
 // sets the park position
-CommandError Park::set() {
+CommandError Park::set(bool ignoreTrust) {
   if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
   if (state == PS_PARKED)      return CE_PARKED;
   if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
+  if (!ignoreTrust && !mount.startupAuthorityTrusted()) {
+    DLF("WRN: Mount, set park rejected because startup authority is not trusted");
+    return CE_SLEW_ERR_UNSPECIFIED;
+  }
 
   VLF("MSG: Mount, setting park position");
 
@@ -84,6 +88,10 @@ CommandError Park::request() {
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
+    if (!mount.startupAuthorityTrusted()) {
+      DLF("WRN: Mount, park rejected because startup authority is not trusted");
+      return CE_SLEW_ERR_UNSPECIFIED;
+    }
     if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
     if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
     if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
@@ -130,6 +138,8 @@ CommandError Park::request() {
 
     if (e != CE_NONE) {
       mount.tracking(wasTracking);
+      axis1.setBacklash(mount.settings.backlash.axis1);
+      axis2.setBacklash(mount.settings.backlash.axis2);
 
       state = priorParkState;
       settings.state = state;
@@ -162,7 +172,11 @@ void Park::requestDone() {
       VLF("MSG: Mount, park sense state indicates success.");
     } else {
       DLF("WRN: Mount, park sense state failed!");
+      axis1.setBacklash(mount.settings.backlash.axis1);
+      axis2.setBacklash(mount.settings.backlash.axis2);
       state = PS_PARK_FAILED;
+      settings.state = state;
+      nv().kv().put(nvKey, settings);
     }
   #endif
 
@@ -194,6 +208,10 @@ void Park::requestDone() {
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved) return CE_NO_PARK_POSITION_SET;
+  if (!mount.startupAuthorityTrusted()) {
+    DLF("WRN: Mount, unpark rejected because startup authority is not trusted");
+    return CE_SLEW_ERR_UNSPECIFIED;
+  }
   if (state != PS_PARKED) {
     #if PARK_STRICT == ON
       VLF("MSG: Mount, unpark ignored not parked");
@@ -224,7 +242,11 @@ CommandError Park::restore(bool withTrackingOn) {
   if (!goTo.absoluteEncodersPresent) {
 
     // reset the mount, zero backlash
-    home.reset();
+    CommandError e = home.reset();
+    if (e != CE_NONE) {
+      DF("WRN: Mount, unpark reset failed (code "); D(e); DLF(")");
+      return e;
+    }
     axis1.setBacklashSteps(0);
     axis2.setBacklashSteps(0);
 
@@ -251,6 +273,7 @@ CommandError Park::restore(bool withTrackingOn) {
     transform.mountToInstrument(&parkTarget, &a1, &a2);
     axis1.setInstrumentCoordinatePark(a1);
     axis2.setInstrumentCoordinatePark(a2);
+    mount.captureNominalIndexPositions();
 
     VF("MSG: Mount, unpark axis1 motor position "); VL(axis1.getMotorPositionSteps());
     VF("MSG: Mount, unpark axis2 motor position "); VL(axis2.getMotorPositionSteps());
@@ -278,6 +301,7 @@ CommandError Park::restore(bool withTrackingOn) {
 
 void Park::reset() {
   state = PS_UNPARKED;
+  settings.state = state;
   nv().kv().put(nvKey, settings);
 }
 
