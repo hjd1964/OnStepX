@@ -60,6 +60,7 @@ Later authoritative actions:
 - authoritative set-origin at a known home position
 - authoritative reset at a known home position
 - successful switch-based home
+- SWS v2.10d or later hosting absolute encoders (for pointing correction)
 
 Ordinary sync is not used to restore trust.
 

@@ -220,7 +220,7 @@ Available when `MOUNT_PRESENT` is enabled.
 | `:SX41,n#` | `0/1` | Stage encoder axis2 angle in degrees |
 | `:SX42,1#` | `0/1` | Sync mount from staged encoder axis values |
 | `:SX43,0#` | `0/1` | Allow SWS to control sync mode |
-| `:SX44,deg1,deg2#` | `0/1` | Stage and sync both encoder axes |
+| `:SX44,deg1,deg2[a]#` | `0/1` | Stage and sync both encoder axes, append `a` when both SWS encoder values are absolute and trusted |
 | `:SXEM,n#` | `0/1` | Set mount type for next restart |
 | `:SXTD,n.n#` | `0/1` | Set Dec tracking rate offset, arcsec per sidereal second |
 | `:SXTR,n.n#` | `0/1` | Set RA tracking rate offset, arcsec per sidereal second |
