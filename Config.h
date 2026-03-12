@@ -100,7 +100,7 @@
                                           //         n = (stepper_steps * micro_steps * overall_gear_reduction)/360.0
 #define AXIS2_REVERSE                 OFF //    OFF, ON Reverses movement direction, or reverse wiring instead to correct.   <-Often
 #define AXIS2_LIMIT_MIN               -90 //    -90, n. Where n=-90..0 (degrees.) Minimum allowed Declination or Altitude.    Infreq
-#define AXIS2_LIMIT_MAX                90 //     90, n. Where n=0..90 (degrees.) Maximum allowed Declination or Altitude.     Infreq
+#define AXIS2_LIMIT_MAX                90 //     90, n. Where n= 0..90 (degrees.) Maximum allowed Declination or Altitude.    Infreq
 #define AXIS2_LIMIT_SYNC              OFF //    OFF, n. Where n= 0..90 (degrees.) Allow sync/reset only within this distance. Option
 
 #define AXIS2_DRIVER_MICROSTEPS       OFF //    OFF, n. Microstep mode when tracking.                                        <-Req'd
@@ -136,7 +136,7 @@
 #define MOUNT_ALTERNATE_ORIENTATION   OFF //    OFF, ON Enables Meridian Flips for FORK mounts and passing through the        Option
                                           //         Zenith for ALTAZM mounts.  GEM mode ignores this setting.
                                           
-#define MOUNT_STARTUP_MODE        SA_AUTO // SA_AUTO,SA_STRICT, or SA_PERMISSIVE. Controls when startup trust is granted.    Option
+#define MOUNT_STARTUP_MODE        SA_AUTO // SA_AUTO,SA_STRICT, or SA_PERMISSIVE. Controls when startup trust is granted.     Option
                                           //         SA_AUTO keeps legacy immediate goto only when no absolute position source
                                           //         is present and coordinate memory is OFF.
 
