@@ -57,14 +57,14 @@ CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double val
 
     switch (axisNumber) {
       case 1:
-        threshold = (AXIS1_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS1_SYNC_THRESHOLD);
+        threshold = (AXIS1_LIMIT_SYNC == OFF) ? OFF : degToRadF((float)AXIS1_LIMIT_SYNC);
         proposedIndexSteps = lround(value*axis1.getStepsPerMeasure()) - (axis1.getInstrumentCoordinateSteps() - axis1.getIndexPositionSteps());
         nominalIndexSteps = mount.getNominalIndexPositionSteps(1);
         delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis1.getStepsPerMeasure();
         axisLabel = "axis1";
       break;
       case 2:
-        threshold = (AXIS2_SYNC_THRESHOLD == OFF) ? OFF : degToRadF((float)AXIS2_SYNC_THRESHOLD);
+        threshold = (AXIS2_LIMIT_SYNC == OFF) ? OFF : degToRadF((float)AXIS2_LIMIT_SYNC);
         proposedIndexSteps = lround(value*axis2.getStepsPerMeasure()) - (axis2.getInstrumentCoordinateSteps() - axis2.getIndexPositionSteps());
         nominalIndexSteps = mount.getNominalIndexPositionSteps(2);
         delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis2.getStepsPerMeasure();

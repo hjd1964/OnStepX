@@ -247,8 +247,8 @@
 #ifndef AXIS1_LIMIT_MAX
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
-#ifndef AXIS1_SYNC_THRESHOLD
-#define AXIS1_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
+#ifndef AXIS1_LIMIT_SYNC
+#define AXIS1_LIMIT_SYNC              OFF                         // sync limit in degrees, or OFF
 #endif
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
@@ -420,8 +420,8 @@
 #ifndef AXIS2_LIMIT_MAX
 #define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
-#ifndef AXIS2_SYNC_THRESHOLD
-#define AXIS2_SYNC_THRESHOLD          OFF                         // sync threshold in degrees, or OFF
+#ifndef AXIS2_LIMIT_SYNC
+#define AXIS2_LIMIT_SYNC              OFF                         // sync limit in degrees, or OFF
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
