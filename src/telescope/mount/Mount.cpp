@@ -161,7 +161,7 @@ void Mount::begin() {
             captureNominalIndexPositions();
             mount.syncFromOnStepToEncoders = true;
             setStartupAuthorityTrusted(true);
-          } else DLF("WRN: Mount, coordinate memory restore failed");
+          } else { DLF("WRN: Mount, coordinate memory restore failed"); }
         } else {
           DLF("WRN: Mount, coordinate memory restore failed");
         }
