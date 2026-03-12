@@ -136,7 +136,7 @@
 #define MOUNT_ALTERNATE_ORIENTATION   OFF //    OFF, ON Enables Meridian Flips for FORK mounts and passing through the        Option
                                           //         Zenith for ALTAZM mounts.  GEM mode ignores this setting.
 
-#define MOUNT_STARTUP_MODE        SA_AUTO // SA_AUTO,SA_STRICT, or SA_PERMISSIVE. Controls when startup trust is granted.     Option
+#define MOUNT_STARTUP_MODE        SA_AUTO // ..AUTO, SA_STRICT, or SA_PERMISSIVE. Controls when startup trust is granted.     Option
                                           //         SA_AUTO keeps legacy immediate goto only when no absolute position source
                                           //         is present and coordinate memory is OFF.
 
