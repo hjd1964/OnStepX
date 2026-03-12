@@ -412,6 +412,22 @@ Sector gear axis1 and tangent-arm axis2 are special.
 In those cases, homing and reset do not always follow the plain "reset both
 axes to zero and write home coordinates" pattern.
 
+For these geometries, home is not only about returning to a meaningful
+coordinate reference. It is also about resetting the mechanism so later gotos
+and tracking have useful travel remaining inside the limited range.
+
+So on a sector gear or tangent-arm mount, homing is often better understood as:
+
+- mechanical re-baselining of the constrained axis
+- restoring useful travel for later motion
+- re-establishing the coordinate-to-mechanism relationship for that limited
+  range
+
+Because of that, some of the ordinary coordinate-based prechecks are also less
+meaningful here. On these mounts the code relaxes or skips parts of the normal
+"how far are we from home in coordinates?" logic before sensed homing, because
+operation is fundamentally constrained and often more manual.
+
 Instead:
 
 - origin/position handling is adjusted to fit the special axis geometry
