@@ -778,10 +778,6 @@
 #define PARK_STATUS                   OFF
 #endif
 
-#ifndef PARK_STRICT
-#define PARK_STRICT                   OFF
-#endif
-
 // pec
 #ifndef PEC_STEPS_PER_WORM_ROTATION
 #define PEC_STEPS_PER_WORM_ROTATION   0

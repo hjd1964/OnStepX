@@ -550,8 +550,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #endif
 
 // PARKING BEHAVIOUR
-#if PARK_STRICT != ON && PARK_STRICT != OFF
-  #error "Configuration (Config.h): Setting PARK_STRICT unknown, use OFF or ON."
+#ifdef PARK_STRICT
+  #if PARK_STRICT == ON
+    #error "Configuration (Config.h): PARK_STRICT is obsolete. Remove it and use the startup authority / parking policy defaults instead."
+  #endif
 #endif
 
 // ROTATOR ---------------------------------------

@@ -213,10 +213,14 @@ CommandError Park::restore(bool withTrackingOn) {
     return CE_SLEW_ERR_UNSPECIFIED;
   }
   if (state != PS_PARKED) {
-    #if PARK_STRICT == ON
-      VLF("MSG: Mount, unpark ignored not parked");
+    #if MOUNT_STARTUP_MODE == SA_STRICT || MOUNT_COORDS_MEMORY == ON
+      VLF("MSG: Mount, unpark from home disabled by startup authority policy");
       return CE_NOT_PARKED;
     #else
+      if (goTo.absoluteEncodersPresent) {
+        VLF("MSG: Mount, unpark from home disabled when absolute position sources are present");
+        return CE_NOT_PARKED;
+      }
       if (!mount.isHome()) {
         VLF("MSG: Mount, unpark when not parked allowed at home only");
         return CE_NOT_PARKED;
