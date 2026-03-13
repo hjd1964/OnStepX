@@ -39,12 +39,9 @@ Typical reasons include:
 - building a more modular system where peripherals can be added or moved more
   easily
 
-One of the nicest consequences is that these peripheral controllers can be
-coupled to a specific OTA or OTA assembly.
+In this arrangement:
 
-In that arrangement:
-
-- the rotator, focusers, and auxiliary-feature controllers stay with that OTA
+- the rotator, focusers, and auxiliary-feature controllers can stay with an OTA
 - plugging in one CAN/power cable brings that whole peripheral set online
 - the correct functionality and settings can then appear at the mount
   controller immediately and work as one integrated system from Android App,
