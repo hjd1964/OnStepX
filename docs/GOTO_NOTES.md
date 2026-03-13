@@ -154,10 +154,19 @@ This is still not the same thing on every mount type.
 
 So `AUTO` is really an automatic orientation policy, not one fixed algorithm.
 
-In practical terms, it is often one of the better choices for imaging mounts.
-Compared with a fixed preference such as `PSS_EAST`, `PSS_AUTO` is better at
-using meridian-overlap freedom to end up on the side where tracking can keep
-going cleanly after the change.
+In practical terms, it is most at home on GEMs, especially imaging setups where
+automatic meridian-flip style behavior is desirable. Compared with a fixed
+preference such as `PSS_EAST`, `PSS_AUTO` is better at using meridian-overlap
+freedom to end up on the side where tracking can keep going cleanly after the
+change.
+
+On fork mounts, the usual practical approach is often different. Users commonly
+widen the meridian limits to allow much more freedom, then keep a fixed side
+preference such as `PSS_EAST` or `PSS_WEST` for normal operation. If they want
+the mount to use the other orientation, they typically change that preferred
+side. Forks often do not need, and often should not do, automatic flip-style
+behavior in the first place. So wide limits help create freedom, but the
+selected side policy still drives whether the planner stays put or flips.
 
 ## `PSS_BEST`
 
@@ -379,6 +388,14 @@ into a "normal east-like" coordinate form before checking limits.
 
 That is one reason the same target can feel simpler on some mounts and much
 more orientation-sensitive on others.
+
+For fork mode specifically, this is why wide meridian limits are often used as
+a practical way to increase motion freedom without constantly tripping a
+side-change style decision. But wide limits are not the whole story. Orientation
+selection still matters. In typical fork use, that usually means keeping
+`PSS_EAST` or `PSS_WEST` fixed until the user intentionally changes it to get
+the opposite orientation, even though the generous limit window would allow
+more than one valid branch.
 
 ## `ALTALT` And Other Less Common Modes
 
