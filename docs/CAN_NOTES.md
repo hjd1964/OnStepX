@@ -39,6 +39,20 @@ Typical reasons include:
 - building a more modular system where peripherals can be added or moved more
   easily
 
+One of the nicest consequences is that these peripheral controllers can be
+coupled to a specific OTA or OTA assembly.
+
+In that arrangement:
+
+- the rotator, focusers, and auxiliary-feature controllers stay with that OTA
+- plugging in one CAN/power cable brings that whole peripheral set online
+- the correct functionality and settings can then appear at the mount
+  controller immediately
+
+So the CAN link is not just carrying commands. It also helps turn an OTA
+assembly into a more self-contained module that can be moved from one mount
+controller to another with much less rework.
+
 In other words, CAN is being used here as a practical interconnect between
 cooperating OnStepX feature nodes.
 
