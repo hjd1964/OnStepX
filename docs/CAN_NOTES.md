@@ -172,6 +172,135 @@ So the usual pattern is:
 - the mount/main controller proxies
 - the physically-near peripheral node serves
 
+## Example Assignments
+
+Here is a typical main-controller configuration when the mount controller is
+meant to talk to remote CAN-connected peripheral nodes:
+
+```c
+#define CAN_ROTATOR                  ON
+#define CAN_FOCUSER                  ON
+#define CAN_FEATURES                 ON
+#define CAN_SEND_RATE_MS              2
+#define CAN_RECV_RATE_MS             10
+#define CAN_PLUS           CAN2_TEENSY4
+#define CAN_BAUD                 250000
+```
+
+In that role:
+
+- `CAN_ROTATOR ON` means the main controller expects the rotator to be remote
+- `CAN_FOCUSER ON` means the main controller expects focuser control to be remote
+- `CAN_FEATURES ON` means the main controller expects the auxiliary-features
+  provider to be remote
+
+Typical remote-node assignments then look like this.
+
+Remote rotator node:
+
+```c
+#define CAN_ROTATOR              REMOTE
+#define CAN_SEND_RATE_MS              2
+#define CAN_RECV_RATE_MS             10
+#define CAN_PLUS           CAN2_TEENSY4
+#define CAN_BAUD                 250000
+```
+
+Remote focuser node:
+
+```c
+#define CAN_FOCUSER              REMOTE
+#define CAN_FOCUSER_NUMBER            1
+#define CAN_SEND_RATE_MS              2
+#define CAN_RECV_RATE_MS             10
+#define CAN_PLUS           CAN2_TEENSY4
+#define CAN_BAUD                 250000
+```
+
+Remote auxiliary-features node:
+
+```c
+#define CAN_FEATURES             REMOTE
+#define CAN_SEND_RATE_MS              2
+#define CAN_RECV_RATE_MS             10
+#define CAN_PLUS           CAN2_TEENSY4
+#define CAN_BAUD                 250000
+```
+
+These examples mirror the common case where the CAN interface is on the ST4
+port through `CAN2_TEENSY4`, with `250000` baud and the faster `2ms` send
+pacing.
+
+The repeated send/receive-rate lines in those examples are mainly there for
+documentation clarity. They make the intended CAN setup obvious in one place,
+not because every line is a special non-default requirement.
+
+## Platform Guidance
+
+In current practical use, a Teensy 4.1 makes a very good mount controller when
+CAN is involved.
+
+That is the preferred direction because:
+
+- it has worked well as the main controller side
+- `CAN2_TEENSY4` on the ST4 port is a natural fit for this role
+
+ESP32 is a different story.
+
+Using the built-in TWAI interface on ESP32:
+
+- ESP32 can feel slow as a CAN client/proxy on the main controller side
+- but ESP32 is perfectly reasonable as a remote CAN server for things like a
+  rotator, focuser, or auxiliary-features node
+
+The push toward `250000` baud is intentional.
+
+The reason is mainly practical:
+
+- `250000` gives more wiring freedom
+- it is a better fit for the kind of real-world cable runs and connectors these
+  distributed peripheral nodes are likely to use
+
+This whole CAN peripheral-interconnect feature set is still fairly new and
+experimental.
+
+So the current practical guidance is:
+
+- prefer Teensy 4.1 as the CAN mount controller
+- ESP32 is fine for remote peripheral-server roles
+- treat `250000` as the preferred default unless there is a clear reason to do
+  otherwise
+- do not assume other CAN platforms are equally proven
+
+Important reality check:
+
+- other platforms have not really been tested in this role yet
+
+## Important Rule: Remote Or Local, Never Both
+
+For each feature family, a build must choose whether that feature is local or
+reached through CAN.
+
+That means:
+
+- if `CAN_ROTATOR == ON`, do not also configure a normal local rotator in that
+  same build
+- if `CAN_FOCUSER == ON`, do not also configure normal local focusers in that
+  same build
+- if `CAN_FEATURES == ON`, do not also configure local auxiliary features in
+  that same build
+
+`REMOTE` is the opposite role:
+
+- a `REMOTE` rotator node must actually host the local rotator it is serving
+- a `REMOTE` focuser node must actually host the local focuser it is serving
+- a `REMOTE` auxiliary node must actually host the local features it is serving
+
+So the rule is not "both local and remote at once." The rule is:
+
+- main controller build: client/proxy
+- remote peripheral build: local provider/server
+
 ## What This Feels Like In Practice
 
 From the user-facing point of view, this is meant to feel like the feature is
