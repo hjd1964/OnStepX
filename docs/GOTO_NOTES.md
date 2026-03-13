@@ -316,6 +316,11 @@ Goto does not always drive directly to the literal final target at full intent.
 - refine in one or more additional stages
 - then finish at the final destination
 
+That final approach is not only about positional refinement. In practice, the
+near-destination exit can also be used to normalize backlash on arrival by
+finishing with a consistent last-direction approach instead of simply accepting
+whatever direction the earlier slew happened to end with.
+
 ## This is why the code carries
 
 - `GG_NEAR_DESTINATION_START`
