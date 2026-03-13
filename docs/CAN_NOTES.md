@@ -47,7 +47,8 @@ In that arrangement:
 - the rotator, focusers, and auxiliary-feature controllers stay with that OTA
 - plugging in one CAN/power cable brings that whole peripheral set online
 - the correct functionality and settings can then appear at the mount
-  controller immediately
+  controller immediately and work as one integrated system from Android App,
+  Smart Hand Controller, Smart Web Server, ASCOM, and similar clients
 
 So the CAN link is not just carrying commands. It also helps turn an OTA
 assembly into a more self-contained module that can be moved from one mount
