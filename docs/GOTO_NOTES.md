@@ -1,6 +1,6 @@
-GOTO NOTES
+# Goto Notes
 
-Purpose
+## Purpose
 
 These notes describe how goto, sync, orientation choice, and target-limit
 planning currently work in OnStepX.
@@ -8,16 +8,15 @@ planning currently work in OnStepX.
 This is a workflow note. It is meant to help explain how the system decides on
 a sensible motion plan, not to document every goto command.
 
-For related topics also see:
+## For related topics also see
 
-- `docs/STARTUP_AUTHORITY_NOTES.txt`
-- `docs/HOMING_NOTES.txt`
-- `docs/COMMAND_REFERENCE.md`
+- [STARTUP_AUTHORITY_NOTES.md](STARTUP_AUTHORITY_NOTES.md)
+- [HOMING_NOTES.md](HOMING_NOTES.md)
+- [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
 
+## Quick Summary
 
-Quick Summary
-
-The cleanest mental model is:
+## The cleanest mental model is
 
 1. a user target is turned into mount coordinates
 2. the system checks whether that target is reachable in one or more valid
@@ -27,26 +26,25 @@ The cleanest mental model is:
    handling
 5. runtime limits continue watching during the motion
 
-So goto in OnStepX is not just:
+## So goto in OnStepX is not just
 
 - convert coordinates
 - slew there
 
 It is more like a small decision engine.
 
-
-The Main Distinction: Goto vs Sync
+## The Main Distinction: Goto vs Sync
 
 `goTo.setTarget(...)` is the common decision point for both goto and sync.
 
-That means both operations share:
+## That means both operations share
 
 - target conversion
 - orientation selection
 - reachability checks
 - axis1 wrap/unwind correction
 
-Then they diverge:
+## Then they diverge
 
 - goto moves the mount to the chosen target
 - sync keeps the current physical mount orientation and reassigns coordinates to
@@ -56,10 +54,9 @@ So sync is not a separate simpler target model. It reuses most of the same
 target-planning logic, then applies it as a coordinate reassignment instead of
 motion.
 
+## What A Goto Request Really Does
 
-What A Goto Request Really Does
-
-At a high level a goto request goes through these steps:
+## At a high level a goto request goes through these steps
 
 1. make sure goto is allowed right now
 2. convert the request into mount coordinates
@@ -72,14 +69,13 @@ At a high level a goto request goes through these steps:
 The important thing is that the target may have more than one valid
 representation.
 
-Examples:
+## Examples
 
 - east-side vs west-side orientation on a GEM
 - axis1 target plus or minus 360 degrees when wrapping/unlimited motion exists
 - alternate orientation choices on mounts such as `ALTALT`
 
-
-Workflow 1: Entry Conditions
+## Workflow 1: Entry Conditions
 
 Before goto or sync can proceed, the mount checks a number of ordinary
 conditions:
@@ -96,16 +92,15 @@ and limit logic as well.
 
 In other words, goto is not treated as a way to escape unknown state.
 
+## Workflow 2: Converting The Target
 
-Workflow 2: Converting The Target
-
-The incoming target may start life in:
+## The incoming target may start life in
 
 - native coordinates
 - mount coordinates
 - equatorial, horizontal, or `ALTALT` forms depending on mount type
 
-The goto code converts as needed so the mount can reason about:
+## The goto code converts as needed so the mount can reason about
 
 - target hour angle / declination where applicable
 - target altitude for horizon checks
@@ -114,12 +109,11 @@ The goto code converts as needed so the mount can reason about:
 This is why the same sky target can still lead to more than one valid motion
 plan.
 
-
-Workflow 3: Choosing Orientation
+## Workflow 3: Choosing Orientation
 
 This is one of the core pieces.
 
-OnStepX supports a family of orientation-selection policies:
+## OnStepX supports a family of orientation-selection policies
 
 - `PSS_EAST_ONLY`
 - `PSS_WEST_ONLY`
@@ -129,14 +123,14 @@ OnStepX supports a family of orientation-selection policies:
 - `PSS_AUTO`
 - `PSS_SAME_ONLY`
 
-What these really mean:
+## What these really mean
 
 - some insist on one side only
 - some prefer one side but can fall back to the other if needed
 - some try to stay on the current side
 - some ask the planner to choose what seems best
 
-`PSS_AUTO`
+## `PSS_AUTO`
 
 This was added mainly to support automatic meridian-flip style behavior when the
 mount is in the meridian-overlap region and can legitimately continue tracking
@@ -148,13 +142,13 @@ tracking path when overlap allows it.
 
 This is still not the same thing on every mount type.
 
-For ordinary equatorial cases:
+## For ordinary equatorial cases
 
 - it usually picks a preferred side from current hour angle
 - in overlap cases, that helps place the target on the side where tracking can
   continue unimpeded after the orientation change
 
-For `ALTAZM` and `ALTALT`:
+## For `ALTAZM` and `ALTALT`
 
 - it falls back to `PSS_BEST`
 
@@ -165,14 +159,14 @@ Compared with a fixed preference such as `PSS_EAST`, `PSS_AUTO` is better at
 using meridian-overlap freedom to end up on the side where tracking can keep
 going cleanly after the change.
 
-`PSS_BEST`
+## `PSS_BEST`
 
 `BEST` is distance-aware.
 
 It compares the reachable east- and west-orientation targets in instrument
 space and may choose the alternate orientation if that target is closer.
 
-This is why OnStepX can sometimes choose what looks like a shortcut:
+## This is why OnStepX can sometimes choose what looks like a shortcut
 
 - through the pole
 - through an alternate valid orientation
@@ -185,13 +179,12 @@ can reduce unnecessary flips and choose the shorter or less awkward path. That
 can make the mount feel nicer at the eyepiece even when it is not the same
 choice an imaging workflow would prefer.
 
-
-Workflow 4: Reachability And Target Unwinding
+## Workflow 4: Reachability And Target Unwinding
 
 After a tentative target exists, `Limits::validateTarget(...)` checks whether
 the target is reachable.
 
-This includes:
+## This includes
 
 - altitude min/max
 - east-side axis1 window
@@ -199,7 +192,7 @@ This includes:
 - meridian overlap limits for GEMs
 - axis2 limits
 
-But there is another subtle step:
+## But there is another subtle step
 
 - axis1 may be normalized by plus or minus 360 degrees to find a sensible
   branch
@@ -207,7 +200,7 @@ But there is another subtle step:
 That means the planner does not necessarily use the raw first axis1 value that
 falls out of the transform.
 
-Instead it may:
+## Instead it may
 
 - keep the current branch if it is already best
 - unwind to a nearby branch if that is closer
@@ -219,10 +212,9 @@ be reachable after normalization.
 It is also why wrapped or effectively unlimited axes feel smarter than a simple
 "move to exactly this number" implementation.
 
+## What `AXIS1_WRAP` Changes
 
-What `AXIS1_WRAP` Changes
-
-If `AXIS1_WRAP == ON`:
+## If `AXIS1_WRAP == ON`
 
 - axis1 is configured with a 360-degree wrap
 - its configured range becomes `-360 .. +360`
@@ -230,7 +222,7 @@ If `AXIS1_WRAP == ON`:
 
 That does not mean the mount ignores all planning.
 
-It means:
+## It means
 
 - axis1 has a broader wrapped coordinate space to work in
 - goto can choose a sensible branch in that larger space
@@ -238,18 +230,17 @@ It means:
 This is most relevant on azimuth-like axes and other mounts where bounded
 `-180 .. +180` thinking is too restrictive.
 
-
-Workflow 5: Waypoints And Home During Orientation Change
+## Workflow 5: Waypoints And Home During Orientation Change
 
 If an equatorial goto changes pier side and `MFLIP_SKIP_HOME == OFF`, OnStepX
 does not always go straight to the final destination.
 
-Instead it may:
+## Instead it may
 
 - insert a waypoint at home
 - or insert an avoid waypoint first, then go to home, then continue
 
-That is why the goto stage machine includes:
+## That is why the goto stage machine includes
 
 - `GG_WAYPOINT_AVOID`
 - `GG_WAYPOINT_HOME`
@@ -259,21 +250,20 @@ That is why the goto stage machine includes:
 So a meridian flip or alternate-orientation goto is often a multi-stage motion,
 not one direct straight-line idea.
 
-
-Horizon Avoidance
+## Horizon Avoidance
 
 There are two different horizon-avoidance ideas in the goto system.
 
 The first is path-shaping during side/orientation changes.
 
-When a pier-side change is involved, goto may first route through:
+## When a pier-side change is involved, goto may first route through
 
 - about 4 hours HA
 - or about 3 hours HA
 
 before going home and then heading to the final target.
 
-The reason is practical horizon avoidance:
+## The reason is practical horizon avoidance
 
 - some otherwise valid geometry would pass too low near the horizon during a
   flip or alternate-orientation transition
@@ -284,7 +274,7 @@ math paths are equally safe in practice.
 
 The second is runtime rate shaping based on distance from the altitude limit.
 
-There is a runtime slowdown heuristic:
+## There is a runtime slowdown heuristic
 
 - in equatorial mode with `MOUNT_HORIZON_AVOIDANCE == ON`
 - the axis frequencies are scaled down near the minimum altitude limit
@@ -294,66 +284,63 @@ There is a runtime slowdown heuristic:
 
 This is best thought of as practical protective behavior, not pure geometry.
 
-
-Workflow 6: Near Destination Refinement
+## Workflow 6: Near Destination Refinement
 
 Goto does not always drive directly to the literal final target at full intent.
 
-Depending on encoder/tolerance context, it may:
+## Depending on encoder/tolerance context, it may
 
 - slew to a near-destination first
 - wait to settle
 - refine in one or more additional stages
 - then finish at the final destination
 
-This is why the code carries:
+## This is why the code carries
 
 - `GG_NEAR_DESTINATION_START`
 - `GG_NEAR_DESTINATION_WAIT`
 - `GG_NEAR_DESTINATION`
 - `GG_DESTINATION`
 
-It is also why encoder presence changes behavior:
+## It is also why encoder presence changes behavior
 
 - with suitable encoder/tolerance support, more refined near-target behavior is
   allowed
 - during homing/parking or on simpler cases, that refinement can be reduced or
   skipped
 
-
-Runtime Limits Are Not The Same As Target Validation
+## Runtime Limits Are Not The Same As Target Validation
 
 This is another important distinction.
 
-Target validation answers:
+## Target validation answers
 
 - "is this planned target/orientation allowed?"
 
-Runtime limit monitoring answers:
+## Runtime limit monitoring answers
 
 - "while the mount is moving or tracking, have we crossed something dangerous?"
 
-Runtime checks include:
+## Runtime checks include
 
 - horizon / overhead limits
 - meridian east/west limits
 - axis min/max limits
 - sensed min/max limits
 
-Those runtime checks can:
+## Those runtime checks can
 
 - stop one axis
 - stop the whole mount
 - abort goto
 - trigger automatic meridian flip in some GEM tracking cases
 
-So there are really two layers:
+## So there are really two layers
 
 - planned target acceptance
 - live motion policing
 
-
-Automatic Meridian Flip
+## Automatic Meridian Flip
 
 If automatic meridian flip is enabled and the mount is tracking, some runtime
 limit crossings do not simply stop motion.
@@ -364,14 +351,13 @@ the opposite side:
 - east-side request if currently west and beyond the west meridian limit
 - west-side request if currently east and beyond the axis1 max side
 
-So automatic meridian flip is implemented as:
+## So automatic meridian flip is implemented as
 
 - a limit-triggered alternate-orientation goto
 
 not as a separate completely different motion engine.
 
-
-How Non-GEM Mounts Differ
+## How Non-GEM Mounts Differ
 
 For fork and alt/az style mounts, some axis-limit reasoning is based on shaft
 angles rather than GEM-style pier-side interpretation.
@@ -382,66 +368,62 @@ into a "normal east-like" coordinate form before checking limits.
 That is one reason the same target can feel simpler on some mounts and much
 more orientation-sensitive on others.
 
-
-`ALTALT` And Other Less Common Modes
+## `ALTALT` And Other Less Common Modes
 
 `ALTALT` is one of the modes that can seem obscure from the outside.
 
-The important high-level point is:
+## The important high-level point is
 
 - it still participates in the same planner
 - but some of the normal equatorial assumptions do not apply directly
 
-In practice this means:
+## In practice this means
 
 - target conversion differs
 - `PSS_AUTO` falls back to `PSS_BEST`
 - tracking and motion behavior are not identical to GEM or ordinary alt/az
 
-So it is better to think of `ALTALT` as:
+## So it is better to think of `ALTALT` as
 
 - another consumer of the same decision framework
 
-not as just "equatorial with funny numbers."
+## not as just "equatorial with funny numbers."
 
-
-Special Geometry: Sector Gear And Tangent Arm
+## Special Geometry: Sector Gear And Tangent Arm
 
 Sector gear axis1 and tangent-arm axis2 are special enough that ordinary full
 range goto thinking does not always apply.
 
-For these mounts:
+## For these mounts
 
 - target reachability is influenced by limited physical travel
 - some checks are relaxed or specialized
 - origin handling can matter more than wide-range coordinate elegance
 
-So goto on these mounts is partly about:
+## So goto on these mounts is partly about
 
 - choosing a useful target in a constrained motion envelope
 
 not simply navigating a wide continuous axis range.
 
+## No-Goto Builds
 
-No-Goto Builds
-
-If `GOTO_FEATURE == OFF`:
+## If `GOTO_FEATURE == OFF`
 
 - real automatic goto motion does not exist
 - sync still reuses the target-selection logic
 - the old fake-completion paths for home/park are intentionally gone
 
-So this mode still benefits from:
+## So this mode still benefits from
 
 - coordinate planning
 - orientation choice for sync-like operations
 
 But it is not pretending to offer the full automatic motion planner.
 
+## Examples
 
-Examples
-
-Example 1: Ordinary GEM goto
+## Example 1: Ordinary GEM goto
 
 - user asks for a sky target
 - planner computes east and west solutions
@@ -449,20 +431,20 @@ Example 1: Ordinary GEM goto
 - preferred side or best-distance logic chooses one
 - goto may go directly, or through home if the side changes
 
-Example 2: `PIER_SIDE_BEST`
+## Example 2: `PIER_SIDE_BEST`
 
 - both orientations are valid
 - alternate orientation is closer in instrument space
 - planner chooses the alternate branch
 - this can look like a shortcut through the pole or a less-obvious orientation
 
-Example 3: Wrapped axis1
+## Example 3: Wrapped axis1
 
 - raw target axis1 value is not ideal
 - planner shifts by `+360` or `-360`
 - resulting branch is closer or simply the only valid one inside limits
 
-Example 4: Horizon-avoidance flip
+## Example 4: Horizon-avoidance flip
 
 - side change is needed
 - direct route would be too low near the horizon
@@ -470,10 +452,9 @@ Example 4: Horizon-avoidance flip
 - then goes home
 - then continues to the final destination
 
+## Good Mental Summary
 
-Good Mental Summary
-
-The cleanest way to think about goto in OnStepX is:
+## The cleanest way to think about goto in OnStepX is
 
 - transforms produce candidate target representations
 - limits decide which ones are reachable
@@ -482,7 +463,7 @@ The cleanest way to think about goto in OnStepX is:
 - waypoints and heuristics make the chosen path practical
 - runtime limits keep watching after motion begins
 
-So the goto system is best understood as:
+## So the goto system is best understood as
 
 - a target-planning and motion-decision engine
 

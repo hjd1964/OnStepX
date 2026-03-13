@@ -1,22 +1,21 @@
-HOMING NOTES
+# Homing Notes
 
-Purpose
+## Purpose
 
 These notes describe how mount homing currently works in OnStepX.
 
 This is a workflow note, not a deep explanation of low-level input filtering.
 For the shared sensing subsystem itself, see:
 
-- `docs/SENSING_NOTES.txt`
+- [SENSING_NOTES.md](SENSING_NOTES.md)
 
-For how homing relates to startup trust/authority, also see:
+## For how homing relates to startup trust/authority, also see
 
-- `docs/STARTUP_AUTHORITY_NOTES.txt`
+- [STARTUP_AUTHORITY_NOTES.md](STARTUP_AUTHORITY_NOTES.md)
 
+## Quick Summary
 
-Quick Summary
-
-There are three related but different ideas:
+## There are three related but different ideas
 
 1. Return to home
    Move the mount to the configured home coordinates
@@ -27,10 +26,9 @@ There are three related but different ideas:
 
 Those are often used together, but they are not the same operation.
 
+## The Main Entry Points
 
-The Main Entry Points
-
-The core mount home commands are:
+## The core mount home commands are
 
 - `:hC#`
   move to home
@@ -43,15 +41,14 @@ The core mount home commands are:
 - `:hC1,n#` / `:hC2,n#`
   set home sense offset in arc-seconds
 
-Status command:
+## Status command
 
 - `:h?#`
   returns `hasSense,axis1Offset,axis2Offset`
 
+## What "Home" Means
 
-What "Home" Means
-
-The configured home position is derived from:
+## The configured home position is derived from
 
 - mount type
 - configured home defaults
@@ -64,7 +61,7 @@ That home position is refreshed by `Home::init()` and then returned through
 
 So "home" is not just a fixed pair of axis numbers. It is computed in context.
 
-It is also important to separate:
+## It is also important to separate
 
 - mount orientation
 - coordinates assigned to that orientation
@@ -77,7 +74,7 @@ basis says corresponds to the home coordinates.
 That means the practical truth about what mount orientation counts as "home"
 can shift when the coordinate basis shifts.
 
-Examples:
+## Examples
 
 - an authoritative reset at home reassigns the coordinate basis
 - sync/model/origin changes can improve accuracy by shifting how the system
@@ -88,26 +85,25 @@ Examples:
 With home switches, the home procedure has a stronger mount-orientation anchor
 because the system is observing a real sense event during homing.
 
-So it is best to think of home as:
+## So it is best to think of home as
 
 - a reference in coordinate space
 
 that may or may not be strongly anchored to mount orientation depending on
 whether home sensing is available.
 
+## The Three Main Workflows
 
-The Three Main Workflows
-
-Workflow 1: Return To Home Without Sensors
+## Workflow 1: Return To Home Without Sensors
 
 This is the simple "move to home coordinates" path.
 
-It happens when:
+## It happens when
 
 - `home.request()` is called
 - no home switches/sense inputs are configured
 
-Behavior:
+## Behavior
 
 - goto must be available
 - startup authority must already be trusted
@@ -117,17 +113,16 @@ Behavior:
 This is just motion to a known coordinate target. It does not establish truth
 from hardware sensing.
 
-
-Workflow 2: Sensed Home
+## Workflow 2: Sensed Home
 
 This is the switch/sensor-based path.
 
-It happens when:
+## It happens when
 
 - `home.request()` is called
 - home sense is available
 
-Behavior:
+## Behavior
 
 - goto must be available
 - if startup authority is not trusted, sensed home is still allowed because it
@@ -138,27 +133,26 @@ Behavior:
   sensed state
 - the axis refines through fast/slow/fine homing stages
 
-If sensing succeeds:
+## If sensing succeeds
 
 - `home.guideDone(true)` runs
 - an authoritative reset is performed
 - startup authority becomes trusted
 
-If sensing fails:
+## If sensing fails
 
 - `home.guideDone(false)` runs
 - a non-authoritative reset/recovery path is attempted
 - the home operation is marked failed
 
-
-What The Axis Class Actually Does During Sensed Home
+## What The Axis Class Actually Does During Sensed Home
 
 The mount-level home request is only part of the story. The detailed switch
 search sequence lives down in the axis class.
 
 Each relevant axis uses `Axis::autoSlewHome()`.
 
-The important sequence is:
+## The important sequence is
 
 1. Check the current home-sense state
 2. Choose an initial direction
@@ -166,7 +160,7 @@ The important sequence is:
 4. Decelerate to a stop
 5. Refine through additional slower passes
 
-More concretely:
+## More concretely
 
 - if home sense is already ON, the axis first moves forward off the switch
 - if home sense is OFF, the axis first moves reverse toward the switch
@@ -174,7 +168,7 @@ More concretely:
 - the homing stage advances from `HOME_FAST` to `HOME_SLOW`
 - then usually to `HOME_FINE`
 
-During the refinement sequence:
+## During the refinement sequence
 
 - the slew rate is reduced
 - the axis repeats the search with tighter motion
@@ -184,38 +178,37 @@ During the refinement sequence:
 This is why sensed home is more than "drive until switch closes once." It is a
 small staged search procedure implemented at the axis level.
 
-Timeout also matters:
+## Timeout also matters
 
 - if no explicit timeout is supplied, the axis derives one from the configured
   home distance limit and slew rate
 - if the search times out, the homing slew aborts
 
-Motion safety still applies:
+## Motion safety still applies
 
 - motion errors abort homing
 - motor faults abort homing
 - common min/max sense conflicts can also abort the slew
 
-So the full sensed-home sequence is:
+## So the full sensed-home sequence is
 
 - mount/home layer decides that sensed home should happen
 - guide layer starts coordinated home-guiding
 - axis layer performs the actual staged switch search
 - home layer interprets success/failure and performs reset/recovery
 
-
-Workflow 3: Reset At Home
+## Workflow 3: Reset At Home
 
 This is the coordinate-basis rebuild step.
 
-It happens through:
+## It happens through
 
 - `home.reset(...)`
 - `:hF#`
 - startup reset logic
 - successful sensed-home completion
 
-Behavior:
+## Behavior
 
 - tracking is stopped
 - tracking-rate offsets are cleared
@@ -225,53 +218,51 @@ Behavior:
 - nominal index positions are captured
 - backlash and slow slew defaults are restored
 
-If the reset is authoritative:
+## If the reset is authoritative
 
 - startup trust is granted
 
-If it is not authoritative:
+## If it is not authoritative
 
 - it does not grant trust by itself
 
-
-Authoritative vs Non-Authoritative Reset
+## Authoritative vs Non-Authoritative Reset
 
 This is one of the key distinctions.
 
-Authoritative reset means:
+## Authoritative reset means
 
 - the software has a good reason to believe the home position being applied is
   truly correct
 
-Examples:
+## Examples
 
 - successful sensed home
 - startup reset using valid paired absolute authority
 - explicit authoritative origin/home workflows
 
-Non-authoritative reset means:
+## Non-authoritative reset means
 
 - coordinates are being reassigned to home, but the software is not treating
   that as proof of truth
 
-This distinction matters because:
+## This distinction matters because
 
 - authoritative reset can establish startup trust
 - non-authoritative reset cannot
 
-
-How Trust Interacts With Homing
+## How Trust Interacts With Homing
 
 Homing is one of the main bridges between untrusted and trusted state.
 
-Important rules:
+## Important rules
 
 - plain return-to-home without sensors requires trust first
 - sensed home can be used to regain trust
 - authoritative reset grants trust
 - non-authoritative reset does not
 
-There is also one permissive carveout:
+## There is also one permissive carveout
 
 - in `SA_AUTO` on simple mounts with no absolute encoders and no coordinate
   memory, home/reset is allowed to bypass the sync-limit style coordinate jump
@@ -280,26 +271,24 @@ There is also one permissive carveout:
 That keeps older/simple mounts practical without weakening the stricter cases
 globally.
 
+## Auto Home At Boot
 
-Auto Home At Boot
-
-If `automaticAtBoot` is enabled:
+## If `automaticAtBoot` is enabled
 
 - autostart requests home after boot
 
 This shares the same sensed-home or return-home machinery as a normal home
 request. It is not a separate home implementation.
 
-That means:
+## That means
 
 - success behaves like normal homing success
 - failure behaves like normal homing failure
 - auto-home does not silently pretend success if the sensed-home flow fails
 
+## No-Goto Behavior
 
-No-Goto Behavior
-
-If `GOTO_FEATURE == OFF`:
+## If `GOTO_FEATURE == OFF`
 
 - home request is rejected
 - reset/home-with-motion request is rejected
@@ -307,67 +296,64 @@ If `GOTO_FEATURE == OFF`:
 
 This is intentional.
 
-In no-goto builds:
+## In no-goto builds
 
 - there is no fast automatic slew/home capability
 - home/return is not supposed to pretend to exist as a supported motion mode
 
-
-How Home Sense Offsets Work
+## How Home Sense Offsets Work
 
 Each mount axis can have a stored sense offset.
 
-These offsets mean:
+## These offsets mean
 
 - the physical home sense event is not necessarily the final logical home
   coordinate
 
-Typical use:
+## Typical use
 
 - a switch is placed somewhere repeatable but not exactly at the desired final
   home location
 - the offset defines the difference between switch-detected home and desired
   coordinate home
 
-Commands:
+## Commands
 
 - `:hC1,n#`
 - `:hC2,n#`
 
-Examples:
+## Examples
 
 - `:hC1,120#`
   set axis1 home offset to +120 arcsec
 - `:hC2,-300#`
   set axis2 home offset to -300 arcsec
 
-
-Two Offset Modes
+## Two Offset Modes
 
 The config option `MOUNT_HOME_AT_OFFSETS` changes how offsets are used.
 
-When `MOUNT_HOME_AT_OFFSETS == OFF`:
+## When `MOUNT_HOME_AT_OFFSETS == OFF`
 
 - sensed home resets at the switch-derived home first
 - then, if offsets are in use, the mount may perform a finishing move toward
   the true home coordinates after the authoritative reset
 
-When `MOUNT_HOME_AT_OFFSETS == ON`:
+## When `MOUNT_HOME_AT_OFFSETS == ON`
 
 - offsets are folded directly into the computed home position
 
-So the difference is basically:
+## So the difference is basically
 
 - separate finishing move
 vs
 - home already means the offset-adjusted position
 
-
-Home Sense Reversal
+## Home Sense Reversal
 
 Each axis can also reverse the meaning of its home sense input.
 
-Commands:
+## Commands
 
 - `:hC1,R#`
 - `:hC2,R#`
@@ -379,24 +365,23 @@ Axis1 also has a latitude-related reversal for equatorial mounts in the
 southern hemisphere, so axis1 home sense behavior is slightly more subtle than
 just a plain stored boolean.
 
+## Examples
 
-Examples
-
-Example 1: Simple mount, no home switches
+## Example 1: Simple mount, no home switches
 
 - user powers on
 - mount already has trusted startup authority or permissive `SA_AUTO`
 - `:hC#` moves to home coordinates
 - `:hF#` can reset at the home position
 
-Example 2: Mount with home switches
+## Example 2: Mount with home switches
 
 - user or autostart requests home
 - guide-home uses switch sensing to find home
 - successful sensed home performs authoritative reset
 - trust is granted
 
-Example 3: Switch is repeatable but not exactly at desired home
+## Example 3: Switch is repeatable but not exactly at desired home
 
 - home sense is configured
 - nonzero offsets are stored
@@ -404,8 +389,7 @@ Example 3: Switch is repeatable but not exactly at desired home
 - reset establishes truth
 - final coordinate home may be offset from the literal switch crossing
 
-
-Special Geometry Cases
+## Special Geometry Cases
 
 Sector gear axis1 and tangent-arm axis2 are special.
 
@@ -416,7 +400,7 @@ For these geometries, home is not only about returning to a meaningful
 coordinate reference. It is also about resetting the mechanism so later gotos
 and tracking have useful travel remaining inside the limited range.
 
-So on a sector gear or tangent-arm mount, homing is often better understood as:
+## So on a sector gear or tangent-arm mount, homing is often better understood as
 
 - mechanical re-baselining of the constrained axis
 - restoring useful travel for later motion
@@ -428,7 +412,7 @@ meaningful here. On these mounts the code relaxes or skips parts of the normal
 "how far are we from home in coordinates?" logic before sensed homing, because
 operation is fundamentally constrained and often more manual.
 
-Instead:
+## Instead
 
 - origin/position handling is adjusted to fit the special axis geometry
 - successful sensed home may set origin more directly for the special axis
@@ -436,10 +420,9 @@ Instead:
 So if behavior looks a little different on sector gear or tangent-arm mounts,
 that is expected.
 
+## Failure Modes
 
-Failure Modes
-
-Homing can fail because of:
+## Homing can fail because of
 
 - goto disabled
 - motion already active
@@ -451,26 +434,24 @@ Homing can fail because of:
 
 The code tries to fail conservatively rather than pretending home succeeded.
 
-
-Relationship To Sensing
+## Relationship To Sensing
 
 Homing depends heavily on the shared sensing subsystem, but that low-level
 behavior is documented separately.
 
-If you need to understand:
+## If you need to understand
 
 - how `HIGH | HYST(20)` is interpreted
 - how analog threshold/hysteresis sensing works
 - how runtime reversal works
 
-see:
+## see
 
-- `docs/SENSING_NOTES.txt`
+- [SENSING_NOTES.md](SENSING_NOTES.md)
 
+## Good Mental Summary
 
-Good Mental Summary
-
-The cleanest summary is:
+## The cleanest summary is
 
 - return-to-home is motion to a known coordinate target
 - sensed home is a hardware-based search procedure

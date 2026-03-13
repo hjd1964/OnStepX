@@ -1,10 +1,10 @@
-PEC NOTES
+# PEC Notes
 
-Purpose
+## Purpose
 
 These notes describe how PEC currently works in OnStepX.
 
-PEC is one of the harder features to reason about because it combines:
+## PEC is one of the harder features to reason about because it combines
 
 - persistent state
 - a sampled correction table
@@ -13,30 +13,28 @@ PEC is one of the harder features to reason about because it combines:
 - guide interaction
 - park/unpark interaction
 
-The implementation is concentrated mainly in:
+## The implementation is concentrated mainly in
 
 - `src/telescope/mount/pec/Pec.h`
 - `src/telescope/mount/pec/Pec.cpp`
 - `src/telescope/mount/pec/Pec.command.cpp`
 
+## Quick Summary
 
-Quick Summary
-
-The clean mental model is:
+## The clean mental model is
 
 1. PEC stores one correction value per sidereal second of worm rotation
 2. a worm index event establishes where the buffer starts
 3. playback adds/subtracts a small tracking-rate correction each second
 4. recording learns those per-second corrections from accumulated guide action
 
-So PEC in OnStepX is basically:
+## So PEC in OnStepX is basically
 
 - a one-second-slot correction table wrapped around the worm rotation
 
+## What PEC Applies To
 
-What PEC Applies To
-
-Current mount PEC support is for:
+## Current mount PEC support is for
 
 - axis1 only
 
@@ -48,14 +46,13 @@ other repeatable geared error sources as long as:
 - the cycle length is stable
 - the cycle period fits within the supported PEC limits/buffer size
 
-If `PEC_BUFFER_SIZE_LIMIT == 0` or `PEC_STEPS_PER_WORM_ROTATION == 0`:
+## If `PEC_BUFFER_SIZE_LIMIT == 0` or `PEC_STEPS_PER_WORM_ROTATION == 0`
 
 - PEC is effectively disabled
 
+## The Main Stored Data
 
-The Main Stored Data
-
-PEC stores:
+## PEC stores
 
 - whether valid PEC data have been recorded
 - current PEC state
@@ -64,46 +61,45 @@ PEC stores:
 
 The small settings live in normal NV settings storage.
 
-The correction table itself lives in a dedicated NV partition named:
+## The correction table itself lives in a dedicated NV partition named
 
 - `PEC`
 
-Important persistence detail:
+## Important persistence detail
 
 - changing or recording PEC data in RAM does not automatically write the PEC
   table to NV
 - writing the PEC table to NV only happens on explicit user command
 
-This is separate from PEC control state:
+## This is separate from PEC control state
 
 - arming playback/record or disabling PEC updates the small PEC settings in NV
 - but the actual correction table is only written by explicit save command
 
-That means:
+## That means
 
 - after a recording session, the in-memory PEC table may differ from the
   persisted PEC table
 - if the user does not explicitly save the new data, a reboot comes back with
   whatever PEC table was previously stored
 
-This is useful because:
+## This is useful because
 
 - a bad recording session can simply be abandoned by not saving it
 
-
-The PEC Buffer
+## The PEC Buffer
 
 The PEC buffer is not stored as one entry per motor step.
 
-Instead:
+## Instead
 
 - one entry represents one sidereal second of worm rotation
 
-That means:
+## That means
 
 - buffer size in bytes is approximately worm rotation time in seconds
 
-Example:
+## Example
 
 - if one worm rotation takes 720 sidereal seconds
 - the PEC buffer has 720 entries
@@ -112,50 +108,47 @@ Each entry is an `int8_t` correction value.
 
 So each second of worm rotation gets a small signed rate correction.
 
+## How Worm Rotation Length Is Used
 
-How Worm Rotation Length Is Used
-
-The configured worm rotation length is stored as:
+## The configured worm rotation length is stored as
 
 - `PEC_STEPS_PER_WORM_ROTATION`
 
-PEC uses that to derive:
+## PEC uses that to derive
 
 - seconds per worm rotation
 - buffer size
 - current worm-rotation position from current axis1 motor steps
 
-So PEC fundamentally depends on:
+## So PEC fundamentally depends on
 
 - knowing how many axis1 motor steps correspond to one worm rotation
 
+## Two Ways PEC Gets Its Index
 
-Two Ways PEC Gets Its Index
-
-PEC can work with:
+## PEC can work with
 
 1. real sense input (`PEC_SENSE != OFF`)
 2. virtual wraparound indexing (`PEC_SENSE == OFF`)
 
-With real sense input:
+## With real sense input
 
 - a sense event on `PEC_SENSE_PIN` defines the worm index
 - PEC waits for enough worm travel before accepting another index
 - this avoids repeated false retriggers too close together
 
-Without real sense input:
+## Without real sense input
 
 - PEC treats worm rotation wraparound as a virtual index
 
-So:
+## So
 
 - hardware sense gives a stronger physical anchor
 - no-sense PEC is still possible, but indexing is inferred
 
+## How The Index Event Works
 
-How The Index Event Works
-
-When PEC sense is enabled:
+## When PEC sense is enabled
 
 - the sense input is read through the shared `Sense` subsystem
 - a valid ON transition after enough worm travel is treated as an index event
@@ -163,41 +156,39 @@ When PEC sense is enabled:
 - PEC marks that it has a valid worm reference
 - playback buffer position can be realigned to that reference
 
-This is why the sensing note matters here too:
+## This is why the sensing note matters here too
 
 - low-level sense filtering decides whether the PEC index input is ON
 - PEC then adds its own motion/spacing logic before trusting that event as a
   real index
 
-
-When PEC Is Active
+## When PEC Is Active
 
 PEC is only allowed to do real work when the mount is in an appropriate state.
 
-Main requirements:
+## Main requirements
 
 - the mount must be tracking
 - guide state must not exceed pulse-guide style use
 - the mount must not be parking or parked
 
-If those conditions are not true:
+## If those conditions are not true
 
 - PEC disables recording
 - PEC pauses playback
 
-Important distinction:
+## Important distinction
 
 - playback pause is not the same as losing PEC data
 
-If PEC was playing and the mount becomes ineligible:
+## If PEC was playing and the mount becomes ineligible
 
 - state drops back to `PEC_READY_PLAY`
 - playback can resume after re-indexing/alignment timing is right again
 
+## The PEC State Machine
 
-The PEC State Machine
-
-Main states:
+## Main states
 
 - `PEC_NONE`
 - `PEC_READY_PLAY`
@@ -205,7 +196,7 @@ Main states:
 - `PEC_READY_RECORD`
 - `PEC_RECORD`
 
-Meaning:
+## Meaning
 
 - `PEC_NONE`
   PEC inactive
@@ -218,33 +209,31 @@ Meaning:
 - `PEC_RECORD`
   PEC actively recording guide-derived corrections
 
-
-Why "Ready" States Exist
+## Why "Ready" States Exist
 
 PEC does not jump into play or record at an arbitrary instant.
 
-Instead, it waits until:
+## Instead, it waits until
 
 - the worm position is aligned to a one-second slot boundary
 
 This makes the table alignment cleaner and keeps the one-second buffer indexing
 consistent.
 
-So "ready" means:
+## So "ready" means
 
 - the user has requested the action
 - PEC is waiting for the correct phase/alignment to begin
 
+## Playback
 
-Playback
-
-During playback:
+## During playback
 
 - PEC advances the buffer index once per sidereal second
 - it looks up the correction for the current worm segment
 - it applies that as a fractional tracking-rate offset
 
-One subtle detail:
+## One subtle detail
 
 - playback uses the correction from one second earlier than the current segment
 
@@ -253,49 +242,46 @@ acquisition and response.
 
 So PEC playback is intentionally shifted slightly ahead in effect.
 
+## Recording
 
-Recording
-
-During recording:
+## During recording
 
 - guide contribution on axis1 is accumulated
 - once per sidereal second, that accumulated correction is quantized into a
   small signed step value
 - that value becomes the PEC table entry for the current buffer slot
 
-If this is not the first recording:
+## If this is not the first recording
 
 - new data are blended with existing data using a weighted average
 
-So PEC recording is not just "write raw guide values directly." It is:
+## So PEC recording is not just "write raw guide values directly." It is
 
 - accumulate
 - quantize per second
 - optionally blend with existing data
 
+## What "First Recording" Changes
 
-What "First Recording" Changes
-
-If this is the first time PEC is being recorded:
+## If this is the first time PEC is being recorded
 
 - the new table is taken directly from current recording data
 
-If PEC data already exist:
+## If PEC data already exist
 
 - new data are blended with the old table
 
 That lets users refine an existing PEC table rather than always replacing it
 from scratch.
 
+## Cleanup After Recording
 
-Cleanup After Recording
-
-When recording finishes:
+## When recording finishes
 
 - PEC automatically switches to play
 - the table is run through a cleanup pass
 
-Cleanup includes:
+## Cleanup includes
 
 - a low-pass smoothing pass
 - a linear-regression style correction so the total sequence sums close to zero
@@ -303,38 +289,36 @@ Cleanup includes:
 That last part matters because PEC corrections should not create a long-term
 net tracking bias over a whole worm cycle.
 
-If the cleanup result looks unreasonable:
+## If the cleanup result looks unreasonable
 
 - PEC invalidates the recorded data
 - PEC drops back to `PEC_NONE`
 
-
-Why The Sum Matters
+## Why The Sum Matters
 
 A PEC table is supposed to redistribute tracking slightly over the worm cycle,
 not permanently add or subtract motion over a full cycle.
 
-So after cleanup:
+## So after cleanup
 
 - the total correction sequence should roughly cancel out
 
 That is why PEC does a "reality check" on the residual sum.
 
-
-Park / Unpark Interaction
+## Park / Unpark Interaction
 
 PEC interacts with park in an important way.
 
-When parking:
+## When parking
 
 - PEC is turned off
 - the current worm sense position is saved into park settings
 
-When unparking/restoring:
+## When unparking/restoring
 
 - that saved worm sense position is restored
 
-If a real `PEC_SENSE` input exists:
+## If a real `PEC_SENSE` input exists
 
 - worm index truth is also recovered automatically once the worm rotates far
   enough to detect the next valid PEC index event
@@ -349,10 +333,9 @@ interval.
 This is another reason PEC is harder to reason about than a simple runtime
 feature. It is not independent of park state.
 
+## Examples
 
-Examples
-
-Example 1: Playback with real worm index
+## Example 1: Playback with real worm index
 
 - PEC data were previously recorded
 - user enables PEC playback
@@ -362,7 +345,7 @@ Example 1: Playback with real worm index
 - playback starts
 - a later real PEC index event can realign buffer start
 
-Example 2: Recording new PEC data
+## Example 2: Recording new PEC data
 
 - mount is tracking
 - user arms PEC recording
@@ -373,7 +356,7 @@ Example 2: Recording new PEC data
 - cleanup runs
 - PEC switches into playback
 
-Example 3: Mount stops tracking during playback
+## Example 3: Mount stops tracking during playback
 
 - PEC was in `PEC_PLAY`
 - tracking stops or mount becomes ineligible
@@ -381,10 +364,9 @@ Example 3: Mount stops tracking during playback
 - rate goes to zero
 - playback can later resume when conditions are valid again
 
+## Commands
 
-Commands
-
-There are several PEC commands, but the most important control ones are:
+## There are several PEC commands, but the most important control ones are
 
 - `:$QZ+#`
   arm/enable playback
@@ -399,21 +381,20 @@ There are several PEC commands, but the most important control ones are:
 - `:$QZ?#`
   get PEC status
 
-There are also read/write commands for:
+## There are also read/write commands for
 
 - table contents
 - worm rotation steps
 - buffer size
 - current index location
 
-For the exact command list, see:
+## For the exact command list, see
 
-- `docs/COMMAND_REFERENCE.md`
+- [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
 
+## Things That Make PEC Hard To Reason About
 
-Things That Make PEC Hard To Reason About
-
-PEC combines several different concerns at once:
+## PEC combines several different concerns at once
 
 - mount motion state
 - tracking state
@@ -425,10 +406,9 @@ PEC combines several different concerns at once:
 
 That is why local code reading can still leave the feature feeling opaque.
 
+## Good Mental Summary
 
-Good Mental Summary
-
-The most useful summary is:
+## The most useful summary is
 
 - PEC is a per-second correction table over one worm rotation
 - indexing tells PEC where the table starts

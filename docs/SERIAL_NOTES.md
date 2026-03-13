@@ -1,26 +1,25 @@
-SERIAL NOTES
+# Serial Notes
 
-Purpose
+## Purpose
 
 These notes explain how serial interfaces are used in OnStepX and why serial
 configuration can be confusing across platforms.
 
-The short version is:
+## The short version is
 
 - a platform may support several kinds of serial interfaces
 - a pinmap chooses which ones are exposed for a given board
 - a feature may or may not be well suited to the chosen serial transport
 
-So "serial is supported" does not always mean:
+## So "serial is supported" does not always mean
 
 - easy to configure
 - portable to another board
 - good for real-time runtime use
 
+## Quick Summary
 
-Quick Summary
-
-Think about serial in three layers:
+## Think about serial in three layers
 
 1. Platform:
    What the MCU/core can do
@@ -29,20 +28,19 @@ Think about serial in three layers:
 3. Feature:
    Whether the transport is actually a good fit for the workload
 
-Examples:
+## Examples
 
 - GPS over `SoftSerial` can be fine
 - TMC2209 over `SoftSerial` may compile but still be a poor runtime fit
 - Teensy can expose extra USB virtual serial ports
 - ESP32 can often move hardware UARTs to different pins
 
-
-The Main Serial Roles
+## The Main Serial Roles
 
 OnStepX uses generic serial role names instead of hard-coding one board's port
 names everywhere.
 
-Common roles include:
+## Common roles include
 
 - `SERIAL_A`
 - `SERIAL_B`
@@ -55,20 +53,19 @@ Common roles include:
 
 These are best thought of as roles, not fixed physical ports.
 
-One board might make:
+## One board might make
 
 - `SERIAL_B = Serial2`
 
-Another board might make:
+## Another board might make
 
 - `SERIAL_B = HardSerial` with configured RX/TX pins
 
 Another board might not expose `SERIAL_B` at all.
 
+## The Main Serial Types
 
-The Main Serial Types
-
-In practice, OnStepX may use:
+## In practice, OnStepX may use
 
 - built-in hardware serial ports such as `Serial1`, `Serial2`, etc.
 - created hardware serial objects using chosen RX/TX pins
@@ -79,19 +76,18 @@ In practice, OnStepX may use:
 All of these may look stream-like in code, but they are not equally suitable
 for all jobs.
 
-
-Platform Differences
+## Platform Differences
 
 This is where a lot of confusion starts.
 
-Teensy
+## Teensy
 
 - often has multiple hardware UARTs
 - can also expose extra USB virtual serial ports depending on USB mode
 - some pinmaps use that to expose `SERIAL_D = SerialUSB1` and
   `SERIAL_E = SerialUSB2`
 
-ESP32
+## ESP32
 
 - usually has flexible hardware UART routing
 - can often place UART RX/TX on non-default pins
@@ -99,23 +95,23 @@ ESP32
   on some other Arduino-class targets
 - also has optional Bluetooth serial support in the HAL
 
-STM32
+## STM32
 
 - often supports created/remapped hardware serial well
 - also pulls in `SoftwareSerial` support early in the HAL because library/core
   behavior can otherwise get awkward
 
-Why ESP32 Is Worth Calling Out
+## Why ESP32 Is Worth Calling Out
 
 ESP32 is a good example of why "hardware serial" does not always mean
 "hard-wired fixed pins."
 
-In OnStepX, some ESP32 pinmaps define roles like:
+## In OnStepX, some ESP32 pinmaps define roles like
 
 - `SERIAL_B = Serial2`
 - `SERIAL_TMC = Serial1`
 
-and then separately define:
+## and then separately define
 
 - `SERIAL_B_RX`
 - `SERIAL_B_TX`
@@ -125,83 +121,80 @@ and then separately define:
 That means the feature gets a real hardware UART, but the board still has some
 freedom to place it where it makes sense.
 
-This is one reason ESP32 can be a nice middle ground:
+## This is one reason ESP32 can be a nice middle ground
 
 - better than `SoftSerial` for runtime work
 - more flexible than boards with only fixed UART pin assignments
 
-
-Pinmaps Decide What Exists
+## Pinmaps Decide What Exists
 
 The pinmap layer is where generic serial roles become concrete.
 
-This means:
+## This means
 
 - a feature may request `SERIAL_GPS`
 - but whether that becomes `SoftSerial`, `HardSerial`, `Serial1`, or something
   else depends on the pinmap and platform
 
-Compile-time validation catches some problems, for example:
+## Compile-time validation catches some problems, for example
 
 - a baud rate is enabled for a serial role that the pinmap did not define
 - a TMC UART driver is enabled but `SERIAL_TMC` is missing
 
-What validation does not prove:
+## What validation does not prove
 
 - that the chosen serial transport is a good runtime fit
 - that it is non-blocking enough
 - that the underlying library behaves well on that platform
 
+## Best Uses For Each Type
 
-Best Uses For Each Type
+## Built-in or created hardware serial
 
-Built-in or created hardware serial
-
-Usually best for:
+## Usually best for
 
 - continuous runtime traffic
 - higher baud rates
 - frequent bidirectional communication
 - motion-control related serial work
 
-Examples:
+## Examples
 
 - shared TMC2209 UART on boards designed for it
 - a secondary MCU link
 - frequent device polling
 
-`SoftwareSerial`
+## `SoftwareSerial`
 
-Usually best for:
+## Usually best for
 
 - one-time configuration at boot
 - low-rate telemetry
 - devices that become less important once startup finishes
 
-Examples:
+## Examples
 
 - GPS
 - boot-time driver setup in some constrained builds
 
-USB virtual serial
+## USB virtual serial
 
-Usually best for:
+## Usually best for
 
 - extra host-side channels
 - debug, tooling, or auxiliary control on supported platforms
 
-Examples:
+## Examples
 
 - Teensy `SerialUSB1`
 - Teensy `SerialUSB2`
 
-
-Why `SoftwareSerial` Is Tricky
+## Why `SoftwareSerial` Is Tricky
 
 `SoftwareSerial` is often the most confusing case because it is sometimes very
 useful and sometimes a terrible fit.
 
-General concerns:
+## General concerns
 
 - it is often blocking or close enough to blocking to matter
 - support quality varies by platform
@@ -215,12 +208,11 @@ as:
 - non-blocking
 - appropriate for real-time runtime use
 
-
-Example: GPS
+## Example: GPS
 
 GPS is one of the better cases for less-than-perfect serial.
 
-Why:
+## Why
 
 - relatively low-rate
 - mostly an input stream
@@ -232,63 +224,60 @@ So GPS over `SoftSerial` can be a reasonable trade on many builds.
 That does not make `SoftSerial` universally good. It just means GPS is a
 feature that can often tolerate it.
 
-
-Example: TMC2209 UART
+## Example: TMC2209 UART
 
 TMC2209 is the opposite kind of example.
 
-Why it is harder:
+## Why it is harder
 
 - runtime UART interaction can matter
 - mode changes may happen during operation
 - status/config traffic may be needed while the rest of the mount is busy
 - blocking behavior is much more painful in a real-time motion system
 
-So for TMC2209:
+## So for TMC2209
 
 - `SoftSerial` may be acceptable for one-time setup at boot
 - `SoftSerial` is much less attractive for active runtime interaction
 
 That does not mean `SoftSerial` is useless here. It means the use case matters.
 
+## Example: More Than Four TMC2209s
 
-Example: More Than Four TMC2209s
-
-There is one place where `SoftSerial` can still be attractive for TMC2209:
+## There is one place where `SoftSerial` can still be attractive for TMC2209
 
 - per-device links can make scaling easier when a shared hardware UART bus gets
   awkward
 
-So there is a real trade:
+## So there is a real trade
 
 - shared hardware UART is usually better for runtime quality
 - per-device `SoftSerial` may make some larger or stranger topologies possible
 
-This is why the answer is not simply:
+## This is why the answer is not simply
 
 - "never use `SoftSerial`"
 
-It is more like:
+## It is more like
 
 - use it carefully
 - prefer it for boot/setup or unusual topologies
 - do not assume it is ideal for active runtime control
 
+## Library Ownership Matters
 
-Library Ownership Matters
-
-Another subtle point:
+## Another subtle point
 
 OnStepX may define the transport, but the feature library often performs the
 real reads and writes.
 
-That means serial behavior depends on:
+## That means serial behavior depends on
 
 - the platform core
 - the chosen transport
 - the feature library
 
-This is especially relevant for:
+## This is especially relevant for
 
 - TMC driver libraries
 - any feature with frequent serial traffic
@@ -296,29 +285,27 @@ This is especially relevant for:
 So a configuration can be theoretically valid while still being lightly tested
 or operationally uncertain.
 
+## Practical Rules Of Thumb
 
-Practical Rules Of Thumb
-
-If the serial link is mostly needed at boot:
+## If the serial link is mostly needed at boot
 
 - `SoftSerial` may be acceptable
 
-If the serial link is needed continuously during runtime:
+## If the serial link is needed continuously during runtime
 
 - prefer hardware UART where possible
 
-If the board/platform offers extra USB serial channels:
+## If the board/platform offers extra USB serial channels
 
 - treat that as a platform-specific bonus, not a general Arduino assumption
 
-If a user is choosing between "works in theory" and "works robustly":
+## If a user is choosing between "works in theory" and "works robustly"
 
 - favor the more boring hardware-UART option
 
+## Good Mental Summary
 
-Good Mental Summary
-
-The simplest reliable way to think about serial in OnStepX is:
+## The simplest reliable way to think about serial in OnStepX is
 
 - HAL defines what the platform can plausibly do
 - the pinmap assigns generic serial roles to actual transports

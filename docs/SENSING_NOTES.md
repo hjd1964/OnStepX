@@ -1,8 +1,8 @@
-SENSING NOTES
+# Sensing Notes
 
-Purpose
+## Purpose
 
-These notes describe the shared sensing subsystem used across OnStepX for:
+## These notes describe the shared sensing subsystem used across OnStepX for
 
 - home sense
 - limit sense
@@ -23,16 +23,15 @@ There is also a related but separate `Button` helper for more button-specific
 input behavior, including analog range comparison. That is covered near the end
 of this note.
 
+## Quick Summary
 
-Quick Summary
-
-The simplest mental model is:
+## The simplest mental model is
 
 1. raw GPIO or analog input comes in
 2. `Sense` turns it into a normalized ON/OFF state
 3. higher-level code decides what ON/OFF means operationally
 
-Examples:
+## Examples
 
 - home code asks whether home sense is active/ON according to its configured
   `HIGH`/`LOW` meaning
@@ -41,15 +40,14 @@ Examples:
 
 The same low-level sensing code is reused in all of those cases.
 
+## Where The Shared Sense Code Lives
 
-Where The Shared Sense Code Lives
-
-The main subsystem is:
+## The main subsystem is
 
 - `src/lib/sense/Sense.h`
 - `src/lib/sense/Sense.cpp`
 
-Main API:
+## Main API
 
 - `sense.add(...)`
 - `sense.isOn(...)`
@@ -62,10 +60,9 @@ In most feature code, the higher-level subsystem does not read the GPIO pin
 directly. It registers a sense input once and then works with the normalized
 result through a sense handle.
 
+## How Sense Configuration Works
 
-How Sense Configuration Works
-
-Each sense input is defined by:
+## Each sense input is defined by
 
 - a pin
 - an init mode such as `INPUT`, `INPUT_PULLUP`, or `INPUT_PULLDOWN`
@@ -75,7 +72,7 @@ The packed trigger value normally combines pieces with `|`.
 
 That is the usual configuration pattern.
 
-Examples:
+## Examples
 
 - `HIGH`
 - `LOW`
@@ -86,31 +83,29 @@ Examples:
 
 Combining flags numerically with `|` is typically the intended style.
 
+## What The Trigger Encodes
 
-What The Trigger Encodes
-
-The trigger value carries:
+## The trigger value carries
 
 - the active state bit: `HIGH` or `LOW`
 - an optional analog threshold via `THLD(v)`
 - an optional hysteresis via `HYST(v)`
 
-Important rule:
+## Important rule
 
 - if the threshold part is zero, the input is treated as digital
 - if the threshold part is nonzero, the input is treated as analog
 
-So:
+## So
 
 - `HIGH | HYST(20)` is still digital
 - `LOW | THLD(400) | HYST(15)` is analog
 
-
-Digital Sense
+## Digital Sense
 
 Digital mode is used when there is no threshold component.
 
-Behavior:
+## Behavior
 
 - raw input is read with `digitalReadEx(pin)`
 - `HYST(n)` is the required stable time in milliseconds before a digital state
@@ -118,11 +113,11 @@ Behavior:
 - the new digital sample must remain unchanged for that long before the
   logical state changes
 
-So in digital mode, `HYST()` does not mean an analog band. It means:
+## So in digital mode, `HYST()` does not mean an analog band. It means
 
 - how long the signal must stay stable before the change is accepted
 
-Examples:
+## Examples
 
 - `HIGH`
   active-high digital input, no extra filtering
@@ -134,25 +129,24 @@ Examples:
 - `LOW | HYST(50)`
   active-low digital input with heavier software debounce/noise filtering
 
-This is useful for:
+## This is useful for
 
 - switch debounce
 - modest EMI/RFI filtering
 - noisy digital inputs that should not chatter
 
-
-Analog Sense
+## Analog Sense
 
 Analog mode is used when a threshold component is present.
 
-Behavior:
+## Behavior
 
 - raw input is read with `analogRead(...)`
 - on ESP32, `analogReadMilliVolts(...)` is converted back into the common
   `ANALOG_READ_RANGE` scale for higher accuracy on this platform
 - the threshold and hysteresis act like a software Schmitt trigger
 
-This means:
+## This means
 
 - if the sample rises above `threshold + hysteresis`, the logical value becomes
   `HIGH`
@@ -161,13 +155,13 @@ This means:
 - inside the band between those two thresholds, the last logical state is
   retained
 
-That band is effectively a deadband zone:
+## That band is effectively a deadband zone
 
 - the signal can move around inside it without causing repeated state changes
 - a state change only happens after the signal leaves the deadband on one side
   or the other
 
-Examples:
+## Examples
 
 - `HIGH | THLD(512)`
   active-high analog threshold at mid-scale, no hysteresis band
@@ -177,31 +171,29 @@ Examples:
   active-high analog input that must move well above and below the threshold
   before changing state
 
-This is useful when:
+## This is useful when
 
 - a clean digital threshold is not available from hardware
 - analog noise would otherwise cause state chatter
 
-
-Why Hysteresis Means Two Different Things
+## Why Hysteresis Means Two Different Things
 
 This is one of the easiest things to forget.
 
-In digital mode:
+## In digital mode
 
 - `HYST(n)` means time in milliseconds
 
-In analog mode:
+## In analog mode
 
 - `HYST(n)` means an analog hysteresis band around the threshold, creating a
   deadband zone where the current state is held
 
 That dual meaning is intentional, but it is easy to misread in config.
 
+## What "ON" Means
 
-What "ON" Means
-
-The subsystem separates:
+## The subsystem separates
 
 - the filtered internal logical value (`HIGH` or `LOW`)
 - whether that logical value counts as ON for the caller
@@ -209,44 +201,42 @@ The subsystem separates:
 `sense.isOn(...)` returns true when the filtered value matches the configured
 active state.
 
-So:
+## So
 
 - active-high means HIGH is considered ON
 - active-low means LOW is considered ON
 
-This lets higher-level code work with:
+## This lets higher-level code work with
 
 - "is the home sense active?"
 - "is the limit sense active?"
 
 without caring whether the hardware is electrically active-high or active-low.
 
-
-Runtime Reversal
+## Runtime Reversal
 
 `sense.reverse(handle, state)` flips the interpretation at runtime.
 
 This is different from the original config.
 
-Config answers:
+## Config answers
 
 - what electrical state counts as active
 
-Runtime reversal answers:
+## Runtime reversal answers
 
 - should this sense be interpreted the opposite way right now
 
-In practice this is used by code such as:
+## In practice this is used by code such as
 
 - `Axis::setHomeReverse()`
 
 This is useful when the electrical truth stays the same but the motion logic
 needs the opposite interpretation.
 
+## Where `Sense` Is Used
 
-Where `Sense` Is Used
-
-Shared `Sense` users currently include:
+## Shared `Sense` users currently include
 
 - axis home sense
 - axis min/max limit sense
@@ -258,12 +248,11 @@ Shared `Sense` users currently include:
 That is why it is better to think of `Sense` as a general-purpose input
 normalization subsystem, not just "home switch code."
 
-
-Example: Home Sense
+## Example: Home Sense
 
 Axis home sense is registered in `Axis::init()`.
 
-Important behavior:
+## Important behavior
 
 - homing first checks whether home sense is already ON
 - if it is ON, motion first goes forward off the switch
@@ -272,7 +261,7 @@ Important behavior:
 So home sense is not just an endpoint detector. It also affects the search
 direction and homing flow.
 
-Typical home examples:
+## Typical home examples
 
 - `AXIS1_SENSE_HOME HIGH`
   simple active-high home switch
@@ -281,42 +270,40 @@ Typical home examples:
 - `AXIS1_SENSE_HOME HIGH | THLD(450) | HYST(20)`
   analog thresholded home sense with hysteresis
 
-
-Example: Limit Sense
+## Example: Limit Sense
 
 Limit sense uses the same subsystem for min/max axis limits.
 
-Runtime behavior:
+## Runtime behavior
 
 - `Axis::poll()` updates the sensed limit flags
 - `Limits::poll()` reacts and stops the relevant motion direction
 
-One important special case:
+## One important special case
 
 - min and max can share the same physical pin
 
-By default:
+## By default
 
 - the axis notes this as `commonMinMaxSense`
 - the higher-level limit logic avoids treating one shared input as two separate
   independent events
 
-Config option:
+## Config option
 
 - `LIMIT_SENSE_STRICT == ON` disables that relaxation and treats shared min/max
   more strictly
 
-Typical limit examples:
+## Typical limit examples
 
 - `LIMIT_SENSE LOW`
   common active-low limit input
 - `LIMIT_SENSE LOW | HYST(10)`
   common active-low limit input with digital filtering
 
+## Example: Park Sense
 
-Example: Park Sense
-
-Parking uses the same sensing framework for:
+## Parking uses the same sensing framework for
 
 - `PARK_SENSE`
 - `PARK_SIGNAL`
@@ -324,12 +311,11 @@ Parking uses the same sensing framework for:
 Those are not special sensing implementations. They are just more clients of
 the shared normalized ON/OFF sensing subsystem.
 
-
-Example: PEC Sense
+## Example: PEC Sense
 
 PEC can also use the same shared `Sense` subsystem.
 
-That means the PEC index input can also be:
+## That means the PEC index input can also be
 
 - digital
 - analog thresholded
@@ -338,35 +324,33 @@ That means the PEC index input can also be:
 Then PEC adds its own higher-level logic on top, such as only accepting a new
 index event after enough motion has occurred.
 
-So:
+## So
 
 - `Sense` decides whether the input is ON
 - PEC decides whether that ON transition counts as a valid worm index event
 
-
-What `Sense` Does Not Do
+## What `Sense` Does Not Do
 
 The shared `Sense` subsystem does not implement every kind of analog input
 pattern.
 
-In particular, it does not implement:
+## In particular, it does not implement
 
 - "pressed when analog value lies within a range"
 
-It is focused on:
+## It is focused on
 
 - digital filtered ON/OFF sensing
 - analog threshold-plus-hysteresis ON/OFF sensing
 
+## Related But Separate: `Button`
 
-Related But Separate: `Button`
-
-There is a related helper in:
+## There is a related helper in
 
 - `src/lib/pushButton/PushButton.h`
 - `src/lib/pushButton/PushButton.cpp`
 
-That helper is more button-focused and adds behavior such as:
+## That helper is more button-focused and adds behavior such as
 
 - press/release semantics
 - click and double-click detection
@@ -377,7 +361,7 @@ That helper is more button-focused and adds behavior such as:
 That analog value/range mode is the "pseudo-digital using analog sampling and
 range comparison" behavior.
 
-So if someone is looking for:
+## So if someone is looking for
 
 - analog value-in-range detection
 - button semantics
@@ -385,30 +369,28 @@ So if someone is looking for:
 
 they should usually look at `Button`, not `Sense`.
 
+## Practical Rules Of Thumb
 
-Practical Rules Of Thumb
-
-If the input is a normal switch:
+## If the input is a normal switch
 
 - start with plain `HIGH` or `LOW`
 
-If the switch chatters or is noisy:
+## If the switch chatters or is noisy
 
 - add `HYST(n)` and remember that in digital mode it means milliseconds
 
-If the input is fundamentally analog:
+## If the input is fundamentally analog
 
 - use `THLD(...)`
 - add `HYST(...)` if you want Schmitt-trigger-like stability
 
-If the meaning of the signal must flip at runtime:
+## If the meaning of the signal must flip at runtime
 
 - use runtime reversal rather than redefining the electrical config
 
+## Good Mental Summary
 
-Good Mental Summary
-
-The cleanest way to think about sensing in OnStepX is:
+## The cleanest way to think about sensing in OnStepX is
 
 - config defines how raw input should be interpreted
 - `Sense` turns that raw input into a stable ON/OFF result

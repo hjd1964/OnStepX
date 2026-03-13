@@ -1,12 +1,12 @@
-Startup Authority And Coordinate Trust Notes
+# Startup Authority And Coordinate Trust Notes
 
-Purpose
+## Purpose
 
 These notes describe how startup authority and coordinate trust currently work
 for the mount, and how that affects automatic motion such as goto, sync,
 park/unpark, and home/return.
 
-Core idea
+## Core idea
 
 The mount tracks a runtime trust state whose only question is:
 "Do we trust the current coordinate basis enough for coordinate-based
@@ -20,7 +20,7 @@ If trust is false:
 - manual guide recovery is still allowed
 - plain sidereal tracking is still allowed
 
-Two useful distinctions
+## Two useful distinctions
 
 1. Immediate startup authority
 - trust is available immediately at boot from an already-available authority
@@ -32,7 +32,7 @@ Two useful distinctions
 
 Date/time readiness is separate from both of the above.
 
-What currently establishes trust
+## What currently establishes trust
 
 Trust can currently come from either immediate startup authority sources or
 later authoritative actions.
@@ -64,7 +64,7 @@ Later authoritative actions:
 
 Ordinary sync is not used to restore trust.
 
-What currently revokes trust
+## What currently revokes trust
 
 Trust is revoked conservatively when the system can no longer honestly assume
 the coordinate basis is valid.
@@ -77,7 +77,7 @@ Important non-revocation note:
 - a motion stop caused by limits or StallGuard is not, by itself, a trust
   revocation event
 
-What is blocked while untrusted
+## What is blocked while untrusted
 
 Blocked:
 - goto
@@ -91,7 +91,7 @@ Allowed:
 - manual guide
 - plain sidereal tracking
 
-Parking workflow
+## Parking workflow
 
 Parking is part of the same trust model because park/set-park/unpark all depend
 on the mount coordinate basis being believable.
@@ -117,7 +117,7 @@ Operationally this means:
   is disabled for SA_STRICT, for mounts using coordinate memory, and for mounts
   with absolute position sources
 
-Workflow 1: Boot With Immediate Startup Authority
+## Workflow 1: Boot With Immediate Startup Authority
 
 This is the cleanest startup path.
 
@@ -129,7 +129,7 @@ Current immediate startup authority sources are:
 - paired mount-axis absolute position sources
 - trusted mount coordinate memory
 
-Workflow 1a: Boot With Paired Mount-Axis Absolute Coordinate Authority
+## Workflow 1a: Boot With Paired Mount-Axis Absolute Coordinate Authority
 
 This applies when:
 - both mount axes report absolute position at startup
@@ -152,7 +152,7 @@ For runtime/NV origin storage:
 Compile-time configured nonzero AXIS*_ENCODER_ORIGIN values are treated as
 already established by configuration.
 
-Workflow 1b: Boot With Trusted Mount Coordinate Memory
+## Workflow 1b: Boot With Trusted Mount Coordinate Memory
 
 Mount coordinate memory acts much like an "effective absolute startup source"
 in the trust model:
@@ -179,7 +179,7 @@ This separates:
 So coordinate memory is not just "last known position storage." It is also a
 startup authority source when, and only when, the saved record is trusted.
 
-Workflow 2: Boot Without Immediate Startup Authority
+## Workflow 2: Boot Without Immediate Startup Authority
 
 What happens here depends on MOUNT_STARTUP_MODE.
 
@@ -219,7 +219,7 @@ Important practical consequence:
   neither paired absolute position sources nor coordinate memory enabled
 - SA_STRICT remains available for observatory and interlock-sensitive installs
 
-Workflow 3: Boot Untrusted, Then Establish Trust With Auto-Home
+## Workflow 3: Boot Untrusted, Then Establish Trust With Auto-Home
 
 Auto-home with switches is best thought of as deferred startup authority.
 
@@ -244,7 +244,7 @@ Failure:
 This behavior is intentionally consistent with normal switch-based return/home,
 not just boot homing.
 
-Coordinate memory during homing
+## Coordinate memory during homing
 
 Important edge case:
 when switch-based homing is in progress, mount coordinates are effectively
@@ -261,7 +261,7 @@ So if power is lost mid-home:
 - automatic coordinate-based motion will remain blocked
 - the user can home/reset again, regain trust, and continue
 
-Workflow 4: Date/Time Not Ready
+## Workflow 4: Date/Time Not Ready
 
 Date/time readiness and startup trust are related but not the same thing.
 
@@ -281,7 +281,7 @@ Example:
 - unpark recovery may wait for the normal site/time flow even when trust is
   already valid
 
-Workflow 5: Losing Trust During Runtime
+## Workflow 5: Losing Trust During Runtime
 
 If trust is lost after startup:
 - coordinate-based automatic motion stops being allowed
@@ -293,7 +293,7 @@ The guiding rule is:
 - if it does not know where it is, coordinate-based automatic motion is blocked
 - guide-based manual recovery remains available
 
-Important startup workflows to remember
+## Important startup workflows to remember
 
 1. Basic mount with clutches, no absolute encoders, no coordinate memory:
 - common user workflow is manually place at home, power on, then goto/sync
@@ -311,7 +311,7 @@ Important startup workflows to remember
 - trust does not gate sidereal tracking
 - this is intentional and should remain so
 
-NV policy
+## NV policy
 
 The compile-time switch:
 - NV_INIT_ERROR_REVOKES_AUTHORITY
@@ -325,7 +325,7 @@ Meaning:
 
 This is intentionally strict, but it has an escape hatch for expert use.
 
-Status exposure
+## Status exposure
 
 The trust state is exposed in :Gu# so clients can detect it without extra
 status calls.
@@ -333,7 +333,7 @@ status calls.
 Longer term, a small circular event log is probably a better place to record
 why trust changed than trying to pack too much into live status.
 
-Open future work
+## Open future work
 
 - circular timestamped event log for trust loss/recovery reasons
 - possibly record a simple trust-loss reason code
