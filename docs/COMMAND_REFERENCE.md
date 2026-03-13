@@ -821,6 +821,9 @@ Locale-backed axis parameter name tokens currently used by firmware:
 
 ## CAN Remote-Node Variants
 
+For architecture, configuration, and current scope, see
+[CAN_NOTES.md](CAN_NOTES.md).
+
 The following files implement the same logical command families over packed CAN messages rather than the ASCII LX200-style transport:
 
 - `src/telescope/focuser/local/Focuser.can.command.cpp`
