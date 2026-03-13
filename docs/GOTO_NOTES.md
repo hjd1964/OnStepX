@@ -406,22 +406,32 @@ more than one valid branch.
 
 `ALTALT` is one of the modes that can seem obscure from the outside.
 
-## The important high-level point is
+One useful way to picture it is by re-aiming the primary axis of a familiar
+equatorial mount.
 
-- it still participates in the same planner
-- but some of the normal equatorial assumptions do not apply directly
+- on a GEM, that axis points parallel to Earth's rotation axis
+- on an `ALTAZM`, that same idea would point the primary axis at the zenith
+- on an `ALTALT`, the primary axis points north on the horizon at `ALT = 0`
+
+That is why `ALTALT` is not just "equatorial with funny numbers." It is a
+different mount geometry with its own natural strengths and weak spots.
 
 ## In practice this means
 
 - target conversion differs
 - `PSS_AUTO` falls back to `PSS_BEST`
 - tracking and motion behavior are not identical to GEM or ordinary alt/az
+- the mount can move naturally through the zenith and celestial-pole regions
+- it is therefore one of the most natural mount geometries for satellite
+  tracking
+- the field will still rotate even if the mount is otherwise tracking the
+  general sky motion correctly
+- the geometry is weakest for targets near due north or due south on the
+  horizon
 
-## So it is better to think of `ALTALT` as
-
-- another consumer of the same decision framework
-
-## not as just "equatorial with funny numbers."
+So it is better to think of `ALTALT` as another consumer of the same decision
+framework, but with a different singularity pattern and a different relationship
+between its primary axis and Earth's rotation.
 
 ## Special Geometry: Sector Gear And Tangent Arm
 
