@@ -101,7 +101,7 @@ In the standard arrangement:
 - the far end of the chain gets the second `120 Ohm` termination resistor
 
 For this system, that far-end termination can be provided by plugging a custom
-terminating modular jack into the last node in the chain.
+terminating modular jack or `GX12-6` connector into the last node in the chain.
 
 So the intended layout is the normal two-ended CAN termination pattern:
 
