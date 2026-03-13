@@ -192,6 +192,18 @@ the target is reachable.
 - meridian overlap limits for GEMs
 - axis2 limits
 
+These sketches help visualize why the same configured GEM limits can look
+different depending on which side of the pier the mount is currently using:
+
+![GEM limits example when east of the pier](<GEM LIMITS EXAMPLE EAST OF PIER.jpg>)
+
+When east of the pier, the active limit window is interpreted against the
+east-side geometry shown above.
+
+![GEM limits example when west of the pier](<GEM LIMITS EXAMPLE WEST OF PIER.jpg>)
+
+When west of the pier, the same ideas map onto the mirrored west-side geometry.
+
 ## But there is another subtle step
 
 - axis1 may be normalized by plus or minus 360 degrees to find a sensible

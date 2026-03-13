@@ -418,6 +418,9 @@ Current core constants are:
 
 ### Limits
 
+For a visual explanation of confusing GEM east/west pier-side limit geometry,
+see [GOTO_NOTES.md](GOTO_NOTES.md#workflow-4-reachability-and-target-unwinding).
+
 | Command | Reply | Description |
 | --- | --- | --- |
 | `:Gh#` | `sDD*#` | Horizon limit |
