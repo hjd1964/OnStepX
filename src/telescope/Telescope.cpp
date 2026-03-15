@@ -157,7 +157,7 @@ void Telescope::init(const char *fwName, int fwMajor, int fwMinor, const char *f
 
       // next any PEC partition
       uint32_t pecSize = 0;
-      #if AXIS1_PEC != OFF
+      #if AXIS1_PEC == ON
         pecSize = ((PEC_BUFFER_SIZE_LIMIT) >> 4) << 4;
         if (kvSize + pecSize > vSize) { pecSize = 0; }
 

@@ -364,9 +364,12 @@ void Mount::update() {
     float f1 = 0, f2 = 0;
     if (!guide.activeAxis1() || guide.state == GU_PULSE_GUIDE) {
       f1 = trackingRateAxis1;
-      #if AXIS1_PEC != OFF
-        if (transform.mountType != ALTAZM && transform.mountType != ALTALT)  f1 += guide.rateAxis1 + pec.rate;
-      #endif
+      if (transform.mountType != ALTAZM && transform.mountType != ALTALT) {
+        f1 += guide.rateAxis1;
+        #if AXIS1_PEC == ON
+          f1 += pec.rate;
+        #endif
+      }
       axis1.setSynchronizedFrequency(siderealToRadF(f1)*SIDEREAL_RATIO_F*site.getSiderealRatio());
     }
 
