@@ -135,13 +135,13 @@ bool TmcStepDirDriverSG::parameterIsValid(AxisParameter* parameter, bool next) {
       if (sgEnabledValue == ON && (decaySlewingValue != OFF && decaySlewingValue != STEALTHCHOP)) {
         DF("WRN:"); D(axisPrefix);
         DLF("stallGuard SG-Enable ON requires Decay-mode-Goto StealthChop");
-        return false;
+        return true;
       }
     } else {
       if (sgEnabledValue == ON && (decaySlewingValue != OFF && decaySlewingValue != SPREADCYCLE)) {
         DF("WRN:"); D(axisPrefix);
         DLF("stallGuard SG-Enable ON requires Decay-mode-Goto SpreadCycle");
-        return false;
+        return true;
       }
     }
   }
