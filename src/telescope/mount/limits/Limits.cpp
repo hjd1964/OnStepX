@@ -49,36 +49,33 @@ CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double val
       return CE_NONE;
     #endif
 
-    double threshold;
     double delta;
-    const char *axisLabel;
     long proposedIndexSteps;
     long nominalIndexSteps;
 
     switch (axisNumber) {
       case 1:
-        threshold = (AXIS1_LIMIT_SYNC == OFF) ? OFF : degToRadF((float)AXIS1_LIMIT_SYNC);
+        if (AXIS1_LIMIT_SYNC == OFF) return CE_NONE;
         proposedIndexSteps = lround(value*axis1.getStepsPerMeasure()) - (axis1.getInstrumentCoordinateSteps() - axis1.getIndexPositionSteps());
         nominalIndexSteps = mount.getNominalIndexPositionSteps(1);
         delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis1.getStepsPerMeasure();
-        axisLabel = "axis1";
+        if (delta > degToRadF((float)AXIS1_LIMIT_SYNC)) {
+          VLF("MSG: Mount, sync axis1 rejected (exceeds threshold)");
+          return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        }
       break;
       case 2:
-        threshold = (AXIS2_LIMIT_SYNC == OFF) ? OFF : degToRadF((float)AXIS2_LIMIT_SYNC);
+        if (AXIS2_LIMIT_SYNC == OFF) return CE_NONE;
         proposedIndexSteps = lround(value*axis2.getStepsPerMeasure()) - (axis2.getInstrumentCoordinateSteps() - axis2.getIndexPositionSteps());
         nominalIndexSteps = mount.getNominalIndexPositionSteps(2);
         delta = fabs((double)(proposedIndexSteps - nominalIndexSteps))/axis2.getStepsPerMeasure();
-        axisLabel = "axis2";
+        if (delta > degToRadF((float)AXIS2_LIMIT_SYNC)) {
+          VLF("MSG: Mount, sync axis2 rejected (exceeds threshold)");
+          return CE_SLEW_ERR_OUTSIDE_LIMITS;
+        }
       break;
       default:
         return CE_PARAM_RANGE;
-    }
-
-    if (threshold == OFF) return CE_NONE;
-
-    if (delta > threshold) {
-      VF("MSG: Mount, sync "); V(axisLabel); VLF(" rejected (exceeds threshold)");
-      return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
 
     return CE_NONE;
