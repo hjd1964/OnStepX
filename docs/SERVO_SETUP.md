@@ -281,6 +281,9 @@ Those are the `_GOTO` values:
 - `AXIS*_PID_I_GOTO`
 - `AXIS*_PID_D_GOTO`
 
+Often since this uses feed-forward the goto parameters are less important.  Also
+these can be changed instantly at runtime from the SWS or Website Plugin which makes tuning far far faster.
+
 ## How motion feed-forward works now
 
 This is one area where older servo examples can be misleading.
