@@ -33,6 +33,11 @@ If trust is false:
 
 Date/time readiness is separate from both of the above.
 
+Limit enforcement is related but separate too:
+- startup authority answers whether the coordinate basis is trusted
+- date/time readiness answers whether sky-referenced operation is ready
+- limit enforcement can become active as soon as both are available
+
 ## What currently establishes trust
 
 Trust can currently come from either immediate startup authority sources or
@@ -283,6 +288,14 @@ So a mount may have trust while date/time is still not ready.
 In that state:
 - the coordinate basis may still be considered authoritative
 - but some operations may remain postponed or blocked until date/time is ready
+
+For mounts using trusted coordinate memory restore or trusted paired absolute
+startup position:
+- once date/time becomes ready, limit enforcement can be enabled immediately
+- this does not require a later goto, reset/home, or unpark just to make
+  limits active
+- that in turn allows tracking requests to succeed normally under the usual
+  limit-safety policy
 
 Example:
 - unpark recovery may wait for the normal site/time flow even when trust is
