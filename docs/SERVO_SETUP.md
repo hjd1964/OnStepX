@@ -206,6 +206,10 @@ The practical rule is:
 Do not use motor reverse as a substitute for fixing an encoder that counts the
 wrong direction.
 
+If the motor and encoder direction are NOT in agreement the axis will run-away.
+There is code that attempts to detect run-away, or oscillation, which will hopefully
+shut the axis down in short order if this happens.
+
 5. Conservative limits
 - set reasonable axis limits before doing long moves
 - keep first tests short and slow
