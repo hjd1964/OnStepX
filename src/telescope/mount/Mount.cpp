@@ -197,6 +197,10 @@ void Mount::setStartupAuthorityTrusted(bool state) {
   #endif
 
   startupAuthorityTrustedValue = state;
+
+  // If we have a trusted coordinate basis and date/time is ready, limits can
+  // be enforced immediately without waiting for a later goto/reset/unpark path.
+  if (startupAuthorityTrustedValue && site.isDateTimeReady()) limits.enabled(true);
 }
 
 void Mount::captureNominalIndexPositions() {

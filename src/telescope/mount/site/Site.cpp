@@ -272,6 +272,8 @@ void Site::setDateTime(JulianDate julianDate) {
   #if LIMIT_STRICT == ON
     limits.enabled(isDateTimeReady());
   #endif
+
+  if (isDateTimeReady() && mount.startupAuthorityTrusted()) limits.enabled(true);
 }
 
 // gets the time in sidereal hours
