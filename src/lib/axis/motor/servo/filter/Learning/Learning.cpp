@@ -1,5 +1,11 @@
 // -----------------------------------------------------------------------------------
 // learning filter (experimental)
+//
+// This is not a conventional noise filter.
+// It attempts to learn a repeatable cosine-like periodic error in the
+// encoder-minus-motor delta for the RA axis and subtract part of that learned
+// pattern back out. It should be treated as experimental cyclic-error
+// compensation rather than a general-purpose smoothing filter.
 
 #include "Learning.h"
 
@@ -9,21 +15,35 @@
 
 void learningAnalyze() { filterAxis1.analyze(); }
 
-LearningFilter::LearningFilter(int windowSize, int frameWidth) {
-  this->windowSize = windowSize;
-  this->frameWidth = frameWidth;
+LearningFilter::LearningFilter(int smoothingWindowSize, int historyLength) {
+  this->smoothingWindowSize = smoothingWindowSize;
+  this->historyLength = historyLength;
 
-  deltas = new long[this->frameWidth];
-  counts = new long[this->frameWidth];
+  deltaSamples = new long[this->historyLength];
 
-  if (deltas == NULL || counts == NULL) { active = false; return; } else active = true;
+  if (deltaSamples == NULL) { active = false; return; } else active = true;
 
-  countsPerSecond = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
-  countsPerSample = countsPerSecond/4.0F;
-  samplesPerSecond = countsPerSample/countsPerSecond;
+  trackingCountsPerSecond = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
+  sampleSpacingCounts = trackingCountsPerSecond/4.0F;
+  sampleSpacingSeconds = sampleSpacingCounts/trackingCountsPerSecond;
 }
 
-long LearningFilter::update(long encoderCounts, long motorCounts, bool learn) {
+long LearningFilter::wrappedSampleIndex(long sample) const {
+  long wrapped = sample % historyLength;
+  if (wrapped < 0) wrapped += historyLength;
+  return wrapped;
+}
+
+float LearningFilter::periodicCorrection(long sample) const {
+  if (!lock || averagePeriodSamples <= 0.0F) return 0.0F;
+
+  float phaseOffset = fmodf((sample - averagePhaseSample), averagePeriodSamples);
+  if (phaseOffset < 0.0F) phaseOffset += averagePeriodSamples;
+
+  return cosf((phaseOffset/averagePeriodSamples)*PI*2.0F) * (averageAmplitude*0.4F);
+}
+
+long LearningFilter::update(long encoderCounts, long motorCounts, bool learningActive) {
   if (!active) return encoderCounts;
 
   long delta = encoderCounts - motorCounts;
@@ -31,8 +51,8 @@ long LearningFilter::update(long encoderCounts, long motorCounts, bool learn) {
   if (!initialized) {
     reset();
 
-    avgDelta = delta;
-    avgEncoderCounts = encoderCounts;
+    smoothedDelta = delta;
+    smoothedEncoderCounts = encoderCounts;
 
     VF("MSG: Filter, learning start polling task (rate 5s priority 7)... ");
     if (tasks.add(2000, 0, true, 7, learningAnalyze, "Learn")) { VLF("success"); } else { VLF("FAILED!"); }
@@ -40,103 +60,96 @@ long LearningFilter::update(long encoderCounts, long motorCounts, bool learn) {
     initialized = true;
   }
 
-  avgDelta = (avgDelta*(windowSize - 1) + delta)/windowSize;
-  avgEncoderCounts = (avgEncoderCounts*(windowSize - 1) + encoderCounts)/windowSize;
+  smoothedDelta = (smoothedDelta*(smoothingWindowSize - 1) + delta)/smoothingWindowSize;
+  smoothedEncoderCounts = (smoothedEncoderCounts*(smoothingWindowSize - 1) + encoderCounts)/smoothingWindowSize;
 
-  index = lround(avgEncoderCounts/countsPerSample);
+  sampleIndex = lround(smoothedEncoderCounts/sampleSpacingCounts);
 
-  // take a samples
-  if (learn && index != lastIndex) {
-    lastIndex = index;
+  // Take samples only while the motion is stable enough to learn from.
+  if (learningActive && sampleIndex != lastLearnedSampleIndex) {
+    lastLearnedSampleIndex = sampleIndex;
 
-    deltas[index % frameWidth] = avgDelta;
-    counts[index % frameWidth] = avgEncoderCounts;
+    deltaSamples[wrappedSampleIndex(sampleIndex)] = smoothedDelta;
+  }
 
-   // DL(cos(((index - phase)/avgPeriod)*PI*2));
-    if (lock) {
-      correction = cos((((index - avgPhase) % (long)avgPeriod)/avgPeriod)*PI*2.0F) * (avgAmplitude*0.4);
-//      correction = 0;
-    } else correction = 0;
-  } else correction = 0;
+  learnedCorrection = lroundf(periodicCorrection(sampleIndex));
 
-  avgDelta -= correction;
-
-  return avgDelta + motorCounts;
+  return (smoothedDelta - learnedCorrection) + motorCounts;
 }
 
 void LearningFilter::analyze() {
   if (!active) return;
 
-  // locate highest delta, an start of phase
-  // locate lowest delta, an half-phase
-  long maxDelta = 0;
-  long minDelta = 0;
-  long maxCount = 0;
-  long minCount = 0;
-  long p = 0, t = 0;
-  for (int i = 0; i < frameWidth; i++) {
-    int j = (index - i) % frameWidth;
-    if (j < 0) j += frameWidth;
-    if (deltas[j] >= maxDelta) { maxDelta = deltas[j]; maxCount = counts[j]; p = j; }
-    if (deltas[j] <= minDelta) { minDelta = deltas[j]; minCount = counts[j]; t = j; }
+  // Find the strongest positive and negative error sample in the learned history.
+  long maxDelta = deltaSamples[wrappedSampleIndex(sampleIndex)];
+  long minDelta = maxDelta;
+  long strongestPhaseSample = wrappedSampleIndex(sampleIndex);
+  for (int i = 0; i < historyLength; i++) {
+    int j = wrappedSampleIndex(sampleIndex - i);
+    if (deltaSamples[j] >= maxDelta) { maxDelta = deltaSamples[j]; strongestPhaseSample = j; }
+    if (deltaSamples[j] <= minDelta) { minDelta = deltaSamples[j]; }
     Y;
   }
-  phase = p;
+  phaseSample = strongestPhaseSample;
 
-  avgMaxDelta = ((avgMaxDelta*19.0F) + maxDelta)/20.0F;
-  avgMinDelta = ((avgMinDelta*19.0F) + minDelta)/20.0F;
-  avgAmplitude = (avgMaxDelta - avgMinDelta)/2.0F;
+  averagePeakDelta = ((averagePeakDelta*19.0F) + maxDelta)/20.0F;
+  averageValleyDelta = ((averageValleyDelta*19.0F) + minDelta)/20.0F;
+  averageAmplitude = (averagePeakDelta - averageValleyDelta)/2.0F;
 
-  float error, delta;
+  float error;
+  float sampleDelta;
   error = 0;
-  for (int i = 0; i < frameWidth; i++) {
-    int j = (phase - i) % frameWidth;
-    if (j < 0) j += frameWidth;
-    delta = deltas[j];
-    error += delta*delta;
+  for (int i = 0; i < historyLength; i++) {
+    int j = wrappedSampleIndex(phaseSample - i);
+    sampleDelta = deltaSamples[j];
+    error += sampleDelta*sampleDelta;
     Y;
   }
-  error /= frameWidth;
+  error /= historyLength;
   float nativeError = error;
 
   float bestError = 100000;
   float bestPeriod = 0;
   for (int period = 200; period > 20; period -= 1) {
     error = 0;
-    for (int i = 0; i < frameWidth; i++) {
-      int j = (phase - i) % frameWidth;
-      if (j < 0) j += frameWidth;
-      delta = deltas[j] - cos(((i/(float)frameWidth)*(period/20.0F))*(float)(PI)*2.0F)*avgAmplitude;
-      error += delta*delta;
+    for (int i = 0; i < historyLength; i++) {
+      int j = wrappedSampleIndex(phaseSample - i);
+      sampleDelta = deltaSamples[j] - cosf(((i/(float)historyLength)*(period/20.0F))*(float)(PI)*2.0F)*averageAmplitude;
+      error += sampleDelta*sampleDelta;
       Y;
     }
-    error /= frameWidth;
+    error /= historyLength;
 
     if (error < bestError) {
-      bestPeriod = frameWidth/(period/20.0F);
+      bestPeriod = historyLength/(period/20.0F);
       bestError = error;
     }
   }
 
-  if (phase != lastPhase) {
-    lastPhase = phase;
-    avgPhase += avgPhaseShift;
+  if (averagePhaseSample == 0) {
+    averagePhaseSample = phaseSample;
   } else {
-    if (avgPhaseShift = 0) avgPhaseShift = lastPhase - phase;
-    avgPhaseShift = ((avgPhaseShift*19.0F) + (lastPhase - phase))/20.0F;
+    float phaseForAverage = (float)phaseSample;
+    float avgPhaseForAverage = (float)averagePhaseSample;
 
-    if (avgPhase == 0) avgPhase = phase;
-    avgPhase = ((avgPhase*19.0F) + phase)/20.0F;
+    // Smooth phase on a circular history buffer without jumping at wraparound.
+    if (labs(phaseSample - averagePhaseSample) > historyLength/2) {
+      if (phaseSample < averagePhaseSample) phaseForAverage += historyLength; else avgPhaseForAverage += historyLength;
+    }
+
+    averagePhaseSample = wrappedSampleIndex(lroundf((avgPhaseForAverage*19.0F + phaseForAverage)/20.0F));
   }
+  if (averagePeriodSamples == 0) averagePeriodSamples = bestPeriod;
+  averagePeriodSamples = ((averagePeriodSamples*19.0F) + bestPeriod)/20.0F;
 
-  if (avgPeriod == 0) avgPeriod = bestPeriod;
-  avgPeriod = ((avgPeriod*19.0F) + bestPeriod)/20.0F;
+  long phaseDistance = labs(phaseSample - averagePhaseSample);
+  if (phaseDistance > historyLength/2) phaseDistance = historyLength - phaseDistance;
+  const long phaseTolerance = max(2L, lroundf(averagePeriodSamples*0.1F));
 
   if (bestError < nativeError &&
-      avgPeriod > 0 &&
-      avgPhase > 0 &&
-      bestPeriod/avgPeriod > 0.8 && bestPeriod/avgPeriod < 1.2 &&
-      phase/avgPhase > 0.9 && phase/avgPhase < 1.1)
+      averagePeriodSamples > 0 &&
+      bestPeriod/averagePeriodSamples > 0.8F && bestPeriod/averagePeriodSamples < 1.2F &&
+      phaseDistance <= phaseTolerance)
   {
     lock = true; 
   } else {
@@ -144,20 +157,20 @@ void LearningFilter::analyze() {
   }
 
   if (lock) { D("Lock: true "); } else { D("Lock: false"); }
-  D(", Qual: "); D(sqrt(nativeError)/sqrt(bestError)*100.0); D("%");
-  D(", Period: "); D(bestPeriod*samplesPerSecond); D(", Period avg: "); D(avgPeriod*samplesPerSecond);
-  D(", Phase: ");     D((phase % (long)avgPeriod)/avgPeriod);
-  D(", Phase avg: "); DL((avgPhase % (long)avgPeriod)/avgPeriod);
+  D(", Qual: "); D((bestError > 0.0F) ? sqrtf(nativeError/bestError)*100.0F : 0.0F); D("%");
+  D(", Period s: "); D(bestPeriod*sampleSpacingSeconds); D(", Period avg s: "); D(averagePeriodSamples*sampleSpacingSeconds);
+  D(", Phase: "); D((averagePeriodSamples > 0.0F) ? fmodf((float)phaseSample, averagePeriodSamples)/averagePeriodSamples : 0.0F);
+  D(", Phase avg: "); DL((averagePeriodSamples > 0.0F) ? fmodf((float)averagePhaseSample, averagePeriodSamples)/averagePeriodSamples : 0.0F);
 
 
 //  VF("MSG: Native error (sd)      "); VL(sqrt(nativeError));
 //  VF("MSG: Best error             "); VL(sqrt(bestError));
-//  VF("MSG: Default frame (samples)"); VL(frameWidth);
+//  VF("MSG: Default frame (samples)"); VL(historyLength);
 //  VF("MSG: B Period (samples)     "); VL(bestPeriod);
-//  VF("MSG: A Period (samples)     "); VL(avgPeriod);
-//  VF("MSG: Phase (samples)        "); VL(avgPhase);
-//  VF("MSG: Phase cos()            "); VL(cos((avgPhase/avgPeriod)*PI*2.0F));
-//  VF("MSG: Amplitude (counts)     "); VL(avgAmplitude);
+//  VF("MSG: A Period (samples)     "); VL(averagePeriodSamples);
+//  VF("MSG: Phase (samples)        "); VL(averagePhaseSample);
+//  VF("MSG: Phase cos()            "); VL(cos((averagePhaseSample/averagePeriodSamples)*PI*2.0F));
+//  VF("MSG: Amplitude (counts)     "); VL(averageAmplitude);
 //  VL("");
   
 }
@@ -165,14 +178,18 @@ void LearningFilter::analyze() {
 void LearningFilter::reset() {
   if (!active) return;
 
-  phase = 0;
-  avgMaxDelta = 0;
-  avgMinDelta = 0;
-  avgAmplitude = 0;
-  avgPeriod = 0;
-  for (int i = 0; i < frameWidth; i++) {
-    counts[i] = 0;
-    deltas[i] = 0;
+  phaseSample = 0;
+  averagePhaseSample = 0;
+  learnedCorrection = 0;
+  averagePeakDelta = 0;
+  averageValleyDelta = 0;
+  averageAmplitude = 0;
+  averagePeriodSamples = 0;
+  sampleIndex = 0;
+  lastLearnedSampleIndex = 0;
+  lock = false;
+  for (int i = 0; i < historyLength; i++) {
+    deltaSamples[i] = 0;
   }
 }
 

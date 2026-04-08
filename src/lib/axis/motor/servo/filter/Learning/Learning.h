@@ -8,42 +8,42 @@
 
 class LearningFilter : public Filter {
   public:
-    // windowSize: in counts for rolling average
-    // frameWidth: in seconds for learning window
-    // learn: true when the (high accuracy) motion critical to the process is stable
-    LearningFilter(int windowSize, int frameWidth);
+    // smoothingWindowSize: sample count for the rolling average
+    // historyLength: number of learned samples retained for periodic analysis
+    // learningActive: true when the motion is stable enough to train on
+    LearningFilter(int smoothingWindowSize, int historyLength);
 
-    long update(long encoderCounts, long motorCounts, bool learn);
+    long update(long encoderCounts, long motorCounts, bool learningActive);
 
     void analyze();
 
     void reset();
 
   private:
+    long wrappedSampleIndex(long sample) const;
+    float periodicCorrection(long sample) const;
+
     bool active = false;
     bool initialized = false;
     bool lock = false;
-    int windowSize; // in samples
-    int frameWidth; // in samples
+    int smoothingWindowSize; // in samples
+    int historyLength;       // in samples
 
-    float countsPerSecond;
-    float countsPerSample;
-    float samplesPerSecond;
-    long phase = 0;
-    long lastPhase = 0;
-    long avgPhase = 0;
-    long avgPhaseShift = 0;
-    long correction = 0;
-    float avgMaxDelta = 0;
-    float avgMinDelta = 0;
-    float avgAmplitude = 0;
-    float avgPeriod = 0; // in samples
-    long *deltas;
-    long *counts;
-    long index;
-    long long avgDelta;
-    long long avgEncoderCounts;
-    long lastIndex = 0;
+    float trackingCountsPerSecond;
+    float sampleSpacingCounts;
+    float sampleSpacingSeconds;
+    long phaseSample = 0;
+    long averagePhaseSample = 0;
+    long learnedCorrection = 0;
+    float averagePeakDelta = 0;
+    float averageValleyDelta = 0;
+    float averageAmplitude = 0;
+    float averagePeriodSamples = 0;
+    long *deltaSamples;
+    long sampleIndex = 0;
+    long long smoothedDelta;
+    long long smoothedEncoderCounts;
+    long lastLearnedSampleIndex = 0;
 };
 
 extern LearningFilter filterAxis1;
