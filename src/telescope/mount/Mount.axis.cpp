@@ -62,8 +62,6 @@ namespace {
     // nothing to do as this is auotmatically created... LearningFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE, 240);
   #elif AXIS1_SERVO_FLTR == ROLLING
     RollingFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE);
-  #elif AXIS1_SERVO_FLTR == WINDOWING
-    WindowingFilter filterAxis1(AXIS1_SERVO_FLTR_WSIZE);
   #elif AXIS1_SERVO_FLTR == OFF
     Filter filterAxis1;
   #endif
@@ -180,8 +178,6 @@ namespace {
     KalmanFilter filterAxis2(AXIS2_SERVO_FLTR_MEAS_U, AXIS2_SERVO_FLTR_VARIANCE);
   #elif AXIS2_SERVO_FLTR == ROLLING
     RollingFilter filterAxis2(AXIS2_SERVO_FLTR_WSIZE);
-  #elif AXIS2_SERVO_FLTR == WINDOWING
-    WindowingFilter filterAxis2(AXIS2_SERVO_FLTR_WSIZE);
   #elif AXIS2_SERVO_FLTR == OFF
     Filter filterAxis2;
   #endif

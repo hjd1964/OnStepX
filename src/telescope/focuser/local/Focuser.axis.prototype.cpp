@@ -43,15 +43,13 @@
       DualPid feedbackAxis@(AXIS@_PID_P, AXIS@_PID_I, AXIS@_PID_D, AXIS@_PID_P_GOTO, AXIS@_PID_I_GOTO, AXIS@_PID_D_GOTO, AXIS@_PID_SENSITIVITY);
     #endif
 
-    #if AXIS@_SERVO_FLTR == KALMAN
-      KalmanFilter filterAxis@(AXIS@_SERVO_FLTR_MEAS_U, AXIS@_SERVO_FLTR_VARIANCE);
-    #elif AXIS@_SERVO_FLTR == ROLLING
-      RollingFilter filterAxis@(AXIS@_SERVO_FLTR_WSIZE);
-    #elif AXIS@_SERVO_FLTR == WINDOWING
-      WindowingFilter filterAxis@(AXIS@_SERVO_FLTR_WSIZE);
-    #elif AXIS@_SERVO_FLTR == OFF
-      Filter filterAxis@;
-    #endif
+  #if AXIS@_SERVO_FLTR == KALMAN
+    KalmanFilter filterAxis@(AXIS@_SERVO_FLTR_MEAS_U, AXIS@_SERVO_FLTR_VARIANCE);
+  #elif AXIS@_SERVO_FLTR == ROLLING
+    RollingFilter filterAxis@(AXIS@_SERVO_FLTR_WSIZE);
+  #elif AXIS@_SERVO_FLTR == OFF
+    Filter filterAxis@;
+  #endif
 
     const ServoPins DriverPinsAxis@ = {AXIS@_SERVO_PH1_PIN, AXIS@_SERVO_PH1_STATE, AXIS@_SERVO_PH2_PIN, AXIS@_SERVO_PH2_STATE, AXIS@_ENABLE_PIN, AXIS@_ENABLE_STATE, AXIS@_M0_PIN, AXIS@_M1_PIN, AXIS@_M2_PIN, AXIS@_M3_PIN, AXIS@_FAULT_PIN};
     const ServoSettings DriverSettingsAxis@ = {AXIS@_DRIVER_MODEL, AXIS@_DRIVER_STATUS, AXIS@_SERVO_ACCELERATION};

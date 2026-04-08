@@ -124,7 +124,7 @@
 #define ENC_FILT_FIRST              1
 #define KALMAN                      1      // more advanced, predictive
 #define ROLLING                     2      // basic, rolling average
-#define WINDOWING                   3      // basic, average
+#define WINDOWING                   ROLLING // deprecated compatibility alias for rolling average
 #define LEARNING                    4      // learning, for RA axis only (experimental may be removed)
 #define ENC_FILT_LAST               4
 

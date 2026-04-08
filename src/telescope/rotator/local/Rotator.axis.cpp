@@ -44,8 +44,6 @@ namespace {
     KalmanFilter filterAxis3(AXIS3_SERVO_FLTR_MEAS_U, AXIS3_SERVO_FLTR_VARIANCE);
   #elif AXIS3_SERVO_FLTR == ROLLING
     RollingFilter filterAxis3(AXIS3_SERVO_FLTR_WSIZE);
-  #elif AXIS3_SERVO_FLTR == WINDOWING
-    WindowingFilter filterAxis3(AXIS3_SERVO_FLTR_WSIZE);
   #elif AXIS3_SERVO_FLTR == OFF
     Filter filterAxis3;
   #endif
