@@ -93,7 +93,6 @@ Current mount-axis choices are wired in through `Mount.axis.cpp`:
 - `KALMAN`
 - `LEARNING` for Axis1
 - `ROLLING`
-- `WINDOWING`
 
 If you are starting fresh, `OFF` is the simplest baseline.
 
