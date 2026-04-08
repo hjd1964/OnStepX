@@ -231,14 +231,18 @@ bool AnalogClass::pwmInit(int16_t pin, const AnalogPwmConfig& cfg) {
           warned = true;
           VLF("WRN: Analog, adding new resolutions/frequencies may affect other PWM pins (tone, servo, due to shared timers.)");
         }
-      #elif HAL_HAS_GLOBAL_PWM_RESOLUTION
+    #elif HAL_HAS_GLOBAL_PWM_RESOLUTION
+      if (reqBits != gPwmBits) {
         if (!HAL_ALLOW_GLOBAL_PWM_RECONFIG) {
-          DF("ERR: Analog, pwmInit global PWM resolution reconfig disallowed pin="); DL(pin);
+          DF("ERR: Analog, pwmInit global PWM resolution reconfig disallowed pin="); D(pin);
+          DF(" reqBits="); D(reqBits);
+          DF(" currentBits="); DL(gPwmBits);
           return false;
         }
         analogWriteResolution(reqBits);
-        gPwmBits = reqBits; // reflect actual global state
+        gPwmBits = reqBits;
         VF("WRN: Analog, pwmInit global PWM bits set bits="); VL(reqBits);
+      }
       #else
         DF("ERR: Analog, pwmInit no PWM resolution control pin="); DL(pin);
         return false;
