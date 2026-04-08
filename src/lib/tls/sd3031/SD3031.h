@@ -24,6 +24,9 @@ class TlsSd3031 : public TimeLocationSource {
     // get the RTC's time
     bool get(JulianDate &ut1);
 
+    // secondary way to enable PPS
+    void ppsEnable();
+
     // not used, date/time is stored as UT1
     double DUT1 = 0.0L;
 

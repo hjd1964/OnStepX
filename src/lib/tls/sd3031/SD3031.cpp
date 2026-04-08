@@ -18,7 +18,7 @@ bool TlsSd3031::init() {
   HAL_WIRE.begin();
   HAL_WIRE_SET_CLOCK();
 
-  bool error = !rtcSD3031.begin();
+  bool error = rtcSD3031.begin();
   if (!error) {
     HAL_WIRE_SET_CLOCK();
 
@@ -75,6 +75,11 @@ bool TlsSd3031::get(JulianDate &ut1) {
   }
 
   return true;
+}
+
+void TlsSd3031::ppsEnable() {
+  // frequency 0 (1Hz) on the SQW pin
+  rtcSD3031.enableFrequency(rtcSD3031.eHz_1Second);
 }
 
 #endif
