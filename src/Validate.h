@@ -673,6 +673,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #if AXIS4_POWER_DOWN != ON && AXIS4_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS4_POWER_DOWN unknown, use OFF or ON."
 #endif
+#if AXIS4_POWER_DOWN == ON && (AXIS4_ENABLE_PIN == OFF || AXIS4_ENABLE_PIN == SHARED) && \
+    (AXIS4_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS4_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS4_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
+#endif
 
 #if AXIS4_LIMIT_MIN < 0 || AXIS4_LIMIT_MIN > 500
   #error "Configuration (Config.h): Setting AXIS4_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
@@ -770,6 +774,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 
 #if AXIS5_POWER_DOWN != ON && AXIS5_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS5_POWER_DOWN unknown, use OFF or ON."
+#endif
+#if AXIS5_POWER_DOWN == ON && (AXIS5_ENABLE_PIN == OFF || AXIS5_ENABLE_PIN == SHARED) && \
+    (AXIS5_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS5_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS5_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
 #endif
 
 #if AXIS5_LIMIT_MIN < 0 || AXIS5_LIMIT_MIN > 500
@@ -869,6 +877,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #if AXIS6_POWER_DOWN != ON && AXIS6_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS6_POWER_DOWN unknown, use OFF or ON."
 #endif
+#if AXIS6_POWER_DOWN == ON && (AXIS6_ENABLE_PIN == OFF || AXIS6_ENABLE_PIN == SHARED) && \
+    (AXIS6_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS6_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS6_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
+#endif
 
 #if AXIS6_LIMIT_MIN < 0 || AXIS6_LIMIT_MIN > 500
   #error "Configuration (Config.h): Setting AXIS6_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
@@ -963,6 +975,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 
 #if AXIS7_POWER_DOWN != ON && AXIS7_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS7_POWER_DOWN unknown, use OFF or ON."
+#endif
+#if AXIS7_POWER_DOWN == ON && (AXIS7_ENABLE_PIN == OFF || AXIS7_ENABLE_PIN == SHARED) && \
+    (AXIS7_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS7_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS7_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
 #endif
 
 #if AXIS7_LIMIT_MIN < 0 || AXIS7_LIMIT_MIN > 500
@@ -1059,6 +1075,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #if AXIS8_POWER_DOWN != ON && AXIS8_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS8_POWER_DOWN unknown, use OFF or ON."
 #endif
+#if AXIS8_POWER_DOWN == ON && (AXIS8_ENABLE_PIN == OFF || AXIS8_ENABLE_PIN == SHARED) && \
+    (AXIS8_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS8_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS8_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
+#endif
 
 #if AXIS8_LIMIT_MIN < 0 || AXIS8_LIMIT_MIN > 500
   #error "Configuration (Config.h): Setting AXIS8_LIMIT_MIN unknown, use value in the range 0 to 500 (mm.)"
@@ -1153,6 +1173,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 
 #if AXIS9_POWER_DOWN != ON && AXIS9_POWER_DOWN != OFF
   #error "Configuration (Config.h): Setting AXIS9_POWER_DOWN unknown, use OFF or ON."
+#endif
+#if AXIS9_POWER_DOWN == ON && (AXIS9_ENABLE_PIN == OFF || AXIS9_ENABLE_PIN == SHARED) && \
+    (AXIS9_DRIVER_MODEL < TMC_DRIVER_FIRST || AXIS9_DRIVER_MODEL > STEP_DIR_DRIVER_LAST)
+  #error "Configuration (Config.h): AXIS9_POWER_DOWN requires a dedicated enable pin or a software-controlled step/dir TMC driver."
 #endif
 
 #if AXIS9_LIMIT_MIN < 0 || AXIS9_LIMIT_MIN > 500
