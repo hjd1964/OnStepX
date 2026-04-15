@@ -27,6 +27,31 @@
     #define BISSC_ACK_PHASE 20
   #endif
 
+  // sample during the low phase after LOW_MA
+  #ifndef BISSC_SAMPLE_IN_LOW_PHASE
+    #define BISSC_SAMPLE_IN_LOW_PHASE ON
+  #endif
+
+  // sample during the high phase after HIGH_MA
+  #ifndef BISSC_SAMPLE_IN_HIGH_PHASE
+    #define BISSC_SAMPLE_IN_HIGH_PHASE OFF
+  #endif
+
+  // sample point within the selected half-clock phase, in quarter-cycle steps (2 is mid-cycle and default)
+  #ifndef BISSC_TSAMPLE_QUARTERS
+    #define BISSC_TSAMPLE_QUARTERS 2
+  #endif
+
+  #if BISSC_SAMPLE_IN_LOW_PHASE == BISSC_SAMPLE_IN_HIGH_PHASE
+    #error "Configuration (Config.h): Set exactly one of BISSC_SAMPLE_IN_LOW_PHASE or BISSC_SAMPLE_IN_HIGH_PHASE to ON"
+  #endif
+  #if BISSC_TSAMPLE_QUARTERS < 1
+    #error "Configuration (Config.h): BISSC_TSAMPLE_QUARTERS must be >= 1"
+  #endif
+  #if BISSC_TSAMPLE_QUARTERS > 3
+    #error "Configuration (Config.h): BISSC_TSAMPLE_QUARTERS must be between 1 and 3"
+  #endif
+
   // resolution adjustment use 2, 4, or 8 (example:)
   //#define BISSC_RESOLUTION_DIVISOR 4
 
@@ -100,7 +125,7 @@
 
       // bit delay in nanoseconds
       const uint32_t rate = 500000/BISSC_CLOCK_RATE_KHZ;
-      const uint32_t tSample = (500000/BISSC_CLOCK_RATE_KHZ) >> 2;
+      const uint32_t tSample = (rate*BISSC_TSAMPLE_QUARTERS)/4;
 
       int16_t maPin;
       int16_t sloPin;
