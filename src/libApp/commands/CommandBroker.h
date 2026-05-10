@@ -63,7 +63,7 @@ class CommandBroker {
       uint8_t generation = 0;
     };
 
-    Request request[COMMAND_BROKER_SLOTS];
+    Request requests[COMMAND_BROKER_SLOTS];
     int8_t active = -1;
     bool initialized = false;
 
