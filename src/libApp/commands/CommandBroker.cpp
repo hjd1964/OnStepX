@@ -23,9 +23,15 @@ bool CommandBroker::init() {
     requests[i].generation = 0;
   }
 
-  initialized = true;
   VF("MSG: System, start command broker task (rate 3ms priority 5)... ");
-  if (tasks.add(3, 0, true, 5, commandBrokerWrapper, "CmdBrkr")) { VLF("success"); return true; } else { VLF("FAILED!"); return false; }
+  if (tasks.add(3, 0, true, 5, commandBrokerWrapper, "CmdBrkr")) {
+    initialized = true;
+    VLF("success");
+    return true;
+  } else {
+    VLF("FAILED!");
+    return false;
+  }
 }
 
 uint8_t CommandBroker::request(const char *command, unsigned long timeoutMs) {
@@ -60,6 +66,8 @@ uint8_t CommandBroker::enqueue(const char *command, unsigned long timeoutMs, boo
 }
 
 CommandBrokerStatus CommandBroker::status(uint8_t handle) {
+  if (!initialized) return CB_FREE;
+
   int8_t slot = handleToSlot(handle);
   if (slot < 0) return CB_FREE;
 
@@ -72,6 +80,7 @@ CommandBrokerStatus CommandBroker::status(uint8_t handle) {
 CommandBrokerStatus CommandBroker::result(uint8_t &handle, char *reply, size_t replySize) {
   if (reply != NULL && replySize > 0) reply[0] = 0;
   if (reply == NULL || replySize == 0) { handle = 0; return CB_FREE; }
+  if (!initialized) { handle = 0; return CB_FREE; }
 
   int8_t slot = handleToSlot(handle);
   if (slot < 0) { handle = 0; return CB_FREE; }
@@ -93,6 +102,8 @@ CommandBrokerStatus CommandBroker::result(uint8_t &handle, char *reply, size_t r
 }
 
 void CommandBroker::release(uint8_t handle) {
+  if (!initialized) return;
+
   int8_t slot = handleToSlot(handle);
   if (slot < 0) return;
 
