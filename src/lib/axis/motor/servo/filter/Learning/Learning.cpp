@@ -23,7 +23,7 @@ LearningFilter::LearningFilter(int smoothingWindowSize, int historyLength) {
 
   if (deltaSamples == NULL) { active = false; return; } else active = true;
 
-  trackingCountsPerSecond = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
+  trackingCountsPerSecond = (AXIS1_COUNTS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
   sampleSpacingCounts = trackingCountsPerSecond/4.0F;
   sampleSpacingSeconds = sampleSpacingCounts/trackingCountsPerSecond;
 }

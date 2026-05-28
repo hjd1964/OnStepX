@@ -792,7 +792,7 @@ Locale-backed axis parameter name tokens currently used by firmware:
 
 | Token | Meaning |
 | --- | --- |
-| `$1` | Steps/degree |
+| `$1` | Counts/degree |
 | `$2` | Min limit, degs |
 | `$3` | Max limit, degs |
 | `$4` | Steps/um |

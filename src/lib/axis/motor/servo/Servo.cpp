@@ -85,7 +85,7 @@ bool ServoMotor::init() {
   // get the feedback control loop ready
   feedback->init(axisNumber, control);
   feedback->reset();
-  trackingFrequency = (AXIS1_STEPS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
+  trackingFrequency = (AXIS1_COUNTS_PER_DEGREE/240.0F)*SIDEREAL_RATIO_F;
 
   // start the motion timer
   VF("MSG:"); V(axisPrefix); VF("start task to synthesize motion... ");
@@ -438,7 +438,7 @@ void ServoMotor::poll() {
         char s[256];
 
         float spas = 0;
-        if (axisNumber == 1) spas = AXIS1_STEPS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_STEPS_PER_DEGREE/3600.0F;
+        if (axisNumber == 1) spas = AXIS1_COUNTS_PER_DEGREE/3600.0F; else if (axisNumber == 2) spas = AXIS2_COUNTS_PER_DEGREE/3600.0F;
 
 //      snprintf(s, sizeof(s), "Ax%dSvo: Delta %6ld, Motor %6ld, Encoder %6ld, Ax%dSvo_Power: %6.3f%%\r\n", (int)axisNumber, (motorCounts - encoderCounts), motorCounts, (long)encoderCounts, (int)axisNumber, velocityPercent);
 //      snprintf(s, sizeof(s), "Ax%dSvo: Motor %6ld, Encoder %6ld\r\n", (int)axisNumber, motorCounts, (long)encoderCounts);

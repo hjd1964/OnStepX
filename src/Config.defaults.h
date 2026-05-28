@@ -229,6 +229,9 @@
 #ifndef AXIS1_STEPS_PER_DEGREE
 #define AXIS1_STEPS_PER_DEGREE        12800.0                     // (micro)steps per degree
 #endif
+#ifndef AXIS1_COUNTS_PER_DEGREE
+#define AXIS1_COUNTS_PER_DEGREE       AXIS1_STEPS_PER_DEGREE      // counts per degree
+#endif
 #ifndef AXIS1_REVERSE
 #define AXIS1_REVERSE                 OFF                         // reverse rotation direction
 #endif
@@ -326,9 +329,6 @@
   #ifndef AXIS1_SERVO_VELOCITY_PWMTHRS
   #define AXIS1_SERVO_VELOCITY_PWMTHRS  OFF                       // velocity (in steps/s) to switch from stealthChop to spreadCycle
   #endif                                                          // should happen at the 2x sidereal rate, for TMC2209/TMC5160 only
-  #ifndef AXIS1_MOTOR_STEPS_PER_DEGREE
-  #define AXIS1_MOTOR_STEPS_PER_DEGREE  AXIS1_STEPS_PER_DEGREE    // for calculating ratio of encoder counts/deg to motor steps/deg
-  #endif                                                          // for TMC stepper motors only
   #ifndef AXIS1_SERVO_DC_PWR_MIN                          
   #define AXIS1_SERVO_DC_PWR_MIN        0.0F                      // minimum power just below where axis motion starts, in %
   #endif                                                          // approximate, for DC motors only
@@ -401,6 +401,9 @@
 #endif
 #ifndef AXIS2_STEPS_PER_DEGREE
 #define AXIS2_STEPS_PER_DEGREE        12800.0                     // (micro)steps per degree of movement
+#endif
+#ifndef AXIS2_COUNTS_PER_DEGREE
+#define AXIS2_COUNTS_PER_DEGREE       AXIS2_STEPS_PER_DEGREE      // counts per degree
 #endif
 #ifndef AXIS2_REVERSE
 #define AXIS2_REVERSE                 OFF                         // reverse movement
@@ -499,9 +502,6 @@
   #ifndef AXIS2_SERVO_VELOCITY_PWMTHRS
   #define AXIS2_SERVO_VELOCITY_PWMTHRS  OFF
   #endif
-  #ifndef AXIS2_MOTOR_STEPS_PER_DEGREE
-  #define AXIS2_MOTOR_STEPS_PER_DEGREE  AXIS2_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS2_SERVO_DC_PWR_MIN
   #define AXIS2_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -646,7 +646,7 @@
 #define AXIS1_TARGET_TOLERANCE        0.0F                        // distance in arc-seconds when goto is at destination
 #endif
 #ifndef AXIS1_HOME_TOLERANCE                                      // distance in arc-seconds when at home
-#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_STEPS_PER_DEGREE)
+#define AXIS1_HOME_TOLERANCE          AXIS1_TARGET_TOLERANCE + (1800.0/AXIS1_COUNTS_PER_DEGREE)
 #endif
 #ifndef AXIS1_SECTOR_GEAR
 #define AXIS1_SECTOR_GEAR             OFF                         // special case of a Sector Gear RA with limited travel
@@ -659,7 +659,7 @@
 #define AXIS2_TARGET_TOLERANCE        0.0F                        // in arc-seconds
 #endif
 #ifndef AXIS2_HOME_TOLERANCE                                      // in arc-seconds
-#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_STEPS_PER_DEGREE)
+#define AXIS2_HOME_TOLERANCE          AXIS2_TARGET_TOLERANCE + (1800.0/AXIS2_COUNTS_PER_DEGREE)
 #endif
 #ifndef AXIS2_TANGENT_ARM
 #define AXIS2_TANGENT_ARM             OFF                         // special case of a Tangent Arm Dec with limited travel
@@ -904,6 +904,9 @@
 #ifndef AXIS3_STEPS_PER_DEGREE
 #define AXIS3_STEPS_PER_DEGREE        64.0                        // (micro)steps per degree of movement
 #endif
+#ifndef AXIS3_COUNTS_PER_DEGREE
+#define AXIS3_COUNTS_PER_DEGREE       AXIS3_STEPS_PER_DEGREE      // counts per degree
+#endif
 #ifndef AXIS3_REVERSE
 #define AXIS3_REVERSE                 OFF                         // reverse movement
 #endif
@@ -1006,9 +1009,6 @@
   #ifndef AXIS3_SERVO_VELOCITY_PWMTHRS
   #define AXIS3_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS3_MOTOR_STEPS_PER_DEGREE
-  #define AXIS3_MOTOR_STEPS_PER_DEGREE  AXIS3_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS3_SERVO_DC_PWR_MIN
   #define AXIS3_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1080,6 +1080,9 @@
 #endif
 #ifndef AXIS4_STEPS_PER_MICRON
 #define AXIS4_STEPS_PER_MICRON        0.5                         // (micro)steps per micron of movement
+#endif
+#ifndef AXIS4_COUNTS_PER_MICRON
+#define AXIS4_COUNTS_PER_MICRON       AXIS4_STEPS_PER_MICRON      // counts per micron
 #endif
 #ifndef AXIS4_REVERSE
 #define AXIS4_REVERSE                 OFF                         // reverse movement direction
@@ -1193,9 +1196,6 @@
   #ifndef AXIS4_SERVO_VELOCITY_PWMTHRS
   #define AXIS4_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS4_MOTOR_STEPS_PER_DEGREE
-  #define AXIS4_MOTOR_STEPS_PER_DEGREE  AXIS4_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS4_SERVO_DC_PWR_MIN
   #define AXIS4_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1244,6 +1244,9 @@
 #endif
 #ifndef AXIS5_STEPS_PER_MICRON
 #define AXIS5_STEPS_PER_MICRON        0.5
+#endif
+#ifndef AXIS5_COUNTS_PER_MICRON
+#define AXIS5_COUNTS_PER_MICRON       AXIS5_STEPS_PER_MICRON
 #endif
 #ifndef AXIS5_REVERSE
 #define AXIS5_REVERSE                 OFF
@@ -1357,9 +1360,6 @@
   #ifndef AXIS5_SERVO_VELOCITY_PWMTHRS
   #define AXIS5_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS5_MOTOR_STEPS_PER_DEGREE
-  #define AXIS5_MOTOR_STEPS_PER_DEGREE  AXIS5_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS5_SERVO_DC_PWR_MIN
   #define AXIS5_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1417,6 +1417,9 @@
 #endif
 #ifndef AXIS6_STEPS_PER_MICRON
 #define AXIS6_STEPS_PER_MICRON        0.5
+#endif
+#ifndef AXIS6_COUNTS_PER_MICRON
+#define AXIS6_COUNTS_PER_MICRON       AXIS6_STEPS_PER_MICRON
 #endif
 #ifndef AXIS6_REVERSE
 #define AXIS6_REVERSE                 OFF
@@ -1530,9 +1533,6 @@
   #ifndef AXIS6_SERVO_VELOCITY_PWMTHRS
   #define AXIS6_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS6_MOTOR_STEPS_PER_DEGREE
-  #define AXIS6_MOTOR_STEPS_PER_DEGREE  AXIS6_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS6_SERVO_DC_PWR_MIN
   #define AXIS6_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1581,6 +1581,9 @@
 #endif
 #ifndef AXIS7_STEPS_PER_MICRON
 #define AXIS7_STEPS_PER_MICRON        0.5
+#endif
+#ifndef AXIS7_COUNTS_PER_MICRON
+#define AXIS7_COUNTS_PER_MICRON       AXIS7_STEPS_PER_MICRON
 #endif
 #ifndef AXIS7_REVERSE
 #define AXIS7_REVERSE                 OFF
@@ -1693,9 +1696,6 @@
   #ifndef AXIS7_SERVO_VELOCITY_PWMTHRS
   #define AXIS7_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS7_MOTOR_STEPS_PER_DEGREE
-  #define AXIS7_MOTOR_STEPS_PER_DEGREE  AXIS7_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS7_SERVO_DC_PWR_MIN
   #define AXIS7_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1744,6 +1744,9 @@
 #endif
 #ifndef AXIS8_STEPS_PER_MICRON
 #define AXIS8_STEPS_PER_MICRON        0.5
+#endif
+#ifndef AXIS8_COUNTS_PER_MICRON
+#define AXIS8_COUNTS_PER_MICRON       AXIS8_STEPS_PER_MICRON
 #endif
 #ifndef AXIS8_REVERSE
 #define AXIS8_REVERSE                 OFF
@@ -1857,9 +1860,6 @@
   #ifndef AXIS8_SERVO_VELOCITY_PWMTHRS
   #define AXIS8_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS8_MOTOR_STEPS_PER_DEGREE
-  #define AXIS8_MOTOR_STEPS_PER_DEGREE  AXIS8_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS8_SERVO_DC_PWR_MIN
   #define AXIS8_SERVO_DC_PWR_MIN        0.0F
   #endif
@@ -1908,6 +1908,9 @@
 #endif
 #ifndef AXIS9_STEPS_PER_MICRON
 #define AXIS9_STEPS_PER_MICRON        0.5
+#endif
+#ifndef AXIS9_COUNTS_PER_MICRON
+#define AXIS9_COUNTS_PER_MICRON       AXIS9_STEPS_PER_MICRON
 #endif
 #ifndef AXIS9_REVERSE
 #define AXIS9_REVERSE                 OFF
@@ -2021,9 +2024,6 @@
   #ifndef AXIS9_SERVO_VELOCITY_PWMTHRS
   #define AXIS9_SERVO_VELOCITY_PWMTHRS  OFF
   #endif                            
-  #ifndef AXIS9_MOTOR_STEPS_PER_DEGREE
-  #define AXIS9_MOTOR_STEPS_PER_DEGREE  AXIS9_STEPS_PER_DEGREE
-  #endif   
   #ifndef AXIS9_SERVO_DC_PWR_MIN
   #define AXIS9_SERVO_DC_PWR_MIN        0.0F
   #endif

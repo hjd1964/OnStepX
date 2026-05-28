@@ -161,6 +161,13 @@
   #if AXIS1_ENCODER < ENC_FIRST || AXIS1_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS1_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS1_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS1_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS1_DRIVER_MODEL == SERVO_TMC2209 || AXIS1_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS1_DRIVER_MICROSTEPS != 256 || AXIS1_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS1_DRIVER_MICROSTEPS must be 256 and AXIS1_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 #if AXIS1_REVERSE != ON && AXIS1_REVERSE != OFF
@@ -261,6 +268,13 @@
 #ifdef AXIS2_SERVO_PRESENT
   #if AXIS2_ENCODER < ENC_FIRST || AXIS2_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS2_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+  #if AXIS2_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS2_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS2_DRIVER_MODEL == SERVO_TMC2209 || AXIS2_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS2_DRIVER_MICROSTEPS != 256 || AXIS2_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS2_DRIVER_MICROSTEPS must be 256 and AXIS2_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
   #endif
 #endif
 
@@ -614,6 +628,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #if AXIS3_ENCODER != OFF && (AXIS3_ENCODER < ENC_FIRST || AXIS3_ENCODER > ENC_LAST)
     #error "Configuration (Config.h): Setting AXIS3_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS3_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS3_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS3_DRIVER_MODEL == SERVO_TMC2209 || AXIS3_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS3_DRIVER_MICROSTEPS != 256 || AXIS3_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS3_DRIVER_MICROSTEPS must be 256 and AXIS3_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 #if AXIS3_REVERSE != ON && AXIS3_REVERSE != OFF
@@ -746,6 +767,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #if AXIS4_ENCODER < ENC_FIRST || AXIS4_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS4_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS4_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS4_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS4_DRIVER_MODEL == SERVO_TMC2209 || AXIS4_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS4_DRIVER_MICROSTEPS != 256 || AXIS4_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS4_DRIVER_MICROSTEPS must be 256 and AXIS4_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 // AXIS5 FOCUSER
@@ -848,6 +876,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #if AXIS5_ENCODER < ENC_FIRST || AXIS5_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS5_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS5_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS5_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS5_DRIVER_MODEL == SERVO_TMC2209 || AXIS5_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS5_DRIVER_MICROSTEPS != 256 || AXIS5_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS5_DRIVER_MICROSTEPS must be 256 and AXIS5_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 // AXIS6 FOCUSER
@@ -946,6 +981,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #ifdef AXIS6_SERVO_PRESENT
   #if AXIS6_ENCODER < ENC_FIRST || AXIS6_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS6_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+  #if AXIS6_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS6_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS6_DRIVER_MODEL == SERVO_TMC2209 || AXIS6_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS6_DRIVER_MICROSTEPS != 256 || AXIS6_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS6_DRIVER_MICROSTEPS must be 256 and AXIS6_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
   #endif
 #endif
 
@@ -1046,6 +1088,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #if AXIS7_ENCODER < ENC_FIRST || AXIS7_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS7_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS7_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS7_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS7_DRIVER_MODEL == SERVO_TMC2209 || AXIS7_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS7_DRIVER_MICROSTEPS != 256 || AXIS7_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS7_DRIVER_MICROSTEPS must be 256 and AXIS7_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 // AXIS8 FOCUSER
@@ -1145,6 +1194,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #if AXIS8_ENCODER < ENC_FIRST || AXIS8_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS8_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
   #endif
+  #if AXIS8_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS8_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS8_DRIVER_MODEL == SERVO_TMC2209 || AXIS8_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS8_DRIVER_MICROSTEPS != 256 || AXIS8_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS8_DRIVER_MICROSTEPS must be 256 and AXIS8_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
+  #endif
 #endif
 
 // AXIS9 FOCUSER
@@ -1243,6 +1299,13 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
 #ifdef AXIS9_SERVO_PRESENT
   #if AXIS9_ENCODER < ENC_FIRST || AXIS9_ENCODER > ENC_LAST
     #error "Configuration (Config.h): Setting AXIS9_ENCODER unknown, use a valid SERVO ENCODER (from Constants.h)"
+  #endif
+  #if AXIS9_DRIVER_IGOTO != OFF
+    #error "Configuration (Config.h): Setting AXIS9_DRIVER_IGOTO must be OFF for servo mode."
+  #endif
+  #if (AXIS9_DRIVER_MODEL == SERVO_TMC2209 || AXIS9_DRIVER_MODEL == SERVO_TMC5160) && \
+      (AXIS9_DRIVER_MICROSTEPS != 256 || AXIS9_DRIVER_MICROSTEPS_GOTO != OFF)
+    #error "Configuration (Config.h): Settings AXIS9_DRIVER_MICROSTEPS must be 256 and AXIS9_DRIVER_MICROSTEPS_GOTO must be OFF for SERVO_TMC2209/SERVO_TMC5160."
   #endif
 #endif
 

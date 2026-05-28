@@ -102,15 +102,22 @@ For stepper-based servo drivers such as `SERVO_TMC2209`, `SERVO_TMC5160`, and
 `SERVO_KTECH`, the code uses this ratio:
 
 ```cpp
-AXIS*_MOTOR_STEPS_PER_DEGREE / AXIS*_STEPS_PER_DEGREE
+AXIS*_STEPS_PER_DEGREE / AXIS*_COUNTS_PER_DEGREE
 ```
 
-That ratio is passed into the servo driver in `Mount.axis.cpp`.
+For focuser axes the same pattern uses microns:
+
+```cpp
+AXIS*_STEPS_PER_MICRON / AXIS*_COUNTS_PER_MICRON
+```
+
+That ratio is passed into the servo driver in the local axis implementation.
 
 In practical terms:
-- `AXIS*_STEPS_PER_DEGREE` is still the mount axis scale
-- `AXIS*_MOTOR_STEPS_PER_DEGREE` matters when the motor-side step scale is not
-  the same as the encoder-side axis scale
+- `AXIS*_STEPS_PER_DEGREE` is the motor-side step scale
+- `AXIS*_COUNTS_PER_DEGREE` is the axis coordinate scale
+- `AXIS*_STEPS_PER_MICRON` and `AXIS*_COUNTS_PER_MICRON` are the equivalent
+  focuser-axis scales
 
 These two are rarely the same.  Sometimes the encoders are on the mount axes and there is not reduction and other times there is.  Then the encoder has a resolution as well.  On the other hand the motor almost always has an associated reduction and full-steps per rotation and 256 micro-steps per full-step.
 
@@ -182,9 +189,10 @@ Example:
 ```
 
 2. Axis scale
-- set `AXIS*_STEPS_PER_DEGREE` correctly
-- for stepper-based servo drivers, also check `AXIS*_MOTOR_STEPS_PER_DEGREE`
-  if your hardware needs it
+- set `AXIS*_STEPS_PER_DEGREE` to the motor-side step scale
+- set `AXIS*_COUNTS_PER_DEGREE` to the encoder/axis coordinate scale
+- for focuser axes, use `AXIS*_STEPS_PER_MICRON` and
+  `AXIS*_COUNTS_PER_MICRON` instead
 
 If the scale is wrong, almost everything else becomes confusing.
 
@@ -297,6 +305,9 @@ For TMC stepper servos such as `SERVO_TMC2209` and `SERVO_TMC5160`:
 - motion feed-forward is automatic
 - OnStepX combines the requested motion with the feedback correction and sends
   a velocity command to the driver
+- `AXIS*_DRIVER_MICROSTEPS` must be `256` and
+  `AXIS*_DRIVER_MICROSTEPS_GOTO` must be `OFF`, matching the 256x mode used
+  internally
 
 In user terms:
 - you do not usually "turn feed-forward on"
@@ -304,7 +315,9 @@ In user terms:
 
 The main coupling setting is the counts-to-steps ratio:
 - it starts from the config default based on
-  `AXIS*_MOTOR_STEPS_PER_DEGREE / AXIS*_STEPS_PER_DEGREE`
+  `AXIS*_STEPS_PER_DEGREE / AXIS*_COUNTS_PER_DEGREE`
+- for focuser axes this is
+  `AXIS*_STEPS_PER_MICRON / AXIS*_COUNTS_PER_MICRON`
 - that ratio is also a runtime-adjustable axis parameter
 
 So for TMC stepper servos, the important question is usually not whether
