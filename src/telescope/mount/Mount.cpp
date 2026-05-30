@@ -97,7 +97,19 @@ void Mount::begin() {
   // coordinate basis at startup, so allow reset() to bypass sync-threshold
   // checks only in that case.
   const bool absoluteAxisAuthority = axis1.motor->hasAbsoluteEncoder() && axis2.motor->hasAbsoluteEncoder();
-  home.reset(true, absoluteAxisAuthority && absoluteCoordinateOriginsEstablished);
+  const bool authoritativeReset = absoluteAxisAuthority && absoluteCoordinateOriginsEstablished;
+  CommandError startupResetError = home.reset(true, authoritativeReset);
+  #ifdef HAS_ABSOLUTE_ENCODER_SERVO
+    if (!absoluteAxisAuthority) {
+      DLF("WRN: Mount, absolute encoder startup authority unavailable; paired absolute encoders not detected");
+    }
+  #endif
+  if (absoluteAxisAuthority && !absoluteCoordinateOriginsEstablished) {
+    DLF("WRN: Mount, absolute encoder startup authority unavailable; encoder origin missing");
+  }
+  if (authoritativeReset && startupResetError != CE_NONE) {
+    DF("WRN: Mount, absolute encoder startup authority reset failed with code "); DL(startupResetError);
+  }
   limits.init();
   guide.init();
 
@@ -193,7 +205,10 @@ void Mount::begin() {
 
 void Mount::setStartupAuthorityTrusted(bool state) {
   #if NV_INIT_ERROR_REVOKES_AUTHORITY == ON
-    if (state && initError.nv) return;
+    if (state && initError.nv) {
+      DLF("WRN: Mount, startup authority trust rejected due to NV fault");
+      return;
+    }
   #endif
 
   startupAuthorityTrustedValue = state;
