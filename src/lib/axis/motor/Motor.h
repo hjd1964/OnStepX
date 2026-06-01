@@ -134,6 +134,9 @@ class Motor {
     // signal that the motor load has exceeded its threshold
     virtual bool isStalled() { return false; }
 
+    // get live StallGuard telemetry if the motor/driver supports it
+    virtual bool getStallGuardTelemetry(char *reply, size_t replySize) { UNUSED(reply); UNUSED(replySize); return false; }
+
     // calibrate the motor if required
     virtual void calibrate(float value) { UNUSED(value); }
 

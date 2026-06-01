@@ -99,6 +99,9 @@ class StepDirMotor : public Motor {
     // signal that the motor load has exceeded its threshold
     bool isStalled();
 
+    // get live StallGuard telemetry if supported
+    bool getStallGuardTelemetry(char *reply, size_t replySize) { return driver->getStallGuardTelemetry(reply, replySize); }
+
     // calibrate stealthChop then return to tracking mode
     void calibrateDriver() {
       if (!ready) return;

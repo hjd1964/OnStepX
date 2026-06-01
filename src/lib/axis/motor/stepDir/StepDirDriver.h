@@ -91,6 +91,9 @@ class StepDirDriver {
     // reset any internal stall-detect state (baseline, latch, etc.)
     virtual void stallDetectReset() {}
 
+    // get live StallGuard telemetry if supported
+    virtual bool getStallGuardTelemetry(char *reply, size_t replySize) { UNUSED(reply); UNUSED(replySize); return false; }
+
     // get the pulse width in nanoseconds, if unknown (-1) returns 2000 nanoseconds
     long getPulseWidth();
 

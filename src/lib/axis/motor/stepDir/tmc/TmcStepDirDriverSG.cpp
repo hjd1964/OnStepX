@@ -153,8 +153,8 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
 
   #ifdef DRIVER_TMC_STEPPER_STALLGUARD
 
-    if (sgEnabled.value == OFF) return false;
-    if (!stallGuardModeActive()) return false;
+    if (sgEnabled.value == OFF) { sgArmed = false; return false; }
+    if (!stallGuardModeActive()) { sgArmed = false; return false; }
 
     sgTrainPrev = sgTrain.value;
 
@@ -225,6 +225,7 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
       sgLastFps = fpsSigned;
       return false;
     }
+    sgArmed = true;
 
     const uint16_t armWarmMs = (uint16_t)SG_ARM_WARM_MS;
 
@@ -326,7 +327,7 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
       if (floorPct < 0) floorPct = 0;
       if (floorPct > 100) floorPct = 100;
 
-      if (floorPct > 0 && base > 0 && sgWarmMs >= SG_ZERO_GRACE_MS) {
+      if (sgTrain.value == OFF && floorPct > 0 && base > 0 && sgWarmMs >= SG_ZERO_GRACE_MS) {
         const float vref = (spd > armFps) ? spd : armFps;
         const float r = (vref > 0.0f) ? (absA / vref) : 1.0f;
 
@@ -360,12 +361,14 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
 
     // debug snapshot
     sgLast       = sg;
+    sgLastTrip   = (uint16_t)trip;
     sgLastMargin = margin;
     sgBadLast    = bad;
 
+    const bool trainingMode = (sgTrain.value == ON);
     const bool steadyHealthy = steadyNow && !sgLatch && !bad;
-    const bool adaptFast = (sgTrain.value == ON) && steadyHealthy;
-    const bool adaptSlow = (sgTrain.value == OFF) && steadyHealthy;
+    const bool adaptFast = trainingMode && steadyNow && !sgLatch;
+    const bool adaptSlow = !trainingMode && steadyHealthy;
 
     if (adaptFast || adaptSlow) {
       const float baseTc = adaptFast ? BASE_TC_FAST : BASE_TC_SLOW;
@@ -388,6 +391,13 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
       }
 
       // decay fault accumulator toward 0 when healthy
+      if (dtMs) {
+        const uint16_t d = dtMs;
+        if (sgBadMs >= d) sgBadMs -= d; else sgBadMs = 0;
+      }
+    } else if (trainingMode) {
+      // In training mode, the model is allowed to recover from a bad/stale
+      // threshold; do not let trip state accumulate a fault.
       if (dtMs) {
         const uint16_t d = dtMs;
         if (sgBadMs >= d) sgBadMs -= d; else sgBadMs = 0;
@@ -458,6 +468,26 @@ void TmcStepDirDriverSG::stallDetectReset() {
     stallDetectSoftReset();
   #else
     sgLatch = false;
+  #endif
+}
+
+bool TmcStepDirDriverSG::getStallGuardTelemetry(char *reply, size_t replySize) {
+  #ifdef DRIVER_TMC_STEPPER_STALLGUARD
+    if (reply == nullptr || replySize == 0) return false;
+    if (sgEnabled.value == OFF) return false;
+
+    const int sg = (sgLast == 0xFFFF) ? -1 : (int)sgLast;
+    snprintf(reply, replySize, "%d,%u,%u,%d,%d",
+             sg,
+             (unsigned)sgLastTrip,
+             (unsigned)sgBadMs,
+             sgArmed ? 1 : 0,
+             sgLatch ? 1 : 0);
+    return true;
+  #else
+    UNUSED(reply);
+    UNUSED(replySize);
+    return false;
   #endif
 }
 
@@ -588,9 +618,11 @@ void TmcStepDirDriverSG::stallDetectSoftReset() {
   sgRetryAtMs  = 0;
 
   sgLast          = 0xFFFF;
+  sgLastTrip      = 0;
   sgLastMargin    = 0;
   sgLastRampExtra = 0;
   sgBadLast       = false;
+  sgArmed         = false;
 }
 
 void TmcStepDirDriverSG::stallDetectHardReset() {

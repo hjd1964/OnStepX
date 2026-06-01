@@ -89,6 +89,17 @@ bool Axis::command(char *reply, char *command, char *parameter, bool *suppressFr
       } else
     #endif
 
+    // :GXSG[n]#   Get live StallGuard telemetry for axis [n]
+    //             Returns: sg,trip,badMs,armed,latched
+    if (parameter[0] == 'S' && parameter[1] == 'G' && parameter[3] == 0) {
+      int index = parameter[2] - '1';
+      if (index < 0 || index > 8) { *commandError = CE_PARAM_RANGE; return true; }
+      if (index + 1 != axisNumber) return false; // command wasn't processed
+      if (!motor->getStallGuardTelemetry(reply, 40)) { *commandError = CE_0; return true; }
+      *numericReply = false;
+      return true;
+    } else
+
     // :GXU[n]#   Get stepper driver statUs for axis [n]
     //            Returns: Value
     if (parameter[0] == 'U' && parameter[2] == 0) {

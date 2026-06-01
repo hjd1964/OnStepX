@@ -243,6 +243,9 @@ class TmcStepDirDriverSG : public TmcStepDirDriver {
     // reset any internal stall-detect state (baseline, latch, etc.)
     void stallDetectReset() override;
 
+    // get live StallGuard telemetry
+    bool getStallGuardTelemetry(char *reply, size_t replySize) override;
+
   protected:
 
     // read the 32bit status register
@@ -316,9 +319,11 @@ class TmcStepDirDriverSG : public TmcStepDirDriver {
 
       // debug logging
       uint16_t sgLast = 0xFFFF;
+      uint16_t sgLastTrip = 0;
       uint16_t sgLastMargin = 0;
       uint16_t sgLastRampExtra = 0;
       bool     sgBadLast = false;
+      bool     sgArmed = false;
       bool     sgModelSavePending = false;
       uint32_t sgModelSaveIntervalMs = (uint32_t)SG_MODEL_SAVE_MS;
       uint32_t sgModelLastSaveMs = 0;
