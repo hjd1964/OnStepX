@@ -357,6 +357,8 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
 
   if (mount.motorFault()) return CE_SLEW_ERR_HARDWARE_FAULT;
 
+  mountStatus.wake();
+
   return CE_NONE;
 }
 

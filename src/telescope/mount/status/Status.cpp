@@ -49,13 +49,21 @@ void Status::init() {
 void Status::wake() {
   static bool ready = false;
 
-  if (!ready) {
-    #if STATUS_LED == ON
+  #if STATUS_LED != OFF && STATUS_LED_PIN != OFF && \
+    ((STATUS_MOUNT_LED != OFF && MOUNT_LED_PIN != OFF && MOUNT_LED_PIN == STATUS_LED_PIN) || \
+     (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN))
+    static bool statusLedReleased = false;
+    if (!statusLedReleased) {
       // if Mount buzzer or status LED are using the Telescope status LED pin, disable it and use here now
-      if (STATUS_MOUNT_LED != OFF && MOUNT_LED_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
-      if (STATUS_BUZZER != OFF && STATUS_BUZZER_PIN == STATUS_LED_PIN) tasks.remove(tasks.getHandleByName("StaLed"));
-    #endif
+      uint8_t statusLedHandle = tasks.getHandleByName("StaLed");
+      if (statusLedHandle) {
+        tasks.remove(statusLedHandle);
+        statusLedReleased = true;
+      }
+    }
+  #endif
 
+  if (!ready) {
     #if STATUS_MOUNT_LED != OFF && MOUNT_LED_PIN != OFF
       if (!tasks.getHandleByName("mntLed")) {
         pinModeEx(MOUNT_LED_PIN, OUTPUT);
