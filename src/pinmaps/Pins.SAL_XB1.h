@@ -54,7 +54,7 @@
 #endif
 #define STATUS_LED_ON_STATE HIGH
 #ifndef STATUS_LED_PIN
-  #define STATUS_LED_PIN        12               // Default LED Anode (+)
+  #define STATUS_LED_PIN        12               // [must be low at boot 12] Default LED Anode (+)
 #endif
 #ifdef MOUNT_LED_ON_STATE
   #undef MOUNT_LED_ON_STATE
@@ -67,7 +67,7 @@
 
 // For a piezo buzzer
 #ifndef STATUS_BUZZER_PIN
-  #define STATUS_BUZZER_PIN     12               // [must be low at boot 12] Tone
+  #define STATUS_BUZZER_PIN     OFF              // Tone
 #endif
 
 // The PPS pin is a 3.3V logic input, OnStep measures time between rising edges and adjusts the internal sidereal clock frequency
