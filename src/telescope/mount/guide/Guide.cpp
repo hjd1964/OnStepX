@@ -17,6 +17,7 @@
 #include "../park/Park.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
+#include "../startupAuthority/StartupAuthority.h"
 #include "../status/Status.h"
 
 inline void guideWrapper() { guide.poll(); }
@@ -340,6 +341,14 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
     if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
     if (goTo.state != GS_NONE) { goTo.abort(); return CE_SLEW_IN_MOTION; }
   #endif
+
+  if (guideAction != GA_HOME) {
+    CommandError e = startupAuthority.validateManualMotion();
+    if (e != CE_NONE) {
+      DLF("WRN: Guide, slew rejected because startup authority/limits are not ready");
+      return e;
+    }
+  }
 
   if (axis == 1 || guideAction == GA_SPIRAL) {
     if (!validAxis1(guideAction)) return CE_SLEW_ERR_OUTSIDE_LIMITS;

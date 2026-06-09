@@ -14,6 +14,7 @@
 #include "guide/Guide.h"
 #include "limits/Limits.h"
 #include "park/Park.h"
+#include "startupAuthority/StartupAuthority.h"
 
 bool Mount::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   char *conv_end;
@@ -224,7 +225,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             CommandError e = home.reset(true, true);
             if (e != CE_NONE) { *commandError = e; return true; }
 
-            limits.enabled(site.isDateTimeReady());
+            limits.enabled(site.isDateTimeReady() && startupAuthority.trusted());
 
             syncFromOnStepToEncoders = true;
             handled = true;
@@ -322,7 +323,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             if (*commandError != CE_NONE) return true;
             if (absoluteAuthority) {
               captureNominalIndexPositions();
-              setStartupAuthorityTrusted(true);
+              startupAuthority.setTrusted(true);
               goTo.absoluteEncodersPresent = true;
               goTo.encodersPresent = true;
               VLF("MSG: Mount, sync from trusted paired absolute SWS encoders");

@@ -15,6 +15,7 @@
 #include "../home/Home.h"
 #include "../park/Park.h"
 #include "../limits/Limits.h"
+#include "../startupAuthority/StartupAuthority.h"
 #include "../status/Status.h"
 
 #if GOTO_FEATURE == ON
@@ -77,7 +78,7 @@ CommandError Goto::request() {
 
 // goto equatorial position (Native or Mount coordinate system)
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
-  if (!mount.startupAuthorityTrusted()) {
+  if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, goto rejected because startup authority is not trusted");
     return CE_SLEW_ERR_UNSPECIFIED;
   }
@@ -199,7 +200,7 @@ CommandError Goto::requestSync() {
 
 // sync to equatorial position (Native or Mount coordinate system)
 CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
-  if (!mount.startupAuthorityTrusted()) {
+  if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, sync rejected because startup authority is not trusted");
     return CE_SLEW_ERR_UNSPECIFIED;
   }

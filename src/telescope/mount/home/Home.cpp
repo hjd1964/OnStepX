@@ -13,6 +13,7 @@
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
 #include "../limits/Limits.h"
+#include "../startupAuthority/StartupAuthority.h"
 
 // init the home position (according to settings and mount type)
 void Home::init() {
@@ -53,7 +54,7 @@ CommandError Home::request() {
     #endif
 
     failed = false;
-    if (!mount.startupAuthorityTrusted() && !hasSense) {
+    if (!startupAuthority.trusted() && !hasSense) {
       DLF("WRN: Mount, home rejected because startup authority is not trusted and no home switches are present");
       return CE_SLEW_ERR_UNSPECIFIED;
     }
@@ -140,7 +141,7 @@ CommandError Home::requestWithReset() {
     return CE_SLEW_ERR_UNSPECIFIED;
   #endif
 
-  if (!mount.startupAuthorityTrusted() && !hasSense) {
+  if (!startupAuthority.trusted() && !hasSense) {
     DLF("WRN: Mount, reset/home rejected because startup authority is not trusted and no home switches are present");
     return CE_SLEW_ERR_UNSPECIFIED;
   }
@@ -332,7 +333,7 @@ CommandError Home::reset(bool fullReset, bool authoritative) {
     VLF(")");
   }
 
-  if (authoritative) mount.setStartupAuthorityTrusted(true);
+  if (authoritative) startupAuthority.setTrusted(true);
 
   return CE_NONE;
 }

@@ -554,6 +554,10 @@ static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_S
   #endif
 #endif
 
+#ifdef LIMIT_STRICT
+  #error "Configuration (Config.h): LIMIT_STRICT is obsolete. Remove it; startup authority now controls when limits can be enabled."
+#endif
+
 // ROTATOR ---------------------------------------
 
 // AXIS3 ROTATOR

@@ -14,6 +14,7 @@
 #include "../guide/Guide.h"
 #include "../home/Home.h"
 #include "../limits/Limits.h"
+#include "../startupAuthority/StartupAuthority.h"
 #include "../../../lib/sense/Sense.h"
 
 void parkSignalWrapper() { park.signal(); }
@@ -46,7 +47,7 @@ CommandError Park::set(bool ignoreTrust) {
   if (goTo.state != GS_NONE)   return CE_SLEW_IN_MOTION;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
-  if (!ignoreTrust && !mount.startupAuthorityTrusted()) {
+  if (!ignoreTrust && !startupAuthority.trusted()) {
     DLF("WRN: Mount, set park rejected because startup authority is not trusted");
     return CE_SLEW_ERR_UNSPECIFIED;
   }
@@ -88,7 +89,7 @@ CommandError Park::request() {
     if (state == PS_PARKED)      return CE_NONE;
     if (state == PS_PARKING)     return CE_PARK_FAILED;
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
-    if (!mount.startupAuthorityTrusted()) {
+    if (!startupAuthority.trusted()) {
       DLF("WRN: Mount, park rejected because startup authority is not trusted");
       return CE_SLEW_ERR_UNSPECIFIED;
     }
@@ -208,7 +209,7 @@ void Park::requestDone() {
 // returns a parked telescope to operation
 CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved) return CE_NO_PARK_POSITION_SET;
-  if (!mount.startupAuthorityTrusted()) {
+  if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, unpark rejected because startup authority is not trusted");
     return CE_SLEW_ERR_UNSPECIFIED;
   }

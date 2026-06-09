@@ -10,6 +10,7 @@
 #include "../limits/Limits.h"
 #include "../park/Park.h"
 #include "../site/Site.h"
+#include "../startupAuthority/StartupAuthority.h"
 
 bool Home::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   UNUSED(reply);
@@ -82,7 +83,7 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
     if (command[1] == 'F' && parameter[0] == 0) {
       *commandError = reset(true);
       park.reset();
-      limits.enabled(site.isDateTimeReady());
+      limits.enabled(site.isDateTimeReady() && startupAuthority.trusted());
       *numericReply = false;
     } else return false;
 

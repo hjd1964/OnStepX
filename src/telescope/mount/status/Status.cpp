@@ -97,10 +97,6 @@ uint8_t Status::errorCode() {
   return limits.errorCode();
 }
 
-bool Status::startupAuthorityTrusted() {
-  return mount.startupAuthorityTrusted();
-}
-
 // mount misc. general status indicators
 void Status::general() {
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF

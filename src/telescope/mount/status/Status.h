@@ -28,7 +28,6 @@ class Status {
 
     // current mount fault/status code for external reporting
     uint8_t errorCode();
-    bool startupAuthorityTrusted();
 
     // mount status LED flash rate (in ms)
     void flashRate(int period);

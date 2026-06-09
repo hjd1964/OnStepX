@@ -19,6 +19,7 @@
 #include "pec/Pec.h"
 #include "site/Site.h"
 #include "st4/St4.h"
+#include "startupAuthority/StartupAuthority.h"
 #include "status/Status.h"
 
 #if MOUNT_COORDS_MEMORY == ON && (NV_DRIVER != NV_MB85RC32 && NV_DRIVER != NV_MB85RC64 && NV_DRIVER != NV_MB85RC256)
@@ -29,7 +30,7 @@ inline void mountWrapper() { mount.poll(); }
 inline void autostartWrapper() { mount.autostartPostponed(); }
 
 void Mount::init() {
-  absoluteCoordinateOriginsEstablished = true;
+  startupAuthority.init();
 
   nvKey = nv().kv().computeKey("MOUNT_SETTINGS");
   if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for MOUNT_SETTINGS"); }
@@ -44,7 +45,7 @@ void Mount::init() {
       uint32_t origin = UINT32_MAX;
       if (AXIS1_ENCODER_ORIGIN == 0) {
         nv().kv().getOrInit("AXIS1_ENCODER_ORIGIN", origin);
-        if (origin != UINT32_MAX) axis1.motor->encoderSetOrigin(origin); else absoluteCoordinateOriginsEstablished = false;
+        if (origin != UINT32_MAX) axis1.motor->encoderSetOrigin(origin); else startupAuthority.clearAbsoluteCoordinateOriginsEstablished();
       }
     #endif
   }
@@ -58,14 +59,14 @@ void Mount::init() {
       uint32_t origin = UINT32_MAX;
       if (AXIS2_ENCODER_ORIGIN == 0) {
         nv().kv().getOrInit("AXIS2_ENCODER_ORIGIN", origin);
-        if (origin != UINT32_MAX) axis2.motor->encoderSetOrigin(origin); else absoluteCoordinateOriginsEstablished = false;
+        if (origin != UINT32_MAX) axis2.motor->encoderSetOrigin(origin); else startupAuthority.clearAbsoluteCoordinateOriginsEstablished();
       }
     #endif
   }
 }
 
 void Mount::begin() {
-  startupAuthorityTrustedValue = false;
+  startupAuthority.begin();
 
   axis1.calibrateDriver();
   axis1.enable(MOUNT_ENABLE_IN_STANDBY == ON);
@@ -97,14 +98,14 @@ void Mount::begin() {
   // coordinate basis at startup, so allow reset() to bypass sync-threshold
   // checks only in that case.
   const bool absoluteAxisAuthority = axis1.motor->hasAbsoluteEncoder() && axis2.motor->hasAbsoluteEncoder();
-  const bool authoritativeReset = absoluteAxisAuthority && absoluteCoordinateOriginsEstablished;
+  const bool authoritativeReset = absoluteAxisAuthority && startupAuthority.absoluteCoordinateOriginsEstablished();
   CommandError startupResetError = home.reset(true, authoritativeReset);
   #ifdef HAS_ABSOLUTE_ENCODER_SERVO
     if (!absoluteAxisAuthority) {
       DLF("WRN: Mount, absolute encoder startup authority unavailable; paired absolute encoders not detected");
     }
   #endif
-  if (absoluteAxisAuthority && !absoluteCoordinateOriginsEstablished) {
+  if (absoluteAxisAuthority && !startupAuthority.absoluteCoordinateOriginsEstablished()) {
     DLF("WRN: Mount, absolute encoder startup authority unavailable; encoder origin missing");
   }
   if (authoritativeReset && startupResetError != CE_NONE) {
@@ -147,11 +148,31 @@ void Mount::begin() {
     if (!goTo.absoluteEncodersPresent && park.state != PS_PARKED) {
 
       MountPositionMemory a{}, b{};
-      const bool foundA = (nv().kv().get(nvKeyLastA, a) == KvPartition::Status::Ok);
-      const bool foundB = (nv().kv().get(nvKeyLastB, b) == KvPartition::Status::Ok);
+      KvPartition::Status statusA = nv().kv().get(nvKeyLastA, a);
+      KvPartition::Status statusB = nv().kv().get(nvKeyLastB, b);
+      const bool foundA = (statusA == KvPartition::Status::Ok);
+      const bool foundB = (statusB == KvPartition::Status::Ok);
+      const bool missingA = (statusA == KvPartition::Status::NotFound);
+      const bool missingB = (statusB == KvPartition::Status::NotFound);
+      const bool mountTypeA = foundA && (a.mountType == (uint8_t)(transform.mountType & 0x0Fu));
+      const bool mountTypeB = foundB && (b.mountType == (uint8_t)(transform.mountType & 0x0Fu));
 
-      const bool va = foundA && (a.mountType == (uint8_t)(transform.mountType & 0x0Fu)) && !a.untrusted;
-      const bool vb = foundB && (b.mountType == (uint8_t)(transform.mountType & 0x0Fu)) && !b.untrusted;
+      const bool va = mountTypeA && !a.untrusted;
+      const bool vb = mountTypeB && !b.untrusted;
+
+      const bool commissioningAllowed = !va && !vb && missingA && missingB;
+      startupAuthority.setCommissioningAllowed(commissioningAllowed);
+      if (commissioningAllowed) {
+        VLF("MSG: Mount, startup authority commissioning allowed (coordinate memory not initialized)");
+      } else {
+        VF("MSG: Mount, startup authority coordinate memory verified (A=");
+        if (missingA) { VF("missing"); } else
+        if (mountTypeA) { VF(a.untrusted ? "untrusted" : "trusted"); } else { VF(foundA ? "wrong mount" : "read error"); }
+        VF(", B=");
+        if (missingB) { VF("missing"); } else
+        if (mountTypeB) { VF(b.untrusted ? "untrusted" : "trusted"); } else { VF(foundB ? "wrong mount" : "read error"); }
+        VLF(")");
+      }
 
       const MountPositionMemory* best = nullptr;
 
@@ -173,7 +194,7 @@ void Mount::begin() {
           if (e == CE_NONE) {
             captureNominalIndexPositions();
             mount.syncFromOnStepToEncoders = true;
-            setStartupAuthorityTrusted(true);
+            startupAuthority.setTrusted(true);
           } else { DLF("WRN: Mount, coordinate memory restore failed"); }
         } else {
           DLF("WRN: Mount, coordinate memory restore failed");
@@ -187,11 +208,11 @@ void Mount::begin() {
   #endif
 
   #if MOUNT_STARTUP_MODE == SA_PERMISSIVE
-    setStartupAuthorityTrusted(true);
+    startupAuthority.setTrusted(true);
   #elif MOUNT_STARTUP_MODE == SA_AUTO
     #if MOUNT_COORDS_MEMORY == OFF
       if (!axis1.motor->hasAbsoluteEncoder() && !axis2.motor->hasAbsoluteEncoder()) {
-        setStartupAuthorityTrusted(true);
+        startupAuthority.setTrusted(true);
       }
     #endif
   #endif
@@ -201,21 +222,6 @@ void Mount::begin() {
 
   update();
   autostart();
-}
-
-void Mount::setStartupAuthorityTrusted(bool state) {
-  #if NV_INIT_ERROR_REVOKES_AUTHORITY == ON
-    if (state && initError.nv) {
-      DLF("WRN: Mount, startup authority trust rejected due to NV fault");
-      return;
-    }
-  #endif
-
-  startupAuthorityTrustedValue = state;
-
-  // If we have a trusted coordinate basis and date/time is ready, limits can
-  // be enforced immediately without waiting for a later goto/reset/unpark path.
-  if (startupAuthorityTrustedValue && site.isDateTimeReady()) limits.enabled(true);
 }
 
 void Mount::captureNominalIndexPositions() {
@@ -234,6 +240,7 @@ long Mount::getNominalIndexPositionSteps(uint8_t axisNumber) const {
 #if MOUNT_COORDS_MEMORY == ON
 void Mount::saveCoordinateMemory(bool trusted) {
   if (goTo.absoluteEncodersPresent) return;
+  if (!startupAuthority.trustEstablished()) return;
   if (nv().device().endurance() != NvDevice::Endurance::High) return;
 
   lastPosition.a1 = (float)axis1.getInstrumentCoordinate();
@@ -349,10 +356,6 @@ void Mount::tracking(bool state) {
 // enables or disables power to the mount motors
 void Mount::enable(bool state) {
   if (state == true) {
-    #if LIMIT_STRICT == ON
-      if (!site.dateIsReady || !site.timeIsReady) return;
-    #endif
-
     mountStatus.wake();
   } else {
     trackingState = TS_NONE;
@@ -408,7 +411,7 @@ void Mount::update() {
     axis2.setSynchronizedFrequency(0.0F);
   }
 
-  if (statusFlashMs != lastStatusFlashMs) {
+  if (statusFlashMs != lastStatusFlashMs || statusFlashMs == SF_STOPPED) {
     lastStatusFlashMs = statusFlashMs;
     mountStatus.flashRate(statusFlashMs);
     xBusy = statusFlashMs == SF_SLEWING;
@@ -417,16 +420,16 @@ void Mount::update() {
 
 void Mount::poll() {
   #if NV_INIT_ERROR_REVOKES_AUTHORITY == ON
-    if (initError.nv && startupAuthorityTrustedValue) {
-      startupAuthorityTrustedValue = false;
+    if (initError.nv && startupAuthority.trusted()) {
+      startupAuthority.setTrusted(false);
       DLF("WRN: Mount, startup authority trust cleared due to NV fault");
     }
   #endif
 
   // stop any movement then disable on motor hardware fault
   if (mount.motorFault()) {
-    if (startupAuthorityTrustedValue) {
-      startupAuthorityTrustedValue = false;
+    if (startupAuthority.trusted()) {
+      startupAuthority.setTrusted(false);
       DLF("WRN: Mount, startup authority trust cleared due to motor/encoder fault");
     }
     if (goTo.state > GS_NONE) goTo.abort(); else
@@ -445,7 +448,7 @@ void Mount::poll() {
 
   // keep track of where we are pointing
   #if MOUNT_COORDS_MEMORY == ON
-    saveCoordinateMemory(startupAuthorityTrustedValue && home.state != HS_HOMING);
+    saveCoordinateMemory(startupAuthority.trusted() && home.state != HS_HOMING);
   #endif
 
   if (trackingState == TS_NONE) {

@@ -17,7 +17,8 @@ If trust is true:
 
 If trust is false:
 - coordinate-based automatic operations are blocked
-- manual guide recovery is still allowed
+- manual guide recovery may still be allowed, depending on whether the mount
+  requires startup authority and whether it is in a commissioning/recovery state
 - plain sidereal tracking is not gated by startup authority itself, but it may
   still be blocked by other safety policy
 
@@ -94,7 +95,9 @@ Blocked:
 - home/return unless switch-based home is available
 
 Allowed:
-- manual guide
+- manual guide on simple mounts that do not require startup authority
+- manual guide during first-time coordinate-memory commissioning, when no saved
+  coordinate-memory record exists yet
 - plain sidereal tracking, subject to the normal tracking safety policy
 
 Important tracking note:
@@ -218,7 +221,7 @@ In SA_PERMISSIVE:
   sources
 
 Current recovery model:
-1. user manually guides to a known place if needed
+1. user manually guides to a known place if allowed by startup authority policy
 2. user performs an authoritative action:
    - set origin
    - authoritative reset at a known home position
@@ -230,6 +233,34 @@ Important practical consequence:
 - the default SA_AUTO mode preserves permissive startup for simple mounts with
   neither paired absolute position sources nor coordinate memory enabled
 - SA_STRICT remains available for observatory and interlock-sensitive installs
+- SA_STRICT controls whether boot trust is granted automatically; it does not,
+  by itself, make manual guide require startup authority on otherwise simple
+  mounts
+
+## Manual guide while untrusted
+
+Manual guide is treated as recovery motion, not coordinate-based automatic
+motion.
+
+However, it is not always allowed while untrusted.
+
+Allowed while untrusted:
+- simple mounts where startup authority is not required
+- first-time coordinate-memory commissioning, when both coordinate-memory
+  records are missing and the user must move the mount to establish the origin
+- absolute-encoder origin commissioning before startup authority has ever been
+  established
+- switch-based home motion through the sensed-home path
+
+Blocked while untrusted:
+- mounts using coordinate memory after coordinate-memory records exist but are
+  untrusted, wrong for the mount type, or unreadable
+- mounts with known absolute startup authority sources after trust has been lost
+  or rejected
+
+This distinction avoids treating an NV failure or an untrusted coordinate-memory
+record as if it were the same thing as a clean first boot.  Fresh coordinate
+memory gets a one-time commissioning path; later failures stay conservative.
 
 ## Workflow 3: Boot Untrusted, Then Establish Trust With Auto-Home
 
@@ -305,14 +336,16 @@ Example:
 
 If trust is lost after startup:
 - coordinate-based automatic motion stops being allowed
-- manual guide recovery remains available
+- manual guide recovery may remain available, according to the same manual-guide
+  policy used at startup
 - sidereal tracking is still not gated by startup authority itself, but it
   remains subject to the normal tracking safety policy
 
 The guiding rule is:
 - if the system knows where it is, coordinate-based automatic motion is allowed
 - if it does not know where it is, coordinate-based automatic motion is blocked
-- guide-based manual recovery remains available
+- guide-based manual recovery remains available only where startup authority
+  policy allows it
 
 ## Important startup workflows to remember
 
@@ -323,12 +356,25 @@ The guiding rule is:
 
 2. Mount without coordinate memory and without clutches:
 - mount may power up far from home
-- user must guide back to home
+- user may need to guide back to home
 - then perform an authoritative home/reset action
 - then begin normal operation
 - current model fits this workflow well
 
-3. User wants only sidereal tracking at startup:
+3. Fresh coordinate-memory install:
+- coordinate-memory records are missing
+- manual guide commissioning is allowed so the user can move to the one-time
+  origin
+- set-origin or authoritative reset establishes trust
+- after that, coordinate memory is treated as a startup authority source
+
+4. Coordinate-memory NV failure or untrusted saved record:
+- this is not treated as fresh commissioning
+- automatic coordinate-based motion remains blocked
+- ordinary manual guide is blocked until trust is restored through an
+  authoritative path, such as sensed home or a deliberate set-origin workflow
+
+5. User wants only sidereal tracking at startup:
 - trust does not gate sidereal tracking by itself
 - but default safety behavior still disallows tracking when limits are not
   enforced

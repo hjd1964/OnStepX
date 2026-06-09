@@ -751,9 +751,6 @@
 #ifndef LIMIT_SENSE_STRICT
 #define LIMIT_SENSE_STRICT            OFF                         // for all axes, ON blocks motion if min/max are on the same pin
 #endif
-#ifndef LIMIT_STRICT
-#define LIMIT_STRICT                  ON                          // ON enables Mount limits at startup if date/time are set
-#endif
 #ifndef LIMIT_RECOVERY
 #define LIMIT_RECOVERY                OFF                         // ON allows 1s for gotos away from horizon, meridian w, and axis1 max limits
 #endif

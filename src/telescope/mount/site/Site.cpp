@@ -13,6 +13,7 @@
 #include "../home/Home.h"
 #include "../limits/Limits.h"
 #include "../Mount.h"
+#include "../startupAuthority/StartupAuthority.h"
 
 // fractional second sidereal clock (fracsec or millisecond)
 volatile unsigned long fracLAST;
@@ -269,11 +270,7 @@ void Site::setDateTime(JulianDate julianDate) {
   
   if (nv().device().endurance() < NvDevice::Endurance::Mid) writeTime = false;
 
-  #if LIMIT_STRICT == ON
-    limits.enabled(isDateTimeReady());
-  #endif
-
-  if (isDateTimeReady() && mount.startupAuthorityTrusted()) limits.enabled(true);
+  limits.enabled(isDateTimeReady() && startupAuthority.trusted());
 }
 
 // gets the time in sidereal hours

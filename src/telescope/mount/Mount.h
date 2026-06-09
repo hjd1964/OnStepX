@@ -100,8 +100,6 @@ class Mount {
     // true if syncing only from OnStep to the Encoders
     bool syncFromOnStepToEncoders = false;
 
-    inline bool startupAuthorityTrusted() const { return startupAuthorityTrustedValue; }
-    void setStartupAuthorityTrusted(bool state);
     void captureNominalIndexPositions();
     long getNominalIndexPositionSteps(uint8_t axisNumber) const;
 
@@ -147,9 +145,6 @@ class Mount {
 
     long nominalIndexAxis1Steps = 0;
     long nominalIndexAxis2Steps = 0;
-
-    bool absoluteCoordinateOriginsEstablished = true;
-    bool startupAuthorityTrustedValue = false;
 };
 
 extern Motor& motor1;
