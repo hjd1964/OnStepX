@@ -343,7 +343,10 @@ void Mount::autostartPostponed() {
 void Mount::tracking(bool state) {
   if (state == true) {
     enable(state);
-    if (isEnabled()) trackingState = TS_SIDEREAL;
+    if (isEnabled()) {
+      mountStatus.wake();
+      trackingState = TS_SIDEREAL;
+    }
   } else
 
   if (state == false) {
@@ -355,9 +358,7 @@ void Mount::tracking(bool state) {
 
 // enables or disables power to the mount motors
 void Mount::enable(bool state) {
-  if (state == true) {
-    mountStatus.wake();
-  } else {
+  if (state == false) {
     trackingState = TS_NONE;
     update();
   }

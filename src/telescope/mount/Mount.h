@@ -91,7 +91,6 @@ class Mount {
     inline bool isTracking() { return trackingState == TS_SIDEREAL; }
 
     // enables or disables power to the mount motors
-    // first enable starts the mount status indications
     void enable(bool state);
 
     // returns true if the mount motors are powered on

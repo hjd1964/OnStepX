@@ -229,6 +229,7 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
 
   limits.enabled(true);
   mount.syncFromOnStepToEncoders = true;
+  mountStatus.wake();
 
   VLF("MSG: Mount, sync instrument coordinates updated");
 
@@ -682,6 +683,8 @@ CommandError Goto::startAutoSlew() {
   }
 
   VF("MSG: Mount, goto target coordinates set (a1="); V(radToDeg(a1)); VF(" deg, a2="); V(radToDeg(a2)); VLF(" deg)");
+
+  mountStatus.wake();
 
   e = axis1.autoGoto(radsPerSecondCurrent);
   if (e == CE_NONE) e = axis2.autoGoto(radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
