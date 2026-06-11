@@ -335,11 +335,11 @@ void StepDirMotor::setSlewing(bool state) {
   if (state == true) driver->modeDecaySlewing(); else driver->modeDecayTracking();
 }
 
-bool StepDirMotor::isStalled() {
+bool StepDirMotor::isStalled(double axisPosition) {
   if (!ready || !enabled || !driver) return false;
   if (!driver->hasStallDetect()) return false;
 //  if (microstepModeControl != MMC_SLEWING) return false;
-  return driver->isStalled(step >= 0 ? lastFrequency : -lastFrequency);
+  return driver->isStalled(step >= 0 ? lastFrequency : -lastFrequency, axisPosition);
 }
 
 // swaps in/out fast unidirectional ISR for slewing 

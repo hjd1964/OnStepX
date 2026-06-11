@@ -19,15 +19,24 @@
 #endif
 // - SG Train OFF => slow EMA drift tracking
 #ifndef BASE_TC_SLOW
-  #define BASE_TC_SLOW 4096.0f
+  #define BASE_TC_SLOW 1024.0f
 #endif
 #ifndef DEV_TC_SLOW
-  #define DEV_TC_SLOW  8192.0f
+  #define DEV_TC_SLOW  2048.0f
 #endif
 
 // Margin for model:
 #define MARGIN_GENERAL 80 // general was 40
 #define MARGIN_NOISE   4  // noise relative was 3
+
+#if defined(DRIVER_TMC_STEPPER_STALLGUARD) && SG_ANGLE_BINS > 1
+namespace {
+  SgModel axis1SgAngleModel[SG_ANGLE_BINS];
+  float axis1SgAngleBaseF[SG_ANGLE_BINS][2][SG_BINS];
+  float axis1SgAngleDevF[SG_ANGLE_BINS][2][SG_BINS];
+  uint32_t axis1SgAngleNvKey[SG_ANGLE_BINS];
+}
+#endif
 
 TmcStepDirDriverSG::TmcStepDirDriverSG(uint8_t axisNumber, const StepDirDriverPins *Pins, const StepDirDriverSettings *Settings,
                                        int16_t currentHold, int16_t currentRun, int16_t currentSlewing, int8_t intpol)
@@ -60,6 +69,7 @@ bool TmcStepDirDriverSG::init() {
     sgRampF   = 0.0f;
     sgTrainPrev = sgTrain.value;
     sgModelSavePending = false;
+    sgAngleDirtyMask = 0;
     sgModelSaveIntervalMs = (uint32_t)SG_MODEL_SAVE_MS;
     if (nv().device().endurance() == NvDevice::Endurance::Mid) sgModelSaveIntervalMs = (uint32_t)SG_MODEL_SAVE_MS_MID; else
     if (nv().device().endurance() == NvDevice::Endurance::High) sgModelSaveIntervalMs = (uint32_t)SG_MODEL_SAVE_MS_HIGH;
@@ -74,26 +84,68 @@ bool TmcStepDirDriverSG::init() {
     nvKey = nv().kv().computeKey(keyStr);
 
     if (sgEnabled.value == ON) {
-      // Read existing model (if present)
-      KvPartition::Status result = nv().kv().get(nvKey, sgModel);
-      if (result == KvPartition::Status::Ok) {
-        VF("MSG:"); V(axisPrefix); VLF("StallGuard model NV file read success");
-      } else if (result == KvPartition::Status::NotFound) {
-        VF("MSG:"); V(axisPrefix); VLF("StallGuard model NV file not found (using defaults)");
-      } else {
-        DF("WRN:"); D(axisPrefix); DLF("StallGuard model NV file read failed");
-      }
+      #if SG_ANGLE_BINS > 1
+        if (sgUseAngleBins()) {
+          SgModel legacyModel;
+          sgModelInit(legacyModel);
+          KvPartition::Status legacyResult = nv().kv().get(nvKey, legacyModel);
+          const bool legacyOk = (legacyResult == KvPartition::Status::Ok) && sgModelValid(legacyModel);
 
-      sgModelDebugDumpNv();
+          for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) {
+            sgModelInit(axis1SgAngleModel[a]);
+            sprintf(keyStr, "STALLGUARD_AXIS1_A%u", (unsigned)a);
+            axis1SgAngleNvKey[a] = nv().kv().computeKey(keyStr);
 
-      // If loaded model is stale/incompatible, reset to defaults and store back
-      if (!sgModelValid(sgModel)) {
-        DF("WRN:"); D(axisPrefix); DLF("StallGuard model invalid/discarded");
-        sgModelInit(sgModel);
-        sgRuntimeFromModel();
-        if (nv().kv().put(nvKey, sgModel) != KvPartition::Status::Ok) { DF("WRN:"); D(axisPrefix); DLF("StallGuard save failed"); }
-      } else {
-        sgRuntimeFromModel();
+            KvPartition::Status result = nv().kv().get(axis1SgAngleNvKey[a], axis1SgAngleModel[a]);
+            if (result == KvPartition::Status::Ok) {
+              VF("MSG:"); V(axisPrefix); VF("StallGuard angle model "); V((int)a); VLF(" NV file read success");
+            } else if (result == KvPartition::Status::NotFound) {
+              VF("MSG:"); V(axisPrefix); VF("StallGuard angle model "); V((int)a);
+              if (legacyOk) {
+                VLF(" NV file not found (using legacy seed)");
+                axis1SgAngleModel[a] = legacyModel;
+              } else {
+                VLF(" NV file not found (using defaults)");
+              }
+            } else {
+              DF("WRN:"); D(axisPrefix); D("StallGuard angle model "); D((int)a); DLF(" NV file read failed");
+            }
+
+            if (!sgModelValid(axis1SgAngleModel[a])) {
+              DF("WRN:"); D(axisPrefix); D("StallGuard angle model "); D((int)a); DLF(" invalid/discarded");
+              if (legacyOk) axis1SgAngleModel[a] = legacyModel; else sgModelInit(axis1SgAngleModel[a]);
+              if (nv().kv().put(axis1SgAngleNvKey[a], axis1SgAngleModel[a]) != KvPartition::Status::Ok) {
+                DF("WRN:"); D(axisPrefix); DLF("StallGuard angle model save failed");
+              }
+            }
+          }
+
+          sgModelDebugDumpNv();
+          sgRuntimeFromModel();
+        } else
+      #endif
+      {
+        // Read existing model (if present)
+        KvPartition::Status result = nv().kv().get(nvKey, sgModel);
+        if (result == KvPartition::Status::Ok) {
+          VF("MSG:"); V(axisPrefix); VLF("StallGuard model NV file read success");
+        } else if (result == KvPartition::Status::NotFound) {
+          VF("MSG:"); V(axisPrefix); VLF("StallGuard model NV file not found (using defaults)");
+        } else {
+          DF("WRN:"); D(axisPrefix); DLF("StallGuard model NV file read failed");
+        }
+
+        sgModelDebugDumpNv();
+
+        // If loaded model is stale/incompatible, reset to defaults and store back
+        if (!sgModelValid(sgModel)) {
+          DF("WRN:"); D(axisPrefix); DLF("StallGuard model invalid/discarded");
+          sgModelInit(sgModel);
+          sgRuntimeFromModel();
+          if (nv().kv().put(nvKey, sgModel) != KvPartition::Status::Ok) { DF("WRN:"); D(axisPrefix); DLF("StallGuard save failed"); }
+        } else {
+          sgRuntimeFromModel();
+        }
       }
 
     } else {
@@ -104,6 +156,19 @@ bool TmcStepDirDriverSG::init() {
       } else if (result != KvPartition::Status::NotFound) {
         DF("WRN:"); D(axisPrefix); DLF("StallGuard model NV file delete error");
       }
+
+      #if SG_ANGLE_BINS > 1
+        if (sgUseAngleBins()) {
+          for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) {
+            sprintf(keyStr, "STALLGUARD_AXIS1_A%u", (unsigned)a);
+            axis1SgAngleNvKey[a] = nv().kv().computeKey(keyStr);
+            result = nv().kv().del(axis1SgAngleNvKey[a]);
+            if (result != KvPartition::Status::Ok && result != KvPartition::Status::NotFound) {
+              DF("WRN:"); D(axisPrefix); D("StallGuard angle model "); D((int)a); DLF(" NV file delete error");
+            }
+          }
+        }
+      #endif
     }
 
     // bin cache invalid until first use
@@ -132,13 +197,13 @@ bool TmcStepDirDriverSG::parameterIsValid(AxisParameter* parameter, bool next) {
     }
 
     if (driverModel == TMC2209) {
-      if (sgEnabledValue == ON && (decaySlewingValue != OFF && decaySlewingValue != STEALTHCHOP)) {
+      if (sgEnabledValue == ON && decaySlewingValue != STEALTHCHOP) {
         DF("WRN:"); D(axisPrefix);
         DLF("stallGuard SG-Enable ON requires Decay-mode-Goto StealthChop");
         return true;
       }
     } else {
-      if (sgEnabledValue == ON && (decaySlewingValue != OFF && decaySlewingValue != SPREADCYCLE)) {
+      if (sgEnabledValue == ON && decaySlewingValue != SPREADCYCLE) {
         DF("WRN:"); D(axisPrefix);
         DLF("stallGuard SG-Enable ON requires Decay-mode-Goto SpreadCycle");
         return true;
@@ -149,7 +214,7 @@ bool TmcStepDirDriverSG::parameterIsValid(AxisParameter* parameter, bool next) {
   return true;
 }
 
-bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
+bool TmcStepDirDriverSG::isStalled(float stepsPerSec, double axisPosition) {
 
   #ifdef DRIVER_TMC_STEPPER_STALLGUARD
 
@@ -167,15 +232,14 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
 
     // Defer model writes while slewing; flush once speed drops below SG arm threshold.
     if (sgModelSavePending && spd < sgArmFps.value) {
-      sgModelFromRuntime();
-
-      if (nv().kv().put(nvKey, sgModel) == KvPartition::Status::Ok) {
+      const bool saved = sgSaveModel();
+      if (saved) {
         DF("MSG:"); D(axisPrefix); DLF("StallGuard model NV file saved");
       } else {
         DF("WRN:"); D(axisPrefix); DLF("StallGuard model NV file save failed");
       }
 
-      sgModelSavePending = false;
+      sgModelSavePending = !saved;
       sgModelLastSaveMs = nowMs;
     }
 
@@ -279,20 +343,32 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
     sgSpeedBlend(spd, armFps, b0, b1, bt);
     const uint8_t bl = (bt < 0.5f) ? b0 : b1; // nearest bin for learning
 
+    uint8_t a0, a1;
+    float at;
+    sgAngleBlend(axisPosition, a0, a1, at);
+    const uint8_t al = (at < 0.5f) ? a0 : a1; // nearest angle bin for learning
+
     // Seed baseline/deviation for the nearest learning bin.
-    if (sgTrain.value == ON) {
-      if (!sgModel.init[dir][bl]) {
-        sgModel.base[dir][bl] = sgToFp(sg);
-        sgModel.dev[dir][bl] = sgToFp(10);
-        sgBaseF[dir][bl] = (float)sg;
-        sgDevF[dir][bl] = 10.0f;
-        sgModel.init[dir][bl] = true;
-      }
+    const bool trainingMode = (sgTrain.value == ON);
+    #if SG_AUTO_SEED == ON
+      const bool autoSeed = !trainingMode && steadyNow && !sgLatch && sg > 0 && sgWarmMs >= armWarmMs;
+    #else
+      const bool autoSeed = false;
+    #endif
+    if (!sgBinInitialized(al, dir, bl) && (trainingMode || autoSeed)) {
+      sgSetBaseRuntime(al, dir, bl, (float)sg);
+      sgSetDevRuntime(al, dir, bl, 10.0f);
+      sgSetBinInitialized(al, dir, bl, true);
+      sgMarkAngleBinDirty(al);
     }
 
     // Blend baseline/deviation across adjacent speed bins for smoother thresholds.
-    const float baseF = (1.0f - bt) * sgBaseF[dir][b0] + bt * sgBaseF[dir][b1];
-    const float devF  = (1.0f - bt) * sgDevF [dir][b0] + bt * sgDevF [dir][b1];
+    const float base0 = (1.0f - bt) * sgBaseRuntime(a0, dir, b0) + bt * sgBaseRuntime(a0, dir, b1);
+    const float base1 = (1.0f - bt) * sgBaseRuntime(a1, dir, b0) + bt * sgBaseRuntime(a1, dir, b1);
+    const float dev0  = (1.0f - bt) * sgDevRuntime (a0, dir, b0) + bt * sgDevRuntime (a0, dir, b1);
+    const float dev1  = (1.0f - bt) * sgDevRuntime (a1, dir, b0) + bt * sgDevRuntime (a1, dir, b1);
+    const float baseF = (1.0f - at) * base0 + at * base1;
+    const float devF  = (1.0f - at) * dev0  + at * dev1;
     const uint16_t base = (uint16_t)lroundf(baseF);
     const uint16_t devE = (uint16_t)lroundf(devF);
 
@@ -322,12 +398,13 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
     if (trip < 0) trip = 0;
 
     // Rate-of-change sensitivity boost ("floor"):
+    // NOTE: Floor must be disabled during training mode to avoid interfering with model learning.
     {
       int floorPct = (int)lroundf(sgFloorPct.value);
       if (floorPct < 0) floorPct = 0;
       if (floorPct > 100) floorPct = 100;
 
-      if (sgTrain.value == OFF && floorPct > 0 && base > 0 && sgWarmMs >= SG_ZERO_GRACE_MS) {
+      if (!trainingMode && floorPct > 0 && base > 0 && sgWarmMs >= SG_ZERO_GRACE_MS) {
         const float vref = (spd > armFps) ? spd : armFps;
         const float r = (vref > 0.0f) ? (absA / vref) : 1.0f;
 
@@ -365,7 +442,6 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
     sgLastMargin = margin;
     sgBadLast    = bad;
 
-    const bool trainingMode = (sgTrain.value == ON);
     const bool steadyHealthy = steadyNow && !sgLatch && !bad;
     const bool adaptFast = trainingMode && steadyNow && !sgLatch;
     const bool adaptSlow = !trainingMode && steadyHealthy;
@@ -376,14 +452,17 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
 
       const float sgF = (float)sg;
 
-      // Update only the nearest bin to avoid cross-speed drift between adjacent bins.
-      sgBaseF[dir][bl] += (sgF - sgBaseF[dir][bl]) / baseTc;
+      // Update only the nearest speed/angle bin to avoid cross-bin drift.
+      float *baseLearn = sgBaseRuntimePtr(al, dir, bl);
+      float *devLearn  = sgDevRuntimePtr(al, dir, bl);
+      *baseLearn += (sgF - *baseLearn) / baseTc;
 
       // Downward-only deviation EMA update for the nearest learning bin.
-      const float d = sgBaseF[dir][bl] - sgF;
+      const float d = *baseLearn - sgF;
       const float devDown = (d > 0.0f) ? d : 0.0f;
 
-      sgDevF[dir][bl] += (devDown - sgDevF[dir][bl]) / devTc;
+      *devLearn += (devDown - *devLearn) / devTc;
+      sgMarkAngleBinDirty(al);
 
       // Queue periodic save; actual write is deferred until non-slew speeds.
       if ((nowMs - sgModelLastSaveMs) >= sgModelSaveIntervalMs) {
@@ -458,6 +537,7 @@ bool TmcStepDirDriverSG::isStalled(float stepsPerSec) {
 
   #else
     UNUSED(stepsPerSec);
+    UNUSED(axisPosition);
   #endif
 
   return sgLatch;
@@ -492,6 +572,112 @@ bool TmcStepDirDriverSG::getStallGuardTelemetry(char *reply, size_t replySize) {
 }
 
 #ifdef DRIVER_TMC_STEPPER_STALLGUARD
+
+bool TmcStepDirDriverSG::sgUseAngleBins() const {
+  #if SG_ANGLE_BINS > 1
+    return axisNumber == 1;
+  #else
+    return false;
+  #endif
+}
+
+void TmcStepDirDriverSG::sgMarkAngleBinDirty(uint8_t angle) {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins() && angle < SG_ANGLE_BINS) sgAngleDirtyMask |= (uint16_t)(1UL << angle);
+  #else
+    UNUSED(angle);
+  #endif
+}
+
+void TmcStepDirDriverSG::sgAngleBlend(double axisPosition, uint8_t &a0, uint8_t &a1, float &t) const {
+  a0 = 0;
+  a1 = 0;
+  t = 0.0f;
+
+  #if SG_ANGLE_BINS > 1
+    if (!sgUseAngleBins()) return;
+    if (isnan(axisPosition) || isinf(axisPosition)) return;
+
+    double phase = fmod(axisPosition, (double)Deg360);
+    if (phase < 0.0) phase += (double)Deg360;
+
+    const double x = phase * (double)SG_ANGLE_BINS / (double)Deg360;
+    int i = (int)floor(x);
+    if (i < 0) i = 0;
+    if (i >= SG_ANGLE_BINS) i = SG_ANGLE_BINS - 1;
+
+    a0 = (uint8_t)i;
+    a1 = (uint8_t)((i + 1) % SG_ANGLE_BINS);
+    t = (float)(x - (double)i);
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+  #endif
+}
+
+bool TmcStepDirDriverSG::sgBinInitialized(uint8_t angle, uint8_t dir, uint8_t bin) const {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) return axis1SgAngleModel[angle].init[dir][bin];
+  #else
+    UNUSED(angle);
+  #endif
+  return sgModel.init[dir][bin];
+}
+
+void TmcStepDirDriverSG::sgSetBinInitialized(uint8_t angle, uint8_t dir, uint8_t bin, bool state) {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) {
+      axis1SgAngleModel[angle].init[dir][bin] = state;
+      return;
+    }
+  #else
+    UNUSED(angle);
+  #endif
+  sgModel.init[dir][bin] = state;
+}
+
+float TmcStepDirDriverSG::sgBaseRuntime(uint8_t angle, uint8_t dir, uint8_t bin) const {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) return axis1SgAngleBaseF[angle][dir][bin];
+  #else
+    UNUSED(angle);
+  #endif
+  return sgBaseF[dir][bin];
+}
+
+float TmcStepDirDriverSG::sgDevRuntime(uint8_t angle, uint8_t dir, uint8_t bin) const {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) return axis1SgAngleDevF[angle][dir][bin];
+  #else
+    UNUSED(angle);
+  #endif
+  return sgDevF[dir][bin];
+}
+
+void TmcStepDirDriverSG::sgSetBaseRuntime(uint8_t angle, uint8_t dir, uint8_t bin, float value) {
+  *sgBaseRuntimePtr(angle, dir, bin) = value;
+}
+
+void TmcStepDirDriverSG::sgSetDevRuntime(uint8_t angle, uint8_t dir, uint8_t bin, float value) {
+  *sgDevRuntimePtr(angle, dir, bin) = value;
+}
+
+float* TmcStepDirDriverSG::sgBaseRuntimePtr(uint8_t angle, uint8_t dir, uint8_t bin) {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) return &axis1SgAngleBaseF[angle][dir][bin];
+  #else
+    UNUSED(angle);
+  #endif
+  return &sgBaseF[dir][bin];
+}
+
+float* TmcStepDirDriverSG::sgDevRuntimePtr(uint8_t angle, uint8_t dir, uint8_t bin) {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) return &axis1SgAngleDevF[angle][dir][bin];
+  #else
+    UNUSED(angle);
+  #endif
+  return &sgDevF[dir][bin];
+}
 
 uint8_t TmcStepDirDriverSG::sgSpeedBin(float spd, float armFps) const {
   if (armFps < 1.0f) armFps = 1.0f;
@@ -626,12 +812,20 @@ void TmcStepDirDriverSG::stallDetectSoftReset() {
 }
 
 void TmcStepDirDriverSG::stallDetectHardReset() {
-  sgModelInit(sgModel);
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) {
+      for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) sgModelInit(axis1SgAngleModel[a]);
+      sgAngleDirtyMask = (uint16_t)((1UL << SG_ANGLE_BINS) - 1UL);
+    } else
+  #endif
+  {
+    sgModelInit(sgModel);
+  }
+
   sgRuntimeFromModel();
 
   // Persist cleared model if possible so next boot starts clean too
-  sgModelFromRuntime();
-  if (nv().kv().put(nvKey, sgModel) == KvPartition::Status::Ok) {
+  if (sgSaveModel()) {
     VF("MSG:"); V(axisPrefix); VLF("StallGuard model reset and file saved");
   } else {
     DF("WRN:"); D(axisPrefix); DLF("StallGuard model reset but file save failed");
@@ -682,6 +876,20 @@ bool TmcStepDirDriverSG::sgModelValid(const SgModel& model) const {
 }
 
 void TmcStepDirDriverSG::sgRuntimeFromModel() {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) {
+      for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) {
+        for (uint8_t d = 0; d < 2; d++) {
+          for (uint8_t b = 0; b < SG_BINS; b++) {
+            axis1SgAngleBaseF[a][d][b] = (float)axis1SgAngleModel[a].base[d][b] / (float)SG_FP_ONE;
+            axis1SgAngleDevF [a][d][b] = (float)axis1SgAngleModel[a].dev [d][b] / (float)SG_FP_ONE;
+          }
+        }
+      }
+      return;
+    }
+  #endif
+
   for (uint8_t d = 0; d < 2; d++) {
     for (uint8_t b = 0; b < SG_BINS; b++) {
       sgBaseF[d][b] = (float)sgModel.base[d][b] / (float)SG_FP_ONE;
@@ -691,6 +899,28 @@ void TmcStepDirDriverSG::sgRuntimeFromModel() {
 }
 
 void TmcStepDirDriverSG::sgModelFromRuntime() {
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) {
+      for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) {
+        for (uint8_t d = 0; d < 2; d++) {
+          for (uint8_t b = 0; b < SG_BINS; b++) {
+            float base = axis1SgAngleBaseF[a][d][b];
+            float dev  = axis1SgAngleDevF [a][d][b];
+            if (base < 0.0f) base = 0.0f;
+            if (dev  < 0.0f) dev  = 0.0f;
+
+            const float baseFp = base * (float)SG_FP_ONE;
+            const float devFp  = dev  * (float)SG_FP_ONE;
+
+            axis1SgAngleModel[a].base[d][b] = (baseFp > 65535.0f) ? 65535u : (uint16_t)lroundf(baseFp);
+            axis1SgAngleModel[a].dev [d][b] = (devFp  > 65535.0f) ? 65535u : (uint16_t)lroundf(devFp);
+          }
+        }
+      }
+      return;
+    }
+  #endif
+
   for (uint8_t d = 0; d < 2; d++) {
     for (uint8_t b = 0; b < SG_BINS; b++) {
       float base = sgBaseF[d][b];
@@ -707,23 +937,58 @@ void TmcStepDirDriverSG::sgModelFromRuntime() {
   }
 }
 
+bool TmcStepDirDriverSG::sgSaveModel() {
+  sgModelFromRuntime();
+
+  #if SG_ANGLE_BINS > 1
+    if (sgUseAngleBins()) {
+      if (sgAngleDirtyMask == 0) return true;
+
+      bool ok = true;
+      for (uint8_t a = 0; a < SG_ANGLE_BINS; a++) {
+        const uint16_t bit = (uint16_t)(1UL << a);
+        if ((sgAngleDirtyMask & bit) == 0) continue;
+
+        if (nv().kv().put(axis1SgAngleNvKey[a], axis1SgAngleModel[a]) == KvPartition::Status::Ok) {
+          sgAngleDirtyMask &= (uint16_t)~bit;
+        } else {
+          ok = false;
+        }
+      }
+      return ok;
+    }
+  #endif
+
+  return nv().kv().put(nvKey, sgModel) == KvPartition::Status::Ok;
+}
+
 void TmcStepDirDriverSG::sgModelDebugDumpNv() const {
   #if DEBUG != OFF
+    const SgModel *model = &sgModel;
+    #if SG_ANGLE_BINS > 1
+      if (sgUseAngleBins()) model = &axis1SgAngleModel[0];
+    #endif
+
     VF("MSG:"); V(axisPrefix); VF("Stallguard model metadata v=");
-    V((int)sgModel.version);
+    V((int)model->version);
     VF(" microstepsGoto=");
-    V((int)sgModel.normalizedMicrostepsSlewing);
+    V((int)model->normalizedMicrostepsSlewing);
     VF(" mAGoto=");
-    V((int)lroundf(sgModel.mAGoto));
+    V((int)lroundf(model->mAGoto));
     VF(" sgSens=");
-    VL((int)lroundf(sgModel.sgSens));
+    V((int)lroundf(model->sgSens));
+    #if SG_ANGLE_BINS > 1
+      if (sgUseAngleBins()) { VF(" angleBins="); V((int)SG_ANGLE_BINS); VLF(" dumpBin=0"); } else { VLF(""); }
+    #else
+      VLF("");
+    #endif
 
     #ifdef SG_DEBUG_MODEL
       VLF("------------------------------------------------------------------");
       VF("#define AXIS"); V((int)axisNumber); VF("_SG_MODEL_INIT { { ");
       for (int d = 0; d < 2; d++) {
         for (int b = 0; b < SG_BINS; b++) {
-          V(sgModel.init[d][b] ? "true" : "false");
+          V(model->init[d][b] ? "true" : "false");
           if (b < SG_BINS - 1) { VF(", "); }
         }
         VF(" }");
@@ -734,7 +999,7 @@ void TmcStepDirDriverSG::sgModelDebugDumpNv() const {
       VF("#define AXIS"); V((int)axisNumber); VF("_SG_MODEL_BASE { { ");
       for (int d = 0; d < 2; d++) {
         for (int b = 0; b < SG_BINS; b++) {
-          V((int)sgModel.base[d][b]);
+          V((int)model->base[d][b]);
           if (b < SG_BINS - 1) { VF(", "); }
         }
         VF(" }");
@@ -745,7 +1010,7 @@ void TmcStepDirDriverSG::sgModelDebugDumpNv() const {
       VF("#define AXIS"); V((int)axisNumber); VF("_SG_MODEL_DEV { { ");
       for (int d = 0; d < 2; d++) {
         for (int b = 0; b < SG_BINS; b++) {
-          V((int)sgModel.dev[d][b]);
+          V((int)model->dev[d][b]);
           if (b < SG_BINS - 1) { VF(", "); }
         }
         VF(" }");

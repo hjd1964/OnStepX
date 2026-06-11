@@ -719,7 +719,7 @@ void Axis::setMotionLimitsCheck(bool state) {
 bool Axis::motionError(Direction direction) {
   bool result = false;
 
-  if (motor->isStalled()) return true;
+  if (motor->isStalled(getInstrumentCoordinate())) return true;
 
   if (direction == DIR_FORWARD || direction == DIR_BOTH) {
     result = getInstrumentCoordinateSteps() > lroundf(0.9F*INT32_MAX) ||

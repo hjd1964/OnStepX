@@ -146,6 +146,9 @@
 #ifndef SG_TRAIN
   #define SG_TRAIN ON
 #endif
+#ifndef SG_AUTO_SEED
+  #define SG_AUTO_SEED ON
+#endif
 #ifndef SG_SENS
   #define SG_SENS 50
 #endif
@@ -166,6 +169,16 @@
 // Keep at 0 for a true low anchor, or raise to manually smooth low-speed behavior.
 #ifndef SG_BIN0_FPS
   #define SG_BIN0_FPS 0
+#endif
+
+// Axis1 can optionally learn separate SG models by axis angle.  Each angle bin
+// is stored in its own NV key so the normal compact model remains unchanged.
+#ifndef SG_ANGLE_BINS
+  #define SG_ANGLE_BINS 1
+#endif
+
+#if SG_ANGLE_BINS < 1 || SG_ANGLE_BINS > 16
+  #error "Configuration (Config.h): SG_ANGLE_BINS must be 1 to 16."
 #endif
 
 // Generic fallback StallGuard seed model
@@ -238,7 +251,7 @@ class TmcStepDirDriverSG : public TmcStepDirDriver {
 
     // Returns true if the motor is overloaded/stalled
     // NOTE: stepsPerSec is signed microsteps/sec; converted internally to signed fullsteps/sec
-    bool isStalled(float stepsPerSec);
+    bool isStalled(float stepsPerSec, double axisPosition = NAN);
 
     // reset any internal stall-detect state (baseline, latch, etc.)
     void stallDetectReset() override;
@@ -288,6 +301,18 @@ class TmcStepDirDriverSG : public TmcStepDirDriver {
       void sgModelDebugDumpNv() const;
       void sgRuntimeFromModel();
       void sgModelFromRuntime();
+      bool sgSaveModel();
+      void sgMarkAngleBinDirty(uint8_t angle);
+      bool sgUseAngleBins() const;
+      void sgAngleBlend(double axisPosition, uint8_t &a0, uint8_t &a1, float &t) const;
+      bool sgBinInitialized(uint8_t angle, uint8_t dir, uint8_t bin) const;
+      void sgSetBinInitialized(uint8_t angle, uint8_t dir, uint8_t bin, bool state);
+      float sgBaseRuntime(uint8_t angle, uint8_t dir, uint8_t bin) const;
+      float sgDevRuntime(uint8_t angle, uint8_t dir, uint8_t bin) const;
+      void sgSetBaseRuntime(uint8_t angle, uint8_t dir, uint8_t bin, float value);
+      void sgSetDevRuntime(uint8_t angle, uint8_t dir, uint8_t bin, float value);
+      float* sgBaseRuntimePtr(uint8_t angle, uint8_t dir, uint8_t bin);
+      float* sgDevRuntimePtr(uint8_t angle, uint8_t dir, uint8_t bin);
 
       SgModel sgModel = {};
       float   sgBaseF[2][SG_BINS] = {{0}};
@@ -325,6 +350,7 @@ class TmcStepDirDriverSG : public TmcStepDirDriver {
       bool     sgBadLast = false;
       bool     sgArmed = false;
       bool     sgModelSavePending = false;
+      uint16_t sgAngleDirtyMask = 0;
       uint32_t sgModelSaveIntervalMs = (uint32_t)SG_MODEL_SAVE_MS;
       uint32_t sgModelLastSaveMs = 0;
 

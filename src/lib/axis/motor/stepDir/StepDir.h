@@ -97,7 +97,7 @@ class StepDirMotor : public Motor {
     void setSlewing(bool state);
 
     // signal that the motor load has exceeded its threshold
-    bool isStalled();
+    bool isStalled(double axisPosition = NAN);
 
     // get live StallGuard telemetry if supported
     bool getStallGuardTelemetry(char *reply, size_t replySize) { return driver->getStallGuardTelemetry(reply, replySize); }

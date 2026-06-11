@@ -86,7 +86,11 @@ class StepDirDriver {
     virtual bool hasStallDetect() const { return false; }
 
     // check to if the motor is stalled
-    virtual bool isStalled(float stepsPerSec) { (void)stepsPerSec; return false; }
+    virtual bool isStalled(float stepsPerSec, double axisPosition = NAN) {
+      (void)stepsPerSec;
+      (void)axisPosition;
+      return false;
+    }
 
     // reset any internal stall-detect state (baseline, latch, etc.)
     virtual void stallDetectReset() {}
