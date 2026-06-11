@@ -13,6 +13,8 @@
 #endif
 #if SERIAL_B_BAUD_DEFAULT != OFF
   #define SERIAL_B              Serial2
+  #define SERIAL_B_RX           16
+  #define SERIAL_B_TX           17
 #endif
 
 // Use the following settings for any TMC UART driver (TMC2209) that may be present
