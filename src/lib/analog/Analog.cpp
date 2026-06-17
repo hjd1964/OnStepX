@@ -599,6 +599,11 @@ float AnalogClass::readV(int16_t pin) {
 #endif
 }
 
+uint16_t AnalogClass::read10(int16_t pin) {
+  const uint32_t v = (uint32_t)lroundf(clamp01(readV(pin) / HAL_VCC) * 1023.0F);
+  return (uint16_t)clampU32(v, 0, 1023U);
+}
+
 uint16_t AnalogClass::readQ16(int16_t pin) {
   uint8_t p;
   if (!toCorePin(pin, p)) {

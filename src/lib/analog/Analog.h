@@ -91,6 +91,7 @@ public:
   uint32_t read(int16_t pin);                // native 0..range
   float    readf(int16_t pin);               // normalized 0..1
   float    readV(int16_t pin);               // volts (best-effort)
+  uint16_t read10(int16_t pin);              // voltage-normalized 0..1023
   uint16_t readQ16(int16_t pin);             // normalized 0..65535
   uint32_t read(const AnalogAdcHandle& h);
   float    readf(const AnalogAdcHandle& h);
