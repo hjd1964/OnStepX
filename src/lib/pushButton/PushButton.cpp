@@ -3,11 +3,10 @@
 
 #include "PushButton.h"
 
+#include "../analog/Analog.h"
 #include "../gpioEx/GpioEx.h"
 
-#ifndef ANALOG_READ_RANGE
-  #define ANALOG_READ_RANGE 1023
-#endif
+static const int ANALOG_BUTTON_RANGE = RANGE_FROM_BITS(10);
 
 Button::Button(int pin, int initState, int32_t trigger) {
   this->pin = pin;
@@ -27,16 +26,18 @@ Button::Button(int pin, int initState, int32_t trigger) {
   if (activeState == HIGH) { UP = LOW; DOWN = HIGH; }
 
   if (isAnalogThreshold || isAnalogValue) {
-    if (analogCompareValue > ANALOG_READ_RANGE) {
-      analogCompareValue = ANALOG_READ_RANGE;
+    analog.begin();
+
+    if (analogCompareValue > ANALOG_BUTTON_RANGE) {
+      analogCompareValue = ANALOG_BUTTON_RANGE;
       DF("WRN: Button::Button(), AnalogCompareValue for pin "); D(pin); DF(" is above analog range setting to "); DL(analogCompareValue);
     }
-	  if (analogCompareValue - hysteresis < 0) {
+    if (analogCompareValue - hysteresis < 0) {
       hysteresis = analogCompareValue;
       DF("WRN: Button::Button(), AnalogCompareValue - hysteresis for pin "); D(pin); DF(" is below analog range setting Hysteresis to "); DL(hysteresis);
     } else
-  	if (analogCompareValue + hysteresis > ANALOG_READ_RANGE) {
-      hysteresis = ANALOG_READ_RANGE - analogCompareValue;
+    if (analogCompareValue + hysteresis > ANALOG_BUTTON_RANGE) {
+      hysteresis = ANALOG_BUTTON_RANGE - analogCompareValue;
       DF("WRN: Button::Button(), AnalogCompareValue + Hysteresis for pin "); D(pin); DF(" is above analog range setting Hysteresis to "); DL(hysteresis);
     }
   }
@@ -47,11 +48,7 @@ Button::Button(int pin, int initState, int32_t trigger) {
 void Button::poll() {
   int lastState = state;
   if (isAnalogThreshold || isAnalogValue) {
-    #ifdef ESP32
-      int analogValue = round((analogReadMilliVolts(pin)/3300.0F)*(float)ANALOG_READ_RANGE);
-    #else
-      int analogValue = analogRead(pin);
-    #endif
+    int analogValue = analog.read10(pin);
 
     if (isAnalogThreshold) {
       if (DOWN == HIGH) { if (analogValue >= analogCompareValue + hysteresis) state = HIGH; else state = LOW; }
