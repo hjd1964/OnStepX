@@ -109,13 +109,15 @@ bool WifiManager::init() {
 
       if (staNameLookup && strlen(wifiManager.sta->host) > 0) {
         IPAddress ip;
+        bool resolved = false;
         char name[32] = "";
         sstrcpy(name, wifiManager.sta->host);
         strtohostname(name);
 
-        if (WiFi.hostByName(name, ip)) {
+        if (WiFi.hostByName(name, ip) && validip4(ip)) {
           VF("MSG: WiFi, host name "); V(name); VF(" DNS resolved to "); VL(ip.toString().c_str());
           ip4toip4(wifiManager.sta->target, ip);
+          resolved = true;
         } else {
           VF("MSG: WiFi, host name "); V(name); VLF(" DNS resolution failed!");
           #if MDNS_CLIENT == ON && !defined(ESP8266)
@@ -124,10 +126,16 @@ bool WifiManager::init() {
             if (validip4(ip)) {
               ip4toip4(wifiManager.sta->target, ip);
               VF("MSG: WiFi, host name "); V(name); VF(" mDNS resolved to "); VL(ip.toString().c_str());
+              resolved = true;
             } else {
               VF("MSG: WiFi, host name "); V(name); VLF(" mDNS resolution failed!");
             }
           #endif
+        }
+
+        if (!resolved && !validip4(wifiManager.sta->target) && validip4(wifiManager.sta->gw)) {
+          ip4toip4(wifiManager.sta->target, wifiManager.sta->gw);
+          VF("MSG: WiFi, using gateway as target "); VL(IPAddress(wifiManager.sta->target).toString().c_str());
         }
       }
 
