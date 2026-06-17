@@ -22,7 +22,11 @@ bool BluetoothManager::init() {
 
     if (strlen(sta->passkey) > 0) {
       VF(" w/passkey "); V(bluetoothManager.sta->passkey);
-      SERIAL_BT.setPin(bluetoothManager.sta->passkey);
+      #if ESP_ARDUINO_VERSION >= 0x30000
+        SERIAL_BT.setPin(bluetoothManager.sta->passkey, strlen(bluetoothManager.sta->passkey));
+      #else
+        SERIAL_BT.setPin(bluetoothManager.sta->passkey);
+      #endif
     }
 
     VF("...");
