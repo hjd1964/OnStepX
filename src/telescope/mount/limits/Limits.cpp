@@ -416,12 +416,12 @@ void Limits::poll() {
     #endif
 
     if (flt(current.a2, axis2.getLimitMin())) {
-      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_REVERSE : GA_FORWARD);
+      stopAxis2(GA_REVERSE);
       error.limit.axis2.min = true;
     } else error.limit.axis2.min = false;
 
     if (fgt(current.a2, axis2.getLimitMax())) {
-      stopAxis2((current.pierSide == PIER_SIDE_EAST) ? GA_FORWARD : GA_REVERSE);
+      stopAxis2(GA_FORWARD);
       error.limit.axis2.max = true;
     } else error.limit.axis2.max = false;
 

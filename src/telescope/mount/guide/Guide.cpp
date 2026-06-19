@@ -307,21 +307,14 @@ bool Guide::validAxis2(GuideAction guideAction) {
     location.a2 = axis2.getMotorPosition();
   #endif
 
-  if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) {
-    if (pierSide == PIER_SIDE_WEST) {
-      if (fgt(location.a2, axis2.getLimitMax())) return false;
-    } else {
-      if (flt(location.a2, axis2.getLimitMin())) return false;
-    }
+  if (flt(location.a2, axis2.getLimitMin())) {
+    if (guideAction == GA_REVERSE || guideAction == GA_SPIRAL) return false;
   }
 
-  if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) {
-    if (pierSide == PIER_SIDE_WEST) {
-      if (flt(location.a2, axis2.getLimitMin())) return false;
-    } else {
-      if (fgt(location.a2, axis2.getLimitMax())) return false;
-    }
+  if (fgt(location.a2, axis2.getLimitMax())) {
+    if (guideAction == GA_FORWARD || guideAction == GA_SPIRAL) return false;
   }
+
   if (guideAction == GA_SPIRAL) {
     if (fabs(location.a2) > degToRad(75.0)) return false;
   }
