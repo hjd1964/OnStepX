@@ -318,6 +318,7 @@ bool Guide::validAxis2(GuideAction guideAction) {
   if (guideAction == GA_SPIRAL) {
     if (fabs(location.a2) > degToRad(75.0)) return false;
   }
+
   return true;
 }
 
