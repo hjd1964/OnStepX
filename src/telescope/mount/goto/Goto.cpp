@@ -153,7 +153,9 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   // a goto is safe since it should always move away from the limit else it wouldn't be allowed
   // finally I enabling tracking again since that allows for easy recovery
   #if LIMIT_RECOVERY == ON
-    if (limits.isBelowHorizon() || limits.isPastMeridianW() || limits.isPastAxis1Max()) {
+    if (limits.isBelowHorizon() ||
+        limits.isPastMeridianE() || limits.isPastMeridianW() ||
+        limits.isPastAxis1Min() || limits.isPastAxis1Max()) {
       limits.limitsDisablePeriod(1.0F);
       #if LIMIT_RECOVERY_WITH_TRACKING == ON
         if (home.state != HS_HOMING && park.state != PS_PARKING) mount.tracking(true);

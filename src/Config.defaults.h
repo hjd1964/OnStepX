@@ -752,7 +752,7 @@
 #define LIMIT_SENSE_STRICT            OFF                         // for all axes, ON blocks motion if min/max are on the same pin
 #endif
 #ifndef LIMIT_RECOVERY
-#define LIMIT_RECOVERY                OFF                         // ON allows 1s for gotos away from horizon, meridian w, and axis1 max limits
+#define LIMIT_RECOVERY                OFF                         // ON allows 1s for gotos away from horizon, meridian, and axis1 min/max limits
 #endif
 #ifndef LIMIT_RECOVERY_WITH_TRACKING
 #define LIMIT_RECOVERY_WITH_TRACKING  OFF                         // ON to automatically enable tracking on limit recovery

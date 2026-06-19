@@ -326,12 +326,12 @@ void Limits::poll() {
     if (current.a < settings.altitude.min && limitsDisablePeriodDs == 0) error.altitude.min = true; else error.altitude.min = false;
 
     if (fabs(settings.altitude.max - Deg90) > OneArcSec) {
-      if (current.a > settings.altitude.max) error.altitude.max = true; else error.altitude.max = false;
+      if (current.a > settings.altitude.max && limitsDisablePeriodDs == 0) error.altitude.max = true; else error.altitude.max = false;
     } else error.altitude.max = false;
 
     // meridian limits
     if (transform.mountType == GEM && current.pierSide == PIER_SIDE_EAST) {
-      if (current.h < -settings.pastMeridianE) {
+      if (current.h < -settings.pastMeridianE && limitsDisablePeriodDs == 0) {
         stopAxis1(GA_REVERSE);
         error.meridian.east = true;
       } else error.meridian.east = false;
@@ -370,7 +370,7 @@ void Limits::poll() {
     #endif
 
     // min and max limits
-    if (flt(current.a1, axis1.getLimitMin())) {
+    if (flt(current.a1, axis1.getLimitMin()) && limitsDisablePeriodDs == 0) {
       stopAxis1(GA_REVERSE);
       error.limit.axis1.min = true;
       // ---------------------------------------------------------

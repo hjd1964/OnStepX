@@ -84,8 +84,14 @@ class Limits {
     // true if an above overhead limit
     inline bool isAboveOverhead() { return error.altitude.max; }
 
+    // true if past meridian limit east
+    inline bool isPastMeridianE() { return error.meridian.east; }
+
     // true if past meridian limit west
     inline bool isPastMeridianW() { return error.meridian.west; }
+
+    // true if past the axis1 min limit
+    inline bool isPastAxis1Min() { return error.limit.axis1.min; }
 
     // true if past the axis1 max limit
     inline bool isPastAxis1Max() { return error.limit.axis1.max; } 
