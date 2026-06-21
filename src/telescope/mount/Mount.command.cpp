@@ -200,12 +200,22 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             SERIAL_ENCODER.print(":SO#");
           #else
             uint32_t zero = (uint32_t)axis1.motor->encoderZero();
-            V("MSG: Mount, absolute encoder saving AXIS1_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-            nv().kv().put("AXIS1_ENCODER_ORIGIN", zero);
+            KvPartition::Status axis1Status = nv().kv().put("AXIS1_ENCODER_ORIGIN", zero);
+            if (axis1Status == KvPartition::Status::Ok) {
+              V("MSG: Mount, absolute encoder saved AXIS1_ENCODER_ORIGIN "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+            } else {
+              DLF("WRN: Mount, absolute encoder failed saving AXIS1_ENCODER_ORIGIN to NV/EEPROM");
+              *commandError = CE_0;
+            }
 
             zero = (uint32_t)axis2.motor->encoderZero();
-            V("MSG: Mount, absolute encoder saving AXIS2_ENCODER_OFFSET "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
-            nv().kv().put("AXIS2_ENCODER_ORIGIN", zero);
+            KvPartition::Status axis2Status = nv().kv().put("AXIS2_ENCODER_ORIGIN", zero);
+            if (axis2Status == KvPartition::Status::Ok) {
+              V("MSG: Mount, absolute encoder saved AXIS2_ENCODER_ORIGIN "); V(uint32_t(zero)); VLF(" to NV/EEPROM");
+            } else {
+              DLF("WRN: Mount, absolute encoder failed saving AXIS2_ENCODER_ORIGIN to NV/EEPROM");
+              *commandError = CE_0;
+            }
           #endif
 
           #ifdef HAL_RESET
