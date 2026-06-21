@@ -219,14 +219,22 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
           #endif
 
           #ifdef HAL_RESET
-            enable(false);
-            VLF("MSG: Mount, resetting OnStep...");
-            if (nv().device().hasCommit()) { nv().device().commit(); }
-            const uint32_t startMs = millis();
-            const uint32_t timeoutMs = 5000;
-            while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
-            tasks.yield(1000);
-            HAL_RESET();
+            if (*commandError == CE_NONE) {
+              enable(false);
+              VLF("MSG: Mount, flushing NV/EEPROM before reset...");
+              bool flushOk = !nv().active().hasCommit() || nv().active().commit() == NvDevice::IoStatus::Ok;
+              const uint32_t startMs = millis();
+              const uint32_t timeoutMs = 5000;
+              while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
+              if (flushOk && nv().active().commitDone()) {
+                VLF("MSG: Mount, resetting OnStep...");
+                tasks.yield(1000);
+                HAL_RESET();
+              } else {
+                DLF("WRN: Mount, NV/EEPROM flush failed or timed out; reset cancelled");
+                *commandError = CE_0;
+              }
+            }
           #endif
         #endif
 

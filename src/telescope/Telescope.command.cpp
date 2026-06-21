@@ -140,13 +140,19 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
 
       #ifdef HAL_RESET
-        VLF("MSG: Mount, resetting OnStep...");
-        if (nv().device().hasCommit()) { nv().device().commit(); }
+        VLF("MSG: Mount, flushing NV/EEPROM before reset...");
+        bool flushOk = !nv().active().hasCommit() || nv().active().commit() == NvDevice::IoStatus::Ok;
         const uint32_t startMs = millis();
         const uint32_t timeoutMs = 30000;
-        while (!nv().device().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1000); }
-        tasks.yield(1000);
-        HAL_RESET();
+        while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
+        if (flushOk && nv().active().commitDone()) {
+          VLF("MSG: Mount, resetting OnStep...");
+          tasks.yield(1000);
+          HAL_RESET();
+        } else {
+          DLF("WRN: Mount, NV/EEPROM flush failed or timed out; reset cancelled");
+          *commandError = CE_0;
+        }
       #endif
 
       *numericReply = false;
