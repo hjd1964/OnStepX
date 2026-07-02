@@ -468,20 +468,21 @@ void Mount::poll() {
 
   // get positions 1 (or 30) arc-min ahead and behind the current
   updatePosition(CR_MOUNT_ALL);
-  double altitude = current.a;
-  double declination = current.d;
-  double altitude2 = current.aa2;
+  Coordinate trackingCurrent = current;
+  double altitude = trackingCurrent.a;
+  double declination = trackingCurrent.d;
+  double altitude2 = trackingCurrent.aa2;
 
   // on fast processors calculate true coordinate for a little more accuracy
   #ifndef HAL_SLOW_PROCESSOR
-    transform.mountToTopocentric(&current);
-    if (transform.mountType == ALTAZM) transform.horToEqu(&current); else
-    if (transform.mountType == ALTALT) transform.aaToEqu(&current);
+    transform.mountToTopocentric(&trackingCurrent);
+    if (transform.mountType == ALTAZM) transform.horToEqu(&trackingCurrent); else
+    if (transform.mountType == ALTALT) transform.aaToEqu(&trackingCurrent);
   #endif
 
   Y;
-  Coordinate ahead = current;
-  Coordinate behind = current;
+  Coordinate ahead = trackingCurrent;
+  Coordinate behind = trackingCurrent;
   double trackingRange = DiffRange*trackingRate;
   ahead.h += trackingRange;
   behind.h -= trackingRange;
@@ -553,7 +554,7 @@ void Mount::poll() {
 
   // calculate the Axis2 Dec/Alt tracking rate
   float rate2 = (aheadAxis2 - behindAxis2)/DiffRange2;
-  if (current.pierSide == PIER_SIDE_WEST) rate2 = -rate2;
+  if (trackingCurrent.pierSide == PIER_SIDE_WEST) rate2 = -rate2;
   if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
 
   // override for special case of near a celestial pole
