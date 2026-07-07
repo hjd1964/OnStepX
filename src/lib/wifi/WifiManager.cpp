@@ -65,6 +65,13 @@ bool WifiManager::init() {
       WiFi.mode(WIFI_AP_STA);
     }
 
+    // Keep command links responsive; ESP cores may enable modem sleep by default.
+    #if defined(ESP32)
+      WiFi.setSleep(false);
+    #elif defined(ESP8266)
+      WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    #endif
+
     delay(100);
 
     if (settings.stationEnabled && !sta->dhcpEnabled) WiFi.config(sta_ip, sta_gw, sta_sn);
