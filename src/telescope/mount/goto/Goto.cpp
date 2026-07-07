@@ -310,7 +310,6 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
   if (mount.isHome() && transform.mountType == GEM) {
     VLF("MSG: Mount, set-target destination from home based on HA");
     if (target.h < 0) pierSideSelect = PSS_WEST; else pierSideSelect = PSS_EAST;
-    pierSideBest = true;
   }
 
   target.pierSide = PIER_SIDE_NONE;
