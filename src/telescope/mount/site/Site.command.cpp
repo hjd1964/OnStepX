@@ -158,7 +158,7 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
     if (command[1] == 'G') {
       double hour;
       if (convert.tzToDouble(&hour, parameter)) {
-        if (hour >= -13.75 || hour <= 12.0) {
+        if (hour >= -13.75 && hour <= 12.0) {
           location.timezone = hour;
           nv().kv().put(nvKey[locationNumber], location);
         } else *commandError = CE_PARAM_RANGE;
