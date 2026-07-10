@@ -28,7 +28,6 @@ typedef struct AltitudeLimits {
   float max; // in radians
 } AltitudeLimits;
 
-#define LimitSettingsSize 16
 typedef struct LimitSettings {
   AltitudeLimits altitude;
   float pastMeridianE; // in radians
