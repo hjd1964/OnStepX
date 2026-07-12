@@ -176,6 +176,11 @@
 
 // LIMITS ------------------------------------------------------ see https://onstep.groups.io/g/main/wiki/Configuration_Mount#LIMITS
 #define LIMIT_SENSE                   OFF //    OFF, HIGH or LOW state on limit sense switch stops movement.                  Option
+#define LIMIT_STRICT                  OFF //    OFF, disables limits until unpark goto or sync. ON enables limits at startup. Option
+                                          //         note that ON also disables all motion until date/time are set.
+#define LIMIT_RECOVERY                OFF //    OFF, disables limits for 1s to allow gotos outside limits for recovery from   Option
+                                          //         overhead (Alt/Azm), horizon, meridian (GEM), and axis1 min/max.
+#define LIMIT_RECOVERY_WITH_TRACKING  OFF //    OFF, automatically enable tracking on limit recovery                          Option
 
 // PARKING ---------------------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#PARKING
 #define PARK_SENSE                    OFF //    OFF, HIGH or LOW state indicates mount is in the park orientation.            Option
