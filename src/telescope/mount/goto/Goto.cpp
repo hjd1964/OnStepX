@@ -154,8 +154,10 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   // finally I enabling tracking again since that allows for easy recovery
   #if LIMIT_RECOVERY == ON
     if (limits.isBelowHorizon() ||
+        (transform.mountType == ALTAZM && limits.isAboveOverhead()) ||
         limits.isPastMeridianE() || limits.isPastMeridianW() ||
         limits.isPastAxis1Min() || limits.isPastAxis1Max()) {
+      VLF("MSG: Goto, limit recovery disabling limits for 1s");
       limits.limitsDisablePeriod(1.0F);
       #if LIMIT_RECOVERY_WITH_TRACKING == ON
         if (home.state != HS_HOMING && park.state != PS_PARKING) mount.tracking(true);
@@ -245,7 +247,7 @@ CommandError Goto::setTarget(Coordinate *coords, PierSideSelect pierSideSelect, 
     mount.enable(true);
     e = validate();
   }
-  if (e == CE_NONE && isGoto && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (e == CE_NONE && isGoto && transform.isEquatorial() && limits.isAboveOverhead()) e = CE_SLEW_ERR_OUTSIDE_LIMITS;
   if (e != CE_NONE) return e;
 
   target = *coords;
