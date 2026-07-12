@@ -21,7 +21,6 @@ typedef struct MeridianFlipHome {
 } MeridianFlipHome;
 
 #pragma pack(1)
-#define GotoSettingsSize 6
 typedef struct GotoSettings {
   bool meridianFlipAuto  :1;
   bool meridianFlipPause :1;
