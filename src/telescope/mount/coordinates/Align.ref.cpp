@@ -450,11 +450,11 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
   }
 
   // finally, apply the index offsets
-  a1 = a1 - model.ax1Cor;
-  a2 = a2 - model.ax2Cor*-p;
+  ax1 = a1 - model.ax1Cor;
+  ax2 = a2 - model.ax2Cor*-p;
 
-  if (mountType == ALTAZM) { coord->z = a1; coord->a = a2; } else {
-  if (mountType == ALTALT) { coord->aa1 = a1; coord->aa2 = a2; } else { coord->h = a1; coord->d = a2; }
+  if (mountType == ALTAZM) { coord->z = ax1; coord->a = ax2; } else {
+  if (mountType == ALTALT) { coord->aa1 = ax1; coord->aa2 = ax2; } else { coord->h = ax1; coord->d = ax2; }
 }
 
 void GeoAlign::mountToObservedPlace(Coordinate *coord) {
