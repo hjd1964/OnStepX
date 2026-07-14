@@ -9,11 +9,12 @@
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 
-enum MeridianFlip: uint8_t     {MF_NEVER, MF_ALWAYS};
-enum GotoState: uint8_t        {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t        {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
-enum GotoType: uint8_t         {GT_NONE, GT_HOME, GT_PARK};
-enum PierSideSelect: uint8_t   {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_AUTO, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
+enum MeridianFlip: uint8_t         {MF_NEVER, MF_ALWAYS};
+enum MeridianFlipHomeMode: uint8_t {MFHM_OFF, MFHM_VISIT, MFHM_PAUSE};
+enum GotoState: uint8_t            {GS_NONE, GS_GOTO};
+enum GotoStage: uint8_t            {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
+enum GotoType: uint8_t             {GT_NONE, GT_HOME, GT_PARK};
+enum PierSideSelect: uint8_t       {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_AUTO, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
 typedef struct MeridianFlipHome {
   bool paused;
@@ -22,12 +23,15 @@ typedef struct MeridianFlipHome {
 
 #pragma pack(1)
 typedef struct GotoSettings {
-  bool meridianFlipAuto  :1;
-  bool meridianFlipPause :1;
+  bool meridianFlipAuto;
+  MeridianFlipHomeMode meridianFlipHomeMode;
   PierSideSelect preferredPierSide;
   float usPerStepCurrent;
 } GotoSettings;
 #pragma pack()
+
+constexpr MeridianFlipHomeMode meridianFlipHomeModeDefault =
+  MFLIP_HOME_DEFAULT == OFF ? MFHM_OFF : MFLIP_HOME_DEFAULT == VISIT ? MFHM_VISIT : MFHM_PAUSE;
 
 typedef struct AlignState {
   uint8_t currentStar;
@@ -79,8 +83,11 @@ class Goto {
     // check if an align is done
     inline bool alignDone() { return alignState.lastStar > 0 && alignState.currentStar > alignState.lastStar; }
 
-    // returns true if the pause at home feature is enabled
-    inline bool isHomePauseEnabled() { return settings.meridianFlipPause; }
+    // returns true if the pause at home mode is selected
+    inline bool isHomePauseEnabled() { return settings.meridianFlipHomeMode == MFHM_PAUSE; }
+
+    // returns the meridian flip home behavior
+    inline MeridianFlipHomeMode getHomeMode() { return settings.meridianFlipHomeMode; }
 
     // returns true if paused at the home position, waiting to continue, during a goto
     inline bool isHomePaused() { return meridianFlipHome.paused; }
@@ -159,7 +166,7 @@ class Goto {
     double slewDestinationDistHA = 0.0;
     double slewDestinationDistDec = 0.0;
 
-    GotoSettings settings = {MFLIP_AUTOMATIC_DEFAULT == ON, MFLIP_PAUSE_HOME_DEFAULT == ON, (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT, 1000001.0F};
+    GotoSettings settings = {MFLIP_AUTOMATIC_DEFAULT == ON, meridianFlipHomeModeDefault, (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT, 1000001.0F};
 
     uint32_t nvKey;
 };

@@ -522,6 +522,18 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
             } else *commandError = CE_SLEW_IN_MOTION;
           break;
 
+          // meridian flip home mode: direct, visit, or pause
+          case '4':
+            if (transform.isEquatorial() && transform.meridianFlips && GOTO_FEATURE != OFF) {
+              if (parameter[3] >= '0' && parameter[3] <= '2') {
+                settings.meridianFlipHomeMode = (MeridianFlipHomeMode)(parameter[3] - '0');
+                #if MFLIP_HOME_MEMORY == ON
+                  nv().kv().put(nvKey, settings);
+                #endif
+              } else *commandError = CE_PARAM_RANGE;
+            } else *commandError = CE_CMD_UNKNOWN;
+          break;
+
           // autoMeridianFlip
           case '5':
             if ((transform.isEquatorial()) && transform.meridianFlips && GOTO_FEATURE != OFF) {
@@ -548,16 +560,20 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
               #endif
             } else *commandError = CE_CMD_UNKNOWN;
           break;
-          // pause at home on meridian flip
+          // legacy pause at home toggle
           case '8':
             if (transform.meridianFlips && GOTO_FEATURE != OFF) {
-              if (parameter[3] == '0' || parameter[3] == '1') {
-                #if GOTO_FEATURE == ON
-                  settings.meridianFlipPause = parameter[3] - '0';
-                  #if MFLIP_PAUSE_HOME_MEMORY == ON
-                    nv().kv().put(nvKey, settings);
-                  #endif
-              #endif
+              if (parameter[3] == '0') {
+                if (settings.meridianFlipHomeMode == MFHM_PAUSE) settings.meridianFlipHomeMode = MFHM_VISIT;
+                #if MFLIP_HOME_MEMORY == ON
+                  nv().kv().put(nvKey, settings);
+                #endif
+              } else
+              if (parameter[3] == '1') {
+                settings.meridianFlipHomeMode = MFHM_PAUSE;
+                #if MFLIP_HOME_MEMORY == ON
+                  nv().kv().put(nvKey, settings);
+                #endif
               } else *commandError = CE_PARAM_RANGE;
             } else *commandError = CE_CMD_UNKNOWN;
           break;

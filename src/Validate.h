@@ -504,16 +504,42 @@
 #endif
 
 // PIER SIDE BEHAVIOUR
-#if MFLIP_SKIP_HOME != ON && MFLIP_SKIP_HOME != OFF
-  #error "Configuration (Config.h): Setting MFLIP_SKIP_HOME unknown, use OFF or ON."
+#ifdef MFLIP_SKIP_HOME
+  #if MFLIP_SKIP_HOME != ON && MFLIP_SKIP_HOME != OFF
+    #error "Configuration (Config.h): Legacy setting MFLIP_SKIP_HOME unknown, use OFF or ON."
+  #endif
 #endif
 
-#if MFLIP_PAUSE_HOME_DEFAULT != ON && MFLIP_PAUSE_HOME_DEFAULT != OFF
-  #error "Configuration (Config.h): Setting MFLIP_PAUSE_HOME_DEFAULT unknown, use OFF or ON."
+#ifdef MFLIP_VISIT_HOME_DEFAULT
+  #if MFLIP_VISIT_HOME_DEFAULT != ON && MFLIP_VISIT_HOME_DEFAULT != OFF
+    #error "Configuration (Config.h): Legacy setting MFLIP_VISIT_HOME_DEFAULT unknown, use OFF or ON."
+  #endif
 #endif
 
-#if MFLIP_PAUSE_HOME_MEMORY != ON && MFLIP_PAUSE_HOME_MEMORY != OFF
-  #error "Configuration (Config.h): Setting MFLIP_PAUSE_HOME_MEMORY unknown, use OFF or ON."
+#ifdef MFLIP_VISIT_HOME_MEMORY
+  #if MFLIP_VISIT_HOME_MEMORY != ON && MFLIP_VISIT_HOME_MEMORY != OFF
+    #error "Configuration (Config.h): Legacy setting MFLIP_VISIT_HOME_MEMORY unknown, use OFF or ON."
+  #endif
+#endif
+
+#ifdef MFLIP_PAUSE_HOME_DEFAULT
+  #if MFLIP_PAUSE_HOME_DEFAULT != ON && MFLIP_PAUSE_HOME_DEFAULT != OFF
+    #error "Configuration (Config.h): Legacy setting MFLIP_PAUSE_HOME_DEFAULT unknown, use OFF or ON."
+  #endif
+#endif
+
+#ifdef MFLIP_PAUSE_HOME_MEMORY
+  #if MFLIP_PAUSE_HOME_MEMORY != ON && MFLIP_PAUSE_HOME_MEMORY != OFF
+    #error "Configuration (Config.h): Legacy setting MFLIP_PAUSE_HOME_MEMORY unknown, use OFF or ON."
+  #endif
+#endif
+
+#if MFLIP_HOME_DEFAULT != OFF && MFLIP_HOME_DEFAULT != VISIT && MFLIP_HOME_DEFAULT != PAUSE
+  #error "Configuration (Config.h): Setting MFLIP_HOME_DEFAULT unknown, use OFF, VISIT, or PAUSE."
+#endif
+
+#if MFLIP_HOME_MEMORY != ON && MFLIP_HOME_MEMORY != OFF
+  #error "Configuration (Config.h): Setting MFLIP_HOME_MEMORY unknown, use OFF or ON."
 #endif
 
 #if MFLIP_AUTOMATIC_DEFAULT != ON && MFLIP_AUTOMATIC_DEFAULT != OFF

@@ -28,12 +28,12 @@ void Goto::init() {
   if (!nv().kv().getOrInit(nvKey, settings)) { DLF("WRN: Nv, init failed for GOTO_SETTINGS"); }
 
   settings.meridianFlipAuto = constrain(settings.meridianFlipAuto, false, true);
-  settings.meridianFlipPause = constrain(settings.meridianFlipPause, false, true);
+  settings.meridianFlipHomeMode = (MeridianFlipHomeMode)constrain((int)settings.meridianFlipHomeMode, (int)MFHM_OFF, (int)MFHM_PAUSE);
   settings.preferredPierSide = constrain(settings.preferredPierSide, PSS_NONE, PSS_SAME_ONLY);
 
   // force defaults if needed
-  #if MFLIP_PAUSE_HOME_MEMORY != ON
-    settings.meridianFlipPause = (MFLIP_PAUSE_HOME_DEFAULT == ON);
+  #if MFLIP_HOME_MEMORY != ON
+    settings.meridianFlipHomeMode = meridianFlipHomeModeDefault;
   #endif
 
   if (MFLIP_AUTOMATIC_MEMORY != ON || !transform.meridianFlips) settings.meridianFlipAuto = (MFLIP_AUTOMATIC_DEFAULT == ON);
@@ -143,7 +143,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
   destination = target;
 
   // add waypoint if needed
-  if (transform.isEquatorial() && MFLIP_SKIP_HOME == OFF && start.pierSide != destination.pierSide) {
+  if (transform.isEquatorial() && settings.meridianFlipHomeMode != MFHM_OFF && start.pierSide != destination.pierSide) {
     VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
     waypoint(&current);
   }
@@ -515,7 +515,7 @@ void Goto::poll() {
     } else
 
     if (stage == GG_WAYPOINT_HOME) {
-      if (settings.meridianFlipPause && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
+      if (settings.meridianFlipHomeMode == MFHM_PAUSE && !meridianFlipHome.resume) { meridianFlipHome.paused = true; goto skip; }
       meridianFlipHome.paused = false;
       meridianFlipHome.resume = false;
 

@@ -253,8 +253,12 @@ This is most relevant on azimuth-like axes and other mounts where bounded
 
 ## Workflow 5: Waypoints And Home During Orientation Change
 
-If an equatorial goto changes pier side and `MFLIP_SKIP_HOME == OFF`, OnStepX
-does not always go straight to the final destination.
+If an equatorial goto changes pier side, `MFLIP_HOME_DEFAULT` selects one of
+three behaviors: `OFF` slews directly to the destination, `VISIT` visits home
+and continues, and `PAUSE` visits home and waits for a continue command.
+Visit-home is the default. `MFLIP_HOME_MEMORY`
+controls whether runtime changes survive a restart. The legacy skip-home and
+pause-home settings remain supported as configuration aliases.
 
 ## Instead it may
 

@@ -869,14 +869,33 @@
 #endif
 
 // meridian flip, pier side
-#ifndef MFLIP_SKIP_HOME
-#define MFLIP_SKIP_HOME               OFF
+#ifndef MFLIP_HOME_DEFAULT
+  #if defined(MFLIP_PAUSE_HOME_DEFAULT) && MFLIP_PAUSE_HOME_DEFAULT == ON
+    #define MFLIP_HOME_DEFAULT        PAUSE
+  #elif defined(MFLIP_VISIT_HOME_DEFAULT)
+    #if MFLIP_VISIT_HOME_DEFAULT == ON
+      #define MFLIP_HOME_DEFAULT      VISIT
+    #else
+      #define MFLIP_HOME_DEFAULT      OFF
+    #endif
+  #elif defined(MFLIP_SKIP_HOME)
+    #if MFLIP_SKIP_HOME == ON
+      #define MFLIP_HOME_DEFAULT      OFF
+    #else
+      #define MFLIP_HOME_DEFAULT      VISIT
+    #endif
+  #else
+    #define MFLIP_HOME_DEFAULT        VISIT
+  #endif
 #endif
-#ifndef MFLIP_PAUSE_HOME_DEFAULT
-#define MFLIP_PAUSE_HOME_DEFAULT      OFF
-#endif
-#ifndef MFLIP_PAUSE_HOME_MEMORY
-#define MFLIP_PAUSE_HOME_MEMORY       OFF
+#ifndef MFLIP_HOME_MEMORY
+  #if defined(MFLIP_PAUSE_HOME_MEMORY) && MFLIP_PAUSE_HOME_MEMORY == ON
+    #define MFLIP_HOME_MEMORY         ON
+  #elif defined(MFLIP_VISIT_HOME_MEMORY)
+    #define MFLIP_HOME_MEMORY         MFLIP_VISIT_HOME_MEMORY
+  #else
+    #define MFLIP_HOME_MEMORY         OFF
+  #endif
 #endif
 #ifndef MFLIP_AUTOMATIC_DEFAULT
 #define MFLIP_AUTOMATIC_DEFAULT       OFF

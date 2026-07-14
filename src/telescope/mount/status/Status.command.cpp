@@ -68,7 +68,8 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
       }
 
       if (goTo.isHomePaused())                 reply[i++]='w';                     // [w]aiting at home 
-      if (goTo.isHomePauseEnabled())           reply[i++]='u';                     // Pa[u]se at home enabled?
+      if (goTo.getHomeMode() == MFHM_VISIT)    reply[i++]='v';                     // [v]isit home mode
+      if (goTo.getHomeMode() == MFHM_PAUSE)    reply[i++]='u';                     // Pa[u]se at home mode
       if (sound.enabled)                       reply[i++]='z';                     // Bu[z]zer enabled?
       if (goTo.isAutoFlipEnabled())            reply[i++]='a';                     // [a]uto meridian flip
       #if AXIS1_PEC == ON
@@ -121,11 +122,13 @@ bool Status::command(char *reply, char *command, char *parameter, bool *suppress
       if (mount.syncFromOnStepToEncoders)          reply[1]|=0b10000100;           // Sync to encoders only
       if (guide.active())                          reply[1]|=0b10001000;           // Guide active
       if (startupAuthority.trusted())              reply[1]|=0b10010000;           // Startup authority trusted
+      if (goTo.getHomeMode() == MFHM_VISIT)        reply[1]|=0b10100000;           // Meridian flip visit home mode
+      if (goTo.getHomeMode() == MFHM_PAUSE)        reply[1]|=0b11000000;           // Meridian flip pause at home mode
       if (mount.isHome())                          reply[2]|=0b10000001;           // At home
       if (home.state == HS_HOMING)                 reply[2]|=0b10100000;           // Slewing home
       if (home.settings.automaticAtBoot)           reply[2]|=0b11000000;           // Auto home at boot
       if (goTo.isHomePaused())                     reply[2]|=0b10000010;           // Waiting at home
-      if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home enabled?
+      if (goTo.isHomePauseEnabled())               reply[2]|=0b10000100;           // Pause at home mode (legacy status bit)
       if (sound.enabled)                           reply[2]|=0b10001000;           // Buzzer enabled?
       if (goTo.isAutoFlipEnabled())                reply[2]|=0b10010000;           // Auto meridian flip
 

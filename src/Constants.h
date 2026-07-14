@@ -108,6 +108,10 @@
 #define AUTOMATIC                   4      // same as PSS_AUTO
 #define PIER_SIDE_LAST              4
 
+// MERIDIAN FLIP HOME MODE
+#define VISIT                       1      // visit home, then continue
+#define PAUSE                       2      // visit home and pause until continued
+
 // COMPENSATED TRACKING
 #define COMPENSATED_TRACKING_FIRST  1
 #define REFRACTION                  1      // refraction compensated tracking RA only

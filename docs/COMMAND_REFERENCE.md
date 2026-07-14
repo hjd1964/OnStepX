@@ -362,12 +362,13 @@ Current core constants are:
 | `:GX99#` | `n.nnn#` | Fastest allowed slew period in us/step |
 | `:SX92,n.nnn#` | `0/1` | Set current slew period in us/step |
 | `:SX93,[1-5]#` | none | Slew preset: `5`=50%, `4`=66.7%, `3`=100%, `2`=150%, `1`=200% |
+| `:SX94,0#`, `:SX94,1#`, or `:SX94,2#` | `0/1` | Meridian flip home mode: `0` direct slew, `1` visit home, `2` pause at home |
 | `:SX95,0#` or `:SX95,1#` | `0/1` | Disable/enable automatic meridian flip |
 | `:SX96,E#` | `0/1` | Preferred pier side east |
 | `:SX96,W#` | `0/1` | Preferred pier side west |
 | `:SX96,B#` | `0/1` | Preferred pier side best |
 | `:SX96,A#` | `0/1` | Preferred pier side automatic |
-| `:SX98,0#` or `:SX98,1#` | `0/1` | Disable/enable pause at home during meridian flip |
+| `:SX98,0#` or `:SX98,1#` | `0/1` | Legacy pause toggle: `1` selects pause; `0` changes pause to visit and otherwise leaves the mode unchanged |
 | `:SX99,1#` | `0/1` | Continue after pause at home |
 
 ## Guide / Manual Motion
@@ -478,7 +479,8 @@ The reply is an ordered string assembled from active conditions. Characters curr
 | `O` | Solar tracking rate selected |
 | `k` | King tracking rate selected |
 | `w` | Meridian flip paused at home |
-| `u` | Pause-at-home enabled |
+| `u` | Pause-at-home meridian flip mode |
+| `v` | Visit-home meridian flip mode |
 | `z` | Buzzer enabled |
 | `a` | Automatic meridian flip enabled |
 | `R` | PEC data recorded |
@@ -487,6 +489,8 @@ The reply is an ordered string assembled from active conditions. Characters curr
 | `o`, `T`, `W` | Pier side none, east, west |
 | final digits | pulse-guide rate, guide rate, general error code |
 
+If neither `u` nor `v` is present, the meridian flip home mode is direct slew.
+
 #### `:Gu#` Packed Status Layout
 
 `Gu` is the binary/pseudo-binary status form. The current implementation fills bytes as:
@@ -494,8 +498,8 @@ The reply is an ordered string assembled from active conditions. Characters curr
 | Byte | Contents |
 | --- | --- |
 | `0` | tracking/goto/PPS/pulse-guide plus compensation mode |
-| `1` | tracking-rate selection plus sync-to-encoders and guide-active |
-| `2` | home/homing/auto-home/home-pause/buzzer/auto-flip |
+| `1` | tracking-rate selection, sync-to-encoders, guide-active, and meridian flip home mode (bits 5..6: `0` direct, `1` visit, `2` pause) |
+| `2` | home/homing/auto-home/waiting-at-home/pause-mode compatibility bit/buzzer/auto-flip |
 | `3` | mount type plus pier side |
 | `4` | PEC state and PEC-recorded flag |
 | `5` | park state |
