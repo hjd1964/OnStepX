@@ -51,12 +51,13 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
         V("MSG: Set Axis1 home reverse "); VL(settings.axis1.senseReverse);
         setReversal();
       } else {
-        long l = atol(&parameter[2]);
-        if (l >= -degToArcsecL(180L) || l <= degToArcsecL(180L)) {
+        char *conv_end;
+        long l = strtol(&parameter[2], &conv_end, 10);
+        if (&parameter[2] != conv_end && conv_end[0] == 0 && l >= -degToArcsecL(180L) && l <= degToArcsecL(180L)) {
           settings.axis1.senseOffset = l;
         } else *commandError = CE_PARAM_RANGE;
       }
-      nv().kv().put(nvKey, settings);
+      if (*commandError == CE_NONE) nv().kv().put(nvKey, settings);
       *numericReply = false;
     } else
 
@@ -68,12 +69,13 @@ bool Home::command(char *reply, char *command, char *parameter, bool *suppressFr
         V("MSG: Set Axis2 home reverse "); VL(settings.axis2.senseReverse);
         setReversal();
       } else {
-        long l = atol(&parameter[2]);
-        if (l >= -degToArcsecL(180L) || l <= degToArcsecL(180L)) {
+        char *conv_end;
+        long l = strtol(&parameter[2], &conv_end, 10);
+        if (&parameter[2] != conv_end && conv_end[0] == 0 && l >= -degToArcsecL(180L) && l <= degToArcsecL(180L)) {
           settings.axis2.senseOffset = l;
         } else *commandError = CE_PARAM_RANGE;
       }
-      nv().kv().put(nvKey, settings);
+      if (*commandError == CE_NONE) nv().kv().put(nvKey, settings);
       *numericReply = false;
     } else
 
