@@ -159,8 +159,8 @@ That matters because some command names are reused by different subsystems, espe
 | `:GX80#` | `HH:MM:SS.ss#` | UT1 time |
 | `:GX81#` | `MM/DD/YY#` | UT1 date |
 | `:GX89#` | `0` or `1` | Date/time ready status. `0` means ready, `1` means not ready. |
-| `:SCMM/DD/YY#` | `0/1` | Set local date |
-| `:SCMM/DD/YYYY#` | `0/1` | Set local date |
+| `:SCMM/DD/YY#` | `0` or `1#` | Set local date |
+| `:SCMM/DD/YYYY#` | `0` or `1#` | Set local date |
 | `:SGsHH#` | `0/1` | Set UTC offset |
 | `:SGsHH:MM#` | `0/1` | Set UTC offset. Comments indicate `MM` should be `00`, `30`, or `45`. |
 | `:Sg(s)DDD*MM#` | `0/1` | Set longitude |
