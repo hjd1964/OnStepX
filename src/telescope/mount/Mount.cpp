@@ -525,7 +525,8 @@ void Mount::poll() {
   }
 
   // transfer to variables named appropriately for mount coordinates
-  float aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
+  // these stay double, the differences below are ~5.8e-4 rad from ~1 rad coordinates
+  double aheadAxis1, aheadAxis2, behindAxis1, behindAxis2;
   if (transform.mountType == ALTAZM) {
     transform.equToHor(&ahead);
     aheadAxis1 = ahead.z;
