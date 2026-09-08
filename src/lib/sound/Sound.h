@@ -13,7 +13,7 @@ class Sound {
     void click(); // sound/beep
     void beep();  // sound/click
 
-    bool enabled = STATUS_BUZZER_DEFAULT == ON;
+    bool enabled = false;
   private:
     bool ready = false;
 };

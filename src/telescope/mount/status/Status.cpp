@@ -34,8 +34,8 @@ void generalWrapper() { mountStatus.general(); }
 void Status::init() {
   #if STATUS_BUZZER_MEMORY == ON
     if (!nv().kv().getOrInit("STATUS_SETTINGS", settings)) { DLF("WRN: Nv, init failed for STATUS_SETTINGS"); }
-    sound.enabled = settings.soundEnabled;
   #endif
+  sound.enabled = settings.soundEnabled;
 
   #if PARK_STATUS != OFF && PARK_STATUS_PIN != OFF
     pinModeEx(PARK_STATUS_PIN, OUTPUT);

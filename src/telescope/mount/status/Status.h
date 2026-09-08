@@ -43,7 +43,7 @@ class Status {
   private:
     uint8_t statusTaskHandle = 0;
     Sound sound;
-    StatusSettings settings = {false};
+    StatusSettings settings = {STATUS_BUZZER_DEFAULT == ON};
 };
 
 extern Status mountStatus;
