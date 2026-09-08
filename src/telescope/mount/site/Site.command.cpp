@@ -142,13 +142,17 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
   if (command[0] == 'S') {
     // :SC[MM/DD/YY]# or :SC[MM/DD/YYYY]#
     //            Change local standard date
-    //            Return: 0 on failure, 1 on success
+    //            Return: 0 on failure, 1# on success
     if (command[1] == 'C') {
       GregorianDate local = calendars.julianToGregorian(UT1ToLocal(getDateTime()));
       if (strToDate(parameter, &local)) {
         dateIsReady = true;
         setDateTime(localToUT1(calendars.gregorianToJulian(local)));        
         updateTLS();
+
+        // Stellarium Mobile Plus waits for a trailing '#'.
+        strcpy(reply, "1");
+        *numericReply = false;
       } else *commandError = CE_PARAM_FORM;
     } else
 
