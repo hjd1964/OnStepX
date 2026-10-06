@@ -167,8 +167,10 @@ bool StepDirDriver::init() {
 
   microstepRatio = normalizedMicrosteps/normalizedMicrostepsSlewing;
 
-  normalizedDecay = lround(decay.value);
-  normalizedDecaySlewing = lround(decaySlewing.value);
+  // drivers that don't expose decay as a runtime parameter (e.g. StepDirGeneric) never set decay.value,
+  // fall back to the compile-time default instead of lround(NAN)
+  normalizedDecay = lround(isnan(decay.value) ? decay.valueDefault : decay.value);
+  normalizedDecaySlewing = lround(isnan(decaySlewing.value) ? decaySlewing.valueDefault : decaySlewing.value);
 
   // automatically set fault status for known drivers
   if (statusMode == ON) {
