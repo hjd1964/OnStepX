@@ -68,7 +68,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     state = GU_PULSE_GUIDE;
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
     V(rate); VL("X");
-    mount.update();
+    mount.update(true);
   } else {
     state = GU_GUIDE;
     backlashEnableControl(true);
@@ -96,7 +96,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
       VLF("MSG: Guide, Axis1 stopped");
       guideActionAxis1 = GA_NONE;
       rateAxis1 = 0.0F;
-      mount.update();
+      mount.update(true);
     }
   }
 }
@@ -129,7 +129,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis2 rev @"); rateAxis2 = -rate; } else { VF("MSG: Guide, Axis2 fwd @"); rateAxis2 = rate; }
     V(rate); VL("X");
-    mount.update();
+    mount.update(true);
   } else {
     state = GU_GUIDE;
     backlashEnableControl(true);
@@ -157,7 +157,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
       VLF("MSG: Guide, Axis2 stopped");
       guideActionAxis2 = GA_NONE;
       rateAxis2 = 0.0F;
-      mount.update();
+      mount.update(true);
     }
   }
 }

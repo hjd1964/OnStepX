@@ -369,7 +369,13 @@ void Mount::enable(bool state) {
 
 // updates the tracking rates, etc. as appropriate for the mount state
 // called once a second by poll() but available here for immediate action
-void Mount::update() {
+void Mount::update(bool guideChanged) {
+  if (guideChanged && (transform.mountType == ALTAZM || transform.mountType == ALTALT)) {
+    // A guide timer changes equatorial input rates. Reproject them now rather
+    // than reapplying the previous one-second tracking sample.
+    ++trackingRateRevision;
+    updateTrackingRates(true);
+  }
   static int lastStatusFlashMs = 0;
   int statusFlashMs = 0;
 
@@ -438,6 +444,18 @@ void Mount::poll() {
     if (axis1.isEnabled() || axis2.isEnabled()) enable(false);
   }
 
+  // keep track of where we are pointing
+  #if MOUNT_COORDS_MEMORY == ON
+    saveCoordinateMemory(startupAuthority.trusted() && home.state != HS_HOMING);
+  #endif
+
+  updateTrackingRates();
+  update();
+}
+
+void Mount::updateTrackingRates(bool immediate) {
+  const uint32_t revision = trackingRateRevision;
+
   #ifdef HAL_NO_DOUBLE_PRECISION
     #define DiffRange  0.0087266463F         // 30 arc-minutes in radians
     #define DiffRange2 0.017453292F          // 60 arc-minutes in radians
@@ -447,22 +465,15 @@ void Mount::poll() {
   #endif
   #define DegenerateRange (DiffRange*1.5)    // we were using Deg85
 
-  // keep track of where we are pointing
-  #if MOUNT_COORDS_MEMORY == ON
-    saveCoordinateMemory(startupAuthority.trusted() && home.state != HS_HOMING);
-  #endif
-
   if (trackingState == TS_NONE) {
     trackingRateAxis1 = 0.0F;
     trackingRateAxis2 = 0.0F;
-    update();
     return;
   }
 
   if (transform.isEquatorial() && settings.rc == RC_NONE && trackingRateOffsetRA == 0.0F && trackingRateOffsetDec == 0.0F) {
     trackingRateAxis1 = trackingRate;
     trackingRateAxis2 = 0.0F;
-    update();
     return;
   }
 
@@ -482,25 +493,29 @@ void Mount::poll() {
 
   Coordinate ahead = current;
   Coordinate behind = current;
-  Y;
+  if (!immediate) { Y; }
   double trackingRange = DiffRange*trackingRate;
   ahead.h += trackingRange;
   behind.h -= trackingRange;
 
   // create horizon coordinates that would exist ahead and behind the current position
-  if (transform.mountType == ALTAZM) { transform.equToHor(&ahead); transform.equToHor(&behind); Y; } else
-  if (transform.mountType == ALTALT) { transform.equToAa(&ahead); transform.equToAa(&behind); Y; }
+  if (transform.mountType == ALTAZM) { transform.equToHor(&ahead); transform.equToHor(&behind); if (!immediate) { Y; } } else
+  if (transform.mountType == ALTALT) { transform.equToAa(&ahead); transform.equToAa(&behind); if (!immediate) { Y; } }
 
   // apply (optional) pointing model and refraction
   if (settings.rc == RC_MODEL || settings.rc == RC_MODEL_DUAL) {
-    transform.topocentricToObservedPlace(&ahead); Y;
-    transform.topocentricToObservedPlace(&behind); Y;
-    transform.observedPlaceToMount(&ahead); Y;
-    transform.observedPlaceToMount(&behind); Y;
+    transform.topocentricToObservedPlace(&ahead); if (!immediate) { Y; }
+    transform.topocentricToObservedPlace(&behind); if (!immediate) { Y; }
+    transform.observedPlaceToMount(&ahead); if (!immediate) { Y; }
+    transform.observedPlaceToMount(&behind); if (!immediate) { Y; }
   } else if (settings.rc == RC_REFRACTION || settings.rc == RC_REFRACTION_DUAL) {
-    transform.topocentricToObservedPlace(&ahead); Y;
-    transform.topocentricToObservedPlace(&behind); Y;
+    transform.topocentricToObservedPlace(&ahead); if (!immediate) { Y; }
+    transform.topocentricToObservedPlace(&behind); if (!immediate) { Y; }
   }
+
+  // A higher-priority guide task may have refreshed both rates while the
+  // periodic calculation yielded. Preserve that newer, unsmoothed result.
+  if (revision != trackingRateRevision) return;
 
   // drop the dual axis if not enabled
   if (settings.rc != RC_REFRACTION_DUAL && settings.rc != RC_MODEL_DUAL) { behind.d = ahead.d; }
@@ -551,12 +566,12 @@ void Mount::poll() {
   if (aheadAxis1 < -Deg90 && behindAxis1 > Deg90) aheadAxis1 += Deg360;
   if (behindAxis1 < -Deg90 && aheadAxis1 > Deg90) behindAxis1 += Deg360;
   float rate1 = (aheadAxis1 - behindAxis1)/DiffRange2;
-  if (fabs(trackingRateAxis1 - rate1) <= 0.005F) trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
+  if (!immediate && fabs(trackingRateAxis1 - rate1) <= 0.005F) trackingRateAxis1 = (trackingRateAxis1*9.0F + rate1)/10.0F; else trackingRateAxis1 = rate1;
 
   // calculate the Axis2 Dec/Alt tracking rate
   float rate2 = (aheadAxis2 - behindAxis2)/DiffRange2;
   if (pierSide == PIER_SIDE_WEST) rate2 = -rate2;
-  if (fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
+  if (!immediate && fabs(trackingRateAxis2 - rate2) <= 0.005F) trackingRateAxis2 = (trackingRateAxis2*9.0F + rate2)/10.0F; else trackingRateAxis2 = rate2;
 
   // override for special case of near a celestial pole
   if (fabs(declination) > Deg90 - DegenerateRange) {
@@ -577,7 +592,6 @@ void Mount::poll() {
   // override for both rates for special case near the aa1 axis of rotation
   if (transform.mountType == ALTALT && fabs(altitude2) > Deg90 - DegenerateRange) { trackingRateAxis1 = 0.0F; }
 
-  update();
 }
 
 // alternate tracking rate calculation method

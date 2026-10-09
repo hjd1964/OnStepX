@@ -108,7 +108,8 @@ class Mount {
 
     // updates the tracking rates, etc. as appropriate for the mount state
     // called once a second by poll() but available here for immediate action
-    void update();
+    // guideChanged immediately refreshes projected Alt/Az or Alt/Alt rates.
+    void update(bool guideChanged = false);
 
     void poll();
 
@@ -122,6 +123,9 @@ class Mount {
     MountSettings settings = {RC_DEFAULT, { 0, 0 }, MOUNT_SUBTYPE};
 
   private:
+    void updateTrackingRates(bool immediate = false);
+    uint32_t trackingRateRevision = 0;
+
     // alternate tracking rate calculation method
     float ztr(float a);
 
