@@ -149,6 +149,14 @@ bool Site::command(char *reply, char *command, char *parameter, bool *suppressFr
         dateIsReady = true;
         setDateTime(localToUT1(calendars.gregorianToJulian(local)));        
         updateTLS();
+
+        // for compatability with some clients such as Stellarium Mobile, may disrupt
+        // communications with other clients though I suspect most will tolerate it
+        #ifdef STRICT_LX200_DATE
+          strcpy(reply, "1Updating planetary data#                                ");
+          *numericReply = false;
+        #endif
+
       } else *commandError = CE_PARAM_FORM;
     } else
 
