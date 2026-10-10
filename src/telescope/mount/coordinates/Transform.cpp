@@ -83,7 +83,12 @@ void Transform::nativeToMount(Coordinate *coord, double *a1, double *a2) {
 
 void Transform::mountToTopocentric(Coordinate *coord) {
   mountToObservedPlace(coord);
+  // Alt/Alt model corrections update aa1/aa2; refraction operates on h/d.
+  if (mountType == ALTALT) aaToEqu(coord);
+
   observedPlaceToTopocentric(coord);
+  // Keep the Alt/Alt coordinates consistent with the corrected h/d.
+  if (mountType == ALTALT) equToAa(coord);
 }
 
 void Transform::mountToObservedPlace(Coordinate *coord) {
