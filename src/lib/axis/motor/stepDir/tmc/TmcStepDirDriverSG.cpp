@@ -186,30 +186,32 @@ bool TmcStepDirDriverSG::init() {
 bool TmcStepDirDriverSG::parameterIsValid(AxisParameter* parameter, bool next) {
   if (!TmcStepDirDriver::parameterIsValid(parameter, next)) return false;
 
-  if (parameter == &sgEnabled || parameter == &decaySlewing) {
-    int sgEnabledValue, decaySlewingValue;
-    if (next) {
-      sgEnabledValue = lround(sgEnabled.valueNv);
-      decaySlewingValue = lround(decaySlewing.valueNv);
-    } else {
-      sgEnabledValue = lround(sgEnabled.value);
-      decaySlewingValue = lround(decaySlewing.value);
-    }
+  #ifdef DRIVER_TMC_STEPPER_STALLGUARD
+    if (parameter == &sgEnabled || parameter == &decaySlewing) {
+      int sgEnabledValue, decaySlewingValue;
+      if (next) {
+        sgEnabledValue = lround(sgEnabled.valueNv);
+        decaySlewingValue = lround(decaySlewing.valueNv);
+      } else {
+        sgEnabledValue = lround(sgEnabled.value);
+        decaySlewingValue = lround(decaySlewing.value);
+      }
 
-    if (driverModel == TMC2209) {
-      if (sgEnabledValue == ON && decaySlewingValue != STEALTHCHOP) {
-        DF("WRN:"); D(axisPrefix);
-        DLF("stallGuard SG-Enable ON requires Decay-mode-Goto StealthChop");
-        return true;
-      }
-    } else {
-      if (sgEnabledValue == ON && decaySlewingValue != SPREADCYCLE) {
-        DF("WRN:"); D(axisPrefix);
-        DLF("stallGuard SG-Enable ON requires Decay-mode-Goto SpreadCycle");
-        return true;
+      if (driverModel == TMC2209) {
+        if (sgEnabledValue == ON && decaySlewingValue != STEALTHCHOP) {
+          DF("WRN:"); D(axisPrefix);
+          DLF("stallGuard SG-Enable ON requires Decay-mode-Goto StealthChop");
+          return true;
+        }
+      } else {
+        if (sgEnabledValue == ON && decaySlewingValue != SPREADCYCLE) {
+          DF("WRN:"); D(axisPrefix);
+          DLF("stallGuard SG-Enable ON requires Decay-mode-Goto SpreadCycle");
+          return true;
+        }
       }
     }
-  }
+  #endif
 
   return true;
 }
