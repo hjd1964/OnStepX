@@ -216,6 +216,7 @@ void Mount::begin() {
       }
     #endif
   #endif
+  startupAuthority.logStatus();
 
   VF("MSG: Mount, start tracking monitor task (rate 1000ms priority 6)... ");
   if (tasks.add(1000, 0, true, 6, mountWrapper, "MtTrack")) { VLF("success"); } else { VLF("FAILED!"); }

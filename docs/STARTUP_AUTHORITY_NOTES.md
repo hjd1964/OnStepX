@@ -448,13 +448,22 @@ This is intentionally strict, but it has an escape hatch for expert use.
 The trust state is exposed in :Gu# so clients can detect it without extra
 status calls.
 
+With debug output enabled, startup logs the effective `MOUNT_STARTUP_MODE`,
+trust state, and date/time readiness. A rejected goto, sync, park, unpark, or
+home operation also logs the authority status. NV and motor/encoder fault
+reasons are retained until trust is established again or startup is restarted,
+so a transient fault remains identifiable after the hardware recovers. When
+no authority has been established, the diagnostic also lists absolute encoder
+availability, encoder origin status, and the coordinate memory configuration.
+Date/time readiness is reported separately; missing date/time does not itself
+revoke coordinate trust.
+
 Longer term, a small circular event log is probably a better place to record
 why trust changed than trying to pack too much into live status.
 
 ## Open future work
 
 - circular timestamped event log for trust loss/recovery reasons
-- possibly record a simple trust-loss reason code
 - maybe future fault-tolerant KV/partition design
 - refine the basic clutch/manual-home startup case so normal users are not
   surprised while still preserving the stricter safety model for systems with
