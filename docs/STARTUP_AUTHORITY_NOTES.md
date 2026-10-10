@@ -239,10 +239,9 @@ In SA_STRICT:
 - trust is not granted automatically at startup
 
 In SA_AUTO:
-- if the mount has neither:
-  - paired mount-axis absolute position sources
-  - mount coordinate memory enabled
-- boot grants legacy session trust automatically
+- if neither mount axis has an absolute position source and mount coordinate
+  memory is OFF, boot grants legacy session trust automatically
+- a single absolute axis also prevents this fallback
 - this preserves the long-standing "power up and goto" workflow on simpler
   mounts
 
@@ -264,8 +263,8 @@ Current recovery model:
 3. trust becomes true again
 
 Important practical consequence:
-- the default SA_AUTO mode preserves permissive startup for simple mounts with
-  neither paired absolute position sources nor coordinate memory enabled
+- the default SA_AUTO mode preserves permissive startup for simple mounts where
+  neither axis has an absolute position source and coordinate memory is OFF
 - SA_STRICT remains available for observatory and interlock-sensitive installs
 - SA_STRICT controls whether boot trust is granted automatically; it does not,
   by itself, make manual guide require startup authority on otherwise simple
@@ -395,6 +394,25 @@ The guiding rule is:
 - if it does not know where it is, coordinate-based automatic motion is blocked
 - guide-based manual recovery remains available only where startup authority
   policy allows it
+
+### Motor/driver power removed while the microcontroller remains powered
+
+Do not cycle motor/driver power independently while the microcontroller remains
+powered. Power loss can invalidate motor configuration, communication setup,
+calibration, or other startup state. Some simple drivers may tolerate this, but
+OnStepX cannot assume that across all motor types or detect every power loss.
+
+A reported motor/encoder fault revokes coordinate trust even when the axes are
+disabled or the mount is parked. Clearing the hardware fault does not restore
+trust. Goto, ordinary sync, and unpark remain blocked. Sync, unpark, and a plain
+`:hF#` coordinate reset do not rerun motor initialization or restore revoked trust.
+
+To recover first restore motor/driver power, then restart OnStepX to repeat motor/encoder
+initialization and any required motor calibration. Finally, follow the normal startup workflow.
+
+Note: Homing or setting an origin does not replace the restart required after
+motor/driver power loss. `SA_PERMISSIVE` grants trust at startup; it does not
+bypass runtime fault handling or restore trust when a fault clears.
 
 ## Important startup workflows to remember
 
