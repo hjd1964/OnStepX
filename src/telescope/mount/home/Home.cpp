@@ -56,6 +56,7 @@ CommandError Home::request() {
     failed = false;
     if (!startupAuthority.trusted() && !hasSense) {
       DLF("WRN: Mount, home rejected because startup authority is not trusted and no home switches are present");
+      startupAuthority.logStatus();
       return CE_SLEW_ERR_UNSPECIFIED;
     }
     if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
@@ -143,6 +144,7 @@ CommandError Home::requestWithReset() {
 
   if (!startupAuthority.trusted() && !hasSense) {
     DLF("WRN: Mount, reset/home rejected because startup authority is not trusted and no home switches are present");
+    startupAuthority.logStatus();
     return CE_SLEW_ERR_UNSPECIFIED;
   }
   if (hasSense) {

@@ -422,7 +422,7 @@ void Mount::update() {
 void Mount::poll() {
   #if NV_INIT_ERROR_REVOKES_AUTHORITY == ON
     if (initError.nv && startupAuthority.trusted()) {
-      startupAuthority.setTrusted(false);
+      startupAuthority.setTrusted(false, StartupAuthority::Reason::NvFault);
       DLF("WRN: Mount, startup authority trust cleared due to NV fault");
     }
   #endif
@@ -430,7 +430,7 @@ void Mount::poll() {
   // stop any movement then disable on motor hardware fault
   if (mount.motorFault()) {
     if (startupAuthority.trusted()) {
-      startupAuthority.setTrusted(false);
+      startupAuthority.setTrusted(false, StartupAuthority::Reason::MotorFault);
       DLF("WRN: Mount, startup authority trust cleared due to motor/encoder fault");
     }
     if (goTo.state > GS_NONE) goTo.abort(); else

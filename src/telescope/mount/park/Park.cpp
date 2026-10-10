@@ -49,6 +49,7 @@ CommandError Park::set(bool ignoreTrust) {
   if (mount.motorFault())      return CE_SLEW_ERR_HARDWARE_FAULT;
   if (!ignoreTrust && !startupAuthority.trusted()) {
     DLF("WRN: Mount, set park rejected because startup authority is not trusted");
+    startupAuthority.logStatus();
     return CE_SLEW_ERR_UNSPECIFIED;
   }
 
@@ -91,6 +92,7 @@ CommandError Park::request() {
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
     if (!startupAuthority.trusted()) {
       DLF("WRN: Mount, park rejected because startup authority is not trusted");
+      startupAuthority.logStatus();
       return CE_SLEW_ERR_UNSPECIFIED;
     }
     if (!mount.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
@@ -211,6 +213,7 @@ CommandError Park::restore(bool withTrackingOn) {
   if (!settings.saved) return CE_NO_PARK_POSITION_SET;
   if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, unpark rejected because startup authority is not trusted");
+    startupAuthority.logStatus();
     return CE_SLEW_ERR_UNSPECIFIED;
   }
   if (state != PS_PARKED) {

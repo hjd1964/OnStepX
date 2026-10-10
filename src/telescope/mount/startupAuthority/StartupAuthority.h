@@ -10,13 +10,16 @@
 
 class StartupAuthority {
   public:
+    enum class Reason : uint8_t { NotEstablished, NvFault, MotorFault };
+
     void init();
     void begin();
 
     inline bool trusted() const { return trustedValue; }
     bool required() const;
     CommandError validateManualMotion() const;
-    void setTrusted(bool state);
+    void setTrusted(bool state, Reason reason = Reason::NotEstablished);
+    void logStatus() const;
 
     inline bool trustEstablished() const { return trustEstablishedValue; }
     inline void setCommissioningAllowed(bool state) { commissioningAllowed = state; }
@@ -29,6 +32,7 @@ class StartupAuthority {
     bool commissioningAllowed = false;
     bool trustEstablishedValue = false;
     bool trustedValue = false;
+    Reason untrustedReason = Reason::NotEstablished;
 };
 
 extern StartupAuthority startupAuthority;

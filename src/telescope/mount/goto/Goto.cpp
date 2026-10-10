@@ -80,6 +80,7 @@ CommandError Goto::request() {
 CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
   if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, goto rejected because startup authority is not trusted");
+    startupAuthority.logStatus();
     return CE_SLEW_ERR_UNSPECIFIED;
   }
 
@@ -206,6 +207,7 @@ CommandError Goto::requestSync() {
 CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect, bool native) {
   if (!startupAuthority.trusted()) {
     DLF("WRN: Mount, sync rejected because startup authority is not trusted");
+    startupAuthority.logStatus();
     return CE_SLEW_ERR_UNSPECIFIED;
   }
   

@@ -19,17 +19,20 @@ void StartupAuthority::begin() {
   trustedValue = false;
   trustEstablishedValue = false;
   commissioningAllowed = false;
+  untrustedReason = Reason::NotEstablished;
 }
 
-void StartupAuthority::setTrusted(bool state) {
+void StartupAuthority::setTrusted(bool state, Reason reason) {
   #if NV_INIT_ERROR_REVOKES_AUTHORITY == ON
     if (state && initError.nv) {
+      if (!trustedValue) untrustedReason = Reason::NvFault;
       DLF("WRN: Mount, startup authority trust rejected due to NV fault");
       return;
     }
   #endif
 
   trustedValue = state;
+  untrustedReason = state ? Reason::NotEstablished : reason;
   if (state) {
     trustEstablishedValue = true;
     commissioningAllowed = false;
@@ -38,6 +41,43 @@ void StartupAuthority::setTrusted(bool state) {
   // If we have a trusted coordinate basis and date/time is ready, limits can
   // be enforced immediately without waiting for a later goto/reset/unpark path.
   if (trustedValue && site.isDateTimeReady()) limits.enabled(true);
+}
+
+void StartupAuthority::logStatus() const {
+  #if DEBUG != OFF
+    if (trustedValue) { DF("MSG: Mount, startup authority trusted"); } else {
+      DF("WRN: Mount, startup authority untrusted: ");
+      switch (untrustedReason) {
+        case Reason::NvFault:    DF("NV fault blocked or revoked trust (latched)"); break;
+        case Reason::MotorFault: DF("motor/encoder fault revoked trust (latched)"); break;
+        default: DF("no authoritative coordinate basis established"); break;
+      }
+    }
+    DF(" (mode=");
+    #if MOUNT_STARTUP_MODE == SA_PERMISSIVE
+      DF("SA_PERMISSIVE");
+    #elif MOUNT_STARTUP_MODE == SA_AUTO
+      DF("SA_AUTO");
+    #else
+      DF("SA_STRICT");
+    #endif
+    DF(", date/time=");
+    if (site.isDateTimeReady()) { DF("ready"); } else { DF("not set"); }
+    DLF(")");
+
+    if (!trustedValue && untrustedReason == Reason::NotEstablished) {
+      DF("MSG: Mount, startup authority sources: absolute axes=");
+      D(axis1.motor->hasAbsoluteEncoder()); DF("/"); D(axis2.motor->hasAbsoluteEncoder());
+      DF(", encoder origins=");
+      if (absoluteCoordinateOriginsEstablishedValue) { DF("established"); } else { DF("missing"); }
+      DF(", coordinate memory=");
+      #if MOUNT_COORDS_MEMORY == ON
+        DLF("ON (see startup restore diagnostics)");
+      #else
+        DLF("OFF");
+      #endif
+    }
+  #endif
 }
 
 bool StartupAuthority::required() const {
