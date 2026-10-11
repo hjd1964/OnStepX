@@ -116,7 +116,7 @@ Where absolute encoders or coordinate memory require first-time origin setup:
 1. Physically establish the known home/origin, using directional guiding as allowed
    by [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
 2. Stop all motion and tracking, then use `:SEO#` to initialize the applicable
-   origin.
+   origin (usually using the SWS or Website control via the `DISPLAY_COORDINATE_ORIGIN` option).
 3. Complete any required restart, then follow normal startup.
 
 Origin setup declares a known physical reference. It is not a general fault-clear
