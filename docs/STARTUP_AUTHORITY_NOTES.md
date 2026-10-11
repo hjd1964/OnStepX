@@ -39,34 +39,6 @@ date/time is available.
 The position reference relates OnStepX's coordinates to the physical positions
 of both mount axes. Establish it in one of the following ways.
 
-### From absolute encoders or coordinate memory
-
-Power on and allow startup to recover the position from the configured source.
-Once a valid position has been accepted and normal readiness checks are complete,
-normal operation can begin.
-
-If the source has not been initialized, follow
-[First-time origin setup](#first-time-origin-setup). Technical differences between
-absolute encoders and coordinate memory are collected at the end of this guide.
-
-For a previously parked mount, use the parked startup workflow below.
-
-Trusted paired absolute encoder positions supplied through SWS v2.10d or later
-can also establish trust when OnStepX accepts that position input.
-
-### From home switches
-
-Run sensed homing. Successful homing establishes the starting position at home and
-coordinate trust so normal operation can begin.
-
-Sensed homing is allowed while initially untrusted, including under `SA_STRICT`,
-subject to date/time, parked-state, motion, and hardware checks. A failed automatic
-home does not establish missing trust, and startup does not continue past it.
-
-Coordinate memory is marked untrusted during sensed homing. After power loss
-mid-home, complete sensed homing or the applicable known-origin workflow before
-resuming coordinate-based operation.
-
 ### By user action
 
 For a basic mount under `SA_AUTO`, session trust is already granted at boot.
@@ -82,6 +54,34 @@ Sync can establish the position reference when the startup authority policy
 permits it. The firmware's trust flag must already be set for ordinary sync to
 be accepted. Sync and a plain home reset cannot restore revoked trust or
 establish missing trust under `SA_STRICT`.
+
+### From home switches
+
+Run sensed homing. Successful homing establishes the starting position at home and
+coordinate trust so normal operation can begin.
+
+Sensed homing is allowed while initially untrusted, including under `SA_STRICT`,
+subject to date/time, parked-state, motion, and hardware checks. A failed automatic
+home does not establish missing trust, and startup does not continue past it.
+
+Coordinate memory is marked untrusted during sensed homing. After power loss
+mid-home, complete sensed homing or the applicable known-origin workflow before
+resuming coordinate-based operation.
+
+### From absolute encoders or coordinate memory
+
+Power on and allow startup to recover the position automatically from the configured source.
+Once a valid position has been accepted and normal readiness checks are complete,
+normal operation can begin.
+
+If the source has not been initialized, follow
+[First-time origin setup](#first-time-origin-setup). Technical differences between
+absolute encoders and coordinate memory are collected at the end of this guide.
+
+For a previously parked mount, use the parked startup workflow below.
+
+Trusted paired absolute encoder positions supplied through SWS v2.10d or later
+can also establish trust when OnStepX accepts that position input.
 
 ## Starting from park
 
