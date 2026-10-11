@@ -20,12 +20,9 @@ firmware calls that acceptance **coordinate trust**.
 
 | Policy | What it permits |
 | --- | --- |
-| `SA_AUTO` (default) | Grants session trust at boot on a basic mount without absolute encoders or coordinate memory. If absolute encoders or coordinate memory are configured, they must provide a valid startup position. |
-| `SA_STRICT` | Requires a valid position from absolute encoders or coordinate memory, or successful sensed homing, before granting session trust. |
+| `SA_AUTO` (default) | Grants session trust at boot on a basic mount without absolute encoders or coordinate memory. If absolute encoders or coordinate memory are configured, they must provide a valid startup position before session trust is granted. |
+| `SA_STRICT` | Requires a valid position from absolute encoders or coordinate memory, or successful sensed homing, before session trust is granted. |
 | `SA_PERMISSIVE` | Grants session trust at boot regardless of the configured position sources. Runtime fault handling still applies. |
-
-Granting trust does not physically position the mount or correct its coordinates.
-The starting position must still be established through an appropriate workflow.
 
 Goto, ordinary sync, set-park, park, and unpark require coordinate trust. Without
 it, software limits are disabled and coordinate-based return home is blocked;
@@ -41,8 +38,8 @@ of both mount axes. Establish it in one of the following ways.
 
 ### By user action
 
-For a basic mount under `SA_AUTO`, session trust is already granted at boot.
-The user can establish the position reference through home or sync:
+For a basic mount under `SA_AUTO`, session trust is already granted at boot **on the
+assumption** that the user will establish the initial position reference through home or sync:
 
 - **Home:** With clutches, physically place the mount home before powering on.
   Without clutches, power on and guide to physical home, then reset home with
