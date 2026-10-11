@@ -142,6 +142,8 @@ Important tracking note:
 
 ## Parking workflow
 
+See [Parking notes](PARKING_NOTES.md) for commands and the parked startup workflow.
+
 Parking is part of the same trust model because park/set-park/unpark all depend
 on the mount coordinate basis being believable.
 
@@ -153,8 +155,8 @@ While untrusted:
 Why:
 - set park stores a coordinate-based reference that should not be accepted if
   the current coordinate basis is already in doubt
-- park and unpark are automatic coordinate-based motions, so they should follow
-  the same trust rules as goto
+- park moves to a coordinate-based destination; unpark may restore saved
+  coordinates, so both require a trusted coordinate basis
 
 Operationally this means:
 - a parked state is only useful if it was established from a trusted coordinate
@@ -416,36 +418,58 @@ bypass runtime fault handling or restore trust when a fault clears.
 
 ## Important startup workflows to remember
 
+In all cases Date/Time/Location must first be set, either manually or automatically from an RTC or GPS source.
+
+The "common user workflow" in items 1–3 assumes the mount is not resuming from
+a parked state. For parked startup, see item 5.
+
 1. Basic mount with clutches, no absolute encoders, no coordinate memory:
-- common user workflow is manually place at home, power on, then goto/sync
-- SA_AUTO preserves this by granting session trust at boot
-- SA_STRICT intentionally blocks this until an authoritative action succeeds
+- common user workflow is manually place at home, power on, then goto or sync or reset home (with `:hF#`).
+- directional guiding remains available.
+- SA_AUTO preserves this by granting session trust at boot.
+- SA_STRICT blocks goto/sync until trust is established
+  with home switches, sensed homing is allowed while untrusted and establishes
+  trust on success.
 
-2. Mount without coordinate memory and without clutches:
-- mount may power up far from home
-- user may need to guide back to home
-- then perform an authoritative home/reset action
-- then begin normal operation
-- current model fits this workflow well
+2. Basic mount without clutches, no absolute encoders, no coordinate memory:
+- common user workflow is to power on, issue guide commands to reach the home position,
+  reset home (with `:hF#`) or sync, then goto.
+- SA_AUTO preserves this by granting session trust at boot.
+- SA_STRICT blocks goto/sync until trust is established
+  with home switches, sensed homing is allowed while untrusted and establishes
+  trust on success.
 
-3. Fresh coordinate-memory install:
-- coordinate-memory records are missing
-- manual guide commissioning is allowed so the user can move to the one-time
-  origin
-- set-origin or authoritative reset establishes trust
-- after that, coordinate memory is treated as a startup authority source
+3. Mount with absolute encoders or coordinate memory:
+- common user workflow is power on, then goto.
+- sync range is often limited so absolute encoders or coordinate memory remain the authority.
+- startup trust comes from paired absolute position sources with established
+  origins, or a trusted coordinate-memory restore.
+- first-time commissioning allows manual guiding to the known origin.  Then use
+  set origin (with `:SEO#`) to initialize the applicable origin.
+  Note: Mounts with absolute encoders require a restart after this operation.
+- an NV failure or untrusted coordinate-memory record does not reopen first-time
+  commissioning. Coordinate-based automatic motion and ordinary manual guiding
+  remain blocked. Resolve any NV fault first, then restore trust through sensed
+  homing or an applicable known-origin workflow.
+- Coordinate memory requires the axes not be manually moved even when powered down.
+  For this reason it's best used on mounts that physically enforce this;
+  for example: by not having clutches, by having one-way worm/wheel gearing, etc.
 
-4. Coordinate-memory NV failure or untrusted saved record:
-- this is not treated as fresh commissioning
-- automatic coordinate-based motion remains blocked
-- ordinary manual guide is blocked until trust is restored through an
-  authoritative path, such as sensed home or a deliberate set-origin workflow
+4. User wants only sidereal tracking at startup:
+- with both `TRACK_AUTOSTART` and `TRACK_WITHOUT_LIMITS` OFF (defaults), tracking
+  stops while software limits are disabled.
+- `TRACK_AUTOSTART ON` starts tracking automatically and permits tracking without
+  active software limits.
+- `TRACK_WITHOUT_LIMITS ON` permits requested tracking without active software
+  limits.
+- neither setting grants coordinate trust or bypasses the trust checks for
+  goto, sync, or unpark.
 
-5. User wants only sidereal tracking at startup:
-- trust does not gate sidereal tracking by itself
-- but default safety behavior still disallows tracking when limits are not
-  enforced
-- this is intentional and should remain so
+5. Mount previously parked:
+- leave the axes at their valid saved park position while powered down.
+- on startup, restore/unpark using the normal trust and date/time checks;
+  a saved parked state alone does not establish trust.
+- see [Parking notes](PARKING_NOTES.md) for the full workflow.
 
 ## NV policy
 

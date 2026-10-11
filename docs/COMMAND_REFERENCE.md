@@ -208,7 +208,7 @@ Available when `MOUNT_PRESENT` is enabled.
 | `:GXEE#` | `0#`, `1#`, ... | Mount coordinate mode (`MOUNT_COORDS - 1`) |
 | `:GXEF#` | `1` or `0` | Axis2 tangent-arm presence flag |
 | `:GXEG#` | `1` or `0` | Axis1 sector-gear presence flag |
-| `:GXEM#` | `n#` | Current mount type |
+| `:GXEM#` | `n#` | Saved mount type selection (effective after restart) |
 | `:GXF3#` | `sn.nnnnnn#` | Axis1 step frequency |
 | `:GXF4#` | `sn.nnnnnn#` | Axis2 step frequency |
 | `:GXFA#` | `50%#` | Reported workload placeholder |
@@ -222,7 +222,7 @@ Available when `MOUNT_PRESENT` is enabled.
 | `:SX43,0#` | `0/1` | Allow SWS to control sync mode |
 | `:SX44,deg1,deg2[a]#` | `0/1` | Stage and sync both encoder axes, append `a` when both SWS encoder values are absolute and trusted |
 | `:GXSGn#` | `sg,trip,badMs,armed,latched#` | Live StallGuard telemetry for axis `n`, when supported |
-| `:SXEM,n#` | `0/1` | Set mount type for next restart |
+| `:SXEM,n#` | `0/1` | Set mount type for next restart: 0 default, 1 GEM, 2 FORK, 3 ALTAZM, 5 TRACKER; TRACKER requires step/dir RA, step/dir or OFF Dec, alternate orientation, sector gear, and tangent arm OFF, and a non-ALTALT build |
 | `:SXTD,n.n#` | `0/1` | Set Dec tracking rate offset, arcsec per sidereal second |
 | `:SXTR,n.n#` | `0/1` | Set RA tracking rate offset, arcsec per sidereal second |
 | `:TS#` | none | Solar tracking rate |
