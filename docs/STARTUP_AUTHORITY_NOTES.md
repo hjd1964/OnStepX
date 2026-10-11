@@ -20,7 +20,7 @@ firmware calls that acceptance **coordinate trust**.
 
 | Policy | What it permits |
 | --- | --- |
-| `SA_AUTO` (default) | Grants session trust at boot on a basic mount without absolute position sources or coordinate memory. If those sources are configured, they must provide a valid startup position. |
+| `SA_AUTO` (default) | Grants session trust at boot on a basic mount without absolute encoders or coordinate memory. If absolute encoders or coordinate memory are configured, they must provide a valid startup position. |
 | `SA_STRICT` | Requires a valid position from absolute encoders or coordinate memory, or successful sensed homing, before granting session trust. |
 | `SA_PERMISSIVE` | Grants session trust at boot regardless of the configured position sources. Runtime fault handling still applies. |
 
@@ -181,7 +181,7 @@ still applies.
 
 ## Status and diagnostics
 
-`:Gu#` exposes coordinate trust.
+`:Gu#` exposes the coordinate trust status.
 
 If startup or goto/sync/unpark is blocked, enable debug output and capture the log
 from startup through the rejected command. It reports the startup policy, trust,
