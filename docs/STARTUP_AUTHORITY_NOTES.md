@@ -111,7 +111,7 @@ trust checks. Hardware protections remain active.
 
 ## First-time origin setup
 
-Where absolute encoders or coordinate memory require first-time origin setup:
+Where coordinate memory or absolute encoders require first-time origin setup:
 
 1. Physically establish the known home/origin, using directional guiding as allowed
    by [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
@@ -124,11 +124,12 @@ operation. Restart requirements are listed in the technical notes below.
 
 ## Motion safety whenever soft limits are disabled
 
-- Directional guiding remains available on basic mounts while untrusted.
+- Directional guiding remains available on basic mounts to facilitate moving
+  to the home position as part of the usual startup procedure.
 - For coordinate memory, initial guiding requires both saved-position records to
   be missing. Untrusted, unreadable, or incompatible records do not reopen that
   permission.
-- With absolute position sources and coordinate memory OFF, guiding is allowed
+- With absolute encoders and coordinate memory OFF, guiding is allowed
   before trust has first been established in the current session, but blocked
   after established trust is lost.
 - `GUIDE_TIME_NO_LIMITS` replaces the normal guide timeout. The default is 5 seconds
