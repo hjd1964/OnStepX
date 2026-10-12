@@ -111,13 +111,15 @@ trust checks. Hardware protections remain active.
 
 ## First-time origin setup
 
-Where coordinate memory or absolute encoders require first-time origin setup:
+Coordinate memory or absolute encoders **require** a first-time origin setup:
 
 1. Physically establish the known home/origin, using directional guiding as allowed
    by [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
 2. Stop all motion and tracking, then use `:SEO#` to initialize the applicable
-   origin (usually using the SWS or Website control via the `DISPLAY_COORDINATE_ORIGIN` option).
+   origin (usually using the SmartWebServer or Website control on the Mount page
+   via the `DISPLAY_COORDINATE_ORIGIN` option).
 3. Complete any required restart, then follow normal startup.
+4. Normal operation can not begin until this step is completed.
 
 Origin setup declares a known physical reference. It is not a general fault-clear
 operation. Restart requirements are listed in the technical notes below.
