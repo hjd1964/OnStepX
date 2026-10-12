@@ -49,7 +49,7 @@ assumption** that the user will establish the initial position reference through
 - **Sync:** Point at a known sky position, supply its coordinates, and sync.
   An accepted sync establishes or corrects the coordinate reference.
 
-Software limits disabled during this startup phase so directional guide commands time
+Software limits are disabled during this startup phase so directional guide commands time
 out after 5 seconds by default; see [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
 This somewhat aggressive guard helps protect the mount and what's riding on it from unbounded guides due
 to broken communication that may occasionally occur.  To keep moving continiously, briefly release and press
