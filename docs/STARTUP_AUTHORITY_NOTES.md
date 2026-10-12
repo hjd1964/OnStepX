@@ -51,6 +51,9 @@ assumption** that the user will establish the initial position reference through
 
 Software limits disabled during this startup phase so directional guide commands time
 out after 5 seconds by default; see [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
+This somewhat aggressive guard helps protect the mount and what's riding on it from unbounded guides due
+to broken communication that may occasionally occur.  To keep moving continiously, briefly release and press
+the direction button again every few seconds.
 
 Sync can establish the position reference when the startup authority policy
 permits it. The firmware's trust flag must already be set for ordinary sync to
