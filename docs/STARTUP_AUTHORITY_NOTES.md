@@ -68,7 +68,7 @@ resuming coordinate-based operation.
 ### From absolute encoders or coordinate memory
 
 Power on and allow startup to recover the position automatically from the configured source.
-Once a valid position has been accepted and normal readiness checks are complete,
+Once a valid position has been accepted and readiness checks are complete,
 normal operation can begin.
 
 If the source has not been initialized, follow
@@ -142,19 +142,29 @@ its usual checks.
 
 ## Recovering after a fault
 
-An NV or reported motor/encoder fault can revoke coordinate trust. Clearing the
-fault does not automatically restore it, even if the mount was parked or disabled.
-A stop caused by limits or StallGuard alone does not revoke trust.
+Clearing a fault does not automatically restore coordinate trust.
+`SA_PERMISSIVE` does not bypass runtime fault handling.
 
-Resolve any NV fault before restoring trust. Do not cycle motor/driver power
-independently while the microcontroller remains powered. After motor/driver power loss,
-restore that power and restart OnStepX to repeat motor/encoder initialization and
-any required motor calibration. Then follow the normal startup workflow for the
-configured position source. `SA_PERMISSIVE` does not bypass runtime fault handling.
+### NV faults
 
 NV faults block or revoke trust when `NV_INIT_ERROR_REVOKES_AUTHORITY` is ON
-(default). Setting it OFF disables that NV check; motor/encoder fault handling
+(default). Resolve the NV fault, then restart OnStepX and follow the normal
+startup workflow under the configured startup authority policy.
+
+Setting the option OFF disables that NV trust check; motor/encoder fault handling
 still applies.
+
+### Motor/encoder faults
+
+A reported motor/encoder fault revokes trust even if the mount was parked or
+disabled. Resolve the hardware fault before restoring trust.  Then restart OnStepX and
+follow the normal startup workflow under the configured startup authority policy.
+
+Do not cycle motor/driver power independently while the microcontroller remains
+powered. After motor/driver power loss, restore that power and restart OnStepX to
+repeat motor/encoder initialization and any required motor calibration.
+
+A stop caused by limits or StallGuard alone does not revoke trust.
 
 ## Technical notes: position sources
 
