@@ -49,6 +49,9 @@ assumption** that the user will establish the initial position reference through
 - **Sync:** Point at a known sky position, supply its coordinates, and sync.
   An accepted sync establishes or corrects the coordinate reference.
 
+Software limits disabled during this startup phase so directional guide commands time
+out after 5 seconds by default; see [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
+
 Sync can establish the position reference when the startup authority policy
 permits it. The firmware's trust flag must already be set for ordinary sync to
 be accepted. Sync and a plain home reset cannot restore revoked trust or
