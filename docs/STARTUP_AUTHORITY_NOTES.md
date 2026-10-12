@@ -145,11 +145,15 @@ its usual checks.
 Clearing a fault does not automatically restore coordinate trust.
 `SA_PERMISSIVE` does not bypass runtime fault handling.
 
-### NV faults
+### NV (Non-Volatile memory for settings) faults
 
 NV faults block or revoke trust when `NV_INIT_ERROR_REVOKES_AUTHORITY` is ON
-(default). Resolve the NV fault, then restart OnStepX and follow the normal
-startup workflow under the configured startup authority policy.
+(default). Resolve the NV fault (clear corrupt stored data or repair/replace faulty
+hardware). Then restart OnStepX and follow the normal startup workflow
+under the configured startup authority policy.
+
+Clearing NV can erase saved origins, positions, and park data, so first-time setup
+may be needed afterward.
 
 Setting the option OFF disables that NV trust check; motor/encoder fault handling
 still applies.
@@ -157,8 +161,9 @@ still applies.
 ### Motor/encoder faults
 
 A reported motor/encoder fault revokes trust even if the mount was parked or
-disabled. Resolve the hardware fault before restoring trust.  Then restart OnStepX and
-follow the normal startup workflow under the configured startup authority policy.
+disabled. Resolve the hardware fault (check cables and repair or replace faulty
+hardware). Then restart OnStepX and follow the normal startup workflow under the
+configured startup authority policy.
 
 Do not cycle motor/driver power independently while the microcontroller remains
 powered. After motor/driver power loss, restore that power and restart OnStepX to
