@@ -41,7 +41,7 @@ of both mount axes. Establish it in one of the following ways.
 For a basic mount under `SA_AUTO`, session trust is already granted at boot **on the
 assumption** that the user will establish the initial position reference through home or sync:
 
-- **Home:** With clutches, physically place the mount home before powering on.
+- **Home:** With clutches, physically place the mount at home before powering on.
   Without clutches, power on and guide to physical home, then reset home with
   `:hF#` to begin normal operation.
 - **Sync:** Point at a known sky position, supply its coordinates, and sync.
