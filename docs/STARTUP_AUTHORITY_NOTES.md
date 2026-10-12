@@ -115,11 +115,16 @@ Coordinate memory or absolute encoders **require** a first-time origin setup:
 
 1. Physically establish the known home/origin, using directional guiding as allowed
    by [Motion safety](#motion-safety-whenever-soft-limits-are-disabled).
-2. Stop all motion and tracking, then use `:SEO#` to initialize the applicable
-   origin (usually using the SmartWebServer or Website control on the Mount page
-   via the `DISPLAY_COORDINATE_ORIGIN` option).
+2. Stop all motion and tracking, then set the applicable origin using the
+   appropriate control below.
+   - Enabling `DISPLAY_COORDINATE_ORIGIN` in the SmartWebServer or Website adds a
+     Set Origin control to the Mount page for OnStepX absolute encoder servos or
+     mount coordinate memory. This sends the `:SEO#` command to OnStepX.
+   - For absolute encoders hosted by the SmartWebServer, use the Set
+     Origin control on the Encoders page. This uses OnStepX's current axis
+     coordinates as the reference, so first ensure they match the physical
+     position (for example, reset home with `:hF#` when physically at home).
 3. Complete any required restart, then follow normal startup.
-4. Normal operation can not begin until this step is completed.
 
 Origin setup declares a known physical reference. It is not a general fault-clear
 operation. Restart requirements are listed in the technical notes below.
