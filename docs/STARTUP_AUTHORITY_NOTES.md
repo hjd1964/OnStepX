@@ -42,8 +42,10 @@ For a basic mount under `SA_AUTO`, session trust is already granted at boot **on
 assumption** that the user will establish the initial position reference through home or sync:
 
 - **Home:** With clutches, physically place the mount at home before powering on.
-  Without clutches, power on and guide to physical home, then reset home with
-  `:hF#` to begin normal operation.
+  OnStepX assumes the mount is at home at startup, so goto can be used directly
+  once the usual readiness checks pass. If you use guide controls to reach
+  physical home after powering on, reset home with `:hF#` before goto. This also
+  provides the startup workflow for a mount without clutches.
 - **Sync:** Point at a known sky position, supply its coordinates, and sync.
   An accepted sync establishes or corrects the coordinate reference.
 
