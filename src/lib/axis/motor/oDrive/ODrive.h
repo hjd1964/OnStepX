@@ -33,19 +33,12 @@
   #define ODRIVE_SLEW_DIRECT OFF
 #endif
 
-// odrive if using absolute encoders set to ON
 #ifndef ODRIVE_ABSOLUTE
-  #define ODRIVE_ABSOLUTE    ON       // was OFF
+  #define ODRIVE_ABSOLUTE OFF
 #endif
 
-// odrive sync limit (for absolute encoders) OFF or specify the sync limit in arc-seconds
-// this should, I hope, allow you to limit just how far from the encoders you can sync. (+/-) to fine-tune the origin
-// with absolute encoders this protects you from exceeding the software min/max limits by > the amount specified
-// in arc seconds..one encoder tick encoder resolution = 2^14 = 16380
-// 16380/360=45.5 ticks/deg; 45.5/60=0.7583 ticks/min; 0.7583/60 = .00126 ticks/sec
-// or 1/0.7583 = 1.32 arc-min/tick; 1.32*60 sec = 79.2 arc sec per encoder tick
-#ifndef ODRIVE_SYNC_LIMIT
-  #define ODRIVE_SYNC_LIMIT  80       // was OFF
+#if ODRIVE_ABSOLUTE != ON && ODRIVE_ABSOLUTE != OFF
+  #error "Configuration (Config.h): ODRIVE_ABSOLUTE must be ON or OFF."
 #endif
 
 // Use OD_UART or OD_CAN...I2C may be added later
@@ -167,6 +160,7 @@ class ODriveMotor : public Motor {
     bool useFastHardwareTimers = true;
 
     bool isSlewing = false;
+    bool homeSet = false;               // absolute encoder Home index established at startup
 
     DriverStatus status = { false, {false, false}, {false, false}, false, false, false, false };
 

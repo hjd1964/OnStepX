@@ -135,14 +135,13 @@ void ODriveMotor::enable(bool state) {
 void ODriveMotor::setInstrumentCoordinateSteps(long value) {
   if (!ready) return;
 
-  #if ODRIVE_ABSOLUTE == ON && ODRIVE_SYNC_LIMIT != OFF
+  // Absolute feedback is relative to Home, like Servo absolute encoder counts.
+  if (hasAbsoluteEncoder() && !homeSet) {
     noInterrupts();
-    long index = value - motorSteps;
+    indexSteps = value;
+    homeSet = true;
     interrupts();
-    float indexRad = index/countsPerRad.value;
-    if (indexRad >= -degToRadF(ODRIVE_SYNC_LIMIT/3600.0F) && indexRad <= degToRadF(ODRIVE_SYNC_LIMIT/3600.0F))
-  #endif
-  Motor::setInstrumentCoordinateSteps(value);
+  } else Motor::setInstrumentCoordinateSteps(value);
 }
 
 // resets motor and target angular position in steps, also zeros backlash and index
@@ -191,7 +190,7 @@ void ODriveMotor::setFrequencySteps(float frequency) {
   if (inBacklash)
     frequency = backlashFrequency;
 
-  if (frequency != currentFrequency) {
+  if (frequency != lastFrequency) {
     lastFrequency = frequency;
 
     // if slewing has a larger step size divide the frequency to account for it

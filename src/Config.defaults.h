@@ -2198,6 +2198,9 @@
 // flag presence of ODRIVE motors
 #if defined(AXIS1_ODRIVE_PRESENT) || defined(AXIS2_ODRIVE_PRESENT)
   #define ODRIVE_MOTOR_PRESENT
+  #ifndef ODRIVE_ABSOLUTE
+    #define ODRIVE_ABSOLUTE OFF
+  #endif
 #endif
 
 // flag presence of KTECH motors

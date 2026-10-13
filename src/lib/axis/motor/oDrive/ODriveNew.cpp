@@ -107,9 +107,10 @@ bool ODriveMotor::init() {
   lastEncoderUpdateRequestTime = millis();
   tasks.yield(250);
 
-  // require an encoder sample
-  if (!odriveCan.hasFreshTurns(oDriveNode, 250)) {
-    VF("MSG:"); V(axisPrefix); VLF("no encoder reply at startup");
+  // require a usable encoder sample before declaring the motor ready
+  long positionSteps;
+  if (!readEncoderPositionSteps(positionSteps)) {
+    VF("MSG:"); V(axisPrefix); VLF("no valid encoder position at startup");
     ready = false;
     return false;
   }
@@ -188,29 +189,39 @@ void ODriveMotor::enable(bool state) {
 void ODriveMotor::setInstrumentCoordinateSteps(long value) {
   if (!ready) return;
 
-  #if ODRIVE_ABSOLUTE == ON && ODRIVE_SYNC_LIMIT != OFF
-    long index = value - ATOMIC_LOAD(motorSteps);
-    float indexRad = index/countsPerRad.value;
-    if (indexRad >= -degToRadF(ODRIVE_SYNC_LIMIT/3600.0F) && indexRad <= degToRadF(ODRIVE_SYNC_LIMIT/3600.0F))
-  #endif
+  // Absolute feedback is relative to Home, like Servo absolute encoder counts.
+  if (hasAbsoluteEncoder() && !homeSet) {
+    noInterrupts();
+    indexSteps = value;
+    homeSet = true;
+    interrupts();
+  } else Motor::setInstrumentCoordinateSteps(value);
+}
 
-  Motor::setInstrumentCoordinateSteps(value);
+// Read a recent encoder position that can be represented by the motor counters.
+bool ODriveMotor::readEncoderPositionSteps(long& positionSteps, uint32_t maxAgeMs) {
+  if (!odriveCan.hasFreshTurns(oDriveNode, maxAgeMs)) return false;
+
+  const float steps = odriveCan.getPosTurns(oDriveNode) * TWO_PI * countsPerRad.value;
+  // INT32_MAX rounds up to 2^31 as a float, so the upper bound is exclusive.
+  if (isnan(steps) || isinf(steps) || steps < (float)INT32_MIN || steps >= -(float)INT32_MIN) return false;
+
+  positionSteps = lroundf(steps);
+  return true;
 }
 
 // resets motor and target angular position in steps, also zeros backlash and index
 void ODriveMotor::resetPositionSteps(long value) {
   if (!ready) return;
 
-  // make sure we have a recent encoder reading
-  if (!odriveCan.hasFreshTurns(oDriveNode, 250)) {
+  // A stopped axis can use a valid cached position up to one second old.
+  long oPositionSteps;
+  if (!readEncoderPositionSteps(oPositionSteps, 1000)) {
     status.fault = true;
     odriveCan.requestTurns(oDriveNode);
     return;
   }
-
-  // Convert turns -> steps (countsPerRad is counts-per-radian)
-  const float posTurns = odriveCan.getPosTurns(oDriveNode);
-  const long  oPositionSteps = lroundf(posTurns * TWO_PI * countsPerRad.value);
+  if (!odriveCan.hasFreshTurns(oDriveNode, 250)) odriveCan.requestTurns(oDriveNode);
 
   noInterrupts();
   motorSteps  = oPositionSteps;

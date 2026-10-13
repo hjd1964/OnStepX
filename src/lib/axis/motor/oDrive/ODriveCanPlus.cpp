@@ -229,8 +229,14 @@ void ODriveCanPlus::onGetVersion(uint8_t node, const uint8_t* d, uint8_t len) {
 void ODriveCanPlus::onFeedbackPosVel(uint8_t node, const uint8_t* d, uint8_t len) {
   if (node >= MaxNodes || len < 8) return;
 
-  // Example: pos_turns (f32) + vel_turns/s (f32)
-  cache_[node].pos_turns   = get_f32(d + 0);
+  // An unknown absolute position can be reported as NaN.
+  const float position = get_f32(d + 0);
+  if (isnan(position) || isinf(position)) {
+    ATOMIC_AND(cache_[node].seen, (uint8_t)~SEEN_ENC);
+    return;
+  }
+
+  cache_[node].pos_turns   = position;
   cache_[node].vel_turns_s = get_f32(d + 4);
   cache_[node].last_enc_ms = millis();
 
