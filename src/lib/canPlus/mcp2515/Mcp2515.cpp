@@ -58,7 +58,7 @@ void CanPlusMCP2515::init() {
       VLF("success");
 
       // setup the burst task disabled (period 0) and so it only runs once
-      burst = tasks.add(0, 0, true, 3, canEsp32Monitor, "CanBrst");
+      burst = tasks.add(0, 0, true, 3, canMcp2515Monitor, "CanBrst");
 
     } else VLF("FAILED!");
   } else {
