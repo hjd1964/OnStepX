@@ -15,6 +15,10 @@
 #include "../limits/Limits.h"
 #include "../status/Status.h"
 
+#if ALIGN_MAX_NUM_STARS > 1
+#include "../coordinates/Align.bounds.h"
+#endif
+
 bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError) {
   PrecisionMode precisionMode = PM_HIGH;
 
@@ -396,26 +400,28 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
         if (parameter[0] == '0') {
           static int star;
           double d;
+          GeoAlign &align = transform.align;
+          const char *value = &parameter[3];
           switch (parameter[1]) {
-            case '0': transform.align.model.ax1Cor = arcsecToRad(atol(&parameter[3])); break; // ax1Cor
-            case '1': transform.align.model.ax2Cor = arcsecToRad(atol(&parameter[3])); break; // ax2Cor 
-            case '2': transform.align.model.altCor = arcsecToRad(atol(&parameter[3])); break; // altCor
-            case '3': transform.align.model.azmCor = arcsecToRad(atol(&parameter[3])); break; // azmCor
-            case '4': transform.align.model.doCor = arcsecToRad(atol(&parameter[3])); break;  // doCor
-            case '5': transform.align.model.pdCor = arcsecToRad(atol(&parameter[3])); break;  // pdCor
+            case '0': *commandError = align.setCoefficient(align.model.ax1Cor, value, AlignBounds::index); break; // ax1Cor
+            case '1': *commandError = align.setCoefficient(align.model.ax2Cor, value, AlignBounds::index); break; // ax2Cor
+            case '2': *commandError = align.setCoefficient(align.model.altCor, value, AlignBounds::polar); break; // altCor
+            case '3': *commandError = align.setCoefficient(align.model.azmCor, value, AlignBounds::polar); break; // azmCor
+            case '4': *commandError = align.setCoefficient(align.model.doCor, value, AlignBounds::cone); break;   // doCor
+            case '5': *commandError = align.setCoefficient(align.model.pdCor, value, AlignBounds::ortho); break;  // pdCor
             case '6':
-              if (transform.mountType == FORK || transform.mountType == ALTAZM)               // fdCor or ffCor
-                transform.align.model.dfCor = arcsecToRad(atol(&parameter[3]));
+              if (transform.mountType == FORK || transform.mountType == ALTAZM) // fdCor or ffCor
+                *commandError = align.setCoefficient(align.model.dfCor, value, AlignBounds::axisFlex);
             break;
             case '7':
-              if (transform.mountType != FORK && transform.mountType != ALTAZM)               // fdCor or ffCor
-                transform.align.model.dfCor = arcsecToRad(atol(&parameter[3]));                 
+              if (transform.mountType != FORK && transform.mountType != ALTAZM) // fdCor or ffCor
+                *commandError = align.setCoefficient(align.model.dfCor, value, AlignBounds::axisFlex);
             break;
-            case '8': transform.align.model.tfCor = arcsecToRad(atol(&parameter[3])); break;  // tfCor
-            case 'a': transform.align.model.hcp = degToRad(atol(&parameter[3])); break;       // hcp
-            case 'b': transform.align.model.hca = arcsecToRad(atol(&parameter[3])); break;    // hca
-            case 'c': transform.align.model.dcp = degToRad(atol(&parameter[3])); break;       // dcp
-            case 'd': transform.align.model.dca = arcsecToRad(atol(&parameter[3])); break;    // dca
+            case '8': *commandError = align.setCoefficient(align.model.tfCor, value, AlignBounds::tubeFlex); break;  // tfCor
+            case 'a': *commandError = align.setCoefficient(align.model.hcp, value, AlignBounds::phase, true); break; // hcp
+            case 'b': *commandError = align.setCoefficient(align.model.hca, value, AlignBounds::harmonic); break;    // hca
+            case 'c': *commandError = align.setCoefficient(align.model.dcp, value, AlignBounds::phase, true); break; // dcp
+            case 'd': *commandError = align.setCoefficient(align.model.dca, value, AlignBounds::harmonic); break;    // dca
             // use :SX09,0# to start upload of stars for align, when done use :SX09,1# to calculate the pointing model, or :SX09,2# to force model activation
             case '9': {
                 int n = atol(&parameter[3]);

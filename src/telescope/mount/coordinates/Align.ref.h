@@ -77,6 +77,9 @@ class GeoAlign
     // prepare goto assist for operation, also clears the alignment model;
     void init(int8_t mountType, float latitude);
 
+    // Parse and set a coefficient within its radian bound; text is arcseconds or degrees.
+    CommandError setCoefficient(float &coefficient, const char *text, float limit, bool degrees = false);
+
     // reads the last saved alignment model from NV
     void modelRead();
     // writes the alignment model to NV

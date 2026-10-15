@@ -18,6 +18,8 @@
 
 #if ALIGN_MAX_NUM_STARS > 1
 
+#include "Align.bounds.h"
+
 uint8_t modelNumberStars = 0;
 void autoModelWrapper() { transform.align.autoModel(modelNumberStars); }
 
@@ -37,18 +39,19 @@ void GeoAlign::init(int8_t mountType, float latitude) {
 void GeoAlign::modelRead() {
   if (!nv().kv().getOrInit("ALIGN_MODEL", model)) { DLF("WRN: Nv, init failed for ALIGN_MODEL"); }
  
-  if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
-  if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
-  if (model.dfCor  <    -256 || model.dfCor  >    256) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
-  if (model.tfCor  <    -128 || model.tfCor  >    128) { model.tfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV tfCor");  }
-  if (model.doCor  <   -8192 || model.doCor  >   8192) { model.doCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV doCor");  }
-  if (model.pdCor  <    -256 || model.pdCor  >    256) { model.pdCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV pdCor");  }
-  if (model.altCor <  -16384 || model.altCor >  16384) { model.altCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV altCor"); }
-  if (model.azmCor <  -16384 || model.azmCor >  16384) { model.azmCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV azmCor"); }
-  if (model.hcp    < -Deg360 || model.hcp    > Deg360) { model.hcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hcp"); }
-  if (model.hca    <  -16384 || model.hca    > 16384)  { model.hca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hca"); }
-  if (model.dcp    < -Deg360 || model.dcp    > Deg360) { model.dcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dcp"); }
-  if (model.dca    <  -16384 || model.dca    > 16384)  { model.dca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dca"); }
+  // Use the same radian bounds as coefficient uploads.
+  if (!AlignBounds::valid(model.ax1Cor, AlignBounds::index   )) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
+  if (!AlignBounds::valid(model.ax2Cor, AlignBounds::index   )) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
+  if (!AlignBounds::valid(model.dfCor , AlignBounds::axisFlex)) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
+  if (!AlignBounds::valid(model.tfCor , AlignBounds::tubeFlex)) { model.tfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV tfCor");  }
+  if (!AlignBounds::valid(model.doCor , AlignBounds::cone    )) { model.doCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV doCor");  }
+  if (!AlignBounds::valid(model.pdCor , AlignBounds::ortho   )) { model.pdCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV pdCor");  }
+  if (!AlignBounds::valid(model.altCor, AlignBounds::polar   )) { model.altCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV altCor"); }
+  if (!AlignBounds::valid(model.azmCor, AlignBounds::polar   )) { model.azmCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV azmCor"); }
+  if (!AlignBounds::valid(model.hcp   , AlignBounds::phase   )) { model.hcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hcp"); }
+  if (!AlignBounds::valid(model.hca   , AlignBounds::harmonic)) { model.hca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hca"); }
+  if (!AlignBounds::valid(model.dcp   , AlignBounds::phase   )) { model.dcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dcp"); }
+  if (!AlignBounds::valid(model.dca   , AlignBounds::harmonic)) { model.dca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dca"); }
 }
 
 void GeoAlign::modelWrite() {

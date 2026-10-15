@@ -18,6 +18,8 @@
 
 #if ALIGN_MAX_NUM_STARS > 1
 
+#include "Align.bounds.h"
+
 uint8_t modelNumberStars = 0;
 void autoModelWrapper() { transform.align.autoModel(modelNumberStars); }
 
@@ -41,18 +43,19 @@ void GeoAlign::init(int8_t mountType, float latitude) {
 void GeoAlign::modelRead() {
   if (!nv().kv().getOrInit("ALIGN_MODEL", model))  { DLF("WRN: Nv, init failed for ALIGN_MODEL"); }
 
-  if (model.ax1Cor < -Deg360 || model.ax1Cor > Deg360) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
-  if (model.ax2Cor < -Deg360 || model.ax2Cor > Deg360) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
-  if (model.dfCor  <    -256 || model.dfCor  >    256) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
-  if (model.tfCor  <    -128 || model.tfCor  >    128) { model.tfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV tfCor");  }
-  if (model.doCor  <   -8192 || model.doCor  >   8192) { model.doCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV doCor");  }
-  if (model.pdCor  <    -256 || model.pdCor  >    256) { model.pdCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV pdCor");  }
-  if (model.altCor <  -16384 || model.altCor >  16384) { model.altCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV altCor"); }
-  if (model.azmCor <  -16384 || model.azmCor >  16384) { model.azmCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV azmCor"); }
-  if (model.hcp    < -Deg360 || model.hcp    > Deg360) { model.hcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hcp"); }
-  if (model.hca    <  -16384 || model.hca    > 16384)  { model.hca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hca"); }
-  if (model.dcp    < -Deg360 || model.dcp    > Deg360) { model.dcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dcp"); }
-  if (model.dca    <  -16384 || model.dca    > 16384)  { model.dca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dca"); }
+  // Use the same radian bounds as coefficient uploads.
+  if (!AlignBounds::valid(model.ax1Cor, AlignBounds::index   )) { model.ax1Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax1Cor"); }
+  if (!AlignBounds::valid(model.ax2Cor, AlignBounds::index   )) { model.ax2Cor = 0; DLF("ERR: GeoAlign::readModel(), bad NV ax2Cor"); }
+  if (!AlignBounds::valid(model.dfCor , AlignBounds::axisFlex)) { model.dfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV dfCor");  }
+  if (!AlignBounds::valid(model.tfCor , AlignBounds::tubeFlex)) { model.tfCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV tfCor");  }
+  if (!AlignBounds::valid(model.doCor , AlignBounds::cone    )) { model.doCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV doCor");  }
+  if (!AlignBounds::valid(model.pdCor , AlignBounds::ortho   )) { model.pdCor  = 0; DLF("ERR: GeoAlign::readModel(), bad NV pdCor");  }
+  if (!AlignBounds::valid(model.altCor, AlignBounds::polar   )) { model.altCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV altCor"); }
+  if (!AlignBounds::valid(model.azmCor, AlignBounds::polar   )) { model.azmCor = 0; DLF("ERR: GeoAlign::readModel(), bad NV azmCor"); }
+  if (!AlignBounds::valid(model.hcp   , AlignBounds::phase   )) { model.hcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hcp"); }
+  if (!AlignBounds::valid(model.hca   , AlignBounds::harmonic)) { model.hca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV hca"); }
+  if (!AlignBounds::valid(model.dcp   , AlignBounds::phase   )) { model.dcp = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dcp"); }
+  if (!AlignBounds::valid(model.dca   , AlignBounds::harmonic)) { model.dca = 0;    DLF("ERR: GeoAlign::readModel(), bad NV dca"); }
 }
 
 void GeoAlign::modelWrite() {
@@ -438,7 +441,14 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
 
   // breaks-down near the poles (limited to > 1' from pole)
   if (fabs(ax2) < degToRadF(89.98333333F)) {
-    for (int pass = 0; pass < 3; pass++) {
+    bool converged = false;
+    const int passes = 16;
+    const float tolerance = (float)arcsecToRad(0.125F);
+    const float cosTargetAx2 = fabsf(cosf(ax2));
+    for (int pass = 0; pass < passes; pass++) {
+      // guard each estimate before evaluating the singular terms
+      if (!(fabs(a2) < degToRadF(89.98333333F))) break;
+
       float sinAx2 = sinf(a2);
       float cosAx2 = cosf(a2);
       float sinAx1 = sinf(a1);
@@ -474,9 +484,24 @@ void GeoAlign::observedPlaceToMount(Coordinate *coord) {
       float ax1c = -model.azmCor*cosAx1*(sinAx2/cosAx2) + model.altCor*sinAx1*(sinAx2/cosAx2);
       float ax2c = +model.azmCor*sinAx1                 + model.altCor*cosAx1;
 
-      // improved guess at instrument coordinate
-      a1 = ax1 + (ax1c + PDh + DOh + TFh + COSh);
-      a2 = ax2 + (ax2c + DFd + TFd + COSd);
+      // the difference from this estimate is its forward-transform residual
+      const float nextA1 = ax1 + (ax1c + PDh + DOh + TFh + COSh);
+      const float nextA2 = ax2 + (ax2c + DFd + TFd + COSd);
+      if (!isfinite(nextA1) || !isfinite(nextA2) || !(fabs(nextA2) < degToRadF(89.98333333F))) break;
+      // compare residuals as local sky-angle components
+      if (pass >= 2 && fabsf(nextA1 - a1)*cosTargetAx2 <= tolerance && fabsf(nextA2 - a2) <= tolerance) {
+        converged = true;
+        break;
+      }
+      a1 = nextA1;
+      a2 = nextA2;
+    }
+
+    // use index offsets only if the inverse leaves the safe region or fails to converge
+    if (!converged) {
+      DL1(F("WRN: observedPlaceToMount(), inverse failed, using index offsets only"));
+      a1 = ax1;
+      a2 = ax2;
     }
   }
 
@@ -541,8 +566,12 @@ void GeoAlign::mountToObservedPlace(Coordinate *coord) {
     float a1 = -model.azmCor*cosAx1*(sinAx2/cosAx2) + model.altCor*sinAx1*(sinAx2/cosAx2);
     float a2 = +model.azmCor*sinAx1                 + model.altCor*cosAx1;
 
-    ax1 = ax1 - (a1 + PDh + DOh + TFh + COSh);
-    ax2 = ax2 - (a2 + DFd + TFd + COSd);
+    const float correctedA1 = ax1 - (a1 + PDh + DOh + TFh + COSh);
+    const float correctedA2 = ax2 - (a2 + DFd + TFd + COSd);
+    if (isfinite(correctedA1) && isfinite(correctedA2)) {
+      ax1 = correctedA1;
+      ax2 = correctedA2;
+    }
   }
 
   if (ax2 >  Deg90) ax2 =  Deg90;
