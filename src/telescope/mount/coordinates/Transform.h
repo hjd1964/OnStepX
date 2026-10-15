@@ -51,7 +51,8 @@ class Transform {
     void observedPlaceToMount(Coordinate *coord);
 
     // converts from Instrument (angular) to Mount (equatorial or horizon) coordinates
-    Coordinate instrumentToMount(double a1, double a2);
+    // Retain lastPierSide within poleTolerance radians of the orientation pole.
+    Coordinate instrumentToMount(double a1, double a2, PierSide lastPierSide = PIER_SIDE_NONE, double poleTolerance = 0.0);
     // converts from Mount (equatorial or horizon) to Instrument (angular) coordinates
     void mountToInstrument(Coordinate *coord, double *a1, double *a2);
 

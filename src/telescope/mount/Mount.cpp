@@ -597,7 +597,7 @@ float Mount::ztr(float a) {
 
 // update where we are pointing *now*
 void Mount::updatePosition(CoordReturn coordReturn) {
-  current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+  current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate(), current.pierSide, poleTolerance);
   if (isHome()) {
     transform.mountToInstrument(&current, &current.a1, &current.a2);
     current.pierSide = PIER_SIDE_NONE;

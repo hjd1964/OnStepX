@@ -148,7 +148,7 @@ void Transform::topocentricToObservedPlace(Coordinate *coord) {
   } else coord->a += trueRefrac(coord->a);
 }
 
-Coordinate Transform::instrumentToMount(double a1, double a2) {
+Coordinate Transform::instrumentToMount(double a1, double a2, PierSide lastPierSide, double poleTolerance) {
   Coordinate mount = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_NONE};
 
   #if AXIS2_TANGENT_ARM_CORRECTION == ON
@@ -156,13 +156,23 @@ Coordinate Transform::instrumentToMount(double a1, double a2) {
   #endif
 
   if (site.location.latitude >= 0.0 || mountType == ALTAZM) {
-    if (a2 > Deg90) {
+    bool west = a2 > Deg90;
+    if (fabs(a2 - (double)Deg90) <= poleTolerance && (lastPierSide == PIER_SIDE_EAST || lastPierSide == PIER_SIDE_WEST)) {
+      a2 = (double)Deg90;
+      west = lastPierSide == PIER_SIDE_WEST;
+    }
+    if (west) {
       mount.pierSide = PIER_SIDE_WEST;
       a1 -= Deg180;
       a2  = Deg180 - a2;
     } else mount.pierSide = PIER_SIDE_EAST;
   } else {
-    if (a2 < -Deg90) {
+    bool west = a2 < -Deg90;
+    if (fabs(a2 + (double)Deg90) <= poleTolerance && (lastPierSide == PIER_SIDE_EAST || lastPierSide == PIER_SIDE_WEST)) {
+      a2 = -(double)Deg90;
+      west = lastPierSide == PIER_SIDE_WEST;
+    }
+    if (west) {
       mount.pierSide = PIER_SIDE_WEST;
       a1 -= Deg180;
       a2  = (-Deg180) - a2;
