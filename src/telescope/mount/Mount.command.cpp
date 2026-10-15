@@ -225,7 +225,11 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
               bool flushOk = !nv().active().hasCommit() || nv().active().commit() == NvDevice::IoStatus::Ok;
               const uint32_t startMs = millis();
               const uint32_t timeoutMs = 5000;
-              while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
+              // The lower-priority NV service cannot run when this command yields.
+              while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) {
+                nv().poll();
+                tasks.yield(1);
+              }
               if (flushOk && nv().active().commitDone()) {
                 VLF("MSG: Mount, resetting OnStep...");
                 tasks.yield(1000);

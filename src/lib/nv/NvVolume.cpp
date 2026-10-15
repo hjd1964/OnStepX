@@ -588,8 +588,9 @@ NvVolume::Status NvVolume::invalidateNextMount() {
   Status rb = readBlockSt(*dev_, 0, sb0);
   if (rb != Status::Ok) return status_ = rb;
 
-  // Poison ONLY the stored CRC (bytes 14..15). No need to touch protected payload.
-  sb0[14] ^= 0x01u;
+  // Always derive an invalid CRC from the payload so repeated requests cannot
+  // restore a valid superblock. Leave the protected payload unchanged.
+  wrle16(&sb0[14], (uint16_t)(crc16_sb(sb0, 14) ^ 0x0001u));
 
   Status wb = writeBlockSt(*dev_, 0, sb0);
   if (wb != Status::Ok) return status_ = wb;

@@ -144,7 +144,12 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
         bool flushOk = !nv().active().hasCommit() || nv().active().commit() == NvDevice::IoStatus::Ok;
         const uint32_t startMs = millis();
         const uint32_t timeoutMs = 30000;
-        while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) { tasks.yield(1); }
+        // The priority-7 NV service cannot run while this priority-5 command
+        // yields. Service it explicitly so cached writes can finish.
+        while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) {
+          nv().poll();
+          tasks.yield(1);
+        }
         if (flushOk && nv().active().commitDone()) {
           VLF("MSG: Mount, resetting OnStep...");
           tasks.yield(1000);
@@ -158,10 +163,24 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
       *numericReply = false;
     } else
 
-    // :ENVRESET# Wipe flash
+    // :ENVRESET# Reset NV memory to defaults on the next boot
     if (command[1] == 'N' && parameter[0] == 'V' && parameter[1] == 'R' && parameter[2] == 'E' && parameter[3] == 'S' && parameter[4] == 'E' && parameter[5] == 'T' && parameter[6] == 0) {
-      nv().volume().invalidateNextMount();
-      strcpy(reply, "NV memory will be cleared on the next boot.");
+      bool flushOk = nv().volume().invalidateNextMount() == NvVolume::Status::Ok;
+      if (flushOk && nv().active().hasCommit()) flushOk = nv().active().commit() == NvDevice::IoStatus::Ok;
+      const uint32_t startMs = millis();
+      const uint32_t timeoutMs = 30000;
+      // Service NV here: yielding from a command cannot run its lower-priority task.
+      while (flushOk && !nv().active().commitDone() && (uint32_t)(millis() - startMs) < timeoutMs) {
+        nv().poll();
+        tasks.yield(1);
+      }
+      if (flushOk && nv().active().commitDone()) {
+        strcpy(reply, "NV memory will be cleared on the next boot.");
+      } else {
+        DLF("WRN: Mount, NV reset write failed or timed out");
+        *commandError = CE_0;
+        strcpy(reply, "NV reset failed; retry before rebooting.");
+      }
       *numericReply = false;
     } else
 
