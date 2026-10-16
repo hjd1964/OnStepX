@@ -102,6 +102,14 @@ CommandError Limits::setInstrumentCoordinate(uint8_t axisNumber, double value, b
 
 // target coordinate check ahead of sync, goto, etc.
 CommandError Limits::validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto) {
+  if (!hasSoftwareLimits()) {
+    *eastReachable = true;
+    *westReachable = true;
+    *eastCorrection = 0.0;
+    *westCorrection = 0.0;
+    return CE_NONE;
+  }
+
   if (flt(coords->a, settings.altitude.min)) return CE_SLEW_ERR_BELOW_HORIZON;
   if (fgt(coords->a, settings.altitude.max)) return CE_SLEW_ERR_ABOVE_OVERHEAD;
 
