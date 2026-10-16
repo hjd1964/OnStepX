@@ -199,7 +199,7 @@ small staged search procedure implemented at the axis level.
 
 ## Workflow 3: Reset At Home
 
-This is the coordinate-basis rebuild step.
+This resets mount operating state and, when permitted, rebuilds the coordinate basis.
 
 ## It happens through
 
@@ -214,8 +214,8 @@ This is the coordinate-basis rebuild step.
 - tracking-rate offsets are cleared
 - goto first-use state is reset
 - motor positions are reset to zero where appropriate
-- home instrument coordinates are written back
-- nominal index positions are captured
+- home instrument coordinates are written back when coordinates are reset
+- nominal index positions are captured when a new reference is established
 - backlash and slow slew defaults are restored
 
 ## If the reset is authoritative
@@ -243,8 +243,8 @@ This is one of the key distinctions.
 
 ## Non-authoritative reset means
 
-- coordinates are being reassigned to home, but the software is not treating
-  that as proof of truth
+- it does not establish startup trust; coordinates are reassigned only when
+  the coordinate-reset rules allow it
 
 ## This distinction matters because
 
@@ -262,14 +262,20 @@ Homing is one of the main bridges between untrusted and trusted state.
 - authoritative reset grants trust
 - non-authoritative reset does not
 
-## There is also one permissive carveout
+## Sync limits during reset
 
-- in `SA_AUTO` on simple mounts with no absolute encoders and no coordinate
-  memory, home/reset is allowed to bypass the sync-limit style coordinate jump
-  restriction
+When either mount-axis motor has an absolute encoder, subsequent home resets
+preserve motor counters and instrument coordinates, including when sync limits
+are enabled. Trusted absolute positions supplied by SWS receive the same protection.
+The startup reset explicitly initializes the home mapping needed by absolute
+servos before they initialize their counters from encoder readings. Authoritative
+resets can still capture nominal indexes and establish trust.
 
-That keeps older/simple mounts practical without weakening the stricter cases
-globally.
+Without absolute position sources and with sync limits active, an ordinary reset adjusts the instrument coordinates to
+home only within those limits, retaining motor positions and the nominal
+sync-limit reference. Both axes are checked before either coordinate is changed.
+Return-to-home still moves to the configured home position. Successful sensed
+homing or explicit coordinate origin setup can establish a new reference.
 
 ## Auto Home At Boot
 

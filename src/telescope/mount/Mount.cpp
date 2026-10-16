@@ -99,7 +99,7 @@ void Mount::begin() {
   // checks only in that case.
   const bool absoluteAxisAuthority = axis1.motor->hasAbsoluteEncoder() && axis2.motor->hasAbsoluteEncoder();
   const bool authoritativeReset = absoluteAxisAuthority && startupAuthority.absoluteCoordinateOriginsEstablished();
-  CommandError startupResetError = home.reset(true, authoritativeReset);
+  CommandError startupResetError = home.reset(true, authoritativeReset, true);
   #ifdef HAS_ABSOLUTE_ENCODER_SERVO
     if (!absoluteAxisAuthority) {
       DLF("WRN: Mount, absolute encoder startup authority unavailable; paired absolute encoders not detected");

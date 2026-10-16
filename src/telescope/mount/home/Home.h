@@ -46,8 +46,8 @@ class Home {
     // once homed mark as done
     void requestDone();
 
-    // reset mount at home
-    CommandError reset(bool fullReset = true, bool authoritative = false);
+    // reset mount at home; initializeCoordinates is reserved for startup origin initialization
+    CommandError reset(bool fullReset = true, bool authoritative = false, bool initializeCoordinates = false);
 
     // get the home position (Mount coordinate system)
     Coordinate getPosition(CoordReturn coordReturn = CR_MOUNT_EQU);

@@ -240,7 +240,7 @@ void Home::requestDone() {
 }
 
 // reset mount at home
-CommandError Home::reset(bool fullReset, bool authoritative) {
+CommandError Home::reset(bool fullReset, bool authoritative, bool initializeCoordinates) {
   #if GOTO_FEATURE == ON
     if (goTo.state != GS_NONE) {
       axis1.autoSlewAbort();
@@ -266,8 +266,15 @@ CommandError Home::reset(bool fullReset, bool authoritative) {
   tasks.yieldMicros(10000);
 
   Coordinate homePosition = getPosition(CR_MOUNT);
+  bool syncCoordinates = false;
+  #if AXIS1_WRAP == OFF && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+    syncCoordinates = !mount.hasAbsoluteEncoders() && !authoritative && limits.isEnabled() && limits.hasSoftwareLimits() &&
+                      limits.hasSyncAxisLimits();
+  #endif
+  // Absolute servos still need the initial home mapping to initialize from their encoders.
+  const bool resetCoordinates = (!mount.hasAbsoluteEncoders() || initializeCoordinates) && !syncCoordinates;
 
-  if (!mount.hasAbsoluteEncoders()) {
+  if (resetCoordinates || syncCoordinates) {
     #if MOUNT_HOME_AT_OFFSETS == OFF
       if (useOffset() && state == HS_HOMING && !fullReset) {
         homePosition.a1 += arcsecToRad(site.locationEx.latitude.sign*settings.axis1.senseOffset);
@@ -275,30 +282,29 @@ CommandError Home::reset(bool fullReset, bool authoritative) {
       }
     #endif
 
-    bool bypassCoordinateLimit = authoritative;
-    #if MOUNT_STARTUP_MODE == SA_AUTO && MOUNT_COORDS_MEMORY == OFF
-      if (!bypassCoordinateLimit) {
-        bypassCoordinateLimit = true;
+    CommandError e = CE_NONE;
+    if (syncCoordinates) {
+      // Adjust the home mapping like Sync, retaining counters and nominal indexes.
+      e = limits.validateInstrumentCoordinate(1, homePosition.a1);
+      if (e == CE_NONE) e = limits.validateInstrumentCoordinate(2, homePosition.a2);
+      if (e != CE_NONE) {
+        DLF("WRN: Home::reset(), coordinate adjustment rejected by sync threshold");
+        if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
+        return e;
       }
-    #endif
-
-    CommandError e = limits.validateInstrumentCoordinate(1, homePosition.a1, bypassCoordinateLimit);
-    if (e == CE_NONE) e = limits.validateInstrumentCoordinate(2, homePosition.a2, bypassCoordinateLimit);
-    if (e != CE_NONE) {
-      DLF("WRN: Home::reset(), coordinate reset rejected by sync threshold");
-      if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
-      return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
 
-    if (axis1.resetPosition(0.0L) != 0) {
-      DLF("WRN: Home::reset(), failed to resetPosition Axis1");
-      if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
-      return CE_SLEW_IN_MOTION;
-    }
-    if (axis2.resetPosition(0.0L) != 0) {
-      DLF("WRN: Home::reset(), failed to resetPosition Axis2");
-      if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
-      return CE_SLEW_IN_MOTION;
+    if (resetCoordinates) {
+      if (axis1.resetPosition(0.0L) != 0) {
+        DLF("WRN: Home::reset(), failed to resetPosition Axis1");
+        if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
+        return CE_SLEW_IN_MOTION;
+      }
+      if (axis2.resetPosition(0.0L) != 0) {
+        DLF("WRN: Home::reset(), failed to resetPosition Axis2");
+        if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
+        return CE_SLEW_IN_MOTION;
+      }
     }
 
     e = limits.setInstrumentCoordinate(1, homePosition.a1, true);
@@ -307,9 +313,10 @@ CommandError Home::reset(bool fullReset, bool authoritative) {
       if (fullReset) mount.enable(MOUNT_ENABLE_IN_STANDBY == ON);
       return e;
     }
+    if (syncCoordinates) mount.syncFromOnStepToEncoders = true;
   }
 
-  mount.captureNominalIndexPositions();
+  if (resetCoordinates || authoritative) mount.captureNominalIndexPositions();
 
   axis1.setBacklash(mount.settings.backlash.axis1);
   axis2.setBacklash(mount.settings.backlash.axis2);
