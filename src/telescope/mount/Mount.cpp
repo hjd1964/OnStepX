@@ -603,6 +603,12 @@ float Mount::ztr(float a) {
 
 // update where we are pointing *now*
 void Mount::updatePosition(CoordReturn coordReturn) {
+  #if AXIS2_TANGENT_ARM_CORRECTION == ON
+    const double poleTolerance = 0.0;
+  #else
+    // A rounded pole target must not change orientation while the other axis is moving.
+    const double poleTolerance = 0.5/axis2.getStepsPerMeasure();
+  #endif
   current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate(), current.pierSide, poleTolerance);
   if (isHome()) {
     transform.mountToInstrument(&current, &current.a1, &current.a2);
