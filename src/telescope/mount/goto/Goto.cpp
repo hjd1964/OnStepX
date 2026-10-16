@@ -598,7 +598,7 @@ void Goto::poll() {
   }
 
   // adjust rates near the horizon to help avoid exceeding the minimum altitude limit
-  if (transform.isEquatorial() && MOUNT_HORIZON_AVOIDANCE == ON) {
+  if (limits.hasSoftwareLimits() && transform.isEquatorial() && MOUNT_HORIZON_AVOIDANCE == ON) {
     if (site.locationEx.latitude.absval > degToRad(10.0)) {
       static float last_a2 = 0;
       Coordinate coords = mount.getMountPosition(CR_MOUNT_ALT);
