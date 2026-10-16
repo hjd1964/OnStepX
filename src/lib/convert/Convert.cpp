@@ -274,12 +274,15 @@ bool Convert::atoi2(char *a, uint8_t *u, bool sign) {
               
 bool Convert::atof2(char *a, double *d, bool sign) {
   int16_t dc = 0;
+  bool hasDigit = false;
   int16_t len = strlen(a);
   for (int l = 0; l < len; l++) {
     if (l == 0 && (a[l] == '+' || a[l] == '-') && sign) continue;
     if (a[l] == '.') { if (dc == 0) { dc++; continue; } else return false; }
     if (a[l] < '0' || a[l] > '9') return false;
+    hasDigit = true;
   }
+  if (!hasDigit) return false;
   *d = atof(a);
   return true;
 }
