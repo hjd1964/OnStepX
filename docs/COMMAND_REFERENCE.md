@@ -434,7 +434,13 @@ see [GOTO_NOTES.md](GOTO_NOTES.md#workflow-4-reachability-and-target-unwinding).
 | `:GXEB#` | `n#` | Axis1 maximum limit in hours |
 | `:GXEC#` | `n#` | Axis2 minimum limit in degrees |
 | `:GXED#` | `n#` | Axis2 maximum limit in degrees |
-| `:ShsDD#` | `0/1` | Set lower altitude limit |
+| `:GXEH#` | `n.nnnnnn#` | Maximum absolute declination for sync/align in degrees; 90 means unlimited |
+| `:GXEI#` | `n.nnnnnn#` | Axis1 sync limit in degrees; 0 means OFF |
+| `:GXEJ#` | `n.nnnnnn#` | Axis2 sync limit in degrees; 0 means OFF |
+| `:SXEH,n#` | `0/1` | Set maximum absolute declination for sync/align: 60–90 degrees; 90 means unlimited |
+| `:SXEI,n#` | `0/1` | Set axis1 sync limit: 0–30 degrees; 0 means OFF |
+| `:SXEJ,n#` | `0/1` | Set axis2 sync limit: 0–30 degrees; 0 means OFF |
+| `:ShsDD#` | `0/1` | Set lower horizon altitude limit |
 | `:SoDD#` | `0/1` | Set overhead altitude limit |
 | `:SXE9,n#` | `0/1` | Set east meridian limit in minutes |
 | `:SXEA,n#` | `0/1` | Set west meridian limit in minutes |
