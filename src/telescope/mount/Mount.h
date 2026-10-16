@@ -126,6 +126,9 @@ class Mount {
 
   private:
     bool swsAbsoluteEncodersPresent = false;
+    // calculate tracking and transformed pulse-guide rates in sidereal units
+    void calculateTrackingRates();
+
     // alternate tracking rate calculation method
     float ztr(float a);
 
