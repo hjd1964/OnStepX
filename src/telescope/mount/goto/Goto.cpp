@@ -62,9 +62,8 @@ void Goto::init() {
   axis1.setFrequencyMax(((1000000.0F/usPerStepBase)/axis1.getStepsPerMeasure())*2.0F);
   axis2.setFrequencyMax(((1000000.0F/usPerStepBase)/axis2.getStepsPerMeasure())*2.0F);
 
-  absoluteEncodersPresent = axis1.motor->hasAbsoluteEncoder() || axis2.motor->hasAbsoluteEncoder();
   if (AXIS1_HOME_TOLERANCE != 0.0F || AXIS2_HOME_TOLERANCE != 0.0F ||
-      AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || absoluteEncodersPresent) encodersPresent = true;
+      AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || mount.hasAbsoluteEncoders()) encodersPresent = true;
 
   updateAccelerationRates();
 }

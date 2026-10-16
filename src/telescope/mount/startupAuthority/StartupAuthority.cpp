@@ -84,7 +84,7 @@ bool StartupAuthority::required() const {
   #if MOUNT_COORDS_MEMORY == ON
     return true;
   #else
-    return goTo.absoluteEncodersPresent || axis1.motor->hasAbsoluteEncoder() || axis2.motor->hasAbsoluteEncoder();
+    return mount.hasAbsoluteEncoders();
   #endif
 }
 

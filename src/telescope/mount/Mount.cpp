@@ -145,7 +145,7 @@ void Mount::begin() {
     nvKeyLastA = nv().kv().computeKey("MOUNT_LAST_POS_A");
     nvKeyLastB = nv().kv().computeKey("MOUNT_LAST_POS_B");
 
-    if (!goTo.absoluteEncodersPresent && park.state != PS_PARKED) {
+    if (!hasAbsoluteEncoders() && park.state != PS_PARKED) {
 
       MountPositionMemory a{}, b{};
       KvPartition::Status statusA = nv().kv().get(nvKeyLastA, a);
@@ -225,6 +225,12 @@ void Mount::begin() {
   autostart();
 }
 
+bool Mount::hasAbsoluteEncoders() const {
+  return swsAbsoluteEncodersPresent ||
+         (axis1.motor != nullptr && axis1.motor->hasAbsoluteEncoder()) ||
+         (axis2.motor != nullptr && axis2.motor->hasAbsoluteEncoder());
+}
+
 void Mount::captureNominalIndexPositions() {
   nominalIndexAxis1Steps = axis1.getIndexPositionSteps();
   nominalIndexAxis2Steps = axis2.getIndexPositionSteps();
@@ -240,7 +246,7 @@ long Mount::getNominalIndexPositionSteps(uint8_t axisNumber) const {
 
 #if MOUNT_COORDS_MEMORY == ON
 void Mount::saveCoordinateMemory(bool trusted) {
-  if (goTo.absoluteEncodersPresent) return;
+  if (hasAbsoluteEncoders()) return;
   if (!startupAuthority.trustEstablished()) return;
   if (nv().device().endurance() != NvDevice::Endurance::High) return;
 

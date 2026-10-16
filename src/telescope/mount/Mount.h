@@ -71,6 +71,9 @@ class Mount {
     // returns true if either of the mount motor drivers report a fault
     inline bool motorFault() { return axis1.motorFault() || axis2.motorFault(); }
 
+    // true when either motor has an absolute encoder or SWS supplied trusted absolute positions
+    bool hasAbsoluteEncoders() const;
+
     // returns true if the mount is at the home (startup) position
     inline bool isHome() {
       return abs(axis1.getInstrumentCoordinate() - home.getPosition(CR_MOUNT).a1) <= arcsecToRad(AXIS1_HOME_TOLERANCE) &&
@@ -122,6 +125,7 @@ class Mount {
     MountSettings settings = {RC_DEFAULT, { 0, 0 }, MOUNT_SUBTYPE};
 
   private:
+    bool swsAbsoluteEncodersPresent = false;
     // alternate tracking rate calculation method
     float ztr(float a);
 

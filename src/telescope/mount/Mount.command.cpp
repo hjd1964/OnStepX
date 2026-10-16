@@ -243,7 +243,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
         #endif
 
         #if MOUNT_COORDS_MEMORY == ON
-          if (!handled && !goTo.absoluteEncodersPresent) {
+          if (!handled && !hasAbsoluteEncoders()) {
             CommandError e = home.reset(true, true);
             if (e != CE_NONE) { *commandError = e; return true; }
 
@@ -346,7 +346,7 @@ bool Mount::command(char *reply, char *command, char *parameter, bool *suppressF
             if (absoluteAuthority) {
               captureNominalIndexPositions();
               startupAuthority.setTrusted(true);
-              goTo.absoluteEncodersPresent = true;
+              swsAbsoluteEncodersPresent = true;
               goTo.encodersPresent = true;
               VLF("MSG: Mount, sync from trusted paired absolute SWS encoders");
             }
