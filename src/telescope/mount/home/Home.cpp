@@ -158,7 +158,6 @@ CommandError Home::requestWithReset() {
 void Home::requestAborted() {
   state = HS_NONE;
   failed = true;
-  mount.tracking(wasTracking);
 }
 
 // after finding home switches displace the mount axes as specified

@@ -164,7 +164,6 @@ void Park::requestAborted() {
   axis1.setBacklash(mount.settings.backlash.axis1);
   axis2.setBacklash(mount.settings.backlash.axis2);
   
-  mount.tracking(wasTracking);
 }
 
 // once parked save the park state
