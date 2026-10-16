@@ -101,8 +101,14 @@ class Limits {
     // enable or disable limit enforcement
     inline void enabled(bool state) { limitsEnabled = state; }
 
-    // check if limits are being enforced
+    // check if limits are enabled
     inline bool isEnabled() { return limitsEnabled; }
+
+    // check if the limits state permits motion
+    inline bool isMotionAllowed() { return limitsEnabled || !hasSoftwareLimits(); }
+
+    // software limits apply to normal mounts; physical limit switches always apply
+    inline bool hasSoftwareLimits() { return true; }
 
     // disable meridian limits for the specified period in seconds
     void limitsDisablePeriod(float seconds) { limitsDisablePeriodDs = lroundf(seconds*10.0F); }

@@ -23,7 +23,7 @@
 inline void guideWrapper() { guide.poll(); }
 
 void Guide::finalizeTimeLimit(unsigned long &guideTimeLimit) {
-  if (!limits.isEnabled()) guideTimeLimit = GUIDE_TIME_NO_LIMITS*1000UL;
+  if (!limits.isMotionAllowed()) guideTimeLimit = GUIDE_TIME_NO_LIMITS*1000UL;
   if (guideTimeLimit == 0) guideTimeLimit = 0x1FFFFFFF; // unlimited 0 means the maximum period, about 49 days
 }
 
@@ -47,7 +47,7 @@ void Guide::init() {
 CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE) return CE_NONE;
   if (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) return CE_NONE;
-  if (pulseGuide && !limits.isEnabled()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (pulseGuide && !limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
   CommandError e = validate(1, guideAction);
   if (e != CE_NONE) return e;
@@ -63,7 +63,7 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     axis2.setPowerDownOverrideTime(300000UL);
   }
 
-  if (limits.isEnabled() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
+  if (limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
     backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
@@ -105,7 +105,7 @@ void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
 CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE) return CE_NONE;
   if (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) return CE_NONE;
-  if (pulseGuide && !limits.isEnabled()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (pulseGuide && !limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
 
   CommandError e = validate(2, guideAction); // if successful always sets pierSide
   if (e != CE_NONE) return e;
@@ -123,7 +123,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     axis2.setPowerDownOverrideTime(300000UL);
   }
 
-  if (limits.isEnabled() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
+  if (limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
     state = GU_PULSE_GUIDE;
     backlashEnableControl(false);
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
@@ -166,7 +166,7 @@ void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
 CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideTimeLimit) {
   if (state == GU_SPIRAL_GUIDE) { stop(); return CE_NONE; }
   if (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) return CE_SLEW_IN_MOTION;
-  if (!limits.isEnabled()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (!limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   CommandError e = validate(0, GA_SPIRAL); if (e != CE_NONE) return e;
 
   backlashEnableControl(true);
@@ -275,7 +275,7 @@ float Guide::rateSelectToRate(GuideRateSelect rateSelect, uint8_t axis) {
 bool Guide::validAxis1(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT_ALT);
 
-  if (!limits.isEnabled()) return true;
+  if (!limits.isEnabled() || !limits.hasSoftwareLimits()) return true;
 
   #if AXIS1_SECTOR_GEAR == ON
     location.a1 = axis1.getMotorPosition();
@@ -306,7 +306,7 @@ bool Guide::validAxis2(GuideAction guideAction) {
   Coordinate location = mount.getMountPosition(CR_MOUNT_ALT);
   pierSide = location.pierSide;
 
-  if (!limits.isEnabled()) return true;
+  if (!limits.isEnabled() || !limits.hasSoftwareLimits()) return true;
 
   #if AXIS2_TANGENT_ARM == ON
     location.a2 = axis2.getMotorPosition();

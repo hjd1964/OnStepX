@@ -40,7 +40,7 @@ CommandError Limits::validateTarget(Coordinate *coords, bool isGoto) {
 
 CommandError Limits::validateInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass) {
   if (bypass) return CE_NONE;
-  if (!limitsEnabled) return CE_NONE;
+  if (!limitsEnabled || !hasSoftwareLimits()) return CE_NONE;
 
   #if AXIS1_WRAP == ON
     return CE_NONE;
@@ -315,13 +315,13 @@ void Limits::poll() {
   Coordinate current = mount.getMountPosition(CR_MOUNT_ALT);
 
   #if TRACK_AUTOSTART == OFF && TRACK_WITHOUT_LIMITS == OFF
-    if (!limitsEnabled && mount.isTracking()) {
+    if (!isMotionAllowed() && mount.isTracking()) {
       VLF("MSG: Mount, tracking without limits disallowed");
       mount.tracking(false);
     }
   #endif
 
-  if (limitsEnabled && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
+  if (limitsEnabled && hasSoftwareLimits() && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
     // overhead and horizon limits
     if (current.a < settings.altitude.min && limitsDisablePeriodDs == 0) error.altitude.min = true; else error.altitude.min = false;
 
