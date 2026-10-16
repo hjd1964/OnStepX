@@ -76,6 +76,7 @@ class Limits {
     CommandError validateTarget(Coordinate *coords, bool isGoto);
     CommandError validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto);
 
+    // validate sync/align declination in radians against the pole limit
     CommandError validateSyncPole(double declination);
 
     // validate and apply an instrument coordinate change for a mount axis
