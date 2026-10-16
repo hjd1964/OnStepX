@@ -558,16 +558,14 @@
   #error "Configuration (Config.h): Setting PIER_SIDE_SYNC_CHANGE_SIDES unknown, use OFF or ON."
 #endif
 
-static_assert(AXIS1_LIMIT_SYNC == OFF || (AXIS1_LIMIT_SYNC >= 0 && AXIS1_LIMIT_SYNC <= 90),
-  "Configuration (Config.h): Setting AXIS1_LIMIT_SYNC unknown, use OFF or value in the range 0 to 90.");
+static_assert(SYNC_POLE_LIMIT == OFF || (SYNC_POLE_LIMIT >= 60 && SYNC_POLE_LIMIT <= 90),
+  "Configuration (Config.h): Setting SYNC_POLE_LIMIT unknown, use OFF or value in the range 60 to 90.");
 
-static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_SYNC <= 90),
-  "Configuration (Config.h): Setting AXIS2_LIMIT_SYNC unknown, use OFF or value in the range 0 to 90.");
+static_assert(AXIS1_LIMIT_SYNC == OFF || (AXIS1_LIMIT_SYNC >= 0 && AXIS1_LIMIT_SYNC <= 30),
+  "Configuration (Config.h): Setting AXIS1_LIMIT_SYNC unknown, use OFF or value in the range 0 to 30.");
 
-#if PIER_SIDE_SYNC_CHANGE_SIDES == ON
-  static_assert(AXIS1_LIMIT_SYNC == OFF && AXIS2_LIMIT_SYNC == OFF,
-    "Configuration (Config.h): Enabling AXIS1_LIMIT_SYNC or AXIS2_LIMIT_SYNC requires PIER_SIDE_SYNC_CHANGE_SIDES to be OFF.");
-#endif
+static_assert(AXIS2_LIMIT_SYNC == OFF || (AXIS2_LIMIT_SYNC >= 0 && AXIS2_LIMIT_SYNC <= 30),
+  "Configuration (Config.h): Setting AXIS2_LIMIT_SYNC unknown, use OFF or value in the range 0 to 30.");
 
 #if PIER_SIDE_PREFERRED_DEFAULT < PIER_SIDE_FIRST && PIER_SIDE_PREFERRED_DEFAULT > PIER_SIDE_LAST
   #error "Configuration (Config.h): Setting PIER_SIDE_PREFERRED_DEFAULT unknown, use EAST or WEST or BEST or AUTOMATIC."

@@ -211,12 +211,15 @@ CommandError Goto::requestSync(Coordinate coords, PierSideSelect pierSideSelect,
     return CE_SLEW_ERR_UNSPECIFIED;
   }
   
+  CommandError e = limits.validateSyncPole(coords.d);
+  if (e != CE_NONE) return e;
+
   if (native) {
     coords.pierSide = PIER_SIDE_NONE;
     transform.nativeToMount(&coords);
   }
 
-  CommandError e = setTarget(&coords, pierSideSelect, false);
+  e = setTarget(&coords, pierSideSelect, false);
   if (e != CE_NONE) return e;
   
   if (mount.isHome()) mount.tracking(true);
@@ -399,7 +402,8 @@ CommandError Goto::validate() {
 CommandError Goto::alignAddStar(bool sync) {
   if (alignState.currentStar > alignState.lastStar) return CE_PARAM_RANGE;
 
-  CommandError e = CE_NONE;
+  CommandError e = limits.validateSyncPole(alignState.currentStar == 1 || sync ? gotoTarget.d : lastAlignTarget.d);
+  if (e != CE_NONE) return e;
 
   // first star, get ready for a new pointing model, init/sync then call gta.addStar 
   if (alignState.currentStar == 1) {

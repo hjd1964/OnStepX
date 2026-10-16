@@ -33,6 +33,12 @@ typedef struct LimitSettings {
   float pastMeridianE; // in radians
   float pastMeridianW; // in radians
 } LimitSettings;
+
+typedef struct SyncLimitSettings {
+  float pole;  // maximum |Dec| in degrees, or OFF; 90 is unlimited
+  float axis1; // degrees, or OFF
+  float axis2; // degrees, or OFF
+} SyncLimitSettings;
 #pragma pack()
 
 typedef struct MerdianError {
@@ -61,11 +67,16 @@ class Limits {
   public:
     void init();
 
+    inline float getSyncPoleLimit() { return syncSettings.pole == OFF ? 90.0F : syncSettings.pole; }
+    inline bool hasSyncAxisLimits() { return syncSettings.axis1 != OFF || syncSettings.axis2 != OFF; }
+
     bool command(char *reply, char *command, char *parameter, bool *suppressFrame, bool *numericReply, CommandError *commandError);
 
     // target coordinate check ahead of sync, goto, etc.
     CommandError validateTarget(Coordinate *coords, bool isGoto);
     CommandError validateTarget(Coordinate *coords, bool *eastReachable, bool *westReachable, double *eastCorrection, double *westCorrection, bool isGoto);
+
+    CommandError validateSyncPole(double declination);
 
     // validate and apply an instrument coordinate change for a mount axis
     CommandError validateInstrumentCoordinate(uint8_t axisNumber, double value, bool bypass = false);
@@ -130,6 +141,8 @@ class Limits {
     int limitsDisablePeriodDs = 0; // in deciseconds (0.1s)
 
     uint32_t nvKey;
+    SyncLimitSettings syncSettings = {SYNC_POLE_LIMIT, AXIS1_LIMIT_SYNC, AXIS2_LIMIT_SYNC};
+    uint32_t syncNvKey;
 };
 
 extern Limits limits;

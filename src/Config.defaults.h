@@ -251,7 +251,7 @@
 #define AXIS1_LIMIT_MAX               180                         // in degrees
 #endif
 #ifndef AXIS1_LIMIT_SYNC
-#define AXIS1_LIMIT_SYNC              OFF                         // sync limit in degrees, or OFF
+#define AXIS1_LIMIT_SYNC              OFF                         // Default sync limit in degrees (0 to 30), or OFF (NV saved)
 #endif
 #ifndef AXIS1_SENSE_HOME
 #define AXIS1_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from front
@@ -424,7 +424,7 @@
 #define AXIS2_LIMIT_MAX               90                          // in degrees
 #endif
 #ifndef AXIS2_LIMIT_SYNC
-#define AXIS2_LIMIT_SYNC              OFF                         // sync limit in degrees, or OFF
+#define AXIS2_LIMIT_SYNC              OFF                         // Default sync limit in degrees (0 to 30), or OFF (NV saved)
 #endif
 #ifndef AXIS2_SENSE_HOME
 #define AXIS2_SENSE_HOME              OFF                         // HIGH or LOW state when clockwise of home position, seen from above
@@ -927,6 +927,10 @@
 
 #ifndef ALIGN_MODEL_MEMORY
 #define ALIGN_MODEL_MEMORY            OFF                         // restores any pointing model saved in NV at startup
+#endif
+
+#ifndef SYNC_POLE_LIMIT
+#define SYNC_POLE_LIMIT               85                          // Default Eq sync/align maximum |Dec| (60 to 90 degrees); 90 or OFF is unlimited (NV saved)
 #endif
 
 #define HIGH_SPEED_ALIGN

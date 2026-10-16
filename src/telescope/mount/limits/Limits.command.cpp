@@ -43,6 +43,10 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *suppress
         case 'B': sprintf(reply, "%ld",lroundf(radToDegF(axis1.getLimitMax())/15.0F)); break;   // RA west or +Az limit, in hours
         case 'C': sprintf(reply, "%ld",lroundf(radToDegF(axis2.getLimitMin()))); break;         // Dec south or -Alt limit, in degrees
         case 'D': sprintf(reply, "%ld",lroundf(radToDegF(axis2.getLimitMax()))); break;         // Dec north or +Alt limit, in degrees
+        // Sync limits in degrees: H = maximum |Dec| (90 = OFF), I/J = axis1/2 (0 = OFF).
+        case 'H': sprintF(reply, "%0.6f", getSyncPoleLimit()); break;
+        case 'I': sprintF(reply, "%0.6f", syncSettings.axis1 == OFF ? 0.0F : syncSettings.axis1); break;
+        case 'J': sprintF(reply, "%0.6f", syncSettings.axis2 == OFF ? 0.0F : syncSettings.axis2); break;
         default: return false;
       }
     } else return false;
@@ -77,23 +81,53 @@ bool Limits::command(char *reply, char *command, char *parameter, bool *suppress
       } else *commandError = CE_PARAM_FORM;
     } else
 
-    //  :SXE9,[n]#
-    //  :SXEA,[n]#
-    //            Set meridian limit east (9) or west (A) to value [n] in minutes
-    //            Return: 0 on failure or 1 on success
-    if (command[1] == 'X' && parameter[0] == 'E' && parameter[2] == ',') {
-      long l = atol(&parameter[3]); float degs = l/4.0;
+    // :SXE[m],n# Set Other Limit [m]
+    //           Return: 0 on failure
+    //                   1 on success
+    if (command[1] == 'X' && parameter[0] == 'E') {
+      if (parameter[2] != ',') { *commandError = CE_PARAM_FORM; return true; }
+      double degrees;
+      if (!convert.atof2(&parameter[3], &degrees)) { *commandError = CE_PARAM_FORM; return true; }
       switch (parameter[1]) {
-        case '9':
-          if (degs >= -360.0F && degs <= 360.0F) {
-            settings.pastMeridianE = degToRadF(degs);
+        case 'A': // west meridian limit in minutes
+          degrees /= 4.0;
+          if (degrees >= -360.0F && degrees <= 360.0F) {
+            settings.pastMeridianW = degToRadF(degrees);
             nv().kv().put(nvKey, settings);
           } else *commandError = CE_PARAM_RANGE;
         break;
-        case 'A':
-          if (degs >= -360.0F && degs <= 360.0F) {
-            settings.pastMeridianW = degToRadF(degs);
+        case '9': // east meridian limit in minutes
+          degrees /= 4.0;
+          if (degrees >= -360.0F && degrees <= 360.0F) {
+            settings.pastMeridianE = degToRadF(degrees);
             nv().kv().put(nvKey, settings);
+          } else *commandError = CE_PARAM_RANGE;
+        break;
+        case 'H': // maximum |Dec| for Sync/align: [60,90] degrees, 90 = OFF
+          if (degrees >= 60.0 && degrees <= 90.0) {
+            SyncLimitSettings updated = syncSettings;
+            updated.pole = degrees == 90.0 ? OFF : degrees;
+            if (nv().kv().put(syncNvKey, updated) == KvPartition::Status::Ok) {
+              syncSettings = updated;
+            } else *commandError = CE_0;
+          } else *commandError = CE_PARAM_RANGE;
+        break;
+        case 'I': // axis1 sync limit: [0,30] degrees, 0 = OFF
+          if (degrees >= 0.0 && degrees <= 30.0) {
+            SyncLimitSettings updated = syncSettings;
+            updated.axis1 = degrees == 0.0 ? OFF : degrees;
+            if (nv().kv().put(syncNvKey, updated) == KvPartition::Status::Ok) {
+              syncSettings = updated;
+            } else *commandError = CE_0;
+          } else *commandError = CE_PARAM_RANGE;
+        break;
+        case 'J': // axis2 sync limit: [0,30] degrees, 0 = OFF
+          if (degrees >= 0.0 && degrees <= 30.0) {
+            SyncLimitSettings updated = syncSettings;
+            updated.axis2 = degrees == 0.0 ? OFF : degrees;
+            if (nv().kv().put(syncNvKey, updated) == KvPartition::Status::Ok) {
+              syncSettings = updated;
+            } else *commandError = CE_0;
           } else *commandError = CE_PARAM_RANGE;
         break;
         default: return false;
