@@ -124,6 +124,47 @@
 #define ST4_DEC_N_PIN           4                // ST4 DE+ North
 #define ST4_RA_E_PIN            35               // [input only 35] ST4 RA+ East
 
+#elif defined(ARDUINO_UNOWIFIR4)
+
+// Arduino UNO R4 WiFi: the CNC Shield V3 plugs straight on (standard Uno pin numbering).
+// Microstep mode is set with the shield's jumpers, so the driver M0..M3 pins are not connected.
+
+#if SERIAL_A_BAUD_DEFAULT != OFF
+  #define SERIAL_A              Serial           // USB
+#endif
+#if SERIAL_B_BAUD_DEFAULT != OFF
+  #define SERIAL_B              Serial1          // D0 (RX), D1 (TX)
+#endif
+
+#define SHARED_ENABLE_PIN       8                // Hint that the enable pins are shared
+
+// Axis1 RA/Azm step/dir driver (X slot)
+#define AXIS1_ENABLE_PIN        SHARED
+#define AXIS1_M0_PIN            OFF
+#define AXIS1_M1_PIN            OFF
+#define AXIS1_M2_PIN            OFF
+#define AXIS1_M3_PIN            OFF
+#define AXIS1_STEP_PIN          2
+#define AXIS1_DIR_PIN           5
+
+// Axis2 Dec/Alt step/dir driver (Y slot)
+#define AXIS2_ENABLE_PIN        SHARED
+#define AXIS2_M0_PIN            OFF
+#define AXIS2_M1_PIN            OFF
+#define AXIS2_M2_PIN            OFF
+#define AXIS2_M3_PIN            OFF
+#define AXIS2_STEP_PIN          3
+#define AXIS2_DIR_PIN           6
+
+// For focuser1 stepper driver (Z slot)
+#define AXIS4_ENABLE_PIN        SHARED
+#define AXIS4_M0_PIN            OFF
+#define AXIS4_M1_PIN            OFF
+#define AXIS4_M2_PIN            OFF
+#define AXIS4_M3_PIN            OFF
+#define AXIS4_STEP_PIN          4
+#define AXIS4_DIR_PIN           7
+
 #else
 #error "Wrong processor for this configuration!"
 
