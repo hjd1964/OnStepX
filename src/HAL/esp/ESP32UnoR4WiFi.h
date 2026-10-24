@@ -50,7 +50,7 @@
 }
 
 // MCU reset
-#define HAL_RESET() ESP.restart()
+#define HAL_RESET() NVIC_SystemReset()
 
 //---------------------------------------------------------------------------------------------------
 // Misc. includes to support this processor's operation

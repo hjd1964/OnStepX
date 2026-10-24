@@ -43,6 +43,8 @@
       defined(__MK66FX1M0__) || defined(__IMXRT1052__) || \
       defined(__IMXRT1062__)
   #include "HAL_TEENSY_HWTIMER.h"
+#elif defined(ARDUINO_ARCH_RENESAS_UNO)
+  #include "HAL_RENESAS_HWTIMER.h"
 #elif defined(ESP32)
   #if ESP_ARDUINO_VERSION >= 0x30000
     #include "HAL_ESP32_V3_HWTIMER.h"

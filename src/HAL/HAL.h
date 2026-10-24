@@ -46,7 +46,7 @@
 #elif defined(ARDUINO_UNOWIFIR4)
   // Arduino UNO R4 WIFI
   #define MCU_STR "RENESAS RA4M1 (Arduino UNO R4 WIFI)"
-  #include "esp32/ESP32UnoR4WiFi.h"
+  #include "esp/ESP32UnoR4WiFi.h"
 
 #elif defined(ARDUINO_ARCH_SAMD)
   // ARDUINO M0
