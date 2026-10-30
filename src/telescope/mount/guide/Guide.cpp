@@ -46,15 +46,18 @@ void Guide::init() {
 // start guide at a given direction and rate on Axis1
 CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE) return CE_NONE;
-  if (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) return CE_NONE;
-  if (pulseGuide && !limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (!pulseGuide && (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT)) return CE_NONE;
 
-  CommandError e = validate(1, guideAction);
+  CommandError e = validate(1, guideAction, pulseGuide);
   if (e != CE_NONE) return e;
 
-  guideActionAxis1 = guideAction;
   float rate = rateSelectToRate(rateSelect, 1);
+  const bool usePulseGuide = limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM) &&
+                             state < GU_GUIDE && !mount.isSlewing();
 
+  if (!usePulseGuide && state == GU_PULSE_GUIDE) stop();
+
+  guideActionAxis1 = guideAction;
   finalizeTimeLimit(guideTimeLimit);
   guideFinishTimeAxis1 = millis() + guideTimeLimit;
 
@@ -63,13 +66,14 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
     axis2.setPowerDownOverrideTime(300000UL);
   }
 
-  if (limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
+  if (usePulseGuide) {
     backlashEnableControl(false);
     state = GU_PULSE_GUIDE;
     if (guideAction == GA_REVERSE) { VF("MSG: Guide, Axis1 rev @"); rateAxis1 = -rate; } else { VF("MSG: Guide, Axis1 fwd @"); rateAxis1 = rate; }
     V(rate); VL("X");
     mount.update();
   } else {
+    rateAxis1 = 0.0F;
     state = GU_GUIDE;
     backlashEnableControl(true);
     if (rateSelect != GR_CUSTOM) {
@@ -87,34 +91,39 @@ CommandError Guide::startAxis1(GuideAction guideAction, GuideRateSelect rateSele
 void Guide::stopAxis1(GuideAction stopDirection, bool abort) {
   if (state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
 
-  if (guideActionAxis1 > GA_BREAK) {
-    if (stopDirection != GA_BREAK && guideActionAxis1 != stopDirection && guideActionAxis1 != GA_HOME) return;
-    if (rateAxis1 == 0.0F) {
+  if (guideActionAxis1 > GA_BREAK || axis1.isSlewing() || rateAxis1 != 0.0F) {
+    if (stopDirection != GA_BREAK && guideActionAxis1 > GA_BREAK && guideActionAxis1 != stopDirection && guideActionAxis1 != GA_HOME) return;
+    rateAxis1 = 0.0F;
+    // Stop the actual slew even if a pulse left a nonzero correction rate.
+    if (axis1.isSlewing()) {
       guideActionAxis1 = GA_BREAK;
       if (abort) axis1.autoSlewAbort(); else axis1.autoSlewStop();
     } else {
       VLF("MSG: Guide, Axis1 stopped");
       guideActionAxis1 = GA_NONE;
-      rateAxis1 = 0.0F;
-      mount.update();
     }
+    mount.update();
   }
 }
 
 // start guide at a given direction and rate on Axis2
 CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSelect, unsigned long guideTimeLimit, bool pulseGuide) {
   if (guideAction == GA_NONE) return CE_NONE;
-  if (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT) return CE_NONE;
-  if (pulseGuide && !limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (!pulseGuide && (state == GU_HOME_GUIDE || state == GU_HOME_GUIDE_ABORT)) return CE_NONE;
 
-  CommandError e = validate(2, guideAction); // if successful always sets pierSide
+  CommandError e = validate(2, guideAction, pulseGuide); // if successful always sets pierSide
   if (e != CE_NONE) return e;
 
-  guideActionAxis2 = guideAction;
   float rate = rateSelectToRate(rateSelect, 2);
   float fastestRate = rateSelectToRate(GR_MAX, 2)*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F);
   if (rate > fastestRate) rate = fastestRate;
 
+  const bool usePulseGuide = limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM) &&
+                             state < GU_GUIDE && !mount.isSlewing();
+
+  if (!usePulseGuide && state == GU_PULSE_GUIDE) stop();
+
+  guideActionAxis2 = guideAction;
   finalizeTimeLimit(guideTimeLimit);
   guideFinishTimeAxis2 = millis() + guideTimeLimit;
 
@@ -123,7 +132,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     axis2.setPowerDownOverrideTime(300000UL);
   }
 
-  if (limits.isMotionAllowed() && rate <= 2 && (pulseGuide || rateSelect != GR_CUSTOM)) {
+  if (usePulseGuide) {
     state = GU_PULSE_GUIDE;
     backlashEnableControl(false);
     if (pierSide == PIER_SIDE_WEST) { if (guideAction == GA_FORWARD) guideAction = GA_REVERSE; else guideAction = GA_FORWARD; };
@@ -131,6 +140,7 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
     V(rate); VL("X");
     mount.update();
   } else {
+    rateAxis2 = 0.0F;
     state = GU_GUIDE;
     backlashEnableControl(true);
     if (rateSelect != GR_CUSTOM) {
@@ -148,17 +158,18 @@ CommandError Guide::startAxis2(GuideAction guideAction, GuideRateSelect rateSele
 void Guide::stopAxis2(GuideAction stopDirection, bool abort) {
   if (state == GU_HOME_GUIDE && !abort) { this->abort(); return; }
 
-  if (guideActionAxis2 > GA_BREAK) {
-    if (stopDirection != GA_BREAK && guideActionAxis2 != stopDirection && guideActionAxis2 != GA_HOME) return;
-    if (rateAxis2 == 0.0F) {
+  if (guideActionAxis2 > GA_BREAK || axis2.isSlewing() || rateAxis2 != 0.0F) {
+    if (stopDirection != GA_BREAK && guideActionAxis2 > GA_BREAK && guideActionAxis2 != stopDirection && guideActionAxis2 != GA_HOME) return;
+    rateAxis2 = 0.0F;
+    // Stop the actual slew even if a pulse left a nonzero correction rate.
+    if (axis2.isSlewing()) {
       guideActionAxis2 = GA_BREAK;
       if (abort) axis2.autoSlewAbort(); else axis2.autoSlewStop();
     } else {
       VLF("MSG: Guide, Axis2 stopped");
       guideActionAxis2 = GA_NONE;
-      rateAxis2 = 0.0F;
-      mount.update();
     }
+    mount.update();
   }
 }
 
@@ -167,7 +178,9 @@ CommandError Guide::startSpiral(GuideRateSelect rateSelect, unsigned long guideT
   if (state == GU_SPIRAL_GUIDE) { stop(); return CE_NONE; }
   if (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) return CE_SLEW_IN_MOTION;
   if (!limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
-  CommandError e = validate(0, GA_SPIRAL); if (e != CE_NONE) return e;
+
+  CommandError e = validate(0, GA_SPIRAL);
+  if (e != CE_NONE) return e;
 
   backlashEnableControl(true);
 
@@ -196,7 +209,9 @@ CommandError Guide::startHome() {
   #if GOTO_FEATURE == ON
     if (state == GU_HOME_GUIDE) { abort(); return CE_NONE; }
     if (guideActionAxis1 != GA_NONE || guideActionAxis2 != GA_NONE) return CE_SLEW_IN_MOTION;
-    CommandError e = validate(0, GA_HOME); if (e != CE_NONE) return e;
+
+    CommandError e = validate(0, GA_HOME);
+    if (e != CE_NONE) return e;
 
     backlashEnableControl(true);
 
@@ -328,10 +343,13 @@ bool Guide::validAxis2(GuideAction guideAction) {
 }
 
 // general validation of guide request
-CommandError Guide::validate(int axis, GuideAction guideAction) {
-  if (!mount.isEnabled()) {
-    mount.enable(true);
-    if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
+CommandError Guide::validate(int axis, GuideAction guideAction, bool pulseGuide) {
+  if (pulseGuide) {
+    if (state >= GU_GUIDE || mount.isSlewing()) return CE_SLEW_IN_MOTION;
+    #if GOTO_FEATURE == ON
+      if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
+    #endif
+    if (!limits.isMotionAllowed()) return CE_SLEW_ERR_OUTSIDE_LIMITS;
   }
 
   if ((guideAction == GA_SPIRAL || guideAction == GA_HOME) && mount.isSlewing()) return CE_SLEW_IN_MOTION;
@@ -361,6 +379,11 @@ CommandError Guide::validate(int axis, GuideAction guideAction) {
     if (settings.axis2RateSelect < 3) {
       if (limits.isError() || axis2.motionError(DIR_BOTH)) return CE_SLEW_ERR_OUTSIDE_LIMITS;
     }
+  }
+
+  if (!mount.isEnabled()) {
+    mount.enable(true);
+    if (!mount.isEnabled()) return CE_SLEW_ERR_IN_STANDBY;
   }
 
   if (mount.motorFault()) return CE_SLEW_ERR_HARDWARE_FAULT;

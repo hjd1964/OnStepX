@@ -106,7 +106,7 @@ class Guide {
     bool validAxis2(GuideAction guideAction);
 
     // general validation of guide request
-    CommandError validate(int axis, GuideAction guideAction);
+    CommandError validate(int axis, GuideAction guideAction, bool pulseGuide = false);
 
     // start axis1 movement
     void axis1AutoSlew(GuideAction guideAction);
