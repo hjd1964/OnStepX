@@ -331,6 +331,47 @@ void Limits::stopAxis2(GuideAction stopDirection) {
   if (!transform.isEquatorial()) mount.tracking(false);
 }
 
+void Limits::altitudeClearance(Coordinate *position, LimitsClearance *clearance) {
+  clearance->altitudeMin = position->a - settings.altitude.min;
+  if (fabs(settings.altitude.max - Deg90) > OneArcSec) {
+    clearance->altitudeMax = settings.altitude.max - position->a;
+  } else clearance->altitudeMax = CLEARANCE_UNLIMITED;
+}
+
+void Limits::meridianClearance(Coordinate *position, LimitsClearance *clearance) {
+  if (transform.mountType == GEM && position->pierSide == PIER_SIDE_EAST) {
+    clearance->meridianEast = position->h + settings.pastMeridianE;
+  } else clearance->meridianEast = CLEARANCE_UNLIMITED;
+
+  if (transform.mountType == GEM && position->pierSide == PIER_SIDE_WEST) {
+    clearance->meridianWest = settings.pastMeridianW - position->h;
+  } else clearance->meridianWest = CLEARANCE_UNLIMITED;
+}
+
+double Limits::limitAxis1Coordinate(Coordinate *position) {
+  // for Fork and Alt/Azm mounts limits are based on shaft angles
+  // so convert axis1 into normal PIER_SIDE_EAST coordinates
+  if (transform.mountType != GEM && position->pierSide == PIER_SIDE_WEST) return position->a1 + Deg180;
+  return position->a1;
+}
+
+void Limits::axis1Clearance(double a1, LimitsClearance *clearance) {
+  clearance->axis1Min = a1 - axis1.getLimitMin();
+  clearance->axis1Max = axis1.getLimitMax() - a1;
+}
+
+void Limits::axis2Clearance(double a2, LimitsClearance *clearance) {
+  clearance->axis2Min = a2 - axis2.getLimitMin();
+  clearance->axis2Max = axis2.getLimitMax() - a2;
+}
+
+void Limits::positionClearance(Coordinate *position, LimitsClearance *clearance) {
+  altitudeClearance(position, clearance);
+  meridianClearance(position, clearance);
+  axis1Clearance(limitAxis1Coordinate(position), clearance);
+  axis2Clearance(position->a2, clearance);
+}
+
 void Limits::poll() {
   if (limitsDisablePeriodDs > 0) limitsDisablePeriodDs--;
 
@@ -346,46 +387,41 @@ void Limits::poll() {
   #endif
 
   if (limitsEnabled && hasSoftwareLimits() && guide.state != GU_HOME_GUIDE && guide.state != GU_HOME_GUIDE_ABORT) {
-    // overhead and horizon limits
-    if (current.a < settings.altitude.min && limitsDisablePeriodDs == 0) error.altitude.min = true; else error.altitude.min = false;
+    LimitsClearance clearance;
 
-    if (fabs(settings.altitude.max - Deg90) > OneArcSec) {
-      if (current.a > settings.altitude.max && limitsDisablePeriodDs == 0) error.altitude.max = true; else error.altitude.max = false;
-    } else error.altitude.max = false;
+    // overhead and horizon limits
+    altitudeClearance(&current, &clearance);
+    if (clearance.altitudeMin < 0.0 && limitsDisablePeriodDs == 0) error.altitude.min = true; else error.altitude.min = false;
+    if (clearance.altitudeMax < 0.0 && limitsDisablePeriodDs == 0) error.altitude.max = true; else error.altitude.max = false;
 
     // meridian limits
-    if (transform.mountType == GEM && current.pierSide == PIER_SIDE_EAST) {
-      if (current.h < -settings.pastMeridianE && limitsDisablePeriodDs == 0) {
-        stopAxis1(GA_REVERSE);
-        error.meridian.east = true;
-      } else error.meridian.east = false;
+    meridianClearance(&current, &clearance);
+    if (clearance.meridianEast < 0.0 && limitsDisablePeriodDs == 0) {
+      stopAxis1(GA_REVERSE);
+      error.meridian.east = true;
     } else error.meridian.east = false;
 
-    if (transform.mountType == GEM && current.pierSide == PIER_SIDE_WEST) {
-      if (current.h > settings.pastMeridianW && limitsDisablePeriodDs == 0) {
-        #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
-          if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
-            limitsDisablePeriod(1.0F);
-            VLF("MSG: Mount, start automatic meridian flip");
-            Coordinate target = mount.getMountPosition();
-            CommandError e = goTo.request(target, PSS_EAST_ONLY, false);
-            if (e != CE_NONE) {
-              stopAxis1(GA_FORWARD);
-              error.meridian.west = true;
-              DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
-            }
-          } else
-        #endif
-        {
-          stopAxis1(GA_FORWARD);
-          error.meridian.west = true;
-        }
-      } else error.meridian.west = false;
+    if (clearance.meridianWest < 0.0 && limitsDisablePeriodDs == 0) {
+      #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
+        if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
+          limitsDisablePeriod(1.0F);
+          VLF("MSG: Mount, start automatic meridian flip");
+          Coordinate target = mount.getMountPosition();
+          CommandError e = goTo.request(target, PSS_EAST_ONLY, false);
+          if (e != CE_NONE) {
+            stopAxis1(GA_FORWARD);
+            error.meridian.west = true;
+            DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
+          }
+        } else
+      #endif
+      {
+        stopAxis1(GA_FORWARD);
+        error.meridian.west = true;
+      }
     } else error.meridian.west = false;
 
-    // for Fork and Alt/Azm mounts limits are based on shaft angles
-    // so convert axis1 into normal PIER_SIDE_EAST coordinates
-    if (transform.mountType != GEM && current.pierSide == PIER_SIDE_WEST) current.a1 += Deg180;
+    current.a1 = limitAxis1Coordinate(&current);
 
     if (mount.isHome()) current.a1 = home.getPosition(CR_MOUNT).a1;
 
@@ -394,7 +430,8 @@ void Limits::poll() {
     #endif
 
     // min and max limits
-    if (flt(current.a1, axis1.getLimitMin()) && limitsDisablePeriodDs == 0) {
+    axis1Clearance(current.a1, &clearance);
+    if (flt(clearance.axis1Min, 0.0) && limitsDisablePeriodDs == 0) {
       stopAxis1(GA_REVERSE);
       error.limit.axis1.min = true;
       // ---------------------------------------------------------
@@ -407,7 +444,7 @@ void Limits::poll() {
       // ---------------------------------------------------------
     } else error.limit.axis1.min = false;
 
-    if (fgt(current.a1, axis1.getLimitMax()) && limitsDisablePeriodDs == 0) {
+    if (flt(clearance.axis1Max, 0.0) && limitsDisablePeriodDs == 0) {
       #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
           limitsDisablePeriod(1.0F);
@@ -439,12 +476,13 @@ void Limits::poll() {
       current.a2 = axis2.getMotorPosition();
     #endif
 
-    if (flt(current.a2, axis2.getLimitMin())) {
+    axis2Clearance(current.a2, &clearance);
+    if (flt(clearance.axis2Min, 0.0)) {
       stopAxis2(GA_REVERSE);
       error.limit.axis2.min = true;
     } else error.limit.axis2.min = false;
 
-    if (fgt(current.a2, axis2.getLimitMax())) {
+    if (flt(clearance.axis2Max, 0.0)) {
       stopAxis2(GA_FORWARD);
       error.limit.axis2.max = true;
     } else error.limit.axis2.max = false;

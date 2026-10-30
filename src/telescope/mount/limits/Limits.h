@@ -63,6 +63,20 @@ typedef struct LimitsError {
   MerdianError    meridian;
 } LimitsError;
 
+#define CLEARANCE_UNLIMITED 1.0e6
+
+// signed distance (in radians) from each position limit, negative when the limit is exceeded
+typedef struct LimitsClearance {
+  double altitudeMin;
+  double altitudeMax;
+  double meridianEast;
+  double meridianWest;
+  double axis1Min;
+  double axis1Max;
+  double axis2Min;
+  double axis2Max;
+} LimitsClearance;
+
 class Limits {
   public:
     void init();
@@ -124,6 +138,24 @@ class Limits {
 
     // disable meridian limits for the specified period in seconds
     void limitsDisablePeriod(float seconds) { limitsDisablePeriodDs = lroundf(seconds*10.0F); }
+
+    // clearance of a mount position (with altitude) from the horizon and overhead limits
+    void altitudeClearance(Coordinate *position, LimitsClearance *clearance);
+
+    // clearance of a mount position from the meridian limits
+    void meridianClearance(Coordinate *position, LimitsClearance *clearance);
+
+    // axis1 coordinate used for the min/max limits of a mount position
+    double limitAxis1Coordinate(Coordinate *position);
+
+    // clearance of a limit axis1 coordinate from the min/max limits
+    void axis1Clearance(double a1, LimitsClearance *clearance);
+
+    // clearance of a limit axis2 coordinate from the min/max limits
+    void axis2Clearance(double a2, LimitsClearance *clearance);
+
+    // clearance of a mount position (with altitude) from all position limits
+    void positionClearance(Coordinate *position, LimitsClearance *clearance);
 
     void poll();
 
