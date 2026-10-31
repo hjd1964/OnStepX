@@ -22,18 +22,23 @@ static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2
   "Configuration (Config.h): Setting GOTO_AVOID_FLIP_OVERSHOOT unknown, use a value between 0 and 2 (degrees.)");
 
 // clearance a sample may use up before the next sample, as distance moved in radians
-#define PLAN_SLACK           degToRad(0.05)
-#define PLAN_SLACK_MIN       (2.0*OneArcSec)
+#define PLAN_SLACK           ((float)degToRad(0.05))
+#define PLAN_SLACK_MIN       ((float)(2.0*OneArcSec))
+// clearance allowed for single precision rounding, a slew may end exactly at its required clearance
+#define PLAN_ROUNDING        ((float)(2.0*OneArcSec))
 // clearance from the horizon slowdown band where predicted timing stops being used
-#define PLAN_BAND_SWITCH     degToRad(1.0)
+#define PLAN_BAND_SWITCH     ((float)degToRad(1.0))
 // samples allowed for one slew and for a whole plan, bounding planning time, a slew or plan needing more is treated as blocked
 #define PLAN_LEG_SAMPLES_MAX 1000
 #define PLAN_SAMPLES_MAX     5000
 #define PLAN_WORK_UNITS      8
+#define PLAN_ARCSEC          ((float)OneArcSec)
+#define PLAN_STEP            ((float)degToRad(GOTO_AVOID_STEP))
+#define PLAN_REFINE          ((float)degToRad(GOTO_AVOID_REFINE))
 // samples spent trying to clear the region holding a whole slew before its timing is used
 #define PLAN_BOX_TRIAL       1
 // furthest a waypoint is moved from the blocked slew
-#define PLAN_PUSH_MAX        degToRad(360.0)
+#define PLAN_PUSH_MAX        ((float)degToRad(360.0))
 
 void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
   this->start = start;
@@ -41,7 +46,7 @@ void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
   this->search = search;
 
   northern = site.location.latitude >= 0.0;
-  pole = northern ? Deg90 : -Deg90;
+  pole = northern ? PLAN_DEG90 : -PLAN_DEG90;
   tolerance = degToRad(GOTO_AVOID_TOLERANCE);
 
   // mount axis2 folds back at the pole, so a limit there can't be passed
@@ -57,12 +62,15 @@ void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
                 site.locationEx.latitude.absval > degToRad(10.0);
   bandTop = limits.settings.altitude.min + degToRad(SLEW_ACCELERATION_DIST*2.0);
 
+  latitudeSine = site.locationEx.latitude.sine;
+  latitudeCosine = site.locationEx.latitude.cosine;
+
   // instrument coordinates of the zenith for each pier side
-  double a2 = transform.mountType == ALTALT ? 0.0 : site.location.latitude;
-  zenith[0].a1 = 0.0;
+  float a2 = transform.mountType == ALTALT ? 0.0F : site.location.latitude;
+  zenith[0].a1 = 0.0F;
   zenith[0].a2 = a2;
-  zenith[1].a1 = Deg180;
-  zenith[1].a2 = northern ? Deg180 - a2 : (-Deg180) - a2;
+  zenith[1].a1 = PLAN_DEG180;
+  zenith[1].a2 = northern ? PLAN_DEG180 - a2 : (-PLAN_DEG180) - a2;
 
   clearance(start, startClearance);
   clearance(end, endClearance);
@@ -136,9 +144,9 @@ void GotoPlanner::finish(PlanState result) {
 void GotoPlanner::surveyBegin(float time) {
   legBegin(start, end, true);
   surveyTime = time;
-  surveyInterval = (float)(degToRad(GOTO_AVOID_STEP)/4.0/legRate);
-  surveyResolution = (float)(degToRad(GOTO_AVOID_STEP)/10.0/legRate);
-  highestAltitude = -Deg90;
+  surveyInterval = PLAN_STEP/4.0F/legRate;
+  surveyResolution = PLAN_STEP/10.0F/legRate;
+  highestAltitude = -PLAN_DEG90;
   highestTime = time;
   highest = legPosition(time);
   zoneEntry = highest;
@@ -230,9 +238,9 @@ void GotoPlanner::surveyPeakBegin() {
 }
 
 // altitude of the slew at this time and if it is within the tolerance of the overhead limit, keeping the highest point found
-double GotoPlanner::surveySample(float time, bool *inZone) {
+float GotoPlanner::surveySample(float time, bool *inZone) {
   PlanPoint p = legPosition(time);
-  double c[PC_COUNT], altitude;
+  float c[PC_COUNT], altitude;
   clearanceSide(p, isWest(p), c, &altitude);
   counters.samples++;
   if (altitude > highestAltitude) { highestAltitude = altitude; highestTime = time; highest = p; }
@@ -243,13 +251,13 @@ double GotoPlanner::surveySample(float time, bool *inZone) {
 // waypoints are moved in steps away from the nearest image of the zenith, then to either side of the slew,
 // a single waypoint from the highest point first then a pair from where the slew enters and leaves the zone
 void GotoPlanner::pushBegin() {
-  double d1 = zoneExit.a1 - zoneEntry.a1;
-  double d2 = zoneExit.a2 - zoneEntry.a2;
-  double length = sqrt(d1*d1 + d2*d2);
-  if (length < OneArcSec) {
+  float d1 = zoneExit.a1 - zoneEntry.a1;
+  float d2 = zoneExit.a2 - zoneEntry.a2;
+  float length = sqrtf(d1*d1 + d2*d2);
+  if (length < PLAN_ARCSEC) {
     d1 = end.a1 - start.a1;
     d2 = end.a2 - start.a2;
-    length = sqrt(d1*d1 + d2*d2);
+    length = sqrtf(d1*d1 + d2*d2);
   }
   pushDirection[1].a1 = -d2/length;
   pushDirection[1].a2 = d1/length;
@@ -259,24 +267,24 @@ void GotoPlanner::pushBegin() {
   PlanPoint z = nearestZenith(highest);
   d1 = highest.a1 - z.a1;
   d2 = highest.a2 - z.a2;
-  length = sqrt(d1*d1 + d2*d2);
-  if (length < OneArcSec) pushDirection[0] = pushDirection[1]; else {
+  length = sqrtf(d1*d1 + d2*d2);
+  if (length < PLAN_ARCSEC) pushDirection[0] = pushDirection[1]; else {
     pushDirection[0].a1 = d1/length;
     pushDirection[0].a2 = d2/length;
   }
 
   pushIndex = 0;
   pushPair = false;
-  pushDistance = 0.0;
+  pushDistance = 0.0F;
   candidateActive = false;
   phase = PP_PUSH;
 }
 
 void GotoPlanner::pushStep() {
   if (!candidateActive) {
-    pushDistance += degToRad(GOTO_AVOID_STEP);
+    pushDistance += PLAN_STEP;
     if (pushDistance > PLAN_PUSH_MAX || pushBlocked()) {
-      pushDistance = 0.0;
+      pushDistance = 0.0F;
       if (++pushIndex >= 3) {
         if (pushPair) { finish(PLAN_FAILED); return; }
         pushIndex = 0;
@@ -291,7 +299,7 @@ void GotoPlanner::pushStep() {
   PlanLegResult result = candidateStep();
   if (result == PL_RUNNING) return;
   if (result == PL_PASS) {
-    bisectLow = pushDistance - degToRad(GOTO_AVOID_STEP);
+    bisectLow = pushDistance - PLAN_STEP;
     bisectHigh = pushDistance;
     phase = PP_BISECT;
   }
@@ -300,36 +308,36 @@ void GotoPlanner::pushStep() {
 // back toward the blocked slew while the waypoints stay clear
 void GotoPlanner::bisectStep() {
   if (!candidateActive) {
-    if (bisectHigh - bisectLow <= degToRad(GOTO_AVOID_REFINE)) { finish(PLAN_WAYPOINTS); return; }
-    candidateBegin((bisectLow + bisectHigh)/2.0);
+    if (bisectHigh - bisectLow <= PLAN_REFINE) { finish(PLAN_WAYPOINTS); return; }
+    candidateBegin((bisectLow + bisectHigh)/2.0F);
     return;
   }
 
   PlanLegResult result = candidateStep();
   if (result == PL_RUNNING) return;
-  if (result == PL_PASS) bisectHigh = (bisectLow + bisectHigh)/2.0; else bisectLow = (bisectLow + bisectHigh)/2.0;
+  if (result == PL_PASS) bisectHigh = (bisectLow + bisectHigh)/2.0F; else bisectLow = (bisectLow + bisectHigh)/2.0F;
 }
 
 // a waypoint can move past the overhead limit but stops at any other limit
 bool GotoPlanner::pushBlocked() {
   for (uint8_t i = 0; i < (pushPair ? 2 : 1); i++) {
     PlanPoint p = pushPoint(pushPair ? (i == 0 ? zoneEntry : zoneExit) : highest, pushDistance);
-    if (!transform.meridianFlips && fabs(p.a2) > Deg90) return true;
-    double c[PC_COUNT];
+    if (!transform.meridianFlips && fabsf(p.a2) > PLAN_DEG90) return true;
+    float c[PC_COUNT];
     clearance(p, c);
     for (int k = 0; k < PC_COUNT; k++) if (k != PC_ALTITUDE_MAX && c[k] < tolerance) return true;
   }
   return false;
 }
 
-PlanPoint GotoPlanner::pushPoint(PlanPoint from, double distance) {
+PlanPoint GotoPlanner::pushPoint(PlanPoint from, float distance) {
   PlanPoint p;
   p.a1 = from.a1 + pushDirection[pushIndex].a1*distance;
   p.a2 = from.a2 + pushDirection[pushIndex].a2*distance;
   return p;
 }
 
-void GotoPlanner::candidateBegin(double distance) {
+void GotoPlanner::candidateBegin(float distance) {
   candidateCount = pushPair ? 2 : 1;
   if (pushPair) {
     candidate[0] = pushPoint(zoneEntry, distance);
@@ -368,13 +376,13 @@ PlanLegResult GotoPlanner::candidateStep() {
 // nearest image of the zenith in instrument coordinates, for each pier side used and axis1 turn
 PlanPoint GotoPlanner::nearestZenith(PlanPoint p) {
   PlanPoint target = zenith[0];
-  double best = CLEARANCE_UNLIMITED;
+  float best = CLEARANCE_UNLIMITED;
   int sides = transform.meridianFlips ? 2 : 1;
   for (int side = 0; side < sides; side++) {
     for (int turn = -1; turn <= 1; turn++) {
       PlanPoint z = zenith[side];
-      z.a1 += turn*Deg360;
-      double distance = fabs(z.a1 - p.a1) + fabs(z.a2 - p.a2);
+      z.a1 += turn*PLAN_DEG360;
+      float distance = fabsf(z.a1 - p.a1) + fabsf(z.a2 - p.a2);
       if (distance < best) { best = distance; target = z; }
     }
   }
@@ -386,7 +394,7 @@ PlanPoint GotoPlanner::nearestZenith(PlanPoint p) {
 void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
   legFrom = from;
   legTo = to;
-  float distance[2] = { (float)fabs(to.a1 - from.a1), (float)fabs(to.a2 - from.a2) };
+  float distance[2] = { (float)fabsf(to.a1 - from.a1), (float)fabsf(to.a2 - from.a2) };
   for (int i = 0; i < 2; i++) legProfile[i].init(distance[i], model[i].accel, model[i].vLow, model[i].vHigh);
   legDuration = legProfile[0].duration() > legProfile[1].duration() ? legProfile[0].duration() : legProfile[1].duration();
   legRate1 = legProfile[0].rateMax();
@@ -400,21 +408,21 @@ void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
   counters.legs++;
 
   // a limit already exceeded at the start is left to the existing limit recovery behaviour
-  double cFrom[PC_COUNT], cTo[PC_COUNT];
+  float cFrom[PC_COUNT], cTo[PC_COUNT];
   pointClearance(from, cFrom);
   pointClearance(to, cTo);
-  double requiredMin = tolerance;
+  float requiredMin = tolerance;
   for (int k = 0; k < PC_COUNT; k++) {
-    if (cFrom[k] <= 0.0 || (overheadOnly && k != PC_ALTITUDE_MAX)) { legRequired[k] = -CLEARANCE_UNLIMITED; continue; }
-    if (cTo[k] < 0.0) legResult = PL_FAIL;
-    double required = tolerance;
+    if (cFrom[k] <= 0.0F || (overheadOnly && k != PC_ALTITUDE_MAX)) { legRequired[k] = -CLEARANCE_UNLIMITED; continue; }
+    if (cTo[k] < 0.0F) legResult = PL_FAIL;
+    float required = tolerance;
     if (cFrom[k] < required) required = cFrom[k];
-    if (cTo[k] < required) required = cTo[k] > 0.0 ? cTo[k] : 0.0;
+    if (cTo[k] < required) required = cTo[k] > 0.0F ? cTo[k] : 0.0F;
     legRequired[k] = required;
     if (required < requiredMin) requiredMin = required;
   }
 
-  legSlack = requiredMin/2.0;
+  legSlack = requiredMin/2.0F;
   if (legSlack > PLAN_SLACK) legSlack = PLAN_SLACK;
   if (legSlack < PLAN_SLACK_MIN) legSlack = PLAN_SLACK_MIN;
 
@@ -437,15 +445,15 @@ PlanLegResult GotoPlanner::legStep() {
 
   PlanPoint p = legPosition(legTime);
 
-  double altitude;
+  float altitude;
   float step;
-  double distance = spare(p, &altitude, &step);
+  float distance = spare(p, &altitude, &step);
   counters.samples++;
-  if (distance < legSlack || ++legSamples > PLAN_LEG_SAMPLES_MAX) return legResult = PL_FAIL;
+  if (distance < legSlack - PLAN_ROUNDING || ++legSamples > PLAN_LEG_SAMPLES_MAX) return legResult = PL_FAIL;
 
   // horizon slowdown changes the timing, so from here on any path inside the region to the end must be clear
   if (bandEnabled) {
-    double band = altitude - bandTop;
+    float band = altitude - bandTop;
     if (band < PLAN_BAND_SWITCH) {
       boxPush(p, legTo);
       legBox = true;
@@ -465,10 +473,10 @@ PlanLegResult GotoPlanner::boxStep() {
   if (boxCount == 0) return legResult = PL_PASS;
 
   PlanBox b = box[--boxCount];
-  double width1 = b.a1High - b.a1Low;
-  double width2 = b.a2High - b.a2Low;
-  double halfSize = (width1 + width2)/2.0;
-  PlanPoint center = {b.a1Low + width1/2.0, b.a2Low + width2/2.0};
+  float width1 = b.a1High - b.a1Low;
+  float width2 = b.a2High - b.a2Low;
+  float halfSize = (width1 + width2)/2.0F;
+  PlanPoint center = {b.a1Low + width1/2.0F, b.a2Low + width2/2.0F};
 
   counters.samples++;
   if (++legSamples > PLAN_LEG_SAMPLES_MAX) return legResult = PL_FAIL;
@@ -527,12 +535,12 @@ PlanAxisModel GotoPlanner::axisModel(Axis *axis, float rate) {
 // Transform::instrumentToMount() with the pier side given
 Coordinate GotoPlanner::mountCoordinate(PlanPoint p, bool west) {
   Coordinate mount = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, PIER_SIDE_EAST};
-  double a1 = p.a1;
-  double a2 = p.a2;
+  float a1 = p.a1;
+  float a2 = p.a2;
   if (west) {
     mount.pierSide = PIER_SIDE_WEST;
-    a1 -= Deg180;
-    a2 = northern ? Deg180 - a2 : (-Deg180) - a2;
+    a1 -= PLAN_DEG180;
+    a2 = northern ? PLAN_DEG180 - a2 : (-PLAN_DEG180) - a2;
   }
   if (transform.mountType == ALTALT) { mount.aa1 = a1; mount.aa2 = a2; } else { mount.h = a1; mount.d = a2; }
   mount.a1 = a1;
@@ -541,9 +549,15 @@ Coordinate GotoPlanner::mountCoordinate(PlanPoint p, bool west) {
 }
 
 // clearance from each limit as Limits::poll() tests them
-void GotoPlanner::clearanceSide(PlanPoint p, bool west, double *clearance, double *altitude) {
+void GotoPlanner::clearanceSide(PlanPoint p, bool west, float *clearance, float *altitude) {
   Coordinate mount = mountCoordinate(p, west);
-  if (transform.mountType == ALTALT) transform.aaToEqu(&mount); else transform.equToAlt(&mount);
+  // altitude as Transform::aaToHor() and Transform::equToAlt() find it
+  float sinAlt;
+  if (transform.mountType == ALTALT) sinAlt = cosf(mount.aa2)*cosf(mount.aa1); else
+    sinAlt = sinf(mount.d)*latitudeSine + cosf(mount.d)*latitudeCosine*cosf(mount.h);
+  if (sinAlt > 1.0F) sinAlt = 1.0F;
+  if (sinAlt < -1.0F) sinAlt = -1.0F;
+  mount.a = asinf(sinAlt);
 
   LimitsClearance mountClearance;
   limits.positionClearance(&mount, &mountClearance);
@@ -563,21 +577,21 @@ void GotoPlanner::clearanceSide(PlanPoint p, bool west, double *clearance, doubl
 // clearance valid for any position within that distance, the pier side changes at the pole
 // so the other side only applies beyond the distance to the pole
 // clearance beyond the tolerance is only exact for the overhead and horizon limits
-void GotoPlanner::clearance(PlanPoint p, double *clearance) {
-  double other[PC_COUNT];
+void GotoPlanner::clearance(PlanPoint p, float *clearance) {
+  float other[PC_COUNT];
   bool west = isWest(p);
-  double toPole = fabs(p.a2 - pole);
+  float toPole = fabsf(p.a2 - pole);
   clearanceSide(p, west, clearance, NULL);
   if (toPole >= tolerance) return;
   clearanceSide(p, !west, other, NULL);
   for (int k = 0; k < PC_COUNT; k++) {
-    double c = other[k] > toPole ? other[k] : toPole;
+    float c = other[k] > toPole ? other[k] : toPole;
     if (c < clearance[k]) clearance[k] = c;
   }
 }
 
-void GotoPlanner::pointClearance(PlanPoint p, double *clearance) {
-  double *known = NULL;
+void GotoPlanner::pointClearance(PlanPoint p, float *clearance) {
+  float *known = NULL;
   if (p.a1 == start.a1 && p.a2 == start.a2) known = startClearance; else
   if (p.a1 == end.a1 && p.a2 == end.a2) known = endClearance;
   if (known == NULL) { this->clearance(p, clearance); return; }
@@ -585,26 +599,26 @@ void GotoPlanner::pointClearance(PlanPoint p, double *clearance) {
 }
 
 // least clearance beyond that required for the leg being tested, and the time before any limit could use it up
-double GotoPlanner::spare(PlanPoint p, double *altitude, float *step) {
-  double margin[PC_COUNT];
+float GotoPlanner::spare(PlanPoint p, float *altitude, float *step) {
+  float margin[PC_COUNT];
   bool west = isWest(p);
   clearanceSide(p, west, margin, altitude);
 
-  double result = CLEARANCE_UNLIMITED;
+  float result = CLEARANCE_UNLIMITED;
   for (int k = 0; k < PC_COUNT; k++) {
     margin[k] -= legRequired[k];
     if (margin[k] < result) result = margin[k];
   }
 
   // the other pier side can only lower the result when the pole is near enough
-  double toPole = fabs(p.a2 - pole);
+  float toPole = fabsf(p.a2 - pole);
   bool poleNear = toPole < result + legRequiredMax;
   if (poleNear) {
-    double other[PC_COUNT];
+    float other[PC_COUNT];
     clearanceSide(p, !west, other, NULL);
     result = CLEARANCE_UNLIMITED;
     for (int k = 0; k < PC_COUNT; k++) {
-      double o = (other[k] > toPole ? other[k] : toPole) - legRequired[k];
+      float o = (other[k] > toPole ? other[k] : toPole) - legRequired[k];
       if (o < margin[k]) margin[k] = o;
       if (margin[k] < result) result = margin[k];
     }
@@ -633,12 +647,12 @@ double GotoPlanner::spare(PlanPoint p, double *altitude, float *step) {
 
 // fastest change in altitude, from the distance moved on the sky by each axis at this axis2 coordinate
 float GotoPlanner::altitudeRate(PlanPoint p) {
-  return legRate2 + fabs(cos(p.a2))*legRate1;
+  return legRate2 + fabsf(cosf(p.a2))*legRate1;
 }
 
 bool GotoPlanner::isValid(PlanPoint p) {
-  if (!transform.meridianFlips && fabs(p.a2) > Deg90) return false;
-  double c[PC_COUNT];
+  if (!transform.meridianFlips && fabsf(p.a2) > PLAN_DEG90) return false;
+  float c[PC_COUNT];
   clearance(p, c);
   for (int k = 0; k < PC_COUNT; k++) if (c[k] < tolerance) return false;
   return true;

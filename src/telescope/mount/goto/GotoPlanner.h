@@ -12,6 +12,11 @@
 class Axis;
 
 #define PLAN_WAYPOINTS_MAX   2
+
+// the planner works in single precision, its arcsecond level rounding is far inside the tolerance
+#define PLAN_DEG90           ((float)Deg90)
+#define PLAN_DEG180          ((float)Deg180)
+#define PLAN_DEG360          ((float)Deg360)
 #define PLAN_BOX_STACK_SIZE  32
 
 enum PlanState: uint8_t     {PLAN_IDLE, PLAN_BUSY, PLAN_DIRECT, PLAN_WAYPOINTS, PLAN_FAILED};
@@ -23,8 +28,8 @@ enum PlanClearance: uint8_t {PC_ALTITUDE_MIN, PC_ALTITUDE_MAX, PC_MERIDIAN_E, PC
 
 // instrument coordinates in radians
 typedef struct PlanPoint {
-  double a1;
-  double a2;
+  float a1;
+  float a2;
 } PlanPoint;
 
 // slew motion of an axis, in radians per second and radians per second per second
@@ -73,13 +78,13 @@ class GotoPlanner {
     void surveyBegin(float time);
     void surveyStep();
     void surveyPeakBegin();
-    double surveySample(float time, bool *inZone);
+    float surveySample(float time, bool *inZone);
     void pushBegin();
     void pushStep();
     void bisectStep();
     bool pushBlocked();
-    PlanPoint pushPoint(PlanPoint from, double distance);
-    void candidateBegin(double distance);
+    PlanPoint pushPoint(PlanPoint from, float distance);
+    void candidateBegin(float distance);
     PlanLegResult candidateStep();
     PlanPoint nearestZenith(PlanPoint p);
 
@@ -91,12 +96,12 @@ class GotoPlanner {
 
     PlanAxisModel axisModel(Axis *axis, float rate);
     Coordinate mountCoordinate(PlanPoint p, bool west);
-    void clearanceSide(PlanPoint p, bool west, double *clearance, double *altitude);
-    void clearance(PlanPoint p, double *clearance);
-    void pointClearance(PlanPoint p, double *clearance);
-    double spare(PlanPoint p, double *altitude, float *step);
+    void clearanceSide(PlanPoint p, bool west, float *clearance, float *altitude);
+    void clearance(PlanPoint p, float *clearance);
+    void pointClearance(PlanPoint p, float *clearance);
+    float spare(PlanPoint p, float *altitude, float *step);
     float altitudeRate(PlanPoint p);
-    inline bool isWest(PlanPoint p) { return northern ? p.a2 > Deg90 : p.a2 < -Deg90; }
+    inline bool isWest(PlanPoint p) { return northern ? p.a2 > PLAN_DEG90 : p.a2 < -PLAN_DEG90; }
     bool isValid(PlanPoint p);
 
     PlanState state = PLAN_IDLE;
@@ -111,16 +116,18 @@ class GotoPlanner {
 
     // fixed when planning begins
     PlanAxisModel model[2];
-    double tolerance = 0.0;
-    double pole = 0.0;
+    float tolerance = 0.0;
+    float pole = 0.0;
     bool northern = true;
     bool axis2MinActive = true;
     bool axis2MaxActive = true;
     bool bandEnabled = false;
-    double bandTop = 0.0;
+    float bandTop = 0.0;
     PlanPoint zenith[2];
-    double startClearance[PC_COUNT];
-    double endClearance[PC_COUNT];
+    float latitudeSine = 0.0F;
+    float latitudeCosine = 0.0F;
+    float startClearance[PC_COUNT];
+    float endClearance[PC_COUNT];
 
     // leg being tested
     bool legActive = false;
@@ -133,9 +140,9 @@ class GotoPlanner {
     float legRate2 = 0.0F;
     float legTime = 0.0F;
     unsigned long legSamples = 0;
-    double legRequired[PC_COUNT];
-    double legRequiredMax = 0.0;
-    double legSlack = 0.0;
+    float legRequired[PC_COUNT];
+    float legRequiredMax = 0.0;
+    float legSlack = 0.0;
     PlanLegResult legResult = PL_RUNNING;
     bool legBox = false;
     PlanBox box[PLAN_BOX_STACK_SIZE];
@@ -148,7 +155,7 @@ class GotoPlanner {
     float surveyTime = 0.0F;
     float surveyInterval = 0.0F;
     float surveyResolution = 0.0F;
-    double highestAltitude = 0.0;
+    float highestAltitude = 0.0;
     float highestTime = 0.0F;
     PlanPoint highest = {0.0, 0.0};
     PlanPoint zoneEntry = {0.0, 0.0};
@@ -163,17 +170,17 @@ class GotoPlanner {
     float goldenHigh = 0.0F;
     float goldenC = 0.0F;
     float goldenD = 0.0F;
-    double goldenAltitudeC = 0.0;
-    double goldenAltitudeD = 0.0;
+    float goldenAltitudeC = 0.0;
+    float goldenAltitudeD = 0.0;
     uint8_t goldenNeed = 0;
 
     // waypoints moved away from the blocked slew, direction components are per radian moved
     PlanPoint pushDirection[3];
     uint8_t pushIndex = 0;
     bool pushPair = false;
-    double pushDistance = 0.0;
-    double bisectLow = 0.0;
-    double bisectHigh = 0.0;
+    float pushDistance = 0.0;
+    float bisectLow = 0.0;
+    float bisectHigh = 0.0;
 
     // waypoints being tested
     PlanPoint candidate[PLAN_WAYPOINTS_MAX];

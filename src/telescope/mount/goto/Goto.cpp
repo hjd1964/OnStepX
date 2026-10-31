@@ -949,9 +949,11 @@ PlanPoint Goto::instrumentTarget(Coordinate coords, bool approach) {
     coords.d -= slewDestinationDistDec;
   }
 
+  double a1, a2;
+  transform.mountToInstrument(&coords, &a1, &a2);
   PlanPoint p;
-  transform.mountToInstrument(&coords, &p.a1, &p.a2);
-  p.a1 += coords.a1Correction;
+  p.a1 = a1 + coords.a1Correction;
+  p.a2 = a2;
   return p;
 }
 
