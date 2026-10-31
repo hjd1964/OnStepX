@@ -876,11 +876,11 @@
 #ifndef GOTO_AVOID_TOLERANCE
 #define GOTO_AVOID_TOLERANCE          2.5                         // distance in degrees goto paths are kept clear of limits
 #endif
-#ifndef GOTO_AVOID_GRID
-#define GOTO_AVOID_GRID               20.0                        // spacing in degrees of the waypoint search grid
+#ifndef GOTO_AVOID_STEP
+#define GOTO_AVOID_STEP               20.0                        // distance in degrees waypoints are moved per step away from a blocked slew
 #endif
 #ifndef GOTO_AVOID_REFINE
-#define GOTO_AVOID_REFINE             1.0                         // distance in degrees to stop refining waypoints toward the limit
+#define GOTO_AVOID_REFINE             1.0                         // distance in degrees to stop moving waypoints back toward a blocked slew
 #endif
 #ifndef GOTO_AVOID_FLIP_OVERSHOOT
 #define GOTO_AVOID_FLIP_OVERSHOOT     0.25                        // distance in degrees tracking may pass the meridian limit while

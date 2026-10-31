@@ -11,14 +11,11 @@
 
 class Axis;
 
-#define PLAN_GRID_AXIS1_MAX  ((int)(540.0/(GOTO_AVOID_GRID)) + 2)
-#define PLAN_GRID_AXIS2_MAX  ((int)(360.0/(GOTO_AVOID_GRID)) + 2)
-#define PLAN_GRID_POINTS_MAX (PLAN_GRID_AXIS1_MAX*PLAN_GRID_AXIS2_MAX)
 #define PLAN_WAYPOINTS_MAX   2
 #define PLAN_BOX_STACK_SIZE  32
 
 enum PlanState: uint8_t     {PLAN_IDLE, PLAN_BUSY, PLAN_DIRECT, PLAN_WAYPOINTS, PLAN_FAILED};
-enum PlanPhase: uint8_t     {PP_DIRECT, PP_GRID, PP_PAIR, PP_REFINE};
+enum PlanPhase: uint8_t     {PP_DIRECT, PP_SURVEY, PP_PUSH, PP_BISECT};
 enum PlanLegResult: uint8_t {PL_RUNNING, PL_PASS, PL_FAIL};
 enum PlanClearance: uint8_t {PC_ALTITUDE_MIN, PC_ALTITUDE_MAX, PC_MERIDIAN_E, PC_MERIDIAN_W,
                              PC_AXIS1_MIN, PC_AXIS1_MAX, PC_AXIS2_MIN, PC_AXIS2_MAX, PC_COUNT};
@@ -72,26 +69,22 @@ class GotoPlanner {
     void work();
     void finish(PlanState result);
 
-    void gridBegin();
-    void gridStep();
-    PlanPoint gridPoint(int index);
-
-    void pairBegin();
-    void pairStep();
-    void pairRoundEnd();
-    void pairAdvance();
-
-    void refineBegin();
-    void refineStep();
-    void refineNext();
-    bool refineCandidate(PlanPoint from, PlanPoint *to);
+    void surveyBegin();
+    void surveyStep();
+    void pushBegin();
+    void pushStep();
+    void bisectStep();
+    bool pushBlocked();
+    PlanPoint pushPoint(PlanPoint from, double distance);
+    void candidateBegin(double distance);
+    PlanLegResult candidateStep();
+    PlanPoint nearestZenith(PlanPoint p);
 
     void legBegin(PlanPoint from, PlanPoint to, bool overheadOnly = false);
     PlanLegResult legStep();
     PlanLegResult boxStep();
     void boxPush(PlanPoint p1, PlanPoint p2);
-    float legCost(PlanPoint from, PlanPoint to);
-    float legCostLowerBound(PlanPoint from, PlanPoint to);
+    PlanPoint legPosition(float time);
 
     PlanAxisModel axisModel(Axis *axis, float rate);
     Coordinate mountCoordinate(PlanPoint p, bool west);
@@ -99,6 +92,7 @@ class GotoPlanner {
     void clearance(PlanPoint p, double *clearance);
     void pointClearance(PlanPoint p, double *clearance);
     double spare(PlanPoint p, double *altitude);
+    inline bool isWest(PlanPoint p) { return northern ? p.a2 > Deg90 : p.a2 < -Deg90; }
     bool isValid(PlanPoint p);
 
     PlanState state = PLAN_IDLE;
@@ -142,39 +136,28 @@ class GotoPlanner {
     uint8_t boxCount = 0;
     uint8_t boxTrial = 0;
 
-    // waypoint grid, with the cost of the slews from the start to each point and each point to the end
-    int gridAxis1Count = 0;
-    int gridCount = 0;
-    double gridAxis1Low = 0.0;
-    double gridAxis2Low = 0.0;
-    double gridAxis1Spacing = 0.0;
-    double gridAxis2Spacing = 0.0;
-    int gridIndex = 0;
-    int gridSelected = 0;
-    uint8_t gridLeg = 0;
-    uint8_t gridFlags[PLAN_GRID_POINTS_MAX];
-    float costStart[PLAN_GRID_POINTS_MAX];
-    float costEnd[PLAN_GRID_POINTS_MAX];
+    // highest point of the blocked slew and where it is within the tolerance of the overhead limit
+    float surveyTime = 0.0F;
+    float surveyInterval = 0.0F;
+    double highestAltitude = 0.0;
+    PlanPoint highest = {0.0, 0.0};
+    PlanPoint zoneEntry = {0.0, 0.0};
+    PlanPoint zoneExit = {0.0, 0.0};
+    bool zoneFound = false;
 
-    // pair search, in rounds of increasing lower bound cost
-    int pairI = 0;
-    int pairJ = 0;
-    bool pairMinimumScan = true;
-    bool pairMore = false;
-    bool pairEndLeg = false;
-    float pairLow = 0.0F;
-    float pairHigh = 0.0F;
-    float pairBest = 0.0F;
-    float pairCandidate = 0.0F;
-    int pairBestI = 0;
-    int pairBestJ = 0;
+    // waypoints moved away from the blocked slew, direction components are per radian moved
+    PlanPoint pushDirection[3];
+    uint8_t pushIndex = 0;
+    bool pushPair = false;
+    double pushDistance = 0.0;
+    double bisectLow = 0.0;
+    double bisectHigh = 0.0;
 
-    // refinement toward the overhead limit
-    uint8_t refineIndex = 0;
-    uint8_t refineLeg = 0;
-    bool refineDone[PLAN_WAYPOINTS_MAX];
-    uint8_t refineMoves[PLAN_WAYPOINTS_MAX];
-    PlanPoint refinePoint = {0.0, 0.0};
+    // waypoints being tested
+    PlanPoint candidate[PLAN_WAYPOINTS_MAX];
+    uint8_t candidateCount = 0;
+    uint8_t candidateLeg = 0;
+    bool candidateActive = false;
 };
 
 extern GotoPlanner gotoPlanner;
