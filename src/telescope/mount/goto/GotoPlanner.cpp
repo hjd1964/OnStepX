@@ -12,14 +12,11 @@
 #include "../limits/Limits.h"
 #include "Goto.h"
 
-static_assert(GOTO_AVOID_TOLERANCE >= 0.1 && GOTO_AVOID_TOLERANCE <= 10.0,
-  "Configuration (Config.h): Setting GOTO_AVOID_TOLERANCE unknown, use a value between 0.1 and 10 (degrees.)");
-static_assert(GOTO_AVOID_STEP >= 5.0 && GOTO_AVOID_STEP <= 45.0,
-  "Configuration (Config.h): Setting GOTO_AVOID_STEP unknown, use a value between 5 and 45 (degrees.)");
-static_assert(GOTO_AVOID_REFINE >= 0.1 && GOTO_AVOID_REFINE <= GOTO_AVOID_STEP/2.0,
-  "Configuration (Config.h): Setting GOTO_AVOID_REFINE unknown, use a value between 0.1 and GOTO_AVOID_STEP/2 (degrees.)");
-static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2.0,
-  "Configuration (Config.h): Setting GOTO_AVOID_FLIP_OVERSHOOT unknown, use a value between 0 and 2 (degrees.)");
+static_assert(gotoAvoidTolerance >= 0.1F && gotoAvoidTolerance <= 10.0F, "GotoPlanner.h: gotoAvoidTolerance must be between 0.1 and 10 (degrees.)");
+static_assert(gotoAvoidStep >= 5.0F && gotoAvoidStep <= 45.0F, "GotoPlanner.h: gotoAvoidStep must be between 5 and 45 (degrees.)");
+static_assert(gotoAvoidRefine >= 0.1F && gotoAvoidRefine <= gotoAvoidStep/2.0F, "GotoPlanner.h: gotoAvoidRefine must be between 0.1 and gotoAvoidStep/2 (degrees.)");
+static_assert(gotoAvoidFlipOvershoot >= 0.0F && gotoAvoidFlipOvershoot <= 2.0F, "GotoPlanner.h: gotoAvoidFlipOvershoot must be between 0 and 2 (degrees.)");
+static_assert(gotoAvoidSliceUs >= 200 && gotoAvoidSliceUs <= 20000, "GotoPlanner.h: gotoAvoidSliceUs must be between 200 and 20000 (microseconds.)");
 
 // clearance a sample may use up before the next sample, as distance moved in radians
 #define PLAN_SLACK           ((float)degToRad(0.05))
@@ -33,8 +30,8 @@ static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2
 #define PLAN_SAMPLES_MAX     5000
 #define PLAN_WORK_UNITS      8
 #define PLAN_ARCSEC          ((float)OneArcSec)
-#define PLAN_STEP            ((float)degToRad(GOTO_AVOID_STEP))
-#define PLAN_REFINE          ((float)degToRad(GOTO_AVOID_REFINE))
+#define PLAN_STEP            ((float)degToRad(gotoAvoidStep))
+#define PLAN_REFINE          ((float)degToRad(gotoAvoidRefine))
 // samples spent trying to clear the region holding a whole slew before its timing is used
 #define PLAN_BOX_TRIAL       1
 // furthest a waypoint is moved from the blocked slew
@@ -46,7 +43,7 @@ void GotoPlanner::begin(PlanPoint start, PlanPoint end) {
 
   northern = site.location.latitude >= 0.0;
   pole = northern ? PLAN_DEG90 : -PLAN_DEG90;
-  tolerance = degToRad(GOTO_AVOID_TOLERANCE);
+  tolerance = degToRad(gotoAvoidTolerance);
 
   // mount axis2 folds back at the pole, so a limit there can't be passed
   axis2MinActive = northern || axis2.getLimitMin() > -Deg90 + OneArcSec;

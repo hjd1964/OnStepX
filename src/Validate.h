@@ -528,9 +528,6 @@
   #if AXIS1_WRAP == ON
     #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD is not compatible with AXIS1_WRAP ON."
   #endif
-  #if GOTO_AVOID_SLICE_US < 200 || GOTO_AVOID_SLICE_US > 20000
-    #error "Configuration (Config.h): Setting GOTO_AVOID_SLICE_US unknown, use a value between 200 and 20000 (microseconds.)"
-  #endif
 #endif
 
 // PIER SIDE BEHAVIOUR

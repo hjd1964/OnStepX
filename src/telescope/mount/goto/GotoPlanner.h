@@ -11,6 +11,17 @@
 
 class Axis;
 
+// distance in degrees slews are kept clear of limits
+static constexpr float gotoAvoidTolerance = 2.5F;
+// distance in degrees waypoints are moved per step away from a blocked slew
+static constexpr float gotoAvoidStep = 20.0F;
+// distance in degrees to stop moving waypoints back toward a blocked slew
+static constexpr float gotoAvoidRefine = 5.0F;
+// distance in degrees tracking may pass the meridian limit while an automatic meridian flip is planned
+static constexpr float gotoAvoidFlipOvershoot = 0.25F;
+// planning time in microseconds per planner task call
+static constexpr unsigned long gotoAvoidSliceUs = 2000;
+
 #define PLAN_WAYPOINTS_MAX   2
 #define PLAN_BOX_STACK_SIZE  32
 

@@ -873,21 +873,6 @@
 #ifndef GOTO_AVOID_OVERHEAD
 #define GOTO_AVOID_OVERHEAD           OFF                         // ON adds waypoints so goto paths stay clear of the overhead limit
 #endif
-#ifndef GOTO_AVOID_TOLERANCE
-#define GOTO_AVOID_TOLERANCE          2.5                         // distance in degrees goto paths are kept clear of limits
-#endif
-#ifndef GOTO_AVOID_STEP
-#define GOTO_AVOID_STEP               20.0                        // distance in degrees waypoints are moved per step away from a blocked slew
-#endif
-#ifndef GOTO_AVOID_REFINE
-#define GOTO_AVOID_REFINE             5.0                         // distance in degrees to stop moving waypoints back toward a blocked slew
-#endif
-#ifndef GOTO_AVOID_FLIP_OVERSHOOT
-#define GOTO_AVOID_FLIP_OVERSHOOT     0.25                        // distance in degrees tracking may pass the meridian limit while
-#endif                                                            // planning an automatic meridian flip
-#ifndef GOTO_AVOID_SLICE_US
-#define GOTO_AVOID_SLICE_US           2000                        // planning time in microseconds per task call
-#endif
 
 // meridian flip, pier side
 #ifndef MFLIP_HOME_DEFAULT

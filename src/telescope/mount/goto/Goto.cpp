@@ -23,14 +23,14 @@ inline void gotoWrapper() { goTo.poll(); }
 #endif
 
 #if GOTO_AVOID_OVERHEAD == ON
-inline void gotoPlanWrapper() { gotoPlanner.poll(GOTO_AVOID_SLICE_US); }
+inline void gotoPlanWrapper() { gotoPlanner.poll(gotoAvoidSliceUs); }
 
 // planning attempts for one slew, before the goto is stopped
 #define PLAN_ATTEMPTS_MAX 4
 // planning time allowed while limits are disabled for limit recovery
 #define PLAN_RECOVERY_TIME_MS 800
 // distance from a planned position the tolerance allows for
-#define PLAN_POSITION_ERROR_MAX (degToRad(GOTO_AVOID_TOLERANCE)/10.0)
+#define PLAN_POSITION_ERROR_MAX (degToRad(gotoAvoidTolerance)/10.0)
 #endif
 
 void Goto::init() {
@@ -260,7 +260,7 @@ CommandError Goto::requestAutoFlip(Coordinate coords, PierSideSelect pierSideSel
   // tracking continues past the meridian limit while planning, so planning time is limited
   float rate = fabs(mount.trackingRateAxis1);
   if (rate < 1.0F) rate = 1.0F;
-  unsigned long timeLimit = lround(1000.0*degToRad(GOTO_AVOID_FLIP_OVERSHOOT)/siderealToRad(rate));
+  unsigned long timeLimit = lround(1000.0*degToRad(gotoAvoidFlipOvershoot)/siderealToRad(rate));
   VF("MSG: Mount, automatic meridian flip planning time limit "); V(timeLimit); VLF("ms");
   planTimeLimit(timeLimit);
 
@@ -842,7 +842,7 @@ CommandError Goto::planRoute() {
   // the last slew is planned first, so the plan kept is for the first slew
   for (int i = count - 2; i >= 0; i--) {
     gotoPlanner.begin(point[i], point[i + 1]);
-    while (gotoPlanner.poll(GOTO_AVOID_SLICE_US) == PLAN_BUSY) {
+    while (gotoPlanner.poll(gotoAvoidSliceUs) == PLAN_BUSY) {
       if (stage == GG_READY_ABORT) gotoPlanner.abort(); else
       if (planDeadlineActive && (long)(millis() - planDeadline) > 0) {
         DLF("WRN: Mount, goto plan time limit exceeded");

@@ -105,7 +105,7 @@ the debug log.
 An automatic meridian flip is planned in the background while tracking
 continues past the meridian limit. Until the pier side changes the meridian
 limit doesn't stop tracking or report an error for that flip. The planning time
-is limited so tracking moves at most `GOTO_AVOID_FLIP_OVERSHOOT` past the limit.
+is limited so tracking moves at most `gotoAvoidFlipOvershoot` past the limit.
 If the flip can't be planned in time the usual meridian limit failure follows
 (tracking stops and the limit error is reported).
 
@@ -126,24 +126,23 @@ While a goto is being planned the other command channels wait. An abort (`:Q#`)
 sent from another channel during planning is acted on as soon as planning ends,
 before the mount moves.
 
-## Settings
+## Planner Values
 
-These have defaults in `src/Config.defaults.h` and can be changed by adding a
-`#define` to `Config.h`.
+`GOTO_AVOID_OVERHEAD` is the only setting. The planner works with these fixed
+values, defined in `src/telescope/mount/goto/GotoPlanner.h`.
 
-| Setting | Default | Range | Description |
-|---|---|---|---|
-| `GOTO_AVOID_TOLERANCE` | 2.5 | 0.1 to 10 | distance in degrees slews are kept clear of limits |
-| `GOTO_AVOID_STEP` | 20 | 5 to 45 | distance in degrees waypoints are moved per step away from a blocked slew |
-| `GOTO_AVOID_REFINE` | 5 | 0.1 to `GOTO_AVOID_STEP`/2 | distance in degrees to stop moving waypoints back toward a blocked slew |
-| `GOTO_AVOID_FLIP_OVERSHOOT` | 0.25 | 0 to 2 | distance in degrees tracking may pass the meridian limit while an automatic flip is planned |
-| `GOTO_AVOID_SLICE_US` | 2000 | 200 to 20000 | planning time in microseconds per planner task call |
+| Value | | Description |
+|---|---|---|
+| `gotoAvoidTolerance` | 2.5 | distance in degrees slews are kept clear of limits |
+| `gotoAvoidStep` | 20 | distance in degrees waypoints are moved per step away from a blocked slew |
+| `gotoAvoidRefine` | 5 | distance in degrees to stop moving waypoints back toward a blocked slew |
+| `gotoAvoidFlipOvershoot` | 0.25 | distance in degrees tracking may pass the meridian limit while an automatic flip is planned |
+| `gotoAvoidSliceUs` | 2000 | planning time in microseconds per planner task call |
 
 The tolerance covers everything the prediction doesn't model: the two axes not
 starting at quite the same moment, servo following error, arrival error and
-movement while planning. It should comfortably exceed the worst pointing error
-your mount shows during slews. A larger tolerance keeps slews further from the
-limits but refuses more gotos.
+movement while planning. A larger tolerance keeps slews further from the limits
+but refuses more gotos.
 
 ## Memory
 
