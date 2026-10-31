@@ -158,7 +158,7 @@ class Goto {
     // monitor planning and start the planned slew
     void planPoll();
 
-    // stop the goto when no clear path is found
+    // stop the goto when a slew can't be planned
     void planFailed();
 
     // planning must finish within this time before the first slew starts
@@ -210,7 +210,7 @@ class Goto {
     #if GOTO_AVOID_OVERHEAD == ON
     uint8_t       planTaskHandle      = 0;
     GotoStage     planStage           = GG_NONE;
-    PlanPoint     planStart           = {0.0, 0.0};
+    PlanPoint     planStart           = {0.0F, 0.0F};
     uint8_t       planAttempts        = 0;
     uint8_t       planWaypoint        = 0;
     unsigned long planDeadline        = 0;

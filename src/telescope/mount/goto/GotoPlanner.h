@@ -12,12 +12,12 @@
 class Axis;
 
 #define PLAN_WAYPOINTS_MAX   2
+#define PLAN_BOX_STACK_SIZE  32
 
 // the planner works in single precision, its arcsecond level rounding is far inside the tolerance
 #define PLAN_DEG90           ((float)Deg90)
 #define PLAN_DEG180          ((float)Deg180)
 #define PLAN_DEG360          ((float)Deg360)
-#define PLAN_BOX_STACK_SIZE  32
 
 enum PlanState: uint8_t     {PLAN_IDLE, PLAN_BUSY, PLAN_DIRECT, PLAN_WAYPOINTS, PLAN_FAILED};
 enum PlanPhase: uint8_t     {PP_DIRECT, PP_SURVEY, PP_PUSH, PP_BISECT};
@@ -57,8 +57,7 @@ class GotoPlanner {
     // start planning a path between instrument coordinates
     // \param start: where the slew starts
     // \param end: where the slew ends
-    // \param search: if false only the direct path is checked
-    void begin(PlanPoint start, PlanPoint end, bool search = true);
+    void begin(PlanPoint start, PlanPoint end);
 
     // continue planning for up to the given time
     PlanState poll(unsigned long microseconds);
@@ -107,22 +106,21 @@ class GotoPlanner {
     PlanState state = PLAN_IDLE;
     PlanPhase phase = PP_DIRECT;
     PlanCounters counters = {0, 0};
-    bool search = true;
 
-    PlanPoint start = {0.0, 0.0};
-    PlanPoint end = {0.0, 0.0};
+    PlanPoint start = {0.0F, 0.0F};
+    PlanPoint end = {0.0F, 0.0F};
     PlanPoint waypoint[PLAN_WAYPOINTS_MAX];
     uint8_t waypointCount = 0;
 
     // fixed when planning begins
     PlanAxisModel model[2];
-    float tolerance = 0.0;
-    float pole = 0.0;
+    float tolerance = 0.0F;
+    float pole = 0.0F;
     bool northern = true;
     bool axis2MinActive = true;
     bool axis2MaxActive = true;
     bool bandEnabled = false;
-    float bandTop = 0.0;
+    float bandTop = 0.0F;
     PlanPoint zenith[2];
     float latitudeSine = 0.0F;
     float latitudeCosine = 0.0F;
@@ -131,8 +129,8 @@ class GotoPlanner {
 
     // leg being tested
     bool legActive = false;
-    PlanPoint legFrom = {0.0, 0.0};
-    PlanPoint legTo = {0.0, 0.0};
+    PlanPoint legFrom = {0.0F, 0.0F};
+    PlanPoint legTo = {0.0F, 0.0F};
     GotoProfile legProfile[2];
     float legDuration = 0.0F;
     float legRate = 0.0F;
@@ -141,8 +139,8 @@ class GotoPlanner {
     float legTime = 0.0F;
     unsigned long legSamples = 0;
     float legRequired[PC_COUNT];
-    float legRequiredMax = 0.0;
-    float legSlack = 0.0;
+    float legRequiredMax = 0.0F;
+    float legSlack = 0.0F;
     PlanLegResult legResult = PL_RUNNING;
     bool legBox = false;
     PlanBox box[PLAN_BOX_STACK_SIZE];
@@ -155,11 +153,11 @@ class GotoPlanner {
     float surveyTime = 0.0F;
     float surveyInterval = 0.0F;
     float surveyResolution = 0.0F;
-    float highestAltitude = 0.0;
+    float highestAltitude = 0.0F;
     float highestTime = 0.0F;
-    PlanPoint highest = {0.0, 0.0};
-    PlanPoint zoneEntry = {0.0, 0.0};
-    PlanPoint zoneExit = {0.0, 0.0};
+    PlanPoint highest = {0.0F, 0.0F};
+    PlanPoint zoneEntry = {0.0F, 0.0F};
+    PlanPoint zoneExit = {0.0F, 0.0F};
     bool zoneEntered = false;
     bool zoneLeft = false;
     float entryLow = 0.0F;
@@ -170,17 +168,17 @@ class GotoPlanner {
     float goldenHigh = 0.0F;
     float goldenC = 0.0F;
     float goldenD = 0.0F;
-    float goldenAltitudeC = 0.0;
-    float goldenAltitudeD = 0.0;
+    float goldenAltitudeC = 0.0F;
+    float goldenAltitudeD = 0.0F;
     uint8_t goldenNeed = 0;
 
     // waypoints moved away from the blocked slew, direction components are per radian moved
     PlanPoint pushDirection[3];
     uint8_t pushIndex = 0;
     bool pushPair = false;
-    float pushDistance = 0.0;
-    float bisectLow = 0.0;
-    float bisectHigh = 0.0;
+    float pushDistance = 0.0F;
+    float bisectLow = 0.0F;
+    float bisectHigh = 0.0F;
 
     // waypoints being tested
     PlanPoint candidate[PLAN_WAYPOINTS_MAX];

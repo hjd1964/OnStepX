@@ -40,10 +40,9 @@ static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2
 // furthest a waypoint is moved from the blocked slew
 #define PLAN_PUSH_MAX        ((float)degToRad(360.0))
 
-void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
+void GotoPlanner::begin(PlanPoint start, PlanPoint end) {
   this->start = start;
   this->end = end;
-  this->search = search;
 
   northern = site.location.latitude >= 0.0;
   pole = northern ? PLAN_DEG90 : -PLAN_DEG90;
@@ -111,7 +110,7 @@ void GotoPlanner::work() {
         case PL_PASS: finish(PLAN_DIRECT); break;
         case PL_FAIL:
           legActive = false;
-          if (search) surveyBegin(legTime); else finish(PLAN_FAILED);
+          surveyBegin(legTime);
         break;
       }
     break;
@@ -217,10 +216,11 @@ void GotoPlanner::surveyStep() {
         zoneExit = zoneLeft ? legPosition(exitLow) : end;
         pushBegin();
         return;
+      } else {
+        bool inZone;
+        surveySample((exitLow + exitHigh)/2.0F, &inZone);
+        if (inZone) exitLow = (exitLow + exitHigh)/2.0F; else exitHigh = (exitLow + exitHigh)/2.0F;
       }
-      bool inZone;
-      surveySample((exitLow + exitHigh)/2.0F, &inZone);
-      if (inZone) exitLow = (exitLow + exitHigh)/2.0F; else exitHigh = (exitLow + exitHigh)/2.0F;
     break;
   }
 }
@@ -258,6 +258,7 @@ void GotoPlanner::pushBegin() {
     d1 = end.a1 - start.a1;
     d2 = end.a2 - start.a2;
     length = sqrtf(d1*d1 + d2*d2);
+    if (length < PLAN_ARCSEC) { finish(PLAN_FAILED); return; }
   }
   pushDirection[1].a1 = -d2/length;
   pushDirection[1].a2 = d1/length;
@@ -389,12 +390,12 @@ PlanPoint GotoPlanner::nearestZenith(PlanPoint p) {
   return target;
 }
 
-// samples the predicted slew so no limit can be reached between samples, since altitude and the
-// other limit coordinates change by no more than the combined axis motion
+// samples the predicted slew so no limit can be reached between samples, each step is the time any limit
+// would take to use up its spare clearance at the fastest rate that limit's coordinate can change
 void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
   legFrom = from;
   legTo = to;
-  float distance[2] = { (float)fabsf(to.a1 - from.a1), (float)fabsf(to.a2 - from.a2) };
+  float distance[2] = { fabsf(to.a1 - from.a1), fabsf(to.a2 - from.a2) };
   for (int i = 0; i < 2; i++) legProfile[i].init(distance[i], model[i].accel, model[i].vLow, model[i].vHigh);
   legDuration = legProfile[0].duration() > legProfile[1].duration() ? legProfile[0].duration() : legProfile[1].duration();
   legRate1 = legProfile[0].rateMax();
@@ -459,7 +460,7 @@ PlanLegResult GotoPlanner::legStep() {
       legBox = true;
       return PL_RUNNING;
     }
-    float bandStep = (float)(band/altitudeRate(p));
+    float bandStep = band/altitudeRate(p);
     if (bandStep < step) step = bandStep;
   }
 

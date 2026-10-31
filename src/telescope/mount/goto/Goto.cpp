@@ -247,6 +247,7 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 CommandError Goto::requestAutoFlip(Coordinate coords, PierSideSelect pierSideSelect) {
   autoFlipRequest = true;
   CommandError e = request(coords, pierSideSelect, false);
+  autoFlipRequest = false;
   if (e != CE_NONE) return e;
 
   // without planning the flip goes ahead as it always has
@@ -604,8 +605,8 @@ void Goto::poll() {
 
     if (stage == GG_WAYPOINT_PLANNED) {
       VLF("MSG: Mount, goto planned waypoint reached");
-      PlanPoint waypoint = gotoPlanner.getWaypoint(planWaypoint);
-      double error = fabs(axis1.getInstrumentCoordinate() - waypoint.a1) + fabs(axis2.getInstrumentCoordinate() - waypoint.a2);
+      PlanPoint planned = gotoPlanner.getWaypoint(planWaypoint);
+      double error = fabs(axis1.getInstrumentCoordinate() - planned.a1) + fabs(axis2.getInstrumentCoordinate() - planned.a2);
       if (++planWaypoint < gotoPlanner.getWaypointCount() && error <= PLAN_POSITION_ERROR_MAX) {
         slowdownReset = true;
         startWaypointSlew(gotoPlanner.getWaypoint(planWaypoint));
@@ -866,7 +867,8 @@ CommandError Goto::planRoute() {
 CommandError Goto::startSlew() {
   if (!planNeeded()) return startAutoSlew();
 
-  if (planTaskHandle == 0 || ++planAttempts > PLAN_ATTEMPTS_MAX) { planFailed(); return CE_NONE; }
+  if (planTaskHandle == 0) { DLF("WRN: Mount, goto planner task not available"); planFailed(); return CE_NONE; }
+  if (++planAttempts > PLAN_ATTEMPTS_MAX) { DLF("WRN: Mount, goto planning attempts exceeded"); planFailed(); return CE_NONE; }
 
   planStage = stage;
   planStart.a1 = axis1.getInstrumentCoordinate();
@@ -891,7 +893,11 @@ void Goto::planPoll() {
   }
 
   tasks.setPeriod(planTaskHandle, 0);
-  if (result != PLAN_DIRECT && result != PLAN_WAYPOINTS) { planFailed(); return; }
+  if (result != PLAN_DIRECT && result != PLAN_WAYPOINTS) {
+    DLF("WRN: Mount, goto has no path clear of the overhead limit");
+    planFailed();
+    return;
+  }
 
   stage = planStage;
 
@@ -921,9 +927,9 @@ void Goto::planPoll() {
   }
 }
 
-// stop the goto when no clear path is found
+// stop the goto when a slew can't be planned
 void Goto::planFailed() {
-  DLF("WRN: Mount, goto stopped, no path clear of the overhead limit found");
+  DLF("WRN: Mount, goto stopped before the slew");
   if (autoFlip) autoFlipFailed = true;
   stage = GG_READY_ABORT;
 }
