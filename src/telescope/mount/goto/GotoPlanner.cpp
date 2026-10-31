@@ -26,7 +26,9 @@ static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2
 #define PLAN_SLACK_MIN       (2.0*OneArcSec)
 // clearance from the horizon slowdown band where predicted timing stops being used
 #define PLAN_BAND_SWITCH     degToRad(1.0)
-#define PLAN_LEG_SAMPLES_MAX 20000
+// samples allowed for one slew and for a whole plan, bounding planning time, a slew or plan needing more is treated as blocked
+#define PLAN_LEG_SAMPLES_MAX 1000
+#define PLAN_SAMPLES_MAX     5000
 #define PLAN_WORK_UNITS      8
 // samples spent trying to clear the region holding a whole slew before its timing is used
 #define PLAN_BOX_TRIAL       1
@@ -91,6 +93,7 @@ void GotoPlanner::abort() {
 }
 
 void GotoPlanner::work() {
+  if (counters.samples > PLAN_SAMPLES_MAX) { finish(PLAN_FAILED); return; }
   switch (phase) {
     case PP_DIRECT:
       // other limits are left to the existing behaviour on the direct path
@@ -100,7 +103,7 @@ void GotoPlanner::work() {
         case PL_PASS: finish(PLAN_DIRECT); break;
         case PL_FAIL:
           legActive = false;
-          if (search) surveyBegin(); else finish(PLAN_FAILED);
+          if (search) surveyBegin(legTime); else finish(PLAN_FAILED);
         break;
       }
     break;
@@ -125,35 +128,116 @@ void GotoPlanner::finish(PlanState result) {
   #endif
 }
 
-// the blocked slew is surveyed for its highest point and where it comes within the tolerance of the overhead limit
-void GotoPlanner::surveyBegin() {
+// the blocked slew is surveyed for its highest point and where it is within the tolerance of the overhead limit,
+// starting where the direct test failed: walk on through the zone, find the highest point by golden section search
+// around the highest sample, then bisect for where the slew enters and leaves the zone
+#define PLAN_GOLDEN 0.618034F
+
+void GotoPlanner::surveyBegin(float time) {
   legBegin(start, end, true);
-  surveyTime = 0.0F;
-  surveyInterval = (float)(degToRad(GOTO_AVOID_STEP)/10.0/legRate);
+  surveyTime = time;
+  surveyInterval = (float)(degToRad(GOTO_AVOID_STEP)/4.0/legRate);
+  surveyResolution = (float)(degToRad(GOTO_AVOID_STEP)/10.0/legRate);
   highestAltitude = -Deg90;
-  highest = start;
-  zoneEntry = start;
+  highestTime = time;
+  highest = legPosition(time);
+  zoneEntry = highest;
   zoneExit = end;
-  zoneFound = false;
+  zoneEntered = false;
+  zoneLeft = false;
+  entryLow = time;
+  entryHigh = time;
+  surveyStage = SS_WALK;
   phase = PP_SURVEY;
 }
 
 void GotoPlanner::surveyStep() {
-  PlanPoint p = legPosition(surveyTime);
+  switch (surveyStage) {
+    case SS_WALK: {
+      bool inZone;
+      surveySample(surveyTime, &inZone);
+      if (!zoneEntered) {
+        if (inZone) { zoneEntered = true; entryHigh = surveyTime; exitLow = surveyTime; } else entryLow = surveyTime;
+      } else
+      if (!inZone) {
+        zoneLeft = true;
+        exitHigh = surveyTime;
+        surveyPeakBegin();
+        return;
+      } else exitLow = surveyTime;
+      if (surveyTime >= legDuration) { surveyPeakBegin(); return; }
+      surveyTime += surveyInterval;
+      if (surveyTime > legDuration) surveyTime = legDuration;
+    } break;
+
+    case SS_PEAK:
+      if (goldenNeed == 1) { goldenAltitudeC = surveySample(goldenC, NULL); goldenNeed = 2; return; }
+      if (goldenNeed == 2) { goldenAltitudeD = surveySample(goldenD, NULL); goldenNeed = 0; return; }
+      if (goldenHigh - goldenLow <= surveyResolution) {
+        surveyStage = zoneEntered ? SS_ENTRY : SS_EXIT;
+        return;
+      }
+      if (goldenAltitudeC > goldenAltitudeD) {
+        goldenHigh = goldenD;
+        goldenD = goldenC;
+        goldenAltitudeD = goldenAltitudeC;
+        goldenC = goldenHigh - PLAN_GOLDEN*(goldenHigh - goldenLow);
+        goldenAltitudeC = surveySample(goldenC, NULL);
+      } else {
+        goldenLow = goldenC;
+        goldenC = goldenD;
+        goldenAltitudeC = goldenAltitudeD;
+        goldenD = goldenLow + PLAN_GOLDEN*(goldenHigh - goldenLow);
+        goldenAltitudeD = surveySample(goldenD, NULL);
+      }
+    break;
+
+    case SS_ENTRY:
+      if (entryHigh - entryLow <= surveyResolution) {
+        zoneEntry = legPosition(entryHigh);
+        surveyStage = SS_EXIT;
+        return;
+      } else {
+        bool inZone;
+        surveySample((entryLow + entryHigh)/2.0F, &inZone);
+        if (inZone) entryHigh = (entryLow + entryHigh)/2.0F; else entryLow = (entryLow + entryHigh)/2.0F;
+      }
+    break;
+
+    case SS_EXIT:
+      if (!zoneLeft || exitHigh - exitLow <= surveyResolution) {
+        zoneExit = zoneLeft ? legPosition(exitLow) : end;
+        pushBegin();
+        return;
+      }
+      bool inZone;
+      surveySample((exitLow + exitHigh)/2.0F, &inZone);
+      if (inZone) exitLow = (exitLow + exitHigh)/2.0F; else exitHigh = (exitLow + exitHigh)/2.0F;
+    break;
+  }
+}
+
+// the highest point is bracketed by the samples either side of the highest walk sample
+void GotoPlanner::surveyPeakBegin() {
+  goldenLow = highestTime - surveyInterval;
+  if (goldenLow < 0.0F) goldenLow = 0.0F;
+  goldenHigh = highestTime + surveyInterval;
+  if (goldenHigh > legDuration) goldenHigh = legDuration;
+  goldenC = goldenHigh - PLAN_GOLDEN*(goldenHigh - goldenLow);
+  goldenD = goldenLow + PLAN_GOLDEN*(goldenHigh - goldenLow);
+  goldenNeed = 1;
+  surveyStage = SS_PEAK;
+}
+
+// altitude of the slew at this time and if it is within the tolerance of the overhead limit, keeping the highest point found
+double GotoPlanner::surveySample(float time, bool *inZone) {
+  PlanPoint p = legPosition(time);
   double c[PC_COUNT], altitude;
   clearanceSide(p, isWest(p), c, &altitude);
   counters.samples++;
-
-  if (altitude > highestAltitude) { highestAltitude = altitude; highest = p; }
-  if (c[PC_ALTITUDE_MAX] < tolerance) {
-    if (!zoneFound) zoneEntry = p;
-    zoneExit = p;
-    zoneFound = true;
-  }
-
-  if (surveyTime >= legDuration) { pushBegin(); return; }
-  surveyTime += surveyInterval;
-  if (surveyTime > legDuration) surveyTime = legDuration;
+  if (altitude > highestAltitude) { highestAltitude = altitude; highestTime = time; highest = p; }
+  if (inZone != NULL) *inZone = c[PC_ALTITUDE_MAX] < tolerance;
+  return altitude;
 }
 
 // waypoints are moved in steps away from the nearest image of the zenith, then to either side of the slew,
@@ -305,7 +389,9 @@ void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
   float distance[2] = { (float)fabs(to.a1 - from.a1), (float)fabs(to.a2 - from.a2) };
   for (int i = 0; i < 2; i++) legProfile[i].init(distance[i], model[i].accel, model[i].vLow, model[i].vHigh);
   legDuration = legProfile[0].duration() > legProfile[1].duration() ? legProfile[0].duration() : legProfile[1].duration();
-  legRate = legProfile[0].rateMax() + legProfile[1].rateMax();
+  legRate1 = legProfile[0].rateMax();
+  legRate2 = legProfile[1].rateMax();
+  legRate = legRate1 + legRate2;
   legTime = 0.0F;
   legSamples = 0;
   legBox = false;
@@ -352,7 +438,8 @@ PlanLegResult GotoPlanner::legStep() {
   PlanPoint p = legPosition(legTime);
 
   double altitude;
-  double distance = spare(p, &altitude);
+  float step;
+  double distance = spare(p, &altitude, &step);
   counters.samples++;
   if (distance < legSlack || ++legSamples > PLAN_LEG_SAMPLES_MAX) return legResult = PL_FAIL;
 
@@ -364,11 +451,12 @@ PlanLegResult GotoPlanner::legStep() {
       legBox = true;
       return PL_RUNNING;
     }
-    if (band < distance) distance = band;
+    float bandStep = (float)(band/altitudeRate(p));
+    if (bandStep < step) step = bandStep;
   }
 
   if (legTime >= legDuration) return legResult = PL_PASS;
-  legTime += distance/legRate;
+  legTime += step;
   if (legTime > legDuration) legTime = legDuration;
   return PL_RUNNING;
 }
@@ -383,7 +471,8 @@ PlanLegResult GotoPlanner::boxStep() {
   PlanPoint center = {b.a1Low + width1/2.0, b.a2Low + width2/2.0};
 
   counters.samples++;
-  bool clear = spare(center, NULL) >= halfSize;
+  if (++legSamples > PLAN_LEG_SAMPLES_MAX) return legResult = PL_FAIL;
+  bool clear = spare(center, NULL, NULL) >= halfSize;
   bool divisible = halfSize >= legSlack && boxCount + 2 <= PLAN_BOX_STACK_SIZE;
   if (boxTrial > 0 && (--boxTrial == 0 || !(clear || divisible))) {
     if (clear && boxCount == 0) return legResult = PL_PASS;
@@ -495,28 +584,56 @@ void GotoPlanner::pointClearance(PlanPoint p, double *clearance) {
   for (int k = 0; k < PC_COUNT; k++) clearance[k] = known[k];
 }
 
-// least clearance beyond that required for the leg being tested
-double GotoPlanner::spare(PlanPoint p, double *altitude) {
-  double c[PC_COUNT];
+// least clearance beyond that required for the leg being tested, and the time before any limit could use it up
+double GotoPlanner::spare(PlanPoint p, double *altitude, float *step) {
+  double margin[PC_COUNT];
   bool west = isWest(p);
-  clearanceSide(p, west, c, altitude);
+  clearanceSide(p, west, margin, altitude);
 
   double result = CLEARANCE_UNLIMITED;
-  for (int k = 0; k < PC_COUNT; k++) if (c[k] - legRequired[k] < result) result = c[k] - legRequired[k];
+  for (int k = 0; k < PC_COUNT; k++) {
+    margin[k] -= legRequired[k];
+    if (margin[k] < result) result = margin[k];
+  }
 
   // the other pier side can only lower the result when the pole is near enough
   double toPole = fabs(p.a2 - pole);
-  if (toPole < result + legRequiredMax) {
+  bool poleNear = toPole < result + legRequiredMax;
+  if (poleNear) {
     double other[PC_COUNT];
     clearanceSide(p, !west, other, NULL);
     result = CLEARANCE_UNLIMITED;
     for (int k = 0; k < PC_COUNT; k++) {
-      double o = other[k] > toPole ? other[k] : toPole;
-      double combined = o < c[k] ? o : c[k];
-      if (combined - legRequired[k] < result) result = combined - legRequired[k];
+      double o = (other[k] > toPole ? other[k] : toPole) - legRequired[k];
+      if (o < margin[k]) margin[k] = o;
+      if (margin[k] < result) result = margin[k];
     }
   }
+
+  if (step != NULL) {
+    // altitude changes no faster than the distance moved on the sky, the other limits are on one axis coordinate
+    // except near the pole where the pier side changes
+    float rateAltitude = altitudeRate(p);
+    float rate[PC_COUNT] = { rateAltitude, rateAltitude, legRate1, legRate1, legRate1, legRate1, legRate2, legRate2 };
+    bool sideLimits = false;
+    *step = legDuration;
+    for (int k = 0; k < PC_COUNT; k++) {
+      if (legRequired[k] <= -CLEARANCE_UNLIMITED) continue;
+      if (k >= PC_MERIDIAN_E) {
+        sideLimits = true;
+        if (poleNear) rate[k] = legRate;
+      }
+      if (rate[k] > 0.0F && margin[k]/rate[k] < *step) *step = margin[k]/rate[k];
+    }
+    if (sideLimits && !poleNear && legRate2 > 0.0F && (toPole - legRequiredMax)/legRate2 < *step) *step = (toPole - legRequiredMax)/legRate2;
+  }
+
   return result;
+}
+
+// fastest change in altitude, from the distance moved on the sky by each axis at this axis2 coordinate
+float GotoPlanner::altitudeRate(PlanPoint p) {
+  return legRate2 + fabs(cos(p.a2))*legRate1;
 }
 
 bool GotoPlanner::isValid(PlanPoint p) {

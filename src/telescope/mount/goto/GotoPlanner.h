@@ -16,6 +16,7 @@ class Axis;
 
 enum PlanState: uint8_t     {PLAN_IDLE, PLAN_BUSY, PLAN_DIRECT, PLAN_WAYPOINTS, PLAN_FAILED};
 enum PlanPhase: uint8_t     {PP_DIRECT, PP_SURVEY, PP_PUSH, PP_BISECT};
+enum PlanSurvey: uint8_t    {SS_WALK, SS_PEAK, SS_ENTRY, SS_EXIT};
 enum PlanLegResult: uint8_t {PL_RUNNING, PL_PASS, PL_FAIL};
 enum PlanClearance: uint8_t {PC_ALTITUDE_MIN, PC_ALTITUDE_MAX, PC_MERIDIAN_E, PC_MERIDIAN_W,
                              PC_AXIS1_MIN, PC_AXIS1_MAX, PC_AXIS2_MIN, PC_AXIS2_MAX, PC_COUNT};
@@ -69,8 +70,10 @@ class GotoPlanner {
     void work();
     void finish(PlanState result);
 
-    void surveyBegin();
+    void surveyBegin(float time);
     void surveyStep();
+    void surveyPeakBegin();
+    double surveySample(float time, bool *inZone);
     void pushBegin();
     void pushStep();
     void bisectStep();
@@ -91,7 +94,8 @@ class GotoPlanner {
     void clearanceSide(PlanPoint p, bool west, double *clearance, double *altitude);
     void clearance(PlanPoint p, double *clearance);
     void pointClearance(PlanPoint p, double *clearance);
-    double spare(PlanPoint p, double *altitude);
+    double spare(PlanPoint p, double *altitude, float *step);
+    float altitudeRate(PlanPoint p);
     inline bool isWest(PlanPoint p) { return northern ? p.a2 > Deg90 : p.a2 < -Deg90; }
     bool isValid(PlanPoint p);
 
@@ -125,6 +129,8 @@ class GotoPlanner {
     GotoProfile legProfile[2];
     float legDuration = 0.0F;
     float legRate = 0.0F;
+    float legRate1 = 0.0F;
+    float legRate2 = 0.0F;
     float legTime = 0.0F;
     unsigned long legSamples = 0;
     double legRequired[PC_COUNT];
@@ -136,14 +142,30 @@ class GotoPlanner {
     uint8_t boxCount = 0;
     uint8_t boxTrial = 0;
 
-    // highest point of the blocked slew and where it is within the tolerance of the overhead limit
+    // highest point of the blocked slew and where it is within the tolerance of the overhead limit, times are
+    // seconds from the start of the slew
+    PlanSurvey surveyStage = SS_WALK;
     float surveyTime = 0.0F;
     float surveyInterval = 0.0F;
+    float surveyResolution = 0.0F;
     double highestAltitude = 0.0;
+    float highestTime = 0.0F;
     PlanPoint highest = {0.0, 0.0};
     PlanPoint zoneEntry = {0.0, 0.0};
     PlanPoint zoneExit = {0.0, 0.0};
-    bool zoneFound = false;
+    bool zoneEntered = false;
+    bool zoneLeft = false;
+    float entryLow = 0.0F;
+    float entryHigh = 0.0F;
+    float exitLow = 0.0F;
+    float exitHigh = 0.0F;
+    float goldenLow = 0.0F;
+    float goldenHigh = 0.0F;
+    float goldenC = 0.0F;
+    float goldenD = 0.0F;
+    double goldenAltitudeC = 0.0;
+    double goldenAltitudeD = 0.0;
+    uint8_t goldenNeed = 0;
 
     // waypoints moved away from the blocked slew, direction components are per radian moved
     PlanPoint pushDirection[3];

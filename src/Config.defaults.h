@@ -880,7 +880,7 @@
 #define GOTO_AVOID_STEP               20.0                        // distance in degrees waypoints are moved per step away from a blocked slew
 #endif
 #ifndef GOTO_AVOID_REFINE
-#define GOTO_AVOID_REFINE             1.0                         // distance in degrees to stop moving waypoints back toward a blocked slew
+#define GOTO_AVOID_REFINE             5.0                         // distance in degrees to stop moving waypoints back toward a blocked slew
 #endif
 #ifndef GOTO_AVOID_FLIP_OVERSHOOT
 #define GOTO_AVOID_FLIP_OVERSHOOT     0.25                        // distance in degrees tracking may pass the meridian limit while
