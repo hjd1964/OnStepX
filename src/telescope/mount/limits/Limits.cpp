@@ -372,6 +372,26 @@ void Limits::positionClearance(Coordinate *position, LimitsClearance *clearance)
   axis2Clearance(position->a2, clearance);
 }
 
+#if GOTO_AVOID_OVERHEAD == ON
+// start an automatic meridian flip, one being planned or under way continues until the pier side changes
+// returns false if the flip failed
+static bool autoFlip(PierSide pierSide, PierSideSelect pierSideSelect) {
+  AutoFlipState flip = goTo.autoFlipState(pierSide);
+  if (flip == AFS_ACTIVE) return true;
+  if (flip == AFS_FAILED) return false;
+
+  limits.limitsDisablePeriod(1.0F);
+  VLF("MSG: Mount, start automatic meridian flip");
+  Coordinate target = mount.getMountPosition();
+  CommandError e = goTo.requestAutoFlip(target, pierSideSelect);
+  if (e != CE_NONE) {
+    DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
+    return false;
+  }
+  return true;
+}
+#endif
+
 void Limits::poll() {
   if (limitsDisablePeriodDs > 0) limitsDisablePeriodDs--;
 
@@ -404,6 +424,12 @@ void Limits::poll() {
     if (clearance.meridianWest < 0.0 && limitsDisablePeriodDs == 0) {
       #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (goTo.isAutoFlipEnabled() && mount.isTracking()) {
+          #if GOTO_AVOID_OVERHEAD == ON
+            if (!autoFlip(current.pierSide, PSS_EAST_ONLY)) {
+              stopAxis1(GA_FORWARD);
+              error.meridian.west = true;
+            }
+          #else
           limitsDisablePeriod(1.0F);
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
@@ -413,6 +439,7 @@ void Limits::poll() {
             error.meridian.west = true;
             DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
           }
+          #endif
         } else
       #endif
       {
@@ -447,6 +474,12 @@ void Limits::poll() {
     if (flt(clearance.axis1Max, 0.0) && limitsDisablePeriodDs == 0) {
       #if GOTO_FEATURE == ON && AXIS1_SECTOR_GEAR == OFF && AXIS2_TANGENT_ARM == OFF
         if (current.pierSide == PIER_SIDE_EAST && goTo.isAutoFlipEnabled() && mount.isTracking()) {
+          #if GOTO_AVOID_OVERHEAD == ON
+            if (!autoFlip(current.pierSide, PSS_WEST_ONLY)) {
+              stopAxis1(GA_FORWARD);
+              error.limit.axis1.max = true;
+            }
+          #else
           limitsDisablePeriod(1.0F);
           VLF("MSG: Mount, start automatic meridian flip");
           Coordinate target = mount.getMountPosition();
@@ -456,6 +489,7 @@ void Limits::poll() {
             error.limit.axis1.max = true;
             DF("WRN: Limits::limitPoll(), goto for automatic meridian flip failed ("); D(e); DL(")");
           }
+          #endif
         } else
       #endif
       {

@@ -132,17 +132,20 @@ void GotoPlanner::finish(PlanState result) {
 
 // single waypoint search, also finds which slews from the start and to the end are clear for the pair search
 void GotoPlanner::gridBegin() {
-  // the axis limits apply to mount coordinates, so cover their instrument coordinates for both pier sides
+  // the axis limits apply to mount coordinates, so cover their instrument coordinates for each pier side used
   double a1Min = axis1.getLimitMin();
   double a1Max = axis1.getLimitMax();
   double a2Min = axis2.getLimitMin();
   double a2Max = axis2.getLimitMax();
-  double westA2Min = northern ? Deg180 - a2Max : (-Deg180) - a2Max;
-  double westA2Max = northern ? Deg180 - a2Min : (-Deg180) - a2Min;
-
-  double westA1Max = a1Max + Deg180;
-  double low[2] = { a1Min, a2Min < westA2Min ? a2Min : westA2Min };
-  double high[2] = { westA1Max, a2Max > westA2Max ? a2Max : westA2Max };
+  double low[2] = { a1Min, a2Min };
+  double high[2] = { a1Max, a2Max };
+  if (transform.meridianFlips) {
+    double westA2Min = northern ? Deg180 - a2Max : (-Deg180) - a2Max;
+    double westA2Max = northern ? Deg180 - a2Min : (-Deg180) - a2Min;
+    high[0] = a1Max + Deg180;
+    if (westA2Min < low[1]) low[1] = westA2Min;
+    if (westA2Max > high[1]) high[1] = westA2Max;
+  }
   int countMax[2] = { PLAN_GRID_AXIS1_MAX, PLAN_GRID_AXIS2_MAX };
   int count[2];
   double spacing[2];
@@ -377,7 +380,8 @@ bool GotoPlanner::refineCandidate(PlanPoint from, PlanPoint *to) {
 
   PlanPoint target = zenith[0];
   double best = CLEARANCE_UNLIMITED;
-  for (int side = 0; side < 2; side++) {
+  int sides = transform.meridianFlips ? 2 : 1;
+  for (int side = 0; side < sides; side++) {
     for (int turn = -1; turn <= 1; turn++) {
       PlanPoint z = zenith[side];
       z.a1 += turn*Deg360;

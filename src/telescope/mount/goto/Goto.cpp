@@ -22,6 +22,17 @@
 inline void gotoWrapper() { goTo.poll(); }
 #endif
 
+#if GOTO_AVOID_OVERHEAD == ON
+inline void gotoPlanWrapper() { gotoPlanner.poll(GOTO_AVOID_SLICE_US); }
+
+// planning attempts for one slew, before the goto is stopped
+#define PLAN_ATTEMPTS_MAX 4
+// planning time allowed while limits are disabled for limit recovery
+#define PLAN_RECOVERY_TIME_MS 800
+// distance from a planned position the tolerance allows for
+#define PLAN_POSITION_ERROR_MAX (degToRad(GOTO_AVOID_TOLERANCE)/10.0)
+#endif
+
 void Goto::init() {
 
   nvKey = nv().kv().computeKey("GOTO_SETTINGS");
@@ -66,6 +77,13 @@ void Goto::init() {
       AXIS1_TARGET_TOLERANCE != 0.0F || AXIS2_TARGET_TOLERANCE != 0.0F || mount.hasAbsoluteEncoders()) encodersPresent = true;
 
   updateAccelerationRates();
+
+  #if GOTO_AVOID_OVERHEAD == ON
+    // runs in time slices while planning, otherwise idle
+    VF("MSG: Mount, create goto planner task (idle, priority 7)... ");
+    planTaskHandle = tasks.add(0, 0, true, 7, gotoPlanWrapper, "MntPlan");
+    if (planTaskHandle) { VLF("success"); } else { VLF("FAILED!"); }
+  #endif
 }
 
 // goto to equatorial target position (Native coordinate system) using the defaut preferredPierSide
@@ -135,12 +153,25 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     }
   }
 
+  #if GOTO_AVOID_OVERHEAD == ON
+    bool flipRequest = autoFlipRequest;
+    autoFlipRequest = false;
+  #endif
+
   // prepare for goto
   Coordinate current = mount.getMountPosition(CR_MOUNT_HOR);
   state = GS_GOTO;
   stage = GG_NEAR_DESTINATION_START;
   start = current;
   destination = target;
+
+  #if GOTO_AVOID_OVERHEAD == ON
+    planAttempts = 0;
+    planDeadlineActive = false;
+    planRecovery = false;
+    autoFlip = false;
+    autoFlipFailed = false;
+  #endif
 
   // add waypoint if needed
   if (transform.isEquatorial() && settings.meridianFlipHomeMode != MFHM_OFF && start.pierSide != destination.pierSide) {
@@ -159,9 +190,28 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
         limits.isPastAxis1Min() || limits.isPastAxis1Max()) {
       VLF("MSG: Goto, limit recovery disabling limits for 1s");
       limits.limitsDisablePeriod(1.0F);
+      #if GOTO_AVOID_OVERHEAD == ON
+        planRecovery = true;
+        planTimeLimit(PLAN_RECOVERY_TIME_MS);
+      #endif
       #if LIMIT_RECOVERY_WITH_TRACKING == ON
         if (home.state != HS_HOMING && park.state != PS_PARKING) mount.tracking(true);
       #endif
+    }
+  #endif
+
+  #if GOTO_AVOID_OVERHEAD == ON
+    // an automatic flip is planned in the background so the limits monitor keeps running
+    bool planned = false;
+    if (!flipRequest && planNeeded()) {
+      e = planRoute();
+      if (e != CE_NONE) {
+        DF("WRN: Mount, goto refused with error "); DL(e);
+        state = GS_NONE;
+        stage = GG_NONE;
+        return e;
+      }
+      planned = true;
     }
   #endif
 
@@ -172,7 +222,11 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     VLF("MSG: Mount, create goto monitor task (idle, priority 3)... success");
     VLF("MSG: Mount, attempting goto");
 
-    e = startAutoSlew();
+    #if GOTO_AVOID_OVERHEAD == ON
+      e = planned ? CE_NONE : startSlew();
+    #else
+      e = startSlew();
+    #endif
     if (e != CE_NONE) {
       VF("MSG: Mount, goto failed with error "); VL(e);
       return e;
@@ -187,6 +241,39 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
   return CE_NONE;
 }
+
+#if GOTO_AVOID_OVERHEAD == ON
+// goto equatorial position (Mount coordinate system) for an automatic meridian flip
+CommandError Goto::requestAutoFlip(Coordinate coords, PierSideSelect pierSideSelect) {
+  autoFlipRequest = true;
+  CommandError e = request(coords, pierSideSelect, false);
+  if (e != CE_NONE) return e;
+
+  // without planning the flip goes ahead as it always has
+  if (stage == GG_READY_ABORT) return CE_SLEW_ERR_OUTSIDE_LIMITS;
+  if (stage != GG_PLAN) return CE_NONE;
+
+  autoFlip = true;
+  autoFlipPierSide = coords.pierSide;
+
+  // tracking continues past the meridian limit while planning, so planning time is limited
+  float rate = fabs(mount.trackingRateAxis1);
+  if (rate < 1.0F) rate = 1.0F;
+  unsigned long timeLimit = lround(1000.0*degToRad(GOTO_AVOID_FLIP_OVERSHOOT)/siderealToRad(rate));
+  VF("MSG: Mount, automatic meridian flip planning time limit "); V(timeLimit); VLF("ms");
+  planTimeLimit(timeLimit);
+
+  return CE_NONE;
+}
+
+// state of the automatic meridian flip from this pier side, a failed flip is reported once
+AutoFlipState Goto::autoFlipState(PierSide pierSide) {
+  if (autoFlipFailed) { autoFlipFailed = false; return AFS_FAILED; }
+  if (autoFlip && state == GS_GOTO && pierSide == autoFlipPierSide) return AFS_ACTIVE;
+  return AFS_NONE;
+}
+#endif
+
 #else
 
 // sync replaces goto to equatorial position (Native or Mount coordinate system) when GOTO_FEATURE is OFF
@@ -512,11 +599,29 @@ void Goto::poll() {
   }
 
   if (!mount.isSlewing()) {
+    #if GOTO_AVOID_OVERHEAD == ON
+    if (stage == GG_PLAN) planPoll(); else
+
+    if (stage == GG_WAYPOINT_PLANNED) {
+      VLF("MSG: Mount, goto planned waypoint reached");
+      PlanPoint waypoint = gotoPlanner.getWaypoint(planWaypoint);
+      double error = fabs(axis1.getInstrumentCoordinate() - waypoint.a1) + fabs(axis2.getInstrumentCoordinate() - waypoint.a2);
+      if (++planWaypoint < gotoPlanner.getWaypointCount() && error <= PLAN_POSITION_ERROR_MAX) {
+        slowdownReset = true;
+        startWaypointSlew(gotoPlanner.getWaypoint(planWaypoint));
+      } else {
+        // the destination may have moved with tracking, or the waypoint was missed, so plan again from here
+        stage = planStage;
+        startSlew();
+      }
+    } else
+    #endif
+
     if (stage == GG_WAYPOINT_AVOID) {
       VLF("MSG: Mount, goto waypoint reached");
       stage = GG_WAYPOINT_HOME;
       destination = home.getPosition(CR_MOUNT);
-      startAutoSlew();
+      startSlew();
     } else
 
     if (stage == GG_WAYPOINT_HOME) {
@@ -527,7 +632,7 @@ void Goto::poll() {
       VLF("MSG: Mount, goto home reached");
       stage = GG_NEAR_DESTINATION_START;
       destination = target;
-      startAutoSlew();
+      startSlew();
     } else
 
     if (stage == GG_NEAR_DESTINATION_START) {
@@ -556,7 +661,7 @@ void Goto::poll() {
           slewDestinationDistHA = 0.0;
           slewDestinationDistDec = 0.0;
         }
-        startAutoSlew();
+        startSlew();
       } else {
         stage = GG_DESTINATION;
         VLF("MSG: Mount, goto near destination skipped");
@@ -576,6 +681,12 @@ void Goto::poll() {
       tasks.setDurationComplete(taskHandle);
       taskHandle = 0;
       VLF("MSG: Mount, goto monitor task terminated");
+
+      #if GOTO_AVOID_OVERHEAD == ON
+        gotoPlanner.abort();
+        tasks.setPeriod(planTaskHandle, 0);
+        autoFlip = false;
+      #endif
 
       // check if parking and mark as finished or unparked as needed
       if (park.state == PS_PARKING) {
@@ -616,6 +727,11 @@ void Goto::poll() {
       float slowdownFactor2 = 1.0F;
       static float slowdownFactor1a = 1.0F;
       static float slowdownFactor2a = 1.0F;
+      #if GOTO_AVOID_OVERHEAD == ON
+        // planned slews start at the full rate away from the horizon
+        if (slowdownReset && slowdownFactor >= 1.0F) { slowdownFactor1a = 1.0F; slowdownFactor2a = 1.0F; }
+        slowdownReset = false;
+      #endif
       if (a2 < last_a2) slowdownFactor2 = slowdownFactor; else slowdownFactor1 = slowdownFactor;
 
       if (slowdownFactor1a < slowdownFactor1) { slowdownFactor1a += sfr; }
@@ -701,6 +817,167 @@ CommandError Goto::startAutoSlew() {
 
   return e;
 }
+
+#if GOTO_AVOID_OVERHEAD == ON
+// true when slews are planned to keep clear of the overhead limit
+bool Goto::planNeeded() {
+  return limits.isEnabled() && limits.hasSoftwareLimits() && fabs(limits.settings.altitude.max - Deg90) > OneArcSec;
+}
+
+// plan each slew of the goto ahead, so a goto without a clear path is refused
+CommandError Goto::planRoute() {
+  // slews after the first are planned again when they start, in the background
+  if (planTaskHandle == 0) return CE_SLEW_ERR_UNSPECIFIED;
+
+  PlanPoint point[5];
+  uint8_t count = 0;
+  point[count].a1 = axis1.getInstrumentCoordinate();
+  point[count++].a2 = axis2.getInstrumentCoordinate();
+  if (stage == GG_WAYPOINT_AVOID) point[count++] = instrumentTarget(destination, false);
+  if (stage == GG_WAYPOINT_AVOID || stage == GG_WAYPOINT_HOME) point[count++] = instrumentTarget(home.getPosition(CR_MOUNT), false);
+  point[count++] = instrumentTarget(target, mount.isTracking());
+  if (nearDestinationRefineStages >= 1) point[count++] = instrumentTarget(target, alignActive() && GOTO_OFFSET_ALIGN == ON);
+
+  // the last slew is planned first, so the plan kept is for the first slew
+  for (int i = count - 2; i >= 0; i--) {
+    gotoPlanner.begin(point[i], point[i + 1]);
+    while (gotoPlanner.poll(GOTO_AVOID_SLICE_US) == PLAN_BUSY) {
+      if (stage == GG_READY_ABORT) gotoPlanner.abort(); else
+      if (planDeadlineActive && (long)(millis() - planDeadline) > 0) {
+        DLF("WRN: Mount, goto plan time limit exceeded");
+        gotoPlanner.abort();
+      }
+    }
+    if (stage == GG_READY_ABORT || gotoPlanner.getState() == PLAN_IDLE) { gotoPlanner.abort(); return CE_SLEW_ERR_UNSPECIFIED; }
+    if (gotoPlanner.getState() == PLAN_FAILED) {
+      DLF("WRN: Mount, goto has no path clear of the overhead limit");
+      return CE_SLEW_ERR_ABOVE_OVERHEAD;
+    }
+  }
+
+  planStart = point[0];
+  planStage = stage;
+  planAttempts = 1;
+  stage = GG_PLAN;
+  return CE_NONE;
+}
+
+// start the next slew once a path clear of the overhead limit is planned
+CommandError Goto::startSlew() {
+  if (!planNeeded()) return startAutoSlew();
+
+  if (planTaskHandle == 0 || ++planAttempts > PLAN_ATTEMPTS_MAX) { planFailed(); return CE_NONE; }
+
+  planStage = stage;
+  planStart.a1 = axis1.getInstrumentCoordinate();
+  planStart.a2 = axis2.getInstrumentCoordinate();
+  gotoPlanner.begin(planStart, slewTarget());
+  stage = GG_PLAN;
+  tasks.setPeriod(planTaskHandle, 1);
+  return CE_NONE;
+}
+
+// monitor planning and start the planned slew
+void Goto::planPoll() {
+  PlanState result = gotoPlanner.getState();
+
+  if (result == PLAN_BUSY) {
+    if (planDeadlineActive && (long)(millis() - planDeadline) > 0) {
+      DLF("WRN: Mount, goto plan time limit exceeded");
+      gotoPlanner.abort();
+      planFailed();
+    }
+    return;
+  }
+
+  tasks.setPeriod(planTaskHandle, 0);
+  if (result != PLAN_DIRECT && result != PLAN_WAYPOINTS) { planFailed(); return; }
+
+  stage = planStage;
+
+  // tracking moves the mount while planning
+  double drift = fabs(axis1.getInstrumentCoordinate() - planStart.a1) + fabs(axis2.getInstrumentCoordinate() - planStart.a2);
+  if (drift > PLAN_POSITION_ERROR_MAX) {
+    VLF("MSG: Mount, goto moved while planning, planning again");
+    startSlew();
+    return;
+  }
+
+  // limit recovery has the limits disabled for the start of the slew, as without planning
+  if (planRecovery) {
+    limits.limitsDisablePeriod(1.0F);
+    planRecovery = false;
+  }
+  planDeadlineActive = false;
+
+  slowdownReset = true;
+  if (result == PLAN_DIRECT) {
+    planAttempts = 0;
+    startAutoSlew();
+  } else {
+    planWaypoint = 0;
+    stage = GG_WAYPOINT_PLANNED;
+    startWaypointSlew(gotoPlanner.getWaypoint(0));
+  }
+}
+
+// stop the goto when no clear path is found
+void Goto::planFailed() {
+  DLF("WRN: Mount, goto stopped, no path clear of the overhead limit found");
+  if (autoFlip) autoFlipFailed = true;
+  stage = GG_READY_ABORT;
+}
+
+// planning must finish within this time before the first slew starts
+void Goto::planTimeLimit(unsigned long milliseconds) {
+  unsigned long deadline = millis() + milliseconds;
+  if (!planDeadlineActive || (long)(deadline - planDeadline) < 0) planDeadline = deadline;
+  planDeadlineActive = true;
+}
+
+// instrument coordinates the next slew goes to, startAutoSlew() uses the approach offset for refinement
+// and while tracking poll() moves the target of the first slew to it
+PlanPoint Goto::slewTarget() {
+  bool approach = stage == GG_NEAR_DESTINATION || stage == GG_DESTINATION || (stage >= GG_NEAR_DESTINATION_START && mount.isTracking());
+  return instrumentTarget(destination, approach);
+}
+
+// instrument coordinates of a slew destination (Mount coordinate system), optionally with the approach offset
+PlanPoint Goto::instrumentTarget(Coordinate coords, bool approach) {
+  if (approach) {
+    coords.h -= slewDestinationDistHA;
+    coords.d -= slewDestinationDistDec;
+  }
+
+  PlanPoint p;
+  transform.mountToInstrument(&coords, &p.a1, &p.a2);
+  p.a1 += coords.a1Correction;
+  return p;
+}
+
+// slew to a planned waypoint (instrument coordinates)
+CommandError Goto::startWaypointSlew(PlanPoint waypoint) {
+  CommandError e;
+
+  const unsigned long now = millis();
+  nearTargetTimeoutAxis1 = now;
+  nearTargetTimeoutAxis2 = now;
+
+  axis1.setTargetCoordinate(waypoint.a1);
+  axis2.setTargetCoordinate(waypoint.a2);
+
+  VF("MSG: Mount, goto planned waypoint coordinates set (a1="); V(radToDeg(waypoint.a1)); VF(" deg, a2="); V(radToDeg(waypoint.a2)); VLF(" deg)");
+
+  mountStatus.wake();
+
+  e = axis1.autoGoto(radsPerSecondCurrent);
+  if (e == CE_NONE) e = axis2.autoGoto(radsPerSecondCurrent*((float)(AXIS2_SLEW_RATE_PERCENT)/100.0F));
+
+  nearTargetTimeout = millis();
+
+  return e;
+}
+#endif
 #endif
 
 // update acceleration rates for goto and guiding

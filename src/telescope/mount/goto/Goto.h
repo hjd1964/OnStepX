@@ -9,12 +9,23 @@
 #include "../../../libApp/commands/ProcessCmds.h"
 #include "../coordinates/Transform.h"
 
+#if GOTO_AVOID_OVERHEAD == ON
+  #include "GotoPlanner.h"
+#endif
+
 enum MeridianFlip: uint8_t         {MF_NEVER, MF_ALWAYS};
 enum MeridianFlipHomeMode: uint8_t {MFHM_OFF, MFHM_VISIT, MFHM_PAUSE};
 enum GotoState: uint8_t            {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t            {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
+enum GotoStage: uint8_t            {GG_NONE, GG_ABORT, GG_READY_ABORT,
+                                    #if GOTO_AVOID_OVERHEAD == ON
+                                      GG_PLAN, GG_WAYPOINT_PLANNED,
+                                    #endif
+                                    GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t             {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t       {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_AUTO, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
+#if GOTO_AVOID_OVERHEAD == ON
+enum AutoFlipState: uint8_t        {AFS_NONE, AFS_ACTIVE, AFS_FAILED};
+#endif
 
 typedef struct MeridianFlipHome {
   bool paused;
@@ -49,6 +60,14 @@ class Goto {
 
     // goto equatorial position (Native or Mount coordinate system)
     CommandError request(Coordinate coords, PierSideSelect pierSideSelect, bool native = true);
+
+    #if GOTO_AVOID_OVERHEAD == ON
+    // goto equatorial position (Mount coordinate system) for an automatic meridian flip
+    CommandError requestAutoFlip(Coordinate coords, PierSideSelect pierSideSelect);
+
+    // state of the automatic meridian flip from this pier side, a failed flip is reported once
+    AutoFlipState autoFlipState(PierSide pierSide);
+    #endif
 
     // sync to equatorial target position (Native coordinate system) using the default preferredPierSide
     CommandError requestSync();
@@ -125,6 +144,37 @@ class Goto {
 
     // start slews with approach correction and parking/homing support
     CommandError startAutoSlew();
+
+    #if GOTO_AVOID_OVERHEAD == ON
+    // true when slews are planned to keep clear of the overhead limit
+    bool planNeeded();
+
+    // plan each slew of the goto ahead, so a goto without a clear path is refused
+    CommandError planRoute();
+
+    // start the next slew once a path clear of the overhead limit is planned
+    CommandError startSlew();
+
+    // monitor planning and start the planned slew
+    void planPoll();
+
+    // stop the goto when no clear path is found
+    void planFailed();
+
+    // planning must finish within this time before the first slew starts
+    void planTimeLimit(unsigned long milliseconds);
+
+    // instrument coordinates the next slew goes to
+    PlanPoint slewTarget();
+
+    // instrument coordinates of a slew destination (Mount coordinate system), optionally with the approach offset
+    PlanPoint instrumentTarget(Coordinate coords, bool approach);
+
+    // slew to a planned waypoint (instrument coordinates)
+    CommandError startWaypointSlew(PlanPoint waypoint);
+    #else
+    inline CommandError startSlew() { return startAutoSlew(); }
+    #endif
     #endif
 
     // update acceleration rates for goto and guiding
@@ -156,6 +206,22 @@ class Goto {
     unsigned long nearDestinationTimeout = 0;
 
     MeridianFlipHome meridianFlipHome = {false, false};
+
+    #if GOTO_AVOID_OVERHEAD == ON
+    uint8_t       planTaskHandle      = 0;
+    GotoStage     planStage           = GG_NONE;
+    PlanPoint     planStart           = {0.0, 0.0};
+    uint8_t       planAttempts        = 0;
+    uint8_t       planWaypoint        = 0;
+    unsigned long planDeadline        = 0;
+    bool          planDeadlineActive  = false;
+    bool          planRecovery        = false;
+    bool          slowdownReset       = false;
+    bool          autoFlip            = false;
+    bool          autoFlipRequest     = false;
+    bool          autoFlipFailed      = false;
+    PierSide      autoFlipPierSide    = PIER_SIDE_NONE;
+    #endif
 
     AlignState alignState = {0, 0};
 
