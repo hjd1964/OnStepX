@@ -13,6 +13,7 @@ a sensible motion plan, not to document every goto command.
 - [STARTUP_AUTHORITY_NOTES.md](STARTUP_AUTHORITY_NOTES.md)
 - [HOMING_NOTES.md](HOMING_NOTES.md)
 - [COMMAND_REFERENCE.md](COMMAND_REFERENCE.md)
+- [GOTO_AVOIDANCE_NOTES.md](GOTO_AVOIDANCE_NOTES.md)
 
 ## Quick Summary
 
