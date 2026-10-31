@@ -457,8 +457,8 @@ void Guide::spiralPoll() {
 }
 
 void Guide::poll() {
-  // just return if no guide is active
-  if (state == GU_NONE) return;
+  // just return if no guide is active, a stop of another slew (goto, limits) still has to complete
+  if (state == GU_NONE && guideActionAxis1 == GA_NONE && guideActionAxis2 == GA_NONE) return;
 
   // check fast guide completion axis1
   if (guideActionAxis1 == GA_BREAK && rateAxis1 == 0.0F && !axis1.isSlewing()) {
