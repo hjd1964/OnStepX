@@ -97,6 +97,7 @@ class GotoPlanner {
     Coordinate mountCoordinate(PlanPoint p, bool west);
     void clearanceSide(PlanPoint p, bool west, double *clearance, double *altitude);
     void clearance(PlanPoint p, double *clearance);
+    void pointClearance(PlanPoint p, double *clearance);
     double spare(PlanPoint p, double *altitude);
     bool isValid(PlanPoint p);
 
@@ -115,9 +116,13 @@ class GotoPlanner {
     double tolerance = 0.0;
     double pole = 0.0;
     bool northern = true;
+    bool axis2MinActive = true;
+    bool axis2MaxActive = true;
     bool bandEnabled = false;
     double bandTop = 0.0;
     PlanPoint zenith[2];
+    double startClearance[PC_COUNT];
+    double endClearance[PC_COUNT];
 
     // leg being tested
     bool legActive = false;
@@ -135,6 +140,7 @@ class GotoPlanner {
     bool legBox = false;
     PlanBox box[PLAN_BOX_STACK_SIZE];
     uint8_t boxCount = 0;
+    uint8_t boxTrial = 0;
 
     // waypoint grid, with the cost of the slews from the start to each point and each point to the end
     int gridAxis1Count = 0;
@@ -146,7 +152,7 @@ class GotoPlanner {
     int gridIndex = 0;
     int gridSelected = 0;
     uint8_t gridLeg = 0;
-    bool gridTested[PLAN_GRID_POINTS_MAX];
+    uint8_t gridFlags[PLAN_GRID_POINTS_MAX];
     float costStart[PLAN_GRID_POINTS_MAX];
     float costEnd[PLAN_GRID_POINTS_MAX];
 
@@ -155,6 +161,7 @@ class GotoPlanner {
     int pairJ = 0;
     bool pairMinimumScan = true;
     bool pairMore = false;
+    bool pairEndLeg = false;
     float pairLow = 0.0F;
     float pairHigh = 0.0F;
     float pairBest = 0.0F;

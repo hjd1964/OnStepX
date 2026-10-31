@@ -25,13 +25,18 @@ static_assert(GOTO_AVOID_FLIP_OVERSHOOT >= 0.0 && GOTO_AVOID_FLIP_OVERSHOOT <= 2
 #define PLAN_SLACK           degToRad(0.05)
 #define PLAN_SLACK_MIN       (2.0*OneArcSec)
 // clearance from the horizon slowdown band where predicted timing stops being used
-#define PLAN_BAND_SWITCH     degToRad(0.01)
+#define PLAN_BAND_SWITCH     degToRad(1.0)
 #define PLAN_LEG_SAMPLES_MAX 20000
 #define PLAN_WORK_UNITS      8
 #define PLAN_PAIR_CHUNK      32
 #define PLAN_PAIR_ROUND      1.25F
 #define PLAN_REFINE_MOVES    16
 #define PLAN_COST_NONE       1.0e9F
+// samples spent trying to clear the region holding a whole slew before its timing is used
+#define PLAN_BOX_TRIAL       1
+// grid point flags
+#define PLAN_GRID_TESTED     1
+#define PLAN_GRID_END_TESTED 2
 
 void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
   this->start = start;
@@ -41,6 +46,10 @@ void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
   northern = site.location.latitude >= 0.0;
   pole = northern ? Deg90 : -Deg90;
   tolerance = degToRad(GOTO_AVOID_TOLERANCE);
+
+  // mount axis2 folds back at the poles, so a limit there can't be passed
+  axis2MinActive = axis2.getLimitMin() > -Deg90 + OneArcSec;
+  axis2MaxActive = axis2.getLimitMax() < Deg90 - OneArcSec;
 
   float rate = goTo.getRadsPerSecond();
   model[0] = axisModel(&axis1, rate);
@@ -57,6 +66,9 @@ void GotoPlanner::begin(PlanPoint start, PlanPoint end, bool search) {
   zenith[0].a2 = a2;
   zenith[1].a1 = Deg180;
   zenith[1].a2 = northern ? Deg180 - a2 : (-Deg180) - a2;
+
+  clearance(start, startClearance);
+  clearance(end, endClearance);
 
   waypointCount = 0;
   counters = {0, 0};
@@ -160,7 +172,7 @@ void GotoPlanner::gridStep() {
   if (gridIndex < gridCount) {
     PlanPoint p = gridPoint(gridIndex);
     bool valid = isValid(p);
-    gridTested[gridIndex] = !valid;
+    gridFlags[gridIndex] = valid ? 0 : PLAN_GRID_TESTED;
     costStart[gridIndex] = valid ? legCost(start, p) : PLAN_COST_NONE;
     costEnd[gridIndex] = valid ? legCost(p, end) : PLAN_COST_NONE;
     gridIndex++;
@@ -173,10 +185,10 @@ void GotoPlanner::gridStep() {
       float best = PLAN_COST_NONE;
       gridSelected = -1;
       for (int i = 0; i < gridCount; i++) {
-        if (!gridTested[i] && costStart[i] + costEnd[i] < best) { best = costStart[i] + costEnd[i]; gridSelected = i; }
+        if (!(gridFlags[i] & PLAN_GRID_TESTED) && costStart[i] + costEnd[i] < best) { best = costStart[i] + costEnd[i]; gridSelected = i; }
       }
       if (gridSelected < 0) { pairBegin(); return; }
-      gridTested[gridSelected] = true;
+      gridFlags[gridSelected] |= PLAN_GRID_TESTED;
       legBegin(start, gridPoint(gridSelected));
       gridLeg = 1;
     } break;
@@ -184,8 +196,10 @@ void GotoPlanner::gridStep() {
       switch (legStep()) {
         case PL_RUNNING: return;
         case PL_PASS: break;
-        case PL_FAIL: costStart[gridSelected] = PLAN_COST_NONE; break;
+        // the slew to the end is left untested until the pair search needs it
+        case PL_FAIL: costStart[gridSelected] = PLAN_COST_NONE; gridLeg = 0; return;
       }
+      gridFlags[gridSelected] |= PLAN_GRID_END_TESTED;
       legBegin(gridPoint(gridSelected), end);
       gridLeg = 2;
     break;
@@ -225,6 +239,11 @@ void GotoPlanner::pairStep() {
     PlanLegResult result = legStep();
     if (result == PL_RUNNING) return;
     legActive = false;
+    if (pairEndLeg) {
+      // the same pair is considered again now its slew to the end is known
+      if (result == PL_FAIL) costEnd[pairJ] = PLAN_COST_NONE;
+      return;
+    }
     if (result == PL_PASS) {
       pairBest = pairCandidate;
       pairBestI = pairI;
@@ -249,8 +268,14 @@ void GotoPlanner::pairStep() {
       if (lower >= pairLow) {
         float total = costStart[pairI] + legCost(p, q) + costEnd[pairJ];
         if (total < pairBest) {
-          pairCandidate = total;
-          legBegin(p, q);
+          pairEndLeg = !(gridFlags[pairJ] & PLAN_GRID_END_TESTED);
+          if (pairEndLeg) {
+            gridFlags[pairJ] |= PLAN_GRID_END_TESTED;
+            legBegin(q, end);
+          } else {
+            pairCandidate = total;
+            legBegin(p, q);
+          }
           legActive = true;
           return;
         }
@@ -385,8 +410,8 @@ void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
 
   // a limit already exceeded at the start is left to the existing limit recovery behaviour
   double cFrom[PC_COUNT], cTo[PC_COUNT];
-  clearance(from, cFrom);
-  clearance(to, cTo);
+  pointClearance(from, cFrom);
+  pointClearance(to, cTo);
   double requiredMin = tolerance;
   for (int k = 0; k < PC_COUNT; k++) {
     if (cFrom[k] <= 0.0 || (overheadOnly && k != PC_ALTITUDE_MAX)) { legRequired[k] = -CLEARANCE_UNLIMITED; continue; }
@@ -408,6 +433,11 @@ void GotoPlanner::legBegin(PlanPoint from, PlanPoint to, bool overheadOnly) {
     legRequired[k] -= legSlack;
     if (legRequired[k] > legRequiredMax) legRequiredMax = legRequired[k];
   }
+
+  // a clear region holding the whole slew passes it without the timing, but is only tried briefly
+  boxPush(from, to);
+  legBox = true;
+  boxTrial = PLAN_BOX_TRIAL;
 }
 
 PlanLegResult GotoPlanner::legStep() {
@@ -450,8 +480,16 @@ PlanLegResult GotoPlanner::boxStep() {
   PlanPoint center = {b.a1Low + width1/2.0, b.a2Low + width2/2.0};
 
   counters.samples++;
-  if (spare(center, NULL) >= halfSize) return PL_RUNNING;
-  if (halfSize < legSlack || boxCount + 2 > PLAN_BOX_STACK_SIZE) return legResult = PL_FAIL;
+  bool clear = spare(center, NULL) >= halfSize;
+  bool divisible = halfSize >= legSlack && boxCount + 2 <= PLAN_BOX_STACK_SIZE;
+  if (boxTrial > 0 && (--boxTrial == 0 || !(clear || divisible))) {
+    if (clear && boxCount == 0) return legResult = PL_PASS;
+    boxTrial = 0;
+    legBox = false;
+    return PL_RUNNING;
+  }
+  if (clear) return PL_RUNNING;
+  if (!divisible) return legResult = PL_FAIL;
 
   PlanBox low = b, high = b;
   if (width1 >= width2) { low.a1High = center.a1; high.a1Low = center.a1; } else { low.a2High = center.a2; high.a2Low = center.a2; }
@@ -533,24 +571,34 @@ void GotoPlanner::clearanceSide(PlanPoint p, bool west, double *clearance, doubl
   clearance[PC_MERIDIAN_W] = mountClearance.meridianWest;
   clearance[PC_AXIS1_MIN] = mountClearance.axis1Min;
   clearance[PC_AXIS1_MAX] = mountClearance.axis1Max;
-  clearance[PC_AXIS2_MIN] = mountClearance.axis2Min;
-  clearance[PC_AXIS2_MAX] = mountClearance.axis2Max;
+  clearance[PC_AXIS2_MIN] = axis2MinActive ? mountClearance.axis2Min : CLEARANCE_UNLIMITED;
+  clearance[PC_AXIS2_MAX] = axis2MaxActive ? mountClearance.axis2Max : CLEARANCE_UNLIMITED;
 
   if (altitude != NULL) *altitude = mount.a;
 }
 
 // clearance valid for any position within that distance, the pier side changes at the pole
 // so the other side only applies beyond the distance to the pole
+// clearance beyond the tolerance is only exact for the overhead and horizon limits
 void GotoPlanner::clearance(PlanPoint p, double *clearance) {
   double other[PC_COUNT];
   bool west = northern ? p.a2 > Deg90 : p.a2 < -Deg90;
   double toPole = fabs(p.a2 - pole);
   clearanceSide(p, west, clearance, NULL);
+  if (toPole >= tolerance) return;
   clearanceSide(p, !west, other, NULL);
   for (int k = 0; k < PC_COUNT; k++) {
     double c = other[k] > toPole ? other[k] : toPole;
     if (c < clearance[k]) clearance[k] = c;
   }
+}
+
+void GotoPlanner::pointClearance(PlanPoint p, double *clearance) {
+  double *known = NULL;
+  if (p.a1 == start.a1 && p.a2 == start.a2) known = startClearance; else
+  if (p.a1 == end.a1 && p.a2 == end.a2) known = endClearance;
+  if (known == NULL) { this->clearance(p, clearance); return; }
+  for (int k = 0; k < PC_COUNT; k++) clearance[k] = known[k];
 }
 
 // least clearance beyond that required for the leg being tested
