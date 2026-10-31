@@ -211,6 +211,7 @@
 #define GOTO_OFFSET                  0.25 //   0.25, Offset in deg's for goto target unidirectional approach, 0.0 disables    Adjust
 #define GOTO_OFFSET_ALIGN             OFF //    OFF, ON skips final phase of goto for align stars so user tends to approach   Option
                                           //         from the correct direction when centering.
+#define GOTO_AVOID_OVERHEAD           OFF //    OFF, ON adds waypoints so goto paths stay clear of the overhead limit.        Option
 
 // PIER SIDE BEHAVIOUR --------------------------------------- see https://onstep.groups.io/g/main/wiki/Configuration_Mount#PIERSIDE
 #define MFLIP_HOME_DEFAULT          VISIT //  VISIT, OFF, VISIT, PAUSE Select meridian flip home waypoint behavior.           Option

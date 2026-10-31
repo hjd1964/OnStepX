@@ -870,6 +870,24 @@
 #ifndef GOTO_REFINE_STAGES
 #define GOTO_REFINE_STAGES           1                            // number of times to perform the goto refinement stage
 #endif
+#ifndef GOTO_AVOID_OVERHEAD
+#define GOTO_AVOID_OVERHEAD           OFF                         // ON adds waypoints so goto paths stay clear of the overhead limit
+#endif
+#ifndef GOTO_AVOID_TOLERANCE
+#define GOTO_AVOID_TOLERANCE          2.5                         // distance in degrees goto paths are kept clear of limits
+#endif
+#ifndef GOTO_AVOID_GRID
+#define GOTO_AVOID_GRID               20.0                        // spacing in degrees of the waypoint search grid
+#endif
+#ifndef GOTO_AVOID_REFINE
+#define GOTO_AVOID_REFINE             1.0                         // distance in degrees to stop refining waypoints toward the limit
+#endif
+#ifndef GOTO_AVOID_FLIP_OVERSHOOT
+#define GOTO_AVOID_FLIP_OVERSHOOT     0.25                        // distance in degrees tracking may pass the meridian limit while
+#endif                                                            // planning an automatic meridian flip
+#ifndef GOTO_AVOID_SLICE_US
+#define GOTO_AVOID_SLICE_US           2000                        // planning time in microseconds per task call
+#endif
 
 // meridian flip, pier side
 #ifndef MFLIP_HOME_DEFAULT

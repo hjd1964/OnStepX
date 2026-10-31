@@ -317,6 +317,12 @@ public:
   // \param frequency: rate of motion in "measures" (radians, microns, etc.) per second
   void setFrequencyMax(float frequency);
 
+  // gets overall minimum frequency in "measures" (radians, microns, etc.) per second, 0 if unlimited
+  inline float getFrequencyMin() { return minFreq; }
+
+  // gets overall maximum frequency in "measures" (radians, microns, etc.) per second, 0 if unlimited
+  inline float getFrequencyMax() { return maxFreq; }
+
   // sets frequency scaling factor for slews
   // \param frequency: scaling factor for this axis ranging from 0.0 (0%) to 1.0 (100%) of normal
   void setFrequencyScale(float frequency)
@@ -328,6 +334,9 @@ public:
   // sets acceleration rate for slews
   // \param mpsps: acceleration rate in "measures" per second per second
   void setSlewAccelerationRate(float mpsps);
+
+  // gets acceleration rate for slews in "measures" per second per second
+  inline float getSlewAccelerationRate() { return slewAccelRateFs*FRACTIONAL_SEC; }
 
   // set acceleration rate for slews
   // \param seconds: time during which acceleration to/from the last specified slew frequency occurs

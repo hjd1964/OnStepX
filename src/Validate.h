@@ -507,6 +507,29 @@
   #error "Configuration (Config.h): Setting FORK_TA/FORK_TAC not available when GOTO_FEATURE is OFF."
 #endif
 
+// GOTO_AVOID_OVERHEAD CHECKS
+#if GOTO_AVOID_OVERHEAD != ON && GOTO_AVOID_OVERHEAD != OFF
+  #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD unknown, use OFF or ON."
+#endif
+
+#if GOTO_AVOID_OVERHEAD == ON
+  #if GOTO_FEATURE == OFF
+    #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD requires GOTO_FEATURE ON."
+  #endif
+  #if defined(__AVR__)
+    #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD is not supported on AVR."
+  #endif
+  #if MOUNT_SUBTYPE != GEM && MOUNT_SUBTYPE != FORK && MOUNT_SUBTYPE != ALTALT
+    #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD requires a GEM, FORK, or ALTALT MOUNT_TYPE."
+  #endif
+  #if AXIS2_TANGENT_ARM == ON || AXIS1_SECTOR_GEAR == ON
+    #error "Configuration (Config.h): Setting GOTO_AVOID_OVERHEAD is not compatible with AXIS2_TANGENT_ARM or AXIS1_SECTOR_GEAR ON."
+  #endif
+  #if GOTO_AVOID_SLICE_US < 200 || GOTO_AVOID_SLICE_US > 20000
+    #error "Configuration (Config.h): Setting GOTO_AVOID_SLICE_US unknown, use a value between 200 and 20000 (microseconds.)"
+  #endif
+#endif
+
 // PIER SIDE BEHAVIOUR
 #ifdef MFLIP_SKIP_HOME
   #if MFLIP_SKIP_HOME != ON && MFLIP_SKIP_HOME != OFF
