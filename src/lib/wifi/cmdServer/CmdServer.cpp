@@ -29,6 +29,9 @@
     if (cmdSvrClient &&
        (!cmdSvrClient.connected() || (long)(clientEndTimeMs - now) < 0)) {
       cmdSvrClient.stop();
+      // ESP8266 stop() can retain unread data, leaving operator bool() true.
+      // Release the client context so this port can accept another connection.
+      cmdSvrClient = WiFiClient();
       cmdBuffer[0] = 0;
       cmdBufferPos = 0;
     }
