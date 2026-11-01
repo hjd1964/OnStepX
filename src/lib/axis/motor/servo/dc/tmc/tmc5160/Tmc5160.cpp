@@ -5,8 +5,8 @@
 
 #ifdef SERVO_TMC5160_DC_PRESENT
 
-#include "../../../../../tasks/OnTask.h"
-#include "../../../../../gpioEx/GpioEx.h"
+#include "../../../../../../tasks/OnTask.h"
+#include "../../../../../../gpioEx/GpioEx.h"
 
 // help with pin names
 #define mosi m0
