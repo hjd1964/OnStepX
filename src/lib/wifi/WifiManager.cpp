@@ -66,10 +66,12 @@ bool WifiManager::init() {
     }
 
     // Keep command links responsive; ESP cores may enable modem sleep by default.
-    #if defined(ESP32)
-      WiFi.setSleep(false);
-    #elif defined(ESP8266)
-      WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    #if !defined(WIFI_MANAGER_ALLOW_SLEEP)
+      #if defined(ESP32)
+          WiFi.setSleep(false);
+      #elif defined(ESP8266)
+        WiFi.setSleepMode(WIFI_NONE_SLEEP);
+      #endif
     #endif
 
     delay(100);
