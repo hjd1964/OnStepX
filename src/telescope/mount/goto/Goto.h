@@ -12,7 +12,7 @@
 enum MeridianFlip: uint8_t         {MF_NEVER, MF_ALWAYS};
 enum MeridianFlipHomeMode: uint8_t {MFHM_OFF, MFHM_VISIT, MFHM_PAUSE};
 enum GotoState: uint8_t            {GS_NONE, GS_GOTO};
-enum GotoStage: uint8_t            {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
+enum GotoStage: uint8_t            {GG_NONE, GG_ABORT, GG_READY_ABORT, GG_WAYPOINT_ROUTE, GG_WAYPOINT_HOME, GG_WAYPOINT_AVOID, GG_NEAR_DESTINATION_START, GG_NEAR_DESTINATION_WAIT, GG_NEAR_DESTINATION, GG_DESTINATION};
 enum GotoType: uint8_t             {GT_NONE, GT_HOME, GT_PARK};
 enum PierSideSelect: uint8_t       {PSS_NONE, PSS_EAST, PSS_WEST, PSS_BEST, PSS_AUTO, PSS_EAST_ONLY, PSS_WEST_ONLY, PSS_SAME_ONLY};
 
@@ -125,6 +125,11 @@ class Goto {
 
     // start slews with approach correction and parking/homing support
     CommandError startAutoSlew();
+
+    #if GOTO_PLANNER == ON
+    // ask the planning engine for a route to the destination, the first waypoint becomes the destination
+    CommandError planSegment();
+    #endif
     #endif
 
     // update acceleration rates for goto and guiding
@@ -164,6 +169,12 @@ class Goto {
 
     double slewDestinationDistHA = 0.0;
     double slewDestinationDistDec = 0.0;
+
+    #if GOTO_FEATURE == ON && GOTO_PLANNER == ON
+    // the stage and destination a planned route ends at
+    GotoStage  routeStage           = GG_NONE;
+    Coordinate routeDestination;
+    #endif
 
     GotoSettings settings = {MFLIP_AUTOMATIC_DEFAULT == ON, meridianFlipHomeModeDefault, (PierSideSelect)PIER_SIDE_PREFERRED_DEFAULT, 1000001.0F};
 
