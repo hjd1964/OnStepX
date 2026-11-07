@@ -870,6 +870,9 @@
 #ifndef GOTO_REFINE_STAGES
 #define GOTO_REFINE_STAGES           1                            // number of times to perform the goto refinement stage
 #endif
+#ifndef GOTO_PLANNER
+#define GOTO_PLANNER                  OFF                         // ON runs gotos through the waypoints of a planning engine
+#endif
 
 // meridian flip, pier side
 #ifndef MFLIP_HOME_DEFAULT
