@@ -315,7 +315,7 @@ void Park::reset() {
 // check input pin to initiate a park operation, if allowed
 void Park::signal() {
   #if PARK_SIGNAL != OFF && PARK_SIGNAL_PIN != OFF
-    if (sense.isOn(parkSignalHandle) && state == PS_UNPARKED && !mount.isSlewing() && !mount.isHome()) {
+    if (sense.isOn(parkSignalHandle) && state == PS_UNPARKED && !mount.isSlewing()) {
       request();
     }
   #endif
