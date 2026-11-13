@@ -140,6 +140,9 @@ bool Telescope::command(char reply[], char command[], char parameter[], bool *su
     if (command[1] == 'R' && parameter[0] == 'E' && parameter[1] == 'S' && parameter[2] == 'E' && parameter[3] == 'T' && parameter[4] == 0) {
 
       #ifdef HAL_RESET
+        #ifdef MOUNT_PRESENT
+          mount.enable(false);
+        #endif
         VLF("MSG: Mount, flushing NV/EEPROM before reset...");
         bool flushOk = !nv().active().hasCommit() || nv().active().commit() == NvDevice::IoStatus::Ok;
         const uint32_t startMs = millis();
