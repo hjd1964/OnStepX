@@ -178,16 +178,9 @@ CommandError CommandProcessor::command(char *reply, char *command, char *paramet
   // silent bool "errors" allow processing commands more than once
   if (commandError == CE_0 || commandError == CE_1) return commandError;
 
-  // (char)6 - Special
-  if (command[0] == (char)6) {
-    if (command[1] == '0') {
-      reply[0] = command[1];
-      strcpy(reply,"CK_FAIL");  // last cmd checksum failed
-    } else {
-      reply[0] = command[1];
-      reply[1] = 0;             // Equatorial or Horizon mode, A or P
-      *suppressFrame = true;
-    }
+  // internal notification from the buffer that the command checksum failed
+  if (command[0] == (char)6 && command[1] == '0') {
+    strcpy(reply,"CK_FAIL");
     *numericReply = false;
     return commandError;
   } else

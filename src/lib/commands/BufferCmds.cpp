@@ -2,19 +2,14 @@
 // Command processing
 
 #include <Arduino.h>
-#include "../Constants.h"
 #include "BufferCmds.h"
 
-void Buffer::init(int mountType) {
-  this->mountType = mountType;
-}
-
 bool Buffer::add(char c) {
-  // (chr)6 is a special status command for the LX200 protocol
+  // 0x06 gets replaced with the "working mode" command :Gw#, so normal command processors can deal with it
   if (c == (char)6 && cbp == 0) {
-    cb[0] = ':'; cb[1] = (char)6;
-    if (mountType == 3) cb[2] = 'A'; else cb[2] = 'P';
-    cb[3] = 0; cbp = 3; c = '#';
+    strcpy(cb, ":Gw");
+    cbp = 3;
+    c = '#';
   }
 
   // ignore spaces/lf/cr
