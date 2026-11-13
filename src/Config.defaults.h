@@ -648,6 +648,24 @@
 #ifndef MOUNT_ENABLE_IN_STANDBY
 #define MOUNT_ENABLE_IN_STANDBY       OFF                         // ON Enables mount motor drivers in standby
 #endif
+#ifndef MOUNT_BRAKE
+#define MOUNT_BRAKE                   OFF                         // ON releases the mount brakes once at startup; faults latch until reboot
+#endif
+#ifndef MOUNT_BRAKE_RELEASE_STATE
+#define MOUNT_BRAKE_RELEASE_STATE     HIGH                        // output level that releases the brake(s)
+#endif
+#ifndef MOUNT_BRAKE_HOLD_STATE
+#define MOUNT_BRAKE_HOLD_STATE        MOUNT_BRAKE_RELEASE_STATE    // output level that supplies the lower holding current
+#endif
+#ifndef MOUNT_BRAKE_STARTUP_DELAY
+#define MOUNT_BRAKE_STARTUP_DELAY     250                         // wait after calibration and motor enable before brake release, in ms
+#endif
+#ifndef MOUNT_BRAKE_RELEASE_DELAY
+#define MOUNT_BRAKE_RELEASE_DELAY     500                         // brake release time before hold handoff or normal operation, in ms
+#endif
+#ifndef MOUNT_BRAKE_HOLD_DELAY
+#define MOUNT_BRAKE_HOLD_DELAY        100                         // overlap after applying hold current before removing high current, in ms
+#endif
 #ifndef MOUNT_AUTO_HOME_DEFAULT
 #define MOUNT_AUTO_HOME_DEFAULT       OFF                         // ON default find home at boot
 #endif

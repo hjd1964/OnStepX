@@ -379,6 +379,39 @@
   #error "Configuration (Config.h): Setting MOUNT_ENABLE_IN_STANDBY unknown, use ON or OFF"
 #endif
 
+#if MOUNT_BRAKE != ON && MOUNT_BRAKE != OFF
+  #error "Configuration (Config.h): Setting MOUNT_BRAKE unknown, use ON or OFF."
+#endif
+#if MOUNT_BRAKE == ON
+  #ifndef MOUNT_PRESENT
+    #error "Configuration (Config.h): MOUNT_BRAKE requires both mount axes."
+  #endif
+  #if MOUNT_ENABLE_IN_STANDBY != ON
+    #error "Configuration (Config.h): MOUNT_BRAKE requires MOUNT_ENABLE_IN_STANDBY ON."
+  #endif
+  #if AXIS1_POWER_DOWN != OFF || AXIS2_POWER_DOWN != OFF
+    #error "Configuration (Config.h): MOUNT_BRAKE requires AXIS1_POWER_DOWN and AXIS2_POWER_DOWN OFF."
+  #endif
+  #if MOUNT_BRAKE_PIN < 0
+    #error "Configuration (Config.h): MOUNT_BRAKE requires MOUNT_BRAKE_PIN."
+  #endif
+  #if MOUNT_BRAKE_HOLD_PIN != OFF && (MOUNT_BRAKE_HOLD_PIN < 0 || MOUNT_BRAKE_PIN == MOUNT_BRAKE_HOLD_PIN)
+    #error "Configuration (Config.h): Optional MOUNT_BRAKE_HOLD_PIN must be a valid pin distinct from MOUNT_BRAKE_PIN."
+  #endif
+  #if MOUNT_BRAKE_PIN >= 0x100 || (MOUNT_BRAKE_HOLD_PIN != OFF && MOUNT_BRAKE_HOLD_PIN >= 0x100)
+    #error "Configuration (Config.h): MOUNT_BRAKE requires native MCU GPIO pins; GPIO_PIN and DAC_PIN are not supported."
+  #endif
+  #if (MOUNT_BRAKE_RELEASE_STATE != HIGH && MOUNT_BRAKE_RELEASE_STATE != LOW) || \
+      (MOUNT_BRAKE_HOLD_STATE != HIGH && MOUNT_BRAKE_HOLD_STATE != LOW)
+    #error "Configuration (Config.h): MOUNT_BRAKE_RELEASE_STATE and MOUNT_BRAKE_HOLD_STATE must be HIGH or LOW."
+  #endif
+  #if MOUNT_BRAKE_STARTUP_DELAY < 0 || MOUNT_BRAKE_STARTUP_DELAY > 10000 || \
+      MOUNT_BRAKE_RELEASE_DELAY < 0 || MOUNT_BRAKE_RELEASE_DELAY > 10000 || \
+      MOUNT_BRAKE_HOLD_DELAY < 0 || MOUNT_BRAKE_HOLD_DELAY > 10000
+    #error "Configuration (Config.h): MOUNT_BRAKE delays must be 0 to 10000 milliseconds."
+  #endif
+#endif
+
 #if ALIGN_MAX_STARS != AUTO && (ALIGN_MAX_STARS < 1 && ALIGN_MAX_STARS > 9)
   #error "Configuration (Config.h): Setting ALIGN_MAX_STARS unknown, use AUTO or a value from 1 to 9."
 #endif

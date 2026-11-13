@@ -69,7 +69,7 @@ class Mount {
     Coordinate getMountPosition(CoordReturn coordReturn = CR_MOUNT_EQU);
 
     // returns true if either of the mount motor drivers report a fault
-    inline bool motorFault() { return axis1.motorFault() || axis2.motorFault(); }
+    bool motorFault();
 
     // true when either motor has an absolute encoder or SWS supplied trusted absolute positions
     bool hasAbsoluteEncoders() const;
@@ -97,7 +97,12 @@ class Mount {
     void enable(bool state);
 
     // returns true if the mount motors are powered on
-    inline bool isEnabled() { return axis1.isEnabled() && axis2.isEnabled(); }
+    inline bool isEnabled() {
+      #if MOUNT_BRAKE == ON
+        if (!brakeReleased || brakeFaultLatched) return false;
+      #endif
+      return axis1.isEnabled() && axis2.isEnabled();
+    }
 
     // true if syncing only from OnStep to the Encoders
     bool syncFromOnStepToEncoders = false;
@@ -125,6 +130,17 @@ class Mount {
     MountSettings settings = {RC_DEFAULT, { 0, 0 }, MOUNT_SUBTYPE};
 
   private:
+    #if MOUNT_BRAKE == ON
+      void initBrake();
+      void beginBrake();
+      void engageBrake();
+      void releaseBrake();
+      void latchBrakeFault();
+      bool brakeMonitoring = false;
+      bool brakeReleased = false;
+      bool brakeFaultLatched = false;
+    #endif
+
     bool swsAbsoluteEncodersPresent = false;
     // calculate tracking and transformed pulse-guide rates in sidereal units
     void calculateTrackingRates();

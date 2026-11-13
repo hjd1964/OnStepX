@@ -94,6 +94,13 @@
 
 // --------------------------------------------------------------------------------------------------------
 // define standard pins as inactive
+#ifndef MOUNT_BRAKE_PIN
+#define MOUNT_BRAKE_PIN               OFF                         // native MCU brake release output; stays active without a hold pin
+#endif
+#ifndef MOUNT_BRAKE_HOLD_PIN
+#define MOUNT_BRAKE_HOLD_PIN          OFF                         // optional native MCU lower-current brake holding output
+#endif
+
 #ifndef AUX0_PIN
 #define AUX0_PIN                    OFF
 #endif
