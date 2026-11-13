@@ -86,7 +86,9 @@ These come from `ProcessCmds.cpp`, not from a subsystem `*.command.cpp`.
 | `:SB8#` | `1` then switches to 2400 baud | Set serial baud rate |
 | `:SB9#` | `1` then switches to 1200 baud | Set serial baud rate |
 | `:GE#` | `CC#` | Get last command error code |
-| `<0x06>` | `A`, `P`, or `CK_FAIL` style response | Special LX200 status query/checksum-fail path handled by the buffer/processor |
+| `<0x06>` | One character, no `#` | Raw LX200 ACK query; the buffer maps it to `:Gw#` for subsystem dispatch |
+
+Invalid checksummed frames receive a checksummed `CK_FAIL` reply; this is separate from the raw ACK query.
 
 ## Dispatcher Notes
 
@@ -452,12 +454,15 @@ see [GOTO_NOTES.md](GOTO_NOTES.md#workflow-4-reachability-and-target-unwinding).
 | `:Gm#` | `E#`, `W#`, or `N#` | Meridian pier side |
 | `:GU#` | status string | Human-readable packed status |
 | `:Gu#` | packed bytes | Bit-packed status |
-| `:GW#` | 4-char status | Mount type, tracking, parked/home, align-done |
+| `:GW#` | Three status characters plus `#` | Mount (`G` GEM, `P` fork, `A` altazimuth or Alt-Alt), tracking (`T`/`N`), then parked `P`, home `H`, or aligned `1`/unaligned `0` |
+| `:Gw#` | One character, no `#` | Working mode: `P` for GEM/fork, `A` for altazimuth/Alt-Alt; also used for raw `<0x06>` queries |
 | `:SX97,0#` | `0/1` | Disable buzzer |
 | `:SX97,1#` | `0/1` | Enable buzzer |
 | `:SX97,2#` | `0/1` | Beep |
 | `:SX97,3#` | `0/1` | Alert tone |
 | `:SX97,4#` | `0/1` | Click |
+
+Use `:GU#` or `:Gu#` to distinguish Alt-Alt from altazimuth; both report the active mount geometry separately. Checksummed `:Gw#` requests use the normal checksummed reply framing.
 
 #### `:GU#` Status Characters
 
