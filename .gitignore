@@ -12,3 +12,6 @@ src/plugins/*
 debug.svd
 z.*
 build/*
+/testing
+/tests
+/tools
