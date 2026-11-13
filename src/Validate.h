@@ -490,7 +490,7 @@
   #error "Configuration (Config.h): Setting TRACK_COMPENSATION_MEMORY unknown, use OFF or ON."
 #endif
 
-#if TRACK_BACKLASH_RATE < 2 && TRACK_BACKLASH_RATE > 100
+#if TRACK_BACKLASH_RATE < 2 || TRACK_BACKLASH_RATE > 100
   #error "Configuration (Config.h): Setting TRACK_BACKLASH_RATE unknown, use a value between 2 and 100 (x Sidereal.)"
 #endif
 
