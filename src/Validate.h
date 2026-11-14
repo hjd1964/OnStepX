@@ -540,6 +540,14 @@
   #error "Configuration (Config.h): Setting FORK_TA/FORK_TAC not available when GOTO_FEATURE is OFF."
 #endif
 
+#if GOTO_PLANNER != OFF && GOTO_PLANNER != ON
+  #error "Configuration (Config.h): Setting GOTO_PLANNER unknown, use OFF or ON."
+#endif
+
+#if GOTO_FEATURE == OFF && GOTO_PLANNER == ON
+  #error "Configuration (Config.h): Setting GOTO_PLANNER ON requires GOTO_FEATURE ON."
+#endif
+
 // PIER SIDE BEHAVIOUR
 #ifdef MFLIP_SKIP_HOME
   #if MFLIP_SKIP_HOME != ON && MFLIP_SKIP_HOME != OFF
