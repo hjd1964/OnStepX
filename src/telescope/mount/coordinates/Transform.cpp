@@ -289,6 +289,8 @@ void Transform::horToAa(Coordinate *coord) {
 }
 
 double Transform::trueRefrac(double altitude) {
+  // Hold the correction below -1 degree to avoid the formula's below-horizon singularities.
+  if (altitude < degToRad(-1.0)) altitude = degToRad(-1.0);
   float pressure = 1010.0F;
   float temperature = 10.0F;
   if (!isnan(weather.getPressure())) pressure = weather.getPressure();
