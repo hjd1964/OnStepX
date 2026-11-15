@@ -17,6 +17,7 @@
 #include "../limits/Limits.h"
 #include "../startupAuthority/StartupAuthority.h"
 #include "../status/Status.h"
+#include "GotoPlanner.h"
 
 #if GOTO_FEATURE == ON
 inline void gotoWrapper() { goTo.poll(); }
@@ -147,6 +148,11 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     VLF("MSG: Mount, goto changes pier side, setting waypoint at home");
     waypoint(&current);
   }
+
+  #if GOTO_PLANNER == ON
+    e = planSegment();
+    if (e != CE_NONE) { stage = GG_NONE; state = GS_NONE; return e; }
+  #endif
 
   // allow goto and enable tracking after any of the limits below are exceeded
   // typically these are triggered by tracking into the relevant limit and
@@ -512,10 +518,21 @@ void Goto::poll() {
   }
 
   if (!mount.isSlewing()) {
+    #if GOTO_PLANNER == ON
+      if (stage == GG_WAYPOINT_ROUTE) {
+        VLF("MSG: Mount, goto route waypoint reached");
+        if (!gotoPlanner.nextWaypoint(&destination)) { stage = routeStage; destination = routeDestination; }
+        startAutoSlew();
+      } else
+    #endif
+
     if (stage == GG_WAYPOINT_AVOID) {
       VLF("MSG: Mount, goto waypoint reached");
       stage = GG_WAYPOINT_HOME;
       destination = home.getPosition(CR_MOUNT);
+      #if GOTO_PLANNER == ON
+        if (planSegment() != CE_NONE) { stage = GG_ABORT; goto skip; }
+      #endif
       startAutoSlew();
     } else
 
@@ -527,6 +544,9 @@ void Goto::poll() {
       VLF("MSG: Mount, goto home reached");
       stage = GG_NEAR_DESTINATION_START;
       destination = target;
+      #if GOTO_PLANNER == ON
+        if (planSegment() != CE_NONE) { stage = GG_ABORT; goto skip; }
+      #endif
       startAutoSlew();
     } else
 
@@ -701,6 +721,25 @@ CommandError Goto::startAutoSlew() {
 
   return e;
 }
+
+#if GOTO_PLANNER == ON
+// ask the planning engine for a route to the destination, the first waypoint becomes the destination
+CommandError Goto::planSegment() {
+  Coordinate current = transform.instrumentToMount(axis1.getInstrumentCoordinate(), axis2.getInstrumentCoordinate());
+  CommandError e = gotoPlanner.plan(&current, &destination, stage);
+  if (e != CE_NONE) { VF("MSG: Mount, goto route refused with error "); VL(e); return e; }
+
+  Coordinate waypoint;
+  if (gotoPlanner.nextWaypoint(&waypoint)) {
+    VLF("MSG: Mount, goto route planned");
+    routeStage = stage;
+    routeDestination = destination;
+    stage = GG_WAYPOINT_ROUTE;
+    destination = waypoint;
+  }
+  return CE_NONE;
+}
+#endif
 #endif
 
 // update acceleration rates for goto and guiding
