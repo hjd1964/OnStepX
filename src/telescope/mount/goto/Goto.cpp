@@ -175,6 +175,13 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
     e = startAutoSlew();
     if (e != CE_NONE) {
       VF("MSG: Mount, goto failed with error "); VL(e);
+      // undo the goto: stop an axis that did start and remove the monitor, so no goto is left running
+      axis1.autoSlewAbort();
+      axis2.autoSlewAbort();
+      tasks.remove(taskHandle);
+      taskHandle = 0;
+      stage = GG_NONE;
+      state = GS_NONE;
       return e;
     }
 
@@ -183,7 +190,12 @@ CommandError Goto::request(Coordinate coords, PierSideSelect pierSideSelect, boo
 
     mountStatus.soundAlert();
 
-  } else { DLF("WRN: Mount, start goto monitor task... FAILED!"); }
+  } else {
+    DLF("WRN: Mount, start goto monitor task... FAILED!");
+    stage = GG_NONE;
+    state = GS_NONE;
+    return CE_SLEW_ERR_UNSPECIFIED;
+  }
 
   return CE_NONE;
 }
