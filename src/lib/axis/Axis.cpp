@@ -726,9 +726,9 @@ bool Axis::motionError(Direction direction) {
              (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() > maxMeasure->value + 1.0F/stepsPerMeasureValue) ||
              (!commonMinMaxSense && errors.maxLimitSensed);
     if (result == true && result != lastErrorResult) { VF("MSG:"); V(axisPrefix); VLF("motion error forward limit"); }
-  } else
+  }
 
-  if (direction == DIR_REVERSE || direction == DIR_BOTH) {
+  if (!result && (direction == DIR_REVERSE || direction == DIR_BOTH)) {
     result = getInstrumentCoordinateSteps() < lroundf(0.9F*INT32_MIN) ||
              (limitsCheck && homingStage == HOME_NONE && getInstrumentCoordinate() < minMeasure->value - 1.0F/stepsPerMeasureValue) ||
              (!commonMinMaxSense && errors.minLimitSensed);
