@@ -63,8 +63,8 @@ class Pec {
       long     wormSenseSteps           = 0;      // step position
 
       bool     firstRecording           = false;
-      uint32_t recordStopTimeFs         = 0;
       uint32_t wormRotationStartTimeFs  = 0;      // start time of worm rotation sequence, in fracsecs or milliseconds
+      long     wormRotationElapsedSeconds = 0;    // seconds counted since wormRotationStartTimeFs
       long     wormRotationSeconds      = 0;      // time for a worm rotation, in seconds
       unsigned long accGuideStartTime   = 0;
 
@@ -72,6 +72,7 @@ class Pec {
 
       bool     bufferStart              = false;
       long     bufferIndex              = 0;      // index into the pec buffer
+      long     lastBufferIndex          = 0;      // buffer index at the last once a second update
       int8_t*  buffer;
     #endif
 
