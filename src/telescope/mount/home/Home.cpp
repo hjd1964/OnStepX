@@ -12,6 +12,7 @@
 #include "../Mount.h"
 #include "../goto/Goto.h"
 #include "../guide/Guide.h"
+#include "../park/Park.h"
 #include "../limits/Limits.h"
 #include "../startupAuthority/StartupAuthority.h"
 
@@ -53,7 +54,8 @@ CommandError Home::request() {
       return CE_SLEW_ERR_UNSPECIFIED;
     #endif
 
-    failed = false;
+    if (park.state == PS_PARKED || park.state == PS_PARKING) return CE_SLEW_ERR_IN_PARK;
+    if (state == HS_HOMING) return CE_SLEW_IN_MOTION;
     if (!startupAuthority.trusted() && !hasSense) {
       DLF("WRN: Mount, home rejected because startup authority is not trusted and no home switches are present");
       startupAuthority.logStatus();
@@ -61,11 +63,9 @@ CommandError Home::request() {
     }
     if (!site.dateIsReady || !site.timeIsReady) return CE_SLEW_ERR_IN_STANDBY;
     if (goTo.state != GS_NONE) return CE_SLEW_IN_MOTION;
-    if (guide.state != GU_NONE) {
-      if (guide.state == GU_HOME_GUIDE) guide.stop();
-      return CE_SLEW_IN_MOTION;
-    }
+    if (guide.state != GU_NONE) return CE_SLEW_IN_MOTION;
 
+    failed = false;
     wasTracking = mount.isTracking();
     #if AXIS1_SECTOR_GEAR == ON || AXIS2_TANGENT_ARM == OFF
       mount.tracking(false);
@@ -142,6 +142,8 @@ CommandError Home::requestWithReset() {
     return CE_SLEW_ERR_UNSPECIFIED;
   #endif
 
+  if (park.state == PS_PARKED || park.state == PS_PARKING) return CE_SLEW_ERR_IN_PARK;
+  if (state == HS_HOMING) return CE_SLEW_IN_MOTION;
   if (!startupAuthority.trusted() && !hasSense) {
     DLF("WRN: Mount, reset/home rejected because startup authority is not trusted and no home switches are present");
     startupAuthority.logStatus();
@@ -149,7 +151,7 @@ CommandError Home::requestWithReset() {
   }
   if (hasSense) {
     CommandError result = request();
-    isRequestWithReset = true;
+    if (result == CE_NONE) isRequestWithReset = true;
     return result;
   } else return reset();
 }

@@ -14,6 +14,10 @@ coordinate basis.
 
 An accepted park command means the operation started, not that parking finished.
 
+While parking, goto requests return `4` (mount parked or parking) and leave
+parking running. Use `:Q#` to explicitly abort parking; once the axes stop, the
+mount is marked unparked.
+
 ## Normal parked startup
 
 1. Establish normal operation and save the desired park position.

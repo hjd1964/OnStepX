@@ -59,7 +59,7 @@ These are the codes returned by `:GE#`:
 | 15 | `CE_SLEW_ERR_BELOW_HORIZON` | Target below horizon limit |
 | 16 | `CE_SLEW_ERR_ABOVE_OVERHEAD` | Target above overhead limit |
 | 17 | `CE_SLEW_ERR_IN_STANDBY` | Controller in standby |
-| 18 | `CE_SLEW_ERR_IN_PARK` | Mount parked |
+| 18 | `CE_SLEW_ERR_IN_PARK` | Mount parked or parking |
 | 19 | `CE_SLEW_IN_SLEW` | Goto already active |
 | 20 | `CE_SLEW_ERR_OUTSIDE_LIMITS` | Outside configured limits |
 | 21 | `CE_SLEW_ERR_HARDWARE_FAULT` | Hardware fault |
@@ -309,12 +309,19 @@ Current core constants are:
 | `1` | Below horizon limit |
 | `2` | Above overhead limit |
 | `3` | Controller in standby |
-| `4` | Mount parked |
+| `4` | Mount parked or parking |
 | `5` | Goto already in progress |
 | `6` | Outside limits |
 | `7` | Hardware fault |
 | `8` | Already in motion |
 | `9` | Unspecified error |
+
+While parking, goto requests return `4` without interrupting parking. Use `:Q#`
+to explicitly abort the park slew.
+
+During a goto-based home slew or home-switch search, goto requests are rejected
+without interrupting homing (normally `8`, already in motion; coordinate trust
+checks can reject them earlier). Use `:Q#` to explicitly abort homing.
 
 ### Alignment Model Extended Commands
 
@@ -419,6 +426,14 @@ Current core constants are:
 | `:hC2,R#` | none | Toggle axis2 home-sense reversal |
 | `:hC2,n#` | none | Set axis2 home offset in arcsec |
 | `:hF#` | none | Reset mount at home/cold-start position |
+
+Repeated `:hC#` requests while homing leave the current operation running and
+report `CE_SLEW_IN_MOTION` through the last-error mechanism. They do not act as a
+stop command; use `:Q#` to abort.
+
+Home requests during parking or while parked return `CE_SLEW_ERR_IN_PARK`.
+Park requests during homing return `CE_SLEW_IN_MOTION`. Both leave the active
+operation running.
 
 ### Limits
 

@@ -336,7 +336,7 @@ bool Goto::command(char *reply, char *command, char *parameter, bool *suppressFr
     //              1=below the horizon limit
     //              2=above overhead limit
     //              3=controller in standby
-    //              4=mount is parked
+    //              4=mount is parked or parking
     //              5=goto in progress
     //              6=outside limits
     //              7=hardware fault

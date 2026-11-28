@@ -88,8 +88,9 @@ CommandError Park::set(bool ignoreTrust) {
 CommandError Park::request() {
     if (!settings.saved)         return CE_NO_PARK_POSITION_SET;
     if (state == PS_PARKED)      return CE_NONE;
-    if (state == PS_PARKING)     return CE_PARK_FAILED;
+    if (state == PS_PARKING)     return CE_NONE;
     if (state == PS_PARK_FAILED) return CE_PARK_FAILED;
+    if (home.state == HS_HOMING) return CE_SLEW_IN_MOTION;
     if (!startupAuthority.trusted()) {
       DLF("WRN: Mount, park rejected because startup authority is not trusted");
       startupAuthority.logStatus();

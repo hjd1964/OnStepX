@@ -400,7 +400,10 @@ void Goto::abort() {
 CommandError Goto::validate() {
   if (!axis1.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
   if (!axis2.isEnabled())      return CE_SLEW_ERR_IN_STANDBY;
-  if (park.state == PS_PARKED) return CE_SLEW_ERR_IN_PARK;
+  // Parking starts its own goto with PS_PARKING set and no active goto yet.
+  if (park.state == PS_PARKED || (park.state == PS_PARKING && state != GS_NONE)) return CE_SLEW_ERR_IN_PARK;
+  // Homing also starts its own goto; competing requests must not abort it.
+  if (home.state == HS_HOMING && state != GS_NONE) return CE_SLEW_IN_MOTION;
   if (state != GS_NONE)        return CE_SLEW_IN_SLEW;
   if (guide.state != GU_NONE)  return CE_SLEW_IN_MOTION;
   if (mount.isSlewing())       return CE_SLEW_IN_MOTION;
