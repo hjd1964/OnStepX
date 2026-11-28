@@ -169,7 +169,9 @@
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
         VLF("MSG: Mount, PEC started playing");
         settings.state = PEC_PLAY;
-        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
+        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond) % wormRotationSeconds;
+        // Load the correction immediately, even if playback resumes in the same slot.
+        lastBufferIndex = -1;
         wormRotationStartTimeFs = lastFs;
         wormRotationElapsedSeconds = 0;
         bufferStart = false;
@@ -180,7 +182,7 @@
       if ((long)fmod(wormRotationSteps, stepsPerSiderealSecond) == 0) {
         VLF("MSG: Mount, PEC started recording");
         settings.state = PEC_RECORD;
-        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond);
+        bufferIndex = lroundf(wormRotationSteps/stepsPerSiderealSecond) % wormRotationSeconds;
         firstRecording = !settings.recorded;
         lastBufferIndex = bufferIndex;
         wormRotationStartTimeFs = lastFs;
@@ -284,7 +286,9 @@
       J4 = lroundf(i*0.04F);
       J9 = lroundf(i*0.09F);
       J17 = lroundf(i*0.17F);
-      buffer[(scc - 4) % wormRotationSeconds] = (buffer[(scc - 4) % wormRotationSeconds]) + J1;
+      // Wrap the leftmost tap before taking the remainder; scc starts at 3.
+      int j = (scc - 4 + wormRotationSeconds) % wormRotationSeconds;
+      buffer[j] = buffer[j] + J1;
       buffer[(scc - 3) % wormRotationSeconds] = (buffer[(scc - 3) % wormRotationSeconds]) + J4;
       buffer[(scc - 2) % wormRotationSeconds] = (buffer[(scc - 2) % wormRotationSeconds]) + J9;
       buffer[(scc - 1) % wormRotationSeconds] = (buffer[(scc - 1) % wormRotationSeconds]) + J17;
